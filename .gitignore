@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Agent folders and instructions — must never live in the project repo
+Instruct.md
+.claude/
+.kilo/
+.qwen/
+.continue/
+.cursor/

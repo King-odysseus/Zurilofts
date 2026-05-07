@@ -1,38 +1,7 @@
-import { useState } from 'react';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 function ContactPage() {
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    setIsSubmitting(false);
-    setSubmitted(true);
-    setFormData({ firstName: '', lastName: '', email: '', phone: '', subject: '', message: '' });
-    
-    // Reset success message after 5 seconds
-    setTimeout(() => setSubmitted(false), 5000);
-  };
-
   const contactInfo = [
     {
       label: 'Address',
@@ -64,7 +33,7 @@ function ContactPage() {
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      
+
       {/* Hero Section */}
       <section className="relative pt-24 pb-16">
         <div className="absolute inset-0 z-0">
@@ -87,132 +56,6 @@ function ContactPage() {
       {/* Contact Section */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-6 space-y-20">
-          {/* Contact Form - Full Width with Image */}
-          <div className="neu-card overflow-hidden">
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-              {/* Form Side */}
-              <div className="p-8">
-                <h2 className="text-2xl font-bold text-[#262262] mb-6">Send us a Message</h2>
-
-                {submitted && (
-                  <div className="mb-6 p-4 bg-[#C49A6C]/20 border border-[#C49A6C] text-[#262262] rounded-xl">
-                    Thank you for your message! We will get back to you within 2 hours.
-                  </div>
-                )}
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">First Name *</label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        value={formData.firstName}
-                        onChange={handleChange}
-                        placeholder="John"
-                        className="w-full px-5 py-3 border border-[#D9D9D9] rounded-xl focus:outline-none focus:border-[#C49A6C] transition-colors bg-white text-[#1f2937] placeholder-[#6b7280]"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Last Name *</label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={formData.lastName}
-                        onChange={handleChange}
-                        placeholder="Doe"
-                        className="w-full px-5 py-3 border border-[#D9D9D9] rounded-xl focus:outline-none focus:border-[#C49A6C] transition-colors bg-white text-[#1f2937] placeholder-[#6b7280]"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email *</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="john@example.com"
-                      className="w-full px-5 py-3 border border-[#D9D9D9] rounded-xl focus:outline-none focus:border-[#C49A6C] transition-colors bg-white text-[#1f2937] placeholder-[#6b7280]"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      placeholder="+254 712 345 678"
-                      className="w-full px-5 py-3 border border-[#D9D9D9] rounded-xl focus:outline-none focus:border-[#C49A6C] transition-colors bg-white text-[#1f2937] placeholder-[#6b7280]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Subject</label>
-                    <select
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      className="w-full px-5 py-3 border border-[#D9D9D9] rounded-xl focus:outline-none focus:border-[#C49A6C] transition-colors bg-white text-[#1f2937]"
-                    >
-                      <option value="">Select a subject</option>
-                      <option value="booking">Booking Inquiry</option>
-                      <option value="availability">Check Availability</option>
-                      <option value="pricing">Pricing Information</option>
-                      <option value="support">Customer Support</option>
-                      <option value="other">Other</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Message *</label>
-                    <textarea
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      placeholder="Tell us about your inquiry..."
-                      className="w-full px-5 py-3 border border-[#D9D9D9] rounded-xl focus:outline-none focus:border-[#C49A6C] transition-colors bg-white text-[#1f2937] placeholder-[#6b7280] h-32 resize-none"
-                      required
-                    ></textarea>
-                  </div>
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-[#C49A6C] text-[#262262] font-semibold py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#262262]" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        Sending...
-                      </>
-                    ) : (
-                      'Send Message'
-                    )}
-                  </button>
-                </form>
-              </div>
-
-              {/* Image Side */}
-              <div className="hidden lg:block relative min-h-[400px]">
-                <img
-                  src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80"
-                  alt="Contact Us"
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Combined Info Card - Get in Touch + Business Hours + Fast Response */}
           <div className="neu-card p-8">
             <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-[#D9D9D9]">
