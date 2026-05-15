@@ -7,6 +7,7 @@ import PropertyPage from './components/PropertyPage';
 import ContactPage from './pages/ContactPage';
 import PropertiesPage from './pages/PropertiesPage';
 import BookingPage from './pages/BookingPage';
+import { zuriImages } from './assets/images';
 
 // Home page component
 function HomePage() {
@@ -84,11 +85,11 @@ function HomePage() {
             <div id="property-carousel" className="relative w-full h-full">
               <div className="relative h-full overflow-hidden rounded-2xl neu-card shadow-[4px_4px_8px_#d9d9d9,-4px_-4px_8px_#ffffff]">
                 {[
-                  'https://images.pexels.com/photos/27224283/pexels-photo-27224283.jpeg?auto=compress&cs=tinysrgb&w=800',
-                  'https://images.pexels.com/photos/7219921/pexels-photo-7219921.jpeg?auto=compress&cs=tinysrgb&w=800',
-                  'https://images.pexels.com/photos/29891537/pexels-photo-29891537.jpeg?auto=compress&cs=tinysrgb&w=800',
-                  'https://images.pexels.com/photos/27975402/pexels-photo-27975402.jpeg?auto=compress&cs=tinysrgb&w=800',
-                  'https://images.pexels.com/photos/34048803/pexels-photo-34048803.jpeg?auto=compress&cs=tinysrgb&w=800',
+                  zuriImages[0],
+                  zuriImages[1],
+                  zuriImages[2],
+                  zuriImages[3],
+                  zuriImages[4],
                 ].map((src, i) => (
                   <div key={i} className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${slide === i ? 'opacity-100' : 'opacity-0'}`}>
                     <img src={src} alt={`Slide ${i + 1}`} className="absolute block w-full h-full object-cover" />
@@ -124,58 +125,58 @@ function HomePage() {
           </p>
         </div>
 
-        {/* Masonry Gallery - Kenyan Homes from Pexels (Free License) */}
+        {/* Masonry Gallery - Zuri Loft */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-24 auto-rows-[150px]">
           {/* Tall — col 1 rows 1-2 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/27224283/pexels-photo-27224283.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Nairobi apartment buildings" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[5]} alt="Zuri Loft interior" />
           </div>
           {/* Small — col 2 row 1 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/7219921/pexels-photo-7219921.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Outdoor pool dining" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[6]} alt="Zuri Loft detail" />
           </div>
           {/* Tall — col 3 rows 1-2 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/29891537/pexels-photo-29891537.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Nairobi city skyline" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[7]} alt="Zuri Loft living space" />
           </div>
           {/* Small — col 4 row 1 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/27975402/pexels-photo-27975402.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Diani Beach entrance" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[8]} alt="Zuri Loft room" />
           </div>
 
           {/* Small — col 2 row 2 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/34048803/pexels-photo-34048803.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Nairobi architecture" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[9]} alt="Zuri Loft view" />
           </div>
           {/* Small — col 4 row 2 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/34048800/pexels-photo-34048800.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Sunset Nairobi" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[10]} alt="Zuri Loft design" />
           </div>
 
           {/* Small — col 1 row 3 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/36539147/pexels-photo-36539147.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Luxury homes" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[11]} alt="Zuri Loft space" />
           </div>
           {/* Tall — col 2 rows 3-4 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/18120169/pexels-photo-18120169.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Wooden cabin Molo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[12]} alt="Zuri Loft feature" />
           </div>
           {/* Small — col 3 row 3 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/36068362/pexels-photo-36068362.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Ruiru countryside" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[14]} alt="Zuri Loft area" />
           </div>
           {/* Tall — col 4 rows 3-4 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/10610013/pexels-photo-10610013.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Kenyan landscape" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[15]} alt="Zuri Loft overview" />
           </div>
 
           {/* Small — col 1 row 4 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/10822170/pexels-photo-10822170.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Traditional Kenyan home" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[16]} alt="Zuri Loft style" />
           </div>
           {/* Small — col 3 row 4 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src="https://images.pexels.com/photos/36298878/pexels-photo-36298878.jpeg?auto=compress&cs=tinysrgb&w=800" alt="Kenyan scenic road" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[17]} alt="Zuri Loft ambiance" />
           </div>
         </div>
 

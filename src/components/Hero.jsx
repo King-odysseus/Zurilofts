@@ -1,6 +1,7 @@
 import Navbar from './Navbar';
 import { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { heroImage } from '../assets/images';
 
 function AnimatedNumber({ value, suffix = '', duration = 2000 }) {
   const [displayValue, setDisplayValue] = useState(0);
@@ -75,7 +76,14 @@ function Hero() {
   return (
     <section className="relative min-h-[700px] flex flex-col overflow-hidden">
       {/* Background Image with Blur */}
-      <div className="absolute inset-0 hero-bg"></div>
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          src={heroImage}
+          alt="Zuri Loft"
+          className="w-full h-full object-cover scale-110"
+          style={{ filter: 'blur(1.5px)' }}
+        />
+      </div>
 
       {/* Gradient overlay — deep indigo tint */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#262262]/70 via-[#262262]/40 to-[#262262]/70"></div>

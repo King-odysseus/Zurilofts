@@ -2,11 +2,11 @@ import { useParams, Link } from 'react-router-dom';
 import { useState } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { zuriImages } from '../assets/images';
 
 function PropertyPage() {
   const { id } = useParams();
   const [featuredImage, setFeaturedImage] = useState(0);
-  const [thumbStart, setThumbStart] = useState(0);
 
   // Sample property data - in a real app, this would come from an API
   const property = {
@@ -20,15 +20,7 @@ function PropertyPage() {
     bathrooms: 2,
     area: 950,
     description: `Experience luxury living in the heart of Kilimani, one of Nairobi's most prestigious neighborhoods. This beautifully furnished apartment offers modern amenities, stunning views, and easy access to shopping centers, restaurants, and business districts. Perfect for business travelers and tourists seeking a comfortable short-term stay.`,
-    images: [
-      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
-      'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80',
-      'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80',
-      'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&q=80',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80',
-      'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&q=80',
-    ],
+    images: zuriImages,
     amenities: [
       'High-Speed WiFi',
       'Smart TV',
@@ -104,27 +96,24 @@ function PropertyPage() {
               </svg>
             </button>
           </div>
-          <div className="grid grid-cols-5 gap-3 mt-4">
-            {property.images.slice(thumbStart, thumbStart + 5).map((img, i) => {
-              const actualIndex = thumbStart + i;
-              return (
-                <div
-                  key={actualIndex}
-                  onClick={() => setFeaturedImage(actualIndex)}
-                  className={`cursor-pointer overflow-hidden rounded-xl transition-all duration-200 ${
-                    featuredImage === actualIndex
-                      ? 'ring-2 ring-[#C49A6C] scale-95'
-                      : 'hover:scale-105 opacity-70 hover:opacity-100'
-                  }`}
-                >
-                  <img
-                    className="w-full h-20 object-cover rounded-xl"
-                    src={img}
-                    alt={`${property.title} ${actualIndex + 1}`}
-                  />
-                </div>
-              );
-            })}
+          <div className="flex gap-3 mt-4 overflow-x-auto pb-2">
+            {property.images.map((img, actualIndex) => (
+              <div
+                key={actualIndex}
+                onClick={() => setFeaturedImage(actualIndex)}
+                className={`cursor-pointer flex-shrink-0 overflow-hidden rounded-xl transition-all duration-200 w-24 h-20 ${
+                  featuredImage === actualIndex
+                    ? 'ring-2 ring-[#C49A6C] scale-95'
+                    : 'hover:scale-105 opacity-70 hover:opacity-100'
+                }`}
+              >
+                <img
+                  className="w-full h-full object-cover rounded-xl"
+                  src={img}
+                  alt={`${property.title} ${actualIndex + 1}`}
+                />
+              </div>
+            ))}
           </div>
         </div>
 

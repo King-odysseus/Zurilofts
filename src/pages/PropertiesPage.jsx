@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PropertyCard from '../components/PropertyCard';
+import { zuriImages } from '../assets/images';
 
 function PropertiesPage() {
   const [filter, setFilter] = useState('all');
@@ -14,7 +15,7 @@ function PropertiesPage() {
   const properties = [
     {
       id: '1',
-      image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+      image: zuriImages[0],
       title: 'Zuriloft - Serenity Apartments',
       location: 'Kilimani, Nairobi',
       price: 6300,
@@ -61,7 +62,7 @@ function PropertiesPage() {
       <section className="relative bg-[#262262] pt-24 pb-20">
         <div className="absolute inset-0">
           <img
-            src="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&q=80"
+            src={zuriImages[13]}
             alt=""
             className="w-full h-full object-cover"
           />
@@ -190,7 +191,7 @@ function PropertiesPage() {
               <div className="group neu-card overflow-hidden">
                 <div className="relative aspect-[4/3]">
                   <img
-                    src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80"
+                    src={zuriImages[18]}
                     alt="Coming Soon"
                     className="w-full h-full object-cover"
                   />
@@ -241,7 +242,7 @@ function PropertiesPage() {
               <div className="group neu-card overflow-hidden">
                 <div className="relative aspect-[4/3]">
                   <img
-                    src="https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&q=80"
+                    src={zuriImages[19]}
                     alt="Coming Soon"
                     className="w-full h-full object-cover"
                   />
