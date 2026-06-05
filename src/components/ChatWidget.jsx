@@ -6,7 +6,7 @@ const STORAGE_KEY = 'zuri_chat_session';
 function getOrCreateSessionId() {
   let id = localStorage.getItem(STORAGE_KEY);
   if (!id) {
-    id = 'chat_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    id = 'chat_' + crypto.randomUUID();
     localStorage.setItem(STORAGE_KEY, id);
   }
   return id;

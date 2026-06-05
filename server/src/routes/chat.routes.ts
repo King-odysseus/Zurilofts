@@ -1,10 +1,18 @@
 import { Router } from 'express';
 import { validate } from '../middleware/validate.js';
+import { chatLimiter } from '../middleware/rateLimiter.js';
 import { z } from 'zod';
 import { env } from '../config/env.js';
 import { recordUserMessage, getMessagesAfter } from '../services/chat.service.js';
 
 const router = Router();
+
+// Escape Markdown special characters so user input can't inject
+// formatting, break the session token, or spoof system messages.
+// Escapes the superset of both Markdown and MarkdownV2 special chars.
+function escapeMarkdown(text: string): string {
+  return text.replace(/([[\]()~`>#+\-=|{}.!])/g, '\\$1');
+}
 
 const chatSchema = z.object({
   name: z.string().min(1).max(100),
@@ -14,7 +22,7 @@ const chatSchema = z.object({
 });
 
 // POST /api/chat/send — forward message to Telegram
-router.post('/send', validate(chatSchema), async (req, res, next) => {
+router.post('/send', chatLimiter, validate(chatSchema), async (req, res, next) => {
   try {
     const { name, email, message, sessionId } = req.body;
     const token = env.TELEGRAM_BOT_TOKEN;
@@ -30,15 +38,20 @@ router.post('/send', validate(chatSchema), async (req, res, next) => {
     // Record in the in-memory store so team replies can be routed back
     if (sessionId) recordUserMessage(sessionId, message);
 
+    // Escape all user-supplied fields to prevent Markdown injection
+    const safeName = escapeMarkdown(name);
+    const safeEmail = email ? escapeMarkdown(email) : '';
+    const safeMessage = escapeMarkdown(message);
+
     const text = [
       `💬 *New Website Chat*`,
       ``,
-      `👤 *Name:* ${name}`,
-      email ? `📧 *Email:* ${email}` : '',
+      `👤 *Name:* ${safeName}`,
+      safeEmail ? `📧 *Email:* ${safeEmail}` : '',
       sessionId ? `🔑 *Session:* \`${sessionId.slice(-8)}\`` : '',
       ``,
       `📝 *Message:*`,
-      message,
+      safeMessage,
       ``,
       `↩️ _Reply to this message to respond to the guest._`,
     ]
@@ -72,7 +85,7 @@ router.post('/send', validate(chatSchema), async (req, res, next) => {
 });
 
 // GET /api/chat/messages — poll for team replies to a session
-router.get('/messages', (req, res) => {
+router.get('/messages', chatLimiter, (req, res) => {
   const sessionId = typeof req.query.sessionId === 'string' ? req.query.sessionId : '';
   const after = Number.parseInt(String(req.query.after ?? '0'), 10) || 0;
   if (!sessionId) {
