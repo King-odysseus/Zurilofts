@@ -1,0 +1,99 @@
+// PostgreSQL schema for Railway production
+// Uses native PostgreSQL features: enums, arrays (String[]), uuid()
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String?
+  firstName    String
+  lastName     String
+  phone        String?
+  googleId     String?   @unique
+  role         Role      @default(USER)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  bookings     Booking[]
+}
+
+model Property {
+  id          String    @id @default(uuid())
+  title       String
+  location    String
+  price       Int
+  rating      Float    @default(0)
+  reviews     Int      @default(0)
+  bedrooms    Int
+  bathrooms   Int
+  area        Int
+  description String
+  images      String[]
+  amenities   String[]
+  nearby      String[]
+  type        String
+  available   Boolean  @default(true)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  bookings    Booking[]
+}
+
+model Booking {
+  id              String        @id @default(uuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId      String
+  property        Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  checkIn         DateTime
+  checkOut        DateTime
+  guests          Int
+  checkInTime     String?
+  specialRequests String?
+  paymentMethod   String
+  status          BookingStatus @default(PENDING)
+  subtotal        Int
+  cleaningFee     Int           @default(1500)
+  serviceFee      Int
+  promoCodeId     String?
+  promoCode       PromoCode?    @relation(fields: [promoCodeId], references: [id])
+  discountAmount  Int           @default(0)
+  total           Int
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model PromoCode {
+  id               String    @id @default(uuid())
+  code             String    @unique
+  discountPercent  Int
+  maxDiscount      Int?
+  minBookingAmount Int?
+  validFrom        DateTime
+  validUntil       DateTime
+  maxUses          Int?
+  currentUses      Int      @default(0)
+  active           Boolean  @default(true)
+  createdBy        String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  bookings         Booking[]
+}

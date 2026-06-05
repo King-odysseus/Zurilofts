@@ -13,13 +13,8 @@ html {
 }
 
 body {
-  font-family: 'Circular', Inter, system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-}
-
-.py-24 {
-  padding-top: 15rem;
-  padding-bottom: 8rem;
 }
 
 /* Hero Section Background - Modern Apartment with City View */

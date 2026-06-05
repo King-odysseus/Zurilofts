@@ -1,0 +1,88 @@
+// SQLite schema for local development
+// For PostgreSQL production schema, see schema.postgresql.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String?
+  firstName    String
+  lastName     String
+  phone        String?
+  googleId     String?   @unique
+  role         String    @default("USER")  // "USER" | "ADMIN"
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  bookings     Booking[]
+}
+
+model Property {
+  id          String    @id @default(cuid())
+  title       String
+  location    String
+  price       Int
+  rating      Float    @default(0)
+  reviews     Int      @default(0)
+  bedrooms    Int
+  bathrooms   Int
+  area        Int
+  description String
+  imagesJson  String    @default("[]")     // JSON array of image URLs
+  amenitiesJson String @default("[]")     // JSON array
+  nearbyJson  String    @default("[]")     // JSON array
+  type        String                       // "apartment" | "studio" | "penthouse"
+  available   Boolean  @default(true)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  bookings    Booking[]
+}
+
+model Booking {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  propertyId      String
+  property        Property  @relation(fields: [propertyId], references: [id])
+  checkIn         DateTime
+  checkOut        DateTime
+  guests          Int
+  checkInTime     String?
+  specialRequests String?
+  paymentMethod   String    // "card" | "mpesa" | "bank"
+  status          String    @default("PENDING")  // "PENDING" | "CONFIRMED" | "CANCELLED"
+  subtotal        Int
+  cleaningFee     Int       @default(1500)
+  serviceFee      Int
+  promoCodeId     String?
+  promoCode       PromoCode? @relation(fields: [promoCodeId], references: [id])
+  discountAmount  Int       @default(0)
+  total           Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model PromoCode {
+  id               String    @id @default(cuid())
+  code             String    @unique
+  discountPercent  Int
+  maxDiscount      Int?
+  minBookingAmount Int?
+  validFrom        DateTime
+  validUntil       DateTime
+  maxUses          Int?
+  currentUses      Int       @default(0)
+  active           Boolean   @default(true)
+  createdBy        String
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  bookings         Booking[]
+}

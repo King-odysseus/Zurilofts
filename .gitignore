@@ -23,6 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
+# Server environment
+server/.env
+server/node_modules
+server/dist
+
 # Agent folders and instructions — must never live in the project repo
 Instruct.md
 .claude/

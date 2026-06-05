@@ -8,6 +8,17 @@ import ContactPage from './pages/ContactPage';
 import PropertiesPage from './pages/PropertiesPage';
 import BookingPage from './pages/BookingPage';
 import { zuriImages } from './assets/images';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import OAuthCallback from './pages/OAuthCallback';
+import ProfilePage from './pages/ProfilePage';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+import ChatWidget from './components/ChatWidget';
+import AdminDashboard, { AdminLayout } from './pages/AdminDashboard';
+import AdminProperties from './pages/AdminProperties';
+import AdminBookings from './pages/AdminBookings';
+import AdminPromos from './pages/AdminPromos';
 
 // Home page component
 function HomePage() {
@@ -28,9 +39,9 @@ function HomePage() {
       <Hero />
       
       {/* Properties Section */}
-      <section id="properties" className="py-16 md:py-24 px-6 max-w-7xl mx-auto">
+      <section id="properties" className="py-16 md:py-20 px-4 md:px-6 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-24">
+        <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-[#262262] mb-4">Our Apartments</h2>
           <p className="text-cool-grey max-w-2xl mx-auto text-lg">
             Discover our carefully curated selection of premium furnished apartments
@@ -39,7 +50,7 @@ function HomePage() {
         </div>
 
         {/* Two Column Layout - Property Info & Card */}
-        <div className="flex flex-col lg:flex-row gap-12 mb-24">
+        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 mb-16">
           {/* Left Column - Property Location & Description */}
           <div className="flex-1 lg:pr-8 pt-4">
             <div className="mb-6">
@@ -118,7 +129,7 @@ function HomePage() {
         </div>
 
         {/* Explore Nairobi Section */}
-        <div className="text-center mb-10 mt-48">
+        <div className="text-center mb-10 mt-24">
           <h2 className="text-3xl md:text-4xl font-bold text-[#262262]">Explore Nairobi</h2>
           <p className="text-cool-grey max-w-2xl mx-auto text-lg mt-3">
             Discover the beauty and vibrancy of Kenya's capital city
@@ -126,7 +137,7 @@ function HomePage() {
         </div>
 
         {/* Masonry Gallery - Zuri Loft */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-24 auto-rows-[150px]">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-16 auto-rows-[120px] md:auto-rows-[150px]">
           {/* Tall — col 1 rows 1-2 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[5]} alt="Zuri Loft interior" />
@@ -181,7 +192,7 @@ function HomePage() {
         </div>
 
         {/* Recommended Places to Visit in Nairobi */}
-        <div className="mt-48 mb-16">
+        <div className="mt-24 mb-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#262262]">Recommended Places to Visit</h2>
             <p className="text-cool-grey max-w-2xl mx-auto text-lg mt-3">
@@ -224,7 +235,7 @@ function HomePage() {
             ].map((place, i) => (
               <div key={i} className="neu-card overflow-hidden transition-shadow duration-300">
                 <div className="h-48 overflow-hidden">
-                  <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500 rounded-t-[1.5rem]" src={place.image} alt={place.name} />
+                  <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500 rounded-t-2xl" src={place.image} alt={place.name} />
                 </div>
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-[#262262] mb-2">{place.name}</h3>
@@ -236,7 +247,7 @@ function HomePage() {
         </div>
 
         {/* Recommended Restaurants in Nairobi */}
-        <div className="mt-48 mb-16">
+        <div className="mt-24 mb-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#262262]">Best Places to Eat</h2>
             <p className="text-cool-grey max-w-2xl mx-auto text-lg mt-3">
@@ -279,7 +290,7 @@ function HomePage() {
             ].map((place, i) => (
               <div key={i} className="neu-card overflow-hidden transition-shadow duration-300">
                 <div className="h-48 overflow-hidden">
-                  <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500 rounded-t-[1.5rem]" src={place.image} alt={place.name} />
+                  <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500 rounded-t-2xl" src={place.image} alt={place.name} />
                 </div>
                 <div className="p-5">
                   <h3 className="text-lg font-bold text-[#262262] mb-2">{place.name}</h3>
@@ -299,12 +310,23 @@ function HomePage() {
 function App() {
   return (
     <Router>
+      <ChatWidget />
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/properties" element={<PropertiesPage />} />
         <Route path="/property/:id" element={<PropertyPage />} />
-        <Route path="/booking/:id" element={<BookingPage />} />
+        <Route path="/booking/:id" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
         <Route path="/contact" element={<ContactPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
+        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="properties" element={<AdminProperties />} />
+          <Route path="bookings" element={<AdminBookings />} />
+          <Route path="promos" element={<AdminPromos />} />
+        </Route>
       </Routes>
     </Router>
   );

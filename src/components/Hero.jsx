@@ -74,7 +74,7 @@ AnimatedNumber.defaultProps = {
 
 function Hero() {
   return (
-    <section className="relative min-h-[700px] flex flex-col overflow-hidden">
+    <section className="relative min-h-[600px] md:min-h-[700px] flex flex-col overflow-hidden">
       {/* Background Image with Blur */}
       <div className="absolute inset-0 overflow-hidden">
         <img

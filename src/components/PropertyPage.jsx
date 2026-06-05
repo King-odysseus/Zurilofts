@@ -1,43 +1,72 @@
 import { useParams, Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import { zuriImages } from '../assets/images';
+import apiClient from '../api/client.js';
 
 function PropertyPage() {
   const { id } = useParams();
   const [featuredImage, setFeaturedImage] = useState(0);
+  const [thumbStart, setThumbStart] = useState(0);
+  const [property, setProperty] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample property data - in a real app, this would come from an API
-  const property = {
-    id: id || '1',
-    title: 'Zuriloft - Serenity Apartments',
-    location: 'Kilimani, Nairobi',
-    price: 6300,
-    rating: 5.0,
-    reviews: 12,
-    bedrooms: 2,
-    bathrooms: 2,
-    area: 950,
-    description: `Experience luxury living in the heart of Kilimani, one of Nairobi's most prestigious neighborhoods. This beautifully furnished apartment offers modern amenities, stunning views, and easy access to shopping centers, restaurants, and business districts. Perfect for business travelers and tourists seeking a comfortable short-term stay.`,
-    images: zuriImages,
-    amenities: [
-      'High-Speed WiFi',
-      'Smart TV',
-      'Fully Equipped Kitchen',
-      'Cleaning Service',
-      '24/7 Power Backup',
-      'Secure Parking',
-      'Air Conditioning',
-      'Washing Machine',
-    ],
-    nearby: [
-      '5 minutes from Yaya Centre',
-      '10 minutes from CBD',
-      'Close to major hospitals',
-      'Near international schools',
-    ],
-  };
+  useEffect(() => {
+    async function fetchProperty() {
+      try {
+        setLoading(true);
+        const res = await apiClient.get(`/properties/${id}`);
+        setProperty(res.data.data);
+      } catch (err) {
+        setError(err.response?.data?.error || 'Failed to load property');
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProperty();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-24 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-[#6b7280]">Loading property...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !property) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-24 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-[#262262] mb-2">Property Not Found</h2>
+            <p className="text-[#6b7280] mb-4">{error || 'This property could not be loaded.'}</p>
+            <Link to="/properties" className="inline-block bg-[#C49A6C] text-[#262262] px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+              View All Properties
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const images = property.images || zuriImages;
 
   return (
     <div className="min-h-screen bg-white">
@@ -58,7 +87,7 @@ function PropertyPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-[70px]">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16">
         {/* Property Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-[#262262] mb-2">{property.title}</h1>
@@ -75,12 +104,12 @@ function PropertyPage() {
         <div className="mb-12">
           <div className="relative">
             <img
-              className="w-full h-[500px] object-cover rounded-2xl neu-card"
-              src={property.images[featuredImage]}
+              className="w-full h-64 md:h-[400px] lg:h-[500px] object-cover rounded-2xl neu-card"
+              src={images[featuredImage]}
               alt={property.title}
             />
             <button
-              onClick={() => setFeaturedImage((prev) => (prev - 1 + property.images.length) % property.images.length)}
+              onClick={() => setFeaturedImage((prev) => (prev - 1 + images.length) % images.length)}
               className="absolute top-1/2 -translate-y-1/2 left-3 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-md"
             >
               <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -88,7 +117,7 @@ function PropertyPage() {
               </svg>
             </button>
             <button
-              onClick={() => setFeaturedImage((prev) => (prev + 1) % property.images.length)}
+              onClick={() => setFeaturedImage((prev) => (prev + 1) % images.length)}
               className="absolute top-1/2 -translate-y-1/2 right-3 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-md"
             >
               <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,24 +125,27 @@ function PropertyPage() {
               </svg>
             </button>
           </div>
-          <div className="flex gap-3 mt-4 overflow-x-auto pb-2">
-            {property.images.map((img, actualIndex) => (
-              <div
-                key={actualIndex}
-                onClick={() => setFeaturedImage(actualIndex)}
-                className={`cursor-pointer flex-shrink-0 overflow-hidden rounded-xl transition-all duration-200 w-24 h-20 ${
-                  featuredImage === actualIndex
-                    ? 'ring-2 ring-[#C49A6C] scale-95'
-                    : 'hover:scale-105 opacity-70 hover:opacity-100'
-                }`}
-              >
-                <img
-                  className="w-full h-full object-cover rounded-xl"
-                  src={img}
-                  alt={`${property.title} ${actualIndex + 1}`}
-                />
-              </div>
-            ))}
+          <div className="grid grid-cols-3 md:grid-cols-5 gap-2 md:gap-3 mt-4">
+            {images.slice(thumbStart, thumbStart + 5).map((img, i) => {
+              const actualIndex = thumbStart + i;
+              return (
+                <div
+                  key={actualIndex}
+                  onClick={() => setFeaturedImage(actualIndex)}
+                  className={`cursor-pointer overflow-hidden rounded-xl transition-all duration-200 ${
+                    featuredImage === actualIndex
+                      ? 'ring-2 ring-[#C49A6C] scale-95'
+                      : 'hover:scale-105 opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <img
+                    className="w-full h-20 object-cover rounded-xl"
+                    src={img}
+                    alt={`${property.title} ${actualIndex + 1}`}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -122,7 +154,7 @@ function PropertyPage() {
           {/* Left Column - Details */}
           <div className="lg:col-span-2">
             {/* Quick Stats */}
-            <div className="flex flex-wrap gap-8 mb-8 py-[60px] border-b border-[#D9D9D9]">
+            <div className="flex flex-wrap gap-6 md:gap-8 mb-8 py-10 md:py-14 border-b border-[#D9D9D9]">
               <div className="flex items-center">
                 <svg className="w-6 h-6 text-[#C49A6C] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
@@ -200,7 +232,7 @@ function PropertyPage() {
 
           {/* Right Column - Booking Card */}
           <div className="lg:col-span-1">
-            <div className="neu-card p-6 pt-[50px] sticky top-24">
+            <div className="neu-card p-5 md:p-6 pt-10 md:pt-12 sticky top-24">
               <div className="mb-6">
                 <span className="text-3xl font-bold text-[#262262]">KES {property.price.toLocaleString()}</span>
                 <span className="text-[#6b7280]"> / night</span>
@@ -245,7 +277,7 @@ function PropertyPage() {
         </div>
       </div>
 
-      <div className="mt-[150px]">
+      <div className="mt-24">
         <Footer />
       </div>
     </div>

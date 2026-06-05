@@ -1,15 +1,14 @@
+import logoImg from '../assets/zurilofts-logo.png';
+
 function Footer() {
   return (
     <footer className="bg-[#262262] text-white">
-      <div className="max-w-7xl mx-auto px-6 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
-          <div className="md:col-span-2">
-            <div className="flex items-center space-x-2 mb-4">
-              <div className="w-8 h-8 bg-[#C49A6C] rounded-lg flex items-center justify-center">
-                <span className="text-[#262262] font-bold text-lg">Z</span>
-              </div>
-              <span className="text-2xl font-bold">ZuriLofts</span>
+          <div className="sm:col-span-2">
+            <div className="inline-flex bg-white rounded-xl p-3 mb-4">
+              <img src={logoImg} alt="ZuriLofts" className="h-16 w-auto" />
             </div>
               <p className="text-white/80 mb-6 max-w-sm">
                 Your trusted host in luxurious short-let apartment stays in Nairobi.
@@ -58,13 +57,13 @@ function Footer() {
             <ul className="space-y-3 text-white/80">
               <li>Westlands, Nairobi</li>
               <li>+254 712 345 678</li>
-              <li>info@zurilofts.co.ke</li>
+              <li>info@zuriloft.com</li>
             </ul>
           </div>
         </div>
 
         {/* Copyright */}
-        <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
+        <div className="border-t border-white/10 mt-10 md:mt-12 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center gap-3 md:gap-0">
           <p className="text-white/60 text-sm">
             © {new Date().getFullYear()} ZuriLofts. All rights reserved.
           </p>

@@ -96,7 +96,6 @@ PropertyCard.propTypes = {
     location: PropTypes.string.isRequired,
     price: PropTypes.number.isRequired,
     rating: PropTypes.number.isRequired,
-    reviews: PropTypes.number.isRequired,
     bedrooms: PropTypes.number.isRequired,
     bathrooms: PropTypes.number.isRequired,
     area: PropTypes.number.isRequired,

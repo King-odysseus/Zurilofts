@@ -1,50 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PropertyCard from '../components/PropertyCard';
 import { zuriImages } from '../assets/images';
+import apiClient from '../api/client.js';
 
 function PropertiesPage() {
   const [filter, setFilter] = useState('all');
   const [priceRange, setPriceRange] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [availableOnly, setAvailableOnly] = useState(false);
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
 
-  // Sample properties data
-  const properties = [
-    {
-      id: '1',
-      image: zuriImages[0],
-      title: 'Zuriloft - Serenity Apartments',
-      location: 'Kilimani, Nairobi',
-      price: 6300,
-      rating: 5.0,
-      reviews: 12,
-      bedrooms: 2,
-      bathrooms: 2,
-      area: 950,
-      badge: 'Featured',
-      type: 'apartment',
-      available: true,
-    },
-  ];
+  const fetchProperties = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = {};
+      if (filter !== 'all') params.type = filter;
+      if (priceRange === 'low') { params.minPrice = 0; params.maxPrice = 4999; }
+      else if (priceRange === 'mid') { params.minPrice = 5000; params.maxPrice = 7999; }
+      else if (priceRange === 'high') { params.minPrice = 8000; }
+      if (searchQuery) params.search = searchQuery;
+      if (availableOnly) params.available = true;
 
-  // Filter properties
-  const filteredProperties = properties.filter((property) => {
-    const matchesType = filter === 'all' || property.type === filter;
-    const matchesSearch = property.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         property.location.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    let matchesPrice = true;
-    if (priceRange === 'low') matchesPrice = property.price < 5000;
-    else if (priceRange === 'mid') matchesPrice = property.price >= 5000 && property.price < 8000;
-    else if (priceRange === 'high') matchesPrice = property.price >= 8000;
+      const res = await apiClient.get('/properties', { params });
+      setProperties(res.data.data || []);
+      if (res.data.pagination) {
+        setPagination(res.data.pagination);
+      }
+    } catch (err) {
+      console.error('Failed to fetch properties:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [filter, priceRange, searchQuery, availableOnly]);
 
-    const matchesAvailability = !availableOnly || property.available;
+  useEffect(() => {
+    fetchProperties();
+  }, [fetchProperties]);
 
-    return matchesType && matchesSearch && matchesPrice && matchesAvailability;
-  });
+  // Debounced search — refetch on searchQuery change
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProperties();
+    }, 400);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
 
   const filterButtons = [
     { key: 'all', label: 'All Properties' },
@@ -56,7 +61,7 @@ function PropertiesPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      <div className="space-y-20">
+      <div className="space-y-14 md:space-y-20">
       
       {/* Hero Section */}
       <section className="relative bg-[#262262] pt-24 pb-20">
@@ -68,7 +73,7 @@ function PropertiesPage() {
           />
           <div className="absolute inset-0 bg-[#262262]/80"></div>
         </div>
-        <div className="relative max-w-7xl mx-auto px-6 pt-20 space-y-20">
+        <div className="relative max-w-7xl mx-auto px-4 md:px-6 pt-16 md:pt-20 space-y-14 md:space-y-20">
           <div className="text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Our Properties</h1>
             <p className="text-white/80 max-w-2xl mx-auto text-lg">
@@ -109,7 +114,7 @@ function PropertiesPage() {
 
       {/* Filters Section */}
       <section className="sticky top-0 z-10 bg-white border-b border-[#D9D9D9] shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             {/* Property Type Filters */}
             <div className="flex flex-wrap gap-2 items-center">
@@ -157,12 +162,12 @@ function PropertiesPage() {
       </section>
 
       {/* Properties Grid */}
-      <section className="py-12 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
+      <section className="py-10 md:py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
           {/* Results Count */}
           <div className="mb-6 flex items-center justify-between">
             <p className="text-[#6b7280]">
-              Showing <span className="font-semibold text-[#262262]">{filteredProperties.length}</span> properties
+              Showing <span className="font-semibold text-[#262262]">{pagination.total}</span> properties
             </p>
             {(filter !== 'all' || priceRange !== 'all' || searchQuery || availableOnly) && (
               <button
@@ -180,11 +185,28 @@ function PropertiesPage() {
           </div>
 
           {/* Grid */}
-          {filteredProperties.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-[#6b7280]">Loading properties...</p>
+            </div>
+          ) : properties.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProperties.map((property) => (
+              {properties.map((property) => (
                 <Link key={property.id} to={`/property/${property.id}`} className="block">
-                  <PropertyCard property={property} />
+                  <PropertyCard property={{
+                    id: property.id,
+                    image: property.images?.[0] || 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+                    title: property.title,
+                    location: property.location,
+                    price: property.price,
+                    rating: property.rating,
+                    reviews: property.reviews,
+                    bedrooms: property.bedrooms,
+                    bathrooms: property.bathrooms,
+                    area: property.area,
+                    badge: property.featured ? 'Featured' : undefined,
+                  }} />
                 </Link>
               ))}
               {/* Coming Soon Cards */}
@@ -318,7 +340,7 @@ function PropertiesPage() {
 
       </div>
 
-      <div className="mt-[150px]">
+      <div className="mt-24">
         <Footer />
       </div>
     </div>

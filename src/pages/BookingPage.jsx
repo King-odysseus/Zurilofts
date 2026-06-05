@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import apiClient from '../api/client.js';
 
 function BookingPage() {
   const { id } = useParams();
@@ -9,6 +10,17 @@ function BookingPage() {
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  // Property from API
+  const [property, setProperty] = useState(null);
+  const [loadingProperty, setLoadingProperty] = useState(true);
+
+  // Promo code
+  const [promoCode, setPromoCode] = useState('');
+  const [promoResult, setPromoResult] = useState(null);
+  const [promoError, setPromoError] = useState('');
+  const [validatingPromo, setValidatingPromo] = useState(false);
 
   // Form states
   const [bookingData, setBookingData] = useState({
@@ -24,18 +36,19 @@ function BookingPage() {
     paymentMethod: 'card',
   });
 
-  // Sample property data
-  const property = {
-    id: id || '1',
-    title: 'Premium Furnished Apartment',
-    location: 'Kilimani, Nairobi',
-    price: 6300,
-    image: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
-    rating: 5.0,
-    reviews: 12,
-    bedrooms: 2,
-    bathrooms: 2,
-  };
+  useEffect(() => {
+    async function fetchProperty() {
+      try {
+        const res = await apiClient.get(`/properties/${id}`);
+        setProperty(res.data.data);
+      } catch {
+        // fallback
+      } finally {
+        setLoadingProperty(false);
+      }
+    }
+    fetchProperty();
+  }, [id]);
 
   // Calculate nights and total
   const calculateNights = () => {
@@ -48,25 +61,68 @@ function BookingPage() {
   };
 
   const nights = calculateNights();
-  const subtotal = nights * property.price;
+  const propertyPrice = property?.price || 0;
+  const subtotal = nights * propertyPrice;
   const cleaningFee = 1500;
   const serviceFee = Math.round(subtotal * 0.12);
-  const total = subtotal + cleaningFee + serviceFee;
+  const discountAmount = promoResult?.discountAmount || 0;
+  const total = subtotal + cleaningFee + serviceFee - discountAmount;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookingData({ ...bookingData, [name]: value });
   };
 
+  async function handleApplyPromo() {
+    if (!promoCode.trim()) return;
+    setValidatingPromo(true);
+    setPromoError('');
+    setPromoResult(null);
+
+    try {
+      const res = await apiClient.post('/promo/validate', { code: promoCode.toUpperCase(), subtotal });
+      setPromoResult(res.data.data);
+    } catch (err) {
+      setPromoError(err.response?.data?.error || 'Invalid promo code');
+    } finally {
+      setValidatingPromo(false);
+    }
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsProcessing(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsProcessing(false);
-    setBookingComplete(true);
+    setSubmitError('');
+
+    try {
+      const res = await apiClient.post('/bookings', {
+        propertyId: id,
+        checkIn: bookingData.checkIn,
+        checkOut: bookingData.checkOut,
+        guests: bookingData.guests,
+        checkInTime: bookingData.checkInTime || undefined,
+        specialRequests: bookingData.specialRequests || undefined,
+        paymentMethod: bookingData.paymentMethod,
+        promoCode: promoResult?.code || undefined,
+      });
+
+      // Update booking data with server response for confirmation display
+      if (res.data.data) {
+        const b = res.data.data;
+        setBookingData((prev) => ({
+          ...prev,
+          confirmationId: b.id,
+          totalCharged: b.total,
+          discountAmount: b.discountAmount,
+        }));
+      }
+
+      setIsProcessing(false);
+      setBookingComplete(true);
+    } catch (err) {
+      setSubmitError(err.response?.data?.error || 'Booking failed. Please try again.');
+      setIsProcessing(false);
+    }
   };
 
   // Step 1: Dates & Guests
@@ -135,7 +191,7 @@ function BookingPage() {
             {nights} {nights === 1 ? 'night' : 'nights'} selected
           </p>
           <p className="text-[#6b7280] text-sm">
-            KES {property.price.toLocaleString()} per night
+            KES {propertyPrice.toLocaleString()} per night
           </p>
         </div>
       )}
@@ -326,9 +382,50 @@ function BookingPage() {
         </label>
       </div>
 
+      {/* Promo Code */}
+      <div className="mt-6">
+        <label className="block text-sm font-semibold text-[#1f2937] mb-2">Promo Code</label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={promoCode}
+            onChange={(e) => { setPromoCode(e.target.value); setPromoError(''); }}
+            placeholder="Enter code"
+            className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] uppercase"
+            disabled={!!promoResult}
+          />
+          {promoResult ? (
+            <button
+              type="button"
+              onClick={() => { setPromoCode(''); setPromoResult(null); setPromoError(''); }}
+              className="px-4 py-3 rounded-xl text-sm font-semibold bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+            >
+              Applied ✓
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleApplyPromo}
+              disabled={validatingPromo || !promoCode.trim()}
+              className="px-4 py-3 rounded-xl text-sm font-semibold bg-[#262262] text-white hover:bg-[#1a1850] transition-all duration-200 disabled:opacity-50"
+            >
+              {validatingPromo ? '...' : 'Apply'}
+            </button>
+          )}
+        </div>
+        {promoError && (
+          <p className="text-red-500 text-xs mt-1">{promoError}</p>
+        )}
+        {promoResult && (
+          <p className="text-green-600 text-xs mt-1">
+            {promoResult.discountPercent}% off — KES {promoResult.discountAmount.toLocaleString()} saved!
+          </p>
+        )}
+      </div>
+
       <div className="bg-[#D9D9D9] rounded-xl p-4 space-y-2">
         <div className="flex justify-between text-[#1f2937]">
-          <span>KES {property.price.toLocaleString()} x {nights} nights</span>
+          <span>KES {propertyPrice.toLocaleString()} x {nights} nights</span>
           <span>KES {subtotal.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-[#1f2937]">
@@ -339,6 +436,12 @@ function BookingPage() {
           <span>Service fee</span>
           <span>KES {serviceFee.toLocaleString()}</span>
         </div>
+        {discountAmount > 0 && (
+          <div className="flex justify-between text-green-600">
+            <span>Promo discount</span>
+            <span>-KES {discountAmount.toLocaleString()}</span>
+          </div>
+        )}
         <div className="border-t border-[#262262]/20 pt-2 flex justify-between font-bold text-[#262262]">
           <span>Total</span>
           <span>KES {total.toLocaleString()}</span>
@@ -389,8 +492,8 @@ function BookingPage() {
             </p>
             <div className="bg-[#D9D9D9] rounded-2xl p-6 mb-6 text-left">
               <h3 className="font-bold text-[#262262] mb-2">Booking Summary</h3>
-              <p className="text-[#1f2937]">{property.title}</p>
-              <p className="text-[#6b7280] text-sm">{property.location}</p>
+              <p className="text-[#1f2937]">{property?.title}</p>
+              <p className="text-[#6b7280] text-sm">{property?.location}</p>
               <div className="mt-3 pt-3 border-t border-[#262262]/10">
                 <div className="flex justify-between text-sm">
                   <span className="text-[#6b7280]">Check-in</span>
@@ -435,16 +538,16 @@ function BookingPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       
-      <div className="pt-24 pb-16">
-        <div className="max-w-7xl mx-auto px-6">
+      <div className="pt-20 md:pt-24 pb-12 md:pb-16">
+        <div className="max-w-7xl mx-auto px-4 md:px-6">
           {/* Progress Steps */}
-          <div className="max-w-2xl mx-auto mb-8">
+          <div className="max-w-md md:max-w-2xl mx-auto mb-8 md:mb-10">
             <div className="flex items-start justify-center">
               {[1, 2, 3].map((s, i) => (
                 <div key={s} className="flex items-center">
                   {i > 0 && (
                     <div
-                      className={`w-16 h-1 mx-2 transition-colors ${
+                      className={`w-8 md:w-16 h-1 mx-1 md:mx-2 transition-colors ${
                         step > i ? 'bg-[#C49A6C]' : 'bg-[#D9D9D9]'
                       }`}
                     />
@@ -471,7 +574,7 @@ function BookingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Left Column - Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-8">
+              <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-5 md:p-8">
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 3 && renderStep3()}
@@ -483,18 +586,18 @@ function BookingPage() {
               <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6 sticky top-24">
                 <Link to={`/property/${property.id}`} className="block">
                   <img
-                    src={property.image}
-                    alt={property.title}
+                    src={(property?.images?.[0] || '')}
+                    alt={property?.title}
                     className="w-full h-48 object-cover rounded-xl mb-4"
                   />
                 </Link>
-                <h3 className="font-bold text-[#262262] text-lg">{property.title}</h3>
+                <h3 className="font-bold text-[#262262] text-lg">{property?.title}</h3>
                 <div className="flex items-center text-[#6b7280] text-sm mt-1">
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  {property.location}
+                  {property?.location}
                 </div>
                 
                 <div className="flex items-center mt-2 space-x-4 text-sm">
@@ -517,7 +620,7 @@ function BookingPage() {
                     <h4 className="font-semibold text-[#262262] mb-3">Price Details</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between text-[#1f2937]">
-                        <span>KES {property.price.toLocaleString()} x {nights} nights</span>
+                        <span>KES {propertyPrice.toLocaleString()} x {nights} nights</span>
                         <span>KES {subtotal.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-[#1f2937]">
