@@ -44,7 +44,7 @@ async function main() {
   // Seed properties
   const propertiesData = [
     {
-      title: 'Zuriloft - Serenity Apartments',
+      title: 'ZuriLofts - Serenity Apartments',
       location: 'Kilimani, Nairobi',
       price: 6300, rating: 5.0, reviews: 12, bedrooms: 2, bathrooms: 2, area: 950,
       description: 'Experience luxury living in the heart of Kilimani...',
@@ -54,7 +54,7 @@ async function main() {
       type: 'apartment', available: true, featured: true,
     },
     {
-      title: 'Zuriloft - Skyview Studio',
+      title: 'ZuriLofts - Skyview Studio',
       location: 'Westlands, Nairobi',
       price: 4500, rating: 4.8, reviews: 8, bedrooms: 1, bathrooms: 1, area: 520,
       description: 'A cozy, modern studio in the vibrant Westlands neighborhood.',
@@ -64,7 +64,7 @@ async function main() {
       type: 'studio', available: true, featured: true,
     },
     {
-      title: 'Zuriloft - Garden Penthouse',
+      title: 'ZuriLofts - Garden Penthouse',
       location: 'Lavington, Nairobi',
       price: 12000, rating: 5.0, reviews: 4, bedrooms: 3, bathrooms: 3, area: 1800,
       description: 'A stunning penthouse with panoramic views and a private garden terrace.',
@@ -74,7 +74,7 @@ async function main() {
       type: 'penthouse', available: true, featured: true,
     },
     {
-      title: 'Zuriloft - Riverside Executive',
+      title: 'ZuriLofts - Riverside Executive',
       location: 'Riverside Drive, Nairobi',
       price: 8500, rating: 4.7, reviews: 6, bedrooms: 2, bathrooms: 2, area: 1100,
       description: 'An executive apartment on Riverside Drive with river views.',
@@ -84,7 +84,7 @@ async function main() {
       type: 'apartment', available: true, featured: false,
     },
     {
-      title: 'Zuriloft - Karen Cottage',
+      title: 'ZuriLofts - Karen Cottage',
       location: 'Karen, Nairobi',
       price: 9500, rating: 4.9, reviews: 10, bedrooms: 3, bathrooms: 2, area: 1400,
       description: 'A charming cottage-style apartment in the leafy Karen suburb.',

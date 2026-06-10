@@ -57,7 +57,7 @@ function Footer() {
             <ul className="space-y-3 text-white/80">
               <li>Westlands, Nairobi</li>
               <li>+254 712 345 678</li>
-              <li>info@zuriloft.com</li>
+              <li>enquires@thezurilofts.com</li>
             </ul>
           </div>
         </div>

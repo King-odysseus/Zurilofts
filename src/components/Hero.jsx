@@ -79,7 +79,7 @@ function Hero() {
       <div className="absolute inset-0 overflow-hidden">
         <img
           src={heroImage}
-          alt="Zuri Loft"
+          alt="ZuriLofts"
           className="w-full h-full object-cover scale-110"
           style={{ filter: 'blur(1.5px)' }}
         />

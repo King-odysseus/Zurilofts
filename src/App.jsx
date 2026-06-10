@@ -136,58 +136,58 @@ function HomePage() {
           </p>
         </div>
 
-        {/* Masonry Gallery - Zuri Loft */}
+        {/* Masonry Gallery - ZuriLofts */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-16 auto-rows-[120px] md:auto-rows-[150px]">
           {/* Tall — col 1 rows 1-2 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[5]} alt="Zuri Loft interior" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[5]} alt="ZuriLofts interior" />
           </div>
           {/* Small — col 2 row 1 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[6]} alt="Zuri Loft detail" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[6]} alt="ZuriLofts detail" />
           </div>
           {/* Tall — col 3 rows 1-2 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[7]} alt="Zuri Loft living space" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[7]} alt="ZuriLofts living space" />
           </div>
           {/* Small — col 4 row 1 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[8]} alt="Zuri Loft room" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[8]} alt="ZuriLofts room" />
           </div>
 
           {/* Small — col 2 row 2 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[9]} alt="Zuri Loft view" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[9]} alt="ZuriLofts view" />
           </div>
           {/* Small — col 4 row 2 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[10]} alt="Zuri Loft design" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[10]} alt="ZuriLofts design" />
           </div>
 
           {/* Small — col 1 row 3 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[11]} alt="Zuri Loft space" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[11]} alt="ZuriLofts space" />
           </div>
           {/* Tall — col 2 rows 3-4 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[12]} alt="Zuri Loft feature" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[12]} alt="ZuriLofts feature" />
           </div>
           {/* Small — col 3 row 3 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[14]} alt="Zuri Loft area" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[14]} alt="ZuriLofts area" />
           </div>
           {/* Tall — col 4 rows 3-4 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[15]} alt="Zuri Loft overview" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[15]} alt="ZuriLofts overview" />
           </div>
 
           {/* Small — col 1 row 4 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[16]} alt="Zuri Loft style" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[16]} alt="ZuriLofts style" />
           </div>
           {/* Small — col 3 row 4 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[17]} alt="Zuri Loft ambiance" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={zuriImages[17]} alt="ZuriLofts ambiance" />
           </div>
         </div>
 
