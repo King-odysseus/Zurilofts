@@ -39,9 +39,9 @@ function HomePage() {
       <Hero />
       
       {/* Properties Section */}
-      <section id="properties" className="py-16 md:py-20 px-4 md:px-6 max-w-7xl mx-auto">
+      <section id="properties" className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-16">
+        <div className="text-center mb-16 mt-8 md:mt-12">
           <h2 className="text-3xl md:text-4xl font-bold text-[#262262] mb-4">Our Apartments</h2>
           <p className="text-cool-grey max-w-2xl mx-auto text-lg">
             Discover our carefully curated selection of premium furnished apartments
@@ -128,11 +128,11 @@ function HomePage() {
           </div>
         </div>
 
-        {/* Explore Nairobi Section */}
-        <div className="text-center mb-10 mt-24">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#262262]">Explore Nairobi</h2>
+        {/* Experience Luxury Section */}
+        <div className="text-center mb-10 mt-40 md:mt-52">
+          <h2 className="text-3xl md:text-4xl font-bold text-[#262262]">Experience Luxury and Class</h2>
           <p className="text-cool-grey max-w-2xl mx-auto text-lg mt-3">
-            Discover the beauty and vibrancy of Kenya's capital city
+            At our lofts you get comfort delivered with a touch of luxury
           </p>
         </div>
 
@@ -192,7 +192,7 @@ function HomePage() {
         </div>
 
         {/* Recommended Places to Visit in Nairobi */}
-        <div className="mt-24 mb-16">
+        <div className="mt-40 md:mt-52 mb-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#262262]">Recommended Places to Visit</h2>
             <p className="text-cool-grey max-w-2xl mx-auto text-lg mt-3">
@@ -203,34 +203,34 @@ function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                name: 'Nairobi National Park',
-                desc: 'A unique wildlife reserve just minutes from the city center. Spot lions, giraffes, zebras, and rhinos against a backdrop of Nairobi\'s skyline.',
-                image: 'https://images.pexels.com/photos/247431/pexels-photo-247431.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'The Junction Mall',
+                desc: 'A premier lifestyle and shopping destination right on Ngong Road. Enjoy top retail brands, restaurants, a cinema, and a vibrant food court — all just minutes away.',
+                image: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=800&q=80',
               },
               {
-                name: 'Karen Blixen Museum',
-                desc: 'Step into the former home of the Out of Africa author. Set in the scenic Karen suburb, this museum offers a glimpse into Kenya\'s colonial history.',
-                image: 'https://images.pexels.com/photos/259593/pexels-photo-259593.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'Ngong Forest Sanctuary',
+                desc: 'A serene urban forest reserve off Ngong Road, perfect for morning walks, bird watching, and peaceful nature escapes from the city buzz.',
+                image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80',
               },
               {
-                name: 'Nairobi National Museum',
-                desc: 'Discover Kenya\'s rich cultural and natural heritage through fascinating exhibits on art, archaeology, history, and wildlife.',
-                image: 'https://images.pexels.com/photos/27975402/pexels-photo-27975402.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'Nairobi War Cemetery',
+                desc: 'A beautifully maintained historical site on Ngong Road commemorating soldiers who served in the World Wars. A quiet, reflective landmark worth visiting.',
+                image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&q=80',
               },
               {
-                name: 'Kazuri Beads Factory',
-                desc: 'Visit this fair-trade ceramic workshop in Karen. Watch artisans create beautiful handmade beads and pottery — perfect for unique souvenirs.',
-                image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80',
+                name: 'Prestige Plaza',
+                desc: 'A convenient shopping and dining hub along Ngong Road featuring Java House, local boutiques, and a variety of eateries ideal for a quick outing.',
+                image: '/images/prestige-plaza.jpg',
               },
               {
                 name: 'Giraffe Centre',
-                desc: 'Get up close with endangered Rothschild giraffes at this conservation and education center. A favorite for families and animal lovers.',
+                desc: 'Get up close with endangered Rothschild giraffes at this acclaimed conservation center in Langata — a short drive from Kilimani via Ngong Road.',
                 image: 'https://images.unsplash.com/photo-1534567153574-2b12153a87f0?w=800&q=80',
               },
               {
-                name: 'Karura Forest',
-                desc: 'Escape the city into this expansive urban forest. Walk, cycle, or picnic along scenic trails with waterfalls, caves, and diverse birdlife.',
-                image: 'https://images.pexels.com/photos/1757363/pexels-photo-1757363.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'Nairobi National Park',
+                desc: 'Africa\'s only wildlife park within a capital city. Spot lions, rhinos, giraffes, and zebras against Nairobi\'s skyline — easily accessible via Langata Road off Ngong Road.',
+                image: 'https://images.unsplash.com/photo-1547471613-cf9af5c52d05?w=800&q=80',
               },
             ].map((place, i) => (
               <div key={i} className="neu-card overflow-hidden transition-shadow duration-300">
@@ -247,7 +247,7 @@ function HomePage() {
         </div>
 
         {/* Recommended Restaurants in Nairobi */}
-        <div className="mt-24 mb-16">
+        <div className="mt-40 md:mt-52 mb-16">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#262262]">Best Places to Eat</h2>
             <p className="text-cool-grey max-w-2xl mx-auto text-lg mt-3">
@@ -258,34 +258,34 @@ function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                name: 'Carnivore Restaurant',
-                desc: 'Nairobi\'s most iconic dining experience. Feast on nyama choma (roasted meat) in a lively, safari-themed setting with traditional sides and sauces.',
-                image: 'https://images.pexels.com/photos/941869/pexels-photo-941869.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'Brew Bistro & Lounge',
+                desc: 'A stylish spot at Piedmont Plaza on Ngong Road serving European, French, Asian, and Kenyan fusion cuisine. Great cocktails and a lively rooftop atmosphere.',
+                image: 'https://images.unsplash.com/photo-1551024709-8f23befc548f?w=800&q=80',
               },
               {
-                name: 'Talisman Restaurant',
-                desc: 'Set in a lush garden in Karen, Talisman serves a fusion of African, European, and Asian flavors. Popular for its art gallery and weekend brunch.',
-                image: 'https://images.pexels.com/photos/262047/pexels-photo-262047.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'La Terrazza',
+                desc: 'An intimate Italian restaurant tucked inside the Greenhouse Mall on Ngong Road. Authentic pasta, wine, and stunning 4th-floor views across Nairobi.',
+                image: 'https://images.unsplash.com/photo-1473093226355-51b44c1ddd31?w=800&q=80',
               },
               {
-                name: 'Al-Yusra',
-                desc: 'A beloved Swahili seafood spot in the city center. Known for its grilled fish, biryani, and authentic coastal Kenyan dishes at affordable prices.',
-                image: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'Mama Oliech\'s',
+                desc: 'A Kilimani institution famous for authentic Kenyan fish dishes. Simple, hearty, and deeply satisfying — a must-try for lovers of local coastal cuisine.',
+                image: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=800&q=80',
               },
               {
-                name: 'About Thyme Restaurant',
-                desc: 'A tranquil garden restaurant in Westlands. Perfect for romantic dinners or relaxed lunches with a menu spanning continental and Kenyan cuisine.',
-                image: 'https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'Fogo Gaucho',
+                desc: 'A buzzing Brazilian churrascaria in Kilimani offering an all-you-can-eat roasted meat experience. Perfect for a celebratory dinner or a hearty group meal.',
+                image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&q=80',
               },
               {
-                name: 'Nyama Mama',
-                desc: 'A modern twist on Kenyan comfort food. Try their signature mursik, smoky grilled meats, and creative takes on traditional ugali and sukuma wiki.',
-                image: 'https://images.pexels.com/photos/1566837/pexels-photo-1566837.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'Cedars Restaurant',
+                desc: 'A refined Lebanese restaurant in Kilimani with an extensive mezze menu, grilled meats, and warm Middle Eastern hospitality. A local favourite for fine dining.',
+                image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80',
               },
               {
-                name: 'Java House',
-                desc: 'Nairobi\'s favorite coffeehouse chain. Great for breakfast, casual meetings, or a quick bite. Known for its Kenyan coffee and relaxed atmosphere.',
-                image: 'https://images.pexels.com/photos/262978/pexels-photo-262978.jpeg?auto=compress&cs=tinysrgb&w=800',
+                name: 'Artcaffe Junction',
+                desc: 'A popular all-day café inside The Junction Mall on Ngong Road. Great for breakfast, light lunches, pastries, and quality Kenyan coffee in a relaxed setting.',
+                image: 'https://images.unsplash.com/photo-1509042239860-f519af6f3557?w=800&q=80',
               },
             ].map((place, i) => (
               <div key={i} className="neu-card overflow-hidden transition-shadow duration-300">

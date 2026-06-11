@@ -41,57 +41,32 @@ async function main() {
   });
   console.log('  ✅ User: user@example.com / User@1234');
 
-  // Seed properties
+  // Build local image paths helper
+  function img(n: number) {
+    return `/images/Ely Homes Photography (${n} of 20).jpg`;
+  }
+
+  // Seed properties — only Serenity Residency is currently live
   const propertiesData = [
     {
-      title: 'ZuriLofts - Serenity Apartments',
-      location: 'Kilimani, Nairobi',
-      price: 6300, rating: 5.0, reviews: 12, bedrooms: 2, bathrooms: 2, area: 950,
-      description: 'Experience luxury living in the heart of Kilimani...',
-      images: ['https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&q=80'],
-      amenities: ['High-Speed WiFi', 'Smart TV', 'Fully Equipped Kitchen', 'Cleaning Service', '24/7 Power Backup', 'Secure Parking', 'Air Conditioning', 'Washing Machine'],
-      nearby: ['5 minutes from Yaya Centre', '10 minutes from CBD', 'Close to major hospitals', 'Near international schools'],
+      title: 'ZuriLofts - Serenity Residency 1305',
+      location: 'Kilimani, Ngong Road, Nairobi',
+      price: 6800, rating: 4.8, reviews: 7, bedrooms: 2, bathrooms: 2, area: 980,
+      description: 'A stylish, contemporary apartment in the heart of Kilimani along Ngong Road. Featuring modern finishes, abundant natural light, and a prime location close to Nairobis best dining and shopping.',
+      images: [img(11), img(12), img(1), img(2), img(3)],
+      amenities: ['High-Speed WiFi', 'Smart TV', 'Fully Equipped Kitchen', 'Cleaning Service', '24/7 Power Backup', 'Secure Parking', 'Air Conditioning', 'Washing Machine', 'Balcony'],
+      nearby: ['3 minutes from Yaya Centre', '8 minutes from CBD', 'Close to major hospitals', 'Near international schools', 'Walking distance to Ngong Road cafes'],
       type: 'apartment', available: true, featured: true,
     },
     {
-      title: 'ZuriLofts - Skyview Studio',
-      location: 'Westlands, Nairobi',
-      price: 4500, rating: 4.8, reviews: 8, bedrooms: 1, bathrooms: 1, area: 520,
-      description: 'A cozy, modern studio in the vibrant Westlands neighborhood.',
-      images: ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80', 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80'],
-      amenities: ['High-Speed WiFi', 'Smart TV', 'Kitchenette', 'Cleaning Service', 'Secure Parking'],
-      nearby: ['2 minutes from Sarit Centre', '8 minutes from CBD'],
-      type: 'studio', available: true, featured: true,
-    },
-    {
-      title: 'ZuriLofts - Garden Penthouse',
-      location: 'Lavington, Nairobi',
-      price: 12000, rating: 5.0, reviews: 4, bedrooms: 3, bathrooms: 3, area: 1800,
-      description: 'A stunning penthouse with panoramic views and a private garden terrace.',
-      images: ['https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&q=80', 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80', 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&q=80', 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80'],
-      amenities: ['High-Speed WiFi', 'Smart TV', 'Gourmet Kitchen', 'Daily Cleaning', '24/7 Power Backup', 'Secure Parking', 'Air Conditioning', 'Private Garden', 'Gym Access', 'Swimming Pool'],
-      nearby: ['Lavington Mall', '10 minutes from CBD', 'Near international schools'],
-      type: 'penthouse', available: true, featured: true,
-    },
-    {
-      title: 'ZuriLofts - Riverside Executive',
-      location: 'Riverside Drive, Nairobi',
-      price: 8500, rating: 4.7, reviews: 6, bedrooms: 2, bathrooms: 2, area: 1100,
-      description: 'An executive apartment on Riverside Drive with river views.',
-      images: ['https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80', 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80', 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80'],
-      amenities: ['High-Speed WiFi', 'Smart TV', 'Full Kitchen', 'Cleaning Service', '24/7 Power Backup', 'Secure Parking', 'Air Conditioning'],
-      nearby: ['Riverside Park', '5 minutes from Westlands', 'Near UN offices'],
-      type: 'apartment', available: true, featured: false,
-    },
-    {
-      title: 'ZuriLofts - Karen Cottage',
-      location: 'Karen, Nairobi',
-      price: 9500, rating: 4.9, reviews: 10, bedrooms: 3, bathrooms: 2, area: 1400,
-      description: 'A charming cottage-style apartment in the leafy Karen suburb.',
-      images: ['https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&q=80', 'https://images.unsplash.com/photo-1484154218962-a197022b5858?w=800&q=80', 'https://images.unsplash.com/photo-1560185007-cde436f6a4d0?w=800&q=80', 'https://images.unsplash.com/photo-1600573472550-8090b5e0745e?w=800&q=80'],
-      amenities: ['High-Speed WiFi', 'Smart TV', 'Full Kitchen', 'Garden', 'Fireplace', 'Secure Parking', 'Laundry'],
-      nearby: ['Karen Blixen Museum', 'Giraffe Centre', 'Karen Country Club'],
-      type: 'apartment', available: true, featured: false,
+      title: 'ZuriLofts - Serenity Residency 1003',
+      location: 'Kilimani, Ngong Road, Nairobi',
+      price: 6300, rating: 5.0, reviews: 12, bedrooms: 2, bathrooms: 2, area: 950,
+      description: 'Experience luxury living in the heart of Kilimani along Ngong Road. This beautifully furnished apartment offers modern amenities, stunning views, and easy access to shopping centers, restaurants, and business districts.',
+      images: [img(13), img(14), img(6), img(7), img(8)],
+      amenities: ['High-Speed WiFi', 'Smart TV', 'Fully Equipped Kitchen', 'Cleaning Service', '24/7 Power Backup', 'Secure Parking', 'Air Conditioning', 'Washing Machine'],
+      nearby: ['5 minutes from Yaya Centre', '10 minutes from CBD', 'Close to major hospitals', 'Near international schools'],
+      type: 'apartment', available: true, featured: true,
     },
   ];
 

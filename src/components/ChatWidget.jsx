@@ -15,6 +15,13 @@ function getOrCreateSessionId() {
 function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [started, setStarted] = useState(false);
+
+  // Listen for external open-chat event (e.g. from navbar)
+  useEffect(() => {
+    function handleOpenChat() { setOpen(true); }
+    window.addEventListener('open-chat', handleOpenChat);
+    return () => window.removeEventListener('open-chat', handleOpenChat);
+  }, []);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');

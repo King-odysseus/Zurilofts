@@ -1,27 +1,14 @@
-import img1 from './Ely Homes Photography (1 of 20).jpg';
-import img2 from './Ely Homes Photography (2 of 20).jpg';
-import img3 from './Ely Homes Photography (3 of 20).jpg';
-import img4 from './Ely Homes Photography (4 of 20).jpg';
-import img5 from './Ely Homes Photography (5 of 20).jpg';
-import img6 from './Ely Homes Photography (6 of 20).jpg';
-import img7 from './Ely Homes Photography (7 of 20).jpg';
-import img8 from './Ely Homes Photography (8 of 20).jpg';
-import img9 from './Ely Homes Photography (9 of 20).jpg';
-import img10 from './Ely Homes Photography (10 of 20).jpg';
-import img11 from './Ely Homes Photography (11 of 20).jpg';
-import img12 from './Ely Homes Photography (12 of 20).jpg';
-import img13 from './Ely Homes Photography (13 of 20).jpg';
-import img14 from './Ely Homes Photography (14 of 20).jpg';
-import img15 from './Ely Homes Photography (15 of 20).jpg';
-import img16 from './Ely Homes Photography (16 of 20).jpg';
-import img17 from './Ely Homes Photography (17 of 20).jpg';
-import img18 from './Ely Homes Photography (18 of 20).jpg';
-import img19 from './Ely Homes Photography (19 of 20).jpg';
-import img20 from './Ely Homes Photography (20 of 20).jpg';
+// Optimized images served from public/images/
+// See scripts/optimize-images.js for the compression step
+function img(n) {
+  return `/images/Ely Homes Photography (${n} of 20).jpg`;
+}
 
 export const zuriImages = [
-  img1, img2, img3, img4, img5, img6, img7, img8, img9, img10,
-  img11, img12, img13, img14, img15, img16, img17, img18, img19, img20,
+  img(1), img(2), img(3), img(4), img(5),
+  img(6), img(7), img(8), img(9), img(10),
+  img(11), img(12), img(13), img(14), img(15),
+  img(16), img(17), img(18), img(19), img(20),
 ];
 
-export const heroImage = img13;
+export const heroImage = img(13);

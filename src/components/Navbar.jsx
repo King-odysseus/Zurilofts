@@ -52,29 +52,15 @@ function Navbar() {
         ? 'bg-white border-[#D9D9D9] shadow-sm'
         : 'bg-transparent border-transparent'
     }`}>
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <div className="max-w-screen-xl flex flex-wrap items-center mx-auto p-4">
 
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse">
-          {needsWhiteNav ? (
-            <img src={logoImg} alt="ZuriLofts" className="h-12 w-auto" />
-          ) : (
-            <>
-              <div className="w-8 h-8 bg-[#C49A6C] rounded-lg flex items-center justify-center">
-                <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-              </div>
-              <span className="self-center text-xl font-bold whitespace-nowrap text-white">
-                ZuriLofts
-              </span>
-            </>
-          )}
+        <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse flex-shrink-0">
+          <img src={logoImg} alt="ZuriLofts" className="h-12 w-auto" />
         </Link>
 
         {/* Right side: CTA buttons / user menu + hamburger */}
-        <div className="flex items-center md:order-2 space-x-2 rtl:space-x-reverse">
+        <div className="flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0 ml-auto md:order-3">
           {isAuthenticated ? (
             /* Authenticated — User dropdown */
             <div className="relative" ref={dropdownRef}>
@@ -149,12 +135,12 @@ function Navbar() {
               >
                 Sign In
               </Link>
-              <Link
-                to="/properties"
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
                 className="hidden md:inline-flex px-5 py-2 rounded-full text-sm font-semibold bg-[#C49A6C] text-[#262262] hover:bg-[#b8895c] transition-all duration-200 shadow-md whitespace-nowrap"
               >
-                Get It Now
-              </Link>
+                Chat with Us
+              </button>
             </>
           )}
 
@@ -183,14 +169,14 @@ function Navbar() {
           </button>
         </div>
 
-        {/* Nav links */}
+        {/* Nav links — centered between logo and buttons on desktop, full-width dropdown on mobile */}
         <div
           id="navbar-main"
-          className={`absolute top-full left-0 right-0 md:static md:flex md:w-auto md:order-1 transition-all duration-300 ${
-            menuOpen ? 'block' : 'hidden'
+          className={`w-full md:w-auto md:flex-1 md:flex md:justify-center md:order-2 ${
+            menuOpen ? 'block' : 'hidden md:flex'
           }`}
         >
-          <ul className="font-medium flex flex-col p-4 md:p-0 mt-0 border-b border-[#D9D9D9] bg-white shadow-lg md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-transparent md:shadow-none rounded-b-2xl md:rounded-none">
+          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 border-t border-[#D9D9D9] md:border-0 md:flex-row md:space-x-8 rtl:space-x-reverse md:bg-transparent rounded-b-2xl md:rounded-none bg-white shadow-lg md:shadow-none">
             {navLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
@@ -250,13 +236,12 @@ function Navbar() {
                   >
                     Sign In
                   </Link>
-                  <Link
-                    to="/properties"
+                  <button
                     className="block w-full py-2.5 rounded-full font-semibold bg-[#C49A6C] text-[#262262] hover:bg-[#b8895c] transition-all duration-200 text-center"
-                    onClick={() => setMenuOpen(false)}
+                    onClick={() => { setMenuOpen(false); window.dispatchEvent(new CustomEvent('open-chat')); }}
                   >
-                    Get It Now
-                  </Link>
+                    Chat with Us
+                  </button>
                 </>
               )}
             </li>

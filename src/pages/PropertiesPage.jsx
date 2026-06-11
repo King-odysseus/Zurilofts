@@ -196,7 +196,7 @@ function PropertiesPage() {
                 <Link key={property.id} to={`/property/${property.id}`} className="block">
                   <PropertyCard property={{
                     id: property.id,
-                    image: property.images?.[0] || 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&q=80',
+                    image: property.images?.[0] || '/images/Ely Homes Photography (1 of 20).jpg',
                     title: property.title,
                     location: property.location,
                     price: property.price,
@@ -214,6 +214,108 @@ function PropertiesPage() {
                 <div className="relative aspect-[4/3]">
                   <img
                     src={zuriImages[18]}
+                    alt="Coming Soon"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-[#1f2937]/70 flex flex-col items-center justify-center">
+                    <h3 className="text-2xl font-bold text-white mb-2">Coming Soon</h3>
+                    <p className="text-white/80 text-sm">Exciting new property being added</p>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-base font-semibold text-[#1f2937] leading-tight">Coming Soon</h3>
+                    <div className="flex items-center space-x-1 flex-shrink-0 bg-[#C49A6C]/10 px-2 py-1 rounded-lg">
+                      <span className="text-sm font-bold text-[#1f2937]">—</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center text-[#6b7280] mb-3">
+                    <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="text-sm truncate">TBA</span>
+                  </div>
+                  <div className="flex items-center justify-between mb-3 py-3 border-y border-[#D9D9D9]">
+                    <div className="flex-1 flex flex-col items-center">
+                      <span className="text-xs text-[#6b7280]">—</span>
+                      <span className="text-xs text-[#6b7280]">Beds</span>
+                    </div>
+                    <div className="flex-1 flex flex-col items-center">
+                      <span className="text-xs text-[#6b7280]">—</span>
+                      <span className="text-xs text-[#6b7280]">Baths</span>
+                    </div>
+                    <div className="flex-1 flex flex-col items-center">
+                      <span className="text-xs text-[#6b7280]">—</span>
+                      <span className="text-xs text-[#6b7280]">Sqft</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs text-[#6b7280]">per night</span>
+                      <div className="text-xl font-bold text-[#C49A6C]">KES —</div>
+                    </div>
+                    <button className="bg-[#D9D9D9] text-[#6b7280] font-semibold px-4 py-2 rounded-full text-sm cursor-not-allowed" disabled>
+                      Coming Soon
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="group neu-card overflow-hidden">
+                <div className="relative aspect-[4/3]">
+                  <img
+                    src={zuriImages[11]}
+                    alt="Coming Soon"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-[#1f2937]/70 flex flex-col items-center justify-center">
+                    <h3 className="text-2xl font-bold text-white mb-2">Coming Soon</h3>
+                    <p className="text-white/80 text-sm">Exciting new property being added</p>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-base font-semibold text-[#1f2937] leading-tight">Coming Soon</h3>
+                    <div className="flex items-center space-x-1 flex-shrink-0 bg-[#C49A6C]/10 px-2 py-1 rounded-lg">
+                      <span className="text-sm font-bold text-[#1f2937]">—</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center text-[#6b7280] mb-3">
+                    <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <span className="text-sm truncate">TBA</span>
+                  </div>
+                  <div className="flex items-center justify-between mb-3 py-3 border-y border-[#D9D9D9]">
+                    <div className="flex-1 flex flex-col items-center">
+                      <span className="text-xs text-[#6b7280]">—</span>
+                      <span className="text-xs text-[#6b7280]">Beds</span>
+                    </div>
+                    <div className="flex-1 flex flex-col items-center">
+                      <span className="text-xs text-[#6b7280]">—</span>
+                      <span className="text-xs text-[#6b7280]">Baths</span>
+                    </div>
+                    <div className="flex-1 flex flex-col items-center">
+                      <span className="text-xs text-[#6b7280]">—</span>
+                      <span className="text-xs text-[#6b7280]">Sqft</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <span className="text-xs text-[#6b7280]">per night</span>
+                      <div className="text-xl font-bold text-[#C49A6C]">KES —</div>
+                    </div>
+                    <button className="bg-[#D9D9D9] text-[#6b7280] font-semibold px-4 py-2 rounded-full text-sm cursor-not-allowed" disabled>
+                      Coming Soon
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div className="group neu-card overflow-hidden">
+                <div className="relative aspect-[4/3]">
+                  <img
+                    src={zuriImages[12]}
                     alt="Coming Soon"
                     className="w-full h-full object-cover"
                   />
