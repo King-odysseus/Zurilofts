@@ -55,12 +55,12 @@ function Navbar() {
       <div className="max-w-screen-xl flex flex-wrap items-center mx-auto p-4">
 
         {/* Logo */}
-        <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse flex-shrink-0">
+        <Link to="/" className="flex items-center space-x-3 rtl:space-x-reverse md:flex-1 flex-shrink-0">
           <img src={logoImg} alt="ZuriLofts" className="h-12 w-auto" />
         </Link>
 
         {/* Right side: CTA buttons / user menu + hamburger */}
-        <div className="flex items-center space-x-2 rtl:space-x-reverse flex-shrink-0 ml-auto md:order-3">
+        <div className="flex items-center space-x-2 rtl:space-x-reverse ml-auto md:ml-0 md:flex-1 md:justify-end md:order-3">
           {isAuthenticated ? (
             /* Authenticated — User dropdown */
             <div className="relative" ref={dropdownRef}>
