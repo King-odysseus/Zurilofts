@@ -486,6 +486,12 @@ function BookingPage() {
         </div>
       </div>
 
+      {submitError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+          {submitError}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <button
           type="submit"
@@ -511,6 +517,45 @@ function BookingPage() {
       </p>
     </div>
   );
+
+  // Loading / not-found guard — prevents dereferencing a null property below
+  if (loadingProperty) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-24 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-[#6b7280]">Loading booking...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!property) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-24 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center max-w-md mx-auto px-6">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-[#262262] mb-2">Property Not Found</h2>
+            <p className="text-[#6b7280] mb-4">We couldn&apos;t load this property to start a booking.</p>
+            <Link to="/properties" className="inline-block bg-[#C49A6C] text-[#262262] px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+              View All Properties
+            </Link>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   // Booking Complete
   if (bookingComplete) {

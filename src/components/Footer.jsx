@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import logoImg from '../assets/zurilofts-logo.png';
 
 function Footer() {
@@ -43,9 +44,9 @@ function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4 text-[#C49A6C]">Quick Links</h4>
             <ul className="space-y-3">
-              {[['Home','#home'],['Properties','#properties'],['Contact','#contact']].map(([label, href]) => (
+              {[['Home','/'],['Properties','/properties'],['Contact','/contact']].map(([label, to]) => (
                 <li key={label}>
-                  <a href={href} className="text-white/80 hover:text-[#C49A6C] transition-colors duration-200">{label}</a>
+                  <Link to={to} className="text-white/80 hover:text-[#C49A6C] transition-colors duration-200">{label}</Link>
                 </li>
               ))}
             </ul>

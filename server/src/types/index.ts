@@ -68,21 +68,24 @@ export const propertyCreateSchema = z.object({
   bathrooms: z.number().int().min(0),
   area: z.number().int().positive(),
   description: z.string().min(1),
-  images: z.array(z.string().url()).min(1),
+  images: z.array(z.string().min(1)).min(1, 'At least one image is required'),
   amenities: z.array(z.string()),
   nearby: z.array(z.string()),
   type: z.enum(['apartment', 'studio', 'penthouse']),
   available: z.boolean().default(true),
   featured: z.boolean().default(false),
+  rating: z.number().min(0).max(5).optional(),
+  reviews: z.number().int().min(0).optional(),
 });
 
 export const propertyUpdateSchema = propertyCreateSchema.partial();
 
 export const bookingCreateSchema = z.object({
-  propertyId: z.string().uuid(),
+  propertyId: z.string().min(1, 'Property is required'),
   checkIn: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-in date'),
   checkOut: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-out date'),
   guests: z.number().int().min(1).max(10),
+  bedOption: z.enum(['1bed', '2bed']).optional(),
   checkInTime: z.string().optional(),
   specialRequests: z.string().max(1000).optional(),
   paymentMethod: z.enum(['card', 'mpesa', 'bank']),
