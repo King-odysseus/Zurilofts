@@ -240,7 +240,7 @@ function PropertyPage() {
 
               <Link
                 to={`/booking/${property.id}`}
-                className="block w-full neu-btn text-[#262262] font-bold py-4 rounded-xl hover:shadow-[2px_2px_4px_#d9d9d9,-2px_-2px_4px_#ffffff] transition-all duration-200 text-center"
+                className="block w-full bg-[#C49A6C] text-[#262262] font-bold py-4 rounded-xl hover:bg-[#b8895c] active:bg-[#a6794d] transition-all duration-200 text-center"
               >
                 Book Now
               </Link>

@@ -124,8 +124,8 @@ function PropertiesPage() {
                   onClick={() => setFilter(key)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     filter === key
-                      ? 'neu-btn-active text-[#C49A6C]'
-                      : 'neu-btn text-[#1f2937] hover:text-[#262262]'
+                      ? 'bg-[#C49A6C]/15 text-[#C49A6C] font-semibold'
+                      : 'bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0]'
                   }`}
                 >
                   {label}
@@ -135,8 +135,8 @@ function PropertiesPage() {
                 onClick={() => setAvailableOnly(!availableOnly)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ml-2 ${
                   availableOnly
-                    ? 'neu-btn-active text-[#C49A6C]'
-                    : 'neu-btn text-[#1f2937] hover:text-[#262262]'
+                    ? 'bg-[#C49A6C]/15 text-[#C49A6C] font-semibold'
+                    : 'bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0]'
                 }`}
               >
                 Available to Book
@@ -149,7 +149,7 @@ function PropertiesPage() {
               <select
                 value={priceRange}
                 onChange={(e) => setPriceRange(e.target.value)}
-                className="px-4 py-2 rounded-full text-sm font-medium neu-btn text-[#1f2937] focus:outline-none cursor-pointer"
+                className="px-4 py-2 rounded-full text-sm font-medium bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0] focus:outline-none cursor-pointer"
               >
                 <option value="all">All Prices</option>
                 <option value="low">Under KES 5,000</option>
