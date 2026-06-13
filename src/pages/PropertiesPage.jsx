@@ -10,7 +10,7 @@ function PropertiesPage() {
   const [filter, setFilter] = useState('all');
   const [priceRange, setPriceRange] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [availableOnly, setAvailableOnly] = useState(true);
+  const [availableOnly, setAvailableOnly] = useState(false);
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
@@ -190,9 +190,13 @@ function PropertiesPage() {
               <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-[#6b7280]">Loading properties...</p>
             </div>
-          ) : properties.length > 0 ? (
+          ) : (
+            (() => {
+              // Show only available properties by default (unavailable ones replaced by Coming Soon cards)
+              const liveProperties = properties.filter(p => p.available);
+              return liveProperties.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {properties.map((property) => (
+              {liveProperties.map((property) => (
                 <Link key={property.id} to={`/property/${property.id}`} className="block">
                   <PropertyCard property={{
                     id: property.id,
@@ -284,7 +288,9 @@ function PropertiesPage() {
                 Clear Filters
               </button>
             </div>
-          )}
+          )
+        })()
+      }
         </div>
       </section>
 
