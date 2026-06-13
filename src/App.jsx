@@ -1,6 +1,7 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './index.css';
 import Hero from './components/Hero';
+import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { useState, useEffect } from 'react';
 import PropertyPage from './components/PropertyPage';
@@ -17,6 +18,7 @@ import AdminRoute from './components/AdminRoute';
 import ChatWidget from './components/ChatWidget';
 import AdminDashboard, { AdminLayout } from './pages/AdminDashboard';
 import AdminProperties from './pages/AdminProperties';
+import AdminPropertyForm from './pages/AdminPropertyForm';
 import AdminBookings from './pages/AdminBookings';
 import AdminPromos from './pages/AdminPromos';
 
@@ -307,6 +309,29 @@ function HomePage() {
   );
 }
 
+// 404 — catch-all for unknown routes
+function NotFound() {
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      <Navbar />
+      <div className="flex-1 flex items-center justify-center px-6 pt-24 pb-16">
+        <div className="text-center max-w-md">
+          <p className="text-7xl font-extrabold text-[#C49A6C]">404</p>
+          <h1 className="text-2xl font-bold text-[#262262] mt-4 mb-2">Page Not Found</h1>
+          <p className="text-[#6b7280] mb-6">The page you&apos;re looking for doesn&apos;t exist or has moved.</p>
+          <Link
+            to="/"
+            className="inline-block bg-[#C49A6C] text-[#262262] px-6 py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+          >
+            Back to Home
+          </Link>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
+
 function App() {
   return (
     <Router>
@@ -324,9 +349,12 @@ function App() {
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="properties" element={<AdminProperties />} />
+          <Route path="properties/new" element={<AdminPropertyForm />} />
+          <Route path="properties/:id/edit" element={<AdminPropertyForm />} />
           <Route path="bookings" element={<AdminBookings />} />
           <Route path="promos" element={<AdminPromos />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
