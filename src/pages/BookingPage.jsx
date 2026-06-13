@@ -22,6 +22,13 @@ function BookingPage() {
   const [promoError, setPromoError] = useState('');
   const [validatingPromo, setValidatingPromo] = useState(false);
 
+  // Bed option — 1 bed (KES 5,100) or 2 bed (KES 5,500)
+  const BED_OPTIONS = [
+    { type: '1bed', label: '1 Bed', price: 5100 },
+    { type: '2bed', label: '2 Bed (main + small room)', price: 5500 },
+  ];
+  const [bedOption, setBedOption] = useState(null);
+
   // Form states
   const [bookingData, setBookingData] = useState({
     checkIn: '',
@@ -40,7 +47,14 @@ function BookingPage() {
     async function fetchProperty() {
       try {
         const res = await apiClient.get(`/properties/${id}`);
-        setProperty(res.data.data);
+        const prop = res.data.data;
+        setProperty(prop);
+        // Default bed option based on property price
+        if (prop.price <= 5100) {
+          setBedOption('1bed');
+        } else {
+          setBedOption('2bed');
+        }
       } catch {
         // fallback
       } finally {
@@ -61,7 +75,8 @@ function BookingPage() {
   };
 
   const nights = calculateNights();
-  const propertyPrice = property?.price || 0;
+  const selectedOption = BED_OPTIONS.find(o => o.type === bedOption);
+  const propertyPrice = selectedOption?.price || property?.price || 0;
   const subtotal = nights * propertyPrice;
   const cleaningFee = 1500;
   const serviceFee = Math.round(subtotal * 0.12);
@@ -97,6 +112,7 @@ function BookingPage() {
     try {
       const res = await apiClient.post('/bookings', {
         propertyId: id,
+        bedOption,
         checkIn: bookingData.checkIn,
         checkOut: bookingData.checkOut,
         guests: bookingData.guests,
@@ -174,6 +190,28 @@ function BookingPage() {
         </select>
       </div>
 
+      {/* Bed Option */}
+      <div>
+        <label className="block text-sm font-semibold text-[#1f2937] mb-3">Bed Option</label>
+        <div className="grid grid-cols-2 gap-3">
+          {BED_OPTIONS.map((opt) => (
+            <button
+              key={opt.type}
+              type="button"
+              onClick={() => setBedOption(opt.type)}
+              className={`p-4 rounded-xl border-2 text-center transition-all duration-200 ${
+                bedOption === opt.type
+                  ? 'border-[#C49A6C] bg-[#C49A6C]/10 text-[#262262]'
+                  : 'border-[#D9D9D9] bg-white text-[#6b7280] hover:border-[#C49A6C]/50'
+              }`}
+            >
+              <p className="font-semibold">{opt.label}</p>
+              <p className="text-sm mt-1">KES {opt.price.toLocaleString()}/night</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Estimated Check-in Time</label>
         <input
@@ -198,7 +236,7 @@ function BookingPage() {
 
       <button
         onClick={() => setStep(2)}
-        disabled={!bookingData.checkIn || !bookingData.checkOut || nights <= 0}
+        disabled={!bookingData.checkIn || !bookingData.checkOut || nights <= 0 || !bedOption}
         className="w-full bg-[#262262] text-white py-3 rounded-full font-semibold hover:bg-[#262262]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
@@ -592,6 +630,11 @@ function BookingPage() {
                   />
                 </Link>
                 <h3 className="font-bold text-[#262262] text-lg">{property?.title}</h3>
+                {bedOption && (
+                  <p className="text-sm text-[#C49A6C] font-medium mt-1">
+                    {BED_OPTIONS.find(o => o.type === bedOption)?.label} — KES {propertyPrice.toLocaleString()}/night
+                  </p>
+                )}
                 <div className="flex items-center text-[#6b7280] text-sm mt-1">
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />

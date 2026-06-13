@@ -20,12 +20,18 @@ function normalizeBookings(bookings: any[]) {
   return bookings.map(normalizeBooking);
 }
 
+const BED_PRICES: Record<string, number> = {
+  '1bed': 5100,
+  '2bed': 5500,
+};
+
 interface CreateBookingInput {
   userId: string;
   propertyId: string;
   checkIn: string;
   checkOut: string;
   guests: number;
+  bedOption?: string;
   checkInTime?: string;
   specialRequests?: string;
   paymentMethod: string;
@@ -53,6 +59,11 @@ export async function createBooking(input: CreateBookingInput) {
     throw new ValidationError('Check-in date cannot be in the past');
   }
 
+  // Determine effective price based on bed option
+  const effectivePrice = input.bedOption && BED_PRICES[input.bedOption]
+    ? BED_PRICES[input.bedOption]
+    : property.price;
+
   const nights = calculateNights(checkInDate, checkOutDate);
 
   // Handle promo code if provided
@@ -61,13 +72,13 @@ export async function createBooking(input: CreateBookingInput) {
   let maxDiscount: number | null = null;
 
   if (input.promoCode) {
-    const promo = await validateAndGetPromo(input.promoCode, property.price * nights);
+    const promo = await validateAndGetPromo(input.promoCode, effectivePrice * nights);
     promoCodeId = promo.id;
     discountPercent = promo.discountPercent;
     maxDiscount = promo.maxDiscount ?? null;
   }
 
-  const pricing = calculatePricing(property.price, nights, discountPercent, maxDiscount);
+  const pricing = calculatePricing(effectivePrice, nights, discountPercent, maxDiscount);
 
   const booking = await prisma.booking.create({
     data: {
@@ -76,6 +87,7 @@ export async function createBooking(input: CreateBookingInput) {
       checkIn: checkInDate,
       checkOut: checkOutDate,
       guests: input.guests,
+      bedOption: input.bedOption,
       checkInTime: input.checkInTime,
       specialRequests: input.specialRequests,
       paymentMethod: input.paymentMethod,

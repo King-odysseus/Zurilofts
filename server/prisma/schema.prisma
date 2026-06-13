@@ -55,6 +55,7 @@ model Booking {
   checkIn         DateTime
   checkOut        DateTime
   guests          Int
+  bedOption       String?   // "1bed" | "2bed"
   checkInTime     String?
   specialRequests String?
   paymentMethod   String    // "card" | "mpesa" | "bank"
