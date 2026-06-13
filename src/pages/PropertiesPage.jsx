@@ -167,7 +167,7 @@ function PropertiesPage() {
           {/* Results Count */}
           <div className="mb-6 flex items-center justify-between">
             <p className="text-[#6b7280]">
-              Showing <span className="font-semibold text-[#262262]">{pagination.total}</span> properties
+              Showing <span className="font-semibold text-[#262262]">{filter === 'all' && priceRange === 'all' && !searchQuery && !availableOnly ? properties.filter(p => p.available).length + 4 : properties.filter(p => p.available).length}</span> properties
             </p>
             {(filter !== 'all' || priceRange !== 'all' || searchQuery || availableOnly) && (
               <button
@@ -190,13 +190,9 @@ function PropertiesPage() {
               <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-[#6b7280]">Loading properties...</p>
             </div>
-          ) : (
-            (() => {
-              // Show only available properties by default (unavailable ones replaced by Coming Soon cards)
-              const liveProperties = properties.filter(p => p.available);
-              return liveProperties.length > 0 ? (
+          ) : properties.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {liveProperties.map((property) => (
+              {properties.filter(p => p.available).map((property) => (
                 <Link key={property.id} to={`/property/${property.id}`} className="block">
                   <PropertyCard property={{
                     id: property.id,
@@ -213,8 +209,8 @@ function PropertiesPage() {
                   }} />
                 </Link>
               ))}
-              {/* Coming Soon Cards — 4 upcoming properties */}
-              {[18, 16, 15, 14].map((imgIndex) => (
+              {/* Coming Soon cards — show on default 'All' view only */}
+              {filter === 'all' && priceRange === 'all' && !searchQuery && !availableOnly && [18, 16, 15, 14].map((imgIndex) => (
                 <div key={imgIndex} className="group neu-card overflow-hidden">
                   <div className="relative aspect-[4/3]">
                     <img
@@ -288,9 +284,7 @@ function PropertiesPage() {
                 Clear Filters
               </button>
             </div>
-          )
-        })()
-      }
+          )}
         </div>
       </section>
 
