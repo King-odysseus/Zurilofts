@@ -195,6 +195,64 @@ export async function listAllBookings(status?: string, page = 1, limit = 20) {
   };
 }
 
+// Per-property booking counts and recorded earnings, for the admin earnings page.
+// "Earnings" = sum of booking totals that are not cancelled (PENDING + CONFIRMED).
+// "Confirmed earnings" tracks realized revenue from CONFIRMED bookings only.
+export async function getPropertyEarnings() {
+  const [properties, all, confirmed] = await Promise.all([
+    prisma.property.findMany({
+      select: { id: true, title: true, location: true, imagesJson: true, price: true },
+    }),
+    prisma.booking.groupBy({
+      by: ['propertyId'],
+      where: { status: { not: 'CANCELLED' } },
+      _count: { _all: true },
+      _sum: { total: true },
+    }),
+    prisma.booking.groupBy({
+      by: ['propertyId'],
+      where: { status: 'CONFIRMED' },
+      _count: { _all: true },
+      _sum: { total: true },
+    }),
+  ]);
+
+  const allMap = new Map(all.map((r) => [r.propertyId, r]));
+  const confirmedMap = new Map(confirmed.map((r) => [r.propertyId, r]));
+
+  const rows = properties.map((p) => {
+    const a = allMap.get(p.id);
+    const c = confirmedMap.get(p.id);
+    const images = p.imagesJson ? JSON.parse(p.imagesJson) : [];
+    return {
+      id: p.id,
+      title: p.title,
+      location: p.location,
+      image: images[0] || null,
+      price: p.price,
+      bookings: a?._count._all ?? 0,
+      confirmedBookings: c?._count._all ?? 0,
+      earnings: a?._sum.total ?? 0,
+      confirmedEarnings: c?._sum.total ?? 0,
+    };
+  });
+
+  rows.sort((x, y) => y.earnings - x.earnings);
+
+  const totals = rows.reduce(
+    (acc, r) => {
+      acc.bookings += r.bookings;
+      acc.confirmedBookings += r.confirmedBookings;
+      acc.earnings += r.earnings;
+      acc.confirmedEarnings += r.confirmedEarnings;
+      return acc;
+    },
+    { bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0 }
+  );
+
+  return { properties: rows, totals };
+}
+
 export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED' | 'CANCELLED') {
   const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
   if (!booking) throw new NotFoundError('Booking');

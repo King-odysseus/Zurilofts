@@ -19,6 +19,9 @@ router.use(authenticate, requireAdmin);
 router.get('/bookings', bookingCtrl.listAll);
 router.patch('/bookings/:id/status', validate(bookingStatusSchema), bookingCtrl.updateStatus);
 
+// Per-property earnings / booking counts
+router.get('/analytics/properties', bookingCtrl.propertyEarnings);
+
 // Calendar — sources, blocks, sync (per property)
 router.get('/properties/:id/calendar', calendarCtrl.getCalendar);
 router.post('/properties/:id/calendar/sources', validate(calendarSourceSchema), calendarCtrl.addSource);

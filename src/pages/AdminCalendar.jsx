@@ -113,7 +113,7 @@ function AdminCalendar() {
   }
 
   return (
-    <div className="max-w-3xl">
+    <div className="w-full">
       <div className="mb-6">
         <Link to={`/admin/properties/${id}/edit`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to property</Link>
         <h1 className="text-2xl font-bold text-[#262262] mt-1">Calendar — {data.property.title}</h1>

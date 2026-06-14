@@ -5,11 +5,42 @@ function AdminPromos() {
   const [promos, setPromos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     code: '', discountPercent: 10, validFrom: '', validUntil: '', maxUses: '', minBookingAmount: '', maxDiscount: '',
   });
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
+
+  const EMPTY_FORM = { code: '', discountPercent: 10, validFrom: '', validUntil: '', maxUses: '', minBookingAmount: '', maxDiscount: '' };
+
+  function openCreate() {
+    setEditingId(null);
+    setFormData(EMPTY_FORM);
+    setFormError('');
+    setShowForm(true);
+  }
+
+  function openEdit(p) {
+    setEditingId(p.id);
+    setFormData({
+      code: p.code,
+      discountPercent: p.discountPercent,
+      validFrom: p.validFrom ? new Date(p.validFrom).toISOString().slice(0, 10) : '',
+      validUntil: p.validUntil ? new Date(p.validUntil).toISOString().slice(0, 10) : '',
+      maxUses: p.maxUses ?? '',
+      minBookingAmount: p.minBookingAmount ?? '',
+      maxDiscount: p.maxDiscount ?? '',
+    });
+    setFormError('');
+    setShowForm(true);
+  }
+
+  function closeForm() {
+    setShowForm(false);
+    setEditingId(null);
+    setFormData(EMPTY_FORM);
+  }
 
   useEffect(() => { fetchPromos(); }, []);
 
@@ -21,25 +52,31 @@ function AdminPromos() {
     finally { setLoading(false); }
   }
 
-  async function handleCreate(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setSaving(true);
     setFormError('');
+
+    const payload = {
+      discountPercent: Number(formData.discountPercent),
+      validFrom: new Date(formData.validFrom).toISOString(),
+      validUntil: new Date(formData.validUntil).toISOString(),
+      maxUses: formData.maxUses ? Number(formData.maxUses) : undefined,
+      minBookingAmount: formData.minBookingAmount ? Number(formData.minBookingAmount) : undefined,
+      maxDiscount: formData.maxDiscount ? Number(formData.maxDiscount) : undefined,
+    };
+
     try {
-      await apiClient.post('/promo', {
-        code: formData.code.toUpperCase(),
-        discountPercent: Number(formData.discountPercent),
-        validFrom: new Date(formData.validFrom).toISOString(),
-        validUntil: new Date(formData.validUntil).toISOString(),
-        maxUses: formData.maxUses ? Number(formData.maxUses) : undefined,
-        minBookingAmount: formData.minBookingAmount ? Number(formData.minBookingAmount) : undefined,
-        maxDiscount: formData.maxDiscount ? Number(formData.maxDiscount) : undefined,
-      });
-      setShowForm(false);
-      setFormData({ code: '', discountPercent: 10, validFrom: '', validUntil: '', maxUses: '', minBookingAmount: '', maxDiscount: '' });
+      if (editingId) {
+        // Code is the identifier and isn't changed on edit
+        await apiClient.patch(`/promo/${editingId}`, payload);
+      } else {
+        await apiClient.post('/promo', { code: formData.code.toUpperCase(), ...payload });
+      }
+      closeForm();
       fetchPromos();
     } catch (err) {
-      setFormError(err.response?.data?.error || 'Failed to create promo code');
+      setFormError(err.response?.data?.error || `Failed to ${editingId ? 'update' : 'create'} promo code`);
     } finally {
       setSaving(false);
     }
@@ -69,28 +106,30 @@ function AdminPromos() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-[#262262]">Promo Codes</h1>
         <button
-          onClick={() => setShowForm(true)}
+          onClick={openCreate}
           className="bg-[#C49A6C] text-[#262262] px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
         >
           + Create Promo
         </button>
       </div>
 
-      {/* Create Form Modal */}
+      {/* Create / Edit Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
-            <h2 className="text-lg font-bold text-[#262262] mb-4">Create Promo Code</h2>
+            <h2 className="text-lg font-bold text-[#262262] mb-4">{editingId ? 'Edit Promo Code' : 'Create Promo Code'}</h2>
             {formError && <div className="bg-red-50 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{formError}</div>}
-            <form onSubmit={handleCreate} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold text-[#1f2937] mb-1">Code</label>
                 <input
                   type="text" value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white text-[#1f2937] uppercase"
+                  className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white text-[#1f2937] uppercase disabled:opacity-60 disabled:cursor-not-allowed"
                   placeholder="SUMMER2026" required
+                  disabled={!!editingId}
                 />
+                {editingId && <p className="text-xs text-[#6b7280] mt-1">The code itself can&apos;t be changed.</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -147,11 +186,11 @@ function AdminPromos() {
                 </div>
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={() => setShowForm(false)} className="flex-1 py-2.5 rounded-full font-semibold border-2 border-[#D9D9D9] text-[#6b7280] hover:border-[#262262] hover:text-[#262262] transition-colors text-sm">
+                <button type="button" onClick={closeForm} className="flex-1 py-2.5 rounded-full font-semibold border-2 border-[#D9D9D9] text-[#6b7280] hover:border-[#262262] hover:text-[#262262] transition-colors text-sm">
                   Cancel
                 </button>
                 <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-[#262262] hover:bg-[#b8895c] transition-all duration-200 text-sm disabled:opacity-50">
-                  {saving ? 'Creating...' : 'Create'}
+                  {saving ? (editingId ? 'Saving...' : 'Creating...') : (editingId ? 'Save Changes' : 'Create')}
                 </button>
               </div>
             </form>
@@ -203,12 +242,20 @@ function AdminPromos() {
                       </button>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <button
-                        onClick={() => handleDelete(p.id)}
-                        className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
-                      >
-                        {p.active ? 'Deactivate' : 'Remove'}
-                      </button>
+                      <div className="flex items-center justify-end space-x-2">
+                        <button
+                          onClick={() => openEdit(p)}
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(p.id)}
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                        >
+                          {p.active ? 'Deactivate' : 'Remove'}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

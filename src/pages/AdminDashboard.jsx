@@ -8,62 +8,106 @@ const navItems = [
   { path: '/admin', label: 'Dashboard', icon: 'M4 6h16M4 10h16M4 14h16M4 18h16', exact: true },
   { path: '/admin/properties', label: 'Properties', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
   { path: '/admin/bookings', label: 'Bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+  { path: '/admin/earnings', label: 'Earnings', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
   { path: '/admin/promos', label: 'Promo Codes', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
 ];
 
 function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-[#262262] text-white hidden md:flex flex-col fixed inset-y-0 left-0 z-10">
-        <div className="p-6">
-          <Link to="/" className="inline-block bg-white rounded-xl px-3 py-2 mb-4">
-            <img src={logoImg} alt="ZuriLofts" className="h-10 w-auto" />
-          </Link>
-          <span className="block text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">Admin Panel</span>
+      <aside
+        className={`bg-[#262262] text-white hidden md:flex flex-col fixed inset-y-0 left-0 z-10 transition-all duration-300 ${
+          collapsed ? 'w-16' : 'w-64'
+        }`}
+      >
+        <div className={`flex items-center ${collapsed ? 'justify-center p-3' : 'justify-between p-6'}`}>
+          {!collapsed && (
+            <Link to="/" className="inline-block bg-white rounded-xl px-3 py-2">
+              <img src={logoImg} alt="ZuriLofts" className="h-10 w-auto" />
+            </Link>
+          )}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          >
+            <svg
+              className={`w-5 h-5 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+            </svg>
+          </button>
         </div>
-        <nav className="flex-1 px-3">
+        {!collapsed && (
+          <span className="block px-6 pb-4 text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">
+            Admin Panel
+          </span>
+        )}
+        <nav className={`flex-1 ${collapsed ? 'px-1' : 'px-3'}`}>
           {navItems.map(({ path, label, icon, exact }) => {
             const active = exact ? location.pathname === path : location.pathname.startsWith(path);
             return (
               <Link
                 key={path}
                 to={path}
-                className={`flex items-center px-4 py-3 rounded-xl mb-1 text-sm font-medium transition-all duration-200 ${
+                title={collapsed ? label : ''}
+                className={`flex items-center rounded-xl mb-1 text-sm font-medium transition-all duration-200 ${
                   active
                     ? 'bg-[#C49A6C] text-[#262262]'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
-                }`}
+                } ${collapsed ? 'justify-center px-2 py-3' : 'px-4 py-3'}`}
               >
-                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
                 </svg>
-                {label}
+                {!collapsed && <span className="ml-3">{label}</span>}
               </Link>
             );
           })}
         </nav>
-        <div className="p-4 border-t border-white/10">
-          <div className="flex items-center space-x-3 mb-3">
+        <div className={`border-t border-white/10 ${collapsed ? 'p-2' : 'p-4'}`}>
+          <Link
+            to="/"
+            title={collapsed ? 'Go back to client view' : ''}
+            className={`flex items-center rounded-xl text-sm font-semibold bg-white/10 text-white hover:bg-[#C49A6C] hover:text-[#262262] transition-all duration-200 ${
+              collapsed ? 'justify-center p-2 mb-2' : 'justify-center mb-4 px-4 py-2.5'
+            }`}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            {!collapsed && <span className="ml-2">Go back to client view</span>}
+          </Link>
+          <div className={`flex items-center mb-3 ${collapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-xs font-bold text-[#262262]">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
             </div>
-            <div className="text-sm">
-              <p className="font-medium">{user?.firstName}</p>
-              <p className="text-white/50 text-xs">Admin</p>
-            </div>
+            {!collapsed && (
+              <div className="text-sm">
+                <p className="font-medium">{user?.firstName}</p>
+                <p className="text-white/50 text-xs">Admin</p>
+              </div>
+            )}
           </div>
           <button
             onClick={logout}
-            className="flex items-center text-white/60 hover:text-white text-sm transition-colors"
+            title={collapsed ? 'Sign Out' : ''}
+            className={`flex items-center text-white/60 hover:text-white text-sm transition-colors ${
+              collapsed ? 'justify-center w-full' : ''
+            }`}
           >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
-            Sign Out
+            {!collapsed && <span className="ml-2">Sign Out</span>}
           </button>
         </div>
       </aside>
@@ -93,11 +137,25 @@ function AdminLayout() {
               <span className="sr-only">{label}</span>
             </Link>
           ))}
+          <Link
+            to="/"
+            className="p-2 rounded-lg text-xs font-medium text-white/70 hover:text-white transition-colors"
+            title="Go back to client view"
+          >
+            <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span className="sr-only">Go back to client view</span>
+          </Link>
         </div>
       </div>
 
       {/* Main content */}
-      <main className="flex-1 md:ml-64 p-4 md:p-8 pt-20 md:pt-8">
+      <main
+        className={`flex-1 p-4 md:p-8 pt-20 md:pt-8 transition-all duration-300 ${
+          collapsed ? 'md:ml-16' : 'md:ml-64'
+        }`}
+      >
         <Outlet />
       </main>
     </div>

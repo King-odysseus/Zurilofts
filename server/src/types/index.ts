@@ -68,7 +68,8 @@ export const propertyCreateSchema = z.object({
   bathrooms: z.number().int().min(0),
   area: z.number().int().positive(),
   description: z.string().min(1),
-  images: z.array(z.string().url()).min(1),
+  // Accept relative paths (e.g. /uploads/..., /images/...) as well as absolute URLs
+  images: z.array(z.string().min(1)).min(1, 'At least one image is required'),
   amenities: z.array(z.string()),
   nearby: z.array(z.string()),
   type: z.enum(['apartment', 'studio', 'penthouse']),

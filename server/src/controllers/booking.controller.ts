@@ -53,6 +53,16 @@ export async function listAll(req: Request, res: Response, next: NextFunction): 
   }
 }
 
+// Admin: per-property booking counts + earnings
+export async function propertyEarnings(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const data = await bookingService.getPropertyEarnings();
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // Admin: update booking status
 export async function updateStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

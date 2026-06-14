@@ -28,6 +28,9 @@ server/.env
 server/node_modules
 server/dist
 
+# Admin-uploaded property images (runtime data, not source)
+server/uploads
+
 # Agent folders and instructions — must never live in the project repo
 Instruct.md
 .claude/

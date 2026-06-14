@@ -20,6 +20,7 @@ import AdminProperties from './pages/AdminProperties';
 import AdminPropertyForm from './pages/AdminPropertyForm';
 import AdminCalendar from './pages/AdminCalendar';
 import AdminBookings from './pages/AdminBookings';
+import AdminEarnings from './pages/AdminEarnings';
 import AdminPromos from './pages/AdminPromos';
 
 // Home page component
@@ -330,6 +331,7 @@ function App() {
           <Route path="properties/:id/edit" element={<AdminPropertyForm />} />
           <Route path="properties/:id/calendar" element={<AdminCalendar />} />
           <Route path="bookings" element={<AdminBookings />} />
+          <Route path="earnings" element={<AdminEarnings />} />
           <Route path="promos" element={<AdminPromos />} />
         </Route>
       </Routes>
