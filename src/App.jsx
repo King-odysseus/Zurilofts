@@ -219,18 +219,18 @@ function HomePage() {
             {[
               {
                 name: 'The Junction Mall',
-                desc: 'A premier lifestyle and shopping destination right on Ngong Road. Enjoy top retail brands, restaurants, a cinema, and a vibrant food court — all just minutes away.',
-                image: 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=800&q=80',
+                desc: 'A premier lifestyle and shopping destination right on Ngong Road. Enjoy top retail brands, restaurants, a cinema, and a vibrant food court, all just minutes away.',
+                image: 'https://images.unsplash.com/photo-1696208732970-5744331c9fdf?w=800&q=80',
               },
               {
                 name: 'Ngong Forest Sanctuary',
                 desc: 'A serene urban forest reserve off Ngong Road, perfect for morning walks, bird watching, and peaceful nature escapes from the city buzz.',
-                image: 'https://images.unsplash.com/photo-1448375240586-882707db888b?w=800&q=80',
+                image: 'https://images.unsplash.com/photo-1659374738397-a354c1dd9872?w=800&q=80',
               },
               {
-                name: 'Nairobi War Cemetery',
-                desc: 'A beautifully maintained historical site on Ngong Road commemorating soldiers who served in the World Wars. A quiet, reflective landmark worth visiting.',
-                image: 'https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=800&q=80',
+                name: 'Sheldrick Elephant Orphanage',
+                desc: 'A world-renowned rescue and rehabilitation centre for orphaned baby elephants, tucked inside Nairobi National Park. Visit during the daily 11am feeding session to watch the calves play, take mud baths, and bond with their keepers.',
+                image: 'https://images.unsplash.com/photo-1702509416519-176ac54b6fbd?w=800&q=80',
               },
               {
                 name: 'Prestige Plaza',
@@ -239,13 +239,13 @@ function HomePage() {
               },
               {
                 name: 'Giraffe Centre',
-                desc: 'Get up close with endangered Rothschild giraffes at this acclaimed conservation center in Langata — a short drive from Kilimani via Ngong Road.',
-                image: 'https://images.unsplash.com/photo-1534567153574-2b12153a87f0?w=800&q=80',
+                desc: 'Get up close with endangered Rothschild giraffes at this acclaimed conservation center in Langata, a short drive from Kilimani via Ngong Road.',
+                image: 'https://images.unsplash.com/photo-1652123263035-f729c7d04aab?w=800&q=80',
               },
               {
                 name: 'Nairobi National Park',
-                desc: 'Africa\'s only wildlife park within a capital city. Spot lions, rhinos, giraffes, and zebras against Nairobi\'s skyline — easily accessible via Langata Road off Ngong Road.',
-                image: 'https://images.unsplash.com/photo-1547471613-cf9af5c52d05?w=800&q=80',
+                desc: 'Africa\'s only wildlife park within a capital city. Spot lions, rhinos, giraffes, and zebras against Nairobi\'s skyline, easily accessible via Langata Road off Ngong Road.',
+                image: 'https://images.unsplash.com/photo-1634662101368-fa8021773862?w=800&q=80',
               },
             ].map((place, i) => (
               <div key={i} className="neu-card overflow-hidden transition-shadow duration-300">
@@ -275,32 +275,32 @@ function HomePage() {
               {
                 name: 'Brew Bistro & Lounge',
                 desc: 'A stylish spot at Piedmont Plaza on Ngong Road serving European, French, Asian, and Kenyan fusion cuisine. Great cocktails and a lively rooftop atmosphere.',
-                image: 'https://images.unsplash.com/photo-1551024709-8f23befc548f?w=800&q=80',
+                image: 'https://images.unsplash.com/photo-1671713682264-ecf27750b276?w=800&q=80',
               },
               {
                 name: 'La Terrazza',
                 desc: 'An intimate Italian restaurant tucked inside the Greenhouse Mall on Ngong Road. Authentic pasta, wine, and stunning 4th-floor views across Nairobi.',
-                image: 'https://images.unsplash.com/photo-1473093226355-51b44c1ddd31?w=800&q=80',
+                image: 'https://images.unsplash.com/photo-1778931163785-c266344f28fe?w=800&q=80',
               },
               {
                 name: 'Mama Oliech\'s',
-                desc: 'A Kilimani institution famous for authentic Kenyan fish dishes. Simple, hearty, and deeply satisfying — a must-try for lovers of local coastal cuisine.',
-                image: 'https://images.unsplash.com/photo-1534482421-64566f976cfa?w=800&q=80',
+                desc: 'A Kilimani institution famous for authentic Kenyan fish dishes. Simple, hearty, and deeply satisfying for lovers of local coastal cuisine.',
+                image: 'https://images.unsplash.com/photo-1601836689782-d08aaffb817d?w=800&q=80',
               },
               {
                 name: 'Fogo Gaucho',
                 desc: 'A buzzing Brazilian churrascaria in Kilimani offering an all-you-can-eat roasted meat experience. Perfect for a celebratory dinner or a hearty group meal.',
-                image: 'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&q=80',
+                image: 'https://images.unsplash.com/photo-1633436375795-12b3b339712f?w=800&q=80',
               },
               {
                 name: 'Cedars Restaurant',
                 desc: 'A refined Lebanese restaurant in Kilimani with an extensive mezze menu, grilled meats, and warm Middle Eastern hospitality. A local favourite for fine dining.',
-                image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80',
+                image: 'https://images.unsplash.com/photo-1743674453093-592bed88018e?w=800&q=80',
               },
               {
                 name: 'Artcaffe Junction',
                 desc: 'A popular all-day café inside The Junction Mall on Ngong Road. Great for breakfast, light lunches, pastries, and quality Kenyan coffee in a relaxed setting.',
-                image: 'https://images.unsplash.com/photo-1509042239860-f519af6f3557?w=800&q=80',
+                image: 'https://images.unsplash.com/photo-1760307145149-b3b17365ac6d?w=800&q=80',
               },
             ].map((place, i) => (
               <div key={i} className="neu-card overflow-hidden transition-shadow duration-300">

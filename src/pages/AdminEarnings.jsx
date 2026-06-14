@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/client.js';
+import Dropdown from '../components/Dropdown.jsx';
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
+
+function formatDate() {
+  return new Date().toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+}
 
 function AdminEarnings() {
   const [rows, setRows] = useState([]);
@@ -22,6 +33,157 @@ function AdminEarnings() {
     load();
   }, []);
 
+  const today = formatDate();
+
+  function handleExportPDF() {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+    const margin = 14;
+
+    // ---- Header bar ----
+    doc.setFillColor(38, 34, 98); // #262262 brand indigo
+    doc.rect(0, 0, pageWidth, 30, 'F');
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.text('ZuriLofts Earnings Report', margin, 18);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Generated: ${today}`, margin, 26);
+
+    // ---- Summary Metrics ----
+    doc.setTextColor(38, 34, 98);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Summary', margin, 42);
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    const summaryData = [
+      ['Total Bookings', String(totals.bookings.toLocaleString())],
+      ['Confirmed Bookings', String(totals.confirmedBookings.toLocaleString())],
+      ['Total Earnings (KES)', totals.earnings.toLocaleString()],
+      ['Confirmed Earnings (KES)', totals.confirmedEarnings.toLocaleString()],
+    ];
+
+    doc.autoTable({
+      startY: 46,
+      head: [['Metric', 'Value']],
+      body: summaryData,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [196, 154, 108], // #C49A6C bronze
+        textColor: [38, 34, 98],
+        fontStyle: 'bold',
+      },
+      bodyStyles: {
+        textColor: [31, 41, 55],
+      },
+      alternateRowStyles: {
+        fillColor: [248, 249, 250],
+      },
+      margin: { left: margin, right: margin },
+      tableWidth: pageWidth - margin * 2,
+      styles: { fontSize: 10 },
+    });
+
+    // ---- Property Earnings Table ----
+    const tableHead = [['Property', 'Location', 'Times Booked', 'Confirmed', 'Earnings (KES)']];
+    const tableBody = rows.map((r) => [
+      r.title,
+      r.location,
+      String(r.bookings),
+      String(r.confirmedBookings),
+      `KES ${r.earnings.toLocaleString()}`,
+    ]);
+    tableBody.push([
+      'TOTAL',
+      '',
+      String(totals.bookings),
+      String(totals.confirmedBookings),
+      `KES ${totals.earnings.toLocaleString()}`,
+    ]);
+
+    const summaryEndY = doc.lastAutoTable ? doc.lastAutoTable.finalY : 70;
+
+    doc.autoTable({
+      startY: summaryEndY + 10,
+      head: tableHead,
+      body: tableBody,
+      theme: 'grid',
+      headStyles: {
+        fillColor: [38, 34, 98], // #262262
+        textColor: [255, 255, 255],
+        fontStyle: 'bold',
+      },
+      bodyStyles: {
+        textColor: [31, 41, 55],
+      },
+      alternateRowStyles: {
+        fillColor: [248, 249, 250],
+      },
+      margin: { left: margin, right: margin },
+      tableWidth: pageWidth - margin * 2,
+      styles: { fontSize: 9 },
+      columnStyles: {
+        0: { cellWidth: 50 },       // Property
+        1: { cellWidth: 35 },       // Location
+        2: { halign: 'right', cellWidth: 30 },  // Times Booked
+        3: { halign: 'right', cellWidth: 25 },  // Confirmed
+        4: { halign: 'right', cellWidth: 40 },  // Earnings
+      },
+    });
+
+    // ---- Footer on every page ----
+    const pageCount = doc.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(156, 163, 175);
+      doc.text(
+        `Page ${i} of ${pageCount}  |  ZuriLofts  |  ${today}`,
+        margin,
+        doc.internal.pageSize.height - 10
+      );
+    }
+
+    doc.save(`ZuriLofts_Earnings_${today.replace(/\s/g, '_')}.pdf`);
+  }
+
+  function handleExportCSV() {
+    // BOM prefix for Excel UTF-8 compatibility
+    let csv = '﻿';
+    csv += 'ZuriLofts Earnings Report\n';
+    csv += `Generated: ${today}\n\n`;
+
+    // Summary section
+    csv += 'Metric,Value\n';
+    csv += `"Total Bookings","${totals.bookings}"\n`;
+    csv += `"Confirmed Bookings","${totals.confirmedBookings}"\n`;
+    csv += `"Total Earnings (KES)","${totals.earnings}"\n`;
+    csv += `"Confirmed Earnings (KES)","${totals.confirmedEarnings}"\n\n`;
+
+    // Property table
+    csv += 'Property,Location,Times Booked,Confirmed,Earnings (KES)\n';
+    rows.forEach((r) => {
+      csv += `"${r.title}","${r.location}",${r.bookings},${r.confirmedBookings},${r.earnings}\n`;
+    });
+    csv += `"TOTAL","",${totals.bookings},${totals.confirmedBookings},${totals.earnings}\n`;
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ZuriLofts_Earnings_${today.replace(/\s/g, '_')}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function handleExport(option) {
+    if (option === 'pdf') handleExportPDF();
+    else if (option === 'csv') handleExportCSV();
+  }
+
   const cards = [
     { label: 'Total Bookings', value: totals.bookings.toLocaleString(), color: 'bg-[#262262]' },
     { label: 'Confirmed Bookings', value: totals.confirmedBookings.toLocaleString(), color: 'bg-[#C49A6C]' },
@@ -31,10 +193,28 @@ function AdminEarnings() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold text-[#262262] mb-2">Earnings</h1>
-      <p className="text-sm text-[#6b7280] mb-6">
-        Bookings and recorded earnings per property. Earnings include pending and confirmed bookings; cancelled bookings are excluded.
-      </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-[#262262] mb-1">Earnings</h1>
+          <p className="text-sm text-[#6b7280]">
+            Bookings and recorded earnings per property. Earnings include pending and confirmed bookings; cancelled bookings are excluded.
+          </p>
+        </div>
+        {!loading && rows.length > 0 && (
+          <Dropdown
+            value=""
+            onChange={handleExport}
+            options={[
+              { value: 'pdf', label: 'Export as PDF' },
+              { value: 'csv', label: 'Export as CSV' },
+            ]}
+            triggerClassName="px-5 py-2.5 rounded-full bg-[#C49A6C] text-white font-semibold text-sm whitespace-nowrap"
+            placeholder="Export Report"
+            ariaLabel="Export earnings report"
+            menuClassName="right-0 left-auto"
+          />
+        )}
+      </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {cards.map(({ label, value, color }) => (
