@@ -13,6 +13,7 @@ export async function getUserProfile(userId: string) {
       firstName: true,
       lastName: true,
       phone: true,
+      avatar: true,
       role: true,
       googleId: true,
       createdAt: true,
@@ -22,7 +23,7 @@ export async function getUserProfile(userId: string) {
   return user;
 }
 
-export async function updateUserProfile(userId: string, data: { firstName?: string; lastName?: string; phone?: string }) {
+export async function updateUserProfile(userId: string, data: { firstName?: string; lastName?: string; phone?: string; avatar?: string }) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError('User');
 
@@ -35,6 +36,7 @@ export async function updateUserProfile(userId: string, data: { firstName?: stri
       firstName: true,
       lastName: true,
       phone: true,
+      avatar: true,
       role: true,
       createdAt: true,
     },

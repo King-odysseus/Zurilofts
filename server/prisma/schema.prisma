@@ -18,6 +18,7 @@ model User {
   lastName     String
   phone        String?
   googleId     String?   @unique
+  avatar       String?                         // profile image path, e.g. /uploads/avatar-xxx.jpg
   role         String    @default("USER")  // "USER" | "ADMIN"
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
