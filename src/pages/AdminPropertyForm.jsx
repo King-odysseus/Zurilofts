@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
 
 const EMPTY = {
@@ -224,11 +225,17 @@ function AdminPropertyForm() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Type</label>
-              <select className={inputCls} value={form.type} onChange={(e) => update('type', e.target.value)}>
-                <option value="apartment">Apartment</option>
-                <option value="studio">Studio</option>
-                <option value="penthouse">Penthouse</option>
-              </select>
+              <Dropdown
+                value={form.type}
+                onChange={(v) => update('type', v)}
+                options={[
+                  { value: 'apartment', label: 'Apartment' },
+                  { value: 'studio', label: 'Studio' },
+                  { value: 'penthouse', label: 'Penthouse' },
+                ]}
+                triggerClassName={inputCls}
+                ariaLabel="Property type"
+              />
             </div>
             <div className="flex items-end gap-6 pb-2">
               <label className="flex items-center gap-2 text-sm font-medium text-[#1f2937]">

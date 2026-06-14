@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PropertyCard from '../components/PropertyCard';
+import Dropdown from '../components/Dropdown.jsx';
 import { zuriImages } from '../assets/images';
 import apiClient from '../api/client.js';
 
@@ -146,16 +147,20 @@ function PropertiesPage() {
             {/* Price Range Filter */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-[#6b7280]">Price:</span>
-              <select
+              <Dropdown
                 value={priceRange}
-                onChange={(e) => setPriceRange(e.target.value)}
-                className="px-4 py-2 rounded-full text-sm font-medium bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0] focus:outline-none cursor-pointer"
-              >
-                <option value="all">All Prices</option>
-                <option value="low">Under KES 5,000</option>
-                <option value="mid">KES 5,000 - 8,000</option>
-                <option value="high">Above KES 8,000</option>
-              </select>
+                onChange={setPriceRange}
+                options={[
+                  { value: 'all', label: 'All Prices' },
+                  { value: 'low', label: 'Under KES 5,000' },
+                  { value: 'mid', label: 'KES 5,000 – 8,000' },
+                  { value: 'high', label: 'Above KES 8,000' },
+                ]}
+                triggerClassName="px-4 py-2 rounded-full text-sm font-medium bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0] focus:outline-none"
+                placeholder="All Prices"
+                menuClassName="left-auto right-0"
+                ariaLabel="Price range"
+              />
             </div>
           </div>
         </div>

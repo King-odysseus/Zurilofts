@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
+import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
 
 function BookingPage() {
@@ -255,19 +256,16 @@ function BookingPage() {
 
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Number of Guests *</label>
-        <select
-          name="guests"
+        <Dropdown
           value={bookingData.guests}
-          onChange={(e) => setGuestCount(Number(e.target.value))}
-          className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white"
-          required
-        >
-          {[1, 2, 3, 4, 5, 6].map((num) => (
-            <option key={num} value={num}>
-              {num} {num === 1 ? 'guest' : 'guests'}
-            </option>
-          ))}
-        </select>
+          onChange={(v) => setGuestCount(Number(v))}
+          options={[1, 2, 3, 4, 5, 6].map((num) => ({
+            value: num,
+            label: `${num} ${num === 1 ? 'guest' : 'guests'}`,
+          }))}
+          triggerClassName="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
+          ariaLabel="Number of guests"
+        />
       </div>
 
       {/* Bed Option */}
@@ -319,21 +317,19 @@ function BookingPage() {
         </div>
         <div>
           <label className="block text-sm font-semibold text-[#1f2937] mb-2">Check-out Time</label>
-          <select
-            name="checkOutTime"
+          <Dropdown
             value={bookingData.checkOutTime}
-            onChange={handleInputChange}
-            className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
-          >
-            {CHECK_OUT_OPTIONS.map((time) => {
+            onChange={(v) => setBookingData((prev) => ({ ...prev, checkOutTime: v }))}
+            options={CHECK_OUT_OPTIONS.map((time) => {
               const fee = calcLateCheckoutFee(time, propertyPrice);
-              return (
-                <option key={time} value={time}>
-                  {formatTime12h(time)}{fee > 0 ? ` (+KES ${fee.toLocaleString()})` : ' (Standard)'}
-                </option>
-              );
+              return {
+                value: time,
+                label: `${formatTime12h(time)}${fee > 0 ? ` (+KES ${fee.toLocaleString()})` : ' (Standard)'}`,
+              };
             })}
-          </select>
+            triggerClassName="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
+            ariaLabel="Check-out time"
+          />
           {lateCheckoutFee > 0 && (
             <p className="text-xs text-[#C49A6C] font-medium mt-1">
               Late check-out fee: KES {lateCheckoutFee.toLocaleString()}

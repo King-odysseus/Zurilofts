@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
 
 function AdminBookings() {
@@ -32,16 +33,19 @@ function AdminBookings() {
     <div>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-[#262262]">Bookings</h1>
-        <select
+        <Dropdown
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2.5 rounded-xl bg-white border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
-        >
-          <option value="">All Statuses</option>
-          <option value="PENDING">Pending</option>
-          <option value="CONFIRMED">Confirmed</option>
-          <option value="CANCELLED">Cancelled</option>
-        </select>
+          onChange={setStatusFilter}
+          options={[
+            { value: '', label: 'All Statuses' },
+            { value: 'PENDING', label: 'Pending' },
+            { value: 'CONFIRMED', label: 'Confirmed' },
+            { value: 'CANCELLED', label: 'Cancelled' },
+          ]}
+          triggerClassName="w-48 px-4 py-2.5 rounded-xl bg-white border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+          placeholder="All Statuses"
+          ariaLabel="Filter by status"
+        />
       </div>
 
       {loading ? (
