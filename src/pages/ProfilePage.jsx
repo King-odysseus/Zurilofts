@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
+import PropertyCard from '../components/PropertyCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useFavorites } from '../context/FavoritesContext.jsx';
 import apiClient from '../api/client.js';
 
 function ProfilePage() {
   const { user } = useAuth();
+  const { favorites } = useFavorites();
   const [activeTab, setActiveTab] = useState('info');
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -63,7 +67,7 @@ function ProfilePage() {
       try {
         const [profileRes, bookingsRes] = await Promise.all([
           apiClient.get('/users/profile'),
-          apiClient.get('/bookings'),
+          apiClient.get('/bookings', { params: { limit: 100 } }),
         ]);
         setProfile(profileRes.data.data);
         setBookings(bookingsRes.data.data || []);
@@ -138,7 +142,7 @@ function ProfilePage() {
 
           {/* Tabs */}
           <div className="flex border-b border-[#D9D9D9] mb-8">
-            {['info', 'bookings'].map((tab) => (
+            {['info', 'bookings', 'favorites'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -148,7 +152,7 @@ function ProfilePage() {
                     : 'border-transparent text-[#6b7280] hover:text-[#262262]'
                 }`}
               >
-                {tab === 'info' ? 'My Info' : 'My Bookings'}
+                {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
               </button>
             ))}
           </div>
@@ -332,6 +336,45 @@ function ProfilePage() {
                     </div>
                   </div>
                 ))
+              )}
+            </div>
+          )}
+
+          {/* Favourites Tab */}
+          {activeTab === 'favorites' && (
+            <div>
+              {favorites.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-bold text-[#262262] mb-1">No favourites yet</h3>
+                  <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
+                  <Link to="/properties" className="inline-block bg-[#C49A6C] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+                    Browse properties
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {favorites.map((property) => (
+                    <Link key={property.id} to={`/property/${property.id}`} className="block">
+                      <PropertyCard property={{
+                        id: property.id,
+                        image: property.images?.[0] || '/images/Ely Homes Photography (1 of 20).jpg',
+                        title: property.title,
+                        location: property.location,
+                        price: property.price,
+                        rating: property.rating,
+                        bedrooms: property.bedrooms,
+                        bathrooms: property.bathrooms,
+                        area: property.area,
+                        badge: property.featured ? 'Featured' : undefined,
+                      }} />
+                    </Link>
+                  ))}
+                </div>
               )}
             </div>
           )}

@@ -108,6 +108,14 @@ export const reviewCreateSchema = z.object({
   privateNote: z.string().max(2000).optional(),
 });
 
+export const favoriteCreateSchema = z.object({
+  propertyId: z.string().min(1, 'Property is required'),
+});
+
+export const messageCreateSchema = z.object({
+  body: z.string().min(1, 'Message cannot be empty').max(2000),
+});
+
 export const promoCreateSchema = z.object({
   code: z.string().min(3).max(20).regex(/^[A-Z0-9_-]+$/, 'Code must be uppercase letters, numbers, hyphens, or underscores'),
   discountPercent: z.number().int().min(1).max(100),

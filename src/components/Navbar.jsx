@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import apiClient from '../api/client.js';
 import logoImg from '../assets/zurilofts-logo.png';
 
 const navLinks = [
@@ -18,12 +19,28 @@ function Navbar() {
   const dropdownRef = useRef(null);
 
   const { user, isAuthenticated, logout } = useAuth();
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', onScroll);
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // Poll unread message count for the badge on the account menu
+  useEffect(() => {
+    if (!isAuthenticated) { setUnreadMessages(0); return; }
+    let active = true;
+    async function loadUnread() {
+      try {
+        const r = await apiClient.get('/messages/unread-count');
+        if (active) setUnreadMessages(r.data.data?.count || 0);
+      } catch { /* ignore */ }
+    }
+    loadUnread();
+    const t = setInterval(loadUnread, 30000);
+    return () => { active = false; clearInterval(t); };
+  }, [isAuthenticated]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -62,14 +79,19 @@ function Navbar() {
         {/* Right side: CTA buttons / user menu + hamburger */}
         <div className="flex items-center space-x-2 rtl:space-x-reverse ml-auto md:ml-0 md:flex-1 md:justify-end md:order-3">
           {isAuthenticated ? (
-            /* Authenticated — User dropdown */
+            /* Authenticated — User dropdown (Profile, Messages, Admin) */
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-[#D9D9D9]/30 transition-all duration-200"
               >
-                <div className={`w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-[#262262]`}>
+                <div className="relative w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-[#262262]">
                   {user?.firstName?.[0]}{user?.lastName?.[0]}
+                  {unreadMessages > 0 && (
+                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {unreadMessages > 9 ? '9+' : unreadMessages}
+                    </span>
+                  )}
                 </div>
                 <span className={`hidden md:block text-sm font-semibold ${needsWhiteNav ? 'text-[#262262]' : 'text-white'}`}>
                   {user?.firstName}
@@ -94,6 +116,21 @@ function Navbar() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                     My Profile
+                  </Link>
+                  <Link
+                    to="/messages"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <span className="flex-1">Messages</span>
+                    {unreadMessages > 0 && (
+                      <span className="min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {unreadMessages > 9 ? '9+' : unreadMessages}
+                      </span>
+                    )}
                   </Link>
                   {user?.role === 'ADMIN' && (
                     <Link
@@ -210,6 +247,13 @@ function Navbar() {
                     onClick={() => setMenuOpen(false)}
                   >
                     My Profile
+                  </Link>
+                  <Link
+                    to="/messages"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Messages{unreadMessages > 0 ? ` (${unreadMessages})` : ''}
                   </Link>
                   {user?.role === 'ADMIN' && (
                     <Link

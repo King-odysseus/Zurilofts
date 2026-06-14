@@ -10,6 +10,8 @@ import {
 import * as bookingCtrl from '../controllers/booking.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
 import * as reviewCtrl from '../controllers/review.controller.js';
+import * as messageCtrl from '../controllers/message.controller.js';
+import { messageCreateSchema } from '../types/index.js';
 
 const router = Router();
 
@@ -22,6 +24,11 @@ router.patch('/bookings/:id/status', validate(bookingStatusSchema), bookingCtrl.
 
 // Guest reviews / private feedback
 router.get('/reviews', reviewCtrl.listAll);
+
+// Customer messages (inbox + per-customer thread + reply)
+router.get('/messages', messageCtrl.adminConversations);
+router.get('/messages/:userId', messageCtrl.adminThread);
+router.post('/messages/:userId', validate(messageCreateSchema), messageCtrl.adminReply);
 
 // Per-property earnings / booking counts
 router.get('/analytics/properties', bookingCtrl.propertyEarnings);

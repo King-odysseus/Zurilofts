@@ -1,10 +1,25 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useFavorites } from '../context/FavoritesContext.jsx';
 
 function PropertyCard({ property }) {
-  const [isLiked, setIsLiked] = useState(false);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+  const { isFavorite, toggleFavorite } = useFavorites();
 
-  const { image, title, location, price, rating, bedrooms, bathrooms, area, badge } = property;
+  const { id, image, title, location, price, rating, bedrooms, bathrooms, area, badge } = property;
+  const isLiked = id ? isFavorite(id) : false;
+
+  const handleToggleFavorite = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    if (id) toggleFavorite(id);
+  };
 
   return (
     <div className="group neu-card neu-card-hover transition-all duration-300 hover:-translate-y-2 overflow-hidden">
@@ -20,9 +35,9 @@ function PropertyCard({ property }) {
         )}
 
         <button
-          onClick={() => setIsLiked(!isLiked)}
+          onClick={handleToggleFavorite}
           className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-md flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200"
-          aria-label="Add to favorites"
+          aria-label={isLiked ? 'Remove from favourites' : 'Add to favourites'}
         >
           <svg
             className={`w-5 h-5 transition-colors duration-200 ${isLiked ? 'text-red-500 fill-current' : 'text-[#6b7280] hover:text-red-400'}`}
@@ -91,6 +106,7 @@ function PropertyCard({ property }) {
 
 PropertyCard.propTypes = {
   property: PropTypes.shape({
+    id: PropTypes.string,
     image: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     location: PropTypes.string.isRequired,

@@ -13,6 +13,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OAuthCallback from './pages/OAuthCallback';
 import ProfilePage from './pages/ProfilePage';
+import MessagesPage from './pages/MessagesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ChatWidget from './components/ChatWidget';
@@ -24,6 +25,7 @@ import AdminBookings from './pages/AdminBookings';
 import AdminEarnings from './pages/AdminEarnings';
 import AdminPromos from './pages/AdminPromos';
 import AdminFeedback from './pages/AdminFeedback';
+import AdminMessages from './pages/AdminMessages';
 
 // Home page component
 function HomePage() {
@@ -334,6 +336,7 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/auth/callback" element={<OAuthCallback />} />
         <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+        <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="properties" element={<AdminProperties />} />
@@ -344,6 +347,7 @@ function App() {
           <Route path="earnings" element={<AdminEarnings />} />
           <Route path="promos" element={<AdminPromos />} />
           <Route path="feedback" element={<AdminFeedback />} />
+          <Route path="messages" element={<AdminMessages />} />
         </Route>
       </Routes>
     </Router>

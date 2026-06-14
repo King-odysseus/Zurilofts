@@ -23,6 +23,8 @@ model User {
   updatedAt    DateTime  @updatedAt
   bookings     Booking[]
   reviews      Review[]
+  favorites    Favorite[]
+  messages     Message[]
 }
 
 model Property {
@@ -50,6 +52,7 @@ model Property {
   calendarBlocks  CalendarBlock[]
   priceRules      PriceRule[]
   guestReviews    Review[]
+  favoritedBy     Favorite[]
 }
 
 // External iCal feeds (Airbnb, Booking.com, VRBO, ...) imported per property
@@ -143,6 +146,34 @@ model Review {
   updatedAt   DateTime @updatedAt
 
   @@index([propertyId])
+}
+
+// A user's saved/favourited property
+model Favorite {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+}
+
+// In-app messages between a customer and the admin team. All messages with the
+// same userId form that customer's conversation thread.
+model Message {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  senderRole  String   // "USER" | "ADMIN"
+  body        String
+  readByAdmin Boolean  @default(false)
+  readByUser  Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
 }
 
 model PromoCode {
