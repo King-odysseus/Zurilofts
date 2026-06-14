@@ -60,19 +60,28 @@ export async function createReview(input: CreateReviewInput) {
   return review;
 }
 
-/** Public summary: average rating, total stays, satisfaction % for the landing page. */
+/** Public summary: rating, stays, satisfaction for the landing page.
+ *  Defaults to live data from reviews and bookings. Admin can override via settings. */
 export async function getPublicStats() {
-  const [reviewAgg, confirmedStays] = await Promise.all([
+  const { getLandingStats } = await import('./settings.service.js');
+  const [reviewAgg, confirmedStays, landingStats] = await Promise.all([
     prisma.review.aggregate({ _avg: { rating: true }, _count: { _all: true } }),
     prisma.booking.count({ where: { status: 'CONFIRMED' } }),
+    getLandingStats(),
   ]);
 
   const totalReviews = reviewAgg._count._all;
-  const averageRating = reviewAgg._avg.rating
-    ? Math.round(reviewAgg._avg.rating * 10) / 10
-    : 0;
 
-  // Satisfaction: % of reviews rated 4 or 5 stars
+  // Star rating: auto-computed from reviews, admin can override
+  const autoRating = reviewAgg._avg.rating
+    ? Math.round(reviewAgg._avg.rating * 10) / 10
+    : 5.0;
+  const averageRating = landingStats.starRating > 0 ? landingStats.starRating : autoRating;
+
+  // Happy stays: auto-computed from confirmed bookings, admin can override
+  const happyStays = landingStats.happyStays > 0 ? landingStats.happyStays : confirmedStays;
+
+  // Satisfaction: always auto-computed from reviews rated 4+ stars
   const positiveReviews = totalReviews > 0
     ? await prisma.review.count({ where: { rating: { gte: 4 } } })
     : 0;
@@ -84,6 +93,7 @@ export async function getPublicStats() {
     averageRating,
     totalReviews,
     confirmedStays,
+    happyStays,
     satisfaction,
   };
 }

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import {
@@ -7,6 +7,7 @@ import {
   calendarBlockSchema,
   priceRuleSchema,
 } from '../types/index.js';
+import { getLandingStats, setLandingStats } from '../services/settings.service.js';
 import * as bookingCtrl from '../controllers/booking.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
 import * as reviewCtrl from '../controllers/review.controller.js';
@@ -32,6 +33,22 @@ router.post('/messages/:userId', validate(messageCreateSchema), messageCtrl.admi
 
 // Per-property earnings / booking counts
 router.get('/analytics/properties', bookingCtrl.propertyEarnings);
+
+// Landing-page hero stats (editable by admin)
+router.get('/settings/landing-stats', async (_req: Request, res: Response, next: NextFunction) => {
+  try { res.json({ success: true, data: await getLandingStats() }); }
+  catch (e) { next(e); }
+});
+router.put('/settings/landing-stats', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { happyStays, starRating } = req.body;
+    const stats = await setLandingStats(
+      happyStays !== undefined ? Number(happyStays) : undefined,
+      starRating !== undefined ? Number(starRating) : undefined,
+    );
+    res.json({ success: true, data: stats });
+  } catch (e) { next(e); }
+});
 
 // Calendar — sources, blocks, sync (per property)
 router.get('/properties/:id/calendar', calendarCtrl.getCalendar);

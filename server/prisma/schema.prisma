@@ -178,6 +178,12 @@ model Message {
   @@index([userId])
 }
 
+model AppSetting {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}
+
 model PromoCode {
   id               String    @id @default(cuid())
   code             String    @unique

@@ -63,7 +63,7 @@ function AdminLayout() {
                 title={collapsed ? label : ''}
                 className={`flex items-center rounded-xl mb-1 text-sm font-medium transition-all duration-200 ${
                   active
-                    ? 'bg-[#C49A6C] text-[#262262]'
+                    ? 'bg-[#C49A6C] text-white'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 } ${collapsed ? 'justify-center px-2 py-3' : 'px-4 py-3'}`}
               >
@@ -79,7 +79,7 @@ function AdminLayout() {
           <Link
             to="/"
             title={collapsed ? 'Go back to client view' : ''}
-            className={`flex items-center rounded-xl text-sm font-semibold bg-white/10 text-white hover:bg-[#C49A6C] hover:text-[#262262] transition-all duration-200 ${
+            className={`flex items-center rounded-xl text-sm font-semibold bg-white/10 text-white hover:bg-[#C49A6C] hover:text-white transition-all duration-200 ${
               collapsed ? 'justify-center p-2 mb-2' : 'justify-center mb-4 px-4 py-2.5'
             }`}
           >
@@ -89,7 +89,7 @@ function AdminLayout() {
             {!collapsed && <span className="ml-2">Go back to client view</span>}
           </Link>
           <div className={`flex items-center mb-3 ${collapsed ? 'justify-center' : 'space-x-3'}`}>
-            <div className="w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-xs font-bold text-[#262262]">
+            <div className="w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-xs font-bold text-white">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
             </div>
             {!collapsed && (
@@ -129,7 +129,7 @@ function AdminLayout() {
               to={path}
               className={`p-2 rounded-lg text-xs font-medium transition-colors ${
                 location.pathname === path
-                  ? 'bg-[#C49A6C] text-[#262262]'
+                  ? 'bg-[#C49A6C] text-white'
                   : 'text-white/70'
               }`}
             >
@@ -168,14 +168,18 @@ function AdminLayout() {
 function DashboardOverview() {
   const [stats, setStats] = useState({ properties: 0, bookings: 0, promos: 0, revenue: 0 });
   const [recentBookings, setRecentBookings] = useState([]);
+  const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0' });
+  const [savingLanding, setSavingLanding] = useState(false);
+  const [landingMsg, setLandingMsg] = useState('');
 
   useEffect(() => {
     async function load() {
       try {
-        const [propsRes, bookingsRes, promosRes] = await Promise.all([
+        const [propsRes, bookingsRes, promosRes, landingRes] = await Promise.all([
           apiClient.get('/properties'),
           apiClient.get('/admin/bookings', { params: { limit: 5 } }),
           apiClient.get('/promo'),
+          apiClient.get('/admin/settings/landing-stats'),
         ]);
         const bookings = bookingsRes.data.data || [];
         const totalRevenue = bookings.reduce((sum, b) => sum + b.total, 0);
@@ -186,12 +190,31 @@ function DashboardOverview() {
           revenue: totalRevenue,
         });
         setRecentBookings(bookings);
+        const ls = landingRes.data.data || {};
+        setLandingStats({ happyStays: String(ls.happyStays || '10'), starRating: String(ls.starRating || '5.0') });
       } catch {
         // silent
       }
     }
     load();
   }, []);
+
+  async function saveLandingStats(e) {
+    e.preventDefault();
+    setSavingLanding(true);
+    setLandingMsg('');
+    try {
+      await apiClient.put('/admin/settings/landing-stats', {
+        happyStays: Number(landingStats.happyStays),
+        starRating: Number(landingStats.starRating),
+      });
+      setLandingMsg('Saved.');
+    } catch {
+      setLandingMsg('Save failed.');
+    } finally {
+      setSavingLanding(false);
+    }
+  }
 
   return (
     <div>
@@ -216,6 +239,44 @@ function DashboardOverview() {
             <p className="text-2xl font-bold text-[#262262]">{value}</p>
           </div>
         ))}
+      </div>
+
+      {/* Landing Page Stats Editor */}
+      <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-6 mb-6">
+        <h2 className="text-lg font-bold text-[#262262] mb-2">Landing Page Stats</h2>
+        <p className="text-sm text-[#6b7280] mb-4">These appear in the hero section. Leave at 0 to use live data from reviews and bookings.</p>
+        <form onSubmit={saveLandingStats} className="flex flex-wrap items-end gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-[#1f2937] mb-1">Happy Stays</label>
+            <input
+              type="number"
+              min="0"
+              value={landingStats.happyStays}
+              onChange={(e) => setLandingStats({ ...landingStats, happyStays: e.target.value })}
+              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C]"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-[#1f2937] mb-1">Star Rating</label>
+            <input
+              type="number"
+              min="0"
+              max="5"
+              step="0.1"
+              value={landingStats.starRating}
+              onChange={(e) => setLandingStats({ ...landingStats, starRating: e.target.value })}
+              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C]"
+            />
+          </div>
+          <button
+            type="submit"
+            disabled={savingLanding}
+            className="bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+          >
+            {savingLanding ? 'Saving...' : 'Update'}
+          </button>
+          {landingMsg && <span className="text-sm text-green-600 self-center">{landingMsg}</span>}
+        </form>
       </div>
 
       {/* Recent Bookings */}

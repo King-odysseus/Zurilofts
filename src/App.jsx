@@ -63,7 +63,7 @@ function HomePage() {
         const d = res.data.data;
         setHeroStats({
           rating: d.averageRating || 5.0,
-          stays: d.confirmedStays || 0,
+          stays: d.happyStays || d.confirmedStays || 0,
           satisfaction: d.satisfaction || 100,
         });
       } catch { /* use hardcoded fallbacks */ }
