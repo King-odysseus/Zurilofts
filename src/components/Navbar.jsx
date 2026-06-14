@@ -164,7 +164,7 @@ function Navbar() {
               )}
             </div>
           ) : (
-            /* Logged out — Sign In + Get It Now */
+            /* Logged out — Sign In/Sign Up + Chat */
             <>
               <Link
                 to="/login"
@@ -174,7 +174,7 @@ function Navbar() {
                     : 'border-white text-white hover:bg-white hover:text-[#262262]'
                 }`}
               >
-                Sign In
+                Sign In / Sign Up
               </Link>
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
@@ -282,7 +282,7 @@ function Navbar() {
                     className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Sign In
+                    Sign In / Sign Up
                   </Link>
                   <button
                     className="block w-full py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 text-center"
