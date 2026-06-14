@@ -14,6 +14,16 @@ export async function create(req: Request, res: Response, next: NextFunction): P
   }
 }
 
+// Public: summary stats for the landing page (rating, stays, satisfaction)
+export async function publicStats(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const stats = await reviewService.getPublicStats();
+    res.json({ success: true, data: stats });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // Admin: list all reviews + rating summary
 export async function listAll(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

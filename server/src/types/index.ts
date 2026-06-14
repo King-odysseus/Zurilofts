@@ -105,6 +105,7 @@ export const bookingCreateSchema = z.object({
 export const reviewCreateSchema = z.object({
   bookingId: z.string().min(1, 'Booking is required'),
   rating: z.number().int().min(1, 'Rating is required').max(5),
+  satisfaction: z.enum(['happy', 'neutral', 'unhappy']).optional(),
   privateNote: z.string().max(2000).optional(),
 });
 

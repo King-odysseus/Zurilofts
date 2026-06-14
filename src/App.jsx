@@ -31,6 +31,7 @@ import AdminMessages from './pages/AdminMessages';
 function HomePage() {
   const [slide, setSlide] = useState(0);
   const [featuredProperty, setFeaturedProperty] = useState(null);
+  const [heroStats, setHeroStats] = useState(null);
   const totalSlides = featuredProperty?.images?.length > 0
     ? Math.min(featuredProperty.images.length, 4)
     : 4;
@@ -55,10 +56,25 @@ function HomePage() {
     fetchProperties();
   }, []);
 
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const res = await apiClient.get('/reviews/summary');
+        const d = res.data.data;
+        setHeroStats({
+          rating: d.averageRating || 5.0,
+          stays: d.confirmedStays || 0,
+          satisfaction: d.satisfaction || 100,
+        });
+      } catch { /* use hardcoded fallbacks */ }
+    }
+    fetchStats();
+  }, []);
+
   return (
     <>
       {/* Hero Section with integrated Navbar */}
-      <Hero />
+      <Hero stats={heroStats} />
       
       {/* Properties Section */}
       <section id="properties" className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 md:px-6 max-w-7xl mx-auto">

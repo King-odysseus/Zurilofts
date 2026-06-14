@@ -72,7 +72,8 @@ AnimatedNumber.defaultProps = {
   duration: 2000,
 };
 
-function Hero() {
+function Hero({ stats }) {
+  const { rating = '5.0', stays = '50', satisfaction = '100' } = stats || {};
   return (
     <section className="relative min-h-[600px] md:min-h-[700px] flex flex-col overflow-hidden">
       {/* Background Image with Blur */}
@@ -131,21 +132,21 @@ function Hero() {
           <div className="mt-16 flex justify-center items-center space-x-8 md:space-x-16">
             <div className="text-center group cursor-default">
               <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 hover:scale-110 hover:text-[#C49A6C]">
-                <AnimatedNumber value="5.0" />
+                <AnimatedNumber value={String(rating)} />
               </div>
               <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Star Rating</div>
             </div>
             <div className="w-px h-12 bg-white/20"></div>
             <div className="text-center group cursor-default">
               <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 hover:scale-110 hover:text-[#C49A6C]">
-                <AnimatedNumber value="50" suffix="+" />
+                <AnimatedNumber value={String(stays)} suffix="+" />
               </div>
               <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Happy Stays</div>
             </div>
             <div className="w-px h-12 bg-white/20 hidden md:block"></div>
             <div className="text-center hidden md:block group cursor-default">
               <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 hover:scale-110 hover:text-[#C49A6C]">
-                <AnimatedNumber value="100" suffix="%" />
+                <AnimatedNumber value={String(satisfaction)} suffix="%" />
               </div>
               <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Satisfaction</div>
             </div>

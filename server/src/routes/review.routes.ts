@@ -6,6 +6,9 @@ import * as ctrl from '../controllers/review.controller.js';
 
 const router = Router();
 
+// Public landing-page stats
+router.get('/summary', ctrl.publicStats);
+
 // Guest leaves a post-stay review
 router.post('/', authenticate, validate(reviewCreateSchema), ctrl.create);
 

@@ -31,7 +31,7 @@ function ContactPage() {
           <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#262262] mb-4 pt-12 md:pt-20">Find Us</h2>
             <p className="text-[#6b7280] max-w-2xl mx-auto">
-              Located in the heart of Westlands, Nairobi. Visit our office to discuss your stay in person.
+              We operate in Nairobi, Kenya.
             </p>
           </div>
           <div className="rounded-2xl overflow-hidden neu-card mb-12">

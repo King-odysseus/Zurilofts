@@ -152,6 +152,7 @@ model Review {
   propertyId  String
   property    Property @relation(fields: [propertyId], references: [id])
   rating      Int
+  satisfaction String? // "happy" | "neutral" | "unhappy"
   privateNote String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
