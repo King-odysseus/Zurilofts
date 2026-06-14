@@ -143,6 +143,10 @@ export function AuthProvider({ children }) {
     dispatch({ type: 'CLEAR_ERROR' });
   }, []);
 
+  const setUser = useCallback((user) => {
+    dispatch({ type: 'SET_USER', payload: user });
+  }, []);
+
   const value = {
     ...state,
     login,
@@ -150,6 +154,7 @@ export function AuthProvider({ children }) {
     logout,
     handleOAuthCallback,
     clearError,
+    setUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

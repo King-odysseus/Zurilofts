@@ -69,7 +69,7 @@ function detectCountry(storedPhone) {
 }
 
 function ProfilePage() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { favorites } = useFavorites();
   const [activeTab, setActiveTab] = useState('info');
   const [profile, setProfile] = useState(null);
@@ -201,6 +201,8 @@ function ProfilePage() {
       };
       const res = await apiClient.put('/users/profile', payload);
       setProfile(res.data.data);
+      // Sync to auth context so navbar shows updated name/avatar
+      setUser({ ...user, ...res.data.data });
       setMessage('Profile updated successfully!');
       setShowCompletionBanner(false);
     } catch (err) {
@@ -222,6 +224,8 @@ function ProfilePage() {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       setProfile(res.data.data);
+      // Sync avatar to auth context so navbar updates
+      setUser({ ...user, avatar: res.data.data.avatar });
       setMessage('Profile photo updated!');
     } catch (err) {
       setMessage(err.response?.data?.error || 'Upload failed');

@@ -85,8 +85,12 @@ function Navbar() {
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-[#D9D9D9]/30 transition-all duration-200"
               >
-                <div className="relative w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-[#262262]">
-                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                <div className="relative w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
+                  {user?.avatar ? (
+                    <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
+                  )}
                   {unreadMessages > 0 && (
                     <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                       {unreadMessages > 9 ? '9+' : unreadMessages}

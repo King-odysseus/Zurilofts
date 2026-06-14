@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import apiClient from '../api/client.js';
 import logoImg from '../assets/zurilofts-logo.png';
 import { zuriImages } from '../assets/images';
 
@@ -19,7 +20,9 @@ function RegisterPage() {
   const [localError, setLocalError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const { register, isAuthenticated, isLoading, error, clearError } = useAuth();
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const { register, isAuthenticated, isLoading, error, clearError, setUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -62,7 +65,25 @@ function RegisterPage() {
 
     if (!result.success) {
       setLocalError(result.message);
+      setSubmitting(false);
+      return;
     }
+
+    // Upload avatar if one was selected
+    if (avatarFile) {
+      try {
+        const form = new FormData();
+        form.append('avatar', avatarFile);
+        const avatarRes = await apiClient.post('/users/avatar', form, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        // Update auth context with the avatar URL
+        setUser(avatarRes.data.data);
+      } catch {
+        // Non-fatal — account is created, avatar can be added later
+      }
+    }
+
     setSubmitting(false);
   }
 
@@ -166,6 +187,43 @@ function RegisterPage() {
                 />
               </div>
             </div>
+            <div className="flex flex-col items-center pt-2">
+              <p className="block text-sm font-semibold text-[#1f2937] mb-3">Profile Picture (optional)</p>
+              <label className="relative cursor-pointer group">
+                {avatarPreview ? (
+                  <img
+                    src={avatarPreview}
+                    alt="Preview"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-[#D9D9D9]"
+                  />
+                ) : (
+                  <div className="w-20 h-20 bg-[#D9D9D9]/30 rounded-full flex items-center justify-center border-2 border-dashed border-[#D9D9D9]">
+                    <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                  </div>
+                )}
+                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      setAvatarFile(file);
+                      setAvatarPreview(URL.createObjectURL(file));
+                    }
+                  }}
+                  className="hidden"
+                />
+              </label>
+            </div>
+
             <button
               type="submit"
               disabled={submitting}
