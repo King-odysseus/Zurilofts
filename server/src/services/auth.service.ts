@@ -16,6 +16,7 @@ export interface UserResponse {
   firstName: string;
   lastName: string;
   phone: string | null;
+  avatar: string | null;
   role: string;
   createdAt: Date;
 }
@@ -27,6 +28,7 @@ function toUserResponse(user: any): UserResponse {
     firstName: user.firstName,
     lastName: user.lastName,
     phone: user.phone,
+    avatar: user.avatar,
     role: user.role,
     createdAt: user.createdAt,
   };
