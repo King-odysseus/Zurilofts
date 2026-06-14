@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
+import logoImg from '../assets/zurilofts-logo.png';
 
 const navItems = [
   { path: '/admin', label: 'Dashboard', icon: 'M4 6h16M4 10h16M4 14h16M4 18h16', exact: true },
@@ -19,13 +20,10 @@ function AdminLayout() {
       {/* Sidebar */}
       <aside className="w-64 bg-[#262262] text-white hidden md:flex flex-col fixed inset-y-0 left-0 z-10">
         <div className="p-6">
-          <Link to="/" className="flex items-center space-x-2 mb-8">
-            <div className="w-8 h-8 bg-[#C49A6C] rounded-lg flex items-center justify-center">
-              <span className="text-[#262262] font-bold">Z</span>
-            </div>
-            <span className="text-lg font-bold">ZuriLofts</span>
+          <Link to="/" className="inline-block bg-white rounded-xl px-3 py-2 mb-4">
+            <img src={logoImg} alt="ZuriLofts" className="h-10 w-auto" />
           </Link>
-          <span className="text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">Admin Panel</span>
+          <span className="block text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">Admin Panel</span>
         </div>
         <nav className="flex-1 px-3">
           {navItems.map(({ path, label, icon, exact }) => {
@@ -73,10 +71,10 @@ function AdminLayout() {
       {/* Mobile nav */}
       <div className="md:hidden fixed top-0 w-full bg-[#262262] z-10 p-4 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <div className="w-7 h-7 bg-[#C49A6C] rounded-lg flex items-center justify-center">
-            <span className="text-[#262262] font-bold text-xs">Z</span>
+          <div className="bg-white rounded-lg px-2 py-1">
+            <img src={logoImg} alt="ZuriLofts" className="h-6 w-auto" />
           </div>
-          <span className="text-white font-bold">Admin</span>
+          <span className="text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">Admin</span>
         </Link>
         <div className="flex space-x-2">
           {navItems.map(({ path, label, icon }) => (
