@@ -70,11 +70,14 @@ function BookingPage() {
   const [promoError, setPromoError] = useState('');
   const [validatingPromo, setValidatingPromo] = useState(false);
 
-  // Bed option — 1 bed (KES 5,100) or 2 bed (KES 5,500)
+  // Bed option — 1 bed (KES 5,100 / max 2 guests) or 2 bed (KES 5,500 / max 4 guests)
+  // Hard cap: 6 people total. Extra guests above the bed max cost KES 500/night each.
   const BED_OPTIONS = [
-    { type: '1bed', label: '1 Bed', price: 5100 },
-    { type: '2bed', label: '2 Bed', price: 5500 },
+    { type: '1bed', label: '1 Bed', price: 5100, maxGuests: 2 },
+    { type: '2bed', label: '2 Bed', price: 5500, maxGuests: 4 },
   ];
+  const EXTRA_GUEST_FEE = 500;
+  const ABSOLUTE_MAX_GUESTS = 6;
   const [bedOption, setBedOption] = useState(null);
 
   // Standard stay times. Check-in from 3:00 PM, check-out by 10:00 AM.
@@ -128,7 +131,7 @@ function BookingPage() {
 
   // Set the headcount and resize the additional-guest forms to match (guests - 1)
   const setGuestCount = (count) => {
-    const n = Math.max(1, Math.min(6, count));
+    const n = Math.max(1, Math.min(ABSOLUTE_MAX_GUESTS, count));
     setBookingData((prev) => ({ ...prev, guests: n }));
     setAdditionalGuests((prev) => {
       const next = prev.slice(0, n - 1);
@@ -216,11 +219,15 @@ function BookingPage() {
   const selectedOption = BED_OPTIONS.find(o => o.type === bedOption);
   const propertyPrice = selectedOption?.price || property?.price || 0;
   const subtotal = nights * propertyPrice;
+  const maxForBed = selectedOption?.maxGuests || 2;
+  const extraGuests = Math.max(0, bookingData.guests - maxForBed);
+  const extraGuestFee = extraGuests * EXTRA_GUEST_FEE * nights;
   const cleaningFee = 1500;
   const serviceFee = Math.round(subtotal * 0.12);
   const lateCheckoutFee = calcLateCheckoutFee(bookingData.checkOutTime, propertyPrice);
   const discountAmount = promoResult?.discountAmount || 0;
-  const total = subtotal + cleaningFee + serviceFee + lateCheckoutFee - discountAmount;
+  const total = subtotal + cleaningFee + serviceFee + extraGuestFee + lateCheckoutFee - discountAmount;
+  const exceedingMax = bookingData.guests > ABSOLUTE_MAX_GUESTS;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -330,13 +337,27 @@ function BookingPage() {
         <Dropdown
           value={bookingData.guests}
           onChange={(v) => setGuestCount(Number(v))}
-          options={[1, 2, 3, 4, 5, 6].map((num) => ({
+          options={Array.from({ length: ABSOLUTE_MAX_GUESTS }, (_, i) => i + 1).map((num) => ({
             value: num,
             label: `${num} ${num === 1 ? 'guest' : 'guests'}`,
           }))}
           triggerClassName="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
           ariaLabel="Number of guests"
         />
+        {bedOption && (
+          <p className="text-xs text-[#6b7280] mt-1">
+            This room fits up to {maxForBed} guests. Each extra guest adds KES {EXTRA_GUEST_FEE.toLocaleString()}/night.
+            {bookingData.guests > maxForBed && (
+              <span className="text-amber-600 font-medium"> {extraGuests} extra guest{extraGuests > 1 ? 's' : ''} &middot; +KES {(extraGuestFee).toLocaleString()}</span>
+            )}
+          </p>
+        )}
+        {bookingData.guests > ABSOLUTE_MAX_GUESTS && (
+          <p className="text-red-500 text-xs mt-1 font-semibold">Maximum {ABSOLUTE_MAX_GUESTS} guests. Exceeding this is grounds for removal.</p>
+        )}
+        {!bedOption && (
+          <p className="text-xs text-[#6b7280] mt-1">Select a bed option above to see guest limits.</p>
+        )}
       </div>
 
       {/* Bed Option */}
@@ -524,7 +545,7 @@ function BookingPage() {
           <button
             type="button"
             onClick={addGuest}
-            disabled={bookingData.guests >= 6}
+            disabled={bookingData.guests >= ABSOLUTE_MAX_GUESTS}
             className="text-sm font-semibold text-[#C49A6C] hover:text-[#262262] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add guest
@@ -732,6 +753,12 @@ function BookingPage() {
           <span>Cleaning fee</span>
           <span>KES {cleaningFee.toLocaleString()}</span>
         </div>
+        {extraGuestFee > 0 && (
+          <div className="flex justify-between text-[#1f2937]">
+            <span>Extra guest fee ({extraGuests} guest{extraGuests > 1 ? 's' : ''} x KES {EXTRA_GUEST_FEE.toLocaleString()} x {nights} nights)</span>
+            <span>KES {extraGuestFee.toLocaleString()}</span>
+          </div>
+        )}
         <div className="flex justify-between text-[#1f2937]">
           <span>Service fee</span>
           <span>KES {serviceFee.toLocaleString()}</span>
@@ -966,6 +993,12 @@ function BookingPage() {
                         <span>Cleaning fee</span>
                         <span>KES {cleaningFee.toLocaleString()}</span>
                       </div>
+                      {extraGuestFee > 0 && (
+                        <div className="flex justify-between text-[#1f2937]">
+                          <span>Extra guest fee ({extraGuests} x KES {EXTRA_GUEST_FEE.toLocaleString()} x {nights} nights)</span>
+                          <span>KES {extraGuestFee.toLocaleString()}</span>
+                        </div>
+                      )}
                       <div className="flex justify-between text-[#1f2937]">
                         <span>Service fee</span>
                         <span>KES {serviceFee.toLocaleString()}</span>

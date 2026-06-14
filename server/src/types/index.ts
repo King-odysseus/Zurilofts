@@ -84,7 +84,7 @@ export const bookingCreateSchema = z.object({
   propertyId: z.string().min(1, 'Property is required'),
   checkIn: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-in date'),
   checkOut: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-out date'),
-  guests: z.number().int().min(1).max(10),
+  guests: z.number().int().min(1).max(6, 'Maximum 6 guests per property'),
   bedOption: z.enum(['1bed', '2bed']).optional(),
   checkInTime: z.string().optional(),
   checkOutTime: z.string().optional(),

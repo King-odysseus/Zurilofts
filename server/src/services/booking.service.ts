@@ -77,12 +77,19 @@ export async function createBooking(input: CreateBookingInput) {
     throw new ConflictError('Those dates are no longer available for this property');
   }
 
+  // Enforce occupancy limits: 2 per bed, 6 absolute max
+  const maxForBed = input.bedOption === '2bed' ? 4 : 2;
+  if (input.guests > 6) {
+    throw new ValidationError('Maximum 6 guests per property. Exceeding this is grounds for removal.');
+  }
+
   // Determine effective base price based on bed option
   const effectivePrice = input.bedOption && BED_PRICES[input.bedOption]
     ? BED_PRICES[input.bedOption]
     : property.price;
 
   const nights = calculateNights(checkInDate, checkOutDate);
+  const extraGuestFee = Math.max(0, input.guests - maxForBed) * 500 * nights;
 
   // Apply seasonal price rules per night (falls back to effectivePrice)
   const priceRules = await prisma.priceRule.findMany({
@@ -107,7 +114,7 @@ export async function createBooking(input: CreateBookingInput) {
 
   // Late check-out fee: doubles each hour past 10:00 AM, up to a full night.
   const lateFee = lateCheckoutFee(input.checkOutTime, effectivePrice);
-  const total = pricing.total + lateFee;
+  const total = pricing.total + lateFee + extraGuestFee;
 
   const booking = await prisma.booking.create({
     data: {
