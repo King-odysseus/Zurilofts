@@ -7,6 +7,66 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 import apiClient from '../api/client.js';
 
+const COUNTRY_CODES = [
+  { code: 'KE', name: 'Kenya', dial: '+254', length: 9, example: '712 345 678' },
+  { code: 'UG', name: 'Uganda', dial: '+256', length: 9, example: '712 345 678' },
+  { code: 'TZ', name: 'Tanzania', dial: '+255', length: 9, example: '712 345 678' },
+  { code: 'RW', name: 'Rwanda', dial: '+250', length: 9, example: '712 345 678' },
+  { code: 'US', name: 'United States', dial: '+1', length: 10, example: '212 555 1234' },
+  { code: 'GB', name: 'United Kingdom', dial: '+44', length: 10, example: '7123 456 789' },
+  { code: 'ZA', name: 'South Africa', dial: '+27', length: 9, example: '71 234 5678' },
+  { code: 'NG', name: 'Nigeria', dial: '+234', length: 10, example: '712 345 6789' },
+  { code: 'AE', name: 'UAE', dial: '+971', length: 9, example: '50 123 4567' },
+  { code: 'IN', name: 'India', dial: '+91', length: 10, example: '71234 56789' },
+  { code: 'DE', name: 'Germany', dial: '+49', length: 11, example: '151 234 56789' },
+  { code: 'FR', name: 'France', dial: '+33', length: 9, example: '6 12 34 56 78' },
+  { code: 'CN', name: 'China', dial: '+86', length: 11, example: '131 2345 6789' },
+  { code: 'CA', name: 'Canada', dial: '+1', length: 10, example: '416 555 1234' },
+];
+
+/**
+ * Strip a phone string down to digits only and validate against a country.
+ * Returns { clean, valid, formatted } — valid is a boolean.
+ * Accepts local or international format; uses the selected country's expected
+ * digit length. If the number starts with the country dial code or "00", that
+ * prefix is stripped before length checking.
+ */
+function validatePhone(raw, country) {
+  if (!raw || !country) return { clean: '', valid: false, formatted: '' };
+  let digits = raw.replace(/\D/g, '');
+  // Strip the dial code if the user typed it
+  const dialDigits = country.dial.replace(/\D/g, '');
+  if (digits.startsWith(dialDigits)) {
+    digits = digits.slice(dialDigits.length);
+  } else if (digits.startsWith('00')) {
+    // Strip "00" + country code prefix — e.g. "00254" -> ""
+    const without00 = digits.slice(2);
+    if (without00.startsWith(dialDigits)) {
+      digits = without00.slice(dialDigits.length);
+    }
+  }
+  const valid = digits.length === country.length;
+  // Simple formatting: no spaces inserted — just return digits ready to combine
+  return { clean: digits, valid, formatted: country.dial + ' ' + digits };
+}
+
+/** Try to detect which country a stored phone number belongs to. */
+function detectCountry(storedPhone) {
+  if (!storedPhone) return { countryCode: 'KE', phoneNumber: '' };
+  const digits = storedPhone.replace(/\D/g, '');
+  // Try exact dial-code match first (longest dial code wins)
+  const sorted = [...COUNTRY_CODES].sort((a, b) => b.dial.length - a.dial.length);
+  for (const c of sorted) {
+    const dialDigits = c.dial.replace(/\D/g, '');
+    if (digits.startsWith(dialDigits)) {
+      const number = digits.slice(dialDigits.length);
+      return { countryCode: c.code, phoneNumber: number };
+    }
+  }
+  // Default to Kenya if we can't detect
+  return { countryCode: 'KE', phoneNumber: digits };
+}
+
 function ProfilePage() {
   const { user } = useAuth();
   const { favorites } = useFavorites();
@@ -17,6 +77,9 @@ function ProfilePage() {
 
   // Profile form state
   const [formData, setFormData] = useState({ firstName: '', lastName: '', phone: '' });
+  const [countryCode, setCountryCode] = useState('KE');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneError, setPhoneError] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [avatarUploading, setAvatarUploading] = useState(false);
@@ -77,6 +140,10 @@ function ProfilePage() {
           lastName: profileRes.data.data.lastName || '',
           phone: profileRes.data.data.phone || '',
         });
+        // Parse out country code from stored phone
+        const { countryCode: cc, phoneNumber: pn } = detectCountry(profileRes.data.data.phone || '');
+        setCountryCode(cc);
+        setPhoneNumber(pn);
       } catch {
         // silent
       } finally {
@@ -86,12 +153,38 @@ function ProfilePage() {
     loadData();
   }, []);
 
+  function handlePhoneChange(newCountryCode, newPhoneNumber) {
+    setCountryCode(newCountryCode);
+    setPhoneNumber(newPhoneNumber);
+    const country = COUNTRY_CODES.find((c) => c.code === newCountryCode);
+    const v = validatePhone(newPhoneNumber, country);
+    if (!newPhoneNumber) {
+      setPhoneError('');
+    } else if (!v.valid) {
+      setPhoneError(`Enter ${country.length} digits for ${country.name} (e.g. ${country.example})`);
+    } else {
+      setPhoneError('');
+    }
+  }
+
   async function handleProfileUpdate(e) {
     e.preventDefault();
+    // Validate phone
+    const country = COUNTRY_CODES.find((c) => c.code === countryCode);
+    const v = validatePhone(phoneNumber, country);
+    if (phoneNumber && !v.valid) {
+      setPhoneError(`Enter ${country.length} digits for ${country.name}`);
+      return;
+    }
+    setPhoneError('');
     setSaving(true);
     setMessage('');
     try {
-      const res = await apiClient.put('/users/profile', formData);
+      const payload = {
+        ...formData,
+        phone: phoneNumber ? country.dial + phoneNumber : '',
+      };
+      const res = await apiClient.put('/users/profile', payload);
       setProfile(res.data.data);
       setMessage('Profile updated successfully!');
     } catch (err) {
@@ -240,12 +333,36 @@ function ProfilePage() {
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label>
-                    <input
-                      type="tel"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        value={countryCode}
+                        onChange={(e) => handlePhoneChange(e.target.value, phoneNumber)}
+                        className="neu-input px-3 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0 appearance-none"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                          backgroundRepeat: 'no-repeat',
+                          backgroundPosition: 'right 8px center',
+                          paddingRight: '28px',
+                        }}
+                      >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.code} value={c.code}>
+                            {c.dial}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
+                        maxLength={15}
+                        placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
+                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                      />
+                    </div>
+                    {phoneError && (
+                      <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+                    )}
                   </div>
                   <button
                     type="submit"

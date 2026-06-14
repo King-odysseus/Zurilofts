@@ -6,6 +6,51 @@ import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
 
+const COUNTRY_CODES = [
+  { code: 'KE', name: 'Kenya', dial: '+254', length: 9, example: '712 345 678' },
+  { code: 'UG', name: 'Uganda', dial: '+256', length: 9, example: '712 345 678' },
+  { code: 'TZ', name: 'Tanzania', dial: '+255', length: 9, example: '712 345 678' },
+  { code: 'RW', name: 'Rwanda', dial: '+250', length: 9, example: '712 345 678' },
+  { code: 'US', name: 'United States', dial: '+1', length: 10, example: '212 555 1234' },
+  { code: 'GB', name: 'United Kingdom', dial: '+44', length: 10, example: '7123 456 789' },
+  { code: 'ZA', name: 'South Africa', dial: '+27', length: 9, example: '71 234 5678' },
+  { code: 'NG', name: 'Nigeria', dial: '+234', length: 10, example: '712 345 6789' },
+  { code: 'AE', name: 'UAE', dial: '+971', length: 9, example: '50 123 4567' },
+  { code: 'IN', name: 'India', dial: '+91', length: 10, example: '71234 56789' },
+  { code: 'DE', name: 'Germany', dial: '+49', length: 11, example: '151 234 56789' },
+  { code: 'FR', name: 'France', dial: '+33', length: 9, example: '6 12 34 56 78' },
+  { code: 'CN', name: 'China', dial: '+86', length: 11, example: '131 2345 6789' },
+  { code: 'CA', name: 'Canada', dial: '+1', length: 10, example: '416 555 1234' },
+];
+
+function validatePhone(raw, country) {
+  if (!raw || !country) return { clean: '', valid: false };
+  let digits = raw.replace(/\D/g, '');
+  const dialDigits = country.dial.replace(/\D/g, '');
+  if (digits.startsWith(dialDigits)) {
+    digits = digits.slice(dialDigits.length);
+  } else if (digits.startsWith('00')) {
+    const without00 = digits.slice(2);
+    if (without00.startsWith(dialDigits)) {
+      digits = without00.slice(dialDigits.length);
+    }
+  }
+  return { clean: digits, valid: digits.length === country.length };
+}
+
+function detectCountry(storedPhone) {
+  if (!storedPhone) return { countryCode: 'KE', phoneNumber: '' };
+  const digits = storedPhone.replace(/\D/g, '');
+  const sorted = [...COUNTRY_CODES].sort((a, b) => b.dial.length - a.dial.length);
+  for (const c of sorted) {
+    const dialDigits = c.dial.replace(/\D/g, '');
+    if (digits.startsWith(dialDigits)) {
+      return { countryCode: c.code, phoneNumber: digits.slice(dialDigits.length) };
+    }
+  }
+  return { countryCode: 'KE', phoneNumber: digits };
+}
+
 function BookingPage() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -74,6 +119,9 @@ function BookingPage() {
     checkOutTime: STANDARD_CHECK_OUT,
     paymentMethod: 'card',
   });
+  const [phoneCountryCode, setPhoneCountryCode] = useState('KE');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneError, setPhoneError] = useState('');
 
   // Extra guests beyond the account holder; length is kept at (guests - 1)
   const [additionalGuests, setAdditionalGuests] = useState([{ firstName: '', lastName: '' }]);
@@ -110,13 +158,19 @@ function BookingPage() {
         const p = res.data.data || {};
         // Auto-fill the primary guest from the account, but only fields the
         // user hasn't already typed into (so their edits are never clobbered).
+        const storedPhone = p.phone || '';
+        const { countryCode: cc, phoneNumber: pn } = detectCountry(storedPhone);
         setBookingData((prev) => ({
           ...prev,
           firstName: prev.firstName || p.firstName || '',
           lastName: prev.lastName || p.lastName || '',
           email: prev.email || p.email || '',
-          phone: prev.phone || p.phone || '',
+          phone: storedPhone,
         }));
+        if (!prev.phone) {
+          setPhoneCountryCode(cc);
+          setPhoneNumber(pn);
+        }
       } catch {
         // not fatal — user can fill the fields manually
       }
@@ -172,6 +226,23 @@ function BookingPage() {
     const { name, value } = e.target;
     setBookingData({ ...bookingData, [name]: value });
   };
+
+  function handlePhoneChange(newCountryCode, newPhoneNumber) {
+    setPhoneCountryCode(newCountryCode);
+    setPhoneNumber(newPhoneNumber);
+    const country = COUNTRY_CODES.find((c) => c.code === newCountryCode);
+    const v = validatePhone(newPhoneNumber, country);
+    if (!newPhoneNumber) {
+      setPhoneError('');
+    } else if (!v.valid) {
+      setPhoneError(`Enter ${country.length} digits for ${country.name} (e.g. ${country.example})`);
+    } else {
+      setPhoneError('');
+    }
+    // Also update bookingData so the combined value is available on submit
+    const dial = country.dial;
+    setBookingData((prev) => ({ ...prev, phone: newPhoneNumber ? dial + newPhoneNumber : '' }));
+  }
 
   async function handleApplyPromo() {
     if (!promoCode.trim()) return;
@@ -421,15 +492,37 @@ function BookingPage() {
 
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone Number *</label>
-        <input
-          type="tel"
-          name="phone"
-          value={bookingData.phone}
-          onChange={handleInputChange}
-          placeholder="+254 712 345 678"
-          className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
-          required
-        />
+        <div className="flex gap-2">
+          <select
+            value={phoneCountryCode}
+            onChange={(e) => handlePhoneChange(e.target.value, phoneNumber)}
+            className="neu-input px-3 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0 appearance-none"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 8px center',
+              paddingRight: '28px',
+            }}
+          >
+            {COUNTRY_CODES.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.dial}
+              </option>
+            ))}
+          </select>
+          <input
+            type="tel"
+            value={phoneNumber}
+            onChange={(e) => handlePhoneChange(phoneCountryCode, e.target.value.replace(/\D/g, ''))}
+            maxLength={15}
+            placeholder={COUNTRY_CODES.find((c) => c.code === phoneCountryCode)?.example || ''}
+            className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+            required
+          />
+        </div>
+        {phoneError && (
+          <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+        )}
       </div>
 
       {/* Additional guests — one form per extra person in the party */}
@@ -807,7 +900,7 @@ function BookingPage() {
                     <div
                       className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors ${
                         step >= s
-                          ? 'bg-[#C49A6C] text-[#262262]'
+                          ? 'bg-[#C49A6C] text-white'
                           : 'bg-[#D9D9D9] text-[#6b7280]'
                       }`}
                     >
