@@ -138,6 +138,7 @@ export const promoValidateSchema = z.object({
 export const profileUpdateSchema = z.object({
   firstName: z.string().min(1).max(50).optional(),
   lastName: z.string().min(1).max(50).optional(),
+  email: z.string().email('Invalid email address').optional(),
   phone: z.string().max(20).optional(),
   avatar: z.string().max(500).optional(),
 });

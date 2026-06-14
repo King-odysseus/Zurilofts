@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import PropertyCard from '../components/PropertyCard.jsx';
+import Dropdown from '../components/Dropdown.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 import apiClient from '../api/client.js';
@@ -76,13 +77,15 @@ function ProfilePage() {
   const [loading, setLoading] = useState(true);
 
   // Profile form state
-  const [formData, setFormData] = useState({ firstName: '', lastName: '', phone: '' });
+  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', phone: '' });
   const [countryCode, setCountryCode] = useState('KE');
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
 
   // Per-booking review form state, keyed by booking id
   const [reviewForms, setReviewForms] = useState({});
@@ -133,17 +136,22 @@ function ProfilePage() {
           apiClient.get('/users/profile'),
           apiClient.get('/bookings', { params: { limit: 100 } }),
         ]);
-        setProfile(profileRes.data.data);
+        const prof = profileRes.data.data;
+        setProfile(prof);
         setBookings(bookingsRes.data.data || []);
         setFormData({
-          firstName: profileRes.data.data.firstName || '',
-          lastName: profileRes.data.data.lastName || '',
-          phone: profileRes.data.data.phone || '',
+          firstName: prof.firstName || '',
+          lastName: prof.lastName || '',
+          email: prof.email || '',
+          phone: prof.phone || '',
         });
         // Parse out country code from stored phone
-        const { countryCode: cc, phoneNumber: pn } = detectCountry(profileRes.data.data.phone || '');
+        const { countryCode: cc, phoneNumber: pn } = detectCountry(prof.phone || '');
         setCountryCode(cc);
         setPhoneNumber(pn);
+        // Show completion banner if any required field is missing
+        const missing = !prof.firstName || !prof.lastName || !prof.email || !prof.phone;
+        setShowCompletionBanner(missing);
       } catch {
         // silent
       } finally {
@@ -169,6 +177,13 @@ function ProfilePage() {
 
   async function handleProfileUpdate(e) {
     e.preventDefault();
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    setEmailError('');
     // Validate phone
     const country = COUNTRY_CODES.find((c) => c.code === countryCode);
     const v = validatePhone(phoneNumber, country);
@@ -187,6 +202,7 @@ function ProfilePage() {
       const res = await apiClient.put('/users/profile', payload);
       setProfile(res.data.data);
       setMessage('Profile updated successfully!');
+      setShowCompletionBanner(false);
     } catch (err) {
       setMessage(err.response?.data?.error || 'Update failed');
     } finally {
@@ -301,6 +317,17 @@ function ProfilePage() {
           {/* My Info Tab */}
           {activeTab === 'info' && (
             <div>
+              {showCompletionBanner && (
+                <div className="mb-6 bg-[#C49A6C]/10 border border-[#C49A6C] rounded-2xl p-5 flex items-start gap-3">
+                  <svg className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="font-semibold text-[#262262] text-sm">Complete your profile</p>
+                    <p className="text-sm text-[#6b7280] mt-1">Fill in your details below to get the most out of ZuriLofts.</p>
+                  </div>
+                </div>
+              )}
               <div className="neu-card p-6">
                 <h2 className="text-lg font-bold text-[#262262] mb-6">Personal Information</h2>
                 {message && (
@@ -332,32 +359,34 @@ function ProfilePage() {
                     />
                   </div>
                   <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                    />
+                    {emailError && (
+                      <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                    )}
+                  </div>
+                  <div>
                     <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label>
                     <div className="flex gap-2">
-                      <select
+                      <Dropdown
                         value={countryCode}
-                        onChange={(e) => handlePhoneChange(e.target.value, phoneNumber)}
-                        className="neu-input px-3 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0 appearance-none"
-                        style={{
-                          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-                          backgroundRepeat: 'no-repeat',
-                          backgroundPosition: 'right 8px center',
-                          paddingRight: '28px',
-                        }}
-                      >
-                        {COUNTRY_CODES.map((c) => (
-                          <option key={c.code} value={c.code}>
-                            {c.dial}
-                          </option>
-                        ))}
-                      </select>
+                        onChange={(val) => handlePhoneChange(val, phoneNumber)}
+                        options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
+                        triggerClassName="neu-input px-3 py-3 bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0"
+                        ariaLabel="Select country code"
+                      />
                       <input
                         type="tel"
                         value={phoneNumber}
                         onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
                         maxLength={15}
                         placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
-                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
                       />
                     </div>
                     {phoneError && (

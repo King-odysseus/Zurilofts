@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 import prisma from '../config/prisma.js';
-import { NotFoundError, ValidationError } from '../types/index.js';
+import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
 
 const SALT_ROUNDS = 12;
 
@@ -23,9 +23,15 @@ export async function getUserProfile(userId: string) {
   return user;
 }
 
-export async function updateUserProfile(userId: string, data: { firstName?: string; lastName?: string; phone?: string; avatar?: string }) {
+export async function updateUserProfile(userId: string, data: { firstName?: string; lastName?: string; phone?: string; avatar?: string; email?: string }) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError('User');
+
+  // If email is being changed, verify it isn't already taken by another user
+  if (data.email && data.email !== user.email) {
+    const existing = await prisma.user.findUnique({ where: { email: data.email } });
+    if (existing) throw new ConflictError('An account with this email already exists');
+  }
 
   return prisma.user.update({
     where: { id: userId },

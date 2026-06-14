@@ -493,30 +493,20 @@ function BookingPage() {
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone Number *</label>
         <div className="flex gap-2">
-          <select
+          <Dropdown
             value={phoneCountryCode}
-            onChange={(e) => handlePhoneChange(e.target.value, phoneNumber)}
-            className="neu-input px-3 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0 appearance-none"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 8px center',
-              paddingRight: '28px',
-            }}
-          >
-            {COUNTRY_CODES.map((c) => (
-              <option key={c.code} value={c.code}>
-                {c.dial}
-              </option>
-            ))}
-          </select>
+            onChange={(val) => handlePhoneChange(val, phoneNumber)}
+            options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
+            triggerClassName="neu-input px-3 py-3 bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0"
+            ariaLabel="Select country code"
+          />
           <input
             type="tel"
             value={phoneNumber}
             onChange={(e) => handlePhoneChange(phoneCountryCode, e.target.value.replace(/\D/g, ''))}
             maxLength={15}
             placeholder={COUNTRY_CODES.find((c) => c.code === phoneCountryCode)?.example || ''}
-            className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+            className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
             required
           />
         </div>
