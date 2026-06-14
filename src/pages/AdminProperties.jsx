@@ -101,6 +101,12 @@ function AdminProperties() {
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
                         <Link
+                          to={`/admin/properties/${p.id}/calendar`}
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
+                        >
+                          Calendar
+                        </Link>
+                        <Link
                           to={`/admin/properties/${p.id}/edit`}
                           className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
                         >

@@ -17,6 +17,8 @@ import AdminRoute from './components/AdminRoute';
 import ChatWidget from './components/ChatWidget';
 import AdminDashboard, { AdminLayout } from './pages/AdminDashboard';
 import AdminProperties from './pages/AdminProperties';
+import AdminPropertyForm from './pages/AdminPropertyForm';
+import AdminCalendar from './pages/AdminCalendar';
 import AdminBookings from './pages/AdminBookings';
 import AdminPromos from './pages/AdminPromos';
 
@@ -324,6 +326,9 @@ function App() {
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="properties" element={<AdminProperties />} />
+          <Route path="properties/new" element={<AdminPropertyForm />} />
+          <Route path="properties/:id/edit" element={<AdminPropertyForm />} />
+          <Route path="properties/:id/calendar" element={<AdminCalendar />} />
           <Route path="bookings" element={<AdminBookings />} />
           <Route path="promos" element={<AdminPromos />} />
         </Route>

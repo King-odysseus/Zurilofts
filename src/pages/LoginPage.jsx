@@ -55,7 +55,7 @@ function LoginPage() {
       </div>
 
       <div className="max-w-md w-full relative z-10">
-        <div className="neu-card p-8 bg-white/95 backdrop-blur-sm">
+        <div className="neu-card auth-card p-8 bg-white/95 backdrop-blur-sm">
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-block mb-6">

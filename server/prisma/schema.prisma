@@ -41,9 +41,59 @@ model Property {
   type        String                       // "apartment" | "studio" | "penthouse"
   available   Boolean  @default(true)
   featured    Boolean  @default(false)
+  icalToken   String?  @unique              // token for the outbound iCal feed URL
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  bookings    Booking[]
+  bookings        Booking[]
+  calendarSources CalendarSource[]
+  calendarBlocks  CalendarBlock[]
+  priceRules      PriceRule[]
+}
+
+// External iCal feeds (Airbnb, Booking.com, VRBO, ...) imported per property
+model CalendarSource {
+  id           String          @id @default(cuid())
+  propertyId   String
+  property     Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name         String                              // "Airbnb", "Booking.com", ...
+  url          String                              // external iCal/ICS URL
+  lastSyncedAt DateTime?
+  lastStatus   String?                             // "OK (n events)" | "ERROR: ..."
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  blocks       CalendarBlock[]
+}
+
+// Blocked date ranges: imported from a CalendarSource, or created manually by admin
+model CalendarBlock {
+  id         String          @id @default(cuid())
+  propertyId String
+  property   Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  sourceId   String?                              // null = manual block
+  source     CalendarSource? @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  uid        String?                              // iCal UID for dedupe
+  summary    String?
+  start      DateTime
+  end        DateTime
+  createdAt  DateTime        @default(now())
+
+  @@index([propertyId])
+  @@index([sourceId])
+}
+
+// Seasonal / date-range nightly price overrides; base Property.price is the fallback
+model PriceRule {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name       String?                              // "Peak season", "Weekends", ...
+  start      DateTime
+  end        DateTime
+  price      Int                                  // nightly price override (KES)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([propertyId])
 }
 
 model Booking {

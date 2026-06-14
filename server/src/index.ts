@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import app from './app.js';
 import { env } from './config/env.js';
 import { startTelegramPoller } from './services/chat.service.js';
+import { syncAll } from './services/ical.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -23,4 +24,21 @@ app.listen(Number(env.PORT), () => {
   console.log(`   Environment: ${env.NODE_ENV}`);
   console.log(`   Health: http://localhost:${env.PORT}/api/health`);
   startTelegramPoller();
+  startCalendarSync();
 });
+
+// Periodically import external iCal feeds (every 3 hours) so blocked dates stay
+// current without manual syncing. Failures per-source are swallowed inside syncAll.
+function startCalendarSync() {
+  const INTERVAL_MS = 3 * 60 * 60 * 1000;
+  const run = () => {
+    syncAll()
+      .then((count) => {
+        if (count > 0) console.log(`📅 Calendar sync ran for ${count} source(s)`);
+      })
+      .catch((err) => console.error('Calendar sync failed:', err?.message || err));
+  };
+  // First run shortly after boot, then on the interval
+  setTimeout(run, 30 * 1000);
+  setInterval(run, INTERVAL_MS);
+}

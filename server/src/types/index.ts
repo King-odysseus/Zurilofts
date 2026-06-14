@@ -127,6 +127,28 @@ export const bookingStatusSchema = z.object({
   status: z.enum(['CONFIRMED', 'CANCELLED']),
 });
 
+// ---- Calendar sync & seasonal pricing ----
+
+export const calendarSourceSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(60),
+  url: z.string().url('Must be a valid iCal/ICS URL'),
+});
+
+const dateString = z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid date');
+
+export const calendarBlockSchema = z.object({
+  start: dateString,
+  end: dateString,
+  summary: z.string().max(200).optional(),
+});
+
+export const priceRuleSchema = z.object({
+  name: z.string().max(60).optional(),
+  start: dateString,
+  end: dateString,
+  price: z.number().int().positive(),
+});
+
 // ============================================================
 // Custom error classes
 // ============================================================

@@ -52,9 +52,59 @@ model Property {
   type        String
   available   Boolean  @default(true)
   featured    Boolean  @default(false)
+  icalToken   String?  @unique
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  bookings    Booking[]
+  bookings        Booking[]
+  calendarSources CalendarSource[]
+  calendarBlocks  CalendarBlock[]
+  priceRules      PriceRule[]
+}
+
+// External iCal feeds (Airbnb, Booking.com, VRBO, ...) imported per property
+model CalendarSource {
+  id           String          @id @default(uuid())
+  propertyId   String
+  property     Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name         String
+  url          String
+  lastSyncedAt DateTime?
+  lastStatus   String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  blocks       CalendarBlock[]
+}
+
+// Blocked date ranges: imported from a CalendarSource, or created manually by admin
+model CalendarBlock {
+  id         String          @id @default(uuid())
+  propertyId String
+  property   Property        @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  sourceId   String?
+  source     CalendarSource? @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  uid        String?
+  summary    String?
+  start      DateTime
+  end        DateTime
+  createdAt  DateTime        @default(now())
+
+  @@index([propertyId])
+  @@index([sourceId])
+}
+
+// Seasonal / date-range nightly price overrides; base Property.price is the fallback
+model PriceRule {
+  id         String   @id @default(uuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  name       String?
+  start      DateTime
+  end        DateTime
+  price      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([propertyId])
 }
 
 model Booking {

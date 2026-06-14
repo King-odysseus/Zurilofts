@@ -1,6 +1,7 @@
 import prisma from '../config/prisma.js';
-import { NotFoundError, ValidationError } from '../types/index.js';
-import { calculatePricing, calculateNights } from '../utils/pricing.js';
+import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
+import { calculateFees, calculateNights, computeSubtotal } from '../utils/pricing.js';
+import { isRangeAvailable } from './calendar.service.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
 function normalizeBooking(booking: any) {
@@ -59,12 +60,25 @@ export async function createBooking(input: CreateBookingInput) {
     throw new ValidationError('Check-in date cannot be in the past');
   }
 
-  // Determine effective price based on bed option
+  // Reject dates already taken by another booking or an imported/manual block
+  const available = await isRangeAvailable(input.propertyId, checkInDate, checkOutDate);
+  if (!available) {
+    throw new ConflictError('Those dates are no longer available for this property');
+  }
+
+  // Determine effective base price based on bed option
   const effectivePrice = input.bedOption && BED_PRICES[input.bedOption]
     ? BED_PRICES[input.bedOption]
     : property.price;
 
   const nights = calculateNights(checkInDate, checkOutDate);
+
+  // Apply seasonal price rules per night (falls back to effectivePrice)
+  const priceRules = await prisma.priceRule.findMany({
+    where: { propertyId: input.propertyId },
+    select: { start: true, end: true, price: true },
+  });
+  const subtotal = computeSubtotal(checkInDate, nights, effectivePrice, priceRules);
 
   // Handle promo code if provided
   let promoCodeId: string | null = null;
@@ -72,13 +86,13 @@ export async function createBooking(input: CreateBookingInput) {
   let maxDiscount: number | null = null;
 
   if (input.promoCode) {
-    const promo = await validateAndGetPromo(input.promoCode, effectivePrice * nights);
+    const promo = await validateAndGetPromo(input.promoCode, subtotal);
     promoCodeId = promo.id;
     discountPercent = promo.discountPercent;
     maxDiscount = promo.maxDiscount ?? null;
   }
 
-  const pricing = calculatePricing(effectivePrice, nights, discountPercent, maxDiscount);
+  const pricing = calculateFees(subtotal, discountPercent, maxDiscount);
 
   const booking = await prisma.booking.create({
     data: {

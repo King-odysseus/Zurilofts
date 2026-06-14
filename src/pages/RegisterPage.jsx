@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import logoImg from '../assets/zurilofts-logo.png';
+import { zuriImages } from '../assets/images';
+
+// Use the same background treatment as the login page for consistency
+const bgImage = zuriImages[14];
 
 function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -61,9 +65,15 @@ function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#D9D9D9] flex items-center justify-center px-4 py-16">
-      <div className="max-w-md w-full">
-        <div className="neu-card p-8">
+    <div className="min-h-screen flex items-center justify-center px-4 py-16 relative">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img src={bgImage} alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-[#262262]/70"></div>
+      </div>
+
+      <div className="max-w-md w-full relative z-10">
+        <div className="neu-card auth-card p-8 bg-white/95 backdrop-blur-sm">
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-block mb-6">
