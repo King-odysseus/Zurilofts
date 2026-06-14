@@ -38,3 +38,6 @@ Instruct.md
 .qwen/
 .continue/
 .cursor/
+
+# Developer manual (local only, separate React app)
+manual/

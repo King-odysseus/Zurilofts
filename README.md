@@ -325,6 +325,21 @@ daisyui: {
 
 ---
 
+## Developer Manual
+
+A separate visual developer manual lives in the `manual/` folder. It documents the entire codebase with live component previews, code examples, step-by-step guides, and a complete API reference.
+
+```bash
+cd manual
+npm install
+npm run dev
+# → opens at http://localhost:5174
+```
+
+The manual is a standalone React app. It shares no code or dependencies with the main ZuriLofts app. The `manual/` folder is gitignored and never deployed.
+
+---
+
 ## License
 
 © 2024 ZuriLofts. All rights reserved.
