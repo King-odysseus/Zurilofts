@@ -81,13 +81,14 @@ export async function getPublicStats() {
   // Happy stays: auto-computed from confirmed bookings, admin can override
   const happyStays = landingStats.happyStays > 0 ? landingStats.happyStays : confirmedStays;
 
-  // Satisfaction: always auto-computed from reviews rated 4+ stars
+  // Satisfaction: auto-computed from reviews rated 4+ stars, admin can override
   const positiveReviews = totalReviews > 0
     ? await prisma.review.count({ where: { rating: { gte: 4 } } })
     : 0;
-  const satisfaction = totalReviews > 0
+  const computedSatisfaction = totalReviews > 0
     ? Math.round((positiveReviews / totalReviews) * 100)
     : 100;
+  const satisfaction = landingStats.satisfaction > 0 ? landingStats.satisfaction : computedSatisfaction;
 
   return {
     averageRating,

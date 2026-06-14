@@ -3,7 +3,11 @@ import { Link } from 'react-router-dom';
 import apiClient from '../api/client.js';
 import Dropdown from '../components/Dropdown.jsx';
 import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import autoTable from 'jspdf-autotable';
+
+// Register autoTable plugin — the auto-registration in the module only
+// checks window.jsPDF which isn't set in Vite's ESM bundler.
+jsPDF.autoTable = autoTable;
 
 function formatDate() {
   return new Date().toLocaleDateString('en-GB', {
@@ -208,7 +212,7 @@ function AdminEarnings() {
               { value: 'pdf', label: 'Export as PDF' },
               { value: 'csv', label: 'Export as CSV' },
             ]}
-            triggerClassName="px-5 py-2.5 rounded-full bg-[#C49A6C] text-white font-semibold text-sm whitespace-nowrap"
+            triggerClassName="px-5 py-2.5 rounded-xl border border-[#D9D9D9] bg-white text-[#1f2937] font-semibold text-sm whitespace-nowrap hover:border-[#C49A6C]"
             placeholder="Export Report"
             ariaLabel="Export earnings report"
             menuClassName="right-0 left-auto"

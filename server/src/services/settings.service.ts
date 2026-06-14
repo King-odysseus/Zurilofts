@@ -3,6 +3,7 @@ import prisma from '../config/prisma.js';
 const DEFAULTS: Record<string, string> = {
   happyStays: '10',
   starRating: '5.0',
+  satisfaction: '0',
 };
 
 export async function getSetting(key: string): Promise<string> {
@@ -10,18 +11,20 @@ export async function getSetting(key: string): Promise<string> {
   return row?.value ?? DEFAULTS[key] ?? '';
 }
 
-export async function getLandingStats(): Promise<{ happyStays: number; starRating: number }> {
-  const [happyStays, starRating] = await Promise.all([
+export async function getLandingStats(): Promise<{ happyStays: number; starRating: number; satisfaction: number }> {
+  const [happyStays, starRating, satisfaction] = await Promise.all([
     getSetting('happyStays'),
     getSetting('starRating'),
+    getSetting('satisfaction'),
   ]);
   return {
     happyStays: Number(happyStays) || 10,
     starRating: Number(starRating) || 5.0,
+    satisfaction: Number(satisfaction) || 0,
   };
 }
 
-export async function setLandingStats(happyStays?: number, starRating?: number) {
+export async function setLandingStats(happyStays?: number, starRating?: number, satisfaction?: number) {
   if (happyStays !== undefined) {
     await prisma.appSetting.upsert({
       where: { key: 'happyStays' },
@@ -34,6 +37,13 @@ export async function setLandingStats(happyStays?: number, starRating?: number) 
       where: { key: 'starRating' },
       create: { key: 'starRating', value: String(starRating) },
       update: { value: String(starRating) },
+    });
+  }
+  if (satisfaction !== undefined) {
+    await prisma.appSetting.upsert({
+      where: { key: 'satisfaction' },
+      create: { key: 'satisfaction', value: String(satisfaction) },
+      update: { value: String(satisfaction) },
     });
   }
   return getLandingStats();

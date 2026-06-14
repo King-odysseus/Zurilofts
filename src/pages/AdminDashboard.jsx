@@ -168,7 +168,7 @@ function AdminLayout() {
 function DashboardOverview() {
   const [stats, setStats] = useState({ properties: 0, bookings: 0, promos: 0, revenue: 0 });
   const [recentBookings, setRecentBookings] = useState([]);
-  const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0' });
+  const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0', satisfaction: '0' });
   const [savingLanding, setSavingLanding] = useState(false);
   const [landingMsg, setLandingMsg] = useState('');
 
@@ -191,7 +191,11 @@ function DashboardOverview() {
         });
         setRecentBookings(bookings);
         const ls = landingRes.data.data || {};
-        setLandingStats({ happyStays: String(ls.happyStays || '10'), starRating: String(ls.starRating || '5.0') });
+        setLandingStats({
+          happyStays: String(ls.happyStays || '10'),
+          starRating: String(ls.starRating || '5.0'),
+          satisfaction: String(ls.satisfaction || '0'),
+        });
       } catch {
         // silent
       }
@@ -207,6 +211,7 @@ function DashboardOverview() {
       await apiClient.put('/admin/settings/landing-stats', {
         happyStays: Number(landingStats.happyStays),
         starRating: Number(landingStats.starRating),
+        satisfaction: Number(landingStats.satisfaction),
       });
       setLandingMsg('Saved.');
     } catch {
@@ -265,6 +270,17 @@ function DashboardOverview() {
               step="0.1"
               value={landingStats.starRating}
               onChange={(e) => setLandingStats({ ...landingStats, starRating: e.target.value })}
+              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C]"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-[#1f2937] mb-1">Satisfaction %</label>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={landingStats.satisfaction}
+              onChange={(e) => setLandingStats({ ...landingStats, satisfaction: e.target.value })}
               className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C]"
             />
           </div>

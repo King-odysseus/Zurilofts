@@ -41,10 +41,11 @@ router.get('/settings/landing-stats', async (_req: Request, res: Response, next:
 });
 router.put('/settings/landing-stats', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { happyStays, starRating } = req.body;
+    const { happyStays, starRating, satisfaction } = req.body;
     const stats = await setLandingStats(
       happyStays !== undefined ? Number(happyStays) : undefined,
       starRating !== undefined ? Number(starRating) : undefined,
+      satisfaction !== undefined ? Number(satisfaction) : undefined,
     );
     res.json({ success: true, data: stats });
   } catch (e) { next(e); }
