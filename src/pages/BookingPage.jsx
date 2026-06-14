@@ -73,7 +73,7 @@ function BookingPage() {
   // Bed option — 1 bed (KES 5,100) or 2 bed (KES 5,500)
   const BED_OPTIONS = [
     { type: '1bed', label: '1 Bed', price: 5100 },
-    { type: '2bed', label: '2 Bed (main + small room)', price: 5500 },
+    { type: '2bed', label: '2 Bed', price: 5500 },
   ];
   const [bedOption, setBedOption] = useState(null);
 
@@ -368,7 +368,7 @@ function BookingPage() {
         </svg>
         <p className="text-sm text-[#1f2937]">
           Standard <span className="font-semibold">check-in from 3:00 PM</span> and{' '}
-          <span className="font-semibold">check-out by 10:00 AM</span>. A later check-out is available — the fee{' '}
+          <span className="font-semibold">check-out by 10:00 AM</span>. A later check-out is available. The fee{' '}
           <span className="font-semibold">doubles each hour</span> past 10:00 AM, up to a{' '}
           <span className="font-semibold">full night after 5 hours</span>.
         </p>
@@ -447,7 +447,7 @@ function BookingPage() {
 
       <div>
         <h2 className="text-2xl font-bold text-[#262262]">Guest Information</h2>
-        <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account — edit anything that's changed.</p>
+        <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account. Edit anything that's changed.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -718,7 +718,7 @@ function BookingPage() {
         )}
         {promoResult && (
           <p className="text-green-600 text-xs mt-1">
-            {promoResult.discountPercent}% off — KES {promoResult.discountAmount.toLocaleString()} saved!
+            {promoResult.discountPercent}% off. KES {promoResult.discountAmount.toLocaleString()} saved!
           </p>
         )}
       </div>
@@ -928,7 +928,7 @@ function BookingPage() {
                 <h3 className="font-bold text-[#262262] text-lg">{property?.title}</h3>
                 {bedOption && (
                   <p className="text-sm text-[#C49A6C] font-medium mt-1">
-                    {BED_OPTIONS.find(o => o.type === bedOption)?.label} — KES {propertyPrice.toLocaleString()}/night
+                    {BED_OPTIONS.find(o => o.type === bedOption)?.label} &middot; KES {propertyPrice.toLocaleString()}/night
                   </p>
                 )}
                 <div className="flex items-center text-[#6b7280] text-sm mt-1">

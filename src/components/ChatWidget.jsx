@@ -103,7 +103,7 @@ function ChatWidget() {
       if (!sent) {
         setMessages((prev) => [
           ...prev,
-          { from: 'bot', text: 'Thanks! Your message has been sent. We typically reply within 2 hours during business hours — keep this chat open and replies will appear here. ✨' },
+          { from: 'bot', text: 'Thanks! Your message has been sent. We typically reply within 2 hours during business hours. Keep this chat open and replies will appear here. ✨' },
         ]);
         setSent(true);
       }
@@ -160,7 +160,7 @@ function ChatWidget() {
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   m.from === 'user'
-                    ? 'bg-[#C49A6C] text-[#262262] rounded-br-md font-medium'
+                    ? 'bg-[#C49A6C] text-white rounded-br-md font-medium'
                     : 'bg-white border border-[#D9D9D9] text-[#1f2937] rounded-bl-md shadow-sm'
                 }`}>
                   {m.text}

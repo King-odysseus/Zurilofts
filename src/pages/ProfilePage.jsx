@@ -542,7 +542,7 @@ function ProfilePage() {
                             <textarea
                               value={reviewForms[booking.id]?.privateNote || ''}
                               onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
-                              placeholder="Only the ZuriLofts team will see this — tell us what we could do better."
+                              placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
                               className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
                             />
                             {reviewForms[booking.id]?.error && (

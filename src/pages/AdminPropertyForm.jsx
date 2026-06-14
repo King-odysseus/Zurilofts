@@ -257,7 +257,7 @@ function AdminPropertyForm() {
         <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6 space-y-5">
           <div>
             <label className={labelCls}>Photos</label>
-            <p className="text-sm text-[#6b7280] mb-3">Upload images from your device — they&apos;re automatically resized and compressed for the website. The first photo is used as the cover.</p>
+            <p className="text-sm text-[#6b7280] mb-3">Upload images from your device. They&apos;re automatically resized and compressed for the website. The first photo is used as the cover.</p>
 
             {form.images.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">

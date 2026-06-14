@@ -116,7 +116,7 @@ function AdminCalendar() {
     <div className="w-full">
       <div className="mb-6">
         <Link to={`/admin/properties/${id}/edit`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to property</Link>
-        <h1 className="text-2xl font-bold text-[#262262] mt-1">Calendar — {data.property.title}</h1>
+        <h1 className="text-2xl font-bold text-[#262262] mt-1">Calendar: {data.property.title}</h1>
         <p className="text-sm text-[#6b7280]">Two-way sync with Airbnb, Booking.com, VRBO and other platforms using iCal feeds.</p>
       </div>
 
