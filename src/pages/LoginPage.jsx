@@ -133,7 +133,14 @@ function LoginPage() {
             Continue with Google
           </a>
 
-          <p className="text-center text-sm text-[#6b7280] mt-8">
+          <Link
+            to="/properties"
+            className="flex items-center justify-center w-full py-3 mt-4 rounded-full border-2 border-[#D9D9D9] text-[#6b7280] font-semibold hover:border-[#C49A6C] hover:text-[#C49A6C] transition-all duration-200 text-sm"
+          >
+            Continue Browsing
+          </Link>
+
+          <p className="text-center text-sm text-[#6b7280] mt-6">
             Don&apos;t have an account?{' '}
             <Link to="/register" className="text-[#C49A6C] font-semibold hover:text-[#262262] transition-colors">
               Sign up
