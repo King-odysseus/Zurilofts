@@ -84,6 +84,7 @@ export const bookingCreateSchema = z.object({
   checkIn: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-in date'),
   checkOut: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-out date'),
   guests: z.number().int().min(1).max(10),
+  bedOption: z.enum(['1bed', '2bed']).optional(),
   checkInTime: z.string().optional(),
   specialRequests: z.string().max(1000).optional(),
   paymentMethod: z.enum(['card', 'mpesa', 'bank']),
