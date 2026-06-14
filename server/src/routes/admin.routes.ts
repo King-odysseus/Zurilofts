@@ -9,6 +9,7 @@ import {
 } from '../types/index.js';
 import * as bookingCtrl from '../controllers/booking.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
+import * as reviewCtrl from '../controllers/review.controller.js';
 
 const router = Router();
 
@@ -18,6 +19,9 @@ router.use(authenticate, requireAdmin);
 // Bookings
 router.get('/bookings', bookingCtrl.listAll);
 router.patch('/bookings/:id/status', validate(bookingStatusSchema), bookingCtrl.updateStatus);
+
+// Guest reviews / private feedback
+router.get('/reviews', reviewCtrl.listAll);
 
 // Per-property earnings / booking counts
 router.get('/analytics/properties', bookingCtrl.propertyEarnings);

@@ -193,7 +193,7 @@ function ChatWidget() {
                   type="button"
                   onClick={handleStart}
                   disabled={sending}
-                  className="w-full bg-[#C49A6C] text-[#262262] py-2.5 rounded-full font-semibold text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                  className="w-full bg-[#C49A6C] text-white py-2.5 rounded-full font-semibold text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
                 >
                   Start Chat
                 </button>

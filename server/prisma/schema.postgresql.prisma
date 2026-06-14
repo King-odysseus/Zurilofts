@@ -33,6 +33,7 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   bookings     Booking[]
+  reviews      Review[]
 }
 
 model Property {
@@ -59,6 +60,7 @@ model Property {
   calendarSources CalendarSource[]
   calendarBlocks  CalendarBlock[]
   priceRules      PriceRule[]
+  guestReviews    Review[]
 }
 
 // External iCal feeds (Airbnb, Booking.com, VRBO, ...) imported per property
@@ -117,18 +119,40 @@ model Booking {
   checkOut        DateTime
   guests          Int
   checkInTime     String?
+  checkOutTime    String?
   specialRequests String?
+  additionalGuestsJson String?
   paymentMethod   String
   status          BookingStatus @default(PENDING)
   subtotal        Int
   cleaningFee     Int           @default(1500)
   serviceFee      Int
+  lateCheckoutFee Int           @default(0)
   promoCodeId     String?
   promoCode       PromoCode?    @relation(fields: [promoCodeId], references: [id])
   discountAmount  Int           @default(0)
   total           Int
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
+  review          Review?
+}
+
+// Post-stay guest review: star rating + a private note for the admin on how to
+// improve. One review per booking.
+model Review {
+  id          String   @id @default(uuid())
+  bookingId   String   @unique
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  rating      Int
+  privateNote String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([propertyId])
 }
 
 model PromoCode {

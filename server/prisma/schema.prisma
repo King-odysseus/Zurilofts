@@ -22,6 +22,7 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   bookings     Booking[]
+  reviews      Review[]
 }
 
 model Property {
@@ -48,6 +49,7 @@ model Property {
   calendarSources CalendarSource[]
   calendarBlocks  CalendarBlock[]
   priceRules      PriceRule[]
+  guestReviews    Review[]
 }
 
 // External iCal feeds (Airbnb, Booking.com, VRBO, ...) imported per property
@@ -107,18 +109,40 @@ model Booking {
   guests          Int
   bedOption       String?   // "1bed" | "2bed"
   checkInTime     String?
+  checkOutTime    String?   // requested check-out "HH:MM"; later than 10:00 AM adds late fee
   specialRequests String?
+  additionalGuestsJson String? // JSON array of extra guests [{firstName,lastName}]
   paymentMethod   String    // "card" | "mpesa" | "bank"
   status          String    @default("PENDING")  // "PENDING" | "CONFIRMED" | "CANCELLED"
   subtotal        Int
   cleaningFee     Int       @default(1500)
   serviceFee      Int
+  lateCheckoutFee Int       @default(0)
   promoCodeId     String?
   promoCode       PromoCode? @relation(fields: [promoCodeId], references: [id])
   discountAmount  Int       @default(0)
   total           Int
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  review          Review?
+}
+
+// Post-stay guest review: star rating + a private note for the admin on how to
+// improve. One review per booking.
+model Review {
+  id          String   @id @default(cuid())
+  bookingId   String   @unique
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  propertyId  String
+  property    Property @relation(fields: [propertyId], references: [id])
+  rating      Int      // 1-5 stars
+  privateNote String?  // private feedback for admin — how to improve
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([propertyId])
 }
 
 model PromoCode {

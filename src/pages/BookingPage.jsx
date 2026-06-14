@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import apiClient from '../api/client.js';
 
 function BookingPage() {
@@ -15,6 +16,7 @@ function BookingPage() {
   // Property from API
   const [property, setProperty] = useState(null);
   const [loadingProperty, setLoadingProperty] = useState(true);
+  const [unavailableRanges, setUnavailableRanges] = useState([]);
 
   // Promo code
   const [promoCode, setPromoCode] = useState('');
@@ -29,6 +31,34 @@ function BookingPage() {
   ];
   const [bedOption, setBedOption] = useState(null);
 
+  // Standard stay times. Check-in from 3:00 PM, check-out by 10:00 AM.
+  // A later check-out doubles each hour past 10:00 AM, reaching one full
+  // night's price at 5 hours late and capping there.
+  const STANDARD_CHECK_IN = '15:00';
+  const STANDARD_CHECK_OUT = '10:00';
+  const LATE_CHECKOUT_FULL_NIGHT_HOURS = 5;
+  // Selectable check-out times: 10 AM (standard) through 6 PM.
+  const CHECK_OUT_OPTIONS = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+
+  // Calibrated doubling: 1h = night/16, 2h = night/8 ... 5h+ = full night.
+  const calcLateCheckoutFee = (time, nightlyPrice) => {
+    if (!time || !nightlyPrice) return 0;
+    const [h, m] = time.split(':').map(Number);
+    const minutes = h * 60 + (m || 0);
+    const standard = 10 * 60; // 10:00 AM
+    if (minutes <= standard) return 0;
+    const hoursLate = Math.ceil((minutes - standard) / 60);
+    const capped = Math.min(hoursLate, LATE_CHECKOUT_FULL_NIGHT_HOURS);
+    return Math.round(nightlyPrice * Math.pow(2, capped - LATE_CHECKOUT_FULL_NIGHT_HOURS));
+  };
+
+  const formatTime12h = (time) => {
+    const [h, m] = time.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    return `${hour12}:${String(m || 0).padStart(2, '0')} ${period}`;
+  };
+
   // Form states
   const [bookingData, setBookingData] = useState({
     checkIn: '',
@@ -39,11 +69,59 @@ function BookingPage() {
     email: '',
     phone: '',
     specialRequests: '',
-    checkInTime: '',
+    checkInTime: STANDARD_CHECK_IN,
+    checkOutTime: STANDARD_CHECK_OUT,
     paymentMethod: 'card',
   });
 
+  // Extra guests beyond the account holder; length is kept at (guests - 1)
+  const [additionalGuests, setAdditionalGuests] = useState([{ firstName: '', lastName: '' }]);
+
+  // Set the headcount and resize the additional-guest forms to match (guests - 1)
+  const setGuestCount = (count) => {
+    const n = Math.max(1, Math.min(6, count));
+    setBookingData((prev) => ({ ...prev, guests: n }));
+    setAdditionalGuests((prev) => {
+      const next = prev.slice(0, n - 1);
+      while (next.length < n - 1) next.push({ firstName: '', lastName: '' });
+      return next;
+    });
+  };
+
+  const updateAdditionalGuest = (index, field, value) => {
+    setAdditionalGuests((prev) => prev.map((g, i) => (i === index ? { ...g, [field]: value } : g)));
+  };
+
+  const addGuest = () => setGuestCount(bookingData.guests + 1);
+
+  const removeGuest = (index) => {
+    setAdditionalGuests((prev) => {
+      const next = prev.filter((_, i) => i !== index);
+      setBookingData((bd) => ({ ...bd, guests: next.length + 1 }));
+      return next;
+    });
+  };
+
   useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const res = await apiClient.get('/users/profile');
+        const p = res.data.data || {};
+        // Auto-fill the primary guest from the account, but only fields the
+        // user hasn't already typed into (so their edits are never clobbered).
+        setBookingData((prev) => ({
+          ...prev,
+          firstName: prev.firstName || p.firstName || '',
+          lastName: prev.lastName || p.lastName || '',
+          email: prev.email || p.email || '',
+          phone: prev.phone || p.phone || '',
+        }));
+      } catch {
+        // not fatal — user can fill the fields manually
+      }
+    }
+    fetchProfile();
+
     async function fetchProperty() {
       try {
         const res = await apiClient.get(`/properties/${id}`);
@@ -62,6 +140,11 @@ function BookingPage() {
       }
     }
     fetchProperty();
+
+    apiClient
+      .get(`/properties/${id}/availability`)
+      .then((r) => setUnavailableRanges(r.data.data || []))
+      .catch(() => { /* calendar still works, just nothing disabled */ });
   }, [id]);
 
   // Calculate nights and total
@@ -80,8 +163,9 @@ function BookingPage() {
   const subtotal = nights * propertyPrice;
   const cleaningFee = 1500;
   const serviceFee = Math.round(subtotal * 0.12);
+  const lateCheckoutFee = calcLateCheckoutFee(bookingData.checkOutTime, propertyPrice);
   const discountAmount = promoResult?.discountAmount || 0;
-  const total = subtotal + cleaningFee + serviceFee - discountAmount;
+  const total = subtotal + cleaningFee + serviceFee + lateCheckoutFee - discountAmount;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -117,9 +201,11 @@ function BookingPage() {
         checkOut: bookingData.checkOut,
         guests: bookingData.guests,
         checkInTime: bookingData.checkInTime || undefined,
+        checkOutTime: bookingData.checkOutTime || undefined,
         specialRequests: bookingData.specialRequests || undefined,
         paymentMethod: bookingData.paymentMethod,
         promoCode: promoResult?.code || undefined,
+        additionalGuests: additionalGuests.filter((g) => g.firstName.trim() || g.lastName.trim()),
       });
 
       // Update booking data with server response for confirmation display
@@ -146,31 +232,25 @@ function BookingPage() {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-[#262262]">Select Dates & Guests</h2>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-2">Check-in Date *</label>
-          <input
-            type="date"
-            name="checkIn"
-            value={bookingData.checkIn}
-            onChange={handleInputChange}
-            min={new Date().toISOString().split('T')[0]}
-            className="date-input neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
-            required
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-2">Check-out Date *</label>
-          <input
-            type="date"
-            name="checkOut"
-            value={bookingData.checkOut}
-            onChange={handleInputChange}
-            min={bookingData.checkIn || new Date().toISOString().split('T')[0]}
-            className="date-input neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
-            required
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-semibold text-[#1f2937] mb-2">Select your dates *</label>
+        <AvailabilityCalendar
+          value={{ checkIn: bookingData.checkIn, checkOut: bookingData.checkOut }}
+          onChange={({ checkIn, checkOut }) => setBookingData((prev) => ({ ...prev, checkIn, checkOut }))}
+          unavailableRanges={unavailableRanges}
+        />
+        {(bookingData.checkIn || bookingData.checkOut) && (
+          <div className="flex gap-4 mt-3">
+            <div className="flex-1 neu-input px-4 py-2 bg-white">
+              <span className="text-xs text-[#6b7280] block">Check-in</span>
+              <span className="font-semibold text-[#262262]">{bookingData.checkIn || '—'}</span>
+            </div>
+            <div className="flex-1 neu-input px-4 py-2 bg-white">
+              <span className="text-xs text-[#6b7280] block">Check-out</span>
+              <span className="font-semibold text-[#262262]">{bookingData.checkOut || '—'}</span>
+            </div>
+          </div>
+        )}
       </div>
 
       <div>
@@ -178,7 +258,7 @@ function BookingPage() {
         <select
           name="guests"
           value={bookingData.guests}
-          onChange={handleInputChange}
+          onChange={(e) => setGuestCount(Number(e.target.value))}
           className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white"
           required
         >
@@ -212,15 +292,54 @@ function BookingPage() {
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-2">Estimated Check-in Time</label>
-        <input
-          type="time"
-          name="checkInTime"
-          value={bookingData.checkInTime}
-          onChange={handleInputChange}
-          className="date-input neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
-        />
+      {/* Standard times note */}
+      <div className="bg-[#262262]/5 rounded-xl p-4 flex items-start gap-3">
+        <svg className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p className="text-sm text-[#1f2937]">
+          Standard <span className="font-semibold">check-in from 3:00 PM</span> and{' '}
+          <span className="font-semibold">check-out by 10:00 AM</span>. A later check-out is available — the fee{' '}
+          <span className="font-semibold">doubles each hour</span> past 10:00 AM, up to a{' '}
+          <span className="font-semibold">full night after 5 hours</span>.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-sm font-semibold text-[#1f2937] mb-2">Estimated Check-in Time</label>
+          <input
+            type="time"
+            name="checkInTime"
+            value={bookingData.checkInTime}
+            onChange={handleInputChange}
+            className="date-input neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
+          />
+          <p className="text-xs text-[#6b7280] mt-1">From 3:00 PM</p>
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-[#1f2937] mb-2">Check-out Time</label>
+          <select
+            name="checkOutTime"
+            value={bookingData.checkOutTime}
+            onChange={handleInputChange}
+            className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
+          >
+            {CHECK_OUT_OPTIONS.map((time) => {
+              const fee = calcLateCheckoutFee(time, propertyPrice);
+              return (
+                <option key={time} value={time}>
+                  {formatTime12h(time)}{fee > 0 ? ` (+KES ${fee.toLocaleString()})` : ' (Standard)'}
+                </option>
+              );
+            })}
+          </select>
+          {lateCheckoutFee > 0 && (
+            <p className="text-xs text-[#C49A6C] font-medium mt-1">
+              Late check-out fee: KES {lateCheckoutFee.toLocaleString()}
+            </p>
+          )}
+        </div>
       </div>
 
       {nights > 0 && (
@@ -259,7 +378,10 @@ function BookingPage() {
         </button>
       </div>
 
-      <h2 className="text-2xl font-bold text-[#262262]">Guest Information</h2>
+      <div>
+        <h2 className="text-2xl font-bold text-[#262262]">Guest Information</h2>
+        <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account — edit anything that's changed.</p>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
@@ -312,6 +434,67 @@ function BookingPage() {
           className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
           required
         />
+      </div>
+
+      {/* Additional guests — one form per extra person in the party */}
+      <div>
+        <div className="flex items-center justify-between mb-1">
+          <label className="block text-sm font-semibold text-[#1f2937]">
+            Additional Guests {additionalGuests.length > 0 && `(${additionalGuests.length})`}
+          </label>
+          <button
+            type="button"
+            onClick={addGuest}
+            disabled={bookingData.guests >= 6}
+            className="text-sm font-semibold text-[#C49A6C] hover:text-[#262262] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            + Add guest
+          </button>
+        </div>
+        <p className="text-xs text-[#6b7280] mb-3">
+          You're booking for {bookingData.guests} {bookingData.guests === 1 ? 'guest' : 'guests'}. Add the names of anyone staying with you.
+        </p>
+
+        {additionalGuests.length === 0 ? (
+          <p className="text-sm text-[#6b7280] italic">Just you — add a guest if others are staying.</p>
+        ) : (
+          <div className="space-y-3">
+            {additionalGuests.map((g, i) => (
+              <div key={i} className="flex items-end gap-3">
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-[#6b7280] mb-1">Guest {i + 2} first name</label>
+                  <input
+                    type="text"
+                    value={g.firstName}
+                    onChange={(e) => updateAdditionalGuest(i, 'firstName', e.target.value)}
+                    placeholder="First name"
+                    className="neu-input w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  />
+                </div>
+                <div className="flex-1">
+                  <label className="block text-xs font-medium text-[#6b7280] mb-1">Last name</label>
+                  <input
+                    type="text"
+                    value={g.lastName}
+                    onChange={(e) => updateAdditionalGuest(i, 'lastName', e.target.value)}
+                    placeholder="Last name"
+                    className="neu-input w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeGuest(i)}
+                  className="mb-1 w-10 h-10 flex items-center justify-center rounded-xl text-[#6b7280] hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0"
+                  aria-label="Remove guest"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <div>
@@ -474,6 +657,12 @@ function BookingPage() {
           <span>Service fee</span>
           <span>KES {serviceFee.toLocaleString()}</span>
         </div>
+        {lateCheckoutFee > 0 && (
+          <div className="flex justify-between text-[#1f2937]">
+            <span>Late check-out ({formatTime12h(bookingData.checkOutTime)})</span>
+            <span>KES {lateCheckoutFee.toLocaleString()}</span>
+          </div>
+        )}
         {discountAmount > 0 && (
           <div className="flex justify-between text-green-600">
             <span>Promo discount</span>
@@ -486,11 +675,17 @@ function BookingPage() {
         </div>
       </div>
 
+      {submitError && (
+        <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">
+          {submitError}
+        </div>
+      )}
+
       <form onSubmit={handleSubmit}>
         <button
           type="submit"
           disabled={isProcessing}
-          className="w-full bg-[#C49A6C] text-[#262262] py-4 rounded-full font-bold hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full bg-[#C49A6C] text-white py-4 rounded-full font-bold hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {isProcessing ? (
             <>
@@ -539,8 +734,14 @@ function BookingPage() {
                 </div>
                 <div className="flex justify-between text-sm mt-1">
                   <span className="text-[#6b7280]">Check-out</span>
-                  <span className="font-medium">{bookingData.checkOut}</span>
+                  <span className="font-medium">{bookingData.checkOut} · {formatTime12h(bookingData.checkOutTime)}</span>
                 </div>
+                {lateCheckoutFee > 0 && (
+                  <div className="flex justify-between text-sm mt-1">
+                    <span className="text-[#6b7280]">Late check-out fee</span>
+                    <span className="font-medium">KES {lateCheckoutFee.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm mt-1">
                   <span className="text-[#6b7280]">Guests</span>
                   <span className="font-medium">{bookingData.guests}</span>
@@ -554,7 +755,7 @@ function BookingPage() {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/')}
-                className="w-full bg-[#C49A6C] text-[#262262] py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+                className="w-full bg-[#C49A6C] text-white py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
               >
                 Return to Home
               </button>
@@ -572,12 +773,28 @@ function BookingPage() {
     );
   }
 
+  // Loading state
+  if (loadingProperty || !property) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-24 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-[#6b7280]">Loading property...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       
       <div className="pt-20 md:pt-24 pb-12 md:pb-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-6">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
           {/* Progress Steps */}
           <div className="max-w-md md:max-w-2xl mx-auto mb-8 md:mb-10">
             <div className="flex items-start justify-center">
@@ -622,7 +839,7 @@ function BookingPage() {
             {/* Right Column - Property Summary */}
             <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6 sticky top-24">
-                <Link to={`/property/${property.id}`} className="block">
+                <Link to={`/property/${property?.id}`} className="block">
                   <img
                     src={(property?.images?.[0] || '')}
                     alt={property?.title}
@@ -648,13 +865,13 @@ function BookingPage() {
                     <svg className="w-4 h-4 text-[#C49A6C] mr-1" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                     </svg>
-                    <span className="font-medium">{property.rating}</span>
+                    <span className="font-medium">{property?.rating}</span>
                   </div>
                   <div className="flex items-center text-[#6b7280]">
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
-                    {property.bedrooms} beds
+                    {property?.bedrooms} beds
                   </div>
                 </div>
 
@@ -674,6 +891,18 @@ function BookingPage() {
                         <span>Service fee</span>
                         <span>KES {serviceFee.toLocaleString()}</span>
                       </div>
+                      {lateCheckoutFee > 0 && (
+                        <div className="flex justify-between text-[#1f2937]">
+                          <span>Late check-out</span>
+                          <span>KES {lateCheckoutFee.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {discountAmount > 0 && (
+                        <div className="flex justify-between text-green-600">
+                          <span>Promo discount</span>
+                          <span>-KES {discountAmount.toLocaleString()}</span>
+                        </div>
+                      )}
                       <div className="pt-2 border-t border-[#D9D9D9] flex justify-between font-bold text-[#262262]">
                         <span>Total</span>
                         <span>KES {total.toLocaleString()}</span>

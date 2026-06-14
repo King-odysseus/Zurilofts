@@ -176,7 +176,7 @@ function AdminCalendar() {
             <label className={labelCls}>iCal URL</label>
             <input className={inputCls} placeholder="https://www.airbnb.com/calendar/ical/....ics" value={sourceDraft.url} onChange={(e) => setSourceDraft({ ...sourceDraft, url: e.target.value })} required />
           </div>
-          <button type="submit" className="md:col-span-2 bg-[#C49A6C] text-[#262262] font-semibold px-4 py-2.5 rounded-xl hover:bg-[#b8895c] transition-colors">Add feed</button>
+          <button type="submit" className="md:col-span-2 bg-[#C49A6C] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#b8895c] transition-colors">Add feed</button>
         </form>
       </section>
 

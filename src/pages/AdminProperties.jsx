@@ -52,7 +52,7 @@ function AdminProperties() {
         <h1 className="text-2xl font-bold text-[#262262]">Properties</h1>
         <Link
           to="/admin/properties/new"
-          className="bg-[#C49A6C] text-[#262262] px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
+          className="bg-[#C49A6C] text-white px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
         >
           + Add Property
         </Link>

@@ -1,6 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
-import { calculateFees, calculateNights, computeSubtotal } from '../utils/pricing.js';
+import { calculateFees, calculateNights, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
 import { isRangeAvailable } from './calendar.service.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
@@ -13,6 +13,15 @@ function normalizeBooking(booking: any) {
       delete p.imagesJson;
     }
     b.property = p;
+  }
+  // Parse the stored extra-guests JSON back into an array
+  if ('additionalGuestsJson' in b) {
+    try {
+      b.additionalGuests = b.additionalGuestsJson ? JSON.parse(b.additionalGuestsJson) : [];
+    } catch {
+      b.additionalGuests = [];
+    }
+    delete b.additionalGuestsJson;
   }
   return b;
 }
@@ -34,7 +43,9 @@ interface CreateBookingInput {
   guests: number;
   bedOption?: string;
   checkInTime?: string;
+  checkOutTime?: string;
   specialRequests?: string;
+  additionalGuests?: { firstName: string; lastName: string }[];
   paymentMethod: string;
   promoCode?: string;
 }
@@ -94,6 +105,10 @@ export async function createBooking(input: CreateBookingInput) {
 
   const pricing = calculateFees(subtotal, discountPercent, maxDiscount);
 
+  // Late check-out fee: doubles each hour past 10:00 AM, up to a full night.
+  const lateFee = lateCheckoutFee(input.checkOutTime, effectivePrice);
+  const total = pricing.total + lateFee;
+
   const booking = await prisma.booking.create({
     data: {
       userId: input.userId,
@@ -103,14 +118,22 @@ export async function createBooking(input: CreateBookingInput) {
       guests: input.guests,
       bedOption: input.bedOption,
       checkInTime: input.checkInTime,
+      checkOutTime: input.checkOutTime,
       specialRequests: input.specialRequests,
+      additionalGuestsJson:
+        input.additionalGuests && input.additionalGuests.length
+          ? JSON.stringify(
+              input.additionalGuests.filter((g) => g.firstName?.trim() || g.lastName?.trim())
+            )
+          : null,
       paymentMethod: input.paymentMethod,
       promoCodeId,
       subtotal: pricing.subtotal,
       cleaningFee: pricing.cleaningFee,
       serviceFee: pricing.serviceFee,
+      lateCheckoutFee: lateFee,
       discountAmount: pricing.discountAmount,
-      total: pricing.total,
+      total,
     },
     include: {
       property: true,
@@ -143,6 +166,7 @@ export async function listUserBookings(userId: string, status?: string, page = 1
       include: {
         property: { select: { id: true, title: true, location: true, imagesJson: true, price: true } },
         promoCode: { select: { code: true, discountPercent: true } },
+        review: { select: { id: true, rating: true, privateNote: true } },
       },
     }),
     prisma.booking.count({ where }),

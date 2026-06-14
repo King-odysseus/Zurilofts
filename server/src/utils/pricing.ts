@@ -61,6 +61,37 @@ export function calculateFees(
 }
 
 /**
+ * Standard stay times and the late check-out policy.
+ * Check-in from 3:00 PM, check-out by 10:00 AM. A guest may request a later
+ * check-out; every hour (rounded up) past 10:00 AM adds a flat KES fee.
+ */
+export const STANDARD_CHECK_IN_TIME = '15:00'; // 3:00 PM
+export const STANDARD_CHECK_OUT_TIME = '10:00'; // 10:00 AM
+// At/after this many hours late, the fee equals one full night.
+export const LATE_CHECKOUT_FULL_NIGHT_HOURS = 5;
+
+/**
+ * Late check-out fee in KES for a requested check-out time ("HH:MM", 24h).
+ *
+ * Calibrated doubling: each started hour past the standard 10:00 AM doubles the
+ * fee, landing exactly on one night's price at 5 hours late and capping there:
+ *   1h = night/16, 2h = night/8, 3h = night/4, 4h = night/2, 5h+ = full night.
+ * Returns 0 for an empty/invalid time or any time at/before 10:00 AM.
+ */
+export function lateCheckoutFee(checkOutTime: string | null | undefined, nightlyPrice: number): number {
+  if (!checkOutTime || !nightlyPrice) return 0;
+  const m = /^(\d{1,2}):(\d{2})$/.exec(checkOutTime.trim());
+  if (!m) return 0;
+  const minutes = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+  const standardMinutes = 10 * 60; // 10:00 AM
+  if (minutes <= standardMinutes) return 0;
+  const hoursLate = Math.ceil((minutes - standardMinutes) / 60);
+  const capped = Math.min(hoursLate, LATE_CHECKOUT_FULL_NIGHT_HOURS);
+  // night * 2^(capped - 5): capped=5 → full night; each earlier hour halves it.
+  return Math.round(nightlyPrice * Math.pow(2, capped - LATE_CHECKOUT_FULL_NIGHT_HOURS));
+}
+
+/**
  * Calculate number of nights between two dates.
  */
 export function calculateNights(checkIn: Date, checkOut: Date): number {

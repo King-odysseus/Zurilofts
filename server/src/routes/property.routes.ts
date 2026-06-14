@@ -12,6 +12,8 @@ router.get('/', ctrl.list);
 // Outbound iCal feed (token-protected) — external platforms subscribe to this.
 // Declared before '/:id' so the longer path matches first.
 router.get('/:id/calendar/:token.ics', calendarCtrl.publicFeed);
+// Taken date ranges for the guest booking calendar
+router.get('/:id/availability', calendarCtrl.availability);
 router.get('/:id', ctrl.getById);
 
 // Admin only

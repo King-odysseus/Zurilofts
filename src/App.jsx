@@ -1,9 +1,10 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './index.css';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
 import { useState, useEffect } from 'react';
 import PropertyPage from './components/PropertyPage';
+import apiClient from './api/client.js';
 import ContactPage from './pages/ContactPage';
 import PropertiesPage from './pages/PropertiesPage';
 import BookingPage from './pages/BookingPage';
@@ -22,11 +23,15 @@ import AdminCalendar from './pages/AdminCalendar';
 import AdminBookings from './pages/AdminBookings';
 import AdminEarnings from './pages/AdminEarnings';
 import AdminPromos from './pages/AdminPromos';
+import AdminFeedback from './pages/AdminFeedback';
 
 // Home page component
 function HomePage() {
   const [slide, setSlide] = useState(0);
-  const totalSlides = 5;
+  const [featuredProperty, setFeaturedProperty] = useState(null);
+  const totalSlides = featuredProperty?.images?.length > 0
+    ? Math.min(featuredProperty.images.length, 4)
+    : 4;
 
   function nextSlide() { setSlide((s) => (s + 1) % totalSlides); }
   function prevSlide() { setSlide((s) => (s - 1 + totalSlides) % totalSlides); }
@@ -34,6 +39,18 @@ function HomePage() {
   useEffect(() => {
     const id = setInterval(nextSlide, 4000);
     return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    async function fetchProperties() {
+      try {
+        const res = await apiClient.get('/properties');
+        const properties = res.data.data || [];
+        const firstActive = properties.find((p) => p.available);
+        setFeaturedProperty(firstActive || properties[0] || null);
+      } catch { /* silent */ }
+    }
+    fetchProperties();
   }, []);
 
   return (
@@ -58,13 +75,12 @@ function HomePage() {
           <div className="flex-1 lg:pr-8 pt-4">
             <div className="mb-6">
               <span className="text-[#C49A6C] font-semibold text-sm uppercase tracking-wider">Featured Location</span>
-              <h3 className="text-2xl md:text-3xl font-bold text-[#262262] mt-2">Kilimani, Nairobi</h3>
+              <h3 className="text-2xl md:text-3xl font-bold text-[#262262] mt-2">
+                {featuredProperty?.location || 'Kilimani, Nairobi'}
+              </h3>
             </div>
             <p className="text-charcoal leading-relaxed mb-6 text-justify pr-4 lg:pr-8">
-              Experience luxury living in the heart of Kilimani, one of Nairobi's most prestigious neighborhoods.
-              This beautifully furnished apartment offers modern amenities, stunning views, and easy access to
-              shopping centers, restaurants, and business districts. Perfect for business travelers and tourists
-              seeking a comfortable short-term stay.
+              {featuredProperty?.description || 'Experience luxury living in the heart of Kilimani, one of Nairobi\'s most prestigious neighborhoods. This beautifully furnished apartment offers modern amenities, stunning views, and easy access to shopping centers, restaurants, and business districts. Perfect for business travelers and tourists seeking a comfortable short-term stay.'}
             </p>
             <ul className="space-y-3 mb-8">
               <li className="flex items-center text-charcoal">
@@ -86,25 +102,19 @@ function HomePage() {
                 24/7 security & concierge
               </li>
             </ul>
-            <a
-              href="/property/1"
+            <Link
+              to={featuredProperty ? `/property/${featuredProperty.id}` : '/properties'}
               className="inline-block neu-btn text-[#262262] px-8 py-3 rounded-full font-semibold hover:shadow-[2px_2px_4px_#d9d9d9,-2px_-2px_4px_#ffffff] transition-all duration-200"
             >
               View Property
-            </a>
+            </Link>
           </div>
           
           {/* Right Column - Property Image Carousel */}
           <div className="w-full max-w-md">
             <div id="property-carousel" className="relative w-full h-full">
               <div className="relative h-full overflow-hidden rounded-2xl neu-card shadow-[4px_4px_8px_#d9d9d9,-4px_-4px_8px_#ffffff]">
-                {[
-                  zuriImages[0],
-                  zuriImages[1],
-                  zuriImages[2],
-                  zuriImages[3],
-                  zuriImages[4],
-                ].map((src, i) => (
+                {[...(featuredProperty?.images || []), zuriImages[0], zuriImages[1], zuriImages[2], zuriImages[3]].slice(0, 4).map((src, i) => (
                   <div key={i} className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${slide === i ? 'opacity-100' : 'opacity-0'}`}>
                     <img src={src} alt={`Slide ${i + 1}`} className="absolute block w-full h-full object-cover" />
                   </div>
@@ -112,7 +122,7 @@ function HomePage() {
               </div>
 
               <div className="absolute z-30 flex -translate-x-1/2 space-x-3 bottom-3 left-1/2">
-                {[0, 1, 2, 3, 4].map((i) => (
+                {[...(featuredProperty?.images || []), zuriImages[0], zuriImages[1], zuriImages[2], zuriImages[3]].slice(0, 4).map((_, i) => (
                   <button key={i} type="button" onClick={() => setSlide(i)} className={`w-3 h-3 rounded-full transition-colors ${slide === i ? 'bg-white' : 'bg-white/50 hover:bg-white/80'}`} aria-label={`Slide ${i + 1}`} />
                 ))}
               </div>
@@ -333,6 +343,7 @@ function App() {
           <Route path="bookings" element={<AdminBookings />} />
           <Route path="earnings" element={<AdminEarnings />} />
           <Route path="promos" element={<AdminPromos />} />
+          <Route path="feedback" element={<AdminFeedback />} />
         </Route>
       </Routes>
     </Router>

@@ -121,7 +121,7 @@ function Hero() {
                   className="w-full py-3 text-[#1f2937] placeholder-[#6b7280] focus:outline-none bg-transparent text-base"
                 />
               </div>
-              <button className="bg-[#C49A6C] text-[#262262] font-bold px-8 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg">
+              <button className="bg-[#C49A6C] text-white font-bold px-8 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg">
                 Search
               </button>
             </div>

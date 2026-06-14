@@ -56,7 +56,7 @@ function PropertyPage() {
             </div>
             <h2 className="text-xl font-bold text-[#262262] mb-2">Property Not Found</h2>
             <p className="text-[#6b7280] mb-4">{error || 'This property could not be loaded.'}</p>
-            <Link to="/properties" className="inline-block bg-[#C49A6C] text-[#262262] px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+            <Link to="/properties" className="inline-block bg-[#C49A6C] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
               View All Properties
             </Link>
           </div>
@@ -240,7 +240,7 @@ function PropertyPage() {
 
               <Link
                 to={`/booking/${property.id}`}
-                className="block w-full bg-[#C49A6C] text-[#262262] font-bold py-4 rounded-xl hover:bg-[#b8895c] active:bg-[#a6794d] transition-all duration-200 text-center"
+                className="block w-full bg-[#C49A6C] text-white font-bold py-4 rounded-xl hover:bg-[#b8895c] active:bg-[#a6794d] transition-all duration-200 text-center"
               >
                 Book Now
               </Link>

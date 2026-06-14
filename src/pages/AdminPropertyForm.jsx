@@ -258,7 +258,7 @@ function AdminPropertyForm() {
                   <div key={src + i} className="relative group aspect-[4/3] rounded-xl overflow-hidden border border-[#D9D9D9]">
                     <img src={src} alt={`Property photo ${i + 1}`} className="w-full h-full object-cover" />
                     {i === 0 && (
-                      <span className="absolute top-1.5 left-1.5 bg-[#C49A6C] text-[#262262] text-[10px] font-bold px-2 py-0.5 rounded-full">Cover</span>
+                      <span className="absolute top-1.5 left-1.5 bg-[#C49A6C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Cover</span>
                     )}
                     <button
                       type="button"
@@ -313,7 +313,7 @@ function AdminPropertyForm() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-[#C49A6C] text-[#262262] font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+            className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
           >
             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Property'}
           </button>
@@ -378,7 +378,7 @@ function PropertyPreview({ form }) {
           <div className="w-full h-full flex items-center justify-center text-[#6b7280] text-sm">No photo yet</div>
         )}
         {form.featured && (
-          <span className="absolute top-4 left-4 bg-[#C49A6C] text-[#262262] text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
+          <span className="absolute top-4 left-4 bg-[#C49A6C] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
         )}
         {!form.available && (
           <span className="absolute top-4 right-4 bg-[#262262] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
@@ -415,7 +415,7 @@ function PropertyPreview({ form }) {
             <span className="text-xs text-[#6b7280]">per night</span>
             <div className="text-xl font-bold text-[#C49A6C]">KES {price.toLocaleString()}</div>
           </div>
-          <span className="bg-[#C49A6C] text-[#262262] font-semibold px-4 py-2 rounded-full text-sm">Book Now</span>
+          <span className="bg-[#C49A6C] text-white font-semibold px-4 py-2 rounded-full text-sm">Book Now</span>
         </div>
       </div>
     </div>
@@ -549,7 +549,7 @@ function FullPagePreview({ form, onClose }) {
               <div className="border border-[#D9D9D9] rounded-2xl p-6 sticky top-20">
                 <span className="text-3xl font-bold text-[#262262]">KES {price.toLocaleString()}</span>
                 <span className="text-[#6b7280]"> / night</span>
-                <div className="block w-full bg-[#C49A6C] text-[#262262] font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
+                <div className="block w-full bg-[#C49A6C] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
                 {!form.available && (
                   <p className="text-center text-sm text-red-600 mt-3 font-medium">Currently marked unavailable</p>
                 )}

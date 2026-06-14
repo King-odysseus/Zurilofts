@@ -137,7 +137,7 @@ function Navbar() {
               </Link>
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
-                className="hidden md:inline-flex px-5 py-2 rounded-full text-sm font-semibold bg-[#C49A6C] text-[#262262] hover:bg-[#b8895c] transition-all duration-200 shadow-md whitespace-nowrap"
+                className="hidden md:inline-flex px-5 py-2 rounded-full text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 shadow-md whitespace-nowrap"
               >
                 Chat with Us
               </button>
@@ -237,7 +237,7 @@ function Navbar() {
                     Sign In
                   </Link>
                   <button
-                    className="block w-full py-2.5 rounded-full font-semibold bg-[#C49A6C] text-[#262262] hover:bg-[#b8895c] transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 text-center"
                     onClick={() => { setMenuOpen(false); window.dispatchEvent(new CustomEvent('open-chat')); }}
                   >
                     Chat with Us

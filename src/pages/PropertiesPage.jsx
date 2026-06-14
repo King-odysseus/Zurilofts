@@ -279,7 +279,7 @@ function PropertiesPage() {
                   setSearchQuery('');
                   setAvailableOnly(false);
                 }}
-                className="bg-[#C49A6C] text-[#262262] px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+                className="bg-[#C49A6C] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
               >
                 Clear Filters
               </button>

@@ -69,7 +69,7 @@ function Contact() {
                 ></textarea>
               </div>
 
-              <button type="submit" className="w-full bg-[#C49A6C] text-[#262262] font-semibold py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200">
+              <button type="submit" className="w-full bg-[#C49A6C] text-white font-semibold py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200">
                 Send Message
               </button>
             </form>

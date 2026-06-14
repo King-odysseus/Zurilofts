@@ -87,9 +87,25 @@ export const bookingCreateSchema = z.object({
   guests: z.number().int().min(1).max(10),
   bedOption: z.enum(['1bed', '2bed']).optional(),
   checkInTime: z.string().optional(),
+  checkOutTime: z.string().optional(),
   specialRequests: z.string().max(1000).optional(),
+  additionalGuests: z
+    .array(
+      z.object({
+        firstName: z.string().max(100),
+        lastName: z.string().max(100),
+      })
+    )
+    .max(9)
+    .optional(),
   paymentMethod: z.enum(['card', 'mpesa', 'bank']),
   promoCode: z.string().optional(),
+});
+
+export const reviewCreateSchema = z.object({
+  bookingId: z.string().min(1, 'Booking is required'),
+  rating: z.number().int().min(1, 'Rating is required').max(5),
+  privateNote: z.string().max(2000).optional(),
 });
 
 export const promoCreateSchema = z.object({

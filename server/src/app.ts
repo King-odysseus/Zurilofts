@@ -12,6 +12,7 @@ import { UPLOAD_DIR } from './controllers/upload.controller.js';
 import authRoutes from './routes/auth.routes.js';
 import propertyRoutes from './routes/property.routes.js';
 import bookingRoutes from './routes/booking.routes.js';
+import reviewRoutes from './routes/review.routes.js';
 import promoRoutes from './routes/promo.routes.js';
 import userRoutes from './routes/user.routes.js';
 import adminRoutes from './routes/admin.routes.js';
@@ -49,6 +50,7 @@ app.get('/api/health', (_req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/reviews', reviewRoutes);
 app.use('/api/promo', promoRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);

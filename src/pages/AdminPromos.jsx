@@ -3,16 +3,17 @@ import apiClient from '../api/client.js';
 
 function AdminPromos() {
   const [promos, setPromos] = useState([]);
+  const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    code: '', discountPercent: 10, validFrom: '', validUntil: '', maxUses: '', minBookingAmount: '', maxDiscount: '',
+    code: '', discountPercent: 10, validFrom: '', validUntil: '', maxUses: '', minBookingAmount: '', maxDiscount: '', propertyIds: [],
   });
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const EMPTY_FORM = { code: '', discountPercent: 10, validFrom: '', validUntil: '', maxUses: '', minBookingAmount: '', maxDiscount: '' };
+  const EMPTY_FORM = { code: '', discountPercent: 10, validFrom: '', validUntil: '', maxUses: '', minBookingAmount: '', maxDiscount: '', propertyIds: [] };
 
   function openCreate() {
     setEditingId(null);
@@ -31,6 +32,7 @@ function AdminPromos() {
       maxUses: p.maxUses ?? '',
       minBookingAmount: p.minBookingAmount ?? '',
       maxDiscount: p.maxDiscount ?? '',
+      propertyIds: p.properties?.map((prop) => prop.id) || [],
     });
     setFormError('');
     setShowForm(true);
@@ -42,7 +44,7 @@ function AdminPromos() {
     setFormData(EMPTY_FORM);
   }
 
-  useEffect(() => { fetchPromos(); }, []);
+  useEffect(() => { fetchPromos(); fetchProperties(); }, []);
 
   async function fetchPromos() {
     try {
@@ -50,6 +52,13 @@ function AdminPromos() {
       setPromos(res.data.data || []);
     } catch { /* silent */ }
     finally { setLoading(false); }
+  }
+
+  async function fetchProperties() {
+    try {
+      const res = await apiClient.get('/properties');
+      setProperties(res.data.data || []);
+    } catch { /* silent */ }
   }
 
   async function handleSubmit(e) {
@@ -64,12 +73,12 @@ function AdminPromos() {
       maxUses: formData.maxUses ? Number(formData.maxUses) : undefined,
       minBookingAmount: formData.minBookingAmount ? Number(formData.minBookingAmount) : undefined,
       maxDiscount: formData.maxDiscount ? Number(formData.maxDiscount) : undefined,
+      propertyIds: formData.propertyIds.length > 0 ? formData.propertyIds : undefined,
     };
 
     try {
       if (editingId) {
-        // Code is the identifier and isn't changed on edit
-        await apiClient.patch(`/promo/${editingId}`, payload);
+        await apiClient.patch(`/promo/${editingId}`, { code: formData.code.toUpperCase(), ...payload });
       } else {
         await apiClient.post('/promo', { code: formData.code.toUpperCase(), ...payload });
       }
@@ -92,10 +101,10 @@ function AdminPromos() {
   }
 
   async function handleDelete(id) {
-    if (!confirm('Deactivate this promo code?')) return;
+    if (!confirm('Delete this promo code permanently?')) return;
     try {
       await apiClient.delete(`/promo/${id}`);
-      setPromos((prev) => prev.map((p) => (p.id === id ? { ...p, active: false } : p)));
+      setPromos((prev) => prev.filter((p) => p.id !== id));
     } catch {
       alert('Failed to delete promo code');
     }
@@ -107,7 +116,7 @@ function AdminPromos() {
         <h1 className="text-2xl font-bold text-[#262262]">Promo Codes</h1>
         <button
           onClick={openCreate}
-          className="bg-[#C49A6C] text-[#262262] px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
+          className="bg-[#C49A6C] text-white px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
         >
           + Create Promo
         </button>
@@ -125,11 +134,9 @@ function AdminPromos() {
                 <input
                   type="text" value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white text-[#1f2937] uppercase disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white text-[#1f2937] uppercase"
                   placeholder="SUMMER2026" required
-                  disabled={!!editingId}
                 />
-                {editingId && <p className="text-xs text-[#6b7280] mt-1">The code itself can&apos;t be changed.</p>}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -185,11 +192,50 @@ function AdminPromos() {
                   />
                 </div>
               </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-sm font-semibold text-[#1f2937]">Applies to Properties</label>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const allIds = properties.map((p) => p.id);
+                      const allSelected = allIds.length > 0 && allIds.every((id) => formData.propertyIds.includes(id));
+                      setFormData({ ...formData, propertyIds: allSelected ? [] : allIds });
+                    }}
+                    className="text-xs font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
+                  >
+                    {properties.length > 0 && properties.every((p) => formData.propertyIds.includes(p.id)) ? 'Clear All' : 'Select All'}
+                  </button>
+                </div>
+                <div className="border border-[#D9D9D9] rounded-xl p-3 max-h-40 overflow-y-auto">
+                  {properties.length === 0 ? (
+                    <p className="text-xs text-[#6b7280]">No properties available.</p>
+                  ) : (
+                    properties.map((prop) => (
+                      <label key={prop.id} className="flex items-center space-x-2 py-1 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.propertyIds.includes(prop.id)}
+                          onChange={(e) => {
+                            const ids = e.target.checked
+                              ? [...formData.propertyIds, prop.id]
+                              : formData.propertyIds.filter((id) => id !== prop.id);
+                            setFormData({ ...formData, propertyIds: ids });
+                          }}
+                          className="w-4 h-4 accent-[#C49A6C]"
+                        />
+                        <span className="text-sm text-[#1f2937]">{prop.title}</span>
+                      </label>
+                    ))
+                  )}
+                </div>
+                <p className="text-xs text-[#6b7280] mt-1">Leave unchecked to apply to all properties.</p>
+              </div>
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={closeForm} className="flex-1 py-2.5 rounded-full font-semibold border-2 border-[#D9D9D9] text-[#6b7280] hover:border-[#262262] hover:text-[#262262] transition-colors text-sm">
                   Cancel
                 </button>
-                <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-[#262262] hover:bg-[#b8895c] transition-all duration-200 text-sm disabled:opacity-50">
+                <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 text-sm disabled:opacity-50">
                   {saving ? (editingId ? 'Saving...' : 'Creating...') : (editingId ? 'Save Changes' : 'Create')}
                 </button>
               </div>
@@ -213,6 +259,7 @@ function AdminPromos() {
                   <th className="text-left py-3 px-4 font-semibold text-[#262262]">Discount</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#262262]">Usage</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#262262]">Valid Period</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Properties</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#262262]">Status</th>
                   <th className="text-right py-3 px-4 font-semibold text-[#262262]">Actions</th>
                 </tr>
@@ -230,6 +277,17 @@ function AdminPromos() {
                     </td>
                     <td className="py-3 px-4 text-xs">
                       {new Date(p.validFrom).toLocaleDateString()} — {new Date(p.validUntil).toLocaleDateString()}
+                    </td>
+                    <td className="py-3 px-4 text-xs">
+                      {p.properties?.length > 0 ? (
+                        <span className="inline-flex flex-wrap gap-1">
+                          {p.properties.map((prop) => (
+                            <span key={prop.id} className="px-2 py-0.5 bg-[#f8f9fa] rounded-md text-[#262262]">{prop.title}</span>
+                          ))}
+                        </span>
+                      ) : (
+                        <span className="text-[#6b7280]">All properties</span>
+                      )}
                     </td>
                     <td className="py-3 px-4">
                       <button
@@ -253,7 +311,7 @@ function AdminPromos() {
                           onClick={() => handleDelete(p.id)}
                           className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
                         >
-                          {p.active ? 'Deactivate' : 'Remove'}
+                          Delete
                         </button>
                       </div>
                     </td>

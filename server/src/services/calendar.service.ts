@@ -85,6 +85,36 @@ export async function deleteBlock(id: string) {
 }
 
 /**
+ * Public availability: the unavailable date ranges for a property (imported +
+ * manual calendar blocks and existing non-cancelled bookings), from today
+ * onward. `end` is exclusive — the check-out day itself is free to book.
+ * Used by the guest booking calendar to disable taken dates.
+ */
+export async function getUnavailableRanges(propertyId: string) {
+  const property = await prisma.property.findUnique({ where: { id: propertyId } });
+  if (!property) throw new NotFoundError('Property');
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const [blocks, bookings] = await Promise.all([
+    prisma.calendarBlock.findMany({
+      where: { propertyId, end: { gt: today } },
+      select: { start: true, end: true },
+    }),
+    prisma.booking.findMany({
+      where: { propertyId, status: { not: 'CANCELLED' }, checkOut: { gt: today } },
+      select: { checkIn: true, checkOut: true },
+    }),
+  ]);
+
+  return [
+    ...blocks.map((b) => ({ start: b.start, end: b.end })),
+    ...bookings.map((b) => ({ start: b.checkIn, end: b.checkOut })),
+  ];
+}
+
+/**
  * Whether [checkIn, checkOut) is free of any calendar block or existing
  * (non-cancelled) booking. Ranges overlap when start < otherEnd && end > otherStart.
  */

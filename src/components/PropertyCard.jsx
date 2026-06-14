@@ -14,7 +14,7 @@ function PropertyCard({ property }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
         {badge && (
-          <span className="absolute top-4 left-4 bg-[#C49A6C] text-[#262262] text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
+          <span className="absolute top-4 left-4 bg-[#C49A6C] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
             {badge}
           </span>
         )}
@@ -80,7 +80,7 @@ function PropertyCard({ property }) {
             <span className="text-xs text-[#6b7280]">per night</span>
             <div className="text-xl font-bold text-[#C49A6C]">KES {price.toLocaleString()}</div>
           </div>
-          <button className="bg-[#C49A6C] text-[#262262] font-semibold px-4 py-2 rounded-full hover:bg-[#b8895c] hover:shadow-lg transition-all duration-200 text-sm">
+          <button className="bg-[#C49A6C] text-white font-semibold px-4 py-2 rounded-full hover:bg-[#b8895c] hover:shadow-lg transition-all duration-200 text-sm">
             Book Now
           </button>
         </div>
