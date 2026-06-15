@@ -76,7 +76,6 @@ function BookingPage() {
   // Properties define their own 1-bed / 2-bed prices via price1Bed / price2Bed
   const [bedOption, setBedOption] = useState(urlVariant);
   const EXTRA_GUEST_FEE = 500;
-  const ABSOLUTE_MAX_GUESTS = 6;
 
   // Standard stay times. Check-in from 3:00 PM, check-out by 10:00 AM.
   // A later check-out doubles each hour past 10:00 AM, reaching one full
@@ -129,7 +128,7 @@ function BookingPage() {
 
   // Set the headcount and resize the additional-guest forms to match (guests - 1)
   const setGuestCount = (count) => {
-    const n = Math.max(1, Math.min(ABSOLUTE_MAX_GUESTS, count));
+    const n = Math.max(1, Math.min(6, count)); // 6 is the global hard cap
     setBookingData((prev) => ({ ...prev, guests: n }));
     setAdditionalGuests((prev) => {
       const next = prev.slice(0, n - 1);
@@ -218,20 +217,21 @@ function BookingPage() {
   };
 
   const nights = calculateNights();
-  // Derive price and max guests from the property's bed-specific pricing
+  // Derive price and guest limits from the property's bed-specific pricing
   const propertyPrice = bedOption === '2bed'
     ? (property?.price2Bed ?? property?.price ?? 0)
     : (property?.price1Bed ?? property?.price ?? 0);
-  const maxForBed = bedOption === '2bed' ? 4 : 2;
+  const baseGuests = bedOption === '2bed' ? 4 : 2;   // guests included in base price
+  const maxGuests  = bedOption === '2bed' ? 6 : 4;   // hard cap for this variant
   const subtotal = nights * propertyPrice;
-  const extraGuests = Math.max(0, bookingData.guests - maxForBed);
+  const extraGuests = Math.max(0, bookingData.guests - baseGuests);
   const extraGuestFee = extraGuests * EXTRA_GUEST_FEE * nights;
   const cleaningFee = 1500;
   const serviceFee = Math.round(subtotal * 0.12);
   const lateCheckoutFee = calcLateCheckoutFee(bookingData.checkOutTime, propertyPrice);
   const discountAmount = promoResult?.discountAmount || 0;
   const total = subtotal + cleaningFee + serviceFee + extraGuestFee + lateCheckoutFee - discountAmount;
-  const exceedingMax = bookingData.guests > ABSOLUTE_MAX_GUESTS;
+  const exceedingMax = bookingData.guests > maxGuests;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -341,7 +341,7 @@ function BookingPage() {
         <Dropdown
           value={bookingData.guests}
           onChange={(v) => setGuestCount(Number(v))}
-          options={Array.from({ length: ABSOLUTE_MAX_GUESTS }, (_, i) => i + 1).map((num) => ({
+          options={Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => ({
             value: num,
             label: `${num} ${num === 1 ? 'guest' : 'guests'}`,
           }))}
@@ -350,14 +350,14 @@ function BookingPage() {
         />
         {bedOption && (
           <p className="text-xs text-[#6b7280] mt-1">
-            This room fits up to {maxForBed} guests. Each extra guest adds KES {EXTRA_GUEST_FEE.toLocaleString()}/night.
-            {bookingData.guests > maxForBed && (
+            This room fits up to {maxGuests} guests ({baseGuests} included). Each extra guest adds KES {EXTRA_GUEST_FEE.toLocaleString()}/night.
+            {bookingData.guests > baseGuests && (
               <span className="text-amber-600 font-medium"> {extraGuests} extra guest{extraGuests > 1 ? 's' : ''} &middot; +KES {(extraGuestFee).toLocaleString()}</span>
             )}
           </p>
         )}
-        {bookingData.guests > ABSOLUTE_MAX_GUESTS && (
-          <p className="text-red-500 text-xs mt-1 font-semibold">Maximum {ABSOLUTE_MAX_GUESTS} guests. Exceeding this is grounds for removal.</p>
+        {bookingData.guests > maxGuests && (
+          <p className="text-red-500 text-xs mt-1 font-semibold">Maximum {maxGuests} guests for this room type. Exceeding this is grounds for removal.</p>
         )}
         {!bedOption && (
           <p className="text-xs text-[#6b7280] mt-1">Select a bed option above to see guest limits.</p>
@@ -372,7 +372,7 @@ function BookingPage() {
               {bedOption === '2bed' ? '2-Bed Configuration' : '1-Bed Configuration'}
             </p>
             <p className="text-xs text-[#6b7280]">
-              Fits up to {maxForBed} guests &middot; KES {propertyPrice.toLocaleString()}/night
+              Fits up to {maxGuests} guests ({baseGuests} included) &middot; KES {propertyPrice.toLocaleString()}/night
             </p>
           </div>
           <span className="bg-[#C49A6C] text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -544,7 +544,7 @@ function BookingPage() {
           <button
             type="button"
             onClick={addGuest}
-            disabled={bookingData.guests >= ABSOLUTE_MAX_GUESTS}
+            disabled={bookingData.guests >= maxGuests}
             className="text-sm font-semibold text-[#C49A6C] hover:text-[#262262] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add guest
