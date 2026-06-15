@@ -37,10 +37,10 @@ function PropertiesPage() {
         badge: p.featured ? 'Featured' : undefined,
       };
       if (has1Bed) {
-        result.push({ ...base, price: p.price1Bed, variant: '1bed', variantLabel: '1 Bed' });
+        result.push({ ...base, price: p.price1Bed, variant: '1bed', variantLabel: '1 Bed', bedrooms: 1, bathrooms: 1 });
       }
       if (has2Bed) {
-        result.push({ ...base, price: p.price2Bed, variant: '2bed', variantLabel: '2 Bed' });
+        result.push({ ...base, price: p.price2Bed, variant: '2bed', variantLabel: '2 Bed', bedrooms: 2 });
       }
       if (!has1Bed && !has2Bed) {
         // Legacy property — show as single card with base price
