@@ -71,7 +71,10 @@ function detectCountry(storedPhone) {
 function ProfilePage() {
   const { user, setUser } = useAuth();
   const { favorites } = useFavorites();
-  const [activeTab, setActiveTab] = useState('info');
+  const [activeTab, setActiveTab] = useState(() => {
+    const hash = window.location.hash.replace('#', '');
+    return ['info', 'bookings', 'favorites'].includes(hash) ? hash : 'info';
+  });
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);

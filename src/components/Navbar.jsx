@@ -112,7 +112,7 @@ function Navbar() {
                     <p className="text-xs text-[#6b7280]">{user?.email}</p>
                   </div>
                   <Link
-                    to="/profile"
+                    to="/profile#info"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
                   >
@@ -135,6 +135,26 @@ function Navbar() {
                         {unreadMessages > 9 ? '9+' : unreadMessages}
                       </span>
                     )}
+                  </Link>
+                  <Link
+                    to="/profile#bookings"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    Booking History
+                  </Link>
+                  <Link
+                    to="/profile#favorites"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    Favourites
                   </Link>
                   {user?.role === 'ADMIN' && (
                     <Link
@@ -246,11 +266,25 @@ function Navbar() {
               {isAuthenticated ? (
                 <>
                   <Link
-                    to="/profile"
+                    to="/profile#info"
                     className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     My Profile
+                  </Link>
+                  <Link
+                    to="/profile#bookings"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Booking History
+                  </Link>
+                  <Link
+                    to="/profile#favorites"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Favourites
                   </Link>
                   <Link
                     to="/messages"
