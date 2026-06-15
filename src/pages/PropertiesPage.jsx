@@ -17,9 +17,11 @@ function PropertiesPage() {
   const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
 
   // Expand properties into bed-variant listings (only available properties)
+  // Treat null/undefined as true for legacy properties created before the
+  // available column existed.
   const listings = useCallback(() => {
     const result = [];
-    for (const p of properties.filter((p) => p.available)) {
+    for (const p of properties.filter((p) => p.available !== false)) {
       const has1Bed = p.price1Bed != null;
       const has2Bed = p.price2Bed != null;
       const base = {
@@ -227,7 +229,7 @@ function PropertiesPage() {
               <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-[#6b7280]">Loading properties...</p>
             </div>
-          ) : listings().length > 0 ? (
+          ) : properties.length > 0 || (filter === 'all' && priceRange === 'all' && !searchQuery && !availableOnly) ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {listings().map((listing) => (
                 <Link key={`${listing.id}-${listing.variant || 'base'}`} to={`/property/${listing.id}${listing.variant ? `?variant=${listing.variant}` : ''}`} className="block">
