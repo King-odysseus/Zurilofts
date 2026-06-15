@@ -16,10 +16,10 @@ function PropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
 
-  // Expand properties into bed-variant listings
+  // Expand properties into bed-variant listings (only available properties)
   const listings = useCallback(() => {
     const result = [];
-    for (const p of properties) {
+    for (const p of properties.filter((p) => p.available)) {
       const has1Bed = p.price1Bed != null;
       const has2Bed = p.price2Bed != null;
       const base = {
