@@ -1,33 +1,117 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/client.js';
 import Dropdown from '../components/Dropdown.jsx';
 import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
+import { autoTable } from 'jspdf-autotable';
 
-// Register autoTable plugin — the auto-registration in the module only
-// checks window.jsPDF which isn't set in Vite's ESM bundler.
-jsPDF.autoTable = autoTable;
-
-function formatDate() {
-  return new Date().toLocaleDateString('en-GB', {
+function formatDate(d) {
+  if (!d) return '';
+  return new Date(d).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
 }
 
+function getPeriodDates(period) {
+  const now = new Date();
+  const startOfDay = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); return x; };
+  const endOfDay = (d) => { const x = new Date(d); x.setHours(23, 59, 59, 999); return x; };
+
+  switch (period) {
+    case 'this-week': {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      const mon = new Date(now.setDate(diff));
+      return { from: startOfDay(mon), to: endOfDay(new Date()) };
+    }
+    case 'this-month': {
+      const first = new Date(now.getFullYear(), now.getMonth(), 1);
+      return { from: startOfDay(first), to: endOfDay(new Date()) };
+    }
+    case 'this-year': {
+      const first = new Date(now.getFullYear(), 0, 1);
+      return { from: startOfDay(first), to: endOfDay(new Date()) };
+    }
+    case 'last-week': {
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1) - 7;
+      const mon = new Date(now.setDate(diff));
+      const sun = new Date(mon);
+      sun.setDate(mon.getDate() + 6);
+      return { from: startOfDay(mon), to: endOfDay(sun) };
+    }
+    case 'last-month': {
+      const first = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const last = new Date(now.getFullYear(), now.getMonth(), 0);
+      return { from: startOfDay(first), to: endOfDay(last) };
+    }
+    case 'last-year': {
+      const first = new Date(now.getFullYear() - 1, 0, 1);
+      const last = new Date(now.getFullYear() - 1, 11, 31);
+      return { from: startOfDay(first), to: endOfDay(last) };
+    }
+    default:
+      return {};
+  }
+}
+
+const PERIOD_OPTIONS = [
+  { value: 'all', label: 'All Time' },
+  { value: 'this-week', label: 'This Week' },
+  { value: 'this-month', label: 'This Month' },
+  { value: 'this-year', label: 'This Year' },
+  { value: 'last-week', label: 'Last Week' },
+  { value: 'last-month', label: 'Last Month' },
+  { value: 'last-year', label: 'Last Year' },
+  { value: 'custom', label: 'Custom Range' },
+];
+
+const SORT_OPTIONS = [
+  { value: 'earnings-desc', label: 'Earnings (High → Low)' },
+  { value: 'earnings-asc', label: 'Earnings (Low → High)' },
+  { value: 'bookings-desc', label: 'Bookings (High → Low)' },
+  { value: 'bookings-asc', label: 'Bookings (Low → High)' },
+  { value: 'name-asc', label: 'Property Name (A → Z)' },
+  { value: 'name-desc', label: 'Property Name (Z → A)' },
+];
+
 function AdminEarnings() {
   const [rows, setRows] = useState([]);
-  const [totals, setTotals] = useState({ bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0 });
+  const [totals, setTotals] = useState({
+    bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0,
+    bed1Bookings: 0, bed1Earnings: 0, bed2Bookings: 0, bed2Earnings: 0,
+  });
   const [loading, setLoading] = useState(true);
+  const [period, setPeriod] = useState('all');
+  const [customFrom, setCustomFrom] = useState('');
+  const [customTo, setCustomTo] = useState('');
+  const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState('earnings-desc');
+
+  const dateRange = useMemo(() => {
+    if (period === 'custom') {
+      const from = customFrom ? new Date(customFrom) : undefined;
+      const to = customTo ? new Date(customTo) : undefined;
+      return { from, to };
+    }
+    return getPeriodDates(period);
+  }, [period, customFrom, customTo]);
 
   useEffect(() => {
     async function load() {
+      setLoading(true);
       try {
-        const res = await apiClient.get('/admin/analytics/properties');
+        const params = {};
+        if (dateRange.from) params.from = dateRange.from.toISOString();
+        if (dateRange.to) params.to = dateRange.to.toISOString();
+        const res = await apiClient.get('/admin/analytics/properties', { params });
         setRows(res.data.data?.properties || []);
-        setTotals(res.data.data?.totals || { bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0 });
+        setTotals(res.data.data?.totals || {
+          bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0,
+          bed1Bookings: 0, bed1Earnings: 0, bed2Bookings: 0, bed2Earnings: 0,
+        });
       } catch {
         // silent
       } finally {
@@ -35,17 +119,81 @@ function AdminEarnings() {
       }
     }
     load();
-  }, []);
+  }, [dateRange]);
 
-  const today = formatDate();
+  const filteredRows = useMemo(() => {
+    let data = [...rows];
+
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      data = data.filter((r) =>
+        r.title.toLowerCase().includes(q) ||
+        r.location.toLowerCase().includes(q)
+      );
+    }
+
+    data.sort((a, b) => {
+      switch (sortBy) {
+        case 'earnings-desc': return b.earnings - a.earnings;
+        case 'earnings-asc': return a.earnings - b.earnings;
+        case 'bookings-desc': return b.bookings - a.bookings;
+        case 'bookings-asc': return a.bookings - b.bookings;
+        case 'name-asc': return a.title.localeCompare(b.title);
+        case 'name-desc': return b.title.localeCompare(a.title);
+        default: return 0;
+      }
+    });
+
+    return data;
+  }, [rows, search, sortBy]);
+
+  const filteredTotals = useMemo(() => {
+    return filteredRows.reduce(
+      (acc, r) => {
+        acc.bookings += r.bookings;
+        acc.confirmedBookings += r.confirmedBookings;
+        acc.earnings += r.earnings;
+        acc.confirmedEarnings += r.confirmedEarnings;
+        acc.bed1Bookings += r.bed1Bookings;
+        acc.bed1Earnings += r.bed1Earnings;
+        acc.bed2Bookings += r.bed2Bookings;
+        acc.bed2Earnings += r.bed2Earnings;
+        return acc;
+      },
+      { bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0, bed1Bookings: 0, bed1Earnings: 0, bed2Bookings: 0, bed2Earnings: 0 }
+    );
+  }, [filteredRows]);
+
+  const topProperties = useMemo(() => {
+    return [...filteredRows]
+      .filter((r) => r.earnings > 0)
+      .sort((a, b) => b.earnings - a.earnings)
+      .slice(0, 5);
+  }, [filteredRows]);
+
+  const maxEarnings = useMemo(() => {
+    return topProperties.length > 0 ? Math.max(topProperties[0].earnings, 1) : 1;
+  }, [topProperties]);
+
+  const today = formatDate(new Date());
+  const rangeLabel = useMemo(() => {
+    if (period === 'all') return 'All Time';
+    if (period === 'custom') {
+      if (!customFrom && !customTo) return 'Custom Range';
+      const f = customFrom ? formatDate(customFrom) : 'Start';
+      const t = customTo ? formatDate(customTo) : 'End';
+      return `${f} – ${t}`;
+    }
+    const opt = PERIOD_OPTIONS.find((o) => o.value === period);
+    return opt?.label || '';
+  }, [period, customFrom, customTo]);
 
   function handleExportPDF() {
-    const doc = new jsPDF();
+    const doc = new jsPDF({ orientation: 'landscape' });
     const pageWidth = doc.internal.pageSize.width;
     const margin = 14;
 
-    // ---- Header bar ----
-    doc.setFillColor(38, 34, 98); // #262262 brand indigo
+    doc.setFillColor(38, 34, 98);
     doc.rect(0, 0, pageWidth, 30, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18);
@@ -53,9 +201,8 @@ function AdminEarnings() {
     doc.text('ZuriLofts Earnings Report', margin, 18);
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Generated: ${today}`, margin, 26);
+    doc.text(`Generated: ${today}  |  Period: ${rangeLabel}`, margin, 26);
 
-    // ---- Summary Metrics ----
     doc.setTextColor(38, 34, 98);
     doc.setFontSize(12);
     doc.setFont('helvetica', 'bold');
@@ -64,115 +211,99 @@ function AdminEarnings() {
     doc.setFont('helvetica', 'normal');
 
     const summaryData = [
-      ['Total Bookings', String(totals.bookings.toLocaleString())],
-      ['Confirmed Bookings', String(totals.confirmedBookings.toLocaleString())],
-      ['Total Earnings (KES)', totals.earnings.toLocaleString()],
-      ['Confirmed Earnings (KES)', totals.confirmedEarnings.toLocaleString()],
+      ['Total Bookings', String(filteredTotals.bookings.toLocaleString())],
+      ['Confirmed Bookings', String(filteredTotals.confirmedBookings.toLocaleString())],
+      ['Total Earnings (KES)', filteredTotals.earnings.toLocaleString()],
+      ['Confirmed Earnings (KES)', filteredTotals.confirmedEarnings.toLocaleString()],
+      ['1-Bed Bookings', String(filteredTotals.bed1Bookings.toLocaleString())],
+      ['1-Bed Earnings (KES)', filteredTotals.bed1Earnings.toLocaleString()],
+      ['2-Bed Bookings', String(filteredTotals.bed2Bookings.toLocaleString())],
+      ['2-Bed Earnings (KES)', filteredTotals.bed2Earnings.toLocaleString()],
     ];
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: 46,
       head: [['Metric', 'Value']],
       body: summaryData,
       theme: 'grid',
-      headStyles: {
-        fillColor: [196, 154, 108], // #C49A6C bronze
-        textColor: [38, 34, 98],
-        fontStyle: 'bold',
-      },
-      bodyStyles: {
-        textColor: [31, 41, 55],
-      },
-      alternateRowStyles: {
-        fillColor: [248, 249, 250],
-      },
+      headStyles: { fillColor: [196, 154, 108], textColor: [255, 255, 255], fontStyle: 'bold' },
+      bodyStyles: { textColor: [31, 41, 55] },
+      alternateRowStyles: { fillColor: [248, 249, 250] },
       margin: { left: margin, right: margin },
       tableWidth: pageWidth - margin * 2,
       styles: { fontSize: 10 },
     });
 
-    // ---- Property Earnings Table ----
-    const tableHead = [['Property', 'Location', 'Times Booked', 'Confirmed', 'Earnings (KES)']];
-    const tableBody = rows.map((r) => [
+    const tableHead = [['Property', 'Location', 'Total Booked', 'Confirmed', 'Total Earnings', '1-Bed Booked', '1-Bed Earnings', '2-Bed Booked', '2-Bed Earnings']];
+    const tableBody = filteredRows.map((r) => [
       r.title,
       r.location,
       String(r.bookings),
       String(r.confirmedBookings),
       `KES ${r.earnings.toLocaleString()}`,
+      String(r.bed1Bookings),
+      `KES ${r.bed1Earnings.toLocaleString()}`,
+      String(r.bed2Bookings),
+      `KES ${r.bed2Earnings.toLocaleString()}`,
     ]);
     tableBody.push([
-      'TOTAL',
-      '',
-      String(totals.bookings),
-      String(totals.confirmedBookings),
-      `KES ${totals.earnings.toLocaleString()}`,
+      'TOTAL', '',
+      String(filteredTotals.bookings),
+      String(filteredTotals.confirmedBookings),
+      `KES ${filteredTotals.earnings.toLocaleString()}`,
+      String(filteredTotals.bed1Bookings),
+      `KES ${filteredTotals.bed1Earnings.toLocaleString()}`,
+      String(filteredTotals.bed2Bookings),
+      `KES ${filteredTotals.bed2Earnings.toLocaleString()}`,
     ]);
 
     const summaryEndY = doc.lastAutoTable ? doc.lastAutoTable.finalY : 70;
 
-    doc.autoTable({
+    autoTable(doc, {
       startY: summaryEndY + 10,
       head: tableHead,
       body: tableBody,
       theme: 'grid',
-      headStyles: {
-        fillColor: [38, 34, 98], // #262262
-        textColor: [255, 255, 255],
-        fontStyle: 'bold',
-      },
-      bodyStyles: {
-        textColor: [31, 41, 55],
-      },
-      alternateRowStyles: {
-        fillColor: [248, 249, 250],
-      },
+      headStyles: { fillColor: [38, 34, 98], textColor: [255, 255, 255], fontStyle: 'bold' },
+      bodyStyles: { textColor: [31, 41, 55] },
+      alternateRowStyles: { fillColor: [248, 249, 250] },
       margin: { left: margin, right: margin },
       tableWidth: pageWidth - margin * 2,
-      styles: { fontSize: 9 },
-      columnStyles: {
-        0: { cellWidth: 50 },       // Property
-        1: { cellWidth: 35 },       // Location
-        2: { halign: 'right', cellWidth: 30 },  // Times Booked
-        3: { halign: 'right', cellWidth: 25 },  // Confirmed
-        4: { halign: 'right', cellWidth: 40 },  // Earnings
-      },
+      styles: { fontSize: 9, cellPadding: 3 },
     });
 
-    // ---- Footer on every page ----
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
       doc.setFontSize(8);
       doc.setTextColor(156, 163, 175);
-      doc.text(
-        `Page ${i} of ${pageCount}  |  ZuriLofts  |  ${today}`,
-        margin,
-        doc.internal.pageSize.height - 10
-      );
+      doc.text(`Page ${i} of ${pageCount}  |  ZuriLofts  |  ${today}`, margin, doc.internal.pageSize.height - 10);
     }
 
     doc.save(`ZuriLofts_Earnings_${today.replace(/\s/g, '_')}.pdf`);
   }
 
   function handleExportCSV() {
-    // BOM prefix for Excel UTF-8 compatibility
-    let csv = '﻿';
+    let csv = '\uFEFF';
     csv += 'ZuriLofts Earnings Report\n';
-    csv += `Generated: ${today}\n\n`;
+    csv += `Generated: ${today}\n`;
+    csv += `Period: ${rangeLabel}\n\n`;
 
-    // Summary section
     csv += 'Metric,Value\n';
-    csv += `"Total Bookings","${totals.bookings}"\n`;
-    csv += `"Confirmed Bookings","${totals.confirmedBookings}"\n`;
-    csv += `"Total Earnings (KES)","${totals.earnings}"\n`;
-    csv += `"Confirmed Earnings (KES)","${totals.confirmedEarnings}"\n\n`;
+    csv += `"Total Bookings","${filteredTotals.bookings}"\n`;
+    csv += `"Confirmed Bookings","${filteredTotals.confirmedBookings}"\n`;
+    csv += `"Total Earnings (KES)","${filteredTotals.earnings}"\n`;
+    csv += `"Confirmed Earnings (KES)","${filteredTotals.confirmedEarnings}"\n`;
+    csv += `"1-Bed Bookings","${filteredTotals.bed1Bookings}"\n`;
+    csv += `"1-Bed Earnings (KES)","${filteredTotals.bed1Earnings}"\n`;
+    csv += `"2-Bed Bookings","${filteredTotals.bed2Bookings}"\n`;
+    csv += `"2-Bed Earnings (KES)","${filteredTotals.bed2Earnings}"\n\n`;
 
-    // Property table
-    csv += 'Property,Location,Times Booked,Confirmed,Earnings (KES)\n';
-    rows.forEach((r) => {
-      csv += `"${r.title}","${r.location}",${r.bookings},${r.confirmedBookings},${r.earnings}\n`;
+    csv += 'Property,Location,Total Booked,Confirmed,Total Earnings,1-Bed Booked,1-Bed Earnings,2-Bed Booked,2-Bed Earnings\n';
+    filteredRows.forEach((r) => {
+      csv += `"${r.title}","${r.location}",${r.bookings},${r.confirmedBookings},${r.earnings},${r.bed1Bookings},${r.bed1Earnings},${r.bed2Bookings},${r.bed2Earnings}\n`;
     });
-    csv += `"TOTAL","",${totals.bookings},${totals.confirmedBookings},${totals.earnings}\n`;
+    csv += `"TOTAL","",${filteredTotals.bookings},${filteredTotals.confirmedBookings},${filteredTotals.earnings},${filteredTotals.bed1Bookings},${filteredTotals.bed1Earnings},${filteredTotals.bed2Bookings},${filteredTotals.bed2Earnings}\n`;
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -189,10 +320,10 @@ function AdminEarnings() {
   }
 
   const cards = [
-    { label: 'Total Bookings', value: totals.bookings.toLocaleString(), color: 'bg-[#262262]' },
-    { label: 'Confirmed Bookings', value: totals.confirmedBookings.toLocaleString(), color: 'bg-[#C49A6C]' },
-    { label: 'Total Earnings (KES)', value: totals.earnings.toLocaleString(), color: 'bg-green-600' },
-    { label: 'Confirmed Earnings (KES)', value: totals.confirmedEarnings.toLocaleString(), color: 'bg-purple-600' },
+    { label: 'Total Bookings', value: filteredTotals.bookings.toLocaleString(), color: 'bg-[#262262]' },
+    { label: 'Confirmed Bookings', value: filteredTotals.confirmedBookings.toLocaleString(), color: 'bg-[#C49A6C]' },
+    { label: 'Total Earnings (KES)', value: filteredTotals.earnings.toLocaleString(), color: 'bg-green-600' },
+    { label: 'Confirmed Earnings (KES)', value: filteredTotals.confirmedEarnings.toLocaleString(), color: 'bg-purple-600' },
   ];
 
   return (
@@ -220,6 +351,89 @@ function AdminEarnings() {
         )}
       </div>
 
+      <div className="bg-white rounded-2xl border border-[#D9D9D9] p-4 mb-6 shadow-sm">
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="flex-shrink-0">
+            <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">Period</label>
+            <Dropdown
+              value={period}
+              onChange={setPeriod}
+              options={PERIOD_OPTIONS}
+              triggerClassName="px-4 py-2.5 rounded-xl border border-[#D9D9D9] bg-white text-sm min-w-[160px] hover:border-[#C49A6C]"
+              placeholder="Select period"
+              ariaLabel="Select time period"
+            />
+          </div>
+
+          {period === 'custom' && (
+            <>
+              <div className="flex-shrink-0">
+                <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">From</label>
+                <input
+                  type="date"
+                  value={customFrom}
+                  onChange={(e) => setCustomFrom(e.target.value)}
+                  className="px-4 py-2.5 rounded-xl border border-[#D9D9D9] bg-white text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+                />
+              </div>
+              <div className="flex-shrink-0">
+                <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">To</label>
+                <input
+                  type="date"
+                  value={customTo}
+                  onChange={(e) => setCustomTo(e.target.value)}
+                  className="px-4 py-2.5 rounded-xl border border-[#D9D9D9] bg-white text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+                />
+              </div>
+            </>
+          )}
+
+          <div className="flex-1 min-w-[200px]">
+            <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">Search Property</label>
+            <div className="relative">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Type property or location name..."
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#D9D9D9] bg-white text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+              />
+              <svg className="w-4 h-4 text-[#6b7280] absolute left-3.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              {search && (
+                <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] hover:text-[#262262]">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+          </div>
+
+          <div className="flex-shrink-0">
+            <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">Sort By</label>
+            <Dropdown
+              value={sortBy}
+              onChange={setSortBy}
+              options={SORT_OPTIONS}
+              triggerClassName="px-4 py-2.5 rounded-xl border border-[#D9D9D9] bg-white text-sm min-w-[200px] hover:border-[#C49A6C]"
+              placeholder="Sort by"
+              ariaLabel="Sort earnings table"
+            />
+          </div>
+        </div>
+
+        {period !== 'all' && (
+          <div className="mt-3 pt-3 border-t border-[#D9D9D9]/50 flex items-center gap-2 text-sm text-[#6b7280]">
+            <svg className="w-4 h-4 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <span>Showing data for: <span className="font-semibold text-[#262262]">{rangeLabel}</span></span>
+          </div>
+        )}
+      </div>
+
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {cards.map(({ label, value, color }) => (
           <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
@@ -232,6 +446,28 @@ function AdminEarnings() {
         ))}
       </div>
 
+      {!loading && topProperties.length > 0 && (
+        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-8 shadow-sm">
+          <h2 className="text-lg font-bold text-[#262262] mb-4">Top Properties by Earnings</h2>
+          <div className="space-y-3">
+            {topProperties.map((p) => {
+              const pct = Math.max(1, Math.round((p.earnings / maxEarnings) * 100));
+              return (
+                <div key={p.id} className="flex items-center gap-3">
+                  <div className="w-24 sm:w-32 text-sm text-[#1f2937] truncate font-medium" title={p.title}>{p.title}</div>
+                  <div className="flex-1 h-8 bg-[#f0f0f5] rounded-lg overflow-hidden">
+                    <div className="h-full bg-[#C49A6C] rounded-lg flex items-center justify-end pr-2 transition-all duration-500" style={{ width: `${pct}%` }}>
+                      {pct > 25 && <span className="text-xs font-semibold text-white">KES {p.earnings.toLocaleString()}</span>}
+                    </div>
+                  </div>
+                  {pct <= 25 && <span className="text-xs font-semibold text-[#C49A6C] w-20 text-right">KES {p.earnings.toLocaleString()}</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       {loading ? (
         <div className="text-center py-12">
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
@@ -242,15 +478,19 @@ function AdminEarnings() {
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
                 <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Property</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Location</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#262262]">Times Booked</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#262262]">Confirmed</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#262262]">Earnings (KES)</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#262262] whitespace-nowrap">Property</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#262262] whitespace-nowrap">Location</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#262262] whitespace-nowrap">Total Booked</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#262262] whitespace-nowrap">Confirmed</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#262262] whitespace-nowrap">Total Earnings</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#262262] whitespace-nowrap">1-Bed Booked</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#262262] whitespace-nowrap">1-Bed Earnings</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#262262] whitespace-nowrap">2-Bed Booked</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#262262] whitespace-nowrap">2-Bed Earnings</th>
                 </tr>
               </thead>
               <tbody>
-                {rows.map((r) => (
+                {filteredRows.map((r) => (
                   <tr key={r.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#f8f9fa]">
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-3">
@@ -266,23 +506,31 @@ function AdminEarnings() {
                     <td className="py-3 px-4 text-right font-semibold">{r.bookings.toLocaleString()}</td>
                     <td className="py-3 px-4 text-right">{r.confirmedBookings.toLocaleString()}</td>
                     <td className="py-3 px-4 text-right font-bold text-[#C49A6C]">KES {r.earnings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right">{r.bed1Bookings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right text-[#6b7280]">KES {r.bed1Earnings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right">{r.bed2Bookings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right text-[#6b7280]">KES {r.bed2Earnings.toLocaleString()}</td>
                   </tr>
                 ))}
               </tbody>
-              {rows.length > 0 && (
+              {filteredRows.length > 0 && (
                 <tfoot>
                   <tr className="border-t-2 border-[#D9D9D9] bg-[#f8f9fa] font-bold text-[#262262]">
                     <td className="py-3 px-4" colSpan={2}>Total</td>
-                    <td className="py-3 px-4 text-right">{totals.bookings.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right">{totals.confirmedBookings.toLocaleString()}</td>
-                    <td className="py-3 px-4 text-right text-[#C49A6C]">KES {totals.earnings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right">{filteredTotals.bookings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right">{filteredTotals.confirmedBookings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right text-[#C49A6C]">KES {filteredTotals.earnings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right">{filteredTotals.bed1Bookings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right">KES {filteredTotals.bed1Earnings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right">{filteredTotals.bed2Bookings.toLocaleString()}</td>
+                    <td className="py-3 px-4 text-right">KES {filteredTotals.bed2Earnings.toLocaleString()}</td>
                   </tr>
                 </tfoot>
               )}
             </table>
           </div>
-          {rows.length === 0 && (
-            <div className="text-center py-12 text-[#6b7280]">No properties yet.</div>
+          {filteredRows.length === 0 && (
+            <div className="text-center py-12 text-[#6b7280]">{search ? 'No properties match your search.' : 'No properties yet.'}</div>
           )}
         </div>
       )}

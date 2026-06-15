@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZuriLofts — Developer Manual</title>
+<style>
+  :root {
+    --indigo: #262262;
+    --bronze: #C49A6C;
+    --grey: #6b7280;
+    --light: #f8f9fa;
+    --border: #D9D9D9;
+    --text: #1f2937;
+    --code-bg: #1e1e2e;
+    --code-text: #e0e0e0;
+    --sidebar-w: 260px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #f4f4f8; color: var(--text); display: flex; min-height: 100vh; }
+
+  /* Sidebar */
+  nav {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: var(--sidebar-w); background: var(--indigo); color: #fff;
+    overflow-y: auto; z-index: 100; padding: 24px 0;
+  }
+  nav h2 { font-size: 16px; padding: 0 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.15); margin-bottom: 8px; }
+  nav h2 small { font-size: 11px; color: rgba(255,255,255,0.5); display: block; margin-top: 2px; font-weight: normal; }
+  nav a {
+    display: block; color: rgba(255,255,255,0.7); text-decoration: none;
+    padding: 8px 20px; font-size: 13px; transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  nav a:hover, nav a.active { color: #fff; background: rgba(255,255,255,0.08); border-left-color: var(--bronze); }
+
+  /* Main */
+  main { margin-left: var(--sidebar-w); flex: 1; padding: 32px 40px; max-width: 900px; }
+  section { display: none; margin-bottom: 40px; }
+  section.active { display: block; }
+  h1 { font-size: 28px; color: var(--indigo); margin-bottom: 4px; }
+  .subtitle { color: var(--grey); font-size: 14px; margin-bottom: 24px; }
+  h2 { font-size: 20px; color: var(--indigo); margin: 28px 0 12px; border-bottom: 2px solid var(--bronze); padding-bottom: 6px; }
+  h3 { font-size: 16px; color: var(--bronze); margin: 20px 0 8px; }
+  p { line-height: 1.7; margin-bottom: 12px; font-size: 14px; }
+  ul, ol { margin: 0 0 16px 20px; line-height: 1.7; font-size: 14px; }
+  li { margin-bottom: 4px; }
+
+  /* Cards */
+  .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+
+  /* Code blocks */
+  pre { background: var(--code-bg); color: var(--code-text); padding: 16px; border-radius: 8px; overflow-x: auto; font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 13px; }
+  :not(pre) > code { background: #e8e8f0; color: var(--indigo); padding: 2px 6px; border-radius: 4px; font-size: 13px; }
+
+  /* Tags */
+  .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
+  .tag-get { background: #d1fae5; color: #065f46; }
+  .tag-post { background: #dbeafe; color: #1e40af; }
+  .tag-put { background: #fef3c7; color: #92400e; }
+  .tag-delete { background: #fee2e2; color: #991b1b; }
+  .tag-admin { background: #ede9fe; color: #5b21b6; }
+  .tag-auth { background: #fce7f3; color: #9d174d; }
+  .tag-public { background: #e0e7ff; color: #3730a3; }
+
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 13px; }
+  th { background: var(--indigo); color: #fff; padding: 10px 12px; text-align: left; font-weight: 600; }
+  td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+  tr:nth-child(even) td { background: var(--light); }
+
+  /* Info box */
+  .info-box { border-left: 4px solid var(--bronze); background: #fff; padding: 14px 18px; border-radius: 0 8px 8px 0; margin-bottom: 16px; font-size: 13px; }
+  .info-box strong { color: var(--indigo); }
+
+  /* File path badge */
+  .file-path { display: inline-block; background: var(--indigo); color: #fff; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-family: monospace; margin-bottom: 8px; }
+
+  /* Step */
+  .step { display: flex; gap: 12px; margin-bottom: 16px; }
+  .step-num { width: 28px; height: 28px; background: var(--bronze); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; }
+  .step-body { flex: 1; }
+  .step-body h4 { margin: 0 0 4px; color: var(--indigo); font-size: 15px; }
+  .step-body p { margin: 0; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    nav { width: 100%; position: relative; height: auto; max-height: 200px; }
+    main { margin-left: 0; padding: 20px; }
+    body { flex-direction: column; }
+  }
+
+  /* Print */
+  @media print {
+    nav { display: none; }
+    main { margin-left: 0; }
+    section { display: block !important; }
+    section:not(.active) { page-break-before: always; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <h2>ZuriLofts<br><small>Developer Manual v1.0</small></h2>
+  <a href="#start" class="active" onclick="showSection('start', this)">Getting Started</a>
+  <a href="#stack" onclick="showSection('stack', this)">Tech Stack</a>
+  <a href="#architecture" onclick="showSection('architecture', this)">Architecture</a>
+  <a href="#database" onclick="showSection('database', this)">Database</a>
+  <a href="#api" onclick="showSection('api', this)">API Reference</a>
+  <a href="#frontend" onclick="showSection('frontend', this)">Frontend Guide</a>
+  <a href="#add-feature" onclick="showSection('add-feature', this)">Adding Features</a>
+  <a href="#deploy" onclick="showSection('deploy', this)">Deployment</a>
+  <a href="#troubleshoot" onclick="showSection('troubleshoot', this)">Troubleshooting</a>
+</nav>
+
+<main>
+<!-- ================================================================ -->
+<section id="start" class="active">
+<h1>Getting Started</h1>
+<p class="subtitle">Everything you need to run and maintain the ZuriLofts website on your computer</p>
+
+<h2>Prerequisites</h2>
+<table>
+  <tr><th>Tool</th><th>Purpose</th><th>Download</th></tr>
+  <tr><td>Node.js (v18 or v20)</td><td>Runs JavaScript on your computer</td><td>nodejs.org</td></tr>
+  <tr><td>npm</td><td>Installs packages (comes with Node)</td><td>Included with Node</td></tr>
+  <tr><td>Git</td><td>Version control + push to GitHub</td><td>git-scm.com</td></tr>
+  <tr><td>VS Code (recommended)</td><td>Code editor</td><td>code.visualstudio.com</td></tr>
+</table>
+
+<h2>First-Time Setup</h2>
+<p>Open a terminal and run these commands ONE at a time:</p>
+
+<div class="step"><div class="step-num">1</div><div class="step-body"><h4>Go to project folder</h4><p><code>cd "C:\Users\Mega-Mind\Documents\WebDev Projects\zurilofts"</code></p></div></div>
+
+<div class="step"><div class="step-num">2</div><div class="step-body"><h4>Install frontend packages</h4><p><code>npm install</code></p></div></div>
+
+<div class="step"><div class="step-num">3</div><div class="step-body"><h4>Install backend packages</h4>
+<pre>cd server
+npm install</pre></div></div>
+
+<div class="step"><div class="step-num">4</div><div class="step-body"><h4>Create the database</h4>
+<pre>npx prisma db push
+npx prisma generate</pre></div></div>
+
+<div class="step"><div class="step-num">5</div><div class="step-body"><h4>Go back to project root</h4><p><code>cd ..</code></p></div></div>
+
+<h2>Starting the App (Every Time)</h2>
+<p>You need <strong>TWO terminals</strong> running at the same time:</p>
+
+<div class="card-grid">
+  <div class="card">
+    <h3>Terminal 1 — Backend (port 3000)</h3>
+    <pre>cd server
+npm run dev</pre>
+  </div>
+  <div class="card">
+    <h3>Terminal 2 — Frontend (port 5173)</h3>
+    <pre>npm run dev</pre>
+  </div>
+</div>
+
+<div class="info-box">
+  <strong>Then open:</strong> <code>http://localhost:5173</code> in your browser
+</div>
+
+<h2>How It Connects</h2>
+<pre>
+Browser (localhost:5173)
+    │
+    │  User visits a page (React)
+    │
+    ▼
+Vite Dev Server ── serves React app
+    │
+    │  API calls go to /api/*
+    │  (Vite proxies them)
+    │
+    ▼
+Express Server (localhost:3000)
+    │
+    │  Reads/writes data
+    │
+    ▼
+SQLite Database (server/prisma/dev.db)
+</pre>
+
+<h2>Creating an Admin Account</h2>
+<div class="step"><div class="step-num">1</div><div class="step-body"><h4>Register a normal account</h4><p>Go to <code>/register</code> and create your account.</p></div></div>
+<div class="step"><div class="step-num">2</div><div class="step-body"><h4>Open the database</h4><p>Download <a href="https://sqlitebrowser.org/">DB Browser for SQLite</a>. Open <code>server/prisma/dev.db</code>.</p></div></div>
+<div class="step"><div class="step-num">3</div><div class="step-body"><h4>Change the role</h4><p>Go to the <code>User</code> table, find your account, change <code>role</code> from <code>"USER"</code> to <code>"ADMIN"</code>. Click <strong>Write Changes</strong>.</p></div></div>
+<div class="step"><div class="step-num">4</div><div class="step-body"><h4>Access the admin panel</h4><p>Go to <code>http://localhost:5173/admin</code></p></div></div>
+
+<h2>Building for Production</h2>
+<pre>npm run build:all</pre>
+<p>Built files go to <code>dist/</code> (frontend) and <code>server/dist/</code> (backend).</p>
+
+<h2>Environment Variables</h2>
+<p>File: <code>server/.env</code></p>
+<table>
+  <tr><th>Variable</th><th>Purpose</th><th>Default</th></tr>
+  <tr><td>DATABASE_URL</td><td>Database file location</td><td>file:./dev.db</td></tr>
+  <tr><td>JWT_SECRET</td><td>Secret key for user login tokens</td><td>(set in .env)</td></tr>
+  <tr><td>GOOGLE_CLIENT_ID</td><td>Google sign-in</td><td>(set in .env)</td></tr>
+  <tr><td>GOOGLE_CLIENT_SECRET</td><td>Google sign-in</td><td>(set in .env)</td></tr>
+  <tr><td>PORT</td><td>Backend port</td><td>3000</td></tr>
+</table>
+</section>
+
+<!-- ================================================================ -->
+<section id="stack">
+<h1>Tech Stack</h1>
+<p class="subtitle">What every technology does and how they connect</p>
+
+<h2>The Big Picture</h2>
+<pre>
+USER'S BROWSER                    YOUR SERVER / COMPUTER
+┌──────────────────┐          ┌─────────────────────────────┐
+│  React App        │  HTTP    │  Express Server             │
+│  (Vite)           │◄────────►│  (Node.js + TypeScript)     │
+│                   │  JSON    │                             │
+│  - Pages          │          │  Routes → Controllers       │
+│  - Components     │          │  Controllers → Services     │
+│  - Tailwind CSS   │          │  Services → Prisma          │
+│  - Axios (API)    │          │  Prisma → Database          │
+└──────────────────┘          └─────────────────────────────┘
+</pre>
+
+<h2>Frontend (What Users See)</h2>
+<table>
+  <tr><th>Technology</th><th>What it does</th><th>Where used</th></tr>
+  <tr><td><strong>React 18</strong></td><td>Builds UI from reusable components</td><td>All pages in <code>src/pages/</code></td></tr>
+  <tr><td><strong>Vite</strong></td><td>Dev server + fast build tool</td><td><code>npm run dev</code></td></tr>
+  <tr><td><strong>Tailwind CSS</strong></td><td>Utility CSS classes (no CSS files)</td><td>Classes like <code>bg-[#262262] text-white</code></td></tr>
+  <tr><td><strong>React Router</strong></td><td>URL-based page navigation</td><td>Routes in <code>src/App.jsx</code></td></tr>
+  <tr><td><strong>Axios</strong></td><td>HTTP requests to backend</td><td><code>src/api/client.js</code></td></tr>
+  <tr><td><strong>jsPDF</strong></td><td>PDF report generation</td><td>Admin Earnings export</td></tr>
+</table>
+
+<h2>Backend (Server-Side Logic)</h2>
+<table>
+  <tr><th>Technology</th><th>What it does</th><th>Where used</th></tr>
+  <tr><td><strong>Node.js</strong></td><td>Runs JavaScript on a server</td><td>Runtime for Express</td></tr>
+  <tr><td><strong>Express</strong></td><td>Handles HTTP requests + responses</td><td>Routes in <code>server/src/routes/</code></td></tr>
+  <tr><td><strong>TypeScript</strong></td><td>JavaScript with type safety</td><td>All <code>.ts</code> files in server</td></tr>
+  <tr><td><strong>Prisma</strong></td><td>Database ORM — query DB from code</td><td><code>server/prisma/schema.prisma</code></td></tr>
+  <tr><td><strong>SQLite</strong></td><td>File-based database (dev)</td><td><code>server/prisma/dev.db</code></td></tr>
+  <tr><td><strong>Zod</strong></td><td>Input validation</td><td><code>server/src/types/index.ts</code></td></tr>
+  <tr><td><strong>JWT</strong></td><td>User authentication tokens</td><td><code>server/src/utils/jwt.ts</code></td></tr>
+  <tr><td><strong>Sharp</strong></td><td>Image optimization</td><td>Upload controllers</td></tr>
+</table>
+
+<h2>Key Concepts in Plain English</h2>
+
+<div class="card">
+  <h3>What is a "Component"?</h3>
+  <p>A React component is a reusable piece of UI. Think of it like a blueprint. <code>PropertyCard.jsx</code> takes property data and renders the same card layout every time, just with different content. You write it once and use it everywhere.</p>
+</div>
+
+<div class="card">
+  <h3>What is an "API Endpoint"?</h3>
+  <p>An endpoint is a URL that the frontend calls to get or save data. <code>GET /api/properties</code> returns all properties as JSON. The frontend says "give me properties" and the backend responds with an array of property data.</p>
+</div>
+
+<div class="card">
+  <h3>What is "Middleware"?</h3>
+  <p>Middleware runs between the request arriving and the response being sent. The <code>authenticate</code> middleware checks if the user is logged in. The <code>validate</code> middleware checks if the data sent is in the correct format.</p>
+</div>
+</section>
+
+<!-- ================================================================ -->
+<section id="architecture">
+<h1>Architecture</h1>
+<p class="subtitle">The complete project structure and how files connect</p>
+
+<h2>Folder Map</h2>
+<pre>
+zurilofts/
+├── src/                         ← FRONTEND (React app)
+│   ├── pages/                   ← Full pages (LoginPage, BookingPage, etc.)
+│   ├── components/              ← Reusable UI pieces (Navbar, Dropdown, etc.)
+│   ├── context/                 ← Shared state (Auth, Favorites)
+│   ├── api/client.js            ← Axios HTTP client
+│   ├── App.jsx                  ← Routes + HomePage + layout
+│   ├── index.css                ← Global styles + Tailwind
+│   └── main.jsx                 ← Entry point
+│
+├── server/
+│   ├── prisma/schema.prisma     ← Database structure
+│   ├── prisma/dev.db            ← SQLite database file (dev)
+│   └── src/
+│       ├── routes/              ← URL definitions (e.g. /api/properties)
+│       ├── controllers/         ← Request handlers (parse input → response)
+│       ├── services/            ← Business logic + database queries
+│       ├── middleware/           ← Auth, validation, error handling
+│       ├── types/index.ts       ← Validation schemas + TypeScript types
+│       └── utils/               ← JWT, pricing helpers
+│
+├── public/                      ← Static files (images served directly)
+├── docs/                        ← THIS MANUAL (not part of the app)
+├── package.json                 ← Frontend dependencies
+└── vite.config.js               ← Vite configuration
+</pre>
+
+<h2>Request Flow (What Happens When You Click a Button)</h2>
+<div class="step"><div class="step-num">1</div><div class="step-body"><h4>User clicks "Book Now" on a property page</h4><p>The React component calls <code>apiClient.post('/bookings', bookingData)</code></p></div></div>
+<div class="step"><div class="step-num">2</div><div class="step-body"><h4>Axios sends HTTP POST to /api/bookings</h4><p>Vite proxies this to <code>localhost:3000/api/bookings</code>. The auth interceptor attaches the user's JWT token.</p></div></div>
+<div class="step"><div class="step-num">3</div><div class="step-body"><h4>Express matches the route</h4><p><span class="file-path">server/src/routes/booking.routes.ts</span> matches <code>POST /</code> to <code>bookingCtrl.create</code></p></div></div>
+<div class="step"><div class="step-num">4</div><div class="step-body"><h4>Middleware runs</h4><p><code>authenticate</code> verifies the JWT. <code>validate(bookingCreateSchema)</code> checks all fields are valid.</p></div></div>
+<div class="step"><div class="step-num">5</div><div class="step-body"><h4>Controller handles the request</h4><p><span class="file-path">server/src/controllers/booking.controller.ts</span> extracts data from <code>req.body</code>, calls the service.</p></div></div>
+<div class="step"><div class="step-num">6</div><div class="step-body"><h4>Service does the actual work</h4><p><span class="file-path">server/src/services/booking.service.ts</span> checks availability, calculates pricing, creates the database record.</p></div></div>
+<div class="step"><div class="step-num">7</div><div class="step-body"><h4>Response goes back</h4><p>Controller sends <code>{ success: true, data: booking }</code> back to the browser. Axios resolves the promise. React updates the UI.</p></div></div>
+
+<h2>Key Files to Know</h2>
+<table>
+  <tr><th>When you want to...</th><th>Edit this file</th></tr>
+  <tr><td>Change a page's content</td><td><code>src/pages/[PageName].jsx</code></td></tr>
+  <tr><td>Change a reusable UI piece</td><td><code>src/components/[Component].jsx</code></td></tr>
+  <tr><td>Change navigation/routes</td><td><code>src/App.jsx</code></td></tr>
+  <tr><td>Add a backend API endpoint</td><td><code>server/src/routes/</code> + controller + service</td></tr>
+  <tr><td>Change the database structure</td><td><code>server/prisma/schema.prisma</code></td></tr>
+  <tr><td>Change input validation rules</td><td><code>server/src/types/index.ts</code></td></tr>
+  <tr><td>Change navbar</td><td><code>src/components/Navbar.jsx</code></td></tr>
+  <tr><td>Change footer</td><td><code>src/components/Footer.jsx</code></td></tr>
+  <tr><td>Change the hero section</td><td><code>src/components/Hero.jsx</code></td></tr>
+  <tr><td>Change API client behavior</td><td><code>src/api/client.js</code></td></tr>
+</table>
+</section>
+
+<!-- ================================================================ -->
+<section id="database">
+<h1>Database</h1>
+<p class="subtitle">The Prisma schema and all database models</p>
+
+<div class="info-box">
+  <strong>Schema file:</strong> <code>server/prisma/schema.prisma</code> (dev uses SQLite, production uses PostgreSQL)
+</div>
+
+<h2>All Models (Tables)</h2>
+
+<h3>User — Account information</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>String (auto)</td><td>Unique ID</td></tr>
+  <tr><td>email</td><td>String</td><td>Unique, required</td></tr>
+  <tr><td>passwordHash</td><td>String?</td><td>Null for Google sign-in users</td></tr>
+  <tr><td>firstName</td><td>String</td><td>Required</td></tr>
+  <tr><td>lastName</td><td>String</td><td>Required</td></tr>
+  <tr><td>phone</td><td>String?</td><td>Optional</td></tr>
+  <tr><td>avatar</td><td>String?</td><td>Profile image path</td></tr>
+  <tr><td>googleId</td><td>String?</td><td>For Google OAuth users</td></tr>
+  <tr><td>role</td><td>String</td><td>"USER" or "ADMIN"</td></tr>
+</table>
+
+<h3>Property — Apartment/rental listings</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>String (auto)</td><td></td></tr>
+  <tr><td>title</td><td>String</td><td>Display name</td></tr>
+  <tr><td>location</td><td>String</td><td>Area/neighbourhood</td></tr>
+  <tr><td>price</td><td>Int</td><td>Base nightly price (KES)</td></tr>
+  <tr><td>rating</td><td>Float</td><td>Auto-computed from reviews</td></tr>
+  <tr><td>bedrooms / bathrooms / area</td><td>Int</td><td></td></tr>
+  <tr><td>description</td><td>String</td><td>Full text</td></tr>
+  <tr><td>imagesJson / amenitiesJson / nearbyJson</td><td>String</td><td>JSON arrays</td></tr>
+  <tr><td>type</td><td>String</td><td>"apartment", "studio", "penthouse"</td></tr>
+  <tr><td>available / featured</td><td>Boolean</td><td></td></tr>
+</table>
+
+<h3>Booking — Each reservation</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>id</td><td>String (auto)</td><td></td></tr>
+  <tr><td>userId / propertyId</td><td>String</td><td>Foreign keys</td></tr>
+  <tr><td>checkIn / checkOut</td><td>DateTime</td><td></td></tr>
+  <tr><td>guests</td><td>Int</td><td>1 bed = max 2, 2 bed = max 4, absolute max 6</td></tr>
+  <tr><td>bedOption</td><td>String?</td><td>"1bed" or "2bed"</td></tr>
+  <tr><td>status</td><td>String</td><td>"PENDING", "CONFIRMED", "CANCELLED"</td></tr>
+  <tr><td>subtotal / cleaningFee / serviceFee / lateCheckoutFee / discountAmount / total</td><td>Int</td><td>Price breakdown in KES</td></tr>
+</table>
+
+<h3>Review — Post-stay feedback</h3>
+<table>
+  <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+  <tr><td>rating</td><td>Int</td><td>1-5 stars</td></tr>
+  <tr><td>satisfaction</td><td>String?</td><td>"happy", "neutral", "unhappy"</td></tr>
+  <tr><td>privateNote</td><td>String?</td><td>Admin-only feedback</td></tr>
+</table>
+
+<h3>Other Models</h3>
+<ul>
+  <li><strong>Favorite</strong> — User-property saved list</li>
+  <li><strong>Message</strong> — In-app chat</li>
+  <li><strong>PromoCode</strong> — Discount codes</li>
+  <li><strong>CalendarSource</strong> — External iCal feeds (Airbnb)</li>
+  <li><strong>CalendarBlock</strong> — Blocked date ranges</li>
+  <li><strong>PriceRule</strong> — Seasonal price overrides</li>
+  <li><strong>AppSetting</strong> — Key-value settings (landing stats)</li>
+</ul>
+
+<h2>How to Add a New Field to the Database</h2>
+<div class="step"><div class="step-num">1</div><div class="step-body"><h4>Edit the schema</h4><p>Open <code>server/prisma/schema.prisma</code>. Add your field to an existing model.</p>
+<pre>model Property {
+  // ... existing fields ...
+  wifiSpeed   Int?      // ← new field
+}</pre></div></div>
+
+<div class="step"><div class="step-num">2</div><div class="step-body"><h4>Push to dev database</h4><pre>cd server
+npx prisma db push</pre></div></div>
+
+<div class="step"><div class="step-num">3</div><div class="step-body"><h4>Regenerate Prisma client</h4><pre>npx prisma generate</pre><p>If you get a permission error: <code>rm node_modules/.prisma/client/query_engine-windows.dll.node</code> then run generate again.</p></div></div>
+
+<div class="step"><div class="step-num">4</div><div class="step-body"><h4>Update your code</h4><p>Add the new field to the Prisma <code>select</code> in the relevant service file so it gets returned in API responses.</p></div></div>
+</section>
+
+<!-- ================================================================ -->
+<section id="api">
+<h1>API Reference</h1>
+<p class="subtitle">Every backend endpoint, what it does, and what it returns</p>
+
+<div class="info-box">
+  <strong>Base URL:</strong> <code>/api</code> (Vite proxies to <code>localhost:3000</code>)
+</div>
+
+<h2>Authentication <span class="tag tag-public">Public</span></h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>What it does</th></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/register</code></td><td>Create account — body: {firstName, lastName, email, password}</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/login</code></td><td>Sign in — body: {email, password}</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/refresh</code></td><td>Get new access token from cookie</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/auth/google</code></td><td>Start Google OAuth sign-in</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/auth/me</code></td><td><span class="tag tag-auth">Auth</span> Get current user</td></tr>
+</table>
+
+<h2>Properties <span class="tag tag-public">Public</span></h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>What it does</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/properties</code></td><td>List all (supports ?search= query)</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/properties/:id</code></td><td>Get single property with bookings</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/properties</code></td><td><span class="tag tag-admin">Admin</span> Create property</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td><code>/properties/:id</code></td><td><span class="tag tag-admin">Admin</span> Update property</td></tr>
+  <tr><td><span class="tag tag-delete">DELETE</span></td><td><code>/properties/:id</code></td><td><span class="tag tag-admin">Admin</span> Delete property</td></tr>
+</table>
+
+<h2>Bookings <span class="tag tag-auth">Auth</span></h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>What it does</th></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/bookings</code></td><td>Create a booking</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/bookings</code></td><td>List your bookings</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/bookings/availability/:propertyId</code></td><td><span class="tag tag-public">Public</span> Get unavailable dates</td></tr>
+</table>
+
+<h2>Admin <span class="tag tag-admin">Admin Only</span></h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>What it does</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/admin/bookings</code></td><td>All bookings</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/admin/reviews</code></td><td>All reviews with stats</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/admin/analytics/properties</code></td><td>Per-property earnings</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/admin/settings/landing-stats</code></td><td>Get landing page stats</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td><code>/admin/settings/landing-stats</code></td><td>Update stats (happyStays, starRating, satisfaction)</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/admin/messages</code></td><td>All conversations</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/admin/messages/:userId</code></td><td>Reply to a guest</td></tr>
+</table>
+
+<h2>Reviews</h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>What it does</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/reviews/summary</code></td><td><span class="tag tag-public">Public</span> Landing page stats</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/reviews</code></td><td><span class="tag tag-auth">Auth</span> Submit review</td></tr>
+</table>
+
+<h2>Other Routes</h2>
+<table>
+  <tr><th>Method</th><th>Path</th><th>What it does</th></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/users/profile</code></td><td><span class="tag tag-auth">Auth</span> Your profile</td></tr>
+  <tr><td><span class="tag tag-put">PUT</span></td><td><code>/users/profile</code></td><td><span class="tag tag-auth">Auth</span> Update profile</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/users/avatar</code></td><td><span class="tag tag-auth">Auth</span> Upload profile photo</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/uploads</code></td><td><span class="tag tag-admin">Admin</span> Upload property images</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/promo/validate</code></td><td><span class="tag tag-auth">Auth</span> Validate promo code</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/favorites/:propertyId</code></td><td><span class="tag tag-auth">Auth</span> Save property</td></tr>
+  <tr><td><span class="tag tag-get">GET</span></td><td><code>/messages</code></td><td><span class="tag tag-auth">Auth</span> Your conversation</td></tr>
+</table>
+</section>
+
+<!-- ================================================================ -->
+<section id="frontend">
+<h1>Frontend Guide</h1>
+<p class="subtitle">How the React app is organized and how to make changes</p>
+
+<h2>Page List</h2>
+<table>
+  <tr><th>File</th><th>Route</th><th>What it shows</th></tr>
+  <tr><td><code>App.jsx (HomePage)</code></td><td><code>/</code></td><td>Landing: hero, property carousel, places to visit/eat</td></tr>
+  <tr><td><code>LoginPage.jsx</code></td><td><code>/login</code></td><td>Email/password + Google sign-in</td></tr>
+  <tr><td><code>RegisterPage.jsx</code></td><td><code>/register</code></td><td>Create account + profile photo</td></tr>
+  <tr><td><code>PropertiesPage.jsx</code></td><td><code>/properties</code></td><td>Search + browse all properties</td></tr>
+  <tr><td><code>PropertyPage.jsx</code></td><td><code>/property/:id</code></td><td>Single property detail</td></tr>
+  <tr><td><code>BookingPage.jsx</code></td><td><code>/book/:id</code></td><td>3-step booking flow</td></tr>
+  <tr><td><code>ProfilePage.jsx</code></td><td><code>/profile</code></td><td>My Info, Bookings, Favorites</td></tr>
+  <tr><td><code>MessagesPage.jsx</code></td><td><code>/messages</code></td><td>Chat with admin</td></tr>
+  <tr><td><code>ContactPage.jsx</code></td><td><code>/contact</code></td><td>Contact info + map</td></tr>
+  <tr><td><code>AdminDashboard.jsx</code></td><td><code>/admin</code></td><td>Stats overview + landing stats editor</td></tr>
+  <tr><td><code>AdminProperties.jsx</code></td><td><code>/admin/properties</code></td><td>Property list</td></tr>
+  <tr><td><code>AdminPropertyForm.jsx</code></td><td><code>/admin/properties/new</code></td><td>Add/edit property</td></tr>
+  <tr><td><code>AdminBookings.jsx</code></td><td><code>/admin/bookings</code></td><td>All bookings</td></tr>
+  <tr><td><code>AdminEarnings.jsx</code></td><td><code>/admin/earnings</code></td><td>Earnings + PDF/CSV export</td></tr>
+  <tr><td><code>AdminPromos.jsx</code></td><td><code>/admin/promos</code></td><td>Promo codes</td></tr>
+  <tr><td><code>AdminCalendar.jsx</code></td><td><code>/admin/properties/:id/calendar</code></td><td>iCal sync</td></tr>
+</table>
+
+<h2>Components</h2>
+<table>
+  <tr><th>File</th><th>What it does</th></tr>
+  <tr><td><code>Navbar.jsx</code></td><td>Top nav: logo, links, user dropdown, mobile menu</td></tr>
+  <tr><td><code>Footer.jsx</code></td><td>Page footer with contact and links</td></tr>
+  <tr><td><code>Hero.jsx</code></td><td>Landing hero: headline, search bar, animated stats</td></tr>
+  <tr><td><code>PropertyCard.jsx</code></td><td>Property card with image, price, rating</td></tr>
+  <tr><td><code>PropertyPage.jsx</code></td><td>Full property detail component</td></tr>
+  <tr><td><code>Dropdown.jsx</code></td><td>Custom fly-out select (replaces native &lt;select&gt;)</td></tr>
+  <tr><td><code>AvailabilityCalendar.jsx</code></td><td>Date-range picker with unavailable dates</td></tr>
+  <tr><td><code>ChatWidget.jsx</code></td><td>Floating chat button + conversation</td></tr>
+</table>
+
+<h2>Styling System</h2>
+<p>This project uses <strong>Tailwind CSS</strong>. All styles are inline utility classes. No separate CSS files (except <code>index.css</code> for custom classes like <code>.neu-card</code>).</p>
+
+<h3>Color Reference</h3>
+<table>
+  <tr><th>Token</th><th>Hex</th><th>Usage</th></tr>
+  <tr><td>Indigo</td><td style="background:#262262;color:#fff;padding:2px 8px;">#262262</td><td>Headings, sidebar, navbar, footer</td></tr>
+  <tr><td>Bronze</td><td style="background:#C49A6C;color:#fff;padding:2px 8px;">#C49A6C</td><td>CTAs, accents, prices, active states</td></tr>
+  <tr><td>Silver Grey</td><td style="background:#D9D9D9;padding:2px 8px;">#D9D9D9</td><td>Borders, dividers, disabled</td></tr>
+  <tr><td>Charcoal</td><td style="background:#1f2937;color:#fff;padding:2px 8px;">#1f2937</td><td>Body text</td></tr>
+  <tr><td>Cool Grey</td><td style="background:#6b7280;color:#fff;padding:2px 8px;">#6b7280</td><td>Muted/secondary text</td></tr>
+</table>
+
+<h3>Common Patterns</h3>
+<pre>Card (neumorphic):
+&lt;div className="neu-card p-6"&gt;...&lt;/div&gt;
+
+Card (flat admin):
+&lt;div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-6"&gt;...&lt;/div&gt;
+
+Input (neumorphic):
+&lt;input className="neu-input w-full px-4 py-3 focus:outline-none bg-white" /&gt;
+
+Primary button:
+&lt;button className="bg-[#C49A6C] text-white font-semibold px-6 py-3 rounded-full
+               hover:bg-[#b8895c] transition-all duration-200"&gt;
+  Book Now
+&lt;/button&gt;
+
+Secondary button:
+&lt;button className="border-2 border-[#D9D9D9] rounded-full px-5 py-2"&gt;Cancel&lt;/button&gt;
+</pre>
+
+<h3>Dropdown (Custom Select)</h3>
+<div class="info-box">
+  <strong>Never use native <code>&lt;select&gt;</code></strong>. Always use the <code>Dropdown</code> component from <code>src/components/Dropdown.jsx</code>. This keeps the fly-out menu consistent with the app's design.
+</div>
+
+<pre>import Dropdown from '../components/Dropdown.jsx';
+
+&lt;Dropdown
+  value={selected}
+  onChange={(v) => setSelected(v)}
+  options={[
+    { value: '1bed', label: '1 Bed' },
+    { value: '2bed', label: '2 Bed' },
+  ]}
+  triggerClassName="neu-input w-full px-4 py-3"
+  ariaLabel="Select bed option"
+/&gt;
+</pre>
+</section>
+
+<!-- ================================================================ -->
+<section id="add-feature">
+<h1>Adding Features</h1>
+<p class="subtitle">Step-by-step guides for common changes</p>
+
+<h2>Example: Add a New Admin Page</h2>
+<p>Let's add a <strong>"House Rules"</strong> admin page that lets the admin configure rules.</p>
+
+<h3>Step 1: Create the React Page</h3>
+<div class="file-path">src/pages/AdminHouseRules.jsx (new file)</div>
+<pre>import { useState } from 'react';
+
+function AdminHouseRules() {
+  const [rules, setRules] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  async function handleSave(e) {
+    e.preventDefault();
+    // Save to API
+    setSaved(true);
+  }
+
+  return (
+    &lt;div className="w-full"&gt;
+      &lt;h1 className="text-2xl font-bold text-[#262262] mb-6"&gt;House Rules&lt;/h1&gt;
+      &lt;div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-6"&gt;
+        &lt;form onSubmit={handleSave}&gt;
+          &lt;textarea
+            value={rules}
+            onChange={(e) => setRules(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] h-40"
+            placeholder="Enter house rules..."
+          /&gt;
+          &lt;button type="submit" className="mt-4 bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c]"&gt;
+            Save Rules
+          &lt;/button&gt;
+          {saved && &lt;span className="ml-3 text-green-600 text-sm"&gt;Saved!&lt;/span&gt;}
+        &lt;/form&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  );
+}
+export default AdminHouseRules;
+</pre>
+
+<h3>Step 2: Add the Route</h3>
+<div class="file-path">src/App.jsx (add inside the admin Route group)</div>
+<pre>import AdminHouseRules from './pages/AdminHouseRules.jsx';
+
+// Inside the admin &lt;Route&gt; group:
+&lt;Route path="house-rules" element={&lt;AdminHouseRules /&gt;} /&gt;
+</pre>
+
+<h3>Step 3: Add to Admin Sidebar</h3>
+<div class="file-path">src/App.jsx (find navItems array in AdminLayout)</div>
+<pre>// Add to the navItems array:
+{ label: 'House Rules', path: '/admin/house-rules' },
+</pre>
+
+<h3>Step 4: (Optional) Add Backend Endpoint</h3>
+<div class="file-path">server/src/routes/admin.routes.ts</div>
+<pre>router.get('/settings/house-rules', async (req, res, next) => {
+  try { res.json({ success: true, data: await getSetting('houseRules') }); }
+  catch (e) { next(e); }
+});
+router.put('/settings/house-rules', async (req, res, next) => {
+  try { /* save to AppSetting */ res.json({ success: true }); }
+  catch (e) { next(e); }
+});
+</pre>
+
+<hr style="margin:32px 0;border-color:#D9D9D9">
+
+<h2>Example: Change Prices</h2>
+<div class="file-path">src/pages/BookingPage.jsx</div>
+<p>Find the <code>BED_OPTIONS</code> array near the top:</p>
+<pre>const BED_OPTIONS = [
+  { type: '1bed', label: '1 Bed', price: 5100 },   // ← change this number
+  { type: '2bed', label: '2 Bed', price: 5500 },   // ← change this number
+];</pre>
+<p>Also update <code>server/src/services/booking.service.ts</code>:</p>
+<pre>const BED_PRICES: Record<string, number> = {
+  '1bed': 5100,   // ← must match frontend
+  '2bed': 5500,   // ← must match frontend
+};</pre>
+
+<hr style="margin:32px 0;border-color:#D9D9D9">
+
+<h2>Example: Add a New Public Page</h2>
+<div class="step"><div class="step-num">1</div><div class="step-body"><h4>Create the page component</h4><p><span class="file-path">src/pages/AboutPage.jsx (new)</span></p></div></div>
+<div class="step"><div class="step-num">2</div><div class="step-body"><h4>Add the route in App.jsx</h4><pre>&lt;Route path="/about" element={&lt;AboutPage /&gt;} /&gt;</pre></div></div>
+<div class="step"><div class="step-num">3</div><div class="step-body"><h4>Add a link to it (in Navbar or Footer)</h4><pre>&lt;Link to="/about" className="..."&gt;About Us&lt;/Link&gt;</pre></div></div>
+
+<hr style="margin:32px 0;border-color:#D9D9D9">
+
+<h2>Example: Change Landing Page Images</h2>
+<div class="file-path">src/App.jsx</div>
+<p>Find the arrays inside the <code>HomePage</code> component (around line 219 for Places to Visit, line 274 for Places to Eat). Each place has:</p>
+<pre>{
+  name: 'The Junction Mall',
+  desc: 'A premier lifestyle and shopping destination...',
+  image: 'https://images.unsplash.com/photo-XXXXX...?w=800&q=80',
+}</pre>
+<p>Replace the <code>image</code> URL. Source new images from <a href="https://unsplash.com" target="_blank">Unsplash.com</a>. Right-click a photo, "Copy Image Address", paste as the value.</p>
+
+<hr style="margin:32px 0;border-color:#D9D9D9">
+
+<h2>Example: Change the Google Maps Location</h2>
+<div class="file-path">src/pages/ContactPage.jsx</div>
+<p>Find the <code>&lt;iframe&gt;</code> element. Replace the <code>src</code> URL with a new Google Maps embed link. Go to Google Maps, find your location, click Share → Embed a map → copy the URL.</p>
+</section>
+
+<!-- ================================================================ -->
+<section id="deploy">
+<h1>Deployment</h1>
+<p class="subtitle">How to deploy to Railway (production hosting)</p>
+
+<h2>Build First</h2>
+<pre>npm run build:all</pre>
+
+<h2>Railway Configuration</h2>
+<p>File: <code>railway.json</code> (already in the project root)</p>
+<p>The app deploys as a single service. The Express server serves both the API and the built frontend from <code>dist/</code>.</p>
+
+<h3>Key settings on Railway</h3>
+<table>
+  <tr><th>Setting</th><th>Value</th></tr>
+  <tr><td>Build command</td><td><code>npm run build:all</code></td></tr>
+  <tr><td>Start command</td><td><code>npm start</code></td></tr>
+  <tr><td>Node version</td><td>20.x</td></tr>
+</table>
+
+<h3>Environment variables on Railway</h3>
+<p>Set these in the Railway dashboard under Variables:</p>
+<ul>
+  <li><code>DATABASE_URL</code> — PostgreSQL connection string (Railway provides this)</li>
+  <li><code>JWT_SECRET</code> — A long random string for token signing</li>
+  <li><code>GOOGLE_CLIENT_ID</code> + <code>GOOGLE_CLIENT_SECRET</code> — From Google Cloud Console</li>
+  <li><code>NODE_ENV</code> — Set to <code>production</code></li>
+  <li><code>COGNITIVE1_API_KEY</code> — API key for the Cognitive1 daemon</li>
+</ul>
+
+<h3>Database Migration on Railway</h3>
+<p>After first deploy, run this in the Railway console:</p>
+<pre>cd server
+npx prisma db push</pre>
+
+<h2>Procfile</h2>
+<div class="file-path">Procfile</div>
+<pre>web: cd server && node dist/index.js</pre>
+</section>
+
+<!-- ================================================================ -->
+<section id="troubleshoot">
+<h1>Troubleshooting</h1>
+<p class="subtitle">Common problems and how to fix them</p>
+
+<table>
+  <tr><th>Problem</th><th>Fix</th></tr>
+  <tr><td>"Module not found" error</td><td>Run <code>npm install</code> in that folder</td></tr>
+  <tr><td>Database errors / missing columns</td><td>Run <code>cd server && npx prisma db push</code></td></tr>
+  <tr><td>Prisma client out of date</td><td>Run <code>cd server && npx prisma generate</code></td></tr>
+  <tr><td>Port 3000 already in use</td><td>Kill the process: <code>taskkill /f /im node.exe</code> (Windows) or change PORT in .env</td></tr>
+  <tr><td>Port 5173 already in use</td><td>Vite will auto-pick the next available port</td></tr>
+  <tr><td>White page in browser</td><td>Open browser dev tools (F12) → Console tab for errors</td></tr>
+  <tr><td>API calls failing (401 Unauthorized)</td><td>Your login token expired. Sign out and sign in again.</td></tr>
+  <tr><td>Images not showing</td><td>Check <code>server/uploads/</code> folder exists and has files. Check the image path starts with <code>/uploads/</code>.</td></tr>
+  <tr><td>Google sign-in not working</td><td>Check GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET in server/.env are correct. The callback URL must match Google Cloud Console settings.</td></tr>
+  <tr><td>Changes not appearing in browser</td><td>Hard refresh: Ctrl+Shift+R. If that fails, restart both dev servers.</td></tr>
+  <tr><td>tailwind.config.js changes not applying</td><td>Restart the Vite dev server (Terminal 2). Tailwind only reads config at startup.</td></tr>
+  <tr><td>Backend TypeScript errors on build</td><td>Run <code>cd server && npx tsc --noEmit</code> to see all type errors. Fix them before building.</td></tr>
+  <tr><td>npm install fails with permissions</td><td>Try <code>npm install --legacy-peer-deps</code> or delete <code>node_modules</code> folder and try again.</td></tr>
+  <tr><td>Can't push to GitHub</td><td>Make sure you're on a branch: <code>git checkout -b your-branch-name</code>. Then push: <code>git push -u origin your-branch-name</code>.</td></tr>
+  <tr><td>.env file not loading</td><td>Server reads <code>server/.env</code>, not the root <code>.env</code>. Make sure it's in the server folder.</td></tr>
+</table>
+
+<h2>Quick Reset (Start Fresh)</h2>
+<pre># Kill all node processes
+taskkill /f /im node.exe
+
+# Delete and recreate database
+cd server
+rm prisma/dev.db
+npx prisma db push
+npx prisma generate
+
+# Reinstall packages
+cd ..
+rm -rf node_modules server/node_modules
+npm install
+cd server && npm install && cd ..
+
+# Start everything
+# Terminal 1: cd server && npm run dev
+# Terminal 2: npm run dev
+</pre>
+</section>
+
+</main>
+
+<script>
+function showSection(id, link) {
+  document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (link) link.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Handle hash navigation on load
+if (window.location.hash) {
+  const id = window.location.hash.slice(1);
+  const section = document.getElementById(id);
+  const link = document.querySelector(`nav a[href="#${id}"]`);
+  if (section && link) showSection(id, link);
+}
+</script>
+
+</body>
+</html>

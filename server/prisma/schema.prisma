@@ -32,7 +32,9 @@ model Property {
   id          String    @id @default(cuid())
   title       String
   location    String
-  price       Int
+  price       Int                         // fallback / base nightly price
+  price1Bed   Int?                        // nightly price for 1-bed option
+  price2Bed   Int?                        // nightly price for 2-bed option
   rating      Float    @default(0)
   reviews     Int      @default(0)
   bedrooms    Int

@@ -64,6 +64,8 @@ export const propertyCreateSchema = z.object({
   title: z.string().min(1).max(200),
   location: z.string().min(1).max(200),
   price: z.number().int().positive(),
+  price1Bed: z.number().int().positive().optional(),
+  price2Bed: z.number().int().positive().optional(),
   bedrooms: z.number().int().min(0),
   bathrooms: z.number().int().min(0),
   area: z.number().int().positive(),

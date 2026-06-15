@@ -35,7 +35,7 @@ export default {
           'base-300':         '#b0b0b0',  // Darker grey
           'base-content':     '#1f2937',  // Charcoal
           'primary-content':  '#ffffff',  // White on indigo
-          'secondary-content':'#262262',  // Indigo on bronze
+          'secondary-content':'#ffffff',  // White on bronze
         },
       },
     ],

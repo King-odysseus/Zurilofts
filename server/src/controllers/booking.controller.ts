@@ -54,9 +54,16 @@ export async function listAll(req: Request, res: Response, next: NextFunction): 
 }
 
 // Admin: per-property booking counts + earnings
-export async function propertyEarnings(_req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function propertyEarnings(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const data = await bookingService.getPropertyEarnings();
+    const { from, to } = req.query;
+    const dateFilter = {
+      ...(from ? { from: new Date(from as string) } : {}),
+      ...(to ? { to: new Date(to as string) } : {}),
+    };
+    const data = await bookingService.getPropertyEarnings(
+      Object.keys(dateFilter).length > 0 ? dateFilter : undefined
+    );
     res.json({ success: true, data });
   } catch (error) {
     next(error);

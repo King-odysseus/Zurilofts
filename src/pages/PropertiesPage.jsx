@@ -16,6 +16,38 @@ function PropertiesPage() {
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
 
+  // Expand properties into bed-variant listings
+  const listings = useCallback(() => {
+    const result = [];
+    for (const p of properties) {
+      const has1Bed = p.price1Bed != null;
+      const has2Bed = p.price2Bed != null;
+      const base = {
+        id: p.id,
+        image: p.images?.[0] || '/images/Ely Homes Photography (1 of 20).jpg',
+        title: p.title,
+        location: p.location,
+        rating: p.rating,
+        reviews: p.reviews,
+        bedrooms: p.bedrooms,
+        bathrooms: p.bathrooms,
+        area: p.area,
+        badge: p.featured ? 'Featured' : undefined,
+      };
+      if (has1Bed) {
+        result.push({ ...base, price: p.price1Bed, variant: '1bed', variantLabel: '1 Bed' });
+      }
+      if (has2Bed) {
+        result.push({ ...base, price: p.price2Bed, variant: '2bed', variantLabel: '2 Bed' });
+      }
+      if (!has1Bed && !has2Bed) {
+        // Legacy property — show as single card with base price
+        result.push({ ...base, price: p.price });
+      }
+    }
+    return result;
+  }, [properties]);
+
   const fetchProperties = useCallback(async () => {
     setLoading(true);
     try {
@@ -172,7 +204,7 @@ function PropertiesPage() {
           {/* Results Count */}
           <div className="mb-6 flex items-center justify-between">
             <p className="text-[#6b7280]">
-              Showing <span className="font-semibold text-[#262262]">{filter === 'all' && priceRange === 'all' && !searchQuery && !availableOnly ? properties.filter(p => p.available).length + 4 : properties.filter(p => p.available).length}</span> properties
+              Showing <span className="font-semibold text-[#262262]">{listings().length}</span> listings
             </p>
             {(filter !== 'all' || priceRange !== 'all' || searchQuery || availableOnly) && (
               <button
@@ -195,23 +227,11 @@ function PropertiesPage() {
               <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-[#6b7280]">Loading properties...</p>
             </div>
-          ) : properties.length > 0 ? (
+          ) : listings().length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {properties.filter(p => p.available).map((property) => (
-                <Link key={property.id} to={`/property/${property.id}`} className="block">
-                  <PropertyCard property={{
-                    id: property.id,
-                    image: property.images?.[0] || '/images/Ely Homes Photography (1 of 20).jpg',
-                    title: property.title,
-                    location: property.location,
-                    price: property.price,
-                    rating: property.rating,
-                    reviews: property.reviews,
-                    bedrooms: property.bedrooms,
-                    bathrooms: property.bathrooms,
-                    area: property.area,
-                    badge: property.featured ? 'Featured' : undefined,
-                  }} />
+              {listings().map((listing) => (
+                <Link key={`${listing.id}-${listing.variant || 'base'}`} to={`/property/${listing.id}${listing.variant ? `?variant=${listing.variant}` : ''}`} className="block">
+                  <PropertyCard property={listing} />
                 </Link>
               ))}
               {/* Coming Soon cards — show on default 'All' view only */}

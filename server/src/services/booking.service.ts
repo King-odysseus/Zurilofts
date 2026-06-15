@@ -30,10 +30,11 @@ function normalizeBookings(bookings: any[]) {
   return bookings.map(normalizeBooking);
 }
 
-const BED_PRICES: Record<string, number> = {
-  '1bed': 5100,
-  '2bed': 5500,
-};
+function getBedPrice(property: any, bedOption?: string): number {
+  if (bedOption === '1bed' && property.price1Bed != null) return property.price1Bed;
+  if (bedOption === '2bed' && property.price2Bed != null) return property.price2Bed;
+  return property.price;
+}
 
 interface CreateBookingInput {
   userId: string;
@@ -84,9 +85,7 @@ export async function createBooking(input: CreateBookingInput) {
   }
 
   // Determine effective base price based on bed option
-  const effectivePrice = input.bedOption && BED_PRICES[input.bedOption]
-    ? BED_PRICES[input.bedOption]
-    : property.price;
+  const effectivePrice = getBedPrice(property, input.bedOption);
 
   const nights = calculateNights(checkInDate, checkOutDate);
   const extraGuestFee = Math.max(0, input.guests - maxForBed) * 500 * nights;
@@ -229,20 +228,35 @@ export async function listAllBookings(status?: string, page = 1, limit = 20) {
 // Per-property booking counts and recorded earnings, for the admin earnings page.
 // "Earnings" = sum of booking totals that are not cancelled (PENDING + CONFIRMED).
 // "Confirmed earnings" tracks realized revenue from CONFIRMED bookings only.
-export async function getPropertyEarnings() {
-  const [properties, all, confirmed] = await Promise.all([
+export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date }) {
+  const whereDate = dateFilter?.from || dateFilter?.to
+    ? {
+        createdAt: {
+          ...(dateFilter.from ? { gte: dateFilter.from } : {}),
+          ...(dateFilter.to ? { lte: dateFilter.to } : {}),
+        },
+      }
+    : {};
+
+  const [properties, all, confirmed, byBed] = await Promise.all([
     prisma.property.findMany({
       select: { id: true, title: true, location: true, imagesJson: true, price: true },
     }),
     prisma.booking.groupBy({
       by: ['propertyId'],
-      where: { status: { not: 'CANCELLED' } },
+      where: { status: { not: 'CANCELLED' }, ...whereDate },
       _count: { _all: true },
       _sum: { total: true },
     }),
     prisma.booking.groupBy({
       by: ['propertyId'],
-      where: { status: 'CONFIRMED' },
+      where: { status: 'CONFIRMED', ...whereDate },
+      _count: { _all: true },
+      _sum: { total: true },
+    }),
+    prisma.booking.groupBy({
+      by: ['propertyId', 'bedOption'],
+      where: { status: { not: 'CANCELLED' }, ...whereDate },
       _count: { _all: true },
       _sum: { total: true },
     }),
@@ -251,10 +265,36 @@ export async function getPropertyEarnings() {
   const allMap = new Map(all.map((r) => [r.propertyId, r]));
   const confirmedMap = new Map(confirmed.map((r) => [r.propertyId, r]));
 
+  // Build a nested map: propertyId -> bedOption -> { bookings, earnings }
+  const bedMap = new Map<string, Map<string | null, { bookings: number; earnings: number }>>();
+  for (const row of byBed) {
+    if (!bedMap.has(row.propertyId)) {
+      bedMap.set(row.propertyId, new Map());
+    }
+    const inner = bedMap.get(row.propertyId)!;
+    inner.set(row.bedOption, {
+      bookings: row._count._all,
+      earnings: row._sum.total ?? 0,
+    });
+  }
+
+  function getBedStats(propertyId: string, option: string) {
+    const inner = bedMap.get(propertyId);
+    if (!inner) return { bookings: 0, earnings: 0 };
+    // Try exact match first, then fallback to null (legacy bookings)
+    const exact = inner.get(option);
+    if (exact) return exact;
+    const legacy = inner.get(null);
+    if (legacy) return legacy;
+    return { bookings: 0, earnings: 0 };
+  }
+
   const rows = properties.map((p) => {
     const a = allMap.get(p.id);
     const c = confirmedMap.get(p.id);
     const images = p.imagesJson ? JSON.parse(p.imagesJson) : [];
+    const bed1 = getBedStats(p.id, '1bed');
+    const bed2 = getBedStats(p.id, '2bed');
     return {
       id: p.id,
       title: p.title,
@@ -265,6 +305,10 @@ export async function getPropertyEarnings() {
       confirmedBookings: c?._count._all ?? 0,
       earnings: a?._sum.total ?? 0,
       confirmedEarnings: c?._sum.total ?? 0,
+      bed1Bookings: bed1.bookings,
+      bed1Earnings: bed1.earnings,
+      bed2Bookings: bed2.bookings,
+      bed2Earnings: bed2.earnings,
     };
   });
 
@@ -276,9 +320,13 @@ export async function getPropertyEarnings() {
       acc.confirmedBookings += r.confirmedBookings;
       acc.earnings += r.earnings;
       acc.confirmedEarnings += r.confirmedEarnings;
+      acc.bed1Bookings += r.bed1Bookings;
+      acc.bed1Earnings += r.bed1Earnings;
+      acc.bed2Bookings += r.bed2Bookings;
+      acc.bed2Earnings += r.bed2Earnings;
       return acc;
     },
-    { bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0 }
+    { bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0, bed1Bookings: 0, bed1Earnings: 0, bed2Bookings: 0, bed2Earnings: 0 }
   );
 
   return { properties: rows, totals };

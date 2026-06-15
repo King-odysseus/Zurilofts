@@ -30,7 +30,7 @@ function isSQLite(): boolean {
 
 function buildCreateData(data: any) {
   if (isSQLite()) {
-    return {
+    const base: any = {
       title: data.title,
       location: data.location,
       price: data.price,
@@ -47,6 +47,9 @@ function buildCreateData(data: any) {
       rating: data.rating,
       reviews: data.reviews,
     };
+    if (data.price1Bed !== undefined) base.price1Bed = data.price1Bed;
+    if (data.price2Bed !== undefined) base.price2Bed = data.price2Bed;
+    return base;
   }
   return data;
 }
@@ -67,6 +70,9 @@ function buildUpdateData(data: any) {
       delete updateData.nearby;
     }
   }
+  // Allow clearing bed prices by sending null
+  if (data.price1Bed === null) updateData.price1Bed = null;
+  if (data.price2Bed === null) updateData.price2Bed = null;
   return updateData;
 }
 

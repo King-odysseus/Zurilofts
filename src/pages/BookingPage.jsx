@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
@@ -54,6 +54,8 @@ function detectCountry(storedPhone) {
 function BookingPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const urlVariant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
   const [bookingComplete, setBookingComplete] = useState(false);
@@ -70,15 +72,11 @@ function BookingPage() {
   const [promoError, setPromoError] = useState('');
   const [validatingPromo, setValidatingPromo] = useState(false);
 
-  // Bed option — 1 bed (KES 5,100 / max 2 guests) or 2 bed (KES 5,500 / max 4 guests)
-  // Hard cap: 6 people total. Extra guests above the bed max cost KES 500/night each.
-  const BED_OPTIONS = [
-    { type: '1bed', label: '1 Bed', price: 5100, maxGuests: 2 },
-    { type: '2bed', label: '2 Bed', price: 5500, maxGuests: 4 },
-  ];
+  // Bed option driven by URL variant (from property card click)
+  // Properties define their own 1-bed / 2-bed prices via price1Bed / price2Bed
+  const [bedOption, setBedOption] = useState(urlVariant);
   const EXTRA_GUEST_FEE = 500;
   const ABSOLUTE_MAX_GUESTS = 6;
-  const [bedOption, setBedOption] = useState(null);
 
   // Standard stay times. Check-in from 3:00 PM, check-out by 10:00 AM.
   // A later check-out doubles each hour past 10:00 AM, reaching one full
@@ -185,11 +183,15 @@ function BookingPage() {
         const res = await apiClient.get(`/properties/${id}`);
         const prop = res.data.data;
         setProperty(prop);
-        // Default bed option based on property price
-        if (prop.price <= 5100) {
-          setBedOption('1bed');
-        } else {
-          setBedOption('2bed');
+        // Only auto-set bed option if no URL variant was provided
+        if (!urlVariant) {
+          if (prop.price1Bed != null) {
+            setBedOption('1bed');
+          } else if (prop.price2Bed != null) {
+            setBedOption('2bed');
+          } else {
+            setBedOption('1bed');
+          }
         }
       } catch {
         // fallback
@@ -216,10 +218,12 @@ function BookingPage() {
   };
 
   const nights = calculateNights();
-  const selectedOption = BED_OPTIONS.find(o => o.type === bedOption);
-  const propertyPrice = selectedOption?.price || property?.price || 0;
+  // Derive price and max guests from the property's bed-specific pricing
+  const propertyPrice = bedOption === '2bed'
+    ? (property?.price2Bed ?? property?.price ?? 0)
+    : (property?.price1Bed ?? property?.price ?? 0);
+  const maxForBed = bedOption === '2bed' ? 4 : 2;
   const subtotal = nights * propertyPrice;
-  const maxForBed = selectedOption?.maxGuests || 2;
   const extraGuests = Math.max(0, bookingData.guests - maxForBed);
   const extraGuestFee = extraGuests * EXTRA_GUEST_FEE * nights;
   const cleaningFee = 1500;
@@ -360,27 +364,22 @@ function BookingPage() {
         )}
       </div>
 
-      {/* Bed Option */}
-      <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-3">Bed Option</label>
-        <div className="grid grid-cols-2 gap-3">
-          {BED_OPTIONS.map((opt) => (
-            <button
-              key={opt.type}
-              type="button"
-              onClick={() => setBedOption(opt.type)}
-              className={`p-4 rounded-xl border-2 text-center transition-all duration-200 ${
-                bedOption === opt.type
-                  ? 'border-[#C49A6C] bg-[#C49A6C]/10 text-[#262262]'
-                  : 'border-[#D9D9D9] bg-white text-[#6b7280] hover:border-[#C49A6C]/50'
-              }`}
-            >
-              <p className="font-semibold">{opt.label}</p>
-              <p className="text-sm mt-1">KES {opt.price.toLocaleString()}/night</p>
-            </button>
-          ))}
+      {/* Bed Option — shown as read-only since it was selected on the property card */}
+      {bedOption && (
+        <div className="bg-[#C49A6C]/10 rounded-xl p-4 flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-[#262262]">
+              {bedOption === '2bed' ? '2-Bed Configuration' : '1-Bed Configuration'}
+            </p>
+            <p className="text-xs text-[#6b7280]">
+              Fits up to {maxForBed} guests &middot; KES {propertyPrice.toLocaleString()}/night
+            </p>
+          </div>
+          <span className="bg-[#C49A6C] text-white text-xs font-bold px-3 py-1 rounded-full">
+            {bedOption === '2bed' ? '2 Bed' : '1 Bed'}
+          </span>
         </div>
-      </div>
+      )}
 
       {/* Standard times note */}
       <div className="bg-[#262262]/5 rounded-xl p-4 flex items-start gap-3">
@@ -955,7 +954,7 @@ function BookingPage() {
                 <h3 className="font-bold text-[#262262] text-lg">{property?.title}</h3>
                 {bedOption && (
                   <p className="text-sm text-[#C49A6C] font-medium mt-1">
-                    {BED_OPTIONS.find(o => o.type === bedOption)?.label} &middot; KES {propertyPrice.toLocaleString()}/night
+                    {bedOption === '2bed' ? '2 Bed' : '1 Bed'} &middot; KES {propertyPrice.toLocaleString()}/night
                   </p>
                 )}
                 <div className="flex items-center text-[#6b7280] text-sm mt-1">

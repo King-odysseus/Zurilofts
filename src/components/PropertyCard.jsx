@@ -8,7 +8,7 @@ function PropertyCard({ property }) {
   const { isAuthenticated } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  const { id, image, title, location, price, rating, bedrooms, bathrooms, area, badge } = property;
+  const { id, image, title, location, price, rating, bedrooms, bathrooms, area, badge, variantLabel } = property;
   const isLiked = id ? isFavorite(id) : false;
 
   const handleToggleFavorite = (e) => {
@@ -31,6 +31,11 @@ function PropertyCard({ property }) {
         {badge && (
           <span className="absolute top-4 left-4 bg-[#C49A6C] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">
             {badge}
+          </span>
+        )}
+        {variantLabel && (
+          <span className={`absolute ${badge ? 'top-12' : 'top-4'} left-4 bg-[#262262] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md`}>
+            {variantLabel}
           </span>
         )}
 

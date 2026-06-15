@@ -8,6 +8,8 @@ const EMPTY = {
   title: '',
   location: '',
   price: '',
+  price1Bed: '',
+  price2Bed: '',
   bedrooms: 1,
   bathrooms: 1,
   area: '',
@@ -55,6 +57,8 @@ function AdminPropertyForm() {
           title: p.title || '',
           location: p.location || '',
           price: p.price ?? '',
+          price1Bed: p.price1Bed ?? '',
+          price2Bed: p.price2Bed ?? '',
           bedrooms: p.bedrooms ?? 1,
           bathrooms: p.bathrooms ?? 1,
           area: p.area ?? '',
@@ -125,6 +129,9 @@ function AdminPropertyForm() {
       amenities: linesToArray(form.amenities),
       nearby: linesToArray(form.nearby),
     };
+
+    if (form.price1Bed !== '') payload.price1Bed = Number(form.price1Bed);
+    if (form.price2Bed !== '') payload.price2Bed = Number(form.price2Bed);
 
     if (payload.images.length === 0) {
       setError('Add at least one image');
@@ -220,6 +227,59 @@ function AdminPropertyForm() {
             <div>
               <label className={labelCls}>Bathrooms</label>
               <input type="number" min="0" className={inputCls} value={form.bathrooms} onChange={(e) => update('bathrooms', e.target.value)} required />
+            </div>
+          </div>
+
+          {/* Bed variant pricing */}
+          <div className="bg-[#f8f9fa] rounded-xl p-4 space-y-4">
+            <p className="text-sm font-semibold text-[#262262]">Bed Variant Pricing</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="flex items-start gap-3 bg-white rounded-xl border border-[#D9D9D9] p-4 cursor-pointer hover:border-[#C49A6C] transition-colors">
+                <input
+                  type="checkbox"
+                  className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
+                  checked={form.price1Bed !== ''}
+                  onChange={(e) => update('price1Bed', e.target.checked ? (form.price || '') : '')}
+                />
+                <div className="flex-1">
+                  <span className="block text-sm font-semibold text-[#1f2937]">List as 1-Bed</span>
+                  <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 1-bed card</span>
+                  {form.price1Bed !== '' && (
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="1-Bed price per night"
+                      className={inputCls}
+                      value={form.price1Bed}
+                      onChange={(e) => update('price1Bed', e.target.value)}
+                      required
+                    />
+                  )}
+                </div>
+              </label>
+              <label className="flex items-start gap-3 bg-white rounded-xl border border-[#D9D9D9] p-4 cursor-pointer hover:border-[#C49A6C] transition-colors">
+                <input
+                  type="checkbox"
+                  className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
+                  checked={form.price2Bed !== ''}
+                  onChange={(e) => update('price2Bed', e.target.checked ? (form.price || '') : '')}
+                />
+                <div className="flex-1">
+                  <span className="block text-sm font-semibold text-[#1f2937]">List as 2-Bed</span>
+                  <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 2-bed card</span>
+                  {form.price2Bed !== '' && (
+                    <input
+                      type="number"
+                      min="1"
+                      placeholder="2-Bed price per night"
+                      className={inputCls}
+                      value={form.price2Bed}
+                      onChange={(e) => update('price2Bed', e.target.value)}
+                      required
+                    />
+                  )}
+                </div>
+              </label>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
