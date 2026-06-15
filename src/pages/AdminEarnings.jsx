@@ -147,8 +147,12 @@ function AdminEarnings() {
     return data;
   }, [rows, search, sortBy]);
 
+  const earningRows = useMemo(() => {
+    return filteredRows.filter((r) => r.earnings > 0);
+  }, [filteredRows]);
+
   const filteredTotals = useMemo(() => {
-    return filteredRows.reduce(
+    return earningRows.reduce(
       (acc, r) => {
         acc.bookings += r.bookings;
         acc.confirmedBookings += r.confirmedBookings;
@@ -162,18 +166,15 @@ function AdminEarnings() {
       },
       { bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0, bed1Bookings: 0, bed1Earnings: 0, bed2Bookings: 0, bed2Earnings: 0 }
     );
-  }, [filteredRows]);
+  }, [earningRows]);
 
-  const topProperties = useMemo(() => {
-    return [...filteredRows]
-      .filter((r) => r.earnings > 0)
-      .sort((a, b) => b.earnings - a.earnings)
-      .slice(0, 5);
-  }, [filteredRows]);
+  const chartProperties = useMemo(() => {
+    return [...earningRows].sort((a, b) => b.earnings - a.earnings);
+  }, [earningRows]);
 
-  const maxEarnings = useMemo(() => {
-    return topProperties.length > 0 ? Math.max(topProperties[0].earnings, 1) : 1;
-  }, [topProperties]);
+  const maxChartEarnings = useMemo(() => {
+    return chartProperties.length > 0 ? Math.max(chartProperties[0].earnings, 1) : 1;
+  }, [chartProperties]);
 
   const today = formatDate(new Date());
   const rangeLabel = useMemo(() => {
@@ -446,24 +447,56 @@ function AdminEarnings() {
         ))}
       </div>
 
-      {!loading && topProperties.length > 0 && (
+      {/* SVG Bar Chart */}
+      {!loading && chartProperties.length > 0 && (
         <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-8 shadow-sm">
-          <h2 className="text-lg font-bold text-[#262262] mb-4">Top Properties by Earnings</h2>
-          <div className="space-y-3">
-            {topProperties.map((p) => {
-              const pct = Math.max(1, Math.round((p.earnings / maxEarnings) * 100));
-              return (
-                <div key={p.id} className="flex items-center gap-3">
-                  <div className="w-24 sm:w-32 text-sm text-[#1f2937] truncate font-medium" title={p.title}>{p.title}</div>
-                  <div className="flex-1 h-8 bg-[#f0f0f5] rounded-lg overflow-hidden">
-                    <div className="h-full bg-[#C49A6C] rounded-lg flex items-center justify-end pr-2 transition-all duration-500" style={{ width: `${pct}%` }}>
-                      {pct > 25 && <span className="text-xs font-semibold text-white">KES {p.earnings.toLocaleString()}</span>}
-                    </div>
-                  </div>
-                  {pct <= 25 && <span className="text-xs font-semibold text-[#C49A6C] w-20 text-right">KES {p.earnings.toLocaleString()}</span>}
-                </div>
-              );
-            })}
+          <h2 className="text-lg font-bold text-[#262262] mb-4">Earnings by Property</h2>
+          <div className="overflow-x-auto">
+            <svg viewBox={`0 0 ${Math.max(600, chartProperties.length * 80 + 80)} 320`} className="w-full min-w-[600px]" preserveAspectRatio="xMidYMid meet">
+              {/* Background grid lines */}
+              {[0, 1, 2, 3, 4, 5].map((i) => {
+                const y = 260 - i * 40;
+                return (
+                  <g key={i}>
+                    <line x1="60" y1={y} x2={chartProperties.length * 80 + 20} y2={y} stroke="#e5e7eb" strokeWidth="1" />
+                    <text x="55" y={y + 4} textAnchor="end" fontSize="11" fill="#6b7280">
+                      KES {Math.round((maxChartEarnings * i) / 5).toLocaleString()}
+                    </text>
+                  </g>
+                );
+              })}
+
+              {/* Bars */}
+              {chartProperties.map((p, i) => {
+                const barHeight = (p.earnings / maxChartEarnings) * 200;
+                const x = 80 + i * 80;
+                const y = 260 - barHeight;
+                return (
+                  <g key={p.id}>
+                    <rect
+                      x={x}
+                      y={y}
+                      width="50"
+                      height={barHeight}
+                      rx="4"
+                      fill="#C49A6C"
+                      className="transition-all duration-500 hover:fill-[#b8895c]"
+                    />
+                    {/* Value label on top of bar */}
+                    <text x={x + 25} y={y - 6} textAnchor="middle" fontSize="10" fontWeight="600" fill="#262262">
+                      KES {(p.earnings / 1000).toFixed(0)}k
+                    </text>
+                    {/* Property name below bar */}
+                    <text x={x + 25} y="280" textAnchor="middle" fontSize="10" fill="#1f2937">
+                      {p.title.length > 10 ? p.title.slice(0, 10) + '…' : p.title}
+                    </text>
+                  </g>
+                );
+              })}
+
+              {/* X axis line */}
+              <line x1="60" y1="260" x2={chartProperties.length * 80 + 20} y2="260" stroke="#D9D9D9" strokeWidth="1" />
+            </svg>
           </div>
         </div>
       )}
@@ -490,7 +523,7 @@ function AdminEarnings() {
                 </tr>
               </thead>
               <tbody>
-                {filteredRows.map((r) => (
+                {earningRows.map((r) => (
                   <tr key={r.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#f8f9fa]">
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-3">
@@ -513,7 +546,7 @@ function AdminEarnings() {
                   </tr>
                 ))}
               </tbody>
-              {filteredRows.length > 0 && (
+              {earningRows.length > 0 && (
                 <tfoot>
                   <tr className="border-t-2 border-[#D9D9D9] bg-[#f8f9fa] font-bold text-[#262262]">
                     <td className="py-3 px-4" colSpan={2}>Total</td>
@@ -529,8 +562,8 @@ function AdminEarnings() {
               )}
             </table>
           </div>
-          {filteredRows.length === 0 && (
-            <div className="text-center py-12 text-[#6b7280]">{search ? 'No properties match your search.' : 'No properties yet.'}</div>
+          {earningRows.length === 0 && (
+            <div className="text-center py-12 text-[#6b7280]">No properties with earnings for the selected period.</div>
           )}
         </div>
       )}
