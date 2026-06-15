@@ -497,39 +497,57 @@ function AdminEarnings() {
             </div>
           </div>
 
-          {/* Bookings Chart */}
+          {/* Bookings Pie Chart */}
           <div className="bg-white rounded-2xl border border-[#D9D9D9] p-4 shadow-sm">
             <h2 className="text-sm font-bold text-[#262262] mb-2">Bookings by Property</h2>
-            <div className="overflow-x-auto">
-              <svg viewBox={`0 0 ${Math.max(320, chartBookings.length * 44 + 60)} 140`} className="w-full min-w-[320px]" preserveAspectRatio="xMidYMid meet">
-                {[0, 1, 2, 3].map((i) => {
-                  const y = 108 - i * 26;
+            <div className="flex items-center justify-center">
+              <svg viewBox="0 0 280 180" className="w-full max-w-[280px]">
+                {(() => {
+                  const cx = 90, cy = 90, r = 55;
+                  const total = chartBookings.reduce((s, p) => s + p.bookings, 0);
+                  const colors = ['#C49A6C', '#262262', '#6b7280', '#b8895c', '#1d1a4d', '#9ca3af'];
+                  let angle = -Math.PI / 2;
+                  const slices = chartBookings.map((p, i) => {
+                    const sliceAngle = total > 0 ? (p.bookings / total) * 2 * Math.PI : 0;
+                    const start = angle;
+                    const end = angle + sliceAngle;
+                    angle = end;
+                    const x1 = cx + r * Math.cos(start);
+                    const y1 = cy + r * Math.sin(start);
+                    const x2 = cx + r * Math.cos(end);
+                    const y2 = cy + r * Math.sin(end);
+                    const largeArc = sliceAngle > Math.PI ? 1 : 0;
+                    const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+                    const labelAngle = start + sliceAngle / 2;
+                    const lr = r * 0.7;
+                    const lx = cx + lr * Math.cos(labelAngle);
+                    const ly = cy + lr * Math.sin(labelAngle);
+                    return { ...p, path, color: colors[i % colors.length], lx, ly, labelAngle, sliceAngle };
+                  });
                   return (
-                    <g key={i}>
-                      <line x1="40" y1={y} x2={chartBookings.length * 44 + 8} y2={y} stroke="#f3f4f6" strokeWidth="1" />
-                      <text x="36" y={y + 3} textAnchor="end" fontSize="8" fill="#9ca3af">
-                        {Math.round((maxChartBookings * i) / 3)}
-                      </text>
-                    </g>
+                    <>
+                      {slices.map((s, i) => (
+                        <path key={s.id} d={s.path} fill={s.color} stroke="white" strokeWidth="2" className="transition-opacity duration-300 hover:opacity-80" />
+                      ))}
+                      {slices.map((s, i) => (
+                        s.sliceAngle > 0.15 && (
+                          <text key={`l-${s.id}`} x={s.lx} y={s.ly} textAnchor="middle" dominantBaseline="middle" fontSize="9" fontWeight="600" fill="white">
+                            {s.bookings}
+                          </text>
+                        )
+                      ))}
+                      {/* Legend */}
+                      {slices.map((s, i) => (
+                        <g key={`leg-${s.id}`} transform={`translate(170, ${20 + i * 20})`}>
+                          <rect x="0" y="0" width="10" height="10" rx="2" fill={s.color} />
+                          <text x="16" y="8" fontSize="9" fill="#4b5563">
+                            {s.title.length > 14 ? s.title.slice(0, 14) + '…' : s.title} ({s.bookings})
+                          </text>
+                        </g>
+                      ))}
+                    </>
                   );
-                })}
-                {chartBookings.map((p, i) => {
-                  const barHeight = (p.bookings / maxChartBookings) * 78;
-                  const x = 48 + i * 44;
-                  const y = 108 - barHeight;
-                  return (
-                    <g key={p.id}>
-                      <rect x={x} y={y} width="28" height={barHeight} rx="2" fill="#262262" className="transition-all duration-500 hover:fill-[#1d1a4d]" />
-                      <text x={x + 14} y={y - 3} textAnchor="middle" fontSize="8" fontWeight="600" fill="#262262">
-                        {p.bookings}
-                      </text>
-                      <text x={x + 14} y="122" textAnchor="middle" fontSize="8" fill="#6b7280">
-                        {p.title.length > 6 ? p.title.slice(0, 6) + '…' : p.title}
-                      </text>
-                    </g>
-                  );
-                })}
-                <line x1="40" y1="108" x2={chartBookings.length * 44 + 8} y2="108" stroke="#e5e7eb" strokeWidth="1" />
+                })()}
               </svg>
             </div>
           </div>
