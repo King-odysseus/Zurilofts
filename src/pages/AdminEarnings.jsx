@@ -176,6 +176,14 @@ function AdminEarnings() {
     return chartProperties.length > 0 ? Math.max(chartProperties[0].earnings, 1) : 1;
   }, [chartProperties]);
 
+  const chartBookings = useMemo(() => {
+    return [...earningRows].sort((a, b) => b.bookings - a.bookings);
+  }, [earningRows]);
+
+  const maxChartBookings = useMemo(() => {
+    return chartBookings.length > 0 ? Math.max(chartBookings[0].bookings, 1) : 1;
+  }, [chartBookings]);
+
   const today = formatDate(new Date());
   const rangeLabel = useMemo(() => {
     if (period === 'all') return 'All Time';
@@ -447,62 +455,83 @@ function AdminEarnings() {
         ))}
       </div>
 
-      {/* SVG Bar Chart */}
+      {/* Charts */}
       {!loading && chartProperties.length > 0 && (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 mb-8 shadow-sm">
-          <h2 className="text-base font-bold text-[#262262] mb-3">Earnings by Property</h2>
-          <div className="overflow-x-auto">
-            <svg
-              viewBox={`0 0 ${Math.max(480, chartProperties.length * 56 + 72)} 200`}
-              className="w-full min-w-[480px]"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              {/* Background grid lines */}
-              {[0, 1, 2, 3, 4].map((i) => {
-                const y = 155 - i * 30;
-                return (
-                  <g key={i}>
-                    <line x1="48" y1={y} x2={chartProperties.length * 56 + 12} y2={y} stroke="#f0f0f5" strokeWidth="1" />
-                    <text x="44" y={y + 3} textAnchor="end" fontSize="9" fill="#9ca3af">
-                      {Math.round((maxChartEarnings * i) / 4) >= 1000
-                        ? `KES ${(Math.round((maxChartEarnings * i) / 4) / 1000).toFixed(0)}k`
-                        : `KES ${Math.round((maxChartEarnings * i) / 4)}`}
-                    </text>
-                  </g>
-                );
-              })}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
+          {/* Earnings Chart */}
+          <div className="bg-white rounded-2xl border border-[#D9D9D9] p-4 shadow-sm">
+            <h2 className="text-sm font-bold text-[#262262] mb-2">Earnings by Property</h2>
+            <div className="overflow-x-auto">
+              <svg viewBox={`0 0 ${Math.max(320, chartProperties.length * 44 + 60)} 140`} className="w-full min-w-[320px]" preserveAspectRatio="xMidYMid meet">
+                {[0, 1, 2, 3].map((i) => {
+                  const y = 108 - i * 26;
+                  return (
+                    <g key={i}>
+                      <line x1="40" y1={y} x2={chartProperties.length * 44 + 8} y2={y} stroke="#f3f4f6" strokeWidth="1" />
+                      <text x="36" y={y + 3} textAnchor="end" fontSize="8" fill="#9ca3af">
+                        {Math.round((maxChartEarnings * i) / 3) >= 1000
+                          ? `${(Math.round((maxChartEarnings * i) / 3) / 1000).toFixed(0)}k`
+                          : Math.round((maxChartEarnings * i) / 3)}
+                      </text>
+                    </g>
+                  );
+                })}
+                {chartProperties.map((p, i) => {
+                  const barHeight = (p.earnings / maxChartEarnings) * 78;
+                  const x = 48 + i * 44;
+                  const y = 108 - barHeight;
+                  return (
+                    <g key={p.id}>
+                      <rect x={x} y={y} width="28" height={barHeight} rx="2" fill="#C49A6C" className="transition-all duration-500 hover:fill-[#b8895c]" />
+                      <text x={x + 14} y={y - 3} textAnchor="middle" fontSize="8" fontWeight="600" fill="#262262">
+                        {(p.earnings / 1000).toFixed(0)}k
+                      </text>
+                      <text x={x + 14} y="122" textAnchor="middle" fontSize="8" fill="#6b7280">
+                        {p.title.length > 6 ? p.title.slice(0, 6) + '…' : p.title}
+                      </text>
+                    </g>
+                  );
+                })}
+                <line x1="40" y1="108" x2={chartProperties.length * 44 + 8} y2="108" stroke="#e5e7eb" strokeWidth="1" />
+              </svg>
+            </div>
+          </div>
 
-              {/* Bars */}
-              {chartProperties.map((p, i) => {
-                const barHeight = (p.earnings / maxChartEarnings) * 120;
-                const x = 56 + i * 56;
-                const y = 155 - barHeight;
-                return (
-                  <g key={p.id}>
-                    <rect
-                      x={x}
-                      y={y}
-                      width="36"
-                      height={barHeight}
-                      rx="3"
-                      fill="#C49A6C"
-                      className="transition-all duration-500 hover:fill-[#b8895c]"
-                    />
-                    {/* Value label */}
-                    <text x={x + 18} y={y - 4} textAnchor="middle" fontSize="9" fontWeight="600" fill="#262262">
-                      {(p.earnings / 1000).toFixed(0)}k
-                    </text>
-                    {/* Property name */}
-                    <text x={x + 18} y="172" textAnchor="middle" fontSize="9" fill="#4b5563">
-                      {p.title.length > 8 ? p.title.slice(0, 8) + '…' : p.title}
-                    </text>
-                  </g>
-                );
-              })}
-
-              {/* X axis line */}
-              <line x1="48" y1="155" x2={chartProperties.length * 56 + 12} y2="155" stroke="#D9D9D9" strokeWidth="1" />
-            </svg>
+          {/* Bookings Chart */}
+          <div className="bg-white rounded-2xl border border-[#D9D9D9] p-4 shadow-sm">
+            <h2 className="text-sm font-bold text-[#262262] mb-2">Bookings by Property</h2>
+            <div className="overflow-x-auto">
+              <svg viewBox={`0 0 ${Math.max(320, chartBookings.length * 44 + 60)} 140`} className="w-full min-w-[320px]" preserveAspectRatio="xMidYMid meet">
+                {[0, 1, 2, 3].map((i) => {
+                  const y = 108 - i * 26;
+                  return (
+                    <g key={i}>
+                      <line x1="40" y1={y} x2={chartBookings.length * 44 + 8} y2={y} stroke="#f3f4f6" strokeWidth="1" />
+                      <text x="36" y={y + 3} textAnchor="end" fontSize="8" fill="#9ca3af">
+                        {Math.round((maxChartBookings * i) / 3)}
+                      </text>
+                    </g>
+                  );
+                })}
+                {chartBookings.map((p, i) => {
+                  const barHeight = (p.bookings / maxChartBookings) * 78;
+                  const x = 48 + i * 44;
+                  const y = 108 - barHeight;
+                  return (
+                    <g key={p.id}>
+                      <rect x={x} y={y} width="28" height={barHeight} rx="2" fill="#262262" className="transition-all duration-500 hover:fill-[#1d1a4d]" />
+                      <text x={x + 14} y={y - 3} textAnchor="middle" fontSize="8" fontWeight="600" fill="#262262">
+                        {p.bookings}
+                      </text>
+                      <text x={x + 14} y="122" textAnchor="middle" fontSize="8" fill="#6b7280">
+                        {p.title.length > 6 ? p.title.slice(0, 6) + '…' : p.title}
+                      </text>
+                    </g>
+                  );
+                })}
+                <line x1="40" y1="108" x2={chartBookings.length * 44 + 8} y2="108" stroke="#e5e7eb" strokeWidth="1" />
+              </svg>
+            </div>
           </div>
         </div>
       )}
