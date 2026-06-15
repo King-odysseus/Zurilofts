@@ -449,18 +449,24 @@ function AdminEarnings() {
 
       {/* SVG Bar Chart */}
       {!loading && chartProperties.length > 0 && (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-8 shadow-sm">
-          <h2 className="text-lg font-bold text-[#262262] mb-4">Earnings by Property</h2>
+        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 mb-8 shadow-sm">
+          <h2 className="text-base font-bold text-[#262262] mb-3">Earnings by Property</h2>
           <div className="overflow-x-auto">
-            <svg viewBox={`0 0 ${Math.max(600, chartProperties.length * 80 + 80)} 320`} className="w-full min-w-[600px]" preserveAspectRatio="xMidYMid meet">
+            <svg
+              viewBox={`0 0 ${Math.max(480, chartProperties.length * 56 + 72)} 200`}
+              className="w-full min-w-[480px]"
+              preserveAspectRatio="xMidYMid meet"
+            >
               {/* Background grid lines */}
-              {[0, 1, 2, 3, 4, 5].map((i) => {
-                const y = 260 - i * 40;
+              {[0, 1, 2, 3, 4].map((i) => {
+                const y = 155 - i * 30;
                 return (
                   <g key={i}>
-                    <line x1="60" y1={y} x2={chartProperties.length * 80 + 20} y2={y} stroke="#e5e7eb" strokeWidth="1" />
-                    <text x="55" y={y + 4} textAnchor="end" fontSize="11" fill="#6b7280">
-                      KES {Math.round((maxChartEarnings * i) / 5).toLocaleString()}
+                    <line x1="48" y1={y} x2={chartProperties.length * 56 + 12} y2={y} stroke="#f0f0f5" strokeWidth="1" />
+                    <text x="44" y={y + 3} textAnchor="end" fontSize="9" fill="#9ca3af">
+                      {Math.round((maxChartEarnings * i) / 4) >= 1000
+                        ? `KES ${(Math.round((maxChartEarnings * i) / 4) / 1000).toFixed(0)}k`
+                        : `KES ${Math.round((maxChartEarnings * i) / 4)}`}
                     </text>
                   </g>
                 );
@@ -468,34 +474,34 @@ function AdminEarnings() {
 
               {/* Bars */}
               {chartProperties.map((p, i) => {
-                const barHeight = (p.earnings / maxChartEarnings) * 200;
-                const x = 80 + i * 80;
-                const y = 260 - barHeight;
+                const barHeight = (p.earnings / maxChartEarnings) * 120;
+                const x = 56 + i * 56;
+                const y = 155 - barHeight;
                 return (
                   <g key={p.id}>
                     <rect
                       x={x}
                       y={y}
-                      width="50"
+                      width="36"
                       height={barHeight}
-                      rx="4"
+                      rx="3"
                       fill="#C49A6C"
                       className="transition-all duration-500 hover:fill-[#b8895c]"
                     />
-                    {/* Value label on top of bar */}
-                    <text x={x + 25} y={y - 6} textAnchor="middle" fontSize="10" fontWeight="600" fill="#262262">
-                      KES {(p.earnings / 1000).toFixed(0)}k
+                    {/* Value label */}
+                    <text x={x + 18} y={y - 4} textAnchor="middle" fontSize="9" fontWeight="600" fill="#262262">
+                      {(p.earnings / 1000).toFixed(0)}k
                     </text>
-                    {/* Property name below bar */}
-                    <text x={x + 25} y="280" textAnchor="middle" fontSize="10" fill="#1f2937">
-                      {p.title.length > 10 ? p.title.slice(0, 10) + '…' : p.title}
+                    {/* Property name */}
+                    <text x={x + 18} y="172" textAnchor="middle" fontSize="9" fill="#4b5563">
+                      {p.title.length > 8 ? p.title.slice(0, 8) + '…' : p.title}
                     </text>
                   </g>
                 );
               })}
 
               {/* X axis line */}
-              <line x1="60" y1="260" x2={chartProperties.length * 80 + 20} y2="260" stroke="#D9D9D9" strokeWidth="1" />
+              <line x1="48" y1="155" x2={chartProperties.length * 56 + 12} y2="155" stroke="#D9D9D9" strokeWidth="1" />
             </svg>
           </div>
         </div>
