@@ -41,3 +41,6 @@ Instruct.md
 
 # Developer manual (local only, separate React app)
 manual/
+
+# Claude Code local settings (hooks, permissions per machine)
+.claude/
