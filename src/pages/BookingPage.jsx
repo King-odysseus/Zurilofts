@@ -141,7 +141,16 @@ function BookingPage() {
     setAdditionalGuests((prev) => prev.map((g, i) => (i === index ? { ...g, [field]: value } : g)));
   };
 
-  const addGuest = () => setGuestCount(bookingData.guests + 1);
+  const addGuest = () => {
+    setBookingData((prev) => {
+      const next = Math.min(maxGuests, prev.guests + 1);
+      return { ...prev, guests: next };
+    });
+    setAdditionalGuests((prev) => {
+      if (prev.length >= maxGuests - 1) return prev;
+      return [...prev, { firstName: '', lastName: '' }];
+    });
+  };
 
   const removeGuest = (index) => {
     setAdditionalGuests((prev) => {
