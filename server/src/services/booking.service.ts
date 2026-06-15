@@ -88,7 +88,7 @@ export async function createBooking(input: CreateBookingInput) {
   const effectivePrice = getBedPrice(property, input.bedOption);
 
   const nights = calculateNights(checkInDate, checkOutDate);
-  const extraGuestFee = Math.max(0, input.guests - maxForBed) * 500 * nights;
+  const extraGuestFee = Math.max(0, input.guests - maxForBed) * 800 * nights;
 
   // Apply seasonal price rules per night (falls back to effectivePrice)
   const priceRules = await prisma.priceRule.findMany({

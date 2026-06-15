@@ -75,7 +75,7 @@ function BookingPage() {
   // Bed option driven by URL variant (from property card click)
   // Properties define their own 1-bed / 2-bed prices via price1Bed / price2Bed
   const [bedOption, setBedOption] = useState(urlVariant);
-  const EXTRA_GUEST_FEE = 500;
+  const EXTRA_GUEST_FEE = 800;
 
   // Standard stay times. Check-in from 3:00 PM, check-out by 10:00 AM.
   // A later check-out doubles each hour past 10:00 AM, reaching one full
@@ -350,7 +350,7 @@ function BookingPage() {
         />
         {bedOption && (
           <p className="text-xs text-[#6b7280] mt-1">
-            This room fits up to {maxGuests} guests ({baseGuests} included). Each extra guest adds KES {EXTRA_GUEST_FEE.toLocaleString()}/night.
+            This apartment fits up to {maxGuests} guests ({baseGuests} included in the {bedOption === '2bed' ? '2-bed' : '1-bed'} rate). Each additional guest is KES {EXTRA_GUEST_FEE.toLocaleString()}/night.
             {bookingData.guests > baseGuests && (
               <span className="text-amber-600 font-medium"> {extraGuests} extra guest{extraGuests > 1 ? 's' : ''} &middot; +KES {(extraGuestFee).toLocaleString()}</span>
             )}
@@ -372,7 +372,7 @@ function BookingPage() {
               {bedOption === '2bed' ? '2-Bed Configuration' : '1-Bed Configuration'}
             </p>
             <p className="text-xs text-[#6b7280]">
-              Fits up to {maxGuests} guests ({baseGuests} included) &middot; KES {propertyPrice.toLocaleString()}/night
+              Apartment fits up to {maxGuests} guests &middot; KES {propertyPrice.toLocaleString()}/night
             </p>
           </div>
           <span className="bg-[#C49A6C] text-white text-xs font-bold px-3 py-1 rounded-full">
