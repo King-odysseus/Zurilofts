@@ -20,8 +20,14 @@ import userRoutes from './routes/user.routes.js';
 import adminRoutes from './routes/admin.routes.js';
 import chatRoutes from './routes/chat.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
+import paymentRoutes from './routes/payment.routes.js';
+import payoutRoutes from './routes/payout.routes.js';
 
 const app = express();
+
+// Paystack webhook MUST use raw body BEFORE global JSON parser.
+// HMAC-SHA512 signature is computed over the raw request body.
+app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
 // Global middleware
 app.use(helmet());
@@ -60,6 +66,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api', payoutRoutes); // /api/host/payouts, /api/admin/payouts, etc.
 
 // Error handler (must be last)
 app.use(errorHandler);

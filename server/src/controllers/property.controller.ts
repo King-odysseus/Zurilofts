@@ -25,6 +25,32 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
   }
 }
 
+/** Authenticated listing — returns only properties owned by the logged-in host/admin. */
+export async function listMine(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { type, minPrice, maxPrice, search, available, featured, page, limit } = req.query;
+    const result = await propertyService.listProperties({
+      type: type as string | undefined,
+      minPrice: minPrice ? Number(minPrice) : undefined,
+      maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      search: search as string | undefined,
+      available: available !== undefined ? available === 'true' : undefined,
+      featured: featured !== undefined ? featured === 'true' : undefined,
+      hostId: req.user!.sub,
+      page: page ? Number(page) : 1,
+      limit: limit ? Number(limit) : 12,
+    });
+
+    res.json({
+      success: true,
+      data: result.properties,
+      pagination: result.pagination,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getById(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const property = await propertyService.getProperty(req.params.id);
@@ -36,7 +62,10 @@ export async function getById(req: Request, res: Response, next: NextFunction): 
 
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const property = await propertyService.createProperty(req.body);
+    const property = await propertyService.createProperty({
+      ...req.body,
+      hostId: req.user!.sub,   // always record who created the property
+    });
     res.status(201).json({ success: true, data: property });
   } catch (error) {
     next(error);
@@ -45,7 +74,8 @@ export async function create(req: Request, res: Response, next: NextFunction): P
 
 export async function update(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const property = await propertyService.updateProperty(req.params.id, req.body);
+    // Scope by hostId so a user can only update their own properties
+    const property = await propertyService.updateProperty(req.params.id, req.body, req.user!.sub);
     res.json({ success: true, data: property });
   } catch (error) {
     next(error);
@@ -54,7 +84,8 @@ export async function update(req: Request, res: Response, next: NextFunction): P
 
 export async function remove(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    await propertyService.deleteProperty(req.params.id);
+    // Scope by hostId so a user can only delete their own properties
+    await propertyService.deleteProperty(req.params.id, req.user!.sub);
     res.json({ success: true, message: 'Property deleted' });
   } catch (error) {
     next(error);

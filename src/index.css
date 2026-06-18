@@ -103,7 +103,7 @@ body {
 .date-input::-webkit-datetime-edit-hour-field:focus,
 .date-input::-webkit-datetime-edit-minute-field:focus {
   background-color: #C49A6C20;
-  color: #262262;
+  color: #0B0B45;
   border-radius: 4px;
 }
 
@@ -125,7 +125,7 @@ select.neu-input option {
 select.neu-input option:hover,
 select.neu-input option:checked {
   background: #C49A6C20;
-  color: #262262;
+  color: #0B0B45;
 }
 
 /* All other selects (admin filters/forms, price filter) get the same app
@@ -176,4 +176,35 @@ select:not(.neu-input) option {
   box-shadow: inset 3px 3px 6px #d9d9d9, inset -3px -3px 6px #ffffff;
   border: 2px solid #C49A6C;
   border-radius: 1rem;
+}
+
+/* Marquee scroll — continuous auto-scrolling track */
+@keyframes marquee-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-container {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 12%,
+    black 88%,
+    transparent 100%
+  );
+}
+
+.marquee-track {
+  animation: marquee-scroll 60s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
 }

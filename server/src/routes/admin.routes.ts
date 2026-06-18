@@ -22,6 +22,8 @@ router.use(authenticate, requireAdmin);
 // Bookings
 router.get('/bookings', bookingCtrl.listAll);
 router.patch('/bookings/:id/status', validate(bookingStatusSchema), bookingCtrl.updateStatus);
+router.put('/bookings/:id', bookingCtrl.updateBooking);
+router.delete('/bookings/:id', bookingCtrl.deleteBooking);
 
 // Guest reviews / private feedback
 router.get('/reviews', reviewCtrl.listAll);

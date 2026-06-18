@@ -39,5 +39,7 @@ router.get('/profile', authenticate, ctrl.getProfile);
 router.put('/profile', authenticate, validate(profileUpdateSchema), ctrl.updateProfile);
 router.post('/avatar', authenticate, handleAvatarUpload, ctrl.uploadAvatar);
 router.put('/password', authenticate, validate(passwordChangeSchema), ctrl.changePassword);
+router.put('/profile/bank', authenticate, ctrl.updateBankDetails);
+router.put('/profile/payout-frequency', authenticate, ctrl.updatePayoutFrequency);
 
 export default router;

@@ -116,7 +116,7 @@ function AdminCalendar() {
     <div className="w-full">
       <div className="mb-6">
         <Link to={`/admin/properties/${id}/edit`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to property</Link>
-        <h1 className="text-2xl font-bold text-[#262262] mt-1">Calendar: {data.property.title}</h1>
+        <h1 className="text-2xl font-bold text-[#0B0B45] mt-1">Calendar: {data.property.title}</h1>
         <p className="text-sm text-[#6b7280]">Two-way sync with Airbnb, Booking.com, VRBO and other platforms using iCal feeds.</p>
       </div>
 
@@ -124,11 +124,11 @@ function AdminCalendar() {
 
       {/* Outbound feed */}
       <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
-        <h2 className="text-lg font-bold text-[#262262] mb-1">Export this calendar</h2>
+        <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Export this calendar</h2>
         <p className="text-sm text-[#6b7280] mb-4">Paste this link into Airbnb / Booking.com so they block the dates booked on ZuriLofts.</p>
         <div className="flex items-center gap-2">
           <input readOnly value={data.feedUrl} className={`${inputCls} font-mono text-xs`} onFocus={(e) => e.target.select()} />
-          <button onClick={copyFeed} className="shrink-0 bg-[#262262] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#1d1a4d] transition-colors text-sm">
+          <button onClick={copyFeed} className="shrink-0 bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors text-sm">
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
@@ -137,11 +137,11 @@ function AdminCalendar() {
       {/* Imported feeds */}
       <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-lg font-bold text-[#262262]">Imported calendars</h2>
+          <h2 className="text-lg font-bold text-[#0B0B45]">Imported calendars</h2>
           <button
             onClick={syncNow}
             disabled={syncing || data.sources.length === 0}
-            className="text-sm font-semibold px-4 py-2 rounded-full border border-[#D9D9D9] text-[#262262] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-50"
+            className="text-sm font-semibold px-4 py-2 rounded-full border border-[#D9D9D9] text-[#0B0B45] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-50"
           >
             {syncing ? 'Syncing...' : 'Sync now'}
           </button>
@@ -153,7 +153,7 @@ function AdminCalendar() {
             {data.sources.map((s) => (
               <div key={s.id} className="flex items-center justify-between bg-[#f8f9fa] rounded-xl px-4 py-3 text-sm">
                 <div className="min-w-0">
-                  <p className="font-semibold text-[#262262]">{s.name}</p>
+                  <p className="font-semibold text-[#0B0B45]">{s.name}</p>
                   <p className="text-[#6b7280] text-xs truncate max-w-md">{s.url}</p>
                   <p className={`text-xs mt-0.5 ${s.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-green-700'}`}>
                     {s.lastSyncedAt ? `${s.lastStatus} · ${new Date(s.lastSyncedAt).toLocaleString()}` : 'Not synced yet'}
@@ -182,7 +182,7 @@ function AdminCalendar() {
 
       {/* Blocked dates */}
       <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
-        <h2 className="text-lg font-bold text-[#262262] mb-1">Blocked dates</h2>
+        <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Blocked dates</h2>
         <p className="text-sm text-[#6b7280] mb-4">Imported bookings (read-only) and manual blocks. Blocked ranges can't be booked on ZuriLofts.</p>
 
         {data.blocks.length > 0 ? (
@@ -190,7 +190,7 @@ function AdminCalendar() {
             {data.blocks.map((b) => (
               <div key={b.id} className="flex items-center justify-between bg-[#f8f9fa] rounded-xl px-4 py-2.5 text-sm">
                 <div>
-                  <span className="font-semibold text-[#262262]">{fmt(b.start)} &rarr; {fmt(b.end)}</span>
+                  <span className="font-semibold text-[#0B0B45]">{fmt(b.start)} &rarr; {fmt(b.end)}</span>
                   <span className="text-[#6b7280] ml-2">{b.summary || 'Blocked'}</span>
                   <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${b.manual ? 'bg-[#C49A6C]/15 text-[#8a6a3e]' : 'bg-blue-100 text-blue-700'}`}>
                     {b.manual ? 'Manual' : b.sourceName || 'Imported'}
@@ -219,7 +219,7 @@ function AdminCalendar() {
             <label className={labelCls}>Reason</label>
             <input className={inputCls} placeholder="Maintenance" value={blockDraft.summary} onChange={(e) => setBlockDraft({ ...blockDraft, summary: e.target.value })} />
           </div>
-          <button type="submit" className="md:col-span-2 bg-[#262262] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#1d1a4d] transition-colors">Block</button>
+          <button type="submit" className="md:col-span-2 bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors">Block</button>
         </form>
       </section>
     </div>

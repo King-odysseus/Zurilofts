@@ -16,6 +16,10 @@ export async function getUserProfile(userId: string) {
       avatar: true,
       role: true,
       googleId: true,
+      bankName: true,
+      bankAccountNo: true,
+      bankCode: true,
+      payoutFrequency: true,
       createdAt: true,
     },
   });
@@ -45,6 +49,45 @@ export async function updateUserProfile(userId: string, data: { firstName?: stri
       avatar: true,
       role: true,
       createdAt: true,
+    },
+  });
+}
+
+export async function updateBankDetails(userId: string, data: { bankName: string; bankAccountNo: string; bankCode: string }) {
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new NotFoundError('User');
+
+  return prisma.user.update({
+    where: { id: userId },
+    data: {
+      bankName: data.bankName,
+      bankAccountNo: data.bankAccountNo,
+      bankCode: data.bankCode,
+    },
+    select: {
+      id: true,
+      bankName: true,
+      bankAccountNo: true,
+      bankCode: true,
+    },
+  });
+}
+
+export async function updatePayoutFrequency(userId: string, frequency: string) {
+  const valid = ['weekly', 'biweekly', 'monthly'];
+  if (!valid.includes(frequency)) {
+    throw new ValidationError(`Invalid frequency. Must be one of: ${valid.join(', ')}`);
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new NotFoundError('User');
+
+  return prisma.user.update({
+    where: { id: userId },
+    data: { payoutFrequency: frequency },
+    select: {
+      id: true,
+      payoutFrequency: true,
     },
   });
 }

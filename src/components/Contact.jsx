@@ -8,7 +8,7 @@ function Contact() {
     <section id="contact" className="py-10 md:py-16 bg-[#D9D9D9]">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <div className="text-center mb-10 md:mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#262262] mb-4">Contact Us</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-4">Contact Us</h2>
           <p className="text-[#6b7280] max-w-2xl mx-auto">
             Have questions about our apartment? We would love to hear from you.
             Send us a message and we will respond as soon as possible.
@@ -18,7 +18,7 @@ function Contact() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className="bg-white rounded-2xl shadow-md p-8">
-            <h3 className="text-xl font-semibold text-[#262262] mb-6">Send us a Message</h3>
+            <h3 className="text-xl font-semibold text-[#0B0B45] mb-6">Send us a Message</h3>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
@@ -77,7 +77,7 @@ function Contact() {
 
           {/* Contact Information */}
           <div className="space-y-6">
-            <div className="bg-[#262262] text-white rounded-2xl p-8">
+            <div className="bg-[#0B0B45] text-white rounded-2xl p-8">
               <h3 className="text-xl font-semibold text-[#C49A6C] mb-6">Get in Touch</h3>
               <div className="space-y-5">
                 {[
@@ -96,7 +96,7 @@ function Contact() {
                 ].map(({ label, value, icon }) => (
                   <div key={label} className="flex items-start space-x-4">
                     <div className="w-12 h-12 bg-[#C49A6C] rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-6 h-6 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-6 h-6 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         {icon}
                       </svg>
                     </div>
@@ -111,11 +111,11 @@ function Contact() {
 
             {/* Response Time */}
             <div className="bg-[#C49A6C] rounded-2xl p-8 text-center">
-              <svg className="w-12 h-12 text-[#262262] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-12 h-12 text-[#0B0B45] mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <h3 className="text-xl font-semibold text-[#262262] mb-2">Fast Response</h3>
-              <p className="text-[#262262]/80">We typically respond within 2 hours during business hours.</p>
+              <h3 className="text-xl font-semibold text-[#0B0B45] mb-2">Fast Response</h3>
+              <p className="text-[#0B0B45]/80">We typically respond within 2 hours during business hours.</p>
             </div>
           </div>
         </div>

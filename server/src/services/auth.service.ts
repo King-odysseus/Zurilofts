@@ -35,7 +35,7 @@ function toUserResponse(user: any): UserResponse {
 }
 
 async function generateTokens(user: { id: string; email: string; role: string }): Promise<AuthTokens> {
-  const payload = { sub: user.id, email: user.email, role: user.role as 'USER' | 'ADMIN' };
+  const payload = { sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN' };
   return {
     accessToken: signAccessToken(payload),
     refreshToken: signRefreshToken(payload),
@@ -49,7 +49,8 @@ export async function registerUser(
   email: string,
   password: string,
   firstName: string,
-  lastName: string
+  lastName: string,
+  role: 'USER' | 'HOST' = 'USER'
 ): Promise<{ user: UserResponse; tokens: AuthTokens }> {
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -58,7 +59,7 @@ export async function registerUser(
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const user = await prisma.user.create({
-    data: { email, passwordHash, firstName, lastName },
+    data: { email, passwordHash, firstName, lastName, role },
   });
 
   const tokens = await generateTokens(user);

@@ -12,6 +12,7 @@ datasource db {
 
 enum Role {
   USER
+  HOST
   ADMIN
 }
 
@@ -31,20 +32,33 @@ model User {
   googleId     String?   @unique
   avatar       String?         // profile image path
   role         Role      @default(USER)
+  bankName       String?       // Host bank name
+  bankAccountNo  String?       // Host 10-digit Kenyan account number
+  bankCode       String?       // Paystack bank code
+  payoutFrequency String?      // "weekly" | "biweekly" | "monthly"
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   bookings     Booking[]
   reviews      Review[]
   favorites    Favorite[]
   messages     Message[]
+  properties   Property[]
+  payouts      Payout[]
+  wallet       HostWallet?
 }
 
 model Property {
   id          String    @id @default(uuid())
+  hostId      String?                        // user who owns/manages this property
+  host        User?     @relation(fields: [hostId], references: [id])
   title       String
   location    String
-  price       Int
-  rating      Float    @default(0)
+  price         Int
+  price1Bed     Int?                              // nightly price for 1-bed option
+  price2Bed     Int?                              // nightly price for 2-bed option
+  bathrooms1Bed Int?                              // bathroom count for 1-bed listing
+  bathrooms2Bed Int?                              // bathroom count for 2-bed listing
+  rating        Float    @default(0)
   reviews     Int      @default(0)
   bedrooms    Int
   bathrooms   Int
@@ -65,6 +79,8 @@ model Property {
   priceRules      PriceRule[]
   guestReviews    Review[]
   favoritedBy     Favorite[]
+
+  @@index([hostId])
 }
 
 // External iCal feeds (Airbnb, Booking.com, VRBO, ...) imported per property
@@ -122,6 +138,7 @@ model Booking {
   checkIn         DateTime
   checkOut        DateTime
   guests          Int
+  bedOption       String?
   checkInTime     String?
   checkOutTime    String?
   specialRequests String?
@@ -136,9 +153,16 @@ model Booking {
   promoCode       PromoCode?    @relation(fields: [promoCodeId], references: [id])
   discountAmount  Int           @default(0)
   total           Int
+  paymentReference String?  @unique
+  paymentChannel   String?
+  paymentGateway   String?
+  paidAt           DateTime?
+  hostNetAmount    Int?
+  withholdingTax   Int?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   review          Review?
+  payoutBookings  PayoutBooking[]
 }
 
 // Post-stay guest review: star rating + a private note for the admin on how to
@@ -200,4 +224,55 @@ model PromoCode {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   bookings         Booking[]
+}
+
+model HostWallet {
+  id            String   @id @default(uuid())
+  hostId        String   @unique
+  host          User     @relation(fields: [hostId], references: [id])
+  balance       Int      @default(0)
+  totalEarned   Int      @default(0)
+  totalPaidOut  Int      @default(0)
+  lastPayoutAt  DateTime?
+  nextPayoutAt  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Payout {
+  id            String   @id @default(uuid())
+  hostId        String
+  host          User     @relation(fields: [hostId], references: [id])
+  amount        Int
+  transferRef   String?  @unique
+  recipientCode String?
+  status        String   @default("PENDING")
+  failureReason String?
+  initiatedBy   String?
+  bookingsCount Int      @default(0)
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  bookings      PayoutBooking[]
+}
+
+model PayoutBooking {
+  id        String  @id @default(uuid())
+  payoutId  String
+  payout    Payout @relation(fields: [payoutId], references: [id], onDelete: Cascade)
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id])
+  amount    Int
+
+  @@unique([payoutId, bookingId])
+  @@index([bookingId])
+}
+
+model PaymentLog {
+  id        String   @id @default(uuid())
+  bookingId String?
+  event     String
+  reference String?
+  payload   String?
+  createdAt DateTime @default(now())
 }

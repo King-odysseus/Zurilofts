@@ -14,7 +14,7 @@ function ContactPage() {
             alt="Contact Hero Background"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-[#262262]/70"></div>
+          <div className="absolute inset-0 bg-[#0B0B45]/70"></div>
         </div>
         <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Contact Us</h1>
@@ -29,7 +29,7 @@ function ContactPage() {
       <section className="pt-10 pb-20 md:pt-16 md:pb-32 bg-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="text-center mb-8 md:mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#262262] mb-4 pt-12 md:pt-20">Find Us</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-4 pt-12 md:pt-20">Find Us</h2>
             <p className="text-[#6b7280] max-w-2xl mx-auto">
               We operate in Nairobi, Kenya.
             </p>
@@ -52,13 +52,13 @@ function ContactPage() {
       {/* Email Section */}
       <section className="pb-20 md:pb-32 bg-white">
         <div className="max-w-7xl mx-auto px-4 md:px-6 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#262262] mb-4">Send Us an Email</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-4">Send Us an Email</h2>
           <p className="text-[#6b7280] max-w-2xl mx-auto mb-8">
             Prefer to reach out digitally? Drop us a line and we will get back to you as soon as possible.
           </p>
           <a
             href="mailto:enquires@zurilofts.com"
-            className="inline-block px-8 py-4 bg-[#262262] text-white font-semibold rounded-xl hover:bg-[#1e1b4f] transition-colors duration-200"
+            className="inline-block px-8 py-4 bg-[#0B0B45] text-white font-semibold rounded-xl hover:bg-[#1e1b4f] transition-colors duration-200"
           >
             enquires@zurilofts.com
           </a>

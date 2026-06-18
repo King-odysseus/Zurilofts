@@ -6,7 +6,7 @@ import { z } from 'zod';
 export interface JwtPayload {
   sub: string;
   email: string;
-  role: 'USER' | 'ADMIN';
+  role: 'USER' | 'HOST' | 'ADMIN';
 }
 
 declare global {
@@ -49,6 +49,7 @@ export const registerSchema = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number'),
   firstName: z.string().min(1, 'First name is required').max(50),
   lastName: z.string().min(1, 'Last name is required').max(50),
+  role: z.enum(['USER', 'HOST']).default('USER'),
 });
 
 export const loginSchema = z.object({
@@ -66,6 +67,8 @@ export const propertyCreateSchema = z.object({
   price: z.number().int().positive(),
   price1Bed: z.number().int().positive().optional(),
   price2Bed: z.number().int().positive().optional(),
+  bathrooms1Bed: z.number().int().min(0).optional(),
+  bathrooms2Bed: z.number().int().min(0).optional(),
   bedrooms: z.number().int().min(0),
   bathrooms: z.number().int().min(0),
   area: z.number().int().positive(),

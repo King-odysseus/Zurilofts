@@ -2,7 +2,7 @@ import logoImg from '../assets/zurilofts-logo.png';
 
 function Footer() {
   return (
-    <footer className="bg-[#262262] text-white">
+    <footer className="bg-[#0B0B45] text-white">
       <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -67,8 +67,8 @@ function Footer() {
             © {new Date().getFullYear()} ZuriLofts. All rights reserved.
           </p>
           <div className="flex space-x-6 mt-4 md:mt-0">
-            <a href="#" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Privacy Policy</a>
-            <a href="#" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Terms of Service</a>
+            <a href="/privacy" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Privacy Policy</a>
+            <a href="/terms" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Terms of Service</a>
           </div>
         </div>
       </div>

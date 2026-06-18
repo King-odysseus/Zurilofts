@@ -65,3 +65,21 @@ export async function changePassword(req: Request, res: Response, next: NextFunc
     next(error);
   }
 }
+
+export async function updateBankDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await userService.updateBankDetails(req.user!.sub, req.body);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function updatePayoutFrequency(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await userService.updatePayoutFrequency(req.user!.sub, req.body.frequency);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}

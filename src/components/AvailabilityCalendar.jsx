@@ -104,7 +104,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
 
     return (
       <div className="flex-1">
-        <div className="text-center font-semibold text-[#262262] mb-3">{MONTHS[month]} {year}</div>
+        <div className="text-center font-semibold text-[#0B0B45] mb-3">{MONTHS[month]} {year}</div>
         <div className="grid grid-cols-7 gap-1 mb-1">
           {WEEKDAYS.map((w) => (
             <div key={w} className="text-center text-xs font-medium text-[#6b7280] py-1">{w}</div>
@@ -157,7 +157,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
           className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#f8f9fa] disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Previous month"
         >
-          <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -167,7 +167,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
           className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#f8f9fa]"
           aria-label="Next month"
         >
-          <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>

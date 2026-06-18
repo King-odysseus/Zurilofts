@@ -208,7 +208,7 @@ See [`DESIGN.md`](DESIGN.md) for comprehensive design documentation including:
 
 | Color | Hex | Usage |
 |-------|-----|-------|
-| Deep Indigo | `#262262` | Headings, navbar, footer |
+| Deep Indigo | `#0B0B45` | Headings, navbar, footer |
 | Warm Bronze | `#C49A6C` | CTAs, accents, highlights |
 | Silver Grey | `#D9D9D9` | Borders, backgrounds |
 | Charcoal | `#1f2937` | Body text |
@@ -269,7 +269,7 @@ const observer = new IntersectionObserver(
 ```javascript
 // tailwind.config.js
 colors: {
-  indigo:   '#262262',
+  indigo:   '#0B0B45',
   bronze:   '#C49A6C',
   silver:   '#D9D9D9',
   charcoal: '#1f2937',
@@ -282,7 +282,7 @@ colors: {
 daisyui: {
   themes: [{
     zuriloft: {
-      primary:   '#262262',
+      primary:   '#0B0B45',
       secondary: '#C49A6C',
       accent:    '#C49A6C',
       neutral:   '#D9D9D9',

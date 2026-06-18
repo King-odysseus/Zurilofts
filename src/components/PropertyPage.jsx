@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
@@ -7,6 +7,8 @@ import apiClient from '../api/client.js';
 
 function PropertyPage() {
   const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const variant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [featuredImage, setFeaturedImage] = useState(0);
   const [thumbStart, setThumbStart] = useState(0);
   const [property, setProperty] = useState(null);
@@ -54,7 +56,7 @@ function PropertyPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-[#262262] mb-2">Property Not Found</h2>
+            <h2 className="text-xl font-bold text-[#0B0B45] mb-2">Property Not Found</h2>
             <p className="text-[#6b7280] mb-4">{error || 'This property could not be loaded.'}</p>
             <Link to="/properties" className="inline-block bg-[#C49A6C] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
               View All Properties
@@ -68,12 +70,27 @@ function PropertyPage() {
 
   const images = property.images || zuriImages;
 
+  // When arriving from a specific bed-variant card, reflect that variant's
+  // bedroom count, bathroom count, and price rather than the property's raw values.
+  const displayBedrooms = variant === '1bed' ? 1 : variant === '2bed' ? 2 : property.bedrooms;
+  const displayBathrooms = variant === '1bed'
+    ? (property.bathrooms1Bed ?? property.bathrooms)
+    : variant === '2bed'
+      ? (property.bathrooms2Bed ?? property.bathrooms)
+      : property.bathrooms;
+  const displayPrice = variant === '2bed'
+    ? (property.price2Bed ?? property.price)
+    : variant === '1bed'
+      ? (property.price1Bed ?? property.price)
+      : property.price;
+  const bookingHref = `/booking/${property.id}${variant ? `?variant=${variant}` : ''}`;
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       
       {/* Header with back button */}
-      <div className="bg-[#262262] py-4 px-6 pt-24">
+      <div className="bg-[#0B0B45] py-4 px-6 pt-24">
         <div className="max-w-7xl mx-auto flex items-center">
           <Link 
             to="/properties" 
@@ -87,10 +104,10 @@ function PropertyPage() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-12 md:py-16">
+      <div className="max-w-7xl mx-auto px-8 md:px-16 py-12 md:py-16">
         {/* Property Header */}
         <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#262262] mb-2">{property.title}</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-2">{property.title}</h1>
           <div className="flex items-center text-[#6b7280]">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -112,7 +129,7 @@ function PropertyPage() {
               onClick={() => setFeaturedImage((prev) => (prev - 1 + images.length) % images.length)}
               className="absolute top-1/2 -translate-y-1/2 left-3 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-md"
             >
-              <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
@@ -120,7 +137,7 @@ function PropertyPage() {
               onClick={() => setFeaturedImage((prev) => (prev + 1) % images.length)}
               className="absolute top-1/2 -translate-y-1/2 right-3 w-10 h-10 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-md"
             >
-              <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -160,7 +177,7 @@ function PropertyPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
                 <div>
-                  <p className="font-bold text-[#262262]">{property.bedrooms}</p>
+                  <p className="font-bold text-[#0B0B45]">{displayBedrooms}</p>
                   <p className="text-sm text-[#6b7280]">Bedrooms</p>
                 </div>
               </div>
@@ -169,7 +186,7 @@ function PropertyPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 <div>
-                  <p className="font-bold text-[#262262]">{property.bathrooms}</p>
+                  <p className="font-bold text-[#0B0B45]">{displayBathrooms}</p>
                   <p className="text-sm text-[#6b7280]">Bathrooms</p>
                 </div>
               </div>
@@ -178,7 +195,7 @@ function PropertyPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                 </svg>
                 <div>
-                  <p className="font-bold text-[#262262]">{property.area} sq ft</p>
+                  <p className="font-bold text-[#0B0B45]">{property.area} sq ft</p>
                   <p className="text-sm text-[#6b7280]">Area</p>
                 </div>
               </div>
@@ -187,20 +204,20 @@ function PropertyPage() {
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
                 <div>
-                  <p className="font-bold text-[#262262]">{property.rating}</p>
+                  <p className="font-bold text-[#0B0B45]">{property.rating}</p>
                 </div>
               </div>
             </div>
 
             {/* Description */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#262262] mb-4">About this property</h2>
+              <h2 className="text-2xl font-bold text-[#0B0B45] mb-4">About this property</h2>
               <p className="text-[#1f2937] leading-relaxed">{property.description}</p>
             </div>
 
             {/* Amenities */}
             <div className="mb-8">
-              <h2 className="text-2xl font-bold text-[#262262] mb-4">Amenities</h2>
+              <h2 className="text-2xl font-bold text-[#0B0B45] mb-4">Amenities</h2>
               <div className="grid grid-cols-2 gap-4">
                 {property.amenities.map((amenity, index) => (
                   <div key={index} className="flex items-center">
@@ -215,7 +232,7 @@ function PropertyPage() {
 
             {/* Nearby */}
             <div>
-              <h2 className="text-2xl font-bold text-[#262262] mb-4">What's nearby</h2>
+              <h2 className="text-2xl font-bold text-[#0B0B45] mb-4">What's nearby</h2>
               <ul className="space-y-3">
                 {property.nearby.map((item, index) => (
                   <li key={index} className="flex items-center text-[#1f2937]">
@@ -234,12 +251,12 @@ function PropertyPage() {
           <div className="lg:col-span-1">
             <div className="neu-card p-5 md:p-6 pt-10 md:pt-12 sticky top-24">
               <div className="mb-6">
-                <span className="text-3xl font-bold text-[#262262]">KES {property.price.toLocaleString()}</span>
+                <span className="text-3xl font-bold text-[#0B0B45]">KES {displayPrice.toLocaleString()}</span>
                 <span className="text-[#6b7280]"> / night</span>
               </div>
 
               <Link
-                to={`/booking/${property.id}`}
+                to={bookingHref}
                 className="block w-full bg-[#C49A6C] text-white font-bold py-4 rounded-xl hover:bg-[#b8895c] active:bg-[#a6794d] transition-all duration-200 text-center"
               >
                 Book Now
@@ -250,7 +267,7 @@ function PropertyPage() {
               </p>
 
               <div className="mt-6 pt-6 border-t border-[#D9D9D9]">
-                <h4 className="font-semibold text-[#262262] mb-3">Why book with us?</h4>
+                <h4 className="font-semibold text-[#0B0B45] mb-3">Why book with us?</h4>
                 <ul className="space-y-2 text-sm text-[#6b7280]">
                   <li className="flex items-center">
                     <svg className="w-4 h-4 text-[#C49A6C] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

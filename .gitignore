@@ -42,5 +42,8 @@ Instruct.md
 # Developer manual (local only, separate React app)
 manual/
 
+# Offline Android APK shell (local only — imports parent source)
+offline-app/
+
 # Claude Code local settings (hooks, permissions per machine)
 .claude/

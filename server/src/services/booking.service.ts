@@ -144,6 +144,7 @@ export async function createBooking(input: CreateBookingInput) {
     include: {
       property: true,
       promoCode: { select: { code: true, discountPercent: true } },
+      user: { select: { email: true } },
     },
   });
 
@@ -341,6 +342,124 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
     data: { status },
   });
   return updated;
+}
+
+interface UpdateBookingInput {
+  checkIn?: string;
+  checkOut?: string;
+  guests?: number;
+  bedOption?: string | null;
+  checkInTime?: string | null;
+  checkOutTime?: string | null;
+  specialRequests?: string | null;
+  additionalGuests?: { firstName: string; lastName: string }[];
+}
+
+export async function updateBooking(bookingId: string, input: UpdateBookingInput) {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: { property: true },
+  });
+  if (!booking) throw new NotFoundError('Booking');
+
+  const property = booking.property;
+
+  const checkIn = input.checkIn ? new Date(input.checkIn) : booking.checkIn;
+  const checkOut = input.checkOut ? new Date(input.checkOut) : booking.checkOut;
+
+  if (checkIn >= checkOut) {
+    throw new ValidationError('Check-out date must be after check-in date');
+  }
+
+  // Check availability for new dates (exclude current booking from conflict check)
+  if (input.checkIn || input.checkOut) {
+    const available = await isRangeAvailable(booking.propertyId, checkIn, checkOut, bookingId);
+    if (!available) {
+      throw new ConflictError('Those dates are no longer available for this property');
+    }
+  }
+
+  const guests = input.guests ?? booking.guests;
+  // null means "clear", undefined means "don't change"
+  const bedOption = input.bedOption !== undefined ? (input.bedOption || null) : booking.bedOption;
+
+  // Enforce occupancy limits
+  const maxForBed = bedOption === '2bed' ? 4 : 2;
+  if (guests > 6) {
+    throw new ValidationError('Maximum 6 guests per property');
+  }
+
+  // Recalculate pricing
+  const effectivePrice = getBedPrice(property, bedOption ?? undefined);
+  const nights = calculateNights(checkIn, checkOut);
+  const extraGuestFee = Math.max(0, guests - maxForBed) * 800 * nights;
+
+  const priceRules = await prisma.priceRule.findMany({
+    where: { propertyId: booking.propertyId },
+    select: { start: true, end: true, price: true },
+  });
+  const subtotal = computeSubtotal(checkIn, nights, effectivePrice, priceRules);
+
+  // Re-apply promo discount if present
+  let discountAmount = 0;
+  if (booking.promoCodeId) {
+    const promo = await prisma.promoCode.findUnique({ where: { id: booking.promoCodeId } });
+    if (promo && promo.active) {
+      const discountPercent = promo.discountPercent;
+      const maxDiscount = promo.maxDiscount ?? null;
+      const rawDiscount = Math.round(subtotal * (discountPercent / 100));
+      discountAmount = maxDiscount !== null ? Math.min(rawDiscount, maxDiscount) : rawDiscount;
+    }
+  }
+
+  const pricing = calculateFees(subtotal, 0, null); // discount already applied above
+  // checkOutTime: null means clear, undefined means keep existing
+  const effectiveCheckOutTime = input.checkOutTime !== undefined ? (input.checkOutTime || null) : booking.checkOutTime;
+  const lateFee = lateCheckoutFee(effectiveCheckOutTime ?? undefined, effectivePrice);
+  const total = pricing.subtotal - discountAmount + pricing.cleaningFee + pricing.serviceFee + lateFee + extraGuestFee;
+
+  const data: any = {
+    checkIn,
+    checkOut,
+    guests,
+    bedOption,
+    subtotal,
+    cleaningFee: pricing.cleaningFee,
+    serviceFee: pricing.serviceFee,
+    lateCheckoutFee: lateFee,
+    discountAmount,
+    total,
+  };
+
+  // Optional fields: undefined = don't change, null = clear, string = set
+  if (input.checkInTime !== undefined) data.checkInTime = input.checkInTime || null;
+  if (input.checkOutTime !== undefined) data.checkOutTime = input.checkOutTime || null;
+  if (input.specialRequests !== undefined) data.specialRequests = input.specialRequests || null;
+  if (input.additionalGuests !== undefined) {
+    data.additionalGuestsJson = input.additionalGuests.length
+      ? JSON.stringify(input.additionalGuests.filter((g) => g.firstName?.trim() || g.lastName?.trim()))
+      : null;
+  }
+
+  const updated = await prisma.booking.update({
+    where: { id: bookingId },
+    data,
+    include: {
+      user: { select: { id: true, email: true, firstName: true, lastName: true } },
+      property: { select: { id: true, title: true, imagesJson: true } },
+      promoCode: { select: { code: true } },
+    },
+  });
+
+  return normalizeBooking(updated);
+}
+
+export async function deleteBooking(bookingId: string) {
+  const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+  if (!booking) throw new NotFoundError('Booking');
+
+  await prisma.booking.delete({ where: { id: bookingId } });
+  return { deleted: true };
 }
 
 // Internal: validate a promo code and return it

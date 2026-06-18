@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import logoImg from '../assets/zurilofts-logo.png';
@@ -8,7 +8,16 @@ import { zuriImages } from '../assets/images';
 // Use the same background treatment as the login page for consistency
 const bgImage = zuriImages[14];
 
+function getDashboardPath(user) {
+  if (user?.role === 'HOST' || user?.role === 'ADMIN') return '/admin';
+  return '/';
+}
+
 function RegisterPage() {
+  const [searchParams] = useSearchParams();
+  const urlRole = (searchParams.get('role') || '').toUpperCase();
+  const isHost = urlRole === 'HOST';
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -22,14 +31,14 @@ function RegisterPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
-  const { register, isAuthenticated, isLoading, error, clearError, setUser } = useAuth();
+  const { user, register, isAuthenticated, isLoading, error, clearError, setUser } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      navigate('/', { replace: true });
+    if (isAuthenticated && !isLoading && user) {
+      navigate(getDashboardPath(user), { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, isLoading, user, navigate]);
 
   useEffect(() => {
     return () => clearError();
@@ -61,6 +70,7 @@ function RegisterPage() {
       lastName: formData.lastName,
       email: formData.email,
       password: formData.password,
+      role: isHost ? 'HOST' : 'USER',
     });
 
     if (!result.success) {
@@ -92,8 +102,19 @@ function RegisterPage() {
       {/* Background Image */}
       <div className="absolute inset-0">
         <img src={bgImage} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#262262]/70"></div>
+        <div className="absolute inset-0 bg-[#0B0B45]/70"></div>
       </div>
+
+      {/* Back button */}
+      <Link
+        to="/"
+        className="fixed top-6 left-6 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors"
+        aria-label="Back to home"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </Link>
 
       <div className="max-w-md w-full relative z-10">
         <div className="neu-card auth-card p-8 bg-white/95 backdrop-blur-sm">
@@ -102,8 +123,14 @@ function RegisterPage() {
             <Link to="/" className="inline-block mb-6">
               <img src={logoImg} alt="ZuriLofts" className="h-20 w-auto mx-auto" />
             </Link>
-            <h1 className="text-2xl font-bold text-[#262262]">Create Account</h1>
-            <p className="text-[#6b7280] mt-2">Join ZuriLofts for premium stays</p>
+            <h1 className="text-2xl font-bold text-[#0B0B45]">
+              {isHost ? 'Become a Host' : 'Create Account'}
+            </h1>
+            <p className="text-[#6b7280] mt-2">
+              {isHost
+                ? 'List your property and start earning with ZuriLofts'
+                : 'Join ZuriLofts for premium stays'}
+            </p>
           </div>
 
           {(localError || error) && (
@@ -229,7 +256,9 @@ function RegisterPage() {
               disabled={submitting}
               className="w-full bg-[#C49A6C] text-white font-semibold py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 mt-6"
             >
-              {submitting ? 'Creating Account...' : 'Create Account'}
+              {submitting
+                ? 'Creating Account...'
+                : isHost ? 'Create Host Account' : 'Create Account'}
             </button>
           </form>
 
@@ -242,11 +271,76 @@ function RegisterPage() {
 
           <p className="text-center text-sm text-[#6b7280] mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="text-[#C49A6C] font-semibold hover:text-[#262262] transition-colors">
+            <Link to="/login" className="text-[#C49A6C] font-semibold hover:text-[#0B0B45] transition-colors">
               Sign in
             </Link>
           </p>
         </div>
+
+        {/* Selling Points — Host Registration */}
+        {isHost && (
+          <div className="mt-6 neu-card p-6 bg-white/95 backdrop-blur-sm max-w-md w-full">
+            <h3 className="text-lg font-bold text-[#0B0B45] mb-4">Why Host with ZuriLofts</h3>
+            <ul className="space-y-3 text-sm">
+              <li className="flex gap-3">
+                <span className="text-[#C49A6C] font-bold flex-shrink-0">7.5%</span>
+                <span className="text-[#1f2937]"><span className="font-semibold">Lowest platform fee in Kenya</span> — less than half of Booking.com (15%)</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="text-[#C49A6C] flex-shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                </span>
+                <span className="text-[#1f2937]"><span className="font-semibold">Guests pay zero markup</span> — unlike Airbnb's 14% guest fee, your listed price IS the guest price</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="text-[#C49A6C] flex-shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                </span>
+                <span className="text-[#1f2937]"><span className="font-semibold">Tax handled for you</span> — WHT auto-deducted, remitted to KRA, and you get a downloadable statement anytime</span>
+              </li>
+              <li className="flex gap-3">
+                <span className="text-[#C49A6C] flex-shrink-0">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                </span>
+                <span className="text-[#1f2937]"><span className="font-semibold">Flexible payouts</span> — choose weekly, bi-weekly, or monthly transfers to your bank account</span>
+              </li>
+            </ul>
+
+            {/* Airbnb comparison */}
+            <div className="mt-5 bg-[#0B0B45]/5 rounded-xl p-4">
+              <p className="text-xs font-semibold text-[#0B0B45] mb-2 uppercase tracking-wide">Cost Comparison — Guest Pays</p>
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-[#6b7280] border-b border-[#D9D9D9]">
+                    <th className="text-left py-1">Property at KES 8,000/night</th>
+                    <th className="text-right py-1">Airbnb</th>
+                    <th className="text-right py-1 text-[#C49A6C]">ZuriLofts</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-[#D9D9D9]/50">
+                    <td className="py-1">Nightly rate</td>
+                    <td className="text-right">KES 8,000</td>
+                    <td className="text-right text-[#C49A6C] font-medium">KES 8,000</td>
+                  </tr>
+                  <tr className="border-b border-[#D9D9D9]/50">
+                    <td className="py-1">Guest service fee</td>
+                    <td className="text-right text-red-500">+KES 1,120 (14%)</td>
+                    <td className="text-right text-[#C49A6C] font-bold">KES 0</td>
+                  </tr>
+                  <tr>
+                    <td className="py-1 font-semibold">Guest pays</td>
+                    <td className="text-right font-semibold text-red-500">KES 9,120</td>
+                    <td className="text-right font-bold text-[#C49A6C]">KES 8,000</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p className="text-xs text-[#6b7280] mt-2 italic">
+                Guests save 12% booking direct — your property attracts more bookings at the same listed price.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -259,7 +353,7 @@ function PasswordToggle({ shown, onClick }) {
       type="button"
       onClick={onClick}
       aria-label={shown ? 'Hide password' : 'Show password'}
-      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#262262] transition-colors"
+      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#0B0B45] transition-colors"
     >
       {shown ? (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

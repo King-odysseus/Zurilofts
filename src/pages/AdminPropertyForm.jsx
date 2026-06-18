@@ -10,6 +10,8 @@ const EMPTY = {
   price: '',
   price1Bed: '',
   price2Bed: '',
+  bathrooms1Bed: '',
+  bathrooms2Bed: '',
   bedrooms: 1,
   bathrooms: 1,
   area: '',
@@ -59,6 +61,8 @@ function AdminPropertyForm() {
           price: p.price ?? '',
           price1Bed: p.price1Bed ?? '',
           price2Bed: p.price2Bed ?? '',
+          bathrooms1Bed: p.bathrooms1Bed ?? '',
+          bathrooms2Bed: p.bathrooms2Bed ?? '',
           bedrooms: p.bedrooms ?? 1,
           bathrooms: p.bathrooms ?? 1,
           area: p.area ?? '',
@@ -132,6 +136,8 @@ function AdminPropertyForm() {
 
     if (form.price1Bed !== '') payload.price1Bed = Number(form.price1Bed);
     if (form.price2Bed !== '') payload.price2Bed = Number(form.price2Bed);
+    if (form.bathrooms1Bed !== '') payload.bathrooms1Bed = Number(form.bathrooms1Bed);
+    if (form.bathrooms2Bed !== '') payload.bathrooms2Bed = Number(form.bathrooms2Bed);
 
     if (payload.images.length === 0) {
       setError('Add at least one image');
@@ -168,13 +174,13 @@ function AdminPropertyForm() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <Link to="/admin/properties" className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to properties</Link>
-          <h1 className="text-2xl font-bold text-[#262262] mt-1">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
+          <h1 className="text-2xl font-bold text-[#0B0B45] mt-1">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setShowFullPreview(true)}
-            className="flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-[#262262] text-white hover:bg-[#1d1a4d] transition-colors"
+            className="flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-[#0B0B45] text-white hover:bg-[#06062a] transition-colors"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -185,7 +191,7 @@ function AdminPropertyForm() {
           {isEdit && (
             <Link
               to={`/admin/properties/${id}/calendar`}
-              className="px-4 py-2 rounded-full text-sm font-semibold border border-[#D9D9D9] text-[#262262] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
+              className="px-4 py-2 rounded-full text-sm font-semibold border border-[#D9D9D9] text-[#0B0B45] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
             >
               Manage Calendar &rarr;
             </Link>
@@ -232,28 +238,42 @@ function AdminPropertyForm() {
 
           {/* Bed variant pricing */}
           <div className="bg-[#f8f9fa] rounded-xl p-4 space-y-4">
-            <p className="text-sm font-semibold text-[#262262]">Bed Variant Pricing</p>
+            <p className="text-sm font-semibold text-[#0B0B45]">Bed Variant Pricing &amp; Bathrooms</p>
+            <p className="text-xs text-[#6b7280] -mt-3">Each variant can have its own price and bathroom count. Leave unchecked to not list.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="flex items-start gap-3 bg-white rounded-xl border border-[#D9D9D9] p-4 cursor-pointer hover:border-[#C49A6C] transition-colors">
                 <input
                   type="checkbox"
                   className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
                   checked={form.price1Bed !== ''}
-                  onChange={(e) => update('price1Bed', e.target.checked ? (form.price || '') : '')}
+                  onChange={(e) => {
+                    update('price1Bed', e.target.checked ? (form.price || '') : '');
+                    if (!e.target.checked) update('bathrooms1Bed', '');
+                  }}
                 />
                 <div className="flex-1">
                   <span className="block text-sm font-semibold text-[#1f2937]">List as 1-Bed</span>
                   <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 1-bed card</span>
                   {form.price1Bed !== '' && (
-                    <input
-                      type="number"
-                      min="1"
-                      placeholder="1-Bed price per night"
-                      className={inputCls}
-                      value={form.price1Bed}
-                      onChange={(e) => update('price1Bed', e.target.value)}
-                      required
-                    />
+                    <div className="space-y-3">
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="1-Bed price per night"
+                        className={inputCls}
+                        value={form.price1Bed}
+                        onChange={(e) => update('price1Bed', e.target.value)}
+                        required
+                      />
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="Bathrooms (e.g. 1)"
+                        className={inputCls}
+                        value={form.bathrooms1Bed}
+                        onChange={(e) => update('bathrooms1Bed', e.target.value)}
+                      />
+                    </div>
                   )}
                 </div>
               </label>
@@ -262,21 +282,34 @@ function AdminPropertyForm() {
                   type="checkbox"
                   className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
                   checked={form.price2Bed !== ''}
-                  onChange={(e) => update('price2Bed', e.target.checked ? (form.price || '') : '')}
+                  onChange={(e) => {
+                    update('price2Bed', e.target.checked ? (form.price || '') : '');
+                    if (!e.target.checked) update('bathrooms2Bed', '');
+                  }}
                 />
                 <div className="flex-1">
                   <span className="block text-sm font-semibold text-[#1f2937]">List as 2-Bed</span>
                   <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 2-bed card</span>
                   {form.price2Bed !== '' && (
-                    <input
-                      type="number"
-                      min="1"
-                      placeholder="2-Bed price per night"
-                      className={inputCls}
-                      value={form.price2Bed}
-                      onChange={(e) => update('price2Bed', e.target.value)}
-                      required
-                    />
+                    <div className="space-y-3">
+                      <input
+                        type="number"
+                        min="1"
+                        placeholder="2-Bed price per night"
+                        className={inputCls}
+                        value={form.price2Bed}
+                        onChange={(e) => update('price2Bed', e.target.value)}
+                        required
+                      />
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="Bathrooms (e.g. 2)"
+                        className={inputCls}
+                        value={form.bathrooms2Bed}
+                        onChange={(e) => update('bathrooms2Bed', e.target.value)}
+                      />
+                    </div>
                   )}
                 </div>
               </label>
@@ -353,7 +386,7 @@ function AdminPropertyForm() {
                   <svg className="w-8 h-8 text-[#C49A6C] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  <span className="text-sm font-semibold text-[#262262]">Click to upload photos</span>
+                  <span className="text-sm font-semibold text-[#0B0B45]">Click to upload photos</span>
                   <span className="text-xs text-[#6b7280] mt-1">JPEG, PNG or WebP · up to 10 at a time</span>
                 </>
               )}
@@ -384,7 +417,7 @@ function AdminPropertyForm() {
           >
             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Property'}
           </button>
-          <Link to="/admin/properties" className="px-6 py-2.5 rounded-full font-semibold text-[#6b7280] hover:text-[#262262]">Cancel</Link>
+          <Link to="/admin/properties" className="px-6 py-2.5 rounded-full font-semibold text-[#6b7280] hover:text-[#0B0B45]">Cancel</Link>
         </div>
       </form>
 
@@ -393,7 +426,7 @@ function AdminPropertyForm() {
         type="button"
         onClick={() => setPreviewOpen((o) => !o)}
         aria-label={previewOpen ? 'Hide preview' : 'Show preview'}
-        className={`fixed top-1/2 -translate-y-1/2 z-40 bg-[#262262] text-white px-2 py-4 rounded-l-xl shadow-lg hover:bg-[#1d1a4d] transition-all duration-300 ${
+        className={`fixed top-1/2 -translate-y-1/2 z-40 bg-[#0B0B45] text-white px-2 py-4 rounded-l-xl shadow-lg hover:bg-[#06062a] transition-all duration-300 ${
           previewOpen ? 'right-[372px]' : 'right-0'
         }`}
         style={{ writingMode: 'vertical-rl' }}
@@ -413,8 +446,8 @@ function AdminPropertyForm() {
       >
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-[#262262]">Live preview</p>
-            <button type="button" onClick={() => setPreviewOpen(false)} className="text-[#6b7280] hover:text-[#262262]" aria-label="Collapse preview">
+            <p className="text-sm font-semibold text-[#0B0B45]">Live preview</p>
+            <button type="button" onClick={() => setPreviewOpen(false)} className="text-[#6b7280] hover:text-[#0B0B45]" aria-label="Collapse preview">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -428,12 +461,43 @@ function AdminPropertyForm() {
   );
 }
 
+// Derive the bed count shown on a card from the bed-variant selection.
+// 1-Bed → 1, 2-Bed → 2, both → "1 & 2", neither → the raw Bedrooms field.
+function bedLabel(form) {
+  const has1 = form.price1Bed !== '' && form.price1Bed != null;
+  const has2 = form.price2Bed !== '' && form.price2Bed != null;
+  if (has1 && has2) return '1 & 2';
+  if (has1) return 1;
+  if (has2) return 2;
+  return form.bedrooms === '' ? '—' : form.bedrooms;
+}
+
+// Derive the bathroom count shown on a card from the bed-variant selection,
+// using per-variant bathrooms when set, otherwise falling back to the base.
+function bedBathLabel(form) {
+  const has1 = form.price1Bed !== '' && form.price1Bed != null;
+  const has2 = form.price2Bed !== '' && form.price2Bed != null;
+  const b1 = form.bathrooms1Bed !== '' && form.bathrooms1Bed != null ? Number(form.bathrooms1Bed) : null;
+  const b2 = form.bathrooms2Bed !== '' && form.bathrooms2Bed != null ? Number(form.bathrooms2Bed) : null;
+  if (has1 && has2) {
+    const v1 = b1 ?? form.bathrooms;
+    const v2 = b2 ?? form.bathrooms;
+    return v1 === v2 ? v1 : `${v1} & ${v2}`;
+  }
+  if (has1) return b1 ?? (form.bathrooms === '' ? '—' : form.bathrooms);
+  if (has2) return b2 ?? (form.bathrooms === '' ? '—' : form.bathrooms);
+  return form.bathrooms === '' ? '—' : form.bathrooms;
+}
+
 // Live preview of the public PropertyCard, driven by the current form values
 function PropertyPreview({ form }) {
   const cover = form.images?.[0];
   const price = Number(form.price) || 0;
-  const bedrooms = form.bedrooms === '' ? '—' : form.bedrooms;
-  const bathrooms = form.bathrooms === '' ? '—' : form.bathrooms;
+  // The bed-variant checkboxes drive the card's bed count: a property listed as
+  // 1-Bed shows 1, as 2-Bed shows 2, as both shows "1 & 2". Only when neither
+  // variant is selected does the raw Bedrooms field apply.
+  const bedrooms = bedLabel(form);
+  const bathrooms = bedBathLabel(form);
   const area = form.area === '' ? '—' : form.area;
 
   return (
@@ -448,7 +512,7 @@ function PropertyPreview({ form }) {
           <span className="absolute top-4 left-4 bg-[#C49A6C] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
         )}
         {!form.available && (
-          <span className="absolute top-4 right-4 bg-[#262262] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
+          <span className="absolute top-4 right-4 bg-[#0B0B45] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
         )}
       </div>
 
@@ -464,15 +528,15 @@ function PropertyPreview({ form }) {
 
         <div className="flex items-center justify-between mb-3 py-3 border-y border-[#D9D9D9] text-center">
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#262262]">{bedrooms}</p>
+            <p className="text-sm font-semibold text-[#0B0B45]">{bedrooms}</p>
             <p className="text-xs text-[#6b7280]">Beds</p>
           </div>
           <div className="flex-1 border-x border-[#D9D9D9]">
-            <p className="text-sm font-semibold text-[#262262]">{bathrooms}</p>
+            <p className="text-sm font-semibold text-[#0B0B45]">{bathrooms}</p>
             <p className="text-xs text-[#6b7280]">Baths</p>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#262262]">{area}</p>
+            <p className="text-sm font-semibold text-[#0B0B45]">{area}</p>
             <p className="text-xs text-[#6b7280]">Sqft</p>
           </div>
         </div>
@@ -506,7 +570,7 @@ function FullPagePreview({ form, onClose }) {
     <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl w-full max-w-5xl my-8 shadow-2xl overflow-hidden">
         {/* Bar */}
-        <div className="sticky top-0 z-10 flex items-center justify-between bg-[#262262] text-white px-5 py-3">
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-[#0B0B45] text-white px-5 py-3">
           <span className="text-sm font-semibold">Page preview — not yet saved</span>
           <button onClick={onClose} className="text-white/70 hover:text-white" aria-label="Close preview">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -517,7 +581,7 @@ function FullPagePreview({ form, onClose }) {
 
         <div className="p-5 md:p-8">
           {/* Title */}
-          <h1 className="text-2xl md:text-3xl font-bold text-[#262262] mb-1">{form.title || 'Property title'}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#0B0B45] mb-1">{form.title || 'Property title'}</h1>
           <div className="flex items-center text-[#6b7280] mb-6">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -554,31 +618,31 @@ function FullPagePreview({ form, onClose }) {
               {/* Stats */}
               <div className="flex flex-wrap gap-8 pb-6 mb-6 border-b border-[#D9D9D9]">
                 <div>
-                  <p className="font-bold text-[#262262]">{form.bedrooms === '' ? '—' : form.bedrooms}</p>
+                  <p className="font-bold text-[#0B0B45]">{bedLabel(form)}</p>
                   <p className="text-sm text-[#6b7280]">Bedrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#262262]">{form.bathrooms === '' ? '—' : form.bathrooms}</p>
+                  <p className="font-bold text-[#0B0B45]">{bedBathLabel(form)}</p>
                   <p className="text-sm text-[#6b7280]">Bathrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#262262]">{form.area === '' ? '—' : `${form.area} sq ft`}</p>
+                  <p className="font-bold text-[#0B0B45]">{form.area === '' ? '—' : `${form.area} sq ft`}</p>
                   <p className="text-sm text-[#6b7280]">Area</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#262262] capitalize">{form.type}</p>
+                  <p className="font-bold text-[#0B0B45] capitalize">{form.type}</p>
                   <p className="text-sm text-[#6b7280]">Type</p>
                 </div>
               </div>
 
               {/* Description */}
-              <h2 className="text-xl font-bold text-[#262262] mb-3">About this property</h2>
+              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">About this property</h2>
               <p className="text-[#1f2937] leading-relaxed whitespace-pre-line mb-8">{form.description || 'No description yet.'}</p>
 
               {/* Amenities */}
               {amenities.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="text-xl font-bold text-[#262262] mb-3">Amenities</h2>
+                  <h2 className="text-xl font-bold text-[#0B0B45] mb-3">Amenities</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {amenities.map((a, i) => (
                       <div key={i} className="flex items-center text-[#1f2937]">
@@ -595,7 +659,7 @@ function FullPagePreview({ form, onClose }) {
               {/* Nearby */}
               {nearby.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-bold text-[#262262] mb-3">What&apos;s nearby</h2>
+                  <h2 className="text-xl font-bold text-[#0B0B45] mb-3">What&apos;s nearby</h2>
                   <ul className="space-y-2">
                     {nearby.map((n, i) => (
                       <li key={i} className="flex items-center text-[#1f2937]">
@@ -614,7 +678,7 @@ function FullPagePreview({ form, onClose }) {
             {/* Booking card */}
             <div className="lg:col-span-1">
               <div className="border border-[#D9D9D9] rounded-2xl p-6 sticky top-20">
-                <span className="text-3xl font-bold text-[#262262]">KES {price.toLocaleString()}</span>
+                <span className="text-3xl font-bold text-[#0B0B45]">KES {price.toLocaleString()}</span>
                 <span className="text-[#6b7280]"> / night</span>
                 <div className="block w-full bg-[#C49A6C] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
                 {!form.available && (
@@ -686,7 +750,7 @@ function SeasonalPricing({ propertyId }) {
 
   return (
     <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
-      <h2 className="text-lg font-bold text-[#262262] mb-1">Seasonal Pricing</h2>
+      <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Seasonal Pricing</h2>
       <p className="text-sm text-[#6b7280] mb-4">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
 
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{error}</div>}
@@ -698,11 +762,11 @@ function SeasonalPricing({ propertyId }) {
           {rules.map((r) => (
             <div key={r.id} className="flex items-center justify-between bg-[#f8f9fa] rounded-xl px-4 py-2.5 text-sm">
               <div>
-                <span className="font-semibold text-[#262262]">{r.name || 'Rate'}</span>
+                <span className="font-semibold text-[#0B0B45]">{r.name || 'Rate'}</span>
                 <span className="text-[#6b7280] ml-2">{fmt(r.start)} &rarr; {fmt(r.end)}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="font-semibold text-[#262262]">KES {r.price.toLocaleString()}/night</span>
+                <span className="font-semibold text-[#0B0B45]">KES {r.price.toLocaleString()}/night</span>
                 <button type="button" onClick={() => removeRule(r.id)} className="text-red-600 hover:text-red-800 text-xs font-semibold">Remove</button>
               </div>
             </div>
@@ -729,7 +793,7 @@ function SeasonalPricing({ propertyId }) {
           <label className={labelCls}>Price/Night</label>
           <input type="number" min="1" className={inputCls} value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
         </div>
-        <button type="button" onClick={addRule} className="bg-[#262262] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#1d1a4d] transition-colors">Add</button>
+        <button type="button" onClick={addRule} className="bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors">Add</button>
       </div>
     </div>
   );

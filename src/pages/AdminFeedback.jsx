@@ -41,7 +41,7 @@ function AdminFeedback() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold text-[#262262] mb-1">Guest Feedback</h1>
+      <h1 className="text-2xl font-bold text-[#0B0B45] mb-1">Guest Feedback</h1>
       <p className="text-[#6b7280] mb-6">Star ratings and private notes from guests on how to improve.</p>
 
       {/* Summary cards */}
@@ -49,13 +49,13 @@ function AdminFeedback() {
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
           <span className="text-sm text-[#6b7280]">Average Rating</span>
           <div className="flex items-center gap-2 mt-2">
-            <p className="text-2xl font-bold text-[#262262]">{summary.averageRating || 0}</p>
+            <p className="text-2xl font-bold text-[#0B0B45]">{summary.averageRating || 0}</p>
             <StarRow rating={Math.round(summary.averageRating)} />
           </div>
         </div>
         <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
           <span className="text-sm text-[#6b7280]">Total Reviews</span>
-          <p className="text-2xl font-bold text-[#262262] mt-2">{summary.totalReviews || 0}</p>
+          <p className="text-2xl font-bold text-[#0B0B45] mt-2">{summary.totalReviews || 0}</p>
         </div>
       </div>
 
@@ -67,7 +67,7 @@ function AdminFeedback() {
         <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 text-sm">{error}</div>
       ) : reviews.length === 0 ? (
         <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-12 text-center">
-          <h3 className="text-lg font-bold text-[#262262] mb-1">No feedback yet</h3>
+          <h3 className="text-lg font-bold text-[#0B0B45] mb-1">No feedback yet</h3>
           <p className="text-[#6b7280]">Guest reviews will appear here after completed stays.</p>
         </div>
       ) : (
@@ -76,18 +76,18 @@ function AdminFeedback() {
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa]">
                 <tr className="text-left">
-                  <th className="px-4 py-3 font-semibold text-[#262262]">Property</th>
-                  <th className="px-4 py-3 font-semibold text-[#262262]">Guest</th>
-                  <th className="px-4 py-3 font-semibold text-[#262262]">Rating</th>
-                  <th className="px-4 py-3 font-semibold text-[#262262]">Private note</th>
-                  <th className="px-4 py-3 font-semibold text-[#262262]">Date</th>
+                  <th className="px-4 py-3 font-semibold text-[#0B0B45]">Property</th>
+                  <th className="px-4 py-3 font-semibold text-[#0B0B45]">Guest</th>
+                  <th className="px-4 py-3 font-semibold text-[#0B0B45]">Rating</th>
+                  <th className="px-4 py-3 font-semibold text-[#0B0B45]">Private note</th>
+                  <th className="px-4 py-3 font-semibold text-[#0B0B45]">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {reviews.map((r) => (
                   <tr key={r.id} className="border-t border-[#D9D9D9] hover:bg-[#f8f9fa] align-top">
                     <td className="px-4 py-3">
-                      <p className="font-medium text-[#262262]">{r.property?.title}</p>
+                      <p className="font-medium text-[#0B0B45]">{r.property?.title}</p>
                       <p className="text-xs text-[#6b7280]">{r.property?.location}</p>
                     </td>
                     <td className="px-4 py-3">

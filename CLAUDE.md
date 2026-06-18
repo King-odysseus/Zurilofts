@@ -24,7 +24,7 @@ mcp__cognitive1__brain_recall { "query": "your task keywords" }
 mcp__cognitive1__brain_learn { type, project: "zurilofts", title, ... }
 ```
 
-**Full standing instructions:** See [cognitive1/Instruct.md](../cognitive1/Instruct.md) for the complete 50-rule session checklist.
+**Full standing instructions:** See [cognitive1/Instruct.md](./cognitive1/Instruct.md) for the complete 50-rule session checklist.
 
 ## Project Architecture
 
@@ -51,7 +51,7 @@ server/               # Express + Prisma backend
 **Source:** [DESIGN.md](DESIGN.md) and the brain's `ZuriLofts design system` pattern (recall it before UI work).
 
 **Core colors (use arbitrary hex, per file convention):**
-- `#262262` Deep Indigo — headings, navbar, admin sidebar, footer
+- `#0B0B45` Dark Navy — headings, navbar, admin sidebar, footer
 - `#C49A6C` Warm Bronze — CTAs, accents, highlights, active states
 - `#D9D9D9` Silver Grey — borders, dividers, disabled
 - `#1f2937` Charcoal — body text
@@ -59,11 +59,11 @@ server/               # Express + Prisma backend
 
 **Neumorphic classes** (from `src/index.css`): `.neu-card`, `.neu-card-hover`, `.neu-input`, `.neu-btn`, `.neu-radio-card`. Admin forms use flat inputs (`rounded-xl border border-[#D9D9D9]`).
 
-**Buttons:** Primary = bronze pill `bg-[#C49A6C] text-[#262262] rounded-full`, Dark = `bg-[#262262] text-white rounded-full`.
+**Buttons:** Primary = bronze pill `bg-[#C49A6C] text-[#0B0B45] rounded-full`, Dark = `bg-[#0B0B45] text-white rounded-full`.
 
 **Rounding:** cards `rounded-2xl`, pills/buttons `rounded-full`, inputs/thumbnails `rounded-xl`.
 
-**Admin:** sidebar bg `#262262`, active nav `bg-[#C49A6C]`, collapsible w-64↔w-16, routes nested under `/admin` via `<Outlet/>`.
+**Admin:** sidebar bg `#0B0B45`, active nav `bg-[#C49A6C]`, collapsible w-64↔w-16, routes nested under `/admin` via `<Outlet/>`.
 
 ## Key Patterns
 

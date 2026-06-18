@@ -130,7 +130,7 @@ export function AuthProvider({ children }) {
       const res = await apiClient.get('/auth/me');
       const user = res.data.data;
       dispatch({ type: 'AUTH_SUCCESS', payload: { user, accessToken: oauthToken } });
-      return { success: true };
+      return { success: true, user };
     } catch (err) {
       clearAccessToken();
       const message = 'Google sign-in failed';

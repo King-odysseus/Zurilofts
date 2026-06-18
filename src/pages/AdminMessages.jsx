@@ -60,7 +60,7 @@ function AdminMessages() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold text-[#262262] mb-1">Messages</h1>
+      <h1 className="text-2xl font-bold text-[#0B0B45] mb-1">Messages</h1>
       <p className="text-[#6b7280] mb-6">Conversations with your guests.</p>
 
       <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden grid grid-cols-1 md:grid-cols-3 min-h-[60vh]">
@@ -80,7 +80,7 @@ function AdminMessages() {
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#262262] text-sm">{c.firstName} {c.lastName}</span>
+                  <span className="font-semibold text-[#0B0B45] text-sm">{c.firstName} {c.lastName}</span>
                   {c.unread > 0 && (
                     <span className="min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{c.unread}</span>
                   )}
@@ -102,7 +102,7 @@ function AdminMessages() {
           ) : (
             <>
               <div className="px-4 py-3 border-b border-[#D9D9D9]">
-                <p className="font-semibold text-[#262262] text-sm">{activeUser.firstName} {activeUser.lastName}</p>
+                <p className="font-semibold text-[#0B0B45] text-sm">{activeUser.firstName} {activeUser.lastName}</p>
                 <p className="text-xs text-[#6b7280]">{activeUser.email}</p>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-2">

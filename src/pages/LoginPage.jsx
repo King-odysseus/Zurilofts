@@ -7,6 +7,11 @@ import { zuriImages } from '../assets/images';
 // Use a consistent background image with a dark overlay
 const bgImage = zuriImages[14]; // Ely Homes Photography (15 of 20)
 
+function getDashboardPath(user) {
+  if (user?.role === 'HOST' || user?.role === 'ADMIN') return '/admin';
+  return '/';
+}
+
 const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 function LoginPage() {
@@ -15,16 +20,16 @@ function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const { login, isAuthenticated, isLoading, error, clearError } = useAuth();
+  const { user, login, isAuthenticated, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
-    if (isAuthenticated && !isLoading) {
-      const returnTo = searchParams.get('returnUrl') || '/';
+    if (isAuthenticated && !isLoading && user) {
+      const returnTo = searchParams.get('returnUrl') || getDashboardPath(user);
       navigate(returnTo, { replace: true });
     }
-  }, [isAuthenticated, isLoading, navigate, searchParams]);
+  }, [isAuthenticated, isLoading, user, navigate, searchParams]);
 
   useEffect(() => {
     if (searchParams.get('error')) {
@@ -52,8 +57,19 @@ function LoginPage() {
       {/* Background Image */}
       <div className="absolute inset-0">
         <img src={bgImage} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#262262]/70"></div>
+        <div className="absolute inset-0 bg-[#0B0B45]/70"></div>
       </div>
+
+      {/* Back button */}
+      <Link
+        to="/"
+        className="fixed top-6 left-6 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors"
+        aria-label="Back to home"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+      </Link>
 
       <div className="max-w-md w-full relative z-10">
         <div className="neu-card auth-card p-8 bg-white/95 backdrop-blur-sm">
@@ -62,7 +78,7 @@ function LoginPage() {
             <Link to="/" className="inline-block mb-6">
               <img src={logoImg} alt="ZuriLofts" className="h-20 w-auto mx-auto" />
             </Link>
-            <h1 className="text-2xl font-bold text-[#262262]">Welcome Back</h1>
+            <h1 className="text-2xl font-bold text-[#0B0B45]">Welcome Back</h1>
             <p className="text-[#6b7280] mt-2">Sign in to your account</p>
           </div>
 
@@ -142,7 +158,7 @@ function LoginPage() {
 
           <p className="text-center text-sm text-[#6b7280] mt-6">
             Don&apos;t have an account?{' '}
-            <Link to="/register" className="text-[#C49A6C] font-semibold hover:text-[#262262] transition-colors">
+            <Link to="/register" className="text-[#C49A6C] font-semibold hover:text-[#0B0B45] transition-colors">
               Sign up
             </Link>
           </p>
@@ -159,7 +175,7 @@ function PasswordToggle({ shown, onClick }) {
       type="button"
       onClick={onClick}
       aria-label={shown ? 'Hide password' : 'Show password'}
-      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#262262] transition-colors"
+      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#0B0B45] transition-colors"
     >
       {shown ? (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

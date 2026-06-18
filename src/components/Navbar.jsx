@@ -97,10 +97,10 @@ function Navbar() {
                     </span>
                   )}
                 </div>
-                <span className={`hidden md:block text-sm font-semibold ${needsWhiteNav ? 'text-[#262262]' : 'text-white'}`}>
+                <span className={`hidden md:block text-sm font-semibold ${needsWhiteNav ? 'text-[#0B0B45]' : 'text-white'}`}>
                   {user?.firstName}
                 </span>
-                <svg className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''} ${needsWhiteNav ? 'text-[#262262]' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''} ${needsWhiteNav ? 'text-[#0B0B45]' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
@@ -108,7 +108,7 @@ function Navbar() {
               {dropdownOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-lg border border-[#D9D9D9] py-2 z-30">
                   <div className="px-4 py-3 border-b border-[#D9D9D9]">
-                    <p className="text-sm font-semibold text-[#262262]">{user?.firstName} {user?.lastName}</p>
+                    <p className="text-sm font-semibold text-[#0B0B45]">{user?.firstName} {user?.lastName}</p>
                     <p className="text-xs text-[#6b7280]">{user?.email}</p>
                   </div>
                   <Link
@@ -156,7 +156,7 @@ function Navbar() {
                     </svg>
                     Favourites
                   </Link>
-                  {user?.role === 'ADMIN' && (
+                  {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
                       to="/admin"
                       onClick={() => setDropdownOpen(false)}
@@ -166,7 +166,7 @@ function Navbar() {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
-                      Admin Panel
+                      {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
                     </Link>
                   )}
                   <div className="border-t border-[#D9D9D9] mt-1 pt-1">
@@ -190,8 +190,8 @@ function Navbar() {
                 to="/login"
                 className={`hidden md:inline-flex px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200 border-2 whitespace-nowrap ${
                   needsWhiteNav
-                    ? 'border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white'
-                    : 'border-white text-white hover:bg-white hover:text-[#262262]'
+                    ? 'border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white'
+                    : 'border-white text-white hover:bg-white hover:text-[#0B0B45]'
                 }`}
               >
                 Sign In / Sign Up
@@ -211,7 +211,7 @@ function Navbar() {
             onClick={() => setMenuOpen(!menuOpen)}
             className={`inline-flex items-center p-2 w-10 h-10 justify-center rounded-lg md:hidden transition-colors duration-200 ${
               needsWhiteNav
-                ? 'text-[#262262] hover:bg-[#D9D9D9]'
+                ? 'text-[#0B0B45] hover:bg-[#D9D9D9]'
                 : 'text-white hover:bg-white/10'
             }`}
             aria-controls="navbar-main"
@@ -267,39 +267,39 @@ function Navbar() {
                 <>
                   <Link
                     to="/profile#info"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     My Profile
                   </Link>
                   <Link
                     to="/profile#bookings"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Booking History
                   </Link>
                   <Link
                     to="/profile#favorites"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Favourites
                   </Link>
                   <Link
                     to="/messages"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Messages{unreadMessages > 0 ? ` (${unreadMessages})` : ''}
                   </Link>
-                  {user?.role === 'ADMIN' && (
+                  {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
                       to="/admin"
-                      className="block w-full py-2.5 rounded-full font-semibold bg-[#262262] text-white hover:bg-[#1a1850] transition-all duration-200 text-center"
+                      className="block w-full py-2.5 rounded-full font-semibold bg-[#0B0B45] text-white hover:bg-[#06062a] transition-all duration-200 text-center"
                       onClick={() => setMenuOpen(false)}
                     >
-                      Admin Panel
+                      {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
                     </Link>
                   )}
                   <button
@@ -313,7 +313,7 @@ function Navbar() {
                 <>
                   <Link
                     to="/login"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#262262] text-[#262262] hover:bg-[#262262] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Sign In / Sign Up

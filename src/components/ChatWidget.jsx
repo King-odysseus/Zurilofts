@@ -124,7 +124,7 @@ function ChatWidget() {
           className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#C49A6C] rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-all duration-200 hover:shadow-xl group"
           aria-label="Open chat"
         >
-          <svg className="w-7 h-7 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></span>
@@ -135,10 +135,10 @@ function ChatWidget() {
       {open && (
         <div className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-[#D9D9D9] flex flex-col overflow-hidden transition-all duration-300" style={{ maxHeight: '520px' }}>
           {/* Header */}
-          <div className="bg-[#262262] px-5 py-4 flex items-center justify-between">
+          <div className="bg-[#0B0B45] px-5 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 bg-[#C49A6C] rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </div>
@@ -201,11 +201,11 @@ function ChatWidget() {
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#6b7280]">Chatting as <span className="font-semibold text-[#262262]">{name}</span></span>
+                  <span className="text-xs text-[#6b7280]">Chatting as <span className="font-semibold text-[#0B0B45]">{name}</span></span>
                   <button
                     type="button"
                     onClick={() => { setStarted(false); setName(''); setEmail(''); setMessages([{ from: 'bot', text: 'Hi! 👋 How can we help you today? Ask us anything about our apartments.' }]); setSent(false); }}
-                    className="text-xs text-[#C49A6C] hover:text-[#262262]"
+                    className="text-xs text-[#C49A6C] hover:text-[#0B0B45]"
                   >
                     New chat
                   </button>
@@ -224,9 +224,9 @@ function ChatWidget() {
                     className="w-10 h-10 bg-[#C49A6C] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
                   >
                     {sending ? (
-                      <div className="w-4 h-4 border-2 border-[#262262] border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-[#0B0B45] border-t-transparent rounded-full animate-spin"></div>
                     ) : (
-                      <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                       </svg>
                     )}

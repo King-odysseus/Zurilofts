@@ -56,7 +56,7 @@ function AdminPromos() {
 
   async function fetchProperties() {
     try {
-      const res = await apiClient.get('/properties');
+      const res = await apiClient.get('/properties/mine');
       setProperties(res.data.data || []);
     } catch { /* silent */ }
   }
@@ -113,7 +113,7 @@ function AdminPromos() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#262262]">Promo Codes</h1>
+        <h1 className="text-2xl font-bold text-[#0B0B45]">Promo Codes</h1>
         <button
           onClick={openCreate}
           className="bg-[#C49A6C] text-white px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
@@ -126,7 +126,7 @@ function AdminPromos() {
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
-            <h2 className="text-lg font-bold text-[#262262] mb-4">{editingId ? 'Edit Promo Code' : 'Create Promo Code'}</h2>
+            <h2 className="text-lg font-bold text-[#0B0B45] mb-4">{editingId ? 'Edit Promo Code' : 'Create Promo Code'}</h2>
             {formError && <div className="bg-red-50 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{formError}</div>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -232,7 +232,7 @@ function AdminPromos() {
                 <p className="text-xs text-[#6b7280] mt-1">Leave unchecked to apply to all properties.</p>
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={closeForm} className="flex-1 py-2.5 rounded-full font-semibold border-2 border-[#D9D9D9] text-[#6b7280] hover:border-[#262262] hover:text-[#262262] transition-colors text-sm">
+                <button type="button" onClick={closeForm} className="flex-1 py-2.5 rounded-full font-semibold border-2 border-[#D9D9D9] text-[#6b7280] hover:border-[#0B0B45] hover:text-[#0B0B45] transition-colors text-sm">
                   Cancel
                 </button>
                 <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 text-sm disabled:opacity-50">
@@ -255,19 +255,19 @@ function AdminPromos() {
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
                 <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Code</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Discount</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Usage</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Valid Period</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Properties</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Status</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#262262]">Actions</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Code</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Discount</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Usage</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Valid Period</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Properties</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Status</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#0B0B45]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {promos.map((p) => (
                   <tr key={p.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#f8f9fa]">
-                    <td className="py-3 px-4 font-mono font-bold text-[#262262]">{p.code}</td>
+                    <td className="py-3 px-4 font-mono font-bold text-[#0B0B45]">{p.code}</td>
                     <td className="py-3 px-4">
                       {p.discountPercent}%
                       {p.maxDiscount && <span className="text-[#6b7280] text-xs ml-1">(max KES {p.maxDiscount.toLocaleString()})</span>}
@@ -282,7 +282,7 @@ function AdminPromos() {
                       {p.properties?.length > 0 ? (
                         <span className="inline-flex flex-wrap gap-1">
                           {p.properties.map((prop) => (
-                            <span key={prop.id} className="px-2 py-0.5 bg-[#f8f9fa] rounded-md text-[#262262]">{prop.title}</span>
+                            <span key={prop.id} className="px-2 py-0.5 bg-[#f8f9fa] rounded-md text-[#0B0B45]">{prop.title}</span>
                           ))}
                         </span>
                       ) : (

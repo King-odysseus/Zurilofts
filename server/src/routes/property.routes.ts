@@ -9,8 +9,10 @@ const router = Router();
 
 // Public
 router.get('/', ctrl.list);
+// Host-scoped listing (auth required) — returns only properties owned by the
+// logged-in host/admin. Declared before '/:id' so the longer path matches first.
+router.get('/mine', authenticate, ctrl.listMine);
 // Outbound iCal feed (token-protected) — external platforms subscribe to this.
-// Declared before '/:id' so the longer path matches first.
 router.get('/:id/calendar/:token.ics', calendarCtrl.publicFeed);
 // Taken date ranges for the guest booking calendar
 router.get('/:id/availability', calendarCtrl.availability);

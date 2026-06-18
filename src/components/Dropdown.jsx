@@ -75,7 +75,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
                   setOpen(false);
                 }}
                 className={`flex items-center w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                  isSel ? 'bg-[#C49A6C]/10 text-[#262262] font-semibold' : 'text-[#1f2937] hover:bg-[#D9D9D9]/30'
+                  isSel ? 'bg-[#C49A6C]/10 text-[#0B0B45] font-semibold' : 'text-[#1f2937] hover:bg-[#D9D9D9]/30'
                 }`}
               >
                 <span className="flex-1">{o.label}</span>

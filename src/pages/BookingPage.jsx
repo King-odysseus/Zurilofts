@@ -300,19 +300,15 @@ function BookingPage() {
         additionalGuests: additionalGuests.filter((g) => g.firstName.trim() || g.lastName.trim()),
       });
 
-      // Update booking data with server response for confirmation display
-      if (res.data.data) {
-        const b = res.data.data;
-        setBookingData((prev) => ({
-          ...prev,
-          confirmationId: b.id,
-          totalCharged: b.total,
-          discountAmount: b.discountAmount,
-        }));
-      }
+      const { paymentUrl } = res.data.data;
 
-      setIsProcessing(false);
-      setBookingComplete(true);
+      if (paymentUrl) {
+        // Redirect to Paystack checkout
+        window.location.href = paymentUrl;
+      } else {
+        setSubmitError('Payment gateway unavailable. Please try again.');
+        setIsProcessing(false);
+      }
     } catch (err) {
       setSubmitError(err.response?.data?.error || 'Booking failed. Please try again.');
       setIsProcessing(false);
@@ -322,7 +318,16 @@ function BookingPage() {
   // Step 1: Dates & Guests
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#262262]">Select Dates & Guests</h2>
+      <button
+        onClick={() => navigate(`/property/${id}${urlVariant ? `?variant=${urlVariant}` : ''}`)}
+        className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
+      >
+        <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to property
+      </button>
+      <h2 className="text-2xl font-bold text-[#0B0B45]">Select Dates & Guests</h2>
       
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Select your dates *</label>
@@ -335,11 +340,11 @@ function BookingPage() {
           <div className="flex gap-4 mt-3">
             <div className="flex-1 neu-input px-4 py-2 bg-white">
               <span className="text-xs text-[#6b7280] block">Check-in</span>
-              <span className="font-semibold text-[#262262]">{bookingData.checkIn || '—'}</span>
+              <span className="font-semibold text-[#0B0B45]">{bookingData.checkIn || '—'}</span>
             </div>
             <div className="flex-1 neu-input px-4 py-2 bg-white">
               <span className="text-xs text-[#6b7280] block">Check-out</span>
-              <span className="font-semibold text-[#262262]">{bookingData.checkOut || '—'}</span>
+              <span className="font-semibold text-[#0B0B45]">{bookingData.checkOut || '—'}</span>
             </div>
           </div>
         )}
@@ -377,7 +382,7 @@ function BookingPage() {
       {bedOption && (
         <div className="bg-[#C49A6C]/10 rounded-xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-[#262262]">
+            <p className="text-sm font-semibold text-[#0B0B45]">
               {bedOption === '2bed' ? '2-Bed Configuration' : '1-Bed Configuration'}
             </p>
             <p className="text-xs text-[#6b7280]">
@@ -391,7 +396,7 @@ function BookingPage() {
       )}
 
       {/* Standard times note */}
-      <div className="bg-[#262262]/5 rounded-xl p-4 flex items-start gap-3">
+      <div className="bg-[#0B0B45]/5 rounded-xl p-4 flex items-start gap-3">
         <svg className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
@@ -440,7 +445,7 @@ function BookingPage() {
 
       {nights > 0 && (
         <div className="bg-[#C49A6C]/10 rounded-xl p-4">
-          <p className="text-[#262262] font-medium">
+          <p className="text-[#0B0B45] font-medium">
             {nights} {nights === 1 ? 'night' : 'nights'} selected
           </p>
           <p className="text-[#6b7280] text-sm">
@@ -452,7 +457,7 @@ function BookingPage() {
       <button
         onClick={() => setStep(2)}
         disabled={!bookingData.checkIn || !bookingData.checkOut || nights <= 0 || !bedOption}
-        className="w-full bg-[#262262] text-white py-3 rounded-full font-semibold hover:bg-[#262262]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
       </button>
@@ -465,7 +470,7 @@ function BookingPage() {
       <div className="flex items-center mb-4">
         <button
           onClick={() => setStep(1)}
-          className="text-[#C49A6C] hover:text-[#262262] font-medium flex items-center transition-colors"
+          className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -475,7 +480,7 @@ function BookingPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-[#262262]">Guest Information</h2>
+        <h2 className="text-2xl font-bold text-[#0B0B45]">Guest Information</h2>
         <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account. Edit anything that's changed.</p>
       </div>
 
@@ -554,7 +559,7 @@ function BookingPage() {
             type="button"
             onClick={addGuest}
             disabled={bookingData.guests >= maxGuests}
-            className="text-sm font-semibold text-[#C49A6C] hover:text-[#262262] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="text-sm font-semibold text-[#C49A6C] hover:text-[#0B0B45] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add guest
           </button>
@@ -619,7 +624,7 @@ function BookingPage() {
       <button
         onClick={() => setStep(3)}
         disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone}
-        className="w-full bg-[#262262] text-white py-3 rounded-full font-semibold hover:bg-[#262262]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue to Payment
       </button>
@@ -632,7 +637,7 @@ function BookingPage() {
       <div className="flex items-center mb-4">
         <button
           onClick={() => setStep(2)}
-          className="text-[#C49A6C] hover:text-[#262262] font-medium flex items-center transition-colors"
+          className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -641,7 +646,7 @@ function BookingPage() {
         </button>
       </div>
 
-      <h2 className="text-2xl font-bold text-[#262262]">Payment</h2>
+      <h2 className="text-2xl font-bold text-[#0B0B45]">Payment</h2>
 
       <div className="space-y-3">
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
@@ -656,7 +661,7 @@ function BookingPage() {
             className="w-5 h-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
-            <svg className="w-8 h-8 text-[#262262] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-8 h-8 text-[#0B0B45] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
             <div>
@@ -700,7 +705,7 @@ function BookingPage() {
             className="w-5 h-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
-            <svg className="w-8 h-8 text-[#262262] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-8 h-8 text-[#0B0B45] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
             </svg>
             <div>
@@ -736,7 +741,7 @@ function BookingPage() {
               type="button"
               onClick={handleApplyPromo}
               disabled={validatingPromo || !promoCode.trim()}
-              className="px-4 py-3 rounded-xl text-sm font-semibold bg-[#262262] text-white hover:bg-[#1a1850] transition-all duration-200 disabled:opacity-50"
+              className="px-4 py-3 rounded-xl text-sm font-semibold bg-[#0B0B45] text-white hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
             >
               {validatingPromo ? '...' : 'Apply'}
             </button>
@@ -783,7 +788,7 @@ function BookingPage() {
             <span>-KES {discountAmount.toLocaleString()}</span>
           </div>
         )}
-        <div className="border-t border-[#262262]/20 pt-2 flex justify-between font-bold text-[#262262]">
+        <div className="border-t border-[#0B0B45]/20 pt-2 flex justify-between font-bold text-[#0B0B45]">
           <span>Total</span>
           <span>KES {total.toLocaleString()}</span>
         </div>
@@ -803,7 +808,7 @@ function BookingPage() {
         >
           {isProcessing ? (
             <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#262262]" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#0B0B45]" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -833,15 +838,15 @@ function BookingPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-[#262262] mb-4">Booking Confirmed!</h1>
+            <h1 className="text-3xl font-bold text-[#0B0B45] mb-4">Booking Confirmed!</h1>
             <p className="text-[#6b7280] mb-6">
               Thank you for your booking. We have sent a confirmation email to {bookingData.email} with all the details.
             </p>
             <div className="bg-[#D9D9D9] rounded-2xl p-6 mb-6 text-left">
-              <h3 className="font-bold text-[#262262] mb-2">Booking Summary</h3>
+              <h3 className="font-bold text-[#0B0B45] mb-2">Booking Summary</h3>
               <p className="text-[#1f2937]">{property?.title}</p>
               <p className="text-[#6b7280] text-sm">{property?.location}</p>
-              <div className="mt-3 pt-3 border-t border-[#262262]/10">
+              <div className="mt-3 pt-3 border-t border-[#0B0B45]/10">
                 <div className="flex justify-between text-sm">
                   <span className="text-[#6b7280]">Check-in</span>
                   <span className="font-medium">{bookingData.checkIn}</span>
@@ -860,7 +865,7 @@ function BookingPage() {
                   <span className="text-[#6b7280]">Guests</span>
                   <span className="font-medium">{bookingData.guests}</span>
                 </div>
-                <div className="flex justify-between font-bold text-[#262262] mt-2 pt-2 border-t border-[#262262]/10">
+                <div className="flex justify-between font-bold text-[#0B0B45] mt-2 pt-2 border-t border-[#0B0B45]/10">
                   <span>Total Paid</span>
                   <span>KES {total.toLocaleString()}</span>
                 </div>
@@ -875,7 +880,7 @@ function BookingPage() {
               </button>
               <button
                 onClick={() => window.print()}
-                className="w-full border-2 border-[#262262] text-[#262262] py-3 rounded-full font-semibold hover:bg-[#262262] hover:text-white transition-all duration-200"
+                className="w-full border-2 border-[#0B0B45] text-[#0B0B45] py-3 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
               >
                 Print Confirmation
               </button>
@@ -960,7 +965,7 @@ function BookingPage() {
                     className="w-full h-48 object-cover rounded-xl mb-4"
                   />
                 </Link>
-                <h3 className="font-bold text-[#262262] text-lg">{property?.title}</h3>
+                <h3 className="font-bold text-[#0B0B45] text-lg">{property?.title}</h3>
                 {bedOption && (
                   <p className="text-sm text-[#C49A6C] font-medium mt-1">
                     {bedOption === '2bed' ? '2 Bed' : '1 Bed'} &middot; KES {propertyPrice.toLocaleString()}/night
@@ -985,13 +990,13 @@ function BookingPage() {
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
-                    {property?.bedrooms} beds
+                    {(bedOption ? (bedOption === '2bed' ? 2 : 1) : property?.bedrooms)} beds
                   </div>
                 </div>
 
                 {nights > 0 && (
                   <div className="mt-6 pt-6 border-t border-[#D9D9D9]">
-                    <h4 className="font-semibold text-[#262262] mb-3">Price Details</h4>
+                    <h4 className="font-semibold text-[#0B0B45] mb-3">Price Details</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between text-[#1f2937]">
                         <span>KES {propertyPrice.toLocaleString()} x {nights} nights</span>
@@ -1023,7 +1028,7 @@ function BookingPage() {
                           <span>-KES {discountAmount.toLocaleString()}</span>
                         </div>
                       )}
-                      <div className="pt-2 border-t border-[#D9D9D9] flex justify-between font-bold text-[#262262]">
+                      <div className="pt-2 border-t border-[#D9D9D9] flex justify-between font-bold text-[#0B0B45]">
                         <span>Total</span>
                         <span>KES {total.toLocaleString()}</span>
                       </div>

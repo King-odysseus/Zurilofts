@@ -49,7 +49,7 @@ function MessagesPage() {
       <div className="flex-1 pt-24 pb-16">
         <div className="max-w-2xl mx-auto px-4 md:px-6">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[#262262]">Messages</h1>
+            <h1 className="text-2xl font-bold text-[#0B0B45]">Messages</h1>
             <p className="text-[#6b7280] text-sm">Chat with the ZuriLofts team. We usually reply within a few hours.</p>
           </div>
 

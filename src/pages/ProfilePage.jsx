@@ -90,6 +90,14 @@ function ProfilePage() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [showCompletionBanner, setShowCompletionBanner] = useState(false);
 
+  // Bank / Payout state (HOST only)
+  const [bankSaving, setBankSaving] = useState(false);
+  const [bankMessage, setBankMessage] = useState('');
+  const [bankForm, setBankForm] = useState({ bankName: '', bankAccountNo: '', bankCode: '' });
+  const [payoutFrequency, setPayoutFrequency] = useState('monthly');
+  const [banks, setBanks] = useState([]);
+  const [banksLoading, setBanksLoading] = useState(false);
+
   // Per-booking review form state, keyed by booking id
   const [reviewForms, setReviewForms] = useState({});
 
@@ -164,6 +172,62 @@ function ProfilePage() {
     }
     loadData();
   }, []);
+
+  // Populate bank form when profile loads (HOST only)
+  useEffect(() => {
+    if (!profile || profile.role !== 'HOST') return;
+    setBankForm({
+      bankName: profile.bankName || '',
+      bankAccountNo: profile.bankAccountNo || '',
+      bankCode: profile.bankCode || '',
+    });
+    setPayoutFrequency(profile.payoutFrequency || 'monthly');
+  }, [profile]);
+
+  // Fetch bank list for dropdown
+  useEffect(() => {
+    if (!profile || profile.role !== 'HOST') return;
+    setBanksLoading(true);
+    apiClient.get('/payments/banks')
+      .then((res) => {
+        if (res.data?.data) setBanks(res.data.data);
+      })
+      .catch(() => {})
+      .finally(() => setBanksLoading(false));
+  }, [profile?.role]);
+
+  async function handleBankSave(e) {
+    e.preventDefault();
+    if (!bankForm.bankName || !bankForm.bankAccountNo || !bankForm.bankCode) {
+      setBankMessage('Please fill in all bank details');
+      return;
+    }
+    setBankSaving(true);
+    setBankMessage('');
+    try {
+      const res = await apiClient.put('/users/profile/bank', bankForm);
+      setProfile((prev) => ({ ...prev, ...res.data.data }));
+      setBankMessage('Bank details saved!');
+    } catch (err) {
+      setBankMessage(err.response?.data?.error || 'Failed to save bank details');
+    } finally {
+      setBankSaving(false);
+    }
+  }
+
+  async function handleFrequencySave() {
+    setBankSaving(true);
+    setBankMessage('');
+    try {
+      const res = await apiClient.put('/users/profile/payout-frequency', { frequency: payoutFrequency });
+      setProfile((prev) => ({ ...prev, payoutFrequency: res.data.data.payoutFrequency }));
+      setBankMessage('Payout frequency updated!');
+    } catch (err) {
+      setBankMessage(err.response?.data?.error || 'Failed to update frequency');
+    } finally {
+      setBankSaving(false);
+    }
+  }
 
   function handlePhoneChange(newCountryCode, newPhoneNumber) {
     setCountryCode(newCountryCode);
@@ -273,7 +337,7 @@ function ProfilePage() {
                   />
                 ) : (
                   <div className="w-16 h-16 bg-[#C49A6C] rounded-full flex items-center justify-center">
-                    <span className="text-[#262262] font-bold text-2xl">
+                    <span className="text-white font-bold text-2xl">
                       {user?.firstName?.[0]}{user?.lastName?.[0]}
                     </span>
                   </div>
@@ -297,7 +361,7 @@ function ProfilePage() {
                 />
               </label>
               <div className="ml-4">
-                <h1 className="text-2xl font-bold text-[#262262]">
+                <h1 className="text-2xl font-bold text-[#0B0B45]">
                   {profile?.firstName} {profile?.lastName}
                 </h1>
                 <p className="text-[#6b7280]">{profile?.email}</p>
@@ -313,8 +377,8 @@ function ProfilePage() {
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-3 font-semibold text-sm transition-colors border-b-2 -mb-px ${
                   activeTab === tab
-                    ? 'border-[#C49A6C] text-[#262262]'
-                    : 'border-transparent text-[#6b7280] hover:text-[#262262]'
+                    ? 'border-[#C49A6C] text-[#0B0B45]'
+                    : 'border-transparent text-[#6b7280] hover:text-[#0B0B45]'
                 }`}
               >
                 {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
@@ -331,13 +395,13 @@ function ProfilePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div>
-                    <p className="font-semibold text-[#262262] text-sm">Complete your profile</p>
+                    <p className="font-semibold text-[#0B0B45] text-sm">Complete your profile</p>
                     <p className="text-sm text-[#6b7280] mt-1">Fill in your details below to get the most out of ZuriLofts.</p>
                   </div>
                 </div>
               )}
               <div className="neu-card p-6">
-                <h2 className="text-lg font-bold text-[#262262] mb-6">Personal Information</h2>
+                <h2 className="text-lg font-bold text-[#0B0B45] mb-6">Personal Information</h2>
                 {message && (
                   <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
                     message.includes('success')
@@ -413,6 +477,102 @@ function ProfilePage() {
             </div>
           )}
 
+          {/* Payout Settings — HOST only */}
+          {activeTab === 'info' && profile?.role === 'HOST' && (
+            <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
+              <h3 className="text-xl font-bold text-[#0B0B45] mb-1">Payout Settings</h3>
+              <p className="text-sm text-[#6b7280] mb-6">
+                Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
+              </p>
+
+              {/* Bank Account Section */}
+              <form onSubmit={handleBankSave} className="space-y-4 mb-8">
+                <h4 className="font-semibold text-[#1f2937]">Bank Account</h4>
+
+                <div>
+                  <label className="block text-sm font-semibold text-[#1f2937] mb-2">Bank Name *</label>
+                  {banksLoading ? (
+                    <p className="text-sm text-[#6b7280]">Loading banks...</p>
+                  ) : banks.length > 0 ? (
+                    <Dropdown
+                      value={bankForm.bankCode}
+                      onChange={(code) => {
+                        const bank = banks.find((b) => b.code === code);
+                        setBankForm((prev) => ({ ...prev, bankCode: code, bankName: bank?.name || '' }));
+                      }}
+                      options={banks.map((b) => ({ value: b.code, label: b.name }))}
+                      triggerClassName="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl"
+                      ariaLabel="Select your bank"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={bankForm.bankName}
+                      onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
+                      placeholder="e.g. KCB Bank"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                      required
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-[#1f2937] mb-2">Account Number *</label>
+                  <input
+                    type="text"
+                    value={bankForm.bankAccountNo}
+                    onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
+                    maxLength={10}
+                    placeholder="10-digit account number"
+                    className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                    required
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={bankSaving}
+                  className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 text-sm"
+                >
+                  {bankSaving ? 'Saving...' : 'Save Bank Details'}
+                </button>
+              </form>
+
+              {/* Payout Frequency */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-[#1f2937]">Payout Frequency</h4>
+                <p className="text-xs text-[#6b7280]">Your accumulated earnings will be transferred to your bank account on this schedule.</p>
+                <div className="flex items-center gap-3">
+                  <Dropdown
+                    value={payoutFrequency}
+                    onChange={setPayoutFrequency}
+                    options={[
+                      { value: 'weekly', label: 'Weekly (every Monday)' },
+                      { value: 'biweekly', label: 'Bi-Weekly (every other Monday)' },
+                      { value: 'monthly', label: 'Monthly (1st of month)' },
+                    ]}
+                    triggerClassName="neu-input px-4 py-3 bg-white text-[#1f2937] rounded-xl w-64"
+                    ariaLabel="Select payout frequency"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleFrequencySave}
+                    disabled={bankSaving}
+                    className="bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50 text-sm"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+
+              {bankMessage && (
+                <p className={`text-sm mt-4 font-medium ${bankMessage.includes('failed') || bankMessage.includes('Failed') || bankMessage.includes('Please') ? 'text-red-500' : 'text-green-600'}`}>
+                  {bankMessage}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* My Bookings Tab */}
           {activeTab === 'bookings' && (
             <div className="space-y-4">
@@ -423,7 +583,7 @@ function ProfilePage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[#262262] mb-1">No bookings yet</h3>
+                  <h3 className="text-lg font-bold text-[#0B0B45] mb-1">No bookings yet</h3>
                   <p className="text-[#6b7280]">Your upcoming stays will appear here.</p>
                 </div>
               ) : (
@@ -440,7 +600,7 @@ function ProfilePage() {
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-bold text-[#262262]">{booking.property?.title}</h3>
+                            <h3 className="font-bold text-[#0B0B45]">{booking.property?.title}</h3>
                             <p className="text-sm text-[#6b7280]">{booking.property?.location}</p>
                           </div>
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[booking.status]}`}>
@@ -472,7 +632,7 @@ function ProfilePage() {
                         {/* Post-stay review */}
                         {booking.review ? (
                           <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
-                            <p className="text-sm font-semibold text-[#262262] mb-1">Your rating</p>
+                            <p className="text-sm font-semibold text-[#0B0B45] mb-1">Your rating</p>
                             <div className="flex items-center gap-1">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <svg
@@ -489,7 +649,7 @@ function ProfilePage() {
                           </div>
                         ) : isStayCompleted(booking) ? (
                           <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
-                            <p className="text-sm font-semibold text-[#262262] mb-2">Rate your stay</p>
+                            <p className="text-sm font-semibold text-[#0B0B45] mb-2">Rate your stay</p>
                             <div className="flex items-center gap-1 mb-3">
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const current = reviewForms[booking.id]?.rating || 0;
@@ -579,7 +739,7 @@ function ProfilePage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[#262262] mb-1">No favourites yet</h3>
+                  <h3 className="text-lg font-bold text-[#0B0B45] mb-1">No favourites yet</h3>
                   <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
                   <Link to="/properties" className="inline-block bg-[#C49A6C] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
                     Browse properties

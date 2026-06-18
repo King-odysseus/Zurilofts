@@ -73,6 +73,7 @@ async function main() {
   for (const prop of propertiesData) {
     await prisma.property.create({
       data: {
+        hostId: admin.id,
         title: prop.title,
         location: prop.location,
         price: prop.price,

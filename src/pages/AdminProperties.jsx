@@ -13,7 +13,7 @@ function AdminProperties() {
 
   async function fetchProperties() {
     try {
-      const res = await apiClient.get('/properties');
+      const res = await apiClient.get('/properties/mine');
       setProperties(res.data.data || []);
     } catch {
       // silent
@@ -49,7 +49,7 @@ function AdminProperties() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#262262]">Properties</h1>
+        <h1 className="text-2xl font-bold text-[#0B0B45]">Properties</h1>
         <Link
           to="/admin/properties/new"
           className="bg-[#C49A6C] text-white px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
@@ -68,12 +68,12 @@ function AdminProperties() {
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
                 <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Property</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Location</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Type</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Price/Night</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#262262]">Status</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#262262]">Actions</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Property</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Location</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Type</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Price/Night</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Status</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#0B0B45]">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -82,7 +82,7 @@ function AdminProperties() {
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-3">
                         <img src={p.images?.[0]} alt="" className="w-12 h-12 object-cover rounded-lg" />
-                        <Link to={`/property/${p.id}`} className="font-semibold text-[#262262] hover:text-[#C49A6C]">{p.title}</Link>
+                        <Link to={`/property/${p.id}`} className="font-semibold text-[#0B0B45] hover:text-[#C49A6C]">{p.title}</Link>
                       </div>
                     </td>
                     <td className="py-3 px-4 text-[#6b7280]">{p.location}</td>

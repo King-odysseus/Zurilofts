@@ -6,7 +6,7 @@
 <title>ZuriLofts — Developer Manual</title>
 <style>
   :root {
-    --indigo: #262262;
+    --indigo: #0B0B45;
     --bronze: #C49A6C;
     --grey: #6b7280;
     --light: #f8f9fa;
@@ -234,7 +234,7 @@ USER'S BROWSER                    YOUR SERVER / COMPUTER
   <tr><th>Technology</th><th>What it does</th><th>Where used</th></tr>
   <tr><td><strong>React 18</strong></td><td>Builds UI from reusable components</td><td>All pages in <code>src/pages/</code></td></tr>
   <tr><td><strong>Vite</strong></td><td>Dev server + fast build tool</td><td><code>npm run dev</code></td></tr>
-  <tr><td><strong>Tailwind CSS</strong></td><td>Utility CSS classes (no CSS files)</td><td>Classes like <code>bg-[#262262] text-white</code></td></tr>
+  <tr><td><strong>Tailwind CSS</strong></td><td>Utility CSS classes (no CSS files)</td><td>Classes like <code>bg-[#0B0B45] text-white</code></td></tr>
   <tr><td><strong>React Router</strong></td><td>URL-based page navigation</td><td>Routes in <code>src/App.jsx</code></td></tr>
   <tr><td><strong>Axios</strong></td><td>HTTP requests to backend</td><td><code>src/api/client.js</code></td></tr>
   <tr><td><strong>jsPDF</strong></td><td>PDF report generation</td><td>Admin Earnings export</td></tr>
@@ -530,7 +530,7 @@ npx prisma db push</pre></div></div>
 <h3>Color Reference</h3>
 <table>
   <tr><th>Token</th><th>Hex</th><th>Usage</th></tr>
-  <tr><td>Indigo</td><td style="background:#262262;color:#fff;padding:2px 8px;">#262262</td><td>Headings, sidebar, navbar, footer</td></tr>
+  <tr><td>Indigo</td><td style="background:#0B0B45;color:#fff;padding:2px 8px;">#0B0B45</td><td>Headings, sidebar, navbar, footer</td></tr>
   <tr><td>Bronze</td><td style="background:#C49A6C;color:#fff;padding:2px 8px;">#C49A6C</td><td>CTAs, accents, prices, active states</td></tr>
   <tr><td>Silver Grey</td><td style="background:#D9D9D9;padding:2px 8px;">#D9D9D9</td><td>Borders, dividers, disabled</td></tr>
   <tr><td>Charcoal</td><td style="background:#1f2937;color:#fff;padding:2px 8px;">#1f2937</td><td>Body text</td></tr>
@@ -601,7 +601,7 @@ function AdminHouseRules() {
 
   return (
     &lt;div className="w-full"&gt;
-      &lt;h1 className="text-2xl font-bold text-[#262262] mb-6"&gt;House Rules&lt;/h1&gt;
+      &lt;h1 className="text-2xl font-bold text-[#0B0B45] mb-6"&gt;House Rules&lt;/h1&gt;
       &lt;div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-6"&gt;
         &lt;form onSubmit={handleSave}&gt;
           &lt;textarea
