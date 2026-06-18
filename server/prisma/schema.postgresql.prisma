@@ -32,6 +32,7 @@ model User {
   googleId     String?   @unique
   avatar       String?         // profile image path
   role         Role      @default(USER)
+  suspended    Boolean   @default(false)     // admin-disabled: blocks login + hides host listings
   bankName       String?       // Host bank name
   bankAccountNo  String?       // Host 10-digit Kenyan account number
   bankCode       String?       // Paystack bank code

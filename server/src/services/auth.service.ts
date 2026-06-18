@@ -80,6 +80,10 @@ export async function loginUser(email: string, password: string): Promise<{ user
     throw new UnauthorizedError('Invalid email or password');
   }
 
+  if (user.suspended) {
+    throw new UnauthorizedError('This account has been suspended. Please contact support.');
+  }
+
   const tokens = await generateTokens(user);
   return { user: toUserResponse(user), tokens };
 }
@@ -102,6 +106,12 @@ export async function refreshTokens(refreshToken?: string): Promise<{ user: User
   const user = await prisma.user.findUnique({ where: { id: payload.sub } });
   if (!user) {
     throw new NotFoundError('User');
+  }
+
+  // A suspended user's refresh fails, logging them out once the short-lived
+  // access token expires (≤15m) without needing a per-request DB lookup.
+  if (user.suspended) {
+    throw new UnauthorizedError('This account has been suspended. Please contact support.');
   }
 
   const tokens = await generateTokens(user);
@@ -142,6 +152,10 @@ export async function googleAuth(profile: {
         lastName: profile.lastName,
       },
     });
+  }
+
+  if (user.suspended) {
+    throw new UnauthorizedError('This account has been suspended. Please contact support.');
   }
 
   const tokens = await generateTokens(user);

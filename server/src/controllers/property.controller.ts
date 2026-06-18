@@ -74,8 +74,9 @@ export async function create(req: Request, res: Response, next: NextFunction): P
 
 export async function update(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    // Scope by hostId so a user can only update their own properties
-    const property = await propertyService.updateProperty(req.params.id, req.body, req.user!.sub);
+    // Admins may edit any property; hosts are scoped to their own (404 otherwise).
+    const ownerId = req.user!.role === 'ADMIN' ? undefined : req.user!.sub;
+    const property = await propertyService.updateProperty(req.params.id, req.body, ownerId);
     res.json({ success: true, data: property });
   } catch (error) {
     next(error);
@@ -84,8 +85,9 @@ export async function update(req: Request, res: Response, next: NextFunction): P
 
 export async function remove(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    // Scope by hostId so a user can only delete their own properties
-    await propertyService.deleteProperty(req.params.id, req.user!.sub);
+    // Admins may delete any property; hosts are scoped to their own (404 otherwise).
+    const ownerId = req.user!.role === 'ADMIN' ? undefined : req.user!.sub;
+    await propertyService.deleteProperty(req.params.id, ownerId);
     res.json({ success: true, message: 'Property deleted' });
   } catch (error) {
     next(error);

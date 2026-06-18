@@ -200,9 +200,14 @@ export async function getBooking(bookingId: string, userId?: string) {
   return normalizeBooking(booking);
 }
 
-export async function listAllBookings(status?: string, page = 1, limit = 20) {
+// Lists bookings across properties. When `hostId` is provided, results are
+// scoped to bookings on that host's listings — the data-layer isolation that
+// guarantees a host can never read another host's (or guest's) bookings,
+// independent of which route called this.
+export async function listAllBookings(status?: string, page = 1, limit = 20, hostId?: string) {
   const where: any = {};
   if (status) where.status = status;
+  if (hostId) where.property = { hostId };
 
   const skip = (page - 1) * limit;
   const [bookings, total] = await Promise.all([
@@ -229,7 +234,7 @@ export async function listAllBookings(status?: string, page = 1, limit = 20) {
 // Per-property booking counts and recorded earnings, for the admin earnings page.
 // "Earnings" = sum of booking totals that are not cancelled (PENDING + CONFIRMED).
 // "Confirmed earnings" tracks realized revenue from CONFIRMED bookings only.
-export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date }) {
+export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date }, hostId?: string) {
   const whereDate = dateFilter?.from || dateFilter?.to
     ? {
         createdAt: {
@@ -239,25 +244,30 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
       }
     : {};
 
+  // When scoped to a host, only their properties and bookings on them are counted.
+  const propertyWhere = hostId ? { hostId } : {};
+  const bookingHost = hostId ? { property: { hostId } } : {};
+
   const [properties, all, confirmed, byBed] = await Promise.all([
     prisma.property.findMany({
+      where: propertyWhere,
       select: { id: true, title: true, location: true, imagesJson: true, price: true },
     }),
     prisma.booking.groupBy({
       by: ['propertyId'],
-      where: { status: { not: 'CANCELLED' }, ...whereDate },
+      where: { status: { not: 'CANCELLED' }, ...whereDate, ...bookingHost },
       _count: { _all: true },
       _sum: { total: true },
     }),
     prisma.booking.groupBy({
       by: ['propertyId'],
-      where: { status: 'CONFIRMED', ...whereDate },
+      where: { status: 'CONFIRMED', ...whereDate, ...bookingHost },
       _count: { _all: true },
       _sum: { total: true },
     }),
     prisma.booking.groupBy({
       by: ['propertyId', 'bedOption'],
-      where: { status: { not: 'CANCELLED' }, ...whereDate },
+      where: { status: { not: 'CANCELLED' }, ...whereDate, ...bookingHost },
       _count: { _all: true },
       _sum: { total: true },
     }),

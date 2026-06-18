@@ -83,3 +83,50 @@ export async function updatePayoutFrequency(req: Request, res: Response, next: N
     next(error);
   }
 }
+
+// ── Admin user management ──────────────────────────────────────────────
+
+export async function adminListUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { role, search } = req.query as { role?: string; search?: string };
+    const users = await userService.listAllUsers({ role, search });
+    res.json({ success: true, data: users });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminUpdateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const user = await userService.adminUpdateUser(req.params.id, req.body);
+    res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminSetUserRole(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    // Guard: an admin cannot change their own role and lock themselves out.
+    if (req.params.id === req.user!.sub) {
+      throw new ValidationError('You cannot change your own role.');
+    }
+    const user = await userService.setUserRole(req.params.id, req.body.role);
+    res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminSetUserSuspended(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    // Guard: an admin cannot suspend their own account.
+    if (req.params.id === req.user!.sub) {
+      throw new ValidationError('You cannot suspend your own account.');
+    }
+    const user = await userService.setUserSuspended(req.params.id, req.body.suspended);
+    res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+}

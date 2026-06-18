@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const BED_OPTIONS = [
   { value: '1bed', label: '1 Bedroom' },
@@ -221,6 +222,8 @@ EditBookingModal.propTypes = {
 };
 
 function AdminBookings() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
@@ -238,9 +241,10 @@ function AdminBookings() {
     try {
       const params = {};
       if (statusFilter) params.status = statusFilter;
-      const res = await apiClient.get('/admin/bookings', { params });
+      // Admins see all bookings; hosts only those on their own listings.
+      const res = await apiClient.get(isAdmin ? '/admin/bookings' : '/bookings/host', { params });
       setBookings(res.data.data || []);
-    } catch { /* silent */ }
+    } catch (err) { console.error('AdminBookings error', err); }
     finally { setLoading(false); }
   }
 
@@ -351,7 +355,8 @@ function AdminBookings() {
                     </td>
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end space-x-1">
-                        {b.status === 'PENDING' && (
+                        {!isAdmin && <span className="text-xs text-[#6b7280]">View only</span>}
+                        {isAdmin && b.status === 'PENDING' && (
                           <>
                             <button
                               onClick={() => handleStatusChange(b.id, 'CONFIRMED')}
@@ -370,7 +375,7 @@ function AdminBookings() {
                           </>
                         )}
 
-                        {b.status === 'CONFIRMED' && (
+                        {isAdmin && b.status === 'CONFIRMED' && (
                           <>
                             <button
                               onClick={() => setEditingBooking(b)}
@@ -396,7 +401,7 @@ function AdminBookings() {
                           </>
                         )}
 
-                        {b.status === 'CANCELLED' && (
+                        {isAdmin && b.status === 'CANCELLED' && (
                           <button
                             onClick={() => setDeleteTarget(b)}
                             disabled={actionLoading}

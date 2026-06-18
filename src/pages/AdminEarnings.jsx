@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import apiClient from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
@@ -78,6 +79,8 @@ const SORT_OPTIONS = [
 ];
 
 function AdminEarnings() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'ADMIN';
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [period, setPeriod] = useState('all');
@@ -102,10 +105,11 @@ function AdminEarnings() {
         const params = {};
         if (dateRange.from) params.from = dateRange.from.toISOString();
         if (dateRange.to) params.to = dateRange.to.toISOString();
-        const res = await apiClient.get('/admin/analytics/properties', { params });
+        // Admins see all properties' earnings; hosts only their own.
+        const res = await apiClient.get(isAdmin ? '/admin/analytics/properties' : '/bookings/host/earnings', { params });
         setRows(res.data.data?.properties || []);
-      } catch {
-        // silent
+      } catch (err) {
+        console.error('AdminEarnings error', err);
       } finally {
         setLoading(false);
       }
@@ -645,7 +649,7 @@ function AdminEarnings() {
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-3">
                         {r.image ? (
-                          <img src={r.image} alt="" className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
+                          <img src={r.image} alt={r.title} className="w-12 h-12 object-cover rounded-lg flex-shrink-0" />
                         ) : (
                           <div className="w-12 h-12 rounded-lg bg-[#D9D9D9] flex-shrink-0" />
                         )}

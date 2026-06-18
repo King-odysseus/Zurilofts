@@ -149,6 +149,26 @@ export const profileUpdateSchema = z.object({
   avatar: z.string().max(500).optional(),
 });
 
+// Admin editing another user's account (profile + host bank/payout details)
+export const adminUserUpdateSchema = z.object({
+  firstName: z.string().min(1).max(50).optional(),
+  lastName: z.string().min(1).max(50).optional(),
+  email: z.string().email('Invalid email address').optional(),
+  phone: z.string().max(20).optional(),
+  bankName: z.string().max(100).optional(),
+  bankAccountNo: z.string().max(20).optional(),
+  bankCode: z.string().max(10).optional(),
+  payoutFrequency: z.enum(['weekly', 'biweekly', 'monthly']).optional(),
+});
+
+export const userRoleSchema = z.object({
+  role: z.enum(['USER', 'HOST', 'ADMIN']),
+});
+
+export const userSuspendSchema = z.object({
+  suspended: z.boolean(),
+});
+
 export const passwordChangeSchema = z.object({
   currentPassword: z.string().min(1),
   newPassword: z

@@ -46,14 +46,18 @@ export async function getById(req: Request, res: Response, next: NextFunction): 
   }
 }
 
-// Admin: list all bookings
+// List bookings. Admins see all; any other role is scoped to bookings on the
+// properties they own. The scoping is derived from the token, never the client,
+// so this controller is safe to mount on both admin and host routes.
 export async function listAll(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { status, page, limit } = req.query;
+    const hostId = req.user!.role === 'ADMIN' ? undefined : req.user!.sub;
     const result = await bookingService.listAllBookings(
       status as string | undefined,
       page ? Number(page) : 1,
-      limit ? Number(limit) : 20
+      limit ? Number(limit) : 20,
+      hostId
     );
     res.json({ success: true, data: result.bookings, pagination: result.pagination });
   } catch (error) {
@@ -61,7 +65,8 @@ export async function listAll(req: Request, res: Response, next: NextFunction): 
   }
 }
 
-// Admin: per-property booking counts + earnings
+// Per-property booking counts + earnings. Admins see all properties; other
+// roles are scoped to their own listings (token-derived).
 export async function propertyEarnings(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { from, to } = req.query;
@@ -69,8 +74,10 @@ export async function propertyEarnings(req: Request, res: Response, next: NextFu
       ...(from ? { from: new Date(from as string) } : {}),
       ...(to ? { to: new Date(to as string) } : {}),
     };
+    const hostId = req.user!.role === 'ADMIN' ? undefined : req.user!.sub;
     const data = await bookingService.getPropertyEarnings(
-      Object.keys(dateFilter).length > 0 ? dateFilter : undefined
+      Object.keys(dateFilter).length > 0 ? dateFilter : undefined,
+      hostId
     );
     res.json({ success: true, data });
   } catch (error) {

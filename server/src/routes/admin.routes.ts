@@ -6,18 +6,28 @@ import {
   calendarSourceSchema,
   calendarBlockSchema,
   priceRuleSchema,
+  adminUserUpdateSchema,
+  userRoleSchema,
+  userSuspendSchema,
 } from '../types/index.js';
 import { getLandingStats, setLandingStats } from '../services/settings.service.js';
 import * as bookingCtrl from '../controllers/booking.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
 import * as reviewCtrl from '../controllers/review.controller.js';
 import * as messageCtrl from '../controllers/message.controller.js';
+import * as userCtrl from '../controllers/user.controller.js';
 import { messageCreateSchema } from '../types/index.js';
 
 const router = Router();
 
 // All admin routes require auth + admin role
 router.use(authenticate, requireAdmin);
+
+// User / host account management
+router.get('/users', userCtrl.adminListUsers);
+router.patch('/users/:id', validate(adminUserUpdateSchema), userCtrl.adminUpdateUser);
+router.patch('/users/:id/role', validate(userRoleSchema), userCtrl.adminSetUserRole);
+router.patch('/users/:id/suspend', validate(userSuspendSchema), userCtrl.adminSetUserSuspended);
 
 // Bookings
 router.get('/bookings', bookingCtrl.listAll);

@@ -99,7 +99,13 @@ export async function listProperties(filters: PropertyFilters) {
 
   const where: any = {};
 
-  if (hostId) where.hostId = hostId;
+  if (hostId) {
+    where.hostId = hostId;
+  } else {
+    // Public discovery: hide listings of suspended hosts. Keeps null-host
+    // properties and properties owned by active hosts.
+    where.NOT = { host: { is: { suspended: true } } };
+  }
   if (type) where.type = type;
   if (available !== undefined) where.available = available;
   if (featured !== undefined) where.featured = featured;
