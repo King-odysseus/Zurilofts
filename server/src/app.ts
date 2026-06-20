@@ -22,6 +22,7 @@ import chatRoutes from './routes/chat.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import payoutRoutes from './routes/payout.routes.js';
+import contactRoutes from './routes/contact.routes.js';
 
 const app = express();
 
@@ -68,6 +69,7 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api', payoutRoutes); // /api/host/payouts, /api/admin/payouts, etc.
+app.use('/api/contact', contactRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

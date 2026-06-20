@@ -47,3 +47,6 @@ offline-app/
 
 # Claude Code local settings (hooks, permissions per machine)
 .claude/
+.kimi/
+.kimi-code/
+.agents/

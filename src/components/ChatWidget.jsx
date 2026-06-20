@@ -43,26 +43,45 @@ function ChatWidget() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  // Poll for team replies coming back from Telegram while the chat is open
+  // Poll for team replies coming back from Telegram while the chat is open.
+  // Pauses when the tab is hidden and backs off on repeated errors.
   useEffect(() => {
     if (!open || !started) return;
-    const interval = setInterval(async () => {
+    let timeoutId = null;
+    let consecutiveErrors = 0;
+    const baseDelay = 4000;
+    const maxDelay = 30000;
+
+    async function tick() {
+      if (document.hidden) {
+        timeoutId = setTimeout(tick, baseDelay);
+        return;
+      }
       try {
         const { data } = await apiClient.get('/chat/messages', {
           params: { sessionId: sessionId.current, after: lastReplyId.current },
         });
+        consecutiveErrors = 0;
         const msgs = data?.messages || [];
-        if (!msgs.length) return;
+        if (!msgs.length) {
+          timeoutId = setTimeout(tick, baseDelay);
+          return;
+        }
         lastReplyId.current = Math.max(lastReplyId.current, ...msgs.map((m) => m.id));
         const replies = msgs.filter((m) => m.from === 'agent');
         if (replies.length) {
           setMessages((prev) => [...prev, ...replies.map((m) => ({ from: 'bot', text: m.text }))]);
         }
+        timeoutId = setTimeout(tick, baseDelay);
       } catch {
-        /* ignore transient poll errors */
+        consecutiveErrors += 1;
+        const delay = Math.min(baseDelay * Math.pow(2, consecutiveErrors - 1), maxDelay);
+        timeoutId = setTimeout(tick, delay);
       }
-    }, 4000);
-    return () => clearInterval(interval);
+    }
+
+    timeoutId = setTimeout(tick, baseDelay);
+    return () => clearTimeout(timeoutId);
   }, [open, started]);
 
   function handleStart() {
@@ -108,7 +127,7 @@ function ChatWidget() {
         setSent(true);
       }
     } catch (err) {
-      const errMsg = err.response?.data?.error || 'Failed to send. Please try again or email us at enquires@thezurilofts.com.';
+      const errMsg = err.response?.data?.error || 'Failed to send. Please try again or email us at enquires@zurilofts.com.';
       setMessages((prev) => [...prev, { from: 'bot', text: errMsg }]);
     } finally {
       setSending(false);

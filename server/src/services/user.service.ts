@@ -135,7 +135,12 @@ export async function listAllUsers(filters: { role?: string; search?: string }) 
     },
     orderBy: { createdAt: 'desc' },
   });
-  return users;
+  // Mask bank account numbers to last-4 in the list view; full value is
+  // available when editing a single user via adminUpdateUser.
+  return users.map((u) => ({
+    ...u,
+    bankAccountNo: u.bankAccountNo ? `••••${u.bankAccountNo.slice(-4)}` : null,
+  }));
 }
 
 export async function adminUpdateUser(

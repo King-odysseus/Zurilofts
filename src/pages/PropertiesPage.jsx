@@ -1,36 +1,33 @@
-import { useState, useEffect, useCallback } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PropertyCard from '../components/PropertyCard';
 import Dropdown from '../components/Dropdown.jsx';
+import { SearchBar } from '../components/Hero.jsx';
 import { zuriImages } from '../assets/images';
 import apiClient from '../api/client.js';
 
 function PropertiesPage() {
-  const [urlParams] = useSearchParams();
-  const urlSearch = urlParams.get('search') || '';
-
   const [filter, setFilter] = useState('all');
   const [priceRange, setPriceRange] = useState('all');
-  const [searchQuery, setSearchQuery] = useState(urlSearch);
   const [availableOnly, setAvailableOnly] = useState(false);
-  const [bedFilter, setBedFilter] = useState('all'); // 'all' | '1bed' | '2bed'
+  const [bedFilter, setBedFilter] = useState('all');
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
+  const [, setPagination] = useState({ total: 0, page: 1, totalPages: 1 });
 
   // Expand properties into bed-variant listings (only available properties)
   // Treat null/undefined as true for legacy properties created before the
   // available column existed.
-  const listings = useCallback(() => {
+  const listings = useMemo(() => {
     const result = [];
     for (const p of properties.filter((p) => p.available !== false)) {
       const has1Bed = p.price1Bed != null;
       const has2Bed = p.price2Bed != null;
       const base = {
         id: p.id,
-        image: p.images?.[0] || '/images/Ely Homes Photography (1 of 20).jpg',
+        image: p.images?.[0] || null,
         title: p.title,
         location: p.location,
         rating: p.rating,
@@ -79,7 +76,6 @@ function PropertiesPage() {
       if (priceRange === 'low') { params.minPrice = 0; params.maxPrice = 4999; }
       else if (priceRange === 'mid') { params.minPrice = 5000; params.maxPrice = 7999; }
       else if (priceRange === 'high') { params.minPrice = 8000; }
-      if (searchQuery) params.search = searchQuery;
       if (availableOnly) params.available = true;
 
       const res = await apiClient.get('/properties', { params });
@@ -92,20 +88,11 @@ function PropertiesPage() {
     } finally {
       setLoading(false);
     }
-  }, [filter, priceRange, searchQuery, availableOnly]);
+  }, [filter, priceRange, availableOnly]);
 
   useEffect(() => {
     fetchProperties();
   }, [fetchProperties]);
-
-  // Debounced search — refetch on searchQuery change
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchProperties();
-    }, 400);
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery]);
 
   const filterButtons = [
     { key: 'all', label: 'All Properties' },
@@ -140,36 +127,13 @@ function PropertiesPage() {
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Our Properties</h1>
             <p className="text-white/80 max-w-2xl mx-auto text-lg">
               Discover our carefully curated selection of premium furnished apartments
-              in Nairobi's most desirable neighborhoods.
+              in Nairobi&apos;s most desirable neighborhoods.
             </p>
           </div>
 
-          {/* Search Bar */}
+          {/* Search Bar with live results */}
           <div className="max-w-2xl mx-auto pb-20">
-            <div className="bg-white rounded-full shadow-xl px-2 py-2 flex items-center">
-              <div className="flex-1 flex items-center px-5">
-                <svg className="w-5 h-5 text-[#C49A6C] mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-                <input
-                  type="text"
-                  placeholder="Search by location or property name..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full py-3 text-[#1f2937] placeholder-[#6b7280] focus:outline-none bg-transparent text-base"
-                />
-              </div>
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="p-2 text-[#6b7280] hover:text-[#0B0B45] transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              )}
-            </div>
+            <SearchBar />
           </div>
         </div>
       </section>
@@ -248,14 +212,13 @@ function PropertiesPage() {
           {/* Results Count */}
           <div className="mb-6 flex items-center justify-between">
             <p className="text-[#6b7280]">
-              Showing <span className="font-semibold text-[#0B0B45]">{listings().length}</span> listings
+              Showing <span className="font-semibold text-[#0B0B45]">{listings.length}</span> listing{listings.length !== 1 ? 's' : ''}
             </p>
-            {(filter !== 'all' || priceRange !== 'all' || searchQuery || availableOnly || bedFilter !== 'all') && (
+            {(filter !== 'all' || priceRange !== 'all' || availableOnly || bedFilter !== 'all') && (
               <button
                 onClick={() => {
                   setFilter('all');
                   setPriceRange('all');
-                  setSearchQuery('');
                   setAvailableOnly(false);
                   setBedFilter('all');
                 }}
@@ -272,15 +235,15 @@ function PropertiesPage() {
               <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
               <p className="text-[#6b7280]">Loading properties...</p>
             </div>
-          ) : properties.length > 0 || (filter === 'all' && priceRange === 'all' && !searchQuery && !availableOnly) ? (
+          ) : properties.length > 0 || (filter === 'all' && priceRange === 'all' && !availableOnly) ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-              {listings().map((listing) => (
+              {listings.map((listing) => (
                 <Link key={`${listing.id}-${listing.variant || 'base'}`} to={`/property/${listing.id}${listing.variant ? `?variant=${listing.variant}` : ''}`} className="block h-full">
                   <PropertyCard property={listing} />
                 </Link>
               ))}
               {/* Coming Soon cards — show on default 'All' view only */}
-              {filter === 'all' && priceRange === 'all' && !searchQuery && !availableOnly && [18, 16, 15, 14].map((imgIndex) => (
+              {filter === 'all' && priceRange === 'all' && !availableOnly && [18, 16, 15, 14].map((imgIndex) => (
                 <div key={imgIndex} className="group neu-card overflow-hidden h-full flex flex-col">
                   <div className="relative aspect-[4/3] flex-shrink-0">
                     <img
@@ -346,7 +309,6 @@ function PropertiesPage() {
                 onClick={() => {
                   setFilter('all');
                   setPriceRange('all');
-                  setSearchQuery('');
                   setAvailableOnly(false);
                   setBedFilter('all');
                 }}

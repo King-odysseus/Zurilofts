@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import apiClient from '../api/client';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const statusColors = {
   PENDING: 'bg-yellow-100 text-yellow-700',
@@ -10,12 +11,29 @@ const statusColors = {
 };
 
 function HostPayouts() {
+  const { user } = useAuth();
   const [wallet, setWallet] = useState(null);
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Guests have no business here; show clear denial instead of a spinner.
+  if (user?.role === 'USER') {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center max-w-sm px-6">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+          </div>
+          <h1 className="text-xl font-bold text-[#0B0B45] mb-2">Access Denied</h1>
+          <p className="text-[#6b7280]">This page is for hosts and administrators only.</p>
+        </div>
+      </div>
+    );
+  }
   const [whtData, setWhtData] = useState(null);
   const [whtMonth, setWhtMonth] = useState('');
-  const [whtModal, setWhtModal] = useState(false);
 
   const whtRef = useRef(null);
 
@@ -51,8 +69,18 @@ function HostPayouts() {
     }
   }
 
+  // Build a safe print view from whtData (not innerHTML) — no injection risk.
+  const escapeHtml = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
   function printWht() {
-    if (!whtRef.current) return;
+    if (!whtData?.bookings) return;
+    const period = whtMonth || 'All time';
+    const rowsHtml = whtData.bookings.map(b => {
+      const date = b.paidAt ? new Date(b.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+      return `<tr><td>${escapeHtml(b.property?.title)}</td><td>${date}</td><td class="num">${(b.hostNetAmount ?? 0).toLocaleString()}</td><td class="num">${(b.withholdingTax ?? 0).toLocaleString()}</td></tr>`;
+    }).join('');
+    const totalHtml = `<tr class="total"><td colspan="2">Total</td><td class="num">${(whtData.totalEarnings ?? 0).toLocaleString()}</td><td class="num">${(whtData.totalWht ?? 0).toLocaleString()}</td></tr>`;
+
     const printWindow = window.open('', '_blank', 'width=700,height=600');
     printWindow.document.write(`
       <html><head><title>WHT Statement</title>
@@ -63,8 +91,15 @@ function HostPayouts() {
         th, td { padding: 10px; border-bottom: 1px solid #D9D9D9; text-align: left; }
         th { background: #0B0B45; color: white; }
         .total { font-weight: bold; }
+        .num { text-align: right; }
       </style></head><body>
-      ${whtRef.current.innerHTML}
+      <h2>ZuriLofts — WHT Statement</h2>
+      <p style="color:#6b7280;font-size:14px;margin-bottom:16px">Period: ${escapeHtml(period)} | WHT Rate: 5% | Remitted to KRA</p>
+      <table><thead><tr><th>Property</th><th>Paid Date</th><th>Earnings (KES)</th><th>WHT (KES)</th></tr></thead><tbody>
+      ${rowsHtml}
+      ${totalHtml}
+      </tbody></table>
+      <p style="color:#6b7280;font-size:11px;margin-top:12px">This statement confirms that ZuriLofts has deducted and remitted the above withholding tax amounts to KRA on your behalf. Use this document to claim tax credits when filing your annual returns.</p>
       </body></html>
     `);
     printWindow.document.close();

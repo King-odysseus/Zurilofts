@@ -4,6 +4,15 @@ import crypto from 'crypto';
 const BASE = env.PAYSTACK_BASE_URL;
 const SECRET = env.PAYSTACK_SECRET_KEY ?? '';
 
+function requireSecret(): string {
+  if (!SECRET || SECRET.startsWith('sk_test_xxxx') || SECRET === 'your_paystack_secret_key') {
+    throw new Error(
+      'Paystack secret key is not configured. Set PAYSTACK_SECRET_KEY in server/.env (get it from https://dashboard.paystack.com).'
+    );
+  }
+  return SECRET;
+}
+
 interface PaystackInitResponse {
   status: boolean;
   message: string;
@@ -65,7 +74,7 @@ interface PaystackTransferResponse {
 
 function headers(): Record<string, string> {
   return {
-    Authorization: `Bearer ${SECRET}`,
+    Authorization: `Bearer ${requireSecret()}`,
     'Content-Type': 'application/json',
   };
 }
@@ -133,6 +142,16 @@ export async function verifyTransaction(
   } catch {
     return null;
   }
+}
+
+function requireWebhookSecret(): string {
+  const s = env.PAYSTACK_WEBHOOK_SECRET ?? '';
+  if (!s || s === 'whsec_xxxxxxxxxxxxxxxxxxxxxxxx') {
+    throw new Error(
+      'Paystack webhook secret is not configured. Set PAYSTACK_WEBHOOK_SECRET in server/.env.'
+    );
+  }
+  return s;
 }
 
 /** Verify HMAC SHA-512 webhook signature from Paystack */

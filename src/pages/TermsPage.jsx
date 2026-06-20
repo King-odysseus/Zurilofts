@@ -66,7 +66,7 @@ function TermsPage() {
               </p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li>Use a strong, unique password that you do not reuse across other services.</li>
-                <li>Notify us immediately at <strong>enquires@thezurilofts.com</strong> of any unauthorised use of your account or any other breach of security.</li>
+                <li>Notify us immediately at <strong>enquires@zurilofts.com</strong> of any unauthorised use of your account or any other breach of security.</li>
                 <li>Log out of your account at the end of each session when using shared or public devices.</li>
               </ul>
               <p className="mt-2">
@@ -192,7 +192,7 @@ function TermsPage() {
               </ul>
               <p className="mt-2">
                 To cancel a booking, contact us through the in-app messaging system or email{' '}
-                <strong>enquires@thezurilofts.com</strong>. The cancellation is effective from
+                <strong>enquires@zurilofts.com</strong>. The cancellation is effective from
                 the date and time we receive and acknowledge your request.
               </p>
 
@@ -443,7 +443,7 @@ function TermsPage() {
               <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">17.1 Informal Resolution</h3>
               <p>
                 Before initiating any formal legal action, you agree to first contact us at{' '}
-                <strong>enquires@thezurilofts.com</strong> and attempt to resolve the dispute
+                <strong>enquires@zurilofts.com</strong> and attempt to resolve the dispute
                 informally. Both parties agree to negotiate in good faith for a period of at
                 least 30 days.
               </p>
@@ -500,7 +500,7 @@ function TermsPage() {
                 <li><strong>No Waiver:</strong> Our failure to enforce any right or provision of these Terms shall not constitute a waiver of that right or provision.</li>
                 <li><strong>Assignment:</strong> You may not assign or transfer your rights or obligations under these Terms without our prior written consent. We may assign or transfer these Terms without restriction.</li>
                 <li><strong>Relationship:</strong> Nothing in these Terms creates a partnership, joint venture, employment, or agency relationship between you and {companyName}.</li>
-                <li><strong>Notices:</strong> Any legal notices to {companyName} must be sent to <strong>enquires@thezurilofts.com</strong>. Notices to you will be sent to the email address associated with your account or posted on the Platform.</li>
+                <li><strong>Notices:</strong> Any legal notices to {companyName} must be sent to <strong>enquires@zurilofts.com</strong>. Notices to you will be sent to the email address associated with your account or posted on the Platform.</li>
                 <li><strong>Electronic Communications:</strong> You consent to receive communications from us electronically. Electronic communications satisfy any legal requirement that such communications be in writing.</li>
               </ul>
             </section>
@@ -513,7 +513,7 @@ function TermsPage() {
                 contact us at:
               </p>
               <p className="mt-2">
-                <strong>Email:</strong> enquires@thezurilofts.com<br />
+                <strong>Email:</strong> enquires@zurilofts.com<br />
                 <strong>Website:</strong> thezurilofts.com<br />
                 <strong>Address:</strong> Nairobi, Kenya
               </p>

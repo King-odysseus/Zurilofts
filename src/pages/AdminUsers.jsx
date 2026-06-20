@@ -76,10 +76,11 @@ function AdminUsers() {
     e.preventDefault();
     setSaving(true);
     setFormError('');
-    // Only send non-empty fields; payoutFrequency '' means "leave unset"
+    // Send all fields except null/undefined so admins can clear values.
+    // payoutFrequency '' is sent explicitly to unset the frequency.
     const payload = {};
     for (const [k, v] of Object.entries(formData)) {
-      if (v !== '' && v !== null && v !== undefined) payload[k] = v;
+      if (v !== null && v !== undefined) payload[k] = v;
     }
     try {
       await apiClient.patch(`/admin/users/${editing.id}`, payload);

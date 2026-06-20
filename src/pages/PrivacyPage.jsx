@@ -40,7 +40,7 @@ function PrivacyPage() {
                 Platform. For any privacy-related enquiries, contact us at:
               </p>
               <p className="mt-2">
-                <strong>Email:</strong> privacy@thezurilofts.com<br />
+                <strong>Email:</strong> privacy@zurilofts.com<br />
                 <strong>Address:</strong> Nairobi, Kenya
               </p>
             </section>
@@ -288,8 +288,8 @@ function PrivacyPage() {
               <h2 className="text-xl font-bold text-[#0B0B45] mb-3">16. Contact Us</h2>
               <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
               <p className="mt-2">
-                <strong>Email:</strong> privacy@thezurilofts.com<br />
-                <strong>General enquiries:</strong> enquires@thezurilofts.com<br />
+                <strong>Email:</strong> privacy@zurilofts.com<br />
+                <strong>General enquiries:</strong> enquires@zurilofts.com<br />
                 <strong>Address:</strong> Nairobi, Kenya
               </p>
               <p className="mt-2">

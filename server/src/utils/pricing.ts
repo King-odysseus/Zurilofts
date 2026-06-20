@@ -67,15 +67,16 @@ export function calculateFees(
  */
 export const STANDARD_CHECK_IN_TIME = '15:00'; // 3:00 PM
 export const STANDARD_CHECK_OUT_TIME = '10:00'; // 10:00 AM
-// At/after this many hours late, the fee equals one full night.
-export const LATE_CHECKOUT_FULL_NIGHT_HOURS = 5;
+// At/after this many hours late, the fee equals one full night. Capped at 3h
+// so the host still has time to turn the apartment before the next booking.
+export const LATE_CHECKOUT_FULL_NIGHT_HOURS = 3;
 
 /**
  * Late check-out fee in KES for a requested check-out time ("HH:MM", 24h).
  *
  * Calibrated doubling: each started hour past the standard 10:00 AM doubles the
- * fee, landing exactly on one night's price at 5 hours late and capping there:
- *   1h = night/16, 2h = night/8, 3h = night/4, 4h = night/2, 5h+ = full night.
+ * fee, landing exactly on one night's price at 3 hours late and capping there:
+ *   1h = night/4, 2h = night/2, 3h+ = full extra night.
  * Returns 0 for an empty/invalid time or any time at/before 10:00 AM.
  */
 export function lateCheckoutFee(checkOutTime: string | null | undefined, nightlyPrice: number): number {

@@ -56,7 +56,7 @@ function Footer() {
             <h4 className="text-lg font-semibold mb-4 text-[#C49A6C]">Contact</h4>
             <ul className="space-y-3 text-white/80">
               <li>Nairobi, Kenya</li>
-              <li>enquires@thezurilofts.com</li>
+              <li>enquires@zurilofts.com</li>
             </ul>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -6,50 +6,7 @@ import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
 
-const COUNTRY_CODES = [
-  { code: 'KE', name: 'Kenya', dial: '+254', length: 9, example: '712 345 678' },
-  { code: 'UG', name: 'Uganda', dial: '+256', length: 9, example: '712 345 678' },
-  { code: 'TZ', name: 'Tanzania', dial: '+255', length: 9, example: '712 345 678' },
-  { code: 'RW', name: 'Rwanda', dial: '+250', length: 9, example: '712 345 678' },
-  { code: 'US', name: 'United States', dial: '+1', length: 10, example: '212 555 1234' },
-  { code: 'GB', name: 'United Kingdom', dial: '+44', length: 10, example: '7123 456 789' },
-  { code: 'ZA', name: 'South Africa', dial: '+27', length: 9, example: '71 234 5678' },
-  { code: 'NG', name: 'Nigeria', dial: '+234', length: 10, example: '712 345 6789' },
-  { code: 'AE', name: 'UAE', dial: '+971', length: 9, example: '50 123 4567' },
-  { code: 'IN', name: 'India', dial: '+91', length: 10, example: '71234 56789' },
-  { code: 'DE', name: 'Germany', dial: '+49', length: 11, example: '151 234 56789' },
-  { code: 'FR', name: 'France', dial: '+33', length: 9, example: '6 12 34 56 78' },
-  { code: 'CN', name: 'China', dial: '+86', length: 11, example: '131 2345 6789' },
-  { code: 'CA', name: 'Canada', dial: '+1', length: 10, example: '416 555 1234' },
-];
-
-function validatePhone(raw, country) {
-  if (!raw || !country) return { clean: '', valid: false };
-  let digits = raw.replace(/\D/g, '');
-  const dialDigits = country.dial.replace(/\D/g, '');
-  if (digits.startsWith(dialDigits)) {
-    digits = digits.slice(dialDigits.length);
-  } else if (digits.startsWith('00')) {
-    const without00 = digits.slice(2);
-    if (without00.startsWith(dialDigits)) {
-      digits = without00.slice(dialDigits.length);
-    }
-  }
-  return { clean: digits, valid: digits.length === country.length };
-}
-
-function detectCountry(storedPhone) {
-  if (!storedPhone) return { countryCode: 'KE', phoneNumber: '' };
-  const digits = storedPhone.replace(/\D/g, '');
-  const sorted = [...COUNTRY_CODES].sort((a, b) => b.dial.length - a.dial.length);
-  for (const c of sorted) {
-    const dialDigits = c.dial.replace(/\D/g, '');
-    if (digits.startsWith(dialDigits)) {
-      return { countryCode: c.code, phoneNumber: digits.slice(dialDigits.length) };
-    }
-  }
-  return { countryCode: 'KE', phoneNumber: digits };
-}
+import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
 
 function BookingPage() {
   const { id } = useParams();
@@ -58,7 +15,7 @@ function BookingPage() {
   const urlVariant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [bookingComplete, setBookingComplete] = useState(false);
+  const [bookingComplete] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
   // Property from API
@@ -78,13 +35,13 @@ function BookingPage() {
   const EXTRA_GUEST_FEE = 800;
 
   // Standard stay times. Check-in from 3:00 PM, check-out by 10:00 AM.
-  // A later check-out doubles each hour past 10:00 AM, reaching one full
-  // night's price at 5 hours late and capping there.
+  // A later check-out doubles each hour past 10:00 AM: 1h = ¼ night,
+  // 2h = ½ night, 3h = 1 full extra night. Capped at 3 hours (1:00 PM).
   const STANDARD_CHECK_IN = '15:00';
   const STANDARD_CHECK_OUT = '10:00';
-  const LATE_CHECKOUT_FULL_NIGHT_HOURS = 5;
-  // Selectable check-out times: 10 AM (standard) through 6 PM.
-  const CHECK_OUT_OPTIONS = ['10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+  const LATE_CHECKOUT_FULL_NIGHT_HOURS = 3;
+  // Maximum late check-out capped at 3 hours past standard (1:00 PM).
+  const CHECK_OUT_OPTIONS = ['10:00', '11:00', '12:00', '13:00'];
 
   // Calibrated doubling: 1h = night/16, 2h = night/8 ... 5h+ = full night.
   const calcLateCheckoutFee = (time, nightlyPrice) => {
@@ -143,11 +100,11 @@ function BookingPage() {
 
   const addGuest = () => {
     setBookingData((prev) => {
-      const next = Math.min(maxGuests, prev.guests + 1);
+      const next = Math.min(pricing.maxGuests, prev.guests + 1);
       return { ...prev, guests: next };
     });
     setAdditionalGuests((prev) => {
-      if (prev.length >= maxGuests - 1) return prev;
+      if (prev.length >= pricing.maxGuests - 1) return prev;
       return [...prev, { firstName: '', lastName: '' }];
     });
   };
@@ -176,7 +133,7 @@ function BookingPage() {
           email: prev.email || p.email || '',
           phone: storedPhone,
         }));
-        if (!prev.phone) {
+        if (!storedPhone) {
           setPhoneCountryCode(cc);
           setPhoneNumber(pn);
         }
@@ -213,35 +170,32 @@ function BookingPage() {
       .get(`/properties/${id}/availability`)
       .then((r) => setUnavailableRanges(r.data.data || []))
       .catch(() => { /* calendar still works, just nothing disabled */ });
-  }, [id]);
+  }, [id, urlVariant]);
 
-  // Calculate nights and total
-  const calculateNights = () => {
-    if (!bookingData.checkIn || !bookingData.checkOut) return 0;
-    const checkIn = new Date(bookingData.checkIn);
-    const checkOut = new Date(bookingData.checkOut);
-    const diffTime = checkOut - checkIn;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 0;
-  };
+  // ── Cost calculations (memoised — expensive enough to matter on every date pick / guest toggle) ──
+  const pricing = useMemo(() => {
+    const nights = (() => {
+      if (!bookingData.checkIn || !bookingData.checkOut) return 0;
+      const diff = new Date(bookingData.checkOut) - new Date(bookingData.checkIn);
+      return Math.max(0, Math.ceil(diff / 86_400_000));
+    })();
 
-  const nights = calculateNights();
-  // Derive price and guest limits from the property's bed-specific pricing
-  const propertyPrice = bedOption === '2bed'
-    ? (property?.price2Bed ?? property?.price ?? 0)
-    : (property?.price1Bed ?? property?.price ?? 0);
-  const baseGuests = bedOption === '2bed' ? 4 : 2;   // guests included in base price
-  const maxGuests  = bedOption === '2bed' ? 6 : 4;   // hard cap for this variant
-  const subtotal = nights * propertyPrice;
-  const extraGuests = Math.max(0, bookingData.guests - baseGuests);
-  const extraGuestFee = extraGuests * EXTRA_GUEST_FEE * nights;
-  const cleaningFee = 1500;
-  const serviceFee = Math.round(subtotal * 0.12);
-  const lateCheckoutFee = calcLateCheckoutFee(bookingData.checkOutTime, propertyPrice);
-  const discountAmount = promoResult?.discountAmount || 0;
-  const total = subtotal + cleaningFee + serviceFee + extraGuestFee + lateCheckoutFee - discountAmount;
-  const exceedingMax = bookingData.guests > maxGuests;
+    const propertyPrice = bedOption === '2bed'
+      ? (property?.price2Bed ?? property?.price ?? 0)
+      : (property?.price1Bed ?? property?.price ?? 0);
+    const baseGuests = bedOption === '2bed' ? 4 : 2;
+    const maxGuests  = bedOption === '2bed' ? 6 : 4;
+    const subtotal    = nights * propertyPrice;
+    const extraGuests = Math.max(0, bookingData.guests - baseGuests);
+    const extraGuestFee = extraGuests * EXTRA_GUEST_FEE * nights;
+    const cleaningFee    = 1500;
+    const serviceFee     = Math.round(subtotal * 0.12);
+    const lateCheckoutFee = calcLateCheckoutFee(bookingData.checkOutTime, propertyPrice);
+    const discountAmount  = promoResult?.discountAmount || 0;
+    const total = subtotal + cleaningFee + serviceFee + extraGuestFee + lateCheckoutFee - discountAmount;
 
+    return { nights, propertyPrice, baseGuests, maxGuests, subtotal, extraGuests, extraGuestFee, cleaningFee, serviceFee, lateCheckoutFee, discountAmount, total };
+  }, [bookingData.checkIn, bookingData.checkOut, bookingData.guests, bookingData.checkOutTime, bedOption, property, promoResult]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookingData({ ...bookingData, [name]: value });
@@ -271,7 +225,7 @@ function BookingPage() {
     setPromoResult(null);
 
     try {
-      const res = await apiClient.post('/promo/validate', { code: promoCode.toUpperCase(), subtotal });
+      const res = await apiClient.post('/promo/validate', { code: promoCode.toUpperCase(), subtotal: pricing.subtotal });
       setPromoResult(res.data.data);
     } catch (err) {
       setPromoError(err.response?.data?.error || 'Invalid promo code');
@@ -355,7 +309,7 @@ function BookingPage() {
         <Dropdown
           value={bookingData.guests}
           onChange={(v) => setGuestCount(Number(v))}
-          options={Array.from({ length: maxGuests }, (_, i) => i + 1).map((num) => ({
+          options={Array.from({ length: pricing.maxGuests }, (_, i) => i + 1).map((num) => ({
             value: num,
             label: `${num} ${num === 1 ? 'guest' : 'guests'}`,
           }))}
@@ -364,14 +318,14 @@ function BookingPage() {
         />
         {bedOption && (
           <p className="text-xs text-[#6b7280] mt-1">
-            This apartment fits up to {maxGuests} guests ({baseGuests} included in the {bedOption === '2bed' ? '2-bed' : '1-bed'} rate). Each additional guest is KES {EXTRA_GUEST_FEE.toLocaleString()}/night.
-            {bookingData.guests > baseGuests && (
-              <span className="text-amber-600 font-medium"> {extraGuests} extra guest{extraGuests > 1 ? 's' : ''} &middot; +KES {(extraGuestFee).toLocaleString()}</span>
+            This apartment fits up to {pricing.maxGuests} guests ({pricing.baseGuests} included in the {bedOption === '2bed' ? '2-bed' : '1-bed'} rate). Each additional guest is KES {EXTRA_GUEST_FEE.toLocaleString()}/night.
+            {bookingData.guests > pricing.baseGuests && (
+              <span className="text-amber-600 font-medium"> {pricing.extraGuests} extra guest{pricing.extraGuests > 1 ? 's' : ''} &middot; +KES {pricing.extraGuestFee.toLocaleString()}</span>
             )}
           </p>
         )}
-        {bookingData.guests > maxGuests && (
-          <p className="text-red-500 text-xs mt-1 font-semibold">Maximum {maxGuests} guests for this room type. Exceeding this is grounds for removal.</p>
+        {bookingData.guests > pricing.maxGuests && (
+          <p className="text-red-500 text-xs mt-1 font-semibold">Maximum {pricing.maxGuests} guests for this room type. Exceeding this is grounds for removal.</p>
         )}
         {!bedOption && (
           <p className="text-xs text-[#6b7280] mt-1">Select a bed option above to see guest limits.</p>
@@ -386,7 +340,7 @@ function BookingPage() {
               {bedOption === '2bed' ? '2-Bed Configuration' : '1-Bed Configuration'}
             </p>
             <p className="text-xs text-[#6b7280]">
-              Apartment fits up to {maxGuests} guests &middot; KES {propertyPrice.toLocaleString()}/night
+              Apartment fits up to {pricing.maxGuests} guests &middot; KES {pricing.propertyPrice.toLocaleString()}/night
             </p>
           </div>
           <span className="bg-[#C49A6C] text-white text-xs font-bold px-3 py-1 rounded-full">
@@ -402,9 +356,10 @@ function BookingPage() {
         </svg>
         <p className="text-sm text-[#1f2937]">
           Standard <span className="font-semibold">check-in from 3:00 PM</span> and{' '}
-          <span className="font-semibold">check-out by 10:00 AM</span>. A later check-out is available. The fee{' '}
-          <span className="font-semibold">doubles each hour</span> past 10:00 AM, up to a{' '}
-          <span className="font-semibold">full night after 5 hours</span>.
+          <span className="font-semibold">check-out by 10:00 AM</span>. You may extend up to{' '}
+          <span className="font-semibold">1:00 PM (3 hours max)</span>. The fee{' '}
+          <span className="font-semibold">doubles each hour</span> past 10:00 AM, reaching a{' '}
+          <span className="font-semibold">full extra night at 3 hours</span>.
         </p>
       </div>
 
@@ -426,7 +381,7 @@ function BookingPage() {
             value={bookingData.checkOutTime}
             onChange={(v) => setBookingData((prev) => ({ ...prev, checkOutTime: v }))}
             options={CHECK_OUT_OPTIONS.map((time) => {
-              const fee = calcLateCheckoutFee(time, propertyPrice);
+              const fee = calcLateCheckoutFee(time, pricing.propertyPrice);
               return {
                 value: time,
                 label: `${formatTime12h(time)}${fee > 0 ? ` (+KES ${fee.toLocaleString()})` : ' (Standard)'}`,
@@ -435,28 +390,28 @@ function BookingPage() {
             triggerClassName="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
             ariaLabel="Check-out time"
           />
-          {lateCheckoutFee > 0 && (
+          {pricing.lateCheckoutFee > 0 && (
             <p className="text-xs text-[#C49A6C] font-medium mt-1">
-              Late check-out fee: KES {lateCheckoutFee.toLocaleString()}
+              Late check-out fee: KES {pricing.lateCheckoutFee.toLocaleString()}
             </p>
           )}
         </div>
       </div>
 
-      {nights > 0 && (
+      {pricing.nights > 0 && (
         <div className="bg-[#C49A6C]/10 rounded-xl p-4">
           <p className="text-[#0B0B45] font-medium">
-            {nights} {nights === 1 ? 'night' : 'nights'} selected
+            {pricing.nights} {pricing.nights === 1 ? 'night' : 'nights'} selected
           </p>
           <p className="text-[#6b7280] text-sm">
-            KES {propertyPrice.toLocaleString()} per night
+            KES {pricing.propertyPrice.toLocaleString()} per night
           </p>
         </div>
       )}
 
       <button
         onClick={() => setStep(2)}
-        disabled={!bookingData.checkIn || !bookingData.checkOut || nights <= 0 || !bedOption}
+        disabled={!bookingData.checkIn || !bookingData.checkOut || pricing.nights <= 0 || !bedOption}
         className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
@@ -481,7 +436,7 @@ function BookingPage() {
 
       <div>
         <h2 className="text-2xl font-bold text-[#0B0B45]">Guest Information</h2>
-        <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account. Edit anything that's changed.</p>
+        <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account. Edit anything that&apos;s changed.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -558,14 +513,14 @@ function BookingPage() {
           <button
             type="button"
             onClick={addGuest}
-            disabled={bookingData.guests >= maxGuests}
+            disabled={bookingData.guests >= pricing.maxGuests}
             className="text-sm font-semibold text-[#C49A6C] hover:text-[#0B0B45] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add guest
           </button>
         </div>
         <p className="text-xs text-[#6b7280] mb-3">
-          You're booking for {bookingData.guests} {bookingData.guests === 1 ? 'guest' : 'guests'}. Add the names of anyone staying with you.
+          You&apos;re booking for {bookingData.guests} {bookingData.guests === 1 ? 'guest' : 'guests'}. Add the names of anyone staying with you.
         </p>
 
         {additionalGuests.length === 0 ? (
@@ -759,38 +714,38 @@ function BookingPage() {
 
       <div className="bg-[#D9D9D9] rounded-xl p-4 space-y-2">
         <div className="flex justify-between text-[#1f2937]">
-          <span>KES {propertyPrice.toLocaleString()} x {nights} nights</span>
-          <span>KES {subtotal.toLocaleString()}</span>
+          <span>KES {pricing.propertyPrice.toLocaleString()} x {pricing.nights} nights</span>
+          <span>KES {pricing.subtotal.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-[#1f2937]">
           <span>Cleaning fee</span>
-          <span>KES {cleaningFee.toLocaleString()}</span>
+          <span>KES {pricing.cleaningFee.toLocaleString()}</span>
         </div>
-        {extraGuestFee > 0 && (
+        {pricing.extraGuestFee > 0 && (
           <div className="flex justify-between text-[#1f2937]">
-            <span>Extra guest fee ({extraGuests} guest{extraGuests > 1 ? 's' : ''} x KES {EXTRA_GUEST_FEE.toLocaleString()} x {nights} nights)</span>
-            <span>KES {extraGuestFee.toLocaleString()}</span>
+            <span>Extra guest fee ({pricing.extraGuests} guest{pricing.extraGuests > 1 ? 's' : ''} x KES {EXTRA_GUEST_FEE.toLocaleString()} x {pricing.nights} nights)</span>
+            <span>KES {pricing.extraGuestFee.toLocaleString()}</span>
           </div>
         )}
         <div className="flex justify-between text-[#1f2937]">
           <span>Service fee</span>
-          <span>KES {serviceFee.toLocaleString()}</span>
+          <span>KES {pricing.serviceFee.toLocaleString()}</span>
         </div>
-        {lateCheckoutFee > 0 && (
+        {pricing.lateCheckoutFee > 0 && (
           <div className="flex justify-between text-[#1f2937]">
             <span>Late check-out ({formatTime12h(bookingData.checkOutTime)})</span>
-            <span>KES {lateCheckoutFee.toLocaleString()}</span>
+            <span>KES {pricing.lateCheckoutFee.toLocaleString()}</span>
           </div>
         )}
-        {discountAmount > 0 && (
+        {pricing.discountAmount > 0 && (
           <div className="flex justify-between text-green-600">
             <span>Promo discount</span>
-            <span>-KES {discountAmount.toLocaleString()}</span>
+            <span>-KES {pricing.discountAmount.toLocaleString()}</span>
           </div>
         )}
         <div className="border-t border-[#0B0B45]/20 pt-2 flex justify-between font-bold text-[#0B0B45]">
           <span>Total</span>
-          <span>KES {total.toLocaleString()}</span>
+          <span>KES {pricing.total.toLocaleString()}</span>
         </div>
       </div>
 
@@ -815,7 +770,7 @@ function BookingPage() {
               Processing...
             </>
           ) : (
-            `Pay KES ${total.toLocaleString()}`
+            `Pay KES ${pricing.total.toLocaleString()}`
           )}
         </button>
       </form>
@@ -855,10 +810,10 @@ function BookingPage() {
                   <span className="text-[#6b7280]">Check-out</span>
                   <span className="font-medium">{bookingData.checkOut} · {formatTime12h(bookingData.checkOutTime)}</span>
                 </div>
-                {lateCheckoutFee > 0 && (
+                {pricing.lateCheckoutFee > 0 && (
                   <div className="flex justify-between text-sm mt-1">
                     <span className="text-[#6b7280]">Late check-out fee</span>
-                    <span className="font-medium">KES {lateCheckoutFee.toLocaleString()}</span>
+                    <span className="font-medium">KES {pricing.lateCheckoutFee.toLocaleString()}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-sm mt-1">
@@ -867,7 +822,7 @@ function BookingPage() {
                 </div>
                 <div className="flex justify-between font-bold text-[#0B0B45] mt-2 pt-2 border-t border-[#0B0B45]/10">
                   <span>Total Paid</span>
-                  <span>KES {total.toLocaleString()}</span>
+                  <span>KES {pricing.total.toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -968,7 +923,7 @@ function BookingPage() {
                 <h3 className="font-bold text-[#0B0B45] text-lg">{property?.title}</h3>
                 {bedOption && (
                   <p className="text-sm text-[#C49A6C] font-medium mt-1">
-                    {bedOption === '2bed' ? '2 Bed' : '1 Bed'} &middot; KES {propertyPrice.toLocaleString()}/night
+                    {bedOption === '2bed' ? '2 Bed' : '1 Bed'} &middot; KES {pricing.propertyPrice.toLocaleString()}/night
                   </p>
                 )}
                 <div className="flex items-center text-[#6b7280] text-sm mt-1">
@@ -994,43 +949,43 @@ function BookingPage() {
                   </div>
                 </div>
 
-                {nights > 0 && (
+                {pricing.nights > 0 && (
                   <div className="mt-6 pt-6 border-t border-[#D9D9D9]">
                     <h4 className="font-semibold text-[#0B0B45] mb-3">Price Details</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between text-[#1f2937]">
-                        <span>KES {propertyPrice.toLocaleString()} x {nights} nights</span>
-                        <span>KES {subtotal.toLocaleString()}</span>
+                        <span>KES {pricing.propertyPrice.toLocaleString()} x {pricing.nights} nights</span>
+                        <span>KES {pricing.subtotal.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-[#1f2937]">
                         <span>Cleaning fee</span>
-                        <span>KES {cleaningFee.toLocaleString()}</span>
+                        <span>KES {pricing.cleaningFee.toLocaleString()}</span>
                       </div>
-                      {extraGuestFee > 0 && (
+                      {pricing.extraGuestFee > 0 && (
                         <div className="flex justify-between text-[#1f2937]">
-                          <span>Extra guest fee ({extraGuests} x KES {EXTRA_GUEST_FEE.toLocaleString()} x {nights} nights)</span>
-                          <span>KES {extraGuestFee.toLocaleString()}</span>
+                          <span>Extra guest fee ({pricing.extraGuests} x KES {EXTRA_GUEST_FEE.toLocaleString()} x {pricing.nights} nights)</span>
+                          <span>KES {pricing.extraGuestFee.toLocaleString()}</span>
                         </div>
                       )}
                       <div className="flex justify-between text-[#1f2937]">
                         <span>Service fee</span>
-                        <span>KES {serviceFee.toLocaleString()}</span>
+                        <span>KES {pricing.serviceFee.toLocaleString()}</span>
                       </div>
-                      {lateCheckoutFee > 0 && (
+                      {pricing.lateCheckoutFee > 0 && (
                         <div className="flex justify-between text-[#1f2937]">
                           <span>Late check-out</span>
-                          <span>KES {lateCheckoutFee.toLocaleString()}</span>
+                          <span>KES {pricing.lateCheckoutFee.toLocaleString()}</span>
                         </div>
                       )}
-                      {discountAmount > 0 && (
+                      {pricing.discountAmount > 0 && (
                         <div className="flex justify-between text-green-600">
                           <span>Promo discount</span>
-                          <span>-KES {discountAmount.toLocaleString()}</span>
+                          <span>-KES {pricing.discountAmount.toLocaleString()}</span>
                         </div>
                       )}
                       <div className="pt-2 border-t border-[#D9D9D9] flex justify-between font-bold text-[#0B0B45]">
                         <span>Total</span>
-                        <span>KES {total.toLocaleString()}</span>
+                        <span>KES {pricing.total.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>

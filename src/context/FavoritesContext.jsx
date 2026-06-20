@@ -69,10 +69,10 @@ export function FavoritesProvider({ children }) {
   );
 }
 
-export function useFavorites() {
+export const useFavorites = () => {
   const ctx = useContext(FavoritesContext);
   if (!ctx) throw new Error('useFavorites must be used within a FavoritesProvider');
   return ctx;
-}
+};
 
 export default FavoritesContext;

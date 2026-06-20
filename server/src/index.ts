@@ -11,7 +11,7 @@ const __dirname = path.dirname(__filename);
 
 // In production, serve the built frontend
 if (env.NODE_ENV === 'production') {
-  const clientDist = path.resolve(__dirname, '../../client/dist');
+  const clientDist = path.resolve(__dirname, '../../dist');
   app.use(express.static(clientDist));
   app.get('*', (_req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'));

@@ -183,7 +183,7 @@ function AdminCalendar() {
       {/* Blocked dates */}
       <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Blocked dates</h2>
-        <p className="text-sm text-[#6b7280] mb-4">Imported bookings (read-only) and manual blocks. Blocked ranges can't be booked on ZuriLofts.</p>
+        <p className="text-sm text-[#6b7280] mb-4">Imported bookings (read-only) and manual blocks. Blocked ranges can&apos;t be booked on ZuriLofts.</p>
 
         {data.blocks.length > 0 ? (
           <div className="space-y-2 mb-5">

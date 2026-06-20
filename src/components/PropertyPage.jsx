@@ -2,7 +2,7 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import { zuriImages } from '../assets/images';
+
 import apiClient from '../api/client.js';
 
 function PropertyPage() {
@@ -10,7 +10,7 @@ function PropertyPage() {
   const [searchParams] = useSearchParams();
   const variant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [featuredImage, setFeaturedImage] = useState(0);
-  const [thumbStart, setThumbStart] = useState(0);
+  const [thumbStart] = useState(0);
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -29,6 +29,19 @@ function PropertyPage() {
     }
     fetchProperty();
   }, [id]);
+
+  useEffect(() => {
+    if (!property) return;
+    document.title = `${property.title} — ZuriLofts`;
+    const setMeta = (prop, content) => {
+      let el = document.querySelector(`meta[property="og:${prop}"]`);
+      if (!el) { el = document.createElement('meta'); el.setAttribute('property', `og:${prop}`); document.head.appendChild(el); }
+      el.setAttribute('content', content);
+    };
+    setMeta('title', `${property.title} — ZuriLofts`);
+    setMeta('description', property.description?.slice(0, 200) || '');
+    setMeta('image', property.images?.[0] || '');
+  }, [property]);
 
   if (loading) {
     return (
@@ -68,7 +81,7 @@ function PropertyPage() {
     );
   }
 
-  const images = property.images || zuriImages;
+  const images = property.images?.length > 0 ? property.images : [];
 
   // When arriving from a specific bed-variant card, reflect that variant's
   // bedroom count, bathroom count, and price rather than the property's raw values.
@@ -117,7 +130,8 @@ function PropertyPage() {
           </div>
         </div>
 
-        {/* Featured Image Gallery */}
+        {/* Featured Image Gallery — only render if property has uploaded images */}
+        {images.length > 0 && (
         <div className="mb-12">
           <div className="relative">
             <img
@@ -165,6 +179,7 @@ function PropertyPage() {
             })}
           </div>
         </div>
+        )}
 
         {/* Property Details */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -212,7 +227,7 @@ function PropertyPage() {
             {/* Description */}
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-[#0B0B45] mb-4">About this property</h2>
-              <p className="text-[#1f2937] leading-relaxed">{property.description}</p>
+              <p className="text-[#1f2937] leading-relaxed">{property.description?.replace(/<[^>]*>?/gm, '')}</p>
             </div>
 
             {/* Amenities */}
@@ -232,7 +247,7 @@ function PropertyPage() {
 
             {/* Nearby */}
             <div>
-              <h2 className="text-2xl font-bold text-[#0B0B45] mb-4">What's nearby</h2>
+              <h2 className="text-2xl font-bold text-[#0B0B45] mb-4">What&apos;s nearby</h2>
               <ul className="space-y-3">
                 {property.nearby.map((item, index) => (
                   <li key={index} className="flex items-center text-[#1f2937]">
@@ -263,7 +278,7 @@ function PropertyPage() {
               </Link>
 
               <p className="text-center text-sm text-[#6b7280] mt-4">
-                You won't be charged yet
+                You won&apos;t be charged yet
               </p>
 
               <div className="mt-6 pt-6 border-t border-[#D9D9D9]">

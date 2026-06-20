@@ -101,7 +101,8 @@ function SearchBar() {
         const res = await apiClient.get('/properties', { params: { search: q, limit: 8 } });
         setResults(res.data.data || []);
         setOpen(true);
-      } catch {
+      } catch (err) {
+        console.error('Search error', err);
         setResults([]);
       } finally {
         setLoading(false);
@@ -185,11 +186,19 @@ function SearchBar() {
                   onClick={() => handleSelect(p.id)}
                   className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-[#f8f9fa] transition-colors border-b border-[#D9D9D9]/50 last:border-b-0"
                 >
-                  <img
-                    src={p.images?.[0] || '/images/Ely Homes Photography (1 of 20).jpg'}
-                    alt=""
-                    className="w-12 h-12 object-cover rounded-xl flex-shrink-0"
-                  />
+                  {p.images?.[0] ? (
+                    <img
+                      src={p.images[0]}
+                      alt=""
+                      className="w-12 h-12 object-cover rounded-xl flex-shrink-0"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-[#D9D9D9]/30 flex items-center justify-center">
+                      <svg className="w-5 h-5 text-[#D9D9D9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                  )}
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#0B0B45] truncate">{p.title}</p>
                     <p className="text-xs text-[#6b7280] truncate">{p.location}</p>
@@ -266,8 +275,7 @@ function Hero({ stats }) {
         <img
           src={heroImage}
           alt="ZuriLofts"
-          className="w-full h-full object-cover scale-110"
-          style={{ filter: 'blur(1.5px)' }}
+          className="w-full h-full object-cover scale-110 hero-bg-img"
         />
       </div>
 
@@ -295,7 +303,7 @@ function Hero({ stats }) {
               </span>
             </div>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-10 leading-tight tracking-tight drop-shadow-lg" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5), 0 0 20px rgba(0,0,0,0.3)' }}>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-10 leading-tight tracking-tight drop-shadow-lg hero-heading">
               {isHost ? (
                 <>Earn More by <span className="text-[#C49A6C]">Hosting</span> on ZuriLofts</>
               ) : (
@@ -358,4 +366,5 @@ function Hero({ stats }) {
   );
 }
 
+export { SearchBar };
 export default Hero;

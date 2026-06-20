@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
@@ -7,6 +7,13 @@ import { useAuth } from '../context/AuthContext.jsx';
 const BED_OPTIONS = [
   { value: '1bed', label: '1 Bedroom' },
   { value: '2bed', label: '2 Bedroom' },
+];
+
+const CHECK_OUT_OPTIONS = [
+  { value: '10:00', label: '10:00 AM (Standard)' },
+  { value: '11:00', label: '11:00 AM (+¼ night)' },
+  { value: '12:00', label: '12:00 PM (+½ night)' },
+  { value: '13:00', label: '1:00 PM (+1 full night)' },
 ];
 
 function ConfirmDialog({ open, title, message, confirmLabel, confirmClass, onConfirm, onCancel }) {
@@ -183,11 +190,12 @@ function EditBookingModal({ booking, onClose, onSaved }) {
             </div>
             <div>
               <label className="block text-xs font-semibold text-[#6b7280] mb-1">Check-out Time</label>
-              <input
-                type="time"
-                value={form.checkOutTime}
-                onChange={set('checkOutTime')}
-                className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+              <Dropdown
+                value={form.checkOutTime || '10:00'}
+                onChange={(v) => setForm((prev) => ({ ...prev, checkOutTime: v }))}
+                options={CHECK_OUT_OPTIONS}
+                triggerClassName="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+                ariaLabel="Check-out time"
               />
             </div>
           </div>
@@ -221,6 +229,21 @@ EditBookingModal.propTypes = {
   onSaved: PropTypes.func.isRequired,
 };
 
+// ── Helpers ────────────────────────────────────────────────────────────────
+function formatTime12h(time) {
+  if (!time) return '—';
+  const [h, m] = time.split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const hour12 = h % 12 === 0 ? 12 : h % 12;
+  return `${hour12}:${String(m || 0).padStart(2, '0')} ${period}`;
+}
+
+function isLateCheckout(time) {
+  if (!time) return false;
+  const [h, m] = time.split(':').map(Number);
+  return h > 10 || (h === 10 && m > 0);
+}
+
 function AdminBookings() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -234,9 +257,7 @@ function AdminBookings() {
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
-  useEffect(() => { fetchBookings(); }, [statusFilter]);
-
-  async function fetchBookings() {
+  const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
       const params = {};
@@ -246,7 +267,9 @@ function AdminBookings() {
       setBookings(res.data.data || []);
     } catch (err) { console.error('AdminBookings error', err); }
     finally { setLoading(false); }
-  }
+  }, [statusFilter, isAdmin]);
+
+  useEffect(() => { fetchBookings(); }, [fetchBookings]);
 
   async function handleStatusChange(id, status) {
     setActionLoading(true);
@@ -314,6 +337,7 @@ function AdminBookings() {
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Property</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Check-in</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Check-out</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Times</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Guests</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Total</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Status</th>
@@ -333,6 +357,18 @@ function AdminBookings() {
                     <td className="py-3 px-4">{b.property?.title}</td>
                     <td className="py-3 px-4 text-xs">{new Date(b.checkIn).toLocaleDateString()}</td>
                     <td className="py-3 px-4 text-xs">{new Date(b.checkOut).toLocaleDateString()}</td>
+                    <td className="py-3 px-4 text-xs">
+                      <span className="text-[#6b7280]">In </span>{formatTime12h(b.checkInTime || '15:00')}
+                      <span className="text-[#6b7280]"> · Out </span>
+                      <span className={isLateCheckout(b.checkOutTime) ? 'text-amber-600 font-semibold' : ''}>
+                        {formatTime12h(b.checkOutTime || '10:00')}
+                      </span>
+                      {b.lateCheckoutFee > 0 && (
+                        <span className="ml-1 text-[10px] text-amber-600 font-medium">
+                          +KES {b.lateCheckoutFee.toLocaleString()}
+                        </span>
+                      )}
+                    </td>
                     <td className="py-3 px-4">{b.guests}</td>
                     <td className="py-3 px-4 font-semibold">KES {b.total.toLocaleString()}</td>
                     <td className="py-3 px-4">

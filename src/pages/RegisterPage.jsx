@@ -290,7 +290,7 @@ function RegisterPage() {
                 <span className="text-[#C49A6C] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
-                <span className="text-[#1f2937]"><span className="font-semibold">Guests pay zero markup</span> — unlike Airbnb's 14% guest fee, your listed price IS the guest price</span>
+                <span className="text-[#1f2937]"><span className="font-semibold">Guests pay zero markup</span> — unlike Airbnb&apos;s 14% guest fee, your listed price IS the guest price</span>
               </li>
               <li className="flex gap-3">
                 <span className="text-[#C49A6C] flex-shrink-0">

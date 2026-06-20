@@ -66,6 +66,18 @@ export async function createBooking(input: CreateBookingInput) {
     throw new ValidationError('Check-out date must be after check-in date');
   }
 
+  // Late check-out capped at 3 hours past 10:00 AM (13:00).
+  if (input.checkOutTime) {
+    const m = /^(\d{1,2}):(\d{2})$/.exec(input.checkOutTime);
+    if (m) {
+      const minutes = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+      const maxMinutes = 13 * 60; // 1:00 PM
+      if (minutes > maxMinutes) {
+        throw new ValidationError('Late check-out cannot extend past 1:00 PM (3 hours max)');
+      }
+    }
+  }
+
   const now = new Date();
   now.setHours(0, 0, 0, 0);
   if (checkInDate < now) {
@@ -231,9 +243,11 @@ export async function listAllBookings(status?: string, page = 1, limit = 20, hos
   };
 }
 
-// Per-property booking counts and recorded earnings, for the admin earnings page.
+// Per-property booking counts and recorded earnings, for the admin/host earnings page.
 // "Earnings" = sum of booking totals that are not cancelled (PENDING + CONFIRMED).
 // "Confirmed earnings" tracks realized revenue from CONFIRMED bookings only.
+// Also returns fee breakdown: gross rent (subtotal), cleaning fees, service fees,
+// discounts, host net amount, and withholding tax (WHT).
 export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date }, hostId?: string) {
   const whereDate = dateFilter?.from || dateFilter?.to
     ? {
@@ -248,22 +262,44 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
   const propertyWhere = hostId ? { hostId } : {};
   const bookingHost = hostId ? { property: { hostId } } : {};
 
+  // Admin mode: also fetch host info per property so we can build per-host rankings.
+  const isAdminView = !hostId;
+
   const [properties, all, confirmed, byBed] = await Promise.all([
     prisma.property.findMany({
       where: propertyWhere,
-      select: { id: true, title: true, location: true, imagesJson: true, price: true },
+      select: {
+        id: true, title: true, location: true, imagesJson: true, price: true,
+        ...(isAdminView ? { hostId: true, host: { select: { id: true, firstName: true, lastName: true, email: true } } } : {}),
+      },
     }),
     prisma.booking.groupBy({
       by: ['propertyId'],
       where: { status: { not: 'CANCELLED' }, ...whereDate, ...bookingHost },
       _count: { _all: true },
-      _sum: { total: true },
+      _sum: {
+        subtotal: true,
+        cleaningFee: true,
+        serviceFee: true,
+        discountAmount: true,
+        total: true,
+        hostNetAmount: true,
+        withholdingTax: true,
+      },
     }),
     prisma.booking.groupBy({
       by: ['propertyId'],
       where: { status: 'CONFIRMED', ...whereDate, ...bookingHost },
       _count: { _all: true },
-      _sum: { total: true },
+      _sum: {
+        subtotal: true,
+        cleaningFee: true,
+        serviceFee: true,
+        discountAmount: true,
+        total: true,
+        hostNetAmount: true,
+        withholdingTax: true,
+      },
     }),
     prisma.booking.groupBy({
       by: ['propertyId', 'bedOption'],
@@ -300,12 +336,26 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     return { bookings: 0, earnings: 0 };
   }
 
+  // Extract fee breakdown helper
+  function extractFees(sums: any) {
+    return {
+      grossRent: sums?._sum?.subtotal ?? 0,
+      cleaningFees: sums?._sum?.cleaningFee ?? 0,
+      serviceFees: sums?._sum?.serviceFee ?? 0,
+      discounts: sums?._sum?.discountAmount ?? 0,
+      hostNet: sums?._sum?.hostNetAmount ?? 0,
+      wht: sums?._sum?.withholdingTax ?? 0,
+    };
+  }
+
   const rows = properties.map((p) => {
     const a = allMap.get(p.id);
     const c = confirmedMap.get(p.id);
     const images = p.imagesJson ? JSON.parse(p.imagesJson) : [];
     const bed1 = getBedStats(p.id, '1bed');
     const bed2 = getBedStats(p.id, '2bed');
+    const activeFees = extractFees(a);
+    const confirmedFees = extractFees(c);
     return {
       id: p.id,
       title: p.title,
@@ -314,12 +364,26 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
       price: p.price,
       bookings: a?._count._all ?? 0,
       confirmedBookings: c?._count._all ?? 0,
-      earnings: a?._sum.total ?? 0,
-      confirmedEarnings: c?._sum.total ?? 0,
+      earnings: a?._sum?.total ?? 0,
+      confirmedEarnings: c?._sum?.total ?? 0,
       bed1Bookings: bed1.bookings,
       bed1Earnings: bed1.earnings,
       bed2Bookings: bed2.bookings,
       bed2Earnings: bed2.earnings,
+      // Fee breakdown for active (non-cancelled) bookings
+      grossRent: activeFees.grossRent,
+      cleaningFees: activeFees.cleaningFees,
+      serviceFees: activeFees.serviceFees,
+      discounts: activeFees.discounts,
+      hostNet: activeFees.hostNet,
+      wht: activeFees.wht,
+      // Confirmed fee breakdown
+      confirmedGrossRent: confirmedFees.grossRent,
+      confirmedCleaningFees: confirmedFees.cleaningFees,
+      confirmedServiceFees: confirmedFees.serviceFees,
+      confirmedDiscounts: confirmedFees.discounts,
+      confirmedHostNet: confirmedFees.hostNet,
+      confirmedWht: confirmedFees.wht,
     };
   });
 
@@ -335,12 +399,77 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
       acc.bed1Earnings += r.bed1Earnings;
       acc.bed2Bookings += r.bed2Bookings;
       acc.bed2Earnings += r.bed2Earnings;
+      // Fee breakdown totals
+      acc.grossRent += r.grossRent;
+      acc.cleaningFees += r.cleaningFees;
+      acc.serviceFees += r.serviceFees;
+      acc.discounts += r.discounts;
+      acc.hostNet += r.hostNet;
+      acc.wht += r.wht;
       return acc;
     },
-    { bookings: 0, confirmedBookings: 0, earnings: 0, confirmedEarnings: 0, bed1Bookings: 0, bed1Earnings: 0, bed2Bookings: 0, bed2Earnings: 0 }
+    {
+      bookings: 0, confirmedBookings: 0,
+      earnings: 0, confirmedEarnings: 0,
+      bed1Bookings: 0, bed1Earnings: 0, bed2Bookings: 0, bed2Earnings: 0,
+      grossRent: 0, cleaningFees: 0, serviceFees: 0, discounts: 0,
+      hostNet: 0, wht: 0,
+    }
   );
 
-  return { properties: rows, totals };
+  // Admin-only: per-host rankings aggregated from per-property data
+  let hosts: any[] = [];
+  if (isAdminView) {
+    const hostMap = new Map<string, {
+      hostId: string;
+      name: string;
+      email: string;
+      propertyCount: number;
+      bookings: number;
+      grossRent: number;
+      serviceFees: number;
+      cleaningFees: number;
+      discounts: number;
+      hostNet: number;
+      wht: number;
+      earnings: number;
+    }>();
+    for (const row of rows) {
+      const prop = properties.find((p: any) => p.id === row.id);
+      const hostId = prop?.hostId;
+      const hostUser = prop?.host;
+      if (!hostId) continue;
+      if (!hostMap.has(hostId)) {
+        hostMap.set(hostId, {
+          hostId,
+          name: hostUser ? `${hostUser.firstName} ${hostUser.lastName}` : 'Unknown Host',
+          email: hostUser?.email || '',
+          propertyCount: 0,
+          bookings: 0,
+          grossRent: 0,
+          serviceFees: 0,
+          cleaningFees: 0,
+          discounts: 0,
+          hostNet: 0,
+          wht: 0,
+          earnings: 0,
+        });
+      }
+      const h = hostMap.get(hostId)!;
+      h.propertyCount++;
+      h.bookings += row.bookings;
+      h.grossRent += (row.grossRent || 0);
+      h.serviceFees += (row.serviceFees || 0);
+      h.cleaningFees += (row.cleaningFees || 0);
+      h.discounts += (row.discounts || 0);
+      h.hostNet += (row.hostNet || 0);
+      h.wht += (row.wht || 0);
+      h.earnings += (row.earnings || 0);
+    }
+    hosts = Array.from(hostMap.values()).sort((a, b) => b.earnings - a.earnings);
+  }
+
+  return { properties: rows, totals, ...(isAdminView ? { hosts } : {}) };
 }
 
 export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED' | 'CANCELLED') {
@@ -379,6 +508,18 @@ export async function updateBooking(bookingId: string, input: UpdateBookingInput
 
   if (checkIn >= checkOut) {
     throw new ValidationError('Check-out date must be after check-in date');
+  }
+
+  // Late check-out capped at 3 hours past 10:00 AM (13:00).
+  const effectiveCheckOutTimeRaw = input.checkOutTime !== undefined ? input.checkOutTime : booking.checkOutTime;
+  if (effectiveCheckOutTimeRaw) {
+    const tm = /^(\d{1,2}):(\d{2})$/.exec(effectiveCheckOutTimeRaw);
+    if (tm) {
+      const tMinutes = parseInt(tm[1], 10) * 60 + parseInt(tm[2], 10);
+      if (tMinutes > 13 * 60) {
+        throw new ValidationError('Late check-out cannot extend past 1:00 PM (3 hours max)');
+      }
+    }
   }
 
   // Check availability for new dates (exclude current booking from conflict check)

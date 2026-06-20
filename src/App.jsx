@@ -1,8 +1,8 @@
+import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
-import { useState, useEffect, useMemo } from 'react';
 import PropertyPage from './components/PropertyPage';
 import apiClient from './api/client.js';
 import ContactPage from './pages/ContactPage';
@@ -14,7 +14,7 @@ import PlacesPage from './pages/PlacesPage';
 import RestaurantsPage from './pages/RestaurantsPage';
 import NearbySection from './components/NearbySection.jsx';
 import { PLACES_TO_VISIT, PLACES_TO_EAT, AREAS, PLACE_CATEGORIES, EAT_CATEGORIES } from './data/nearby.js';
-import { zuriImages } from './assets/images';
+
 
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -24,18 +24,24 @@ import MessagesPage from './pages/MessagesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ChatWidget from './components/ChatWidget';
-import AdminDashboard, { AdminLayout } from './pages/AdminDashboard';
-import AdminProperties from './pages/AdminProperties';
-import AdminPropertyForm from './pages/AdminPropertyForm';
-import AdminCalendar from './pages/AdminCalendar';
-import AdminBookings from './pages/AdminBookings';
-import AdminEarnings from './pages/AdminEarnings';
-import AdminPromos from './pages/AdminPromos';
-import AdminFeedback from './pages/AdminFeedback';
-import AdminMessages from './pages/AdminMessages';
-import PaymentCallback from './pages/PaymentCallback';
-import AdminPayouts from './pages/AdminPayouts';
+import ErrorBoundary from './components/ErrorBoundary';
+import Spinner from './components/Spinner.jsx';
+import NotFoundPage from './pages/NotFoundPage';
 import HostPayouts from './pages/HostPayouts';
+
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'));
+const AdminLayout = lazy(() => import('./pages/AdminDashboard.jsx').then(m => ({ default: m.AdminLayout })));
+const AdminProperties = lazy(() => import('./pages/AdminProperties.jsx'));
+const AdminPropertyForm = lazy(() => import('./pages/AdminPropertyForm.jsx'));
+const AdminCalendar = lazy(() => import('./pages/AdminCalendar.jsx'));
+const AdminBookings = lazy(() => import('./pages/AdminBookings.jsx'));
+const AdminEarnings = lazy(() => import('./pages/AdminEarnings.jsx'));
+const AdminPromos = lazy(() => import('./pages/AdminPromos.jsx'));
+const AdminFeedback = lazy(() => import('./pages/AdminFeedback.jsx'));
+const AdminMessages = lazy(() => import('./pages/AdminMessages.jsx'));
+const AdminUsers = lazy(() => import('./pages/AdminUsers.jsx'));
+const AdminPayouts = lazy(() => import('./pages/AdminPayouts.jsx'));
+const PaymentCallback = lazy(() => import('./pages/PaymentCallback.jsx'));
 
 // Home page component
 function HomePage() {
@@ -44,18 +50,27 @@ function HomePage() {
   const [heroStats, setHeroStats] = useState(null);
 
   useEffect(() => {
-    async function fetchProperties() {
+    async function load() {
       try {
-        const res = await apiClient.get('/properties');
-        const properties = res.data.data || [];
-        // Filter 3-star and above for marquee slider
-        const premium = properties.filter((p) => p.rating >= 3.0);
-        setPremiumProperties(premium);
+        const [propsRes, statsRes] = await Promise.all([
+          apiClient.get('/properties'),
+          apiClient.get('/reviews/summary'),
+        ]);
+        const properties = propsRes.data.data || [];
+        setPremiumProperties(properties.filter(p => p.rating >= 3.0));
         setAllProperties(properties);
-      } catch { /* silent */ }
+        const d = statsRes.data.data;
+        setHeroStats({ rating: d.averageRating || 5.0, stays: d.happyStays || d.confirmedStays || 0, satisfaction: d.satisfaction || 100 });
+      } catch (err) { console.error('HomePage load error', err); }
     }
-    fetchProperties();
+    load();
   }, []);
+
+  const marqueeItems = useMemo(() =>
+    premiumProperties.length > 0
+      ? [...premiumProperties, ...premiumProperties, ...premiumProperties, ...premiumProperties]
+      : []
+  , [premiumProperties]);
 
   // Weekly-rotating masonry images from property pool
   const masonryImages = useMemo(() => {
@@ -65,39 +80,20 @@ function HomePage() {
     const daysSinceStart = Math.floor((now - startOfYear) / 86400000);
     const weekNumber = Math.ceil((daysSinceStart + startOfYear.getDay() + 1) / 7);
 
-    // Collect all images from all properties
-    const propImages = allProperties.flatMap((p) => p.images || []);
+    // Collect all images from all properties (only user-uploaded, no stock fallback)
+    let propImages = allProperties.flatMap((p) => p.images || []);
 
-    if (propImages.length >= 12) {
-      const offset = (weekNumber * 12) % propImages.length;
-      return [...propImages.slice(offset), ...propImages.slice(0, offset)].slice(0, 12);
-    }
+    if (propImages.length === 0) return [];
 
-    // Fallback: mix property images + zuriImages to fill 12 slots
-    const fill = [...propImages];
-    const fallbackIndices = [5, 6, 7, 8, 9, 10, 11, 12, 14, 15, 16, 17];
-    for (const i of fallbackIndices) {
-      if (fill.length >= 12) break;
-      fill.push(zuriImages[i]);
+    // Cycle user images to fill 12 slots when fewer available
+    while (propImages.length < 12) {
+      propImages = [...propImages, ...propImages];
     }
-    const offset = (weekNumber * 12) % Math.max(fill.length, 1);
-    return [...fill.slice(offset), ...fill.slice(0, offset)].slice(0, 12);
+    propImages = propImages.slice(0, 12);
+
+    const offset = (weekNumber * 12) % propImages.length;
+    return [...propImages.slice(offset), ...propImages.slice(0, offset)].slice(0, 12);
   }, [allProperties]);
-
-  useEffect(() => {
-    async function fetchStats() {
-      try {
-        const res = await apiClient.get('/reviews/summary');
-        const d = res.data.data;
-        setHeroStats({
-          rating: d.averageRating || 5.0,
-          stays: d.happyStays || d.confirmedStays || 0,
-          satisfaction: d.satisfaction || 100,
-        });
-      } catch { /* use hardcoded fallbacks */ }
-    }
-    fetchStats();
-  }, []);
 
   return (
     <>
@@ -117,7 +113,7 @@ function HomePage() {
       {premiumProperties.length > 0 && (
         <div className="marquee-container w-full overflow-hidden pb-8 px-10 md:px-20 lg:px-32">
           <div className="marquee-track flex gap-6 w-max">
-            {[...premiumProperties, ...premiumProperties, ...premiumProperties, ...premiumProperties].map((property, i) => (
+            {marqueeItems.map((property, i) => (
               <a
                 key={`${property.id}-${i}`}
                 href={`/property/${property.id}`}
@@ -249,41 +245,54 @@ function HomePage() {
   );
 }
 
+function Loading() {
+  return <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]"><Spinner /></div>;
+}
+
+function Page({ title, children }) {
+  useEffect(() => { document.title = title ? `${title} — ZuriLofts` : 'ZuriLofts — Premium Short-let Apartments'; }, [title]);
+  return children;
+}
+
 function App() {
   return (
     <Router>
       <ChatWidget />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/properties" element={<PropertiesPage />} />
-        <Route path="/property/:id" element={<PropertyPage />} />
-        <Route path="/booking/:id" element={<ProtectedRoute><BookingPage /></ProtectedRoute>} />
-        <Route path="/contact" element={<ContactPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/auth/callback" element={<OAuthCallback />} />
-        <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
-        <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
-        <Route path="/privacy" element={<PrivacyPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/places" element={<PlacesPage />} />
-        <Route path="/restaurants" element={<RestaurantsPage />} />
-        <Route path="/payment/callback" element={<ProtectedRoute><PaymentCallback /></ProtectedRoute>} />
-        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-          <Route index element={<AdminDashboard />} />
-          <Route path="properties" element={<AdminProperties />} />
-          <Route path="properties/new" element={<AdminPropertyForm />} />
-          <Route path="properties/:id/edit" element={<AdminPropertyForm />} />
-          <Route path="properties/:id/calendar" element={<AdminCalendar />} />
-          <Route path="bookings" element={<AdminBookings />} />
-          <Route path="earnings" element={<AdminEarnings />} />
-          <Route path="promos" element={<AdminPromos />} />
-          <Route path="feedback" element={<AdminFeedback />} />
-          <Route path="messages" element={<AdminMessages />} />
-          <Route path="payouts" element={<AdminPayouts />} />
-        </Route>
-        <Route path="/host/payouts" element={<ProtectedRoute><HostPayouts /></ProtectedRoute>} />
-      </Routes>
+      <ErrorBoundary>
+        <Routes>
+          <Route path="/" element={<Page><HomePage /></Page>} />
+          <Route path="/properties" element={<Page title="Properties"><PropertiesPage /></Page>} />
+          <Route path="/property/:id" element={<PropertyPage />} />
+          <Route path="/booking/:id" element={<Page title="Booking"><ProtectedRoute><BookingPage /></ProtectedRoute></Page>} />
+          <Route path="/contact" element={<Page title="Contact"><ContactPage /></Page>} />
+          <Route path="/login" element={<Page title="Login"><LoginPage /></Page>} />
+          <Route path="/register" element={<Page title="Register"><RegisterPage /></Page>} />
+          <Route path="/auth/callback" element={<OAuthCallback />} />
+          <Route path="/profile" element={<Page title="Profile"><ProtectedRoute><ProfilePage /></ProtectedRoute></Page>} />
+          <Route path="/messages" element={<Page title="Messages"><ProtectedRoute><MessagesPage /></ProtectedRoute></Page>} />
+          <Route path="/privacy" element={<Page title="Privacy Policy"><PrivacyPage /></Page>} />
+          <Route path="/terms" element={<Page title="Terms of Service"><TermsPage /></Page>} />
+          <Route path="/places" element={<Page title="Places"><PlacesPage /></Page>} />
+          <Route path="/restaurants" element={<Page title="Restaurants"><RestaurantsPage /></Page>} />
+          <Route path="/payment/callback" element={<Suspense fallback={<Loading />}><Page title="Payment"><ProtectedRoute><PaymentCallback /></ProtectedRoute></Page></Suspense>} />
+          <Route path="/admin" element={<Suspense fallback={<Loading />}><AdminRoute><AdminLayout /></AdminRoute></Suspense>}>
+            <Route index element={<Suspense fallback={<Loading />}><AdminDashboard /></Suspense>} />
+            <Route path="properties" element={<Suspense fallback={<Loading />}><AdminProperties /></Suspense>} />
+            <Route path="properties/new" element={<Suspense fallback={<Loading />}><AdminPropertyForm /></Suspense>} />
+            <Route path="properties/:id/edit" element={<Suspense fallback={<Loading />}><AdminPropertyForm /></Suspense>} />
+            <Route path="properties/:id/calendar" element={<Suspense fallback={<Loading />}><AdminCalendar /></Suspense>} />
+            <Route path="bookings" element={<Suspense fallback={<Loading />}><AdminBookings /></Suspense>} />
+            <Route path="earnings" element={<Suspense fallback={<Loading />}><AdminEarnings /></Suspense>} />
+            <Route path="users" element={<Suspense fallback={<Loading />}><AdminUsers /></Suspense>} />
+            <Route path="promos" element={<Suspense fallback={<Loading />}><AdminPromos /></Suspense>} />
+            <Route path="feedback" element={<Suspense fallback={<Loading />}><AdminFeedback /></Suspense>} />
+            <Route path="messages" element={<Suspense fallback={<Loading />}><AdminMessages /></Suspense>} />
+            <Route path="payouts" element={<Suspense fallback={<Loading />}><AdminPayouts /></Suspense>} />
+          </Route>
+          <Route path="/host/payouts" element={<Page title="Host Payouts"><ProtectedRoute><HostPayouts /></ProtectedRoute></Page>} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </ErrorBoundary>
     </Router>
   );
 }

@@ -27,7 +27,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,woff2,svg,png,jpg,jpeg,gif}'],
-        navigateFallback: null, // SPA — let the app handle routing
+        navigateFallback: '/index.html', // SPA shell for offline/deep links
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -61,6 +61,19 @@ export default defineConfig({
       },
     }),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        // Split heavyweight PDF/imaging libs into their own chunks so the
+        // main app bundle stays small. Only loaded when the earnings page
+        // actually mounts (via React.lazy).
+        manualChunks: {
+          'pdf-export': ['jspdf', 'jspdf-autotable'],
+          'html2canvas': ['html2canvas'],
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       '/api': {

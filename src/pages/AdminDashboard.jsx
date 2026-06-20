@@ -1,37 +1,146 @@
-import { useState, useEffect } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import PropTypes from 'prop-types';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import logoImg from '../assets/zurilofts-logo.png';
 
-const allNavItems = [
+// Shared: both hosts and admins — routes gated by requireHost (or weaker).
+const sharedNavItems = [
   { path: '/admin', label: 'Dashboard', icon: 'M4 6h16M4 10h16M4 14h16M4 18h16', exact: true },
   { path: '/admin/properties', label: 'Properties', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-  { path: '/admin/bookings', label: 'Bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
   { path: '/admin/earnings', label: 'Earnings', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
-  { path: '/admin/payouts', label: 'Payouts', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z' },
   { path: '/admin/messages', label: 'Messages', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
+  { path: '/admin/payouts', label: 'Payouts', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z' },
 ];
 
+// Admin-only: backend is requireAdmin. Hosts must not see these — clicking
+// them would 403. Separated from sharedNavItems so the host sidebar stays
+// functional and doesn't invite users to dead-end pages.
 const adminOnlyItems = [
+  { path: '/admin/bookings', label: 'Bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
   { path: '/admin/users', label: 'Users & Hosts', icon: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65' },
   { path: '/admin/promos', label: 'Promo Codes', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
   { path: '/admin/feedback', label: 'Feedback', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z' },
 ];
 
+// Avatar dropdown shown in the dashboard header — mirrors the client Navbar's
+// account menu so admins/hosts get the same affordance inside the panel.
+function HeaderUserMenu({ user, isAdmin, onLogout }) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    function handleClick(e) {
+      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  return (
+    <div className="relative" ref={menuRef}>
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center space-x-2 px-2 py-1.5 rounded-full hover:bg-[#D9D9D9]/40 transition-all duration-200"
+      >
+        <div className="w-9 h-9 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
+          {user?.avatar ? (
+            <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+          ) : (
+            <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
+          )}
+        </div>
+        <span className="hidden sm:block text-sm font-semibold text-[#0B0B45]">{user?.firstName}</span>
+        <svg className={`w-4 h-4 text-[#0B0B45] transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-lg border border-[#D9D9D9] py-2 z-30">
+          <div className="px-4 py-3 border-b border-[#D9D9D9]">
+            <p className="text-sm font-semibold text-[#0B0B45]">{user?.firstName} {user?.lastName}</p>
+            <p className="text-xs text-[#6b7280]">{user?.email}</p>
+            <span className="inline-block mt-1.5 text-[10px] font-bold uppercase tracking-wider text-[#C49A6C]">{isAdmin ? 'Admin' : 'Host'}</span>
+          </div>
+          <Link
+            to="/profile#info"
+            onClick={() => setOpen(false)}
+            className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+            My Profile
+          </Link>
+          <Link
+            to="/admin/messages"
+            onClick={() => setOpen(false)}
+            className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            Messages
+          </Link>
+          <Link
+            to="/"
+            onClick={() => setOpen(false)}
+            className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Go back to client view
+          </Link>
+          <div className="border-t border-[#D9D9D9] mt-1 pt-1">
+            <button
+              onClick={() => { setOpen(false); onLogout(); }}
+              className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign Out
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+HeaderUserMenu.propTypes = {
+  user: PropTypes.shape({
+    firstName: PropTypes.string,
+    lastName: PropTypes.string,
+    email: PropTypes.string,
+    avatar: PropTypes.string,
+  }),
+  isAdmin: PropTypes.bool,
+  onLogout: PropTypes.func.isRequired,
+};
+
 function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem('zurilofts_admin_sidebar') === 'collapsed'; } catch { return false; }
   });
   const isAdmin = user?.role === 'ADMIN';
-  const navItems = isAdmin ? [...allNavItems, ...adminOnlyItems] : allNavItems;
+  const navItems = isAdmin ? [...sharedNavItems, ...adminOnlyItems] : sharedNavItems;
+
+  function handleLogout() {
+    logout();
+    navigate('/');
+  }
 
   function toggleSidebar() {
     setCollapsed((prev) => {
       const next = !prev;
-      try { localStorage.setItem('zurilofts_admin_sidebar', next ? 'collapsed' : 'expanded'); } catch {}
+      try { localStorage.setItem('zurilofts_admin_sidebar', next ? 'collapsed' : 'expanded'); } catch { /* ignore localStorage errors */ }
       return next;
     });
   }
@@ -76,6 +185,7 @@ function AdminLayout() {
                 key={path}
                 to={path}
                 title={collapsed ? label : ''}
+                aria-current={active ? 'page' : undefined}
                 className={`flex items-center rounded-full mb-2 text-sm font-medium transition-all duration-200 ${
                   active
                     ? 'bg-[#C49A6C] text-white'
@@ -115,7 +225,7 @@ function AdminLayout() {
             )}
           </div>
           <button
-            onClick={logout}
+            onClick={handleLogout}
             title={collapsed ? 'Sign Out' : ''}
             className={`flex items-center text-white/60 hover:text-white transition-colors mt-3 ${
               collapsed ? 'justify-center w-full text-base' : 'text-[15px]'
@@ -137,7 +247,7 @@ function AdminLayout() {
           </div>
           <span className="text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">{isAdmin ? 'Admin' : 'Host'}</span>
         </Link>
-        <div className="flex space-x-2">
+        <div className="flex items-center space-x-2">
           {navItems.map(({ path, label, icon }) => (
             <Link
               key={path}
@@ -164,16 +274,25 @@ function AdminLayout() {
             </svg>
             <span className="sr-only">Go back to client view</span>
           </Link>
+          <div className="bg-white/95 rounded-full">
+            <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+          </div>
         </div>
       </div>
 
       {/* Main content */}
       <main
-        className={`flex-1 p-4 md:p-8 pt-20 md:pt-8 transition-all duration-300 ${
+        className={`flex-1 transition-all duration-300 ${
           collapsed ? 'md:ml-[88px]' : 'md:ml-64'
         }`}
       >
-        <Outlet />
+        {/* Desktop header with avatar dropdown */}
+        <header className="hidden md:flex items-center justify-end h-16 px-8 bg-white border-b border-[#D9D9D9] sticky top-0 z-[5]">
+          <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+        </header>
+        <div className="p-4 md:p-8 pt-20 md:pt-8">
+          <Outlet />
+        </div>
       </main>
     </div>
   );
