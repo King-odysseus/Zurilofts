@@ -66,10 +66,16 @@ export async function banks(_req: Request, res: Response, next: NextFunction): P
 export async function webhook(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const signature = (req.headers['x-paystack-signature'] as string) || '';
-    const event = req.body?.event || '';
 
-    // The body is already a Buffer from express.raw()
+    // The body is a Buffer from express.raw(), so req.body.event is undefined.
+    // The event type lives inside the JSON payload — parse it from the raw string.
     const rawBody = req.body instanceof Buffer ? req.body.toString('utf-8') : JSON.stringify(req.body);
+    let event = '';
+    try {
+      event = JSON.parse(rawBody)?.event || '';
+    } catch {
+      // Malformed JSON — leave event blank; the signature check will reject it.
+    }
 
     const result = await paymentService.handleWebhookEvent(event, rawBody, signature);
     // Always return 200 so Paystack doesn't keep retrying
