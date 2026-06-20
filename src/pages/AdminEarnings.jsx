@@ -81,7 +81,6 @@ const SORT_OPTIONS = [
 function AdminEarnings() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  const isHost = user?.role === 'HOST';
   const [rows, setRows] = useState([]);
   const [hosts, setHosts] = useState([]);
   const [loading, setLoading] = useState(true);
