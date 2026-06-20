@@ -38,8 +38,11 @@ export async function listMine(req: Request, res: Response, next: NextFunction):
 
 export async function getById(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
+    // Admins see any booking; everyone else is scoped to bookings they own as a
+    // guest or that sit on one of their own listings (host).
     const isAdmin = req.user?.role === 'ADMIN';
-    const booking = await bookingService.getBooking(req.params.id, isAdmin ? undefined : req.user!.sub);
+    const scope = isAdmin ? undefined : { userId: req.user!.sub, hostId: req.user!.sub };
+    const booking = await bookingService.getBooking(req.params.id, scope);
     res.json({ success: true, data: booking });
   } catch (error) {
     next(error);

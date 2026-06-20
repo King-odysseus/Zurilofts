@@ -197,7 +197,11 @@ export async function listUserBookings(userId: string, status?: string, page = 1
   };
 }
 
-export async function getBooking(bookingId: string, userId?: string) {
+// `scope` restricts who may read the booking. Admins pass undefined (no scope).
+// Everyone else passes their own id as both candidates: a guest sees their own
+// booking, a host sees bookings on their own listings. Misses throw 404 (not
+// 403) so the endpoint never reveals whether a booking exists.
+export async function getBooking(bookingId: string, scope?: { userId?: string; hostId?: string }) {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: {
@@ -207,7 +211,11 @@ export async function getBooking(bookingId: string, userId?: string) {
   });
 
   if (!booking) throw new NotFoundError('Booking');
-  if (userId && booking.userId !== userId) throw new NotFoundError('Booking');
+  if (scope) {
+    const isGuestOwner = scope.userId != null && booking.userId === scope.userId;
+    const isHostOwner = scope.hostId != null && booking.property?.hostId === scope.hostId;
+    if (!isGuestOwner && !isHostOwner) throw new NotFoundError('Booking');
+  }
 
   return normalizeBooking(booking);
 }
