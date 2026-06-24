@@ -184,7 +184,7 @@ function PrivacyPage() {
             </section>
 
             {/* 10. Cookies and Tracking */}
-            <section>
+            <section id="cookies" className="scroll-mt-24">
               <h2 className="text-xl font-bold text-[#0B0B45] mb-3">10. Cookies and Similar Technologies</h2>
               <p>We use the following categories of cookies on the Platform:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">

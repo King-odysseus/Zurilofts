@@ -24,6 +24,7 @@ import MessagesPage from './pages/MessagesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ChatWidget from './components/ChatWidget';
+import CookieConsent from './components/CookieConsent';
 import ErrorBoundary from './components/ErrorBoundary';
 import Spinner from './components/Spinner.jsx';
 import NotFoundPage from './pages/NotFoundPage';
@@ -258,6 +259,7 @@ function App() {
   return (
     <Router>
       <ChatWidget />
+      <CookieConsent />
       <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Page><HomePage /></Page>} />
