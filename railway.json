@@ -1,7 +1,10 @@
 {
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "cd server && NODE_ENV=development npm ci && npx prisma generate --schema=prisma/schema.postgresql.prisma && npm run build && cd .. && npm run build"
+    "buildCommand": "cd server && NODE_ENV=development npm ci && npx prisma generate --schema=prisma/schema.postgresql.prisma && npm run build && cd .. && npm run build",
+    "nixpacks": {
+      "providers": ["nodejs_20", "npm-9_x"]
+    }
   },
   "deploy": {
     "startCommand": "cd server && npx prisma db push --schema=prisma/schema.postgresql.prisma && node dist/index.js",
