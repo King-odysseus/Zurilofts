@@ -26,6 +26,9 @@ import contactRoutes from './routes/contact.routes.js';
 
 const app = express();
 
+// Trust Railway's proxy for rate-limiting and IP-based features
+app.set('trust proxy', 1);
+
 // Paystack webhook MUST use raw body BEFORE global JSON parser.
 // HMAC-SHA512 signature is computed over the raw request body.
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
