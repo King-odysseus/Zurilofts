@@ -71,26 +71,29 @@ async function main() {
   ];
 
   for (const prop of propertiesData) {
-    await prisma.property.create({
-      data: {
-        hostId: admin.id,
-        title: prop.title,
-        location: prop.location,
-        price: prop.price,
-        rating: prop.rating,
-        reviews: prop.reviews,
-        bedrooms: prop.bedrooms,
-        bathrooms: prop.bathrooms,
-        area: prop.area,
-        description: prop.description,
-        imagesJson: json(prop.images),
-        amenitiesJson: json(prop.amenities),
-        nearbyJson: json(prop.nearby),
-        type: prop.type,
-        available: prop.available,
-        featured: prop.featured,
-      },
-    });
+    const existing = await prisma.property.findFirst({ where: { title: prop.title } });
+    if (!existing) {
+      await prisma.property.create({
+        data: {
+          hostId: admin.id,
+          title: prop.title,
+          location: prop.location,
+          price: prop.price,
+          rating: prop.rating,
+          reviews: prop.reviews,
+          bedrooms: prop.bedrooms,
+          bathrooms: prop.bathrooms,
+          area: prop.area,
+          description: prop.description,
+          imagesJson: json(prop.images),
+          amenitiesJson: json(prop.amenities),
+          nearbyJson: json(prop.nearby),
+          type: prop.type,
+          available: prop.available,
+          featured: prop.featured,
+        },
+      });
+    }
   }
   console.log(`  ✅ ${propertiesData.length} properties seeded`);
 
@@ -102,7 +105,10 @@ async function main() {
   ];
 
   for (const promo of promos) {
-    await prisma.promoCode.create({ data: promo });
+    const existing = await prisma.promoCode.findFirst({ where: { code: promo.code } });
+    if (!existing) {
+      await prisma.promoCode.create({ data: promo });
+    }
   }
   console.log('  ✅ 3 promo codes seeded: WELCOME10, SUMMER2026, STAYLONG');
 
