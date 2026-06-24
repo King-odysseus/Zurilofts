@@ -7,7 +7,8 @@
     }
   },
   "deploy": {
-    "startCommand": "cd server && npx prisma db push --schema=prisma/schema.postgresql.prisma && node dist/index.js",
+    "preDeployCommand": "cd server && npx prisma db push --schema=prisma/schema.postgresql.prisma --accept-data-loss",
+    "startCommand": "cd server && node dist/index.js",
     "healthcheckPath": "/api/health"
   }
 }
