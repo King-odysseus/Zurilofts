@@ -25,6 +25,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ChatWidget from './components/ChatWidget';
 import CookieConsent from './components/CookieConsent';
+import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import Spinner from './components/Spinner.jsx';
 import NotFoundPage from './pages/NotFoundPage';
@@ -258,6 +259,7 @@ function Page({ title, children }) {
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <ChatWidget />
       <CookieConsent />
       <ErrorBoundary>
