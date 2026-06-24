@@ -1,31 +1,45 @@
-ZuriLofts 'Nearby' images — sourced from Wikimedia Commons
-file | source file | license | author
-place-yaya-centre.jpg | File:Yaya Centre.jpg | CC BY 4.0 | LittleT889
-place-sarit-centre.jpg | File:Sarit Centre.jpg | CC BY-SA 3.0 | OhanaUnited
-place-westgate-mall.jpg | File:Westgate Shopping Mall, Nairobi (13).jpg | CC BY-SA 4.0 | Yahya
-place-nairobi-national-museum.jpg | File:A2613-Nairobi National Museum-Building.jpg | CC BY-SA 4.0 | A2613
-place-giraffe-centre.jpg | File:GIRAFFE CENTRE NAIROBI KAREN.jpg | CC BY-SA 4.0 | Collins obiye
-place-sheldrick-orphanage.jpg | File:Orphan Elephants feeding at Sheldrick Wildlife Trust Orphanage.jpg | CC BY-SA 4.0 | Erahmbuthia
-place-karen-blixen-museum.jpg | File:Karen blixen museum in nairobi kenya 02.jpg | CC BY-SA 4.0 | Alexander Leisser
-place-nairobi-national-park.jpg | File:Standing zebra at Nairobi National Park.jpg | CC BY-SA 4.0 | Brihaspati
-place-karura-forest.jpg | File:Karura forest path.jpg | CC BY-SA 4.0 | Mekami
-place-village-market.jpg | File:Overhead view of the Village Market, Nairobi.jpg | CC BY-SA 4.0 | Sdkb
-place-two-rivers-mall.jpg | File:Centum Investment Company at Two Rivers Mall, Nairobi.jpg | CC BY-SA 4.0 | Jok Garang
-place-nairobi-arboretum.jpg | File:Nairobi Arboretum Park 02.JPG | CC BY-SA 4.0 | Ahero dala
+ZuriLofts — "Places to Visit / Places to Eat in Nairobi" imagery
+All images sourced from Wikimedia Commons. License shown per file;
+CC BY / CC BY-SA files require attribution to the author (see the file page on
+https://commons.wikimedia.org for full author + license details). CC0 = public domain, no attribution required.
 
---- closer-matched stock (Openverse / Flickr CC) ---
-file | title | license | creator | source
-place-junction-mall.jpg | HK SKD TKO Lohas Park Road shopping mall interior escalators July 2021 SS2 | by-sa 4.0 | Jimun Guao Weiaml | https://commons.wikimedia.org/w/index.php?curid=107328702
-place-ngong-forest.jpg | Nature trail within Karura Forest (2) | by-sa 4.0 | Eva Ayub | https://commons.wikimedia.org/w/index.php?curid=92745954
-place-nairobi-street-kitchen.jpg | DZ6 1783 Night market food stall vendors frying and serving freshly cooked snacks under lantern light as customers browse the bustling street | by-sa 4.0 | PattayaPatrol | https://commons.wikimedia.org/w/index.php?curid=189379099
-place-un-hq.jpg | SEAPOINT RAILWAY STATION (ON THE OLD DUBLIN AND KINGSTON LINE)-126937 (cropped) | by-sa 2.0 | William Murphy | https://commons.wikimedia.org/w/index.php?curid=118018755
-place-lavington-curve.jpg | Limerick - Urban Depression On Ellen Street | by-sa 2.0 | infomatique | https://www.flickr.com/photos/80824546@N00/5771671718
-place-sigiria-forest.jpg | A cave at Oloolua Nature Trail Nairobi Kenya | by-sa 4.0 | Cmwaura | https://commons.wikimedia.org/w/index.php?curid=127888138
-eat-artcaffe.jpg | Coffee and Croissant Breakfast | by 2.0 | Dominic's pics | https://www.flickr.com/photos/64097751@N00/820472339
-eat-mercado.jpg | Taco plate with lengua (left) and pastor. -Mexican -tacos -oalland -lengua -pastor (15848356933) | by 2.0 | Arnold Gatilao from Oakland, CA, USA | https://commons.wikimedia.org/w/index.php?curid=40530163
-eat-slate.jpg | DFC 5196 Rooftop bar in Pattaya bartenders mix cocktails against a glittering city skyline as guests enjoy the evening atmosphere | by-sa 4.0 | PattayaPatrol | https://commons.wikimedia.org/w/index.php?curid=188628580
-eat-talisman.jpg | Shabbily Pampered | by 2.0 | YourCastlesDecor | https://www.flickr.com/photos/101592688@N07/14173139869
-eat-cultiva.jpg | Raw Food Tacos | by 2.0 | Geoff Peters 604 | https://www.flickr.com/photos/54359128@N00/3462048736
-eat-harvest.jpg | Perfectly delightful summer salad, avocado, celery, romaine lettuce, olives, feta cheese, almonds, tomato, tamari sauce, olive oil, served on a square maroon zen plate, silver fork, second floor loft, Seattle, Washington, USA | by 2.0 | Wonderlane | https://www.flickr.com/photos/71401718@N00/6089391116
-eat-mama-rocks.jpg | Cheeseburger with fries | by-sa 4.0 | Mark Miller | https://commons.wikimedia.org/w/index.php?curid=82000109
-eat-graze.jpg | Best BBQ Chicken with Simple Barbecue Sauce | by 2.0 | thebittenword.com | https://www.flickr.com/photos/22198928@N00/2695764032
+== Real Nairobi landmark photos ==
+place-yaya-centre.jpg            | File:Yaya Centre.jpg                                              | CC BY 4.0
+place-sarit-centre.jpg           | File:Sarit Centre.jpg                                             | CC BY-SA 3.0
+place-westgate-mall.jpg          | File:Westgate Shopping Mall, Nairobi (13).jpg                     | CC BY-SA 4.0
+place-nairobi-national-museum.jpg| File:A2613-Nairobi National Museum-Building.jpg                   | CC BY-SA 4.0
+place-giraffe-centre.jpg         | File:GIRAFFE CENTRE NAIROBI KAREN.jpg                             | CC BY-SA 4.0
+place-sheldrick-orphanage.jpg    | File:Orphan Elephants feeding at Sheldrick Wildlife Trust Orphanage.jpg | CC BY-SA 4.0
+place-karen-blixen-museum.jpg    | File:Karen blixen museum in nairobi kenya 02.jpg                  | CC BY-SA 4.0
+place-nairobi-national-park.jpg  | File:Standing zebra at Nairobi National Park.jpg                  | CC BY-SA 4.0
+place-karura-forest.jpg          | File:Karura forest path.jpg                                       | CC BY-SA 4.0
+place-village-market.jpg         | File:Overhead view of the Village Market, Nairobi.jpg             | CC BY-SA 4.0
+place-two-rivers-mall.jpg        | File:Centum Investment Company at Two Rivers Mall, Nairobi.jpg    | CC BY-SA 4.0
+place-nairobi-arboretum.jpg      | File:Nairobi Arboretum Park 02.JPG                                | CC BY-SA 4.0
+place-ngong-forest.jpg           | File:Oloolua Nature Trail -Nairobi.jpg (real Nairobi forest trail)| Wikimedia Commons (see file page)
+
+== Closer-matched, people-free stock (generic, not the literal venue) ==
+place-junction-mall.jpg          | File:Atrium in the Myer Centre shopping centre.jpg                | CC BY-SA 4.0
+place-sigiria-forest.jpg         | File:Tropical rainforest Agumbe.jpg                               | CC BY-SA 4.0
+eat-brew-bistro.jpg              | File:16-09-17-WikiLovesCocktails-Drink (cocktail)                 | GFDL 1.2
+eat-mama-oliech.jpg              | File:Fish fry (72986).jpg                                         | CC BY-SA 4.0
+eat-fogo-gaucho.jpg              | File:Linguiça churrasco. (20289902739).jpg                        | CC BY 2.0
+eat-cedars.jpg                   | File:Meze plate.jpg                                               | CC BY-SA 4.0
+eat-artcaffe.jpg                 | File:Zlaté cappuccino v A-Caffe.jpg                               | CC0
+eat-la-terrazza.jpg              | File:Espaguetis carbonara.jpg                                     | CC BY-SA 4.0
+eat-mercado.jpg                  | File:Tacos 2.jpg                                                  | CC BY-SA 3.0
+eat-about-thyme.jpg              | File:Green Salad - Flat Iron.jpg                                  | CC0
+eat-slate.jpg                    | File:Grilled steak served on a plate.jpg                          | CC BY 2.0
+eat-talisman.jpg                 | File:Sisig in iron plate.jpg                                      | CC BY-SA 4.0
+eat-cultiva.jpg                  | File:DFC 1189 Pan-seared salmon fillet.jpg                        | Wikimedia Commons (see file page)
+eat-matbronze.jpg                | File:Applesauce walnut coffee cake.jpg                            | CC BY-SA 2.0
+eat-harvest.jpg                  | File:Salad bowl, Kiedrich.jpg                                     | CC0
+eat-mama-rocks.jpg               | File:Big Mac hamburger.jpg                                        | CC0
+eat-hero.jpg                     | File:Sashimi of São Paulo.jpg                                     | CC BY-SA 4.0
+eat-the-arbor.jpg                | File:Vegetarian Pizza.jpg                                         | CC BY-SA 4.0
+eat-pallet.jpg                   | File:Café latte - French Coffee Shop.jpg                          | CC0
+eat-graze.jpg                    | File:Charcoal Steak.jpg                                           | CC BY-SA 4.0
+
+== Left on original Unsplash images (no clean Kenya-appropriate source found) ==
+The Hub Karen, UN Headquarters Nairobi, Nairobi Street Kitchen,
+The Lavington Green, Lavington Curve  -> still use their original Unsplash photos.
