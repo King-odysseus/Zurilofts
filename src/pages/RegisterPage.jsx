@@ -279,7 +279,7 @@ function RegisterPage() {
 
         {/* Selling Points — Host Registration */}
         {isHost && (
-          <div className="mt-6 neu-card p-6 bg-white/95 backdrop-blur-sm max-w-md w-full">
+          <div className="mt-6 auth-card rounded-2xl p-6 bg-white/95 backdrop-blur-sm max-w-md w-full">
             <h3 className="text-lg font-bold text-[#0B0B45] mb-4">Why Host with ZuriLofts</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex gap-3">
