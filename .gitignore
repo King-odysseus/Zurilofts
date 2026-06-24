@@ -35,3 +35,6 @@ Instruct.md
 .qwen/
 .continue/
 .cursor/
+.kimi/
+.kimi-code/
+.agents/

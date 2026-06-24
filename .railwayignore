@@ -1,0 +1,10 @@
+# Don't upload git history
+.git
+
+# Dependencies are installed during build
+node_modules
+server/node_modules
+
+# Build output is generated during build
+dist
+server/dist
