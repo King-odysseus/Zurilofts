@@ -46,9 +46,9 @@ model Property {
   bathrooms   Int
   area        Int
   description String
-  images      String[]
-  amenities   String[]
-  nearby      String[]
+  imagesJson   String    @default("[]")
+  amenitiesJson String   @default("[]")
+  nearbyJson   String    @default("[]")
   type        String
   available   Boolean  @default(true)
   featured    Boolean  @default(false)
@@ -116,6 +116,7 @@ model Booking {
   checkIn         DateTime
   checkOut        DateTime
   guests          Int
+  bedOption       String?
   checkInTime     String?
   specialRequests String?
   paymentMethod   String

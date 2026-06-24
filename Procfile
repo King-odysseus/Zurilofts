@@ -1,1 +1,1 @@
-web: cd server && npx prisma generate && npx prisma migrate deploy && node dist/index.js
+web: cd server && cp prisma/schema.postgresql.prisma prisma/schema.prisma && npx prisma generate && npx prisma db push && node dist/index.js
