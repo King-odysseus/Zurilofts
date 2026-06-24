@@ -48,13 +48,13 @@ const envSchema = z.object({
           message: 'Production JWT secrets must not use the development placeholder values. Generate strong random secrets (e.g. `openssl rand -base64 48`).',
         });
       }
-      // Require Paystack keys in production
+      // Paystack keys are needed for payments in production, but their absence
+      // must not crash the server — it should still boot and serve everything
+      // else. Payment/payout endpoints fail with a clear error only when used.
       if (!data.PAYSTACK_SECRET_KEY || !data.PAYSTACK_PUBLIC_KEY || !data.PAYSTACK_WEBHOOK_SECRET) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['PAYSTACK_SECRET_KEY'],
-          message: 'Paystack keys are required in production (PAYSTACK_SECRET_KEY, PAYSTACK_PUBLIC_KEY, PAYSTACK_WEBHOOK_SECRET).',
-        });
+        console.warn(
+          '⚠️  Paystack keys are not fully configured (PAYSTACK_SECRET_KEY, PAYSTACK_PUBLIC_KEY, PAYSTACK_WEBHOOK_SECRET). Payments and payouts are disabled until these are set.'
+        );
       }
     }
   });
