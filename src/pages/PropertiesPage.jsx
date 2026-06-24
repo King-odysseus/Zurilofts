@@ -209,8 +209,8 @@ function PropertiesPage() {
                   }} />
                 </Link>
               ))}
-              {/* Coming Soon cards — show on default 'All' view only */}
-              {filter === 'all' && priceRange === 'all' && !searchQuery && !availableOnly && [18, 16, 15, 14].map((imgIndex) => (
+              {/* Coming Soon cards — show only when no real properties exist on default view */}
+              {!loading && properties.length === 0 && filter === 'all' && priceRange === 'all' && !searchQuery && !availableOnly && [18, 16, 15, 14].map((imgIndex) => (
                 <div key={imgIndex} className="group neu-card overflow-hidden">
                   <div className="relative aspect-[4/3]">
                     <img
