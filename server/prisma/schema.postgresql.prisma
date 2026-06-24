@@ -210,6 +210,12 @@ model Message {
   @@index([userId])
 }
 
+model AppSetting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+}
+
 model PromoCode {
   id               String    @id @default(uuid())
   code             String    @unique

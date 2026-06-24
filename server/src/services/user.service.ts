@@ -184,7 +184,7 @@ export async function setUserRole(userId: string, role: string) {
 
   return prisma.user.update({
     where: { id: userId },
-    data: { role },
+    data: { role: role as any },
     select: ADMIN_USER_SELECT,
   });
 }
