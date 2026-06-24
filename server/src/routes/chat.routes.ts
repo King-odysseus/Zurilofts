@@ -44,16 +44,14 @@ router.post('/send', chatLimiter, validate(chatSchema), async (req, res, next) =
     const safeMessage = escapeMarkdown(message);
 
     const text = [
-      `💬 *New Website Chat*`,
+      `💬 *New website chat*`,
+      safeEmail ? `${safeName} · ${safeEmail}` : safeName,
       ``,
-      `👤 *Name:* ${safeName}`,
-      safeEmail ? `📧 *Email:* ${safeEmail}` : '',
-      sessionId ? `🔑 *Session:* \`${sessionId.slice(-8)}\`` : '',
-      ``,
-      `📝 *Message:*`,
       safeMessage,
       ``,
-      `↩️ _Reply to this message to respond to the guest._`,
+      sessionId
+        ? `_Reply to this message to respond · Session: ${sessionId.slice(-8)}_`
+        : `_Reply to this message to respond._`,
     ]
       .filter(Boolean)
       .join('\n');
