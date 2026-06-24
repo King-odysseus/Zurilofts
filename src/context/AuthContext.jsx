@@ -130,7 +130,7 @@ export function AuthProvider({ children }) {
       const res = await apiClient.get('/auth/me');
       const user = res.data.data;
       dispatch({ type: 'AUTH_SUCCESS', payload: { user, accessToken: oauthToken } });
-      return { success: true };
+      return { success: true, user };
     } catch (err) {
       clearAccessToken();
       const message = 'Google sign-in failed';
@@ -143,6 +143,10 @@ export function AuthProvider({ children }) {
     dispatch({ type: 'CLEAR_ERROR' });
   }, []);
 
+  const setUser = useCallback((user) => {
+    dispatch({ type: 'SET_USER', payload: user });
+  }, []);
+
   const value = {
     ...state,
     login,
@@ -150,17 +154,18 @@ export function AuthProvider({ children }) {
     logout,
     handleOAuthCallback,
     clearError,
+    setUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export function useAuth() {
+export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}
+};
 
 export default AuthContext;

@@ -30,7 +30,7 @@ function isSQLite(): boolean {
 
 function buildCreateData(data: any) {
   if (isSQLite()) {
-    return {
+    const base: any = {
       title: data.title,
       location: data.location,
       price: data.price,
@@ -47,6 +47,12 @@ function buildCreateData(data: any) {
       rating: data.rating,
       reviews: data.reviews,
     };
+    if (data.hostId) base.hostId = data.hostId;
+    if (data.price1Bed !== undefined) base.price1Bed = data.price1Bed;
+    if (data.price2Bed !== undefined) base.price2Bed = data.price2Bed;
+    if (data.bathrooms1Bed !== undefined) base.bathrooms1Bed = data.bathrooms1Bed;
+    if (data.bathrooms2Bed !== undefined) base.bathrooms2Bed = data.bathrooms2Bed;
+    return base;
   }
   return data;
 }
@@ -67,6 +73,11 @@ function buildUpdateData(data: any) {
       delete updateData.nearby;
     }
   }
+  // Allow clearing bed prices & bathrooms by sending null
+  if (data.price1Bed === null) updateData.price1Bed = null;
+  if (data.price2Bed === null) updateData.price2Bed = null;
+  if (data.bathrooms1Bed === null) updateData.bathrooms1Bed = null;
+  if (data.bathrooms2Bed === null) updateData.bathrooms2Bed = null;
   return updateData;
 }
 
@@ -77,16 +88,24 @@ interface PropertyFilters {
   search?: string;
   available?: boolean;
   featured?: boolean;
+  hostId?: string;
   page?: number;
   limit?: number;
 }
 
 export async function listProperties(filters: PropertyFilters) {
-  const { type, minPrice, maxPrice, search, available, featured, page = 1, limit = 12 } = filters;
+  const { type, minPrice, maxPrice, search, available, featured, hostId, page = 1, limit = 12 } = filters;
   const skip = (page - 1) * limit;
 
   const where: any = {};
 
+  if (hostId) {
+    where.hostId = hostId;
+  } else {
+    // Public discovery: hide listings of suspended hosts. Keeps null-host
+    // properties and properties owned by active hosts.
+    where.NOT = { host: { is: { suspended: true } } };
+  }
   if (type) where.type = type;
   if (available !== undefined) where.available = available;
   if (featured !== undefined) where.featured = featured;
@@ -134,15 +153,21 @@ export async function createProperty(data: any) {
   return normalizeProperty(property);
 }
 
-export async function updateProperty(id: string, data: any) {
-  const property = await prisma.property.findUnique({ where: { id } });
+export async function updateProperty(id: string, data: any, hostId?: string) {
+  const where: any = { id };
+  // If hostId provided, scope the update to properties owned by that user
+  if (hostId) where.hostId = hostId;
+  const property = await prisma.property.findUnique({ where });
   if (!property) throw new NotFoundError('Property');
   const updated = await prisma.property.update({ where: { id }, data: buildUpdateData(data) });
   return normalizeProperty(updated);
 }
 
-export async function deleteProperty(id: string) {
-  const property = await prisma.property.findUnique({ where: { id } });
+export async function deleteProperty(id: string, hostId?: string) {
+  const where: any = { id };
+  // If hostId provided, scope the delete to properties owned by that user
+  if (hostId) where.hostId = hostId;
+  const property = await prisma.property.findUnique({ where });
   if (!property) throw new NotFoundError('Property');
   return prisma.property.delete({ where: { id } });
 }

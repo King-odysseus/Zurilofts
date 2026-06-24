@@ -8,22 +8,22 @@ This document is the single source of truth for visual design. All AI agents and
 
 | Role            | Name            | Hex       | Usage                                               |
 |-----------------|-----------------|-----------|-----------------------------------------------------|
-| Primary         | Deep Indigo     | `#262262` | Navbar, headings, footer, primary text, hero overlay|
+| Primary         | Dark Navy     | `#0B0B45` | Navbar, headings, footer, primary text, hero overlay|
 | Accent          | Warm Bronze/Gold| `#C49A6C` | CTA buttons, highlights, badges, hover states, icons|
 | Surface         | Silver Grey     | `#D9D9D9` | Section backgrounds, input fields, dividers, borders|
 | Background      | White           | `#ffffff` | Page background, cards                              |
 | Body Text       | Dark Charcoal   | `#1f2937` | Paragraphs, labels, secondary text                  |
 | Muted Text      | Cool Grey       | `#6b7280` | Captions, placeholders, meta info                   |
-| White Text      | White           | `#ffffff` | Text on indigo or bronze backgrounds                |
+| White Text      | White           | `#ffffff` | Text on navy or bronze backgrounds                |
 
 ### Color Rules
-- **Deep Indigo `#262262`** is the authority color — navbar, all headings, footer background, hero overlay tint, section titles.
+- **Dark Navy `#0B0B45`** is the authority color — navbar, all headings, footer background, hero overlay tint, section titles.
 - **Warm Bronze `#C49A6C`** is the action color — every CTA button, hover state, active nav indicator, badge, price highlight, and icon accent uses bronze.
 - **Silver Grey `#D9D9D9`** is the neutral surface — alternate section backgrounds, input borders, card dividers, skeleton loaders.
 - **White** is the default page and card background — keeps the layout breathing.
-- Never place bronze text on white — contrast is low. Use indigo or charcoal for text on light backgrounds.
-- Bronze buttons always use indigo (`#262262`) or white text depending on button size — never charcoal.
-- Deep indigo and bronze can be paired directly (e.g. indigo footer with bronze links/icons).
+- Never place bronze text on white — contrast is low. Use navy or charcoal for text on light backgrounds.
+- Bronze buttons always use navy (`#0B0B45`) or white text depending on button size — never charcoal.
+- Dark navy and bronze can be paired directly (e.g. navy footer with bronze links/icons).
 
 ---
 
@@ -40,7 +40,7 @@ Fallback:  Helvetica, Arial, sans-serif
 | Element          | Size       | Weight | Color          | Notes                          |
 |------------------|------------|--------|----------------|--------------------------------|
 | Hero Heading     | 3rem–4rem  | 800    | White          | On dark/blurred image overlay  |
-| Section Heading  | 2rem–2.5rem| 700    | Deep Indigo `#262262` | Left-aligned or centered       |
+| Section Heading  | 2rem–2.5rem| 700    | Dark Navy `#0B0B45` | Left-aligned or centered       |
 | Card Title       | 1.125rem   | 600    | Charcoal       |                                |
 | Body Text        | 1rem       | 400    | Charcoal       | Line height 1.6                |
 | Muted / Caption  | 0.875rem   | 400    | Cool Grey      |                                |
@@ -112,7 +112,7 @@ useEffect(() => {
 - Search bar width: max `680px`, centered
 
 **Design Techniques:**
-- **Multi-layer gradient overlay**: `bg-gradient-to-b from-[#262262]/70 via-[#262262]/40 to-[#262262]/70` for depth
+- **Multi-layer gradient overlay**: `bg-gradient-to-b from-[#0B0B45]/70 via-[#0B0B45]/40 to-[#0B0B45]/70` for depth
 - **Animated number counters**: Custom `AnimatedNumber` component using `IntersectionObserver` and `requestAnimationFrame` with easing
 - **Easing function**: `easeOutQuart = 1 - Math.pow(1 - progress, 4)` for smooth number animation
 - **Status badge with pulse**: Green pulse dot using `animate-pulse` to indicate availability
@@ -196,12 +196,12 @@ All buttons: `rounded-full`, `px-6 py-2.5`, `font-semibold`, `transition-all`
 **Design Techniques:**
 - **Split layout**: `grid-cols-1 lg:grid-cols-2` for responsive two-column design
 - **Form input styling**: Rounded-full inputs with `focus:border-[#C49A6C]` transition
-- **Icon containers**: Circular bronze backgrounds with indigo icons for contact methods
+- **Icon containers**: Circular bronze backgrounds with navy icons for contact methods
 - **Response time highlight**: Bronze background card for emphasis
 - **Form validation**: Native HTML5 validation with `required` attributes
 
 ### Footer
-- Deep Indigo `#262262` background
+- Dark Navy `#0B0B45` background
 - White text for links and headings
 - Gold for link hover states and logo accent
 - Minimal: copyright left, social icons right
@@ -311,7 +311,7 @@ const currentValue = numericValue * easeOutQuart;
 ### Custom Colors (tailwind.config.js)
 ```javascript
 colors: {
-  indigo:   '#262262',    // Deep Indigo
+  navy:     '#0B0B45',    // Dark Navy
   bronze:   '#C49A6C',    // Warm Bronze
   silver:   '#D9D9D9',    // Silver Grey
   charcoal: '#1f2937',    // Dark Charcoal
@@ -323,15 +323,15 @@ colors: {
 ```javascript
 themes: [{
   zuriloft: {
-    primary:            '#262262',  // Deep Indigo
+    primary:            '#0B0B45',  // Dark Navy
     secondary:          '#C49A6C',  // Warm Bronze
     accent:             '#C49A6C',  // Warm Bronze
     neutral:            '#D9D9D9',  // Silver Grey
     'base-100':         '#ffffff',  // White
     'base-200':         '#D9D9D9',  // Silver Grey
     'base-content':     '#1f2937',  // Charcoal
-    'primary-content':  '#ffffff',  // White on indigo
-    'secondary-content':'#262262',  // Indigo on bronze
+    'primary-content':  '#ffffff',  // White on navy
+    'secondary-content':'#0B0B45',  // Navy on bronze
   }
 }]
 ```

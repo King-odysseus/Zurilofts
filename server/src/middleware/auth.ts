@@ -40,3 +40,17 @@ export function requireAdmin(req: Request, _res: Response, next: NextFunction): 
   }
   next();
 }
+
+/**
+ * Require at least host-level access (HOST or ADMIN) in addition to valid JWT.
+ * Must be used after `authenticate`.
+ */
+export function requireHost(req: Request, _res: Response, next: NextFunction): void {
+  if (!req.user) {
+    return next(new UnauthorizedError());
+  }
+  if (req.user.role !== 'HOST' && req.user.role !== 'ADMIN') {
+    return next(new ForbiddenError('Host access required'));
+  }
+  next();
+}

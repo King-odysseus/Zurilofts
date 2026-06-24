@@ -5,6 +5,17 @@ import * as priceRuleService from '../services/priceRule.service.js';
 import { NotFoundError } from '../types/index.js';
 import prisma from '../config/prisma.js';
 
+// ---- Public: availability (taken date ranges) for the booking calendar ----
+
+export async function availability(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const ranges = await calendarService.getUnavailableRanges(req.params.id);
+    res.json({ success: true, data: ranges });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // ---- Admin: calendar (sources + blocks) ----
 
 export async function getCalendar(req: Request, res: Response, next: NextFunction): Promise<void> {

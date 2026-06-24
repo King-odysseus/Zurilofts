@@ -28,8 +28,8 @@ function clearRefreshCookie(res: Response): void {
  */
 export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { email, password, firstName, lastName } = req.body;
-    const { user, tokens } = await authService.registerUser(email, password, firstName, lastName);
+    const { email, password, firstName, lastName, role } = req.body;
+    const { user, tokens } = await authService.registerUser(email, password, firstName, lastName, role);
     setRefreshCookie(res, tokens.refreshToken);
 
     res.status(201).json({

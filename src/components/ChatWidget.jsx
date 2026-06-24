@@ -43,26 +43,45 @@ function ChatWidget() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  // Poll for team replies coming back from Telegram while the chat is open
+  // Poll for team replies coming back from Telegram while the chat is open.
+  // Pauses when the tab is hidden and backs off on repeated errors.
   useEffect(() => {
     if (!open || !started) return;
-    const interval = setInterval(async () => {
+    let timeoutId = null;
+    let consecutiveErrors = 0;
+    const baseDelay = 4000;
+    const maxDelay = 30000;
+
+    async function tick() {
+      if (document.hidden) {
+        timeoutId = setTimeout(tick, baseDelay);
+        return;
+      }
       try {
         const { data } = await apiClient.get('/chat/messages', {
           params: { sessionId: sessionId.current, after: lastReplyId.current },
         });
+        consecutiveErrors = 0;
         const msgs = data?.messages || [];
-        if (!msgs.length) return;
+        if (!msgs.length) {
+          timeoutId = setTimeout(tick, baseDelay);
+          return;
+        }
         lastReplyId.current = Math.max(lastReplyId.current, ...msgs.map((m) => m.id));
         const replies = msgs.filter((m) => m.from === 'agent');
         if (replies.length) {
           setMessages((prev) => [...prev, ...replies.map((m) => ({ from: 'bot', text: m.text }))]);
         }
+        timeoutId = setTimeout(tick, baseDelay);
       } catch {
-        /* ignore transient poll errors */
+        consecutiveErrors += 1;
+        const delay = Math.min(baseDelay * Math.pow(2, consecutiveErrors - 1), maxDelay);
+        timeoutId = setTimeout(tick, delay);
       }
-    }, 4000);
-    return () => clearInterval(interval);
+    }
+
+    timeoutId = setTimeout(tick, baseDelay);
+    return () => clearTimeout(timeoutId);
   }, [open, started]);
 
   function handleStart() {
@@ -103,12 +122,12 @@ function ChatWidget() {
       if (!sent) {
         setMessages((prev) => [
           ...prev,
-          { from: 'bot', text: 'Thanks! Your message has been sent. We typically reply within 2 hours during business hours — keep this chat open and replies will appear here. ✨' },
+          { from: 'bot', text: 'Thanks! Your message has been sent. We typically reply within 2 hours during business hours. Keep this chat open and replies will appear here. ✨' },
         ]);
         setSent(true);
       }
     } catch (err) {
-      const errMsg = err.response?.data?.error || 'Failed to send. Please try again or email us at enquires@thezurilofts.com.';
+      const errMsg = err.response?.data?.error || 'Failed to send. Please try again or email us at enquires@zurilofts.com.';
       setMessages((prev) => [...prev, { from: 'bot', text: errMsg }]);
     } finally {
       setSending(false);
@@ -124,7 +143,7 @@ function ChatWidget() {
           className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#C49A6C] rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-all duration-200 hover:shadow-xl group"
           aria-label="Open chat"
         >
-          <svg className="w-7 h-7 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
           </svg>
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></span>
@@ -135,10 +154,10 @@ function ChatWidget() {
       {open && (
         <div className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-[#D9D9D9] flex flex-col overflow-hidden transition-all duration-300" style={{ maxHeight: '520px' }}>
           {/* Header */}
-          <div className="bg-[#262262] px-5 py-4 flex items-center justify-between">
+          <div className="bg-[#0B0B45] px-5 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-9 h-9 bg-[#C49A6C] rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
               </div>
@@ -160,7 +179,7 @@ function ChatWidget() {
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   m.from === 'user'
-                    ? 'bg-[#C49A6C] text-[#262262] rounded-br-md font-medium'
+                    ? 'bg-[#C49A6C] text-white rounded-br-md font-medium'
                     : 'bg-white border border-[#D9D9D9] text-[#1f2937] rounded-bl-md shadow-sm'
                 }`}>
                   {m.text}
@@ -193,7 +212,7 @@ function ChatWidget() {
                   type="button"
                   onClick={handleStart}
                   disabled={sending}
-                  className="w-full bg-[#C49A6C] text-[#262262] py-2.5 rounded-full font-semibold text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                  className="w-full bg-[#C49A6C] text-white py-2.5 rounded-full font-semibold text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
                 >
                   Start Chat
                 </button>
@@ -201,11 +220,11 @@ function ChatWidget() {
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#6b7280]">Chatting as <span className="font-semibold text-[#262262]">{name}</span></span>
+                  <span className="text-xs text-[#6b7280]">Chatting as <span className="font-semibold text-[#0B0B45]">{name}</span></span>
                   <button
                     type="button"
                     onClick={() => { setStarted(false); setName(''); setEmail(''); setMessages([{ from: 'bot', text: 'Hi! 👋 How can we help you today? Ask us anything about our apartments.' }]); setSent(false); }}
-                    className="text-xs text-[#C49A6C] hover:text-[#262262]"
+                    className="text-xs text-[#C49A6C] hover:text-[#0B0B45]"
                   >
                     New chat
                   </button>
@@ -224,9 +243,9 @@ function ChatWidget() {
                     className="w-10 h-10 bg-[#C49A6C] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
                   >
                     {sending ? (
-                      <div className="w-4 h-4 border-2 border-[#262262] border-t-transparent rounded-full animate-spin"></div>
+                      <div className="w-4 h-4 border-2 border-[#0B0B45] border-t-transparent rounded-full animate-spin"></div>
                     ) : (
-                      <svg className="w-5 h-5 text-[#262262]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                       </svg>
                     )}

@@ -16,6 +16,7 @@ export interface UserResponse {
   firstName: string;
   lastName: string;
   phone: string | null;
+  avatar: string | null;
   role: string;
   createdAt: Date;
 }
@@ -27,13 +28,14 @@ function toUserResponse(user: any): UserResponse {
     firstName: user.firstName,
     lastName: user.lastName,
     phone: user.phone,
+    avatar: user.avatar,
     role: user.role,
     createdAt: user.createdAt,
   };
 }
 
 async function generateTokens(user: { id: string; email: string; role: string }): Promise<AuthTokens> {
-  const payload = { sub: user.id, email: user.email, role: user.role as 'USER' | 'ADMIN' };
+  const payload = { sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN' };
   return {
     accessToken: signAccessToken(payload),
     refreshToken: signRefreshToken(payload),
@@ -47,7 +49,8 @@ export async function registerUser(
   email: string,
   password: string,
   firstName: string,
-  lastName: string
+  lastName: string,
+  role: 'USER' | 'HOST' = 'USER'
 ): Promise<{ user: UserResponse; tokens: AuthTokens }> {
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
@@ -56,7 +59,7 @@ export async function registerUser(
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const user = await prisma.user.create({
-    data: { email, passwordHash, firstName, lastName },
+    data: { email, passwordHash, firstName, lastName, role },
   });
 
   const tokens = await generateTokens(user);
@@ -75,6 +78,10 @@ export async function loginUser(email: string, password: string): Promise<{ user
   const valid = await bcrypt.compare(password, user.passwordHash);
   if (!valid) {
     throw new UnauthorizedError('Invalid email or password');
+  }
+
+  if (user.suspended) {
+    throw new UnauthorizedError('This account has been suspended. Please contact support.');
   }
 
   const tokens = await generateTokens(user);
@@ -99,6 +106,12 @@ export async function refreshTokens(refreshToken?: string): Promise<{ user: User
   const user = await prisma.user.findUnique({ where: { id: payload.sub } });
   if (!user) {
     throw new NotFoundError('User');
+  }
+
+  // A suspended user's refresh fails, logging them out once the short-lived
+  // access token expires (≤15m) without needing a per-request DB lookup.
+  if (user.suspended) {
+    throw new UnauthorizedError('This account has been suspended. Please contact support.');
   }
 
   const tokens = await generateTokens(user);
@@ -139,6 +152,10 @@ export async function googleAuth(profile: {
         lastName: profile.lastName,
       },
     });
+  }
+
+  if (user.suspended) {
+    throw new UnauthorizedError('This account has been suspended. Please contact support.');
   }
 
   const tokens = await generateTokens(user);

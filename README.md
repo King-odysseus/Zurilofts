@@ -208,7 +208,7 @@ See [`DESIGN.md`](DESIGN.md) for comprehensive design documentation including:
 
 | Color | Hex | Usage |
 |-------|-----|-------|
-| Deep Indigo | `#262262` | Headings, navbar, footer |
+| Deep Indigo | `#0B0B45` | Headings, navbar, footer |
 | Warm Bronze | `#C49A6C` | CTAs, accents, highlights |
 | Silver Grey | `#D9D9D9` | Borders, backgrounds |
 | Charcoal | `#1f2937` | Body text |
@@ -269,7 +269,7 @@ const observer = new IntersectionObserver(
 ```javascript
 // tailwind.config.js
 colors: {
-  indigo:   '#262262',
+  indigo:   '#0B0B45',
   bronze:   '#C49A6C',
   silver:   '#D9D9D9',
   charcoal: '#1f2937',
@@ -282,7 +282,7 @@ colors: {
 daisyui: {
   themes: [{
     zuriloft: {
-      primary:   '#262262',
+      primary:   '#0B0B45',
       secondary: '#C49A6C',
       accent:    '#C49A6C',
       neutral:   '#D9D9D9',
@@ -322,6 +322,21 @@ daisyui: {
 3. Ensure responsive behavior across breakpoints
 4. Add PropTypes for new components
 5. Test animations on lower-powered devices
+
+---
+
+## Developer Manual
+
+A separate visual developer manual lives in the `manual/` folder. It documents the entire codebase with live component previews, code examples, step-by-step guides, and a complete API reference.
+
+```bash
+cd manual
+npm install
+npm run dev
+# → opens at http://localhost:5174
+```
+
+The manual is a standalone React app. It shares no code or dependencies with the main ZuriLofts app. The `manual/` folder is gitignored and never deployed.
 
 ---
 

@@ -6,7 +6,7 @@ import { z } from 'zod';
 export interface JwtPayload {
   sub: string;
   email: string;
-  role: 'USER' | 'ADMIN';
+  role: 'USER' | 'HOST' | 'ADMIN';
 }
 
 declare global {
@@ -49,6 +49,7 @@ export const registerSchema = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number'),
   firstName: z.string().min(1, 'First name is required').max(50),
   lastName: z.string().min(1, 'Last name is required').max(50),
+  role: z.enum(['USER', 'HOST']).default('USER'),
 });
 
 export const loginSchema = z.object({
@@ -64,11 +65,16 @@ export const propertyCreateSchema = z.object({
   title: z.string().min(1).max(200),
   location: z.string().min(1).max(200),
   price: z.number().int().positive(),
+  price1Bed: z.number().int().positive().optional(),
+  price2Bed: z.number().int().positive().optional(),
+  bathrooms1Bed: z.number().int().min(0).optional(),
+  bathrooms2Bed: z.number().int().min(0).optional(),
   bedrooms: z.number().int().min(0),
   bathrooms: z.number().int().min(0),
   area: z.number().int().positive(),
   description: z.string().min(1),
-  images: z.array(z.string().url()).min(1),
+  // Accept relative paths (e.g. /uploads/..., /images/...) as well as absolute URLs
+  images: z.array(z.string().min(1)).min(1, 'At least one image is required'),
   amenities: z.array(z.string()),
   nearby: z.array(z.string()),
   type: z.enum(['apartment', 'studio', 'penthouse']),
@@ -83,12 +89,37 @@ export const bookingCreateSchema = z.object({
   propertyId: z.string().min(1, 'Property is required'),
   checkIn: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-in date'),
   checkOut: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-out date'),
-  guests: z.number().int().min(1).max(10),
+  guests: z.number().int().min(1).max(6, 'Maximum 6 guests per property'),
   bedOption: z.enum(['1bed', '2bed']).optional(),
   checkInTime: z.string().optional(),
+  checkOutTime: z.string().optional(),
   specialRequests: z.string().max(1000).optional(),
+  additionalGuests: z
+    .array(
+      z.object({
+        firstName: z.string().max(100),
+        lastName: z.string().max(100),
+      })
+    )
+    .max(9)
+    .optional(),
   paymentMethod: z.enum(['card', 'mpesa', 'bank']),
   promoCode: z.string().optional(),
+});
+
+export const reviewCreateSchema = z.object({
+  bookingId: z.string().min(1, 'Booking is required'),
+  rating: z.number().int().min(1, 'Rating is required').max(5),
+  satisfaction: z.enum(['happy', 'neutral', 'unhappy']).optional(),
+  privateNote: z.string().max(2000).optional(),
+});
+
+export const favoriteCreateSchema = z.object({
+  propertyId: z.string().min(1, 'Property is required'),
+});
+
+export const messageCreateSchema = z.object({
+  body: z.string().min(1, 'Message cannot be empty').max(2000),
 });
 
 export const promoCreateSchema = z.object({
@@ -113,7 +144,29 @@ export const promoValidateSchema = z.object({
 export const profileUpdateSchema = z.object({
   firstName: z.string().min(1).max(50).optional(),
   lastName: z.string().min(1).max(50).optional(),
+  email: z.string().email('Invalid email address').optional(),
   phone: z.string().max(20).optional(),
+  avatar: z.string().max(500).optional(),
+});
+
+// Admin editing another user's account (profile + host bank/payout details)
+export const adminUserUpdateSchema = z.object({
+  firstName: z.string().min(1).max(50).optional(),
+  lastName: z.string().min(1).max(50).optional(),
+  email: z.string().email('Invalid email address').optional(),
+  phone: z.string().max(20).optional(),
+  bankName: z.string().max(100).optional(),
+  bankAccountNo: z.string().max(20).optional(),
+  bankCode: z.string().max(10).optional(),
+  payoutFrequency: z.enum(['weekly', 'biweekly', 'monthly']).optional(),
+});
+
+export const userRoleSchema = z.object({
+  role: z.enum(['USER', 'HOST', 'ADMIN']),
+});
+
+export const userSuspendSchema = z.object({
+  suspended: z.boolean(),
 });
 
 export const passwordChangeSchema = z.object({

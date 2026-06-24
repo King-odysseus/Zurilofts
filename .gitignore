@@ -28,6 +28,9 @@ server/.env
 server/node_modules
 server/dist
 
+# Admin-uploaded property images (runtime data, not source)
+server/uploads
+
 # Agent folders and instructions — must never live in the project repo
 Instruct.md
 .claude/
@@ -35,6 +38,15 @@ Instruct.md
 .qwen/
 .continue/
 .cursor/
+
+# Developer manual (local only, separate React app)
+manual/
+
+# Offline Android APK shell (local only — imports parent source)
+offline-app/
+
+# Claude Code local settings (hooks, permissions per machine)
+.claude/
 .kimi/
 .kimi-code/
 .agents/

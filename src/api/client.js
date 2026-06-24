@@ -36,6 +36,13 @@ apiClient.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // Never retry if the failed request was itself a refresh attempt.
+    // Retrying `/auth/refresh` when it 401s is pointless — there's no
+    // valid refresh token to exchange, so it will just 401 again.
+    if (originalRequest.url?.includes('/auth/refresh')) {
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
