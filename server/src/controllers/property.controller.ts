@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as propertyService from '../services/property.service.js';
+import * as reviewService from '../services/review.service.js';
 
 export async function list(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -89,6 +90,15 @@ export async function bulk(req: Request, res: Response, next: NextFunction): Pro
     const ids = idsParam ? idsParam.split(',').map((s) => s.trim()).filter(Boolean) : [];
     const properties = await propertyService.getPropertiesByIds(ids);
     res.json({ success: true, data: properties });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getReviews(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const reviews = await reviewService.getPropertyReviews(req.params.id);
+    res.json({ success: true, data: reviews });
   } catch (error) {
     next(error);
   }

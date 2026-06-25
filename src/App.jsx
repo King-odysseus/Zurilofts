@@ -11,6 +11,8 @@ import BookingPage from './pages/BookingPage';
 import PrivacyPage from './pages/PrivacyPage';
 import TermsPage from './pages/TermsPage';
 import PlacesPage from './pages/PlacesPage';
+import GuidesPage from './pages/GuidesPage';
+import GuideDetailPage from './pages/GuideDetailPage';
 import RestaurantsPage from './pages/RestaurantsPage';
 import NearbySection from './components/NearbySection.jsx';
 import { PLACES_TO_VISIT, PLACES_TO_EAT, AREAS, PLACE_CATEGORIES, EAT_CATEGORIES } from './data/nearby.js';
@@ -281,6 +283,8 @@ function App() {
           <Route path="/favourites" element={<Page title="Favourites"><FavouritesPage /></Page>} />
           <Route path="/bookings" element={<Page title="My Bookings"><ProtectedRoute><BookingHistoryPage /></ProtectedRoute></Page>} />
           <Route path="/places" element={<Page title="Places"><PlacesPage /></Page>} />
+          <Route path="/guides" element={<Page title="Travel Guides"><GuidesPage /></Page>} />
+          <Route path="/guides/:slug" element={<Page title="Guide"><GuideDetailPage /></Page>} />
           <Route path="/restaurants" element={<Page title="Restaurants"><RestaurantsPage /></Page>} />
           <Route path="/payment/callback" element={<Suspense fallback={<Loading />}><Page title="Payment"><ProtectedRoute><PaymentCallback /></ProtectedRoute></Page></Suspense>} />
           <Route path="/admin" element={<Suspense fallback={<Loading />}><AdminRoute><AdminLayout /></AdminRoute></Suspense>}>
@@ -295,6 +299,7 @@ function App() {
             <Route path="promos" element={<Suspense fallback={<Loading />}><AdminPromos /></Suspense>} />
             <Route path="feedback" element={<Suspense fallback={<Loading />}><AdminFeedback /></Suspense>} />
             <Route path="messages" element={<Suspense fallback={<Loading />}><AdminMessages /></Suspense>} />
+            <Route path="guides" element={<Suspense fallback={<Loading />}><AdminGuides /></Suspense>} />
             <Route path="payouts" element={<Suspense fallback={<Loading />}><AdminPayouts /></Suspense>} />
           </Route>
           <Route path="/host/payouts" element={<Page title="Host Payouts"><ProtectedRoute><HostPayouts /></ProtectedRoute></Page>} />

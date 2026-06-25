@@ -167,6 +167,7 @@ model Review {
   rating      Int      // 1-5 stars
   satisfaction String? // "happy" | "neutral" | "unhappy"
   privateNote String?  // private feedback for admin — how to improve
+  hidden      Boolean   @default(false)  // admin moderation: hide from public display
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -222,6 +223,19 @@ model PromoCode {
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   bookings         Booking[]
+}
+
+// Travel guides / blog posts
+model BlogPost {
+  id          String    @id @default(cuid())
+  title       String
+  slug        String    @unique
+  excerpt     String?
+  body        String                            // HTML content
+  coverImage  String?                           // image URL or path
+  published   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 // Host running balance of unpaid earnings

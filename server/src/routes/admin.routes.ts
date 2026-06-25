@@ -14,6 +14,7 @@ import { getLandingStats, setLandingStats } from '../services/settings.service.j
 import * as bookingCtrl from '../controllers/booking.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
 import * as reviewCtrl from '../controllers/review.controller.js';
+import * as blogCtrl from '../controllers/blog.controller.js';
 import * as messageCtrl from '../controllers/message.controller.js';
 import * as userCtrl from '../controllers/user.controller.js';
 import { messageCreateSchema } from '../types/index.js';
@@ -37,6 +38,8 @@ router.delete('/bookings/:id', bookingCtrl.deleteBooking);
 
 // Guest reviews / private feedback
 router.get('/reviews', reviewCtrl.listAll);
+router.patch('/reviews/:id', reviewCtrl.adminUpdateReview);
+router.delete('/reviews/:id', reviewCtrl.adminDeleteReview);
 
 // Customer messages (inbox + per-customer thread + reply)
 router.get('/messages', messageCtrl.adminConversations);
@@ -75,5 +78,13 @@ router.delete('/properties/:id/calendar/blocks/:blockId', calendarCtrl.deleteBlo
 router.get('/properties/:id/price-rules', calendarCtrl.listPriceRules);
 router.post('/properties/:id/price-rules', validate(priceRuleSchema), calendarCtrl.addPriceRule);
 router.delete('/properties/:id/price-rules/:ruleId', calendarCtrl.deletePriceRule);
+
+
+// Blog management
+router.get('/guides', blogCtrl.adminList);
+router.get('/guides/:id', blogCtrl.adminGet);
+router.post('/guides', blogCtrl.adminCreate);
+router.put('/guides/:id', blogCtrl.adminUpdate);
+router.delete('/guides/:id', blogCtrl.adminDelete);
 
 export default router;

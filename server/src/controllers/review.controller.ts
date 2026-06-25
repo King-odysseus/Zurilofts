@@ -42,3 +42,23 @@ export async function listAll(req: Request, res: Response, next: NextFunction): 
     next(error);
   }
 }
+
+// Admin: hide / unhide a review
+export async function adminUpdateReview(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const review = await reviewService.updateReview(req.params.id, req.body);
+    res.json({ success: true, data: review });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Admin: delete a review
+export async function adminDeleteReview(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    await reviewService.deleteReview(req.params.id);
+    res.json({ success: true, message: 'Review deleted' });
+  } catch (error) {
+    next(error);
+  }
+}

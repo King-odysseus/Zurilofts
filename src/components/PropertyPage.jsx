@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import Lightbox from './Lightbox.jsx';
+import ReviewSection from './ReviewSection.jsx';
 
 import apiClient from '../api/client.js';
 
@@ -312,6 +313,13 @@ function PropertyPage() {
           </div>
         </div>
       </div>
+
+      {/* Public Reviews */}
+      {property && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+          <ReviewSection propertyId={property.id} />
+        </div>
+      )}
 
       <div className="mt-24">
         <Footer />

@@ -18,6 +18,8 @@ router.get('/mine', authenticate, ctrl.listMine);
 router.get('/:id/calendar/:token.ics', calendarCtrl.publicFeed);
 // Taken date ranges for the guest booking calendar
 router.get('/:id/availability', calendarCtrl.availability);
+// Public reviews for a property
+router.get('/:id/reviews', ctrl.getReviews);
 router.get('/:id', ctrl.getById);
 
 // Host or admin. The controllers stamp/scope by the caller's id: a host always

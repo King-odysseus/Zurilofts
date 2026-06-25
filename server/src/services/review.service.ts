@@ -126,3 +126,67 @@ export async function listAllReviews(page = 1, limit = 20) {
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   };
 }
+
+/** Public: reviews for a specific property, newest-first, excluding hidden ones. */
+export async function getPropertyReviews(propertyId: string) {
+  const [reviews, agg] = await Promise.all([
+    prisma.review.findMany({
+      where: { propertyId, hidden: false },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+      include: {
+        user: { select: { firstName: true, lastName: true } },
+      },
+    }),
+    prisma.review.aggregate({
+      where: { propertyId, hidden: false },
+      _avg: { rating: true },
+      _count: { _all: true },
+    }),
+  ]);
+
+  // Star distribution (5, 4, 3, 2, 1)
+  const distribution = await Promise.all(
+    [5, 4, 3, 2, 1].map(async (star) => ({
+      stars: star,
+      count: await prisma.review.count({ where: { propertyId, hidden: false, rating: star } }),
+    })),
+  );
+
+  return {
+    reviews,
+    summary: {
+      averageRating: agg._avg.rating ? Math.round(agg._avg.rating * 10) / 10 : 0,
+      totalReviews: agg._count._all,
+      distribution,
+    },
+  };
+}
+
+/** Admin: toggle hidden status on a review. */
+export async function updateReview(id: string, data: { hidden?: boolean }) {
+  const review = await prisma.review.findUnique({ where: { id } });
+  if (!review) throw new NotFoundError('Review');
+  return prisma.review.update({ where: { id }, data });
+}
+
+/** Admin: delete a review and recalculate property aggregate. */
+export async function deleteReview(id: string) {
+  const review = await prisma.review.findUnique({ where: { id } });
+  if (!review) throw new NotFoundError('Review');
+
+  await prisma.review.delete({ where: { id } });
+
+  // Recalculate property aggregate
+  const agg = await prisma.review.aggregate({
+    where: { propertyId: review.propertyId, hidden: false },
+    _avg: { rating: true },
+    _count: { _all: true },
+  });
+  await prisma.property.update({
+    where: { id: review.propertyId },
+    data: { rating: agg._avg.rating ? Math.round(agg._avg.rating * 10) / 10 : 0, reviews: agg._count._all },
+  });
+
+  return { deleted: true };
+}
