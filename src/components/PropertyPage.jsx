@@ -2,6 +2,7 @@ import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import Lightbox from './Lightbox.jsx';
 
 import apiClient from '../api/client.js';
 
@@ -11,6 +12,8 @@ function PropertyPage() {
   const variant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [featuredImage, setFeaturedImage] = useState(0);
   const [thumbStart] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -135,9 +138,10 @@ function PropertyPage() {
         <div className="mb-12">
           <div className="relative">
             <img
-              className="w-full h-64 md:h-[400px] lg:h-[500px] object-cover rounded-2xl neu-card"
+              className="w-full h-64 md:h-[400px] lg:h-[500px] object-cover rounded-2xl neu-card cursor-pointer"
               src={images[featuredImage]}
               alt={property.title}
+              onClick={() => { setLightboxIndex(featuredImage); setLightboxOpen(true); }}
             />
             <button
               onClick={() => setFeaturedImage((prev) => (prev - 1 + images.length) % images.length)}
@@ -162,7 +166,7 @@ function PropertyPage() {
               return (
                 <div
                   key={actualIndex}
-                  onClick={() => setFeaturedImage(actualIndex)}
+                  onClick={() => { setFeaturedImage(actualIndex); setLightboxIndex(actualIndex); setLightboxOpen(true); }}
                   className={`cursor-pointer overflow-hidden rounded-xl transition-all duration-200 ${
                     featuredImage === actualIndex
                       ? 'ring-2 ring-[#C49A6C] scale-95'
@@ -312,6 +316,15 @@ function PropertyPage() {
       <div className="mt-24">
         <Footer />
       </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && (
+        <Lightbox
+          images={images}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
+      )}
     </div>
   );
 }

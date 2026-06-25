@@ -137,7 +137,7 @@ function Navbar() {
                     )}
                   </Link>
                   <Link
-                    to="/profile#bookings"
+                    to="/bookings"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
                   >
@@ -147,7 +147,7 @@ function Navbar() {
                     Booking History
                   </Link>
                   <Link
-                    to="/profile#favorites"
+                    to="/favourites"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
                   >
@@ -273,14 +273,14 @@ function Navbar() {
                     My Profile
                   </Link>
                   <Link
-                    to="/profile#bookings"
+                    to="/bookings"
                     className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Booking History
                   </Link>
                   <Link
-                    to="/profile#favorites"
+                    to="/favourites"
                     className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >

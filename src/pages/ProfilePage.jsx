@@ -669,6 +669,19 @@ function ProfilePage() {
                   </div>
                 ))
               )}
+              {bookings.length > 0 && (
+                <div className="mt-6 text-center">
+                  <Link
+                    to="/bookings"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
+                  >
+                    View all bookings
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </Link>
+                </div>
+              )}
             </div>
           )}
 

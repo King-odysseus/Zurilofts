@@ -9,6 +9,8 @@ const router = Router();
 
 // Public
 router.get('/', ctrl.list);
+// Bulk fetch by IDs (must be before /:id to avoid capturing as an ID param)
+router.get('/bulk', ctrl.bulk);
 // Host-scoped listing (auth required) — returns only properties owned by the
 // logged-in host/admin. Declared before '/:id' so the longer path matches first.
 router.get('/mine', authenticate, ctrl.listMine);

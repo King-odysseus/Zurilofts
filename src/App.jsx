@@ -30,6 +30,8 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Spinner from './components/Spinner.jsx';
 import NotFoundPage from './pages/NotFoundPage';
 import HostPayouts from './pages/HostPayouts';
+import FavouritesPage from './pages/FavouritesPage';
+import BookingHistoryPage from './pages/BookingHistoryPage';
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'));
 const AdminLayout = lazy(() => import('./pages/AdminDashboard.jsx').then(m => ({ default: m.AdminLayout })));
@@ -276,6 +278,8 @@ function App() {
           <Route path="/messages" element={<Page title="Messages"><ProtectedRoute><MessagesPage /></ProtectedRoute></Page>} />
           <Route path="/privacy" element={<Page title="Privacy Policy"><PrivacyPage /></Page>} />
           <Route path="/terms" element={<Page title="Terms of Service"><TermsPage /></Page>} />
+          <Route path="/favourites" element={<Page title="Favourites"><FavouritesPage /></Page>} />
+          <Route path="/bookings" element={<Page title="My Bookings"><ProtectedRoute><BookingHistoryPage /></ProtectedRoute></Page>} />
           <Route path="/places" element={<Page title="Places"><PlacesPage /></Page>} />
           <Route path="/restaurants" element={<Page title="Restaurants"><RestaurantsPage /></Page>} />
           <Route path="/payment/callback" element={<Suspense fallback={<Loading />}><Page title="Payment"><ProtectedRoute><PaymentCallback /></ProtectedRoute></Page></Suspense>} />

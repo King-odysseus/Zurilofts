@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import apiClient from '../api/client';
+import { useFavorites } from '../context/FavoritesContext.jsx';
 
 function PaymentCallback() {
   const [searchParams] = useSearchParams();
@@ -11,6 +12,8 @@ function PaymentCallback() {
   const [status, setStatus] = useState('loading'); // loading | success | failed
   const [booking, setBooking] = useState(null);
   const [error, setError] = useState('');
+  const { toggleFavorite, isFavorite } = useFavorites();
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (!reference) {
@@ -101,6 +104,34 @@ function PaymentCallback() {
                     <div className="flex justify-between text-xs text-[#6b7280] mt-1">
                       <span>Payment Ref</span>
                       <span className="font-mono">{booking.paymentReference?.slice(0, 16)}...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Post-booking save prompt */}
+              {booking && !saved && !isFavorite(booking.propertyId) && (
+                <div className="bg-white rounded-2xl border-2 border-[#C49A6C]/30 p-4 mb-6 text-left">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-[#C49A6C]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-5 h-5 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-[#0B0B45]">Save this property for later?</p>
+                      <p className="text-xs text-[#6b7280] mt-0.5">
+                        Add it to your favourites so you can find it again easily.
+                      </p>
+                      <button
+                        onClick={async () => {
+                          const ok = await toggleFavorite(booking.propertyId);
+                          if (ok) setSaved(true);
+                        }}
+                        className="mt-2 text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
+                      >
+                        Yes, save to favourites →
+                      </button>
                     </div>
                   </div>
                 </div>

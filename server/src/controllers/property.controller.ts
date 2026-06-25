@@ -83,6 +83,17 @@ export async function update(req: Request, res: Response, next: NextFunction): P
   }
 }
 
+export async function bulk(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const idsParam = req.query.ids as string | undefined;
+    const ids = idsParam ? idsParam.split(',').map((s) => s.trim()).filter(Boolean) : [];
+    const properties = await propertyService.getPropertiesByIds(ids);
+    res.json({ success: true, data: properties });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function remove(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     // Admins may delete any property; hosts are scoped to their own (404 otherwise).

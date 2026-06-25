@@ -163,6 +163,14 @@ export async function updateProperty(id: string, data: any, hostId?: string) {
   return normalizeProperty(updated);
 }
 
+export async function getPropertiesByIds(ids: string[]) {
+  if (!ids.length) return [];
+  const properties = await prisma.property.findMany({
+    where: { id: { in: ids } },
+  });
+  return normalizeProperties(properties);
+}
+
 export async function deleteProperty(id: string, hostId?: string) {
   const where: any = { id };
   // If hostId provided, scope the delete to properties owned by that user
