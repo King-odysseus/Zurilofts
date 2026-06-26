@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dropdown from './Dropdown.jsx';
+import Spinner from './Spinner.jsx';
+
+const NearbyMap = lazy(() => import('./NearbyMap.jsx'));
 
 /** Card for a single place or restaurant */
 function NearbyCard({ item, areaLabels }) {
@@ -104,18 +107,9 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
       {filtered.length === 0 ? (
         <p className="text-center text-[#6b7280] py-12">Nothing matches those filters — try a different area or category.</p>
       ) : viewMode === 'map' ? (
-        <div className="rounded-2xl overflow-hidden border border-[#D9D9D9] shadow-sm mx-4 md:mx-0">
-          <iframe
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(filtered.map((i) => `${i.lat},${i.lng}(${i.name})`).join('|'))}&z=13&output=embed`}
-            width="100%"
-            height="500"
-            style={{ border: 0 }}
-            allowFullScreen=""
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-            title={`${title} map`}
-          />
-        </div>
+        <Suspense fallback={<div className="flex items-center justify-center py-24"><Spinner /></div>}>
+          <NearbyMap items={filtered} title={title} />
+        </Suspense>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
