@@ -45,6 +45,7 @@ const AdminBookings = lazy(() => import('./pages/AdminBookings.jsx'));
 const AdminEarnings = lazy(() => import('./pages/AdminEarnings.jsx'));
 const AdminPromos = lazy(() => import('./pages/AdminPromos.jsx'));
 const AdminFeedback = lazy(() => import('./pages/AdminFeedback.jsx'));
+const AdminGuides = lazy(() => import('./pages/AdminGuides.jsx'));
 const AdminMessages = lazy(() => import('./pages/AdminMessages.jsx'));
 const AdminUsers = lazy(() => import('./pages/AdminUsers.jsx'));
 const AdminPayouts = lazy(() => import('./pages/AdminPayouts.jsx'));
