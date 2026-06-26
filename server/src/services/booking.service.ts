@@ -480,6 +480,20 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
     where: { id: bookingId },
     data: { status },
   });
+
+  // Send push notification when booking is confirmed
+  if (status === 'CONFIRMED') {
+    try {
+      const { sendPushToUser } = await import('./push.service.js');
+      sendPushToUser(
+        booking.userId,
+        'Booking Confirmed!',
+        `Your stay at this property has been confirmed. View your bookings for details.`,
+        `/bookings`,
+      );
+    } catch { /* push is best-effort, don't block the status update */ }
+  }
+
   return updated;
 }
 

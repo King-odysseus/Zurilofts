@@ -26,6 +26,7 @@ export default defineConfig({
         ],
       },
       workbox: {
+        importScripts: ['/push-handler.js'],
         globPatterns: ['**/*.{js,css,html,woff2,svg,png,jpg,jpeg,gif}'],
         navigateFallback: '/index.html', // SPA shell for offline/deep links
         runtimeCaching: [

@@ -241,6 +241,19 @@ model BlogPost {
   updatedAt   DateTime  @updatedAt
 }
 
+// Web push notification subscriptions
+model PushSubscription {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint   String   @unique
+  keys       String                    // JSON: { p256dh, auth }
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
+}
+
 // Host running balance of unpaid earnings
 model HostWallet {
   id            String   @id @default(cuid())

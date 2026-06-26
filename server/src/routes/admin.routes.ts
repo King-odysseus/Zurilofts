@@ -15,6 +15,7 @@ import * as bookingCtrl from '../controllers/booking.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
 import * as reviewCtrl from '../controllers/review.controller.js';
 import * as blogCtrl from '../controllers/blog.controller.js';
+import * as pushCtrl from '../controllers/push.controller.js';
 import * as messageCtrl from '../controllers/message.controller.js';
 import * as userCtrl from '../controllers/user.controller.js';
 import { messageCreateSchema } from '../types/index.js';
@@ -86,5 +87,8 @@ router.get('/guides/:id', blogCtrl.adminGet);
 router.post('/guides', blogCtrl.adminCreate);
 router.put('/guides/:id', blogCtrl.adminUpdate);
 router.delete('/guides/:id', blogCtrl.adminDelete);
+
+// Push notifications
+router.post('/push/send', pushCtrl.broadcast);
 
 export default router;

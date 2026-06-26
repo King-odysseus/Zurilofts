@@ -37,6 +37,7 @@ NearbyCard.propTypes = {
 function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, categories, viewMoreLink, maxCards }) {
   const [areaFilter, setAreaFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'map'
 
   const filtered = items.filter((item) => {
     const areaMatch = areaFilter === 'all' || item.area === areaFilter;
@@ -58,13 +59,13 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
         <p className="text-cool-grey max-w-2xl mx-auto text-base md:text-lg mt-3 px-2 md:px-0">{subtitle}</p>
       </div>
 
-      {/* Filters */}
+      {/* Filters + View Toggle */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 px-4 md:px-0">
         <Dropdown
           value={areaFilter}
           onChange={setAreaFilter}
           options={areaOptions}
-          triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px]"
+          triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px] border border-[#D9D9D9]"
           ariaLabel="Filter by area"
         />
         {catOptions && (
@@ -72,15 +73,49 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             value={categoryFilter}
             onChange={setCategoryFilter}
             options={catOptions}
-            triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px]"
+            triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px] border border-[#D9D9D9]"
             ariaLabel="Filter by category"
           />
         )}
+        {/* Map/Grid toggle */}
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setViewMode('grid')}
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#C49A6C] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
+            aria-label="Grid view"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+            </svg>
+          </button>
+          <button
+            onClick={() => setViewMode('map')}
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'map' ? 'bg-[#C49A6C] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
+            aria-label="Map view"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {/* Grid */}
+      {/* Grid or Map */}
       {filtered.length === 0 ? (
         <p className="text-center text-[#6b7280] py-12">Nothing matches those filters — try a different area or category.</p>
+      ) : viewMode === 'map' ? (
+        <div className="rounded-2xl overflow-hidden border border-[#D9D9D9] shadow-sm mx-4 md:mx-0">
+          <iframe
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(filtered.map((i) => `${i.lat},${i.lng}(${i.name})`).join('|'))}&z=13&output=embed`}
+            width="100%"
+            height="500"
+            style={{ border: 0 }}
+            allowFullScreen=""
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+            title={`${title} map`}
+          />
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

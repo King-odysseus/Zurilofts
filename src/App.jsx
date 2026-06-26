@@ -27,6 +27,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ChatWidget from './components/ChatWidget';
 import CookieConsent from './components/CookieConsent';
+import PushNotificationPrompt from './components/PushNotificationPrompt';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import Spinner from './components/Spinner.jsx';
@@ -266,6 +267,7 @@ function App() {
       <ScrollToTop />
       <ChatWidget />
       <CookieConsent />
+      <PushNotificationPrompt />
       <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Page><HomePage /></Page>} />

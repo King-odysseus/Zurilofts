@@ -23,6 +23,7 @@ import uploadRoutes from './routes/upload.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import payoutRoutes from './routes/payout.routes.js';
 import contactRoutes from './routes/contact.routes.js';
+import pushRoutes from './routes/push.routes.js';
 import blogRoutes from './routes/blog.routes.js';
 
 const app = express();
@@ -92,6 +93,7 @@ app.use('/api/uploads', uploadRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api', payoutRoutes); // /api/host/payouts, /api/admin/payouts, etc.
 app.use('/api/contact', contactRoutes);
+app.use('/api/push', pushRoutes);
 app.use('/api/guides', blogRoutes);
 
 // Error handler (must be last)
