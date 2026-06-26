@@ -46,14 +46,14 @@ function AdminFeedback() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-2xl p-5 shadow-md border border-[#D9D9D9]">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
           <span className="text-sm text-[#6b7280]">Average Rating</span>
           <div className="flex items-center gap-2 mt-2">
             <p className="text-2xl font-bold text-[#0B0B45]">{summary.averageRating || 0}</p>
             <StarRow rating={Math.round(summary.averageRating)} />
           </div>
         </div>
-        <div className="bg-white rounded-2xl p-5 shadow-md border border-[#D9D9D9]">
+        <div className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
           <span className="text-sm text-[#6b7280]">Total Reviews</span>
           <p className="text-2xl font-bold text-[#0B0B45] mt-2">{summary.totalReviews || 0}</p>
         </div>
@@ -66,12 +66,12 @@ function AdminFeedback() {
       ) : error ? (
         <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 text-sm">{error}</div>
       ) : reviews.length === 0 ? (
-        <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] p-12 text-center">
+        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-12 text-center">
           <h3 className="text-lg font-bold text-[#0B0B45] mb-1">No feedback yet</h3>
           <p className="text-[#6b7280]">Guest reviews will appear here after completed stays.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa]">

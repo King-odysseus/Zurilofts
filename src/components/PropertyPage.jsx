@@ -139,7 +139,7 @@ function PropertyPage() {
         <div className="mb-12">
           <div className="relative">
             <img
-              className="w-full h-64 md:h-[400px] lg:h-[500px] object-cover rounded-2xl shadow-sm cursor-pointer"
+              className="w-full h-64 md:h-[400px] lg:h-[500px] object-cover rounded-2xl neu-card cursor-pointer"
               src={images[featuredImage]}
               alt={property.title}
               onClick={() => { setLightboxIndex(featuredImage); setLightboxOpen(true); }}
@@ -269,7 +269,7 @@ function PropertyPage() {
 
           {/* Right Column - Booking Card */}
           <div className="lg:col-span-1">
-            <div className="shadow-sm p-5 md:p-6 pt-10 md:pt-12 sticky top-24">
+            <div className="neu-card p-5 md:p-6 pt-10 md:pt-12 sticky top-24">
               <div className="mb-6">
                 <span className="text-3xl font-bold text-[#0B0B45]">KES {displayPrice.toLocaleString()}</span>
                 <span className="text-[#6b7280]"> / night</span>

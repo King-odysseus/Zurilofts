@@ -43,11 +43,11 @@ function ContactForm() {
     <form onSubmit={handleSubmit} className="space-y-5 text-left">
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">{error}</div>}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div><label className="block text-sm font-semibold text-[#1f2937] mb-2">Name *</label><input type="text" value={form.name} onChange={e => update('name', e.target.value)} placeholder="Your full name" className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]" required /></div>
-        <div><label className="block text-sm font-semibold text-[#1f2937] mb-2">Email *</label><input type="email" value={form.email} onChange={e => update('email', e.target.value)} placeholder="your@email.com" className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]" required /></div>
+        <div><label className="block text-sm font-semibold text-[#1f2937] mb-2">Name *</label><input type="text" value={form.name} onChange={e => update('name', e.target.value)} placeholder="Your full name" className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]" required /></div>
+        <div><label className="block text-sm font-semibold text-[#1f2937] mb-2">Email *</label><input type="email" value={form.email} onChange={e => update('email', e.target.value)} placeholder="your@email.com" className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]" required /></div>
       </div>
-      <div><label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label><input type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="+254 712 345 678" className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]" /></div>
-      <div><label className="block text-sm font-semibold text-[#1f2937] mb-2">Message *</label><textarea value={form.message} onChange={e => update('message', e.target.value)} placeholder="Tell us about your inquiry..." className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] h-32 resize-none" required /></div>
+      <div><label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label><input type="tel" value={form.phone} onChange={e => update('phone', e.target.value)} placeholder="+254 712 345 678" className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]" /></div>
+      <div><label className="block text-sm font-semibold text-[#1f2937] mb-2">Message *</label><textarea value={form.message} onChange={e => update('message', e.target.value)} placeholder="Tell us about your inquiry..." className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] h-32 resize-none" required /></div>
       <button type="submit" disabled={sending} className="w-full bg-[#C49A6C] text-white font-semibold py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50">{sending ? 'Sending...' : 'Send Message'}</button>
     </form>
   );
@@ -86,7 +86,7 @@ function ContactPage() {
               We operate in Nairobi, Kenya.
             </p>
           </div>
-          <div className="rounded-2xl overflow-hidden shadow-sm mb-12">
+          <div className="rounded-2xl overflow-hidden neu-card mb-12">
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d255281.19891802623!2d36.7203769!3d-1.3028611!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1172d84d49a7%3A0xf7cf0254b297924c!2sNairobi%2C%20Kenya!5e0!3m2!1sen!2sus!4v1704067200000!5m2!1sen!2sus"
               width="100%"

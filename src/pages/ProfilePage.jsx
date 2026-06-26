@@ -343,7 +343,7 @@ function ProfilePage() {
                   </div>
                 </div>
               )}
-              <div className="shadow-sm p-6">
+              <div className="neu-card p-6">
                 <h2 className="text-lg font-bold text-[#0B0B45] mb-6">Personal Information</h2>
                 {message && (
                   <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
@@ -361,7 +361,7 @@ function ProfilePage() {
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
                     />
                   </div>
                   <div>
@@ -370,7 +370,7 @@ function ProfilePage() {
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
                     />
                   </div>
                   <div>
@@ -379,7 +379,7 @@ function ProfilePage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
-                      className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
                     />
                     {emailError && (
                       <p className="text-red-500 text-xs mt-1">{emailError}</p>
@@ -401,7 +401,7 @@ function ProfilePage() {
                         onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
                         maxLength={15}
                         placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
-                        className=" flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
                       />
                     </div>
                     {phoneError && (
