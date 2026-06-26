@@ -292,11 +292,11 @@ function BookingPage() {
         />
         {(bookingData.checkIn || bookingData.checkOut) && (
           <div className="flex gap-4 mt-3">
-            <div className="flex-1 neu-input px-4 py-2 bg-white">
+            <div className="flex-1  px-4 py-2 bg-white">
               <span className="text-xs text-[#6b7280] block">Check-in</span>
               <span className="font-semibold text-[#0B0B45]">{bookingData.checkIn || '—'}</span>
             </div>
-            <div className="flex-1 neu-input px-4 py-2 bg-white">
+            <div className="flex-1  px-4 py-2 bg-white">
               <span className="text-xs text-[#6b7280] block">Check-out</span>
               <span className="font-semibold text-[#0B0B45]">{bookingData.checkOut || '—'}</span>
             </div>
@@ -313,7 +313,7 @@ function BookingPage() {
             value: num,
             label: `${num} ${num === 1 ? 'guest' : 'guests'}`,
           }))}
-          triggerClassName="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
+          triggerClassName=" w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
           ariaLabel="Number of guests"
         />
         {bedOption && (
@@ -371,7 +371,7 @@ function BookingPage() {
             name="checkInTime"
             value={bookingData.checkInTime}
             onChange={handleInputChange}
-            className="date-input neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
+            className="date-input  w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
           />
           <p className="text-xs text-[#6b7280] mt-1">From 3:00 PM</p>
         </div>
@@ -448,7 +448,7 @@ function BookingPage() {
             value={bookingData.firstName}
             onChange={handleInputChange}
             placeholder="John"
-            className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+            className=" w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
             required
           />
         </div>
@@ -460,7 +460,7 @@ function BookingPage() {
             value={bookingData.lastName}
             onChange={handleInputChange}
             placeholder="Doe"
-            className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+            className=" w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
             required
           />
         </div>
@@ -474,7 +474,7 @@ function BookingPage() {
           value={bookingData.email}
           onChange={handleInputChange}
           placeholder="john@example.com"
-          className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+          className=" w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
           required
         />
       </div>
@@ -495,7 +495,7 @@ function BookingPage() {
             onChange={(e) => handlePhoneChange(phoneCountryCode, e.target.value.replace(/\D/g, ''))}
             maxLength={15}
             placeholder={COUNTRY_CODES.find((c) => c.code === phoneCountryCode)?.example || ''}
-            className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+            className=" flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
             required
           />
         </div>
@@ -536,7 +536,7 @@ function BookingPage() {
                     value={g.firstName}
                     onChange={(e) => updateAdditionalGuest(i, 'firstName', e.target.value)}
                     placeholder="First name"
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+                    className=" w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
                   />
                 </div>
                 <div className="flex-1">
@@ -546,7 +546,7 @@ function BookingPage() {
                     value={g.lastName}
                     onChange={(e) => updateAdditionalGuest(i, 'lastName', e.target.value)}
                     placeholder="Last name"
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+                    className=" w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
                   />
                 </div>
                 <button
@@ -572,7 +572,7 @@ function BookingPage() {
           value={bookingData.specialRequests}
           onChange={handleInputChange}
           placeholder="Any special requirements or requests..."
-          className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280] h-24 resize-none"
+          className=" w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280] h-24 resize-none"
         />
       </div>
 
@@ -605,7 +605,7 @@ function BookingPage() {
 
       <div className="space-y-3">
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
-          bookingData.paymentMethod === 'card' ? 'neu-radio-selected' : 'neu-radio-card'
+          bookingData.paymentMethod === 'card' ? 'border-2 border-[#C49A6C] rounded-xl' : 'border border-[#D9D9D9] rounded-xl'
         }`}>
           <input
             type="radio"
@@ -627,7 +627,7 @@ function BookingPage() {
         </label>
 
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
-          bookingData.paymentMethod === 'mpesa' ? 'neu-radio-selected' : 'neu-radio-card'
+          bookingData.paymentMethod === 'mpesa' ? 'border-2 border-[#C49A6C] rounded-xl' : 'border border-[#D9D9D9] rounded-xl'
         }`}>
           <input
             type="radio"
@@ -649,7 +649,7 @@ function BookingPage() {
         </label>
 
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
-          bookingData.paymentMethod === 'bank' ? 'neu-radio-selected' : 'neu-radio-card'
+          bookingData.paymentMethod === 'bank' ? 'border-2 border-[#C49A6C] rounded-xl' : 'border border-[#D9D9D9] rounded-xl'
         }`}>
           <input
             type="radio"

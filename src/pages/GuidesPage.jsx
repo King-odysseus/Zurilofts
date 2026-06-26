@@ -60,7 +60,7 @@ function GuidesPage() {
               <Link
                 key={post.id}
                 to={`/guides/${post.slug}`}
-                className="group bg-white rounded-2xl border border-[#D9D9D9] overflow-hidden neu-card-hover transition-all duration-300 no-underline"
+                className="group bg-white rounded-2xl border border-[#D9D9D9] overflow-hidden hover:shadow-lg transition-shadow transition-all duration-300 no-underline"
               >
                 {/* Cover image */}
                 <div className="aspect-[16/9] overflow-hidden">

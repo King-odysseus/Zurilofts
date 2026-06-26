@@ -134,7 +134,7 @@ function AdminPromos() {
                 <input
                   type="text" value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white text-[#1f2937] uppercase"
+                  className=" w-full px-4 py-2.5 focus:outline-none bg-white text-[#1f2937] uppercase"
                   placeholder="SUMMER2026" required
                 />
               </div>
@@ -144,7 +144,7 @@ function AdminPromos() {
                   <input
                     type="number" value={formData.discountPercent}
                     onChange={(e) => setFormData({ ...formData, discountPercent: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" min="1" max="100" required
+                    className=" w-full px-4 py-2.5 focus:outline-none bg-white" min="1" max="100" required
                   />
                 </div>
                 <div>
@@ -152,7 +152,7 @@ function AdminPromos() {
                   <input
                     type="number" value={formData.maxDiscount}
                     onChange={(e) => setFormData({ ...formData, maxDiscount: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="Optional"
+                    className=" w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="Optional"
                   />
                 </div>
               </div>
@@ -162,7 +162,7 @@ function AdminPromos() {
                   <input
                     type="date" value={formData.validFrom}
                     onChange={(e) => setFormData({ ...formData, validFrom: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" required
+                    className=" w-full px-4 py-2.5 focus:outline-none bg-white" required
                   />
                 </div>
                 <div>
@@ -170,7 +170,7 @@ function AdminPromos() {
                   <input
                     type="date" value={formData.validUntil}
                     onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" required
+                    className=" w-full px-4 py-2.5 focus:outline-none bg-white" required
                   />
                 </div>
               </div>
@@ -180,7 +180,7 @@ function AdminPromos() {
                   <input
                     type="number" value={formData.maxUses}
                     onChange={(e) => setFormData({ ...formData, maxUses: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="Unlimited"
+                    className=" w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="Unlimited"
                   />
                 </div>
                 <div>
@@ -188,7 +188,7 @@ function AdminPromos() {
                   <input
                     type="number" value={formData.minBookingAmount}
                     onChange={(e) => setFormData({ ...formData, minBookingAmount: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="No minimum"
+                    className=" w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="No minimum"
                   />
                 </div>
               </div>
@@ -250,7 +250,7 @@ function AdminPromos() {
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">

@@ -148,7 +148,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
   const canGoBack = viewMonth > new Date(today.getFullYear(), today.getMonth(), 1);
 
   return (
-    <div className="neu-card p-4 md:p-5 bg-white">
+    <div className="shadow-sm p-4 md:p-5 bg-white">
       <div className="flex items-center justify-between mb-2">
         <button
           type="button"
