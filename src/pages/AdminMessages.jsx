@@ -63,7 +63,7 @@ function AdminMessages() {
       <h1 className="text-2xl font-bold text-[#0B0B45] mb-1">Messages</h1>
       <p className="text-[#6b7280] mb-6">Conversations with your guests.</p>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden grid grid-cols-1 md:grid-cols-3 min-h-[60vh]">
+      <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] overflow-hidden grid grid-cols-1 md:grid-cols-3 min-h-[60vh]">
         {/* Conversation list */}
         <div className="border-b md:border-b-0 md:border-r border-[#D9D9D9] overflow-y-auto max-h-[70vh]">
           {loadingList ? (

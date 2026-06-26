@@ -588,7 +588,7 @@ function AdminEarnings() {
       {/* Stats Cards — Top row: core metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
         {cards.map(({ label, value, color, sub }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
+          <div key={label} className="bg-white rounded-2xl p-5 shadow-md border border-[#D9D9D9]">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-[#6b7280]">{label}</span>
               <div className={`w-2.5 h-2.5 rounded-full ${color}`}></div>
@@ -602,7 +602,7 @@ function AdminEarnings() {
       {/* Fee Breakdown Cards — Second row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         {feeCards.map(({ label, value, sub }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
+          <div key={label} className="bg-white rounded-2xl p-5 shadow-md border border-[#D9D9D9]">
             <span className="text-sm text-[#6b7280]">{label}</span>
             <p className="text-xl font-bold text-[#0B0B45] mt-2">{value}</p>
             {sub && <p className="text-xs text-[#6b7280] mt-1">{sub}</p>}
@@ -907,7 +907,7 @@ function AdminEarnings() {
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">

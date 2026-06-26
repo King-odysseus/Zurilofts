@@ -328,7 +328,7 @@ function AdminBookings() {
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
