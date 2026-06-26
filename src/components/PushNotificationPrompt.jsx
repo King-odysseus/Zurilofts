@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { usePushNotifications } from '../hooks/usePushNotifications.js';
+import { useAuth } from '../context/AuthContext.jsx';
 
 function PushNotificationPrompt() {
   const { permission, isSupported, subscribe } = usePushNotifications();
+  const { isAuthenticated, isLoading } = useAuth();
   const [dismissed, setDismissed] = useState(false);
 
-  // Only show if supported, not already granted/denied, and not dismissed
-  if (!isSupported || permission !== 'default' || dismissed) return null;
+  // Only show for logged-in users, when supported, not already granted/denied, and not dismissed
+  if (isLoading || !isAuthenticated || !isSupported || permission !== 'default' || dismissed) return null;
 
   return (
     <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:bottom-4 sm:w-96 z-40 bg-white rounded-2xl border-2 border-[#C49A6C]/30 shadow-lg p-4">
