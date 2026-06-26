@@ -10,7 +10,7 @@ const NearbyMap = lazy(() => import('./NearbyMap.jsx'));
 function NearbyCard({ item, areaLabels }) {
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lng}`;
   return (
-    <div className="shadow-sm overflow-hidden transition-shadow duration-300 group">
+    <div className="neu-card overflow-hidden transition-shadow duration-300 group">
       <div className="h-48 overflow-hidden relative">
         <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-2xl" src={item.image} alt={item.name} />
         <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"

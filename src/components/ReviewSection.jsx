@@ -128,7 +128,7 @@ function ReviewSection({ propertyId }) {
       {/* Review cards */}
       <div className="space-y-4">
         {reviews.map((review) => (
-          <div key={review.id} className="bg-white rounded-2xl border border-[#D9D9D9] shadow-sm p-4 md:p-5">
+          <div key={review.id} className="bg-white rounded-2xl border border-[#D9D9D9] neu-card p-4 md:p-5">
             <div className="flex items-center justify-between mb-2">
               <div>
                 <span className="font-semibold text-[#0B0B45] text-sm">

@@ -392,7 +392,7 @@ function DashboardOverview() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {statCards.map(({ label, value, color, icon }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 shadow-md border border-[#D9D9D9]">
+          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-[#6b7280]">{label}</span>
               <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center`}>
@@ -408,7 +408,7 @@ function DashboardOverview() {
 
       {/* Landing Page Stats Editor — admin only */}
       {isAdmin && (
-      <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] p-6 mb-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-6 mb-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-2">Landing Page Stats</h2>
         <p className="text-sm text-[#6b7280] mb-4">These appear in the hero section. Leave at 0 to use live data from reviews and bookings.</p>
         <form onSubmit={saveLandingStats} className="flex flex-wrap items-end gap-4">
@@ -458,7 +458,7 @@ function DashboardOverview() {
       )}
 
       {/* Recent Bookings */}
-      <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] p-6">
+      <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-4">Recent Bookings</h2>
         {recentBookings.length === 0 ? (
           <p className="text-[#6b7280] text-sm">No bookings yet.</p>

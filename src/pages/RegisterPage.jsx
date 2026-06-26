@@ -149,7 +149,7 @@ function RegisterPage() {
                   value={formData.firstName}
                   onChange={handleChange}
                   placeholder="John"
-                  className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                   required
                 />
               </div>
@@ -161,7 +161,7 @@ function RegisterPage() {
                   value={formData.lastName}
                   onChange={handleChange}
                   placeholder="Doe"
-                  className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                   required
                 />
               </div>
@@ -174,7 +174,7 @@ function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="you@example.com"
-                className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                 required
               />
             </div>
@@ -187,7 +187,7 @@ function RegisterPage() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Min. 8 chars, 1 uppercase, 1 number"
-                  className=" w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                   required
                 />
                 <PasswordToggle
@@ -205,7 +205,7 @@ function RegisterPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Re-enter your password"
-                  className=" w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                   required
                 />
                 <PasswordToggle

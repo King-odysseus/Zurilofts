@@ -181,7 +181,7 @@ function BookingHistoryPage() {
             {filtered.map((booking) => (
               <div
                 key={booking.id}
-                className="bg-white rounded-2xl border border-[#D9D9D9] shadow-sm p-4 md:p-6"
+                className="bg-white rounded-2xl border border-[#D9D9D9] neu-card p-4 md:p-6"
               >
                 <div className="flex flex-col md:flex-row gap-4">
                   {/* Property image */}
