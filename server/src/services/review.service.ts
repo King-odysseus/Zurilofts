@@ -156,8 +156,8 @@ export async function getPropertyReviews(propertyId: string) {
   return {
     reviews,
     summary: {
-      averageRating: agg._avg.rating ? Math.round(agg._avg.rating * 10) / 10 : 0,
-      totalReviews: agg._count._all,
+      averageRating: (agg as any)._avg?.rating ? Math.round((agg as any)._avg.rating * 10) / 10 : 0,
+      totalReviews: (agg as any)._count?._all ?? 0,
       distribution,
     },
   };
@@ -167,7 +167,7 @@ export async function getPropertyReviews(propertyId: string) {
 export async function updateReview(id: string, data: { hidden?: boolean }) {
   const review = await prisma.review.findUnique({ where: { id } });
   if (!review) throw new NotFoundError('Review');
-  return prisma.review.update({ where: { id }, data });
+  return prisma.review.update({ where: { id }, data: { hidden: data.hidden } } as any);
 }
 
 /** Admin: delete a review and recalculate property aggregate. */
@@ -179,13 +179,13 @@ export async function deleteReview(id: string) {
 
   // Recalculate property aggregate
   const agg = await prisma.review.aggregate({
-    where: { propertyId: review.propertyId, hidden: false },
+    where: { propertyId: review.propertyId, hidden: false } as any,
     _avg: { rating: true },
     _count: { _all: true },
   });
   await prisma.property.update({
     where: { id: review.propertyId },
-    data: { rating: agg._avg.rating ? Math.round(agg._avg.rating * 10) / 10 : 0, reviews: agg._count._all },
+    data: { rating: (agg as any)._avg?.rating ? Math.round((agg as any)._avg.rating * 10) / 10 : 0, reviews: (agg as any)._count?._all ?? 0 },
   });
 
   return { deleted: true };

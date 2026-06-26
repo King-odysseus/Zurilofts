@@ -53,7 +53,7 @@ export async function sendPush(
   const results: Array<{ endpoint: string; ok: boolean }> = [];
 
   await Promise.allSettled(
-    subscriptions.map(async (sub) => {
+    subscriptions.map(async (sub: { endpoint: string; keys: string }) => {
       try {
         const pushSub = {
           endpoint: sub.endpoint,
@@ -78,5 +78,5 @@ export async function sendPush(
 export async function sendPushToUser(userId: string, title: string, body: string, url = '/') {
   const subs = await getSubscriptionsForUser(userId);
   if (!subs.length) return [];
-  return sendPush(subs.map((s) => ({ endpoint: s.endpoint, keys: s.keys })), title, body, url);
+  return sendPush(subs.map((s: { endpoint: string; keys: string }) => ({ endpoint: s.endpoint, keys: s.keys })), title, body, url);
 }

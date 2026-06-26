@@ -64,6 +64,9 @@ model Property {
   bedrooms    Int
   bathrooms   Int
   area        Int
+  neighborhood String?                  // Kilimani | Westlands | Karen | Gigiri | Lavington
+  lat          Float?                   // map coordinate
+  lng          Float?                   // map coordinate
   description String
   imagesJson   String    @default("[]")
   amenitiesJson String   @default("[]")
@@ -179,6 +182,7 @@ model Review {
   rating      Int
   satisfaction String? // "happy" | "neutral" | "unhappy"
   privateNote String?
+  hidden      Boolean   @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -231,6 +235,30 @@ model PromoCode {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   bookings         Booking[]
+}
+
+model BlogPost {
+  id          String    @id @default(uuid())
+  title       String
+  slug        String    @unique
+  excerpt     String?
+  body        String
+  coverImage  String?
+  published   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model PushSubscription {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  endpoint   String   @unique
+  keys       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model HostWallet {
