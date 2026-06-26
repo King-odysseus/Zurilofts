@@ -46,6 +46,7 @@ model User {
   properties   Property[]
   payouts      Payout[]
   wallet       HostWallet?
+  pushSubscriptions PushSubscription[]
 }
 
 model Property {
