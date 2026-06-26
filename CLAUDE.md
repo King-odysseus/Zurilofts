@@ -35,7 +35,7 @@ mcp__cognitive1__brain_recall { "query": "your task keywords" }
 mcp__cognitive1__brain_learn { type, project: "zurilofts", title, ... }
 ```
 
-**Full standing instructions:** See [cognitive1/Instruct.md](./cognitive1/Instruct.md) for the complete 50-rule session checklist.
+**Full standing instructions:** See [Instruct.md](./Instruct.md) for the complete rule checklist.
 
 ## Project Architecture
 
