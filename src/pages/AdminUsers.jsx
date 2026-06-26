@@ -147,7 +147,7 @@ function AdminUsers() {
               { value: 'HOST', label: 'Hosts' },
               { value: 'ADMIN', label: 'Admins' },
             ]}
-            triggerClassName="neu-input px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm"
+            triggerClassName=" px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm"
             ariaLabel="Filter by role"
           />
         </div>

@@ -181,7 +181,7 @@ function HostPayouts() {
             type="month"
             value={whtMonth}
             onChange={(e) => setWhtMonth(e.target.value)}
-            className="neu-input px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm"
+            className=" px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm"
           />
           <button
             onClick={downloadWht}

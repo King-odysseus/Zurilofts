@@ -22,7 +22,7 @@ function PropertyCard({ property }) {
   };
 
   return (
-    <div className="group neu-card neu-card-hover transition-all duration-300 hover:-translate-y-2 overflow-hidden h-full flex flex-col">
+    <div className="group shadow-sm shadow-sm-hover transition-all duration-300 hover:-translate-y-2 overflow-hidden h-full flex flex-col">
       {/* Image */}
       <div className="relative aspect-[4/3] overflow-hidden flex-shrink-0">
         {image ? (

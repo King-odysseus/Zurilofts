@@ -86,6 +86,9 @@ interface PropertyFilters {
   minPrice?: number;
   maxPrice?: number;
   search?: string;
+  neighborhood?: string;
+  minBedrooms?: number;
+  minRating?: number;
   available?: boolean;
   featured?: boolean;
   hostId?: string;
@@ -94,7 +97,7 @@ interface PropertyFilters {
 }
 
 export async function listProperties(filters: PropertyFilters) {
-  const { type, minPrice, maxPrice, search, available, featured, hostId, page = 1, limit = 12 } = filters;
+  const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minRating, available, featured, hostId, page = 1, limit = 12 } = filters;
   const skip = (page - 1) * limit;
 
   const where: any = {};
@@ -114,6 +117,9 @@ export async function listProperties(filters: PropertyFilters) {
     if (minPrice !== undefined) where.price.gte = minPrice;
     if (maxPrice !== undefined) where.price.lte = maxPrice;
   }
+  if (neighborhood) where.neighborhood = neighborhood;
+  if (minBedrooms) where.bedrooms = { gte: minBedrooms };
+  if (minRating) where.rating = { gte: minRating };
   if (search) {
     where.OR = [
       { title: { contains: search } },

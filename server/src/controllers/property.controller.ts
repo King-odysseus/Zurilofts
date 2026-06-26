@@ -4,12 +4,15 @@ import * as reviewService from '../services/review.service.js';
 
 export async function list(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { type, minPrice, maxPrice, search, available, featured, page, limit } = req.query;
+    const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minRating, available, featured, page, limit } = req.query;
     const result = await propertyService.listProperties({
       type: type as string | undefined,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
       search: search as string | undefined,
+      neighborhood: neighborhood as string | undefined,
+      minBedrooms: minBedrooms ? Number(minBedrooms) : undefined,
+      minRating: minRating ? Number(minRating) : undefined,
       available: available !== undefined ? available === 'true' : undefined,
       featured: featured !== undefined ? featured === 'true' : undefined,
       page: page ? Number(page) : 1,

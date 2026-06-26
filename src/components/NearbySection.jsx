@@ -7,7 +7,7 @@ import Dropdown from './Dropdown.jsx';
 function NearbyCard({ item, areaLabels }) {
   const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lng}`;
   return (
-    <div className="neu-card overflow-hidden transition-shadow duration-300 group">
+    <div className="shadow-sm overflow-hidden transition-shadow duration-300 group">
       <div className="h-48 overflow-hidden relative">
         <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-2xl" src={item.image} alt={item.name} />
         <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
@@ -64,7 +64,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
           value={areaFilter}
           onChange={setAreaFilter}
           options={areaOptions}
-          triggerClassName="neu-input w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px]"
+          triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px]"
           ariaLabel="Filter by area"
         />
         {catOptions && (
@@ -72,7 +72,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             value={categoryFilter}
             onChange={setCategoryFilter}
             options={catOptions}
-            triggerClassName="neu-input w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px]"
+            triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px]"
             ariaLabel="Filter by category"
           />
         )}

@@ -198,14 +198,14 @@ function ChatWidget() {
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError(''); }}
                   placeholder="Your name"
-                  className="neu-input w-full px-4 py-2.5 text-sm focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className=" w-full px-4 py-2.5 text-sm focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email (optional)"
-                  className="neu-input w-full px-4 py-2.5 text-sm focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className=" w-full px-4 py-2.5 text-sm focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                 />
                 {error && <p className="text-red-500 text-xs">{error}</p>}
                 <button
@@ -235,7 +235,7 @@ function ChatWidget() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Type your message..."
-                    className="neu-input flex-1 px-4 py-2.5 text-sm focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] disabled:opacity-50"
+                    className=" flex-1 px-4 py-2.5 text-sm focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] disabled:opacity-50"
                   />
                   <button
                     type="submit"

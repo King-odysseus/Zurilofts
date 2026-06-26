@@ -52,6 +52,9 @@ model Property {
   bedrooms    Int
   bathrooms   Int
   area        Int
+  neighborhood String?                  // Kilimani | Westlands | Karen | Gigiri | Lavington
+  lat          Float?                       // map coordinate
+  lng          Float?                       // map coordinate
   description String
   imagesJson  String    @default("[]")     // JSON array of image URLs
   amenitiesJson String @default("[]")     // JSON array

@@ -126,7 +126,7 @@ function HomePage() {
                 className="flex-shrink-0 w-64 group cursor-pointer no-underline"
               >
                 {/* Image */}
-                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl neu-card shadow-md mb-3">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl shadow-sm shadow-md mb-3">
                   <img
                     src={property.images?.[0] || property.coverImage || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80'}
                     alt={property.title}

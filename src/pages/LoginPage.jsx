@@ -72,7 +72,7 @@ function LoginPage() {
       </Link>
 
       <div className="max-w-md w-full relative z-10">
-        <div className="neu-card auth-card p-8 bg-white/95 backdrop-blur-sm">
+        <div className="shadow-sm auth-card p-8 bg-white/95 backdrop-blur-sm">
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-block mb-6">
@@ -98,7 +98,7 @@ function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                 required
               />
             </div>
@@ -110,7 +110,7 @@ function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="neu-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className=" w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                   required
                 />
                 <PasswordToggle

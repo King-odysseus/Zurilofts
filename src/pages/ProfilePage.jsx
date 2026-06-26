@@ -343,7 +343,7 @@ function ProfilePage() {
                   </div>
                 </div>
               )}
-              <div className="neu-card p-6">
+              <div className="shadow-sm p-6">
                 <h2 className="text-lg font-bold text-[#0B0B45] mb-6">Personal Information</h2>
                 {message && (
                   <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
@@ -361,7 +361,7 @@ function ProfilePage() {
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
                     />
                   </div>
                   <div>
@@ -370,7 +370,7 @@ function ProfilePage() {
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
                     />
                   </div>
                   <div>
@@ -379,7 +379,7 @@ function ProfilePage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
                     />
                     {emailError && (
                       <p className="text-red-500 text-xs mt-1">{emailError}</p>
@@ -392,7 +392,7 @@ function ProfilePage() {
                         value={countryCode}
                         onChange={(val) => handlePhoneChange(val, phoneNumber)}
                         options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
-                        triggerClassName="neu-input px-3 py-3 bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0"
+                        triggerClassName=" px-3 py-3 bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0"
                         ariaLabel="Select country code"
                       />
                       <input
@@ -401,7 +401,7 @@ function ProfilePage() {
                         onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
                         maxLength={15}
                         placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
-                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                        className=" flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
                       />
                     </div>
                     {phoneError && (
@@ -444,7 +444,7 @@ function ProfilePage() {
                         setBankForm((prev) => ({ ...prev, bankCode: code, bankName: bank?.name || '' }));
                       }}
                       options={banks.map((b) => ({ value: b.code, label: b.name }))}
-                      triggerClassName="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl"
+                      triggerClassName=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl"
                       ariaLabel="Select your bank"
                     />
                   ) : (
@@ -453,7 +453,7 @@ function ProfilePage() {
                       value={bankForm.bankName}
                       onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
                       placeholder="e.g. KCB Bank"
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                      className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                       required
                     />
                   )}
@@ -467,7 +467,7 @@ function ProfilePage() {
                     onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
                     maxLength={10}
                     placeholder="10-digit account number"
-                    className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                    className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                     required
                   />
                 </div>
@@ -494,7 +494,7 @@ function ProfilePage() {
                       { value: 'biweekly', label: 'Bi-Weekly (every other Monday)' },
                       { value: 'monthly', label: 'Monthly (1st of month)' },
                     ]}
-                    triggerClassName="neu-input px-4 py-3 bg-white text-[#1f2937] rounded-xl w-64"
+                    triggerClassName=" px-4 py-3 bg-white text-[#1f2937] rounded-xl w-64"
                     ariaLabel="Select payout frequency"
                   />
                   <button
@@ -531,7 +531,7 @@ function ProfilePage() {
                 </div>
               ) : (
                 bookings.map((booking) => (
-                  <div key={booking.id} className="neu-card p-6">
+                  <div key={booking.id} className="shadow-sm p-6">
                     <div className="flex flex-col md:flex-row gap-4">
                       {booking.property?.images?.[0] && (
                         <img
@@ -649,7 +649,7 @@ function ProfilePage() {
                               value={reviewForms[booking.id]?.privateNote || ''}
                               onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
                               placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
-                              className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
+                              className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
                             />
                             {reviewForms[booking.id]?.error && (
                               <p className="text-red-500 text-xs mt-1">{reviewForms[booking.id].error}</p>
