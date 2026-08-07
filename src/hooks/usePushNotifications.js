@@ -30,7 +30,7 @@ export function usePushNotifications() {
       const registration = await navigator.serviceWorker.ready;
       let subscription = await registration.pushManager.getSubscription();
       if (subscription) {
-        // Already subscribed — save to backend
+        // Already subscribed - save to backend
         const sub = subscription.toJSON();
         await apiClient.post('/push/subscribe', { endpoint: sub.endpoint, keys: sub.keys });
         setPermission('granted');

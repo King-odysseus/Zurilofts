@@ -23,7 +23,7 @@ function GuideDetailPage() {
   // SEO meta
   useEffect(() => {
     if (post) {
-      document.title = `${post.title} — ZuriLofts`;
+      document.title = `${post.title} - ZuriLofts`;
       const meta = document.querySelector('meta[name="description"]');
       if (meta) meta.setAttribute('content', post.excerpt || post.title);
       const ogTitle = document.querySelector('meta[property="og:title"]');

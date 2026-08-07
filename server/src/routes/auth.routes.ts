@@ -18,7 +18,7 @@ router.post('/logout', authController.logout);
 // Current user (requires auth)
 router.get('/me', authenticate, authController.me);
 
-// Google OAuth — only register routes if Google credentials are configured
+// Google OAuth - only register routes if Google credentials are configured
 if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET && env.GOOGLE_CALLBACK_URL) {
   router.get(
     '/google',

@@ -37,7 +37,7 @@ function CookieConsent() {
         JSON.stringify({ choice, ts: Date.now(), version: CONSENT_VERSION })
       );
     } catch {
-      // localStorage unavailable (private mode / blocked) — dismiss anyway.
+      // localStorage unavailable (private mode / blocked) - dismiss anyway.
     }
     setVisible(false);
     // Let the exit transition finish before unmounting.

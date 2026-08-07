@@ -49,7 +49,7 @@ const envSchema = z.object({
         });
       }
       // Paystack keys are needed for payments in production, but their absence
-      // must not crash the server — it should still boot and serve everything
+      // must not crash the server - it should still boot and serve everything
       // else. Payment/payout endpoints fail with a clear error only when used.
       if (!data.PAYSTACK_SECRET_KEY || !data.PAYSTACK_PUBLIC_KEY || !data.PAYSTACK_WEBHOOK_SECRET) {
         console.warn(

@@ -1,4 +1,4 @@
-// Push notification handler — imported by the Workbox service worker.
+// Push notification handler - imported by the Workbox service worker.
 // Receives push events from the ZuriLofts server and shows browser notifications.
 self.addEventListener('push', (event) => {
   let data = {};

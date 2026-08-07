@@ -13,7 +13,7 @@ const STATUS_STYLES = {
 };
 
 function formatDate(iso) {
-  if (!iso) return '—';
+  if (!iso) return '-';
   try {
     return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   } catch {
@@ -22,7 +22,7 @@ function formatDate(iso) {
 }
 
 function formatCurrency(n) {
-  if (n == null) return '—';
+  if (n == null) return '-';
   return `KES ${Number(n).toLocaleString()}`;
 }
 
@@ -35,11 +35,11 @@ function generateInvoice(booking) {
     doc.text('ZuriLofts - Booking Invoice', 14, 22);
     doc.setFontSize(10);
     doc.setTextColor(107, 114, 128); // #6b7280
-    doc.text(`Booking #${booking.id ? booking.id.slice(0, 8) : '—'}`, 14, 28);
+    doc.text(`Booking #${booking.id ? booking.id.slice(0, 8) : '-'}`, 14, 28);
 
     let y = 36;
     const items = [
-      ['Property', booking.property?.title || '—'],
+      ['Property', booking.property?.title || '-'],
       ['Location', booking.property?.location || 'Nairobi'],
       ['Check-in', formatDate(booking.checkIn)],
       ['Check-out', formatDate(booking.checkOut)],
@@ -57,7 +57,7 @@ function generateInvoice(booking) {
     if (booking.lateCheckoutFee) items.push(['Late Check-out Fee', formatCurrency(booking.lateCheckoutFee)]);
     items.push(
       ['Total', formatCurrency(booking.total)],
-      ['Payment Ref', booking.paymentReference ? booking.paymentReference.slice(0, 16) : '—'],
+      ['Payment Ref', booking.paymentReference ? booking.paymentReference.slice(0, 16) : '-'],
     );
 
     items.forEach(([label, value]) => {
