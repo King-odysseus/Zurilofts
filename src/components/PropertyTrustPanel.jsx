@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 /**
- * PropertyTrustPanel — a slim confidence strip that surfaces only verified
+ * PropertyTrustPanel - a slim confidence strip that surfaces only verified
  * facts from the property API. No invented badges, verifications, or guarantees.
  *
  * Props:

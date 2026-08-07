@@ -1,4 +1,4 @@
-# Session Workflow — MANDATORY (do NOT skip)
+# Session Workflow - MANDATORY (do NOT skip)
 
 This file is auto-read by Qwen Code at session start (QWEN.md + AGENTS.md as fallback).
 
@@ -6,13 +6,13 @@ This file is auto-read by Qwen Code at session start (QWEN.md + AGENTS.md as fal
 
 **START (do this FIRST):**
 1. Sync brain from GitHub
-2. Call MCP tool `session_start` with `project_path` and `task` — auto-claims project and delivers briefing.
+2. Call MCP tool `session_start` with `project_path` and `task` - auto-claims project and delivers briefing.
 
 **BEFORE EVERY CODING TASK:**
 Call MCP tool `brain_recall` with a query relevant to what you're about to do. Past agents already discovered bugs and gotchas.
 
 **AFTER LEARNING:**
-Call MCP tool `brain_learn` — bug fixes, decisions, gotchas, patterns. Feed it back.
+Call MCP tool `brain_learn` - bug fixes, decisions, gotchas, patterns. Feed it back.
 
 **LEAVING UNFINISHED:**
 Call MCP tool `brain_handoff` with status, next steps, and files.
@@ -39,4 +39,4 @@ Call MCP tool `brain_handoff` with status, next steps, and files.
 - One logical change per commit. Messages describe the change, never the agent.
 - Never commit agent folders (.qwen, .claude, etc.), secrets, or API keys.
 - Every feature must work for any AI agent equally. No Qwen-only logic.
-- Keep the brain clean — record only reusable knowledge.
+- Keep the brain clean - record only reusable knowledge.

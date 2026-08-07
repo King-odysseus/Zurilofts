@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as paymentService from '../services/payment.service.js';
 
-/** POST /api/payments/initialize — auth required */
+/** POST /api/payments/initialize - auth required */
 export async function initialize(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const bookingId = req.body.bookingId;
@@ -38,7 +38,7 @@ export async function initialize(req: Request, res: Response, next: NextFunction
   }
 }
 
-/** GET /api/payments/verify/:reference — auth required */
+/** GET /api/payments/verify/:reference - auth required */
 export async function verify(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await paymentService.verifyAndConfirmPayment(req.params.reference);
@@ -52,7 +52,7 @@ export async function verify(req: Request, res: Response, next: NextFunction): P
   }
 }
 
-/** GET /api/payments/banks — auth required (used by ProfilePage for dropdown) */
+/** GET /api/payments/banks - auth required (used by ProfilePage for dropdown) */
 export async function banks(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const banks = await import('../config/paystack.js').then((m) => m.fetchBanks('KES', 'kepss'));
@@ -62,19 +62,19 @@ export async function banks(_req: Request, res: Response, next: NextFunction): P
   }
 }
 
-/** POST /api/payments/webhook — no auth (called by Paystack) */
+/** POST /api/payments/webhook - no auth (called by Paystack) */
 export async function webhook(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const signature = (req.headers['x-paystack-signature'] as string) || '';
 
     // The body is a Buffer from express.raw(), so req.body.event is undefined.
-    // The event type lives inside the JSON payload — parse it from the raw string.
+    // The event type lives inside the JSON payload - parse it from the raw string.
     const rawBody = req.body instanceof Buffer ? req.body.toString('utf-8') : JSON.stringify(req.body);
     let event = '';
     try {
       event = JSON.parse(rawBody)?.event || '';
     } catch {
-      // Malformed JSON — leave event blank; the signature check will reject it.
+      // Malformed JSON - leave event blank; the signature check will reject it.
     }
 
     const result = await paymentService.handleWebhookEvent(event, rawBody, signature);

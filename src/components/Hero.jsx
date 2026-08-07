@@ -279,7 +279,7 @@ function Hero({ stats }) {
         />
       </div>
 
-      {/* Gradient overlay — dark navy tint */}
+      {/* Gradient overlay - dark navy tint */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B45]/70 via-[#0B0B45]/40 to-[#0B0B45]/70"></div>
 
       {/* Navbar */}
@@ -287,7 +287,7 @@ function Hero({ stats }) {
 
       <div className="relative flex-1 flex items-center">
         <div className="max-w-7xl mx-auto px-6 w-full py-28 md:py-32">
-          {/* Role Toggle — Airbnb-style pill (hidden when authenticated) */}
+          {/* Role Toggle - Airbnb-style pill (hidden when authenticated) */}
           {showToggle && (
           <div className="flex justify-center mb-10">
             <RoleToggle mode={mode} onChange={setMode} />
@@ -312,7 +312,7 @@ function Hero({ stats }) {
             </h1>
             <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed mb-4">
               {isHost
-                ? 'List your furnished apartment and start earning today. We handle the bookings — you focus on hospitality.'
+                ? 'List your furnished apartment and start earning today. We handle the bookings - you focus on hospitality.'
                 : 'Premium furnished apartments in Nairobi. Experience comfort, convenience, and luxury all in one place.'
               }
             </p>

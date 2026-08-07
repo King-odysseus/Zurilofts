@@ -90,7 +90,7 @@ function RegisterPage() {
         // Update auth context with the avatar URL
         setUser(avatarRes.data.data);
       } catch {
-        // Non-fatal — account is created, avatar can be added later
+        // Non-fatal - account is created, avatar can be added later
       }
     }
 
@@ -277,38 +277,38 @@ function RegisterPage() {
           </p>
         </div>
 
-        {/* Selling Points — Host Registration */}
+        {/* Selling Points - Host Registration */}
         {isHost && (
           <div className="mt-6 neu-card p-6 bg-white/95 backdrop-blur-sm max-w-md w-full">
             <h3 className="text-lg font-bold text-[#0B0B45] mb-4">Why Host with ZuriLofts</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex gap-3">
                 <span className="text-[#C49A6C] font-bold flex-shrink-0">7.5%</span>
-                <span className="text-[#1f2937]"><span className="font-semibold">Lowest platform fee in Kenya</span> — less than half of Booking.com (15%)</span>
+                <span className="text-[#1f2937]"><span className="font-semibold">Lowest platform fee in Kenya</span> - less than half of Booking.com (15%)</span>
               </li>
               <li className="flex gap-3">
                 <span className="text-[#C49A6C] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
-                <span className="text-[#1f2937]"><span className="font-semibold">Guests pay zero markup</span> — unlike Airbnb&apos;s 14% guest fee, your listed price IS the guest price</span>
+                <span className="text-[#1f2937]"><span className="font-semibold">Guests pay zero markup</span> - unlike Airbnb&apos;s 14% guest fee, your listed price IS the guest price</span>
               </li>
               <li className="flex gap-3">
                 <span className="text-[#C49A6C] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
-                <span className="text-[#1f2937]"><span className="font-semibold">Tax handled for you</span> — WHT auto-deducted, remitted to KRA, and you get a downloadable statement anytime</span>
+                <span className="text-[#1f2937]"><span className="font-semibold">Tax handled for you</span> - WHT auto-deducted, remitted to KRA, and you get a downloadable statement anytime</span>
               </li>
               <li className="flex gap-3">
                 <span className="text-[#C49A6C] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
-                <span className="text-[#1f2937]"><span className="font-semibold">Flexible payouts</span> — choose weekly, bi-weekly, or monthly transfers to your bank account</span>
+                <span className="text-[#1f2937]"><span className="font-semibold">Flexible payouts</span> - choose weekly, bi-weekly, or monthly transfers to your bank account</span>
               </li>
             </ul>
 
             {/* Airbnb comparison */}
             <div className="mt-5 bg-[#0B0B45]/5 rounded-xl p-4">
-              <p className="text-xs font-semibold text-[#0B0B45] mb-2 uppercase tracking-wide">Cost Comparison — Guest Pays</p>
+              <p className="text-xs font-semibold text-[#0B0B45] mb-2 uppercase tracking-wide">Cost Comparison - Guest Pays</p>
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-[#6b7280] border-b border-[#D9D9D9]">
@@ -336,7 +336,7 @@ function RegisterPage() {
                 </tbody>
               </table>
               <p className="text-xs text-[#6b7280] mt-2 italic">
-                Guests save 12% booking direct — your property attracts more bookings at the same listed price.
+                Guests save 12% booking direct - your property attracts more bookings at the same listed price.
               </p>
             </div>
           </div>

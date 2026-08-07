@@ -6,7 +6,7 @@ function parseExpiry(expiry: string): SignOptions['expiresIn'] {
   // If it's a number string like "3600", parse to int (seconds)
   const num = parseInt(expiry, 10);
   if (!isNaN(num) && String(num) === expiry) return num;
-  // Otherwise it's a string like "15m" or "7d" — cast to the expected type
+  // Otherwise it's a string like "15m" or "7d" - cast to the expected type
   return expiry as SignOptions['expiresIn'];
 }
 

@@ -1,4 +1,4 @@
-# ZuriLofts — Design System
+# ZuriLofts - Design System
 
 This document is the single source of truth for visual design. All AI agents and developers must follow these guidelines when building any page or component.
 
@@ -17,12 +17,12 @@ This document is the single source of truth for visual design. All AI agents and
 | White Text      | White           | `#ffffff` | Text on navy or bronze backgrounds                |
 
 ### Color Rules
-- **Dark Navy `#0B0B45`** is the authority color — navbar, all headings, footer background, hero overlay tint, section titles.
-- **Warm Bronze `#C49A6C`** is the action color — every CTA button, hover state, active nav indicator, badge, price highlight, and icon accent uses bronze.
-- **Silver Grey `#D9D9D9`** is the neutral surface — alternate section backgrounds, input borders, card dividers, skeleton loaders.
-- **White** is the default page and card background — keeps the layout breathing.
-- Never place bronze text on white — contrast is low. Use navy or charcoal for text on light backgrounds.
-- Bronze buttons always use navy (`#0B0B45`) or white text depending on button size — never charcoal.
+- **Dark Navy `#0B0B45`** is the authority color - navbar, all headings, footer background, hero overlay tint, section titles.
+- **Warm Bronze `#C49A6C`** is the action color - every CTA button, hover state, active nav indicator, badge, price highlight, and icon accent uses bronze.
+- **Silver Grey `#D9D9D9`** is the neutral surface - alternate section backgrounds, input borders, card dividers, skeleton loaders.
+- **White** is the default page and card background - keeps the layout breathing.
+- Never place bronze text on white - contrast is low. Use navy or charcoal for text on light backgrounds.
+- Bronze buttons always use navy (`#0B0B45`) or white text depending on button size - never charcoal.
 - Dark navy and bronze can be paired directly (e.g. navy footer with bronze links/icons).
 
 ---
@@ -72,7 +72,7 @@ Section padding: `py-16` (64px) on desktop, `py-10` (40px) on mobile.
 
 - **Max content width:** `1280px` centered with `mx-auto px-6`
 - **Grid:** 12-column conceptual grid; use Tailwind `grid-cols-3` for card grids, `grid-cols-2` for split layouts
-- **Sidebar split:** 40% text / 60% image (or image grid) — as seen in the features section
+- **Sidebar split:** 40% text / 60% image (or image grid) - as seen in the features section
 - **Card grid:** 3 columns desktop → 2 tablet → 1 mobile
 
 ---
@@ -221,7 +221,7 @@ All buttons: `rounded-full`, `px-6 py-2.5`, `font-semibold`, `transition-all`
 - **Mood:** aspirational, warm, trustworthy
 - **Overlay:** always use a dark overlay on hero images for text legibility
 - **Aspect ratios:** hero = `16:9` or full viewport height; cards = `4:3` or `16:9`
-- **No stock illustrations** — photos only
+- **No stock illustrations** - photos only
 
 ---
 
@@ -243,7 +243,7 @@ All buttons: `rounded-full`, `px-6 py-2.5`, `font-semibold`, `transition-all`
 - All interactive elements: `transition-all duration-200`
 - Card hover: `hover:-translate-y-1 hover:shadow-lg`
 - Button hover: `hover:opacity-90` or darken by one shade
-- No heavy animations — keep it fast and professional
+- No heavy animations - keep it fast and professional
 
 ### Advanced Animation Patterns
 
@@ -344,7 +344,7 @@ themes: [{
 |-------------------------------------------------|-----------------------------------------------|
 | Use gold exclusively for actions and highlights | Use gold as a background for large sections   |
 | Keep section backgrounds white or light grey    | Mix many background colors in one section     |
-| Use navy for all headings and authority text    | Use black (`#000`) — use charcoal instead     |
+| Use navy for all headings and authority text    | Use black (`#000`) - use charcoal instead     |
 | Maintain generous whitespace between sections   | Crowd elements together                       |
 | Use rounded-full for all buttons and inputs     | Use squared or slightly-rounded buttons       |
 | Lead with large bold property photography       | Use illustrations or abstract graphics        |

@@ -65,6 +65,6 @@ export async function updatePromoCode(id: string, data: any) {
 export async function deletePromoCode(id: string) {
   const promo = await prisma.promoCode.findUnique({ where: { id } });
   if (!promo) throw new NotFoundError('Promo code');
-  // Soft delete — just deactivate
+  // Soft delete - just deactivate
   return prisma.promoCode.update({ where: { id }, data: { active: false } });
 }

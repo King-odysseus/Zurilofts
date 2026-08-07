@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 /**
- * BookingSummaryCard — a focused booking sidebar that shows only what the
+ * BookingSummaryCard - a focused booking sidebar that shows only what the
  * property API actually supplies. No invented guarantees, fees, or policies.
  *
  * Props:
@@ -22,12 +22,12 @@ function BookingSummaryCard({ price, bookingHref, rating, reviewCount, variantLa
       {/* Price */}
       <div className="mb-5">
         <span className="text-3xl font-bold text-[#0B0B45]">
-          KES {price != null ? price.toLocaleString() : '—'}
+          KES {price != null ? price.toLocaleString() : '-'}
         </span>
         <span className="text-[#6b7280]"> / night</span>
       </div>
 
-      {/* Bed variant chip — only when arriving from a variant card */}
+      {/* Bed variant chip - only when arriving from a variant card */}
       {variantLabel && (
         <div className="mb-5 inline-flex items-center gap-1.5 bg-[#C49A6C]/10 text-[#0B0B45] text-sm font-medium px-3 py-1.5 rounded-full">
           <svg className="w-4 h-4 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -41,7 +41,7 @@ function BookingSummaryCard({ price, bookingHref, rating, reviewCount, variantLa
       <Link
         to={bookingHref}
         className="block w-full bg-[#C49A6C] text-white font-bold py-4 rounded-xl hover:bg-[#b8895c] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] active:bg-[#a6794d] transition-all duration-200 text-center"
-        aria-label={`Book ${variantLabel ? variantLabel + ' option' : 'this property'} for KES ${price != null ? price.toLocaleString() : '—'} per night`}
+        aria-label={`Book ${variantLabel ? variantLabel + ' option' : 'this property'} for KES ${price != null ? price.toLocaleString() : '-'} per night`}
       >
         Book Now
       </Link>
@@ -50,7 +50,7 @@ function BookingSummaryCard({ price, bookingHref, rating, reviewCount, variantLa
         You won&apos;t be charged yet
       </p>
 
-      {/* Trust context — only facts from the API */}
+      {/* Trust context - only facts from the API */}
       <div className="mt-6 pt-6 border-t border-[#D9D9D9]">
         <h4 className="font-semibold text-[#0B0B45] mb-3">About this listing</h4>
         <ul className="space-y-2 text-sm text-[#6b7280]">

@@ -9,7 +9,7 @@ export async function create(req: Request, res: Response, next: NextFunction): P
       ...req.body,
     });
 
-    // Initialize Paystack payment — returns authorization URL for redirect
+    // Initialize Paystack payment - returns authorization URL for redirect
     const payment = await paymentService.initializeBookingPayment(booking);
 
     res.status(201).json({

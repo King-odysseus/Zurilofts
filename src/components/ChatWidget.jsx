@@ -117,7 +117,7 @@ function ChatWidget() {
         sessionId: sessionId.current,
       });
 
-      // Show the "we'll reply" note only on the first message — after that the
+      // Show the "we'll reply" note only on the first message - after that the
       // conversation stays live and team replies stream in via polling.
       if (!sent) {
         setMessages((prev) => [

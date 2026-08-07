@@ -1,4 +1,4 @@
-# ZuriLofts — Airbnb-Inspired Implementation Plan
+# ZuriLofts - Airbnb-Inspired Implementation Plan
 
 A concrete, phased roadmap for building a premium short-let experience informed
 by the usability principles of leading travel products, expressed exclusively
@@ -21,23 +21,23 @@ through ZuriLofts' own visual language and tailored to the Kenyan market.
 
 ### Component Patterns We Own
 
-- **Neumorphic cards** (`.neu-card`, `.neu-card-hover`) — soft raised surfaces with
+- **Neumorphic cards** (`.neu-card`, `.neu-card-hover`) - soft raised surfaces with
   layered `box-shadow` on white backgrounds. Not flat Material Design; not heavy
   drop-shadow elevation. Subtle inner highlight + outer shadow creates depth.
-- **Pill CTAs** — `rounded-full` bronze-on-navy (`bg-[#C49A6C] text-white`) for
+- **Pill CTAs** - `rounded-full` bronze-on-navy (`bg-[#C49A6C] text-white`) for
   primary actions; navy-on-white for secondary. Never square-cornered buttons.
-- **Bronze as the sole action colour** — never used as a large background fill.
+- **Bronze as the sole action colour** - never used as a large background fill.
   Reserved for interactive elements: buttons, icons, rating stars, active states,
   focus rings, hover underlines.
-- **Navy as the authority colour** — headings, navigation, footer backgrounds,
+- **Navy as the authority colour** - headings, navigation, footer backgrounds,
   hero image overlays. Always paired with white or cream text for readability.
-- **Group-hover coordinated reveals** — image zoom + overlay fade + floating
+- **Group-hover coordinated reveals** - image zoom + overlay fade + floating
   action button on `PropertyCard`. Established pattern; extend consistently.
-- **IntersectionObserver counters** — scroll-triggered, eased number animations
+- **IntersectionObserver counters** - scroll-triggered, eased number animations
   on the landing page stats section.
-- **Staggered responsive grids** — `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
+- **Staggered responsive grids** - `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
   with `gap-6`. Cards breathe; never crammed.
-- **Admin full-bleed layout** — no `max-w-7xl` wrapper; sidebar + content area
+- **Admin full-bleed layout** - no `max-w-7xl` wrapper; sidebar + content area
   fills viewport. Client pages use standard `max-w-7xl` centred container.
 
 ### Typography & Spacing
@@ -51,16 +51,16 @@ through ZuriLofts' own visual language and tailored to the Kenyan market.
 
 ### Patterns We Explicitly Avoid
 
-These are deliberate anti-copying decisions — not gaps, but identity choices:
+These are deliberate anti-copying decisions - not gaps, but identity choices:
 
 | Airbnb Pattern              | ZuriLofts Alternative |
 |-----------------------------|-----------------------|
-| Red/coral accent (`#FF5A5F`) | Warm bronze (`#C49A6C`) — premium, African-inspired, calm |
+| Red/coral accent (`#FF5A5F`) | Warm bronze (`#C49A6C`) - premium, African-inspired, calm |
 | "Superhost" badge           | No invented verification tiers. Display only `rating` + `reviewCount` from real guest data. "New" for unrated properties. |
 | Horizontal icon-scroll category bar | No icon strip of property types. Filters live in a sidebar or top-bar dropdown using the existing `Dropdown` component. |
 | "AirCover" / invented guarantees | No invented protections. Show only factual "Secure booking via Paystack" with the shield icon. |
 | Split-stay / multi-destination | Not planned. Single-property booking keeps the flow simple and the data model clean. |
-| "Experiences" UGC marketplace | Phase 6 "Local Add-ons" is concierge-curated only — no user-generated listings, no host-submitted experiences. |
+| "Experiences" UGC marketplace | Phase 6 "Local Add-ons" is concierge-curated only - no user-generated listings, no host-submitted experiences. |
 | Social wishlist features | Phase 4 shortlists are named, link-shareable collections. No following, liking, commenting, or social graph. |
 | Dynamic pricing / "Smart Pricing" | Not planned. Hosts set fixed prices + optional bed-variant pricing (price1Bed, price2Bed). |
 | Identity verification badges | No government-ID verification system. Trust is built through reviews and Paystack's payment security. |
@@ -79,9 +79,9 @@ These are implemented, tested, and ready to compose into new phases without refa
 | Bed-variant routing             | `?variant=1bed\|2bed` on `/property/:id` | Fully functional; `PropertyPage` computes displayPrice/displayBedrooms/displayBathrooms from variant |
 | Image upload + sharp optimise   | `POST /api/upload` (multer + sharp)       | Reuse for host photo management, add-on images |
 | Auth stack (JWT + Google OAuth) | `server/src/middleware/auth.ts`           | `authenticate`, `requireHost`, `requireAdmin` middleware chain |
-| Booking flow + Paystack         | `server/src/controllers/booking.controller.ts` | Create, confirm, webhook, cancel — extend for add-ons line items |
+| Booking flow + Paystack         | `server/src/controllers/booking.controller.ts` | Create, confirm, webhook, cancel - extend for add-ons line items |
 | Favourites                      | `server/src/routes/favorite.routes.ts`    | Pattern to follow for shortlists; same user-scoped CRUD shape |
-| Admin dashboard shell           | `src/pages/AdminDashboard.jsx`            | Collapsible sidebar, Outlet-based routing, role-gated — reuse for host workspace |
+| Admin dashboard shell           | `src/pages/AdminDashboard.jsx`            | Collapsible sidebar, Outlet-based routing, role-gated - reuse for host workspace |
 | Neumorphic CSS                  | `src/index.css` (`.neu-card` etc.)        | No changes needed; all new components use existing classes |
 | Dropdown component              | `src/components/Dropdown.jsx`             | All filter/sort controls use this instead of native `<select>` |
 | Spinner + loading states        | `src/components/Spinner.jsx`              | Consistent loading UX across all async pages |
@@ -109,8 +109,8 @@ The backend has two namespaced route groups with misaligned role guards:
 router.get('/mine', authenticate, propertyController.listMine);
 ```
 
-This endpoint is guarded only by `authenticate`. Any logged-in user — even one
-with the USER role — can hit it. They receive an empty array (200), not a 403.
+This endpoint is guarded only by `authenticate`. Any logged-in user - even one
+with the USER role - can hit it. They receive an empty array (200), not a 403.
 The correct behaviour is a 403 Forbidden because non-host users have no
 properties to list.
 
@@ -142,7 +142,7 @@ The current behaviour is functionally correct for all real use cases:
 - Admins pass through `requireHost` and can manage any property
 - Guests never hit property-management endpoints
 
-Fixing it touches route registration, controller logic, and admin UI wiring —
+Fixing it touches route registration, controller logic, and admin UI wiring -
 scope for a dedicated commit block. Tracked here so no phase accidentally
 depends on corrected behaviour that doesn't exist yet.
 
@@ -164,14 +164,14 @@ Historical note: initial Qwen CLI endpoint failure blocked an earlier
 AI-assisted pass; Claude CLI completed the fallback implementation the same day.
 
 **User outcome**: A guest arrives on `/properties` and finds a relevant listing
-by location, dates, guest count, and property type — with clear, complete
+by location, dates, guest count, and property type - with clear, complete
 results and no dead ends.
 
 #### Frontend
 
 - [x] TripSearchBar on `/properties`: location text input that submits to
       `GET /properties?search=`. Typing updates a draft; submit commits to URL
-      and fires the API call; clear resets both. No date or guest controls —
+      and fires the API call; clear resets both. No date or guest controls -
       backend lacks support (not fabricated).
 - [x] Filter controls (using existing `Dropdown` component):
   - Property type: Apartment / Studio / Penthouse / All
@@ -186,7 +186,7 @@ results and no dead ends.
       searches are shareable and back-button-friendly
 - [x] Redesigned `PropertyCard` with flatter editorial navy/gold/cream card and
       subtle motion (lighter than old neumorphic translate-y-2 + scale-110)
-- [x] New `TripSearchBar` component — compact mobile-first search bar with
+- [x] New `TripSearchBar` component - compact mobile-first search bar with
       location text input, submit button ("Find a stay"), and clear control.
       Draft state separated from submitted query so typing does not fire API
       calls. (Qwen/DeepSeek)
@@ -205,7 +205,7 @@ results and no dead ends.
   - `ratingMin` (number, >= filter)
   - `priceMin` / `priceMax` (number, range filter)
   - `sort` (enum: price_asc | price_desc | rating | newest)
-- [ ] `GET /api/properties/autocomplete?q=` — fuzzy location search returning
+- [ ] `GET /api/properties/autocomplete?q=` - fuzzy location search returning
       distinct location strings (limit 10). Rate-limited to 30 req/min per IP.
 - [ ] All params validated with express-validator or Joi; reject unknown params.
 
@@ -218,7 +218,7 @@ results and no dead ends.
 
 #### Security & Authorization
 
-- **Public endpoint** — no auth required. All search/filter params are
+- **Public endpoint** - no auth required. All search/filter params are
   read-only on published properties.
 - **Injection**: Use parameterised queries (Prisma `where` clauses, never raw
   SQL string concatenation). Validate all enum params against allowed values.
@@ -275,7 +275,7 @@ with confidence?" using only verified data the API actually supplies.
 **PropertyPage.jsx (rewritten)**
 - **Information hierarchy**: Title → location + rating → trust panel → gallery →
   quick facts → description → amenities → nearby → booking card. Each section
-  is independently conditional — no rendering of empty `<section>` wrappers.
+  is independently conditional - no rendering of empty `<section>` wrappers.
 - **Safe data handling**: `safeArray()` helper guards against `null`/`undefined`
   arrays from the API. Description has a fallback string. Amenities and nearby
   sections only render when the array is non-empty. All-optional fallback:
@@ -296,14 +296,14 @@ with confidence?" using only verified data the API actually supplies.
   `focus-visible:outline-*` on all interactive elements.
 - **Cancellation safety**: `useEffect` cleanup flag prevents state updates on
   unmounted component.
-- **Bed variant behaviour**: Preserved exactly — `?variant=1bed|2bed` controls
+- **Bed variant behaviour**: Preserved exactly - `?variant=1bed|2bed` controls
   bedrooms, bathrooms, price, and booking link.
 
 **BookingSummaryCard.jsx (new)**
 - Factual-only booking sidebar: nightly price (KES), bed-variant chip (when
   applicable), "Book Now" CTA, "You won't be charged yet", rating + review
   count, "Secure booking via Paystack" with shield icon.
-- Null-safe `price.toLocaleString()` — guards against `undefined`/`null` price.
+- Null-safe `price.toLocaleString()` - guards against `undefined`/`null` price.
 - `PropTypes` on all props with sensible `defaultProps`.
 - Sticky positioning (`sticky top-24`) so the booking card follows scroll.
 - No invented fees, cancellation terms, guarantees, or host response times.
@@ -312,7 +312,7 @@ with confidence?" using only verified data the API actually supplies.
 - Three trust badges: Guest Rating (stars + review count), Property Type, Location.
 - Uses only API fields: `rating`, `reviewCount`, `type`, `location`.
 - Handles missing/unrated properties: displays "New · No reviews yet".
-- Reusable component — can drop onto any property-facing page.
+- Reusable component - can drop onto any property-facing page.
 - `PropTypes` + `defaultProps` for all props.
 
 #### Acceptance Criteria
@@ -327,7 +327,7 @@ with confidence?" using only verified data the API actually supplies.
 
 #### Verification
 
-- `npm run build` — ✅ passes
+- `npm run build` - ✅ passes
 - Manual: visit `/property/:id` with a seeded property; all sections render
 - Manual: visit with `?variant=1bed`; price/bedrooms change
 - Manual: visit with `?variant=2bed`; 2-bed price/bedrooms/bathrooms shown
@@ -336,17 +336,17 @@ with confidence?" using only verified data the API actually supplies.
 
 #### Files Changed
 
-- `src/components/PropertyPage.jsx` — rewritten (Rules of Hooks fix applied)
-- `src/components/BookingSummaryCard.jsx` — created (null-safety guard applied)
-- `src/components/PropertyTrustPanel.jsx` — created
-- `AIRBNB_INSPIRED_IMPLEMENTATION_PLAN.md` — this document
+- `src/components/PropertyPage.jsx` - rewritten (Rules of Hooks fix applied)
+- `src/components/BookingSummaryCard.jsx` - created (null-safety guard applied)
+- `src/components/PropertyTrustPanel.jsx` - created
+- `AIRBNB_INSPIRED_IMPLEMENTATION_PLAN.md` - this document
 
 #### Logical Commits (Completed)
 
 ```
-feat: add BookingSummaryCard — factual booking sidebar, no invented claims
-feat: add PropertyTrustPanel — verified-facts confidence strip
-refactor: rewrite PropertyPage — hierarchy, safety, a11y, remove unverified claims
+feat: add BookingSummaryCard - factual booking sidebar, no invented claims
+feat: add PropertyTrustPanel - verified-facts confidence strip
+refactor: rewrite PropertyPage - hierarchy, safety, a11y, remove unverified claims
 fix: move useCallback above early returns in PropertyPage (Rules of Hooks)
 fix: add null-safety guard for price.toLocaleString in BookingSummaryCard
 docs: add Airbnb-inspired phased implementation plan
@@ -359,7 +359,7 @@ docs: add Airbnb-inspired phased implementation plan
 **Status**: NOT STARTED
 
 **User outcome**: After booking, a guest has a single dashboard for their
-upcoming and past stays — itinerary details, host contact, and rebooking.
+upcoming and past stays - itinerary details, host contact, and rebooking.
 
 ### Frontend
 
@@ -375,10 +375,10 @@ upcoming and past stays — itinerary details, host contact, and rebooking.
 
 ### Backend
 
-- [ ] `GET /api/bookings` already returns user's bookings — reuse directly
+- [ ] `GET /api/bookings` already returns user's bookings - reuse directly
 - [ ] Add `include: { property: { include: { host: { select: { firstName, lastName, phone } } } } }`
       to the booking query so the frontend can show host contact info
-- [ ] Add `GET /api/bookings/:id/review-status` — returns `{ reviewed: boolean }`
+- [ ] Add `GET /api/bookings/:id/review-status` - returns `{ reviewed: boolean }`
       so the UI knows whether the guest has already left a review for this stay
 - [ ] Optional: `GET /api/bookings?status=upcoming|past` filter on the existing
       endpoint to avoid client-side filtering
@@ -386,13 +386,13 @@ upcoming and past stays — itinerary details, host contact, and rebooking.
 ### Data
 
 - No schema changes. Booking already links to Property, Property links to User (host).
-- Review existence check: `GET /api/reviews?propertyId=X&userId=Y` — reuse
+- Review existence check: `GET /api/reviews?propertyId=X&userId=Y` - reuse
   existing review endpoint.
 
 ### Security & Authorization
 
-- `GET /api/bookings` scoped to `req.user.sub` — guest sees only own bookings.
-- Host contact info: expose only `firstName`, `lastName`, `phone` — never email
+- `GET /api/bookings` scoped to `req.user.sub` - guest sees only own bookings.
+- Host contact info: expose only `firstName`, `lastName`, `phone` - never email
   or password hash.
 - Review status: only return the authenticated user's own review existence.
 - Admin can view any user's trip hub via `?userId=` param (future admin feature).
@@ -433,7 +433,7 @@ feat: add empty state and loading skeleton to trip hub
 **Status**: NOT STARTED
 
 **User outcome**: A host logs in and sees a focused, scannable dashboard for
-today's operations — arrivals, departures, in-house guests, and quick actions.
+today's operations - arrivals, departures, in-house guests, and quick actions.
 
 ### Frontend
 
@@ -451,7 +451,7 @@ today's operations — arrivals, departures, in-house guests, and quick actions.
 
 ### Backend
 
-- [ ] `GET /api/bookings/host/today` — returns bookings scoped to the
+- [ ] `GET /api/bookings/host/today` - returns bookings scoped to the
       authenticated host's properties, filtered to today's date range.
       Uses `requireHost` middleware.
 - [ ] Query logic:
@@ -479,7 +479,7 @@ today's operations — arrivals, departures, in-house guests, and quick actions.
 ### Dependencies
 
 - Phase 1B (property detail page for "view details" links).
-- Phase 5 (messaging for "Message guest" quick action — can be a no-op link
+- Phase 5 (messaging for "Message guest" quick action - can be a no-op link
   until Phase 5).
 
 ### Acceptance Criteria
@@ -522,7 +522,7 @@ shortlist, share a link, and coordinate choices without a group chat.
       last modified date. "Create new shortlist" card.
 - [ ] `/shortlists/:id` page: property cards in the shortlist, each with a note
       field and remove button. Share button copies a link to clipboard.
-- [ ] Shared view at `/s/:token` — read-only view of the shortlist. No auth
+- [ ] Shared view at `/s/:token` - read-only view of the shortlist. No auth
       required. Shows property cards with notes.
 - [ ] Optional: upvote/downvote per property within a shared shortlist (stored
       in localStorage for anonymous viewers, server-side for authenticated).
@@ -535,15 +535,15 @@ shortlist, share a link, and coordinate choices without a group chat.
       `propertyId` (FK→Property), `addedBy` (FK→User), `note` (text, nullable),
       `createdAt`
 - [ ] Routes:
-  - `POST /api/shortlists` — create (auth'd)
-  - `GET /api/shortlists` — list user's shortlists (auth'd, scoped to owner)
-  - `GET /api/shortlists/:id` — get shortlist with items + property details (auth'd)
-  - `PATCH /api/shortlists/:id` — rename (owner only)
-  - `DELETE /api/shortlists/:id` — delete (owner only)
-  - `GET /api/shortlists/shared/:token` — public read-only view
-  - `POST /api/shortlists/:id/items` — add property (auth'd shortlist member)
-  - `PATCH /api/shortlists/:id/items/:itemId` — update note (auth'd)
-  - `DELETE /api/shortlists/:id/items/:itemId` — remove property (auth'd)
+  - `POST /api/shortlists` - create (auth'd)
+  - `GET /api/shortlists` - list user's shortlists (auth'd, scoped to owner)
+  - `GET /api/shortlists/:id` - get shortlist with items + property details (auth'd)
+  - `PATCH /api/shortlists/:id` - rename (owner only)
+  - `DELETE /api/shortlists/:id` - delete (owner only)
+  - `GET /api/shortlists/shared/:token` - public read-only view
+  - `POST /api/shortlists/:id/items` - add property (auth'd shortlist member)
+  - `PATCH /api/shortlists/:id/items/:itemId` - update note (auth'd)
+  - `DELETE /api/shortlists/:id/items/:itemId` - remove property (auth'd)
 
 ### Data
 
@@ -566,7 +566,7 @@ shortlist, share a link, and coordinate choices without a group chat.
 ### Dependencies
 
 - Phase 1B (property detail for "save" button anchor).
-- Existing favourites system — can share UI patterns and heart-icon conventions.
+- Existing favourites system - can share UI patterns and heart-icon conventions.
 
 ### Acceptance Criteria
 
@@ -603,7 +603,7 @@ feat: add "Save to shortlist" button on PropertyCard and PropertyPage
 **Status**: NOT STARTED
 
 **User outcome**: After booking, guest and host can message each other about
-check-in details, special requests, or questions — all within ZuriLofts, no
+check-in details, special requests, or questions - all within ZuriLofts, no
 phone-number sharing required.
 
 ### Frontend
@@ -621,21 +621,21 @@ phone-number sharing required.
 
 ### Backend
 
-- [ ] New `Conversation` model: `id`, `bookingId` (FK→Booking, unique — one
+- [ ] New `Conversation` model: `id`, `bookingId` (FK→Booking, unique - one
       conversation per booking), `createdAt`, `updatedAt`
 - [ ] New `ConversationMessage` model: `id`, `conversationId` (FK→Conversation),
       `senderId` (FK→User), `content` (text), `read` (boolean, default false),
       `createdAt`
 - [ ] Routes:
-  - `POST /api/conversations` — create conversation for a booking (auth'd,
+  - `POST /api/conversations` - create conversation for a booking (auth'd,
         must be booking guest or booking's property host)
-  - `GET /api/conversations` — list user's conversations (auth'd, scoped to
+  - `GET /api/conversations` - list user's conversations (auth'd, scoped to
         user as guest or host)
-  - `GET /api/conversations/:id/messages` — get thread messages (auth'd,
+  - `GET /api/conversations/:id/messages` - get thread messages (auth'd,
         must be conversation participant)
-  - `POST /api/conversations/:id/messages` — send message (auth'd participant)
-  - `PATCH /api/conversations/:id/read` — mark all messages as read (auth'd)
-  - `GET /api/conversations/unread-count` — unread count for navbar badge
+  - `POST /api/conversations/:id/messages` - send message (auth'd participant)
+  - `PATCH /api/conversations/:id/read` - mark all messages as read (auth'd)
+  - `GET /api/conversations/unread-count` - unread count for navbar badge
 
 ### Data
 
@@ -659,7 +659,7 @@ phone-number sharing required.
 
 - Phase 2 (trip hub for "message host" entry point).
 - Phase 3 (host today for host-side messaging entry point).
-- Existing admin messaging system — reuse admin reply patterns.
+- Existing admin messaging system - reuse admin reply patterns.
 
 ### Acceptance Criteria
 
@@ -681,10 +681,10 @@ phone-number sharing required.
 
 ```
 feat: add Conversation and ConversationMessage Prisma models + migration
-feat: add POST /api/conversations — create conversation for a booking
-feat: add GET /api/conversations — list user's conversations
-feat: add GET/POST /api/conversations/:id/messages — thread read/write
-feat: add GET /api/conversations/unread-count — navbar badge endpoint
+feat: add POST /api/conversations - create conversation for a booking
+feat: add GET /api/conversations - list user's conversations
+feat: add GET/POST /api/conversations/:id/messages - thread read/write
+feat: add GET /api/conversations/unread-count - navbar badge endpoint
 feat: add /messages inbox page with conversation list
 feat: add /messages/:conversationId thread page with message bubbles
 feat: add "Message host" buttons on trip hub and host today
@@ -698,7 +698,7 @@ feat: add navbar unread-message badge with polling
 **Status**: NOT STARTED
 
 **User outcome**: A guest booking a stay can browse and request local services
-(airport pickup, private chef, daily housekeeping) curated by ZuriLofts — all
+(airport pickup, private chef, daily housekeeping) curated by ZuriLofts - all
 priced transparently and added as line items to the booking.
 
 ### Frontend
@@ -724,17 +724,17 @@ priced transparently and added as line items to the booking.
       (FK→AddOn), `quantity` (int), `unitPrice` (snapshot of add-on price at
       booking time)
 - [ ] Routes:
-  - `GET /api/properties/:id/addons` — public, returns add-ons available for
+  - `GET /api/properties/:id/addons` - public, returns add-ons available for
         this property
-  - `GET /api/admin/addons` — admin: list all add-ons
-  - `POST /api/admin/addons` — admin: create add-on
-  - `PATCH /api/admin/addons/:id` — admin: update add-on
-  - `DELETE /api/admin/addons/:id` — admin: delete add-on
-  - `POST /api/admin/properties/:id/addons` — admin: assign add-on to property
-  - `DELETE /api/admin/properties/:id/addons/:addOnId` — admin: unassign
-  - `POST /api/bookings/:id/addons` — guest: add add-ons to a pending booking
-  - `PATCH /api/bookings/:id/addons/:addOnId` — guest: update quantity
-  - `DELETE /api/bookings/:id/addons/:addOnId` — guest: remove from booking
+  - `GET /api/admin/addons` - admin: list all add-ons
+  - `POST /api/admin/addons` - admin: create add-on
+  - `PATCH /api/admin/addons/:id` - admin: update add-on
+  - `DELETE /api/admin/addons/:id` - admin: delete add-on
+  - `POST /api/admin/properties/:id/addons` - admin: assign add-on to property
+  - `DELETE /api/admin/properties/:id/addons/:addOnId` - admin: unassign
+  - `POST /api/bookings/:id/addons` - guest: add add-ons to a pending booking
+  - `PATCH /api/bookings/:id/addons/:addOnId` - guest: update quantity
+  - `DELETE /api/bookings/:id/addons/:addOnId` - guest: remove from booking
 
 ### Data
 
@@ -751,11 +751,11 @@ priced transparently and added as line items to the booking.
   `requireAdmin` middleware.
 - **Guest booking add-ons**: Mutation only during active/pending booking flow.
   Must be the booking's guest (`booking.guestId === req.user.sub`).
-- **Price integrity**: Server-side only — the frontend sends `addOnId` +
+- **Price integrity**: Server-side only - the frontend sends `addOnId` +
   `quantity`; the server looks up the current price. Never trust client-side
   price values.
 - **No host-submitted add-ons**: Add-ons are curated by ZuriLofts admin only.
-  This is not a marketplace — it's a concierge service.
+  This is not a marketplace - it's a concierge service.
 
 ### Dependencies
 
@@ -801,14 +801,14 @@ feat: add add-on management CRUD to admin dashboard
 **Status**: NOT STARTED
 
 **User outcome**: Returning guests see relevant recommendations based on their
-booking history and saved properties — making ZuriLofts feel like it knows
+booking history and saved properties - making ZuriLofts feel like it knows
 their preferences without being invasive.
 
 ### Frontend
 
 - [ ] "Because you stayed in [area]" recommendation row on home page
 - [ ] "Similar properties" section at the bottom of `PropertyPage`
-- [ ] Recently viewed properties (localStorage-based, no auth required) —
+- [ ] Recently viewed properties (localStorage-based, no auth required) -
       horizontal scroll row on home page
 - [ ] Personalised sort option in search: "Recommended for you" (weighted by
       past booking locations and property types)
@@ -817,12 +817,12 @@ their preferences without being invasive.
 
 ### Backend
 
-- [ ] `GET /api/recommendations` — returns properties based on user's past
+- [ ] `GET /api/recommendations` - returns properties based on user's past
       bookings: same location (highest weight), similar price range, same type.
       Fallback to popular/highly-rated if user has no history.
-- [ ] `GET /api/properties/:id/similar` — returns properties with same type
+- [ ] `GET /api/properties/:id/similar` - returns properties with same type
       and location, excluding the current property. Limit 4.
-- [ ] `POST /api/analytics/view` — record property view for server-side
+- [ ] `POST /api/analytics/view` - record property view for server-side
       personalisation (optional; privacy-first alternative is localStorage only).
       If implemented, requires opt-in consent.
 
@@ -831,7 +831,7 @@ their preferences without being invasive.
 - If server-side view tracking: new `PropertyView` model (`userId`, `propertyId`,
   `viewedAt`). Prisma migration required.
 - If client-side only: no schema changes. `localStorage` key:
-  `zurilofts_recently_viewed` — array of `{ id, title, image, viewedAt }`,
+  `zurilofts_recently_viewed` - array of `{ id, title, image, viewedAt }`,
   max 12 entries, FIFO eviction.
 
 ### Security & Authorization
@@ -841,13 +841,13 @@ their preferences without being invasive.
 - **View tracking**: Must be opt-in via a consent banner if server-side.
   LocalStorage approach avoids this entirely and is the recommended Phase 7
   implementation.
-- **Similar properties**: Public endpoint — no auth needed. Based on property
+- **Similar properties**: Public endpoint - no auth needed. Based on property
   attributes only, not user data.
 
 ### Dependencies
 
 - Phase 1 (search, for "Recommended for you" sort).
-- Phase 2 (trip hub — past bookings data drives recommendations).
+- Phase 2 (trip hub - past bookings data drives recommendations).
 - Existing favourites system (can boost favourited property types).
 
 ### Acceptance Criteria
@@ -902,7 +902,7 @@ feat: add "Recommended for you" sort option to search
   continue to adjust price, bedrooms, and bathrooms exactly as before.
 - **Auth flows** (login, register, Google OAuth, token refresh, logout) must be
   unaffected by any phase.
-- **Paystack webhook** must continue to process payments — no changes to the
+- **Paystack webhook** must continue to process payments - no changes to the
   webhook handler unless explicitly scoped.
 
 ---
@@ -913,37 +913,37 @@ Each commit is one logical, atomic change. Phases are independent where
 dependencies allow; no phase's commits block another phase's start.
 
 ```
-# Phase 1B — IMPLEMENTED ✅
-feat: add BookingSummaryCard — factual booking sidebar, no invented claims
-feat: add PropertyTrustPanel — verified-facts confidence strip
-refactor: rewrite PropertyPage — hierarchy, safety, a11y, remove unverified claims
+# Phase 1B - IMPLEMENTED ✅
+feat: add BookingSummaryCard - factual booking sidebar, no invented claims
+feat: add PropertyTrustPanel - verified-facts confidence strip
+refactor: rewrite PropertyPage - hierarchy, safety, a11y, remove unverified claims
 fix: move useCallback above early returns in PropertyPage (Rules of Hooks)
 fix: add null-safety guard for price.toLocaleString in BookingSummaryCard
 docs: add Airbnb-inspired phased implementation plan
 
-# Phase 1A — IMPLEMENTED ✅ (2026-08-07)
+# Phase 1A - IMPLEMENTED ✅ (2026-08-07)
 # TripSearchBar by Qwen/DeepSeek; integration & PropertyCard redesign by Claude CLI
-feat: add TripSearchBar — compact mobile-first search bar (Qwen/DeepSeek)
-feat: add draft-vs-submitted search state — typing does not fire API calls
+feat: add TripSearchBar - compact mobile-first search bar (Qwen/DeepSeek)
+feat: add draft-vs-submitted search state - typing does not fire API calls
 feat: add URL-synced filter/sort/search state on /properties
 feat: add sort dropdown (default, price_asc, price_desc, rating, newest)
-refactor: redesign PropertyCard — flatter editorial navy/gold/cream with subtle motion
+refactor: redesign PropertyCard - flatter editorial navy/gold/cream with subtle motion
 feat: add API error state with retry on /properties
 feat: add active filter states and contextual result count on /properties
 
-# Phase 2 — Trip Hub
+# Phase 2 - Trip Hub
 feat: add /trips page with upcoming/past tabs and booking cards
 feat: add host contact info to booking response
 feat: add review-status check for past bookings
 feat: add empty state and loading skeleton to trip hub
 
-# Phase 3 — Host Today Workspace
+# Phase 3 - Host Today Workspace
 feat: add GET /api/bookings/host/today with arrivals/departures/in-house grouping
 feat: add /host/today page with three-panel dashboard layout
 feat: add empty states and loading skeletons to host today panels
 feat: add quick-action buttons (view details, message guest) to today cards
 
-# Phase 4 — Collaborative Shortlists
+# Phase 4 - Collaborative Shortlists
 feat: add Shortlist and ShortlistItem Prisma models + migration
 feat: add POST/GET/DELETE /api/shortlists CRUD endpoints
 feat: add GET /api/shortlists/shared/:token public read-only endpoint
@@ -953,18 +953,18 @@ feat: add /shortlists/:id detail page with property cards and notes
 feat: add /s/:token shared read-only shortlist view
 feat: add "Save to shortlist" button on PropertyCard and PropertyPage
 
-# Phase 5 — Reservation Messaging
+# Phase 5 - Reservation Messaging
 feat: add Conversation and ConversationMessage Prisma models + migration
-feat: add POST /api/conversations — create conversation for a booking
-feat: add GET /api/conversations — list user's conversations
-feat: add GET/POST /api/conversations/:id/messages — thread read/write
-feat: add GET /api/conversations/unread-count — navbar badge endpoint
+feat: add POST /api/conversations - create conversation for a booking
+feat: add GET /api/conversations - list user's conversations
+feat: add GET/POST /api/conversations/:id/messages - thread read/write
+feat: add GET /api/conversations/unread-count - navbar badge endpoint
 feat: add /messages inbox page with conversation list
 feat: add /messages/:conversationId thread page with message bubbles
 feat: add "Message host" buttons on trip hub and host today
 feat: add navbar unread-message badge with polling
 
-# Phase 6 — Local Add-ons
+# Phase 6 - Local Add-ons
 feat: add AddOn, PropertyAddOn, and BookingAddOn Prisma models + migration
 feat: add admin CRUD endpoints for add-ons catalogue
 feat: add property-add-on assignment endpoints (admin)
@@ -974,7 +974,7 @@ feat: add "Enhance your stay" add-ons section to PropertyPage
 feat: add add-on selection and line items to booking flow
 feat: add add-on management CRUD to admin dashboard
 
-# Phase 7 — Personalization
+# Phase 7 - Personalization
 feat: add GET /api/recommendations based on booking history
 feat: add GET /api/properties/:id/similar endpoint
 feat: add recommendation rows to home page
@@ -987,7 +987,7 @@ feat: add "Recommended for you" sort option to search
 
 ## Notes
 
-- **No calendar dates in this plan** — effort estimates depend on team capacity
+- **No calendar dates in this plan** - effort estimates depend on team capacity
   and availability. Phases are scoped by outcome, not by sprint.
 - **Phases are parallelisable**: Phases 2–7 can begin independently once their
   listed dependencies are met. Phase 1A (search) and Phase 1B (detail) are the

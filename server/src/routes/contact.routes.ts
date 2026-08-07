@@ -27,7 +27,7 @@ router.post('/', async (req: Request, res: Response) => {
     }
 
     // Log the contact for now (future: persist to DB or send email notification)
-    console.log(`[Contact] From: ${name.trim()} <${email.trim()}>${req.body.phone ? ` Phone: ${req.body.phone.trim()}` : ''} — ${message.trim()}`);
+    console.log(`[Contact] From: ${name.trim()} <${email.trim()}>${req.body.phone ? ` Phone: ${req.body.phone.trim()}` : ''} - ${message.trim()}`);
 
     res.status(200).json({
       success: true,

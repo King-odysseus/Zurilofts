@@ -276,7 +276,7 @@ function AdminPromos() {
                       {p.currentUses}{p.maxUses ? ` / ${p.maxUses}` : ''}
                     </td>
                     <td className="py-3 px-4 text-xs">
-                      {new Date(p.validFrom).toLocaleDateString()} — {new Date(p.validUntil).toLocaleDateString()}
+                      {new Date(p.validFrom).toLocaleDateString()} - {new Date(p.validUntil).toLocaleDateString()}
                     </td>
                     <td className="py-3 px-4 text-xs">
                       {p.properties?.length > 0 ? (

@@ -1,7 +1,7 @@
 import rateLimit from 'express-rate-limit';
 
 /**
- * Rate limiter for auth routes — 10 attempts per 15 minutes per IP.
+ * Rate limiter for auth routes - 10 attempts per 15 minutes per IP.
  */
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
@@ -15,7 +15,7 @@ export const authLimiter = rateLimit({
 });
 
 /**
- * Rate limiter for chat endpoints — 20 requests per minute per IP.
+ * Rate limiter for chat endpoints - 20 requests per minute per IP.
  * Chat is conversational, so we allow more throughput than auth.
  */
 export const chatLimiter = rateLimit({

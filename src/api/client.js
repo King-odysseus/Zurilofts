@@ -37,7 +37,7 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config;
 
     // Never retry if the failed request was itself a refresh attempt.
-    // Retrying `/auth/refresh` when it 401s is pointless — there's no
+    // Retrying `/auth/refresh` when it 401s is pointless - there's no
     // valid refresh token to exchange, so it will just 401 again.
     if (originalRequest.url?.includes('/auth/refresh')) {
       return Promise.reject(error);
@@ -72,7 +72,7 @@ apiClient.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(originalRequest);
       } catch {
-        // Refresh failed — trigger logout
+        // Refresh failed - trigger logout
         clearAccessToken();
         window.dispatchEvent(new CustomEvent('auth:logout'));
         return Promise.reject(error);

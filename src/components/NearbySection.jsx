@@ -80,7 +80,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
 
       {/* Grid */}
       {filtered.length === 0 ? (
-        <p className="text-center text-[#6b7280] py-12">Nothing matches those filters — try a different area or category.</p>
+        <p className="text-center text-[#6b7280] py-12">Nothing matches those filters - try a different area or category.</p>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

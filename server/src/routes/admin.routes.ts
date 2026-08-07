@@ -63,7 +63,7 @@ router.put('/settings/landing-stats', async (req: Request, res: Response, next: 
   } catch (e) { next(e); }
 });
 
-// Calendar — sources, blocks, sync (per property)
+// Calendar - sources, blocks, sync (per property)
 router.get('/properties/:id/calendar', calendarCtrl.getCalendar);
 router.post('/properties/:id/calendar/sources', validate(calendarSourceSchema), calendarCtrl.addSource);
 router.delete('/properties/:id/calendar/sources/:sourceId', calendarCtrl.deleteSource);

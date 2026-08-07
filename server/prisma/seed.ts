@@ -46,7 +46,7 @@ async function main() {
     return `/images/Ely Homes Photography (${n} of 20).jpg`;
   }
 
-  // Seed properties — only Serenity Residency is currently live
+  // Seed properties - only Serenity Residency is currently live
   const propertiesData = [
     {
       title: 'ZuriLofts - Serenity Residency 1305',

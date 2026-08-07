@@ -420,7 +420,7 @@ function ProfilePage() {
             </div>
           )}
 
-          {/* Payout Settings — HOST only */}
+          {/* Payout Settings - HOST only */}
           {activeTab === 'info' && profile?.role === 'HOST' && (
             <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
               <h3 className="text-xl font-bold text-[#0B0B45] mb-1">Payout Settings</h3>

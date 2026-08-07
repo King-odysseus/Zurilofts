@@ -42,7 +42,7 @@ function handleUpload(req: Request, res: Response, next: NextFunction): void {
 
 const router = Router();
 
-// Host or admin — accepts up to 10 files under the "images" field. Hosts need
+// Host or admin - accepts up to 10 files under the "images" field. Hosts need
 // this to add photos to the listings they create (property routes are requireHost).
 router.post('/', authenticate, requireHost, handleUpload, uploadImages);
 

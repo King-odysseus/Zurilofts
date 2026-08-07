@@ -13,7 +13,7 @@ router.post('/initialize', authenticate, ctrl.initialize);
 // Verify payment status (requires auth)
 router.get('/verify/:reference', authenticate, ctrl.verify);
 
-// Webhook — no auth, handled by Paystack
+// Webhook - no auth, handled by Paystack
 router.post('/webhook', ctrl.webhook);
 
 export default router;

@@ -71,14 +71,14 @@ function HostPayouts() {
     }
   }
 
-  // Build a safe print view from whtData (not innerHTML) — no injection risk.
+  // Build a safe print view from whtData (not innerHTML) - no injection risk.
   const escapeHtml = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   function printWht() {
     if (!whtData?.bookings) return;
     const period = whtMonth || 'All time';
     const rowsHtml = whtData.bookings.map(b => {
-      const date = b.paidAt ? new Date(b.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+      const date = b.paidAt ? new Date(b.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
       return `<tr><td>${escapeHtml(b.property?.title)}</td><td>${date}</td><td class="num">${(b.hostNetAmount ?? 0).toLocaleString()}</td><td class="num">${(b.withholdingTax ?? 0).toLocaleString()}</td></tr>`;
     }).join('');
     const totalHtml = `<tr class="total"><td colspan="2">Total</td><td class="num">${(whtData.totalEarnings ?? 0).toLocaleString()}</td><td class="num">${(whtData.totalWht ?? 0).toLocaleString()}</td></tr>`;
@@ -95,7 +95,7 @@ function HostPayouts() {
         .total { font-weight: bold; }
         .num { text-align: right; }
       </style></head><body>
-      <h2>ZuriLofts — WHT Statement</h2>
+      <h2>ZuriLofts - WHT Statement</h2>
       <p style="color:#6b7280;font-size:14px;margin-bottom:16px">Period: ${escapeHtml(period)} | WHT Rate: 5% | Remitted to KRA</p>
       <table><thead><tr><th>Property</th><th>Paid Date</th><th>Earnings (KES)</th><th>WHT (KES)</th></tr></thead><tbody>
       ${rowsHtml}
@@ -196,7 +196,7 @@ function HostPayouts() {
         {whtData && (
           <div className="mt-4">
             <div ref={whtRef}>
-              <h2 className="text-lg font-bold text-[#0B0B45] mb-2">ZuriLofts — WHT Statement</h2>
+              <h2 className="text-lg font-bold text-[#0B0B45] mb-2">ZuriLofts - WHT Statement</h2>
               <p className="text-sm text-[#6b7280] mb-4">
                 Period: {whtMonth || 'All time'} | WHT Rate: 5% | Remitted to KRA
               </p>
@@ -214,7 +214,7 @@ function HostPayouts() {
                     <tr key={i} className="border-b border-[#D9D9D9]/50">
                       <td className="p-2 text-[#1f2937]">{b.property?.title}</td>
                       <td className="p-2 text-[#6b7280]">
-                        {b.paidAt ? new Date(b.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                        {b.paidAt ? new Date(b.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                       </td>
                       <td className="p-2 text-right">{b.hostNetAmount?.toLocaleString()}</td>
                       <td className="p-2 text-right">{b.withholdingTax?.toLocaleString()}</td>
@@ -280,7 +280,7 @@ function HostPayouts() {
                       )}
                     </td>
                     <td className="p-3 text-[#6b7280]">
-                      {p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                      {p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                     </td>
                   </tr>
                 ))}

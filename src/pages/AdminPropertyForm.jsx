@@ -421,7 +421,7 @@ function AdminPropertyForm() {
         </div>
       </form>
 
-      {/* Live preview — collapsible drawer docked to the right edge */}
+      {/* Live preview - collapsible drawer docked to the right edge */}
       <button
         type="button"
         onClick={() => setPreviewOpen((o) => !o)}
@@ -469,7 +469,7 @@ function bedLabel(form) {
   if (has1 && has2) return '1 & 2';
   if (has1) return 1;
   if (has2) return 2;
-  return form.bedrooms === '' ? '—' : form.bedrooms;
+  return form.bedrooms === '' ? '-' : form.bedrooms;
 }
 
 // Derive the bathroom count shown on a card from the bed-variant selection,
@@ -484,9 +484,9 @@ function bedBathLabel(form) {
     const v2 = b2 ?? form.bathrooms;
     return v1 === v2 ? v1 : `${v1} & ${v2}`;
   }
-  if (has1) return b1 ?? (form.bathrooms === '' ? '—' : form.bathrooms);
-  if (has2) return b2 ?? (form.bathrooms === '' ? '—' : form.bathrooms);
-  return form.bathrooms === '' ? '—' : form.bathrooms;
+  if (has1) return b1 ?? (form.bathrooms === '' ? '-' : form.bathrooms);
+  if (has2) return b2 ?? (form.bathrooms === '' ? '-' : form.bathrooms);
+  return form.bathrooms === '' ? '-' : form.bathrooms;
 }
 
 // Live preview of the public PropertyCard, driven by the current form values
@@ -498,7 +498,7 @@ function PropertyPreview({ form }) {
   // variant is selected does the raw Bedrooms field apply.
   const bedrooms = bedLabel(form);
   const bathrooms = bedBathLabel(form);
-  const area = form.area === '' ? '—' : form.area;
+  const area = form.area === '' ? '-' : form.area;
 
   return (
     <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] overflow-hidden max-w-sm">
@@ -571,7 +571,7 @@ function FullPagePreview({ form, onClose }) {
       <div className="bg-white rounded-2xl w-full max-w-5xl my-8 shadow-2xl overflow-hidden">
         {/* Bar */}
         <div className="sticky top-0 z-10 flex items-center justify-between bg-[#0B0B45] text-white px-5 py-3">
-          <span className="text-sm font-semibold">Page preview — not yet saved</span>
+          <span className="text-sm font-semibold">Page preview - not yet saved</span>
           <button onClick={onClose} className="text-white/70 hover:text-white" aria-label="Close preview">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -626,7 +626,7 @@ function FullPagePreview({ form, onClose }) {
                   <p className="text-sm text-[#6b7280]">Bathrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B0B45]">{form.area === '' ? '—' : `${form.area} sq ft`}</p>
+                  <p className="font-bold text-[#0B0B45]">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
                   <p className="text-sm text-[#6b7280]">Area</p>
                 </div>
                 <div>
@@ -698,7 +698,7 @@ FullPagePreview.propTypes = {
   onClose: PropTypes.func.isRequired,
 };
 
-// ---- Seasonal pricing (price rules) — only available once a property exists ----
+// ---- Seasonal pricing (price rules) - only available once a property exists ----
 function SeasonalPricing({ propertyId }) {
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);

@@ -1,15 +1,15 @@
-# Cognitive1 — Session Workflow
+# Cognitive1 - Session Workflow
 
 ## Session checklist (do this FIRST)
 1. Sync brain from GitHub
-2. Call MCP tool `session_start` with `project_path` and `task` — auto-claims project and delivers briefing.
-3. Before every task: `brain_recall "topic"` — always.
+2. Call MCP tool `session_start` with `project_path` and `task` - auto-claims project and delivers briefing.
+3. Before every task: `brain_recall "topic"` - always.
 4. After learning: `brain_learn` to feed it back.
 5. If leaving: `brain_handoff` with status and next steps.
 6. End: commit + push, `session_end "summary"`, push brain.
 
 
-# ZuriLofts — Premium Short-Let Apartments
+# ZuriLofts - Premium Short-Let Apartments
 
 React 18 + Vite + Tailwind 3 + DaisyUI + Flowbite React. Font: Inter.
 
@@ -21,7 +21,7 @@ npm run build    # production build
 npm run preview  # preview production build
 ```
 
-## Cognitive1 Brain (mandatory — do not skip)
+## Cognitive1 Brain (mandatory - do not skip)
 
 **Before every task**, recall the brain for cached knowledge. The `UserPromptSubmit` hook auto-runs this, but also call it manually if needed:
 
@@ -62,11 +62,11 @@ server/               # Express + Prisma backend
 **Source:** [DESIGN.md](DESIGN.md) and the brain's `ZuriLofts design system` pattern (recall it before UI work).
 
 **Core colors (use arbitrary hex, per file convention):**
-- `#0B0B45` Dark Navy — headings, navbar, admin sidebar, footer
-- `#C49A6C` Warm Bronze — CTAs, accents, highlights, active states
-- `#D9D9D9` Silver Grey — borders, dividers, disabled
-- `#1f2937` Charcoal — body text
-- `#6b7280` Cool Grey — muted/secondary
+- `#0B0B45` Dark Navy - headings, navbar, admin sidebar, footer
+- `#C49A6C` Warm Bronze - CTAs, accents, highlights, active states
+- `#D9D9D9` Silver Grey - borders, dividers, disabled
+- `#1f2937` Charcoal - body text
+- `#6b7280` Cool Grey - muted/secondary
 
 **Neumorphic classes** (from `src/index.css`): `.neu-card`, `.neu-card-hover`, `.neu-input`, `.neu-btn`, `.neu-radio-card`. Admin forms use flat inputs (`rounded-xl border border-[#D9D9D9]`).
 

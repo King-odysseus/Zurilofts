@@ -143,10 +143,10 @@ function AdminPayouts() {
                     </span>
                   </td>
                   <td className="p-4 text-[#6b7280]">
-                    {p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                    {p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                   </td>
                   <td className="p-4 text-[#6b7280]">
-                    {p.completedAt ? new Date(p.completedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                    {p.completedAt ? new Date(p.completedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                   </td>
                   <td className="p-4">
                     {(p.status === 'FAILED' || p.status === 'PENDING') && (

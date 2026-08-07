@@ -21,7 +21,7 @@ export function FavoritesProvider({ children }) {
       setFavorites(props);
       setIds(new Set(props.map((p) => p.id)));
     } catch {
-      /* ignore — keep current state */
+      /* ignore - keep current state */
     }
   }, [isAuthenticated]);
 

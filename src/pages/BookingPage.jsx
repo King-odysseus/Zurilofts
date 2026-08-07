@@ -138,7 +138,7 @@ function BookingPage() {
           setPhoneNumber(pn);
         }
       } catch {
-        // not fatal — user can fill the fields manually
+        // not fatal - user can fill the fields manually
       }
     }
     fetchProfile();
@@ -172,7 +172,7 @@ function BookingPage() {
       .catch(() => { /* calendar still works, just nothing disabled */ });
   }, [id, urlVariant]);
 
-  // ── Cost calculations (memoised — expensive enough to matter on every date pick / guest toggle) ──
+  // ── Cost calculations (memoised - expensive enough to matter on every date pick / guest toggle) ──
   const pricing = useMemo(() => {
     const nights = (() => {
       if (!bookingData.checkIn || !bookingData.checkOut) return 0;
@@ -294,11 +294,11 @@ function BookingPage() {
           <div className="flex gap-4 mt-3">
             <div className="flex-1 neu-input px-4 py-2 bg-white">
               <span className="text-xs text-[#6b7280] block">Check-in</span>
-              <span className="font-semibold text-[#0B0B45]">{bookingData.checkIn || '—'}</span>
+              <span className="font-semibold text-[#0B0B45]">{bookingData.checkIn || '-'}</span>
             </div>
             <div className="flex-1 neu-input px-4 py-2 bg-white">
               <span className="text-xs text-[#6b7280] block">Check-out</span>
-              <span className="font-semibold text-[#0B0B45]">{bookingData.checkOut || '—'}</span>
+              <span className="font-semibold text-[#0B0B45]">{bookingData.checkOut || '-'}</span>
             </div>
           </div>
         )}
@@ -332,7 +332,7 @@ function BookingPage() {
         )}
       </div>
 
-      {/* Bed Option — shown as read-only since it was selected on the property card */}
+      {/* Bed Option - shown as read-only since it was selected on the property card */}
       {bedOption && (
         <div className="bg-[#C49A6C]/10 rounded-xl p-4 flex items-center justify-between">
           <div>
@@ -504,7 +504,7 @@ function BookingPage() {
         )}
       </div>
 
-      {/* Additional guests — one form per extra person in the party */}
+      {/* Additional guests - one form per extra person in the party */}
       <div>
         <div className="flex items-center justify-between mb-1">
           <label className="block text-sm font-semibold text-[#1f2937]">
@@ -524,7 +524,7 @@ function BookingPage() {
         </p>
 
         {additionalGuests.length === 0 ? (
-          <p className="text-sm text-[#6b7280] italic">Just you — add a guest if others are staying.</p>
+          <p className="text-sm text-[#6b7280] italic">Just you - add a guest if others are staying.</p>
         ) : (
           <div className="space-y-3">
             {additionalGuests.map((g, i) => (
