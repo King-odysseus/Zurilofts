@@ -184,7 +184,9 @@ export async function setUserRole(userId: string, role: string) {
 
   return prisma.user.update({
     where: { id: userId },
-    data: { role },
+    // Validation above narrows this to USER | HOST | ADMIN. The cast keeps
+    // this source compatible with SQLite's String and PostgreSQL's Role enum.
+    data: { role: role as any },
     select: ADMIN_USER_SELECT,
   });
 }
