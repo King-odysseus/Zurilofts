@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ZuriLofts — Developer Manual</title>
+<title>ZuriLofts - Developer Manual</title>
 <style>
   :root {
     --indigo: #0B0B45;
@@ -153,12 +153,12 @@ npx prisma generate</pre></div></div>
 
 <div class="card-grid">
   <div class="card">
-    <h3>Terminal 1 — Backend (port 3000)</h3>
+    <h3>Terminal 1 - Backend (port 3000)</h3>
     <pre>cd server
 npm run dev</pre>
   </div>
   <div class="card">
-    <h3>Terminal 2 — Frontend (port 5173)</h3>
+    <h3>Terminal 2 - Frontend (port 5173)</h3>
     <pre>npm run dev</pre>
   </div>
 </div>
@@ -246,7 +246,7 @@ USER'S BROWSER                    YOUR SERVER / COMPUTER
   <tr><td><strong>Node.js</strong></td><td>Runs JavaScript on a server</td><td>Runtime for Express</td></tr>
   <tr><td><strong>Express</strong></td><td>Handles HTTP requests + responses</td><td>Routes in <code>server/src/routes/</code></td></tr>
   <tr><td><strong>TypeScript</strong></td><td>JavaScript with type safety</td><td>All <code>.ts</code> files in server</td></tr>
-  <tr><td><strong>Prisma</strong></td><td>Database ORM — query DB from code</td><td><code>server/prisma/schema.prisma</code></td></tr>
+  <tr><td><strong>Prisma</strong></td><td>Database ORM - query DB from code</td><td><code>server/prisma/schema.prisma</code></td></tr>
   <tr><td><strong>SQLite</strong></td><td>File-based database (dev)</td><td><code>server/prisma/dev.db</code></td></tr>
   <tr><td><strong>Zod</strong></td><td>Input validation</td><td><code>server/src/types/index.ts</code></td></tr>
   <tr><td><strong>JWT</strong></td><td>User authentication tokens</td><td><code>server/src/utils/jwt.ts</code></td></tr>
@@ -341,7 +341,7 @@ zurilofts/
 
 <h2>All Models (Tables)</h2>
 
-<h3>User — Account information</h3>
+<h3>User - Account information</h3>
 <table>
   <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
   <tr><td>id</td><td>String (auto)</td><td>Unique ID</td></tr>
@@ -355,7 +355,7 @@ zurilofts/
   <tr><td>role</td><td>String</td><td>"USER" or "ADMIN"</td></tr>
 </table>
 
-<h3>Property — Apartment/rental listings</h3>
+<h3>Property - Apartment/rental listings</h3>
 <table>
   <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
   <tr><td>id</td><td>String (auto)</td><td></td></tr>
@@ -370,7 +370,7 @@ zurilofts/
   <tr><td>available / featured</td><td>Boolean</td><td></td></tr>
 </table>
 
-<h3>Booking — Each reservation</h3>
+<h3>Booking - Each reservation</h3>
 <table>
   <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
   <tr><td>id</td><td>String (auto)</td><td></td></tr>
@@ -382,7 +382,7 @@ zurilofts/
   <tr><td>subtotal / cleaningFee / serviceFee / lateCheckoutFee / discountAmount / total</td><td>Int</td><td>Price breakdown in KES</td></tr>
 </table>
 
-<h3>Review — Post-stay feedback</h3>
+<h3>Review - Post-stay feedback</h3>
 <table>
   <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
   <tr><td>rating</td><td>Int</td><td>1-5 stars</td></tr>
@@ -392,13 +392,13 @@ zurilofts/
 
 <h3>Other Models</h3>
 <ul>
-  <li><strong>Favorite</strong> — User-property saved list</li>
-  <li><strong>Message</strong> — In-app chat</li>
-  <li><strong>PromoCode</strong> — Discount codes</li>
-  <li><strong>CalendarSource</strong> — External iCal feeds (Airbnb)</li>
-  <li><strong>CalendarBlock</strong> — Blocked date ranges</li>
-  <li><strong>PriceRule</strong> — Seasonal price overrides</li>
-  <li><strong>AppSetting</strong> — Key-value settings (landing stats)</li>
+  <li><strong>Favorite</strong> - User-property saved list</li>
+  <li><strong>Message</strong> - In-app chat</li>
+  <li><strong>PromoCode</strong> - Discount codes</li>
+  <li><strong>CalendarSource</strong> - External iCal feeds (Airbnb)</li>
+  <li><strong>CalendarBlock</strong> - Blocked date ranges</li>
+  <li><strong>PriceRule</strong> - Seasonal price overrides</li>
+  <li><strong>AppSetting</strong> - Key-value settings (landing stats)</li>
 </ul>
 
 <h2>How to Add a New Field to the Database</h2>
@@ -428,8 +428,8 @@ npx prisma db push</pre></div></div>
 <h2>Authentication <span class="tag tag-public">Public</span></h2>
 <table>
   <tr><th>Method</th><th>Path</th><th>What it does</th></tr>
-  <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/register</code></td><td>Create account — body: {firstName, lastName, email, password}</td></tr>
-  <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/login</code></td><td>Sign in — body: {email, password}</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/register</code></td><td>Create account - body: {firstName, lastName, email, password}</td></tr>
+  <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/login</code></td><td>Sign in - body: {email, password}</td></tr>
   <tr><td><span class="tag tag-post">POST</span></td><td><code>/auth/refresh</code></td><td>Get new access token from cookie</td></tr>
   <tr><td><span class="tag tag-get">GET</span></td><td><code>/auth/google</code></td><td>Start Google OAuth sign-in</td></tr>
   <tr><td><span class="tag tag-get">GET</span></td><td><code>/auth/me</code></td><td><span class="tag tag-auth">Auth</span> Get current user</td></tr>
@@ -712,11 +712,11 @@ router.put('/settings/house-rules', async (req, res, next) => {
 <h3>Environment variables on Railway</h3>
 <p>Set these in the Railway dashboard under Variables:</p>
 <ul>
-  <li><code>DATABASE_URL</code> — PostgreSQL connection string (Railway provides this)</li>
-  <li><code>JWT_SECRET</code> — A long random string for token signing</li>
-  <li><code>GOOGLE_CLIENT_ID</code> + <code>GOOGLE_CLIENT_SECRET</code> — From Google Cloud Console</li>
-  <li><code>NODE_ENV</code> — Set to <code>production</code></li>
-  <li><code>COGNITIVE1_API_KEY</code> — API key for the Cognitive1 daemon</li>
+  <li><code>DATABASE_URL</code> - PostgreSQL connection string (Railway provides this)</li>
+  <li><code>JWT_SECRET</code> - A long random string for token signing</li>
+  <li><code>GOOGLE_CLIENT_ID</code> + <code>GOOGLE_CLIENT_SECRET</code> - From Google Cloud Console</li>
+  <li><code>NODE_ENV</code> - Set to <code>production</code></li>
+  <li><code>COGNITIVE1_API_KEY</code> - API key for the Cognitive1 daemon</li>
 </ul>
 
 <h3>Database Migration on Railway</h3>

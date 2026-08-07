@@ -10,7 +10,7 @@ const router = Router();
 router.post('/', authenticate, validate(bookingCreateSchema), ctrl.create);
 router.get('/', authenticate, ctrl.listMine);
 
-// Host views — bookings on, and earnings from, the caller's own listings.
+// Host views - bookings on, and earnings from, the caller's own listings.
 // Declared before '/:id' so these literal paths match first. The controllers
 // scope to the caller's hostId from the token, so a host only ever sees their
 // own data even though the same controllers serve the admin (all-data) routes.

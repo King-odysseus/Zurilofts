@@ -18,7 +18,7 @@ function RestaurantsPage() {
           </Link>
           <NearbySection
             title="Best Places to Eat in Nairobi"
-            subtitle="Explore Nairobi's vibrant dining scene — from street food to fine dining."
+            subtitle="Explore Nairobi's vibrant dining scene - from street food to fine dining."
             items={PLACES_TO_EAT}
             areaLabels={AREAS}
             categoryLabels={EAT_CATEGORIES}

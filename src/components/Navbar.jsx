@@ -79,7 +79,7 @@ function Navbar() {
         {/* Right side: CTA buttons / user menu + hamburger */}
         <div className="flex items-center space-x-2 rtl:space-x-reverse ml-auto md:ml-0 md:flex-1 md:justify-end md:order-3">
           {isAuthenticated ? (
-            /* Authenticated — User dropdown (Profile, Messages, Admin) */
+            /* Authenticated - User dropdown (Profile, Messages, Admin) */
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -184,7 +184,7 @@ function Navbar() {
               )}
             </div>
           ) : (
-            /* Logged out — Sign In/Sign Up + Chat */
+            /* Logged out - Sign In/Sign Up + Chat */
             <>
               <Link
                 to="/login"
@@ -230,7 +230,7 @@ function Navbar() {
           </button>
         </div>
 
-        {/* Nav links — centered between logo and buttons on desktop, full-width dropdown on mobile */}
+        {/* Nav links - centered between logo and buttons on desktop, full-width dropdown on mobile */}
         <div
           id="navbar-main"
           className={`w-full md:w-auto md:flex-1 md:flex md:justify-center md:order-2 ${

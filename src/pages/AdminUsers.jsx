@@ -196,7 +196,7 @@ function AdminUsers() {
                     </td>
                     <td className="p-4">
                       <div className="text-[#1f2937]">{u.email}</div>
-                      <div className="text-xs text-[#6b7280]">{u.phone || '—'}</div>
+                      <div className="text-xs text-[#6b7280]">{u.phone || '-'}</div>
                     </td>
                     <td className="p-4">
                       {isSelf ? (
@@ -216,7 +216,7 @@ function AdminUsers() {
                       )}
                     </td>
                     <td className="p-4">{u._count?.properties ?? 0}</td>
-                    <td className="p-4">{u.wallet?.balance != null ? u.wallet.balance.toLocaleString() : '—'}</td>
+                    <td className="p-4">{u.wallet?.balance != null ? u.wallet.balance.toLocaleString() : '-'}</td>
                     <td className="p-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${u.suspended ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
                         {u.suspended ? 'Suspended' : 'Active'}

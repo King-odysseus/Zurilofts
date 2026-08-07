@@ -21,7 +21,7 @@ const chatSchema = z.object({
   sessionId: z.string().optional(),
 });
 
-// POST /api/chat/send — forward message to Telegram
+// POST /api/chat/send - forward message to Telegram
 router.post('/send', chatLimiter, validate(chatSchema), async (req, res, next) => {
   try {
     const { name, email, message, sessionId } = req.body;
@@ -82,7 +82,7 @@ router.post('/send', chatLimiter, validate(chatSchema), async (req, res, next) =
   }
 });
 
-// GET /api/chat/messages — poll for team replies to a session
+// GET /api/chat/messages - poll for team replies to a session
 router.get('/messages', chatLimiter, (req, res) => {
   const sessionId = typeof req.query.sessionId === 'string' ? req.query.sessionId : '';
   const after = Number.parseInt(String(req.query.after ?? '0'), 10) || 0;

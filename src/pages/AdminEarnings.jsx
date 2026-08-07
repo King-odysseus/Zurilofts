@@ -81,7 +81,6 @@ const SORT_OPTIONS = [
 function AdminEarnings() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  const isHost = user?.role === 'HOST';
   const [rows, setRows] = useState([]);
   const [hosts, setHosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -90,7 +89,7 @@ function AdminEarnings() {
   const [customTo, setCustomTo] = useState('');
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('earnings-desc');
-  const [viewMode, setViewMode] = useState('all'); // 'all' | 'mine' — admin-only toggle
+  const [viewMode, setViewMode] = useState('all'); // 'all' | 'mine' - admin-only toggle
 
   const effectiveEndpoint = useMemo(() => {
     if (!isAdmin) return '/bookings/host/earnings';
@@ -191,7 +190,7 @@ function AdminEarnings() {
     return [...earningRows].sort((a, b) => b.bookings - a.bookings);
   }, [earningRows]);
 
-  // Derived analytics — computed from the filtered totals so they track the active period/search.
+  // Derived analytics - computed from the filtered totals so they track the active period/search.
   const metrics = useMemo(() => {
     const t = filteredTotals;
     const avgBookingValue = t.bookings > 0 ? Math.round(t.earnings / t.bookings) : 0;
@@ -366,7 +365,7 @@ function AdminEarnings() {
       styles: { fontSize: 8, cellPadding: 2 },
     });
 
-    // Footer — page numbers
+    // Footer - page numbers
     const pageCount = doc.getNumberOfPages();
     for (let i = 1; i <= pageCount; i++) {
       doc.setPage(i);
@@ -429,7 +428,7 @@ function AdminEarnings() {
     else if (option === 'csv') handleExportCSV();
   }
 
-  // Stat cards — top row: quick overview
+  // Stat cards - top row: quick overview
   const cards = [
     { label: 'Active Bookings', value: filteredTotals.bookings.toLocaleString(), color: 'bg-[#0B0B45]', sub: `${metrics.confirmationRate}% confirmed (ex. cancelled)` },
     { label: 'Gross Rent (KES)', value: filteredTotals.grossRent.toLocaleString(), color: 'bg-[#C49A6C]', sub: 'Subtotal before fees & discounts' },
@@ -438,7 +437,7 @@ function AdminEarnings() {
     { label: 'WHT 5% (KES)', value: filteredTotals.wht.toLocaleString(), color: 'bg-purple-600', sub: `Remitted to KRA · ~${metrics.whtPct}% of host net` },
   ];
 
-  // Second row — additional breakdown
+  // Second row - additional breakdown
   const feeCards = [
     { label: 'Discounts (KES)', value: `${filteredTotals.discounts.toLocaleString()}`, sub: 'Promo code deductions' },
     { label: 'Confirmed Revenue (KES)', value: filteredTotals.confirmedEarnings.toLocaleString(), sub: `KES ${metrics.avgBookingValue.toLocaleString()} avg / booking` },
@@ -447,7 +446,7 @@ function AdminEarnings() {
   ];
 
   const insights = [
-    { label: 'Top Earner', value: metrics.topEarner ? metrics.topEarner.title : '—', hint: metrics.topEarner ? `KES ${metrics.topEarner.earnings.toLocaleString()}` : undefined },
+    { label: 'Top Earner', value: metrics.topEarner ? metrics.topEarner.title : '-', hint: metrics.topEarner ? `KES ${metrics.topEarner.earnings.toLocaleString()}` : undefined },
     { label: 'Confirmation Rate', value: `${metrics.confirmationRate}%`, hint: `${filteredTotals.confirmedBookings.toLocaleString()} of ${filteredTotals.bookings.toLocaleString()} bookings` },
     { label: '1-Bed Share', value: `${metrics.bed1Share}%`, hint: `KES ${filteredTotals.bed1Earnings.toLocaleString()}` },
     { label: '2-Bed Share', value: `${metrics.bed2Share}%`, hint: `KES ${filteredTotals.bed2Earnings.toLocaleString()}` },
@@ -585,7 +584,7 @@ function AdminEarnings() {
         )}
       </div>
 
-      {/* Stats Cards — Top row: core metrics */}
+      {/* Stats Cards - Top row: core metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
         {cards.map(({ label, value, color, sub }) => (
           <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
@@ -599,7 +598,7 @@ function AdminEarnings() {
         ))}
       </div>
 
-      {/* Fee Breakdown Cards — Second row */}
+      {/* Fee Breakdown Cards - Second row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         {feeCards.map(({ label, value, sub }) => (
           <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
@@ -624,7 +623,7 @@ function AdminEarnings() {
       {/* Earnings Flow visualization (only when we have fee data) */}
       {!loading && filteredTotals.grossRent > 0 && (
         <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm mb-4">
-          <h2 className="text-sm font-bold text-[#0B0B45] mb-4">Earnings Flow — How Your Money Moves</h2>
+          <h2 className="text-sm font-bold text-[#0B0B45] mb-4">Earnings Flow - How Your Money Moves</h2>
           <div className="flex flex-col lg:flex-row items-center gap-3 text-sm">
             {/* Gross Rent */}
             <div className="bg-[#0B0B45]/5 rounded-xl p-3 text-center min-w-[120px] flex-1">
@@ -827,7 +826,7 @@ function AdminEarnings() {
         </div>
       )}
 
-      {/* Top Hosts — Admin only */}
+      {/* Top Hosts - Admin only */}
       {isAdmin && !loading && hosts.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
           {/* Top Hosts Table */}

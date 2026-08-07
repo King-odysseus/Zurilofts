@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import { authenticate, requireAdmin } from '../middleware/auth.js';
+import { authenticate, requireHost } from '../middleware/auth.js';
 import { uploadImages } from '../controllers/upload.controller.js';
 import { ValidationError } from '../types/index.js';
 
@@ -42,7 +42,8 @@ function handleUpload(req: Request, res: Response, next: NextFunction): void {
 
 const router = Router();
 
-// Admin only — accepts up to 10 files under the "images" field
-router.post('/', authenticate, requireAdmin, handleUpload, uploadImages);
+// Host or admin - accepts up to 10 files under the "images" field. Hosts need
+// this to add photos to the listings they create (property routes are requireHost).
+router.post('/', authenticate, requireHost, handleUpload, uploadImages);
 
 export default router;

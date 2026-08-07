@@ -73,7 +73,7 @@ function PrivacyPage() {
                 <li>Government-issued identification numbers (national ID, passport number, KRA PIN) unless you voluntarily provide them.</li>
                 <li>Biometric data or facial recognition data.</li>
                 <li>Precise geolocation data beyond what your IP address reveals.</li>
-                <li>Data about children under 18 — our Platform is not intended for minors.</li>
+                <li>Data about children under 18 - our Platform is not intended for minors.</li>
               </ul>
             </section>
 
@@ -96,7 +96,7 @@ function PrivacyPage() {
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li>To create and maintain your account.</li>
                 <li>To process, confirm, and manage your bookings.</li>
-                <li>To communicate with you about your reservations — confirmations, reminders, changes, and cancellations.</li>
+                <li>To communicate with you about your reservations - confirmations, reminders, changes, and cancellations.</li>
                 <li>To facilitate in-app messaging between you and the ZuriLofts team.</li>
                 <li>To process payments and issue receipts or invoices.</li>
                 <li>To calculate and apply seasonal pricing, promo code discounts, late check-out fees, and extra-guest charges.</li>
@@ -120,7 +120,7 @@ function PrivacyPage() {
               <h2 className="text-xl font-bold text-[#0B0B45] mb-3">6. Data Sharing and Disclosure</h2>
               <p>We may share your data only in the following limited circumstances:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
-                <li><strong>Service providers:</strong> Trusted third-party vendors who perform services on our behalf — payment processors, hosting providers (our servers are hosted in a secure data centre), email delivery services, and analytics providers. These providers are contractually bound to process data only on our instructions and with equivalent data protection standards.</li>
+                <li><strong>Service providers:</strong> Trusted third-party vendors who perform services on our behalf - payment processors, hosting providers (our servers are hosted in a secure data centre), email delivery services, and analytics providers. These providers are contractually bound to process data only on our instructions and with equivalent data protection standards.</li>
                 <li><strong>External calendar platforms:</strong> When you book a stay, your booking dates (but not your personal identity) are included in our outbound iCal feed so that external platforms like Airbnb and Booking.com can block those dates. No guest names, contact details, or payment information are included in iCal feeds.</li>
                 <li><strong>Legal compliance:</strong> If required by law, court order, or governmental regulation, we may disclose data to law enforcement, regulators, or other authorised bodies.</li>
                 <li><strong>Business transfers:</strong> In the event of a merger, acquisition, or sale of all or a portion of our assets, your data may be transferred as part of that transaction. You will be notified via email and/or a prominent notice on the Platform before your data is transferred and becomes subject to a different privacy policy.</li>
@@ -188,7 +188,7 @@ function PrivacyPage() {
               <h2 className="text-xl font-bold text-[#0B0B45] mb-3">10. Cookies and Similar Technologies</h2>
               <p>We use the following categories of cookies on the Platform:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
-                <li><strong>Essential cookies:</strong> Required for core functionality — authentication sessions, booking flow state, and security. The Platform cannot function without these.</li>
+                <li><strong>Essential cookies:</strong> Required for core functionality - authentication sessions, booking flow state, and security. The Platform cannot function without these.</li>
                 <li><strong>Preference cookies:</strong> Remember your display settings and preferences (e.g., which bed configuration you last viewed).</li>
                 <li><strong>Analytics cookies:</strong> Help us understand how visitors use the Platform so we can improve it. These collect anonymous, aggregated data.</li>
               </ul>

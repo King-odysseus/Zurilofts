@@ -19,9 +19,9 @@ function TermsPage() {
             <section>
               <h2 className="text-xl font-bold text-[#0B0B45] mb-3">1. Acceptance of Terms</h2>
               <p>
-                By accessing or using the {companyName} Platform — including the website{' '}
+                By accessing or using the {companyName} Platform - including the website{' '}
                 <strong>thezurilofts.com</strong>, the {companyName} progressive web application,
-                and any related services (collectively, the &ldquo;Platform&rdquo;) — you
+                and any related services (collectively, the &ldquo;Platform&rdquo;) - you
                 (&ldquo;you,&rdquo; &ldquo;Guest,&rdquo; or &ldquo;User&rdquo;) agree to be
                 bound by these Terms of Service (&ldquo;Terms&rdquo;). If you do not agree to
                 every provision of these Terms, you must not access or use the Platform.
@@ -165,7 +165,7 @@ function TermsPage() {
 
               <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">5.4 Promo Codes</h3>
               <p>
-                Promo codes are subject to the specific terms stated at issuance — including
+                Promo codes are subject to the specific terms stated at issuance - including
                 validity period, minimum booking amount, maximum discount, and usage limits.
                 A promo code:
               </p>
@@ -228,7 +228,7 @@ function TermsPage() {
               <p>
                 The total number of guests staying overnight (including the booking account
                 holder and all additional named guests) must not exceed the maximum occupancy
-                for the selected Bed Option — 4 guests for a 1-Bed or 6 guests for a 2-Bed.
+                for the selected Bed Option - 4 guests for a 1-Bed or 6 guests for a 2-Bed.
                 Exceeding this limit is a material breach and grounds for immediate removal
                 without refund.
               </p>
@@ -325,9 +325,9 @@ function TermsPage() {
             <section>
               <h2 className="text-xl font-bold text-[#0B0B45] mb-3">11. Intellectual Property</h2>
               <p>
-                The Platform and all its content — including but not limited to the {companyName}{' '}
+                The Platform and all its content - including but not limited to the {companyName}{' '}
                 name, logo, design, text, graphics, images, photographs, software code, user
-                interface, and the selection and arrangement thereof — are owned by or licensed
+                interface, and the selection and arrangement thereof - are owned by or licensed
                 to {companyName} and are protected by Kenyan and international copyright,
                 trademark, and intellectual property laws.
               </p>
@@ -354,9 +354,9 @@ function TermsPage() {
                 To the fullest extent permitted by Kenyan law:
               </p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
-                <li>{companyName}, its owners, officers, employees, and agents shall not be liable for any indirect, consequential, special, incidental, or punitive damages — including loss of profits, loss of data, loss of business opportunity, or personal injury — arising from or related to your use of the Platform or any stay at a property, even if we have been advised of the possibility of such damages.</li>
+                <li>{companyName}, its owners, officers, employees, and agents shall not be liable for any indirect, consequential, special, incidental, or punitive damages - including loss of profits, loss of data, loss of business opportunity, or personal injury - arising from or related to your use of the Platform or any stay at a property, even if we have been advised of the possibility of such damages.</li>
                 <li>Our total aggregate liability to you for any claim arising from or related to these Terms, the Platform, or any booking shall not exceed the total amount you paid for the specific booking giving rise to the claim.</li>
-                <li>We are not liable for: (a) events beyond our reasonable control (force majeure — see Section 16); (b) acts or omissions of third-party service providers; (c) your failure to secure your account credentials; (d) inaccuracies in information you provide; (e) temporary unavailability of the Platform due to maintenance, upgrades, or technical issues.</li>
+                <li>We are not liable for: (a) events beyond our reasonable control (force majeure - see Section 16); (b) acts or omissions of third-party service providers; (c) your failure to secure your account credentials; (d) inaccuracies in information you provide; (e) temporary unavailability of the Platform due to maintenance, upgrades, or technical issues.</li>
               </ul>
               <p className="mt-2">
                 Nothing in these Terms excludes or limits our liability for death or personal
@@ -432,8 +432,8 @@ function TermsPage() {
               </ul>
               <p className="mt-2">
                 Upon termination, your right to use the Platform ceases immediately. Provisions
-                of these Terms that by their nature should survive termination — including
-                Sections 6, 7, 11, 12, 13, 14, 17, and 18 — shall survive.
+                of these Terms that by their nature should survive termination - including
+                Sections 6, 7, 11, 12, 13, 14, 17, and 18 - shall survive.
               </p>
             </section>
 

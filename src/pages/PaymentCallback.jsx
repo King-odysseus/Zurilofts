@@ -87,11 +87,11 @@ function PaymentCallback() {
                   <div className="mt-3 pt-3 border-t border-[#D9D9D9]">
                     <div className="flex justify-between text-sm">
                       <span className="text-[#6b7280]">Check-in</span>
-                      <span className="font-medium">{booking.checkIn ? new Date(booking.checkIn).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</span>
+                      <span className="font-medium">{booking.checkIn ? new Date(booking.checkIn).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</span>
                     </div>
                     <div className="flex justify-between text-sm mt-1">
                       <span className="text-[#6b7280]">Check-out</span>
-                      <span className="font-medium">{booking.checkOut ? new Date(booking.checkOut).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}</span>
+                      <span className="font-medium">{booking.checkOut ? new Date(booking.checkOut).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</span>
                     </div>
                     <div className="flex justify-between text-sm mt-1">
                       <span className="text-[#6b7280]">Guests</span>

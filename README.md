@@ -1,4 +1,4 @@
-# ZuriLofts — Premium Short-Let Apartments
+# ZuriLofts - Premium Short-Let Apartments
 
 A modern React + Vite web application for ZuriLofts, offering premium furnished apartments in Nairobi. Built with Tailwind CSS, DaisyUI, and modern animation techniques.
 

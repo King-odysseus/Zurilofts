@@ -85,7 +85,7 @@ export const propertyCreateSchema = z.object({
 export const propertyUpdateSchema = propertyCreateSchema.partial();
 
 export const bookingCreateSchema = z.object({
-  // IDs are cuid in SQLite (dev) and uuid in Postgres (prod) — accept either
+  // IDs are cuid in SQLite (dev) and uuid in Postgres (prod) - accept either
   propertyId: z.string().min(1, 'Property is required'),
   checkIn: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-in date'),
   checkOut: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-out date'),

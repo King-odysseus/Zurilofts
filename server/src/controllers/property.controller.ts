@@ -29,7 +29,7 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
   }
 }
 
-/** Authenticated listing — returns only properties owned by the logged-in host/admin. */
+/** Authenticated listing - returns only properties owned by the logged-in host/admin. */
 export async function listMine(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { type, minPrice, maxPrice, search, available, featured, page, limit } = req.query;

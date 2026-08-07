@@ -117,7 +117,7 @@ function HomePage() {
         </p>
       </div>
 
-      {/* Auto-scrolling Premium Property Row — full-width */}
+      {/* Auto-scrolling Premium Property Row - full-width */}
       {premiumProperties.length > 0 && (
         <div className="marquee-container w-full overflow-hidden pb-8 px-10 md:px-20 lg:px-32">
           <div className="marquee-track flex gap-6 w-max">
@@ -165,57 +165,57 @@ function HomePage() {
         </p>
       </div>
 
-      {/* Masonry Gallery — weekly rotation from property images */}
+      {/* Masonry Gallery - weekly rotation from property images */}
       <div className="max-w-7xl mx-auto px-4 md:px-6 mb-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[120px] md:auto-rows-[150px]">
-          {/* Tall — col 1 rows 1-2 */}
+          {/* Tall - col 1 rows 1-2 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[0]} alt="Property photo" />
           </div>
-          {/* Small — col 2 row 1 */}
+          {/* Small - col 2 row 1 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[1]} alt="Property photo" />
           </div>
-          {/* Tall — col 3 rows 1-2 */}
+          {/* Tall - col 3 rows 1-2 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[2]} alt="Property photo" />
           </div>
-          {/* Small — col 4 row 1 */}
+          {/* Small - col 4 row 1 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[3]} alt="Property photo" />
           </div>
 
-          {/* Small — col 2 row 2 */}
+          {/* Small - col 2 row 2 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[4]} alt="Property photo" />
           </div>
-          {/* Small — col 4 row 2 */}
+          {/* Small - col 4 row 2 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[5]} alt="Property photo" />
           </div>
 
-          {/* Small — col 1 row 3 */}
+          {/* Small - col 1 row 3 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[6]} alt="Property photo" />
           </div>
-          {/* Tall — col 2 rows 3-4 */}
+          {/* Tall - col 2 rows 3-4 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[7]} alt="Property photo" />
           </div>
-          {/* Small — col 3 row 3 */}
+          {/* Small - col 3 row 3 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[8]} alt="Property photo" />
           </div>
-          {/* Tall — col 4 rows 3-4 */}
+          {/* Tall - col 4 rows 3-4 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[9]} alt="Property photo" />
           </div>
 
-          {/* Small — col 1 row 4 */}
+          {/* Small - col 1 row 4 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[10]} alt="Property photo" />
           </div>
-          {/* Small — col 3 row 4 */}
+          {/* Small - col 3 row 4 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
             <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[11]} alt="Property photo" />
           </div>
@@ -236,7 +236,7 @@ function HomePage() {
         />
         <NearbySection
           title="Best Places to Eat in Nairobi"
-          subtitle="Explore Nairobi's vibrant dining scene — from street food to fine dining."
+          subtitle="Explore Nairobi's vibrant dining scene - from street food to fine dining."
           items={PLACES_TO_EAT}
           areaLabels={AREAS}
           categoryLabels={EAT_CATEGORIES}
@@ -258,7 +258,7 @@ function Loading() {
 }
 
 function Page({ title, children }) {
-  useEffect(() => { document.title = title ? `${title} — ZuriLofts` : 'ZuriLofts — Premium Short-let Apartments'; }, [title]);
+  useEffect(() => { document.title = title ? `${title} - ZuriLofts` : 'ZuriLofts - Premium Short-let Apartments'; }, [title]);
   return children;
 }
 

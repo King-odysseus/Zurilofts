@@ -105,7 +105,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
 
       {/* Grid or Map */}
       {filtered.length === 0 ? (
-        <p className="text-center text-[#6b7280] py-12">Nothing matches those filters — try a different area or category.</p>
+        <p className="text-center text-[#6b7280] py-12">Nothing matches those filters - try a different area or category.</p>
       ) : viewMode === 'map' ? (
         <Suspense fallback={<div className="flex items-center justify-center py-24"><Spinner /></div>}>
           <NearbyMap items={filtered} title={title} />

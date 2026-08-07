@@ -26,13 +26,13 @@ body {
   transform: scale(1.1);
 }
 
-/* Hero background img element — blur + subtle scale for depth */
+/* Hero background img element - blur + subtle scale for depth */
 .hero-bg-img {
   filter: blur(1.5px);
   transform: scale(1.1);
 }
 
-/* Hero heading — deep shadow for legibility over photo backgrounds */
+/* Hero heading - deep shadow for legibility over photo backgrounds */
 .hero-heading {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 0, 0, 0.3);
 }
@@ -220,7 +220,7 @@ select:not(.neu-input) option {
   outline: none;
 }
 
-/* Marquee scroll — continuous auto-scrolling track */
+/* Marquee scroll - continuous auto-scrolling track */
 @keyframes marquee-scroll {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }

@@ -87,7 +87,7 @@ export async function deleteBlock(id: string) {
 /**
  * Public availability: the unavailable date ranges for a property (imported +
  * manual calendar blocks and existing non-cancelled bookings), from today
- * onward. `end` is exclusive — the check-out day itself is free to book.
+ * onward. `end` is exclusive - the check-out day itself is free to book.
  * Used by the guest booking calendar to disable taken dates.
  */
 export async function getUnavailableRanges(propertyId: string) {

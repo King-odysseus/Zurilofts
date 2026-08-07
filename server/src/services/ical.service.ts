@@ -128,7 +128,7 @@ export async function generatePropertyICS(propertyId: string): Promise<string> {
     'PRODID:-//ZuriLofts//Calendar//EN',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    `X-WR-CALNAME:${escapeText(property.title)} — ZuriLofts`,
+    `X-WR-CALNAME:${escapeText(property.title)} - ZuriLofts`,
   ];
 
   for (const b of bookings) {

@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as payoutService from '../services/payout.service.js';
 
-/** GET /api/host/payouts — host views their own payout history + wallet */
+/** GET /api/host/payouts - host views their own payout history + wallet */
 export async function hostPayouts(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const [wallet, payouts] = await Promise.all([
@@ -14,7 +14,7 @@ export async function hostPayouts(req: Request, res: Response, next: NextFunctio
   }
 }
 
-/** GET /api/host/wht — host downloads their WHT statement */
+/** GET /api/host/wht - host downloads their WHT statement */
 export async function hostWht(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const year = req.query.year ? Number(req.query.year) : undefined;
@@ -26,7 +26,7 @@ export async function hostWht(req: Request, res: Response, next: NextFunction): 
   }
 }
 
-/** GET /api/admin/payouts — admin lists all payouts */
+/** GET /api/admin/payouts - admin lists all payouts */
 export async function adminListPayouts(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await payoutService.listPayouts({
@@ -41,7 +41,7 @@ export async function adminListPayouts(req: Request, res: Response, next: NextFu
   }
 }
 
-/** POST /api/admin/payouts/trigger — admin manually triggers payout for a host */
+/** POST /api/admin/payouts/trigger - admin manually triggers payout for a host */
 export async function adminTriggerPayout(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const hostId = req.body.hostId;
@@ -56,7 +56,7 @@ export async function adminTriggerPayout(req: Request, res: Response, next: Next
   }
 }
 
-/** POST /api/admin/payouts/run-scheduled — admin runs scheduled payout batch */
+/** POST /api/admin/payouts/run-scheduled - admin runs scheduled payout batch */
 export async function adminRunScheduled(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const result = await payoutService.processScheduledPayouts();
@@ -66,7 +66,7 @@ export async function adminRunScheduled(req: Request, res: Response, next: NextF
   }
 }
 
-/** GET /api/admin/wht — accountant downloads consolidated WHT report */
+/** GET /api/admin/wht - accountant downloads consolidated WHT report */
 export async function adminWht(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const year = req.query.year ? Number(req.query.year) : undefined;

@@ -20,7 +20,7 @@ export async function getHostWallet(hostId: string) {
   return wallet || { balance: 0, totalEarned: 0, totalPaidOut: 0, lastPayoutAt: null, nextPayoutAt: null };
 }
 
-/** Process a payout for a specific host — transfers their accumulated wallet balance */
+/** Process a payout for a specific host - transfers their accumulated wallet balance */
 export async function processHostPayout(hostId: string, initiatedBy: string = 'system'): Promise<{
   payout: any;
   message: string;
@@ -91,7 +91,7 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
     transferResult = await paystack.initiateTransfer({
       recipientCode,
       amount: transferAmount,
-      reason: `ZuriLofts payout — ${unpaidBookings.length} booking(s)`,
+      reason: `ZuriLofts payout - ${unpaidBookings.length} booking(s)`,
       reference: transferRef,
     });
   } catch (e: any) {

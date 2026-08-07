@@ -85,7 +85,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
       return;
     }
     if (!rangeIsFree(checkIn, date)) {
-      // A blocked night sits between — restart selection here
+      // A blocked night sits between - restart selection here
       onChange({ checkIn: iso, checkOut: '' });
       return;
     }

@@ -8,9 +8,16 @@ function normalizeBooking(booking: any) {
   const b = { ...booking };
   if (b.property) {
     const p = { ...b.property };
-    if (p.imagesJson) {
-      p.images = JSON.parse(p.imagesJson);
+    if ('imagesJson' in p) {
+      try {
+        const parsed = p.imagesJson ? JSON.parse(p.imagesJson) : [];
+        p.images = Array.isArray(parsed) ? parsed : [];
+      } catch {
+        p.images = [];
+      }
       delete p.imagesJson;
+    } else if (!Array.isArray(p.images)) {
+      p.images = [];
     }
     b.property = p;
   }
@@ -183,7 +190,7 @@ export async function listUserBookings(userId: string, status?: string, page = 1
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
-        property: { select: { id: true, title: true, location: true, imagesJson: true, price: true } },
+        property: true,
         promoCode: { select: { code: true, discountPercent: true } },
         review: { select: { id: true, rating: true, privateNote: true } },
       },
@@ -197,7 +204,11 @@ export async function listUserBookings(userId: string, status?: string, page = 1
   };
 }
 
-export async function getBooking(bookingId: string, userId?: string) {
+// `scope` restricts who may read the booking. Admins pass undefined (no scope).
+// Everyone else passes their own id as both candidates: a guest sees their own
+// booking, a host sees bookings on their own listings. Misses throw 404 (not
+// 403) so the endpoint never reveals whether a booking exists.
+export async function getBooking(bookingId: string, scope?: { userId?: string; hostId?: string }) {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: {
@@ -207,13 +218,17 @@ export async function getBooking(bookingId: string, userId?: string) {
   });
 
   if (!booking) throw new NotFoundError('Booking');
-  if (userId && booking.userId !== userId) throw new NotFoundError('Booking');
+  if (scope) {
+    const isGuestOwner = scope.userId != null && booking.userId === scope.userId;
+    const isHostOwner = scope.hostId != null && booking.property?.hostId === scope.hostId;
+    if (!isGuestOwner && !isHostOwner) throw new NotFoundError('Booking');
+  }
 
   return normalizeBooking(booking);
 }
 
 // Lists bookings across properties. When `hostId` is provided, results are
-// scoped to bookings on that host's listings — the data-layer isolation that
+// scoped to bookings on that host's listings - the data-layer isolation that
 // guarantees a host can never read another host's (or guest's) bookings,
 // independent of which route called this.
 export async function listAllBookings(status?: string, page = 1, limit = 20, hostId?: string) {
@@ -230,7 +245,7 @@ export async function listAllBookings(status?: string, page = 1, limit = 20, hos
       orderBy: { createdAt: 'desc' },
       include: {
         user: { select: { id: true, email: true, firstName: true, lastName: true } },
-        property: { select: { id: true, title: true, imagesJson: true } },
+        property: true,
         promoCode: { select: { code: true } },
       },
     }),
@@ -268,10 +283,9 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
   const [properties, all, confirmed, byBed] = await Promise.all([
     prisma.property.findMany({
       where: propertyWhere,
-      select: {
-        id: true, title: true, location: true, imagesJson: true, price: true,
-        ...(isAdminView ? { hostId: true, host: { select: { id: true, firstName: true, lastName: true, email: true } } } : {}),
-      },
+      include: isAdminView
+        ? { host: { select: { id: true, firstName: true, lastName: true, email: true } } }
+        : undefined,
     }),
     prisma.booking.groupBy({
       by: ['propertyId'],
@@ -351,7 +365,18 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
   const rows = properties.map((p) => {
     const a = allMap.get(p.id);
     const c = confirmedMap.get(p.id);
-    const images = p.imagesJson ? JSON.parse(p.imagesJson) : [];
+    const rawImages = (p as any).images ?? (p as any).imagesJson;
+    let images: string[] = [];
+    if (Array.isArray(rawImages)) {
+      images = rawImages;
+    } else if (typeof rawImages === 'string' && rawImages) {
+      try {
+        const parsed = JSON.parse(rawImages);
+        images = Array.isArray(parsed) ? parsed : [];
+      } catch {
+        images = [];
+      }
+    }
     const bed1 = getBedStats(p.id, '1bed');
     const bed2 = getBedStats(p.id, '2bed');
     const activeFees = extractFees(a);
@@ -437,7 +462,7 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     for (const row of rows) {
       const prop = properties.find((p: any) => p.id === row.id);
       const hostId = prop?.hostId;
-      const hostUser = prop?.host;
+      const hostUser = (prop as any)?.host;
       if (!hostId) continue;
       if (!hostMap.has(hostId)) {
         hostMap.set(hostId, {
@@ -611,7 +636,7 @@ export async function updateBooking(bookingId: string, input: UpdateBookingInput
     data,
     include: {
       user: { select: { id: true, email: true, firstName: true, lastName: true } },
-      property: { select: { id: true, title: true, imagesJson: true } },
+      property: true,
       promoCode: { select: { code: true } },
     },
   });

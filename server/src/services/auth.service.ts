@@ -130,7 +130,7 @@ export async function googleAuth(profile: {
   // Try to find by Google ID first
   let user = await prisma.user.findUnique({ where: { googleId: profile.googleId } });
 
-  // If not found, try by email — link accounts
+  // If not found, try by email - link accounts
   if (!user) {
     user = await prisma.user.findUnique({ where: { email: profile.email } });
     if (user) {

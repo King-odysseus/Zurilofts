@@ -170,7 +170,7 @@ model Review {
   property    Property @relation(fields: [propertyId], references: [id])
   rating      Int      // 1-5 stars
   satisfaction String? // "happy" | "neutral" | "unhappy"
-  privateNote String?  // private feedback for admin — how to improve
+  privateNote String?  // private feedback for admin - how to improve
   hidden      Boolean   @default(false)  // admin moderation: hide from public display
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

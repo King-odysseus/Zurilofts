@@ -113,7 +113,7 @@ export async function initializeTransaction(params: {
 }): Promise<{ authorizationUrl: string; reference: string; accessCode: string }> {
   // Paystack expects amount in kobo for NGN; for KES it's the subunit (cents).
   // However Paystack's KES integration typically uses the whole-unit amount
-  // in the "amount" field — confirmed working with KES.
+  // in the "amount" field - confirmed working with KES.
   const body: Record<string, any> = {
     email: params.email,
     amount: params.amount,

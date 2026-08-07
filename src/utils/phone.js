@@ -1,4 +1,4 @@
-// Shared phone utility — keep one source of truth for country codes
+// Shared phone utility - keep one source of truth for country codes
 // and validation. Both ProfilePage and BookingPage import from here.
 
 export const COUNTRY_CODES = [
@@ -20,7 +20,7 @@ export const COUNTRY_CODES = [
 
 /**
  * Strip a phone string down to digits only and validate against a country.
- * Returns { clean, valid, formatted } — valid is a boolean.
+ * Returns { clean, valid, formatted } - valid is a boolean.
  * Accepts local or international format; uses the selected country's expected
  * digit length. If the number starts with the country dial code or "00", that
  * prefix is stripped before length checking.
@@ -33,7 +33,7 @@ export function validatePhone(raw, country) {
   if (digits.startsWith(dialDigits)) {
     digits = digits.slice(dialDigits.length);
   } else if (digits.startsWith('00')) {
-    // Strip "00" + country code prefix — e.g. "00254" → ""
+    // Strip "00" + country code prefix - e.g. "00254" → ""
     const without00 = digits.slice(2);
     if (without00.startsWith(dialDigits)) {
       digits = without00.slice(dialDigits.length);

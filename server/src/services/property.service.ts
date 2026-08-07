@@ -5,16 +5,25 @@ import { NotFoundError } from '../types/index.js';
 // This helper normalizes both to JS arrays for API responses.
 function normalizeProperty(property: any) {
   if (property.images !== undefined) {
-    // PostgreSQL — native arrays
+    // PostgreSQL - native arrays
     return property;
   }
-  // SQLite — JSON fields, map to expected property names
+  // SQLite - JSON fields, map to expected property names
   const { imagesJson, amenitiesJson, nearbyJson, ...rest } = property;
+  const parseArray = (value: string | null | undefined) => {
+    if (!value) return [];
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  };
   return {
     ...rest,
-    images: imagesJson ? JSON.parse(imagesJson) : [],
-    amenities: amenitiesJson ? JSON.parse(amenitiesJson) : [],
-    nearby: nearbyJson ? JSON.parse(nearbyJson) : [],
+    images: parseArray(imagesJson),
+    amenities: parseArray(amenitiesJson),
+    nearby: parseArray(nearbyJson),
   };
 }
 
@@ -24,8 +33,9 @@ function normalizeProperties(properties: any[]) {
 
 // Detect if we're using SQLite (JSON columns) or Postgres (native arrays)
 function isSQLite(): boolean {
-  // SQLite Prisma client uses imagesJson; Postgres uses images
-  return true; // always use JSON fields for local dev
+  // SQLite uses a file: URL and JSON string columns. Railway supplies a
+  // PostgreSQL URL and the generated client uses native array columns.
+  return (process.env.DATABASE_URL || '').trim().startsWith('file:');
 }
 
 function buildCreateData(data: any) {
