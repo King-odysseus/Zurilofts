@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
@@ -7,7 +7,7 @@ import { useFavorites } from '../context/FavoritesContext.jsx';
  * Flatter editorial property card with navy/gold/cream palette and subtle motion.
  *
  * Visuals: cream surface, navy headings, bronze accents, thin border. Hover
- * applies a gentle lift + shadow increase — lighter than the old neumorphic
+ * applies a gentle lift + shadow increase - lighter than the old neumorphic
  * translate-y-2 + scale-110 zoom.
  *
  * Behaviour preserved exactly: favourite toggle, variant badge, bed-variant
@@ -33,13 +33,15 @@ function PropertyCard({ property }) {
     area,
     badge,
     variantLabel,
+    variant,
   } = property;
 
   const isLiked = id ? isFavorite(id) : false;
+  const propertyHref = id
+    ? `/property/${id}${variant ? `?variant=${variant}` : ''}`
+    : '/properties';
 
-  const handleToggleFavorite = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleToggleFavorite = () => {
     if (!isAuthenticated) {
       navigate('/login');
       return;
@@ -47,11 +49,19 @@ function PropertyCard({ property }) {
     if (id) toggleFavorite(id);
   };
 
-  // Safely format price — guard against null/undefined
+  // Safely format price - guard against null/undefined
   const formattedPrice = price != null ? price.toLocaleString() : null;
 
   return (
     <article className="group relative bg-white border border-[#D9D9D9]/50 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#0B0B45]/5 hover:border-[#C49A6C]/25 h-full flex flex-col">
+      <Link
+        to={propertyHref}
+        className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+        aria-label={`View ${title || 'property'}`}
+      >
+        <span className="sr-only">View {title || 'property'}</span>
+      </Link>
+
       {/* Image area */}
       <div className="relative aspect-[4/3] overflow-hidden flex-shrink-0 bg-[#D9D9D9]/20">
         {image ? (
@@ -69,7 +79,7 @@ function PropertyCard({ property }) {
           </div>
         )}
 
-        {/* Gradient overlay — visible on hover */}
+        {/* Gradient overlay - visible on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0B0B45]/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true" />
 
         {/* Badges: Featured + variant */}
@@ -90,7 +100,7 @@ function PropertyCard({ property }) {
         <button
           type="button"
           onClick={handleToggleFavorite}
-          className="absolute top-2.5 right-2.5 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#C49A6C]"
+          className="absolute z-20 top-2.5 right-2.5 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#C49A6C]"
           aria-label={isLiked ? 'Remove from favourites' : 'Add to favourites'}
         >
           <svg
@@ -136,14 +146,14 @@ function PropertyCard({ property }) {
           <span className="text-xs truncate">{location || 'TBA'}</span>
         </div>
 
-        {/* Stats row — beds, baths, area */}
+        {/* Stats row - beds, baths, area */}
         <div className="flex items-center justify-between mb-3 py-2.5 border-y border-[#D9D9D9]/60">
           <div className="flex-1 text-center">
             <div className="flex items-center justify-center text-[#0B0B45] mb-0.5">
               <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
               </svg>
-              <span className="text-xs font-semibold">{bedrooms != null ? bedrooms : '—'}</span>
+              <span className="text-xs font-semibold">{bedrooms != null ? bedrooms : '-'}</span>
             </div>
             <span className="text-[10px] text-[#6b7280]">{bedrooms === 1 ? 'Bed' : 'Beds'}</span>
           </div>
@@ -152,7 +162,7 @@ function PropertyCard({ property }) {
               <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
-              <span className="text-xs font-semibold">{bathrooms != null ? bathrooms : '—'}</span>
+              <span className="text-xs font-semibold">{bathrooms != null ? bathrooms : '-'}</span>
             </div>
             <span className="text-[10px] text-[#6b7280]">{bathrooms === 1 ? 'Bath' : 'Baths'}</span>
           </div>
@@ -161,18 +171,18 @@ function PropertyCard({ property }) {
               <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
               </svg>
-              <span className="text-xs font-semibold">{area != null ? area : '—'}</span>
+              <span className="text-xs font-semibold">{area != null ? area : '-'}</span>
             </div>
             <span className="text-[10px] text-[#6b7280]">Sqft</span>
           </div>
         </div>
 
-        {/* Price + CTA — pinned to bottom */}
+        {/* Price + CTA - pinned to bottom */}
         <div className="flex items-center justify-between mt-auto">
           <div>
             <span className="text-[10px] text-[#6b7280]">per night</span>
             <div className="text-lg font-bold text-[#C49A6C]">
-              {formattedPrice ? `KES ${formattedPrice}` : 'KES —'}
+              {formattedPrice ? `KES ${formattedPrice}` : 'KES -'}
             </div>
           </div>
           <span className="bg-[#0B0B45] text-white font-semibold px-3.5 py-1.5 rounded-full text-xs transition-colors duration-200 group-hover:bg-[#C49A6C]">

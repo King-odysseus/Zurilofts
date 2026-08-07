@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import PropertyCard from '../components/PropertyCard';
@@ -391,13 +391,10 @@ function PropertiesPage() {
           {!loading && !error && sortedListings.length > 0 && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
               {sortedListings.map((listing) => (
-                <Link
+                <PropertyCard
                   key={`${listing.id}-${listing.variant || 'base'}`}
-                  to={`/property/${listing.id}${listing.variant ? `?variant=${listing.variant}` : ''}`}
-                  className="block h-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] rounded-2xl"
-                >
-                  <PropertyCard property={listing} />
-                </Link>
+                  property={listing}
+                />
               ))}
 
               {/* Coming Soon placeholders */}
@@ -423,22 +420,22 @@ function PropertiesPage() {
                       <p className="text-xs text-[#6b7280] mb-3">TBA</p>
                       <div className="flex items-center justify-between mb-3 py-2 border-y border-[#D9D9D9]/60">
                         <div className="flex-1 text-center">
-                          <span className="text-xs text-[#6b7280]">—</span>
+                          <span className="text-xs text-[#6b7280]">-</span>
                           <p className="text-[10px] text-[#6b7280]">Beds</p>
                         </div>
                         <div className="flex-1 text-center">
-                          <span className="text-xs text-[#6b7280]">—</span>
+                          <span className="text-xs text-[#6b7280]">-</span>
                           <p className="text-[10px] text-[#6b7280]">Baths</p>
                         </div>
                         <div className="flex-1 text-center">
-                          <span className="text-xs text-[#6b7280]">—</span>
+                          <span className="text-xs text-[#6b7280]">-</span>
                           <p className="text-[10px] text-[#6b7280]">Sqft</p>
                         </div>
                       </div>
                       <div className="flex items-center justify-between mt-auto">
                         <div>
                           <span className="text-[10px] text-[#6b7280]">per night</span>
-                          <p className="text-base font-bold text-[#6b7280]">KES —</p>
+                          <p className="text-base font-bold text-[#6b7280]">KES -</p>
                         </div>
                         <span className="bg-[#D9D9D9]/50 text-[#6b7280] font-semibold px-3 py-1.5 rounded-full text-xs">
                           Coming Soon

@@ -29,7 +29,10 @@ function PropertyPage() {
         setLoading(true);
         setError(null);
         const res = await apiClient.get(`/properties/${id}`);
-        if (!cancelled) setProperty(res.data.data);
+        if (!cancelled) {
+          setFeaturedImage(0);
+          setProperty(res.data.data);
+        }
       } catch (err) {
         if (!cancelled) setError(err.response?.data?.error || 'Failed to load property');
       } finally {
@@ -42,18 +45,18 @@ function PropertyPage() {
 
   useEffect(() => {
     if (!property) return;
-    document.title = `${property.title} — ZuriLofts`;
+    document.title = `${property.title} - ZuriLofts`;
     const setMeta = (prop, content) => {
       let el = document.querySelector(`meta[property="og:${prop}"]`);
       if (!el) { el = document.createElement('meta'); el.setAttribute('property', `og:${prop}`); document.head.appendChild(el); }
       el.setAttribute('content', content);
     };
-    setMeta('title', `${property.title} — ZuriLofts`);
+    setMeta('title', `${property.title} - ZuriLofts`);
     setMeta('description', property.description?.slice(0, 200) || '');
     setMeta('image', property.images?.[0] || '');
   }, [property]);
 
-  // ── Stable gallery callbacks (must be above early returns — Rules of Hooks) ──
+  // ── Stable gallery callbacks (must be above early returns - Rules of Hooks) ──
   const imagesLength = property?.images?.length || 0;
   const goPrev = useCallback(() => {
     if (imagesLength === 0) return;
@@ -197,9 +200,9 @@ function PropertyPage() {
               <img
                 className="w-full h-56 sm:h-72 md:h-[400px] lg:h-[500px] object-cover rounded-2xl neu-card"
                 src={images[featuredImage]}
-                alt={`${property.title} — photo ${featuredImage + 1} of ${images.length}`}
+                alt={`${property.title} - photo ${featuredImage + 1} of ${images.length}`}
               />
-              {/* Previous / Next — only show when there are multiple images */}
+              {/* Previous / Next - only show when there are multiple images */}
               {images.length > 1 && (
                 <>
                   <button
@@ -224,7 +227,7 @@ function PropertyPage() {
               )}
             </div>
 
-            {/* Thumbnail strip — show up to 5 */}
+            {/* Thumbnail strip - show up to 5 */}
             <div className="grid grid-cols-3 min-[480px]:grid-cols-4 md:grid-cols-5 gap-2 md:gap-3 mt-3 md:mt-4" role="list" aria-label="Photo thumbnails">
               {images.slice(0, 5).map((img, i) => (
                 <button
@@ -242,7 +245,7 @@ function PropertyPage() {
                   <img
                     className="w-full h-16 sm:h-20 object-cover rounded-xl"
                     src={img}
-                    alt={`${property.title} — thumbnail ${i + 1}`}
+                    alt={`${property.title} - thumbnail ${i + 1}`}
                   />
                 </button>
               ))}
@@ -252,7 +255,7 @@ function PropertyPage() {
 
         {/* ── Two-column body ────────────────────────────────────── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
-          {/* ── Left column — property details ─────────────────── */}
+          {/* ── Left column - property details ─────────────────── */}
           <div className="lg:col-span-2">
             {/* Quick facts */}
             <section className="flex flex-wrap gap-5 sm:gap-8 mb-8 py-8 md:py-10 border-b border-[#D9D9D9]" aria-label="Key facts">
@@ -345,7 +348,7 @@ function PropertyPage() {
             )}
           </div>
 
-          {/* ── Right column — booking card ─────────────────────── */}
+          {/* ── Right column - booking card ─────────────────────── */}
           <aside className="lg:col-span-1" aria-label="Booking">
             <BookingSummaryCard
               price={displayPrice}
