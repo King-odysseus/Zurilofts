@@ -16,6 +16,7 @@ router.get('/', authenticate, ctrl.listMine);
 // own data even though the same controllers serve the admin (all-data) routes.
 router.get('/host', authenticate, requireHost, ctrl.listAll);
 router.get('/host/earnings', authenticate, requireHost, ctrl.propertyEarnings);
+router.get('/host/today', authenticate, requireHost, ctrl.hostToday);
 
 router.get('/:id', authenticate, ctrl.getById);
 
