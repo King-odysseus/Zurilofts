@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
+import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
 
 const navLinks = [
@@ -20,6 +21,8 @@ function Navbar() {
 
   const { user, isAuthenticated, logout } = useAuth();
   const [unreadMessages, setUnreadMessages] = useState(0);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const notifRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -27,26 +30,77 @@ function Navbar() {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Poll unread message count for the badge on the account menu
+  // Poll unread message count + booking updates for badge + sound alerts
+  const [bookingUpdates, setBookingUpdates] = useState(0);
+  const lastMsgRef = useRef(0);
+  const lastBookingRef = useRef(0);
+  // Booking updates are a rolling count of recent confirmed/cancelled bookings.
+  // Persist how many the guest has already acknowledged so the badge doesn't
+  // keep reappearing for the same updates after a reload.
+  const seenBookingsRef = useRef(Number(localStorage.getItem('zuri_bk_seen') || 0));
+
   useEffect(() => {
-    if (!isAuthenticated) { setUnreadMessages(0); return; }
+    if (!isAuthenticated) { setUnreadMessages(0); setBookingUpdates(0); return; }
     let active = true;
     async function loadUnread() {
       try {
-        const r = await apiClient.get('/messages/unread-count');
-        if (active) setUnreadMessages(r.data.data?.count || 0);
-      } catch { /* ignore */ }
+        // Use the combined notifications endpoint for guests too
+        const r = await apiClient.get('/notifications');
+        if (!active) return;
+        const d = r.data.data || {};
+        const msgCount = d.unreadMessages ?? 0;
+        const bkCount = d.bookingUpdates ?? 0;
+
+        // Play a sound only when a count actually increases between polls -
+        // never on every tick just because a count is non-zero.
+        if (msgCount > lastMsgRef.current) playMessageSound();
+        if (bkCount > lastBookingRef.current) playBookingSound();
+        lastMsgRef.current = msgCount;
+        lastBookingRef.current = bkCount;
+
+        // If the rolling count shrank (old bookings aged out), lower the
+        // acknowledged baseline so genuinely new updates still show.
+        if (bkCount < seenBookingsRef.current) {
+          seenBookingsRef.current = bkCount;
+          localStorage.setItem('zuri_bk_seen', String(bkCount));
+        }
+
+        setUnreadMessages(msgCount);
+        setBookingUpdates(Math.max(0, bkCount - seenBookingsRef.current));
+      } catch {
+        // Fallback to legacy endpoint
+        try {
+          const r = await apiClient.get('/messages/unread-count');
+          if (!active) return;
+          const count = r.data.data?.count || 0;
+          if (count > lastMsgRef.current) playMessageSound();
+          lastMsgRef.current = count;
+          setUnreadMessages(count);
+        } catch { /* ignore */ }
+      }
     }
     loadUnread();
     const t = setInterval(loadUnread, 30000);
     return () => { active = false; clearInterval(t); };
   }, [isAuthenticated]);
 
-  // Close dropdown on outside click
+  // Guest acknowledges booking updates - clears the badge and remembers it.
+  function acknowledgeBookings() {
+    seenBookingsRef.current = lastBookingRef.current;
+    localStorage.setItem('zuri_bk_seen', String(lastBookingRef.current));
+    setBookingUpdates(0);
+  }
+
+  const totalNotif = unreadMessages + bookingUpdates;
+
+  // Close dropdowns on outside click
   useEffect(() => {
     function handleClick(e) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setDropdownOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(e.target)) {
+        setNotifOpen(false);
       }
     }
     document.addEventListener('mousedown', handleClick);
@@ -79,8 +133,73 @@ function Navbar() {
         {/* Right side: CTA buttons / user menu + hamburger */}
         <div className="flex items-center space-x-2 rtl:space-x-reverse ml-auto md:ml-0 md:flex-1 md:justify-end md:order-3">
           {isAuthenticated ? (
-            /* Authenticated - User dropdown (Profile, Messages, Admin) */
-            <div className="relative" ref={dropdownRef}>
+            /* Authenticated - Bell + User dropdown */
+            <>
+              {/* Notification bell with dropdown */}
+              <div className="relative" ref={notifRef}>
+                <button
+                  onClick={() => setNotifOpen((o) => !o)}
+                  className={`p-2 rounded-full transition-colors ${needsWhiteNav ? 'text-[#0B0B45] hover:bg-[#D9D9D9]/40' : 'text-white hover:bg-white/10'}`}
+                  title="Notifications"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                </button>
+                {totalNotif > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                    {totalNotif > 9 ? '9+' : totalNotif}
+                  </span>
+                )}
+                {notifOpen && (
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-lg border border-[#D9D9D9] py-2 z-30">
+                    <div className="px-4 py-2 border-b border-[#D9D9D9]">
+                      <p className="text-sm font-semibold text-[#0B0B45]">Notifications</p>
+                    </div>
+                    {totalNotif === 0 ? (
+                      <p className="px-4 py-6 text-sm text-[#6b7280] text-center">No new notifications</p>
+                    ) : (
+                      <>
+                        {unreadMessages > 0 && (
+                          <Link
+                            to="/messages"
+                            onClick={() => setNotifOpen(false)}
+                            className="flex items-center px-4 py-3 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#C49A6C]/10 flex items-center justify-center mr-3 flex-shrink-0">
+                              <svg className="w-4 h-4 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-[#0B0B45] text-xs">New Messages</p>
+                              <p className="text-[#6b7280] text-[11px]">You have {unreadMessages} unread message{unreadMessages > 1 ? 's' : ''}</p>
+                            </div>
+                          </Link>
+                        )}
+                        {bookingUpdates > 0 && (
+                          <Link
+                            to="/profile#bookings"
+                            onClick={() => { setNotifOpen(false); acknowledgeBookings(); }}
+                            className="flex items-center px-4 py-3 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3 flex-shrink-0">
+                              <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-[#0B0B45] text-xs">Booking Updates</p>
+                              <p className="text-[#6b7280] text-[11px]">{bookingUpdates} recent booking update{bookingUpdates > 1 ? 's' : ''}</p>
+                            </div>
+                          </Link>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
                 className="flex items-center space-x-2 px-3 py-2 rounded-full hover:bg-[#D9D9D9]/30 transition-all duration-200"
@@ -90,11 +209,6 @@ function Navbar() {
                     <img src={user.avatar} alt="" className="w-full h-full object-cover" />
                   ) : (
                     <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
-                  )}
-                  {unreadMessages > 0 && (
-                    <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {unreadMessages > 9 ? '9+' : unreadMessages}
-                    </span>
                   )}
                 </div>
                 <span className={`hidden md:block text-sm font-semibold ${needsWhiteNav ? 'text-[#0B0B45]' : 'text-white'}`}>
@@ -183,6 +297,7 @@ function Navbar() {
                 </div>
               )}
             </div>
+            </>
           ) : (
             /* Logged out - Sign In/Sign Up + Chat */
             <>
@@ -238,7 +353,7 @@ function Navbar() {
           }`}
         >
           <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 border-t border-[#D9D9D9] md:border-0 md:flex-row md:space-x-8 rtl:space-x-reverse md:bg-transparent rounded-b-2xl md:rounded-none bg-white shadow-lg md:shadow-none">
-            {navLinks.map((link) => {
+            {[...navLinks, ...(isAuthenticated ? [{ name: 'Trips', href: '/trips' }] : [])].map((link) => {
               const isActive = location.pathname === link.href;
               return (
                 <li key={link.name}>

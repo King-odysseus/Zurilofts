@@ -21,11 +21,8 @@ through ZuriLofts' own visual language and tailored to the Kenyan market.
 
 ### Component Patterns We Own
 
-- **Neumorphic cards** (`.neu-card`, `.neu-card-hover`) - soft raised surfaces with
-  layered `box-shadow` on white backgrounds. Not flat Material Design; not heavy
-  drop-shadow elevation. Subtle inner highlight + outer shadow creates depth.
-- **Pill CTAs** - `rounded-full` bronze-on-navy (`bg-[#C49A6C] text-white`) for
-  primary actions; navy-on-white for secondary. Never square-cornered buttons.
+- **Neumorphic cards** (`.neu-card`, `.neu-card-hover`) — legacy soft raised surfaces with layered `box-shadow` on white backgrounds. Still used in some existing components (`BookingSummaryCard`, `NearbySection`, `ChatWidget`). New components use flat Tailwind shadows (`shadow-md`, `shadow-lg`) per DESIGN.md. Full migration pending.
+- **Pill CTAs** — `rounded-full` bronze background with white text (`bg-[#C49A6C] text-white`) for primary actions; white background with navy border/text for secondary (`border-2 border-[#0B0B45] text-[#0B0B45]`). Never square-cornered buttons.
 - **Bronze as the sole action colour** - never used as a large background fill.
   Reserved for interactive elements: buttons, icons, rating stars, active states,
   focus rings, hover underlines.
@@ -64,7 +61,7 @@ These are deliberate anti-copying decisions - not gaps, but identity choices:
 | Social wishlist features | Phase 4 shortlists are named, link-shareable collections. No following, liking, commenting, or social graph. |
 | Dynamic pricing / "Smart Pricing" | Not planned. Hosts set fixed prices + optional bed-variant pricing (price1Bed, price2Bed). |
 | Identity verification badges | No government-ID verification system. Trust is built through reviews and Paystack's payment security. |
-| Map-centric search UI | Search is list+filter-first. Map view is a future stretch goal, not a Phase 1 priority. |
+| Map-centric search UI | Search is list+filter-first. Map/list toggle with Google Maps already implemented (June 2026). Full map-first browse is not planned. |
 
 ---
 
@@ -82,7 +79,7 @@ These are implemented, tested, and ready to compose into new phases without refa
 | Booking flow + Paystack         | `server/src/controllers/booking.controller.ts` | Create, confirm, webhook, cancel - extend for add-ons line items |
 | Favourites                      | `server/src/routes/favorite.routes.ts`    | Pattern to follow for shortlists; same user-scoped CRUD shape |
 | Admin dashboard shell           | `src/pages/AdminDashboard.jsx`            | Collapsible sidebar, Outlet-based routing, role-gated - reuse for host workspace |
-| Neumorphic CSS                  | `src/index.css` (`.neu-card` etc.)        | No changes needed; all new components use existing classes |
+| Neumorphic + flat shadows | `src/index.css` (`.neu-card` etc. coexist with Tailwind `shadow-md/lg`) | Targeted removal planned. New components prefer flat Tailwind shadows per DESIGN.md; existing `.neu-*` classes remain for backward compat until full migration. |
 | Dropdown component              | `src/components/Dropdown.jsx`             | All filter/sort controls use this instead of native `<select>` |
 | Spinner + loading states        | `src/components/Spinner.jsx`              | Consistent loading UX across all async pages |
 | NearbySection component         | `src/components/NearbySection.jsx`        | Reuse on property page, trip hub, and booking confirmation |

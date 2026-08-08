@@ -190,7 +190,11 @@ export async function listUserBookings(userId: string, status?: string, page = 1
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
-        property: true,
+        property: {
+          include: {
+            host: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
+          },
+        },
         promoCode: { select: { code: true, discountPercent: true } },
         review: { select: { id: true, rating: true, privateNote: true } },
       },

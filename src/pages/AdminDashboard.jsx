@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
+import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
 
 // Shared: both hosts and admins - routes gated by requireHost (or weaker).
@@ -132,6 +133,32 @@ function AdminLayout() {
   const isAdmin = user?.role === 'ADMIN';
   const navItems = isAdmin ? [...sharedNavItems, ...adminOnlyItems] : sharedNavItems;
 
+  // ── Notification polling (messages + new bookings) ──
+  const [notif, setNotif] = useState({ unreadMessages: 0, pendingBookings: 0 });
+  const lastNotifRef = useRef({ unreadMessages: 0, pendingBookings: 0 });
+
+  useEffect(() => {
+    let active = true;
+    const poll = async () => {
+      try {
+        const r = await apiClient.get('/notifications');
+        if (!active) return;
+        const d = r.data.data || {};
+        const prev = lastNotifRef.current;
+
+        // Play sound only when a count increased
+        if (d.unreadMessages > prev.unreadMessages) playMessageSound();
+        if (d.pendingBookings > prev.pendingBookings) playBookingSound();
+
+        lastNotifRef.current = { unreadMessages: d.unreadMessages ?? 0, pendingBookings: d.pendingBookings ?? 0 };
+        setNotif({ unreadMessages: d.unreadMessages ?? 0, pendingBookings: d.pendingBookings ?? 0 });
+      } catch { /* silently ignore */ }
+    };
+    poll();
+    const t = setInterval(poll, 25000);
+    return () => { active = false; clearInterval(t); };
+  }, []);
+
   function handleLogout() {
     logout();
     navigate('/');
@@ -192,9 +219,21 @@ function AdminLayout() {
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
                 } ${collapsed ? 'justify-center w-11 h-11' : 'px-4 py-4'}`}
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-                </svg>
+                <div className="relative">
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                  </svg>
+                  {path === '/admin/messages' && notif.unreadMessages > 0 && (
+                    <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
+                    </span>
+                  )}
+                  {path === '/admin/bookings' && notif.pendingBookings > 0 && (
+                    <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                      {notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}
+                    </span>
+                  )}
+                </div>
                 {!collapsed && <span className="ml-3">{label}</span>}
               </Link>
             );
@@ -274,6 +313,25 @@ function AdminLayout() {
             </svg>
             <span className="sr-only">Go back to client view</span>
           </Link>
+          {/* Mobile bell */}
+          <div className="relative">
+            <button
+              className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </button>
+            {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                {(() => {
+                  const t = notif.unreadMessages + notif.pendingBookings;
+                  return t > 99 ? '99+' : t;
+                })()}
+              </span>
+            )}
+          </div>
           <div className="bg-white/95 rounded-full">
             <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
           </div>
@@ -286,8 +344,28 @@ function AdminLayout() {
           collapsed ? 'md:ml-[88px]' : 'md:ml-64'
         }`}
       >
-        {/* Desktop header with avatar dropdown */}
-        <header className="hidden md:flex items-center justify-end h-16 px-8 bg-white border-b border-[#D9D9D9] sticky top-0 z-[5]">
+        {/* Desktop header with notification bell and avatar dropdown */}
+        <header className="hidden md:flex items-center justify-end gap-3 h-16 px-8 bg-white border-b border-[#D9D9D9] sticky top-0 z-[5]">
+          {/* Bell - unread messages + pending bookings */}
+          <div className="relative">
+            <button
+              onClick={() => { /* just a visual indicator for now */ }}
+              className="p-2 rounded-full hover:bg-[#D9D9D9]/40 transition-colors text-[#0B0B45]"
+              title={`${notif.unreadMessages} unread messages, ${notif.pendingBookings} pending bookings`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+            </button>
+            {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {(() => {
+                  const t = notif.unreadMessages + notif.pendingBookings;
+                  return t > 99 ? '99+' : t;
+                })()}
+              </span>
+            )}
+          </div>
           <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
         </header>
         <div className="p-4 md:p-8 pt-20 md:pt-8">

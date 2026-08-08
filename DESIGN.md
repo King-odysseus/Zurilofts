@@ -22,7 +22,7 @@ This document is the single source of truth for visual design. All AI agents and
 - **Silver Grey `#D9D9D9`** is the neutral surface - alternate section backgrounds, input borders, card dividers, skeleton loaders.
 - **White** is the default page and card background - keeps the layout breathing.
 - Never place bronze text on white - contrast is low. Use navy or charcoal for text on light backgrounds.
-- Bronze buttons always use navy (`#0B0B45`) or white text depending on button size - never charcoal.
+- Bronze buttons use white text for readability against the gold background — never navy or charcoal on bronze.
 - Dark navy and bronze can be paired directly (e.g. navy footer with bronze links/icons).
 
 ---
@@ -176,7 +176,7 @@ useEffect(() => {
 
 | Variant        | Background | Text       | Border         | Hover              |
 |----------------|------------|------------|----------------|--------------------|
-| Primary (CTA)  | Gold       | Navy       | None           | Gold-600 darken    |
+| Primary (CTA)  | Gold       | White       | None           | Gold-600 darken    |
 | Secondary      | Transparent| Navy       | 2px Navy       | Navy bg, white text|
 | Ghost          | Transparent| Gold       | None           | Gold underline     |
 
