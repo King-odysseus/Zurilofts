@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useMode } from '../context/ModeContext.jsx';
 import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
@@ -8,6 +9,18 @@ import logoImg from '../assets/zurilofts-logo.png';
 const navLinks = [
   { name: 'Home',       href: '/' },
   { name: 'Properties', href: '/properties' },
+];
+
+const travellingLinks = [
+  { name: 'Home',       href: '/' },
+  { name: 'Properties', href: '/properties' },
+  { name: 'Trips',      href: '/trips' },
+];
+
+const hostingLinks = [
+  { name: 'Today',     href: '/host/today' },
+  { name: 'Calendar',  href: '/admin/calendar' },
+  { name: 'Earnings',  href: '/admin/earnings' },
 ];
 
 function Navbar() {
@@ -19,6 +32,7 @@ function Navbar() {
   const dropdownRef = useRef(null);
 
   const { user, isAuthenticated, logout } = useAuth();
+  const { mode, setMode, canHost } = useMode();
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -114,6 +128,22 @@ function Navbar() {
     setMenuOpen(false);
     logout();
     navigate('/');
+  }
+
+  // Links shown depend on the active mode. Guests and logged-out visitors only
+  // ever see travelling links; hosting links require canHost.
+  const activeLinks = !isAuthenticated
+    ? navLinks
+    : mode === 'hosting' && canHost
+      ? hostingLinks
+      : travellingLinks;
+
+  function handleSwitchMode() {
+    const next = mode === 'hosting' ? 'travelling' : 'hosting';
+    setMode(next);
+    setDropdownOpen(false);
+    setMenuOpen(false);
+    navigate(next === 'hosting' ? '/host/today' : '/');
   }
 
   return (
@@ -282,6 +312,19 @@ function Navbar() {
                       {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
                     </Link>
                   )}
+                  {canHost && (
+                    <div className="border-t border-[#D9D9D9] mt-1 pt-1">
+                      <button
+                        onClick={handleSwitchMode}
+                        className="flex items-center w-full px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        {mode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
+                      </button>
+                    </div>
+                  )}
                   <div className="border-t border-[#D9D9D9] mt-1 pt-1">
                     <button
                       onClick={handleLogout}
@@ -352,7 +395,7 @@ function Navbar() {
           }`}
         >
           <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 border-t border-[#D9D9D9] md:border-0 md:flex-row md:space-x-8 rtl:space-x-reverse md:bg-transparent rounded-b-2xl md:rounded-none bg-white shadow-lg md:shadow-none">
-            {[...navLinks, ...(isAuthenticated ? [{ name: 'Trips', href: '/trips' }] : []), ...(isAuthenticated && (user?.role === 'HOST' || user?.role === 'ADMIN') ? [{ name: 'Host', href: '/host/today' }] : [])].map((link) => {
+            {activeLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
                 <li key={link.name}>
@@ -415,6 +458,14 @@ function Navbar() {
                     >
                       {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
                     </Link>
+                  )}
+                  {canHost && (
+                    <button
+                      onClick={handleSwitchMode}
+                      className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#C49A6C] text-[#C49A6C] hover:bg-[#C49A6C] hover:text-white transition-all duration-200 text-center"
+                    >
+                      {mode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
+                    </button>
                   )}
                   <button
                     onClick={handleLogout}
