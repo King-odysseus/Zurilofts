@@ -75,6 +75,7 @@ model Property {
   guestReviews    Review[]
   favoritedBy     Favorite[]
   shortlistItems ShortlistItem[]
+  addOns          PropertyAddOn[]
 
   @@index([hostId])
 }
@@ -159,6 +160,7 @@ model Booking {
   updatedAt       DateTime  @updatedAt
   review          Review?
   payoutBookings  PayoutBooking[]
+  addOns          BookingAddOn[]
   conversation    Conversation?
 }
 
@@ -362,4 +364,41 @@ model ConversationMessage {
   createdAt      DateTime     @default(now())
 
   @@index([conversationId, createdAt])
+}
+model AddOn {
+  id          String          @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  image       String?
+  category    String          // transport | catering | housekeeping | concierge
+  active      Boolean         @default(true)
+  properties  PropertyAddOn[]
+  bookings    BookingAddOn[]
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model PropertyAddOn {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  addOnId    String
+  addOn      AddOn    @relation(fields: [addOnId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, addOnId])
+  @@index([propertyId])
+}
+
+model BookingAddOn {
+  id        String  @id @default(cuid())
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  addOnId   String
+  addOn     AddOn   @relation(fields: [addOnId], references: [id], onDelete: Cascade)
+  quantity  Int     @default(1)
+  unitPrice Float   // snapshot at booking time - price changes must not alter existing bookings
+
+  @@unique([bookingId, addOnId])
+  @@index([bookingId])
 }

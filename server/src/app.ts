@@ -28,6 +28,7 @@ import pushRoutes from './routes/push.routes.js';
 import blogRoutes from './routes/blog.routes.js';
 import shortlistRoutes from './routes/shortlist.routes.js';
 import conversationRoutes from './routes/conversation.routes.js';
+import addonRoutes from './routes/addon.routes.js';
 
 const app = express();
 
@@ -96,6 +97,8 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api', payoutRoutes); // /api/host/payouts, /api/admin/payouts, etc.
+
+app.use('/api', addonRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/push', pushRoutes);
 app.use('/api/guides', blogRoutes);
