@@ -29,6 +29,7 @@ import blogRoutes from './routes/blog.routes.js';
 import shortlistRoutes from './routes/shortlist.routes.js';
 import conversationRoutes from './routes/conversation.routes.js';
 import addonRoutes from './routes/addon.routes.js';
+import recommendationRoutes from './routes/recommendation.routes.js';
 
 const app = express();
 
@@ -85,6 +86,7 @@ app.get('/api/health', (_req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoriteRoutes);

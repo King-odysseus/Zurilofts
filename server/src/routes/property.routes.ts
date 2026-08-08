@@ -18,6 +18,10 @@ router.get('/mine', authenticate, requireHost, ctrl.listMine);
 router.get('/:id/calendar/:token.ics', calendarCtrl.publicFeed);
 // Taken date ranges for the guest booking calendar
 router.get('/:id/availability', calendarCtrl.availability);
+// Similar properties (public discovery)
+router.get('/:id/similar', ctrl.getSimilar);
+
+
 // Public reviews for a property
 router.get('/:id/reviews', ctrl.getReviews);
 router.get('/:id', ctrl.getById);

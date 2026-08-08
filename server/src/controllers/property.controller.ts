@@ -59,6 +59,16 @@ export async function listMine(req: Request, res: Response, next: NextFunction):
     next(error);
   }
 }
+export async function getSimilar(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const similar = await propertyService.getSimilarProperties(req.params.id);
+    res.json({ success: true, data: similar });
+  } catch (error) {
+    next(error);
+  }
+}
+
+
 
 export async function getById(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

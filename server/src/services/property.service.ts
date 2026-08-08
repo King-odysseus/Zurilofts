@@ -187,6 +187,70 @@ export async function getPropertiesByIds(ids: string[]) {
   return normalizeProperties(properties);
 }
 
+
+// ---------------------------------------------------------------
+// Similar properties — public discovery
+// ---------------------------------------------------------------
+
+/** Matches same location, then type, then closest price. Excludes the
+ *  current property. Tops up with highly-rated or recent properties
+ *  when fewer than `limit` matches are found. */
+export async function getSimilarProperties(id: string, limit: number = 4) {
+  const property = await prisma.property.findUnique({ where: { id } });
+  if (!property) throw new NotFoundError('Property');
+
+  const suspendedFilter = { host: { is: { suspended: true } } };
+  const result: any[] = [];
+  const seen = new Set<string>([id]);
+
+  // Helper to collect up to `needed` properties from a query
+  async function collect(
+    needed: number,
+    where: any,
+    orderBy: any
+  ): Promise<any[]> {
+    if (needed <= 0) return [];
+    const batch = await prisma.property.findMany({
+      where: { ...where, id: { notIn: [...seen] }, NOT: suspendedFilter },
+      take: needed,
+      orderBy,
+    });
+    for (const p of batch) seen.add(p.id);
+    return batch;
+  }
+
+  // 1. Same location
+  const byLocation = await collect(limit, { location: property.location }, { rating: 'desc' });
+  result.push(...byLocation);
+  if (result.length >= limit) return normalizeProperties(result.slice(0, limit));
+
+  // 2. Same type
+  const byType = await collect(limit - result.length, { type: property.type }, { rating: 'desc' });
+  result.push(...byType);
+  if (result.length >= limit) return normalizeProperties(result.slice(0, limit));
+
+  // 3. Closest price (within ~30% band)
+  const priceBuffer = Math.max(Math.round(property.price * 0.3), 1000);
+  const byPrice = await collect(
+    limit - result.length,
+    { price: { gte: property.price - priceBuffer, lte: property.price + priceBuffer } },
+    { rating: 'desc' }
+  );
+  result.push(...byPrice);
+  if (result.length >= limit) return normalizeProperties(result.slice(0, limit));
+
+  // 4. Top up with highly-rated or recent
+  const topUp = await collect(
+    limit - result.length,
+    {},
+    [{ rating: 'desc' }, { createdAt: 'desc' }]
+  );
+  result.push(...topUp);
+
+  return normalizeProperties(result.slice(0, limit));
+}
+
+
 export async function deleteProperty(id: string, hostId?: string) {
   const where: any = { id };
   // If hostId provided, scope the delete to properties owned by that user

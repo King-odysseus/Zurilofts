@@ -30,7 +30,7 @@ async function requireParticipant(
     include: {
       booking: {
         include: {
-          property: { select: { hostId: true } },
+          property: { select: { hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -77,7 +77,7 @@ export async function getOrCreateConversation(input: GetOrCreateInput) {
     include: {
       booking: {
         include: {
-          property: { select: { id: true, title: true, imagesJson: true } },
+          property: { select: { id: true, title: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -91,7 +91,7 @@ export async function getOrCreateConversation(input: GetOrCreateInput) {
     include: {
       booking: {
         include: {
-          property: { select: { id: true, title: true, imagesJson: true } },
+          property: { select: { id: true, title: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -125,7 +125,7 @@ export async function listUserConversations(userId: string) {
       },
       booking: {
         include: {
-          property: { select: { id: true, title: true, imagesJson: true } },
+          property: { select: { id: true, title: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -199,7 +199,7 @@ export async function sendMessage(conversationId: string, senderId: string, rawC
     include: {
       booking: {
         include: {
-          property: { select: { hostId: true } },
+          property: { select: { hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
         },
       },
     },
