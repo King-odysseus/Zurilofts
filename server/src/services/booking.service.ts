@@ -383,7 +383,7 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     }),
     prisma.booking.groupBy({
       by: ['propertyId'],
-      where: { status: { not: 'CANCELLED' }, ...whereDate, ...bookingHost },
+      where: { status: { in: ['PENDING', 'CONFIRMED'] }, ...whereDate, ...bookingHost },
       _count: { _all: true },
       _sum: {
         subtotal: true,
@@ -411,7 +411,7 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     }),
     prisma.booking.groupBy({
       by: ['propertyId', 'bedOption'],
-      where: { status: { not: 'CANCELLED' }, ...whereDate, ...bookingHost },
+      where: { status: { in: ['PENDING', 'CONFIRMED'] }, ...whereDate, ...bookingHost },
       _count: { _all: true },
       _sum: { total: true },
     }),
@@ -592,13 +592,55 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
 }
 
 export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED' | 'CANCELLED') {
-  const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: { property: { select: { hostId: true } } },
+  });
   if (!booking) throw new NotFoundError('Booking');
+
+  const previousStatus = booking.status;
+  const isConflict = previousStatus === 'CONFLICT';
+
+  if (isConflict) {
+    console.log(
+      `[CONFLICT-RESOLVE] booking=${bookingId} ${previousStatus} -> ${status} by admin`
+    );
+  }
+
+  // Compute host finances when admin resolves CONFLICT -> CONFIRMED
+  let hostNetAmount: number | undefined;
+  let withholdingTax: number | undefined;
+  if (isConflict && status === 'CONFIRMED') {
+    const extraGuestFee = Math.max(0, booking.guests - (booking.bedOption === '2bed' ? 4 : 2)) * 800 *
+      Math.ceil((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / (1000 * 60 * 60 * 24));
+    const { calculateHostNet } = await import('./payment.service.js');
+    const hn = calculateHostNet(booking.subtotal, booking.discountAmount, extraGuestFee);
+    hostNetAmount = hn.hostNet;
+    withholdingTax = hn.withholdingTax;
+  }
+
+  const data: any = { status };
+  if (hostNetAmount != null) {
+    data.hostNetAmount = hostNetAmount;
+    data.withholdingTax = withholdingTax;
+  }
 
   const updated = await prisma.booking.update({
     where: { id: bookingId },
-    data: { status },
+    data,
   });
+
+  // Credit host wallet on CONFLICT -> CONFIRMED resolution
+  if (isConflict && status === 'CONFIRMED' && hostNetAmount != null) {
+    const hostId = booking.property?.hostId;
+    if (hostId) {
+      await prisma.hostWallet.upsert({
+        where: { hostId },
+        create: { hostId, balance: hostNetAmount, totalEarned: hostNetAmount },
+        update: { balance: { increment: hostNetAmount }, totalEarned: { increment: hostNetAmount } },
+      });
+    }
+  }
 
   // Send push notification when booking is confirmed
   if (status === 'CONFIRMED') {
@@ -816,7 +858,7 @@ export async function getHostToday(hostId: string) {
     prisma.booking.findMany({
       where: {
         property: { hostId },
-        status: { not: 'CANCELLED' },
+        status: { in: ['PENDING', 'CONFIRMED'] },
         checkIn: { gte: today, lt: tomorrow },
       },
       orderBy: { checkIn: 'asc' },
@@ -830,7 +872,7 @@ export async function getHostToday(hostId: string) {
     prisma.booking.findMany({
       where: {
         property: { hostId },
-        status: { not: 'CANCELLED' },
+        status: { in: ['PENDING', 'CONFIRMED'] },
         checkOut: { gte: today, lt: tomorrow },
       },
       orderBy: { checkOut: 'asc' },
@@ -844,7 +886,7 @@ export async function getHostToday(hostId: string) {
     prisma.booking.findMany({
       where: {
         property: { hostId },
-        status: { not: 'CANCELLED' },
+        status: { in: ['PENDING', 'CONFIRMED'] },
         checkIn: { lt: today },
         checkOut: { gt: tomorrow },
       },
