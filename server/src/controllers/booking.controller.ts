@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as bookingService from '../services/booking.service.js';
 import * as paymentService from '../services/payment.service.js';
+import prisma from '../config/prisma.js';
 
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -123,6 +124,70 @@ export async function deleteBooking(req: Request, res: Response, next: NextFunct
   try {
     const result = await bookingService.deleteBooking(req.params.id);
     res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Guest: re-initialize payment for an existing booking (includes add-ons in total)
+export async function initializePayment(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const bookingId = req.params.id;
+
+    // Fetch booking with user + property info for authorization and Paystack call
+    const booking = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        user: { select: { email: true } },
+        property: { select: { title: true } },
+      },
+    });
+
+    if (!booking) {
+      res.status(404).json({ success: false, error: 'Booking not found' });
+      return;
+    }
+
+    // Auth: must be the booking's guest (admin can also pay on behalf of guest)
+    const isAdmin = req.user!.role === 'ADMIN';
+    if (!isAdmin && booking.userId !== req.user!.sub) {
+      res.status(404).json({ success: false, error: 'Booking not found' });
+      return;
+    }
+
+    // Validate status
+    if (booking.status === 'CANCELLED') {
+      res.status(400).json({ success: false, error: 'Cannot pay for a cancelled booking' });
+      return;
+    }
+    if (booking.status === 'CONFIRMED') {
+      res.status(400).json({ success: false, error: 'Booking is already confirmed' });
+      return;
+    }
+
+    // Recompute authoritative total (includes add-ons) before initialising Paystack
+    await bookingService.recalculateBookingTotal(bookingId);
+
+    // Re-fetch for the updated total
+    const updated = await prisma.booking.findUnique({
+      where: { id: bookingId },
+      include: {
+        user: { select: { email: true } },
+        property: { select: { title: true } },
+      },
+    });
+
+    if (!updated) {
+      res.status(404).json({ success: false, error: 'Booking not found' });
+      return;
+    }
+
+    const payment = await paymentService.initializeBookingPayment(updated);
+
+    res.json({
+      success: true,
+      data: { authorizationUrl: payment.authorizationUrl, reference: payment.reference },
+    });
   } catch (error) {
     next(error);
   }

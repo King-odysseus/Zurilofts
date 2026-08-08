@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ForbiddenError, ValidationError } from '../types/index.js';
+import { recalculateBookingTotal } from './booking.service.js';
 
 // ---------------------------------------------------------------
 // Normalize helpers
@@ -178,21 +179,29 @@ export async function addAddOnToBooking(
     // Keep the original snapshot. Re-pricing here would let a catalogue price
     // change alter a booking the guest has already agreed to, which is exactly
     // what unitPrice exists to prevent.
-    return prisma.bookingAddOn.update({
-      where: { bookingId_addOnId: { bookingId, addOnId } },
-      data: { quantity: qty },
-      include: { addOn: true },
+    return prisma.$transaction(async (tx) => {
+      const result = await tx.bookingAddOn.update({
+        where: { bookingId_addOnId: { bookingId, addOnId } },
+        data: { quantity: qty },
+        include: { addOn: true },
+      });
+      await recalculateBookingTotal(bookingId, tx);
+      return result;
     });
   }
 
-  return prisma.bookingAddOn.create({
-    data: {
-      bookingId,
-      addOnId,
-      quantity: qty,
-      unitPrice: addOn.price, // server-sourced price
-    },
-    include: { addOn: true },
+  return prisma.$transaction(async (tx) => {
+    const result = await tx.bookingAddOn.create({
+      data: {
+        bookingId,
+        addOnId,
+        quantity: qty,
+        unitPrice: addOn.price, // server-sourced price
+      },
+      include: { addOn: true },
+    });
+    await recalculateBookingTotal(bookingId, tx);
+    return result;
   });
 }
 
@@ -213,10 +222,14 @@ export async function updateBookingAddOn(
   // Quantity-only update: the unitPrice snapshot taken when the add-on was
   // first attached is deliberately preserved, so a later catalogue price
   // change cannot alter a booking the guest has already agreed to.
-  return prisma.bookingAddOn.update({
-    where: { bookingId_addOnId: { bookingId, addOnId } },
-    data: { quantity: qty },
-    include: { addOn: true },
+  return prisma.$transaction(async (tx) => {
+    const result = await tx.bookingAddOn.update({
+      where: { bookingId_addOnId: { bookingId, addOnId } },
+      data: { quantity: qty },
+      include: { addOn: true },
+    });
+    await recalculateBookingTotal(bookingId, tx);
+    return result;
   });
 }
 
@@ -228,7 +241,10 @@ export async function removeBookingAddOn(bookingId: string, addOnId: string, use
   });
   if (!existing) throw new NotFoundError('Booking add-on');
 
-  await prisma.bookingAddOn.delete({
-    where: { bookingId_addOnId: { bookingId, addOnId } },
+  await prisma.$transaction(async (tx) => {
+    await tx.bookingAddOn.delete({
+      where: { bookingId_addOnId: { bookingId, addOnId } },
+    });
+    await recalculateBookingTotal(bookingId, tx);
   });
 }

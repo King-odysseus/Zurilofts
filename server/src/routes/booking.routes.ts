@@ -18,6 +18,7 @@ router.get('/host', authenticate, requireHost, ctrl.listAll);
 router.get('/host/earnings', authenticate, requireHost, ctrl.propertyEarnings);
 router.get('/host/today', authenticate, requireHost, ctrl.hostToday);
 
+router.post('/:id/payment', authenticate, ctrl.initializePayment);
 router.get('/:id', authenticate, ctrl.getById);
 
 export default router;
