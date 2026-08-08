@@ -29,10 +29,15 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
   }
 }
 
-/** Authenticated listing - returns only properties owned by the logged-in host/admin. */
+/** Authenticated listing - returns only properties owned by the logged-in host/admin.
+ *  Admins may pass ?hostId= to view another host's properties. */
 export async function listMine(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { type, minPrice, maxPrice, search, available, featured, page, limit } = req.query;
+    const { type, minPrice, maxPrice, search, available, featured, page, limit, hostId } = req.query;
+    // Admins may optionally scope to another host; everyone else is scoped to self.
+    const effectiveHostId = req.user!.role === 'ADMIN' && typeof hostId === 'string' && hostId
+      ? hostId
+      : req.user!.sub;
     const result = await propertyService.listProperties({
       type: type as string | undefined,
       minPrice: minPrice ? Number(minPrice) : undefined,
@@ -40,7 +45,7 @@ export async function listMine(req: Request, res: Response, next: NextFunction):
       search: search as string | undefined,
       available: available !== undefined ? available === 'true' : undefined,
       featured: featured !== undefined ? featured === 'true' : undefined,
-      hostId: req.user!.sub,
+      hostId: effectiveHostId,
       page: page ? Number(page) : 1,
       limit: limit ? Number(limit) : 12,
     });

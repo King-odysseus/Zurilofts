@@ -19,6 +19,7 @@ import * as pushCtrl from '../controllers/push.controller.js';
 import * as messageCtrl from '../controllers/message.controller.js';
 import * as userCtrl from '../controllers/user.controller.js';
 import { messageCreateSchema } from '../types/index.js';
+import adminPropertyRoutes from './admin-property.routes.js';
 
 const router = Router();
 
@@ -81,6 +82,9 @@ router.post('/properties/:id/price-rules', validate(priceRuleSchema), calendarCt
 router.delete('/properties/:id/price-rules/:ruleId', calendarCtrl.deletePriceRule);
 
 
+// Admin property CRUD
+router.use('/properties', adminPropertyRoutes);
+
 // Blog management
 router.get('/guides', blogCtrl.adminList);
 router.get('/guides/:id', blogCtrl.adminGet);
@@ -92,3 +96,4 @@ router.delete('/guides/:id', blogCtrl.adminDelete);
 router.post('/push/send', pushCtrl.broadcast);
 
 export default router;
+
