@@ -88,6 +88,16 @@ export async function propertyEarnings(req: Request, res: Response, next: NextFu
   }
 }
 
+
+export async function hostToday(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const data = await bookingService.getHostToday(req.user!.sub);
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // Admin: update booking status
 export async function updateStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

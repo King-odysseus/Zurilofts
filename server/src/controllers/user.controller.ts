@@ -1,13 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import sharp from 'sharp';
-import { randomBytes } from 'crypto';
-import path from 'path';
-import fs from 'fs';
 import * as userService from '../services/user.service.js';
 import { ValidationError } from '../types/index.js';
-
-// Same upload directory as the property image upload controller
-const UPLOAD_DIR = path.resolve(process.cwd(), 'uploads');
+import { storeImage, deleteImage } from '../utils/imageStorage.js';
 
 export async function getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -34,21 +29,18 @@ export async function uploadAvatar(req: Request, res: Response, next: NextFuncti
       throw new ValidationError('No image file was uploaded');
     }
 
-    // Delete old avatar if it exists (skip external URLs)
+    // Delete the previous avatar (local file or Cloudinary asset). External
+    // avatars such as Google OAuth URLs are left untouched by deleteImage.
     const currentUser = await userService.getUserProfile(req.user!.sub);
-    if (currentUser.avatar && (currentUser.avatar as string).startsWith('/uploads/')) {
-      const oldPath = path.join(UPLOAD_DIR, path.basename(currentUser.avatar as string));
-      try { fs.unlinkSync(oldPath); } catch { /* old file may already be gone */ }
-    }
+    await deleteImage(currentUser.avatar as string | null);
 
-    const name = `avatar-${Date.now()}-${randomBytes(4).toString('hex')}.jpg`;
-    await sharp(file.buffer)
+    const buffer = await sharp(file.buffer)
       .rotate()
       .resize({ width: 400, height: 400, fit: 'cover', withoutEnlargement: true })
       .jpeg({ quality: 88, mozjpeg: true })
-      .toFile(path.join(UPLOAD_DIR, name));
+      .toBuffer();
 
-    const avatarUrl = `/uploads/${name}`;
+    const avatarUrl = await storeImage(buffer, 'avatar');
     const user = await userService.updateUserProfile(req.user!.sub, { avatar: avatarUrl });
 
     res.json({ success: true, data: user });

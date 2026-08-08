@@ -190,7 +190,11 @@ export async function listUserBookings(userId: string, status?: string, page = 1
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
-        property: true,
+        property: {
+          include: {
+            host: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
+          },
+        },
         promoCode: { select: { code: true, discountPercent: true } },
         review: { select: { id: true, rating: true, privateNote: true } },
       },
@@ -650,6 +654,69 @@ export async function deleteBooking(bookingId: string) {
 
   await prisma.booking.delete({ where: { id: bookingId } });
   return { deleted: true };
+}
+
+
+export async function getHostToday(hostId: string) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const [arrivals, departures, inHouse] = await Promise.all([
+    prisma.booking.findMany({
+      where: {
+        property: { hostId },
+        status: { not: 'CANCELLED' },
+        checkIn: { gte: today, lt: tomorrow },
+      },
+      orderBy: { checkIn: 'asc' },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
+        property: true,
+        review: { select: { id: true, rating: true } },
+      },
+    }),
+    prisma.booking.findMany({
+      where: {
+        property: { hostId },
+        status: { not: 'CANCELLED' },
+        checkOut: { gte: today, lt: tomorrow },
+      },
+      orderBy: { checkOut: 'asc' },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
+        property: true,
+        review: { select: { id: true, rating: true } },
+      },
+    }),
+    prisma.booking.findMany({
+      where: {
+        property: { hostId },
+        status: { not: 'CANCELLED' },
+        checkIn: { lt: today },
+        checkOut: { gt: tomorrow },
+      },
+      orderBy: { checkOut: 'asc' },
+      include: {
+        user: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
+        property: true,
+        review: { select: { id: true, rating: true } },
+      },
+    }),
+  ]);
+
+  return {
+    arrivals: normalizeBookings(arrivals),
+    departures: normalizeBookings(departures),
+    inHouse: normalizeBookings(inHouse),
+    summary: {
+      arrivals: arrivals.length,
+      departures: departures.length,
+      inHouse: inHouse.length,
+      total: arrivals.length + departures.length + inHouse.length,
+    },
+  };
 }
 
 // Internal: validate a promo code and return it
