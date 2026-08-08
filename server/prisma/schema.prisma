@@ -141,7 +141,7 @@ model Booking {
   specialRequests String?
   additionalGuestsJson String? // JSON array of extra guests [{firstName,lastName}]
   paymentMethod   String    // "card" | "mpesa" | "bank"
-  status          String    @default("PENDING")  // "PENDING" | "CONFIRMED" | "CANCELLED"
+  status          String    @default("PENDING")  // "PENDING" | "CONFIRMED" | "CANCELLED" | "CONFLICT"
   subtotal        Int
   cleaningFee     Int       @default(1500)
   serviceFee      Int

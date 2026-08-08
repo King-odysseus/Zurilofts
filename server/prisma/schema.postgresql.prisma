@@ -20,6 +20,10 @@ enum BookingStatus {
   PENDING
   CONFIRMED
   CANCELLED
+  // Paid, but the dates were taken before payment confirmed. Needs an admin to
+  // resolve - never auto-confirmed and never auto-cancelled, because money has
+  // already changed hands. See confirmBookingPayment in payment.service.ts.
+  CONFLICT
 }
 
 model User {

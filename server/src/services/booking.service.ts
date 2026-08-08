@@ -1,7 +1,7 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
 import { calculateFees, calculateNights, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
-import { isRangeAvailable } from './calendar.service.js';
+import { isRangeAvailable, PENDING_HOLD_MINUTES } from './calendar.service.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
 function normalizeBooking(booking: any) {
@@ -759,7 +759,7 @@ export async function deleteBooking(bookingId: string) {
 
 
 
-export async function abandonStaleBookings(olderThanMinutes = 60): Promise<number> {
+export async function abandonStaleBookings(olderThanMinutes = PENDING_HOLD_MINUTES): Promise<number> {
   const cutoff = new Date(Date.now() - olderThanMinutes * 60 * 1000);
 
   // Find PENDING bookings created before the cutoff with no paidAt timestamp.
