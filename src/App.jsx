@@ -28,7 +28,6 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import HostRoute from './components/HostRoute';
 import HostLayout from './components/HostLayout';
-import ChatWidget from './components/ChatWidget';
 import CookieConsent from './components/CookieConsent';
 import PushNotificationPrompt from './components/PushNotificationPrompt';
 import ScrollToTop from './components/ScrollToTop';
@@ -292,7 +291,8 @@ function App() {
   return (
     <Router>
       <ScrollToTop />
-      <ChatWidget />
+      {/* Telegram-backed support chat, disabled for now. The component and its
+          /api/chat endpoints are untouched - re-enable by restoring <ChatWidget />. */}
       <CookieConsent />
       <PushNotificationPrompt />
       <ErrorBoundary>

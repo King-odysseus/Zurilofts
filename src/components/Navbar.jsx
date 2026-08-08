@@ -415,12 +415,8 @@ function Navbar() {
               >
                 Sign In / Sign Up
               </Link>
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('open-chat'))}
-                className="hidden md:inline-flex px-5 py-2 rounded-full text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 shadow-md whitespace-nowrap"
-              >
-                Chat with Us
-              </button>
+              {/* "Chat with Us" removed with the Telegram-backed ChatWidget.
+                  Restore alongside <ChatWidget /> in App.jsx if it comes back. */}
             </>
           )}
 
@@ -571,12 +567,7 @@ function Navbar() {
                   >
                     Sign In / Sign Up
                   </Link>
-                  <button
-                    className="block w-full py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 text-center"
-                    onClick={() => { setMenuOpen(false); window.dispatchEvent(new CustomEvent('open-chat')); }}
-                  >
-                    Chat with Us
-                  </button>
+                  {/* "Chat with Us" removed with the Telegram-backed ChatWidget. */}
                   <Link
                     to="/terms"
                     className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
