@@ -353,7 +353,7 @@ docs: add Airbnb-inspired phased implementation plan
 
 ## Phase 2: Trip Hub
 
-**Status**: NOT STARTED
+**Status**: ✅ IMPLEMENTED (2026-08-08) - `TripHubPage.jsx` at `/trips`
 
 **User outcome**: After booking, a guest has a single dashboard for their
 upcoming and past stays - itinerary details, host contact, and rebooking.
@@ -427,7 +427,7 @@ feat: add empty state and loading skeleton to trip hub
 
 ## Phase 3: Host "Today" Workspace
 
-**Status**: NOT STARTED
+**Status**: ✅ IMPLEMENTED (2026-08-08) - `HostTodayPage.jsx` at `/host/today`
 
 **User outcome**: A host logs in and sees a focused, scannable dashboard for
 today's operations - arrivals, departures, in-house guests, and quick actions.
@@ -506,7 +506,7 @@ feat: add quick-action buttons (view details, message guest) to today cards
 
 ## Phase 4: Collaborative Shortlists
 
-**Status**: NOT STARTED
+**Status**: ✅ IMPLEMENTED (2026-08-08) - `Shortlist`/`ShortlistItem` models, shortlist pages + shared view
 
 **User outcome**: A group planning a trip can save properties to a named
 shortlist, share a link, and coordinate choices without a group chat.
@@ -597,7 +597,9 @@ feat: add "Save to shortlist" button on PropertyCard and PropertyPage
 
 ## Phase 5: Reservation Messaging
 
-**Status**: NOT STARTED
+**Status**: ✅ IMPLEMENTED (2026-08-08) - `Conversation`/`ConversationMessage` models,
+`/api/conversations`, inbox at `/inbox`. Note: the pre-existing `Message` model and
+`/messages` page are a separate admin-user support inbox, deliberately left untouched.
 
 **User outcome**: After booking, guest and host can message each other about
 check-in details, special requests, or questions - all within ZuriLofts, no
@@ -692,7 +694,9 @@ feat: add navbar unread-message badge with polling
 
 ## Phase 6: Local Add-ons
 
-**Status**: NOT STARTED
+**Status**: ✅ IMPLEMENTED (2026-08-08) - `AddOn`/`PropertyAddOn`/`BookingAddOn` models,
+10 endpoints, add-ons in the booking flow, admin CRUD at `/admin/addons`. Booking totals
+and Paystack re-initialisation include add-ons (see `POST /api/bookings/:id/payment`).
 
 **User outcome**: A guest booking a stay can browse and request local services
 (airport pickup, private chef, daily housekeeping) curated by ZuriLofts - all
@@ -795,7 +799,10 @@ feat: add add-on management CRUD to admin dashboard
 
 ## Phase 7: Personalization
 
-**Status**: NOT STARTED
+**Status**: ✅ IMPLEMENTED (2026-08-08) - recently-viewed (localStorage), similar
+properties, `GET /api/recommendations` and `GET /api/properties/:id/similar`.
+Server-side view tracking was deliberately not built; localStorage is the
+privacy-first option this plan recommends.
 
 **User outcome**: Returning guests see relevant recommendations based on their
 booking history and saved properties - making ZuriLofts feel like it knows
