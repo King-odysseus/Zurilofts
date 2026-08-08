@@ -32,6 +32,7 @@ import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import Spinner from './components/Spinner.jsx';
 import TripHubPage from './pages/TripHubPage.jsx';
+import HostTodayPage from './pages/HostTodayPage.jsx';
 import NotFoundPage from './pages/NotFoundPage';
 import HostPayouts from './pages/HostPayouts';
 import FavouritesPage from './pages/FavouritesPage';
@@ -283,6 +284,7 @@ function App() {
           <Route path="/profile" element={<Page title="Profile"><ProtectedRoute><ProfilePage /></ProtectedRoute></Page>} />
           <Route path="/messages" element={<Page title="Messages"><ProtectedRoute><MessagesPage /></ProtectedRoute></Page>} />
           <Route path="/trips" element={<Page title="Trips"><ProtectedRoute><TripHubPage /></ProtectedRoute></Page>} />
+          <Route path="/host/today" element={<Page title="Host Today"><ProtectedRoute><HostTodayPage /></ProtectedRoute></Page>} />
           <Route path="/privacy" element={<Page title="Privacy Policy"><PrivacyPage /></Page>} />
           <Route path="/terms" element={<Page title="Terms of Service"><TermsPage /></Page>} />
           <Route path="/favourites" element={<Page title="Favourites"><FavouritesPage /></Page>} />
