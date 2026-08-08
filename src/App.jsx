@@ -26,6 +26,8 @@ import ProfilePage from './pages/ProfilePage';
 import MessagesPage from './pages/MessagesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import HostRoute from './components/HostRoute';
+import HostLayout from './components/HostLayout';
 import ChatWidget from './components/ChatWidget';
 import CookieConsent from './components/CookieConsent';
 import PushNotificationPrompt from './components/PushNotificationPrompt';
@@ -307,7 +309,13 @@ function App() {
           <Route path="/inbox" element={<Page title="Inbox"><ProtectedRoute><InboxPage /></ProtectedRoute></Page>} />
           <Route path="/inbox/:conversationId" element={<Page title="Conversation"><ProtectedRoute><ConversationPage /></ProtectedRoute></Page>} />
           <Route path="/trips" element={<Page title="Trips"><ProtectedRoute><TripHubPage /></ProtectedRoute></Page>} />
-          <Route path="/host/today" element={<Page title="Host Today"><ProtectedRoute><HostTodayPage /></ProtectedRoute></Page>} />
+          <Route path="/host/today" element={<Page title="Host Today"><HostRoute><HostTodayPage /></HostRoute></Page>} />
+          <Route path="/host/calendar" element={<Page title="Host Calendar"><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/calendar/:id" element={<Page title="Host Calendar"><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/listings" element={<Page title="Host Listings"><HostRoute><HostLayout><AdminProperties /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/earnings" element={<Page title="Host Earnings"><HostRoute><HostLayout><AdminEarnings /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/properties/new" element={<Page title="Add Property"><HostRoute><HostLayout><AdminPropertyForm /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/properties/:id/edit" element={<Page title="Edit Property"><HostRoute><HostLayout><AdminPropertyForm /></HostLayout></HostRoute></Page>} />
           <Route path="/privacy" element={<Page title="Privacy Policy"><PrivacyPage /></Page>} />
           <Route path="/terms" element={<Page title="Terms of Service"><TermsPage /></Page>} />
           <Route path="/favourites" element={<Page title="Favourites"><FavouritesPage /></Page>} />

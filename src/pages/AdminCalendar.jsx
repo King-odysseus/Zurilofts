@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 
 const labelCls = 'block text-sm font-semibold text-[#1f2937] mb-2';
@@ -8,8 +9,91 @@ const inputCls =
 
 const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
+// The calendar is per-property, so /host/calendar (no id) shows a picker of the
+// host's own listings. Reuses the existing /properties/mine endpoint.
+function CalendarPropertyPicker({ base }) {
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await apiClient.get('/properties/mine');
+        if (!cancelled) setProperties(res.data.data || []);
+      } catch {
+        if (!cancelled) setProperties([]);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  return (
+    <div className="w-full">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-[#0B0B45]">Calendar</h1>
+        <p className="text-sm text-[#6b7280]">Pick a property to manage its iCal feeds and blocked dates.</p>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-12">
+          <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        </div>
+      ) : properties.length === 0 ? (
+        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-10 text-center">
+          <p className="text-[#6b7280]">No properties yet. Add a property to manage its calendar.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {properties.map((p) => (
+            <Link
+              key={p.id}
+              to={`${base}/calendar/${p.id}`}
+              className="bg-white rounded-2xl border border-[#D9D9D9] overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group"
+            >
+              <div className="aspect-[4/3] overflow-hidden bg-[#D9D9D9]/30">
+                {p.images?.[0] ? (
+                  <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <div className="p-4">
+                <p className="font-semibold text-[#0B0B45] group-hover:text-[#C49A6C] transition-colors line-clamp-1">{p.title}</p>
+                <p className="text-sm text-[#6b7280] mt-0.5">{p.location}</p>
+                <span className="inline-flex items-center mt-3 text-xs font-semibold text-[#C49A6C]">
+                  View calendar
+                  <svg className="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+CalendarPropertyPicker.propTypes = {
+  base: PropTypes.string.isRequired,
+};
+
 function AdminCalendar() {
   const { id } = useParams();
+  const location = useLocation();
+  // Shared between the admin control centre (/admin/*) and the host workspace
+  // (/host/*). Build frontend links against the active base so a host never
+  // lands on an /admin/* URL. The backend /admin/properties/:id/calendar
+  // endpoints are unchanged - they already scope by hostId.
+  const base = location.pathname.startsWith('/host') ? '/host' : '/admin';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -31,8 +115,9 @@ function AdminCalendar() {
   }, [id]);
 
   useEffect(() => {
+    if (!id) return;
     load();
-  }, [load]);
+  }, [load, id]);
 
   async function addSource(e) {
     e.preventDefault();
@@ -100,6 +185,12 @@ function AdminCalendar() {
     setTimeout(() => setCopied(false), 1500);
   }
 
+  // No property selected (e.g. /host/calendar) - show a picker of the host's
+  // own listings instead of trying to load a calendar without an id.
+  if (!id) {
+    return <CalendarPropertyPicker base={base} />;
+  }
+
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -115,7 +206,7 @@ function AdminCalendar() {
   return (
     <div className="w-full">
       <div className="mb-6">
-        <Link to={`/admin/properties/${id}/edit`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to property</Link>
+        <Link to={`${base}/properties/${id}/edit`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to property</Link>
         <h1 className="text-2xl font-bold text-[#0B0B45] mt-1">Calendar: {data.property.title}</h1>
         <p className="text-sm text-[#6b7280]">Two-way sync with Airbnb, Booking.com, VRBO and other platforms using iCal feeds.</p>
       </div>

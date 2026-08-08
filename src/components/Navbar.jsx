@@ -19,10 +19,10 @@ const travellingLinks = [
 
 const hostingLinks = [
   { name: 'Today',     href: '/host/today' },
-  { name: 'Calendar',  href: '/admin/calendar' },
-  { name: 'Listings',  href: '/admin/properties' },
+  { name: 'Calendar',  href: '/host/calendar' },
+  { name: 'Listings',  href: '/host/listings' },
   { name: 'Messages',  href: '/inbox' },
-  { name: 'Earnings',  href: '/admin/earnings' },
+  { name: 'Earnings',  href: '/host/earnings' },
 ];
 
 function Navbar() {
@@ -343,7 +343,7 @@ function Navbar() {
                   </Link>
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
-                      to="/admin"
+                      to={user?.role === 'ADMIN' ? '/admin' : '/host/today'}
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
                     >
@@ -506,7 +506,7 @@ function Navbar() {
                   </Link>
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
-                      to="/admin"
+                      to={user?.role === 'ADMIN' ? '/admin' : '/host/today'}
                       className="block w-full py-2.5 rounded-full font-semibold bg-[#0B0B45] text-white hover:bg-[#06062a] transition-all duration-200 text-center"
                       onClick={() => setMenuOpen(false)}
                     >

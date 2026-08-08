@@ -1,8 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import apiClient from '../api/client.js';
 
 function AdminProperties() {
+  const location = useLocation();
+  // This component is shared between the admin control centre (/admin/*) and the
+  // host workspace (/host/*). Build links against the active base so a host never
+  // lands on an /admin/* URL.
+  const base = location.pathname.startsWith('/host') ? '/host' : '/admin';
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
@@ -51,7 +56,7 @@ function AdminProperties() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-[#0B0B45]">Properties</h1>
         <Link
-          to="/admin/properties/new"
+          to={`${base}/properties/new`}
           className="bg-[#C49A6C] text-white px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
         >
           + Add Property
@@ -109,13 +114,13 @@ function AdminProperties() {
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end space-x-2">
                         <Link
-                          to={`/admin/properties/${p.id}/calendar`}
+                          to={`${base}/properties/${p.id}/calendar`}
                           className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
                         >
                           Calendar
                         </Link>
                         <Link
-                          to={`/admin/properties/${p.id}/edit`}
+                          to={`${base}/properties/${p.id}/edit`}
                           className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
                         >
                           Edit
