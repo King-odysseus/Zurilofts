@@ -124,12 +124,12 @@ function HomePage() {
       {/* Auto-scrolling Premium Property Row - full-width */}
       {premiumProperties.length > 0 && (
         <div className="marquee-container w-full overflow-hidden pb-8 px-10 md:px-20 lg:px-32">
-          <div className="marquee-track flex gap-6 w-max">
+          <div className="marquee-track flex w-max">
             {marqueeItems.map((property, i) => (
               <a
                 key={`${property.id}-${i}`}
                 href={`/property/${property.id}`}
-                className="flex-shrink-0 w-64 group cursor-pointer no-underline"
+                className="flex-shrink-0 w-64 mr-6 group cursor-pointer no-underline"
               >
                 {/* Image */}
                 <div className="relative aspect-[4/3] overflow-hidden rounded-2xl neu-card shadow-md mb-3">
