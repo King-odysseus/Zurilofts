@@ -1,9 +1,9 @@
 -- CreateTable
 CREATE TABLE "Shortlist" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "ownerId" UUID NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
+    "ownerId" TEXT NOT NULL,
     "name" TEXT NOT NULL,
-    "token" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "token" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "Shortlist_pkey" PRIMARY KEY ("id")
@@ -11,9 +11,9 @@ CREATE TABLE "Shortlist" (
 
 -- CreateTable
 CREATE TABLE "ShortlistItem" (
-    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
-    "shortlistId" UUID NOT NULL,
-    "propertyId" UUID NOT NULL,
+    "id" TEXT NOT NULL DEFAULT gen_random_uuid()::text,
+    "shortlistId" TEXT NOT NULL,
+    "propertyId" TEXT NOT NULL,
     "note" TEXT,
     "addedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT "ShortlistItem_pkey" PRIMARY KEY ("id")
