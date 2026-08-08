@@ -27,6 +27,7 @@ import contactRoutes from './routes/contact.routes.js';
 import pushRoutes from './routes/push.routes.js';
 import blogRoutes from './routes/blog.routes.js';
 import shortlistRoutes from './routes/shortlist.routes.js';
+import conversationRoutes from './routes/conversation.routes.js';
 
 const app = express();
 
@@ -99,6 +100,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/push', pushRoutes);
 app.use('/api/guides', blogRoutes);
 app.use('/api/shortlists', shortlistRoutes);
+app.use('/api/conversations', conversationRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

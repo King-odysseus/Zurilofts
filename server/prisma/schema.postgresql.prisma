@@ -48,6 +48,7 @@ model User {
   wallet       HostWallet?
   pushSubscriptions PushSubscription[]
   shortlists    Shortlist[]
+  conversationMessages ConversationMessage[]
 }
 
 model Property {
@@ -170,6 +171,7 @@ model Booking {
   updatedAt       DateTime      @updatedAt
   review          Review?
   payoutBookings  PayoutBooking[]
+  conversation    Conversation?
 }
 
 // Post-stay guest review: star rating + a private note for the admin on how to
@@ -341,3 +343,25 @@ model ShortlistItem {
   @@index([shortlistId])
 }
 
+
+model Conversation {
+  id        String                 @id @default(uuid())
+  bookingId String                 @unique
+  booking   Booking                @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  messages  ConversationMessage[]
+  createdAt DateTime               @default(now())
+  updatedAt DateTime               @updatedAt
+}
+
+model ConversationMessage {
+  id             String       @id @default(uuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  content        String
+  read           Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  @@index([conversationId, createdAt])
+}
