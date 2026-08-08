@@ -3,8 +3,15 @@ import PropTypes from 'prop-types';
 function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveSearch }) {
   return (
     <form onSubmit={onSubmit} role="search" className="w-full">
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
+      <div className="bg-white rounded-full shadow-lg px-2 py-2 flex items-center transform hover:scale-[1.02] transition-transform duration-200">
+        <div className="flex-1 flex items-center px-4">
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-[#C49A6C] border-t-transparent rounded-full animate-spin mr-3 flex-shrink-0" />
+          ) : (
+            <svg className="w-5 h-5 text-[#C49A6C] mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          )}
           <label htmlFor="trip-search-destination" className="sr-only">
             Search destinations or neighbourhoods
           </label>
@@ -13,16 +20,16 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
             type="search"
             value={value}
             onChange={onChange}
-            placeholder="Where are you headed?"
+            placeholder="Search by location or property name..."
             autoComplete="address-level2"
-            className="w-full rounded-xl border-2 border-[#D9D9D9] bg-white px-4 py-3 text-base text-[#1f2937] placeholder-[#6b7280] transition-shadow duration-200 focus:outline-none focus-visible:border-[#C49A6C] focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-0"
+            className="w-full py-3 text-[#1f2937] placeholder-[#6b7280] focus:outline-none bg-transparent text-base"
           />
           {hasActiveSearch && (
             <button
               type="button"
               onClick={onClear}
               aria-label="Clear search"
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#6b7280] transition-colors duration-150 hover:text-[#1f2937] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+              className="rounded-full p-1 text-[#6b7280] transition-colors duration-150 hover:text-[#1f2937] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
             >
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path
@@ -37,9 +44,9 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
         <button
           type="submit"
           disabled={loading}
-          className="whitespace-nowrap rounded-full bg-[#C49A6C] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#C49A6C]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B0B45] focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+          className="bg-[#C49A6C] text-white font-bold px-8 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? 'Searching…' : 'Find a stay'}
+          {loading ? 'Searching…' : 'Search'}
         </button>
       </div>
     </form>
