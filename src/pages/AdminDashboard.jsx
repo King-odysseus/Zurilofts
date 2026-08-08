@@ -125,6 +125,40 @@ HeaderUserMenu.propTypes = {
   onLogout: PropTypes.func.isRequired,
 };
 
+/* ── StatCard — TijhaBooks-style dashboard metric card ── */
+const TONE_STYLES = {
+  primary: { bg: 'bg-[#0B0B45]', icon: 'text-white' },
+  gold:    { bg: 'bg-[#C49A6C]', icon: 'text-white' },
+  success: { bg: 'bg-green-600', icon: 'text-white' },
+  warning: { bg: 'bg-amber-500', icon: 'text-white' },
+  danger:  { bg: 'bg-red-600', icon: 'text-white' },
+  info:    { bg: 'bg-blue-600', icon: 'text-white' },
+};
+
+function StatCardView({ label, value, icon, tone }) {
+  const t = TONE_STYLES[tone] || TONE_STYLES.primary;
+  return (
+    <div className="bg-white rounded-2xl border border-[#EFEFF2] shadow-sm p-5 hover:shadow-md transition-shadow duration-200">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-sm text-[#6b7280]">{label}</span>
+        <div className={`w-10 h-10 ${t.bg} rounded-xl flex items-center justify-center`}>
+          <svg className={`w-5 h-5 ${t.icon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+          </svg>
+        </div>
+      </div>
+      <p className="text-2xl font-bold text-[#0B0B45]">{value}</p>
+    </div>
+  );
+}
+
+StatCardView.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  icon: PropTypes.string.isRequired,
+  tone: PropTypes.oneOf(['primary', 'gold', 'success', 'warning', 'danger', 'info']),
+};
+
 function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -379,6 +413,7 @@ function AdminLayout() {
 }
 
 // Dashboard Overview
+// Dashboard Overview
 function DashboardOverview() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -387,12 +422,19 @@ function DashboardOverview() {
   const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0', satisfaction: '0' });
   const [savingLanding, setSavingLanding] = useState(false);
   const [landingMsg, setLandingMsg] = useState('');
+  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const quickRef = useRef(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    function handleClick(e) { if (quickRef.current && !quickRef.current.contains(e.target)) setQuickActionsOpen(false); }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   useEffect(() => {
     async function load() {
       try {
-        // Admins read all data; hosts read only their own (scoped endpoints).
-        // Hosts don't need promos or landing stats.
         const bookingsUrl = isAdmin ? '/admin/bookings' : '/bookings/host';
         const earningsUrl = isAdmin ? '/admin/analytics/properties' : '/bookings/host/earnings';
         const fetches = [
@@ -404,19 +446,13 @@ function DashboardOverview() {
           fetches.push(apiClient.get('/promo'));
           fetches.push(apiClient.get('/admin/settings/landing-stats'));
         }
-
         const results = await Promise.all(fetches);
         const propsRes = results[0];
         const bookingsRes = results[1];
         const earningsRes = results[2];
-
         const bookings = bookingsRes.data.data || [];
-        const totalRevenue = bookings
-          .filter((b) => b.status !== 'CANCELLED')
-          .reduce((sum, b) => sum + b.total, 0);
-
+        const totalRevenue = bookings.filter((b) => b.status !== 'CANCELLED').reduce((sum, b) => sum + b.total, 0);
         const totals = earningsRes.data.data?.totals || {};
-
         setStats({
           properties: propsRes.data.pagination?.total || 0,
           bookings: totals.bookings || bookingsRes.data.pagination?.total || 0,
@@ -424,111 +460,113 @@ function DashboardOverview() {
           revenue: totals.earnings || totalRevenue,
         });
         setRecentBookings(bookings);
-
         if (isAdmin && results[4]) {
           const ls = results[4].data.data || {};
-          setLandingStats({
-            happyStays: String(ls.happyStays || '10'),
-            starRating: String(ls.starRating || '5.0'),
-            satisfaction: String(ls.satisfaction || '0'),
-          });
+          setLandingStats({ happyStays: String(ls.happyStays || '10'), starRating: String(ls.starRating || '5.0'), satisfaction: String(ls.satisfaction || '0') });
         }
-      } catch {
-        // silent
-      }
+      } catch { /* silent */ }
     }
     load();
   }, [isAdmin]);
 
   async function saveLandingStats(e) {
     e.preventDefault();
-    setSavingLanding(true);
-    setLandingMsg('');
+    setSavingLanding(true); setLandingMsg('');
     try {
-      await apiClient.put('/admin/settings/landing-stats', {
-        happyStays: Number(landingStats.happyStays),
-        starRating: Number(landingStats.starRating),
-        satisfaction: Number(landingStats.satisfaction),
-      });
+      await apiClient.put('/admin/settings/landing-stats', { happyStays: Number(landingStats.happyStays), starRating: Number(landingStats.starRating), satisfaction: Number(landingStats.satisfaction) });
       setLandingMsg('Saved.');
-    } catch {
-      setLandingMsg('Save failed.');
-    } finally {
-      setSavingLanding(false);
-    }
+    } catch { setLandingMsg('Save failed.'); }
+    finally { setSavingLanding(false); }
   }
 
-  const statCards = [
-    { label: 'Total Properties', value: stats.properties, color: 'bg-[#0B0B45]', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-    { label: 'Active Bookings', value: stats.bookings, color: 'bg-[#C49A6C]', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-    ...(isAdmin ? [{ label: 'Active Promos', value: stats.promos, color: 'bg-green-600', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' }] : []),
-    { label: 'Active Revenue (KES)', value: stats.revenue.toLocaleString(), color: 'bg-purple-600', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+  const greeting = (() => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; })();
+  const quickLinks = [
+    ...(isAdmin ? [
+      { to: '/admin/bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label: 'View bookings' },
+      { to: '/admin/users', icon: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65', label: 'Manage users' },
+      { to: '/admin/properties/new', icon: 'M12 4v16m8-8H4', label: 'Add property' },
+      { to: '/admin/promos', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z', label: 'Manage promos' },
+    ] : [
+      { to: '/admin/properties/new', icon: 'M12 4v16m8-8H4', label: 'Add property' },
+      { to: '/admin/bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label: 'View bookings' },
+      { to: '/admin/earnings', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', label: 'View earnings' },
+    ]),
   ];
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-[#0B0B45] mb-6">Dashboard</h1>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        {statCards.map(({ label, value, color, icon }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-[#6b7280]">{label}</span>
-              <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center`}>
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-                </svg>
-              </div>
-            </div>
-            <p className="text-2xl font-bold text-[#0B0B45]">{value}</p>
+      {/* Hero panel */}
+      <div className="bg-gradient-to-br from-[#0B0B45] to-[#07072e] rounded-2xl p-6 sm:p-8 text-white mb-6">
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-white/50">{greeting}</p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
+              Welcome back{user?.firstName ? `, ${user.firstName}` : ''}
+            </h1>
+            <p className="mt-2 max-w-md text-sm text-white/60">
+              {isAdmin ? 'Manage properties, bookings, and users from one place.' : 'Track your listings, earnings, and upcoming guests.'}
+            </p>
           </div>
-        ))}
+          {quickLinks.length > 0 && (
+            <div className="relative self-start" ref={quickRef}>
+              <button
+                type="button"
+                aria-haspopup="menu"
+                aria-expanded={quickActionsOpen}
+                onClick={() => setQuickActionsOpen((o) => !o)}
+                className="inline-flex items-center gap-2 rounded-full bg-[#C49A6C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#b8895c] transition-colors shadow-md"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                Quick actions
+                <svg className={`w-4 h-4 transition-transform ${quickActionsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </button>
+              {quickActionsOpen && (
+                <div className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-xl border border-[#EFEFF2] bg-white p-1.5 shadow-lg sm:left-auto sm:right-0" role="menu">
+                  {quickLinks.map((link) => (
+                    <button key={link.label} type="button" role="menuitem" onClick={() => { setQuickActionsOpen(false); navigate(link.to); }}
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F8F9FA] hover:text-[#1f2937] transition-colors">
+                      <svg className="w-4 h-4 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} /></svg>
+                      {link.label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Stat cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCardView label="Total Properties" value={stats.properties} icon="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" tone="primary" />
+        <StatCardView label="Active Bookings" value={stats.bookings} icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" tone="gold" />
+        {isAdmin && <StatCardView label="Active Promos" value={stats.promos} icon="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" tone="success" />}
+        <StatCardView label="Revenue (KES)" value={stats.revenue.toLocaleString()} icon="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" tone="info" />
       </div>
 
       {/* Landing Page Stats Editor - admin only */}
       {isAdmin && (
-      <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-6 mb-6">
+      <div className="bg-white rounded-2xl border border-[#EFEFF2] shadow-sm p-6 mb-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-2">Landing Page Stats</h2>
-        <p className="text-sm text-[#6b7280] mb-4">These appear in the hero section. Leave at 0 to use live data from reviews and bookings.</p>
+        <p className="text-sm text-[#6b7280] mb-4">These appear in the hero section. Set to 0 to use live data from reviews and bookings.</p>
         <form onSubmit={saveLandingStats} className="flex flex-wrap items-end gap-4">
           <div>
             <label className="block text-sm font-semibold text-[#1f2937] mb-1">Happy Stays</label>
-            <input
-              type="number"
-              min="0"
-              value={landingStats.happyStays}
-              onChange={(e) => setLandingStats({ ...landingStats, happyStays: e.target.value })}
-              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C]"
-            />
+            <input type="number" min="0" value={landingStats.happyStays} onChange={(e) => setLandingStats({ ...landingStats, happyStays: e.target.value })}
+              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-[#1f2937] mb-1">Star Rating</label>
-            <input
-              type="number"
-              min="0"
-              max="5"
-              step="0.1"
-              value={landingStats.starRating}
-              onChange={(e) => setLandingStats({ ...landingStats, starRating: e.target.value })}
-              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C]"
-            />
+            <input type="number" min="0" max="5" step="0.1" value={landingStats.starRating} onChange={(e) => setLandingStats({ ...landingStats, starRating: e.target.value })}
+              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20" />
           </div>
           <div>
             <label className="block text-sm font-semibold text-[#1f2937] mb-1">Satisfaction %</label>
-            <input
-              type="number"
-              min="0"
-              max="100"
-              value={landingStats.satisfaction}
-              onChange={(e) => setLandingStats({ ...landingStats, satisfaction: e.target.value })}
-              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C]"
-            />
+            <input type="number" min="0" max="100" value={landingStats.satisfaction} onChange={(e) => setLandingStats({ ...landingStats, satisfaction: e.target.value })}
+              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20" />
           </div>
-          <button
-            type="submit"
-            disabled={savingLanding}
-            className="bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
-          >
+          <button type="submit" disabled={savingLanding}
+            className="bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50">
             {savingLanding ? 'Saving...' : 'Update'}
           </button>
           {landingMsg && <span className="text-sm text-green-600 self-center">{landingMsg}</span>}
@@ -537,34 +575,37 @@ function DashboardOverview() {
       )}
 
       {/* Recent Bookings */}
-      <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] p-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-4">Recent Bookings</h2>
+      <div className="bg-white rounded-2xl border border-[#EFEFF2] shadow-sm p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-[#0B0B45]">Recent Bookings</h2>
+          <Link to="/admin/bookings" className="text-sm font-medium text-[#C49A6C] hover:text-[#b8895c] transition-colors">View all</Link>
+        </div>
         {recentBookings.length === 0 ? (
-          <p className="text-[#6b7280] text-sm">No bookings yet.</p>
+          <p className="text-[#6b7280] text-sm py-8 text-center">No bookings yet.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left border-b border-[#D9D9D9]">
+                <tr className="text-left border-b border-[#EFEFF2]">
                   <th className="pb-3 font-semibold text-[#0B0B45]">Guest</th>
                   <th className="pb-3 font-semibold text-[#0B0B45]">Property</th>
-                  <th className="pb-3 font-semibold text-[#0B0B45]">Dates</th>
+                  <th className="pb-3 font-semibold text-[#0B0B45] hidden sm:table-cell">Dates</th>
                   <th className="pb-3 font-semibold text-[#0B0B45]">Total</th>
                   <th className="pb-3 font-semibold text-[#0B0B45]">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {recentBookings.map((b) => (
-                  <tr key={b.id} className="border-b border-[#D9D9D9]/50">
+                  <tr key={b.id} className="border-b border-[#EFEFF2]/50 hover:bg-[#F8F9FA] transition-colors">
                     <td className="py-3">{b.user?.firstName} {b.user?.lastName}</td>
-                    <td className="py-3">{b.property?.title}</td>
-                    <td className="py-3 text-xs">{new Date(b.checkIn).toLocaleDateString()} - {new Date(b.checkOut).toLocaleDateString()}</td>
-                    <td className="py-3 font-semibold">KES {b.total.toLocaleString()}</td>
+                    <td className="py-3 max-w-[140px] truncate">{b.property?.title}</td>
+                    <td className="py-3 text-xs text-[#6b7280] hidden sm:table-cell">{new Date(b.checkIn).toLocaleDateString()} - {new Date(b.checkOut).toLocaleDateString()}</td>
+                    <td className="py-3 font-semibold">KES {b.total?.toLocaleString()}</td>
                     <td className="py-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
                         b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
                         b.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
-                        'bg-yellow-100 text-yellow-700'
+                        'bg-amber-100 text-amber-700'
                       }`}>{b.status}</span>
                     </td>
                   </tr>
@@ -577,7 +618,6 @@ function DashboardOverview() {
     </div>
   );
 }
-
 function AdminDashboard() {
   return <DashboardOverview />;
 }

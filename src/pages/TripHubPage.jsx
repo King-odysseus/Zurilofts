@@ -292,8 +292,12 @@ export default function TripHubPage() {
     <div className="min-h-screen bg-[#f8f9fa]">
       <Navbar />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        <h1 className="text-2xl sm:text-3xl font-bold text-[#0B0B45] mb-2">Trips</h1>
-        <p className="text-[#6b7280] mb-8">Your stays at a glance — upcoming adventures and past memories.</p>
+        {/* Hero panel */}
+        <div className="bg-gradient-to-br from-[#0B0B45] to-[#07072e] rounded-2xl p-6 sm:p-8 text-white mb-8">
+          <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Your stays</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Trips</h1>
+          <p className="mt-2 max-w-md text-sm text-white/60">Upcoming adventures and past memories — all in one place.</p>
+        </div>
 
         {/* Tabs */}
         <div className="flex border-b border-[#D9D9D9] mb-8">

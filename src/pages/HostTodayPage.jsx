@@ -247,14 +247,13 @@ export default function HostTodayPage() {
     <div className="min-h-screen bg-[#f8f9fa]">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#0B0B45] mb-1">
+        {/* Hero panel */}
+        <div className="bg-gradient-to-br from-[#0B0B45] to-[#07072e] rounded-2xl p-6 sm:p-8 text-white mb-8">
+          <p className="text-xs font-semibold uppercase tracking-wider text-white/50">{new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
             Today{user?.firstName ? `, ${user.firstName}` : ""}
           </h1>
-          <p className="text-[#6b7280]">
-            {new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-          </p>
+          <p className="mt-2 max-w-md text-sm text-white/60">Your arrivals, in-house guests, and departures at a glance.</p>
         </div>
 
         {/* Summary cards */}
