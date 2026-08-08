@@ -1,13 +1,15 @@
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import Lightbox from './Lightbox.jsx';
 import ReviewSection from './ReviewSection.jsx';
 import BookingSummaryCard from './BookingSummaryCard';
 import PropertyTrustPanel from './PropertyTrustPanel';
+import SimilarProperties from './SimilarProperties';
 
 import apiClient from '../api/client.js';
+import { recordView } from '../utils/recentlyViewed.js';
 
 /** Safely coerce a value to an array, no matter what the API sends. */
 function safeArray(value) {
@@ -26,6 +28,7 @@ function PropertyPage() {
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const recordedRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +50,14 @@ function PropertyPage() {
     fetchProperty();
     return () => { cancelled = true; };
   }, [id]);
+
+  // Record the view once the property data has loaded. Guarded so it never
+  // fires before data arrives or twice on re-render.
+  useEffect(() => {
+    if (!property || recordedRef.current) return;
+    recordedRef.current = true;
+    recordView(property);
+  }, [property]);
 
   useEffect(() => {
     if (!property) return;
@@ -371,6 +382,13 @@ function PropertyPage() {
       {property && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <ReviewSection propertyId={property.id} />
+        </div>
+      )}
+
+      {/* Similar properties */}
+      {property && (
+        <div className="mt-16 md:mt-20">
+          <SimilarProperties property={property} />
         </div>
       )}
 

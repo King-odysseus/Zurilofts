@@ -4,7 +4,9 @@ import './index.css';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
 import PropertyPage from './components/PropertyPage';
+import PropertyCardRow from './components/PropertyCardRow';
 import apiClient from './api/client.js';
+import { getRecentlyViewed } from './utils/recentlyViewed.js';
 import PropertiesPage from './pages/PropertiesPage';
 import BookingPage from './pages/BookingPage';
 import PrivacyPage from './pages/PrivacyPage';
@@ -60,6 +62,7 @@ function HomePage() {
   const [premiumProperties, setPremiumProperties] = useState([]);
   const [allProperties, setAllProperties] = useState([]);
   const [heroStats, setHeroStats] = useState(null);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   useEffect(() => {
     async function load() {
@@ -77,6 +80,17 @@ function HomePage() {
     }
     load();
   }, []);
+
+  // Resolve stored recently-viewed ids against the loaded property list so the
+  // cards render with full data. Renders nothing when storage is empty.
+  useEffect(() => {
+    if (allProperties.length === 0) return;
+    const byId = new Map(allProperties.map((p) => [p.id, p]));
+    const viewed = getRecentlyViewed()
+      .map((entry) => byId.get(entry.id))
+      .filter(Boolean);
+    setRecentlyViewed(viewed);
+  }, [allProperties]);
 
   const marqueeItems = useMemo(() =>
     premiumProperties.length > 0
@@ -120,6 +134,9 @@ function HomePage() {
           in prime Nairobi locations. Each property is designed for comfort and convenience.
         </p>
       </div>
+
+      {/* Recently viewed - renders nothing for a first-time visitor */}
+      <PropertyCardRow title="Recently viewed" properties={recentlyViewed} />
 
       {/* Auto-scrolling Premium Property Row - full-width */}
       {premiumProperties.length > 0 && (
