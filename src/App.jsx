@@ -52,6 +52,7 @@ const AdminCalendar = lazy(() => import('./pages/AdminCalendar.jsx'));
 const AdminBookings = lazy(() => import('./pages/AdminBookings.jsx'));
 const AdminEarnings = lazy(() => import('./pages/AdminEarnings.jsx'));
 const AdminPromos = lazy(() => import('./pages/AdminPromos.jsx'));
+const AdminAddOns = lazy(() => import('./pages/AdminAddOns.jsx'));
 const AdminFeedback = lazy(() => import('./pages/AdminFeedback.jsx'));
 const AdminMessages = lazy(() => import('./pages/AdminMessages.jsx'));
 const AdminUsers = lazy(() => import('./pages/AdminUsers.jsx'));
@@ -326,6 +327,7 @@ function App() {
             <Route path="earnings" element={<Suspense fallback={<Loading />}><AdminEarnings /></Suspense>} />
             <Route path="users" element={<Suspense fallback={<Loading />}><AdminUsers /></Suspense>} />
             <Route path="promos" element={<Suspense fallback={<Loading />}><AdminPromos /></Suspense>} />
+            <Route path="addons" element={<Suspense fallback={<Loading />}><AdminAddOns /></Suspense>} />
             <Route path="feedback" element={<Suspense fallback={<Loading />}><AdminFeedback /></Suspense>} />
             <Route path="messages" element={<Suspense fallback={<Loading />}><AdminMessages /></Suspense>} />
             <Route path="guides" element={<Suspense fallback={<Loading />}><AdminGuides /></Suspense>} />

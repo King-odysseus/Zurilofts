@@ -7,6 +7,7 @@ import ReviewSection from './ReviewSection.jsx';
 import BookingSummaryCard from './BookingSummaryCard';
 import PropertyTrustPanel from './PropertyTrustPanel';
 import SimilarProperties from './SimilarProperties';
+import AddOnsSection from './AddOnsSection';
 
 import apiClient from '../api/client.js';
 import { recordView } from '../utils/recentlyViewed.js';
@@ -358,6 +359,9 @@ function PropertyPage() {
                 </ul>
               </section>
             )}
+
+            {/* Add-ons - renders nothing when the property has none */}
+            <AddOnsSection propertyId={property.id} />
 
             {/* No-content fallback when all optional sections are empty */}
             {amenities.length === 0 && nearby.length === 0 && (
