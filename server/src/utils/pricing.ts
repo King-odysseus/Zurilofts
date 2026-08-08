@@ -7,6 +7,18 @@
  * - discount: percentage off subtotal, capped at maxDiscount if set
  * - total = subtotal + cleaningFee + serviceFee - discount
  */
+
+/** Flat fees and rates used across all pricing calculations. */
+
+/** Extra-guest surcharge per guest per night in KES. */
+export const EXTRA_GUEST_FEE_PER_NIGHT = 800;
+
+/** Flat cleaning fee per stay in KES. */
+export const CLEANING_FEE = 1500;
+
+/** Service fee as a fraction of the subtotal. */
+export const SERVICE_FEE_RATE = 0.12;
+
 export function calculatePricing(
   pricePerNight: number,
   nights: number,
@@ -20,8 +32,8 @@ export function calculatePricing(
   total: number;
 } {
   const subtotal = pricePerNight * nights;
-  const cleaningFee = 1500;
-  const serviceFee = Math.round(subtotal * 0.12);
+  const cleaningFee = CLEANING_FEE;
+  const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE);
 
   let discountAmount = Math.round(subtotal * (discountPercent / 100));
   if (maxDiscount !== null && maxDiscount !== undefined && discountAmount > maxDiscount) {
@@ -48,8 +60,8 @@ export function calculateFees(
   discountAmount: number;
   total: number;
 } {
-  const cleaningFee = 1500;
-  const serviceFee = Math.round(subtotal * 0.12);
+  const cleaningFee = CLEANING_FEE;
+  const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE);
 
   let discountAmount = Math.round(subtotal * (discountPercent / 100));
   if (maxDiscount !== null && maxDiscount !== undefined && discountAmount > maxDiscount) {
@@ -90,6 +102,20 @@ export function lateCheckoutFee(checkOutTime: string | null | undefined, nightly
   const capped = Math.min(hoursLate, LATE_CHECKOUT_FULL_NIGHT_HOURS);
   // night * 2^(capped - 5): capped=5 → full night; each earlier hour halves it.
   return Math.round(nightlyPrice * Math.pow(2, capped - LATE_CHECKOUT_FULL_NIGHT_HOURS));
+}
+
+/**
+ * Extra-guest surcharge: KES EXTRA_GUEST_FEE_PER_NIGHT per guest
+ * exceeding the bed-option capacity (2 guests for 1-bed, 4 for 2-bed),
+ * per night of the stay. Returns 0 when guests do not exceed capacity.
+ */
+export function computeExtraGuestFee(
+  guests: number,
+  bedOption: string | null | undefined,
+  nights: number,
+): number {
+  const maxForBed = bedOption === '2bed' ? 4 : 2;
+  return Math.max(0, guests - maxForBed) * EXTRA_GUEST_FEE_PER_NIGHT * nights;
 }
 
 /**

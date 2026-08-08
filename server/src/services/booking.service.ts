@@ -1,6 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
-import { calculateFees, calculateNights, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
+import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
 import { isRangeAvailable, PENDING_HOLD_MINUTES } from './calendar.service.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
@@ -65,8 +65,7 @@ interface BookingPricingParams {
 function computeBookingPricing(params: BookingPricingParams) {
   const effectivePrice = getBedPrice(params.property, params.bedOption ?? undefined);
   const nights = calculateNights(params.checkIn, params.checkOut);
-  const maxForBed = params.bedOption === '2bed' ? 4 : 2;
-  const extraGuestFee = Math.max(0, params.guests - maxForBed) * 800 * nights;
+  const extraGuestFee = computeExtraGuestFee(params.guests, params.bedOption ?? undefined, nights);
   const subtotal = computeSubtotal(params.checkIn, nights, effectivePrice, params.priceRules);
   const pricing = calculateFees(subtotal, params.discountPercent, params.maxDiscount);
   const lateFee = lateCheckoutFee(params.checkOutTime ?? undefined, effectivePrice);
@@ -109,8 +108,7 @@ export async function recalculateBookingTotal(bookingId: string, client?: any): 
   const nights = booking.checkIn && booking.checkOut
     ? Math.max(1, Math.ceil((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / (1000 * 60 * 60 * 24)))
     : 1;
-  const maxForBed = booking.bedOption === '2bed' ? 4 : 2;
-  const extraGuestFee = Math.max(0, booking.guests - maxForBed) * 800 * nights;
+  const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
 
   const baseTotal = booking.subtotal + booking.cleaningFee + booking.serviceFee
     + booking.lateCheckoutFee - booking.discountAmount + extraGuestFee;
@@ -611,8 +609,8 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
   let hostNetAmount: number | undefined;
   let withholdingTax: number | undefined;
   if (isConflict && status === 'CONFIRMED') {
-    const extraGuestFee = Math.max(0, booking.guests - (booking.bedOption === '2bed' ? 4 : 2)) * 800 *
-      Math.ceil((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / (1000 * 60 * 60 * 24));
+    const nights = calculateNights(booking.checkIn, booking.checkOut);
+    const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
     const { calculateHostNet } = await import('./payment.service.js');
     const hn = calculateHostNet(booking.subtotal, booking.discountAmount, extraGuestFee);
     hostNetAmount = hn.hostNet;
@@ -625,24 +623,32 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
     data.withholdingTax = withholdingTax;
   }
 
-  const updated = await prisma.booking.update({
-    where: { id: bookingId },
-    data,
+  // Wrap the money writes in a transaction: booking update + wallet credit
+  // are atomic. Push notification fires after commit — a failed push must
+  // never roll back a money write.
+  const updated = await prisma.$transaction(async (tx) => {
+    const result = await tx.booking.update({
+      where: { id: bookingId },
+      data,
+    });
+
+    // Credit host wallet on CONFLICT -> CONFIRMED resolution (double-credit
+    // guard: only runs when previous status was CONFLICT)
+    if (isConflict && status === 'CONFIRMED' && hostNetAmount != null) {
+      const hostId = booking.property?.hostId;
+      if (hostId) {
+        await tx.hostWallet.upsert({
+          where: { hostId },
+          create: { hostId, balance: hostNetAmount, totalEarned: hostNetAmount },
+          update: { balance: { increment: hostNetAmount }, totalEarned: { increment: hostNetAmount } },
+        });
+      }
+    }
+
+    return result;
   });
 
-  // Credit host wallet on CONFLICT -> CONFIRMED resolution
-  if (isConflict && status === 'CONFIRMED' && hostNetAmount != null) {
-    const hostId = booking.property?.hostId;
-    if (hostId) {
-      await prisma.hostWallet.upsert({
-        where: { hostId },
-        create: { hostId, balance: hostNetAmount, totalEarned: hostNetAmount },
-        update: { balance: { increment: hostNetAmount }, totalEarned: { increment: hostNetAmount } },
-      });
-    }
-  }
-
-  // Send push notification when booking is confirmed
+  // Send push notification when booking is confirmed (after transaction commit)
   if (status === 'CONFIRMED') {
     try {
       const { sendPushToUser } = await import('./push.service.js');

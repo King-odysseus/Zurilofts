@@ -341,6 +341,26 @@ function Navbar() {
                     </svg>
                     Favourites
                   </Link>
+                  <Link
+                    to="/terms"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Terms of Service
+                  </Link>
+                  <Link
+                    to="/privacy"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    Privacy Policy
+                  </Link>
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
                       to={user?.role === 'ADMIN' ? '/admin' : '/host/today'}
@@ -504,6 +524,20 @@ function Navbar() {
                   >
                     Inbox{conversationUnread > 0 ? ` (${conversationUnread})` : ''}
                   </Link>
+                  <Link
+                    to="/terms"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Terms of Service
+                  </Link>
+                  <Link
+                    to="/privacy"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Privacy Policy
+                  </Link>
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
                       to={user?.role === 'ADMIN' ? '/admin' : '/host/today'}
@@ -543,6 +577,20 @@ function Navbar() {
                   >
                     Chat with Us
                   </button>
+                  <Link
+                    to="/terms"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Terms of Service
+                  </Link>
+                  <Link
+                    to="/privacy"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Privacy Policy
+                  </Link>
                 </>
               )}
             </li>

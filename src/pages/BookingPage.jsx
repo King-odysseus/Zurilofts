@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
@@ -1083,7 +1082,6 @@ function BookingPage() {
             </div>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -1099,7 +1097,6 @@ function BookingPage() {
             <p className="text-[#6b7280]">Loading property...</p>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -1243,8 +1240,6 @@ function BookingPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }

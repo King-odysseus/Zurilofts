@@ -3,6 +3,7 @@ import * as paystack from '../config/paystack.js';
 import { env } from '../config/env.js';
 import crypto from 'crypto';
 import { isRangeAvailable } from './calendar.service.js';
+import { calculateNights, computeExtraGuestFee } from '../utils/pricing.js';
 import { sendTelegramAlert } from './chat.service.js';
 
 const SERVICE_FEE_PERCENT = Number(env.SERVICE_FEE_PERCENT) / 100;
@@ -140,8 +141,8 @@ async function confirmBookingPayment(
   }
 
   // Calculate host earnings
-  const extraGuestFee = Math.max(0, booking.guests - (booking.bedOption === '2bed' ? 4 : 2)) * 800 *
-    Math.ceil((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / (1000 * 60 * 60 * 24));
+  const nights = calculateNights(booking.checkIn, booking.checkOut);
+  const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
 
   const { hostGross, withholdingTax, hostNet } = calculateHostNet(
     booking.subtotal,
