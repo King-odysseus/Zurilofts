@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import PropertyCard from '../components/PropertyCard.jsx';
@@ -7,12 +7,14 @@ import Dropdown from '../components/Dropdown.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 import apiClient from '../api/client.js';
+import { openConsentManager } from '../utils/consent.js';
 
 import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
 
 function ProfilePage() {
-  const { user, setUser } = useAuth();
+  const { user, setUser, logout } = useAuth();
   const { favorites } = useFavorites();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.replace('#', '');
     return ['info', 'bookings', 'favorites'].includes(hash) ? hash : 'info';
@@ -42,6 +44,14 @@ function ProfilePage() {
 
   // Per-booking review form state, keyed by booking id
   const [reviewForms, setReviewForms] = useState({});
+
+  // Privacy and data controls
+  const [exporting, setExporting] = useState(false);
+  const [exportMessage, setExportMessage] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   const isStayCompleted = (booking) =>
     booking.status !== 'CANCELLED' && new Date(booking.checkOut) < new Date();
@@ -245,6 +255,44 @@ function ProfilePage() {
     }
   }
 
+  async function handleExportData() {
+    setExporting(true);
+    setExportMessage('');
+    try {
+      const res = await apiClient.get('/me/export', { responseType: 'blob' });
+      const disposition = res.headers?.['content-disposition'] || '';
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      const filename = match?.[1] || `zurilofts-data-${new Date().toISOString().slice(0, 10)}.json`;
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setExportMessage('Your data has been downloaded.');
+    } catch (err) {
+      setExportMessage(err.response?.data?.error || 'Could not export your data. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    if (deleteConfirm !== 'DELETE') return;
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      await apiClient.delete('/me');
+      await logout();
+      navigate('/');
+    } catch (err) {
+      setDeleteError(err.response?.data?.error || 'Could not delete your account. Please try again.');
+      setDeleting(false);
+    }
+  }
+
   const statusColors = {
     PENDING: 'bg-yellow-100 text-yellow-800',
     CONFIRMED: 'bg-green-100 text-green-800',
@@ -416,6 +464,120 @@ function ProfilePage() {
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
                 </form>
+              </div>
+
+              {/* Privacy and data */}
+              <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
+                <h3 className="text-xl font-bold text-[#0B0B45] mb-1">Privacy and data</h3>
+                <p className="text-sm text-[#6b7280] mb-6">
+                  Manage your personal data and consent choices. See our{' '}
+                  <Link to="/privacy" className="text-[#C49A6C] hover:underline font-medium">Privacy Policy</Link>{' '}
+                  for full details.
+                </p>
+
+                <div className="space-y-4">
+                  {/* Download my data */}
+                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1f2937]">Download my data</h4>
+                      <p className="text-sm text-[#6b7280] mt-1">
+                        Get a copy of the personal data we hold about you in a portable format.
+                      </p>
+                      {exportMessage && (
+                        <p className={`text-sm mt-2 font-medium ${exportMessage.includes('Could') ? 'text-red-500' : 'text-green-600'}`}>
+                          {exportMessage}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleExportData}
+                      disabled={exporting}
+                      className="flex-shrink-0 inline-flex items-center gap-2 bg-[#0B0B45] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
+                    >
+                      {exporting ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                          Exporting...
+                        </>
+                      ) : (
+                        'Download my data'
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Cookie preferences */}
+                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1f2937]">Cookie preferences</h4>
+                      <p className="text-sm text-[#6b7280] mt-1">
+                        Review or change which optional cookies we may use. You can withdraw consent at any time.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={openConsentManager}
+                      className="flex-shrink-0 bg-[#0B0B45] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200"
+                    >
+                      Manage preferences
+                    </button>
+                  </div>
+
+                  {/* Delete my account */}
+                  <div className="rounded-2xl border-2 border-red-200 bg-red-50/50 p-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="font-semibold text-red-700">Delete my account</h4>
+                        <p className="text-sm text-[#6b7280] mt-1">
+                          Permanently erase your account and personal data. Bookings and payment records are
+                          retained for legal and tax reasons but are anonymised so they no longer identify you.
+                          This action cannot be undone.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setShowDeleteDialog(true); setDeleteConfirm(''); setDeleteError(''); }}
+                        className="flex-shrink-0 bg-red-600 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-red-700 transition-all duration-200"
+                      >
+                        Delete my account
+                      </button>
+                    </div>
+
+                    {showDeleteDialog && (
+                      <div className="mt-5 pt-5 border-t border-red-200">
+                        <p className="text-sm font-semibold text-[#1f2937] mb-2">
+                          To confirm, type <span className="font-mono font-bold text-red-700">DELETE</span> below.
+                        </p>
+                        <input
+                          type="text"
+                          value={deleteConfirm}
+                          onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
+                          placeholder="Type DELETE to confirm"
+                          className="neu-input w-full sm:w-72 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                        />
+                        {deleteError && <p className="text-red-500 text-xs mt-2">{deleteError}</p>}
+                        <div className="flex gap-3 mt-4">
+                          <button
+                            type="button"
+                            onClick={handleDeleteAccount}
+                            disabled={deleteConfirm !== 'DELETE' || deleting}
+                            className="bg-red-600 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-red-700 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            {deleting ? 'Deleting...' : 'Permanently delete my account'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowDeleteDialog(false)}
+                            disabled={deleting}
+                            className="px-5 py-2.5 rounded-full border border-[#D9D9D9] text-[#1f2937] text-sm font-semibold hover:bg-[#f8f9fa] transition-colors duration-200 disabled:opacity-50"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
           )}

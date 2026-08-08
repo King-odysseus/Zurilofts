@@ -791,7 +791,7 @@ function BookingPage() {
                     </button>
                   </div>
                   <p className="text-sm font-semibold text-[#0B0B45]">
-                    {qty > 0 ? `KES ${subtotal.toLocaleString()}` : '—'}
+                    {qty > 0 ? `KES ${subtotal.toLocaleString()}` : '-'}
                   </p>
                 </div>
               </div>

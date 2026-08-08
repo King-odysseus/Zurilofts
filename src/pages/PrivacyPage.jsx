@@ -1,8 +1,9 @@
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
+import { POLICY_VERSION } from '../utils/consent.js';
 
 function PrivacyPage() {
-  const lastUpdated = '17 June 2026';
+  const lastUpdated = '8 August 2026';
 
   return (
     <div className="min-h-screen bg-white">
@@ -10,7 +11,9 @@ function PrivacyPage() {
       <div className="pt-24 pb-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
           <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-2">Privacy Policy</h1>
-          <p className="text-sm text-[#6b7280] mb-8">Last updated: {lastUpdated}</p>
+          <p className="text-sm text-[#6b7280] mb-8">
+            Last updated: {lastUpdated} · Policy version: {POLICY_VERSION}
+          </p>
 
           <div className="prose prose-slate max-w-none space-y-8 text-[#1f2937] leading-relaxed">
 
@@ -200,20 +203,62 @@ function PrivacyPage() {
               </p>
             </section>
 
-            {/* 11. Third-Party Services */}
+            {/* 11. Third-Party Processors */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">11. Third-Party Services</h2>
-              <p>Our Platform integrates with the following third-party services, each of which has its own privacy policy:</p>
-              <ul className="list-disc pl-6 space-y-2 mt-2">
-                <li><strong>Google OAuth:</strong> For social sign-in. Google&apos;s privacy policy applies to data you share through the sign-in flow.{' '}
-                  <a href="https://policies.google.com/privacy" className="text-[#C49A6C] hover:underline" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a></li>
-                <li><strong>Google Fonts:</strong> We serve the Inter typeface from Google Fonts. Google may log the request for font files.{' '}
-                  <a href="https://policies.google.com/privacy" className="text-[#C49A6C] hover:underline" target="_blank" rel="noopener noreferrer">Google Privacy Policy</a></li>
-                <li><strong>Payment processors:</strong> Card payments and M-Pesa transactions are processed through PCI-DSS compliant payment gateways. We do not handle or store raw payment credentials.</li>
-              </ul>
-              <p className="mt-2">
-                We are not responsible for the privacy practices of third-party websites or
-                services linked from our Platform. Please review their policies independently.
+              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">11. Third-Party Processors</h2>
+              <p>
+                We use the following third-party processors to operate the Platform. Each
+                receives only the data needed to provide its service, and each has its own
+                privacy policy. We are not responsible for the privacy practices of these
+                third parties; please review their policies independently.
+              </p>
+              <div className="overflow-x-auto mt-4">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="text-left text-[#0B0B45] border-b-2 border-[#D9D9D9]">
+                      <th className="py-2 pr-4 font-semibold">Processor</th>
+                      <th className="py-2 pr-4 font-semibold">Receives</th>
+                      <th className="py-2 font-semibold">Purpose</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#D9D9D9]">
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Cloudinary</td>
+                      <td className="py-3 pr-4 align-top">Uploaded images</td>
+                      <td className="py-3 align-top">Image hosting and delivery</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Paystack</td>
+                      <td className="py-3 pr-4 align-top">Name, email, payment details</td>
+                      <td className="py-3 align-top">Payment processing</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Google (OAuth)</td>
+                      <td className="py-3 pr-4 align-top">Email, name, profile picture</td>
+                      <td className="py-3 align-top">Optional sign-in</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Web Push (browser vendors)</td>
+                      <td className="py-3 pr-4 align-top">Push subscription endpoint</td>
+                      <td className="py-3 align-top">Booking notifications</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Telegram</td>
+                      <td className="py-3 pr-4 align-top">Support chat message contents</td>
+                      <td className="py-3 align-top">Support conversations</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Railway</td>
+                      <td className="py-3 pr-4 align-top">All application data</td>
+                      <td className="py-3 align-top">Hosting and database</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p className="mt-3">
+                We do not sell your personal data to any third party. Processors are engaged
+                only to provide the services described above and are bound to process data
+                on our instructions.
               </p>
             </section>
 
@@ -232,7 +277,16 @@ function PrivacyPage() {
                 <li><strong>Right to lodge a complaint:</strong> File a complaint with the Office of the Data Protection Commissioner (ODPC) in Kenya or your local supervisory authority.</li>
               </ul>
               <p className="mt-3">
-                To exercise any of these rights, email us at{' '}
+                You can exercise several of these rights directly from your account:
+              </p>
+              <ul className="list-disc pl-6 space-y-2 mt-2">
+                <li><strong>Access and portability:</strong> Use <strong>Download my data</strong> in your profile&apos;s <em>Privacy and data</em> section to receive a copy of your personal data in a portable format.</li>
+                <li><strong>Rectification:</strong> Update your name, email, phone, and photo from the <em>My Info</em> tab of your profile.</li>
+                <li><strong>Erasure:</strong> Use <strong>Delete my account</strong> in your profile&apos;s <em>Privacy and data</em> section. Bookings and payment records are retained for legal and tax reasons but are anonymised so they no longer identify you.</li>
+                <li><strong>Withdrawal of consent:</strong> Use <strong>Cookie preferences</strong> in your profile or the footer to change or withdraw your consent choices at any time.</li>
+              </ul>
+              <p className="mt-3">
+                For any other request, email us at{' '}
                 <strong>privacy@thezurilofts.com</strong>. We will respond within 30 days.
                 We may need to verify your identity before processing your request. We will
                 not charge a fee unless your request is manifestly unfounded or excessive.

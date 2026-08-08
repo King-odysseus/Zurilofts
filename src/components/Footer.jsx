@@ -1,4 +1,5 @@
 import logoImg from '../assets/zurilofts-logo.png';
+import { openConsentManager } from '../utils/consent.js';
 
 function Footer() {
   return (
@@ -70,6 +71,13 @@ function Footer() {
             <a href="/privacy" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Privacy Policy</a>
             <a href="/terms" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Terms of Service</a>
             <a href="/privacy#cookies" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Cookie Policy</a>
+            <button
+              type="button"
+              onClick={openConsentManager}
+              className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200"
+            >
+              Cookie preferences
+            </button>
           </div>
         </div>
       </div>

@@ -43,7 +43,7 @@ body {
   }
 }
 
-/* ===== Card System — flat cards with subtle border + single drop shadow ===== */
+/* ===== Card System - flat cards with subtle border + single drop shadow ===== */
 .neu-card {
   background-color: #ffffff;
   border: 1px solid #EFEFF2;
@@ -57,7 +57,7 @@ body {
   transform: translateY(-3px);
 }
 
-/* ===== Form inputs — flat bordered, no inset shadows ===== */
+/* ===== Form inputs - flat bordered, no inset shadows ===== */
 .neu-input {
   background-color: #ffffff;
   border: 1px solid #D9D9D9;
@@ -76,7 +76,7 @@ body {
   box-shadow: 0 0 0 3px rgba(196, 154, 108, 0.18);
 }
 
-/* ===== Radio / option cards — flat bordered ===== */
+/* ===== Radio / option cards - flat bordered ===== */
 .neu-radio-card {
   background-color: #ffffff;
   border: 1px solid #D9D9D9;

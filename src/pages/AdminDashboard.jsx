@@ -126,7 +126,7 @@ HeaderUserMenu.propTypes = {
   onLogout: PropTypes.func.isRequired,
 };
 
-/* ── StatCard — TijhaBooks-style dashboard metric card ── */
+/* ── StatCard - TijhaBooks-style dashboard metric card ── */
 const TONE_STYLES = {
   primary: { bg: 'bg-[#0B0B45]', icon: 'text-white' },
   gold:    { bg: 'bg-[#C49A6C]', icon: 'text-white' },
