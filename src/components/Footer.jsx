@@ -43,7 +43,7 @@ function Footer() {
           <div>
             <h4 className="text-lg font-semibold mb-4 text-[#C49A6C]">Quick Links</h4>
             <ul className="space-y-3">
-              {[['Home','#home'],['Properties','#properties'],['Contact','#contact']].map(([label, href]) => (
+              {[['Home','#home'],['Properties','#properties'],['About','#footer']].map(([label, href]) => (
                 <li key={label}>
                   <a href={href} className="text-white/80 hover:text-[#C49A6C] transition-colors duration-200">{label}</a>
                 </li>

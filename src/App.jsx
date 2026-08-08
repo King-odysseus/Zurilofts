@@ -5,7 +5,6 @@ import Hero from './components/Hero';
 import Footer from './components/Footer';
 import PropertyPage from './components/PropertyPage';
 import apiClient from './api/client.js';
-import ContactPage from './pages/ContactPage';
 import PropertiesPage from './pages/PropertiesPage';
 import BookingPage from './pages/BookingPage';
 import PrivacyPage from './pages/PrivacyPage';
@@ -280,7 +279,6 @@ function App() {
           <Route path="/properties" element={<Page title="Properties"><PropertiesPage /></Page>} />
           <Route path="/property/:id" element={<PropertyPage />} />
           <Route path="/booking/:id" element={<Page title="Booking"><ProtectedRoute><BookingPage /></ProtectedRoute></Page>} />
-          <Route path="/contact" element={<Page title="Contact"><ContactPage /></Page>} />
           <Route path="/login" element={<Page title="Login"><LoginPage /></Page>} />
           <Route path="/register" element={<Page title="Register"><RegisterPage /></Page>} />
           <Route path="/auth/callback" element={<OAuthCallback />} />

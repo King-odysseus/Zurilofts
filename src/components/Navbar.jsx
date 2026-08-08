@@ -8,7 +8,6 @@ import logoImg from '../assets/zurilofts-logo.png';
 const navLinks = [
   { name: 'Home',       href: '/' },
   { name: 'Properties', href: '/properties' },
-  { name: 'Contact',    href: '/contact' },
 ];
 
 function Navbar() {
