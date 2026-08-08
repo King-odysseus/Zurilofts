@@ -33,6 +33,9 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Spinner from './components/Spinner.jsx';
 import TripHubPage from './pages/TripHubPage.jsx';
 import HostTodayPage from './pages/HostTodayPage.jsx';
+import ShortlistsPage from './pages/ShortlistsPage.jsx';
+import ShortlistDetailPage from './pages/ShortlistDetailPage.jsx';
+import SharedShortlistPage from './pages/SharedShortlistPage.jsx';
 import NotFoundPage from './pages/NotFoundPage';
 import HostPayouts from './pages/HostPayouts';
 import FavouritesPage from './pages/FavouritesPage';
@@ -309,6 +312,9 @@ function App() {
             <Route path="guides" element={<Suspense fallback={<Loading />}><AdminGuides /></Suspense>} />
             <Route path="payouts" element={<Suspense fallback={<Loading />}><AdminPayouts /></Suspense>} />
           </Route>
+          <Route path="/shortlists" element={<Page title="My Shortlists"><ProtectedRoute><ShortlistsPage /></ProtectedRoute></Page>} />
+          <Route path="/shortlists/:id" element={<Page title="Shortlist"><ProtectedRoute><ShortlistDetailPage /></ProtectedRoute></Page>} />
+          <Route path="/s/:token" element={<Page title="Shared Shortlist"><SharedShortlistPage /></Page>} />
           <Route path="/host/payouts" element={<Page title="Host Payouts"><ProtectedRoute><HostPayouts /></ProtectedRoute></Page>} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
@@ -318,3 +324,4 @@ function App() {
 }
 
 export default App;
+
