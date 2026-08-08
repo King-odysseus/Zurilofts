@@ -26,6 +26,7 @@ import payoutRoutes from './routes/payout.routes.js';
 import contactRoutes from './routes/contact.routes.js';
 import pushRoutes from './routes/push.routes.js';
 import blogRoutes from './routes/blog.routes.js';
+import shortlistRoutes from './routes/shortlist.routes.js';
 
 const app = express();
 
@@ -97,8 +98,10 @@ app.use('/api', payoutRoutes); // /api/host/payouts, /api/admin/payouts, etc.
 app.use('/api/contact', contactRoutes);
 app.use('/api/push', pushRoutes);
 app.use('/api/guides', blogRoutes);
+app.use('/api/shortlists', shortlistRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
 
 export default app;
+

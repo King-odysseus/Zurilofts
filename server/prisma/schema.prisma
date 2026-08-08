@@ -35,6 +35,7 @@ model User {
   payouts      Payout[]
   wallet       HostWallet?
   pushSubscriptions PushSubscription[]
+  shortlists    Shortlist[]
 }
 
 model Property {
@@ -72,6 +73,7 @@ model Property {
   priceRules      PriceRule[]
   guestReviews    Review[]
   favoritedBy     Favorite[]
+  shortlistItems ShortlistItem[]
 
   @@index([hostId])
 }
@@ -309,3 +311,31 @@ model PaymentLog {
   payload   String?             // Raw JSON (truncated)
   createdAt DateTime @default(now())
 }
+
+// Collaborative property shortlists (shareable collections)
+model Shortlist {
+  id        String          @id @default(cuid())
+  ownerId   String
+  owner     User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name      String
+  token     String          @unique @default(cuid())
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+  items     ShortlistItem[]
+
+  @@index([ownerId])
+}
+
+model ShortlistItem {
+  id          String    @id @default(cuid())
+  shortlistId String
+  shortlist   Shortlist @relation(fields: [shortlistId], references: [id], onDelete: Cascade)
+  propertyId  String
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  note        String?
+  addedAt     DateTime  @default(now())
+
+  @@unique([shortlistId, propertyId])
+  @@index([shortlistId])
+}
+
