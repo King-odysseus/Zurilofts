@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveSearch }) {
   return (
     <form onSubmit={onSubmit} role="search" className="w-full">
-      <div className="flex flex-col gap-3 sm:flex-row sm:gap-0">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <label htmlFor="trip-search-destination" className="sr-only">
             Search destinations or neighbourhoods
@@ -15,14 +15,14 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
             onChange={onChange}
             placeholder="Where are you headed?"
             autoComplete="address-level2"
-            className="w-full rounded-lg border-2 border-[#0B0B45] bg-[#FDFBF7] px-4 py-3 text-base text-[#0B0B45] placeholder-[#0B0B45]/50 transition-shadow duration-200 focus:outline-none focus-visible:border-[#C49A6C] focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-0 sm:rounded-r-none"
+            className="w-full rounded-xl border-2 border-[#D9D9D9] bg-white px-4 py-3 text-base text-[#1f2937] placeholder-[#6b7280] transition-shadow duration-200 focus:outline-none focus-visible:border-[#C49A6C] focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-0"
           />
           {hasActiveSearch && (
             <button
               type="button"
               onClick={onClear}
               aria-label="Clear search"
-              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#0B0B45]/50 transition-colors duration-150 hover:text-[#0B0B45] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+              className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-[#6b7280] transition-colors duration-150 hover:text-[#1f2937] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
             >
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path
@@ -37,7 +37,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
         <button
           type="submit"
           disabled={loading}
-          className="whitespace-nowrap rounded-lg border-2 border-[#C49A6C] bg-[#C49A6C] px-6 py-3 text-base font-semibold text-[#0B0B45] transition-all duration-200 hover:bg-[#C49A6C]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B0B45] focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 sm:rounded-l-none"
+          className="whitespace-nowrap rounded-full bg-[#C49A6C] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#C49A6C]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0B0B45] focus-visible:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? 'Searching…' : 'Find a stay'}
         </button>
