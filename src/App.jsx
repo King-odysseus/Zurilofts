@@ -4,7 +4,9 @@ import './index.css';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
 import PropertyPage from './components/PropertyPage';
+import PropertyCardRow from './components/PropertyCardRow';
 import apiClient from './api/client.js';
+import { getRecentlyViewed } from './utils/recentlyViewed.js';
 import PropertiesPage from './pages/PropertiesPage';
 import BookingPage from './pages/BookingPage';
 import PrivacyPage from './pages/PrivacyPage';
@@ -24,6 +26,8 @@ import ProfilePage from './pages/ProfilePage';
 import MessagesPage from './pages/MessagesPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import HostRoute from './components/HostRoute';
+import HostLayout from './components/HostLayout';
 import ChatWidget from './components/ChatWidget';
 import CookieConsent from './components/CookieConsent';
 import PushNotificationPrompt from './components/PushNotificationPrompt';
@@ -39,6 +43,8 @@ import NotFoundPage from './pages/NotFoundPage';
 import HostPayouts from './pages/HostPayouts';
 import FavouritesPage from './pages/FavouritesPage';
 import BookingHistoryPage from './pages/BookingHistoryPage';
+import InboxPage from './pages/InboxPage';
+import ConversationPage from './pages/ConversationPage';
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'));
 const AdminLayout = lazy(() => import('./pages/AdminDashboard.jsx').then(m => ({ default: m.AdminLayout })));
@@ -48,6 +54,7 @@ const AdminCalendar = lazy(() => import('./pages/AdminCalendar.jsx'));
 const AdminBookings = lazy(() => import('./pages/AdminBookings.jsx'));
 const AdminEarnings = lazy(() => import('./pages/AdminEarnings.jsx'));
 const AdminPromos = lazy(() => import('./pages/AdminPromos.jsx'));
+const AdminAddOns = lazy(() => import('./pages/AdminAddOns.jsx'));
 const AdminFeedback = lazy(() => import('./pages/AdminFeedback.jsx'));
 const AdminMessages = lazy(() => import('./pages/AdminMessages.jsx'));
 const AdminUsers = lazy(() => import('./pages/AdminUsers.jsx'));
@@ -60,6 +67,7 @@ function HomePage() {
   const [premiumProperties, setPremiumProperties] = useState([]);
   const [allProperties, setAllProperties] = useState([]);
   const [heroStats, setHeroStats] = useState(null);
+  const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   useEffect(() => {
     async function load() {
@@ -77,6 +85,17 @@ function HomePage() {
     }
     load();
   }, []);
+
+  // Resolve stored recently-viewed ids against the loaded property list so the
+  // cards render with full data. Renders nothing when storage is empty.
+  useEffect(() => {
+    if (allProperties.length === 0) return;
+    const byId = new Map(allProperties.map((p) => [p.id, p]));
+    const viewed = getRecentlyViewed()
+      .map((entry) => byId.get(entry.id))
+      .filter(Boolean);
+    setRecentlyViewed(viewed);
+  }, [allProperties]);
 
   const marqueeItems = useMemo(() =>
     premiumProperties.length > 0
@@ -120,6 +139,9 @@ function HomePage() {
           in prime Nairobi locations. Each property is designed for comfort and convenience.
         </p>
       </div>
+
+      {/* Recently viewed - renders nothing for a first-time visitor */}
+      <PropertyCardRow title="Recently viewed" properties={recentlyViewed} />
 
       {/* Auto-scrolling Premium Property Row - full-width */}
       {premiumProperties.length > 0 && (
@@ -284,8 +306,16 @@ function App() {
           <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/profile" element={<Page title="Profile"><ProtectedRoute><ProfilePage /></ProtectedRoute></Page>} />
           <Route path="/messages" element={<Page title="Messages"><ProtectedRoute><MessagesPage /></ProtectedRoute></Page>} />
+          <Route path="/inbox" element={<Page title="Inbox"><ProtectedRoute><InboxPage /></ProtectedRoute></Page>} />
+          <Route path="/inbox/:conversationId" element={<Page title="Conversation"><ProtectedRoute><ConversationPage /></ProtectedRoute></Page>} />
           <Route path="/trips" element={<Page title="Trips"><ProtectedRoute><TripHubPage /></ProtectedRoute></Page>} />
-          <Route path="/host/today" element={<Page title="Host Today"><ProtectedRoute><HostTodayPage /></ProtectedRoute></Page>} />
+          <Route path="/host/today" element={<Page title="Host Today"><HostRoute><HostTodayPage /></HostRoute></Page>} />
+          <Route path="/host/calendar" element={<Page title="Host Calendar"><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/calendar/:id" element={<Page title="Host Calendar"><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/listings" element={<Page title="Host Listings"><HostRoute><HostLayout><AdminProperties /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/earnings" element={<Page title="Host Earnings"><HostRoute><HostLayout><AdminEarnings /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/properties/new" element={<Page title="Add Property"><HostRoute><HostLayout><AdminPropertyForm /></HostLayout></HostRoute></Page>} />
+          <Route path="/host/properties/:id/edit" element={<Page title="Edit Property"><HostRoute><HostLayout><AdminPropertyForm /></HostLayout></HostRoute></Page>} />
           <Route path="/privacy" element={<Page title="Privacy Policy"><PrivacyPage /></Page>} />
           <Route path="/terms" element={<Page title="Terms of Service"><TermsPage /></Page>} />
           <Route path="/favourites" element={<Page title="Favourites"><FavouritesPage /></Page>} />
@@ -305,6 +335,7 @@ function App() {
             <Route path="earnings" element={<Suspense fallback={<Loading />}><AdminEarnings /></Suspense>} />
             <Route path="users" element={<Suspense fallback={<Loading />}><AdminUsers /></Suspense>} />
             <Route path="promos" element={<Suspense fallback={<Loading />}><AdminPromos /></Suspense>} />
+            <Route path="addons" element={<Suspense fallback={<Loading />}><AdminAddOns /></Suspense>} />
             <Route path="feedback" element={<Suspense fallback={<Loading />}><AdminFeedback /></Suspense>} />
             <Route path="messages" element={<Suspense fallback={<Loading />}><AdminMessages /></Suspense>} />
             <Route path="guides" element={<Suspense fallback={<Loading />}><AdminGuides /></Suspense>} />

@@ -27,6 +27,9 @@ import contactRoutes from './routes/contact.routes.js';
 import pushRoutes from './routes/push.routes.js';
 import blogRoutes from './routes/blog.routes.js';
 import shortlistRoutes from './routes/shortlist.routes.js';
+import conversationRoutes from './routes/conversation.routes.js';
+import addonRoutes from './routes/addon.routes.js';
+import recommendationRoutes from './routes/recommendation.routes.js';
 
 const app = express();
 
@@ -83,6 +86,7 @@ app.get('/api/health', (_req, res) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/properties', propertyRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/favorites', favoriteRoutes);
@@ -95,10 +99,13 @@ app.use('/api/chat', chatRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api', payoutRoutes); // /api/host/payouts, /api/admin/payouts, etc.
+
+app.use('/api', addonRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/push', pushRoutes);
 app.use('/api/guides', blogRoutes);
 app.use('/api/shortlists', shortlistRoutes);
+app.use('/api/conversations', conversationRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

@@ -6,7 +6,6 @@ import PropertyCard from '../components/PropertyCard';
 import Dropdown from '../components/Dropdown.jsx';
 import TripSearchBar from '../components/TripSearchBar.jsx';
 import { zuriImages } from '../assets/images';
-import { AREAS } from '../data/nearby.js';
 import apiClient from '../api/client.js';
 
 const NEIGHBORHOODS = [

@@ -50,3 +50,7 @@ offline-app/
 .kimi/
 .kimi-code/
 .agents/
+
+# Local SQLite dev database - seeded locally, never committed
+server/prisma/*.db
+server/prisma/*.db-journal

@@ -71,8 +71,10 @@ function AdminGuides() {
 
   if (loading) return <div className="p-8 flex justify-center"><Spinner /></div>;
 
+  // No width cap or padding on the wrapper - the admin layout already supplies
+  // p-4 md:p-8, and admin pages are full-bleed (see CLAUDE.md).
   return (
-    <div className="p-4 md:p-6 max-w-5xl">
+    <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-[#0B0B45]">Travel Guides</h2>
         {!editing && (

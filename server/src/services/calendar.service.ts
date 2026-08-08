@@ -2,6 +2,9 @@ import crypto from 'crypto';
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError } from '../types/index.js';
 
+/** Duration (minutes) a PENDING booking holds inventory before it lapses. */
+export const PENDING_HOLD_MINUTES = 30;
+
 /** Ensure a property has an outbound iCal feed token; create one if missing. */
 export async function ensureIcalToken(propertyId: string): Promise<string> {
   const property = await prisma.property.findUnique({ where: { id: propertyId } });
@@ -87,8 +90,12 @@ export async function deleteBlock(id: string) {
 /**
  * Public availability: the unavailable date ranges for a property (imported +
  * manual calendar blocks and existing non-cancelled bookings), from today
- * onward. `end` is exclusive - the check-out day itself is free to book.
+ * onward. End is exclusive - the check-out day itself is free to book.
  * Used by the guest booking calendar to disable taken dates.
+ *
+ * PENDING bookings older than PENDING_HOLD_MINUTES minutes are excluded so
+ * abandoned checkouts cannot hold inventory hostage. Recent PENDING bookings
+ * still block dates during active checkout.
  */
 export async function getUnavailableRanges(propertyId: string) {
   const property = await prisma.property.findUnique({ where: { id: propertyId } });
@@ -103,7 +110,19 @@ export async function getUnavailableRanges(propertyId: string) {
       select: { start: true, end: true },
     }),
     prisma.booking.findMany({
-      where: { propertyId, status: { not: 'CANCELLED' }, checkOut: { gt: today } },
+      where: {
+        propertyId,
+        checkOut: { gt: today },
+        AND: [
+          { status: { not: 'CANCELLED' } },
+          {
+            OR: [
+              { status: { not: 'PENDING' } },
+              { createdAt: { gte: new Date(Date.now() - PENDING_HOLD_MINUTES * 60 * 1000) } },
+            ],
+          },
+        ],
+      },
       select: { checkIn: true, checkOut: true },
     }),
   ]);
@@ -117,6 +136,9 @@ export async function getUnavailableRanges(propertyId: string) {
 /**
  * Whether [checkIn, checkOut) is free of any calendar block or existing
  * (non-cancelled) booking. Ranges overlap when start < otherEnd && end > otherStart.
+ *
+ * Stale PENDING bookings (older than PENDING_HOLD_MINUTES min) are excluded so
+ * abandoned checkouts do not hold inventory. Recent PENDING bookings still block.
  */
 export async function isRangeAvailable(
   propertyId: string,
@@ -131,9 +153,17 @@ export async function isRangeAvailable(
     prisma.booking.count({
       where: {
         propertyId,
-        status: { not: 'CANCELLED' },
         checkIn: { lt: checkOut },
         checkOut: { gt: checkIn },
+        AND: [
+          { status: { not: 'CANCELLED' } },
+          {
+            OR: [
+              { status: { not: 'PENDING' } },
+              { createdAt: { gte: new Date(Date.now() - PENDING_HOLD_MINUTES * 60 * 1000) } },
+            ],
+          },
+        ],
         ...(excludeBookingId ? { id: { not: excludeBookingId } } : {}),
       },
     }),

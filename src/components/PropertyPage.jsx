@@ -1,13 +1,16 @@
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import Lightbox from './Lightbox.jsx';
 import ReviewSection from './ReviewSection.jsx';
 import BookingSummaryCard from './BookingSummaryCard';
 import PropertyTrustPanel from './PropertyTrustPanel';
+import SimilarProperties from './SimilarProperties';
+import AddOnsSection from './AddOnsSection';
 
 import apiClient from '../api/client.js';
+import { recordView } from '../utils/recentlyViewed.js';
 
 /** Safely coerce a value to an array, no matter what the API sends. */
 function safeArray(value) {
@@ -20,12 +23,13 @@ function PropertyPage() {
   const [searchParams] = useSearchParams();
   const variant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [featuredImage, setFeaturedImage] = useState(0);
-  const [thumbStart] = useState(0);
+  useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const recordedRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -47,6 +51,14 @@ function PropertyPage() {
     fetchProperty();
     return () => { cancelled = true; };
   }, [id]);
+
+  // Record the view once the property data has loaded. Guarded so it never
+  // fires before data arrives or twice on re-render.
+  useEffect(() => {
+    if (!property || recordedRef.current) return;
+    recordedRef.current = true;
+    recordView(property);
+  }, [property]);
 
   useEffect(() => {
     if (!property) return;
@@ -348,6 +360,9 @@ function PropertyPage() {
               </section>
             )}
 
+            {/* Add-ons - renders nothing when the property has none */}
+            <AddOnsSection propertyId={property.id} />
+
             {/* No-content fallback when all optional sections are empty */}
             {amenities.length === 0 && nearby.length === 0 && (
               <p className="text-[#6b7280] py-4">Additional details about this property are being prepared.</p>
@@ -371,6 +386,13 @@ function PropertyPage() {
       {property && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <ReviewSection propertyId={property.id} />
+        </div>
+      )}
+
+      {/* Similar properties */}
+      {property && (
+        <div className="mt-16 md:mt-20">
+          <SimilarProperties property={property} />
         </div>
       )}
 

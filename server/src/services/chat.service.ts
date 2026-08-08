@@ -147,6 +147,33 @@ async function pollLoop(token: string): Promise<void> {
   }
 }
 
+
+/**
+ * Fire-and-forget admin alert via Telegram. Fails silently when
+ * TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID are not configured.
+ */
+export async function sendTelegramAlert(text: string): Promise<void> {
+  const token = env.TELEGRAM_BOT_TOKEN;
+  const chatId = env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+  const line0 = text.length > 4000 ? `⚠️ ALERT:\n` : `⚠️ `;
+  try {
+    await fetch(
+      `https://api.telegram.org/bot${token}/sendMessage`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: line0 + text.slice(0, 4000),
+        }),
+      },
+    );
+  } catch {
+    // best-effort – never block on notification delivery
+  }
+}
+
 export function startTelegramPoller(): void {
   const token = env.TELEGRAM_BOT_TOKEN;
   if (!token) {

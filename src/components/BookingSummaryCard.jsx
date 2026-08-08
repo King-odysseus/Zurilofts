@@ -11,11 +11,16 @@ import PropTypes from 'prop-types';
  *  - rating       : average star rating (number, e.g. 4.2)
  *  - reviewCount  : total number of reviews (number)
  *  - variantLabel : human-readable bed variant label, or null for base listing
+ *  - addOns       : optional array of selected add-ons to show as line items,
+ *                   each { id, name, quantity, price } (price in KES)
  */
-function BookingSummaryCard({ price, bookingHref, rating, reviewCount, variantLabel }) {
+function BookingSummaryCard({ price, bookingHref, rating, reviewCount, variantLabel, addOns }) {
   const hasReviews = typeof rating === 'number' && rating > 0;
   const reviewLabel =
     reviewCount === 1 ? '1 review' : `${reviewCount || 0} reviews`;
+
+  const addOnItems = Array.isArray(addOns) ? addOns : [];
+  const addOnsTotal = addOnItems.reduce((sum, a) => sum + (a.quantity * (a.price || 0)), 0);
 
   return (
     <div className="neu-card p-5 md:p-6 sticky top-24" role="complementary" aria-label="Booking summary">
@@ -34,6 +39,25 @@ function BookingSummaryCard({ price, bookingHref, rating, reviewCount, variantLa
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
           </svg>
           {variantLabel}
+        </div>
+      )}
+
+      {/* Selected add-ons - only when provided */}
+      {addOnItems.length > 0 && (
+        <div className="mb-5 pt-5 border-t border-[#D9D9D9]">
+          <h4 className="font-semibold text-[#0B0B45] mb-3">Add-ons</h4>
+          <div className="space-y-2 text-sm">
+            {addOnItems.map((a) => (
+              <div key={a.id} className="flex justify-between text-[#1f2937]">
+                <span>{a.name} x {a.quantity}</span>
+                <span>KES {(a.quantity * (a.price || 0)).toLocaleString()}</span>
+              </div>
+            ))}
+            <div className="pt-2 border-t border-[#D9D9D9] flex justify-between font-semibold text-[#0B0B45]">
+              <span>Add-ons total</span>
+              <span>KES {addOnsTotal.toLocaleString()}</span>
+            </div>
+          </div>
         </div>
       )}
 
@@ -82,12 +106,21 @@ BookingSummaryCard.propTypes = {
   rating: PropTypes.number,
   reviewCount: PropTypes.number,
   variantLabel: PropTypes.string,
+  addOns: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+      name: PropTypes.string.isRequired,
+      quantity: PropTypes.number.isRequired,
+      price: PropTypes.number.isRequired,
+    })
+  ),
 };
 
 BookingSummaryCard.defaultProps = {
   rating: 0,
   reviewCount: 0,
   variantLabel: null,
+  addOns: [],
 };
 
 export default BookingSummaryCard;

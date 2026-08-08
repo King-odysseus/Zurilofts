@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useMode } from '../context/ModeContext.jsx';
 import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
@@ -8,6 +9,20 @@ import logoImg from '../assets/zurilofts-logo.png';
 const navLinks = [
   { name: 'Home',       href: '/' },
   { name: 'Properties', href: '/properties' },
+];
+
+const travellingLinks = [
+  { name: 'Home',       href: '/' },
+  { name: 'Properties', href: '/properties' },
+  { name: 'Trips',      href: '/trips' },
+];
+
+const hostingLinks = [
+  { name: 'Today',     href: '/host/today' },
+  { name: 'Calendar',  href: '/host/calendar' },
+  { name: 'Listings',  href: '/host/listings' },
+  { name: 'Messages',  href: '/inbox' },
+  { name: 'Earnings',  href: '/host/earnings' },
 ];
 
 function Navbar() {
@@ -19,6 +34,7 @@ function Navbar() {
   const dropdownRef = useRef(null);
 
   const { user, isAuthenticated, logout } = useAuth();
+  const { mode, setMode, canHost } = useMode();
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -31,6 +47,7 @@ function Navbar() {
 
   // Poll unread message count + booking updates for badge + sound alerts
   const [bookingUpdates, setBookingUpdates] = useState(0);
+  const [conversationUnread, setConversationUnread] = useState(0);
   const lastMsgRef = useRef(0);
   const lastBookingRef = useRef(0);
   // Booking updates are a rolling count of recent confirmed/cancelled bookings.
@@ -39,7 +56,7 @@ function Navbar() {
   const seenBookingsRef = useRef(Number(localStorage.getItem('zuri_bk_seen') || 0));
 
   useEffect(() => {
-    if (!isAuthenticated) { setUnreadMessages(0); setBookingUpdates(0); return; }
+    if (!isAuthenticated) { setUnreadMessages(0); setBookingUpdates(0); setConversationUnread(0); return; }
     let active = true;
     async function loadUnread() {
       try {
@@ -77,6 +94,13 @@ function Navbar() {
           setUnreadMessages(count);
         } catch { /* ignore */ }
       }
+
+      // Reservation conversation unread count (separate from the support inbox)
+      try {
+        const r = await apiClient.get('/conversations/unread-count');
+        if (!active) return;
+        setConversationUnread(r.data.data?.count || 0);
+      } catch { /* ignore */ }
     }
     loadUnread();
     const t = setInterval(loadUnread, 30000);
@@ -90,7 +114,7 @@ function Navbar() {
     setBookingUpdates(0);
   }
 
-  const totalNotif = unreadMessages + bookingUpdates;
+  const totalNotif = unreadMessages + conversationUnread + bookingUpdates;
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -114,6 +138,22 @@ function Navbar() {
     setMenuOpen(false);
     logout();
     navigate('/');
+  }
+
+  // Links shown depend on the active mode. Guests and logged-out visitors only
+  // ever see travelling links; hosting links require canHost.
+  const activeLinks = !isAuthenticated
+    ? navLinks
+    : mode === 'hosting' && canHost
+      ? hostingLinks
+      : travellingLinks;
+
+  function handleSwitchMode() {
+    const next = mode === 'hosting' ? 'travelling' : 'hosting';
+    setMode(next);
+    setDropdownOpen(false);
+    setMenuOpen(false);
+    navigate(next === 'hosting' ? '/host/today' : '/');
   }
 
   return (
@@ -173,6 +213,23 @@ function Navbar() {
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-[#0B0B45] text-xs">New Messages</p>
                               <p className="text-[#6b7280] text-[11px]">You have {unreadMessages} unread message{unreadMessages > 1 ? 's' : ''}</p>
+                            </div>
+                          </Link>
+                        )}
+                        {conversationUnread > 0 && (
+                          <Link
+                            to="/inbox"
+                            onClick={() => setNotifOpen(false)}
+                            className="flex items-center px-4 py-3 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#0B0B45]/10 flex items-center justify-center mr-3 flex-shrink-0">
+                              <svg className="w-4 h-4 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-[#0B0B45] text-xs">Reservation Messages</p>
+                              <p className="text-[#6b7280] text-[11px]">{conversationUnread} unread message{conversationUnread > 1 ? 's' : ''}</p>
                             </div>
                           </Link>
                         )}
@@ -250,6 +307,21 @@ function Navbar() {
                     )}
                   </Link>
                   <Link
+                    to="/inbox"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                    <span className="flex-1">Inbox</span>
+                    {conversationUnread > 0 && (
+                      <span className="min-w-[18px] h-[18px] px-1 bg-[#C49A6C] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {conversationUnread > 9 ? '9+' : conversationUnread}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
                     to="/bookings"
                     onClick={() => setDropdownOpen(false)}
                     className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
@@ -269,9 +341,29 @@ function Navbar() {
                     </svg>
                     Favourites
                   </Link>
+                  <Link
+                    to="/terms"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Terms of Service
+                  </Link>
+                  <Link
+                    to="/privacy"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    Privacy Policy
+                  </Link>
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
-                      to="/admin"
+                      to={user?.role === 'ADMIN' ? '/admin' : '/host/today'}
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
                     >
@@ -281,6 +373,19 @@ function Navbar() {
                       </svg>
                       {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
                     </Link>
+                  )}
+                  {canHost && (
+                    <div className="border-t border-[#D9D9D9] mt-1 pt-1">
+                      <button
+                        onClick={handleSwitchMode}
+                        className="flex items-center w-full px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                      >
+                        <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                        </svg>
+                        {mode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
+                      </button>
+                    </div>
                   )}
                   <div className="border-t border-[#D9D9D9] mt-1 pt-1">
                     <button
@@ -351,8 +456,8 @@ function Navbar() {
             menuOpen ? 'block' : 'hidden md:flex'
           }`}
         >
-          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 border-t border-[#D9D9D9] md:border-0 md:flex-row md:space-x-8 rtl:space-x-reverse md:bg-transparent rounded-b-2xl md:rounded-none bg-white shadow-lg md:shadow-none">
-            {[...navLinks, ...(isAuthenticated ? [{ name: 'Trips', href: '/trips' }] : []), ...(isAuthenticated && (user?.role === 'HOST' || user?.role === 'ADMIN') ? [{ name: 'Host', href: '/host/today' }] : [])].map((link) => {
+          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 border-t border-[#D9D9D9] md:border-0 md:flex-row md:space-x-6 rtl:space-x-reverse md:bg-transparent rounded-b-2xl md:rounded-none bg-white shadow-lg md:shadow-none">
+            {activeLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
                 <li key={link.name}>
@@ -368,6 +473,11 @@ function Navbar() {
                       }`}
                   >
                     {link.name}
+                    {mode === 'hosting' && link.name === 'Messages' && conversationUnread > 0 && (
+                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 ml-2 bg-[#C49A6C] text-white text-[10px] font-bold rounded-full align-middle">
+                        {conversationUnread > 9 ? '9+' : conversationUnread}
+                      </span>
+                    )}
                     <span className={`absolute bottom-0 left-0 h-0.5 bg-[#C49A6C] transition-all duration-200 hidden md:block ${
                       isActive ? 'w-full' : 'w-0 group-hover:w-full'
                     }`} />
@@ -407,14 +517,43 @@ function Navbar() {
                   >
                     Messages{unreadMessages > 0 ? ` (${unreadMessages})` : ''}
                   </Link>
+                  <Link
+                    to="/inbox"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Inbox{conversationUnread > 0 ? ` (${conversationUnread})` : ''}
+                  </Link>
+                  <Link
+                    to="/terms"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Terms of Service
+                  </Link>
+                  <Link
+                    to="/privacy"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Privacy Policy
+                  </Link>
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
-                      to="/admin"
+                      to={user?.role === 'ADMIN' ? '/admin' : '/host/today'}
                       className="block w-full py-2.5 rounded-full font-semibold bg-[#0B0B45] text-white hover:bg-[#06062a] transition-all duration-200 text-center"
                       onClick={() => setMenuOpen(false)}
                     >
                       {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
                     </Link>
+                  )}
+                  {canHost && (
+                    <button
+                      onClick={handleSwitchMode}
+                      className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#C49A6C] text-[#C49A6C] hover:bg-[#C49A6C] hover:text-white transition-all duration-200 text-center"
+                    >
+                      {mode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
+                    </button>
                   )}
                   <button
                     onClick={handleLogout}
@@ -438,6 +577,20 @@ function Navbar() {
                   >
                     Chat with Us
                   </button>
+                  <Link
+                    to="/terms"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Terms of Service
+                  </Link>
+                  <Link
+                    to="/privacy"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Privacy Policy
+                  </Link>
                 </>
               )}
             </li>

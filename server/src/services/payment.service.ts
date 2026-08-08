@@ -2,6 +2,9 @@ import prisma from '../config/prisma.js';
 import * as paystack from '../config/paystack.js';
 import { env } from '../config/env.js';
 import crypto from 'crypto';
+import { isRangeAvailable } from './calendar.service.js';
+import { calculateNights, computeExtraGuestFee } from '../utils/pricing.js';
+import { sendTelegramAlert } from './chat.service.js';
 
 const SERVICE_FEE_PERCENT = Number(env.SERVICE_FEE_PERCENT) / 100;
 const WITHHOLDING_TAX_RATE = Number(env.WITHHOLDING_TAX_RATE) / 100;
@@ -68,7 +71,7 @@ export async function verifyAndConfirmPayment(reference: string): Promise<{
   if (!existing) {
     return { confirmed: false, message: 'No booking found for this payment reference' };
   }
-  if (existing.status === 'CONFIRMED') {
+  if (existing.status === 'CONFIRMED' || existing.status === 'CONFLICT') {
     return { confirmed: true, bookingId: existing.id, message: 'Already confirmed' };
   }
 
@@ -94,15 +97,52 @@ async function confirmBookingPayment(
 ): Promise<void> {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { property: { select: { hostId: true } }, user: { select: { email: true } } },
+    include: { property: { select: { hostId: true, title: true } }, user: { select: { email: true } } },
   });
 
   if (!booking) throw new Error(`Booking ${bookingId} not found`);
   if (booking.status === 'CONFIRMED') return; // idempotent
 
+  // Re-check availability — the guest's hold may have lapsed and another
+  // booking may have taken the dates in the meantime.
+  const available = await isRangeAvailable(
+    booking.propertyId,
+    booking.checkIn,
+    booking.checkOut,
+    bookingId,
+  );
+
+  if (!available) {
+    const msg = `DOUBLE-BOOK_CONFLICT booking=${bookingId} property=${booking.propertyId} ` +
+      `checkIn=${booking.checkIn.toISOString().slice(0,10)} checkOut=${booking.checkOut.toISOString().slice(0,10)} ` +
+      `user=${booking.user.email}`;
+    console.error(msg);
+
+    // Record payment details but flag the booking for admin resolution.
+    // Host wallet is NOT credited until admin resolves the conflict.
+    await prisma.booking.update({
+      where: { id: bookingId },
+      data: {
+        status: 'CONFLICT',
+        paymentChannel: payment.channel,
+        paidAt: new Date(payment.paidAt),
+      },
+    });
+
+    sendTelegramAlert(
+      `DOUBLE-BOOK CONFLICT \u2014 Booking ${bookingId.slice(-8)} for ${booking.property.title}\n` +
+      `Dates: ${booking.checkIn.toISOString().slice(0,10)} \u2192 ${booking.checkOut.toISOString().slice(0,10)}\n` +
+      `Guest: ${booking.user.email}\n` +
+      `Payment ref: ${payment.reference}\n` +
+      `Status set to CONFLICT \u2014 admin action required.`
+    );
+
+    return;
+  }
+
   // Calculate host earnings
-  const extraGuestFee = Math.max(0, booking.guests - (booking.bedOption === '2bed' ? 4 : 2)) * 800 *
-    Math.ceil((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / (1000 * 60 * 60 * 24));
+  const nights = calculateNights(booking.checkIn, booking.checkOut);
+  const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
 
   const { hostGross, withholdingTax, hostNet } = calculateHostNet(
     booking.subtotal,

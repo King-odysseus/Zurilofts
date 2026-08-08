@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
@@ -28,6 +27,16 @@ function BookingPage() {
   const [promoResult, setPromoResult] = useState(null);
   const [promoError, setPromoError] = useState('');
   const [validatingPromo, setValidatingPromo] = useState(false);
+
+  // Add-ons
+  const [bookingId, setBookingId] = useState(null);
+  const [paymentUrl, setPaymentUrl] = useState(null);
+  const [availableAddOns, setAvailableAddOns] = useState([]);
+  const [selectedAddOns, setSelectedAddOns] = useState([]); // { addOn, quantity }
+  const [loadingAddOns, setLoadingAddOns] = useState(false);
+  const [creatingBooking, setCreatingBooking] = useState(false);
+  const [addOnsError, setAddOnsError] = useState('');
+  const [pendingAddOnId, setPendingAddOnId] = useState(null); // guards double-submit
 
   // Bed option driven by URL variant (from property card click)
   // Properties define their own 1-bed / 2-bed prices via price1Bed / price2Bed
@@ -192,10 +201,11 @@ function BookingPage() {
     const serviceFee     = Math.round(subtotal * 0.12);
     const lateCheckoutFee = calcLateCheckoutFee(bookingData.checkOutTime, propertyPrice);
     const discountAmount  = promoResult?.discountAmount || 0;
-    const total = subtotal + cleaningFee + serviceFee + extraGuestFee + lateCheckoutFee - discountAmount;
+    const addOnsTotal = selectedAddOns.reduce((sum, item) => sum + (item.quantity * (item.addOn.price || 0)), 0);
+    const total = subtotal + cleaningFee + serviceFee + extraGuestFee + lateCheckoutFee - discountAmount + addOnsTotal;
 
-    return { nights, propertyPrice, baseGuests, maxGuests, subtotal, extraGuests, extraGuestFee, cleaningFee, serviceFee, lateCheckoutFee, discountAmount, total };
-  }, [bookingData.checkIn, bookingData.checkOut, bookingData.guests, bookingData.checkOutTime, bedOption, property, promoResult]);
+    return { nights, propertyPrice, baseGuests, maxGuests, subtotal, extraGuests, extraGuestFee, cleaningFee, serviceFee, lateCheckoutFee, discountAmount, addOnsTotal, total };
+  }, [bookingData.checkIn, bookingData.checkOut, bookingData.guests, bookingData.checkOutTime, bedOption, property, promoResult, selectedAddOns]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookingData({ ...bookingData, [name]: value });
@@ -234,11 +244,14 @@ function BookingPage() {
     }
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsProcessing(true);
-    setSubmitError('');
-
+  // Create the booking (returns a booking id + payment URL) so add-ons can be
+  // attached to it. Called when the user advances from guest details to the
+  // add-ons step. Guarded so it only runs once per flow.
+  async function ensureBooking() {
+    if (bookingId) return bookingId;
+    if (creatingBooking) return null;
+    setCreatingBooking(true);
+    setAddOnsError('');
     try {
       const res = await apiClient.post('/bookings', {
         propertyId: id,
@@ -253,16 +266,126 @@ function BookingPage() {
         promoCode: promoResult?.code || undefined,
         additionalGuests: additionalGuests.filter((g) => g.firstName.trim() || g.lastName.trim()),
       });
+      const createdId = res.data.data.booking?.id || null;
+      setBookingId(createdId);
+      setPaymentUrl(res.data.data.paymentUrl || null);
+      return createdId;
+    } catch (err) {
+      setAddOnsError(err.response?.data?.error || 'Could not start your booking. Please try again.');
+      return null;
+    } finally {
+      setCreatingBooking(false);
+    }
+  }
 
-      const { paymentUrl } = res.data.data;
+  // Load the property's available add-ons and the booking's current selections.
+  async function loadAddOns(bookingIdOverride) {
+    const bid = bookingIdOverride || bookingId;
+    setLoadingAddOns(true);
+    setAddOnsError('');
+    try {
+      const [availRes, bookingRes] = await Promise.all([
+        apiClient.get(`/properties/${id}/addons`),
+        bid ? apiClient.get(`/bookings/${bid}/addons`) : Promise.resolve({ data: { data: [] } }),
+      ]);
+      const avail = Array.isArray(availRes.data.data) ? availRes.data.data : [];
+      setAvailableAddOns(avail);
+      const existing = Array.isArray(bookingRes.data.data) ? bookingRes.data.data : [];
+      // Map existing booking add-ons (which include the addOn relation) into
+      // the { addOn, quantity } shape used by the steppers.
+      setSelectedAddOns(existing.map((item) => ({
+        addOn: item.addOn || item,
+        quantity: item.quantity || 0,
+      })));
+    } catch {
+      setAddOnsError('Could not load add-ons. Please try again.');
+    } finally {
+      setLoadingAddOns(false);
+    }
+  }
 
-      if (paymentUrl) {
-        // Redirect to Paystack checkout
-        window.location.href = paymentUrl;
+  // Advance from guest details to the add-ons step, creating the booking first.
+  async function goToAddOns() {
+    const createdId = await ensureBooking();
+    if (!createdId) return; // error already surfaced via addOnsError
+    setStep(3);
+    loadAddOns(createdId);
+  }
+
+  // Change the quantity of an add-on on the booking. 0 -> N is a POST, N -> M
+  // (both > 0) is a PATCH, and N -> 0 is a DELETE. Never sends a price.
+  async function changeAddOnQuantity(addOn, nextQty) {
+    if (!bookingId || pendingAddOnId) return;
+    const clamped = Math.max(0, Math.min(20, nextQty));
+    const current = selectedAddOns.find((s) => s.addOn.id === addOn.id);
+    const currentQty = current?.quantity || 0;
+
+    // Optimistically update the UI, then reconcile with the server.
+    setSelectedAddOns((prev) => {
+      if (clamped === 0) return prev.filter((s) => s.addOn.id !== addOn.id);
+      const exists = prev.some((s) => s.addOn.id === addOn.id);
+      if (exists) return prev.map((s) => (s.addOn.id === addOn.id ? { ...s, quantity: clamped } : s));
+      return [...prev, { addOn, quantity: clamped }];
+    });
+
+    setPendingAddOnId(addOn.id);
+    setAddOnsError('');
+    try {
+      if (clamped === 0) {
+        await apiClient.delete(`/bookings/${bookingId}/addons/${addOn.id}`);
+      } else if (currentQty === 0) {
+        await apiClient.post(`/bookings/${bookingId}/addons`, { addOnId: addOn.id, quantity: clamped });
       } else {
+        await apiClient.patch(`/bookings/${bookingId}/addons/${addOn.id}`, { quantity: clamped });
+      }
+    } catch (err) {
+      setAddOnsError(err.response?.data?.error || 'Could not update add-on. Please try again.');
+      // Revert the optimistic update on failure.
+      setSelectedAddOns((prev) => {
+        if (currentQty === 0) return prev.filter((s) => s.addOn.id !== addOn.id);
+        return prev.map((s) => (s.addOn.id === addOn.id ? { ...s, quantity: currentQty } : s));
+      });
+    } finally {
+      setPendingAddOnId(null);
+    }
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsProcessing(true);
+    setSubmitError('');
+
+    try {
+      if (!paymentUrl) {
+        // No booking created yet (e.g. user jumped straight to payment) - create
+        // it now so we have a booking id and a payment URL to redirect to.
+        const res = await apiClient.post('/bookings', {
+          propertyId: id,
+          bedOption,
+          checkIn: bookingData.checkIn,
+          checkOut: bookingData.checkOut,
+          guests: bookingData.guests,
+          checkInTime: bookingData.checkInTime || undefined,
+          checkOutTime: bookingData.checkOutTime || undefined,
+          specialRequests: bookingData.specialRequests || undefined,
+          paymentMethod: bookingData.paymentMethod,
+          promoCode: promoResult?.code || undefined,
+          additionalGuests: additionalGuests.filter((g) => g.firstName.trim() || g.lastName.trim()),
+        });
+        setBookingId(res.data.data.booking?.id || null);
+        setPaymentUrl(res.data.data.paymentUrl || null);
+        if (res.data.data.paymentUrl) {
+          window.location.href = res.data.data.paymentUrl;
+          return;
+        }
         setSubmitError('Payment gateway unavailable. Please try again.');
         setIsProcessing(false);
+        return;
       }
+
+      // Booking already created during the add-ons step - just redirect to the
+      // payment URL that was returned at creation time.
+      window.location.href = paymentUrl;
     } catch (err) {
       setSubmitError(err.response?.data?.error || 'Booking failed. Please try again.');
       setIsProcessing(false);
@@ -577,21 +700,126 @@ function BookingPage() {
       </div>
 
       <button
-        onClick={() => setStep(3)}
-        disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone}
+        onClick={goToAddOns}
+        disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone || creatingBooking}
         className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {creatingBooking ? 'Starting your booking...' : 'Continue to Add-ons'}
+      </button>
+    </div>
+  );
+
+  // Step 3: Add-ons
+  const renderStep3 = () => (
+    <div className="space-y-6">
+      <div className="flex items-center mb-4">
+        <button
+          onClick={() => setStep(2)}
+          className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
+        >
+          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-bold text-[#0B0B45]">Enhance your stay</h2>
+        <p className="text-sm text-[#6b7280] mt-1">
+          Add optional services to your booking. You can change quantities any time before payment.
+        </p>
+      </div>
+
+      {addOnsError && (
+        <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">
+          {addOnsError}
+        </div>
+      )}
+
+      {loadingAddOns ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : availableAddOns.length === 0 ? (
+        <div className="bg-[#D9D9D9]/40 rounded-xl p-6 text-center">
+          <p className="text-[#6b7280]">No add-ons are available for this property.</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {availableAddOns.map((addOn) => {
+            const selected = selectedAddOns.find((s) => s.addOn.id === addOn.id);
+            const qty = selected?.quantity || 0;
+            const subtotal = qty * (addOn.price || 0);
+            const busy = pendingAddOnId === addOn.id;
+            return (
+              <div key={addOn.id} className="border border-[#D9D9D9] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-[#0B0B45]">{addOn.name}</h3>
+                    <span className="bg-[#C49A6C]/10 text-[#0B0B45] text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize">
+                      {addOn.category}
+                    </span>
+                  </div>
+                  <p className="text-sm text-[#6b7280] mt-1">{addOn.description}</p>
+                  <p className="text-sm font-semibold text-[#0B0B45] mt-1">
+                    KES {addOn.price != null ? addOn.price.toLocaleString() : '-'} each
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 sm:flex-col sm:items-end">
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => changeAddOnQuantity(addOn, qty - 1)}
+                      disabled={busy || qty === 0}
+                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#0B0B45] font-bold hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      aria-label={`Decrease ${addOn.name} quantity`}
+                    >
+                      −
+                    </button>
+                    <span className="w-8 text-center font-semibold text-[#0B0B45]" aria-live="polite">
+                      {busy ? '…' : qty}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => changeAddOnQuantity(addOn, qty + 1)}
+                      disabled={busy || qty >= 20}
+                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#0B0B45] font-bold hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      aria-label={`Increase ${addOn.name} quantity`}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className="text-sm font-semibold text-[#0B0B45]">
+                    {qty > 0 ? `KES ${subtotal.toLocaleString()}` : '—'}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <div className="bg-[#D9D9D9] rounded-xl p-4 flex justify-between items-center">
+        <span className="font-semibold text-[#0B0B45]">Add-ons total</span>
+        <span className="font-bold text-[#0B0B45]">KES {pricing.addOnsTotal.toLocaleString()}</span>
+      </div>
+
+      <button
+        onClick={() => setStep(4)}
+        className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200"
       >
         Continue to Payment
       </button>
     </div>
   );
 
-  // Step 3: Payment
-  const renderStep3 = () => (
+  // Step 4: Payment
+  const renderStep4 = () => (
     <div className="space-y-6">
       <div className="flex items-center mb-4">
         <button
-          onClick={() => setStep(2)}
+          onClick={() => setStep(3)}
           className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -731,6 +959,12 @@ function BookingPage() {
           <span>Service fee</span>
           <span>KES {pricing.serviceFee.toLocaleString()}</span>
         </div>
+        {selectedAddOns.map((item) => (
+          <div key={item.addOn.id} className="flex justify-between text-[#1f2937]">
+            <span>{item.addOn.name} x {item.quantity}</span>
+            <span>KES {(item.quantity * (item.addOn.price || 0)).toLocaleString()}</span>
+          </div>
+        ))}
         {pricing.lateCheckoutFee > 0 && (
           <div className="flex justify-between text-[#1f2937]">
             <span>Late check-out ({formatTime12h(bookingData.checkOutTime)})</span>
@@ -816,6 +1050,12 @@ function BookingPage() {
                     <span className="font-medium">KES {pricing.lateCheckoutFee.toLocaleString()}</span>
                   </div>
                 )}
+                {selectedAddOns.map((item) => (
+                  <div key={item.addOn.id} className="flex justify-between text-sm mt-1">
+                    <span className="text-[#6b7280]">{item.addOn.name} x {item.quantity}</span>
+                    <span className="font-medium">KES {(item.quantity * (item.addOn.price || 0)).toLocaleString()}</span>
+                  </div>
+                ))}
                 <div className="flex justify-between text-sm mt-1">
                   <span className="text-[#6b7280]">Guests</span>
                   <span className="font-medium">{bookingData.guests}</span>
@@ -842,7 +1082,6 @@ function BookingPage() {
             </div>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -858,7 +1097,6 @@ function BookingPage() {
             <p className="text-[#6b7280]">Loading property...</p>
           </div>
         </div>
-        <Footer />
       </div>
     );
   }
@@ -872,7 +1110,7 @@ function BookingPage() {
           {/* Progress Steps */}
           <div className="max-w-md md:max-w-2xl mx-auto mb-8 md:mb-10">
             <div className="flex items-start justify-center">
-              {[1, 2, 3].map((s, i) => (
+              {[1, 2, 3, 4].map((s, i) => (
                 <div key={s} className="flex items-center">
                   {i > 0 && (
                     <div
@@ -892,7 +1130,7 @@ function BookingPage() {
                       {s}
                     </div>
                     <span className="text-xs text-[#6b7280] mt-2 whitespace-nowrap">
-                      {s === 1 ? 'Dates' : s === 2 ? 'Details' : 'Payment'}
+                      {s === 1 ? 'Dates' : s === 2 ? 'Details' : s === 3 ? 'Add-ons' : 'Payment'}
                     </span>
                   </div>
                 </div>
@@ -907,6 +1145,7 @@ function BookingPage() {
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 3 && renderStep3()}
+                {step === 4 && renderStep4()}
               </div>
             </div>
 
@@ -971,6 +1210,12 @@ function BookingPage() {
                         <span>Service fee</span>
                         <span>KES {pricing.serviceFee.toLocaleString()}</span>
                       </div>
+                      {selectedAddOns.map((item) => (
+                        <div key={item.addOn.id} className="flex justify-between text-[#1f2937]">
+                          <span>{item.addOn.name} x {item.quantity}</span>
+                          <span>KES {(item.quantity * (item.addOn.price || 0)).toLocaleString()}</span>
+                        </div>
+                      ))}
                       {pricing.lateCheckoutFee > 0 && (
                         <div className="flex justify-between text-[#1f2937]">
                           <span>Late check-out</span>
@@ -995,8 +1240,6 @@ function BookingPage() {
           </div>
         </div>
       </div>
-
-      <Footer />
     </div>
   );
 }

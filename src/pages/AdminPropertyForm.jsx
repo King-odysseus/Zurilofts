@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
@@ -40,6 +40,11 @@ function AdminPropertyForm() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
+  const location = useLocation();
+  // Shared between the admin control centre (/admin/*) and the host workspace
+  // (/host/*). Build frontend links against the active base so a host never
+  // lands on an /admin/* URL. Backend endpoints are unchanged.
+  const base = location.pathname.startsWith('/host') ? '/host' : '/admin';
 
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(isEdit);
@@ -148,11 +153,11 @@ function AdminPropertyForm() {
     try {
       if (isEdit) {
         await apiClient.put(`/properties/${id}`, payload);
-        navigate('/admin/properties');
+        navigate(`${base}/properties`);
       } else {
         const res = await apiClient.post('/properties', payload);
         // Go to edit so seasonal pricing & calendar (which need an id) are available
-        navigate(`/admin/properties/${res.data.data.id}/edit`);
+        navigate(`${base}/properties/${res.data.data.id}/edit`);
       }
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.error || 'Failed to save property');
@@ -173,7 +178,7 @@ function AdminPropertyForm() {
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <Link to="/admin/properties" className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to properties</Link>
+          <Link to={`${base}/properties`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to properties</Link>
           <h1 className="text-2xl font-bold text-[#0B0B45] mt-1">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
         </div>
         <div className="flex items-center gap-2">
@@ -190,7 +195,7 @@ function AdminPropertyForm() {
           </button>
           {isEdit && (
             <Link
-              to={`/admin/properties/${id}/calendar`}
+              to={`${base}/properties/${id}/calendar`}
               className="px-4 py-2 rounded-full text-sm font-semibold border border-[#D9D9D9] text-[#0B0B45] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
             >
               Manage Calendar &rarr;
@@ -417,7 +422,7 @@ function AdminPropertyForm() {
           >
             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Property'}
           </button>
-          <Link to="/admin/properties" className="px-6 py-2.5 rounded-full font-semibold text-[#6b7280] hover:text-[#0B0B45]">Cancel</Link>
+          <Link to={`${base}/properties`} className="px-6 py-2.5 rounded-full font-semibold text-[#6b7280] hover:text-[#0B0B45]">Cancel</Link>
         </div>
       </form>
 

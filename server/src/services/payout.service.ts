@@ -1,18 +1,7 @@
 import prisma from '../config/prisma.js';
 import * as paystack from '../config/paystack.js';
-import { env } from '../config/env.js';
 import crypto from 'crypto';
 import { ValidationError, NotFoundError, ConflictError } from '../types/index.js';
-
-const WITHHOLDING_TAX_RATE = Number(env.WITHHOLDING_TAX_RATE) / 100;
-
-/** Calculate what the host earns from a specific booking */
-export function calculateHostNet(subtotal: number, discountAmount: number, extraGuestFee: number) {
-  const hostGross = subtotal - discountAmount + extraGuestFee;
-  const withholdingTax = Math.round(hostGross * WITHHOLDING_TAX_RATE);
-  const hostNet = hostGross - withholdingTax;
-  return { hostGross, withholdingTax, hostNet };
-}
 
 /** Get a host's current wallet balance + stats */
 export async function getHostWallet(hostId: string) {

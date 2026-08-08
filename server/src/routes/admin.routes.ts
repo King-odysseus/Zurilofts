@@ -34,6 +34,7 @@ router.patch('/users/:id/suspend', validate(userSuspendSchema), userCtrl.adminSe
 
 // Bookings
 router.get('/bookings', bookingCtrl.listAll);
+router.post('/bookings/cleanup-stale', bookingCtrl.cleanupStale);
 router.patch('/bookings/:id/status', validate(bookingStatusSchema), bookingCtrl.updateStatus);
 router.put('/bookings/:id', bookingCtrl.updateBooking);
 router.delete('/bookings/:id', bookingCtrl.deleteBooking);

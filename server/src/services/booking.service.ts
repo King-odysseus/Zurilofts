@@ -1,7 +1,7 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
-import { calculateFees, calculateNights, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
-import { isRangeAvailable } from './calendar.service.js';
+import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
+import { isRangeAvailable, PENDING_HOLD_MINUTES } from './calendar.service.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
 function normalizeBooking(booking: any) {
@@ -30,6 +30,10 @@ function normalizeBooking(booking: any) {
     }
     delete b.additionalGuestsJson;
   }
+  // Compute add-ons subtotal from stored unitPrice snapshots
+  if (b.addOns && Array.isArray(b.addOns)) {
+    b.addonsSubtotal = Math.round(b.addOns.reduce((sum: number, a: any) => sum + a.quantity * a.unitPrice, 0));
+  }
   return b;
 }
 
@@ -41,6 +45,81 @@ function getBedPrice(property: any, bedOption?: string): number {
   if (bedOption === '1bed' && property.price1Bed != null) return property.price1Bed;
   if (bedOption === '2bed' && property.price2Bed != null) return property.price2Bed;
   return property.price;
+}
+// Shared pricing parameters for both create and update paths
+interface BookingPricingParams {
+  property: { price: number; price1Bed?: number | null; price2Bed?: number | null };
+  bedOption?: string | null;
+  checkIn: Date;
+  checkOut: Date;
+  guests: number;
+  checkOutTime?: string | null;
+  priceRules: { start: Date; end: Date; price: number }[];
+  discountPercent: number;
+  maxDiscount: number | null;
+}
+
+/** Single-source-of-truth computation of all price line items for a booking
+ *  (nightly rate, cleaning, service, discount, late checkout, extra guests).
+ *  Does NOT include add-ons — those are layered on top by the caller. */
+function computeBookingPricing(params: BookingPricingParams) {
+  const effectivePrice = getBedPrice(params.property, params.bedOption ?? undefined);
+  const nights = calculateNights(params.checkIn, params.checkOut);
+  const extraGuestFee = computeExtraGuestFee(params.guests, params.bedOption ?? undefined, nights);
+  const subtotal = computeSubtotal(params.checkIn, nights, effectivePrice, params.priceRules);
+  const pricing = calculateFees(subtotal, params.discountPercent, params.maxDiscount);
+  const lateFee = lateCheckoutFee(params.checkOutTime ?? undefined, effectivePrice);
+  const total = pricing.total + lateFee + extraGuestFee;
+  return {
+    effectivePrice,
+    nights,
+    subtotal,
+    cleaningFee: pricing.cleaningFee,
+    serviceFee: pricing.serviceFee,
+    discountAmount: pricing.discountAmount,
+    lateCheckoutFee: lateFee,
+    extraGuestFee,
+    total,
+  };
+}
+
+/** Sum of (quantity * unitPrice) across a booking's add-on rows, rounded to KES. */
+function computeAddonsSubtotal(addOns: { quantity: number; unitPrice: number }[]): number {
+  const raw = addOns.reduce((sum, a) => sum + a.quantity * a.unitPrice, 0);
+  return Math.round(raw);
+}
+
+/** Recompute and persist a booking's total from its stored components plus
+ *  current add-ons. Accepts an optional transaction client so callers can
+ *  wrap this inside their own $transaction. */
+export async function recalculateBookingTotal(bookingId: string, client?: any): Promise<void> {
+  const db = client || prisma;
+
+  const booking = await db.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      property: { select: { price: true, price1Bed: true, price2Bed: true } },
+      addOns: { select: { quantity: true, unitPrice: true } },
+    },
+  });
+  if (!booking) throw new NotFoundError('Booking');
+
+  // Base total from stored component fields + re-derived extra guest fee
+  const nights = booking.checkIn && booking.checkOut
+    ? Math.max(1, Math.ceil((new Date(booking.checkOut).getTime() - new Date(booking.checkIn).getTime()) / (1000 * 60 * 60 * 24)))
+    : 1;
+  const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
+
+  const baseTotal = booking.subtotal + booking.cleaningFee + booking.serviceFee
+    + booking.lateCheckoutFee - booking.discountAmount + extraGuestFee;
+
+  const addonsSubtotal = computeAddonsSubtotal(booking.addOns);
+  const newTotal = baseTotal + addonsSubtotal;
+
+  await db.booking.update({
+    where: { id: bookingId },
+    data: { total: newTotal },
+  });
 }
 
 interface CreateBookingInput {
@@ -103,18 +182,11 @@ export async function createBooking(input: CreateBookingInput) {
     throw new ValidationError('Maximum 6 guests per property. Exceeding this is grounds for removal.');
   }
 
-  // Determine effective base price based on bed option
-  const effectivePrice = getBedPrice(property, input.bedOption);
-
-  const nights = calculateNights(checkInDate, checkOutDate);
-  const extraGuestFee = Math.max(0, input.guests - maxForBed) * 800 * nights;
-
-  // Apply seasonal price rules per night (falls back to effectivePrice)
+  // Fetch seasonal price rules (needed for promo validation below)
   const priceRules = await prisma.priceRule.findMany({
     where: { propertyId: input.propertyId },
     select: { start: true, end: true, price: true },
   });
-  const subtotal = computeSubtotal(checkInDate, nights, effectivePrice, priceRules);
 
   // Handle promo code if provided
   let promoCodeId: string | null = null;
@@ -122,17 +194,29 @@ export async function createBooking(input: CreateBookingInput) {
   let maxDiscount: number | null = null;
 
   if (input.promoCode) {
-    const promo = await validateAndGetPromo(input.promoCode, subtotal);
+    // Compute subtotal upfront for promo min-booking-amount check
+    const effectivePrice = getBedPrice(property, input.bedOption);
+    const nights = calculateNights(checkInDate, checkOutDate);
+    const subtotalForPromo = computeSubtotal(checkInDate, nights, effectivePrice, priceRules);
+    const promo = await validateAndGetPromo(input.promoCode, subtotalForPromo);
     promoCodeId = promo.id;
     discountPercent = promo.discountPercent;
     maxDiscount = promo.maxDiscount ?? null;
   }
 
-  const pricing = calculateFees(subtotal, discountPercent, maxDiscount);
-
-  // Late check-out fee: doubles each hour past 10:00 AM, up to a full night.
-  const lateFee = lateCheckoutFee(input.checkOutTime, effectivePrice);
-  const total = pricing.total + lateFee + extraGuestFee;
+  // Single-source pricing: nightly rate, fees, discount, late checkout, extra guests.
+  // Add-ons are not yet attached at creation time so addonsSubtotal is implicitly 0.
+  const bp = computeBookingPricing({
+    property,
+    bedOption: input.bedOption,
+    checkIn: checkInDate,
+    checkOut: checkOutDate,
+    guests: input.guests,
+    checkOutTime: input.checkOutTime,
+    priceRules,
+    discountPercent,
+    maxDiscount,
+  });
 
   const booking = await prisma.booking.create({
     data: {
@@ -153,16 +237,17 @@ export async function createBooking(input: CreateBookingInput) {
           : null,
       paymentMethod: input.paymentMethod,
       promoCodeId,
-      subtotal: pricing.subtotal,
-      cleaningFee: pricing.cleaningFee,
-      serviceFee: pricing.serviceFee,
-      lateCheckoutFee: lateFee,
-      discountAmount: pricing.discountAmount,
-      total,
+      subtotal: bp.subtotal,
+      cleaningFee: bp.cleaningFee,
+      serviceFee: bp.serviceFee,
+      lateCheckoutFee: bp.lateCheckoutFee,
+      discountAmount: bp.discountAmount,
+      total: bp.total,
     },
     include: {
       property: true,
       promoCode: { select: { code: true, discountPercent: true } },
+      addOns: { include: { addOn: true } },
       user: { select: { email: true } },
     },
   });
@@ -197,6 +282,7 @@ export async function listUserBookings(userId: string, status?: string, page = 1
         },
         promoCode: { select: { code: true, discountPercent: true } },
         review: { select: { id: true, rating: true, privateNote: true } },
+        addOns: { include: { addOn: true } },
       },
     }),
     prisma.booking.count({ where }),
@@ -218,6 +304,7 @@ export async function getBooking(bookingId: string, scope?: { userId?: string; h
     include: {
       property: true,
       promoCode: { select: { code: true, discountPercent: true } },
+      addOns: { include: { addOn: true } },
     },
   });
 
@@ -251,6 +338,7 @@ export async function listAllBookings(status?: string, page = 1, limit = 20, hos
         user: { select: { id: true, email: true, firstName: true, lastName: true } },
         property: true,
         promoCode: { select: { code: true } },
+        addOns: { include: { addOn: true } },
       },
     }),
     prisma.booking.count({ where }),
@@ -293,7 +381,7 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     }),
     prisma.booking.groupBy({
       by: ['propertyId'],
-      where: { status: { not: 'CANCELLED' }, ...whereDate, ...bookingHost },
+      where: { status: { in: ['PENDING', 'CONFIRMED'] }, ...whereDate, ...bookingHost },
       _count: { _all: true },
       _sum: {
         subtotal: true,
@@ -321,7 +409,7 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     }),
     prisma.booking.groupBy({
       by: ['propertyId', 'bedOption'],
-      where: { status: { not: 'CANCELLED' }, ...whereDate, ...bookingHost },
+      where: { status: { in: ['PENDING', 'CONFIRMED'] }, ...whereDate, ...bookingHost },
       _count: { _all: true },
       _sum: { total: true },
     }),
@@ -502,15 +590,65 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
 }
 
 export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED' | 'CANCELLED') {
-  const booking = await prisma.booking.findUnique({ where: { id: bookingId } });
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: { property: { select: { hostId: true } } },
+  });
   if (!booking) throw new NotFoundError('Booking');
 
-  const updated = await prisma.booking.update({
-    where: { id: bookingId },
-    data: { status },
+  const previousStatus = booking.status;
+  const isConflict = previousStatus === 'CONFLICT';
+
+  if (isConflict) {
+    console.log(
+      `[CONFLICT-RESOLVE] booking=${bookingId} ${previousStatus} -> ${status} by admin`
+    );
+  }
+
+  // Compute host finances when admin resolves CONFLICT -> CONFIRMED
+  let hostNetAmount: number | undefined;
+  let withholdingTax: number | undefined;
+  if (isConflict && status === 'CONFIRMED') {
+    const nights = calculateNights(booking.checkIn, booking.checkOut);
+    const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
+    const { calculateHostNet } = await import('./payment.service.js');
+    const hn = calculateHostNet(booking.subtotal, booking.discountAmount, extraGuestFee);
+    hostNetAmount = hn.hostNet;
+    withholdingTax = hn.withholdingTax;
+  }
+
+  const data: any = { status };
+  if (hostNetAmount != null) {
+    data.hostNetAmount = hostNetAmount;
+    data.withholdingTax = withholdingTax;
+  }
+
+  // Wrap the money writes in a transaction: booking update + wallet credit
+  // are atomic. Push notification fires after commit — a failed push must
+  // never roll back a money write.
+  const updated = await prisma.$transaction(async (tx) => {
+    const result = await tx.booking.update({
+      where: { id: bookingId },
+      data,
+    });
+
+    // Credit host wallet on CONFLICT -> CONFIRMED resolution (double-credit
+    // guard: only runs when previous status was CONFLICT)
+    if (isConflict && status === 'CONFIRMED' && hostNetAmount != null) {
+      const hostId = booking.property?.hostId;
+      if (hostId) {
+        await tx.hostWallet.upsert({
+          where: { hostId },
+          create: { hostId, balance: hostNetAmount, totalEarned: hostNetAmount },
+          update: { balance: { increment: hostNetAmount }, totalEarned: { increment: hostNetAmount } },
+        });
+      }
+    }
+
+    return result;
   });
 
-  // Send push notification when booking is confirmed
+  // Send push notification when booking is confirmed (after transaction commit)
   if (status === 'CONFIRMED') {
     try {
       const { sendPushToUser } = await import('./push.service.js');
@@ -583,45 +721,56 @@ export async function updateBooking(bookingId: string, input: UpdateBookingInput
     throw new ValidationError('Maximum 6 guests per property');
   }
 
-  // Recalculate pricing
-  const effectivePrice = getBedPrice(property, bedOption ?? undefined);
-  const nights = calculateNights(checkIn, checkOut);
-  const extraGuestFee = Math.max(0, guests - maxForBed) * 800 * nights;
+  // checkOutTime: null means clear, undefined means keep existing
+  const effectiveCheckOutTime = input.checkOutTime !== undefined ? (input.checkOutTime || null) : booking.checkOutTime;
+
+  // Determine promo discount params
+  let discountPercent = 0;
+  let maxDiscountForBooking: number | null = null;
+  if (booking.promoCodeId) {
+    const promo = await prisma.promoCode.findUnique({ where: { id: booking.promoCodeId } });
+    if (promo && promo.active) {
+      discountPercent = promo.discountPercent;
+      maxDiscountForBooking = promo.maxDiscount ?? null;
+    }
+  }
 
   const priceRules = await prisma.priceRule.findMany({
     where: { propertyId: booking.propertyId },
     select: { start: true, end: true, price: true },
   });
-  const subtotal = computeSubtotal(checkIn, nights, effectivePrice, priceRules);
 
-  // Re-apply promo discount if present
-  let discountAmount = 0;
-  if (booking.promoCodeId) {
-    const promo = await prisma.promoCode.findUnique({ where: { id: booking.promoCodeId } });
-    if (promo && promo.active) {
-      const discountPercent = promo.discountPercent;
-      const maxDiscount = promo.maxDiscount ?? null;
-      const rawDiscount = Math.round(subtotal * (discountPercent / 100));
-      discountAmount = maxDiscount !== null ? Math.min(rawDiscount, maxDiscount) : rawDiscount;
-    }
-  }
+  // Single-source pricing: nightly rate, fees, discount, late checkout, extra guests
+  const bp = computeBookingPricing({
+    property,
+    bedOption: bedOption,
+    checkIn,
+    checkOut,
+    guests,
+    checkOutTime: effectiveCheckOutTime ?? undefined,
+    priceRules,
+    discountPercent,
+    maxDiscount: maxDiscountForBooking,
+  });
 
-  const pricing = calculateFees(subtotal, 0, null); // discount already applied above
-  // checkOutTime: null means clear, undefined means keep existing
-  const effectiveCheckOutTime = input.checkOutTime !== undefined ? (input.checkOutTime || null) : booking.checkOutTime;
-  const lateFee = lateCheckoutFee(effectiveCheckOutTime ?? undefined, effectivePrice);
-  const total = pricing.subtotal - discountAmount + pricing.cleaningFee + pricing.serviceFee + lateFee + extraGuestFee;
+  // Layer add-ons subtotal from stored unitPrice snapshots
+  const bookingAddOns = await prisma.bookingAddOn.findMany({
+    where: { bookingId },
+    select: { quantity: true, unitPrice: true },
+  });
+  const addonsSubtotal = computeAddonsSubtotal(bookingAddOns);
+  const total = bp.total + addonsSubtotal;
 
   const data: any = {
     checkIn,
     checkOut,
     guests,
     bedOption,
-    subtotal,
-    cleaningFee: pricing.cleaningFee,
-    serviceFee: pricing.serviceFee,
-    lateCheckoutFee: lateFee,
-    discountAmount,
+    subtotal: bp.subtotal,
+    cleaningFee: bp.cleaningFee,
+    serviceFee: bp.serviceFee,
+    lateCheckoutFee: bp.lateCheckoutFee,
+    discountAmount: bp.discountAmount,
     total,
   };
 
@@ -657,6 +806,54 @@ export async function deleteBooking(bookingId: string) {
 }
 
 
+
+export async function abandonStaleBookings(olderThanMinutes = PENDING_HOLD_MINUTES): Promise<number> {
+  const cutoff = new Date(Date.now() - olderThanMinutes * 60 * 1000);
+
+  // Find PENDING bookings created before the cutoff with no paidAt timestamp.
+  // paidAt is only set inside confirmBookingPayment, which also flips status
+  // to CONFIRMED, so any PENDING with paidAt set would be an anomaly we still
+  // protect.
+  const staleBookings = await prisma.booking.findMany({
+    where: {
+      status: 'PENDING',
+      createdAt: { lt: cutoff },
+      paidAt: null,
+    },
+    select: { id: true },
+  });
+
+  if (staleBookings.length === 0) return 0;
+
+  // Second safety rail: a booking might have a charge.success PaymentLog even
+  // if its own status row hasn't been updated yet (webhook race).  Exclude any
+  // booking that has a recorded successful payment event.
+  const staleIds = staleBookings.map((b) => b.id);
+  const paidLogs = await prisma.paymentLog.findMany({
+    where: {
+      bookingId: { in: staleIds },
+      event: 'charge.success',
+    },
+    select: { bookingId: true },
+    distinct: ['bookingId'],
+  });
+  const paidIds = new Set(paidLogs.map((l) => l.bookingId!).filter(Boolean));
+
+  const idsToCancel = staleIds.filter((id) => !paidIds.has(id));
+  if (idsToCancel.length === 0) return 0;
+
+  // Mark CANCELLED rather than deleting.  The rest of the codebase already
+  // treats CANCELLED bookings as non-blocking for availability (see
+  // isRangeAvailable / getUnavailableRanges), so this matches the existing
+  // dead-booking idiom and preserves an audit trail.
+  const result = await prisma.booking.updateMany({
+    where: { id: { in: idsToCancel } },
+    data: { status: 'CANCELLED' },
+  });
+
+  return result.count;
+}
+
 export async function getHostToday(hostId: string) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -667,7 +864,7 @@ export async function getHostToday(hostId: string) {
     prisma.booking.findMany({
       where: {
         property: { hostId },
-        status: { not: 'CANCELLED' },
+        status: { in: ['PENDING', 'CONFIRMED'] },
         checkIn: { gte: today, lt: tomorrow },
       },
       orderBy: { checkIn: 'asc' },
@@ -675,12 +872,13 @@ export async function getHostToday(hostId: string) {
         user: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
         property: true,
         review: { select: { id: true, rating: true } },
+        addOns: { include: { addOn: true } },
       },
     }),
     prisma.booking.findMany({
       where: {
         property: { hostId },
-        status: { not: 'CANCELLED' },
+        status: { in: ['PENDING', 'CONFIRMED'] },
         checkOut: { gte: today, lt: tomorrow },
       },
       orderBy: { checkOut: 'asc' },
@@ -688,12 +886,13 @@ export async function getHostToday(hostId: string) {
         user: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
         property: true,
         review: { select: { id: true, rating: true } },
+        addOns: { include: { addOn: true } },
       },
     }),
     prisma.booking.findMany({
       where: {
         property: { hostId },
-        status: { not: 'CANCELLED' },
+        status: { in: ['PENDING', 'CONFIRMED'] },
         checkIn: { lt: today },
         checkOut: { gt: tomorrow },
       },
@@ -702,6 +901,7 @@ export async function getHostToday(hostId: string) {
         user: { select: { id: true, firstName: true, lastName: true, email: true, phone: true } },
         property: true,
         review: { select: { id: true, rating: true } },
+        addOns: { include: { addOn: true } },
       },
     }),
   ]);

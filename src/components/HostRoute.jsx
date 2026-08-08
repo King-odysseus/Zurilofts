@@ -1,7 +1,11 @@
 import { Navigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { useAuth } from '../context/AuthContext.jsx';
 
-function AdminRoute({ children }) {
+// Guards the host workspace (/host/*). Admins may legitimately view the host
+// view, so both HOST and ADMIN are admitted. Unauthenticated visitors are sent
+// to /login; plain users see the same styled Access Denied panel as AdminRoute.
+function HostRoute({ children }) {
   const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
@@ -19,9 +23,7 @@ function AdminRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  // Admin control centre is ADMIN-only. Hosts have their own workspace under
-  // /host/* and must never reach /admin/*.
-  if (user?.role !== 'ADMIN') {
+  if (user?.role !== 'ADMIN' && user?.role !== 'HOST') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
@@ -40,4 +42,8 @@ function AdminRoute({ children }) {
   return children;
 }
 
-export default AdminRoute;
+HostRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+export default HostRoute;
