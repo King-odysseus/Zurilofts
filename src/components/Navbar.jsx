@@ -20,6 +20,8 @@ const travellingLinks = [
 const hostingLinks = [
   { name: 'Today',     href: '/host/today' },
   { name: 'Calendar',  href: '/admin/calendar' },
+  { name: 'Listings',  href: '/admin/properties' },
+  { name: 'Messages',  href: '/inbox' },
   { name: 'Earnings',  href: '/admin/earnings' },
 ];
 
@@ -434,7 +436,7 @@ function Navbar() {
             menuOpen ? 'block' : 'hidden md:flex'
           }`}
         >
-          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 border-t border-[#D9D9D9] md:border-0 md:flex-row md:space-x-8 rtl:space-x-reverse md:bg-transparent rounded-b-2xl md:rounded-none bg-white shadow-lg md:shadow-none">
+          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 border-t border-[#D9D9D9] md:border-0 md:flex-row md:space-x-6 rtl:space-x-reverse md:bg-transparent rounded-b-2xl md:rounded-none bg-white shadow-lg md:shadow-none">
             {activeLinks.map((link) => {
               const isActive = location.pathname === link.href;
               return (
@@ -451,6 +453,11 @@ function Navbar() {
                       }`}
                   >
                     {link.name}
+                    {mode === 'hosting' && link.name === 'Messages' && conversationUnread > 0 && (
+                      <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 ml-2 bg-[#C49A6C] text-white text-[10px] font-bold rounded-full align-middle">
+                        {conversationUnread > 9 ? '9+' : conversationUnread}
+                      </span>
+                    )}
                     <span className={`absolute bottom-0 left-0 h-0.5 bg-[#C49A6C] transition-all duration-200 hidden md:block ${
                       isActive ? 'w-full' : 'w-0 group-hover:w-full'
                     }`} />

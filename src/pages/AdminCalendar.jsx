@@ -147,6 +147,7 @@ function AdminCalendar() {
           </button>
         </div>
         <p className="text-sm text-[#6b7280] mb-4">Add the iCal export URL from each platform to pull in their bookings.</p>
+        <p className="text-sm text-[#6b7280] mb-4">Sync with Airbnb, Booking.com or Google Calendar — import their calendars to block your dates automatically, and share your ZuriLofts calendar with them.</p>
 
         {data.sources.length > 0 ? (
           <div className="space-y-2 mb-5">

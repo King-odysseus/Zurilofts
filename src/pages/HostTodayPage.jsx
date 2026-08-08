@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 import Navbar from "../components/Navbar.jsx";
+import Spinner from "../components/Spinner.jsx";
 
 function formatDate(d) {
   return new Date(d).toLocaleDateString("en-KE", {
@@ -11,6 +12,34 @@ function formatDate(d) {
     day: "numeric",
     month: "short",
   });
+}
+
+function formatRelativeTime(iso) {
+  if (!iso) return "";
+  const date = new Date(iso);
+  const diffMs = Date.now() - date.getTime();
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 1) return "Just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+function parseImages(property) {
+  if (!property) return [];
+  if (Array.isArray(property.images)) return property.images;
+  if (property.imagesJson) {
+    try {
+      const parsed = JSON.parse(property.imagesJson);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
 }
 
 function getNights(checkIn, checkOut) {
@@ -164,11 +193,121 @@ EmptyPanel.propTypes = {
   icon: PropTypes.node,
 };
 
+function RecentMessagesPanel({ conversations, loading }) {
+  if (loading) {
+    return (
+      <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-6 shadow-md flex items-center justify-center py-10">
+        <Spinner />
+      </div>
+    );
+  }
+
+  return (
+    <section className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-6 shadow-md">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-[#0B0B45] flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#C49A6C]" />
+          Recent guest messages
+        </h2>
+        <Link
+          to="/inbox"
+          className="text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
+        >
+          View all
+        </Link>
+      </div>
+
+      {conversations.length === 0 ? (
+        <div className="text-center py-10 px-4">
+          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#D9D9D9]/30 flex items-center justify-center">
+            <svg className="w-6 h-6 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </div>
+          <p className="text-sm text-[#6b7280]">No guest messages yet</p>
+          <p className="text-xs text-[#6b7280] mt-1">Messages from guests about their stays will appear here.</p>
+        </div>
+      ) : (
+        <ul className="divide-y divide-[#D9D9D9]/50">
+          {conversations.map((c) => {
+            const booking = c.booking || {};
+            const property = booking.property || {};
+            const guest = booking.user || {};
+            const guestName = [guest.firstName, guest.lastName].filter(Boolean).join(" ") || "Guest";
+            const lastMessage = c.lastMessage;
+            const preview = lastMessage ? lastMessage.content : "No messages yet";
+            const images = parseImages(property);
+            return (
+              <li key={c.id}>
+                <Link
+                  to={`/inbox/${c.id}`}
+                  className="flex items-center gap-3 py-3 group"
+                >
+                  <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-[#D9D9D9]/30">
+                    {images[0] ? (
+                      <img src={images[0]} alt={property.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="font-semibold text-[#1f2937] text-sm truncate group-hover:text-[#C49A6C] transition-colors">
+                        {guestName}
+                      </p>
+                      <span className="text-xs text-[#6b7280] flex-shrink-0">
+                        {formatRelativeTime(lastMessage ? lastMessage.createdAt : c.updatedAt)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-[#6b7280] truncate">{property.title || "Property"}</p>
+                    <p className="text-sm text-[#6b7280] truncate">{preview}</p>
+                  </div>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+RecentMessagesPanel.propTypes = {
+  conversations: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      updatedAt: PropTypes.string,
+      lastMessage: PropTypes.shape({
+        content: PropTypes.string,
+        createdAt: PropTypes.string,
+      }),
+      booking: PropTypes.shape({
+        property: PropTypes.shape({
+          title: PropTypes.string,
+          images: PropTypes.arrayOf(PropTypes.string),
+          imagesJson: PropTypes.string,
+        }),
+        user: PropTypes.shape({
+          firstName: PropTypes.string,
+          lastName: PropTypes.string,
+        }),
+      }),
+    })
+  ).isRequired,
+  loading: PropTypes.bool.isRequired,
+};
+
 export default function HostTodayPage() {
   const { user, isAuthenticated } = useAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [conversations, setConversations] = useState([]);
+  const [conversationsLoading, setConversationsLoading] = useState(true);
 
   useEffect(() => {
     document.title = "Today | ZuriLofts Host";
@@ -190,6 +329,24 @@ export default function HostTodayPage() {
       }
     }
     fetchToday();
+    return () => { cancelled = true; };
+  }, [isAuthenticated]);
+
+  // Recent guest conversations for the host's daily-operations hub.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let cancelled = false;
+    async function fetchConversations() {
+      try {
+        const res = await apiClient.get("/conversations");
+        if (!cancelled) setConversations((res.data.data || []).slice(0, 3));
+      } catch {
+        if (!cancelled) setConversations([]);
+      } finally {
+        if (!cancelled) setConversationsLoading(false);
+      }
+    }
+    fetchConversations();
     return () => { cancelled = true; };
   }, [isAuthenticated]);
 
@@ -341,6 +498,11 @@ export default function HostTodayPage() {
               </div>
             )}
           </section>
+        </div>
+
+        {/* Recent guest messages */}
+        <div className="mt-10">
+          <RecentMessagesPanel conversations={conversations} loading={conversationsLoading} />
         </div>
       </main>
     </div>
