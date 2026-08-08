@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
-import Spinner from "../components/Spinner.jsx";
 
 function SkeletonCard() {
   return (

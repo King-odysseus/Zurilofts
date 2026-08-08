@@ -129,6 +129,16 @@ export async function deleteBooking(req: Request, res: Response, next: NextFunct
   }
 }
 
+// Admin: cancel stale PENDING bookings that were abandoned before payment
+export async function cleanupStale(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const count = await bookingService.abandonStaleBookings();
+    res.json({ success: true, data: { cancelled: count } });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // Guest: re-initialize payment for an existing booking (includes add-ons in total)
 export async function initializePayment(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

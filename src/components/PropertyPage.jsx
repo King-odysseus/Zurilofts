@@ -23,7 +23,7 @@ function PropertyPage() {
   const [searchParams] = useSearchParams();
   const variant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [featuredImage, setFeaturedImage] = useState(0);
-  const [thumbStart] = useState(0);
+  useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState(0);
   const [property, setProperty] = useState(null);

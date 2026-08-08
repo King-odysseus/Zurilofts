@@ -7,7 +7,10 @@ module.exports = {
     'plugin:react/jsx-runtime',
     'plugin:react-hooks/recommended',
   ],
-  ignorePatterns: ['dist', '.eslintrc.cjs'],
+  // `manual` and `offline-app` are separate, untracked side projects that live
+  // in this folder but are not part of the app. Linting them here produced ~198
+  // errors that drowned out real ones and kept `npm run lint` permanently red.
+  ignorePatterns: ['dist', '.eslintrc.cjs', 'manual', 'offline-app'],
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module' },
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh'],
@@ -23,6 +26,12 @@ module.exports = {
       files: ['src/context/*.jsx'],
       rules: {
         'react-refresh/only-export-components': 'off',
+      },
+    },
+    {
+      files: ['public/push-handler.js'],
+      env: {
+        serviceworker: true,
       },
     },
   ],

@@ -5,7 +5,6 @@ import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
-import Spinner from "../components/Spinner.jsx";
 
 const STATUS_LABELS = {
   PENDING: "Awaiting confirmation",
@@ -18,14 +17,6 @@ const STATUS_STYLES = {
   CONFIRMED: "bg-green-100 text-green-800",
   CANCELLED: "bg-red-100 text-red-800",
 };
-
-function formatDate(d) {
-  return new Date(d).toLocaleDateString("en-KE", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  });
-}
 
 function formatDateRange(checkIn, checkOut) {
   const ci = new Date(checkIn);

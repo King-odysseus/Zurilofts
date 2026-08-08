@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+﻿import { Request, Response, NextFunction } from 'express';
 import * as addonService from '../services/addon.service.js';
 
 // ---------------------------------------------------------------
@@ -57,6 +57,15 @@ export async function deleteAddOn(req: Request, res: Response, next: NextFunctio
 // ---------------------------------------------------------------
 // Admin: property assignment
 // ---------------------------------------------------------------
+
+export async function listAssignments(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const data = await addonService.listAllPropertyAddOnAssignments();
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+}
 
 export async function assignAddOn(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

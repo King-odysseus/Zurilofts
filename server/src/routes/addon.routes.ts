@@ -52,6 +52,10 @@ router.get('/properties/:id/addons', ctrl.getPropertyAddOns);
 
 router.get('/admin/addons', authenticate, requireAdmin, ctrl.listAddOns);
 router.post('/admin/addons', authenticate, requireAdmin, validate(createAddOnSchema), ctrl.createAddOn);
+
+// Declared before /:id to avoid being shadowed
+router.get('/admin/addons/assignments', authenticate, requireAdmin, ctrl.listAssignments);
+
 router.patch('/admin/addons/:id', authenticate, requireAdmin, validate(updateAddOnSchema), ctrl.updateAddOn);
 router.delete('/admin/addons/:id', authenticate, requireAdmin, ctrl.deleteAddOn);
 

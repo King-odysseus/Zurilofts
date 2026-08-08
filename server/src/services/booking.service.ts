@@ -758,6 +758,54 @@ export async function deleteBooking(bookingId: string) {
 }
 
 
+
+export async function abandonStaleBookings(olderThanMinutes = 60): Promise<number> {
+  const cutoff = new Date(Date.now() - olderThanMinutes * 60 * 1000);
+
+  // Find PENDING bookings created before the cutoff with no paidAt timestamp.
+  // paidAt is only set inside confirmBookingPayment, which also flips status
+  // to CONFIRMED, so any PENDING with paidAt set would be an anomaly we still
+  // protect.
+  const staleBookings = await prisma.booking.findMany({
+    where: {
+      status: 'PENDING',
+      createdAt: { lt: cutoff },
+      paidAt: null,
+    },
+    select: { id: true },
+  });
+
+  if (staleBookings.length === 0) return 0;
+
+  // Second safety rail: a booking might have a charge.success PaymentLog even
+  // if its own status row hasn't been updated yet (webhook race).  Exclude any
+  // booking that has a recorded successful payment event.
+  const staleIds = staleBookings.map((b) => b.id);
+  const paidLogs = await prisma.paymentLog.findMany({
+    where: {
+      bookingId: { in: staleIds },
+      event: 'charge.success',
+    },
+    select: { bookingId: true },
+    distinct: ['bookingId'],
+  });
+  const paidIds = new Set(paidLogs.map((l) => l.bookingId!).filter(Boolean));
+
+  const idsToCancel = staleIds.filter((id) => !paidIds.has(id));
+  if (idsToCancel.length === 0) return 0;
+
+  // Mark CANCELLED rather than deleting.  The rest of the codebase already
+  // treats CANCELLED bookings as non-blocking for availability (see
+  // isRangeAvailable / getUnavailableRanges), so this matches the existing
+  // dead-booking idiom and preserves an audit trail.
+  const result = await prisma.booking.updateMany({
+    where: { id: { in: idsToCancel } },
+    data: { status: 'CANCELLED' },
+  });
+
+  return result.count;
+}
+
 export async function getHostToday(hostId: string) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);

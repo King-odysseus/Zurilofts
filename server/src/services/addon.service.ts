@@ -125,6 +125,26 @@ export async function unassignAddOnFromProperty(propertyId: string, addOnId: str
 }
 
 // ---------------------------------------------------------------
+// Admin: list all property-add-on assignments (single query)
+// ---------------------------------------------------------------
+
+export async function listAllPropertyAddOnAssignments() {
+  const assignments = await prisma.propertyAddOn.findMany({
+    include: {
+      property: { select: { title: true } },
+      addOn: { select: { name: true } },
+    },
+    orderBy: [{ propertyId: 'asc' }, { addOnId: 'asc' }],
+  });
+
+  return assignments.map((a) => ({
+    propertyId: a.propertyId,
+    addOnId: a.addOnId,
+    propertyTitle: a.property.title,
+  }));
+}
+
+// ---------------------------------------------------------------
 // Booking add-on mutations (guest)
 // ---------------------------------------------------------------
 
