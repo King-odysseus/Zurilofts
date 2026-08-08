@@ -246,12 +246,12 @@ function PropertiesPage() {
 
       {/* Compact Search Header */}
       <section className="bg-[#0B0B45] pt-24 pb-8 md:pb-10">
-        <div className="w-full mx-auto px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl">
+        <div className="w-full mx-auto text-center px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">Find your stay</h1>
           <p className="text-white/70 text-sm mb-5 md:mb-6">
             Premium furnished apartments in Nairobi&apos;s most desirable neighbourhoods.
           </p>
-          <div className="max-w-3xl">
+          <div className="max-w-3xl mx-auto">
             <TripSearchBar
               value={searchInput}
               onChange={handleSearchChange}
