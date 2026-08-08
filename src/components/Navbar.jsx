@@ -211,7 +211,7 @@ function Navbar() {
                               </svg>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-[#0B0B45] text-xs">New Messages</p>
+                              <p className="font-medium text-[#0B0B45] text-xs">New support message</p>
                               <p className="text-[#6b7280] text-[11px]">You have {unreadMessages} unread message{unreadMessages > 1 ? 's' : ''}</p>
                             </div>
                           </Link>
@@ -228,7 +228,7 @@ function Navbar() {
                               </svg>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-medium text-[#0B0B45] text-xs">Reservation Messages</p>
+                              <p className="font-medium text-[#0B0B45] text-xs">New message</p>
                               <p className="text-[#6b7280] text-[11px]">{conversationUnread} unread message{conversationUnread > 1 ? 's' : ''}</p>
                             </div>
                           </Link>
@@ -299,7 +299,7 @@ function Navbar() {
                     <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
-                    <span className="flex-1">Messages</span>
+                    <span className="flex-1">Contact Support</span>
                     {unreadMessages > 0 && (
                       <span className="min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                         {unreadMessages > 9 ? '9+' : unreadMessages}
@@ -314,7 +314,7 @@ function Navbar() {
                     <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                     </svg>
-                    <span className="flex-1">Inbox</span>
+                    <span className="flex-1">Messages</span>
                     {conversationUnread > 0 && (
                       <span className="min-w-[18px] h-[18px] px-1 bg-[#C49A6C] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                         {conversationUnread > 9 ? '9+' : conversationUnread}
@@ -515,14 +515,14 @@ function Navbar() {
                     className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Messages{unreadMessages > 0 ? ` (${unreadMessages})` : ''}
+                    Contact Support{unreadMessages > 0 ? ` (${unreadMessages})` : ''}
                   </Link>
                   <Link
                     to="/inbox"
                     className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Inbox{conversationUnread > 0 ? ` (${conversationUnread})` : ''}
+                    Messages{conversationUnread > 0 ? ` (${conversationUnread})` : ''}
                   </Link>
                   <Link
                     to="/terms"

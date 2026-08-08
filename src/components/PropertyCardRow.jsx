@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import PropertyCard from './PropertyCard';
+import { firstImage } from '../utils/images.js';
 
 /**
  * Reusable horizontally scrollable card strip.
@@ -24,7 +25,7 @@ function PropertyCardRow({ title, properties, emptyMessage }) {
         <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar">
           {cards.map((property) => (
             <div key={property.id} className="snap-start flex-shrink-0 w-64 sm:w-72">
-              <PropertyCard property={property} />
+              <PropertyCard property={{ ...property, image: firstImage(property) }} />
             </div>
           ))}
         </div>

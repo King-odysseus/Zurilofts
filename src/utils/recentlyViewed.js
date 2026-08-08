@@ -10,6 +10,8 @@
 // mode throws on write. On any failure we degrade to a no-op and return [],
 // so storage can never break rendering.
 
+import { firstImage } from './images.js';
+
 const STORAGE_KEY = 'zurilofts_recently_viewed';
 const MAX_ENTRIES = 12;
 
@@ -44,7 +46,7 @@ export function recordView(property) {
   const entry = {
     id: property.id,
     title: property.title || 'Property',
-    image: property.image || property.images?.[0] || '',
+    image: firstImage(property) || '',
     viewedAt: Date.now(),
   };
 

@@ -5,20 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import Navbar from '../components/Navbar.jsx';
 import Spinner from '../components/Spinner.jsx';
-
-function parseImages(property) {
-  if (!property) return [];
-  if (Array.isArray(property.images)) return property.images;
-  if (property.imagesJson) {
-    try {
-      const parsed = JSON.parse(property.imagesJson);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
-}
+import { firstImage } from '../utils/images.js';
 
 function formatRelativeTime(iso) {
   if (!iso) return '';
@@ -49,7 +36,7 @@ function getOtherParticipant(conversation, currentUserId) {
 function ConversationRow({ conversation, currentUserId }) {
   const booking = conversation.booking || {};
   const property = booking.property || {};
-  const images = parseImages(property);
+  const image = firstImage(property);
   const other = getOtherParticipant(conversation, currentUserId);
   const lastMessage = conversation.lastMessage;
   const preview = lastMessage ? lastMessage.content : 'No messages yet';
@@ -63,8 +50,8 @@ function ConversationRow({ conversation, currentUserId }) {
       <div className="flex items-center gap-4">
         {/* Property thumbnail */}
         <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-[#D9D9D9]/30">
-          {images[0] ? (
-            <img src={images[0]} alt={property.title} className="w-full h-full object-cover" />
+          {image ? (
+            <img src={image} alt={property.title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

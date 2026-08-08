@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 import Navbar from "../components/Navbar.jsx";
 import Spinner from "../components/Spinner.jsx";
+import { firstImage } from "../utils/images.js";
 
 function formatDate(d) {
   return new Date(d).toLocaleDateString("en-KE", {
@@ -28,20 +29,6 @@ function formatRelativeTime(iso) {
   return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-function parseImages(property) {
-  if (!property) return [];
-  if (Array.isArray(property.images)) return property.images;
-  if (property.imagesJson) {
-    try {
-      const parsed = JSON.parse(property.imagesJson);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
-}
-
 function getNights(checkIn, checkOut) {
   return Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000);
 }
@@ -49,7 +36,7 @@ function getNights(checkIn, checkOut) {
 function TodayCard({ booking, type }) {
   const p = booking.property || {};
   const guest = booking.user || {};
-  const image = p.images?.[0] || p.coverImage;
+  const image = firstImage(p) || p.coverImage;
   const nights = getNights(booking.checkIn, booking.checkOut);
   const guestName = [guest.firstName, guest.lastName].filter(Boolean).join(" ") || "Guest";
 
@@ -236,7 +223,7 @@ function RecentMessagesPanel({ conversations, loading }) {
             const guestName = [guest.firstName, guest.lastName].filter(Boolean).join(" ") || "Guest";
             const lastMessage = c.lastMessage;
             const preview = lastMessage ? lastMessage.content : "No messages yet";
-            const images = parseImages(property);
+            const image = firstImage(property);
             return (
               <li key={c.id}>
                 <Link
@@ -244,8 +231,8 @@ function RecentMessagesPanel({ conversations, loading }) {
                   className="flex items-center gap-3 py-3 group"
                 >
                   <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-[#D9D9D9]/30">
-                    {images[0] ? (
-                      <img src={images[0]} alt={property.title} className="w-full h-full object-cover" />
+                    {image ? (
+                      <img src={image} alt={property.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

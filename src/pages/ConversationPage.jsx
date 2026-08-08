@@ -5,20 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import Navbar from '../components/Navbar.jsx';
 import Spinner from '../components/Spinner.jsx';
-
-function parseImages(property) {
-  if (!property) return [];
-  if (Array.isArray(property.images)) return property.images;
-  if (property.imagesJson) {
-    try {
-      const parsed = JSON.parse(property.imagesJson);
-      return Array.isArray(parsed) ? parsed : [];
-    } catch {
-      return [];
-    }
-  }
-  return [];
-}
+import { firstImage } from '../utils/images.js';
 
 function formatMessageTime(iso) {
   if (!iso) return '';
@@ -174,7 +161,7 @@ function ConversationPage() {
 
   const other = getOtherParticipant(conversation, user?.id);
   const property = conversation?.booking?.property || {};
-  const images = parseImages(property);
+  const image = firstImage(property);
 
   return (
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col">
@@ -195,8 +182,8 @@ function ConversationPage() {
             <h1 className="text-lg font-bold text-[#0B0B45] truncate">{other.name}</h1>
             <p className="text-sm text-[#6b7280] truncate">{property.title || 'Property'}</p>
           </div>
-          {images[0] && (
-            <img src={images[0]} alt={property.title} className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
+          {image && (
+            <img src={image} alt={property.title} className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
           )}
         </div>
 
