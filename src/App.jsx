@@ -41,6 +41,8 @@ import NotFoundPage from './pages/NotFoundPage';
 import HostPayouts from './pages/HostPayouts';
 import FavouritesPage from './pages/FavouritesPage';
 import BookingHistoryPage from './pages/BookingHistoryPage';
+import InboxPage from './pages/InboxPage';
+import ConversationPage from './pages/ConversationPage';
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'));
 const AdminLayout = lazy(() => import('./pages/AdminDashboard.jsx').then(m => ({ default: m.AdminLayout })));
@@ -301,6 +303,8 @@ function App() {
           <Route path="/auth/callback" element={<OAuthCallback />} />
           <Route path="/profile" element={<Page title="Profile"><ProtectedRoute><ProfilePage /></ProtectedRoute></Page>} />
           <Route path="/messages" element={<Page title="Messages"><ProtectedRoute><MessagesPage /></ProtectedRoute></Page>} />
+          <Route path="/inbox" element={<Page title="Inbox"><ProtectedRoute><InboxPage /></ProtectedRoute></Page>} />
+          <Route path="/inbox/:conversationId" element={<Page title="Conversation"><ProtectedRoute><ConversationPage /></ProtectedRoute></Page>} />
           <Route path="/trips" element={<Page title="Trips"><ProtectedRoute><TripHubPage /></ProtectedRoute></Page>} />
           <Route path="/host/today" element={<Page title="Host Today"><ProtectedRoute><HostTodayPage /></ProtectedRoute></Page>} />
           <Route path="/privacy" element={<Page title="Privacy Policy"><PrivacyPage /></Page>} />

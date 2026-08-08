@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
@@ -46,6 +46,19 @@ function BookingCard({ booking, isPast }) {
   const image = p.images?.[0] || p.coverImage;
   const reviewSubmitted = booking.review && booking.review.id;
   const nights = getNights(booking.checkIn, booking.checkOut);
+  const navigate = useNavigate();
+
+  // Open (or create) the reservation conversation for this booking, then go to it.
+  // The endpoint is idempotent, so it is safe to click repeatedly.
+  async function openConversation() {
+    try {
+      const res = await apiClient.post("/conversations", { bookingId: booking.id });
+      const conversation = res.data.data;
+      navigate(`/inbox/${conversation.id}`);
+    } catch (err) {
+      console.error("Failed to open conversation", err);
+    }
+  }
 
   return (
     <article className="group bg-white border border-[#D9D9D9]/50 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
@@ -142,6 +155,15 @@ function BookingCard({ booking, isPast }) {
                   Reviewed
                 </span>
               )}
+              <button
+                onClick={openConversation}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200"
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+                Message host
+              </button>
               <Link
                 to={`/booking/${booking.id}`}
                 className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"

@@ -45,6 +45,7 @@ function Navbar() {
 
   // Poll unread message count + booking updates for badge + sound alerts
   const [bookingUpdates, setBookingUpdates] = useState(0);
+  const [conversationUnread, setConversationUnread] = useState(0);
   const lastMsgRef = useRef(0);
   const lastBookingRef = useRef(0);
   // Booking updates are a rolling count of recent confirmed/cancelled bookings.
@@ -53,7 +54,7 @@ function Navbar() {
   const seenBookingsRef = useRef(Number(localStorage.getItem('zuri_bk_seen') || 0));
 
   useEffect(() => {
-    if (!isAuthenticated) { setUnreadMessages(0); setBookingUpdates(0); return; }
+    if (!isAuthenticated) { setUnreadMessages(0); setBookingUpdates(0); setConversationUnread(0); return; }
     let active = true;
     async function loadUnread() {
       try {
@@ -91,6 +92,13 @@ function Navbar() {
           setUnreadMessages(count);
         } catch { /* ignore */ }
       }
+
+      // Reservation conversation unread count (separate from the support inbox)
+      try {
+        const r = await apiClient.get('/conversations/unread-count');
+        if (!active) return;
+        setConversationUnread(r.data.data?.count || 0);
+      } catch { /* ignore */ }
     }
     loadUnread();
     const t = setInterval(loadUnread, 30000);
@@ -104,7 +112,7 @@ function Navbar() {
     setBookingUpdates(0);
   }
 
-  const totalNotif = unreadMessages + bookingUpdates;
+  const totalNotif = unreadMessages + conversationUnread + bookingUpdates;
 
   // Close dropdowns on outside click
   useEffect(() => {
@@ -206,6 +214,23 @@ function Navbar() {
                             </div>
                           </Link>
                         )}
+                        {conversationUnread > 0 && (
+                          <Link
+                            to="/inbox"
+                            onClick={() => setNotifOpen(false)}
+                            className="flex items-center px-4 py-3 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                          >
+                            <div className="w-8 h-8 rounded-full bg-[#0B0B45]/10 flex items-center justify-center mr-3 flex-shrink-0">
+                              <svg className="w-4 h-4 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-[#0B0B45] text-xs">Reservation Messages</p>
+                              <p className="text-[#6b7280] text-[11px]">{conversationUnread} unread message{conversationUnread > 1 ? 's' : ''}</p>
+                            </div>
+                          </Link>
+                        )}
                         {bookingUpdates > 0 && (
                           <Link
                             to="/profile#bookings"
@@ -276,6 +301,21 @@ function Navbar() {
                     {unreadMessages > 0 && (
                       <span className="min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                         {unreadMessages > 9 ? '9+' : unreadMessages}
+                      </span>
+                    )}
+                  </Link>
+                  <Link
+                    to="/inbox"
+                    onClick={() => setDropdownOpen(false)}
+                    className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+                    </svg>
+                    <span className="flex-1">Inbox</span>
+                    {conversationUnread > 0 && (
+                      <span className="min-w-[18px] h-[18px] px-1 bg-[#C49A6C] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {conversationUnread > 9 ? '9+' : conversationUnread}
                       </span>
                     )}
                   </Link>
@@ -449,6 +489,13 @@ function Navbar() {
                     onClick={() => setMenuOpen(false)}
                   >
                     Messages{unreadMessages > 0 ? ` (${unreadMessages})` : ''}
+                  </Link>
+                  <Link
+                    to="/inbox"
+                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Inbox{conversationUnread > 0 ? ` (${conversationUnread})` : ''}
                   </Link>
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link

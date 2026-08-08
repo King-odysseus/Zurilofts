@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import Spinner from '../components/Spinner.jsx';
@@ -82,6 +82,19 @@ function BookingHistoryPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
+  const navigate = useNavigate();
+
+  // Open (or create) the reservation conversation for a booking, then go to it.
+  // The endpoint is idempotent, so it is safe to click repeatedly.
+  async function openConversation(bookingId) {
+    try {
+      const res = await apiClient.post('/conversations', { bookingId });
+      const conversation = res.data.data;
+      navigate(`/inbox/${conversation.id}`);
+    } catch (err) {
+      console.error('Failed to open conversation', err);
+    }
+  }
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -233,6 +246,15 @@ function BookingHistoryPage() {
 
                     {/* Action buttons */}
                     <div className="flex gap-2 mt-4">
+                      <button
+                        onClick={() => openConversation(booking.id)}
+                        className="flex items-center gap-1.5 bg-[#C49A6C] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b8895c] transition-all duration-200"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        Message host
+                      </button>
                       <button
                         onClick={() => generateInvoice(booking)}
                         className="flex items-center gap-1.5 bg-[#0B0B45] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200"
