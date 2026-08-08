@@ -353,7 +353,7 @@ function Navbar() {
           }`}
         >
           <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 md:mt-0 border-t border-[#D9D9D9] md:border-0 md:flex-row md:space-x-8 rtl:space-x-reverse md:bg-transparent rounded-b-2xl md:rounded-none bg-white shadow-lg md:shadow-none">
-            {[...navLinks, ...(isAuthenticated ? [{ name: 'Trips', href: '/trips' }] : [])].map((link) => {
+            {[...navLinks, ...(isAuthenticated ? [{ name: 'Trips', href: '/trips' }] : []), ...(isAuthenticated && (user?.role === 'HOST' || user?.role === 'ADMIN') ? [{ name: 'Host', href: '/host/today' }] : [])].map((link) => {
               const isActive = location.pathname === link.href;
               return (
                 <li key={link.name}>
