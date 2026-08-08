@@ -17,7 +17,7 @@ function sanitizeContent(raw: string): string {
 }
 
 // ---------------------------------------------------------------
-// Participation check — enforces at DB level, never in JS
+// Participation check - enforces at DB level, never in JS
 // ---------------------------------------------------------------
 
 async function requireParticipant(

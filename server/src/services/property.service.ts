@@ -189,7 +189,7 @@ export async function getPropertiesByIds(ids: string[]) {
 
 
 // ---------------------------------------------------------------
-// Similar properties — public discovery
+// Similar properties - public discovery
 // ---------------------------------------------------------------
 
 /** Matches same location, then type, then closest price. Excludes the

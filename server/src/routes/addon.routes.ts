@@ -47,7 +47,7 @@ const bookingAddOnUpdateSchema = z.object({
 router.get('/properties/:id/addons', ctrl.getPropertyAddOns);
 
 // ---------------------------------------------------------------
-// Admin — catalogue
+// Admin - catalogue
 // ---------------------------------------------------------------
 
 router.get('/admin/addons', authenticate, requireAdmin, ctrl.listAddOns);
@@ -60,14 +60,14 @@ router.patch('/admin/addons/:id', authenticate, requireAdmin, validate(updateAdd
 router.delete('/admin/addons/:id', authenticate, requireAdmin, ctrl.deleteAddOn);
 
 // ---------------------------------------------------------------
-// Admin — property assignment
+// Admin - property assignment
 // ---------------------------------------------------------------
 
 router.post('/admin/properties/:id/addons', authenticate, requireAdmin, validate(assignAddOnSchema), ctrl.assignAddOn);
 router.delete('/admin/properties/:id/addons/:addOnId', authenticate, requireAdmin, ctrl.unassignAddOn);
 
 // ---------------------------------------------------------------
-// Guest — booking add-ons
+// Guest - booking add-ons
 // ---------------------------------------------------------------
 
 // Declared before /:id/addons/:addOnId to avoid shadowing

@@ -5,7 +5,7 @@ import * as ctrl from '../controllers/property.controller.js';
 
 const router = Router();
 
-// Admin-namespaced property CRUD — delegates to shared controllers.
+// Admin-namespaced property CRUD - delegates to shared controllers.
 // Mounted under /api/admin/properties (auth + requireAdmin applied by parent).
 router.get('/', ctrl.list);
 router.get('/:id', ctrl.getById);

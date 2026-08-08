@@ -37,6 +37,7 @@ model User {
   pushSubscriptions PushSubscription[]
   shortlists    Shortlist[]
   conversationMessages ConversationMessage[]
+  consentRecords ConsentRecord[]
 }
 
 model Property {
@@ -401,4 +402,20 @@ model BookingAddOn {
 
   @@unique([bookingId, addOnId])
   @@index([bookingId])
+}
+model ConsentRecord {
+  id         String   @id @default(cuid())
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  visitorId  String?
+  necessary  Boolean  @default(true)
+  analytics  Boolean  @default(false)
+  marketing  Boolean  @default(false)
+  policyVersion String
+  ipHash     String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([visitorId])
 }

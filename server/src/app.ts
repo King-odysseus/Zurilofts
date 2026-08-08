@@ -29,6 +29,8 @@ import blogRoutes from './routes/blog.routes.js';
 import shortlistRoutes from './routes/shortlist.routes.js';
 import conversationRoutes from './routes/conversation.routes.js';
 import addonRoutes from './routes/addon.routes.js';
+import consentRoutes from './routes/consent.routes.js';
+import meRoutes from './routes/me.routes.js';
 import recommendationRoutes from './routes/recommendation.routes.js';
 
 const app = express();
@@ -106,6 +108,8 @@ app.use('/api/push', pushRoutes);
 app.use('/api/guides', blogRoutes);
 app.use('/api/shortlists', shortlistRoutes);
 app.use('/api/conversations', conversationRoutes);
+app.use('/api/consent', consentRoutes);
+app.use('/api/me', meRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);

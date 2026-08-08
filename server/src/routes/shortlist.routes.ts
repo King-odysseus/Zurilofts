@@ -15,7 +15,7 @@ router.delete('/:id', authenticate, ctrl.remove);
 router.post('/:id/items', authenticate, ctrl.addItem);
 router.delete('/:id/items/:propertyId', authenticate, ctrl.removeItem);
 
-// Public shared view (no auth — declared before /:id so it matches first)
+// Public shared view (no auth - declared before /:id so it matches first)
 router.get('/shared/:token', ctrl.sharedView);
 
 export default router;

@@ -61,7 +61,7 @@ interface BookingPricingParams {
 
 /** Single-source-of-truth computation of all price line items for a booking
  *  (nightly rate, cleaning, service, discount, late checkout, extra guests).
- *  Does NOT include add-ons — those are layered on top by the caller. */
+ *  Does NOT include add-ons - those are layered on top by the caller. */
 function computeBookingPricing(params: BookingPricingParams) {
   const effectivePrice = getBedPrice(params.property, params.bedOption ?? undefined);
   const nights = calculateNights(params.checkIn, params.checkOut);
@@ -624,7 +624,7 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
   }
 
   // Wrap the money writes in a transaction: booking update + wallet credit
-  // are atomic. Push notification fires after commit — a failed push must
+  // are atomic. Push notification fires after commit - a failed push must
   // never roll back a money write.
   const updated = await prisma.$transaction(async (tx) => {
     const result = await tx.booking.update({

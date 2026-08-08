@@ -103,7 +103,7 @@ async function confirmBookingPayment(
   if (!booking) throw new Error(`Booking ${bookingId} not found`);
   if (booking.status === 'CONFIRMED') return; // idempotent
 
-  // Re-check availability — the guest's hold may have lapsed and another
+  // Re-check availability - the guest's hold may have lapsed and another
   // booking may have taken the dates in the meantime.
   const available = await isRangeAvailable(
     booking.propertyId,
