@@ -140,7 +140,11 @@ function HomePage() {
       </div>
 
       {/* Recently viewed - renders nothing for a first-time visitor */}
-      <PropertyCardRow title="Recently viewed" properties={recentlyViewed} />
+      {recentlyViewed.length > 0 && (
+        <div className="mb-12 md:mb-16">
+          <PropertyCardRow title="Recently viewed" properties={recentlyViewed} />
+        </div>
+      )}
 
       {/* Auto-scrolling Premium Property Row - full-width */}
       {premiumProperties.length > 0 && (
