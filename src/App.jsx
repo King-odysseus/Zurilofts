@@ -142,7 +142,7 @@ function HomePage() {
       {/* Recently viewed - renders nothing for a first-time visitor */}
       {recentlyViewed.length > 0 && (
         <div className="mb-12 md:mb-16">
-          <PropertyCardRow title="Recently viewed" properties={recentlyViewed} />
+          <PropertyCardRow title="Recently viewed" properties={recentlyViewed} align="center" />
         </div>
       )}
 

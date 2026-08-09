@@ -10,19 +10,20 @@ import { firstImage } from '../utils/images.js';
  * when `properties` is empty and no `emptyMessage` is provided, so callers can
  * mount it unconditionally without introducing stray headings or layout gaps.
  */
-function PropertyCardRow({ title, properties, emptyMessage }) {
+function PropertyCardRow({ title, properties, emptyMessage, align = 'left' }) {
   const cards = Array.isArray(properties) ? properties.slice(0, 6) : [];
+  const centered = align === 'center';
 
   if (cards.length === 0 && !emptyMessage) return null;
 
   return (
     <section className="max-w-7xl mx-auto px-4 md:px-6" aria-label={title}>
-      <h2 className="text-2xl md:text-3xl font-bold text-[#0B0B45] mb-6">{title}</h2>
+      <h2 className={`text-2xl md:text-3xl font-bold text-[#0B0B45] mb-6 ${centered ? 'text-center' : ''}`}>{title}</h2>
 
       {cards.length === 0 ? (
-        <p className="text-[#6b7280]">{emptyMessage}</p>
+        <p className={`text-[#6b7280] ${centered ? 'text-center' : ''}`}>{emptyMessage}</p>
       ) : (
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar">
+        <div className={`flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar ${centered ? 'justify-center' : ''}`}>
           {cards.map((property) => (
             <div key={property.id} className="snap-start flex-shrink-0 w-64 sm:w-72">
               <PropertyCard property={{ ...property, image: firstImage(property) }} />
@@ -54,6 +55,7 @@ PropertyCardRow.propTypes = {
     })
   ),
   emptyMessage: PropTypes.string,
+  align: PropTypes.oneOf(['left', 'center']),
 };
 
 export default PropertyCardRow;
