@@ -56,28 +56,115 @@ export async function initializeBookingPayment(booking: {
   return { authorizationUrl: result.authorizationUrl, reference };
 }
 
+/**
+ * Booking states in which payment is already settled (or parked for admin).
+ * These must never be re-processed, which is the basis of callback/webhook
+ * idempotency. Single source of truth for the guard and the conditional updates.
+ */
+export const TERMINAL_BOOKING_STATUSES = ['CONFIRMED', 'CONFLICT'] as const;
+
+export function isTerminalBookingStatus(status: string): boolean {
+  return (TERMINAL_BOOKING_STATUSES as readonly string[]).includes(status);
+}
+
+/** Minimal shape of a Paystack verification we need to trust a payment. */
+interface VerifiedTransaction {
+  reference: string;
+  amount: number; // cent subunit, as returned by Paystack
+  currency: string;
+  status: string;
+  metadata?: { bookingId?: string } | null;
+}
+
+export type PaymentCheckResult =
+  | { ok: true }
+  | { ok: false; reason: string; message: string };
+
+/**
+ * Decide whether a verified transaction may confirm a specific booking. Pure and
+ * side-effect-free so it is exhaustively testable. Confirmation requires ALL of:
+ * success status, matching reference, KES currency, and a paid amount that
+ * exactly equals the booking's expected total converted to subunits. Metadata is
+ * attacker-influenceable, so if it names a booking it must be THIS booking - it
+ * can never redirect a payment onto a different reservation.
+ */
+export function checkVerifiedPayment(params: {
+  verification: VerifiedTransaction;
+  expectedReference: string;
+  expectedBookingId: string;
+  expectedTotalKes: number;
+}): PaymentCheckResult {
+  const { verification, expectedReference, expectedBookingId, expectedTotalKes } = params;
+
+  if (verification.status !== 'success') {
+    return { ok: false, reason: 'not_success', message: `Transaction status is "${verification.status}", not success` };
+  }
+  if (verification.reference !== expectedReference) {
+    return { ok: false, reason: 'reference_mismatch', message: 'Transaction reference does not match the booking' };
+  }
+  const metaBookingId = verification.metadata?.bookingId;
+  if (metaBookingId != null && metaBookingId !== expectedBookingId) {
+    return { ok: false, reason: 'booking_mismatch', message: 'Transaction metadata references a different booking' };
+  }
+  if ((verification.currency || '').toUpperCase() !== 'KES') {
+    return { ok: false, reason: 'currency_mismatch', message: `Transaction currency is "${verification.currency}", not KES` };
+  }
+  // Compare in integer subunits on both sides - no floating-point money.
+  const expectedSubunit = paystack.toPaystackSubunit(expectedTotalKes);
+  if (verification.amount !== expectedSubunit) {
+    return {
+      ok: false,
+      reason: 'amount_mismatch',
+      message: `Paid amount ${verification.amount} does not equal expected ${expectedSubunit} (KES subunits)`,
+    };
+  }
+  return { ok: true };
+}
+
 /** Verify payment with Paystack and confirm the booking if successful */
 export async function verifyAndConfirmPayment(reference: string): Promise<{
   confirmed: boolean;
   bookingId?: string;
   message: string;
+  reason?: string;
 }> {
   // Check if this reference was already processed
   const existing = await prisma.booking.findUnique({
     where: { paymentReference: reference },
-    select: { id: true, status: true },
+    select: { id: true, status: true, total: true },
   });
 
   if (!existing) {
-    return { confirmed: false, message: 'No booking found for this payment reference' };
+    return { confirmed: false, reason: 'not_found', message: 'No booking found for this payment reference' };
   }
-  if (existing.status === 'CONFIRMED' || existing.status === 'CONFLICT') {
+  if (isTerminalBookingStatus(existing.status)) {
     return { confirmed: true, bookingId: existing.id, message: 'Already confirmed' };
   }
 
+  // A transport/API failure throws out of here and propagates to the caller, so a
+  // provider outage surfaces as an error and is never mistaken for a rejected or
+  // mismatched payment.
   const verification = await paystack.verifyTransaction(reference);
-  if (!verification) {
-    return { confirmed: false, message: 'Payment verification failed with Paystack' };
+
+  const check = checkVerifiedPayment({
+    verification,
+    expectedReference: reference,
+    expectedBookingId: existing.id,
+    expectedTotalKes: existing.total,
+  });
+
+  if (!check.ok) {
+    // A verified-but-invalid transaction (wrong amount/currency/reference/booking,
+    // or not success). Persist for audit; never confirm or credit a host.
+    console.error(`PAYMENT-REJECTED ref=${reference} booking=${existing.id} reason=${check.reason} - ${check.message}`);
+    try {
+      await prisma.paymentLog.create({
+        data: { event: 'verify.rejected', reference, bookingId: existing.id, payload: check.message.slice(0, 2000) },
+      });
+    } catch {
+      // Best-effort audit log - never turn a rejection into a 500.
+    }
+    return { confirmed: false, bookingId: existing.id, reason: check.reason, message: check.message };
   }
 
   // Confirm the booking
@@ -101,7 +188,7 @@ async function confirmBookingPayment(
   });
 
   if (!booking) throw new Error(`Booking ${bookingId} not found`);
-  if (booking.status === 'CONFIRMED') return; // idempotent
+  if (isTerminalBookingStatus(booking.status)) return; // idempotent
 
   // Re-check availability - the guest's hold may have lapsed and another
   // booking may have taken the dates in the meantime.
@@ -113,21 +200,25 @@ async function confirmBookingPayment(
   );
 
   if (!available) {
-    const msg = `DOUBLE-BOOK_CONFLICT booking=${bookingId} property=${booking.propertyId} ` +
-      `checkIn=${booking.checkIn.toISOString().slice(0,10)} checkOut=${booking.checkOut.toISOString().slice(0,10)} ` +
-      `user=${booking.user.email}`;
-    console.error(msg);
-
     // Record payment details but flag the booking for admin resolution.
-    // Host wallet is NOT credited until admin resolves the conflict.
-    await prisma.booking.update({
-      where: { id: bookingId },
+    // Host wallet is NOT credited until admin resolves the conflict. The
+    // conditional update makes the transition happen at most once even under
+    // concurrent callback + webhook delivery, so we only alert on a real flip.
+    const flagged = await prisma.booking.updateMany({
+      where: { id: bookingId, status: { notIn: [...TERMINAL_BOOKING_STATUSES] } },
       data: {
         status: 'CONFLICT',
         paymentChannel: payment.channel,
         paidAt: new Date(payment.paidAt),
       },
     });
+
+    if (flagged.count === 0) return; // another delivery already handled it
+
+    const msg = `DOUBLE-BOOK_CONFLICT booking=${bookingId} property=${booking.propertyId} ` +
+      `checkIn=${booking.checkIn.toISOString().slice(0,10)} checkOut=${booking.checkOut.toISOString().slice(0,10)} ` +
+      `user=${booking.user.email}`;
+    console.error(msg);
 
     sendTelegramAlert(
       `DOUBLE-BOOK CONFLICT \u2014 Booking ${bookingId.slice(-8)} for ${booking.property.title}\n` +
@@ -150,9 +241,12 @@ async function confirmBookingPayment(
     extraGuestFee
   );
 
-  // Update booking
-  await prisma.booking.update({
-    where: { id: bookingId },
+  // Atomically flip PENDING -> CONFIRMED. The affected-row count tells us whether
+  // THIS delivery performed the transition; the host wallet is credited only on
+  // that one transition, so duplicate callback/webhook deliveries can never
+  // double-credit a host.
+  const confirmedNow = await prisma.booking.updateMany({
+    where: { id: bookingId, status: { notIn: [...TERMINAL_BOOKING_STATUSES] } },
     data: {
       status: 'CONFIRMED',
       paymentChannel: payment.channel,
@@ -161,6 +255,8 @@ async function confirmBookingPayment(
       withholdingTax,
     },
   });
+
+  if (confirmedNow.count === 0) return; // another delivery already confirmed it
 
   // Credit host wallet
   const hostId = booking.property.hostId;

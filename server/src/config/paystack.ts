@@ -70,6 +70,35 @@ interface PaystackTransferResponse {
   };
 }
 
+// ---- Money boundary (KES <-> Paystack subunit) ----
+
+/**
+ * Paystack expresses every amount in the currency's minor unit. For KES that is
+ * the cent: 1 KES = 100 cents. Application money is stored and reasoned about as
+ * whole KES integers; this factor is the single conversion point at the gateway
+ * boundary. Never do this multiplication anywhere else.
+ */
+export const KES_SUBUNIT_FACTOR = 100;
+
+/**
+ * Convert a whole-KES amount to Paystack's cent subunit using integer maths only
+ * (no floating point). Rejects anything that is not a safe, non-negative integer
+ * so a bad amount can never be silently truncated or overflow into a wrong charge.
+ */
+export function toPaystackSubunit(amountKes: number): number {
+  if (typeof amountKes !== 'number' || !Number.isInteger(amountKes)) {
+    throw new Error(`Refusing to charge a non-integer KES amount: ${amountKes}`);
+  }
+  if (amountKes < 0) {
+    throw new Error(`Refusing to charge a negative KES amount: ${amountKes}`);
+  }
+  const subunit = amountKes * KES_SUBUNIT_FACTOR;
+  if (!Number.isSafeInteger(subunit)) {
+    throw new Error(`KES amount too large to represent safely in subunits: ${amountKes}`);
+  }
+  return subunit;
+}
+
 // ---- Helpers ----
 
 function headers(): Record<string, string> {
@@ -106,17 +135,16 @@ async function paystackPost<T>(path: string, body: Record<string, any>): Promise
 /** Initialize a Paystack transaction, returning the authorization_url */
 export async function initializeTransaction(params: {
   email: string;
-  amount: number; // in KES (the smallest unit = whole KES)
+  amount: number; // whole KES; converted to the cent subunit at this boundary
   reference: string;
   metadata?: Record<string, any>;
   callbackUrl?: string;
 }): Promise<{ authorizationUrl: string; reference: string; accessCode: string }> {
-  // Paystack expects amount in kobo for NGN; for KES it's the subunit (cents).
-  // However Paystack's KES integration typically uses the whole-unit amount
-  // in the "amount" field - confirmed working with KES.
+  // Paystack expects the amount in the currency's minor unit (cents for KES).
+  // params.amount is whole KES; convert exactly once here at the gateway boundary.
   const body: Record<string, any> = {
     email: params.email,
-    amount: params.amount,
+    amount: toPaystackSubunit(params.amount),
     reference: params.reference,
     currency: 'KES',
     metadata: params.metadata || {},
@@ -131,17 +159,22 @@ export async function initializeTransaction(params: {
   };
 }
 
-/** Verify a completed transaction */
+/**
+ * Fetch a transaction from Paystack for verification.
+ *
+ * Returns the raw transaction record so the caller can enforce success status,
+ * currency, reference, and exact amount. Intentionally does NOT swallow errors:
+ * a transport/API failure throws so a provider outage stays distinguishable from
+ * a transaction that verified but failed a business check (wrong amount, etc.).
+ */
 export async function verifyTransaction(
   reference: string
-): Promise<PaystackVerifyResponse['data'] | null> {
-  try {
-    const res = await paystackGet<PaystackVerifyResponse>(`/transaction/verify/${reference}`);
-    if (res.data.status === 'success') return res.data;
-    return null;
-  } catch {
-    return null;
+): Promise<PaystackVerifyResponse['data']> {
+  const res = await paystackGet<PaystackVerifyResponse>(`/transaction/verify/${reference}`);
+  if (!res.status || !res.data) {
+    throw new Error(`Paystack verify for ${reference} returned no transaction data: ${res.message}`);
   }
+  return res.data;
 }
 
 function requireWebhookSecret(): string {
