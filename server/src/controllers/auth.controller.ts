@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as authService from '../services/auth.service.js';
 import { env } from '../config/env.js';
+import { clientUrlForRequest } from '../utils/publicUrl.js';
 
 const REFRESH_COOKIE = 'zuri_refresh_token';
 
@@ -103,9 +104,10 @@ export async function me(req: Request, res: Response, next: NextFunction): Promi
  */
 export async function googleCallback(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
+    const clientUrl = clientUrlForRequest(req);
     const profile = req.user as any;
     if (!profile) {
-      return res.redirect(`${env.CLIENT_URL}/login?error=oauth_failed`);
+      return res.redirect(`${clientUrl}/login?error=oauth_failed`);
     }
 
     const { user, tokens } = await authService.googleAuth({
@@ -116,7 +118,7 @@ export async function googleCallback(req: Request, res: Response, next: NextFunc
     });
 
     setRefreshCookie(res, tokens.refreshToken);
-    res.redirect(`${env.CLIENT_URL}/auth/callback?token=${tokens.accessToken}`);
+    res.redirect(`${clientUrl}/auth/callback?token=${tokens.accessToken}`);
   } catch (error) {
     next(error);
   }
