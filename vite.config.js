@@ -26,9 +26,12 @@ export default defineConfig({
         ],
       },
       workbox: {
+        skipWaiting: true,
+        clientsClaim: true,
         importScripts: ['/push-handler.js'],
         globPatterns: ['**/*.{js,css,html,woff2,svg,png,jpg,jpeg,gif}'],
         navigateFallback: '/index.html', // SPA shell for offline/deep links
+        navigateFallbackDenylist: [/^\/api\//, /^\/uploads\//],
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -47,7 +50,7 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: /\/api\/.*/i,
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/') && !url.pathname.startsWith('/api/auth/'),
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
