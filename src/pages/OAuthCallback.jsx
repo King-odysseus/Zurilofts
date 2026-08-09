@@ -21,7 +21,11 @@ function OAuthCallback() {
 
       const result = await handleOAuthCallback(token);
       if (result.success) {
-        const dest = result.user?.role === 'HOST' || result.user?.role === 'ADMIN' ? '/admin' : '/';
+        const dest = result.user?.role === 'ADMIN'
+          ? '/admin'
+          : result.user?.role === 'HOST'
+            ? '/host/today'
+            : '/';
         navigate(dest, { replace: true });
       } else {
         navigate('/login?error=oauth_failed', { replace: true });

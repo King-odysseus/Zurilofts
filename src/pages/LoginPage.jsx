@@ -8,7 +8,8 @@ import { zuriImages } from '../assets/images';
 const bgImage = zuriImages[14]; // Ely Homes Photography (15 of 20)
 
 function getDashboardPath(user) {
-  if (user?.role === 'HOST' || user?.role === 'ADMIN') return '/admin';
+  if (user?.role === 'ADMIN') return '/admin';
+  if (user?.role === 'HOST') return '/host/today';
   return '/';
 }
 
