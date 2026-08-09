@@ -10,6 +10,7 @@ import {
   googleCallbackUrlForRequest,
   requestOrigin,
 } from '../src/utils/publicUrl.js';
+import { env } from '../src/config/env.js';
 
 function req(headers: Record<string, string>, protocol = 'http') {
   return {
@@ -50,3 +51,34 @@ test('production Google callback URL is derived when env is local or omitted', (
   assert.equal(callbackUrl, 'https://zurilofts.co.ke/api/auth/google/callback');
 });
 
+test('Google callback env pasted as KEY=value is normalized to only the URL', () => {
+  const original = env.GOOGLE_CALLBACK_URL;
+  env.GOOGLE_CALLBACK_URL = 'GOOGLE_CALLBACK_URL = https://thezurilofts.com/api/auth/google/callback';
+  try {
+    const callbackUrl = googleCallbackUrlForRequest(req({
+      'x-forwarded-proto': 'https',
+      'x-forwarded-host': 'thezurilofts.com',
+      host: 'internal.railway.app',
+    }));
+
+    assert.equal(callbackUrl, 'https://thezurilofts.com/api/auth/google/callback');
+  } finally {
+    env.GOOGLE_CALLBACK_URL = original;
+  }
+});
+
+test('client URL env pasted as KEY=value is normalized to only the URL', () => {
+  const original = env.CLIENT_URL;
+  env.CLIENT_URL = 'CLIENT_URL=https://thezurilofts.com';
+  try {
+    const clientUrl = clientUrlForRequest(req({
+      'x-forwarded-proto': 'https',
+      'x-forwarded-host': 'thezurilofts.com',
+      host: 'internal.railway.app',
+    }));
+
+    assert.equal(clientUrl, 'https://thezurilofts.com');
+  } finally {
+    env.CLIENT_URL = original;
+  }
+});
