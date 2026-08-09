@@ -111,7 +111,10 @@ export const reviewCreateSchema = z.object({
   bookingId: z.string().min(1, 'Booking is required'),
   rating: z.number().int().min(1, 'Rating is required').max(5),
   satisfaction: z.enum(['happy', 'neutral', 'unhappy']).optional(),
-  privateNote: z.string().max(2000).optional(),
+  // Guest-facing review text shown publicly on the property page
+  publicComment: z.string().max(1000, 'Public review must be 1000 characters or fewer').optional(),
+  // Private feedback for the ZuriLofts team - never shown publicly
+  privateNote: z.string().max(2000, 'Private note must be 2000 characters or fewer').optional(),
 });
 
 export const favoriteCreateSchema = z.object({

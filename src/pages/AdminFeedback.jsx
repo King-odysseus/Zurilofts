@@ -42,7 +42,7 @@ function AdminFeedback() {
   return (
     <div className="w-full">
       <h1 className="text-2xl font-bold text-[#0B0B45] mb-1">Guest Feedback</h1>
-      <p className="text-[#6b7280] mb-6">Star ratings and private notes from guests on how to improve.</p>
+      <p className="text-[#6b7280] mb-6">Star ratings, public reviews, and private notes from guests. Private notes are never shown publicly.</p>
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -79,6 +79,7 @@ function AdminFeedback() {
                   <th className="px-4 py-3 font-semibold text-[#0B0B45]">Property</th>
                   <th className="px-4 py-3 font-semibold text-[#0B0B45]">Guest</th>
                   <th className="px-4 py-3 font-semibold text-[#0B0B45]">Rating</th>
+                  <th className="px-4 py-3 font-semibold text-[#0B0B45]">Public review</th>
                   <th className="px-4 py-3 font-semibold text-[#0B0B45]">Private note</th>
                   <th className="px-4 py-3 font-semibold text-[#0B0B45]">Date</th>
                 </tr>
@@ -95,6 +96,11 @@ function AdminFeedback() {
                       <p className="text-xs text-[#6b7280]">{r.user?.email}</p>
                     </td>
                     <td className="px-4 py-3"><StarRow rating={r.rating} /></td>
+                    <td className="px-4 py-3 text-[#1f2937] max-w-md">
+                      {r.publicComment
+                        ? <span>{r.publicComment}</span>
+                        : <span className="text-[#6b7280] italic">No public review</span>}
+                    </td>
                     <td className="px-4 py-3 text-[#1f2937] max-w-md">
                       {r.privateNote
                         ? <span>{r.privateNote}</span>

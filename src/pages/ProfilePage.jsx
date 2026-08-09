@@ -53,13 +53,18 @@ function ProfilePage() {
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
 
+  // Mirrors the backend eligibility rules (createReview): a stay is reviewable
+  // only once it is CONFIRMED, paid, and has already ended. The backend remains
+  // authoritative; this just avoids showing a form that would be rejected.
   const isStayCompleted = (booking) =>
-    booking.status !== 'CANCELLED' && new Date(booking.checkOut) < new Date();
+    booking.status === 'CONFIRMED' &&
+    Boolean(booking.paidAt) &&
+    new Date(booking.checkOut) < new Date();
 
   const setReviewField = (bookingId, field, value) => {
     setReviewForms((prev) => ({
       ...prev,
-      [bookingId]: { rating: 0, privateNote: '', ...prev[bookingId], [field]: value, error: '' },
+      [bookingId]: { rating: 0, publicComment: '', privateNote: '', ...prev[bookingId], [field]: value, error: '' },
     }));
   };
 
@@ -75,6 +80,7 @@ function ProfilePage() {
         bookingId,
         rating: form.rating,
         satisfaction: form.satisfaction || undefined,
+        publicComment: form.publicComment?.trim() || undefined,
         privateNote: form.privateNote?.trim() || undefined,
       });
       // Attach the new review to its booking so the form is replaced by a summary
@@ -805,12 +811,23 @@ function ProfilePage() {
                               })}
                             </div>
                             <label className="block text-xs font-semibold text-[#6b7280] mb-1">
-                              Private note to the host (how can we improve?)
+                              Public review <span className="font-normal">(shown on the property page)</span>
+                            </label>
+                            <textarea
+                              value={reviewForms[booking.id]?.publicComment || ''}
+                              onChange={(e) => setReviewField(booking.id, 'publicComment', e.target.value)}
+                              placeholder="Share what other guests should know about this stay. This appears publicly with your first name."
+                              maxLength={1000}
+                              className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm mb-4"
+                            />
+                            <label className="block text-xs font-semibold text-[#6b7280] mb-1">
+                              Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
                             </label>
                             <textarea
                               value={reviewForms[booking.id]?.privateNote || ''}
                               onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
                               placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
+                              maxLength={2000}
                               className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
                             />
                             {reviewForms[booking.id]?.error && (

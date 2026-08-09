@@ -181,8 +181,9 @@ model Booking {
   conversation    Conversation?
 }
 
-// Post-stay guest review: star rating + a private note for the admin on how to
-// improve. One review per booking.
+// Post-stay guest review. `publicComment` is guest-facing text shown on the
+// property page; `satisfaction` and `privateNote` are private admin-only signals
+// and must never be exposed through public APIs. One review per booking.
 model Review {
   id          String   @id @default(uuid())
   bookingId   String   @unique
@@ -192,8 +193,9 @@ model Review {
   propertyId  String
   property    Property @relation(fields: [propertyId], references: [id])
   rating      Int
-  satisfaction String? // "happy" | "neutral" | "unhappy"
-  privateNote String?
+  publicComment String? // guest-facing review text shown publicly on the property page
+  satisfaction String? // PRIVATE: "happy" | "neutral" | "unhappy" - admin only
+  privateNote String?  // PRIVATE: feedback for admin - how to improve - admin only
   hidden      Boolean   @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

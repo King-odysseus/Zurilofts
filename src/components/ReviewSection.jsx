@@ -134,19 +134,14 @@ function ReviewSection({ propertyId }) {
                 <span className="font-semibold text-[#0B0B45] text-sm">
                   {review.user?.firstName} {review.user?.lastName?.[0]}.
                 </span>
-                {review.satisfaction && (
-                  <span className="ml-2 text-sm" title={review.satisfaction}>
-                    {review.satisfaction === 'happy' ? '😊' : review.satisfaction === 'neutral' ? '😐' : '😞'}
-                  </span>
-                )}
               </div>
               <span className="text-xs text-[#6b7280]">
                 {new Date(review.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
               </span>
             </div>
             <StarRating rating={review.rating} />
-            {review.privateNote && (
-              <p className="mt-2 text-sm text-[#1f2937] leading-relaxed">{review.privateNote}</p>
+            {review.publicComment && (
+              <p className="mt-2 text-sm text-[#1f2937] leading-relaxed">{review.publicComment}</p>
             )}
           </div>
         ))}
