@@ -164,8 +164,27 @@ export const adminUserUpdateSchema = z.object({
   payoutFrequency: z.enum(['weekly', 'biweekly', 'monthly']).optional(),
 });
 
+// Applicant-editable fields on a host application. userId/role/status are never
+// accepted from the body - they are derived from the JWT or the state machine.
+export const hostApplicationUpdateSchema = z.object({
+  businessName: z.string().min(1).max(120).optional(),
+  businessType: z.enum(['individual', 'company']).optional(),
+  contactPhone: z.string().min(1).max(20).optional(),
+  contactEmail: z.string().email('Invalid contact email').max(120).optional(),
+  city: z.string().min(1).max(120).optional(),
+  propertyCount: z.number().int().min(1).max(1000).optional(),
+  experience: z.string().max(2000).optional(),
+});
+
+// Admin request-changes / reject both require an applicant-visible reason.
+export const hostApplicationReviewSchema = z.object({
+  reason: z.string().min(1, 'A reason is required').max(2000),
+});
+
 export const userRoleSchema = z.object({
-  role: z.enum(['USER', 'HOST', 'ADMIN']),
+  // HOST elevation is deliberately excluded: it may only happen through an
+  // approved HostApplication, never through the generic user editor.
+  role: z.enum(['USER', 'ADMIN']),
 });
 
 export const userSuspendSchema = z.object({

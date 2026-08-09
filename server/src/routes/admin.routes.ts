@@ -9,6 +9,7 @@ import {
   adminUserUpdateSchema,
   userRoleSchema,
   userSuspendSchema,
+  hostApplicationReviewSchema,
 } from '../types/index.js';
 import { getLandingStats, setLandingStats } from '../services/settings.service.js';
 import * as bookingCtrl from '../controllers/booking.controller.js';
@@ -18,6 +19,7 @@ import * as blogCtrl from '../controllers/blog.controller.js';
 import * as pushCtrl from '../controllers/push.controller.js';
 import * as messageCtrl from '../controllers/message.controller.js';
 import * as userCtrl from '../controllers/user.controller.js';
+import * as hostAppCtrl from '../controllers/host-application.controller.js';
 import { messageCreateSchema } from '../types/index.js';
 import adminPropertyRoutes from './admin-property.routes.js';
 
@@ -31,6 +33,13 @@ router.get('/users', userCtrl.adminListUsers);
 router.patch('/users/:id', validate(adminUserUpdateSchema), userCtrl.adminUpdateUser);
 router.patch('/users/:id/role', validate(userRoleSchema), userCtrl.adminSetUserRole);
 router.patch('/users/:id/suspend', validate(userSuspendSchema), userCtrl.adminSetUserSuspended);
+
+// Host applications (review queue: list, detail, request changes, reject, approve)
+router.get('/host-applications', hostAppCtrl.adminList);
+router.get('/host-applications/:id', hostAppCtrl.adminGet);
+router.post('/host-applications/:id/request-changes', validate(hostApplicationReviewSchema), hostAppCtrl.adminRequestChanges);
+router.post('/host-applications/:id/reject', validate(hostApplicationReviewSchema), hostAppCtrl.adminReject);
+router.post('/host-applications/:id/approve', hostAppCtrl.adminApprove);
 
 // Bookings
 router.get('/bookings', bookingCtrl.listAll);

@@ -54,6 +54,36 @@ model User {
   shortlists    Shortlist[]
   conversationMessages ConversationMessage[]
   consentRecords ConsentRecord[]
+  hostApplication HostApplication?
+}
+
+// A prospective host's application to become a HOST. Registering with role HOST
+// only expresses intent: the user is created as USER with a DRAFT application
+// here, and the HOST role is granted (User.role) only on admin approval.
+// Lifecycle status: "DRAFT" | "SUBMITTED" | "CHANGES_REQUESTED" | "APPROVED" | "REJECTED".
+// Stored as a String (not an enum) to stay consistent with Payout.status and the
+// SQLite schema and avoid enum drift across the dual schemas.
+// No raw identity documents are stored in this model.
+model HostApplication {
+  id            String    @id @default(uuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        String    @default("DRAFT")
+  businessName  String?
+  businessType  String?
+  contactPhone  String?
+  contactEmail  String?
+  city          String?
+  propertyCount Int?
+  experience    String?
+  reviewNote    String?
+  reviewedBy    String?
+  submittedAt   DateTime?
+  reviewedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status])
 }
 
 model Property {

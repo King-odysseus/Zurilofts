@@ -179,6 +179,12 @@ export async function setUserRole(userId: string, role: string) {
   if (!VALID_ROLES.includes(role)) {
     throw new ValidationError(`Invalid role. Must be one of: ${VALID_ROLES.join(', ')}`);
   }
+  // Defense in depth: HOST is an approval-controlled marketplace privilege.
+  // Even if a caller bypasses route validation, the generic user editor must
+  // never grant it. Admins approve a submitted HostApplication instead.
+  if (role === 'HOST') {
+    throw new ValidationError('Approve the user\'s host application to grant HOST access.');
+  }
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError('User');
 

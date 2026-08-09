@@ -38,6 +38,35 @@ model User {
   shortlists    Shortlist[]
   conversationMessages ConversationMessage[]
   consentRecords ConsentRecord[]
+  hostApplication HostApplication?
+}
+
+// A prospective host's application to become a HOST. Registering with role HOST
+// only expresses intent: the user is created as USER with a DRAFT application
+// here, and the HOST role is granted (User.role) only on admin approval.
+// Lifecycle status: "DRAFT" | "SUBMITTED" | "CHANGES_REQUESTED" | "APPROVED" | "REJECTED".
+// No raw identity documents are stored in this model.
+model HostApplication {
+  id            String    @id @default(cuid())
+  userId        String    @unique                 // one application per user
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status        String    @default("DRAFT")
+  // Applicant-entered business / contact / hosting details for later verification
+  businessName  String?                            // trading name (individual hosts allowed)
+  businessType  String?                            // "individual" | "company"
+  contactPhone  String?
+  contactEmail  String?
+  city          String?                            // primary city/area they host in
+  propertyCount Int?                               // number of units they plan to list
+  experience    String?                            // hosting background / notes for verification
+  reviewNote    String?                            // applicant-visible reviewer note (reason for changes/rejection)
+  reviewedBy    String?                            // audit: admin userId who last reviewed (no relation, like Payout.initiatedBy)
+  submittedAt   DateTime?
+  reviewedAt    DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([status])
 }
 
 model Property {

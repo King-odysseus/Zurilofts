@@ -44,6 +44,12 @@ async function generateTokens(user: { id: string; email: string; role: string })
 
 /**
  * Register a new user with email + password.
+ *
+ * Choosing role HOST at registration is host *intent*, not authority: the user
+ * is always created as USER and, when they asked to host, a DRAFT
+ * HostApplication is created atomically. The HOST role is only ever granted
+ * later by an admin approving that application. Issued tokens therefore always
+ * carry USER for a fresh registration.
  */
 export async function registerUser(
   email: string,
@@ -58,8 +64,16 @@ export async function registerUser(
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await prisma.user.create({
-    data: { email, passwordHash, firstName, lastName, role },
+  const wantsToHost = role === 'HOST';
+
+  const user = await prisma.$transaction(async (tx) => {
+    const created = await tx.user.create({
+      data: { email, passwordHash, firstName, lastName, role: 'USER' },
+    });
+    if (wantsToHost) {
+      await tx.hostApplication.create({ data: { userId: created.id, status: 'DRAFT' } });
+    }
+    return created;
   });
 
   const tokens = await generateTokens(user);
