@@ -24,7 +24,8 @@ const envSchema = z.object({
   // Paystack
   PAYSTACK_SECRET_KEY: z.string().optional(),
   PAYSTACK_PUBLIC_KEY: z.string().optional(),
-  PAYSTACK_WEBHOOK_SECRET: z.string().optional(),
+  // Note: Paystack has no separate webhook secret. Webhook signatures are
+  // HMAC-SHA512 over the raw payload signed with PAYSTACK_SECRET_KEY.
   PAYSTACK_BASE_URL: z.string().default('https://api.paystack.co'),
   // Platform fees
   SERVICE_FEE_PERCENT: z.string().default('7.5'),
@@ -54,9 +55,9 @@ const envSchema = z.object({
       // Paystack keys are needed for payments in production, but their absence
       // must not crash the server - it should still boot and serve everything
       // else. Payment/payout endpoints fail with a clear error only when used.
-      if (!data.PAYSTACK_SECRET_KEY || !data.PAYSTACK_PUBLIC_KEY || !data.PAYSTACK_WEBHOOK_SECRET) {
+      if (!data.PAYSTACK_SECRET_KEY || !data.PAYSTACK_PUBLIC_KEY) {
         console.warn(
-          '⚠️  Paystack keys are not fully configured (PAYSTACK_SECRET_KEY, PAYSTACK_PUBLIC_KEY, PAYSTACK_WEBHOOK_SECRET). Payments and payouts are disabled until these are set.'
+          '⚠️  Paystack keys are not fully configured (PAYSTACK_SECRET_KEY, PAYSTACK_PUBLIC_KEY). Payments and payouts are disabled until these are set.'
         );
       }
       // Require Cloudinary in production - Railway's filesystem is ephemeral, so

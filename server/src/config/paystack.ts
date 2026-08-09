@@ -99,6 +99,20 @@ export function toPaystackSubunit(amountKes: number): number {
   return subunit;
 }
 
+/**
+ * Convert a Paystack cent-subunit amount back to whole KES. Paystack's read
+ * endpoints (notably /balance) report money in the minor unit, but application
+ * code reasons in whole KES, so normalize here at the same single boundary.
+ * Floors to whole KES so an available-balance check can never overstate what
+ * can actually be paid out.
+ */
+export function fromPaystackSubunit(subunit: number): number {
+  if (typeof subunit !== 'number' || !Number.isFinite(subunit)) {
+    throw new Error(`Refusing to convert a non-numeric Paystack subunit amount: ${subunit}`);
+  }
+  return Math.floor(subunit / KES_SUBUNIT_FACTOR);
+}
+
 // ---- Helpers ----
 
 function headers(): Record<string, string> {
@@ -177,21 +191,31 @@ export async function verifyTransaction(
   return res.data;
 }
 
-function requireWebhookSecret(): string {
-  const s = env.PAYSTACK_WEBHOOK_SECRET ?? '';
-  if (!s || s === 'whsec_xxxxxxxxxxxxxxxxxxxxxxxx') {
-    throw new Error(
-      'Paystack webhook secret is not configured. Set PAYSTACK_WEBHOOK_SECRET in server/.env.'
-    );
-  }
-  return s;
-}
-
-/** Verify HMAC SHA-512 webhook signature from Paystack */
+/**
+ * Verify the `x-paystack-signature` header on an incoming webhook.
+ *
+ * Paystack signs the raw event payload as HMAC-SHA512 using your integration
+ * SECRET KEY - the very same PAYSTACK_SECRET_KEY used to call the API. Paystack
+ * does NOT issue a separate `whsec`-style webhook signing secret (that is a
+ * Stripe concept); using the secret key here is what their docs prescribe.
+ *
+ * The comparison is timing-safe, and absent/malformed signature values are
+ * rejected safely (returning false) rather than throwing.
+ */
 export function verifyWebhookSignature(body: string, signature: string): boolean {
-  if (!env.PAYSTACK_WEBHOOK_SECRET) return false;
-  const hash = crypto.createHmac('sha512', env.PAYSTACK_WEBHOOK_SECRET).update(body).digest('hex');
-  return hash === signature;
+  const secret = env.PAYSTACK_SECRET_KEY;
+  if (!secret) return false;
+  if (typeof signature !== 'string' || signature.length === 0) return false;
+
+  const expected = crypto.createHmac('sha512', secret).update(body).digest('hex');
+  // Compare the two hex digests as fixed-width byte strings. timingSafeEqual
+  // requires equal lengths, so a truncated/malformed signature (wrong length)
+  // is rejected up front; equal-length values are then compared in constant
+  // time so a mismatch leaks no timing information.
+  const expectedBuf = Buffer.from(expected, 'utf8');
+  const signatureBuf = Buffer.from(signature, 'utf8');
+  if (expectedBuf.length !== signatureBuf.length) return false;
+  return crypto.timingSafeEqual(expectedBuf, signatureBuf);
 }
 
 /** List banks for a given currency and transfer type */
@@ -232,13 +256,16 @@ export async function createTransferRecipient(params: {
 /** Initiate a transfer to a bank account */
 export async function initiateTransfer(params: {
   recipientCode: string;
-  amount: number;       // in KES (whole units)
+  amount: number;       // whole KES; converted to the cent subunit at this boundary
   reason: string;
   reference: string;    // unique reference, use UUID
 }): Promise<{ transferRef: string; status: string }> {
+  // params.amount is whole KES; Paystack expects the currency's minor unit
+  // (cents for KES). Convert exactly once here at the gateway boundary, reusing
+  // the shared helper so a payout can never be sent 100x too small.
   const res = await paystackPost<PaystackTransferResponse>('/transfer', {
     source: 'balance',
-    amount: params.amount,
+    amount: toPaystackSubunit(params.amount),
     recipient: params.recipientCode,
     reference: params.reference,
     reason: params.reason,
@@ -249,8 +276,20 @@ export async function initiateTransfer(params: {
   };
 }
 
-/** Check Paystack balance */
+/**
+ * Available Paystack balance, in WHOLE KES.
+ *
+ * Paystack's /balance reports each currency's balance in its cent subunit. We
+ * take only the KES balance and normalize it to whole KES via fromPaystackSubunit
+ * so callers can compare it directly against HostWallet balances (also whole KES)
+ * without ever comparing cents against whole units.
+ */
 export async function checkBalance(): Promise<number> {
-  const res = await paystackGet<{ status: boolean; data: { balance: number }[] }>('/balance');
-  return res.data.reduce((sum, b) => sum + b.balance, 0);
+  const res = await paystackGet<{ status: boolean; data: { balance: number; currency?: string }[] }>(
+    '/balance'
+  );
+  const kesSubunits = res.data
+    .filter((b) => (b.currency ?? 'KES') === 'KES')
+    .reduce((sum, b) => sum + b.balance, 0);
+  return fromPaystackSubunit(kesSubunits);
 }
