@@ -42,6 +42,14 @@ async function generateTokens(user: { id: string; email: string; role: string })
   };
 }
 
+async function ensureDraftHostApplication(userId: string): Promise<void> {
+  await prisma.hostApplication.upsert({
+    where: { userId },
+    update: {},
+    create: { userId, status: 'DRAFT' },
+  });
+}
+
 /**
  * Register a new user with email + password.
  *
@@ -140,7 +148,10 @@ export async function googleAuth(profile: {
   email: string;
   firstName: string;
   lastName: string;
+  role?: 'USER' | 'HOST';
 }): Promise<{ user: UserResponse; tokens: AuthTokens }> {
+  const wantsToHost = profile.role === 'HOST';
+
   // Try to find by Google ID first
   let user = await prisma.user.findUnique({ where: { googleId: profile.googleId } });
 
@@ -158,18 +169,31 @@ export async function googleAuth(profile: {
 
   // If still not found, create new user
   if (!user) {
-    user = await prisma.user.create({
-      data: {
-        email: profile.email,
-        googleId: profile.googleId,
-        firstName: profile.firstName,
-        lastName: profile.lastName,
-      },
+    user = await prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: {
+          email: profile.email,
+          googleId: profile.googleId,
+          firstName: profile.firstName,
+          lastName: profile.lastName,
+          role: 'USER',
+        },
+      });
+
+      if (wantsToHost) {
+        await tx.hostApplication.create({ data: { userId: created.id, status: 'DRAFT' } });
+      }
+
+      return created;
     });
   }
 
   if (user.suspended) {
     throw new UnauthorizedError('This account has been suspended. Please contact support.');
+  }
+
+  if (wantsToHost && user.role === 'USER') {
+    await ensureDraftHostApplication(user.id);
   }
 
   const tokens = await generateTokens(user);

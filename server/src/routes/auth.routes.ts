@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Request, Router } from 'express';
 import passport from '../config/passport.js';
 import { authenticate } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
@@ -15,7 +15,13 @@ type GoogleAuthenticateOptions = {
   session: false;
   failureRedirect?: string;
   callbackURL: string;
+  state?: string;
 };
+
+function googleOAuthState(req: Request): string | undefined {
+  const role = String(req.query.role || '').toUpperCase();
+  return role === 'HOST' ? 'role=HOST' : undefined;
+}
 
 // Email/Password auth
 router.post('/register', authLimiter, validate(registerSchema), authController.register);
@@ -36,6 +42,7 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
       scope: ['profile', 'email'],
       session: false,
       callbackURL: googleCallbackUrlForRequest(req),
+      state: googleOAuthState(req),
     } as GoogleAuthenticateOptions)(req, res, next)
   );
 
