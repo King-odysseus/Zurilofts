@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import apiClient, { setAccessToken, clearAccessToken } from '../api/client.js';
+import { clearRecentlyViewed } from '../utils/recentlyViewed.js';
 
 const AuthContext = createContext(null);
 
@@ -77,6 +78,7 @@ export function AuthProvider({ children }) {
   // Listen for forced logout from the axios interceptor
   useEffect(() => {
     function handleForceLogout() {
+      clearRecentlyViewed();
       dispatch({ type: 'LOGOUT' });
     }
     window.addEventListener('auth:logout', handleForceLogout);
@@ -120,6 +122,7 @@ export function AuthProvider({ children }) {
       // ignore logout API errors
     }
     clearAccessToken();
+    clearRecentlyViewed();
     dispatch({ type: 'LOGOUT' });
   }, []);
 
