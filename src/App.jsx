@@ -96,11 +96,17 @@ function HomePage() {
     setRecentlyViewed(viewed);
   }, [allProperties]);
 
-  const marqueeItems = useMemo(() =>
-    premiumProperties.length > 0
-      ? [...premiumProperties, ...premiumProperties, ...premiumProperties, ...premiumProperties]
-      : []
-  , [premiumProperties]);
+  const marqueeItems = useMemo(() => {
+    if (premiumProperties.length === 0) return [];
+
+    let loopSegment = [...premiumProperties];
+    while (loopSegment.length < 12) {
+      loopSegment = [...loopSegment, ...premiumProperties];
+    }
+
+    loopSegment = loopSegment.slice(0, Math.max(12, premiumProperties.length));
+    return [...loopSegment, ...loopSegment];
+  }, [premiumProperties]);
 
   // Weekly-rotating masonry images from property pool
   const masonryImages = useMemo(() => {
