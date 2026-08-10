@@ -52,7 +52,10 @@ app.use(
         frameSrc: ["'self'", 'https://www.google.com'],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
-        imgSrc: ["'self'", 'data:'],
+        // Leaflet's base map tiles are images fetched directly from the
+        // OpenStreetMap subdomains. Without this source production creates the
+        // marker DOM but CSP blocks every tile, leaving an apparently blank map.
+        imgSrc: ["'self'", 'data:', 'https://*.tile.openstreetmap.org'],
         fontSrc: ["'self'", 'https:', 'data:'],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
