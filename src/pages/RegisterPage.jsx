@@ -39,9 +39,9 @@ function RegisterPage() {
 
   useEffect(() => {
     if (isAuthenticated && !isLoading && user) {
-      navigate(getDashboardPath(user), { replace: true });
+      navigate(isHost && user.role === 'USER' ? '/host/application' : getDashboardPath(user), { replace: true });
     }
-  }, [isAuthenticated, isLoading, user, navigate]);
+  }, [isAuthenticated, isLoading, user, navigate, isHost]);
 
   useEffect(() => {
     return () => clearError();

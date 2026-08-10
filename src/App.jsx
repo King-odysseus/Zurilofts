@@ -35,6 +35,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import Spinner from './components/Spinner.jsx';
 import TripHubPage from './pages/TripHubPage.jsx';
 import HostTodayPage from './pages/HostTodayPage.jsx';
+import HostApplicationPage from './pages/HostApplicationPage.jsx';
 import ShortlistsPage from './pages/ShortlistsPage.jsx';
 import ShortlistDetailPage from './pages/ShortlistDetailPage.jsx';
 import SharedShortlistPage from './pages/SharedShortlistPage.jsx';
@@ -320,6 +321,7 @@ function App() {
           <Route path="/inbox" element={<Page title="Inbox"><ProtectedRoute><InboxPage /></ProtectedRoute></Page>} />
           <Route path="/inbox/:conversationId" element={<Page title="Conversation"><ProtectedRoute><ConversationPage /></ProtectedRoute></Page>} />
           <Route path="/trips" element={<Page title="Trips"><ProtectedRoute><TripHubPage /></ProtectedRoute></Page>} />
+          <Route path="/host/application" element={<Page title="Host Application"><ProtectedRoute><HostApplicationPage /></ProtectedRoute></Page>} />
           <Route path="/host/today" element={<Page title="Host Today"><HostRoute><HostTodayPage /></HostRoute></Page>} />
           <Route path="/host/calendar" element={<Page title="Host Calendar"><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Page>} />
           <Route path="/host/calendar/:id" element={<Page title="Host Calendar"><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Page>} />

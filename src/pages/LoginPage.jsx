@@ -28,10 +28,11 @@ function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated && !isLoading && user) {
-      const returnTo = searchParams.get('returnUrl') || getDashboardPath(user);
+      const returnTo = searchParams.get('returnUrl')
+        || (isHost && user.role === 'USER' ? '/host/application' : getDashboardPath(user));
       navigate(returnTo, { replace: true });
     }
-  }, [isAuthenticated, isLoading, user, navigate, searchParams]);
+  }, [isAuthenticated, isLoading, user, navigate, searchParams, isHost]);
 
   useEffect(() => {
     if (searchParams.get('error')) {

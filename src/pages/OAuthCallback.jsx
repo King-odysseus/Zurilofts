@@ -21,11 +21,14 @@ function OAuthCallback() {
 
       const result = await handleOAuthCallback(token);
       if (result.success) {
+        const hostIntent = searchParams.get('intent') === 'host';
         const dest = result.user?.role === 'ADMIN'
           ? '/admin'
           : result.user?.role === 'HOST'
             ? '/host/today'
-            : '/';
+            : hostIntent
+              ? '/host/application'
+              : '/';
         navigate(dest, { replace: true });
       } else {
         navigate('/login?error=oauth_failed', { replace: true });
