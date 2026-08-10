@@ -210,6 +210,16 @@ export const userSuspendSchema = z.object({
   suspended: z.boolean(),
 });
 
+export const accountDeletionSchema = z.object({
+  confirm: z.literal('DELETE', {
+    errorMap: () => ({ message: 'Type DELETE to confirm account erasure' }),
+  }),
+});
+
+export const adminAccountDeletionSchema = accountDeletionSchema.extend({
+  reason: z.string().trim().min(3, 'A reason is required').max(500),
+});
+
 export const passwordChangeSchema = z.object({
   currentPassword: z.string().min(1),
   newPassword: z

@@ -29,6 +29,7 @@ model User {
   paystackRecipientCode String?              // Reusable Paystack transfer recipient
   paystackRecipientKey  String?              // Hash of destination details used by that recipient
   payoutFrequency String?                    // "weekly" | "biweekly" | "monthly"
+  deletedAt    DateTime?                     // account erased; row retained only for legal/financial relations
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   bookings     Booking[]
@@ -43,6 +44,21 @@ model User {
   conversationMessages ConversationMessage[]
   consentRecords ConsentRecord[]
   hostApplication HostApplication?
+}
+
+// Durable, non-PII audit trail for self-service and staff-initiated erasure.
+// IDs are intentionally not foreign keys because the target may be hard-deleted.
+model AccountErasureLog {
+  id           String   @id @default(cuid())
+  targetUserId String
+  actorId      String
+  actorRole    String
+  path         String
+  reason       String?
+  createdAt    DateTime @default(now())
+
+  @@index([targetUserId])
+  @@index([actorId])
 }
 
 // A prospective host's application to become a HOST. Registering with role HOST

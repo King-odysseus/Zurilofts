@@ -3,6 +3,7 @@ import sharp from 'sharp';
 import * as userService from '../services/user.service.js';
 import { ValidationError } from '../types/index.js';
 import { storeImage, deleteImage } from '../utils/imageStorage.js';
+import { deleteUserAccount } from '../services/me.service.js';
 
 export async function getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -131,6 +132,22 @@ export async function adminSetUserSuspended(req: Request, res: Response, next: N
     }
     const user = await userService.setUserSuspended(req.params.id, req.body.suspended);
     res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminDeleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    if (req.params.id === req.user!.sub) {
+      throw new ValidationError('You cannot delete your own account from user management.');
+    }
+    const result = await deleteUserAccount(req.params.id, req.body.confirm, {
+      id: req.user!.sub,
+      role: 'ADMIN',
+      reason: req.body.reason,
+    });
+    res.json({ success: true, data: result });
   } catch (error) {
     next(error);
   }

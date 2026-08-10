@@ -137,7 +137,7 @@ const ADMIN_USER_SELECT = {
 } as const;
 
 export async function listAllUsers(filters: { role?: string; search?: string }) {
-  const where: any = {};
+  const where: any = { deletedAt: null };
   if (filters.role && VALID_ROLES.includes(filters.role)) {
     where.role = filters.role;
   }

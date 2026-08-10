@@ -10,6 +10,7 @@ import {
   userRoleSchema,
   userSuspendSchema,
   hostApplicationReviewSchema,
+  adminAccountDeletionSchema,
 } from '../types/index.js';
 import { getLandingStats, setLandingStats } from '../services/settings.service.js';
 import * as bookingCtrl from '../controllers/booking.controller.js';
@@ -33,6 +34,7 @@ router.get('/users', userCtrl.adminListUsers);
 router.patch('/users/:id', validate(adminUserUpdateSchema), userCtrl.adminUpdateUser);
 router.patch('/users/:id/role', validate(userRoleSchema), userCtrl.adminSetUserRole);
 router.patch('/users/:id/suspend', validate(userSuspendSchema), userCtrl.adminSetUserSuspended);
+router.delete('/users/:id', validate(adminAccountDeletionSchema), userCtrl.adminDeleteUser);
 
 // Host applications (review queue: list, detail, request changes, reject, approve)
 router.get('/host-applications', hostAppCtrl.adminList);

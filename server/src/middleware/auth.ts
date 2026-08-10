@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/jwt.js';
 import { UnauthorizedError, ForbiddenError } from '../types/index.js';
+import prisma from '../config/prisma.js';
 
 /**
  * Require a valid JWT access token. Attaches decoded payload to req.user.
  */
-export function authenticate(req: Request, _res: Response, next: NextFunction): void {
+export async function authenticate(req: Request, _res: Response, next: NextFunction): Promise<void> {
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -14,7 +15,21 @@ export function authenticate(req: Request, _res: Response, next: NextFunction): 
 
     const token = authHeader.split(' ')[1];
     const decoded = verifyAccessToken(token);
-    req.user = decoded;
+    // Resolve current account state on every protected request so suspension,
+    // erasure, and role changes take effect immediately instead of waiting for
+    // an already-issued access token to expire.
+    const account = await prisma.user.findUnique({
+      where: { id: decoded.sub },
+      select: { email: true, role: true, suspended: true, deletedAt: true },
+    });
+    if (!account || account.suspended || account.deletedAt) {
+      throw new UnauthorizedError('This account is no longer active');
+    }
+    req.user = {
+      ...decoded,
+      email: account.email,
+      role: account.role as typeof decoded.role,
+    };
     next();
   } catch (error: any) {
     if (error.name === 'TokenExpiredError') {

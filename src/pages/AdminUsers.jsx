@@ -30,6 +30,12 @@ function AdminUsers() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
 
+  // Account erasure modal
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleteReason, setDeleteReason] = useState('');
+  const [deleteError, setDeleteError] = useState('');
+
   const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
@@ -121,6 +127,42 @@ function AdminUsers() {
       loadUsers();
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to update status');
+    } finally {
+      setBusyId('');
+    }
+  }
+
+  function openDelete(u) {
+    setDeleteTarget(u);
+    setDeleteConfirm('');
+    setDeleteReason('');
+    setDeleteError('');
+  }
+
+  function closeDelete() {
+    if (busyId) return;
+    setDeleteTarget(null);
+    setDeleteConfirm('');
+    setDeleteReason('');
+    setDeleteError('');
+  }
+
+  async function handleDeleteUser() {
+    if (!deleteTarget || deleteConfirm !== 'DELETE' || deleteReason.trim().length < 3) return;
+    setBusyId(deleteTarget.id);
+    setDeleteError('');
+    setMessage('');
+    try {
+      const res = await apiClient.delete(`/admin/users/${deleteTarget.id}`, {
+        data: { confirm: 'DELETE', reason: deleteReason.trim() },
+      });
+      setMessage(res.data.data?.message || 'The account was deleted.');
+      setDeleteTarget(null);
+      setDeleteConfirm('');
+      setDeleteReason('');
+      await loadUsers();
+    } catch (err) {
+      setDeleteError(err.response?.data?.error || 'Failed to delete the account');
     } finally {
       setBusyId('');
     }
@@ -231,13 +273,22 @@ function AdminUsers() {
                           Edit
                         </button>
                         {!isSelf && (
-                          <button
-                            onClick={() => toggleSuspend(u)}
-                            disabled={busy}
-                            className={`text-xs font-semibold transition-colors disabled:opacity-50 ${u.suspended ? 'text-green-600 hover:text-green-700' : 'text-red-500 hover:text-red-600'}`}
-                          >
-                            {busy ? '...' : u.suspended ? 'Reactivate' : 'Suspend'}
-                          </button>
+                          <>
+                            <button
+                              onClick={() => toggleSuspend(u)}
+                              disabled={busy}
+                              className={`text-xs font-semibold transition-colors disabled:opacity-50 ${u.suspended ? 'text-green-600 hover:text-green-700' : 'text-red-500 hover:text-red-600'}`}
+                            >
+                              {busy ? '...' : u.suspended ? 'Reactivate' : 'Suspend'}
+                            </button>
+                            <button
+                              onClick={() => openDelete(u)}
+                              disabled={busy}
+                              className="text-xs font-semibold text-red-700 hover:text-red-900 transition-colors disabled:opacity-50"
+                            >
+                              Delete
+                            </button>
+                          </>
                         )}
                       </div>
                     </td>
@@ -301,6 +352,60 @@ function AdminUsers() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Account erasure modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closeDelete}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 border-b border-red-100">
+              <h2 className="text-lg font-bold text-red-700">Delete user account</h2>
+              <p className="text-sm text-[#6b7280] mt-2">
+                You are deleting {deleteTarget.firstName} {deleteTarget.lastName} ({deleteTarget.email}).
+                Personal data will be erased. Records required for bookings, payouts, and legal compliance
+                will be retained only in anonymised form. This cannot be undone.
+              </p>
+            </div>
+            <div className="p-6 space-y-4">
+              {deleteError && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{deleteError}</div>}
+              <div>
+                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Reason for deletion</label>
+                <textarea
+                  value={deleteReason}
+                  onChange={(e) => { setDeleteReason(e.target.value); setDeleteError(''); }}
+                  rows={3}
+                  maxLength={500}
+                  placeholder="For example: Customer requested account erasure"
+                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-red-400"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#1f2937] mb-1">
+                  Type <span className="font-mono text-red-700">DELETE</span> to confirm
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirm}
+                  onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
+                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-red-400"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={closeDelete} disabled={Boolean(busyId)} className="px-5 py-2 rounded-full text-sm font-semibold text-[#6b7280] hover:text-[#0B0B45] disabled:opacity-50">
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteUser}
+                  disabled={Boolean(busyId) || deleteConfirm !== 'DELETE' || deleteReason.trim().length < 3}
+                  className="bg-red-600 text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-red-700 disabled:opacity-50"
+                >
+                  {busyId ? 'Deleting...' : 'Delete account'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -302,7 +302,7 @@ function ProfilePage() {
     setDeleting(true);
     setDeleteError('');
     try {
-      await apiClient.delete('/me');
+      await apiClient.delete('/me', { data: { confirm: 'DELETE' } });
       await logout();
       navigate('/');
     } catch (err) {

@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { authenticate } from '../middleware/auth.js';
 import { authLimiter } from '../middleware/rateLimiter.js';
+import { validate } from '../middleware/validate.js';
+import { accountDeletionSchema } from '../types/index.js';
 import * as ctrl from '../controllers/me.controller.js';
 
 const router = Router();
@@ -9,6 +11,6 @@ const router = Router();
 router.get('/export', authenticate, authLimiter, ctrl.exportData);
 
 // DELETE /api/me -- right to erasure
-router.delete('/', authenticate, authLimiter, ctrl.deleteAccount);
+router.delete('/', authenticate, authLimiter, validate(accountDeletionSchema), ctrl.deleteAccount);
 
 export default router;

@@ -1,7 +1,10 @@
 import crypto from 'crypto';
+import { Prisma } from '@prisma/client';
 import prisma from '../config/prisma.js';
-import { ValidationError, ForbiddenError, NotFoundError } from '../types/index.js';
+import { ValidationError, ForbiddenError, NotFoundError, ConflictError } from '../types/index.js';
 import { getConsentRecordsForUser } from './consent.service.js';
+import { deleteImage } from '../utils/imageStorage.js';
+import { hasOutstandingHostFunds, requiresAccountRetention } from '../utils/accountErasure.js';
 
 // ---------------------------------------------------------------
 // Data export -- GDPR right of access + portability
@@ -22,6 +25,8 @@ export async function exportUserData(userId: string) {
       bankName: true,
       bankAccountNo: true,
       bankCode: true,
+      payoutMethod: true,
+      mpesaPhone: true,
       payoutFrequency: true,
       suspended: true,
       createdAt: true,
@@ -164,47 +169,82 @@ export async function exportUserData(userId: string) {
 // Account erasure -- GDPR right to erasure
 // ---------------------------------------------------------------
 
-async function countAdmins(): Promise<number> {
-  const admins = await prisma.user.findMany({
-    where: { role: 'ADMIN' as any },
-    select: { id: true },
-  });
-  return admins.length;
+export interface AccountErasureActor {
+  id: string;
+  role: 'SELF' | 'ADMIN';
+  reason?: string;
 }
 
-export async function deleteUserAccount(userId: string, confirm: string) {
+export async function deleteUserAccount(
+  userId: string,
+  confirm: string,
+  actor: AccountErasureActor = { id: userId, role: 'SELF' },
+) {
   if (confirm !== 'DELETE') {
     throw new ValidationError(
       'You must send { confirm: "DELETE" } to proceed with account erasure'
     );
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    include: {
-      bookings: {
-        select: { id: true },
+  const logPrefix = `[ERASURE] target=${userId} actor=${actor.id} actorRole=${actor.role}`;
+
+  const erasePersonalRelations = async (tx: Prisma.TransactionClient) => {
+    await tx.favorite.deleteMany({ where: { userId } });
+    await tx.shortlistItem.deleteMany({ where: { shortlist: { ownerId: userId } } });
+    await tx.shortlist.deleteMany({ where: { ownerId: userId } });
+    await tx.pushSubscription.deleteMany({ where: { userId } });
+    await tx.review.deleteMany({ where: { userId } });
+    await tx.conversationMessage.deleteMany({ where: { senderId: userId } });
+    await tx.message.deleteMany({ where: { userId } });
+    await tx.hostApplication.deleteMany({ where: { userId } });
+    await tx.consentRecord.updateMany({ where: { userId }, data: { userId: null } });
+  };
+
+  // Serializable isolation makes the eligibility check and erasure one atomic
+  // decision, preventing a booking or payout from being added mid-erasure.
+  const erasure = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.findUnique({
+      where: { id: userId },
+      include: {
+        bookings: { select: { id: true } },
+        properties: { select: { id: true } },
+        payouts: { select: { id: true, status: true } },
+        wallet: { select: { balance: true } },
       },
-    },
-  });
+    });
 
-  if (!user) throw new NotFoundError('User');
+    if (!user || user.deletedAt) throw new NotFoundError('User');
 
-  // Refuse if user is the only remaining ADMIN
-  if ((user.role as string) === 'ADMIN' && (await countAdmins()) <= 1) {
-    throw new ForbiddenError(
-      'You are the only remaining administrator. Please promote another user to ADMIN before deleting your account, or this platform will become unmanageable.'
-    );
-  }
+    if ((user.role as string) === 'ADMIN') {
+      const adminCount = await tx.user.count({
+        where: { role: 'ADMIN' as any, deletedAt: null },
+      });
+      if (adminCount <= 1) {
+        throw new ForbiddenError(
+          'You cannot delete the only remaining administrator. Promote another administrator first.'
+        );
+      }
+    }
 
-  const hasBookings = user.bookings.length > 0;
-  const logPrefix = `[ERASURE] userId=${userId} hasBookings=${hasBookings}`;
+    if (hasOutstandingHostFunds({
+      walletBalance: user.wallet?.balance ?? 0,
+      payoutStatuses: user.payouts.map((payout) => payout.status),
+    })) {
+      throw new ConflictError(
+        'This account has an outstanding wallet balance or payout. Resolve it before deleting the account.'
+      );
+    }
 
-  if (hasBookings) {
-    // Anonymise the User row -- financial history stays intact but de-identified
-    const placeholderEmail = `deleted-${crypto.randomUUID()}@deleted.invalid`;
+    const retainAccount = requiresAccountRetention({
+      guestBookings: user.bookings.length,
+      properties: user.properties.length,
+      payouts: user.payouts.length,
+      hasWallet: Boolean(user.wallet),
+    });
+    const path = retainAccount ? 'anonymised' : 'hard-deleted';
 
-    await prisma.$transaction(async (tx) => {
+    if (retainAccount) {
+      const placeholderEmail = `deleted-${crypto.randomUUID()}@deleted.invalid`;
       await tx.user.update({
         where: { id: userId },
         data: {
@@ -218,75 +258,57 @@ export async function deleteUserAccount(userId: string, confirm: string) {
           bankName: null,
           bankAccountNo: null,
           bankCode: null,
+          payoutMethod: null,
+          mpesaPhone: null,
+          paystackRecipientCode: null,
+          paystackRecipientKey: null,
           payoutFrequency: null,
           suspended: true,
+          deletedAt: new Date(),
+          role: 'USER' as any,
         },
       });
 
-      // Hard-delete purely personal data
-      await tx.favorite.deleteMany({ where: { userId } });
-      await tx.shortlistItem.deleteMany({
-        where: { shortlist: { ownerId: userId } },
-      });
-      await tx.shortlist.deleteMany({ where: { ownerId: userId } });
-      await tx.pushSubscription.deleteMany({ where: { userId } });
+      // A deleted host must not receive new bookings. Existing bookings and
+      // financial records remain available to staff for fulfilment and audit.
+      await tx.property.updateMany({ where: { hostId: userId }, data: { available: false } });
+      await erasePersonalRelations(tx);
+    } else {
+      await erasePersonalRelations(tx);
+      await tx.user.delete({ where: { id: userId } });
+    }
 
-      // Delete reviews the user wrote
-      await tx.review.deleteMany({ where: { userId } });
-
-      // Delete messages the user sent
-      await tx.conversationMessage.deleteMany({ where: { senderId: userId } });
-      await tx.message.deleteMany({ where: { userId } });
-    });
-
-    console.log(`${logPrefix} path=ANONYMISE`);
-    return {
-      erased: true,
-      path: 'anonymised',
-      message:
-        'Your personal data has been removed. Financial records related to your bookings have been retained as required by law but are no longer linked to an identifiable person.',
-    };
-  }
-
-  // No bookings -- hard-delete the User and all related data
-  await prisma.$transaction(async (tx) => {
-    // Delete conversations and messages where user participated
-    await tx.conversationMessage.deleteMany({ where: { senderId: userId } });
-
-    // Find and delete conversations where user is a participant via their bookings
-    // (should be none since hasBookings is false, but handle for safety)
-    await tx.conversation.deleteMany({
-      where: {
-        booking: {
-          OR: [
-            { userId },
-            { property: { hostId: userId } },
-          ],
-        },
+    await tx.accountErasureLog.create({
+      data: {
+        targetUserId: userId,
+        actorId: actor.id,
+        actorRole: actor.role,
+        path,
+        reason: actor.reason,
       },
     });
 
-    // Delete reviews
-    await tx.review.deleteMany({ where: { userId } });
+    return { avatar: user.avatar, path };
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 
-    // Delete personal data
-    await tx.favorite.deleteMany({ where: { userId } });
-    await tx.shortlistItem.deleteMany({
-      where: { shortlist: { ownerId: userId } },
-    });
-    await tx.shortlist.deleteMany({ where: { ownerId: userId } });
-    await tx.pushSubscription.deleteMany({ where: { userId } });
-    await tx.message.deleteMany({ where: { userId } });
-
-    // Hard-delete the user (no bookings means no cascade issues)
-    await tx.user.delete({ where: { id: userId } });
+  await deleteImage(erasure.avatar).catch((error) => {
+    console.error(`${logPrefix} avatar_cleanup_failed`, error);
   });
+  console.log(`${logPrefix} path=${erasure.path.toUpperCase()}`);
 
-  console.log(`${logPrefix} path=HARD_DELETE`);
+  if (erasure.path === 'anonymised') {
+    return {
+      erased: true,
+      path: erasure.path,
+      message:
+        'The account personal data has been removed. Business and financial records were retained in anonymised form as required for operations and legal compliance.',
+    };
+  }
+
   return {
     erased: true,
-    path: 'hard-deleted',
+    path: erasure.path,
     message:
-      'Your account and all associated data have been permanently deleted.',
+      'The account and all associated personal data have been permanently deleted.',
   };
 }
