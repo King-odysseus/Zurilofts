@@ -92,7 +92,8 @@ function HomePage() {
     const byId = new Map(allProperties.map((p) => [p.id, p]));
     const viewed = getRecentlyViewed()
       .map((entry) => byId.get(entry.id))
-      .filter(Boolean);
+      .filter(Boolean)
+      .slice(0, 4);
     setRecentlyViewed(viewed);
   }, [allProperties]);
 
