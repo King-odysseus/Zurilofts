@@ -11,6 +11,7 @@ import AddOnsSection from './AddOnsSection';
 
 import apiClient from '../api/client.js';
 import { recordView } from '../utils/recentlyViewed.js';
+import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 
 /** Safely coerce a value to an array, no matter what the API sends. */
 function safeArray(value) {
@@ -180,13 +181,20 @@ function PropertyPage() {
             {property.title}
           </h1>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[#6b7280]">
-            <span className="inline-flex items-center gap-1.5">
+            <a
+              href={googleMapsDirectionsUrl({ lat: property.lat, lng: property.lng, label: property.location })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full transition-colors hover:text-[#C49A6C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+              title="Get directions in Google Maps"
+            >
               <svg className="w-5 h-5 text-[#C49A6C] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
               {property.location}
-            </span>
+              <span className="text-xs font-semibold">Google Maps ↗</span>
+            </a>
             {typeof property.rating === 'number' && property.rating > 0 && (
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#0B0B45]" aria-label={`Rated ${property.rating} out of 5 from ${property.reviews || 0} reviews`}>
                 <svg className="w-4 h-4 text-[#C49A6C]" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

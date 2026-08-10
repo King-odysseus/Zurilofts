@@ -7,6 +7,7 @@ import 'leaflet/dist/leaflet.css';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -42,12 +43,36 @@ function NearbyMap({ items, title }) {
     const bounds = L.latLngBounds();
 
     items.forEach((item) => {
-      const marker = L.marker([item.lat, item.lng])
+      const popup = document.createElement('div');
+      const heading = document.createElement('strong');
+      heading.textContent = item.name;
+      popup.appendChild(heading);
+
+      if (item.desc) {
+        const description = document.createElement('p');
+        description.textContent = item.desc;
+        description.style.margin = '6px 0 10px';
+        popup.appendChild(description);
+      }
+
+      const directions = document.createElement('a');
+      directions.href = googleMapsDirectionsUrl(item);
+      directions.target = '_blank';
+      directions.rel = 'noopener noreferrer';
+      directions.textContent = 'Get directions in Google Maps';
+      directions.setAttribute('aria-label', `Get directions to ${item.name} in Google Maps`);
+      directions.style.cssText = 'display:inline-block;color:#0B0B45;font-weight:700;text-decoration:underline;';
+      popup.appendChild(directions);
+
+      const marker = L.marker([Number(item.lat), Number(item.lng)], {
+        title: item.name,
+        alt: `Map pin for ${item.name}`,
+      })
         .addTo(map)
-        .bindPopup(`<strong>${item.name}</strong><br/>${item.desc || ''}`);
+        .bindPopup(popup);
 
       markersRef.current.push(marker);
-      bounds.extend([item.lat, item.lng]);
+      bounds.extend([Number(item.lat), Number(item.lng)]);
     });
 
     if (items.length > 1 && bounds.isValid()) {
@@ -77,12 +102,20 @@ function NearbyMap({ items, title }) {
         style={{ width: '100%', height: '500px' }}
         aria-label={`${title} map`}
       />
+      <p className="bg-white px-4 py-3 text-center text-sm text-[#6b7280]">
+        Tap a pin, then choose <span className="font-semibold text-[#0B0B45]">Get directions in Google Maps</span>.
+      </p>
     </div>
   );
 }
 
 NearbyMap.propTypes = {
-  items: PropTypes.array.isRequired,
+  items: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    desc: PropTypes.string,
+    lat: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    lng: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  })).isRequired,
   title: PropTypes.string.isRequired,
 };
 

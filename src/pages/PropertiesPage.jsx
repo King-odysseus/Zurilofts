@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -7,6 +7,8 @@ import Dropdown from '../components/Dropdown.jsx';
 import TripSearchBar from '../components/TripSearchBar.jsx';
 import { zuriImages } from '../assets/images';
 import apiClient from '../api/client.js';
+
+const PropertyResultsMap = lazy(() => import('../components/PropertyResultsMap.jsx'));
 
 const NEIGHBORHOODS = [
   { value: '', label: 'All Areas' },
@@ -536,17 +538,10 @@ function PropertiesPage() {
 
           {/* Map view */}
           {!loading && !error && viewMode === 'map' && sortedListings.length > 0 && (
-            <div className="rounded-2xl overflow-hidden border border-[#D9D9D9] shadow-sm mb-8">
-              <iframe
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(sortedListings.filter((l) => l.lat).map((l) => `${l.lat},${l.lng}(${l.title})`).join('|') || 'Nairobi')}&z=13&output=embed`}
-                width="100%"
-                height="600"
-                style={{ border: 0 }}
-                allowFullScreen=""
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Property locations map"
-              />
+            <div className="mb-8">
+              <Suspense fallback={<div className="h-[520px] animate-pulse rounded-2xl bg-[#f3f4f6]" aria-label="Loading property map" />}>
+                <PropertyResultsMap listings={sortedListings} />
+              </Suspense>
             </div>
           )}
 

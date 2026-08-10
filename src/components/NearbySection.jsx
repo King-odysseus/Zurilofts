@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dropdown from './Dropdown.jsx';
 import Spinner from './Spinner.jsx';
+import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 
 const NearbyMap = lazy(() => import('./NearbyMap.jsx'));
 
 /** Card for a single place or restaurant */
 function NearbyCard({ item, areaLabels }) {
-  const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item.lat},${item.lng}`;
+  const mapsUrl = googleMapsDirectionsUrl(item);
   return (
     <div className="neu-card overflow-hidden transition-shadow duration-300 group">
       <div className="h-48 overflow-hidden relative">
@@ -27,6 +28,15 @@ function NearbyCard({ item, areaLabels }) {
         </span>
         <h3 className="text-lg font-bold text-[#0B0B45] mb-2">{item.name}</h3>
         <p className="text-charcoal text-sm leading-relaxed">{item.desc}</p>
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0B0B45] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#C49A6C]"
+        >
+          Get directions
+          <span aria-hidden="true">↗</span>
+        </a>
       </div>
     </div>
   );
@@ -140,7 +150,15 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
 NearbySection.propTypes = {
   title: PropTypes.string.isRequired,
   subtitle: PropTypes.string.isRequired,
-  items: PropTypes.array.isRequired,
+  items: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    area: PropTypes.string.isRequired,
+    category: PropTypes.string,
+    desc: PropTypes.string,
+    image: PropTypes.string,
+    lat: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    lng: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  })).isRequired,
   areaLabels: PropTypes.object.isRequired,
   categoryLabels: PropTypes.object,
   categories: PropTypes.bool,
