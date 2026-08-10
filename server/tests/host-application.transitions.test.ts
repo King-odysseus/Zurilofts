@@ -13,6 +13,7 @@ import {
   isEditable,
   assertEditable,
   missingRequiredFields,
+  missingRequiredDocuments,
   assertSubmittable,
   planApproval,
   assertCanRequestChanges,
@@ -25,14 +26,28 @@ import {
 import { userRoleSchema } from '../src/types/index.js';
 
 const COMPLETE = {
+  legalName: 'Jane Wanjiku Doe',
   businessName: 'Skyline Stays',
   businessType: 'company',
   contactPhone: '+254700000000',
   contactEmail: 'host@example.com',
+  dateOfBirth: '1990-01-01',
+  nationality: 'Kenyan',
+  identityType: 'NATIONAL_ID',
+  kraPin: 'A123456789B',
+  companyRegistrationNo: 'CPR-12345',
   city: 'Nairobi',
   propertyCount: 3,
+  propertyRelationship: 'OWNER',
+  propertyTypes: ['apartment'],
+  propertyLocations: 'Kilimani, Nairobi',
+  yearsHosting: 0,
+  preferredPayoutMethod: 'mpesa',
   experience: 'Managed 3 units on other platforms',
+  agreedTerms: true,
 };
+
+const COMPLETE_DOCUMENTS = ['IDENTITY_FRONT', 'IDENTITY_BACK', 'PROPERTY_AUTHORITY', 'BUSINESS_REGISTRATION'];
 
 // ---- Editability ----
 
@@ -71,20 +86,29 @@ test('propertyCount must be a positive integer to count as present', () => {
 // ---- Submission ----
 
 test('a complete editable application may be submitted', () => {
-  assert.doesNotThrow(() => assertSubmittable({ ...COMPLETE, status: 'DRAFT' }));
-  assert.doesNotThrow(() => assertSubmittable({ ...COMPLETE, status: 'CHANGES_REQUESTED' }));
+  assert.doesNotThrow(() => assertSubmittable({ ...COMPLETE, status: 'DRAFT' }, COMPLETE_DOCUMENTS));
+  assert.doesNotThrow(() => assertSubmittable({ ...COMPLETE, status: 'CHANGES_REQUESTED' }, COMPLETE_DOCUMENTS));
 });
 
 test('an incomplete application cannot be submitted', () => {
   assert.throws(
-    () => assertSubmittable({ ...COMPLETE, status: 'DRAFT', contactEmail: '' }),
+    () => assertSubmittable({ ...COMPLETE, status: 'DRAFT', contactEmail: '' }, COMPLETE_DOCUMENTS),
     /complete all required fields/i,
   );
 });
 
+test('required verification documents depend on identity and business type', () => {
+  assert.deepEqual(missingRequiredDocuments(COMPLETE, COMPLETE_DOCUMENTS), []);
+  assert.deepEqual(missingRequiredDocuments(COMPLETE, ['IDENTITY_FRONT']), ['PROPERTY_AUTHORITY', 'IDENTITY_BACK', 'BUSINESS_REGISTRATION']);
+  assert.deepEqual(
+    missingRequiredDocuments({ ...COMPLETE, identityType: 'PASSPORT', businessType: 'individual' }, ['IDENTITY_FRONT', 'PROPERTY_AUTHORITY']),
+    [],
+  );
+});
+
 test('a complete application in a non-editable status cannot be submitted', () => {
-  assert.throws(() => assertSubmittable({ ...COMPLETE, status: 'SUBMITTED' }), /no longer be edited/i);
-  assert.throws(() => assertSubmittable({ ...COMPLETE, status: 'APPROVED' }), /no longer be edited/i);
+  assert.throws(() => assertSubmittable({ ...COMPLETE, status: 'SUBMITTED' }, COMPLETE_DOCUMENTS), /no longer be edited/i);
+  assert.throws(() => assertSubmittable({ ...COMPLETE, status: 'APPROVED' }, COMPLETE_DOCUMENTS), /no longer be edited/i);
 });
 
 // ---- Approval ----

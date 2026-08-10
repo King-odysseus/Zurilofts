@@ -1,5 +1,13 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ForbiddenError, ConflictError } from '../types/index.js';
+import {
+  assertHostDocumentKind,
+  decryptHostDocument,
+  detectHostDocumentMime,
+  encryptHostDocument,
+  safeDocumentName,
+  type HostDocumentKind,
+} from '../utils/hostDocumentCrypto.js';
 
 // ============================================================
 // Host application lifecycle - pure transition logic
@@ -31,34 +39,69 @@ export const EDITABLE_STATUSES: HostApplicationStatus[] = ['DRAFT', 'CHANGES_REQ
 // Applicant-entered fields that must be present before an application may be
 // submitted for review.
 export const REQUIRED_APPLICANT_FIELDS = [
+  'legalName',
   'businessName',
   'businessType',
   'contactPhone',
   'contactEmail',
+  'dateOfBirth',
+  'nationality',
+  'identityType',
+  'kraPin',
   'city',
   'propertyCount',
+  'propertyRelationship',
+  'propertyTypes',
+  'propertyLocations',
+  'yearsHosting',
+  'preferredPayoutMethod',
+  'agreedTerms',
 ] as const;
 
 // Fields the applicant is allowed to write. Anything else (status, userId,
 // reviewedBy, timestamps) is owned by the state machine, never the client.
 export const EDITABLE_APPLICANT_FIELDS = [
+  'legalName',
   'businessName',
   'businessType',
   'contactPhone',
   'contactEmail',
+  'dateOfBirth',
+  'nationality',
+  'identityType',
+  'kraPin',
+  'companyRegistrationNo',
   'city',
   'propertyCount',
+  'propertyRelationship',
+  'propertyTypes',
+  'propertyLocations',
+  'yearsHosting',
+  'preferredPayoutMethod',
   'experience',
+  'agreedTerms',
 ] as const;
 
 export interface ApplicantFields {
+  legalName?: string | null;
   businessName?: string | null;
   businessType?: string | null;
   contactPhone?: string | null;
   contactEmail?: string | null;
+  dateOfBirth?: string | null;
+  nationality?: string | null;
+  identityType?: string | null;
+  kraPin?: string | null;
+  companyRegistrationNo?: string | null;
   city?: string | null;
   propertyCount?: number | null;
+  propertyRelationship?: string | null;
+  propertyTypes?: string[] | null;
+  propertyLocations?: string | null;
+  yearsHosting?: number | null;
+  preferredPayoutMethod?: string | null;
   experience?: string | null;
+  agreedTerms?: boolean | null;
 }
 
 export function isEditable(status: string): boolean {
@@ -76,24 +119,45 @@ export function assertEditable(status: string): void {
 
 /** Names of the required fields still missing/blank on an application. */
 export function missingRequiredFields(app: ApplicantFields): string[] {
-  return REQUIRED_APPLICANT_FIELDS.filter((field) => {
+  const missing: string[] = REQUIRED_APPLICANT_FIELDS.filter((field) => {
     const value = (app as Record<string, unknown>)[field];
     if (value === null || value === undefined) return true;
     if (typeof value === 'string') return value.trim() === '';
-    if (typeof value === 'number') return !(value > 0);
+    if (typeof value === 'number') return field === 'yearsHosting' ? value < 0 : !(value > 0);
+    if (typeof value === 'boolean') return value !== true;
+    if (Array.isArray(value)) return value.length === 0;
     return false;
   });
+  if (app.businessType === 'company' && !app.companyRegistrationNo?.trim()) {
+    missing.push('companyRegistrationNo');
+  }
+  return missing;
+}
+
+export function requiredDocumentKinds(app: Pick<ApplicantFields, 'identityType' | 'businessType'>): HostDocumentKind[] {
+  const kinds: HostDocumentKind[] = ['IDENTITY_FRONT', 'PROPERTY_AUTHORITY'];
+  if (app.identityType === 'NATIONAL_ID' || app.identityType === 'ALIEN_ID') kinds.push('IDENTITY_BACK');
+  if (app.businessType === 'company') kinds.push('BUSINESS_REGISTRATION');
+  return kinds;
+}
+
+export function missingRequiredDocuments(app: ApplicantFields, uploadedKinds: string[]): HostDocumentKind[] {
+  return requiredDocumentKinds(app).filter((kind) => !uploadedKinds.includes(kind));
 }
 
 /**
  * Assert an application may be submitted: it must be in an editable status and
  * have every required field completed. Returns nothing; throws otherwise.
  */
-export function assertSubmittable(app: ApplicantFields & { status: string }): void {
+export function assertSubmittable(app: ApplicantFields & { status: string }, uploadedKinds: string[] = []): void {
   assertEditable(app.status);
   const missing = missingRequiredFields(app);
   if (missing.length > 0) {
     throw new ValidationError(`Please complete all required fields: ${missing.join(', ')}.`);
+  }
+  const missingDocuments = missingRequiredDocuments(app, uploadedKinds);
+  if (missingDocuments.length > 0) {
+    throw new ValidationError(`Please upload all required documents: ${missingDocuments.join(', ')}.`);
   }
 }
 
@@ -132,6 +196,16 @@ export function assertCanReject(status: string): void {
 // Serialization
 // ============================================================
 
+const DOCUMENT_METADATA_SELECT = {
+  id: true,
+  kind: true,
+  originalName: true,
+  mimeType: true,
+  size: true,
+  createdAt: true,
+  updatedAt: true,
+} as const;
+
 // Applicant view: everything the applicant entered plus the applicant-visible
 // reviewer note. The reviewer's identity (reviewedBy) is intentionally omitted.
 export function toApplicantView(app: any) {
@@ -139,18 +213,52 @@ export function toApplicantView(app: any) {
   return {
     id: app.id,
     status: app.status,
+    legalName: app.legalName ?? null,
     businessName: app.businessName ?? null,
     businessType: app.businessType ?? null,
     contactPhone: app.contactPhone ?? null,
     contactEmail: app.contactEmail ?? null,
+    dateOfBirth: app.dateOfBirth ?? null,
+    nationality: app.nationality ?? null,
+    identityType: app.identityType ?? null,
+    kraPin: app.kraPin ?? null,
+    companyRegistrationNo: app.companyRegistrationNo ?? null,
     city: app.city ?? null,
     propertyCount: app.propertyCount ?? null,
+    propertyRelationship: app.propertyRelationship ?? null,
+    propertyTypes: parseStringArray(app.propertyTypesJson),
+    propertyLocations: app.propertyLocations ?? null,
+    yearsHosting: app.yearsHosting ?? null,
+    preferredPayoutMethod: app.preferredPayoutMethod ?? null,
     experience: app.experience ?? null,
+    agreedTerms: Boolean(app.agreedTerms),
+    documents: (app.documents || []).map(toDocumentMetadata),
     reviewNote: app.reviewNote ?? null,
     submittedAt: app.submittedAt ?? null,
     reviewedAt: app.reviewedAt ?? null,
     createdAt: app.createdAt,
     updatedAt: app.updatedAt,
+  };
+}
+
+function parseStringArray(value: string | null | undefined): string[] {
+  try {
+    const parsed = JSON.parse(value || '[]');
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+function toDocumentMetadata(document: any) {
+  return {
+    id: document.id,
+    kind: document.kind,
+    originalName: document.originalName,
+    mimeType: document.mimeType,
+    size: document.size,
+    createdAt: document.createdAt,
+    updatedAt: document.updatedAt,
   };
 }
 
@@ -172,6 +280,13 @@ export function toAdminView(app: any) {
           suspended: app.user.suspended,
         }
       : undefined,
+    auditLogs: (app.auditLogs || []).map((entry: any) => ({
+      id: entry.id,
+      actorId: entry.actorId,
+      action: entry.action,
+      note: entry.note ?? null,
+      createdAt: entry.createdAt,
+    })),
   };
 }
 
@@ -192,7 +307,10 @@ async function loadActiveUser(userId: string) {
 
 /** Get the caller's own application, or null if they have none. */
 export async function getOwnApplication(userId: string) {
-  const app = await prisma.hostApplication.findUnique({ where: { userId } });
+  const app = await prisma.hostApplication.findUnique({
+    where: { userId },
+    include: { documents: { select: DOCUMENT_METADATA_SELECT } },
+  });
   return toApplicantView(app);
 }
 
@@ -204,7 +322,10 @@ export async function getOwnApplication(userId: string) {
 export async function ensureDraft(userId: string) {
   const user = await loadActiveUser(userId);
 
-  const existing = await prisma.hostApplication.findUnique({ where: { userId } });
+  const existing = await prisma.hostApplication.findUnique({
+    where: { userId },
+    include: { documents: { select: DOCUMENT_METADATA_SELECT } },
+  });
   if (existing) return toApplicantView(existing);
 
   if (user.role !== 'USER') {
@@ -217,6 +338,7 @@ export async function ensureDraft(userId: string) {
     where: { userId },
     update: {},
     create: { userId, status: 'DRAFT' },
+    include: { documents: { select: DOCUMENT_METADATA_SELECT } },
   });
   return toApplicantView(created);
 }
@@ -232,12 +354,18 @@ export async function updateDraft(userId: string, data: ApplicantFields) {
   // Whitelist: only ever persist editable applicant fields.
   const patch: Record<string, unknown> = {};
   for (const field of EDITABLE_APPLICANT_FIELDS) {
-    if (data[field] !== undefined) patch[field] = data[field];
+    if (data[field] === undefined) continue;
+    if (field === 'propertyTypes') {
+      patch.propertyTypesJson = JSON.stringify(data.propertyTypes || []);
+    } else {
+      patch[field] = data[field];
+    }
   }
 
   const updated = await prisma.hostApplication.update({
     where: { userId },
     data: patch,
+    include: { documents: { select: DOCUMENT_METADATA_SELECT } },
   });
   return toApplicantView(updated);
 }
@@ -246,16 +374,91 @@ export async function updateDraft(userId: string, data: ApplicantFields) {
 export async function submitApplication(userId: string) {
   await loadActiveUser(userId);
 
-  const app = await prisma.hostApplication.findUnique({ where: { userId } });
+  const app = await prisma.hostApplication.findUnique({
+    where: { userId },
+    include: { documents: { select: DOCUMENT_METADATA_SELECT } },
+  });
   if (!app) throw new NotFoundError('Host application');
-  assertSubmittable(app);
+  const fields = { ...app, propertyTypes: parseStringArray(app.propertyTypesJson) };
+  assertSubmittable(fields, app.documents.map((document) => document.kind));
 
   const updated = await prisma.hostApplication.update({
     where: { userId },
     // Clear any stale reviewer note now that a fresh review begins.
     data: { status: 'SUBMITTED', submittedAt: new Date(), reviewNote: null },
+    include: { documents: { select: DOCUMENT_METADATA_SELECT } },
   });
   return toApplicantView(updated);
+}
+
+export async function uploadApplicationDocument(
+  userId: string,
+  rawKind: string,
+  file: Express.Multer.File,
+) {
+  await loadActiveUser(userId);
+  const kind = assertHostDocumentKind(rawKind);
+  const application = await prisma.hostApplication.findUnique({ where: { userId } });
+  if (!application) throw new NotFoundError('Host application');
+  assertEditable(application.status);
+
+  const mimeType = detectHostDocumentMime(file.buffer);
+  const encrypted = encryptHostDocument(file.buffer);
+  const document = await prisma.hostApplicationDocument.upsert({
+    where: { applicationId_kind: { applicationId: application.id, kind } },
+    update: {
+      originalName: safeDocumentName(file.originalname),
+      mimeType,
+      size: file.size,
+      ...encrypted,
+    },
+    create: {
+      applicationId: application.id,
+      kind,
+      originalName: safeDocumentName(file.originalname),
+      mimeType,
+      size: file.size,
+      ...encrypted,
+    },
+  });
+  return toDocumentMetadata(document);
+}
+
+export async function deleteApplicationDocument(userId: string, rawKind: string) {
+  await loadActiveUser(userId);
+  const kind = assertHostDocumentKind(rawKind);
+  const application = await prisma.hostApplication.findUnique({ where: { userId } });
+  if (!application) throw new NotFoundError('Host application');
+  assertEditable(application.status);
+  await prisma.hostApplicationDocument.deleteMany({
+    where: { applicationId: application.id, kind },
+  });
+  return { deleted: true };
+}
+
+export async function adminDownloadDocument(applicationId: string, documentId: string, actorId: string) {
+  const document = await prisma.hostApplicationDocument.findFirst({
+    where: { id: documentId, applicationId },
+  });
+  if (!document) throw new NotFoundError('Host application document');
+  const buffer = decryptHostDocument(
+    Buffer.from(document.ciphertext),
+    Buffer.from(document.iv),
+    Buffer.from(document.authTag),
+  );
+  await prisma.hostApplicationAudit.create({
+    data: {
+      applicationId,
+      actorId,
+      action: 'DOCUMENT_VIEWED',
+      note: `${document.kind}: ${document.originalName}`,
+    },
+  });
+  return {
+    buffer,
+    mimeType: document.mimeType,
+    originalName: document.originalName,
+  };
 }
 
 // ============================================================
@@ -266,6 +469,8 @@ const ADMIN_APPLICATION_INCLUDE = {
   user: {
     select: { id: true, email: true, firstName: true, lastName: true, role: true, suspended: true },
   },
+  documents: { select: DOCUMENT_METADATA_SELECT },
+  auditLogs: { orderBy: { createdAt: 'desc' as const } },
 } as const;
 
 export async function adminListApplications(filters: {
@@ -320,15 +525,21 @@ export async function adminRequestChanges(id: string, reviewerId: string, reason
   if (!app) throw new NotFoundError('Host application');
   assertCanRequestChanges(app.status);
 
-  const updated = await prisma.hostApplication.update({
-    where: { id },
-    data: {
-      status: 'CHANGES_REQUESTED',
-      reviewNote: reason,
-      reviewedBy: reviewerId,
-      reviewedAt: new Date(),
-    },
-    include: ADMIN_APPLICATION_INCLUDE,
+  const updated = await prisma.$transaction(async (tx) => {
+    const row = await tx.hostApplication.update({
+      where: { id },
+      data: {
+        status: 'CHANGES_REQUESTED',
+        reviewNote: reason,
+        reviewedBy: reviewerId,
+        reviewedAt: new Date(),
+      },
+      include: ADMIN_APPLICATION_INCLUDE,
+    });
+    await tx.hostApplicationAudit.create({
+      data: { applicationId: id, actorId: reviewerId, action: 'CHANGES_REQUESTED', note: reason },
+    });
+    return row;
   });
   // Never touches User.role.
   return toAdminView(updated);
@@ -339,15 +550,21 @@ export async function adminReject(id: string, reviewerId: string, reason: string
   if (!app) throw new NotFoundError('Host application');
   assertCanReject(app.status);
 
-  const updated = await prisma.hostApplication.update({
-    where: { id },
-    data: {
-      status: 'REJECTED',
-      reviewNote: reason,
-      reviewedBy: reviewerId,
-      reviewedAt: new Date(),
-    },
-    include: ADMIN_APPLICATION_INCLUDE,
+  const updated = await prisma.$transaction(async (tx) => {
+    const row = await tx.hostApplication.update({
+      where: { id },
+      data: {
+        status: 'REJECTED',
+        reviewNote: reason,
+        reviewedBy: reviewerId,
+        reviewedAt: new Date(),
+      },
+      include: ADMIN_APPLICATION_INCLUDE,
+    });
+    await tx.hostApplicationAudit.create({
+      data: { applicationId: id, actorId: reviewerId, action: 'REJECTED', note: reason },
+    });
+    return row;
   });
   // Never touches User.role.
   return toAdminView(updated);
@@ -402,6 +619,9 @@ export async function adminApprove(id: string, reviewerId: string) {
         reviewNote: null,
       },
       include: ADMIN_APPLICATION_INCLUDE,
+    });
+    await tx.hostApplicationAudit.create({
+      data: { applicationId: id, actorId: reviewerId, action: 'APPROVED' },
     });
     return toAdminView(updated);
   });

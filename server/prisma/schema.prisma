@@ -65,28 +65,72 @@ model AccountErasureLog {
 // only expresses intent: the user is created as USER with a DRAFT application
 // here, and the HOST role is granted (User.role) only on admin approval.
 // Lifecycle status: "DRAFT" | "SUBMITTED" | "CHANGES_REQUESTED" | "APPROVED" | "REJECTED".
-// No raw identity documents are stored in this model.
+// Verification documents are stored separately as AES-GCM encrypted bytes.
 model HostApplication {
   id            String    @id @default(cuid())
   userId        String    @unique                 // one application per user
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   status        String    @default("DRAFT")
   // Applicant-entered business / contact / hosting details for later verification
+  legalName     String?
   businessName  String?                            // trading name (individual hosts allowed)
   businessType  String?                            // "individual" | "company"
   contactPhone  String?
   contactEmail  String?
+  dateOfBirth   String?                            // YYYY-MM-DD; validated as adult before submission
+  nationality   String?
+  identityType  String?                            // NATIONAL_ID | PASSPORT | ALIEN_ID
+  kraPin        String?
+  companyRegistrationNo String?
   city          String?                            // primary city/area they host in
   propertyCount Int?                               // number of units they plan to list
+  propertyRelationship String?                     // OWNER | MANAGER | AGENT | TENANT
+  propertyTypesJson String?                        // JSON array of intended listing types
+  propertyLocations String?
+  yearsHosting  Int?
+  preferredPayoutMethod String?                    // bank | mpesa
   experience    String?                            // hosting background / notes for verification
+  agreedTerms   Boolean   @default(false)
   reviewNote    String?                            // applicant-visible reviewer note (reason for changes/rejection)
   reviewedBy    String?                            // audit: admin userId who last reviewed (no relation, like Payout.initiatedBy)
   submittedAt   DateTime?
   reviewedAt    DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  documents     HostApplicationDocument[]
+  auditLogs     HostApplicationAudit[]
 
   @@index([status])
+}
+
+model HostApplicationDocument {
+  id            String   @id @default(cuid())
+  applicationId String
+  application   HostApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  kind          String
+  originalName  String
+  mimeType      String
+  size          Int
+  ciphertext    Bytes
+  iv            Bytes
+  authTag       Bytes
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([applicationId, kind])
+  @@index([applicationId])
+}
+
+model HostApplicationAudit {
+  id            String   @id @default(cuid())
+  applicationId String
+  application   HostApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  actorId       String
+  action        String
+  note          String?
+  createdAt     DateTime @default(now())
+
+  @@index([applicationId, createdAt])
 }
 
 model Property {

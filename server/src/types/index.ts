@@ -186,13 +186,31 @@ export const adminUserUpdateSchema = z.object({
 // Applicant-editable fields on a host application. userId/role/status are never
 // accepted from the body - they are derived from the JWT or the state machine.
 export const hostApplicationUpdateSchema = z.object({
+  legalName: z.string().trim().min(2).max(120).optional(),
   businessName: z.string().min(1).max(120).optional(),
   businessType: z.enum(['individual', 'company']).optional(),
   contactPhone: z.string().min(1).max(20).optional(),
   contactEmail: z.string().email('Invalid contact email').max(120).optional(),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD format').refine((value) => {
+    const birthDate = new Date(`${value}T00:00:00Z`);
+    if (Number.isNaN(birthDate.getTime())) return false;
+    const adultDate = new Date();
+    adultDate.setUTCFullYear(adultDate.getUTCFullYear() - 18);
+    return birthDate <= adultDate;
+  }, 'Hosts must be at least 18 years old').optional(),
+  nationality: z.string().trim().min(2).max(80).optional(),
+  identityType: z.enum(['NATIONAL_ID', 'PASSPORT', 'ALIEN_ID']).optional(),
+  kraPin: z.string().trim().toUpperCase().regex(/^[A-Z]\d{9}[A-Z]$/, 'Enter a valid 11-character KRA PIN').optional(),
+  companyRegistrationNo: z.string().trim().max(80).optional(),
   city: z.string().min(1).max(120).optional(),
   propertyCount: z.number().int().min(1).max(1000).optional(),
+  propertyRelationship: z.enum(['OWNER', 'MANAGER', 'AGENT', 'TENANT']).optional(),
+  propertyTypes: z.array(z.enum(['apartment', 'studio', 'penthouse', 'house', 'villa', 'other'])).min(1).max(6).optional(),
+  propertyLocations: z.string().trim().min(2).max(500).optional(),
+  yearsHosting: z.number().int().min(0).max(80).optional(),
+  preferredPayoutMethod: z.enum(['bank', 'mpesa']).optional(),
   experience: z.string().max(2000).optional(),
+  agreedTerms: z.boolean().optional(),
 });
 
 // Admin request-changes / reject both require an applicant-visible reason.

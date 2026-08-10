@@ -19,6 +19,9 @@ const envSchema = z.object({
   // Cloudinary (image storage). Format: cloudinary://<key>:<secret>@<cloud_name>
   // When unset, uploads fall back to local disk (dev only - ephemeral in prod).
   CLOUDINARY_URL: z.string().optional(),
+  // Dedicated host-verification document key. When omitted, the service uses
+  // a domain-separated key derived from JWT_REFRESH_SECRET for compatibility.
+  HOST_DOCUMENT_ENCRYPTION_KEY: z.string().min(32).optional(),
   CLIENT_URL: z.string().default('http://localhost:5173'),
   CORS_ORIGIN: z.string().default('http://localhost:5173'),
   // Paystack

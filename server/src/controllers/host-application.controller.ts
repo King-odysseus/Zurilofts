@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as hostAppService from '../services/host-application.service.js';
+import { ValidationError } from '../types/index.js';
 
 // ── Applicant endpoints - userId is always taken from the JWT (req.user.sub) ──
 
@@ -38,6 +39,26 @@ export async function submit(req: Request, res: Response, next: NextFunction): P
   try {
     const application = await hostAppService.submitApplication(req.user!.sub);
     res.json({ success: true, data: application });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function uploadDocument(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const file = (req as any).file as Express.Multer.File | undefined;
+    if (!file) throw new ValidationError('Choose a document to upload');
+    const document = await hostAppService.uploadApplicationDocument(req.user!.sub, req.params.kind, file);
+    res.status(201).json({ success: true, data: document });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteDocument(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await hostAppService.deleteApplicationDocument(req.user!.sub, req.params.kind);
+    res.json({ success: true, data: result });
   } catch (error) {
     next(error);
   }
@@ -96,6 +117,22 @@ export async function adminApprove(req: Request, res: Response, next: NextFuncti
   try {
     const application = await hostAppService.adminApprove(req.params.id, req.user!.sub);
     res.json({ success: true, data: application });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminDownloadDocument(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const document = await hostAppService.adminDownloadDocument(
+      req.params.id,
+      req.params.documentId,
+      req.user!.sub,
+    );
+    res.setHeader('Content-Type', document.mimeType);
+    res.setHeader('Content-Disposition', `inline; filename="${document.originalName.replace(/"/g, '')}"`);
+    res.setHeader('Cache-Control', 'no-store, private');
+    res.send(document.buffer);
   } catch (error) {
     next(error);
   }

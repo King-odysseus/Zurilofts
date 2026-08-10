@@ -60,6 +60,7 @@ const AdminMessages = lazy(() => import('./pages/AdminMessages.jsx'));
 const AdminUsers = lazy(() => import('./pages/AdminUsers.jsx'));
 const AdminGuides = lazy(() => import('./pages/AdminGuides.jsx'));
 const AdminPayouts = lazy(() => import('./pages/AdminPayouts.jsx'));
+const AdminHostApplications = lazy(() => import('./pages/AdminHostApplications.jsx'));
 const PaymentCallback = lazy(() => import('./pages/PaymentCallback.jsx'));
 
 // Home page component
@@ -347,6 +348,7 @@ function App() {
             <Route path="bookings" element={<Suspense fallback={<Loading />}><AdminBookings /></Suspense>} />
             <Route path="earnings" element={<Suspense fallback={<Loading />}><AdminEarnings /></Suspense>} />
             <Route path="users" element={<Suspense fallback={<Loading />}><AdminUsers /></Suspense>} />
+            <Route path="host-applications" element={<Suspense fallback={<Loading />}><AdminHostApplications /></Suspense>} />
             <Route path="promos" element={<Suspense fallback={<Loading />}><AdminPromos /></Suspense>} />
             <Route path="addons" element={<Suspense fallback={<Loading />}><AdminAddOns /></Suspense>} />
             <Route path="feedback" element={<Suspense fallback={<Loading />}><AdminFeedback /></Suspense>} />

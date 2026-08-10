@@ -39,6 +39,7 @@ router.delete('/users/:id', validate(adminAccountDeletionSchema), userCtrl.admin
 // Host applications (review queue: list, detail, request changes, reject, approve)
 router.get('/host-applications', hostAppCtrl.adminList);
 router.get('/host-applications/:id', hostAppCtrl.adminGet);
+router.get('/host-applications/:id/documents/:documentId', hostAppCtrl.adminDownloadDocument);
 router.post('/host-applications/:id/request-changes', validate(hostApplicationReviewSchema), hostAppCtrl.adminRequestChanges);
 router.post('/host-applications/:id/reject', validate(hostApplicationReviewSchema), hostAppCtrl.adminReject);
 router.post('/host-applications/:id/approve', hostAppCtrl.adminApprove);

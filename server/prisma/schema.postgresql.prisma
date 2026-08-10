@@ -83,27 +83,71 @@ model AccountErasureLog {
 // Lifecycle status: "DRAFT" | "SUBMITTED" | "CHANGES_REQUESTED" | "APPROVED" | "REJECTED".
 // Stored as a String (not an enum) to stay consistent with Payout.status and the
 // SQLite schema and avoid enum drift across the dual schemas.
-// No raw identity documents are stored in this model.
+// Verification documents are stored separately as AES-GCM encrypted bytes.
 model HostApplication {
   id            String    @id @default(uuid())
   userId        String    @unique
   user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   status        String    @default("DRAFT")
+  legalName     String?
   businessName  String?
   businessType  String?
   contactPhone  String?
   contactEmail  String?
+  dateOfBirth   String?
+  nationality   String?
+  identityType  String?
+  kraPin        String?
+  companyRegistrationNo String?
   city          String?
   propertyCount Int?
+  propertyRelationship String?
+  propertyTypesJson String?
+  propertyLocations String?
+  yearsHosting  Int?
+  preferredPayoutMethod String?
   experience    String?
+  agreedTerms   Boolean   @default(false)
   reviewNote    String?
   reviewedBy    String?
   submittedAt   DateTime?
   reviewedAt    DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
+  documents     HostApplicationDocument[]
+  auditLogs     HostApplicationAudit[]
 
   @@index([status])
+}
+
+model HostApplicationDocument {
+  id            String   @id @default(uuid())
+  applicationId String
+  application   HostApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  kind          String
+  originalName  String
+  mimeType      String
+  size          Int
+  ciphertext    Bytes
+  iv            Bytes
+  authTag       Bytes
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([applicationId, kind])
+  @@index([applicationId])
+}
+
+model HostApplicationAudit {
+  id            String   @id @default(uuid())
+  applicationId String
+  application   HostApplication @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  actorId       String
+  action        String
+  note          String?
+  createdAt     DateTime @default(now())
+
+  @@index([applicationId, createdAt])
 }
 
 model Property {
