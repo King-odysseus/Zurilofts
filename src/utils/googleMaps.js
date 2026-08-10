@@ -10,11 +10,14 @@ export function hasMapCoordinates(lat, lng) {
     && longitude <= 180;
 }
 
-export function googleMapsDirectionsUrl({ lat, lng, label = '' }) {
+export function googleMapsDirectionsUrl({ lat, lng, label = '', preferLabel = false }) {
   const latitude = Number(lat);
   const longitude = Number(lng);
   const hasCoordinates = hasMapCoordinates(lat, lng);
-  const destination = hasCoordinates ? `${latitude},${longitude}` : String(label).trim();
+  const cleanLabel = String(label).trim();
+  const destination = preferLabel && cleanLabel
+    ? cleanLabel
+    : hasCoordinates ? `${latitude},${longitude}` : cleanLabel;
 
   if (!destination) return 'https://www.google.com/maps';
 

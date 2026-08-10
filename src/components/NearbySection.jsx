@@ -9,7 +9,11 @@ const NearbyMap = lazy(() => import('./NearbyMap.jsx'));
 
 /** Card for a single place or restaurant */
 function NearbyCard({ item, areaLabels }) {
-  const mapsUrl = googleMapsDirectionsUrl(item);
+  const mapsUrl = googleMapsDirectionsUrl({
+    ...item,
+    label: item.mapsQuery || `${item.name}, Nairobi, Kenya`,
+    preferLabel: true,
+  });
   return (
     <div className="neu-card overflow-hidden transition-shadow duration-300 group">
       <div className="h-48 overflow-hidden relative">
@@ -123,8 +127,8 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {visible.map((item, i) => (
-              <NearbyCard key={i} item={item} areaLabels={areaLabels} />
+            {visible.map((item) => (
+              <NearbyCard key={item.name} item={item} areaLabels={areaLabels} />
             ))}
           </div>
 
@@ -156,6 +160,7 @@ NearbySection.propTypes = {
     category: PropTypes.string,
     desc: PropTypes.string,
     image: PropTypes.string,
+    mapsQuery: PropTypes.string,
     lat: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     lng: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   })).isRequired,
