@@ -122,6 +122,40 @@ test('initiateTransfer refuses a non-integer KES amount at the boundary', async 
   });
 });
 
+test('creates a Kenyan M-PESA transfer recipient with Paystack mobile_money fields', async () => {
+  let sentBody: any;
+  const fake = (async (_url: string, init: RequestInit) => {
+    sentBody = JSON.parse(init.body as string);
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        status: true,
+        data: {
+          recipient_code: 'RCP_mpesa',
+          details: { bank_name: 'M-PESA', account_name: 'Host Name' },
+        },
+      }),
+    };
+  }) as unknown as typeof fetch;
+
+  await withFetch(fake, async () => {
+    await paystack.createTransferRecipient({
+      name: 'Host Name',
+      accountNumber: '0712345678',
+      bankCode: 'MPESA',
+      type: 'mobile_money',
+    });
+    assert.deepEqual(sentBody, {
+      type: 'mobile_money',
+      name: 'Host Name',
+      account_number: '0712345678',
+      bank_code: 'MPESA',
+      currency: 'KES',
+    });
+  });
+});
+
 // ---- Balance unit normalization (Paystack cents -> whole KES) ----
 
 test('checkBalance normalizes the Paystack cent balance to whole KES', async () => {

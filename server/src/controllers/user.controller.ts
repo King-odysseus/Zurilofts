@@ -58,9 +58,22 @@ export async function changePassword(req: Request, res: Response, next: NextFunc
   }
 }
 
+export async function updatePayoutDestination(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const result = await userService.updatePayoutDestination(req.user!.sub, req.body);
+    res.json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/** Backward-compatible bank endpoint for clients cached before payout selection shipped. */
 export async function updateBankDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const result = await userService.updateBankDetails(req.user!.sub, req.body);
+    const result = await userService.updatePayoutDestination(req.user!.sub, {
+      payoutMethod: 'bank',
+      ...req.body,
+    });
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);

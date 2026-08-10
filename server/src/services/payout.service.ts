@@ -2,11 +2,27 @@ import prisma from '../config/prisma.js';
 import * as paystack from '../config/paystack.js';
 import crypto from 'crypto';
 import { ValidationError, NotFoundError, ConflictError } from '../types/index.js';
+import { maskPayoutAccount, normalizeKenyanMpesaPhone, payoutRecipientKey } from '../utils/payoutDestination.js';
 
 /** Get a host's current wallet balance + stats */
 export async function getHostWallet(hostId: string) {
   const wallet = await prisma.hostWallet.findUnique({ where: { hostId } });
   return wallet || { balance: 0, totalEarned: 0, totalPaidOut: 0, lastPayoutAt: null, nextPayoutAt: null };
+}
+
+export async function getHostPayoutDestination(hostId: string) {
+  const host = await prisma.user.findUnique({
+    where: { id: hostId },
+    select: { payoutMethod: true, mpesaPhone: true, bankName: true, bankAccountNo: true },
+  });
+  if (!host) throw new NotFoundError('User');
+
+  const method = host.payoutMethod || (host.bankAccountNo ? 'bank' : null);
+  return method === 'mpesa'
+    ? { method, label: 'M-PESA', maskedAccount: maskPayoutAccount(host.mpesaPhone) }
+    : method === 'bank'
+      ? { method, label: host.bankName || 'Bank account', maskedAccount: maskPayoutAccount(host.bankAccountNo) }
+      : { method: null, label: null, maskedAccount: null };
 }
 
 /** Process a payout for a specific host - transfers their accumulated wallet balance */
@@ -20,14 +36,23 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
     throw new ValidationError('No balance available for payout');
   }
 
-  // Check host has bank details
+  // Load the selected bank or M-PESA payout destination.
   const host = await prisma.user.findUnique({
     where: { id: hostId },
-    select: { firstName: true, lastName: true, bankAccountNo: true, bankCode: true, bankName: true, payoutFrequency: true },
+    select: {
+      firstName: true,
+      lastName: true,
+      bankAccountNo: true,
+      bankCode: true,
+      bankName: true,
+      payoutMethod: true,
+      mpesaPhone: true,
+      paystackRecipientCode: true,
+      paystackRecipientKey: true,
+      payoutFrequency: true,
+    },
   });
-  if (!host || !host.bankAccountNo || !host.bankCode) {
-    throw new ValidationError('Host has not set up bank account details');
-  }
+  if (!host) throw new NotFoundError('User');
 
   // Check there isn't already a pending/processing payout
   const existing = await prisma.payout.findFirst({
@@ -47,17 +72,55 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
 
   const recipientName = `${host.firstName} ${host.lastName}`;
 
-  // Create or reuse transfer recipient
-  let recipientCode: string;
-  try {
-    const recipient = await paystack.createTransferRecipient({
-      name: recipientName,
+  const payoutMethod = host.payoutMethod || (host.bankAccountNo ? 'bank' : null);
+  let recipientDetails: {
+    type: 'kepss' | 'mobile_money';
+    accountNumber: string;
+    bankCode: string;
+    key: string;
+  };
+
+  if (payoutMethod === 'mpesa') {
+    if (!host.mpesaPhone) throw new ValidationError('Host has not set up an M-PESA payout number');
+    const accountNumber = normalizeKenyanMpesaPhone(host.mpesaPhone);
+    recipientDetails = {
+      type: 'mobile_money',
+      accountNumber,
+      bankCode: 'MPESA',
+      key: payoutRecipientKey('mpesa', accountNumber, 'MPESA'),
+    };
+  } else {
+    if (!host.bankAccountNo || !host.bankCode) {
+      throw new ValidationError('Host has not set up payout details');
+    }
+    recipientDetails = {
+      type: 'kepss',
       accountNumber: host.bankAccountNo,
       bankCode: host.bankCode,
-    });
-    recipientCode = recipient.recipientCode;
-  } catch (e: any) {
-    throw new ValidationError(`Failed to create transfer recipient: ${e.message}`);
+      key: payoutRecipientKey('bank', host.bankAccountNo, host.bankCode),
+    };
+  }
+
+  // Create or reuse transfer recipient
+  let recipientCode: string;
+  if (host.paystackRecipientCode && host.paystackRecipientKey === recipientDetails.key) {
+    recipientCode = host.paystackRecipientCode;
+  } else {
+    try {
+      const recipient = await paystack.createTransferRecipient({
+        name: recipientName,
+        accountNumber: recipientDetails.accountNumber,
+        bankCode: recipientDetails.bankCode,
+        type: recipientDetails.type,
+      });
+      recipientCode = recipient.recipientCode;
+      await prisma.user.update({
+        where: { id: hostId },
+        data: { paystackRecipientCode: recipientCode, paystackRecipientKey: recipientDetails.key },
+      });
+    } catch (e: any) {
+      throw new ValidationError(`Failed to create transfer recipient: ${e.message}`);
+    }
   }
 
   // Collect all unpaid bookings for this host to include in the payout

@@ -9,6 +9,20 @@ import { sendTelegramAlert } from './chat.service.js';
 const SERVICE_FEE_PERCENT = Number(env.SERVICE_FEE_PERCENT) / 100;
 const WITHHOLDING_TAX_RATE = Number(env.WITHHOLDING_TAX_RATE) / 100;
 
+/** Map the checkout choice to Paystack's channel names. */
+export function paymentChannelsForMethod(method?: string): paystack.PaystackPaymentChannel[] | undefined {
+  switch (method) {
+    case 'card':
+      return ['card'];
+    case 'mpesa':
+      return ['mobile_money'];
+    case 'bank':
+      return ['bank', 'bank_transfer'];
+    default:
+      return undefined;
+  }
+}
+
 /** Calculate what the host actually earns after platform fee + WHT */
 export function calculateHostNet(subtotal: number, discountAmount: number, extraGuestFee: number) {
   const hostGross = subtotal - discountAmount + extraGuestFee;
@@ -27,6 +41,7 @@ export function generatePaymentReference(bookingId: string): string {
 export async function initializeBookingPayment(booking: {
   id: string;
   total: number;
+  paymentMethod?: string;
   user: { email: string };
   property: { title: string };
 }): Promise<{ authorizationUrl: string; reference: string }> {
@@ -37,6 +52,7 @@ export async function initializeBookingPayment(booking: {
     email: booking.user.email,
     amount: booking.total,
     reference,
+    channels: paymentChannelsForMethod(booking.paymentMethod),
     callbackUrl,
     metadata: {
       bookingId: booking.id,

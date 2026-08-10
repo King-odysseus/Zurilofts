@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -13,6 +14,7 @@ const statusColors = {
 function HostPayouts() {
   const { user } = useAuth();
   const [wallet, setWallet] = useState(null);
+  const [destination, setDestination] = useState(null);
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [whtData, setWhtData] = useState(null);
@@ -25,6 +27,7 @@ function HostPayouts() {
     try {
       const res = await apiClient.get('/host/payouts');
       setWallet(res.data.data.wallet);
+      setDestination(res.data.data.destination || null);
       setPayouts(res.data.data.payouts || []);
     } catch {
       // silent
@@ -170,6 +173,19 @@ function HostPayouts() {
             </span>
           </p>
         )}
+        <div className="mt-4 pt-4 border-t border-[#D9D9D9]/60 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs text-[#6b7280] uppercase tracking-wide">Payout destination</p>
+            <p className="text-sm font-semibold text-[#1f2937] mt-1">
+              {destination?.label
+                ? `${destination.label} · ${destination.maskedAccount || 'details saved'}`
+                : 'Not configured'}
+            </p>
+          </div>
+          <Link to="/profile" className="text-sm font-semibold text-[#C49A6C] hover:text-[#0B0B45]">
+            {destination?.method ? 'Change destination' : 'Set up payouts'}
+          </Link>
+        </div>
       </div>
 
       {/* WHT Statement */}

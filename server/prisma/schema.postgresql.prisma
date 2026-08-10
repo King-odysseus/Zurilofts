@@ -40,6 +40,10 @@ model User {
   bankName       String?       // Host bank name
   bankAccountNo  String?       // Host 10-digit Kenyan account number
   bankCode       String?       // Paystack bank code
+  payoutMethod   String?       // "bank" | "mpesa"
+  mpesaPhone     String?       // Paystack local format, e.g. "0712345678"
+  paystackRecipientCode String? // Reusable Paystack transfer recipient
+  paystackRecipientKey  String? // Hash of destination details used by that recipient
   payoutFrequency String?      // "weekly" | "biweekly" | "monthly"
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt

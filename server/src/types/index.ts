@@ -152,6 +152,25 @@ export const profileUpdateSchema = z.object({
   avatar: z.string().max(500).optional(),
 });
 
+export const payoutDestinationSchema = z.discriminatedUnion('payoutMethod', [
+  z.object({
+    payoutMethod: z.literal('bank'),
+    bankName: z.string().trim().min(1).max(100),
+    bankAccountNo: z.string().trim().regex(/^\d{6,20}$/, 'Enter a valid bank account number'),
+    bankCode: z.string().trim().min(1).max(20),
+  }),
+  z.object({
+    payoutMethod: z.literal('mpesa'),
+    mpesaPhone: z.string().trim().min(10).max(16),
+  }),
+]);
+
+export const legacyBankPayoutSchema = z.object({
+  bankName: z.string().trim().min(1).max(100),
+  bankAccountNo: z.string().trim().regex(/^\d{6,20}$/, 'Enter a valid bank account number'),
+  bankCode: z.string().trim().min(1).max(20),
+});
+
 // Admin editing another user's account (profile + host bank/payout details)
 export const adminUserUpdateSchema = z.object({
   firstName: z.string().min(1).max(50).optional(),

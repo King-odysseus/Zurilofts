@@ -4,11 +4,12 @@ import * as payoutService from '../services/payout.service.js';
 /** GET /api/host/payouts - host views their own payout history + wallet */
 export async function hostPayouts(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const [wallet, payouts] = await Promise.all([
+    const [wallet, destination, payouts] = await Promise.all([
       payoutService.getHostWallet(req.user!.sub),
+      payoutService.getHostPayoutDestination(req.user!.sub),
       payoutService.listPayouts({ hostId: req.user!.sub, page: Number(req.query.page) || 1, limit: Number(req.query.limit) || 10 }),
     ]);
-    res.json({ success: true, data: { wallet, ...payouts } });
+    res.json({ success: true, data: { wallet, destination, ...payouts } });
   } catch (error) {
     next(error);
   }

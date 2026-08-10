@@ -10,7 +10,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { checkVerifiedPayment, isTerminalBookingStatus } from '../src/services/payment.service.js';
+import { checkVerifiedPayment, isTerminalBookingStatus, paymentChannelsForMethod } from '../src/services/payment.service.js';
 
 const EXPECTED_KES = 5000; // -> 500000 subunits
 const REF = 'zrlft-abcd1234-ef01';
@@ -95,4 +95,11 @@ test('isTerminalBookingStatus guards already-settled bookings (idempotency)', ()
   assert.equal(isTerminalBookingStatus('CONFLICT'), true);
   assert.equal(isTerminalBookingStatus('PENDING'), false);
   assert.equal(isTerminalBookingStatus('CANCELLED'), false);
+});
+
+test('maps the M-PESA checkout choice to Paystack mobile_money', () => {
+  assert.deepEqual(paymentChannelsForMethod('mpesa'), ['mobile_money']);
+  assert.deepEqual(paymentChannelsForMethod('card'), ['card']);
+  assert.deepEqual(paymentChannelsForMethod('bank'), ['bank', 'bank_transfer']);
+  assert.equal(paymentChannelsForMethod(undefined), undefined);
 });

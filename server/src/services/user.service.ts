@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
+import { normalizeKenyanMpesaPhone, payoutRecipientKey } from '../utils/payoutDestination.js';
 
 const SALT_ROUNDS = 12;
 
@@ -19,6 +20,8 @@ export async function getUserProfile(userId: string) {
       bankName: true,
       bankAccountNo: true,
       bankCode: true,
+      payoutMethod: true,
+      mpesaPhone: true,
       payoutFrequency: true,
       createdAt: true,
     },
@@ -53,22 +56,42 @@ export async function updateUserProfile(userId: string, data: { firstName?: stri
   });
 }
 
-export async function updateBankDetails(userId: string, data: { bankName: string; bankAccountNo: string; bankCode: string }) {
+export async function updatePayoutDestination(
+  userId: string,
+  data:
+    | { payoutMethod: 'bank'; bankName: string; bankAccountNo: string; bankCode: string }
+    | { payoutMethod: 'mpesa'; mpesaPhone: string }
+) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError('User');
+
+  const destination = data.payoutMethod === 'mpesa'
+    ? { payoutMethod: 'mpesa', mpesaPhone: normalizeKenyanMpesaPhone(data.mpesaPhone) }
+    : {
+        payoutMethod: 'bank',
+        bankName: data.bankName.trim(),
+        bankAccountNo: data.bankAccountNo.trim(),
+        bankCode: data.bankCode.trim(),
+      };
+  const destinationKey = data.payoutMethod === 'mpesa'
+    ? payoutRecipientKey('mpesa', destination.mpesaPhone!, 'MPESA')
+    : payoutRecipientKey('bank', destination.bankAccountNo!, destination.bankCode!);
+  const destinationChanged = user.paystackRecipientKey !== destinationKey;
 
   return prisma.user.update({
     where: { id: userId },
     data: {
-      bankName: data.bankName,
-      bankAccountNo: data.bankAccountNo,
-      bankCode: data.bankCode,
+      ...destination,
+      paystackRecipientCode: destinationChanged ? null : undefined,
+      paystackRecipientKey: destinationKey,
     },
     select: {
       id: true,
       bankName: true,
       bankAccountNo: true,
       bankCode: true,
+      payoutMethod: true,
+      mpesaPhone: true,
     },
   });
 }

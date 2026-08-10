@@ -23,6 +23,7 @@ const hostingLinks = [
   { name: 'Listings',  href: '/host/listings' },
   { name: 'Messages',  href: '/inbox' },
   { name: 'Earnings',  href: '/host/earnings' },
+  { name: 'Payouts',   href: '/host/payouts' },
 ];
 
 function Navbar() {

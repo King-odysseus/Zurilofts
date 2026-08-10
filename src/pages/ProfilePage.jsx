@@ -38,6 +38,8 @@ function ProfilePage() {
   const [bankSaving, setBankSaving] = useState(false);
   const [bankMessage, setBankMessage] = useState('');
   const [bankForm, setBankForm] = useState({ bankName: '', bankAccountNo: '', bankCode: '' });
+  const [payoutMethod, setPayoutMethod] = useState('bank');
+  const [mpesaPhone, setMpesaPhone] = useState('');
   const [payoutFrequency, setPayoutFrequency] = useState('monthly');
   const [banks, setBanks] = useState([]);
   const [banksLoading, setBanksLoading] = useState(false);
@@ -139,6 +141,8 @@ function ProfilePage() {
       bankAccountNo: profile.bankAccountNo || '',
       bankCode: profile.bankCode || '',
     });
+    setPayoutMethod(profile.payoutMethod || (profile.mpesaPhone ? 'mpesa' : 'bank'));
+    setMpesaPhone(profile.mpesaPhone || profile.phone || '');
     setPayoutFrequency(profile.payoutFrequency || 'monthly');
   }, [profile]);
 
@@ -155,20 +159,28 @@ function ProfilePage() {
       .finally(() => setBanksLoading(false));
   }, [hostRole]);
 
-  async function handleBankSave(e) {
+  async function handlePayoutDestinationSave(e) {
     e.preventDefault();
-    if (!bankForm.bankName || !bankForm.bankAccountNo || !bankForm.bankCode) {
+    if (payoutMethod === 'bank' && (!bankForm.bankName || !bankForm.bankAccountNo || !bankForm.bankCode)) {
       setBankMessage('Please fill in all bank details');
+      return;
+    }
+    if (payoutMethod === 'mpesa' && !mpesaPhone.trim()) {
+      setBankMessage('Please enter your M-PESA number');
       return;
     }
     setBankSaving(true);
     setBankMessage('');
     try {
-      const res = await apiClient.put('/users/profile/bank', bankForm);
+      const payload = payoutMethod === 'mpesa'
+        ? { payoutMethod, mpesaPhone: mpesaPhone.trim() }
+        : { payoutMethod, ...bankForm };
+      const res = await apiClient.put('/users/profile/payout-destination', payload);
       setProfile((prev) => ({ ...prev, ...res.data.data }));
-      setBankMessage('Bank details saved!');
+      if (res.data.data.mpesaPhone) setMpesaPhone(res.data.data.mpesaPhone);
+      setBankMessage(payoutMethod === 'mpesa' ? 'M-PESA payout number saved!' : 'Bank details saved!');
     } catch (err) {
-      setBankMessage(err.response?.data?.error || 'Failed to save bank details');
+      setBankMessage(err.response?.data?.error || 'Failed to save payout destination');
     } finally {
       setBankSaving(false);
     }
@@ -596,63 +608,101 @@ function ProfilePage() {
                 Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
               </p>
 
-              {/* Bank Account Section */}
-              <form onSubmit={handleBankSave} className="space-y-4 mb-8">
-                <h4 className="font-semibold text-[#1f2937]">Bank Account</h4>
+              {/* Payout destination */}
+              <form onSubmit={handlePayoutDestinationSave} className="space-y-4 mb-8">
+                <h4 className="font-semibold text-[#1f2937]">Payout Destination</h4>
 
-                <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-2">Bank Name *</label>
-                  {banksLoading ? (
-                    <p className="text-sm text-[#6b7280]">Loading banks...</p>
-                  ) : banks.length > 0 ? (
-                    <Dropdown
-                      value={bankForm.bankCode}
-                      onChange={(code) => {
-                        const bank = banks.find((b) => b.code === code);
-                        setBankForm((prev) => ({ ...prev, bankCode: code, bankName: bank?.name || '' }));
-                      }}
-                      options={banks.map((b) => ({ value: b.code, label: b.name }))}
-                      triggerClassName=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl"
-                      ariaLabel="Select your bank"
-                    />
-                  ) : (
+                <div className="grid grid-cols-2 gap-2 rounded-full bg-[#0B0B45]/5 p-1">
+                  {[
+                    { value: 'bank', label: 'Bank account' },
+                    { value: 'mpesa', label: 'M-PESA' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setPayoutMethod(option.value)}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                        payoutMethod === option.value
+                          ? 'bg-[#0B0B45] text-white shadow-sm'
+                          : 'text-[#6b7280] hover:text-[#0B0B45]'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+
+                {payoutMethod === 'bank' ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Bank Name *</label>
+                      {banksLoading ? (
+                        <p className="text-sm text-[#6b7280]">Loading banks...</p>
+                      ) : banks.length > 0 ? (
+                        <Dropdown
+                          value={bankForm.bankCode}
+                          onChange={(code) => {
+                            const bank = banks.find((b) => b.code === code);
+                            setBankForm((prev) => ({ ...prev, bankCode: code, bankName: bank?.name || '' }));
+                          }}
+                          options={banks.map((b) => ({ value: b.code, label: b.name }))}
+                          triggerClassName=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl"
+                          ariaLabel="Select your bank"
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={bankForm.bankName}
+                          onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
+                          placeholder="e.g. KCB Bank"
+                          className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                          required
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Account Number *</label>
+                      <input
+                        type="text"
+                        value={bankForm.bankAccountNo}
+                        onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 20) }))}
+                        maxLength={20}
+                        placeholder="Bank account number"
+                        className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                        required
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Safaricom M-PESA Number *</label>
                     <input
-                      type="text"
-                      value={bankForm.bankName}
-                      onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
-                      placeholder="e.g. KCB Bank"
+                      type="tel"
+                      value={mpesaPhone}
+                      onChange={(e) => setMpesaPhone(e.target.value)}
+                      placeholder="0712 345 678"
+                      autoComplete="tel"
                       className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                       required
                     />
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-2">Account Number *</label>
-                  <input
-                    type="text"
-                    value={bankForm.bankAccountNo}
-                    onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
-                    maxLength={10}
-                    placeholder="10-digit account number"
-                    className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
-                    required
-                  />
-                </div>
+                    <p className="text-xs text-[#6b7280] mt-2">Use the Safaricom number registered to receive your host payouts.</p>
+                  </div>
+                )}
 
                 <button
                   type="submit"
                   disabled={bankSaving}
                   className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 text-sm"
                 >
-                  {bankSaving ? 'Saving...' : 'Save Bank Details'}
+                  {bankSaving ? 'Saving...' : 'Save Payout Destination'}
                 </button>
               </form>
 
               {/* Payout Frequency */}
               <div className="space-y-3">
                 <h4 className="font-semibold text-[#1f2937]">Payout Frequency</h4>
-                <p className="text-xs text-[#6b7280]">Your accumulated earnings will be transferred to your bank account on this schedule.</p>
+                <p className="text-xs text-[#6b7280]">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
                 <div className="flex items-center gap-3">
                   <Dropdown
                     value={payoutFrequency}

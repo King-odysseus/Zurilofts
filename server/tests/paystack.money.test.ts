@@ -85,3 +85,29 @@ test('verifyTransaction propagates a network error', async () => {
     await assert.rejects(() => paystack.verifyTransaction('ref_net'), /ECONNRESET/);
   });
 });
+
+test('initializeTransaction forwards an explicit mobile-money channel', async () => {
+  let sentBody: any;
+  const fake = (async (_url: string, init: RequestInit) => {
+    sentBody = JSON.parse(init.body as string);
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ({
+        status: true,
+        message: 'Authorization URL created',
+        data: { authorization_url: 'https://checkout.paystack.test/x', access_code: 'x', reference: 'ref_mpesa' },
+      }),
+    };
+  }) as unknown as typeof fetch;
+
+  await withFetch(fake, async () => {
+    await paystack.initializeTransaction({
+      email: 'guest@example.com',
+      amount: 5000,
+      reference: 'ref_mpesa',
+      channels: ['mobile_money'],
+    });
+    assert.deepEqual(sentBody.channels, ['mobile_money']);
+  });
+});

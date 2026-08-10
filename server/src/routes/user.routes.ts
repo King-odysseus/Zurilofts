@@ -1,8 +1,8 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import { authenticate } from '../middleware/auth.js';
+import { authenticate, requireHost } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { profileUpdateSchema, passwordChangeSchema, ValidationError } from '../types/index.js';
+import { profileUpdateSchema, passwordChangeSchema, payoutDestinationSchema, legacyBankPayoutSchema, ValidationError } from '../types/index.js';
 import * as ctrl from '../controllers/user.controller.js';
 
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
@@ -39,7 +39,8 @@ router.get('/profile', authenticate, ctrl.getProfile);
 router.put('/profile', authenticate, validate(profileUpdateSchema), ctrl.updateProfile);
 router.post('/avatar', authenticate, handleAvatarUpload, ctrl.uploadAvatar);
 router.put('/password', authenticate, validate(passwordChangeSchema), ctrl.changePassword);
-router.put('/profile/bank', authenticate, ctrl.updateBankDetails);
-router.put('/profile/payout-frequency', authenticate, ctrl.updatePayoutFrequency);
+router.put('/profile/payout-destination', authenticate, requireHost, validate(payoutDestinationSchema), ctrl.updatePayoutDestination);
+router.put('/profile/bank', authenticate, requireHost, validate(legacyBankPayoutSchema), ctrl.updateBankDetails);
+router.put('/profile/payout-frequency', authenticate, requireHost, ctrl.updatePayoutFrequency);
 
 export default router;

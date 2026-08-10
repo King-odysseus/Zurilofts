@@ -70,6 +70,12 @@ interface PaystackTransferResponse {
   };
 }
 
+export type PaystackPaymentChannel =
+  | 'card'
+  | 'bank'
+  | 'mobile_money'
+  | 'bank_transfer';
+
 // ---- Money boundary (KES <-> Paystack subunit) ----
 
 /**
@@ -151,6 +157,7 @@ export async function initializeTransaction(params: {
   email: string;
   amount: number; // whole KES; converted to the cent subunit at this boundary
   reference: string;
+  channels?: PaystackPaymentChannel[];
   metadata?: Record<string, any>;
   callbackUrl?: string;
 }): Promise<{ authorizationUrl: string; reference: string; accessCode: string }> {
@@ -163,6 +170,7 @@ export async function initializeTransaction(params: {
     currency: 'KES',
     metadata: params.metadata || {},
   };
+  if (params.channels?.length) body.channels = params.channels;
   if (params.callbackUrl) body.callback_url = params.callbackUrl;
 
   const res = await paystackPost<PaystackInitResponse>('/transaction/initialize', body);
@@ -234,12 +242,13 @@ export async function createTransferRecipient(params: {
   name: string;
   accountNumber: string;
   bankCode: string;
+  type?: 'kepss' | 'mobile_money';
   currency?: string;
 }): Promise<{ recipientCode: string; bankName: string; accountName: string }> {
   const res = await paystackPost<{ status: boolean; data: PaystackTransferRecipient }>(
     '/transferrecipient',
     {
-      type: 'kepss',
+      type: params.type || 'kepss',
       name: params.name,
       account_number: params.accountNumber,
       bank_code: params.bankCode,
