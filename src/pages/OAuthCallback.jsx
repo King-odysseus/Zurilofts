@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { consumePostAuthMode, rememberNavMode } from '../utils/authIntent.js';
 
 function OAuthCallback() {
   const [searchParams] = useSearchParams();
@@ -21,12 +22,13 @@ function OAuthCallback() {
 
       const result = await handleOAuthCallback(token);
       if (result.success) {
-        const hostIntent = searchParams.get('intent') === 'host';
+        const requestedMode = consumePostAuthMode();
+        rememberNavMode(requestedMode);
         const dest = result.user?.role === 'ADMIN'
           ? '/admin'
           : result.user?.role === 'HOST'
             ? '/host/today'
-            : hostIntent
+            : requestedMode === 'hosting'
               ? '/host/application'
               : '/';
         navigate(dest, { replace: true });

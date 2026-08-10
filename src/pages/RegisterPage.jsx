@@ -5,6 +5,7 @@ import apiClient from '../api/client.js';
 import logoImg from '../assets/zurilofts-logo.png';
 import { zuriImages } from '../assets/images';
 import { googleOAuthUrl } from '../utils/authUrls.js';
+import { rememberNavMode, rememberPostAuthMode } from '../utils/authIntent.js';
 
 // Use the same background treatment as the login page for consistency
 const bgImage = zuriImages[14];
@@ -19,7 +20,7 @@ function RegisterPage() {
   const [searchParams] = useSearchParams();
   const urlRole = (searchParams.get('role') || '').toUpperCase();
   const isHost = urlRole === 'HOST';
-  const googleHref = googleOAuthUrl(isHost ? 'HOST' : 'USER');
+  const googleHref = googleOAuthUrl();
 
   const [formData, setFormData] = useState({
     firstName: '',
@@ -81,6 +82,8 @@ function RegisterPage() {
       setSubmitting(false);
       return;
     }
+
+    rememberNavMode(isHost ? 'hosting' : 'travelling');
 
     // Upload avatar if one was selected
     if (avatarFile) {
@@ -275,6 +278,7 @@ function RegisterPage() {
 
           <a
             href={googleHref}
+            onClick={() => rememberPostAuthMode(isHost ? 'hosting' : 'travelling')}
             className="flex items-center justify-center w-full py-3 rounded-full border-2 border-[#D9D9D9] text-[#1f2937] font-semibold hover:border-[#C49A6C] hover:bg-[#C49A6C]/5 transition-all duration-200"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -283,7 +287,7 @@ function RegisterPage() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
-            {isHost ? 'Continue with Google to Host' : 'Continue with Google'}
+            Continue with Google
           </a>
 
           <Link
@@ -295,7 +299,7 @@ function RegisterPage() {
 
           <p className="text-center text-sm text-[#6b7280] mt-6">
             Already have an account?{' '}
-            <Link to={isHost ? '/login?role=HOST' : '/login'} className="text-[#C49A6C] font-semibold hover:text-[#0B0B45] transition-colors">
+            <Link to="/login" className="text-[#C49A6C] font-semibold hover:text-[#0B0B45] transition-colors">
               Sign in
             </Link>
           </p>
@@ -372,8 +376,8 @@ function RegisterPage() {
 
 function AuthModeToggle({ activeMode, basePath }) {
   const modes = [
-    { key: 'guest', label: 'Guest', to: basePath },
-    { key: 'host', label: 'Host', to: `${basePath}?role=HOST` },
+    { key: 'guest', label: 'Traveling', to: basePath },
+    { key: 'host', label: 'Hosting', to: `${basePath}?role=HOST` },
   ];
 
   return (

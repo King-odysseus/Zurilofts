@@ -18,12 +18,6 @@ export function getApiBaseUrl() {
   return base;
 }
 
-export function googleOAuthUrl(role = 'USER') {
-  const params = new URLSearchParams();
-  if (role === 'HOST') {
-    params.set('role', 'HOST');
-  }
-
-  const query = params.toString();
-  return `${getApiBaseUrl()}/auth/google${query ? `?${query}` : ''}`;
+export function googleOAuthUrl() {
+  return `${getApiBaseUrl()}/auth/google`;
 }

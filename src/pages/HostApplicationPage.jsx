@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useMode } from '../context/ModeContext.jsx';
 
 const EMPTY_FORM = {
   businessName: '',
@@ -38,6 +39,8 @@ function formFromApplication(application, user) {
 
 function HostApplicationPage() {
   const { user } = useAuth();
+  const { setMode } = useMode();
+  const navigate = useNavigate();
   const [application, setApplication] = useState(null);
   const [form, setForm] = useState(EMPTY_FORM);
   const [loading, setLoading] = useState(true);
@@ -120,6 +123,20 @@ function HostApplicationPage() {
     }
   }
 
+  async function handleSaveAndLeave() {
+    setSaving(true);
+    setError('');
+    setMessage('');
+    try {
+      await saveApplication();
+      setMode('travelling');
+      navigate('/');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Could not save your application.');
+      setSaving(false);
+    }
+  }
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]"><Spinner /></div>;
   }
@@ -131,6 +148,9 @@ function HostApplicationPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-[#D9D9D9]/70 p-6 md:p-10">
           <p className="text-sm font-semibold uppercase tracking-wider text-[#C49A6C] mb-2">Become a ZuriLofts host</p>
           <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45]">Host application</h1>
+          <p className="text-[#6b7280] mt-3">
+            Complete this now or save your draft and return later. Your traveling account remains available while your host application is reviewed.
+          </p>
 
           {application && (
             <div className="mt-6 rounded-2xl bg-[#0B0B45]/5 p-4">
@@ -169,6 +189,9 @@ function HostApplicationPage() {
                 </button>
                 <button type="button" onClick={handleSubmit} disabled={saving} className="rounded-full bg-[#C49A6C] px-6 py-3 font-semibold text-white hover:bg-[#b8895c] disabled:opacity-50">
                   {saving ? 'Submitting...' : 'Submit for review'}
+                </button>
+                <button type="button" onClick={handleSaveAndLeave} disabled={saving} className="rounded-full px-6 py-3 font-semibold text-[#6b7280] hover:text-[#0B0B45] disabled:opacity-50">
+                  Save &amp; continue traveling
                 </button>
               </div>
             </form>

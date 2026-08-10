@@ -26,6 +26,10 @@ const hostingLinks = [
   { name: 'Payouts',   href: '/host/payouts' },
 ];
 
+const hostingOnboardingLinks = [
+  { name: 'Host Setup', href: '/host/application' },
+];
+
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -35,7 +39,7 @@ function Navbar() {
   const dropdownRef = useRef(null);
 
   const { user, isAuthenticated, logout } = useAuth();
-  const { mode, setMode, canHost } = useMode();
+  const { mode, setMode, canHost, canSelectHosting } = useMode();
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -141,12 +145,12 @@ function Navbar() {
     navigate('/');
   }
 
-  // Links shown depend on the active mode. Guests and logged-out visitors only
-  // ever see travelling links; hosting links require canHost.
+  // All signed-in users can choose Hosting. Applicants see setup; only an
+  // approved HOST/ADMIN receives the operational host navigation.
   const activeLinks = !isAuthenticated
     ? navLinks
-    : mode === 'hosting' && canHost
-      ? hostingLinks
+    : mode === 'hosting'
+      ? canHost ? hostingLinks : hostingOnboardingLinks
       : travellingLinks;
 
   function handleSwitchMode() {
@@ -154,7 +158,7 @@ function Navbar() {
     setMode(next);
     setDropdownOpen(false);
     setMenuOpen(false);
-    navigate(next === 'hosting' ? '/host/today' : '/');
+    navigate(next === 'hosting' ? (canHost ? '/host/today' : '/host/application') : '/');
   }
 
   return (
@@ -375,7 +379,7 @@ function Navbar() {
                       {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
                     </Link>
                   )}
-                  {canHost && (
+                  {canSelectHosting && (
                     <div className="border-t border-[#D9D9D9] mt-1 pt-1">
                       <button
                         onClick={handleSwitchMode}
@@ -544,7 +548,7 @@ function Navbar() {
                       {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
                     </Link>
                   )}
-                  {canHost && (
+                  {canSelectHosting && (
                     <button
                       onClick={handleSwitchMode}
                       className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#C49A6C] text-[#C49A6C] hover:bg-[#C49A6C] hover:text-white transition-all duration-200 text-center"

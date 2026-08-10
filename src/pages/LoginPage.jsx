@@ -23,16 +23,15 @@ function LoginPage() {
   const { user, login, isAuthenticated, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const isHost = (searchParams.get('role') || '').toUpperCase() === 'HOST';
-  const googleHref = googleOAuthUrl(isHost ? 'HOST' : 'USER');
+  const googleHref = googleOAuthUrl();
 
   useEffect(() => {
     if (isAuthenticated && !isLoading && user) {
       const returnTo = searchParams.get('returnUrl')
-        || (isHost && user.role === 'USER' ? '/host/application' : getDashboardPath(user));
+        || getDashboardPath(user);
       navigate(returnTo, { replace: true });
     }
-  }, [isAuthenticated, isLoading, user, navigate, searchParams, isHost]);
+  }, [isAuthenticated, isLoading, user, navigate, searchParams]);
 
   useEffect(() => {
     if (searchParams.get('error')) {
@@ -81,15 +80,9 @@ function LoginPage() {
             <Link to="/" className="inline-block mb-6">
               <img src={logoImg} alt="ZuriLofts" className="h-20 w-auto mx-auto" />
             </Link>
-            <h1 className="text-2xl font-bold text-[#0B0B45]">
-              {isHost ? 'Host Sign In' : 'Welcome Back'}
-            </h1>
-            <p className="text-[#6b7280] mt-2">
-              {isHost ? 'Sign in to manage your hosting journey' : 'Sign in to your account'}
-            </p>
+            <h1 className="text-2xl font-bold text-[#0B0B45]">Welcome Back</h1>
+            <p className="text-[#6b7280] mt-2">Sign in, then choose Traveling or Hosting</p>
           </div>
-
-          <AuthModeToggle activeMode={isHost ? 'host' : 'guest'} basePath="/login" />
 
           {/* Error */}
           {(localError || error) && (
@@ -155,7 +148,7 @@ function LoginPage() {
               <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
               <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
             </svg>
-            {isHost ? 'Continue with Google as Host' : 'Continue with Google'}
+            Continue with Google
           </a>
 
           <Link
@@ -167,40 +160,12 @@ function LoginPage() {
 
           <p className="text-center text-sm text-[#6b7280] mt-6">
             Don&apos;t have an account?{' '}
-            <Link to={isHost ? '/register?role=HOST' : '/register'} className="text-[#C49A6C] font-semibold hover:text-[#0B0B45] transition-colors">
-              {isHost ? 'Start hosting' : 'Sign up'}
+            <Link to="/register" className="text-[#C49A6C] font-semibold hover:text-[#0B0B45] transition-colors">
+              Sign up
             </Link>
           </p>
         </div>
       </div>
-    </div>
-  );
-}
-
-function AuthModeToggle({ activeMode, basePath }) {
-  const modes = [
-    { key: 'guest', label: 'Guest', to: basePath },
-    { key: 'host', label: 'Host', to: `${basePath}?role=HOST` },
-  ];
-
-  return (
-    <div className="grid grid-cols-2 gap-2 rounded-full bg-[#0B0B45]/5 p-1 mb-6">
-      {modes.map((mode) => {
-        const active = activeMode === mode.key;
-        return (
-          <Link
-            key={mode.key}
-            to={mode.to}
-            className={`text-center rounded-full px-4 py-2 text-sm font-semibold transition-all ${
-              active
-                ? 'bg-[#0B0B45] text-white shadow-sm'
-                : 'text-[#6b7280] hover:text-[#0B0B45] hover:bg-white/70'
-            }`}
-          >
-            {mode.label}
-          </Link>
-        );
-      })}
     </div>
   );
 }

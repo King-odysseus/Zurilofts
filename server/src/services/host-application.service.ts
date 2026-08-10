@@ -211,8 +211,12 @@ export async function ensureDraft(userId: string) {
     throw new ConflictError('Your account is already elevated; no host application is needed.');
   }
 
-  const created = await prisma.hostApplication.create({
-    data: { userId, status: 'DRAFT' },
+  // Upsert keeps the onboarding entry point idempotent even when React strict
+  // mode or a double-click starts two ensure requests at nearly the same time.
+  const created = await prisma.hostApplication.upsert({
+    where: { userId },
+    update: {},
+    create: { userId, status: 'DRAFT' },
   });
   return toApplicantView(created);
 }
