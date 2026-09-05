@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import multer from 'multer';
-import { authenticate, requireHost } from '../middleware/auth.js';
+import { authenticate, requireHostWorkspace } from '../middleware/auth.js';
 import { uploadImages } from '../controllers/upload.controller.js';
 import { ValidationError } from '../types/index.js';
 
@@ -42,8 +42,9 @@ function handleUpload(req: Request, res: Response, next: NextFunction): void {
 
 const router = Router();
 
-// Host or admin - accepts up to 10 files under the "images" field. Hosts need
-// this to add photos to the listings they create (property routes are requireHost).
-router.post('/', authenticate, requireHost, handleUpload, uploadImages);
+// Host workspace or admin - accepts up to 10 files under the "images" field.
+// A hosting-intent USER may add photos to draft listings before verification
+// completes (property create/update routes use the same requireHostWorkspace gate).
+router.post('/', authenticate, requireHostWorkspace, handleUpload, uploadImages);
 
 export default router;

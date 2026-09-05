@@ -11,6 +11,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
 import { checkVerifiedPayment, isTerminalBookingStatus, paymentChannelsForMethod } from '../src/services/payment.service.js';
+import { bookingPaymentInitSchema, paymentMethodSchema } from '../src/types/index.js';
 
 const EXPECTED_KES = 5000; // -> 500000 subunits
 const REF = 'zrlft-abcd1234-ef01';
@@ -102,4 +103,24 @@ test('maps the M-PESA checkout choice to Paystack mobile_money', () => {
   assert.deepEqual(paymentChannelsForMethod('card'), ['card']);
   assert.deepEqual(paymentChannelsForMethod('bank'), ['bank', 'bank_transfer']);
   assert.equal(paymentChannelsForMethod(undefined), undefined);
+});
+
+// Re-initializing payment is how a guest's method reaches Paystack at all: the
+// booking (and its first transaction) is created before they pick one, so this
+// endpoint's body is the only place the real choice arrives.
+test('payment re-init accepts a chosen method and rejects unknown ones', () => {
+  assert.deepEqual(bookingPaymentInitSchema.parse({ paymentMethod: 'mpesa' }), {
+    paymentMethod: 'mpesa',
+  });
+  // Omitted is valid - a plain retry keeps whatever the booking already stores.
+  assert.deepEqual(bookingPaymentInitSchema.parse({}), {});
+  assert.throws(() => bookingPaymentInitSchema.parse({ paymentMethod: 'bitcoin' }));
+  assert.throws(() => bookingPaymentInitSchema.parse({ paymentMethod: 'mobile_money' }));
+});
+
+test('every accepted payment method maps to a real Paystack channel', () => {
+  for (const method of paymentMethodSchema.options) {
+    const channels = paymentChannelsForMethod(method);
+    assert.ok(channels?.length, `${method} must map to at least one channel`);
+  }
 });

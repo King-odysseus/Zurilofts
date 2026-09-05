@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as bookingService from '../services/booking.service.js';
 import * as paymentService from '../services/payment.service.js';
+import { isApprovedForPayment } from '../services/identity-verification.service.js';
 import prisma from '../config/prisma.js';
 
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -9,6 +10,23 @@ export async function create(req: Request, res: Response, next: NextFunction): P
       userId: req.user!.sub,
       ...req.body,
     });
+
+    // A guest who has not been identity-verified may still hold their dates -
+    // the booking above is created either way, preserving checkout progress -
+    // but payment never opens until verification is APPROVED. The guest is
+    // sent to complete verification and can resume payment afterward via
+    // POST /bookings/:id/payment, which re-checks this same gate.
+    const verification = await prisma.identityVerification.findUnique({
+      where: { userId: req.user!.sub },
+      select: { status: true },
+    });
+    if (!isApprovedForPayment(verification?.status)) {
+      res.status(201).json({
+        success: true,
+        data: { booking, paymentUrl: null, requiresIdentityVerification: true },
+      });
+      return;
+    }
 
     // Initialize Paystack payment - returns authorization URL for redirect
     const payment = await paymentService.initializeBookingPayment(booking);
@@ -175,10 +193,35 @@ export async function initializePayment(req: Request, res: Response, next: NextF
       return;
     }
 
+    // Payment never opens for an unverified guest, even if the client tries to
+    // skip the verification step - the booking itself stays intact either way.
+    if (!isAdmin) {
+      const verification = await prisma.identityVerification.findUnique({
+        where: { userId: req.user!.sub },
+        select: { status: true },
+      });
+      if (!isApprovedForPayment(verification?.status)) {
+        res.status(403).json({ success: false, error: 'IDENTITY_VERIFICATION_REQUIRED' });
+        return;
+      }
+    }
+
+    // The guest picks their payment method on the last checkout step, which is
+    // AFTER createBooking already minted a Paystack transaction from whatever
+    // the form defaulted to. Persist the final choice here so the transaction
+    // we are about to create opens on the channel they actually asked for.
+    const chosenMethod = req.body?.paymentMethod as string | undefined;
+    if (chosenMethod && chosenMethod !== booking.paymentMethod) {
+      await prisma.booking.update({
+        where: { id: bookingId },
+        data: { paymentMethod: chosenMethod },
+      });
+    }
+
     // Recompute authoritative total (includes add-ons) before initialising Paystack
     await bookingService.recalculateBookingTotal(bookingId);
 
-    // Re-fetch for the updated total
+    // Re-fetch for the updated total (and the payment method just stored)
     const updated = await prisma.booking.findUnique({
       where: { id: bookingId },
       include: {

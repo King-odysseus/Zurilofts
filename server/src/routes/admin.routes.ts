@@ -21,7 +21,9 @@ import * as pushCtrl from '../controllers/push.controller.js';
 import * as messageCtrl from '../controllers/message.controller.js';
 import * as userCtrl from '../controllers/user.controller.js';
 import * as hostAppCtrl from '../controllers/host-application.controller.js';
-import { messageCreateSchema } from '../types/index.js';
+import * as verificationCtrl from '../controllers/identity-verification.controller.js';
+import * as disputeCtrl from '../controllers/dispute.controller.js';
+import { messageCreateSchema, identityVerificationReviewSchema, disputeStatusSchema, disputeNoteSchema, disputeMessageSchema } from '../types/index.js';
 import adminPropertyRoutes from './admin-property.routes.js';
 
 const router = Router();
@@ -43,6 +45,23 @@ router.get('/host-applications/:id/documents/:documentId', hostAppCtrl.adminDown
 router.post('/host-applications/:id/request-changes', validate(hostApplicationReviewSchema), hostAppCtrl.adminRequestChanges);
 router.post('/host-applications/:id/reject', validate(hostApplicationReviewSchema), hostAppCtrl.adminReject);
 router.post('/host-applications/:id/approve', hostAppCtrl.adminApprove);
+
+// Guest identity verification (review queue: list, detail, reject, approve).
+// Independent of host applications - gates payment on a booking, not the
+// host workspace/dashboard.
+router.get('/identity-verifications', verificationCtrl.adminList);
+router.get('/identity-verifications/:id', verificationCtrl.adminGet);
+router.get('/identity-verifications/:id/documents/:documentId', verificationCtrl.adminDownloadDocument);
+router.post('/identity-verifications/:id/reject', validate(identityVerificationReviewSchema), verificationCtrl.adminReject);
+router.post('/identity-verifications/:id/approve', verificationCtrl.adminApprove);
+
+// Booking-linked disputes (mediation queue: list, detail, private notes, status/resolution).
+router.get('/disputes', disputeCtrl.adminList);
+router.get('/disputes/:id', disputeCtrl.adminGet);
+router.get('/disputes/:id/evidence/:evidenceId', disputeCtrl.adminDownloadEvidence);
+router.post('/disputes/:id/messages', validate(disputeMessageSchema), disputeCtrl.postMessage);
+router.post('/disputes/:id/notes', validate(disputeNoteSchema), disputeCtrl.addNote);
+router.patch('/disputes/:id/status', validate(disputeStatusSchema), disputeCtrl.updateStatus);
 
 // Bookings
 router.get('/bookings', bookingCtrl.listAll);

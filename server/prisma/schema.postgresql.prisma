@@ -60,6 +60,8 @@ model User {
   conversationMessages ConversationMessage[]
   consentRecords ConsentRecord[]
   hostApplication HostApplication?
+  identityVerification IdentityVerification?
+  disputesRaised  Dispute[]
 }
 
 // Durable, non-PII audit trail for self-service and staff-initiated erasure.
@@ -156,6 +158,14 @@ model Property {
   host        User?     @relation(fields: [hostId], references: [id])
   title       String
   location    String
+  // Listing publication lifecycle - independent of the host's own account
+  // verification (User.role/HostApplication). "DRAFT" | "PENDING_REVIEW" |
+  // "PUBLISHED" | "REJECTED" | "SUSPENDED"
+  status          String    @default("DRAFT")
+  listingReviewNote String?
+  listingReviewedBy String?
+  submittedAt       DateTime?
+  listingReviewedAt DateTime?
   price         Int
   price1Bed     Int?                              // nightly price for 1-bed option
   price2Bed     Int?                              // nightly price for 2-bed option
@@ -189,6 +199,7 @@ model Property {
   addOns          PropertyAddOn[]
 
   @@index([hostId])
+  @@index([status])
 }
 
 // External iCal feeds (Airbnb, Booking.com, VRBO, ...) imported per property
@@ -273,6 +284,127 @@ model Booking {
   payoutBookings  PayoutBooking[]
   addOns          BookingAddOn[]
   conversation    Conversation?
+  disputes        Dispute[]
+}
+
+// Guest-facing identity verification, separate from the host's own
+// HostApplication. Gates payment on a booking, not dashboard/draft access.
+// Lifecycle: "UNVERIFIED" | "SUBMITTED" | "APPROVED" | "REJECTED".
+model IdentityVerification {
+  id           String    @id @default(uuid())
+  userId       String    @unique
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       String    @default("UNVERIFIED")
+  fullName     String?
+  dateOfBirth  String?
+  idType       String?
+  idNumber     String?
+  reviewNote   String?
+  reviewedBy   String?
+  submittedAt  DateTime?
+  reviewedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  documents    IdentityVerificationDocument[]
+
+  @@index([status])
+}
+
+model IdentityVerificationDocument {
+  id             String   @id @default(uuid())
+  verificationId String
+  verification   IdentityVerification @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+  kind           String
+  originalName   String
+  mimeType       String
+  size           Int
+  ciphertext     Bytes
+  iv             Bytes
+  authTag        Bytes
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([verificationId, kind])
+  @@index([verificationId])
+}
+
+// A booking-linked dispute between guest and host, mediated by admin.
+// `messages` are visible to both participants and admin; `notes` are
+// admin-only. Lifecycle: "OPEN" | "UNDER_REVIEW" | "RESOLVED" | "DISMISSED".
+model Dispute {
+  id           String   @id @default(uuid())
+  bookingId    String
+  booking      Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  raisedById   String
+  raisedBy     User     @relation(fields: [raisedById], references: [id])
+  raisedByRole String
+  category     String
+  description  String
+  status       String   @default("OPEN")
+  resolution   String?
+  resolvedBy   String?
+  resolvedAt   DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  evidence     DisputeEvidence[]
+  messages     DisputeMessage[]
+  notes        DisputeNote[]
+  auditLogs    DisputeAudit[]
+
+  @@index([bookingId])
+  @@index([status])
+}
+
+model DisputeEvidence {
+  id           String   @id @default(uuid())
+  disputeId    String
+  dispute      Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  uploadedBy   String
+  originalName String
+  mimeType     String
+  size         Int
+  ciphertext   Bytes
+  iv           Bytes
+  authTag      Bytes
+  createdAt    DateTime @default(now())
+
+  @@index([disputeId])
+}
+
+model DisputeMessage {
+  id         String   @id @default(uuid())
+  disputeId  String
+  dispute    Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  senderId   String
+  senderRole String
+  body       String
+  createdAt  DateTime @default(now())
+
+  @@index([disputeId, createdAt])
+}
+
+// Admin-only private notes on a dispute. Never returned to participants.
+model DisputeNote {
+  id        String   @id @default(uuid())
+  disputeId String
+  dispute   Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([disputeId, createdAt])
+}
+
+model DisputeAudit {
+  id        String   @id @default(uuid())
+  disputeId String
+  dispute   Dispute  @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  actorId   String
+  action    String
+  note      String?
+  createdAt DateTime @default(now())
+
+  @@index([disputeId, createdAt])
 }
 
 // Post-stay guest review. `publicComment` is guest-facing text shown on the

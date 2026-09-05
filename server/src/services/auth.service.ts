@@ -19,9 +19,17 @@ export interface UserResponse {
   avatar: string | null;
   role: string;
   createdAt: Date;
+  // Host workspace intent/verification, independent of `role`. null = the
+  // user has never expressed hosting intent (no HostApplication row).
+  hostApplicationStatus: string | null;
+  // Guest identity verification status, gates payment (not dashboard access).
+  identityVerificationStatus: string;
 }
 
-function toUserResponse(user: any): UserResponse {
+function toUserResponse(
+  user: any,
+  extras: { hostApplicationStatus?: string | null; identityVerificationStatus?: string | null } = {}
+): UserResponse {
   return {
     id: user.id,
     email: user.email,
@@ -31,6 +39,20 @@ function toUserResponse(user: any): UserResponse {
     avatar: user.avatar,
     role: user.role,
     createdAt: user.createdAt,
+    hostApplicationStatus: extras.hostApplicationStatus ?? null,
+    identityVerificationStatus: extras.identityVerificationStatus ?? 'UNVERIFIED',
+  };
+}
+
+/** Fetch the lightweight status fields toUserResponse needs, in one round trip. */
+async function loadUserStatusExtras(userId: string) {
+  const [application, verification] = await Promise.all([
+    prisma.hostApplication.findUnique({ where: { userId }, select: { status: true } }),
+    prisma.identityVerification.findUnique({ where: { userId }, select: { status: true } }),
+  ]);
+  return {
+    hostApplicationStatus: application?.status ?? null,
+    identityVerificationStatus: verification?.status ?? 'UNVERIFIED',
   };
 }
 
@@ -77,7 +99,11 @@ export async function registerUser(
   });
 
   const tokens = await generateTokens(user);
-  return { user: toUserResponse(user), tokens };
+  // Known synchronously from the transaction above - no extra round trip needed.
+  return {
+    user: toUserResponse(user, { hostApplicationStatus: wantsToHost ? 'DRAFT' : null }),
+    tokens,
+  };
 }
 
 /**
@@ -99,7 +125,7 @@ export async function loginUser(email: string, password: string): Promise<{ user
   }
 
   const tokens = await generateTokens(user);
-  return { user: toUserResponse(user), tokens };
+  return { user: toUserResponse(user, await loadUserStatusExtras(user.id)), tokens };
 }
 
 /**
@@ -129,7 +155,7 @@ export async function refreshTokens(refreshToken?: string): Promise<{ user: User
   }
 
   const tokens = await generateTokens(user);
-  return { user: toUserResponse(user), tokens };
+  return { user: toUserResponse(user, await loadUserStatusExtras(user.id)), tokens };
 }
 
 /**
@@ -174,7 +200,7 @@ export async function googleAuth(profile: {
   }
 
   const tokens = await generateTokens(user);
-  return { user: toUserResponse(user), tokens };
+  return { user: toUserResponse(user, await loadUserStatusExtras(user.id)), tokens };
 }
 
 /**
@@ -185,5 +211,5 @@ export async function getCurrentUser(userId: string): Promise<UserResponse> {
   if (!user) {
     throw new NotFoundError('User');
   }
-  return toUserResponse(user);
+  return toUserResponse(user, await loadUserStatusExtras(user.id));
 }

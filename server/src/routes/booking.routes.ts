@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { authenticate, requireHost } from '../middleware/auth.js';
+import { authenticate, requireHostWorkspace } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { bookingCreateSchema } from '../types/index.js';
+import { bookingCreateSchema, bookingPaymentInitSchema } from '../types/index.js';
 import * as ctrl from '../controllers/booking.controller.js';
 
 const router = Router();
@@ -14,11 +14,14 @@ router.get('/', authenticate, ctrl.listMine);
 // Declared before '/:id' so these literal paths match first. The controllers
 // scope to the caller's hostId from the token, so a host only ever sees their
 // own data even though the same controllers serve the admin (all-data) routes.
-router.get('/host', authenticate, requireHost, ctrl.listAll);
-router.get('/host/earnings', authenticate, requireHost, ctrl.propertyEarnings);
-router.get('/host/today', authenticate, requireHost, ctrl.hostToday);
+// Open to hosting-intent USER accounts too (requireHostWorkspace) - a
+// pre-verification host simply sees an empty dashboard, since they cannot
+// have any published listings or bookings yet.
+router.get('/host', authenticate, requireHostWorkspace, ctrl.listAll);
+router.get('/host/earnings', authenticate, requireHostWorkspace, ctrl.propertyEarnings);
+router.get('/host/today', authenticate, requireHostWorkspace, ctrl.hostToday);
 
-router.post('/:id/payment', authenticate, ctrl.initializePayment);
+router.post('/:id/payment', authenticate, validate(bookingPaymentInitSchema), ctrl.initializePayment);
 router.get('/:id', authenticate, ctrl.getById);
 
 export default router;

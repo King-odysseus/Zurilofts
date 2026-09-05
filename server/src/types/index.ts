@@ -84,6 +84,21 @@ export const propertyCreateSchema = z.object({
 
 export const propertyUpdateSchema = propertyCreateSchema.partial();
 
+// Admin review action on a single listing. Separate from host account
+// verification (HostApplication) - a listing can be approved/rejected/
+// suspended independently of the host's own verification status.
+export const propertyReviewSchema = z.object({
+  action: z.enum(['approve', 'reject', 'suspend', 'unsuspend']),
+  note: z.string().max(2000).optional(),
+}).refine((data) => data.action !== 'reject' || (data.note && data.note.trim().length > 0), {
+  message: 'A reason is required to reject a listing',
+  path: ['note'],
+});
+
+/** The checkout methods a guest can pick. Mapped to Paystack channels in
+ *  payment.service.paymentChannelsForMethod - keep the two in step. */
+export const paymentMethodSchema = z.enum(['card', 'mpesa', 'bank']);
+
 export const bookingCreateSchema = z.object({
   // IDs are cuid in SQLite (dev) and uuid in Postgres (prod) - accept either
   propertyId: z.string().min(1, 'Property is required'),
@@ -103,8 +118,16 @@ export const bookingCreateSchema = z.object({
     )
     .max(9)
     .optional(),
-  paymentMethod: z.enum(['card', 'mpesa', 'bank']),
+  paymentMethod: paymentMethodSchema,
   promoCode: z.string().optional(),
+});
+
+// Re-initializing payment for an existing booking. The method is optional so an
+// unchanged retry keeps whatever the booking already stores; when present it
+// overwrites it, because the guest picks their method AFTER the booking row
+// (and its first Paystack transaction) has already been created.
+export const bookingPaymentInitSchema = z.object({
+  paymentMethod: paymentMethodSchema.optional(),
 });
 
 export const reviewCreateSchema = z.object({
@@ -216,6 +239,49 @@ export const hostApplicationUpdateSchema = z.object({
 // Admin request-changes / reject both require an applicant-visible reason.
 export const hostApplicationReviewSchema = z.object({
   reason: z.string().min(1, 'A reason is required').max(2000),
+});
+
+// ---- Guest identity verification (gates payment, not dashboard access) ----
+
+export const identityVerificationUpdateSchema = z.object({
+  fullName: z.string().trim().min(2).max(120).optional(),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Use YYYY-MM-DD format').refine((value) => {
+    const birthDate = new Date(`${value}T00:00:00Z`);
+    if (Number.isNaN(birthDate.getTime())) return false;
+    const adultDate = new Date();
+    adultDate.setUTCFullYear(adultDate.getUTCFullYear() - 18);
+    return birthDate <= adultDate;
+  }, 'You must be at least 18 years old').optional(),
+  idType: z.enum(['NATIONAL_ID', 'PASSPORT', 'ALIEN_ID']).optional(),
+  idNumber: z.string().trim().min(2).max(40).optional(),
+});
+
+export const identityVerificationReviewSchema = z.object({
+  reason: z.string().min(1, 'A reason is required').max(2000),
+});
+
+// ---- Booking-linked disputes ----
+
+export const disputeCreateSchema = z.object({
+  bookingId: z.string().min(1, 'Booking is required'),
+  category: z.enum(['PROPERTY_CONDITION', 'PAYMENT', 'CONDUCT', 'CANCELLATION', 'OTHER']),
+  description: z.string().trim().min(10, 'Please describe the issue in at least 10 characters').max(4000),
+});
+
+export const disputeMessageSchema = z.object({
+  body: z.string().trim().min(1, 'Message cannot be empty').max(2000),
+});
+
+export const disputeNoteSchema = z.object({
+  body: z.string().trim().min(1, 'Note cannot be empty').max(2000),
+});
+
+export const disputeStatusSchema = z.object({
+  status: z.enum(['UNDER_REVIEW', 'RESOLVED', 'DISMISSED']),
+  resolution: z.string().trim().max(4000).optional(),
+}).refine((data) => data.status !== 'RESOLVED' || (data.resolution && data.resolution.trim().length > 0), {
+  message: 'A resolution summary is required to resolve a dispute',
+  path: ['resolution'],
 });
 
 export const userRoleSchema = z.object({

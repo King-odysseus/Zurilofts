@@ -2,6 +2,7 @@ import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
 import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
 import { isRangeAvailable, PENDING_HOLD_MINUTES } from './calendar.service.js';
+import { isBookable } from './property.service.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
 function normalizeBooking(booking: any) {
@@ -140,6 +141,13 @@ interface CreateBookingInput {
 export async function createBooking(input: CreateBookingInput) {
   const property = await prisma.property.findUnique({ where: { id: input.propertyId } });
   if (!property) throw new NotFoundError('Property');
+
+  // A listing must have cleared admin review before it can take bookings -
+  // draft/pending/rejected/suspended listings are never publicly bookable,
+  // independent of the host's own account verification.
+  if (!isBookable(property.status)) {
+    throw new NotFoundError('Property');
+  }
 
   if (!property.available) {
     throw new ValidationError('This property is not currently available');
@@ -813,12 +821,17 @@ export async function abandonStaleBookings(olderThanMinutes = PENDING_HOLD_MINUT
   // Find PENDING bookings created before the cutoff with no paidAt timestamp.
   // paidAt is only set inside confirmBookingPayment, which also flips status
   // to CONFIRMED, so any PENDING with paidAt set would be an anomaly we still
-  // protect.
+  // protect. A booking whose guest has a SUBMITTED identity verification is
+  // also excluded: payment for it was never opened while under admin review
+  // (see booking.controller.create/initializePayment), so the checkout
+  // progress the guest is waiting on should survive that review, not expire
+  // out from under them on the same clock as an abandoned checkout.
   const staleBookings = await prisma.booking.findMany({
     where: {
       status: 'PENDING',
       createdAt: { lt: cutoff },
       paidAt: null,
+      user: { identityVerification: { isNot: { status: 'SUBMITTED' } } },
     },
     select: { id: true },
   });
