@@ -36,6 +36,8 @@ import Spinner from './components/Spinner.jsx';
 import TripHubPage from './pages/TripHubPage.jsx';
 import HostTodayPage from './pages/HostTodayPage.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
+import IdentityVerificationPage from './pages/IdentityVerificationPage.jsx';
+import DisputeThreadPage from './pages/DisputeThreadPage.jsx';
 import ShortlistsPage from './pages/ShortlistsPage.jsx';
 import ShortlistDetailPage from './pages/ShortlistDetailPage.jsx';
 import SharedShortlistPage from './pages/SharedShortlistPage.jsx';
@@ -61,6 +63,8 @@ const AdminUsers = lazy(() => import('./pages/AdminUsers.jsx'));
 const AdminGuides = lazy(() => import('./pages/AdminGuides.jsx'));
 const AdminPayouts = lazy(() => import('./pages/AdminPayouts.jsx'));
 const AdminHostApplications = lazy(() => import('./pages/AdminHostApplications.jsx'));
+const AdminIdentityVerifications = lazy(() => import('./pages/AdminIdentityVerifications.jsx'));
+const AdminDisputes = lazy(() => import('./pages/AdminDisputes.jsx'));
 const PaymentCallback = lazy(() => import('./pages/PaymentCallback.jsx'));
 
 // Home page component
@@ -322,6 +326,9 @@ function App() {
           <Route path="/inbox" element={<Page title="Inbox"><ProtectedRoute><InboxPage /></ProtectedRoute></Page>} />
           <Route path="/inbox/:conversationId" element={<Page title="Conversation"><ProtectedRoute><ConversationPage /></ProtectedRoute></Page>} />
           <Route path="/trips" element={<Page title="Trips"><ProtectedRoute><TripHubPage /></ProtectedRoute></Page>} />
+          <Route path="/verify-identity" element={<Page title="Verify Identity"><ProtectedRoute><IdentityVerificationPage /></ProtectedRoute></Page>} />
+          <Route path="/disputes/new" element={<Page title="Report an Issue"><ProtectedRoute><DisputeThreadPage /></ProtectedRoute></Page>} />
+          <Route path="/disputes/:id" element={<Page title="Dispute"><ProtectedRoute><DisputeThreadPage /></ProtectedRoute></Page>} />
           <Route path="/host/application" element={<Page title="Host Application"><ProtectedRoute><HostApplicationPage /></ProtectedRoute></Page>} />
           <Route path="/host/today" element={<Page title="Host Today"><HostRoute><HostTodayPage /></HostRoute></Page>} />
           <Route path="/host/calendar" element={<Page title="Host Calendar"><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Page>} />
@@ -349,6 +356,8 @@ function App() {
             <Route path="earnings" element={<Suspense fallback={<Loading />}><AdminEarnings /></Suspense>} />
             <Route path="users" element={<Suspense fallback={<Loading />}><AdminUsers /></Suspense>} />
             <Route path="host-applications" element={<Suspense fallback={<Loading />}><AdminHostApplications /></Suspense>} />
+            <Route path="identity-verifications" element={<Suspense fallback={<Loading />}><AdminIdentityVerifications /></Suspense>} />
+            <Route path="disputes" element={<Suspense fallback={<Loading />}><AdminDisputes /></Suspense>} />
             <Route path="promos" element={<Suspense fallback={<Loading />}><AdminPromos /></Suspense>} />
             <Route path="addons" element={<Suspense fallback={<Loading />}><AdminAddOns /></Suspense>} />
             <Route path="feedback" element={<Suspense fallback={<Loading />}><AdminFeedback /></Suspense>} />

@@ -10,7 +10,9 @@ const bgImage = zuriImages[14]; // Ely Homes Photography (15 of 20)
 
 function getDashboardPath(user) {
   if (user?.role === 'ADMIN') return '/admin';
-  if (user?.role === 'HOST') return '/host/today';
+  // A plain USER who has hosting intent (any HostApplication, any status)
+  // lands in their dashboard too, not the application form - see HostRoute.
+  if (user?.role === 'HOST' || user?.hostApplicationStatus != null) return '/host/today';
   return '/';
 }
 

@@ -18,7 +18,10 @@ function readStoredMode() {
 export function ModeProvider({ children }) {
   const { user } = useAuth();
 
-  const canHost = user?.role === 'HOST' || user?.role === 'ADMIN';
+  // A plain USER who has expressed hosting intent (any HostApplication, no
+  // matter its status) may also enter the host workspace - only verified
+  // HOST/ADMIN accounts may publish listings or take payouts.
+  const canHost = user?.role === 'HOST' || user?.role === 'ADMIN' || user?.hostApplicationStatus != null;
   const canSelectHosting = Boolean(user);
 
   const [mode, setModeState] = useState(() => readStoredMode());

@@ -155,11 +155,19 @@ function BookingCard({ booking, isPast }) {
                 </svg>
                 Message host
               </button>
+              {/* /booking/:id is the checkout route and takes a PROPERTY id, so
+                  passing booking.id here left the page stuck on "Loading property..." */}
               <Link
-                to={`/booking/${booking.id}`}
+                to={`/property/${p.id}`}
                 className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
               >
                 View details
+              </Link>
+              <Link
+                to={`/disputes/new?bookingId=${booking.id}`}
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold text-[#6b7280] hover:text-red-600 transition-colors"
+              >
+                Report an issue
               </Link>
             </div>
           </div>

@@ -2,10 +2,38 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
+/**
+ * Stamps each build into index.html so its precache revision always changes.
+ *
+ * Workbox precaches index.html and serves every navigation from that cached
+ * RESPONSE - headers included. Precache entries are keyed on a hash of the
+ * file's content, so a server-only change (a security header, say) leaves
+ * index.html byte-identical, the revision unchanged, and the service worker
+ * never re-fetches it. Clients then keep replaying the old headers forever.
+ *
+ * That is exactly how the OpenStreetMap CSP fix in 56c8c71 failed to reach
+ * devices that had already cached the shell: their maps stayed blank because
+ * the stale header still blocked every tile, while fresh browsers were fine.
+ *
+ * A per-build stamp keeps the revision moving so each deploy re-delivers the
+ * document and whatever headers currently come with it.
+ */
+function buildStamp() {
+  const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  return {
+    name: 'zuri-build-stamp',
+    apply: 'build',
+    transformIndexHtml() {
+      return [{ tag: 'meta', attrs: { name: 'zuri-build', content: id }, injectTo: 'head' }];
+    },
+  };
+}
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    buildStamp(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'pwa-192x192.png', 'pwa-512x512.png'],

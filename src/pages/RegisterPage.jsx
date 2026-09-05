@@ -12,7 +12,11 @@ const bgImage = zuriImages[14];
 
 function getDashboardPath(user) {
   if (user?.role === 'ADMIN') return '/admin';
-  if (user?.role === 'HOST') return '/host/today';
+  // A plain USER who registered with hosting intent (registerUser creates a
+  // DRAFT HostApplication atomically) lands in their dashboard immediately -
+  // see HostRoute. They can prepare draft listings while verification,
+  // reachable from Settings -> Verification, is still pending.
+  if (user?.role === 'HOST' || user?.hostApplicationStatus != null) return '/host/today';
   return '/';
 }
 
@@ -40,9 +44,9 @@ function RegisterPage() {
 
   useEffect(() => {
     if (isAuthenticated && !isLoading && user) {
-      navigate(isHost && user.role === 'USER' ? '/host/application' : getDashboardPath(user), { replace: true });
+      navigate(getDashboardPath(user), { replace: true });
     }
-  }, [isAuthenticated, isLoading, user, navigate, isHost]);
+  }, [isAuthenticated, isLoading, user, navigate]);
 
   useEffect(() => {
     return () => clearError();

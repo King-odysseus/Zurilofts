@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import apiClient from '../api/client.js';
 import { consumePostAuthMode, rememberNavMode } from '../utils/authIntent.js';
 
 function OAuthCallback() {
@@ -24,13 +25,25 @@ function OAuthCallback() {
       if (result.success) {
         const requestedMode = consumePostAuthMode();
         rememberNavMode(requestedMode);
+
+        // A plain USER who picked "Hosting" during Google sign-up has not yet
+        // filed a HostApplication (unlike email registration, which creates
+        // the DRAFT eagerly) - do that now so they land straight in their
+        // dashboard, matching the rest of the onboarding flow. Best-effort:
+        // if it fails, HostApplicationPage still creates it on next visit.
+        if (requestedMode === 'hosting' && result.user?.role === 'USER' && !result.user?.hostApplicationStatus) {
+          try {
+            await apiClient.post('/host-application');
+          } catch {
+            // non-fatal - the applicant can still reach /host/application manually
+          }
+        }
+
         const dest = result.user?.role === 'ADMIN'
           ? '/admin'
-          : result.user?.role === 'HOST'
+          : result.user?.role === 'HOST' || requestedMode === 'hosting'
             ? '/host/today'
-            : requestedMode === 'hosting'
-              ? '/host/application'
-              : '/';
+            : '/';
         navigate(dest, { replace: true });
       } else {
         navigate('/login?error=oauth_failed', { replace: true });

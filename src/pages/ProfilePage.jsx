@@ -10,6 +10,7 @@ import apiClient from '../api/client.js';
 import { openConsentManager } from '../utils/consent.js';
 
 import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
+import IdentityVerificationPanel from '../components/IdentityVerificationPanel.jsx';
 
 function ProfilePage() {
   const { user, setUser, logout } = useAuth();
@@ -17,7 +18,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.replace('#', '');
-    return ['info', 'bookings', 'favorites'].includes(hash) ? hash : 'info';
+    return ['info', 'bookings', 'favorites', 'verification'].includes(hash) ? hash : 'info';
   });
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
@@ -380,7 +381,7 @@ function ProfilePage() {
 
           {/* Tabs */}
           <div className="flex border-b border-[#D9D9D9] mb-8">
-            {['info', 'bookings', 'favorites'].map((tab) => (
+            {['info', 'bookings', 'favorites', 'verification'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -390,10 +391,31 @@ function ProfilePage() {
                     : 'border-transparent text-[#6b7280] hover:text-[#0B0B45]'
                 }`}
               >
-                {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
+                {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : tab === 'verification' ? 'Verification' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
               </button>
             ))}
           </div>
+
+          {/* Verification Tab */}
+          {activeTab === 'verification' && (
+            <div className="space-y-10">
+              <IdentityVerificationPanel />
+              {(profile?.role === 'HOST' || user?.hostApplicationStatus != null) && (
+                <div className="pt-8 border-t border-[#D9D9D9]">
+                  <h3 className="text-lg font-semibold text-[#0B0B45] mb-2">Host account verification</h3>
+                  <p className="text-sm text-[#6b7280] mb-4">
+                    Separate from guest identity verification above - this is your host business/KYC application, required before any listing can be submitted for review.
+                  </p>
+                  <Link
+                    to="/host/application"
+                    className="inline-flex px-5 py-2.5 rounded-full text-sm font-semibold bg-[#0B0B45] text-white hover:bg-[#0B0B45]/90 transition-colors"
+                  >
+                    Go to host verification
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* My Info Tab */}
           {activeTab === 'info' && (

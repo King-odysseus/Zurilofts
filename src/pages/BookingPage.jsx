@@ -20,6 +20,7 @@ function BookingPage() {
   // Property from API
   const [property, setProperty] = useState(null);
   const [loadingProperty, setLoadingProperty] = useState(true);
+  const [propertyError, setPropertyError] = useState('');
   const [unavailableRanges, setUnavailableRanges] = useState([]);
 
   // Promo code
@@ -30,7 +31,8 @@ function BookingPage() {
 
   // Add-ons
   const [bookingId, setBookingId] = useState(null);
-  const [paymentUrl, setPaymentUrl] = useState(null);
+  // No paymentUrl state: the URL a booking was created with is always stale by
+  // the time the guest picks a payment method, so checkout always re-initializes.
   const [availableAddOns, setAvailableAddOns] = useState([]);
   const [selectedAddOns, setSelectedAddOns] = useState([]); // { addOn, quantity }
   const [loadingAddOns, setLoadingAddOns] = useState(false);
@@ -154,6 +156,7 @@ function BookingPage() {
 
     async function fetchProperty() {
       try {
+        setPropertyError('');
         const res = await apiClient.get(`/properties/${id}`);
         const prop = res.data.data;
         setProperty(prop);
@@ -167,8 +170,15 @@ function BookingPage() {
             setBedOption('1bed');
           }
         }
-      } catch {
-        // fallback
+      } catch (err) {
+        // Surface the failure. Swallowing it here used to leave `property` null
+        // forever, and the render guard below then showed an endless
+        // "Loading property..." spinner with no way out.
+        setPropertyError(
+          err.response?.status === 404
+            ? 'We could not find that property. It may have been removed.'
+            : err.response?.data?.error || 'We could not load that property. Please try again.'
+        );
       } finally {
         setLoadingProperty(false);
       }
@@ -266,9 +276,10 @@ function BookingPage() {
         promoCode: promoResult?.code || undefined,
         additionalGuests: additionalGuests.filter((g) => g.firstName.trim() || g.lastName.trim()),
       });
+      // res.data.data.paymentUrl is deliberately ignored - it was minted from
+      // the form's default payment method, before the guest chose theirs.
       const createdId = res.data.data.booking?.id || null;
       setBookingId(createdId);
-      setPaymentUrl(res.data.data.paymentUrl || null);
       return createdId;
     } catch (err) {
       setAddOnsError(err.response?.data?.error || 'Could not start your booking. Please try again.');
@@ -356,36 +367,70 @@ function BookingPage() {
     setSubmitError('');
 
     try {
-      if (!paymentUrl) {
-        // No booking created yet (e.g. user jumped straight to payment) - create
-        // it now so we have a booking id and a payment URL to redirect to.
-        const res = await apiClient.post('/bookings', {
-          propertyId: id,
-          bedOption,
-          checkIn: bookingData.checkIn,
-          checkOut: bookingData.checkOut,
-          guests: bookingData.guests,
-          checkInTime: bookingData.checkInTime || undefined,
-          checkOutTime: bookingData.checkOutTime || undefined,
-          specialRequests: bookingData.specialRequests || undefined,
-          paymentMethod: bookingData.paymentMethod,
-          promoCode: promoResult?.code || undefined,
-          additionalGuests: additionalGuests.filter((g) => g.firstName.trim() || g.lastName.trim()),
-        });
-        setBookingId(res.data.data.booking?.id || null);
-        setPaymentUrl(res.data.data.paymentUrl || null);
-        if (res.data.data.paymentUrl) {
-          window.location.href = res.data.data.paymentUrl;
+      // A booking created during the add-ons step already has a Paystack
+      // transaction, but it was opened on whatever payment method the form
+      // defaulted to - the guest only picks theirs on this step. Re-initialize
+      // with the chosen method so the checkout opens on the right channel
+      // (M-Pesa vs card vs bank); the URL minted earlier is deliberately
+      // discarded rather than reused.
+      const existingId = bookingId;
+      if (existingId) {
+        try {
+          const res = await apiClient.post(`/bookings/${existingId}/payment`, {
+            paymentMethod: bookingData.paymentMethod,
+          });
+          const url = res.data.data?.authorizationUrl;
+          if (url) {
+            window.location.href = url;
+            return;
+          }
+          setSubmitError('Payment gateway unavailable. Please try again.');
+          setIsProcessing(false);
           return;
+        } catch (err) {
+          // The booking itself is untouched - checkout progress is preserved.
+          // Send the guest to verify, then let them come straight back to pay.
+          if (err.response?.data?.error === 'IDENTITY_VERIFICATION_REQUIRED') {
+            navigate(`/verify-identity?bookingId=${existingId}`);
+            return;
+          }
+          throw err;
         }
-        setSubmitError('Payment gateway unavailable. Please try again.');
-        setIsProcessing(false);
-        return;
       }
 
-      // Booking already created during the add-ons step - just redirect to the
-      // payment URL that was returned at creation time.
-      window.location.href = paymentUrl;
+      // No booking yet (e.g. user jumped straight to payment) - create it now.
+      // The method is already chosen at this point, so the transaction created
+      // here opens on the right channel and needs no re-initialization.
+      const res = await apiClient.post('/bookings', {
+        propertyId: id,
+        bedOption,
+        checkIn: bookingData.checkIn,
+        checkOut: bookingData.checkOut,
+        guests: bookingData.guests,
+        checkInTime: bookingData.checkInTime || undefined,
+        checkOutTime: bookingData.checkOutTime || undefined,
+        specialRequests: bookingData.specialRequests || undefined,
+        paymentMethod: bookingData.paymentMethod,
+        promoCode: promoResult?.code || undefined,
+        additionalGuests: additionalGuests.filter((g) => g.firstName.trim() || g.lastName.trim()),
+      });
+      const newBookingId = res.data.data.booking?.id || null;
+      setBookingId(newBookingId);
+      if (res.data.data.paymentUrl) {
+        window.location.href = res.data.data.paymentUrl;
+        return;
+      }
+      // The booking was created (dates are held) but payment was never opened
+      // because this guest is not yet identity-verified. Send them to verify,
+      // then straight back to pay - the booking itself preserves their
+      // checkout progress in the meantime.
+      if (res.data.data.requiresIdentityVerification && newBookingId) {
+        navigate(`/verify-identity?bookingId=${newBookingId}`);
+        return;
+      }
+      setSubmitError('Payment gateway unavailable. Please try again.');
+      setIsProcessing(false);
+      return;
     } catch (err) {
       setSubmitError(err.response?.data?.error || 'Booking failed. Please try again.');
       setIsProcessing(false);
@@ -1087,7 +1132,7 @@ function BookingPage() {
   }
 
   // Loading state
-  if (loadingProperty || !property) {
+  if (loadingProperty) {
     return (
       <div className="min-h-screen bg-white">
         <Navbar />
@@ -1095,6 +1140,43 @@ function BookingPage() {
           <div className="text-center">
             <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-[#6b7280]">Loading property...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // The fetch finished but produced no property. Always render a way out -
+  // falling back to the spinner here is what made this page hang forever.
+  if (!property) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-24 flex items-center justify-center min-h-[60vh]" role="alert">
+          <div className="text-center px-4 max-w-md">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-[#0B0B45] mb-2">Property unavailable</h2>
+            <p className="text-[#6b7280] mb-6">
+              {propertyError || 'We could not load that property. Please try again.'}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200"
+              >
+                Try again
+              </button>
+              <button
+                onClick={() => navigate('/properties')}
+                className="px-6 py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+              >
+                Browse properties
+              </button>
+            </div>
           </div>
         </div>
       </div>
