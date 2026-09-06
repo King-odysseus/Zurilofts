@@ -143,7 +143,7 @@ function HostPayouts() {
   return (
     <div className="space-y-8">
       {/* Wallet card */}
-      <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6">
+      <div className="bg-white rounded-2xl shadow-lg p-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-4">My Earnings Wallet</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-[#0B0B45]/5 rounded-xl p-4">
@@ -189,7 +189,7 @@ function HostPayouts() {
       </div>
 
       {/* WHT Statement */}
-      <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6">
+      <div className="bg-white rounded-2xl shadow-lg p-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-4">WHT Statement (Tax Certificate)</h2>
         <p className="text-sm text-[#6b7280] mb-4">
           Download your withholding tax statement to claim KRA tax credits. WHT at 5% is automatically deducted and remitted on your behalf.
@@ -257,7 +257,7 @@ function HostPayouts() {
               </button>
               <button
                 onClick={csvWht}
-                className="border-2 border-[#0B0B45] text-[#0B0B45] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#0B0B45] hover:text-white transition-colors"
+                className="bg-[#0B0B45]/5 text-[#0B0B45] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#0B0B45] hover:text-white transition-colors"
               >
                 Download CSV
               </button>
@@ -267,7 +267,7 @@ function HostPayouts() {
       </div>
 
       {/* Payout History */}
-      <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6">
+      <div className="bg-white rounded-2xl shadow-lg p-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-4">Payout History</h2>
         {payouts.length === 0 ? (
           <p className="text-[#6b7280] text-sm">No payouts yet. Your first payout will appear here.</p>

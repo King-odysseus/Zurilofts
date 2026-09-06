@@ -102,9 +102,9 @@ function AdminDisputes() {
       {loading ? (
         <div className="py-16 text-center text-[#6b7280]">Loading disputes...</div>
       ) : rows.length === 0 ? (
-        <div className="rounded-3xl border border-[#D9D9D9] bg-white p-12 text-center text-[#6b7280]">No disputes in this view.</div>
+        <div className="rounded-3xl shadow-sm bg-white p-12 text-center text-[#6b7280]">No disputes in this view.</div>
       ) : (
-        <div className="overflow-x-auto rounded-3xl border border-[#D9D9D9] bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-3xl bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-[#D9D9D9] text-left"><th className="p-4">Booking</th><th className="p-4">Raised by</th><th className="p-4">Category</th><th className="p-4">Status</th><th className="p-4"></th></tr></thead>
             <tbody>
@@ -114,7 +114,7 @@ function AdminDisputes() {
                   <td className="p-4">{d.raisedByRole}</td>
                   <td className="p-4">{CATEGORY_LABELS[d.category] || d.category}</td>
                   <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[d.status]}`}>{d.status.replaceAll('_', ' ')}</span></td>
-                  <td className="p-4"><button onClick={() => open(d.id)} disabled={busy === d.id} className="rounded-full border border-[#C49A6C] px-4 py-2 text-xs font-semibold text-[#C49A6C] hover:bg-[#C49A6C] hover:text-white disabled:opacity-50">Review</button></td>
+                  <td className="p-4"><button onClick={() => open(d.id)} disabled={busy === d.id} className="rounded-full shadow-sm hover:shadow-md transition-shadow px-4 py-2 text-xs font-semibold text-[#C49A6C] hover:bg-[#C49A6C] hover:text-white disabled:opacity-50">Review</button></td>
                 </tr>
               ))}
             </tbody>
@@ -172,12 +172,12 @@ function AdminDisputes() {
                 </ul>
                 <div className="flex gap-2">
                   <input value={noteBody} onChange={(e) => setNoteBody(e.target.value)} placeholder="Add a private note..." className="flex-1 rounded-xl border border-[#D9D9D9] px-3 py-2 text-sm" />
-                  <button onClick={handleAddNote} disabled={busy === 'note'} className="rounded-full border border-[#D9D9D9] px-4 py-2 text-xs font-semibold text-[#1f2937] disabled:opacity-50">Add note</button>
+                  <button onClick={handleAddNote} disabled={busy === 'note'} className="rounded-full shadow-sm hover:shadow-md transition-shadow px-4 py-2 text-xs font-semibold text-[#1f2937] disabled:opacity-50">Add note</button>
                 </div>
               </div>
 
               {!closed && (
-                <div className="rounded-3xl border border-[#D9D9D9] p-5">
+                <div className="rounded-3xl shadow-sm p-5">
                   <label className="block text-sm font-semibold text-[#1f2937] mb-2">Resolution summary (required to resolve)</label>
                   <textarea value={resolution} onChange={(e) => setResolution(e.target.value)} rows="3" className="w-full rounded-3xl border border-[#D9D9D9] px-5 py-3 focus:outline-none focus:border-[#C49A6C]" />
                   <div className="mt-4 flex flex-wrap gap-3">
@@ -185,7 +185,7 @@ function AdminDisputes() {
                       <button onClick={() => handleStatus('UNDER_REVIEW')} disabled={Boolean(busy)} className="rounded-full bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Mark under review</button>
                     )}
                     <button onClick={() => handleStatus('RESOLVED')} disabled={Boolean(busy)} className="rounded-full bg-green-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Resolve</button>
-                    <button onClick={() => handleStatus('DISMISSED')} disabled={Boolean(busy)} className="rounded-full border border-red-300 px-5 py-2.5 text-sm font-semibold text-red-600 disabled:opacity-50">Dismiss</button>
+                    <button onClick={() => handleStatus('DISMISSED')} disabled={Boolean(busy)} className="rounded-full shadow-sm hover:shadow-md transition-shadow px-5 py-2.5 text-sm font-semibold text-red-600 disabled:opacity-50">Dismiss</button>
                   </div>
                 </div>
               )}

@@ -157,7 +157,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.fullName}
               onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
+              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
             />
           </div>
           <div>
@@ -167,7 +167,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.dateOfBirth}
               onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
+              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
             />
           </div>
           <div>
@@ -176,7 +176,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.idType}
               onChange={(e) => setForm({ ...form, idType: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
+              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
             >
               <option value="NATIONAL_ID">National ID</option>
               <option value="PASSPORT">Passport</option>
@@ -190,7 +190,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.idNumber}
               onChange={(e) => setForm({ ...form, idNumber: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
+              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
             />
           </div>
         </div>
@@ -209,12 +209,12 @@ function IdentityVerificationPanel({ onApproved }) {
         <div className="space-y-3 mb-6">
           <p className="text-sm font-semibold text-[#1f2937]">Documents</p>
           {DOCUMENT_KINDS.map(({ kind, label, required }) => (
-            <div key={kind} className="flex items-center justify-between gap-3 rounded-xl border border-[#D9D9D9] p-3">
+            <div key={kind} className="flex items-center justify-between gap-3 rounded-xl shadow-sm p-3">
               <div>
                 <p className="text-sm text-[#1f2937]">{label}{required && <span className="text-red-500"> *</span>}</p>
                 {uploadedKinds.has(kind) && <p className="text-xs text-green-700">Uploaded</p>}
               </div>
-              <label className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] cursor-pointer transition-colors">
+              <label className="px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm hover:shadow-md text-[#6b7280] hover:text-[#C49A6C] cursor-pointer transition-all">
                 {uploading === kind ? 'Uploading...' : uploadedKinds.has(kind) ? 'Replace' : 'Upload'}
                 <input
                   type="file"

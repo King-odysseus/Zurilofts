@@ -152,7 +152,7 @@ function ChatWidget() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-[#D9D9D9] flex flex-col overflow-hidden transition-all duration-300" style={{ maxHeight: '520px' }}>
+        <div className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300" style={{ maxHeight: '520px' }}>
           {/* Header */}
           <div className="bg-[#0B0B45] px-5 py-4 flex items-center justify-between">
             <div className="flex items-center space-x-3">
@@ -180,7 +180,7 @@ function ChatWidget() {
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   m.from === 'user'
                     ? 'bg-[#C49A6C] text-white rounded-br-md font-medium'
-                    : 'bg-white border border-[#D9D9D9] text-[#1f2937] rounded-bl-md shadow-sm'
+                    : 'bg-white text-[#1f2937] rounded-bl-md shadow-sm'
                 }`}>
                   {m.text}
                 </div>

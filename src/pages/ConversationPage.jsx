@@ -39,7 +39,7 @@ function MessageBubble({ message, isMine }) {
           className={`px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap break-words ${
             isMine
               ? 'bg-[#0B0B45] text-white rounded-br-md'
-              : 'bg-white border border-[#D9D9D9] text-[#1f2937] rounded-bl-md'
+              : 'bg-white shadow-sm text-[#1f2937] rounded-bl-md'
           }`}
         >
           {message.content}
@@ -188,7 +188,7 @@ function ConversationPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto bg-white rounded-2xl border border-[#D9D9D9] p-4 space-y-3 min-h-[50vh]">
+        <div className="flex-1 overflow-y-auto bg-white rounded-2xl shadow-sm p-4 space-y-3 min-h-[50vh]">
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <Spinner />
@@ -220,7 +220,7 @@ function ConversationPage() {
 
         {/* Composer */}
         <div className="mt-4 pb-4">
-          <div className="flex items-end gap-2 bg-white rounded-2xl border border-[#D9D9D9] p-2">
+          <div className="flex items-end gap-2 bg-white rounded-2xl shadow-sm p-2">
             <textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}

@@ -214,7 +214,7 @@ function HostApplicationPage() {
     <div className="min-h-screen bg-[#f8f9fa]">
       <Navbar />
       <main className="max-w-5xl mx-auto px-4 md:px-6 pt-28 pb-20">
-        <div className="bg-white rounded-[2rem] shadow-sm border border-[#D9D9D9]/70 p-6 md:p-10">
+        <div className="bg-white rounded-[2rem] shadow-md p-6 md:p-10">
           <p className="text-sm font-semibold uppercase tracking-wider text-[#C49A6C] mb-2">Become a ZuriLofts host</p>
           <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45]">Host verification</h1>
           <p className="text-[#6b7280] mt-3 max-w-3xl">Tell us who you are, how you manage your properties, and provide the documents needed to protect guests and legitimate hosts. Save at any time and continue later.</p>
@@ -271,13 +271,13 @@ function HostApplicationPage() {
                   <p className="text-sm font-semibold text-[#1f2937] mb-2">Property types</p>
                   <div className="flex flex-wrap gap-2">
                     {PROPERTY_TYPES.map(([value, label]) => (
-                      <button key={value} type="button" onClick={() => togglePropertyType(value)} className={`rounded-full px-4 py-2 text-sm font-semibold border transition-colors ${form.propertyTypes.includes(value) ? 'bg-[#0B0B45] text-white border-[#0B0B45]' : 'bg-white text-[#6b7280] border-[#D9D9D9] hover:border-[#C49A6C]'}`}>{label}</button>
+                      <button key={value} type="button" onClick={() => togglePropertyType(value)} className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${form.propertyTypes.includes(value) ? 'bg-[#0B0B45] text-white' : 'bg-white text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#C49A6C]'}`}>{label}</button>
                     ))}
                   </div>
                 </div>
                 <div className="mt-5 grid gap-5">
-                  <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">Property locations</span><textarea value={form.propertyLocations} onChange={(e) => update('propertyLocations', e.target.value)} rows="3" maxLength="500" className="w-full rounded-[2rem] border border-[#D9D9D9] px-5 py-4 focus:outline-none focus:border-[#C49A6C]" placeholder="Neighbourhoods, towns, or addresses you intend to list" required /></label>
-                  <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">Hosting experience</span><textarea value={form.experience} onChange={(e) => update('experience', e.target.value)} rows="4" maxLength="2000" className="w-full rounded-[2rem] border border-[#D9D9D9] px-5 py-4 focus:outline-none focus:border-[#C49A6C]" placeholder="Tell us about your experience, team, and how guests will be supported." /></label>
+                  <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">Property locations</span><textarea value={form.propertyLocations} onChange={(e) => update('propertyLocations', e.target.value)} rows="3" maxLength="500" className="w-full rounded-[2rem] border border-transparent shadow-sm px-5 py-4 focus:outline-none focus:border-[#C49A6C]" placeholder="Neighbourhoods, towns, or addresses you intend to list" required /></label>
+                  <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">Hosting experience</span><textarea value={form.experience} onChange={(e) => update('experience', e.target.value)} rows="4" maxLength="2000" className="w-full rounded-[2rem] border border-transparent shadow-sm px-5 py-4 focus:outline-none focus:border-[#C49A6C]" placeholder="Tell us about your experience, team, and how guests will be supported." /></label>
                 </div>
               </Section>
 
@@ -296,7 +296,7 @@ function HostApplicationPage() {
               </label>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
-                <button type="submit" disabled={saving || Boolean(uploadingKind)} className="rounded-full border-2 border-[#0B0B45] px-6 py-3 font-semibold text-[#0B0B45] disabled:opacity-50">{saving ? 'Saving...' : 'Save draft'}</button>
+                <button type="submit" disabled={saving || Boolean(uploadingKind)} className="rounded-full bg-[#0B0B45]/5 px-6 py-3 font-semibold text-[#0B0B45] disabled:opacity-50 hover:bg-[#0B0B45]/10 transition-colors">{saving ? 'Saving...' : 'Save draft'}</button>
                 <button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)} className="rounded-full bg-[#C49A6C] px-6 py-3 font-semibold text-white hover:bg-[#b8895c] disabled:opacity-50">{saving ? 'Working...' : 'Submit for review'}</button>
                 <button type="button" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)} className="rounded-full px-6 py-3 font-semibold text-[#6b7280] hover:text-[#0B0B45] disabled:opacity-50">Save &amp; continue traveling</button>
               </div>
@@ -304,10 +304,10 @@ function HostApplicationPage() {
           ) : application?.status === 'APPROVED' || user?.role === 'HOST' ? (
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link to="/host/properties/new" className="inline-flex justify-center rounded-full bg-[#C49A6C] px-6 py-3 font-semibold text-white">Set up your first property</Link>
-              <Link to="/host/today" className="inline-flex justify-center rounded-full border-2 border-[#0B0B45] px-6 py-3 font-semibold text-[#0B0B45]">Open host dashboard</Link>
+              <Link to="/host/today" className="inline-flex justify-center rounded-full bg-[#0B0B45]/5 px-6 py-3 font-semibold text-[#0B0B45] hover:bg-[#0B0B45]/10 transition-colors">Open host dashboard</Link>
             </div>
           ) : (
-            <button type="button" onClick={() => { setMode('travelling'); navigate('/'); }} className="mt-8 rounded-full border-2 border-[#0B0B45] px-6 py-3 font-semibold text-[#0B0B45]">Continue traveling</button>
+            <button type="button" onClick={() => { setMode('travelling'); navigate('/'); }} className="mt-8 rounded-full bg-[#0B0B45]/5 px-6 py-3 font-semibold text-[#0B0B45] hover:bg-[#0B0B45]/10 transition-colors">Continue traveling</button>
           )}
         </div>
       </main>
@@ -321,15 +321,15 @@ function Section({ title, description, children }) {
 }
 
 function PillField({ label, value, onChange, type = 'text', ...props }) {
-  return <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">{label}</span><input type={type} value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-full border border-[#D9D9D9] px-5 py-3.5 focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/15" {...props} /></label>;
+  return <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">{label}</span><input type={type} value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-full border border-transparent shadow-sm px-5 py-3.5 focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/15" {...props} /></label>;
 }
 
 function PillSelect({ label, value, onChange, options }) {
-  return <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">{label}</span><select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-full border border-[#D9D9D9] bg-white px-5 py-3.5 focus:outline-none focus:border-[#C49A6C]">{options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}</select></label>;
+  return <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">{label}</span><select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-full border border-transparent shadow-sm bg-white px-5 py-3.5 focus:outline-none focus:border-[#C49A6C]">{options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}</select></label>;
 }
 
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
-  return <div className="rounded-3xl border border-[#D9D9D9] p-5"><p className="font-semibold text-[#1f2937]">{DOCUMENT_LABELS[kind]}</p>{document ? <><p className="text-xs text-green-700 mt-2 break-all">Uploaded: {document.originalName}</p><button type="button" onClick={() => onRemove(kind)} disabled={busy} className="mt-3 rounded-full border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 disabled:opacity-50">{busy ? 'Working...' : 'Remove & replace'}</button></> : <label className="mt-3 inline-flex cursor-pointer rounded-full bg-[#0B0B45] px-4 py-2 text-xs font-semibold text-white"><input type="file" className="hidden" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={busy} onChange={(e) => onUpload(kind, e.target.files?.[0])} />{busy ? 'Uploading...' : 'Choose document'}</label>}</div>;
+  return <div className="rounded-3xl shadow-sm p-5"><p className="font-semibold text-[#1f2937]">{DOCUMENT_LABELS[kind]}</p>{document ? <><p className="text-xs text-green-700 mt-2 break-all">Uploaded: {document.originalName}</p><button type="button" onClick={() => onRemove(kind)} disabled={busy} className="mt-3 rounded-full bg-red-50 px-4 py-2 text-xs font-semibold text-red-600 disabled:opacity-50 hover:bg-red-100 transition-colors">{busy ? 'Working...' : 'Remove & replace'}</button></> : <label className="mt-3 inline-flex cursor-pointer rounded-full bg-[#0B0B45] px-4 py-2 text-xs font-semibold text-white"><input type="file" className="hidden" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={busy} onChange={(e) => onUpload(kind, e.target.files?.[0])} />{busy ? 'Uploading...' : 'Choose document'}</label>}</div>;
 }
 
 function Notice({ tone, children }) {

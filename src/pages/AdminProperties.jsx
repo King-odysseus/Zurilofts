@@ -120,7 +120,7 @@ function AdminProperties() {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="rounded-xl border border-[#D9D9D9] text-sm px-3 py-2 text-[#1f2937]"
+              className="rounded-xl text-sm px-3 py-2 text-[#1f2937] bg-white shadow-sm"
             >
               <option value="">All statuses</option>
               <option value="DRAFT">Draft</option>
@@ -130,7 +130,7 @@ function AdminProperties() {
               <option value="SUSPENDED">Suspended</option>
             </select>
           )}
-          <div className="flex rounded-xl border border-[#D9D9D9] bg-white p-1" role="group" aria-label="Listings view">
+          <div className="flex rounded-xl bg-white p-1 shadow-sm" role="group" aria-label="Listings view">
             <button
               type="button"
               onClick={() => setViewMode('grid')}
@@ -164,7 +164,7 @@ function AdminProperties() {
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : viewMode === 'table' ? (
-        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
@@ -265,13 +265,13 @@ function AdminProperties() {
                         )}
                         <Link
                           to={`${base}/properties/${p.id}/calendar`}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#C49A6C] transition-colors"
                         >
                           Calendar
                         </Link>
                         <Link
                           to={`${base}/properties/${p.id}/edit`}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#C49A6C] transition-colors"
                         >
                           Edit
                         </Link>
@@ -294,11 +294,11 @@ function AdminProperties() {
           )}
         </div>
       ) : properties.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] text-center py-12 text-[#6b7280]">No properties found. Add your first property!</div>
+        <div className="bg-white rounded-2xl text-center py-12 text-[#6b7280] shadow-sm">No properties found. Add your first property!</div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {properties.map((p) => (
-            <article key={p.id} className="bg-white rounded-2xl border border-[#D9D9D9] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+            <article key={p.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <Link to={`/property/${p.id}`} className="block aspect-[4/3] bg-[#f8f9fa]">
                 {p.images?.[0] ? (
                   <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
@@ -342,8 +342,8 @@ function AdminProperties() {
                   </>}
                   {isAdminView && p.status === 'PUBLISHED' && <button onClick={() => handleReview(p, 'suspend')} disabled={submitting === p.id} className="px-3 py-2 text-xs font-semibold rounded-lg border border-red-200 text-red-600 disabled:opacity-50">Suspend</button>}
                   {isAdminView && p.status === 'SUSPENDED' && <button onClick={() => handleReview(p, 'unsuspend')} disabled={submitting === p.id} className="px-3 py-2 text-xs font-semibold rounded-lg bg-green-600 text-white disabled:opacity-50">Unsuspend</button>}
-                  <Link to={`${base}/properties/${p.id}/calendar`} className="px-3 py-2 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C]">Calendar</Link>
-                  <Link to={`${base}/properties/${p.id}/edit`} className="px-3 py-2 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C]">Edit</Link>
+                  <Link to={`${base}/properties/${p.id}/calendar`} className="px-3 py-2 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#C49A6C]">Calendar</Link>
+                  <Link to={`${base}/properties/${p.id}/edit`} className="px-3 py-2 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#C49A6C]">Edit</Link>
                   <button onClick={() => handleDelete(p.id)} disabled={deleting === p.id} className="px-3 py-2 text-xs font-semibold rounded-lg border border-red-200 text-red-600 disabled:opacity-50">{deleting === p.id ? 'Deleting…' : 'Delete'}</button>
                 </div>
               </div>

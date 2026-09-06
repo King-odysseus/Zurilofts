@@ -87,14 +87,14 @@ function PropertyResultsMap({ listings }) {
 
   if (!hasCoordinates) {
     return (
-      <div className="rounded-2xl border border-[#D9D9D9] bg-white px-6 py-12 text-center text-[#6b7280]">
+      <div className="rounded-2xl bg-white shadow-sm px-6 py-12 text-center text-[#6b7280]">
         Map coordinates are not available for these properties yet. Open a property to use its address in Google Maps.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#D9D9D9] shadow-sm">
+    <div className="overflow-hidden rounded-2xl shadow-md">
       <div ref={mapElementRef} className="h-[520px] w-full md:h-[600px]" aria-label="Property locations map" />
       <p className="bg-white px-4 py-3 text-center text-sm text-[#6b7280]">
         Tap a property pin to view the listing or open turn-by-turn directions in Google Maps.

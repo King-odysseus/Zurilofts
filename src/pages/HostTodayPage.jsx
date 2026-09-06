@@ -49,7 +49,7 @@ function TodayCard({ booking, type }) {
   const badge = badges[type];
 
   return (
-    <article className="bg-white border border-[#D9D9D9]/50 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
+    <article className="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
       <Link to={`/property/${p.id}`} className="block overflow-hidden">
         <img
           src={image || "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&q=80"}
@@ -107,7 +107,7 @@ function TodayCard({ booking, type }) {
               passing booking.id here left the page stuck on "Loading property..." */}
           <Link
             to={`/property/${p.id}`}
-            className="flex-1 text-center px-3 py-2 rounded-full text-xs font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+            className="flex-1 text-center px-3 py-2 rounded-full text-xs font-semibold bg-[#0B0B45]/5 text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
           >
             View details
           </Link>
@@ -211,7 +211,7 @@ function OnboardingChecklist({ hostApplicationStatus, properties }) {
   const completedCount = steps.filter((s) => s.done).length;
 
   return (
-    <section className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-6 shadow-md mb-8">
+    <section className="bg-white rounded-2xl p-6 shadow-md mb-8">
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-lg font-semibold text-[#0B0B45]">Get set up as a host</h2>
         <span className="text-sm font-medium text-[#6b7280]">{completedCount}/{steps.length} done</span>
@@ -223,8 +223,8 @@ function OnboardingChecklist({ hostApplicationStatus, properties }) {
         {steps.map((step, i) => (
           <li
             key={step.key}
-            className={`flex items-start gap-3 rounded-xl border p-3 ${
-              step.done ? 'border-[#D9D9D9]/40 bg-[#f8f9fa]' : 'border-[#D9D9D9]'
+            className={`flex items-start gap-3 rounded-xl p-3 transition-shadow ${
+              step.done ? 'bg-[#f8f9fa]' : 'bg-white shadow-sm'
             }`}
           >
             <div
@@ -269,7 +269,7 @@ OnboardingChecklist.propTypes = {
 function PanelSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl overflow-hidden shadow-md">
+      <div className="bg-white rounded-2xl overflow-hidden shadow-md">
         <div className="h-36 bg-[#D9D9D9]/40 animate-pulse" />
         <div className="p-4 space-y-3">
           <div className="h-4 w-2/3 bg-[#D9D9D9]/40 rounded animate-pulse" />
@@ -306,14 +306,14 @@ EmptyPanel.propTypes = {
 function RecentMessagesPanel({ conversations, loading }) {
   if (loading) {
     return (
-      <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-6 shadow-md flex items-center justify-center py-10">
+      <div className="bg-white rounded-2xl p-6 shadow-md flex items-center justify-center py-10">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <section className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-6 shadow-md">
+    <section className="bg-white rounded-2xl p-6 shadow-md">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold text-[#0B0B45] flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-[#C49A6C]" />
@@ -489,7 +489,7 @@ export default function HostTodayPage() {
           {/* Summary skeleton */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-5 shadow-md">
+              <div key={i} className="bg-white rounded-2xl p-5 shadow-md">
                 <div className="h-4 w-16 bg-[#D9D9D9]/40 rounded animate-pulse mb-2" />
                 <div className="h-8 w-12 bg-[#D9D9D9]/40 rounded animate-pulse" />
               </div>
@@ -543,15 +543,15 @@ export default function HostTodayPage() {
 
         {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-          <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-5 shadow-md">
+          <div className="bg-white rounded-2xl p-5 shadow-md">
             <p className="text-sm text-[#6b7280] mb-1">Arrivals</p>
             <p className="text-2xl font-bold text-[#C49A6C]">{summary.arrivals}</p>
           </div>
-          <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-5 shadow-md">
+          <div className="bg-white rounded-2xl p-5 shadow-md">
             <p className="text-sm text-[#6b7280] mb-1">Departures</p>
             <p className="text-2xl font-bold text-[#0B0B45]">{summary.departures}</p>
           </div>
-          <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-5 shadow-md">
+          <div className="bg-white rounded-2xl p-5 shadow-md">
             <p className="text-sm text-[#6b7280] mb-1">In house</p>
             <p className="text-2xl font-bold text-green-600">{summary.inHouse}</p>
           </div>

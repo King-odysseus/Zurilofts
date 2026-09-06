@@ -65,7 +65,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-lg border border-[#D9D9D9] py-2 z-30">
+        <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-lg py-2 z-30">
           <div className="px-4 py-3 border-b border-[#D9D9D9]">
             <p className="text-sm font-semibold text-[#0B0B45]">{user?.firstName} {user?.lastName}</p>
             <p className="text-xs text-[#6b7280]">{user?.email}</p>
@@ -142,7 +142,7 @@ const TONE_STYLES = {
 function StatCardView({ label, value, icon, tone }) {
   const t = TONE_STYLES[tone] || TONE_STYLES.primary;
   return (
-    <div className="bg-white rounded-2xl border border-[#EFEFF2] shadow-sm p-5 hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm text-[#6b7280]">{label}</span>
         <div className={`w-10 h-10 ${t.bg} rounded-xl flex items-center justify-center`}>
@@ -385,7 +385,7 @@ function AdminLayout() {
         }`}
       >
         {/* Desktop header with notification bell and avatar dropdown */}
-        <header className="hidden md:flex items-center justify-end gap-3 h-16 px-8 bg-white border-b border-[#D9D9D9] sticky top-0 z-[5]">
+        <header className="hidden md:flex items-center justify-end gap-3 h-16 px-8 bg-white shadow-sm sticky top-0 z-[5]">
           {/* Bell - unread messages + pending bookings */}
           <div className="relative">
             <button
@@ -525,7 +525,7 @@ function DashboardOverview() {
                 <svg className={`w-4 h-4 transition-transform ${quickActionsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
               </button>
               {quickActionsOpen && (
-                <div className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-xl border border-[#EFEFF2] bg-white p-1.5 shadow-lg sm:left-auto sm:right-0" role="menu">
+                <div className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-xl bg-white p-1.5 shadow-lg sm:left-auto sm:right-0" role="menu">
                   {quickLinks.map((link) => (
                     <button key={link.label} type="button" role="menuitem" onClick={() => { setQuickActionsOpen(false); navigate(link.to); }}
                       className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F8F9FA] hover:text-[#1f2937] transition-colors">
@@ -550,7 +550,7 @@ function DashboardOverview() {
 
       {/* Landing Page Stats Editor - admin only */}
       {isAdmin && (
-      <div className="bg-white rounded-2xl border border-[#EFEFF2] shadow-sm p-6 mb-6">
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-2">Landing Page Stats</h2>
         <p className="text-sm text-[#6b7280] mb-4">These appear in the hero section. Set to 0 to use live data from reviews and bookings.</p>
         <form onSubmit={saveLandingStats} className="flex flex-wrap items-end gap-4">
@@ -579,7 +579,7 @@ function DashboardOverview() {
       )}
 
       {/* Recent Bookings */}
-      <div className="bg-white rounded-2xl border border-[#EFEFF2] shadow-sm p-6">
+      <div className="bg-white rounded-2xl shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold text-[#0B0B45]">Recent Bookings</h2>
           <Link to="/admin/bookings" className="text-sm font-medium text-[#C49A6C] hover:text-[#b8895c] transition-colors">View all</Link>

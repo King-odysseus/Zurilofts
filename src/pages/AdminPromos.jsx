@@ -207,7 +207,7 @@ function AdminPromos() {
                     {properties.length > 0 && properties.every((p) => formData.propertyIds.includes(p.id)) ? 'Clear All' : 'Select All'}
                   </button>
                 </div>
-                <div className="border border-[#D9D9D9] rounded-xl p-3 max-h-40 overflow-y-auto">
+                <div className="rounded-xl shadow-sm p-3 max-h-40 overflow-y-auto">
                   {properties.length === 0 ? (
                     <p className="text-xs text-[#6b7280]">No properties available.</p>
                   ) : (
@@ -232,7 +232,7 @@ function AdminPromos() {
                 <p className="text-xs text-[#6b7280] mt-1">Leave unchecked to apply to all properties.</p>
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={closeForm} className="flex-1 py-2.5 rounded-full font-semibold border-2 border-[#D9D9D9] text-[#6b7280] hover:border-[#0B0B45] hover:text-[#0B0B45] transition-colors text-sm">
+                <button type="button" onClick={closeForm} className="flex-1 py-2.5 rounded-full font-semibold text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#0B0B45] transition-colors text-sm">
                   Cancel
                 </button>
                 <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 text-sm disabled:opacity-50">
@@ -250,7 +250,7 @@ function AdminPromos() {
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
@@ -303,7 +303,7 @@ function AdminPromos() {
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => openEdit(p)}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#C49A6C] transition-colors"
                         >
                           Edit
                         </button>

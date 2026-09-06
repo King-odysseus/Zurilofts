@@ -39,12 +39,12 @@ function NewDisputeForm({ bookingId, onCreated }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-6 shadow-md space-y-4 max-w-xl">
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 shadow-md space-y-4 max-w-xl">
       <h2 className="text-lg font-semibold text-[#0B0B45]">Report an issue with this booking</h2>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-1">Category</label>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9]">
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2 rounded-xl shadow-sm">
           {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
           ))}
@@ -58,7 +58,7 @@ function NewDisputeForm({ bookingId, onCreated }) {
           rows={5}
           minLength={10}
           required
-          className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9]"
+          className="w-full px-3 py-2 rounded-xl shadow-sm"
           placeholder="Describe the issue in detail - our team and the other party will see this."
         />
       </div>
@@ -192,7 +192,7 @@ function DisputeThreadPage() {
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
         <Link to="/trips" className="text-sm text-[#C49A6C] font-semibold hover:text-[#0B0B45]">&larr; Back to trips</Link>
-        <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-6 shadow-md mt-4">
+        <div className="bg-white rounded-2xl p-6 shadow-md mt-4">
           <div className="flex items-center gap-3 mb-2 flex-wrap">
             <h1 className="text-xl font-bold text-[#0B0B45]">{CATEGORY_LABELS[dispute.category] || dispute.category}</h1>
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[dispute.status] || ''}`}>
@@ -225,7 +225,7 @@ function DisputeThreadPage() {
               {dispute.evidence.length === 0 && <li className="text-sm text-[#6b7280]">No evidence uploaded yet.</li>}
             </ul>
             {!closed && (
-              <label className="inline-block px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C] hover:text-[#C49A6C] cursor-pointer transition-colors">
+              <label className="inline-block px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm hover:shadow-md text-[#6b7280] hover:text-[#C49A6C] cursor-pointer transition-all">
                 {uploading ? 'Uploading...' : 'Upload evidence'}
                 <input
                   type="file"
@@ -260,7 +260,7 @@ function DisputeThreadPage() {
                   value={messageBody}
                   onChange={(e) => setMessageBody(e.target.value)}
                   placeholder="Write a message..."
-                  className="flex-1 px-3 py-2 rounded-xl border border-[#D9D9D9]"
+                  className="flex-1 px-3 py-2 rounded-xl shadow-sm"
                 />
                 <button
                   type="submit"

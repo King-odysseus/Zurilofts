@@ -111,7 +111,7 @@ function AdminPayouts() {
           <p className="text-[#6b7280]">No payouts found</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] overflow-x-auto">
+        <div className="bg-white rounded-2xl shadow-lg overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#D9D9D9] text-left">

@@ -86,7 +86,7 @@ function AdminGuides() {
 
       {/* Edit form */}
       {editing && (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-4 md:p-6 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6 mb-6">
           <h3 className="text-lg font-bold text-[#0B0B45] mb-4">{editing === 'new' ? 'New Guide' : 'Edit Guide'}</h3>
           <div className="space-y-4">
             <div>
@@ -156,7 +156,7 @@ function AdminGuides() {
               >
                 {saving ? 'Saving...' : 'Save'}
               </button>
-              <button onClick={handleCancel} className="border-2 border-[#D9D9D9] text-[#6b7280] px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#D9D9D9]/20 transition-all duration-200">
+              <button onClick={handleCancel} className="text-[#6b7280] px-6 py-2.5 rounded-full text-sm font-semibold shadow-sm hover:shadow-md hover:bg-[#D9D9D9]/20 transition-shadow">
                 Cancel
               </button>
             </div>
@@ -165,7 +165,7 @@ function AdminGuides() {
       )}
 
       {/* Posts list */}
-      <div className="bg-white rounded-2xl border border-[#D9D9D9] overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-[#0B0B45]/5 text-left">
             <tr>

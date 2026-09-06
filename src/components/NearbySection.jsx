@@ -82,7 +82,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
           value={areaFilter}
           onChange={setAreaFilter}
           options={areaOptions}
-          triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px] border border-[#D9D9D9]"
+          triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px] shadow-sm"
           ariaLabel="Filter by area"
         />
         {catOptions && (
@@ -90,7 +90,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             value={categoryFilter}
             onChange={setCategoryFilter}
             options={catOptions}
-            triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px] border border-[#D9D9D9]"
+            triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px] shadow-sm"
             ariaLabel="Filter by category"
           />
         )}
@@ -136,7 +136,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             <div className="text-center mt-10">
               <Link
                 to={viewMoreLink}
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-full border-2 border-[#0B0B45] text-[#0B0B45] font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-[#0B0B45] font-semibold shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
               >
                 View All {filtered.length} Places
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -80,7 +80,7 @@ function PaymentCallback() {
               </p>
 
               {booking && (
-                <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6 mb-6 text-left">
+                <div className="bg-white rounded-2xl shadow-lg p-6 mb-6 text-left">
                   <h3 className="font-bold text-[#0B0B45] mb-2">Booking Summary</h3>
                   <p className="text-[#1f2937] font-medium">{booking.property?.title}</p>
                   <p className="text-[#6b7280] text-sm">{booking.property?.location}</p>
@@ -147,7 +147,7 @@ function PaymentCallback() {
                 {booking && (
                   <button
                     onClick={() => navigate(`/property/${booking.propertyId}`)}
-                    className="w-full border-2 border-[#0B0B45] text-[#0B0B45] py-3 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                    className="w-full text-[#0B0B45] py-3 rounded-full font-semibold shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
                   >
                     View Property
                   </button>

@@ -6,9 +6,9 @@ import { useFavorites } from '../context/FavoritesContext.jsx';
 /**
  * Flatter editorial property card with navy/gold/cream palette and subtle motion.
  *
- * Visuals: cream surface, navy headings, bronze accents, thin border. Hover
- * applies a gentle lift + shadow increase - lighter than the old neumorphic
- * translate-y-2 + scale-110 zoom.
+ * Visuals: cream surface, navy headings, bronze accents, borderless with a
+ * tinted navy shadow for elevation. Hover applies a gentle lift + shadow
+ * increase - lighter than the old neumorphic translate-y-2 + scale-110 zoom.
  *
  * Behaviour preserved exactly: favourite toggle, variant badge, bed-variant
  * link, rating badge, location, bed/bath/area stats, nightly price, CTA.
@@ -53,7 +53,7 @@ function PropertyCard({ property }) {
   const formattedPrice = price != null ? price.toLocaleString() : null;
 
   return (
-    <article className="group relative bg-white border border-[#D9D9D9]/50 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-[#0B0B45]/5 hover:border-[#C49A6C]/25 h-full flex flex-col">
+    <article className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 shadow-[0_4px_16px_-4px_rgba(38,34,98,0.08)] hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-8px_rgba(38,34,98,0.18)] h-full flex flex-col">
       <Link
         to={propertyHref}
         className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"

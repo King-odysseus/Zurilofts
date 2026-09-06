@@ -67,7 +67,7 @@ function AdminIdentityVerifications() {
           <h1 className="text-2xl font-bold text-[#0B0B45]">Identity Verifications</h1>
           <p className="text-sm text-[#6b7280] mt-1">Guest identity checks - gates payment on a booking, separate from host account review.</p>
         </div>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-full border border-[#D9D9D9] bg-white px-5 py-2.5 text-sm focus:outline-none focus:border-[#C49A6C]">
+        <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-full bg-white px-5 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30">
           <option value="">All statuses</option>
           <option value="SUBMITTED">Submitted</option>
           <option value="APPROVED">Approved</option>
@@ -79,9 +79,9 @@ function AdminIdentityVerifications() {
       {loading ? (
         <div className="py-16 text-center text-[#6b7280]">Loading verifications...</div>
       ) : rows.length === 0 ? (
-        <div className="rounded-3xl border border-[#D9D9D9] bg-white p-12 text-center text-[#6b7280]">No verifications in this view.</div>
+        <div className="rounded-3xl bg-white p-12 text-center text-[#6b7280] shadow-sm">No verifications in this view.</div>
       ) : (
-        <div className="overflow-x-auto rounded-3xl border border-[#D9D9D9] bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-3xl bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-[#D9D9D9] text-left"><th className="p-4">Guest</th><th className="p-4">ID type</th><th className="p-4">Documents</th><th className="p-4">Status</th><th className="p-4"></th></tr></thead>
             <tbody>
@@ -119,7 +119,7 @@ function AdminIdentityVerifications() {
                 <h3 className="font-bold text-[#0B0B45] mb-3">Encrypted documents</h3>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {selected.documents?.map((document) => (
-                    <button key={document.id} onClick={() => downloadDocument(document)} disabled={busy === document.id} className="rounded-3xl border border-[#D9D9D9] p-4 text-left hover:border-[#C49A6C] disabled:opacity-50">
+                    <button key={document.id} onClick={() => downloadDocument(document)} disabled={busy === document.id} className="rounded-3xl shadow-sm p-4 text-left hover:shadow-md disabled:opacity-50">
                       <p className="font-semibold text-[#1f2937]">{DOCUMENT_LABELS[document.kind] || document.kind}</p>
                       <p className="mt-1 text-xs text-[#6b7280] break-all">{document.originalName} · {(document.size / 1024 / 1024).toFixed(1)} MB</p>
                     </button>
@@ -129,7 +129,7 @@ function AdminIdentityVerifications() {
               {selected.status === 'SUBMITTED' && (
                 <div className="rounded-3xl border border-[#D9D9D9] p-5">
                   <label className="block text-sm font-semibold text-[#1f2937] mb-2">Reviewer note (required for rejection)</label>
-                  <textarea value={note} onChange={(e) => setNote(e.target.value)} rows="3" maxLength="2000" className="w-full rounded-3xl border border-[#D9D9D9] px-5 py-3 focus:outline-none focus:border-[#C49A6C]" />
+                  <textarea value={note} onChange={(e) => setNote(e.target.value)} rows="3" maxLength="2000" className="w-full rounded-3xl bg-white px-5 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30" />
                   <div className="mt-4 flex flex-wrap gap-3">
                     <button onClick={() => review('approve')} disabled={Boolean(busy)} className="rounded-full bg-green-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Approve</button>
                     <button onClick={() => review('reject')} disabled={Boolean(busy)} className="rounded-full border border-red-300 px-5 py-2.5 text-sm font-semibold text-red-600 disabled:opacity-50">Reject</button>

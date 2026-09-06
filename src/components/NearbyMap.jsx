@@ -109,7 +109,7 @@ function NearbyMap({ items, title }) {
   }, []);
 
   return (
-    <div className="mx-4 overflow-hidden rounded-2xl border border-[#D9D9D9] bg-white shadow-sm md:mx-0">
+    <div className="mx-4 overflow-hidden rounded-2xl bg-white shadow-md md:mx-0">
       <div className="grid lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div
           ref={mapRef}

@@ -8,7 +8,7 @@ import Footer from "../components/Footer.jsx";
 
 function SkeletonCard() {
   return (
-    <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl shadow-md overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-md overflow-hidden">
       <div className="flex flex-col sm:flex-row">
         <div className="sm:w-40 lg:w-48 h-32 sm:h-28 bg-[#D9D9D9]/40 animate-pulse" />
         <div className="flex-1 p-4 space-y-2">
@@ -26,7 +26,7 @@ function PropertyItem({ item, onRemove }) {
   const image = p.images?.[0];
 
   return (
-    <div className="group bg-white border border-[#D9D9D9]/50 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
+    <div className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
       <div className="flex flex-col sm:flex-row">
         <Link to={`/property/${p.id}`} className="sm:w-40 lg:w-48 flex-shrink-0 overflow-hidden">
           <img
@@ -98,7 +98,7 @@ function DeleteConfirm({ onConfirm, onCancel }) {
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 rounded-full text-sm font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+            className="px-4 py-2 rounded-full text-sm font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
           >
             Cancel
           </button>
@@ -235,12 +235,12 @@ export default function ShortlistDetailPage() {
                       type="text"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
-                      className="flex-1 rounded-xl border border-[#D9D9D9] px-3 py-2 text-lg font-bold text-[#0B0B45] focus:outline-none focus-visible:border-[#C49A6C] focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+                      className="flex-1 rounded-xl shadow-sm px-3 py-2 text-lg font-bold text-[#0B0B45] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
                       autoFocus
                       onKeyDown={(e) => { if (e.key === "Enter") handleRename(); if (e.key === "Escape") setRenaming(false); }}
                     />
                     <button onClick={handleRename} className="px-3 py-2 rounded-full text-sm font-semibold bg-[#C49A6C] text-white">Save</button>
-                    <button onClick={() => setRenaming(false)} className="px-3 py-2 rounded-full text-sm font-semibold border-2 border-[#0B0B45] text-[#0B0B45]">Cancel</button>
+                    <button onClick={() => setRenaming(false)} className="px-3 py-2 rounded-full text-sm font-semibold shadow-sm text-[#0B0B45]">Cancel</button>
                   </div>
                 ) : (
                   <h1 className="text-2xl font-bold text-[#0B0B45] truncate">{shortlist.name}</h1>
@@ -252,7 +252,7 @@ export default function ShortlistDetailPage() {
               <div className="flex items-center gap-2 flex-shrink-0">
                 <button
                   onClick={handleShare}
-                  className="px-3 py-1.5 rounded-full text-xs font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
                 >
                   {copied ? "Copied!" : "Share"}
                 </button>

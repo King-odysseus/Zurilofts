@@ -91,7 +91,7 @@ function MessagesPage() {
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Type a message…"
-                className="flex-1 px-4 py-3 rounded-full border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] text-sm bg-white text-[#1f2937]"
+                className="flex-1 px-4 py-3 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 text-sm bg-white text-[#1f2937]"
               />
               <button
                 type="submit"

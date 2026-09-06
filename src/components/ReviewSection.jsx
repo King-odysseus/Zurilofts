@@ -105,7 +105,7 @@ function ReviewSection({ propertyId }) {
       </div>
 
       {/* Star distribution histogram */}
-      <div className="bg-white rounded-2xl border border-[#D9D9D9] p-4 md:p-6 mb-6">
+      <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgb(38_34_98_/_0.06),0_6px_20px_-6px_rgb(38_34_98_/_0.10)] p-4 md:p-6 mb-6">
         <div className="space-y-2">
           {summary.distribution.map((d) => (
             <div key={d.stars} className="flex items-center gap-3">
@@ -128,7 +128,7 @@ function ReviewSection({ propertyId }) {
       {/* Review cards */}
       <div className="space-y-4">
         {reviews.map((review) => (
-          <div key={review.id} className="bg-white rounded-2xl border border-[#D9D9D9] neu-card p-4 md:p-5">
+          <div key={review.id} className="neu-card p-4 md:p-5">
             <div className="flex items-center justify-between mb-2">
               <div>
                 <span className="font-semibold text-[#0B0B45] text-sm">

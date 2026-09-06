@@ -284,7 +284,7 @@ function PropertiesPage() {
       </section>
 
       {/* Sticky Filters Bar */}
-      <section className="sticky top-0 z-10 bg-white border-b border-[#D9D9D9] shadow-sm">
+      <section className="sticky top-0 z-10 bg-white shadow-sm">
         <div className="w-full mx-auto px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl py-3">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             {/* Left: property type pills + bed variant pills + available toggle */}
@@ -578,7 +578,7 @@ function PropertiesPage() {
                 [18, 16, 15, 14].map((imgIndex, i) => (
                   <div
                     key={`coming-soon-${i}`}
-                    className="group overflow-hidden rounded-2xl border border-[#D9D9D9]/60 bg-white h-full flex flex-col"
+                    className="group overflow-hidden rounded-2xl shadow-[0_4px_16px_-4px_rgba(38,34,98,0.08)] bg-white h-full flex flex-col"
                   >
                     <div className="relative aspect-[4/3] flex-shrink-0">
                       <img

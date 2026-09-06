@@ -67,7 +67,7 @@ export default function SharedShortlistPage() {
                     <Link
                       key={item.id}
                       to={`/property/${p.id}`}
-                      className="group block bg-white border border-[#D9D9D9]/50 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200"
+                      className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200"
                     >
                       <div className="flex flex-col sm:flex-row">
                         <div className="sm:w-40 lg:w-48 flex-shrink-0 overflow-hidden">

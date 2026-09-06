@@ -810,7 +810,7 @@ function BookingPage() {
             const subtotal = qty * (addOn.price || 0);
             const busy = pendingAddOnId === addOn.id;
             return (
-              <div key={addOn.id} className="border border-[#D9D9D9] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div key={addOn.id} className="shadow-sm rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-[#0B0B45]">{addOn.name}</h3>
@@ -829,7 +829,7 @@ function BookingPage() {
                       type="button"
                       onClick={() => changeAddOnQuantity(addOn, qty - 1)}
                       disabled={busy || qty === 0}
-                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#0B0B45] font-bold hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-9 h-9 rounded-full shadow-sm hover:shadow-md text-[#0B0B45] font-bold hover:text-[#C49A6C] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       aria-label={`Decrease ${addOn.name} quantity`}
                     >
                       −
@@ -841,7 +841,7 @@ function BookingPage() {
                       type="button"
                       onClick={() => changeAddOnQuantity(addOn, qty + 1)}
                       disabled={busy || qty >= 20}
-                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#0B0B45] font-bold hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-9 h-9 rounded-full shadow-sm hover:shadow-md text-[#0B0B45] font-bold hover:text-[#C49A6C] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       aria-label={`Increase ${addOn.name} quantity`}
                     >
                       +
@@ -1132,7 +1132,7 @@ function BookingPage() {
               </button>
               <button
                 onClick={() => window.print()}
-                className="w-full border-2 border-[#0B0B45] text-[#0B0B45] py-3 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                className="w-full bg-[#0B0B45]/5 text-[#0B0B45] py-3 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
               >
                 Print Confirmation
               </button>
@@ -1184,7 +1184,7 @@ function BookingPage() {
               </button>
               <button
                 onClick={() => navigate('/properties')}
-                className="px-6 py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                className="px-6 py-2.5 rounded-full font-semibold bg-[#0B0B45]/5 text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
               >
                 Browse properties
               </button>
@@ -1235,7 +1235,7 @@ function BookingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Left Column - Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-5 md:p-8">
+              <div className="bg-white rounded-2xl shadow-lg p-5 md:p-8">
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 3 && renderStep3()}
@@ -1245,7 +1245,7 @@ function BookingPage() {
 
             {/* Right Column - Property Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6 sticky top-24">
+              <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
                 <Link to={`/property/${property?.id}`} className="block">
                   <img
                     src={(property?.images?.[0] || '')}

@@ -26,7 +26,7 @@ const EMPTY = {
 
 const labelCls = 'block text-sm font-semibold text-[#1f2937] mb-2';
 const inputCls =
-  'w-full px-4 py-2.5 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] bg-white text-[#1f2937]';
+  'w-full px-4 py-2.5 rounded-xl bg-white text-[#1f2937] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30';
 
 // textarea where each non-empty line is one array item
 function linesToArray(text) {
@@ -196,7 +196,7 @@ function AdminPropertyForm() {
           {isEdit && (
             <Link
               to={`${base}/properties/${id}/calendar`}
-              className="px-4 py-2 rounded-full text-sm font-semibold border border-[#D9D9D9] text-[#0B0B45] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
+              className="px-4 py-2 rounded-full text-sm font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:text-[#C49A6C] transition-colors"
             >
               Manage Calendar &rarr;
             </Link>
@@ -213,7 +213,7 @@ function AdminPropertyForm() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6 space-y-5">
+        <div className="bg-white rounded-2xl p-6 space-y-5 shadow-sm">
           <div>
             <label className={labelCls}>Title</label>
             <input className={inputCls} value={form.title} onChange={(e) => update('title', e.target.value)} required />
@@ -246,7 +246,7 @@ function AdminPropertyForm() {
             <p className="text-sm font-semibold text-[#0B0B45]">Bed Variant Pricing &amp; Bathrooms</p>
             <p className="text-xs text-[#6b7280] -mt-3">Each variant can have its own price and bathroom count. Leave unchecked to not list.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label className="flex items-start gap-3 bg-white rounded-xl border border-[#D9D9D9] p-4 cursor-pointer hover:border-[#C49A6C] transition-colors">
+              <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#C49A6C]/20 transition-all duration-200">
                 <input
                   type="checkbox"
                   className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
@@ -282,7 +282,7 @@ function AdminPropertyForm() {
                   )}
                 </div>
               </label>
-              <label className="flex items-start gap-3 bg-white rounded-xl border border-[#D9D9D9] p-4 cursor-pointer hover:border-[#C49A6C] transition-colors">
+              <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#C49A6C]/20 transition-all duration-200">
                 <input
                   type="checkbox"
                   className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
@@ -352,7 +352,7 @@ function AdminPropertyForm() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6 space-y-5">
+        <div className="bg-white rounded-2xl p-6 space-y-5 shadow-sm">
           <div>
             <label className={labelCls}>Photos</label>
             <p className="text-sm text-[#6b7280] mb-3">Upload images from your device. They&apos;re automatically resized and compressed for the website. The first photo is used as the cover.</p>
@@ -360,7 +360,7 @@ function AdminPropertyForm() {
             {form.images.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
                 {form.images.map((src, i) => (
-                  <div key={src + i} className="relative group aspect-[4/3] rounded-xl overflow-hidden border border-[#D9D9D9]">
+                  <div key={src + i} className="relative group aspect-[4/3] rounded-xl overflow-hidden shadow-sm">
                     <img src={src} alt={`Property photo ${i + 1}`} className="w-full h-full object-cover" />
                     {i === 0 && (
                       <span className="absolute top-1.5 left-1.5 bg-[#C49A6C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Cover</span>
@@ -445,7 +445,7 @@ function AdminPropertyForm() {
       </button>
 
       <aside
-        className={`fixed top-0 right-0 z-30 h-full w-[372px] max-w-[90vw] bg-[#f8f9fa] border-l border-[#D9D9D9] shadow-2xl transition-transform duration-300 overflow-y-auto ${
+        className={`fixed top-0 right-0 z-30 h-full w-[372px] max-w-[90vw] bg-[#f8f9fa] shadow-2xl transition-transform duration-300 overflow-y-auto ${
           previewOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -506,7 +506,7 @@ function PropertyPreview({ form }) {
   const area = form.area === '' ? '-' : form.area;
 
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] overflow-hidden max-w-sm">
+    <div className="bg-white rounded-2xl shadow-md overflow-hidden max-w-sm">
       <div className="relative aspect-[4/3] overflow-hidden bg-[#f0f0f0]">
         {cover ? (
           <img src={cover} alt={form.title || 'Property'} className="w-full h-full object-cover" />
@@ -682,7 +682,7 @@ function FullPagePreview({ form, onClose }) {
 
             {/* Booking card */}
             <div className="lg:col-span-1">
-              <div className="border border-[#D9D9D9] rounded-2xl p-6 sticky top-20">
+              <div className="rounded-2xl p-6 sticky top-20 shadow-sm bg-white">
                 <span className="text-3xl font-bold text-[#0B0B45]">KES {price.toLocaleString()}</span>
                 <span className="text-[#6b7280]"> / night</span>
                 <div className="block w-full bg-[#C49A6C] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
@@ -754,7 +754,7 @@ function SeasonalPricing({ propertyId }) {
   const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   return (
-    <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
+    <div className="bg-white rounded-2xl p-6 shadow-sm">
       <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Seasonal Pricing</h2>
       <p className="text-sm text-[#6b7280] mb-4">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
 

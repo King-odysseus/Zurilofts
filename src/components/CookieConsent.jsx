@@ -107,7 +107,7 @@ function CookieConsent() {
         visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
       }`}
     >
-      <div className="bg-white rounded-2xl shadow-2xl border border-[#D9D9D9] p-5">
+      <div className="bg-white rounded-2xl shadow-2xl p-5">
         <div className="flex items-start gap-3 mb-3">
           <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[#C49A6C]/15 flex items-center justify-center">
             <svg className="w-5 h-5 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,7 +140,7 @@ function CookieConsent() {
             {CATEGORIES.map((cat) => (
               <div
                 key={cat.key}
-                className="flex items-start justify-between gap-3 rounded-xl border border-[#D9D9D9] p-3"
+                className="flex items-start justify-between gap-3 rounded-xl shadow-sm p-3"
               >
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-[#0B0B45]">{cat.label}</p>
@@ -194,7 +194,7 @@ function CookieConsent() {
               <button
                 type="button"
                 onClick={() => setMode('manage')}
-                className="px-5 py-2 rounded-full border border-[#D9D9D9] text-[#0B0B45] text-sm font-semibold hover:bg-[#f8f9fa] transition-colors duration-200"
+                className="px-5 py-2 rounded-full bg-white shadow-sm hover:shadow-md text-[#0B0B45] text-sm font-semibold transition-all duration-200"
               >
                 Manage preferences
               </button>

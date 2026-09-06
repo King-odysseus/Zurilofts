@@ -45,7 +45,7 @@ function ConversationRow({ conversation, currentUserId }) {
   return (
     <Link
       to={`/inbox/${conversation.id}`}
-      className="block bg-white rounded-2xl border border-[#D9D9D9] neu-card p-4 hover:shadow-md transition-all duration-200"
+      className="block bg-white rounded-2xl neu-card p-4 hover:shadow-md transition-all duration-200"
     >
       <div className="flex items-center gap-4">
         {/* Property thumbnail */}

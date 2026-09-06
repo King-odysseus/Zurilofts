@@ -8,7 +8,7 @@ import Footer from "../components/Footer.jsx";
 
 function SkeletonCard() {
   return (
-    <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl shadow-md p-5">
+    <div className="bg-white rounded-2xl shadow-md p-5">
       <div className="h-5 w-2/3 bg-[#D9D9D9]/40 rounded animate-pulse mb-3" />
       <div className="h-4 w-1/3 bg-[#D9D9D9]/40 rounded animate-pulse mb-4" />
       <div className="flex gap-2">
@@ -55,7 +55,7 @@ function CreateForm({ onSubmit, onCancel, saving }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white border border-[#D9D9D9]/50 rounded-2xl shadow-md p-5 mb-4">
+    <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-md p-5 mb-4">
       <label htmlFor="shortlist-name" className="block text-sm font-semibold text-[#0B0B45] mb-2">
         Shortlist name
       </label>
@@ -67,7 +67,7 @@ function CreateForm({ onSubmit, onCancel, saving }) {
         placeholder="e.g. Weekend getaways, Honeymoon picks"
         maxLength={80}
         autoFocus
-        className="w-full rounded-xl border border-[#D9D9D9] px-4 py-2.5 text-sm text-[#1f2937] placeholder-[#6b7280] focus:outline-none focus-visible:border-[#C49A6C] focus-visible:ring-2 focus-visible:ring-[#C49A6C] mb-3"
+        className="w-full rounded-xl shadow-sm px-4 py-2.5 text-sm text-[#1f2937] placeholder-[#6b7280] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] mb-3"
       />
       <div className="flex items-center gap-2">
         <button
@@ -81,7 +81,7 @@ function CreateForm({ onSubmit, onCancel, saving }) {
           type="button"
           onClick={onCancel}
           disabled={saving}
-          className="px-4 py-2 rounded-full text-sm font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+          className="px-4 py-2 rounded-full text-sm font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
         >
           Cancel
         </button>
@@ -118,7 +118,7 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
   const itemLabel = shortlist._count?.items === 1 ? "property" : "properties";
 
   return (
-    <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 p-5">
+    <div className="bg-white rounded-2xl shadow-md hover:shadow-lg transition-all duration-200 p-5">
       <div className="flex items-start justify-between gap-3 mb-2">
         {renaming ? (
           <form onSubmit={handleRenameSubmit} className="flex-1 flex gap-2">
@@ -126,7 +126,7 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="flex-1 rounded-xl border border-[#D9D9D9] px-3 py-1.5 text-sm text-[#1f2937] focus:outline-none focus-visible:border-[#C49A6C] focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+              className="flex-1 rounded-xl shadow-sm px-3 py-1.5 text-sm text-[#1f2937] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
               autoFocus
               onBlur={() => setRenaming(false)}
             />
@@ -158,7 +158,7 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
         <button
           type="button"
           onClick={handleCopyLink}
-          className="px-3 py-1.5 rounded-full text-xs font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+          className="px-3 py-1.5 rounded-full text-xs font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
         >
           {copied ? "Copied!" : "Share"}
         </button>

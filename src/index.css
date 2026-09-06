@@ -52,27 +52,28 @@ body {
   }
 }
 
-/* ===== Card System - flat cards with subtle border + single drop shadow ===== */
+/* ===== Card System - borderless, elevation carried entirely by shadow ===== */
 .neu-card {
   background-color: #ffffff;
-  border: 1px solid #EFEFF2;
+  border: none;
   border-radius: 1rem;
-  box-shadow: 0 1px 2px rgb(38 34 98 / 0.04), 0 4px 16px -4px rgb(38 34 98 / 0.06);
+  box-shadow: 0 1px 3px rgb(38 34 98 / 0.06), 0 6px 20px -6px rgb(38 34 98 / 0.10);
   transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .neu-card-hover:hover {
-  box-shadow: 0 8px 30px -6px rgb(38 34 98 / 0.12), 0 4px 12px -6px rgb(38 34 98 / 0.06);
+  box-shadow: 0 12px 36px -8px rgb(38 34 98 / 0.16), 0 6px 16px -6px rgb(38 34 98 / 0.08);
   transform: translateY(-3px);
 }
 
-/* ===== Form inputs - flat bordered, no inset shadows ===== */
+/* ===== Form inputs - borderless, resting on a soft shadow instead of an outline ===== */
 .neu-input {
   background-color: #ffffff;
-  border: 1px solid #D9D9D9;
+  border: 1px solid transparent;
   border-radius: 0.75rem;
   color: #1f2937;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgb(38 34 98 / 0.05), 0 1px 8px -2px rgb(38 34 98 / 0.06);
+  transition: box-shadow 0.15s ease;
 }
 
 .neu-input::placeholder {
@@ -85,23 +86,25 @@ body {
   box-shadow: 0 0 0 3px rgba(196, 154, 108, 0.18);
 }
 
-/* ===== Radio / option cards - flat bordered ===== */
+/* ===== Radio / option cards - borderless, shadow communicates the surface ===== */
 .neu-radio-card {
   background-color: #ffffff;
-  border: 1px solid #D9D9D9;
+  border: 1px solid transparent;
   border-radius: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 3px rgb(38 34 98 / 0.06), 0 4px 14px -6px rgb(38 34 98 / 0.08);
+  transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .neu-radio-card:hover {
-  border-color: #C49A6C;
-  box-shadow: 0 2px 8px rgb(196 154 108 / 0.15);
+  box-shadow: 0 6px 20px -4px rgb(196 154 108 / 0.22);
+  transform: translateY(-2px);
 }
 
 .neu-radio-selected {
   background-color: #ffffff;
   border: 2px solid #C49A6C;
   border-radius: 1rem;
+  box-shadow: 0 6px 20px -4px rgb(196 154 108 / 0.28);
 }
 
 /* Auth cards sit over a dark photo background - use a single soft drop
@@ -110,17 +113,18 @@ body {
   box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
 }
 
-/* Flat inputs for auth forms (login/register) and filter dropdowns -
-   bordered instead of neumorphic inset shadows */
+/* Borderless inputs for auth forms (login/register) and filter dropdowns -
+   soft shadow gives definition instead of an outline */
 .auth-input,
 .filter-input {
-  border: 1px solid #D9D9D9;
+  border: 1px solid transparent;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 1px 8px -2px rgb(0 0 0 / 0.06);
 }
 
 .auth-input:focus,
 .filter-input:focus {
   border-color: #C49A6C;
-  box-shadow: 0 0 0 1px rgba(196, 154, 108, 0.3);
+  box-shadow: 0 0 0 3px rgba(196, 154, 108, 0.18);
   outline: none;
 }
 
@@ -268,4 +272,14 @@ select:not(.neu-input) option {
 
 .no-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* Toast slide/settle-in animation */
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.toast-in {
+  animation: toast-in 0.18s ease-out both;
 }

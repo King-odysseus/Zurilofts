@@ -70,7 +70,7 @@ function FavouritesPage() {
               </Link>
               <Link
                 to="/register"
-                className="block w-full border-2 border-[#0B0B45] text-[#0B0B45] py-3 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                className="block w-full bg-[#0B0B45]/5 text-[#0B0B45] py-3 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
               >
                 Create Account
               </Link>
@@ -156,7 +156,7 @@ function FavouritesPage() {
           {!sharedIds && favorites.length > 0 && (
             <button
               onClick={handleShare}
-              className="inline-flex items-center gap-2 bg-white border-2 border-[#0B0B45] text-[#0B0B45] px-5 py-2.5 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+              className="inline-flex items-center gap-2 bg-[#0B0B45]/5 text-[#0B0B45] px-5 py-2.5 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
             >
               {copied ? (
                 <>

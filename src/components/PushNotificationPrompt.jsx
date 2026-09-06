@@ -23,7 +23,7 @@ function PushNotificationPrompt() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:bottom-4 sm:w-96 z-40 bg-white rounded-2xl border-2 border-[#C49A6C]/30 shadow-lg p-4">
+    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:bottom-4 sm:w-96 z-40 bg-white rounded-2xl shadow-2xl p-4">
       <div className="flex items-start gap-3">
         <div className="w-10 h-10 bg-[#C49A6C]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
           <svg className="w-5 h-5 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

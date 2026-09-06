@@ -165,10 +165,10 @@ function Navbar() {
   }
 
   return (
-    <nav className={`fixed w-full z-20 top-0 start-0 border-b transition-all duration-300 ${
+    <nav className={`fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
       needsWhiteNav
-        ? 'bg-white border-[#D9D9D9] shadow-sm'
-        : 'bg-transparent border-transparent'
+        ? 'bg-white shadow-sm'
+        : 'bg-transparent'
     }`}>
       <div className="max-w-screen-xl flex flex-wrap items-center mx-auto p-4">
 
@@ -199,7 +199,7 @@ function Navbar() {
                   </span>
                 )}
                 {notifOpen && (
-                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-lg border border-[#D9D9D9] py-2 z-30">
+                  <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl py-2 z-30">
                     <div className="px-4 py-2 border-b border-[#D9D9D9]">
                       <p className="text-sm font-semibold text-[#0B0B45]">Notifications</p>
                     </div>
@@ -284,7 +284,7 @@ function Navbar() {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-lg border border-[#D9D9D9] py-2 z-30">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl py-2 z-30">
                   <div className="px-4 py-3 border-b border-[#D9D9D9]">
                     <p className="text-sm font-semibold text-[#0B0B45]">{user?.firstName} {user?.lastName}</p>
                     <p className="text-xs text-[#6b7280]">{user?.email}</p>
@@ -495,49 +495,49 @@ function Navbar() {
                 <>
                   <Link
                     to="/profile#info"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     My Profile
                   </Link>
                   <Link
                     to="/bookings"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Booking History
                   </Link>
                   <Link
                     to="/favourites"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Favourites
                   </Link>
                   <Link
                     to="/messages"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Contact Support{unreadMessages > 0 ? ` (${unreadMessages})` : ''}
                   </Link>
                   <Link
                     to="/inbox"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Messages{conversationUnread > 0 ? ` (${conversationUnread})` : ''}
                   </Link>
                   <Link
                     to="/terms"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Terms of Service
                   </Link>
                   <Link
                     to="/privacy"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Privacy Policy
@@ -554,7 +554,7 @@ function Navbar() {
                   {canSelectHosting && (
                     <button
                       onClick={handleSwitchMode}
-                      className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#C49A6C] text-[#C49A6C] hover:bg-[#C49A6C] hover:text-white transition-all duration-200 text-center"
+                      className="block w-full py-2.5 rounded-full font-semibold text-[#C49A6C] shadow-sm hover:shadow-md hover:bg-[#C49A6C] hover:text-white transition-all duration-200 text-center"
                     >
                       {mode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
                     </button>
@@ -570,7 +570,7 @@ function Navbar() {
                 <>
                   <Link
                     to="/login"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Sign In / Sign Up
@@ -578,14 +578,14 @@ function Navbar() {
                   {/* "Chat with Us" removed with the Telegram-backed ChatWidget. */}
                   <Link
                     to="/terms"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Terms of Service
                   </Link>
                   <Link
                     to="/privacy"
-                    className="block w-full py-2.5 rounded-full font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
+                    className="block w-full py-2.5 rounded-full font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Privacy Policy

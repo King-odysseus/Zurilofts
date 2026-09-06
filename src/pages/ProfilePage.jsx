@@ -407,7 +407,7 @@ function ProfilePage() {
                   <img
                     src={profile.avatar}
                     alt="Profile"
-                    className="w-16 h-16 rounded-full object-cover border-2 border-[#D9D9D9]"
+                    className="w-16 h-16 rounded-full object-cover shadow-md"
                   />
                 ) : (
                   <div className="w-16 h-16 bg-[#C49A6C] rounded-full flex items-center justify-center">
@@ -733,7 +733,7 @@ function ProfilePage() {
                             type="button"
                             onClick={() => setShowDeleteDialog(false)}
                             disabled={deleting}
-                            className="px-5 py-2.5 rounded-full border border-[#D9D9D9] text-[#1f2937] text-sm font-semibold hover:bg-[#f8f9fa] transition-colors duration-200 disabled:opacity-50"
+                            className="px-5 py-2.5 rounded-full text-[#1f2937] text-sm font-semibold shadow-sm hover:shadow-md hover:bg-[#f8f9fa] transition-colors duration-200 disabled:opacity-50"
                           >
                             Cancel
                           </button>

@@ -513,7 +513,7 @@ function AdminEarnings() {
         </div>
         <div className="flex items-center gap-2">
           {isAdmin && (
-            <div className="flex items-center bg-[#f3f4f6] rounded-full p-0.5 border border-[#D9D9D9]">
+            <div className="flex items-center bg-[#f3f4f6] rounded-full p-0.5 shadow-sm">
               <button
                 type="button"
                 onClick={() => setViewMode('all')}
@@ -556,7 +556,7 @@ function AdminEarnings() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-2xl border border-[#D9D9D9] p-4 mb-6 shadow-sm">
+      <div className="bg-white rounded-2xl shadow-sm p-4 mb-6">
         <div className="flex flex-col lg:flex-row gap-4">
           <div className="flex-shrink-0">
             <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">Period</label>
@@ -662,7 +662,7 @@ function AdminEarnings() {
       {/* Stats Cards - Top row: core metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
         {cards.map(({ label, value, color, sub }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
+          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-[#6b7280]">{label}</span>
               <div className={`w-2.5 h-2.5 rounded-full ${color}`}></div>
@@ -676,7 +676,7 @@ function AdminEarnings() {
       {/* Fee Breakdown Cards - Second row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         {feeCards.map(({ label, value, sub }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-[#D9D9D9]">
+          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm">
             <span className="text-sm text-[#6b7280]">{label}</span>
             <p className="text-xl font-bold text-[#0B0B45] mt-2">{value}</p>
             {sub && <p className="text-xs text-[#6b7280] mt-1">{sub}</p>}
@@ -687,7 +687,7 @@ function AdminEarnings() {
       {/* Insights strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {insights.map(({ label, value, hint }) => (
-          <div key={label} className="bg-[#f8f9fa] rounded-xl px-4 py-3 border border-[#D9D9D9]/60">
+          <div key={label} className="bg-[#f8f9fa] rounded-xl px-4 py-3 shadow-sm">
             <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-1">{label}</p>
             <p className="text-base font-bold text-[#0B0B45] truncate" title={value}>{value}</p>
             {hint && <p className="text-xs text-[#C49A6C] font-medium mt-0.5">{hint}</p>}
@@ -697,7 +697,7 @@ function AdminEarnings() {
 
       {/* Earnings Flow visualization (only when we have fee data) */}
       {!loading && filteredTotals.grossRent > 0 && (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm mb-4">
+        <div className="bg-white rounded-2xl shadow-sm p-5 mb-4">
           <h2 className="text-sm font-bold text-[#0B0B45] mb-4">Earnings Flow - How Your Money Moves</h2>
           <div className="flex flex-col lg:flex-row items-center gap-3 text-sm">
             {/* Gross Rent */}
@@ -766,7 +766,7 @@ function AdminEarnings() {
       </>}
 
       {activeTab === 'performance' && !loading && (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 sm:p-7 shadow-sm mb-8">
+        <div className="bg-white rounded-2xl shadow-sm p-5 sm:p-7 mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Monthly view</p>
@@ -783,7 +783,7 @@ function AdminEarnings() {
       {activeTab === 'performance' && isAdmin && !loading && hosts.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
           {/* Top Hosts Table */}
-          <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
+          <div className="bg-white rounded-2xl shadow-sm p-5">
             <h2 className="text-sm font-bold text-[#0B0B45] mb-4">Top Hosts by Earnings</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -823,7 +823,7 @@ function AdminEarnings() {
           </div>
 
           {/* Top Hosts Bar Chart */}
-          <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
+          <div className="bg-white rounded-2xl shadow-sm p-5">
             <h2 className="text-sm font-bold text-[#0B0B45] mb-4">Host Net Earnings Comparison</h2>
             {hosts.length > 0 && (
               <div className="space-y-3">
@@ -859,7 +859,7 @@ function AdminEarnings() {
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">

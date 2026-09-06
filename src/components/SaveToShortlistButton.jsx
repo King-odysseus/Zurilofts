@@ -77,7 +77,7 @@ export default function SaveToShortlistButton({ propertyId }) {
         className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
           isSaved
             ? "bg-[#C49A6C] text-white"
-            : "border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white"
+            : "text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white"
         }`}
       >
         <svg className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
@@ -89,7 +89,7 @@ export default function SaveToShortlistButton({ propertyId }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 z-50 w-64 bg-white rounded-xl border border-[#D9D9D9] shadow-lg p-3">
+          <div className="absolute right-0 top-full mt-2 z-50 w-64 bg-white rounded-xl shadow-xl p-3">
             <h4 className="text-sm font-semibold text-[#0B0B45] mb-2">Save to shortlist</h4>
 
             {loading ? (
@@ -122,7 +122,7 @@ export default function SaveToShortlistButton({ propertyId }) {
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Shortlist name"
-                  className="flex-1 rounded-lg border border-[#D9D9D9] px-2 py-1 text-xs text-[#1f2937] focus:outline-none focus-visible:border-[#C49A6C] focus-visible:ring-1 focus-visible:ring-[#C49A6C]"
+                  className="flex-1 rounded-lg shadow-sm px-2 py-1 text-xs text-[#1f2937] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C49A6C]"
                   autoFocus
                   onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); if (e.key === "Escape") setShowCreate(false); }}
                 />

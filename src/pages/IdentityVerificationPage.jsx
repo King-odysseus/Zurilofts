@@ -61,7 +61,7 @@ function IdentityVerificationPage() {
           </div>
         )}
 
-        <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl p-6 shadow-md">
+        <div className="bg-white rounded-2xl p-6 shadow-md">
           <IdentityVerificationPanel onApproved={() => setApproved(true)} />
         </div>
 

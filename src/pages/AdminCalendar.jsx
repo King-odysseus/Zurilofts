@@ -73,7 +73,7 @@ function CalendarPropertyPicker({ base }) {
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : properties.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-10 text-center">
+        <div className="bg-white rounded-2xl shadow-sm p-10 text-center">
           <p className="text-[#6b7280]">No properties yet. Add a property to manage its calendar.</p>
         </div>
       ) : (
@@ -82,7 +82,7 @@ function CalendarPropertyPicker({ base }) {
             <Link
               key={p.id}
               to={`${base}/calendar/${p.id}`}
-              className="bg-white rounded-2xl border border-[#D9D9D9] overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group"
+              className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group"
             >
               <div className="aspect-[4/3] overflow-hidden bg-[#D9D9D9]/30">
                 {p.images?.[0] ? (
@@ -286,10 +286,10 @@ function AdminCalendar() {
         {[['view', 'View'], ['availability', 'Availability'], ['settings', 'Settings']].map(([value, label]) => <button key={value} type="button" role="tab" aria-selected={calendarTab === value} onClick={() => setCalendarTab(value)} className={`px-4 py-2.5 text-sm font-semibold border-b-2 ${calendarTab === value ? 'border-[#C49A6C] text-[#0B0B45]' : 'border-transparent text-[#6b7280]'}`}>{label}</button>)}
       </div>
 
-      {calendarTab === 'view' && <section className="bg-white rounded-2xl border border-[#D9D9D9] p-5 sm:p-6 mb-6">
+      {calendarTab === 'view' && <section className="bg-white rounded-2xl shadow-sm p-5 sm:p-6 mb-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Availability</p><h2 className="text-2xl font-bold text-[#0B0B45] mt-1">{monthCursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h2></div>
-          <div className="flex gap-2"><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1))} className="w-10 h-10 rounded-full border border-[#D9D9D9] text-[#0B0B45]">←</button><button type="button" onClick={() => setMonthCursor(new Date())} className="px-4 rounded-full border border-[#D9D9D9] text-sm font-semibold text-[#0B0B45]">Today</button><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1))} className="w-10 h-10 rounded-full border border-[#D9D9D9] text-[#0B0B45]">→</button></div>
+          <div className="flex gap-2"><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1))} className="w-10 h-10 rounded-full shadow-sm hover:shadow-md transition-shadow text-[#0B0B45]">←</button><button type="button" onClick={() => setMonthCursor(new Date())} className="px-4 rounded-full shadow-sm hover:shadow-md transition-shadow text-sm font-semibold text-[#0B0B45]">Today</button><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1))} className="w-10 h-10 rounded-full shadow-sm hover:shadow-md transition-shadow text-[#0B0B45]">→</button></div>
         </div>
         <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} onBlockClick={handleCalendarBlockClick} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
         <div className="flex flex-wrap items-center justify-between gap-4 mt-4">
@@ -299,7 +299,7 @@ function AdminCalendar() {
       </section>}
 
       {/* Outbound feed */}
-      {calendarTab === 'settings' && <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
+      {calendarTab === 'settings' && <section className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Export this calendar</h2>
         <p className="text-sm text-[#6b7280] mb-4">Paste this link into Airbnb / Booking.com so they block the dates booked on ZuriLofts.</p>
         <div className="flex items-center gap-2">
@@ -311,13 +311,13 @@ function AdminCalendar() {
       </section>}
 
       {/* Imported feeds */}
-      {calendarTab === 'settings' && <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
+      {calendarTab === 'settings' && <section className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-lg font-bold text-[#0B0B45]">Imported calendars</h2>
           <button
             onClick={syncNow}
             disabled={syncing || data.sources.length === 0}
-            className="text-sm font-semibold px-4 py-2 rounded-full border border-[#D9D9D9] text-[#0B0B45] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-50"
+            className="text-sm font-semibold px-4 py-2 rounded-full shadow-sm hover:shadow-md text-[#0B0B45] hover:text-[#C49A6C] transition-shadow disabled:opacity-50"
           >
             {syncing ? 'Syncing...' : 'Sync now'}
           </button>
@@ -358,7 +358,7 @@ function AdminCalendar() {
       </section>}
 
       {/* Blocked dates */}
-      {calendarTab === 'availability' && <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
+      {calendarTab === 'availability' && <section className="bg-white rounded-2xl shadow-sm p-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Blocked dates</h2>
         <p className="text-sm text-[#6b7280] mb-4">Select a start date, then the final night to block it. Existing stays can&apos;t be selected.</p>
         <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} onBlockClick={handleCalendarBlockClick} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
@@ -386,7 +386,7 @@ function AdminCalendar() {
         )}
 
         <form onSubmit={addBlock} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <div className="md:col-span-5 rounded-xl bg-[#f8f9fa] border border-[#D9D9D9] px-4 py-2.5">
+          <div className="md:col-span-5 rounded-xl bg-[#f8f9fa] shadow-sm px-4 py-2.5">
             <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">Selected dates</p>
             <p className="text-sm font-semibold text-[#0B0B45] mt-0.5">{blockDraft.start && selectedBlockEnd ? `${fmt(blockDraft.start)} – ${fmt(selectedBlockEnd)}` : 'Choose dates on the calendar above'}</p>
           </div>
