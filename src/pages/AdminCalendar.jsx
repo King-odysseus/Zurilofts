@@ -271,8 +271,11 @@ function AdminCalendar() {
           <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Availability</p><h2 className="text-2xl font-bold text-[#0B0B45] mt-1">{monthCursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h2></div>
           <div className="flex gap-2"><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1))} className="w-10 h-10 rounded-full border border-[#D9D9D9] text-[#0B0B45]">←</button><button type="button" onClick={() => setMonthCursor(new Date())} className="px-4 rounded-full border border-[#D9D9D9] text-sm font-semibold text-[#0B0B45]">Today</button><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1))} className="w-10 h-10 rounded-full border border-[#D9D9D9] text-[#0B0B45]">→</button></div>
         </div>
-        <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} />
-        <div className="flex flex-wrap gap-4 mt-4 text-xs text-[#6b7280]"><span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-[#0B0B45] mr-1.5" />Booking</span><span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-[#C49A6C]/30 mr-1.5" />Blocked date</span></div>
+        <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
+        <div className="flex flex-wrap items-center justify-between gap-4 mt-4">
+          <div className="flex flex-wrap gap-4 text-xs text-[#6b7280]"><span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-[#0B0B45] mr-1.5" />Booking</span><span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-[#C49A6C]/30 mr-1.5" />Blocked date</span><span>Click a start date, then the final night to block.</span></div>
+          <button type="button" disabled={!blockDraft.start || !blockDraft.end} onClick={() => addBlock({ preventDefault() {} })} className="bg-[#0B0B45] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#06062a] disabled:opacity-50">Block selected dates</button>
+        </div>
       </section>}
 
       {/* Outbound feed */}
