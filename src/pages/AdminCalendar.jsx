@@ -12,12 +12,13 @@ const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', mon
 function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, selectedStart, selectedEnd }) {
   const start = new Date(month.getFullYear(), month.getMonth(), 1);
   const days = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
-  const offset = (start.getDay() + 6) % 7;
+  const offset = start.getDay();
   const cells = Array.from({ length: Math.ceil((offset + days) / 7) * 7 }, (_, index) => index - offset + 1);
   const sameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   const occupied = (date, item) => date >= new Date(item.start) && date < new Date(item.end);
-  return <div className="grid grid-cols-7 border-l border-t border-[#D9D9D9] rounded-2xl overflow-hidden">
-    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => <div key={day} className="bg-[#f8f9fa] p-3 text-center text-xs font-semibold text-[#6b7280] border-r border-b border-[#D9D9D9]">{day}</div>)}
+  return <div>
+    <div className="grid grid-cols-7 gap-2 mb-2">{['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => <div key={day} className="p-2 text-center text-xs font-semibold text-[#6b7280]">{day}</div>)}</div>
+    <div className="grid grid-cols-7 gap-2">
     {cells.map((day, index) => {
       const date = new Date(month.getFullYear(), month.getMonth(), day);
       const inMonth = day > 0 && day <= days;
@@ -26,12 +27,13 @@ function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, se
       const isToday = sameDay(date, new Date());
       const isSelected = selectedStart && (selectedEnd ? date >= selectedStart && date <= selectedEnd : sameDay(date, selectedStart));
       const canClick = inMonth && !booking && (Boolean(onSelectDate) || Boolean(block?.manual && onBlockClick));
-      return <button type="button" key={index} disabled={!canClick} onClick={() => block?.manual ? onBlockClick?.(block) : onSelectDate?.(date)} className={`min-h-[96px] p-2 border-r border-b border-[#D9D9D9] text-left ${inMonth ? 'bg-white' : 'bg-[#f8f9fa]/70'} ${block ? 'bg-[#0B0B45]/5' : ''} ${isSelected ? 'bg-[#C49A6C]/30 ring-2 ring-inset ring-[#C49A6C]' : ''} ${canClick ? 'hover:bg-[#C49A6C]/10 cursor-pointer' : ''}`}>
-        {inMonth && <span className={`inline-flex w-7 h-7 items-center justify-center rounded-full text-sm font-semibold ${isToday ? 'bg-[#C49A6C] text-white' : 'text-[#0B0B45]'}`}>{day}</span>}
-        {booking && <div className="mt-2 rounded-lg bg-[#0B0B45] text-white px-2 py-1.5 text-xs font-semibold truncate" title={`${booking.guestName} · ${booking.guests} guests`}>{booking.guestName}</div>}
-        {!booking && block && <div className="mt-2 rounded-lg bg-[#C49A6C]/20 text-[#0B0B45] px-2 py-1.5 text-xs font-semibold truncate">{block.summary || 'Blocked'}</div>}
+      return <button type="button" key={index} disabled={!canClick} onClick={() => block?.manual ? onBlockClick?.(block) : onSelectDate?.(date)} className={`min-h-[108px] rounded-xl p-3 text-left transition-colors ${inMonth ? 'bg-white border border-[#D9D9D9]' : 'bg-transparent'} ${block ? 'bg-[#0B0B45]/5' : ''} ${isSelected ? 'bg-[#C49A6C]/20 ring-2 ring-inset ring-[#C49A6C]' : ''} ${canClick ? 'hover:bg-[#C49A6C]/10 cursor-pointer' : 'cursor-not-allowed'} ${booking ? 'opacity-80' : ''}`}>
+        {inMonth && <span className={`inline-flex w-9 h-9 items-center justify-center rounded-full text-sm font-bold ${isSelected || isToday ? 'bg-[#C49A6C] text-white' : 'text-[#0B0B45]'}`}>{day}</span>}
+        {booking && <div className="mt-3 rounded-lg bg-[#0B0B45] text-white px-2 py-1.5 text-xs font-semibold truncate" title={`${booking.guestName} · ${booking.guests} guests`}>{booking.guestName}</div>}
+        {!booking && block && <div className="mt-3 rounded-lg bg-[#C49A6C]/20 text-[#0B0B45] px-2 py-1.5 text-xs font-semibold truncate">{block.summary || 'Blocked'}</div>}
       </button>;
     })}
+    </div>
   </div>;
 }
 
