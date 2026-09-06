@@ -231,6 +231,23 @@ export async function setUserSuspended(userId: string, suspended: boolean) {
   });
 }
 
+/** Admin-only replacement password. The route layer prevents self-service
+ * bypasses; account owners must use changePassword with their current password. */
+export async function adminSetUserPassword(userId: string, newPassword: string) {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { id: true } });
+  if (!user) throw new NotFoundError('User');
+
+  const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { passwordHash } }),
+    // Revoke every browser/device session so the password replacement takes
+    // effect immediately for the affected account.
+    prisma.refreshSession.deleteMany({ where: { userId } }),
+  ]);
+
+  return { message: 'Password updated and active sessions revoked.' };
+}
+
 export async function changePassword(userId: string, currentPassword: string, newPassword: string) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError('User');

@@ -313,6 +313,16 @@ export const passwordChangeSchema = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number'),
 });
 
+// Administrators set a temporary/replacement password for another account;
+// the caller's own password is never accepted on this route.
+export const adminPasswordSetSchema = z.object({
+  newPassword: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+});
+
 export const bookingStatusSchema = z.object({
   status: z.enum(['CONFIRMED', 'CANCELLED']),
 });

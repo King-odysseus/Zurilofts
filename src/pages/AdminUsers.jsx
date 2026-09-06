@@ -36,6 +36,13 @@ function AdminUsers() {
   const [deleteReason, setDeleteReason] = useState('');
   const [deleteError, setDeleteError] = useState('');
 
+  // Admin password replacement modal. Passwords are only sent to the server
+  // and never retained in the users table response or UI state after closing.
+  const [passwordTarget, setPasswordTarget] = useState(null);
+  const [replacementPassword, setReplacementPassword] = useState('');
+  const [confirmReplacementPassword, setConfirmReplacementPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
   const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
@@ -145,6 +152,48 @@ function AdminUsers() {
     setDeleteConfirm('');
     setDeleteReason('');
     setDeleteError('');
+  }
+
+  function openPasswordReset(u) {
+    setPasswordTarget(u);
+    setReplacementPassword('');
+    setConfirmReplacementPassword('');
+    setPasswordError('');
+  }
+
+  function closePasswordReset() {
+    if (busyId) return;
+    setPasswordTarget(null);
+    setReplacementPassword('');
+    setConfirmReplacementPassword('');
+    setPasswordError('');
+  }
+
+  async function handlePasswordReset(e) {
+    e.preventDefault();
+    if (!passwordTarget) return;
+    if (replacementPassword !== confirmReplacementPassword) {
+      setPasswordError('Passwords do not match.');
+      return;
+    }
+    if (!/(?=.*[A-Z])(?=.*[0-9]).{8,}/.test(replacementPassword)) {
+      setPasswordError('Use at least 8 characters, including an uppercase letter and a number.');
+      return;
+    }
+    setBusyId(passwordTarget.id);
+    setPasswordError('');
+    setMessage('');
+    try {
+      const res = await apiClient.put(`/admin/users/${passwordTarget.id}/password`, { newPassword: replacementPassword });
+      setMessage(`${passwordTarget.firstName} ${passwordTarget.lastName}: ${res.data.message || 'password updated.'}`);
+      setPasswordTarget(null);
+      setReplacementPassword('');
+      setConfirmReplacementPassword('');
+    } catch (err) {
+      setPasswordError(err.response?.data?.error || 'Failed to update password');
+    } finally {
+      setBusyId('');
+    }
   }
 
   async function handleDeleteUser() {
@@ -282,6 +331,13 @@ function AdminUsers() {
                               {busy ? '...' : u.suspended ? 'Reactivate' : 'Suspend'}
                             </button>
                             <button
+                              onClick={() => openPasswordReset(u)}
+                              disabled={busy}
+                              className="text-xs font-semibold text-[#0B0B45] hover:text-[#C49A6C] transition-colors disabled:opacity-50"
+                            >
+                              Set password
+                            </button>
+                            <button
                               onClick={() => openDelete(u)}
                               disabled={busy}
                               className="text-xs font-semibold text-red-700 hover:text-red-900 transition-colors disabled:opacity-50"
@@ -297,6 +353,54 @@ function AdminUsers() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* Password replacement modal */}
+      {passwordTarget && (
+        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closePasswordReset}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 border-b border-[#D9D9D9]">
+              <h2 className="text-lg font-bold text-[#0B0B45]">Set user password</h2>
+              <p className="text-sm text-[#6b7280] mt-2">
+                Set a replacement password for {passwordTarget.firstName} {passwordTarget.lastName}. This immediately signs them out on all devices. Share it with them securely.
+              </p>
+            </div>
+            <form onSubmit={handlePasswordReset} className="p-6 space-y-4" autoComplete="off">
+              {passwordError && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm" role="alert">{passwordError}</div>}
+              <div>
+                <label className="block text-sm font-semibold text-[#1f2937] mb-1" htmlFor="admin-new-password">New password</label>
+                <input
+                  id="admin-new-password"
+                  type="password"
+                  value={replacementPassword}
+                  onChange={(e) => setReplacementPassword(e.target.value)}
+                  minLength={8}
+                  required
+                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+                />
+                <p className="text-xs text-[#6b7280] mt-1">At least 8 characters, with an uppercase letter and a number.</p>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-[#1f2937] mb-1" htmlFor="admin-confirm-password">Confirm new password</label>
+                <input
+                  id="admin-confirm-password"
+                  type="password"
+                  value={confirmReplacementPassword}
+                  onChange={(e) => setConfirmReplacementPassword(e.target.value)}
+                  minLength={8}
+                  required
+                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button type="button" onClick={closePasswordReset} disabled={busyId === passwordTarget.id} className="px-5 py-2 rounded-full text-sm font-semibold text-[#6b7280] hover:text-[#0B0B45] disabled:opacity-50">Cancel</button>
+                <button type="submit" disabled={busyId === passwordTarget.id} className="bg-[#0B0B45] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#06062a] disabled:opacity-50">
+                  {busyId === passwordTarget.id ? 'Saving...' : 'Set password'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 

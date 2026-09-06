@@ -7,6 +7,7 @@ import {
   calendarBlockSchema,
   priceRuleSchema,
   adminUserUpdateSchema,
+  adminPasswordSetSchema,
   userRoleSchema,
   userSuspendSchema,
   hostApplicationReviewSchema,
@@ -36,6 +37,7 @@ router.get('/users', userCtrl.adminListUsers);
 router.patch('/users/:id', validate(adminUserUpdateSchema), userCtrl.adminUpdateUser);
 router.patch('/users/:id/role', validate(userRoleSchema), userCtrl.adminSetUserRole);
 router.patch('/users/:id/suspend', validate(userSuspendSchema), userCtrl.adminSetUserSuspended);
+router.put('/users/:id/password', validate(adminPasswordSetSchema), userCtrl.adminSetUserPassword);
 router.delete('/users/:id', validate(adminAccountDeletionSchema), userCtrl.adminDeleteUser);
 
 // Host applications (review queue: list, detail, request changes, reject, approve)

@@ -137,6 +137,19 @@ export async function adminSetUserSuspended(req: Request, res: Response, next: N
   }
 }
 
+export async function adminSetUserPassword(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    // Self-service changes must always verify the current password.
+    if (req.params.id === req.user!.sub) {
+      throw new ValidationError('Use Change password in your profile to update your own password.');
+    }
+    const result = await userService.adminSetUserPassword(req.params.id, req.body.newPassword);
+    res.json({ success: true, ...result });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function adminDeleteUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     if (req.params.id === req.user!.sub) {
