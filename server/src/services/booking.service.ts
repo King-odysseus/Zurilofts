@@ -424,8 +424,18 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
 
   // Admin mode: also fetch host info per property so we can build per-host rankings.
   const isAdminView = !hostId;
+  const trendEnd = dateFilter?.to || new Date();
+  const trendStart = new Date(trendEnd.getFullYear(), trendEnd.getMonth() - 11, 1);
+  const monthlyTrendWhere = {
+    status: { in: ['PENDING', 'CONFIRMED'] },
+    createdAt: {
+      gte: dateFilter?.from && dateFilter.from > trendStart ? dateFilter.from : trendStart,
+      ...(dateFilter?.to ? { lte: dateFilter.to } : {}),
+    },
+    ...bookingHost,
+  };
 
-  const [properties, all, confirmed, byBed] = await Promise.all([
+  const [properties, all, confirmed, byBed, trendBookings] = await Promise.all([
     prisma.property.findMany({
       where: propertyWhere,
       include: isAdminView
@@ -466,7 +476,26 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
       _count: { _all: true },
       _sum: { total: true },
     }),
+    prisma.booking.findMany({
+      where: monthlyTrendWhere,
+      select: { createdAt: true, total: true },
+    }),
   ]);
+
+  const monthlyTrend = Array.from({ length: 12 }, (_, index) => {
+    const month = new Date(trendEnd.getFullYear(), trendEnd.getMonth() - 11 + index, 1);
+    return {
+      key: `${month.getFullYear()}-${month.getMonth()}`,
+      label: month.toLocaleString('en-GB', { month: 'short' }),
+      earnings: 0,
+    };
+  });
+  const trendByMonth = new Map(monthlyTrend.map((month) => [month.key, month]));
+  for (const booking of trendBookings) {
+    const key = `${booking.createdAt.getFullYear()}-${booking.createdAt.getMonth()}`;
+    const month = trendByMonth.get(key);
+    if (month) month.earnings += booking.total ?? 0;
+  }
 
   const allMap = new Map(all.map((r) => [r.propertyId, r]));
   const confirmedMap = new Map(confirmed.map((r) => [r.propertyId, r]));
@@ -639,7 +668,7 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     hosts = Array.from(hostMap.values()).sort((a, b) => b.earnings - a.earnings);
   }
 
-  return { properties: rows, totals, ...(isAdminView ? { hosts } : {}) };
+  return { properties: rows, totals, monthlyTrend, ...(isAdminView ? { hosts } : {}) };
 }
 
 export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED' | 'CANCELLED') {

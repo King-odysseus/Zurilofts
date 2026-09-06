@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import Dropdown from '../components/Dropdown.jsx';
@@ -78,6 +79,57 @@ const SORT_OPTIONS = [
   { value: 'name-desc', label: 'Property Name (Z → A)' },
 ];
 
+function EarningsLineChart({ points }) {
+  const width = 760;
+  const height = 300;
+  const padding = { top: 24, right: 20, bottom: 42, left: 20 };
+  const max = Math.max(...points.map((point) => point.earnings), 1);
+  const chartWidth = width - padding.left - padding.right;
+  const chartHeight = height - padding.top - padding.bottom;
+  const coordinates = points.map((point, index) => ({
+    ...point,
+    x: padding.left + (chartWidth * index) / Math.max(points.length - 1, 1),
+    y: padding.top + chartHeight - (point.earnings / max) * chartHeight,
+  }));
+  const path = coordinates.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
+  const areaPath = `${path} L ${coordinates.at(-1)?.x ?? padding.left} ${padding.top + chartHeight} L ${coordinates[0]?.x ?? padding.left} ${padding.top + chartHeight} Z`;
+
+  return (
+    <div className="w-full overflow-x-auto">
+      <svg viewBox={`0 0 ${width} ${height}`} className="min-w-[620px] w-full" role="img" aria-label="Monthly active earnings line chart">
+        <defs>
+          <linearGradient id="earnings-area" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor="#C49A6C" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="#C49A6C" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {[0, 0.25, 0.5, 0.75, 1].map((step) => {
+          const y = padding.top + chartHeight - step * chartHeight;
+          return <line key={step} x1={padding.left} x2={width - padding.right} y1={y} y2={y} stroke="#D9D9D9" strokeWidth="1" />;
+        })}
+        <path d={areaPath} fill="url(#earnings-area)" />
+        <path d={path} fill="none" stroke="#0B0B45" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        {coordinates.map((point) => (
+          <g key={point.key}>
+            <circle cx={point.x} cy={point.y} r="5" fill="#ffffff" stroke="#C49A6C" strokeWidth="3">
+              <title>{`${point.label}: KES ${point.earnings.toLocaleString()}`}</title>
+            </circle>
+            <text x={point.x} y={height - 12} textAnchor="middle" fontSize="12" fill="#6b7280">{point.label}</text>
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+EarningsLineChart.propTypes = {
+  points: PropTypes.arrayOf(PropTypes.shape({
+    key: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    earnings: PropTypes.number.isRequired,
+  })).isRequired,
+};
+
 function AdminEarnings() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
@@ -90,7 +142,8 @@ function AdminEarnings() {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('earnings-desc');
   const [viewMode, setViewMode] = useState('all'); // 'all' | 'mine' - admin-only toggle
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('performance');
+  const [monthlyTrend, setMonthlyTrend] = useState([]);
 
   const effectiveEndpoint = useMemo(() => {
     if (!isAdmin) return '/bookings/host/earnings';
@@ -116,6 +169,7 @@ function AdminEarnings() {
         const res = await apiClient.get(effectiveEndpoint, { params });
         setRows(res.data.data?.properties || []);
         setHosts(res.data.data?.hosts || []);
+        setMonthlyTrend(res.data.data?.monthlyTrend || []);
       } catch (err) {
         console.error('AdminEarnings error', err);
       } finally {
@@ -179,18 +233,6 @@ function AdminEarnings() {
     );
   }, [earningRows]);
 
-  const chartProperties = useMemo(() => {
-    return [...earningRows].sort((a, b) => b.earnings - a.earnings);
-  }, [earningRows]);
-
-  const maxChartEarnings = useMemo(() => {
-    return chartProperties.length > 0 ? Math.max(chartProperties[0].earnings, 1) : 1;
-  }, [chartProperties]);
-
-  const chartBookings = useMemo(() => {
-    return [...earningRows].sort((a, b) => b.bookings - a.bookings);
-  }, [earningRows]);
-
   // Derived analytics - computed from the filtered totals so they track the active period/search.
   const metrics = useMemo(() => {
     const t = filteredTotals;
@@ -210,10 +252,10 @@ function AdminEarnings() {
     return {
       avgBookingValue, confirmationRate, pendingBookings, pendingEarnings,
       activeProperties, avgPerProperty, bedTotal, bed1Share, bed2Share,
-      topEarner: chartProperties[0] || null,
+      topEarner: [...earningRows].sort((a, b) => b.earnings - a.earnings)[0] || null,
       serviceFeePct, hostNetPct, whtPct,
     };
-  }, [filteredTotals, earningRows, chartProperties]);
+  }, [filteredTotals, earningRows]);
 
   const today = formatDate(new Date());
   const rangeLabel = useMemo(() => {
@@ -454,8 +496,8 @@ function AdminEarnings() {
   ];
 
   const earningsTabs = [
-    { value: 'overview', label: 'Overview' },
-    { value: 'charts', label: 'Charts' },
+    { value: 'performance', label: 'Performance' },
+    { value: 'overview', label: 'Summary' },
     { value: 'properties', label: 'Properties' },
   ];
 
@@ -723,151 +765,22 @@ function AdminEarnings() {
       )}
       </>}
 
-      {/* Charts */}
-      {activeTab === 'charts' && !loading && chartProperties.length > 0 && (
-        <div className="space-y-4 mb-8">
-          {/* Ranked earnings bars */}
-          <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold text-[#0B0B45]">Top Properties by Active Earnings</h2>
-              <span className="text-xs text-[#6b7280]">% of active earnings</span>
+      {activeTab === 'performance' && !loading && (
+        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 sm:p-7 shadow-sm mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Monthly view</p>
+              <h2 className="text-xl font-bold text-[#0B0B45] mt-1">Earnings performance</h2>
             </div>
-            <div className="space-y-3">
-              {chartProperties.slice(0, 8).map((p) => {
-                const pct = (p.earnings / maxChartEarnings) * 100;
-                const share = filteredTotals.earnings > 0 ? Math.round((p.earnings / filteredTotals.earnings) * 100) : 0;
-                return (
-                  <div key={p.id}>
-                    <div className="flex items-center justify-between text-xs mb-1.5">
-                      <span className="font-medium text-[#1f2937] truncate pr-3" title={p.title}>{p.title}</span>
-                      <span className="font-semibold text-[#0B0B45] whitespace-nowrap">
-                        KES {p.earnings.toLocaleString()} <span className="text-[#6b7280] font-normal">· {share}%</span>
-                      </span>
-                    </div>
-                    <div className="h-2.5 bg-[#f3f4f6] rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-[#C49A6C] rounded-full transition-all duration-500"
-                        style={{ width: `${Math.max(pct, 2)}%` }}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <p className="text-sm text-[#6b7280]">Active booking value · last 12 months</p>
           </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {/* Revenue Mix: 1-Bed vs 2-Bed */}
-            <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-[#0B0B45] mb-2">Revenue Mix · 1-Bed vs 2-Bed</h2>
-              {metrics.bedTotal > 0 ? (
-                <div className="flex items-center gap-6">
-                  <svg viewBox="0 0 200 200" className="w-44 h-44 flex-shrink-0 -rotate-90">
-                    {(() => {
-                      const r = 78, cx = 100, cy = 100, sw = 26;
-                      const C = 2 * Math.PI * r;
-                      const bed1Len = (filteredTotals.bed1Earnings / metrics.bedTotal) * C;
-                      return (
-                        <>
-                          <circle cx={cx} cy={cy} r={r} fill="none" stroke="#0B0B45" strokeWidth={sw} />
-                          <circle
-                            cx={cx} cy={cy} r={r} fill="none" stroke="#C49A6C" strokeWidth={sw}
-                            strokeDasharray={`${bed1Len} ${C}`} className="transition-all duration-500"
-                          />
-                        </>
-                      );
-                    })()}
-                  </svg>
-                  <div className="space-y-3 text-sm">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-sm bg-[#C49A6C]" />
-                      <span className="text-[#6b7280]">1-Bed</span>
-                      <span className="font-semibold text-[#0B0B45]">{metrics.bed1Share}%</span>
-                      <span className="text-[#6b7280] text-xs">KES {filteredTotals.bed1Earnings.toLocaleString()}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-sm bg-[#0B0B45]" />
-                      <span className="text-[#6b7280]">2-Bed</span>
-                      <span className="font-semibold text-[#0B0B45]">{metrics.bed2Share}%</span>
-                      <span className="text-[#6b7280] text-xs">KES {filteredTotals.bed2Earnings.toLocaleString()}</span>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <p className="text-sm text-[#6b7280] py-8 text-center">No bed-type breakdown for this period.</p>
-              )}
-            </div>
-
-            {/* Bookings by Property donut */}
-              <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
-                <h2 className="text-sm font-bold text-[#0B0B45] mb-2">Bookings by Property</h2>
-              {chartBookings.some((property) => property.bookings > 0) ? <div className="flex items-center justify-center">
-                <svg viewBox="0 0 360 240" className="w-full max-w-[360px]">
-                  {(() => {
-                    const cx = 105, cy = 120, r = 72;
-                    const total = chartBookings.reduce((s, p) => s + p.bookings, 0);
-                    const colors = ['#C49A6C', '#0B0B45', '#6b7280', '#b8895c', '#0B0B45', '#9ca3af'];
-                    let angle = -Math.PI / 2;
-                    const slices = chartBookings.map((p, i) => {
-                      const sliceAngle = total > 0 ? (p.bookings / total) * 2 * Math.PI : 0;
-                      const start = angle;
-                      const end = angle + sliceAngle;
-                      angle = end;
-                      const x1 = cx + r * Math.cos(start);
-                      const y1 = cy + r * Math.sin(start);
-                      const x2 = cx + r * Math.cos(end);
-                      const y2 = cy + r * Math.sin(end);
-                      const largeArc = sliceAngle > Math.PI ? 1 : 0;
-                      const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
-                      const labelAngle = start + sliceAngle / 2;
-                      const lr = r * 0.78;
-                      const lx = cx + lr * Math.cos(labelAngle);
-                      const ly = cy + lr * Math.sin(labelAngle);
-                      return { ...p, path, color: colors[i % colors.length], lx, ly, sliceAngle };
-                    });
-                    return (
-                      <>
-                        {slices.map((s) => (
-                          <path key={s.id} d={s.path} fill={s.color} stroke="white" strokeWidth="2" className="transition-opacity duration-300 hover:opacity-80" />
-                        ))}
-                        {/* Donut hole + center total */}
-                        <circle cx={cx} cy={cy} r="38" fill="white" />
-                        <text x={cx} y={cy - 4} textAnchor="middle" fontSize="20" fontWeight="700" fill="#0B0B45">{total}</text>
-                        <text x={cx} y={cy + 14} textAnchor="middle" fontSize="10" fill="#6b7280">bookings</text>
-                        {slices.map((s) => (
-                          s.sliceAngle > 0.25 && (
-                            <text key={`l-${s.id}`} x={s.lx} y={s.ly} textAnchor="middle" dominantBaseline="middle" fontSize="11" fontWeight="600" fill="white">
-                              {s.bookings}
-                            </text>
-                          )
-                        ))}
-                        {/* Legend */}
-                        {slices.map((s, i) => (
-                          <g key={`leg-${s.id}`} transform={`translate(215, ${24 + i * 22})`}>
-                            <rect x="0" y="0" width="12" height="12" rx="2" fill={s.color} />
-                            <text x="18" y="9" fontSize="10" fill="#4b5563">
-                              {s.title.length > 16 ? s.title.slice(0, 16) + '…' : s.title} ({s.bookings})
-                            </text>
-                          </g>
-                        ))}
-                      </>
-                    );
-                  })()}
-                </svg>
-              </div> : <p className="text-sm text-[#6b7280] py-8 text-center">No bookings to chart for this period.</p>}
-            </div>
-          </div>
+          {monthlyTrend.length > 0 ? <EarningsLineChart points={monthlyTrend} /> : (
+            <p className="text-sm text-[#6b7280] py-12 text-center">No earnings data is available for this period.</p>
+          )}
         </div>
       )}
 
-      {activeTab === 'charts' && !loading && chartProperties.length === 0 && (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-10 text-center mb-8">
-          <p className="text-sm text-[#6b7280]">No earnings data is available to chart for the selected filters.</p>
-        </div>
-      )}
-
-      {/* Top Hosts - Admin only */}
-      {activeTab === 'charts' && isAdmin && !loading && hosts.length > 0 && (
+      {activeTab === 'performance' && isAdmin && !loading && hosts.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
           {/* Top Hosts Table */}
           <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
