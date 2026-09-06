@@ -38,11 +38,12 @@ function Navbar() {
   const dropdownRef = useRef(null);
 
   const { user, isAuthenticated, logout } = useAuth();
-  const { mode, setMode, canHost, canSelectHosting } = useMode();
+  const { mode, setMode, canSelectHosting } = useMode();
+  const hasVerifiedHostAccess = user?.role === 'HOST' || user?.role === 'ADMIN';
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
-  const activeHostingLinks = user?.role === 'HOST' || user?.role === 'ADMIN'
+  const activeHostingLinks = hasVerifiedHostAccess
     ? [...hostingLinks, { name: 'Payouts', href: '/host/payouts' }]
     : hostingLinks;
 
@@ -147,12 +148,12 @@ function Navbar() {
     navigate('/');
   }
 
-  // All signed-in users can choose Hosting. Applicants see setup; only an
-  // approved HOST/ADMIN receives the operational host navigation.
+  // An applicant can enter the host workspace, but must complete the host
+  // verification page before receiving operational host navigation.
   const activeLinks = !isAuthenticated
     ? navLinks
     : mode === 'hosting'
-      ? canHost ? activeHostingLinks : hostingOnboardingLinks
+      ? hasVerifiedHostAccess ? activeHostingLinks : hostingOnboardingLinks
       : travellingLinks;
 
   function handleSwitchMode() {
@@ -160,7 +161,7 @@ function Navbar() {
     setMode(next);
     setDropdownOpen(false);
     setMenuOpen(false);
-    navigate(next === 'hosting' ? (canHost ? '/host/today' : '/host/application') : '/');
+    navigate(next === 'hosting' ? (hasVerifiedHostAccess ? '/host/today' : '/host/application') : '/');
   }
 
   return (
