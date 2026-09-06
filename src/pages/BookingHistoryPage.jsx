@@ -136,7 +136,7 @@ function BookingHistoryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-[#F3F4F6]">
         <Navbar />
         <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
           <Spinner />
@@ -147,7 +147,7 @@ function BookingHistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F3F4F6]">
       <Navbar />
       <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <h1 className="text-3xl font-bold text-[#0B0B45] mb-2">My Bookings</h1>

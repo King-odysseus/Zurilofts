@@ -260,7 +260,7 @@ function PropertiesPage() {
   const showComingSoon = !hasActiveFilters && sort === 'default' && !loading && !error;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F3F4F6]">
       <Navbar />
 
       {/* Compact Search Header */}

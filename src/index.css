@@ -52,18 +52,26 @@ body {
   }
 }
 
-/* ===== Card System - borderless, elevation carried entirely by shadow ===== */
+/* ===== Card System - borderless, elevation carried entirely by shadow =====
+   Cards float on a light-grey app canvas (#F3F4F6), so elevation reads as
+   a layered shadow: a tight contact edge + a large soft base. */
 .neu-card {
   background-color: #ffffff;
   border: none;
   border-radius: 1rem;
-  box-shadow: 0 1px 3px rgb(38 34 98 / 0.06), 0 6px 20px -6px rgb(38 34 98 / 0.10);
+  box-shadow:
+    0 1px 2px rgb(15 23 42 / 0.05),
+    0 2px 4px -1px rgb(15 23 42 / 0.06),
+    0 12px 28px -8px rgb(15 23 42 / 0.13);
   transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .neu-card-hover:hover {
-  box-shadow: 0 12px 36px -8px rgb(38 34 98 / 0.16), 0 6px 16px -6px rgb(38 34 98 / 0.08);
-  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgb(15 23 42 / 0.06),
+    0 6px 12px -4px rgb(15 23 42 / 0.08),
+    0 26px 52px -12px rgb(15 23 42 / 0.22);
+  transform: translateY(-4px);
 }
 
 /* ===== Form inputs - borderless, resting on a soft shadow instead of an outline ===== */
@@ -72,7 +80,7 @@ body {
   border: 1px solid transparent;
   border-radius: 0.75rem;
   color: #1f2937;
-  box-shadow: 0 1px 2px rgb(38 34 98 / 0.05), 0 1px 8px -2px rgb(38 34 98 / 0.06);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 3px 10px -4px rgb(15 23 42 / 0.10);
   transition: box-shadow 0.15s ease;
 }
 
@@ -83,7 +91,7 @@ body {
 .neu-input:focus {
   outline: none;
   border-color: #C49A6C;
-  box-shadow: 0 0 0 3px rgba(196, 154, 108, 0.18);
+  box-shadow: 0 0 0 3px rgba(196, 154, 108, 0.2);
 }
 
 /* ===== Radio / option cards - borderless, shadow communicates the surface ===== */
@@ -91,12 +99,12 @@ body {
   background-color: #ffffff;
   border: 1px solid transparent;
   border-radius: 1rem;
-  box-shadow: 0 1px 3px rgb(38 34 98 / 0.06), 0 4px 14px -6px rgb(38 34 98 / 0.08);
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 6px 18px -8px rgb(15 23 42 / 0.12);
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .neu-radio-card:hover {
-  box-shadow: 0 6px 20px -4px rgb(196 154 108 / 0.22);
+  box-shadow: 0 4px 10px -4px rgb(196 154 108 / 0.16), 0 14px 30px -10px rgb(196 154 108 / 0.28);
   transform: translateY(-2px);
 }
 
@@ -104,7 +112,7 @@ body {
   background-color: #ffffff;
   border: 2px solid #C49A6C;
   border-radius: 1rem;
-  box-shadow: 0 6px 20px -4px rgb(196 154 108 / 0.28);
+  box-shadow: 0 2px 6px rgb(196 154 108 / 0.14), 0 16px 32px -12px rgb(196 154 108 / 0.32);
 }
 
 /* Auth cards sit over a dark photo background - use a single soft drop

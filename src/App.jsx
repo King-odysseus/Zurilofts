@@ -300,7 +300,7 @@ function HomePage() {
 }
 
 function Loading() {
-  return <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]"><Spinner /></div>;
+  return <div className="min-h-screen flex items-center justify-center bg-[#F3F4F6]"><Spinner /></div>;
 }
 
 /** Suspense boundary for code-split route pages. */

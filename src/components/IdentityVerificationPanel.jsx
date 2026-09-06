@@ -157,7 +157,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.fullName}
               onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
+              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#F3F4F6] disabled:text-[#6b7280]"
             />
           </div>
           <div>
@@ -167,7 +167,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.dateOfBirth}
               onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
+              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#F3F4F6] disabled:text-[#6b7280]"
             />
           </div>
           <div>
@@ -176,7 +176,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.idType}
               onChange={(e) => setForm({ ...form, idType: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
+              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#F3F4F6] disabled:text-[#6b7280]"
             >
               <option value="NATIONAL_ID">National ID</option>
               <option value="PASSPORT">Passport</option>
@@ -190,7 +190,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.idNumber}
               onChange={(e) => setForm({ ...form, idNumber: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#f8f9fa] disabled:text-[#6b7280]"
+              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-[#F3F4F6] disabled:text-[#6b7280]"
             />
           </div>
         </div>

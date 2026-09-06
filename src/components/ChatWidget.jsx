@@ -174,7 +174,7 @@ function ChatWidget() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#f8f9fa]" style={{ maxHeight: '280px' }}>
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#F3F4F6]" style={{ maxHeight: '280px' }}>
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${

@@ -359,7 +359,7 @@ function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-[#F3F4F6]">
         <Navbar />
         <div className="pt-24 flex items-center justify-center">
           <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin"></div>
@@ -371,7 +371,7 @@ function ProfilePage() {
 
   if (loadError && !profile) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-[#F3F4F6]">
         <Navbar />
         <div className="pt-24 pb-16 min-h-[60vh] flex flex-col items-center justify-center text-center px-4" role="alert">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -395,7 +395,7 @@ function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F3F4F6]">
       <Navbar />
       <div className="pt-24 pb-16">
         <div className="max-w-5xl mx-auto px-4 md:px-6">
@@ -733,7 +733,7 @@ function ProfilePage() {
                             type="button"
                             onClick={() => setShowDeleteDialog(false)}
                             disabled={deleting}
-                            className="px-5 py-2.5 rounded-full text-[#1f2937] text-sm font-semibold shadow-sm hover:shadow-md hover:bg-[#f8f9fa] transition-colors duration-200 disabled:opacity-50"
+                            className="px-5 py-2.5 rounded-full text-[#1f2937] text-sm font-semibold shadow-sm hover:shadow-md hover:bg-[#F3F4F6] transition-colors duration-200 disabled:opacity-50"
                           >
                             Cancel
                           </button>

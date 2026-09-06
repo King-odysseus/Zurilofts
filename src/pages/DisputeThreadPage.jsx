@@ -148,7 +148,7 @@ function DisputeThreadPage() {
   if (!id) {
     if (!bookingId) {
       return (
-        <div className="min-h-screen bg-[#f8f9fa]">
+        <div className="min-h-screen bg-[#F3F4F6]">
           <Navbar />
           <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
             <p className="text-[#6b7280]">A booking is required to open a dispute.</p>
@@ -157,7 +157,7 @@ function DisputeThreadPage() {
       );
     }
     return (
-      <div className="min-h-screen bg-[#f8f9fa]">
+      <div className="min-h-screen bg-[#F3F4F6]">
         <Navbar />
         <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
           <NewDisputeForm bookingId={bookingId} onCreated={(d) => navigate(`/disputes/${d.id}`, { replace: true })} />
@@ -168,7 +168,7 @@ function DisputeThreadPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F3F4F6] flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
@@ -176,7 +176,7 @@ function DisputeThreadPage() {
 
   if (error && !dispute) {
     return (
-      <div className="min-h-screen bg-[#f8f9fa]">
+      <div className="min-h-screen bg-[#F3F4F6]">
         <Navbar />
         <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
           <p className="text-red-600">{error}</p>
@@ -188,7 +188,7 @@ function DisputeThreadPage() {
   const closed = dispute.status === 'RESOLVED' || dispute.status === 'DISMISSED';
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
+    <div className="min-h-screen bg-[#F3F4F6]">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
         <Link to="/trips" className="text-sm text-[#C49A6C] font-semibold hover:text-[#0B0B45]">&larr; Back to trips</Link>
@@ -246,7 +246,7 @@ function DisputeThreadPage() {
             <p className="text-sm font-semibold text-[#1f2937] mb-3">Messages</p>
             <ul className="space-y-3 mb-4 max-h-96 overflow-y-auto">
               {dispute.messages.map((m) => (
-                <li key={m.id} className="bg-[#f8f9fa] rounded-xl p-3">
+                <li key={m.id} className="bg-[#F3F4F6] rounded-xl p-3">
                   <p className="text-xs font-semibold text-[#0B0B45] mb-1">{m.senderRole}</p>
                   <p className="text-sm text-[#1f2937] whitespace-pre-wrap">{m.body}</p>
                 </li>

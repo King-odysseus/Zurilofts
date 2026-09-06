@@ -296,7 +296,7 @@ function AdminAddOns() {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
+              <thead className="bg-[#F3F4F6] border-b border-[#D9D9D9]">
                 <tr>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Name</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Category</th>
@@ -310,7 +310,7 @@ function AdminAddOns() {
                 {addOns.map((a) => {
                   const assignedProps = assignments[a.id] || new Set();
                   return (
-                    <tr key={a.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#f8f9fa]">
+                    <tr key={a.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#F3F4F6]">
                       <td className="py-3 px-4 font-semibold text-[#0B0B45]">{a.name}</td>
                       <td className="py-3 px-4">
                         <span className="px-2.5 py-0.5 bg-[#C49A6C]/10 text-[#0B0B45] rounded-full text-xs font-semibold capitalize">

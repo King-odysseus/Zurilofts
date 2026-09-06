@@ -365,7 +365,7 @@ function AdminBookings() {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
+              <thead className="bg-[#F3F4F6] border-b border-[#D9D9D9]">
                 <tr>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Guest</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Property</th>
@@ -381,7 +381,7 @@ function AdminBookings() {
               </thead>
               <tbody>
                 {bookings.map((b) => (
-                  <tr key={b.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#f8f9fa]">
+                  <tr key={b.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#F3F4F6]">
                     <td className="py-3 px-4">
                       <div>
                         <p className="font-semibold text-[#0B0B45]">{b.user?.firstName} {b.user?.lastName}</p>

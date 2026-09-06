@@ -111,9 +111,9 @@ function AdminIdentityVerifications() {
             </div>
             <div className="space-y-7 p-6">
               <div className="grid sm:grid-cols-2 gap-3">
-                <div className="rounded-2xl bg-[#f8f9fa] p-3"><p className="text-xs text-[#6b7280]">Date of birth</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.dateOfBirth || '—'}</p></div>
-                <div className="rounded-2xl bg-[#f8f9fa] p-3"><p className="text-xs text-[#6b7280]">ID type</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idType || '—'}</p></div>
-                <div className="rounded-2xl bg-[#f8f9fa] p-3"><p className="text-xs text-[#6b7280]">ID number</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idNumber || '—'}</p></div>
+                <div className="rounded-2xl bg-[#F3F4F6] p-3"><p className="text-xs text-[#6b7280]">Date of birth</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.dateOfBirth || '—'}</p></div>
+                <div className="rounded-2xl bg-[#F3F4F6] p-3"><p className="text-xs text-[#6b7280]">ID type</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idType || '—'}</p></div>
+                <div className="rounded-2xl bg-[#F3F4F6] p-3"><p className="text-xs text-[#6b7280]">ID number</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idNumber || '—'}</p></div>
               </div>
               <div>
                 <h3 className="font-bold text-[#0B0B45] mb-3">Encrypted documents</h3>

@@ -75,8 +75,8 @@ function AdminMessages() {
               <button
                 key={c.userId}
                 onClick={() => openConversation(c)}
-                className={`w-full text-left px-4 py-3 border-b border-[#D9D9D9] hover:bg-[#f8f9fa] transition-colors ${
-                  activeUser?.userId === c.userId ? 'bg-[#f8f9fa]' : ''
+                className={`w-full text-left px-4 py-3 border-b border-[#D9D9D9] hover:bg-[#F3F4F6] transition-colors ${
+                  activeUser?.userId === c.userId ? 'bg-[#F3F4F6]' : ''
                 }`}
               >
                 <div className="flex items-center justify-between">

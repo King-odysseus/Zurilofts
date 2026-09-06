@@ -53,7 +53,7 @@ function PropertyCard({ property }) {
   const formattedPrice = price != null ? price.toLocaleString() : null;
 
   return (
-    <article className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 shadow-[0_4px_16px_-4px_rgba(38,34,98,0.08)] hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-8px_rgba(38,34,98,0.18)] h-full flex flex-col">
+    <article className="group relative bg-white rounded-2xl overflow-hidden transition-all duration-300 shadow-[0_1px_2px_rgba(15,23,42,0.05),0_2px_4px_-1px_rgba(15,23,42,0.06),0_14px_32px_-10px_rgba(15,23,42,0.14)] hover:-translate-y-1 hover:shadow-[0_2px_4px_rgba(15,23,42,0.06),0_6px_12px_-4px_rgba(15,23,42,0.08),0_28px_56px_-14px_rgba(15,23,42,0.24)] h-full flex flex-col">
       <Link
         to={propertyHref}
         className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
