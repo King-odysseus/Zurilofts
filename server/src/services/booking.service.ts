@@ -426,7 +426,9 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
   const isAdminView = !hostId;
   const trendEnd = dateFilter?.to || new Date();
   const trendStart = new Date(trendEnd.getFullYear(), trendEnd.getMonth() - 11, 1);
-  const monthlyTrendWhere = {
+  // Status is a String in the local SQLite schema and an enum in PostgreSQL.
+  // Keep this query portable across both generated Prisma clients.
+  const monthlyTrendWhere: any = {
     status: { in: ['PENDING', 'CONFIRMED'] },
     createdAt: {
       gte: dateFilter?.from && dateFilter.from > trendStart ? dateFilter.from : trendStart,
