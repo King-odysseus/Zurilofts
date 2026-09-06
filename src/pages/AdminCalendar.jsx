@@ -9,6 +9,32 @@ const inputCls =
 
 const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
+function CalendarMonth({ month, blocks, bookings }) {
+  const start = new Date(month.getFullYear(), month.getMonth(), 1);
+  const days = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const offset = (start.getDay() + 6) % 7;
+  const cells = Array.from({ length: Math.ceil((offset + days) / 7) * 7 }, (_, index) => index - offset + 1);
+  const sameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+  const occupied = (date, item) => date >= new Date(item.start) && date < new Date(item.end);
+  return <div className="grid grid-cols-7 border-l border-t border-[#D9D9D9] rounded-2xl overflow-hidden">
+    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => <div key={day} className="bg-[#f8f9fa] p-3 text-center text-xs font-semibold text-[#6b7280] border-r border-b border-[#D9D9D9]">{day}</div>)}
+    {cells.map((day, index) => {
+      const date = new Date(month.getFullYear(), month.getMonth(), day);
+      const inMonth = day > 0 && day <= days;
+      const booking = inMonth && bookings.find((item) => occupied(date, item));
+      const block = inMonth && blocks.find((item) => occupied(date, item));
+      const isToday = sameDay(date, new Date());
+      return <div key={index} className={`min-h-[96px] p-2 border-r border-b border-[#D9D9D9] ${inMonth ? 'bg-white' : 'bg-[#f8f9fa]/70'} ${block ? 'bg-[#0B0B45]/5' : ''}`}>
+        {inMonth && <span className={`inline-flex w-7 h-7 items-center justify-center rounded-full text-sm font-semibold ${isToday ? 'bg-[#C49A6C] text-white' : 'text-[#0B0B45]'}`}>{day}</span>}
+        {booking && <div className="mt-2 rounded-lg bg-[#0B0B45] text-white px-2 py-1.5 text-xs font-semibold truncate" title={`${booking.guestName} · ${booking.guests} guests`}>{booking.guestName}</div>}
+        {!booking && block && <div className="mt-2 rounded-lg bg-[#C49A6C]/20 text-[#0B0B45] px-2 py-1.5 text-xs font-semibold truncate">{block.summary || 'Blocked'}</div>}
+      </div>;
+    })}
+  </div>;
+}
+
+CalendarMonth.propTypes = { month: PropTypes.instanceOf(Date).isRequired, blocks: PropTypes.array.isRequired, bookings: PropTypes.array.isRequired };
+
 // The calendar is per-property, so /host/calendar (no id) shows a picker of the
 // host's own listings. Reuses the existing /properties/mine endpoint.
 function CalendarPropertyPicker({ base }) {
@@ -99,6 +125,7 @@ function AdminCalendar() {
   const [error, setError] = useState('');
   const [syncing, setSyncing] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [monthCursor, setMonthCursor] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
 
   const [sourceDraft, setSourceDraft] = useState({ name: '', url: '' });
   const [blockDraft, setBlockDraft] = useState({ start: '', end: '', summary: '' });
@@ -212,6 +239,15 @@ function AdminCalendar() {
       </div>
 
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">{error}</div>}
+
+      <section className="bg-white rounded-2xl border border-[#D9D9D9] p-5 sm:p-6 mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
+          <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Availability</p><h2 className="text-2xl font-bold text-[#0B0B45] mt-1">{monthCursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h2></div>
+          <div className="flex gap-2"><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1))} className="w-10 h-10 rounded-full border border-[#D9D9D9] text-[#0B0B45]">←</button><button type="button" onClick={() => setMonthCursor(new Date())} className="px-4 rounded-full border border-[#D9D9D9] text-sm font-semibold text-[#0B0B45]">Today</button><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1))} className="w-10 h-10 rounded-full border border-[#D9D9D9] text-[#0B0B45]">→</button></div>
+        </div>
+        <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} />
+        <div className="flex flex-wrap gap-4 mt-4 text-xs text-[#6b7280]"><span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-[#0B0B45] mr-1.5" />Booking</span><span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-[#C49A6C]/30 mr-1.5" />Blocked date</span></div>
+      </section>
 
       {/* Outbound feed */}
       <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">

@@ -23,7 +23,7 @@ export async function getPropertyCalendar(propertyId: string) {
 
   const token = await ensureIcalToken(propertyId);
 
-  const [sources, blocks] = await Promise.all([
+  const [sources, blocks, bookings] = await Promise.all([
     prisma.calendarSource.findMany({
       where: { propertyId },
       orderBy: { createdAt: 'asc' },
@@ -32,6 +32,11 @@ export async function getPropertyCalendar(propertyId: string) {
       where: { propertyId },
       orderBy: { start: 'asc' },
       include: { source: { select: { name: true } } },
+    }),
+    prisma.booking.findMany({
+      where: { propertyId, status: { in: ['PENDING', 'CONFIRMED'] } },
+      orderBy: { checkIn: 'asc' },
+      select: { id: true, checkIn: true, checkOut: true, guests: true, status: true, user: { select: { firstName: true, lastName: true } } },
     }),
   ]);
 
@@ -47,6 +52,14 @@ export async function getPropertyCalendar(propertyId: string) {
       sourceId: b.sourceId,
       sourceName: b.source?.name ?? null,
       manual: b.sourceId === null,
+    })),
+    bookings: bookings.map((booking) => ({
+      id: booking.id,
+      start: booking.checkIn,
+      end: booking.checkOut,
+      guests: booking.guests,
+      status: booking.status,
+      guestName: `${booking.user.firstName} ${booking.user.lastName}`.trim() || 'Guest',
     })),
   };
 }
