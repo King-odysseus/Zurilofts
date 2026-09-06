@@ -9,7 +9,7 @@ const inputCls =
 
 const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
-function CalendarMonth({ month, blocks, bookings }) {
+function CalendarMonth({ month, blocks, bookings, onSelectDate, selectedStart, selectedEnd }) {
   const start = new Date(month.getFullYear(), month.getMonth(), 1);
   const days = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
   const offset = (start.getDay() + 6) % 7;
@@ -24,16 +24,17 @@ function CalendarMonth({ month, blocks, bookings }) {
       const booking = inMonth && bookings.find((item) => occupied(date, item));
       const block = inMonth && blocks.find((item) => occupied(date, item));
       const isToday = sameDay(date, new Date());
-      return <div key={index} className={`min-h-[96px] p-2 border-r border-b border-[#D9D9D9] ${inMonth ? 'bg-white' : 'bg-[#f8f9fa]/70'} ${block ? 'bg-[#0B0B45]/5' : ''}`}>
+      const isSelected = selectedStart && selectedEnd && date >= selectedStart && date <= selectedEnd;
+      return <button type="button" key={index} disabled={!inMonth || !onSelectDate || Boolean(booking)} onClick={() => onSelectDate?.(date)} className={`min-h-[96px] p-2 border-r border-b border-[#D9D9D9] text-left ${inMonth ? 'bg-white' : 'bg-[#f8f9fa]/70'} ${block ? 'bg-[#0B0B45]/5' : ''} ${isSelected ? 'bg-[#C49A6C]/20' : ''} ${onSelectDate && inMonth && !booking ? 'hover:bg-[#C49A6C]/10 cursor-pointer' : ''}`}>
         {inMonth && <span className={`inline-flex w-7 h-7 items-center justify-center rounded-full text-sm font-semibold ${isToday ? 'bg-[#C49A6C] text-white' : 'text-[#0B0B45]'}`}>{day}</span>}
         {booking && <div className="mt-2 rounded-lg bg-[#0B0B45] text-white px-2 py-1.5 text-xs font-semibold truncate" title={`${booking.guestName} · ${booking.guests} guests`}>{booking.guestName}</div>}
         {!booking && block && <div className="mt-2 rounded-lg bg-[#C49A6C]/20 text-[#0B0B45] px-2 py-1.5 text-xs font-semibold truncate">{block.summary || 'Blocked'}</div>}
-      </div>;
+      </button>;
     })}
   </div>;
 }
 
-CalendarMonth.propTypes = { month: PropTypes.instanceOf(Date).isRequired, blocks: PropTypes.array.isRequired, bookings: PropTypes.array.isRequired };
+CalendarMonth.propTypes = { month: PropTypes.instanceOf(Date).isRequired, blocks: PropTypes.array.isRequired, bookings: PropTypes.array.isRequired, onSelectDate: PropTypes.func, selectedStart: PropTypes.instanceOf(Date), selectedEnd: PropTypes.instanceOf(Date) };
 
 // The calendar is per-property, so /host/calendar (no id) shows a picker of the
 // host's own listings. Reuses the existing /properties/mine endpoint.
@@ -132,6 +133,7 @@ function AdminCalendar() {
   const [copied, setCopied] = useState(false);
   const [monthCursor, setMonthCursor] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [calendarTab, setCalendarTab] = useState('view');
+  const [selectedBlockEnd, setSelectedBlockEnd] = useState(null);
 
   const [sourceDraft, setSourceDraft] = useState({ name: '', url: '' });
   const [blockDraft, setBlockDraft] = useState({ start: '', end: '', summary: '' });
@@ -201,6 +203,24 @@ function AdminCalendar() {
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.error || 'Failed to add block');
     }
+  }
+
+  function selectBlockDate(date) {
+    const toInputDate = (value) => `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+    const start = blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null;
+    if (!start || selectedBlockEnd) {
+      setBlockDraft((draft) => ({ ...draft, start: toInputDate(date), end: '' }));
+      setSelectedBlockEnd(null);
+      return;
+    }
+    if (date < start) {
+      setBlockDraft((draft) => ({ ...draft, start: toInputDate(date), end: '' }));
+      return;
+    }
+    const exclusiveEnd = new Date(date);
+    exclusiveEnd.setDate(exclusiveEnd.getDate() + 1);
+    setBlockDraft((draft) => ({ ...draft, end: toInputDate(exclusiveEnd) }));
+    setSelectedBlockEnd(date);
   }
 
   async function removeBlock(blockId) {
@@ -321,7 +341,9 @@ function AdminCalendar() {
       {/* Blocked dates */}
       {calendarTab === 'availability' && <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Blocked dates</h2>
-        <p className="text-sm text-[#6b7280] mb-4">Imported bookings (read-only) and manual blocks. Blocked ranges can&apos;t be booked on ZuriLofts.</p>
+        <p className="text-sm text-[#6b7280] mb-4">Select a start date, then the final night to block it. Existing stays can&apos;t be selected.</p>
+        <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
+        <div className="flex items-center justify-between gap-3 mt-4 mb-6"><p className="text-xs text-[#6b7280]">{blockDraft.start ? selectedBlockEnd ? `Selected: ${fmt(blockDraft.start)} – ${fmt(selectedBlockEnd)}` : 'Now select the final night.' : 'Select a start date to begin.'}</p>{blockDraft.start && <button type="button" onClick={() => { setBlockDraft((draft) => ({ ...draft, start: '', end: '' })); setSelectedBlockEnd(null); }} className="text-xs font-semibold text-[#0B0B45] hover:text-[#C49A6C]">Clear selection</button>}</div>
 
         {data.blocks.length > 0 ? (
           <div className="space-y-2 mb-5">
