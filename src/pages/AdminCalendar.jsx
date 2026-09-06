@@ -194,6 +194,7 @@ function AdminCalendar() {
         summary: blockDraft.summary || undefined,
       });
       setBlockDraft({ start: '', end: '', summary: '' });
+      setSelectedBlockEnd(null);
       load();
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.error || 'Failed to add block');
@@ -361,20 +362,16 @@ function AdminCalendar() {
           <p className="text-sm text-[#6b7280] mb-5">No blocked dates.</p>
         )}
 
-        <form onSubmit={addBlock} className="grid grid-cols-2 md:grid-cols-12 gap-3 items-end">
-          <div className="md:col-span-3">
-            <label className={labelCls}>From</label>
-            <input type="date" className={inputCls} value={blockDraft.start} onChange={(e) => setBlockDraft({ ...blockDraft, start: e.target.value })} required />
+        <form onSubmit={addBlock} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
+          <div className="md:col-span-5 rounded-xl bg-[#f8f9fa] border border-[#D9D9D9] px-4 py-2.5">
+            <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">Selected dates</p>
+            <p className="text-sm font-semibold text-[#0B0B45] mt-0.5">{blockDraft.start && selectedBlockEnd ? `${fmt(blockDraft.start)} – ${fmt(selectedBlockEnd)}` : 'Choose dates on the calendar above'}</p>
           </div>
-          <div className="md:col-span-3">
-            <label className={labelCls}>To</label>
-            <input type="date" className={inputCls} value={blockDraft.end} onChange={(e) => setBlockDraft({ ...blockDraft, end: e.target.value })} required />
-          </div>
-          <div className="md:col-span-4">
+          <div className="md:col-span-5">
             <label className={labelCls}>Reason</label>
             <input className={inputCls} placeholder="Maintenance" value={blockDraft.summary} onChange={(e) => setBlockDraft({ ...blockDraft, summary: e.target.value })} />
           </div>
-          <button type="submit" className="md:col-span-2 bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors">Block</button>
+          <button type="submit" disabled={!blockDraft.start || !blockDraft.end} className="md:col-span-2 bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors disabled:opacity-50">Block dates</button>
         </form>
       </section>}
     </div>
