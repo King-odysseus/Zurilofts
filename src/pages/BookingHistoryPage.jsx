@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
@@ -96,7 +96,7 @@ function BookingHistoryPage() {
     }
   }
 
-  const fetchBookings = async () => {
+  const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
       const params = { limit: 100 };
@@ -108,12 +108,12 @@ function BookingHistoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [statusFilter]);
 
-  useEffect(() => { fetchBookings(); }, [statusFilter]);
+  useEffect(() => { fetchBookings(); }, [fetchBookings]);
 
-  const now = new Date();
   const filtered = useMemo(() => {
+    const now = new Date(); // "now" must be evaluated per computation, not per render
     let list = bookings;
     if (statusFilter === 'upcoming') {
       list = list.filter((b) => b.status === 'CONFIRMED' && new Date(b.checkIn) >= now);
@@ -123,7 +123,7 @@ function BookingHistoryPage() {
       list = list.filter((b) => b.status === 'CANCELLED');
     }
     return list;
-  }, [bookings, statusFilter, now]);
+  }, [bookings, statusFilter]);
 
   const STATUS_FILTERS = [
     { value: 'all',      label: 'All Bookings' },

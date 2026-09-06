@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as pushService from '../services/push.service.js';
+import { env } from '../config/env.js';
 
 // User: subscribe their browser for push notifications
 export async function subscribe(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -46,7 +47,7 @@ export async function broadcast(req: Request, res: Response, next: NextFunction)
 // Public: VAPID public key for the frontend to use
 export async function vapidPublicKey(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    res.json({ success: true, data: { publicKey: process.env.VAPID_PUBLIC_KEY || '' } });
+    res.json({ success: true, data: { publicKey: env.VAPID_PUBLIC_KEY || '' } });
   } catch (error) {
     next(error);
   }

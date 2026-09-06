@@ -1,5 +1,5 @@
 import prisma from '../config/prisma.js';
-import { NotFoundError, ValidationError, ForbiddenError } from '../types/index.js';
+import { NotFoundError, ValidationError, ForbiddenError, ConflictError } from '../types/index.js';
 
 // Listing publication lifecycle - independent of the host's own account
 // verification (User.role / HostApplication).
@@ -402,5 +402,16 @@ export async function deleteProperty(id: string, hostId?: string) {
   if (hostId) where.hostId = hostId;
   const property = await prisma.property.findUnique({ where });
   if (!property) throw new NotFoundError('Property');
+
+  // A property that has ever been booked carries financial history (bookings,
+  // earnings, payouts, reviews, disputes) that a hard delete would cascade away.
+  // Deactivate the listing instead so the audit trail survives.
+  const bookingCount = await prisma.booking.count({ where: { propertyId: id } });
+  if (bookingCount > 0) {
+    throw new ConflictError(
+      'This property has booking history and cannot be deleted. Suspend or unpublish it instead to stop new bookings.'
+    );
+  }
+
   return prisma.property.delete({ where: { id } });
 }

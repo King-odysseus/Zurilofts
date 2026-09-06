@@ -129,9 +129,15 @@ function BookingPage() {
   };
 
   useEffect(() => {
+    // Flag set by the cleanup below. If the user navigates to another property
+    // (changing `id`) while a request is in flight, the older response must not
+    // overwrite the newer property's state - a classic stale-response race.
+    let cancelled = false;
+
     async function fetchProfile() {
       try {
         const res = await apiClient.get('/users/profile');
+        if (cancelled) return;
         const p = res.data.data || {};
         // Auto-fill the primary guest from the account, but only fields the
         // user hasn't already typed into (so their edits are never clobbered).
@@ -158,6 +164,7 @@ function BookingPage() {
       try {
         setPropertyError('');
         const res = await apiClient.get(`/properties/${id}`);
+        if (cancelled) return;
         const prop = res.data.data;
         setProperty(prop);
         // Only auto-set bed option if no URL variant was provided
@@ -171,6 +178,7 @@ function BookingPage() {
           }
         }
       } catch (err) {
+        if (cancelled) return;
         // Surface the failure. Swallowing it here used to leave `property` null
         // forever, and the render guard below then showed an endless
         // "Loading property..." spinner with no way out.
@@ -180,15 +188,19 @@ function BookingPage() {
             : err.response?.data?.error || 'We could not load that property. Please try again.'
         );
       } finally {
-        setLoadingProperty(false);
+        if (!cancelled) setLoadingProperty(false);
       }
     }
     fetchProperty();
 
     apiClient
       .get(`/properties/${id}/availability`)
-      .then((r) => setUnavailableRanges(r.data.data || []))
+      .then((r) => {
+        if (!cancelled) setUnavailableRanges(r.data.data || []);
+      })
       .catch(() => { /* calendar still works, just nothing disabled */ });
+
+    return () => { cancelled = true; };
   }, [id, urlVariant]);
 
   // ── Cost calculations (memoised - expensive enough to matter on every date pick / guest toggle) ──

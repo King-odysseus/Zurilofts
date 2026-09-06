@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -188,7 +188,16 @@ function PropertiesPage() {
   }, [listings, sort]);
 
   // ── Fetch properties from API ──────────────────────────────────────
+  // Tracks the latest fetch so a stale (slow) response can't overwrite the
+  // results of a newer filter change. Rapid filter toggling fires one request
+  // per change; without this, whichever request happens to finish last wins,
+  // regardless of whether it matches the current filters.
+  const fetchRef = useRef(null);
+
   const fetchProperties = useCallback(async () => {
+    fetchRef.current?.abort(); // cancel any in-flight request from an older filter state
+    const controller = new AbortController();
+    fetchRef.current = controller;
     setLoading(true);
     setError(null);
     try {
@@ -206,20 +215,29 @@ function PropertiesPage() {
         const g = Number(minGuests);
         params.minBedrooms = g <= 2 ? 1 : g <= 4 ? 2 : 3;
       }
-      // Request a higher limit so client-side sort has enough data
-      params.limit = 50;
+      // Bed-variant expansion, amenity filtering, and sorting all happen
+      // client-side (a listing can have separate 1-bed/2-bed prices), so we
+      // need the whole set that matches the server-side filters - never a
+      // truncated page that would make the count below lie.
+      params.page = 1;
+      params.limit = 500;
 
-      const res = await apiClient.get('/properties', { params });
+      const res = await apiClient.get('/properties', { params, signal: controller.signal });
+      if (controller.signal.aborted) return;
       setProperties(res.data.data || []);
     } catch (err) {
+      if (controller.signal.aborted) return; // superseded by a newer filter change
       console.error('Failed to fetch properties:', err);
       setError('We couldn\'t load properties right now. Please check your connection and try again.');
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, [searchQuery, filter, priceRange, availableOnly, neighborhood, minRating, minGuests]);
 
-  useEffect(() => { fetchProperties(); }, [fetchProperties]);
+  useEffect(() => {
+    fetchProperties();
+    return () => fetchRef.current?.abort(); // abort on unmount too
+  }, [fetchProperties]);
 
   const hasActiveFilters =
     filter !== 'all' || priceRange !== 'all' || availableOnly || bedFilter !== 'all' || searchQuery !== '' ||

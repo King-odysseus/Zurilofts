@@ -2,7 +2,7 @@ import { Router } from 'express';
 import passport from '../config/passport.js';
 import { authenticate } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { authLimiter } from '../middleware/rateLimiter.js';
+import { authLimiter, refreshLimiter } from '../middleware/rateLimiter.js';
 import { registerSchema, loginSchema, refreshSchema } from '../types/index.js';
 import { env } from '../config/env.js';
 import * as authController from '../controllers/auth.controller.js';
@@ -20,7 +20,7 @@ type GoogleAuthenticateOptions = {
 // Email/Password auth
 router.post('/register', authLimiter, validate(registerSchema), authController.register);
 router.post('/login', authLimiter, validate(loginSchema), authController.login);
-router.post('/refresh', validate(refreshSchema), authController.refresh);
+router.post('/refresh', refreshLimiter, validate(refreshSchema), authController.refresh);
 router.post('/logout', authController.logout);
 
 // Current user (requires auth)

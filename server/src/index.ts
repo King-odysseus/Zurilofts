@@ -27,6 +27,17 @@ app.listen(Number(env.PORT), () => {
   startCalendarSync();
 });
 
+// Unhandled promise rejections and process errors crash hard so Railway can
+// restart and healthchecks surface the failure instead of a half-alive box.
+process.on('unhandledRejection', (reason) => {
+  console.error('UNHANDLED REJECTION:', reason);
+  process.exit(1);
+});
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+  process.exit(1);
+});
+
 // Periodically import external iCal feeds (every 3 hours) so blocked dates stay
 // current without manual syncing. Failures per-source are swallowed inside syncAll.
 function startCalendarSync() {

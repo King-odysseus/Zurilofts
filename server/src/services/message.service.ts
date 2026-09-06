@@ -21,9 +21,22 @@ export async function getUserUnreadCount(userId: string) {
 }
 
 export async function sendUserMessage(userId: string, body: string) {
-  return prisma.message.create({
+  const message = await prisma.message.create({
     data: { userId, senderRole: 'USER', body, readByAdmin: false, readByUser: true },
   });
+
+  // Notify all admins of the new support message (best-effort)
+  try {
+    const { sendPushToUser } = await import('./push.service.js');
+    const admins = await prisma.user.findMany({ where: { role: 'ADMIN' }, select: { id: true } });
+    await Promise.allSettled(
+      admins.map((a: { id: string }) =>
+        sendPushToUser(a.id, 'New Support Message', 'A guest sent a new message.', '/admin/messages')
+      )
+    );
+  } catch { /* push is best-effort */ }
+
+  return message;
 }
 
 // ---- Admin side ----
@@ -81,7 +94,14 @@ export async function getAdminThread(userId: string) {
 }
 
 export async function sendAdminMessage(userId: string, body: string) {
-  return prisma.message.create({
+  const message = await prisma.message.create({
     data: { userId, senderRole: 'ADMIN', body, readByAdmin: true, readByUser: false },
   });
+
+  try {
+    const { sendPushToUser } = await import('./push.service.js');
+    sendPushToUser(userId, 'New Message from ZuriLofts', 'Support has replied to your message.', '/messages');
+  } catch { /* push is best-effort */ }
+
+  return message;
 }

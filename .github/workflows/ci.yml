@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Build
+        run: npm run build
+
+  server:
+    name: Server (typecheck + prisma + tests)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    env:
+      # Lets Prisma's postinstall + generate resolve the sqlite datasource url
+      # without a .env file. Tests never open a real database.
+      #
+      # NODE_ENV is "production" (not "test") because the suite is written to
+      # exercise the production code paths: publicUrl tests assert the
+      # production host derivation, and env validation in production rejects
+      # the dev placeholder secrets - so real-looking values are supplied here.
+      DATABASE_URL: "file:./dev.db"
+      NODE_ENV: "production"
+      JWT_ACCESS_SECRET: "ci-access-secret-0123456789abcdefghijklmnopqrst"
+      JWT_REFRESH_SECRET: "ci-refresh-secret-0123456789abcdefghijklmnopqr"
+      CLIENT_URL: "http://localhost:5173"
+      CORS_ORIGIN: "http://localhost:5173"
+      SERVICE_FEE_PERCENT: "7.5"
+      WITHHOLDING_TAX_RATE: "5"
+      CLOUDINARY_URL: "cloudinary://999999999999999:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef@ci-cloud"
+      PAYSTACK_SECRET_KEY: "sk_test_ci_dummy_dummy_dummy_dummy"
+      VAPID_PUBLIC_KEY: "ci-vapid-public-key"
+      VAPID_PRIVATE_KEY: "ci-vapid-private-key"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Generate Prisma client (sqlite schema)
+        run: npx prisma generate --schema=prisma/schema.prisma
+      - name: Validate schemas
+        run: |
+          npx prisma validate --schema=prisma/schema.prisma
+          DATABASE_URL="postgresql://postgres:postgres@localhost:5432/zurilofts?schema=public" \
+            npx prisma validate --schema=prisma/schema.postgresql.prisma
+      - name: Typecheck
+        run: npx tsc --noEmit
+      - name: Run tests
+        run: node --import tsx --test tests/*.test.ts

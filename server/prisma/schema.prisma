@@ -46,6 +46,27 @@ model User {
   hostApplication       HostApplication?
   identityVerification  IdentityVerification?
   disputesRaised        Dispute[]
+  refreshSessions       RefreshSession[]
+}
+
+// Server-side record of an issued refresh token. Enables rotation on every
+// refresh, reuse detection (a rotated token presented again after the grace
+// window revokes the user's sessions), and immediate revocation on logout -
+// all impossible with a bare JWT that cannot be invalidated before expiry.
+model RefreshSession {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash    String    @unique // sha256 of the opaque refresh token
+  previousHash String?   // hash of the token this session rotated FROM, for reuse detection
+  expiresAt    DateTime
+  ip           String?
+  userAgent    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 // Durable, non-PII audit trail for self-service and staff-initiated erasure.
@@ -270,6 +291,12 @@ model Booking {
   addOns               BookingAddOn[]
   conversation         Conversation?
   disputes             Dispute[]
+
+  // Hot query paths: availability overlap checks (property + window), a user's
+  // booking history, and status-filtered admin/host lists.
+  @@index([propertyId, checkIn])
+  @@index([userId, createdAt])
+  @@index([status])
 }
 
 // Guest-facing identity verification, separate from the host's own
@@ -528,6 +555,9 @@ model Payout {
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
   bookings      PayoutBooking[]
+
+  @@index([hostId])
+  @@index([status])
 }
 
 // Tracks which bookings are included in which payout

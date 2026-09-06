@@ -30,6 +30,10 @@ const envSchema = z.object({
   // Note: Paystack has no separate webhook secret. Webhook signatures are
   // HMAC-SHA512 over the raw payload signed with PAYSTACK_SECRET_KEY.
   PAYSTACK_BASE_URL: z.string().default('https://api.paystack.co'),
+  // Web Push (VAPID). Absent in production just disables push sends (logged),
+  // it never blocks boot - notifications are a nice-to-have, not a hard dependency.
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
   // Platform fees
   SERVICE_FEE_PERCENT: z.string().default('7.5'),
   WITHHOLDING_TAX_RATE: z.string().default('5'),
@@ -71,6 +75,11 @@ const envSchema = z.object({
           path: ['CLOUDINARY_URL'],
           message: 'CLOUDINARY_URL is required in production for persistent image storage (Railway disk is ephemeral).',
         });
+      }
+      if (!data.VAPID_PUBLIC_KEY || !data.VAPID_PRIVATE_KEY) {
+        console.warn(
+          '⚠️  VAPID keys are not configured (VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY). Push notifications are disabled until these are set.'
+        );
       }
     }
   });

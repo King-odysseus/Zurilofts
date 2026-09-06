@@ -17,6 +17,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Keyboard focus must stay visible even where components set Tailwind's
+   outline-none. Mouse clicks don't trigger :focus-visible, so this never
+   adds a ring for pointer users. currentColor adapts to whatever the
+   element sits on (white text on navy stays legible, charcoal on white too). */
+:is(a, button, input, select, textarea, summary, [role='button'], [tabindex]):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
 /* Hero Section Background - Modern Apartment with City View */
 .hero-bg {
   background-image: url('https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=1920&q=80');

@@ -83,8 +83,11 @@ function SearchBar() {
   const [loading, setLoading] = useState(false);
   const containerRef = useRef(null);
   const debounceRef = useRef(null);
+  const searchRef = useRef(null); // in-flight search request, so it can be aborted
 
-  // Fetch results as the user types (debounced 250ms)
+  // Fetch results as the user types (debounced 250ms). The cleanup aborts any
+  // still-running request, so a slow earlier response can never land after a
+  // newer keystroke's results and overwrite them (stale-response race).
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -92,25 +95,34 @@ function SearchBar() {
     if (q.length < 2) {
       setResults([]);
       setOpen(false);
+      setLoading(false);
       return;
     }
 
     debounceRef.current = setTimeout(async () => {
+      const controller = new AbortController();
+      searchRef.current = controller;
       setLoading(true);
       try {
-        const res = await apiClient.get('/properties', { params: { search: q, limit: 8 } });
+        const res = await apiClient.get('/properties', {
+          params: { search: q, limit: 8 },
+          signal: controller.signal,
+        });
+        if (controller.signal.aborted) return;
         setResults(res.data.data || []);
         setOpen(true);
       } catch (err) {
+        if (controller.signal.aborted) return; // superseded by a newer query - ignore
         console.error('Search error', err);
         setResults([]);
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     }, 250);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
+      searchRef.current?.abort();
     };
   }, [query]);
 

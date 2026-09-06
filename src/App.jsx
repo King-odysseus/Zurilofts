@@ -3,50 +3,52 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
-import PropertyPage from './components/PropertyPage';
 import PropertyCardRow from './components/PropertyCardRow';
 import apiClient from './api/client.js';
 import { getRecentlyViewed } from './utils/recentlyViewed.js';
-import PropertiesPage from './pages/PropertiesPage';
-import BookingPage from './pages/BookingPage';
-import PrivacyPage from './pages/PrivacyPage';
-import TermsPage from './pages/TermsPage';
-import PlacesPage from './pages/PlacesPage';
-import GuidesPage from './pages/GuidesPage';
-import GuideDetailPage from './pages/GuideDetailPage';
-import RestaurantsPage from './pages/RestaurantsPage';
 import NearbySection from './components/NearbySection.jsx';
 import { PLACES_TO_VISIT, PLACES_TO_EAT, AREAS, PLACE_CATEGORIES, EAT_CATEGORIES } from './data/nearby.js';
 
-
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import OAuthCallback from './pages/OAuthCallback';
-import ProfilePage from './pages/ProfilePage';
-import MessagesPage from './pages/MessagesPage';
-import ProtectedRoute from './components/ProtectedRoute';
-import AdminRoute from './components/AdminRoute';
-import HostRoute from './components/HostRoute';
-import HostLayout from './components/HostLayout';
 import CookieConsent from './components/CookieConsent';
 import PushNotificationPrompt from './components/PushNotificationPrompt';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import Spinner from './components/Spinner.jsx';
-import TripHubPage from './pages/TripHubPage.jsx';
-import HostTodayPage from './pages/HostTodayPage.jsx';
-import HostApplicationPage from './pages/HostApplicationPage.jsx';
-import IdentityVerificationPage from './pages/IdentityVerificationPage.jsx';
-import DisputeThreadPage from './pages/DisputeThreadPage.jsx';
-import ShortlistsPage from './pages/ShortlistsPage.jsx';
-import ShortlistDetailPage from './pages/ShortlistDetailPage.jsx';
-import SharedShortlistPage from './pages/SharedShortlistPage.jsx';
-import NotFoundPage from './pages/NotFoundPage';
-import HostPayouts from './pages/HostPayouts';
-import FavouritesPage from './pages/FavouritesPage';
-import BookingHistoryPage from './pages/BookingHistoryPage';
-import InboxPage from './pages/InboxPage';
-import ConversationPage from './pages/ConversationPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
+import HostRoute from './components/HostRoute';
+import HostLayout from './components/HostLayout';
+
+// Eager imports stay limited to what the home route needs (plus shared chrome).
+// Every other page is code-split and pulls its chunk in on first navigation.
+const PropertyPage = lazy(() => import('./components/PropertyPage'));
+const PropertiesPage = lazy(() => import('./pages/PropertiesPage'));
+const BookingPage = lazy(() => import('./pages/BookingPage'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'));
+const TermsPage = lazy(() => import('./pages/TermsPage'));
+const PlacesPage = lazy(() => import('./pages/PlacesPage'));
+const GuidesPage = lazy(() => import('./pages/GuidesPage'));
+const GuideDetailPage = lazy(() => import('./pages/GuideDetailPage'));
+const RestaurantsPage = lazy(() => import('./pages/RestaurantsPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const OAuthCallback = lazy(() => import('./pages/OAuthCallback'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const MessagesPage = lazy(() => import('./pages/MessagesPage'));
+const TripHubPage = lazy(() => import('./pages/TripHubPage.jsx'));
+const HostTodayPage = lazy(() => import('./pages/HostTodayPage.jsx'));
+const HostApplicationPage = lazy(() => import('./pages/HostApplicationPage.jsx'));
+const IdentityVerificationPage = lazy(() => import('./pages/IdentityVerificationPage.jsx'));
+const DisputeThreadPage = lazy(() => import('./pages/DisputeThreadPage.jsx'));
+const ShortlistsPage = lazy(() => import('./pages/ShortlistsPage.jsx'));
+const ShortlistDetailPage = lazy(() => import('./pages/ShortlistDetailPage.jsx'));
+const SharedShortlistPage = lazy(() => import('./pages/SharedShortlistPage.jsx'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const HostPayouts = lazy(() => import('./pages/HostPayouts'));
+const FavouritesPage = lazy(() => import('./pages/FavouritesPage'));
+const BookingHistoryPage = lazy(() => import('./pages/BookingHistoryPage'));
+const InboxPage = lazy(() => import('./pages/InboxPage'));
+const ConversationPage = lazy(() => import('./pages/ConversationPage'));
 
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard.jsx'));
 const AdminLayout = lazy(() => import('./pages/AdminDashboard.jsx').then(m => ({ default: m.AdminLayout })));
@@ -174,6 +176,8 @@ function HomePage() {
                   <img
                     src={property.images?.[0] || property.coverImage || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80'}
                     alt={property.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   {/* Star rating badge */}
@@ -212,54 +216,54 @@ function HomePage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[120px] md:auto-rows-[150px]">
           {/* Tall - col 1 rows 1-2 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[0]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[0]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
           {/* Small - col 2 row 1 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[1]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[1]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
           {/* Tall - col 3 rows 1-2 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[2]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[2]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
           {/* Small - col 4 row 1 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[3]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[3]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
 
           {/* Small - col 2 row 2 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[4]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[4]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
           {/* Small - col 4 row 2 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[5]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[5]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
 
           {/* Small - col 1 row 3 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[6]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[6]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
           {/* Tall - col 2 rows 3-4 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[7]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[7]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
           {/* Small - col 3 row 3 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[8]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[8]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
           {/* Tall - col 4 rows 3-4 */}
           <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[9]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[9]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
 
           {/* Small - col 1 row 4 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[10]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[10]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
           {/* Small - col 3 row 4 */}
           <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
-            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[11]} alt="Property photo" />
+            <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[11]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
           </div>
         </div>
       </div>
@@ -299,6 +303,11 @@ function Loading() {
   return <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]"><Spinner /></div>;
 }
 
+/** Suspense boundary for code-split route pages. */
+function Lazy({ children }) {
+  return <Suspense fallback={<Loading />}>{children}</Suspense>;
+}
+
 function Page({ title, children }) {
   useEffect(() => { document.title = title ? `${title} | ZuriLofts` : 'ZuriLofts | Premium Short-let Apartments'; }, [title]);
   return children;
@@ -315,37 +324,37 @@ function App() {
       <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Page><HomePage /></Page>} />
-          <Route path="/properties" element={<Page title="Properties"><PropertiesPage /></Page>} />
-          <Route path="/property/:id" element={<PropertyPage />} />
-          <Route path="/booking/:id" element={<Page title="Booking"><ProtectedRoute><BookingPage /></ProtectedRoute></Page>} />
-          <Route path="/login" element={<Page title="Login"><LoginPage /></Page>} />
-          <Route path="/register" element={<Page title="Register"><RegisterPage /></Page>} />
-          <Route path="/auth/callback" element={<OAuthCallback />} />
-          <Route path="/profile" element={<Page title="Profile"><ProtectedRoute><ProfilePage /></ProtectedRoute></Page>} />
-          <Route path="/messages" element={<Page title="Messages"><ProtectedRoute><MessagesPage /></ProtectedRoute></Page>} />
-          <Route path="/inbox" element={<Page title="Inbox"><ProtectedRoute><InboxPage /></ProtectedRoute></Page>} />
-          <Route path="/inbox/:conversationId" element={<Page title="Conversation"><ProtectedRoute><ConversationPage /></ProtectedRoute></Page>} />
-          <Route path="/trips" element={<Page title="Trips"><ProtectedRoute><TripHubPage /></ProtectedRoute></Page>} />
-          <Route path="/verify-identity" element={<Page title="Verify Identity"><ProtectedRoute><IdentityVerificationPage /></ProtectedRoute></Page>} />
-          <Route path="/disputes/new" element={<Page title="Report an Issue"><ProtectedRoute><DisputeThreadPage /></ProtectedRoute></Page>} />
-          <Route path="/disputes/:id" element={<Page title="Dispute"><ProtectedRoute><DisputeThreadPage /></ProtectedRoute></Page>} />
-          <Route path="/host/application" element={<Page title="Host Application"><ProtectedRoute><HostApplicationPage /></ProtectedRoute></Page>} />
-          <Route path="/host/today" element={<Page title="Host Today"><HostRoute><HostTodayPage /></HostRoute></Page>} />
-          <Route path="/host/calendar" element={<Page title="Host Calendar"><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Page>} />
-          <Route path="/host/calendar/:id" element={<Page title="Host Calendar"><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Page>} />
-          <Route path="/host/listings" element={<Page title="Host Listings"><HostRoute><HostLayout><AdminProperties /></HostLayout></HostRoute></Page>} />
-          <Route path="/host/earnings" element={<Page title="Host Earnings"><HostRoute><HostLayout><AdminEarnings /></HostLayout></HostRoute></Page>} />
-          <Route path="/host/properties/new" element={<Page title="Add Property"><HostRoute><HostLayout><AdminPropertyForm /></HostLayout></HostRoute></Page>} />
-          <Route path="/host/properties/:id/edit" element={<Page title="Edit Property"><HostRoute><HostLayout><AdminPropertyForm /></HostLayout></HostRoute></Page>} />
-          <Route path="/privacy" element={<Page title="Privacy Policy"><PrivacyPage /></Page>} />
-          <Route path="/terms" element={<Page title="Terms of Service"><TermsPage /></Page>} />
-          <Route path="/favourites" element={<Page title="Favourites"><FavouritesPage /></Page>} />
-          <Route path="/bookings" element={<Page title="My Bookings"><ProtectedRoute><BookingHistoryPage /></ProtectedRoute></Page>} />
-          <Route path="/places" element={<Page title="Places"><PlacesPage /></Page>} />
-          <Route path="/guides" element={<Page title="Travel Guides"><GuidesPage /></Page>} />
-          <Route path="/guides/:slug" element={<Page title="Guide"><GuideDetailPage /></Page>} />
-          <Route path="/restaurants" element={<Page title="Restaurants"><RestaurantsPage /></Page>} />
-          <Route path="/payment/callback" element={<Suspense fallback={<Loading />}><Page title="Payment"><ProtectedRoute><PaymentCallback /></ProtectedRoute></Page></Suspense>} />
+          <Route path="/properties" element={<Page title="Properties"><Lazy><PropertiesPage /></Lazy></Page>} />
+          <Route path="/property/:id" element={<Lazy><PropertyPage /></Lazy>} />
+          <Route path="/booking/:id" element={<Page title="Booking"><Lazy><ProtectedRoute><BookingPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/login" element={<Page title="Login"><Lazy><LoginPage /></Lazy></Page>} />
+          <Route path="/register" element={<Page title="Register"><Lazy><RegisterPage /></Lazy></Page>} />
+          <Route path="/auth/callback" element={<Lazy><OAuthCallback /></Lazy>} />
+          <Route path="/profile" element={<Page title="Profile"><Lazy><ProtectedRoute><ProfilePage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/messages" element={<Page title="Messages"><Lazy><ProtectedRoute><MessagesPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/inbox" element={<Page title="Inbox"><Lazy><ProtectedRoute><InboxPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/inbox/:conversationId" element={<Page title="Conversation"><Lazy><ProtectedRoute><ConversationPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/trips" element={<Page title="Trips"><Lazy><ProtectedRoute><TripHubPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/verify-identity" element={<Page title="Verify Identity"><Lazy><ProtectedRoute><IdentityVerificationPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/disputes/new" element={<Page title="Report an Issue"><Lazy><ProtectedRoute><DisputeThreadPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/disputes/:id" element={<Page title="Dispute"><Lazy><ProtectedRoute><DisputeThreadPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/host/application" element={<Page title="Host Application"><Lazy><ProtectedRoute><HostApplicationPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/host/today" element={<Page title="Host Today"><Lazy><HostRoute><HostTodayPage /></HostRoute></Lazy></Page>} />
+          <Route path="/host/calendar" element={<Page title="Host Calendar"><Lazy><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Lazy></Page>} />
+          <Route path="/host/calendar/:id" element={<Page title="Host Calendar"><Lazy><HostRoute><HostLayout><AdminCalendar /></HostLayout></HostRoute></Lazy></Page>} />
+          <Route path="/host/listings" element={<Page title="Host Listings"><Lazy><HostRoute><HostLayout><AdminProperties /></HostLayout></HostRoute></Lazy></Page>} />
+          <Route path="/host/earnings" element={<Page title="Host Earnings"><Lazy><HostRoute><HostLayout><AdminEarnings /></HostLayout></HostRoute></Lazy></Page>} />
+          <Route path="/host/properties/new" element={<Page title="Add Property"><Lazy><HostRoute><HostLayout><AdminPropertyForm /></HostLayout></HostRoute></Lazy></Page>} />
+          <Route path="/host/properties/:id/edit" element={<Page title="Edit Property"><Lazy><HostRoute><HostLayout><AdminPropertyForm /></HostLayout></HostRoute></Lazy></Page>} />
+          <Route path="/privacy" element={<Page title="Privacy Policy"><Lazy><PrivacyPage /></Lazy></Page>} />
+          <Route path="/terms" element={<Page title="Terms of Service"><Lazy><TermsPage /></Lazy></Page>} />
+          <Route path="/favourites" element={<Page title="Favourites"><Lazy><FavouritesPage /></Lazy></Page>} />
+          <Route path="/bookings" element={<Page title="My Bookings"><Lazy><ProtectedRoute><BookingHistoryPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/places" element={<Page title="Places"><Lazy><PlacesPage /></Lazy></Page>} />
+          <Route path="/guides" element={<Page title="Travel Guides"><Lazy><GuidesPage /></Lazy></Page>} />
+          <Route path="/guides/:slug" element={<Page title="Guide"><Lazy><GuideDetailPage /></Lazy></Page>} />
+          <Route path="/restaurants" element={<Page title="Restaurants"><Lazy><RestaurantsPage /></Lazy></Page>} />
+          <Route path="/payment/callback" element={<Lazy><Page title="Payment"><ProtectedRoute><PaymentCallback /></ProtectedRoute></Page></Lazy>} />
           <Route path="/admin" element={<Suspense fallback={<Loading />}><AdminRoute><AdminLayout /></AdminRoute></Suspense>}>
             <Route index element={<Suspense fallback={<Loading />}><AdminDashboard /></Suspense>} />
             <Route path="properties" element={<Suspense fallback={<Loading />}><AdminProperties /></Suspense>} />
@@ -365,11 +374,11 @@ function App() {
             <Route path="guides" element={<Suspense fallback={<Loading />}><AdminGuides /></Suspense>} />
             <Route path="payouts" element={<Suspense fallback={<Loading />}><AdminPayouts /></Suspense>} />
           </Route>
-          <Route path="/shortlists" element={<Page title="My Shortlists"><ProtectedRoute><ShortlistsPage /></ProtectedRoute></Page>} />
-          <Route path="/shortlists/:id" element={<Page title="Shortlist"><ProtectedRoute><ShortlistDetailPage /></ProtectedRoute></Page>} />
-          <Route path="/s/:token" element={<Page title="Shared Shortlist"><SharedShortlistPage /></Page>} />
-          <Route path="/host/payouts" element={<Page title="Host Payouts"><HostRoute><HostPayouts /></HostRoute></Page>} />
-          <Route path="*" element={<NotFoundPage />} />
+          <Route path="/shortlists" element={<Page title="My Shortlists"><Lazy><ProtectedRoute><ShortlistsPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/shortlists/:id" element={<Page title="Shortlist"><Lazy><ProtectedRoute><ShortlistDetailPage /></ProtectedRoute></Lazy></Page>} />
+          <Route path="/s/:token" element={<Page title="Shared Shortlist"><Lazy><SharedShortlistPage /></Lazy></Page>} />
+          <Route path="/host/payouts" element={<Page title="Host Payouts"><Lazy><HostRoute><HostLayout><HostPayouts /></HostLayout></HostRoute></Lazy></Page>} />
+          <Route path="*" element={<Lazy><NotFoundPage /></Lazy>} />
         </Routes>
       </ErrorBoundary>
     </Router>

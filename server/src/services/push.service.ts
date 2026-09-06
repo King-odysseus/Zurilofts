@@ -1,10 +1,11 @@
 import prisma from '../config/prisma.js';
 import webpush from 'web-push';
+import { env } from '../config/env.js';
 
 // VAPID keys: set via env var or generate on first run.
 // Run: node -e "const w=require('web-push');console.log(w.generateVAPIDKeys())"
-const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || '';
-const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || '';
+const vapidPublicKey = env.VAPID_PUBLIC_KEY || '';
+const vapidPrivateKey = env.VAPID_PRIVATE_KEY || '';
 
 if (vapidPublicKey && vapidPrivateKey) {
   webpush.setVapidDetails('mailto:wingzatari@gmail.com', vapidPublicKey, vapidPrivateKey);

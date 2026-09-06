@@ -23,7 +23,6 @@ const hostingLinks = [
   { name: 'Listings',  href: '/host/listings' },
   { name: 'Messages',  href: '/inbox' },
   { name: 'Earnings',  href: '/host/earnings' },
-  { name: 'Payouts',   href: '/host/payouts' },
 ];
 
 const hostingOnboardingLinks = [
@@ -43,6 +42,9 @@ function Navbar() {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
+  const activeHostingLinks = user?.role === 'HOST' || user?.role === 'ADMIN'
+    ? [...hostingLinks, { name: 'Payouts', href: '/host/payouts' }]
+    : hostingLinks;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
@@ -150,7 +152,7 @@ function Navbar() {
   const activeLinks = !isAuthenticated
     ? navLinks
     : mode === 'hosting'
-      ? canHost ? hostingLinks : hostingOnboardingLinks
+      ? canHost ? activeHostingLinks : hostingOnboardingLinks
       : travellingLinks;
 
   function handleSwitchMode() {

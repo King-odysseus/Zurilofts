@@ -120,6 +120,11 @@ app.use('/api/conversations', conversationRoutes);
 app.use('/api/consent', consentRoutes);
 app.use('/api/me', meRoutes);
 
+// Unknown API route -> JSON 404 instead of the default HTML "Cannot GET".
+app.use('/api', (_req, res) => {
+  res.status(404).json({ success: false, error: 'Endpoint not found' });
+});
+
 // Error handler (must be last)
 app.use(errorHandler);
 

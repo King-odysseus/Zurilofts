@@ -24,13 +24,17 @@ function clearRefreshCookie(res: Response): void {
   });
 }
 
+function sessionMetaFor(req: Request): { ip?: string; userAgent?: string } {
+  return { ip: req.ip, userAgent: req.get('user-agent') || undefined };
+}
+
 /**
  * POST /api/auth/register
  */
 export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { email, password, firstName, lastName, role } = req.body;
-    const { user, tokens } = await authService.registerUser(email, password, firstName, lastName, role);
+    const { user, tokens } = await authService.registerUser(email, password, firstName, lastName, role, sessionMetaFor(req));
     setRefreshCookie(res, tokens.refreshToken);
 
     res.status(201).json({
@@ -48,7 +52,7 @@ export async function register(req: Request, res: Response, next: NextFunction):
 export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { email, password } = req.body;
-    const { user, tokens } = await authService.loginUser(email, password);
+    const { user, tokens } = await authService.loginUser(email, password, sessionMetaFor(req));
     setRefreshCookie(res, tokens.refreshToken);
 
     res.json({
@@ -66,7 +70,7 @@ export async function login(req: Request, res: Response, next: NextFunction): Pr
 export async function refresh(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const token = req.cookies?.[REFRESH_COOKIE] || req.body?.refreshToken;
-    const { user, tokens } = await authService.refreshTokens(token);
+    const { user, tokens } = await authService.refreshTokens(token, sessionMetaFor(req));
     setRefreshCookie(res, tokens.refreshToken);
 
     res.json({
@@ -82,7 +86,9 @@ export async function refresh(req: Request, res: Response, next: NextFunction): 
 /**
  * POST /api/auth/logout
  */
-export async function logout(_req: Request, res: Response): Promise<void> {
+export async function logout(req: Request, res: Response): Promise<void> {
+  const token = req.cookies?.[REFRESH_COOKIE] || req.body?.refreshToken;
+  await authService.logoutUser(token);
   clearRefreshCookie(res);
   res.json({ success: true, message: 'Logged out' });
 }
@@ -110,12 +116,15 @@ export async function googleCallback(req: Request, res: Response, next: NextFunc
       return res.redirect(`${clientUrl}/login?error=oauth_failed`);
     }
 
-    const { user, tokens } = await authService.googleAuth({
-      googleId: profile.id,
-      email: profile.emails?.[0]?.value || `${profile.id}@google.oauth`,
-      firstName: profile.name?.givenName || profile.displayName?.split(' ')[0] || 'User',
-      lastName: profile.name?.familyName || profile.displayName?.split(' ').slice(1).join(' ') || '',
-    });
+    const { user, tokens } = await authService.googleAuth(
+      {
+        googleId: profile.id,
+        email: profile.emails?.[0]?.value || `${profile.id}@google.oauth`,
+        firstName: profile.name?.givenName || profile.displayName?.split(' ')[0] || 'User',
+        lastName: profile.name?.familyName || profile.displayName?.split(' ').slice(1).join(' ') || '',
+      },
+      sessionMetaFor(req)
+    );
 
     setRefreshCookie(res, tokens.refreshToken);
     const redirectUrl = new URL('/auth/callback', clientUrl);

@@ -1,9 +1,18 @@
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import prisma from '../config/prisma.js';
-import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../utils/jwt.js';
-import { ConflictError, UnauthorizedError, NotFoundError, ValidationError } from '../types/index.js';
+import { signAccessToken } from '../utils/jwt.js';
+import { UnauthorizedError, NotFoundError, ValidationError } from '../types/index.js';
 
 const SALT_ROUNDS = 12;
+
+// Refresh sessions live server-side (see schema RefreshSession). Lifetime must
+// match the cookie maxAge in auth.controller (7 days). `updatedAt` is bumped on
+// every rotation and is what distinguishes a benign concurrent double-refresh
+// (two tabs sharing one cookie, < GRACE) from real token theft (a rotated token
+// presented again much later).
+const REFRESH_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+const ROTATE_GRACE_MS = 60 * 1000;
 
 export interface AuthTokens {
   accessToken: string;
@@ -24,6 +33,12 @@ export interface UserResponse {
   hostApplicationStatus: string | null;
   // Guest identity verification status, gates payment (not dashboard access).
   identityVerificationStatus: string;
+}
+
+/** Optional request context recorded on a refresh session for audit. */
+export interface SessionMeta {
+  ip?: string;
+  userAgent?: string;
 }
 
 function toUserResponse(
@@ -56,12 +71,56 @@ async function loadUserStatusExtras(userId: string) {
   };
 }
 
-async function generateTokens(user: { id: string; email: string; role: string }): Promise<AuthTokens> {
-  const payload = { sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN' };
-  return {
-    accessToken: signAccessToken(payload),
-    refreshToken: signRefreshToken(payload),
-  };
+function hashToken(token: string): string {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
+/** Create a refresh session row and return its opaque token. */
+async function createRefreshSession(userId: string, meta?: SessionMeta): Promise<string> {
+  const token = crypto.randomBytes(48).toString('base64url');
+  await prisma.refreshSession.create({
+    data: {
+      userId,
+      tokenHash: hashToken(token),
+      expiresAt: new Date(Date.now() + REFRESH_LIFETIME_MS),
+      ip: meta?.ip ?? null,
+      userAgent: meta?.userAgent ?? null,
+    },
+  });
+  return token;
+}
+
+/** Rotate a session to a fresh opaque token; the presented hash becomes previousHash. */
+async function rotateRefreshSession(
+  session: { id: string; tokenHash: string; userId: string },
+  meta?: SessionMeta
+): Promise<string> {
+  const token = crypto.randomBytes(48).toString('base64url');
+  await prisma.refreshSession.update({
+    where: { id: session.id },
+    data: {
+      tokenHash: hashToken(token),
+      previousHash: session.tokenHash,
+      expiresAt: new Date(Date.now() + REFRESH_LIFETIME_MS),
+      ip: meta?.ip ?? undefined,
+      userAgent: meta?.userAgent ?? undefined,
+    },
+  });
+  return token;
+}
+
+async function revokeAllSessions(userId: string): Promise<void> {
+  await prisma.refreshSession.deleteMany({ where: { userId } });
+}
+
+/** Issue an access token + a fresh stored refresh session for a user. */
+async function generateTokens(
+  user: { id: string; email: string; role: string },
+  meta?: SessionMeta
+): Promise<AuthTokens> {
+  const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN' });
+  const refreshToken = await createRefreshSession(user.id, meta);
+  return { accessToken, refreshToken };
 }
 
 /**
@@ -72,17 +131,30 @@ async function generateTokens(user: { id: string; email: string; role: string })
  * HostApplication is created atomically. The HOST role is only ever granted
  * later by an admin approving that application. Issued tokens therefore always
  * carry USER for a fresh registration.
+ *
+ * Anti-enumeration: registering with an email that already exists does NOT say
+ * "that account exists". If the password happens to match the existing account,
+ * the user is simply signed in; otherwise a generic failure is returned.
  */
 export async function registerUser(
   email: string,
   password: string,
   firstName: string,
   lastName: string,
-  role: 'USER' | 'HOST' = 'USER'
+  role: 'USER' | 'HOST' = 'USER',
+  meta?: SessionMeta
 ): Promise<{ user: UserResponse; tokens: AuthTokens }> {
-  const existing = await prisma.user.findUnique({ where: { email } });
+  const normalizedEmail = email.trim().toLowerCase();
+  const existing = await prisma.user.findUnique({ where: { email: normalizedEmail } });
   if (existing) {
-    throw new ConflictError('A user with this email already exists');
+    // Existing account: if these credentials match, treat as sign-in (covers the
+    // "I forgot I already registered" case without confirming the account exists).
+    const valid = existing.passwordHash ? await bcrypt.compare(password, existing.passwordHash) : false;
+    if (!valid || existing.suspended) {
+      throw new ValidationError('Could not create an account with these details.');
+    }
+    const tokens = await generateTokens(existing, meta);
+    return { user: toUserResponse(existing, await loadUserStatusExtras(existing.id)), tokens };
   }
 
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
@@ -90,7 +162,7 @@ export async function registerUser(
 
   const user = await prisma.$transaction(async (tx) => {
     const created = await tx.user.create({
-      data: { email, passwordHash, firstName, lastName, role: 'USER' },
+      data: { email: normalizedEmail, passwordHash, firstName, lastName, role: 'USER' },
     });
     if (wantsToHost) {
       await tx.hostApplication.create({ data: { userId: created.id, status: 'DRAFT' } });
@@ -98,7 +170,7 @@ export async function registerUser(
     return created;
   });
 
-  const tokens = await generateTokens(user);
+  const tokens = await generateTokens(user, meta);
   // Known synchronously from the transaction above - no extra round trip needed.
   return {
     user: toUserResponse(user, { hostApplicationStatus: wantsToHost ? 'DRAFT' : null }),
@@ -109,8 +181,12 @@ export async function registerUser(
 /**
  * Login with email + password.
  */
-export async function loginUser(email: string, password: string): Promise<{ user: UserResponse; tokens: AuthTokens }> {
-  const user = await prisma.user.findUnique({ where: { email } });
+export async function loginUser(
+  email: string,
+  password: string,
+  meta?: SessionMeta
+): Promise<{ user: UserResponse; tokens: AuthTokens }> {
+  const user = await prisma.user.findUnique({ where: { email: email.trim().toLowerCase() } });
   if (!user || !user.passwordHash) {
     throw new UnauthorizedError('Invalid email or password');
   }
@@ -124,49 +200,98 @@ export async function loginUser(email: string, password: string): Promise<{ user
     throw new UnauthorizedError('This account has been suspended. Please contact support.');
   }
 
-  const tokens = await generateTokens(user);
+  const tokens = await generateTokens(user, meta);
   return { user: toUserResponse(user, await loadUserStatusExtras(user.id)), tokens };
 }
 
 /**
- * Refresh tokens using a valid refresh token.
+ * Refresh using a valid opaque refresh token. Every successful refresh rotates
+ * the token and bumps the session; presenting an already-rotated token is either
+ * a benign concurrent refresh (two tabs) or token theft, disambiguated by the
+ * rotation grace window.
  */
-export async function refreshTokens(refreshToken?: string): Promise<{ user: UserResponse; tokens: AuthTokens }> {
+export async function refreshTokens(
+  refreshToken?: string,
+  meta?: SessionMeta
+): Promise<{ user: UserResponse; tokens: AuthTokens }> {
   if (!refreshToken) {
     throw new UnauthorizedError('Refresh token required');
   }
 
-  let payload;
-  try {
-    payload = verifyRefreshToken(refreshToken);
-  } catch {
+  const presentedHash = hashToken(refreshToken);
+  const session = await prisma.refreshSession.findUnique({
+    where: { tokenHash: presentedHash },
+    include: { user: true },
+  });
+
+  if (!session) {
+    // Not the current token. If it is the token this session rotated FROM and
+    // that rotation happened moments ago, it is two tabs racing on one cookie -
+    // rotate the still-live session instead of logging anyone out.
+    const reused = await prisma.refreshSession.findFirst({
+      where: { previousHash: presentedHash },
+      include: { user: true },
+    });
+    if (reused) {
+      if (Date.now() - reused.updatedAt.getTime() < ROTATE_GRACE_MS) {
+        const token = await rotateRefreshSession(reused, meta);
+        return {
+          user: toUserResponse(reused.user, await loadUserStatusExtras(reused.user.id)),
+          tokens: {
+            accessToken: signAccessToken({ sub: reused.user.id, email: reused.user.email, role: reused.user.role as 'USER' | 'HOST' | 'ADMIN' }),
+            refreshToken: token,
+          },
+        };
+      }
+      // Rotated long ago and presented again = stolen token in use. Kill the
+      // user's sessions so the theft cannot be replayed.
+      await revokeAllSessions(reused.userId);
+    }
     throw new UnauthorizedError('Invalid or expired refresh token');
   }
 
-  const user = await prisma.user.findUnique({ where: { id: payload.sub } });
-  if (!user) {
-    throw new NotFoundError('User');
+  if (session.expiresAt < new Date()) {
+    await prisma.refreshSession.delete({ where: { id: session.id } }).catch(() => {});
+    throw new UnauthorizedError('Invalid or expired refresh token');
   }
 
-  // A suspended user's refresh fails, logging them out once the short-lived
-  // access token expires (≤15m) without needing a per-request DB lookup.
-  if (user.suspended) {
-    throw new UnauthorizedError('This account has been suspended. Please contact support.');
+  const user = session.user;
+  if (!user || user.suspended || user.deletedAt) {
+    await revokeAllSessions(session.userId);
+    throw new UnauthorizedError('This account is no longer active. Please log in again.');
   }
 
-  const tokens = await generateTokens(user);
-  return { user: toUserResponse(user, await loadUserStatusExtras(user.id)), tokens };
+  const token = await rotateRefreshSession(session, meta);
+  return {
+    user: toUserResponse(user, await loadUserStatusExtras(user.id)),
+    tokens: {
+      accessToken: signAccessToken({ sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN' }),
+      refreshToken: token,
+    },
+  };
+}
+
+/** Revoke the session backing a refresh token (logout). */
+export async function logoutUser(refreshToken?: string): Promise<void> {
+  if (!refreshToken) return;
+  const h = hashToken(refreshToken);
+  await prisma.refreshSession.deleteMany({
+    where: { OR: [{ tokenHash: h }, { previousHash: h }] },
+  });
 }
 
 /**
  * Find or create user from Google OAuth profile.
  */
-export async function googleAuth(profile: {
-  googleId: string;
-  email: string;
-  firstName: string;
-  lastName: string;
-}): Promise<{ user: UserResponse; tokens: AuthTokens }> {
+export async function googleAuth(
+  profile: {
+    googleId: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+  },
+  meta?: SessionMeta
+): Promise<{ user: UserResponse; tokens: AuthTokens }> {
   // Try to find by Google ID first
   let user = await prisma.user.findUnique({ where: { googleId: profile.googleId } });
 
@@ -199,7 +324,7 @@ export async function googleAuth(profile: {
     throw new UnauthorizedError('This account has been suspended. Please contact support.');
   }
 
-  const tokens = await generateTokens(user);
+  const tokens = await generateTokens(user, meta);
   return { user: toUserResponse(user, await loadUserStatusExtras(user.id)), tokens };
 }
 

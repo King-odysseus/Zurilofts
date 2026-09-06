@@ -44,7 +44,23 @@ export async function createPromoCode(data: any) {
   const existing = await prisma.promoCode.findUnique({ where: { code: data.code } });
   if (existing) throw new ConflictError('A promo code with this code already exists');
 
-  return prisma.promoCode.create({ data });
+  const promo = await prisma.promoCode.create({ data });
+
+  // Announce active promo codes to every subscribed browser (best-effort)
+  if (promo.active) {
+    try {
+      const { getAllSubscriptions, sendPush } = await import('./push.service.js');
+      const subs = await getAllSubscriptions();
+      sendPush(
+        subs.map((s: { endpoint: string; keys: string }) => ({ endpoint: s.endpoint, keys: s.keys })),
+        'New Promo Code!',
+        `Use code ${promo.code} for ${promo.discountPercent}% off your next stay.`,
+        '/properties',
+      );
+    } catch { /* push is best-effort */ }
+  }
+
+  return promo;
 }
 
 export async function listPromoCodes() {

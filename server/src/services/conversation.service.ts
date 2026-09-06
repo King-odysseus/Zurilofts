@@ -230,6 +230,15 @@ export async function sendMessage(conversationId: string, senderId: string, rawC
     data: { updatedAt: new Date() },
   });
 
+  // Notify the other participant of the new message (best-effort)
+  const recipientId = isGuest ? conversation.booking.property.hostId : conversation.booking.userId;
+  if (recipientId) {
+    try {
+      const { sendPushToUser } = await import('./push.service.js');
+      sendPushToUser(recipientId, 'New Message', 'You have a new message about your booking.', `/inbox/${conversationId}`);
+    } catch { /* push is best-effort */ }
+  }
+
   return message;
 }
 

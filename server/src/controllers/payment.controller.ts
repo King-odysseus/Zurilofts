@@ -41,7 +41,10 @@ export async function initialize(req: Request, res: Response, next: NextFunction
 /** GET /api/payments/verify/:reference - auth required */
 export async function verify(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const result = await paymentService.verifyAndConfirmPayment(req.params.reference);
+    const result = await paymentService.verifyAndConfirmPayment(req.params.reference, {
+      userId: req.user!.sub,
+      isAdmin: req.user!.role === 'ADMIN',
+    });
     res.json({
       success: result.confirmed,
       data: { confirmed: result.confirmed, bookingId: result.bookingId },

@@ -78,11 +78,30 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/') && !url.pathname.startsWith('/api/auth/'),
+            // Only public browsing data is worth (and safe to) caching. The broad
+            // "/api/* minus auth" rule this replaced put private GET responses -
+            // a guest's bookings, messages, notifications - on disk in the Cache
+            // Storage. Property + blog endpoints are public GET reads; everything
+            // else (auth, bookings, messages, uploads, admin) is uncached.
+            urlPattern: ({ url }) => {
+              const p = url.pathname;
+              if (p === '/api/properties') return true;
+              if (
+                p.startsWith('/api/properties/') &&
+                !p.startsWith('/api/properties/mine') &&
+                !p.startsWith('/api/properties/bulk')
+              ) {
+                return true;
+              }
+              if (p.startsWith('/api/guides')) return true;
+              if (p.startsWith('/api/reviews/summary')) return true;
+              return false;
+            },
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
               networkTimeoutSeconds: 5,
+              cacheableResponse: { statuses: [0, 200] },
               expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 }, // 1 hour
             },
           },

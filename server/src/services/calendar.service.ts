@@ -146,11 +146,27 @@ export async function isRangeAvailable(
   checkOut: Date,
   excludeBookingId?: string
 ): Promise<boolean> {
+  return isRangeAvailableWithDb(prisma, propertyId, checkIn, checkOut, excludeBookingId);
+}
+
+/**
+ * Same check as `isRangeAvailable`, but scoped to an explicit db client so it
+ * can run INSIDE a transaction. Callers must query through the transaction
+ * client for reads to participate in the transaction's isolation - a global
+ * `prisma` query inside an interactive transaction bypasses it entirely.
+ */
+export async function isRangeAvailableWithDb(
+  db: any,
+  propertyId: string,
+  checkIn: Date,
+  checkOut: Date,
+  excludeBookingId?: string
+): Promise<boolean> {
   const [blockOverlap, bookingOverlap] = await Promise.all([
-    prisma.calendarBlock.count({
+    db.calendarBlock.count({
       where: { propertyId, start: { lt: checkOut }, end: { gt: checkIn } },
     }),
-    prisma.booking.count({
+    db.booking.count({
       where: {
         propertyId,
         checkIn: { lt: checkOut },

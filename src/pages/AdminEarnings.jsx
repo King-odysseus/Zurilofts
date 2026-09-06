@@ -90,6 +90,7 @@ function AdminEarnings() {
   const [search, setSearch] = useState('');
   const [sortBy, setSortBy] = useState('earnings-desc');
   const [viewMode, setViewMode] = useState('all'); // 'all' | 'mine' - admin-only toggle
+  const [activeTab, setActiveTab] = useState('overview');
 
   const effectiveEndpoint = useMemo(() => {
     if (!isAdmin) return '/bookings/host/earnings';
@@ -452,6 +453,12 @@ function AdminEarnings() {
     { label: '2-Bed Share', value: `${metrics.bed2Share}%`, hint: `KES ${filteredTotals.bed2Earnings.toLocaleString()}` },
   ];
 
+  const earningsTabs = [
+    { value: 'overview', label: 'Overview' },
+    { value: 'charts', label: 'Charts' },
+    { value: 'properties', label: 'Properties' },
+  ];
+
   return (
     <div className="w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -462,28 +469,33 @@ function AdminEarnings() {
             {!isAdmin && ' View your gross rent, service fees, host net, and WHT breakdown.'}
           </p>
         </div>
-        {!loading && rows.length > 0 && (
+        <div className="flex items-center gap-2">
+          {isAdmin && (
+            <div className="flex items-center bg-[#f3f4f6] rounded-full p-0.5 border border-[#D9D9D9]">
+              <button
+                type="button"
+                onClick={() => setViewMode('all')}
+                aria-pressed={viewMode === 'all'}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  viewMode === 'all' ? 'bg-[#C49A6C] text-white shadow-sm' : 'text-[#6b7280] hover:text-[#0B0B45]'
+                }`}
+              >
+                All Properties
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode('mine')}
+                aria-pressed={viewMode === 'mine'}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
+                  viewMode === 'mine' ? 'bg-[#C49A6C] text-white shadow-sm' : 'text-[#6b7280] hover:text-[#0B0B45]'
+                }`}
+              >
+                My Properties
+              </button>
+            </div>
+          )}
+          {!loading && rows.length > 0 && (
           <div className="flex items-center gap-2">
-            {isAdmin && (
-              <div className="flex items-center bg-[#f3f4f6] rounded-full p-0.5 border border-[#D9D9D9]">
-                <button
-                  onClick={() => setViewMode('all')}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                    viewMode === 'all' ? 'bg-[#C49A6C] text-white shadow-sm' : 'text-[#6b7280] hover:text-[#0B0B45]'
-                  }`}
-                >
-                  All Properties
-                </button>
-                <button
-                  onClick={() => setViewMode('mine')}
-                  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                    viewMode === 'mine' ? 'bg-[#C49A6C] text-white shadow-sm' : 'text-[#6b7280] hover:text-[#0B0B45]'
-                  }`}
-                >
-                  My Properties
-                </button>
-              </div>
-            )}
             <Dropdown
             value=""
             onChange={handleExport}
@@ -496,8 +508,9 @@ function AdminEarnings() {
             ariaLabel="Export earnings report"
             menuClassName="right-0 left-auto"
           />
-            </div>
-        )}
+          </div>
+          )}
+        </div>
       </div>
 
       {/* Filters */}
@@ -584,6 +597,26 @@ function AdminEarnings() {
         )}
       </div>
 
+      <div className="flex gap-1 border-b border-[#D9D9D9] mb-6" role="tablist" aria-label="Earnings views">
+        {earningsTabs.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.value}
+            onClick={() => setActiveTab(tab.value)}
+            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors ${
+              activeTab === tab.value
+                ? 'border-[#C49A6C] text-[#0B0B45]'
+                : 'border-transparent text-[#6b7280] hover:text-[#0B0B45]'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {activeTab === 'overview' && <>
       {/* Stats Cards - Top row: core metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
         {cards.map(({ label, value, color, sub }) => (
@@ -688,9 +721,10 @@ function AdminEarnings() {
           </div>
         </div>
       )}
+      </>}
 
       {/* Charts */}
-      {!loading && chartProperties.length > 0 && (
+      {activeTab === 'charts' && !loading && chartProperties.length > 0 && (
         <div className="space-y-4 mb-8">
           {/* Ranked earnings bars */}
           <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
@@ -765,9 +799,9 @@ function AdminEarnings() {
             </div>
 
             {/* Bookings by Property donut */}
-            <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-[#0B0B45] mb-2">Bookings by Property</h2>
-              <div className="flex items-center justify-center">
+              <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
+                <h2 className="text-sm font-bold text-[#0B0B45] mb-2">Bookings by Property</h2>
+              {chartBookings.some((property) => property.bookings > 0) ? <div className="flex items-center justify-center">
                 <svg viewBox="0 0 360 240" className="w-full max-w-[360px]">
                   {(() => {
                     const cx = 105, cy = 120, r = 72;
@@ -820,14 +854,20 @@ function AdminEarnings() {
                     );
                   })()}
                 </svg>
-              </div>
+              </div> : <p className="text-sm text-[#6b7280] py-8 text-center">No bookings to chart for this period.</p>}
             </div>
           </div>
         </div>
       )}
 
+      {activeTab === 'charts' && !loading && chartProperties.length === 0 && (
+        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-10 text-center mb-8">
+          <p className="text-sm text-[#6b7280]">No earnings data is available to chart for the selected filters.</p>
+        </div>
+      )}
+
       {/* Top Hosts - Admin only */}
-      {isAdmin && !loading && hosts.length > 0 && (
+      {activeTab === 'charts' && isAdmin && !loading && hosts.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
           {/* Top Hosts Table */}
           <div className="bg-white rounded-2xl border border-[#D9D9D9] p-5 shadow-sm">
@@ -901,7 +941,7 @@ function AdminEarnings() {
         </div>
       )}
 
-      {loading ? (
+      {activeTab === 'properties' && (loading ? (
         <div className="text-center py-12">
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
@@ -960,7 +1000,7 @@ function AdminEarnings() {
             <div className="text-center py-12 text-[#6b7280]">No properties with earnings for the selected period.</div>
           )}
         </div>
-      )}
+      ))}
     </div>
   );
 }

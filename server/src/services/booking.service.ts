@@ -1,7 +1,8 @@
+import { Prisma } from '@prisma/client';
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
 import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
-import { isRangeAvailable, PENDING_HOLD_MINUTES } from './calendar.service.js';
+import { isRangeAvailable, isRangeAvailableWithDb, PENDING_HOLD_MINUTES } from './calendar.service.js';
 import { isBookable } from './property.service.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
@@ -226,46 +227,90 @@ export async function createBooking(input: CreateBookingInput) {
     maxDiscount,
   });
 
-  const booking = await prisma.booking.create({
-    data: {
-      userId: input.userId,
-      propertyId: input.propertyId,
-      checkIn: checkInDate,
-      checkOut: checkOutDate,
-      guests: input.guests,
-      bedOption: input.bedOption,
-      checkInTime: input.checkInTime,
-      checkOutTime: input.checkOutTime,
-      specialRequests: input.specialRequests,
-      additionalGuestsJson:
-        input.additionalGuests && input.additionalGuests.length
-          ? JSON.stringify(
-              input.additionalGuests.filter((g) => g.firstName?.trim() || g.lastName?.trim())
-            )
-          : null,
-      paymentMethod: input.paymentMethod,
-      promoCodeId,
-      subtotal: bp.subtotal,
-      cleaningFee: bp.cleaningFee,
-      serviceFee: bp.serviceFee,
-      lateCheckoutFee: bp.lateCheckoutFee,
-      discountAmount: bp.discountAmount,
-      total: bp.total,
-    },
-    include: {
-      property: true,
-      promoCode: { select: { code: true, discountPercent: true } },
-      addOns: { include: { addOn: true } },
-      user: { select: { email: true } },
-    },
-  });
+  const bookingData = {
+    userId: input.userId,
+    propertyId: input.propertyId,
+    checkIn: checkInDate,
+    checkOut: checkOutDate,
+    guests: input.guests,
+    bedOption: input.bedOption,
+    checkInTime: input.checkInTime,
+    checkOutTime: input.checkOutTime,
+    specialRequests: input.specialRequests,
+    additionalGuestsJson:
+      input.additionalGuests && input.additionalGuests.length
+        ? JSON.stringify(
+            input.additionalGuests.filter((g) => g.firstName?.trim() || g.lastName?.trim())
+          )
+        : null,
+    paymentMethod: input.paymentMethod,
+    promoCodeId,
+    subtotal: bp.subtotal,
+    cleaningFee: bp.cleaningFee,
+    serviceFee: bp.serviceFee,
+    lateCheckoutFee: bp.lateCheckoutFee,
+    discountAmount: bp.discountAmount,
+    total: bp.total,
+  };
 
-  // Increment promo code usage if used
-  if (promoCodeId) {
-    await prisma.promoCode.update({
-      where: { id: promoCodeId },
-      data: { currentUses: { increment: 1 } },
-    });
+  // The isRangeAvailable() check above is a UX fast-fail. The authoritative gate
+  // is re-checked INSIDE this transaction: two concurrent requests can both pass
+  // the earlier check, so we re-verify through the tx client and rely on
+  // Postgres serializable isolation to abort one of them (P2034) if their
+  // windows overlap. SQLite (local dev) is effectively serializable via its
+  // single-writer lock, so no isolation option is passed there.
+  const isPostgres = (process.env.DATABASE_URL || '').startsWith('postgres');
+  let booking: any;
+  try {
+    booking = await prisma.$transaction(
+      async (tx) => {
+        const stillAvailable = await isRangeAvailableWithDb(tx, input.propertyId, checkInDate, checkOutDate);
+        if (!stillAvailable) {
+          throw new ConflictError('Those dates are no longer available for this property');
+        }
+
+        const created = await tx.booking.create({
+          data: bookingData,
+          include: {
+            property: true,
+            promoCode: { select: { code: true, discountPercent: true } },
+            addOns: { include: { addOn: true } },
+            user: { select: { email: true } },
+          },
+        });
+
+        // Increment promo code usage if used
+        if (promoCodeId) {
+          await tx.promoCode.update({
+            where: { id: promoCodeId },
+            data: { currentUses: { increment: 1 } },
+          });
+        }
+
+        return created;
+      },
+      isPostgres ? { isolationLevel: Prisma.TransactionIsolationLevel.Serializable } : undefined
+    );
+  } catch (err: any) {
+    // P2034 = transaction serialization failure: a concurrent request grabbed
+    // these dates first. Surface it as the same conflict a normal check would.
+    if (err?.code === 'P2034') {
+      throw new ConflictError('Those dates are no longer available for this property');
+    }
+    throw err;
+  }
+
+  // Notify the host of the new booking request (best-effort, never blocks creation)
+  if (property.hostId) {
+    try {
+      const { sendPushToUser } = await import('./push.service.js');
+      sendPushToUser(
+        property.hostId,
+        'New Booking Request',
+        `You have a new booking request for ${property.title}.`,
+        `/host/today`,
+      );
+    } catch { /* push is best-effort */ }
   }
 
   return normalizeBooking(booking);
@@ -656,16 +701,15 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
     return result;
   });
 
-  // Send push notification when booking is confirmed (after transaction commit)
-  if (status === 'CONFIRMED') {
+  // Send push notification on status change (after transaction commit, best-effort)
+  if (status === 'CONFIRMED' || status === 'CANCELLED') {
     try {
       const { sendPushToUser } = await import('./push.service.js');
-      sendPushToUser(
-        booking.userId,
-        'Booking Confirmed!',
-        `Your stay at this property has been confirmed. View your bookings for details.`,
-        `/bookings`,
-      );
+      const title = status === 'CONFIRMED' ? 'Booking Confirmed!' : 'Booking Cancelled';
+      const body = status === 'CONFIRMED'
+        ? 'Your stay at this property has been confirmed. View your bookings for details.'
+        : 'Your booking has been cancelled. View your bookings for details.';
+      sendPushToUser(booking.userId, title, body, '/bookings');
     } catch { /* push is best-effort, don't block the status update */ }
   }
 

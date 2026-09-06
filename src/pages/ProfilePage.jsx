@@ -23,6 +23,8 @@ function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
+  const [reloadKey, setReloadKey] = useState(0);
 
   // Profile form state
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', phone: '' });
@@ -106,6 +108,8 @@ function ProfilePage() {
   }
 
   useEffect(() => {
+    setLoading(true);
+    setLoadError('');
     async function loadData() {
       try {
         const [profileRes, bookingsRes] = await Promise.all([
@@ -129,13 +133,15 @@ function ProfilePage() {
         const missing = !prof.firstName || !prof.lastName || !prof.email || !prof.phone;
         setShowCompletionBanner(missing);
       } catch {
-        // silent
+        // Surface a real error state below instead of silently rendering an
+        // empty profile shell with no explanation and no way to retry.
+        setLoadError('We could not load your profile right now. Please check your connection and try again.');
       } finally {
         setLoading(false);
       }
     }
     loadData();
-  }, []);
+  }, [reloadKey]);
 
   // Populate bank form when profile loads (HOST only)
   useEffect(() => {
@@ -357,6 +363,31 @@ function ProfilePage() {
         <Navbar />
         <div className="pt-24 flex items-center justify-center">
           <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin"></div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (loadError && !profile) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-24 pb-16 min-h-[60vh] flex flex-col items-center justify-center text-center px-4" role="alert">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h1 className="text-lg font-bold text-[#0B0B45] mb-2">Something went wrong</h1>
+          <p className="text-[#6b7280] mb-6 max-w-md text-sm">{loadError}</p>
+          <button
+            type="button"
+            onClick={() => setReloadKey((k) => k + 1)}
+            className="bg-[#C49A6C] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+          >
+            Try Again
+          </button>
         </div>
         <Footer />
       </div>
