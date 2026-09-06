@@ -88,7 +88,7 @@ function PropertyPage() {
   // ── Loading ──────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F3F4F6]">
+      <div className="min-h-screen bg-canvas">
         <Navbar />
         <main className="pt-24 flex items-center justify-center min-h-[60vh]" role="status" aria-label="Loading property">
           <div className="text-center">
@@ -104,7 +104,7 @@ function PropertyPage() {
   // ── Error / Not Found ────────────────────────────────────────────────
   if (error || !property) {
     return (
-      <div className="min-h-screen bg-[#F3F4F6]">
+      <div className="min-h-screen bg-canvas">
         <Navbar />
         <main className="pt-24 flex items-center justify-center min-h-[60vh]" role="alert">
           <div className="text-center px-4">
@@ -156,7 +156,7 @@ function PropertyPage() {
 
   // ── Render ───────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-[#F3F4F6]">
+    <div className="min-h-screen bg-canvas">
       <Navbar />
 
       {/* ── Back navigation bar ─────────────────────────────────── */}

@@ -133,7 +133,7 @@ function AdminDisputes() {
               <button onClick={() => setSelected(null)} className="rounded-full px-3 py-2 text-xl text-[#6b7280] hover:bg-gray-100">&times;</button>
             </div>
             <div className="space-y-6 p-6">
-              <p className="rounded-2xl bg-[#F3F4F6] p-4 text-sm text-[#1f2937] whitespace-pre-wrap">{selected.description}</p>
+              <p className="rounded-2xl bg-canvas p-4 text-sm text-[#1f2937] whitespace-pre-wrap">{selected.description}</p>
 
               <div>
                 <h3 className="font-bold text-[#0B0B45] mb-2">Evidence</h3>
@@ -147,7 +147,7 @@ function AdminDisputes() {
                 <h3 className="font-bold text-[#0B0B45] mb-2">Messages (visible to both parties)</h3>
                 <ul className="space-y-2 mb-3 max-h-56 overflow-y-auto">
                   {(selected.messages || []).map((m) => (
-                    <li key={m.id} className="rounded-xl bg-[#F3F4F6] p-3">
+                    <li key={m.id} className="rounded-xl bg-canvas p-3">
                       <p className="text-xs font-semibold text-[#0B0B45]">{m.senderRole}</p>
                       <p className="text-sm text-[#1f2937] whitespace-pre-wrap">{m.body}</p>
                     </li>

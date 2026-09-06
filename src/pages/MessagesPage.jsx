@@ -44,7 +44,7 @@ function MessagesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6] flex flex-col">
+    <div className="min-h-screen bg-canvas flex flex-col">
       <Navbar />
       <div className="flex-1 pt-24 pb-16">
         <div className="max-w-2xl mx-auto px-4 md:px-6">

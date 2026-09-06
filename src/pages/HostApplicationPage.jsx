@@ -208,10 +208,10 @@ function HostApplicationPage() {
     } finally { setUploadingKind(''); }
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#F3F4F6]"><Spinner /></div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-canvas"><Spinner /></div>;
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6]">
+    <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-5xl mx-auto px-4 md:px-6 pt-28 pb-20">
         <div className="bg-white rounded-[2rem] shadow-md p-6 md:p-10">

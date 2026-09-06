@@ -687,7 +687,7 @@ function AdminEarnings() {
       {/* Insights strip */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {insights.map(({ label, value, hint }) => (
-          <div key={label} className="bg-[#F3F4F6] rounded-xl px-4 py-3 shadow-sm">
+          <div key={label} className="bg-canvas rounded-xl px-4 py-3 shadow-sm">
             <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-1">{label}</p>
             <p className="text-base font-bold text-[#0B0B45] truncate" title={value}>{value}</p>
             {hint && <p className="text-xs text-[#C49A6C] font-medium mt-0.5">{hint}</p>}
@@ -799,7 +799,7 @@ function AdminEarnings() {
                 </thead>
                 <tbody>
                   {hosts.slice(0, 10).map((h, i) => (
-                    <tr key={h.hostId} className="border-b border-[#D9D9D9]/50 hover:bg-[#F3F4F6]">
+                    <tr key={h.hostId} className="border-b border-[#D9D9D9]/50 hover:bg-canvas">
                       <td className="py-2.5">
                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
                           i < 3 ? 'bg-[#C49A6C] text-white' : 'bg-[#f3f4f6] text-[#6b7280]'
@@ -862,7 +862,7 @@ function AdminEarnings() {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[#F3F4F6] border-b border-[#D9D9D9]">
+              <thead className="bg-canvas border-b border-[#D9D9D9]">
                 <tr>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45] whitespace-nowrap">Property</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45] whitespace-nowrap">Location</th>
@@ -875,7 +875,7 @@ function AdminEarnings() {
               </thead>
               <tbody>
                 {earningRows.map((r) => (
-                  <tr key={r.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#F3F4F6]">
+                  <tr key={r.id} className="border-b border-[#D9D9D9]/50 hover:bg-canvas">
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-3">
                         {r.image ? (
@@ -897,7 +897,7 @@ function AdminEarnings() {
               </tbody>
               {earningRows.length > 0 && (
                 <tfoot>
-                  <tr className="border-t-2 border-[#D9D9D9] bg-[#F3F4F6] font-bold text-[#0B0B45]">
+                  <tr className="border-t-2 border-[#D9D9D9] bg-canvas font-bold text-[#0B0B45]">
                     <td className="py-3 px-4" colSpan={2}>Active Totals (ex. cancelled)</td>
                     <td className="py-3 px-4 text-right">{filteredTotals.bookings.toLocaleString()}</td>
                     <td className="py-3 px-4 text-right">KES {filteredTotals.grossRent.toLocaleString()}</td>

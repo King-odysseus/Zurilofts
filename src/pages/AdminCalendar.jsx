@@ -328,7 +328,7 @@ function AdminCalendar() {
         {data.sources.length > 0 ? (
           <div className="space-y-2 mb-5">
             {data.sources.map((s) => (
-              <div key={s.id} className="flex items-center justify-between bg-[#F3F4F6] rounded-xl px-4 py-3 text-sm">
+              <div key={s.id} className="flex items-center justify-between bg-canvas rounded-xl px-4 py-3 text-sm">
                 <div className="min-w-0">
                   <p className="font-semibold text-[#0B0B45]">{s.name}</p>
                   <p className="text-[#6b7280] text-xs truncate max-w-md">{s.url}</p>
@@ -367,7 +367,7 @@ function AdminCalendar() {
         {data.blocks.length > 0 ? (
           <div className="space-y-2 mb-5">
             {data.blocks.map((b) => (
-              <div key={b.id} className="flex items-center justify-between bg-[#F3F4F6] rounded-xl px-4 py-2.5 text-sm">
+              <div key={b.id} className="flex items-center justify-between bg-canvas rounded-xl px-4 py-2.5 text-sm">
                 <div>
                   <span className="font-semibold text-[#0B0B45]">{fmt(b.start)} &rarr; {fmt(b.end)}</span>
                   <span className="text-[#6b7280] ml-2">{b.summary || 'Blocked'}</span>
@@ -386,7 +386,7 @@ function AdminCalendar() {
         )}
 
         <form onSubmit={addBlock} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <div className="md:col-span-5 rounded-xl bg-[#F3F4F6] shadow-sm px-4 py-2.5">
+          <div className="md:col-span-5 rounded-xl bg-canvas shadow-sm px-4 py-2.5">
             <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">Selected dates</p>
             <p className="text-sm font-semibold text-[#0B0B45] mt-0.5">{blockDraft.start && selectedBlockEnd ? `${fmt(blockDraft.start)} – ${fmt(selectedBlockEnd)}` : 'Choose dates on the calendar above'}</p>
           </div>
@@ -401,7 +401,7 @@ function AdminCalendar() {
         <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
           <h2 id="unblock-title" className="text-xl font-bold text-[#0B0B45]">Unblock this date?</h2>
           <p className="mt-2 text-sm text-[#6b7280]">{fmt(pendingUnblock.date)} will become available. Other dates in this blocked range will remain blocked.</p>
-          <div className="mt-6 flex justify-end gap-3"><button type="button" onClick={() => setPendingUnblock(null)} className="rounded-full px-4 py-2 text-sm font-semibold text-[#0B0B45] hover:bg-[#F3F4F6]">Cancel</button><button type="button" onClick={confirmUnblockDate} className="rounded-full bg-[#C49A6C] px-5 py-2 text-sm font-semibold text-white hover:bg-[#b8895c]">Unblock date</button></div>
+          <div className="mt-6 flex justify-end gap-3"><button type="button" onClick={() => setPendingUnblock(null)} className="rounded-full px-4 py-2 text-sm font-semibold text-[#0B0B45] hover:bg-canvas">Cancel</button><button type="button" onClick={confirmUnblockDate} className="rounded-full bg-[#C49A6C] px-5 py-2 text-sm font-semibold text-white hover:bg-[#b8895c]">Unblock date</button></div>
         </div>
       </div>}
     </div>

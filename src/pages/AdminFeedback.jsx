@@ -74,7 +74,7 @@ function AdminFeedback() {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[#F3F4F6]">
+              <thead className="bg-canvas">
                 <tr className="text-left">
                   <th className="px-4 py-3 font-semibold text-[#0B0B45]">Property</th>
                   <th className="px-4 py-3 font-semibold text-[#0B0B45]">Guest</th>
@@ -86,7 +86,7 @@ function AdminFeedback() {
               </thead>
               <tbody>
                 {reviews.map((r) => (
-                  <tr key={r.id} className="border-t border-[#D9D9D9] hover:bg-[#F3F4F6] align-top">
+                  <tr key={r.id} className="border-t border-[#D9D9D9] hover:bg-canvas align-top">
                     <td className="px-4 py-3">
                       <p className="font-medium text-[#0B0B45]">{r.property?.title}</p>
                       <p className="text-xs text-[#6b7280]">{r.property?.location}</p>

@@ -53,8 +53,9 @@ body {
 }
 
 /* ===== Card System - borderless, elevation carried entirely by shadow =====
-   Cards float on a light-grey app canvas (#F3F4F6), so elevation reads as
-   a layered shadow: a tight contact edge + a large soft base. */
+   Cards float on the light-grey app canvas (bg-canvas, tuned in
+   tailwind.config.js), so elevation reads as a layered shadow: a tight
+   contact edge + a large soft base. */
 .neu-card {
   background-color: #ffffff;
   border: none;

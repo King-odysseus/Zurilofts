@@ -147,7 +147,7 @@ function CookieConsent() {
                   <p className="text-xs text-[#6b7280] mt-0.5 leading-relaxed">{cat.description}</p>
                 </div>
                 {cat.alwaysOn ? (
-                  <span className="flex-shrink-0 text-xs font-medium text-[#6b7280] bg-[#F3F4F6] rounded-full px-3 py-1.5">
+                  <span className="flex-shrink-0 text-xs font-medium text-[#6b7280] bg-canvas rounded-full px-3 py-1.5">
                     Always on
                   </span>
                 ) : (

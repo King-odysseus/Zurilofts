@@ -1075,7 +1075,7 @@ function BookingPage() {
   // Booking Complete
   if (bookingComplete) {
     return (
-      <div className="min-h-screen bg-[#F3F4F6]">
+      <div className="min-h-screen bg-canvas">
         <Navbar />
         <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
           <div className="max-w-md mx-auto px-6 text-center">
@@ -1146,7 +1146,7 @@ function BookingPage() {
   // Loading state
   if (loadingProperty) {
     return (
-      <div className="min-h-screen bg-[#F3F4F6]">
+      <div className="min-h-screen bg-canvas">
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
@@ -1162,7 +1162,7 @@ function BookingPage() {
   // falling back to the spinner here is what made this page hang forever.
   if (!property) {
     return (
-      <div className="min-h-screen bg-[#F3F4F6]">
+      <div className="min-h-screen bg-canvas">
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]" role="alert">
           <div className="text-center px-4 max-w-md">
@@ -1196,7 +1196,7 @@ function BookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6]">
+    <div className="min-h-screen bg-canvas">
       <Navbar />
       
       <div className="pt-20 md:pt-24 pb-12 md:pb-16">

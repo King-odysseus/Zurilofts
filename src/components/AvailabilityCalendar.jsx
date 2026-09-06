@@ -154,7 +154,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
           type="button"
           onClick={() => canGoBack && setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))}
           disabled={!canGoBack}
-          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#F3F4F6] disabled:opacity-30 disabled:cursor-not-allowed"
+          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-canvas disabled:opacity-30 disabled:cursor-not-allowed"
           aria-label="Previous month"
         >
           <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -164,7 +164,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
         <button
           type="button"
           onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))}
-          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-[#F3F4F6]"
+          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-canvas"
           aria-label="Next month"
         >
           <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -224,7 +224,7 @@ function OnboardingChecklist({ hostApplicationStatus, properties }) {
           <li
             key={step.key}
             className={`flex items-start gap-3 rounded-xl p-3 transition-shadow ${
-              step.done ? 'bg-[#F3F4F6]' : 'bg-white shadow-sm'
+              step.done ? 'bg-canvas' : 'bg-white shadow-sm'
             }`}
           >
             <div
@@ -479,7 +479,7 @@ export default function HostTodayPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#F3F4F6]">
+      <div className="min-h-screen bg-canvas">
         <Navbar />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
           <div className="mb-8">
@@ -507,7 +507,7 @@ export default function HostTodayPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#F3F4F6]">
+      <div className="min-h-screen bg-canvas">
         <Navbar />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
           <div className="text-center py-16">
@@ -527,7 +527,7 @@ export default function HostTodayPage() {
   const { arrivals = [], departures = [], inHouse = [], summary = {} } = data || {};
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6]">
+    <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         {/* Hero panel */}

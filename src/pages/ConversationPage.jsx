@@ -164,7 +164,7 @@ function ConversationPage() {
   const image = firstImage(property);
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6] flex flex-col">
+    <div className="min-h-screen bg-canvas flex flex-col">
       <Navbar />
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-4 flex flex-col">
         {/* Header */}

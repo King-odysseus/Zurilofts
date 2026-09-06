@@ -196,7 +196,7 @@ function SearchBar() {
                 <button
                   type="button"
                   onClick={() => handleSelect(p.id)}
-                  className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-[#F3F4F6] transition-colors border-b border-[#D9D9D9]/50 last:border-b-0"
+                  className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-canvas transition-colors border-b border-[#D9D9D9]/50 last:border-b-0"
                 >
                   {p.images?.[0] ? (
                     <img
@@ -227,7 +227,7 @@ function SearchBar() {
             <button
               type="button"
               onClick={handleSearch}
-              className="w-full py-3 text-sm font-semibold text-[#C49A6C] hover:bg-[#F3F4F6] text-center border-t border-[#D9D9D9]"
+              className="w-full py-3 text-sm font-semibold text-[#C49A6C] hover:bg-canvas text-center border-t border-[#D9D9D9]"
             >
               View all results &rarr;
             </button>

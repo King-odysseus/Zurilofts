@@ -242,7 +242,7 @@ function AdminPropertyForm() {
           </div>
 
           {/* Bed variant pricing */}
-          <div className="bg-[#F3F4F6] rounded-xl p-4 space-y-4">
+          <div className="bg-canvas rounded-xl p-4 space-y-4">
             <p className="text-sm font-semibold text-[#0B0B45]">Bed Variant Pricing &amp; Bathrooms</p>
             <p className="text-xs text-[#6b7280] -mt-3">Each variant can have its own price and bathroom count. Leave unchecked to not list.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -445,7 +445,7 @@ function AdminPropertyForm() {
       </button>
 
       <aside
-        className={`fixed top-0 right-0 z-30 h-full w-[372px] max-w-[90vw] bg-[#F3F4F6] shadow-2xl transition-transform duration-300 overflow-y-auto ${
+        className={`fixed top-0 right-0 z-30 h-full w-[372px] max-w-[90vw] bg-canvas shadow-2xl transition-transform duration-300 overflow-y-auto ${
           previewOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -765,7 +765,7 @@ function SeasonalPricing({ propertyId }) {
       ) : rules.length > 0 ? (
         <div className="space-y-2 mb-4">
           {rules.map((r) => (
-            <div key={r.id} className="flex items-center justify-between bg-[#F3F4F6] rounded-xl px-4 py-2.5 text-sm">
+            <div key={r.id} className="flex items-center justify-between bg-canvas rounded-xl px-4 py-2.5 text-sm">
               <div>
                 <span className="font-semibold text-[#0B0B45]">{r.name || 'Rate'}</span>
                 <span className="text-[#6b7280] ml-2">{fmt(r.start)} &rarr; {fmt(r.end)}</span>

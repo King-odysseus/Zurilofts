@@ -37,7 +37,7 @@ function IdentityVerificationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6]">
+    <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
         <h1 className="text-2xl font-bold text-[#0B0B45] mb-2">Verify your identity</h1>

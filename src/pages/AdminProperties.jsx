@@ -167,7 +167,7 @@ function AdminProperties() {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[#F3F4F6] border-b border-[#D9D9D9]">
+              <thead className="bg-canvas border-b border-[#D9D9D9]">
                 <tr>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Property</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Location</th>
@@ -180,7 +180,7 @@ function AdminProperties() {
               </thead>
               <tbody>
                 {properties.map((p) => (
-                  <tr key={p.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#F3F4F6]">
+                  <tr key={p.id} className="border-b border-[#D9D9D9]/50 hover:bg-canvas">
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-3">
                         {p.images?.[0] ? (
@@ -299,7 +299,7 @@ function AdminProperties() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {properties.map((p) => (
             <article key={p.id} className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-              <Link to={`/property/${p.id}`} className="block aspect-[4/3] bg-[#F3F4F6]">
+              <Link to={`/property/${p.id}`} className="block aspect-[4/3] bg-canvas">
                 {p.images?.[0] ? (
                   <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover" />
                 ) : (

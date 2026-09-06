@@ -253,7 +253,7 @@ function AdminPromos() {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[#F3F4F6] border-b border-[#D9D9D9]">
+              <thead className="bg-canvas border-b border-[#D9D9D9]">
                 <tr>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Code</th>
                   <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Discount</th>
@@ -266,7 +266,7 @@ function AdminPromos() {
               </thead>
               <tbody>
                 {promos.map((p) => (
-                  <tr key={p.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#F3F4F6]">
+                  <tr key={p.id} className="border-b border-[#D9D9D9]/50 hover:bg-canvas">
                     <td className="py-3 px-4 font-mono font-bold text-[#0B0B45]">{p.code}</td>
                     <td className="py-3 px-4">
                       {p.discountPercent}%
@@ -282,7 +282,7 @@ function AdminPromos() {
                       {p.properties?.length > 0 ? (
                         <span className="inline-flex flex-wrap gap-1">
                           {p.properties.map((prop) => (
-                            <span key={prop.id} className="px-2 py-0.5 bg-[#F3F4F6] rounded-md text-[#0B0B45]">{prop.title}</span>
+                            <span key={prop.id} className="px-2 py-0.5 bg-canvas rounded-md text-[#0B0B45]">{prop.title}</span>
                           ))}
                         </span>
                       ) : (

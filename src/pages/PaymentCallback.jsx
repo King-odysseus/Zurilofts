@@ -52,7 +52,7 @@ function PaymentCallback() {
   }, [reference]);
 
   return (
-    <div className="min-h-screen bg-[#F3F4F6]">
+    <div className="min-h-screen bg-canvas">
       <Navbar />
       <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
         <div className="max-w-md mx-auto px-6 text-center">
