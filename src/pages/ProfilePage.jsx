@@ -34,6 +34,9 @@ function ProfilePage() {
   const [message, setMessage] = useState('');
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [showCompletionBanner, setShowCompletionBanner] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState('');
 
   // Bank / Payout state (HOST only)
   const [bankSaving, setBankSaving] = useState(false);
@@ -274,6 +277,36 @@ function ProfilePage() {
     }
   }
 
+  async function handlePasswordChange(e) {
+    e.preventDefault();
+    setPasswordMessage('');
+
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      setPasswordMessage('New passwords do not match.');
+      return;
+    }
+    if (!/(?=.*[A-Z])(?=.*[0-9]).{8,}/.test(passwordForm.newPassword)) {
+      setPasswordMessage('Use at least 8 characters, including an uppercase letter and a number.');
+      return;
+    }
+
+    setPasswordSaving(true);
+    try {
+      await apiClient.put('/users/password', {
+        currentPassword: passwordForm.currentPassword,
+        newPassword: passwordForm.newPassword,
+      });
+      // The server revokes every refresh session as part of the password
+      // change. Clear this tab too, then require a fresh login.
+      await logout();
+      navigate('/login?passwordChanged=1', { replace: true });
+    } catch (err) {
+      setPasswordMessage(err.response?.data?.error || 'Could not change password. Please try again.');
+    } finally {
+      setPasswordSaving(false);
+    }
+  }
+
   async function handleExportData() {
     setExporting(true);
     setExportMessage('');
@@ -502,6 +535,66 @@ function ProfilePage() {
                     className="bg-[#C49A6C] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </form>
+              </div>
+
+              <div className="neu-card p-6 mt-6">
+                <h2 className="text-lg font-bold text-[#0B0B45] mb-2">Change password</h2>
+                <p className="text-sm text-[#6b7280] mb-6">
+                  Choose a strong, unique password. For your security, changing it signs you out on all devices.
+                </p>
+                {passwordMessage && (
+                  <div className="rounded-xl px-4 py-3 mb-4 text-sm bg-red-50 border border-red-200 text-red-700" role="alert">
+                    {passwordMessage}
+                  </div>
+                )}
+                <form onSubmit={handlePasswordChange} className="space-y-4" autoComplete="on">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2" htmlFor="current-password">Current password</label>
+                    <input
+                      id="current-password"
+                      type="password"
+                      autoComplete="current-password"
+                      value={passwordForm.currentPassword}
+                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
+                      required
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2" htmlFor="new-password">New password</label>
+                    <input
+                      id="new-password"
+                      type="password"
+                      autoComplete="new-password"
+                      value={passwordForm.newPassword}
+                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
+                      minLength={8}
+                      required
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                    />
+                    <p className="text-xs text-[#6b7280] mt-1">At least 8 characters, with one uppercase letter and one number.</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2" htmlFor="confirm-password">Confirm new password</label>
+                    <input
+                      id="confirm-password"
+                      type="password"
+                      autoComplete="new-password"
+                      value={passwordForm.confirmPassword}
+                      onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                      minLength={8}
+                      required
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={passwordSaving}
+                    className="bg-[#0B0B45] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
+                  >
+                    {passwordSaving ? 'Changing password...' : 'Change password'}
                   </button>
                 </form>
               </div>

@@ -248,5 +248,11 @@ export async function changePassword(userId: string, currentPassword: string, ne
     data: { passwordHash },
   });
 
+  // A password change is a credential-security event. Remove every persisted
+  // refresh session, including the one which made this request, so a stolen
+  // browser session cannot silently regain access after the password changes.
+  // Access JWTs are intentionally short-lived (15 minutes).
+  await prisma.refreshSession.deleteMany({ where: { userId } });
+
   return { message: 'Password updated successfully' };
 }
