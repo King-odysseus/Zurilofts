@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import Spinner from '../components/Spinner.jsx';
+import CancelBookingDialog, { canCancelBooking } from '../components/CancelBookingDialog.jsx';
 import apiClient from '../api/client.js';
 
 // --- Helpers ---
@@ -82,6 +83,7 @@ function BookingHistoryPage() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [cancelTarget, setCancelTarget] = useState(null);
   const navigate = useNavigate();
 
   // Open (or create) the reservation conversation for a booking, then go to it.
@@ -162,7 +164,7 @@ function BookingHistoryPage() {
               className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
                 statusFilter === sf.value
                   ? 'bg-[#C49A6C] text-white'
-                  : 'bg-white border-2 border-[#D9D9D9] text-[#0B0B45]'
+                  : 'bg-white shadow-sm hover:shadow-md transition-shadow text-[#0B0B45]'
               }`}
             >
               {sf.label}
@@ -194,7 +196,7 @@ function BookingHistoryPage() {
             {filtered.map((booking) => (
               <div
                 key={booking.id}
-                className="bg-white rounded-2xl border border-[#D9D9D9] neu-card p-4 md:p-6"
+                className="bg-white rounded-2xl neu-card p-4 md:p-6"
               >
                 <div className="flex flex-col md:flex-row gap-4">
                   {/* Property image */}
@@ -266,7 +268,7 @@ function BookingHistoryPage() {
                       </button>
                       <Link
                         to={`/property/${booking.propertyId}`}
-                        className="flex items-center gap-1.5 border-2 border-[#0B0B45] text-[#0B0B45] px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                        className="flex items-center gap-1.5 bg-[#0B0B45]/5 text-[#0B0B45] px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -274,6 +276,17 @@ function BookingHistoryPage() {
                         </svg>
                         View
                       </Link>
+                      {canCancelBooking(booking) && (
+                        <button
+                          onClick={() => setCancelTarget(booking)}
+                          className="flex items-center gap-1.5 bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-100 transition-colors duration-200"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                          Cancel booking
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -282,6 +295,16 @@ function BookingHistoryPage() {
           </div>
         )}
       </div>
+
+      <CancelBookingDialog
+        booking={cancelTarget}
+        onClose={() => setCancelTarget(null)}
+        onSuccess={(cancelled) =>
+          setBookings((prev) =>
+            prev.map((b) => (b.id === cancelled.id ? { ...b, status: 'CANCELLED' } : b))
+          )
+        }
+      />
       <Footer />
     </div>
   );

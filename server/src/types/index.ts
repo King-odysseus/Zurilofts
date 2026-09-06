@@ -327,6 +327,12 @@ export const bookingStatusSchema = z.object({
   status: z.enum(['CONFIRMED', 'CANCELLED']),
 });
 
+// Admin resolution of a cancelled-paid booking's manual refund (REFUNDED once
+// the money is sent from the Paystack dashboard, REFUND_DECLINED otherwise).
+export const bookingRefundSchema = z.object({
+  action: z.enum(['REFUNDED', 'REFUND_DECLINED']),
+});
+
 // ---- Calendar sync & seasonal pricing ----
 
 export const calendarSourceSchema = z.object({

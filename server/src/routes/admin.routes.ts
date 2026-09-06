@@ -3,6 +3,7 @@ import { authenticate, requireAdmin } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import {
   bookingStatusSchema,
+  bookingRefundSchema,
   calendarSourceSchema,
   calendarBlockSchema,
   priceRuleSchema,
@@ -69,6 +70,7 @@ router.patch('/disputes/:id/status', validate(disputeStatusSchema), disputeCtrl.
 router.get('/bookings', bookingCtrl.listAll);
 router.post('/bookings/cleanup-stale', bookingCtrl.cleanupStale);
 router.patch('/bookings/:id/status', validate(bookingStatusSchema), bookingCtrl.updateStatus);
+router.patch('/bookings/:id/refund', validate(bookingRefundSchema), bookingCtrl.resolveRefund);
 router.put('/bookings/:id', bookingCtrl.updateBooking);
 router.delete('/bookings/:id', bookingCtrl.deleteBooking);
 

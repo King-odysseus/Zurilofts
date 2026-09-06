@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import Dropdown from '../components/Dropdown';
+import Pagination from '../components/Pagination.jsx';
 
 const roleColors = {
   USER: 'bg-gray-100 text-gray-700',
@@ -22,6 +23,11 @@ function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState('');
   const [search, setSearch] = useState('');
   const [message, setMessage] = useState('');
+  const PAGE_SIZE = 20;
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
+  // Debounced copy of the search box, so the list only refetches after a pause.
+  const [appliedSearch, setAppliedSearch] = useState('');
   const [busyId, setBusyId] = useState('');
 
   // Edit modal
@@ -46,23 +52,29 @@ function AdminUsers() {
   const loadUsers = useCallback(async () => {
     setLoading(true);
     try {
-      const params = {};
+      const params = { page, limit: PAGE_SIZE };
       if (roleFilter) params.role = roleFilter;
-      if (search.trim()) params.search = search.trim();
+      if (appliedSearch) params.search = appliedSearch;
       const res = await apiClient.get('/admin/users', { params });
       setUsers(res.data.data || []);
+      setPagination(res.data.pagination || null);
     } catch {
       // silent
     } finally {
       setLoading(false);
     }
-  }, [roleFilter, search]);
+  }, [page, roleFilter, appliedSearch]);
 
-  // Debounce search; refetch on role change
+  useEffect(() => { loadUsers(); }, [loadUsers]);
+
+  // Debounce the search box, then reset to page 1 because the results shift.
   useEffect(() => {
-    const t = setTimeout(loadUsers, search ? 350 : 0);
+    const t = setTimeout(() => {
+      setAppliedSearch(search.trim());
+      setPage(1);
+    }, search ? 350 : 0);
     return () => clearTimeout(t);
-  }, [loadUsers, search]);
+  }, [search]);
 
   function openEdit(u) {
     setEditing(u);
@@ -209,7 +221,11 @@ function AdminUsers() {
       setDeleteTarget(null);
       setDeleteConfirm('');
       setDeleteReason('');
-      await loadUsers();
+      if (users.length === 1 && page > 1) {
+        setPage((p) => p - 1);
+      } else {
+        await loadUsers();
+      }
     } catch (err) {
       setDeleteError(err.response?.data?.error || 'Failed to delete the account');
     } finally {
@@ -227,11 +243,11 @@ function AdminUsers() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search name or email"
-            className="px-4 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C] w-56"
+            className="px-4 py-2 rounded-xl bg-white text-[#1f2937] text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30 w-56"
           />
           <Dropdown
             value={roleFilter}
-            onChange={setRoleFilter}
+            onChange={(v) => { setPage(1); setRoleFilter(v); }}
             options={[
               { value: '', label: 'All Roles' },
               { value: 'USER', label: 'Users' },
@@ -257,10 +273,14 @@ function AdminUsers() {
         </div>
       ) : users.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-[#6b7280]">No users found</p>
+          <p className="text-[#6b7280]">
+            {pagination && pagination.totalPages > 1
+              ? 'No users on this page.'
+              : 'No users found.'}
+          </p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] overflow-x-auto">
+        <div className="bg-white rounded-2xl shadow-lg overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#D9D9D9] text-left">
@@ -301,7 +321,7 @@ function AdminUsers() {
                             { value: 'HOST', label: 'Host' },
                             { value: 'ADMIN', label: 'Admin' },
                           ]}
-                          triggerClassName="px-3 py-1.5 bg-white border border-[#D9D9D9] text-[#1f2937] rounded-lg text-xs"
+                          triggerClassName="px-3 py-1.5 bg-white text-[#1f2937] rounded-lg text-xs shadow-sm"
                           ariaLabel="Change role"
                         />
                       )}
@@ -356,6 +376,18 @@ function AdminUsers() {
         </div>
       )}
 
+      <Pagination
+        page={pagination?.page ?? page}
+        totalPages={pagination?.totalPages ?? 1}
+        total={pagination?.total}
+        limit={PAGE_SIZE}
+        itemLabel="users"
+        onPageChange={(p) => {
+          setPage(p);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
+      />
+
       {/* Password replacement modal */}
       {passwordTarget && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closePasswordReset}>
@@ -377,7 +409,7 @@ function AdminUsers() {
                   onChange={(e) => setReplacementPassword(e.target.value)}
                   minLength={8}
                   required
-                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+                  className="w-full px-3 py-2 rounded-xl bg-white text-[#1f2937] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
                 />
                 <p className="text-xs text-[#6b7280] mt-1">At least 8 characters, with an uppercase letter and a number.</p>
               </div>
@@ -390,7 +422,7 @@ function AdminUsers() {
                   onChange={(e) => setConfirmReplacementPassword(e.target.value)}
                   minLength={8}
                   required
-                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
+                  className="w-full px-3 py-2 rounded-xl bg-white text-[#1f2937] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">
@@ -440,7 +472,7 @@ function AdminUsers() {
                         { value: 'biweekly', label: 'Biweekly' },
                         { value: 'monthly', label: 'Monthly' },
                       ]}
-                      triggerClassName="w-full px-3 py-2 bg-white border border-[#D9D9D9] text-[#1f2937] rounded-xl text-sm"
+                      triggerClassName="w-full px-3 py-2 bg-white text-[#1f2937] rounded-xl text-sm shadow-sm"
                       ariaLabel="Payout frequency"
                     />
                   </div>
@@ -525,7 +557,7 @@ function Field({ label, value, onChange, type = 'text' }) {
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C]"
+        className="w-full px-3 py-2 rounded-xl bg-white text-[#1f2937] text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
       />
     </div>
   );

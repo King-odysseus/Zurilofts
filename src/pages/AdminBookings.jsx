@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import Dropdown from '../components/Dropdown.jsx';
+import Pagination from '../components/Pagination.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useToast } from '../context/ToastContext.jsx';
 
 const BED_OPTIONS = [
   { value: '1bed', label: '1 Bedroom' },
@@ -27,7 +29,7 @@ function ConfirmDialog({ open, title, message, confirmLabel, confirmClass, onCon
         <div className="flex justify-end gap-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-semibold rounded-full border border-[#D9D9D9] text-[#6b7280] hover:bg-gray-50"
+            className="px-4 py-2 text-sm font-semibold rounded-full text-[#6b7280] shadow-sm hover:shadow-md hover:bg-gray-50 transition-shadow"
           >
             Keep
           </button>
@@ -246,10 +248,14 @@ function isLateCheckout(time) {
 
 function AdminBookings() {
   const { user } = useAuth();
+  const toast = useToast();
   const isAdmin = user?.role === 'ADMIN';
+  const PAGE_SIZE = 20;
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState(null);
 
   // Modal / dialog state
   const [editingBooking, setEditingBooking] = useState(null);
@@ -260,27 +266,50 @@ function AdminBookings() {
   const fetchBookings = useCallback(async () => {
     setLoading(true);
     try {
-      const params = {};
+      const params = { page, limit: PAGE_SIZE };
       if (statusFilter) params.status = statusFilter;
       // Admins see all bookings; hosts only those on their own listings.
       const res = await apiClient.get(isAdmin ? '/admin/bookings' : '/bookings/host', { params });
       setBookings(res.data.data || []);
+      setPagination(res.data.pagination || null);
     } catch (err) { console.error('AdminBookings error', err); }
     finally { setLoading(false); }
-  }, [statusFilter, isAdmin]);
+  }, [statusFilter, page, isAdmin]);
 
   useEffect(() => { fetchBookings(); }, [fetchBookings]);
 
   async function handleStatusChange(id, status) {
     setActionLoading(true);
     try {
-      await apiClient.patch(`/admin/bookings/${id}/status`, { status });
-      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)));
-    } catch {
-      alert('Failed to update booking status');
+      const res = await apiClient.patch(`/admin/bookings/${id}/status`, { status });
+      const updated = res.data.data || { status };
+      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, ...updated } : b)));
+      toast.success(
+        status === 'CONFIRMED'
+          ? 'Booking confirmed.'
+          : updated.refundStatus === 'REFUND_PENDING'
+            ? 'Booking cancelled — refund flagged for processing.'
+            : 'Booking cancelled and dates released.'
+      );
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update booking status');
     } finally {
       setActionLoading(false);
       setCancelTarget(null);
+    }
+  }
+
+  async function handleRefundResolve(id, action) {
+    setActionLoading(true);
+    try {
+      const res = await apiClient.patch(`/admin/bookings/${id}/refund`, { action });
+      const updated = res.data.data || { refundStatus: action };
+      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, ...updated } : b)));
+      toast.success(action === 'REFUNDED' ? 'Refund marked as sent.' : 'Refund request declined.');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to update refund status');
+    } finally {
+      setActionLoading(false);
     }
   }
 
@@ -288,9 +317,14 @@ function AdminBookings() {
     setActionLoading(true);
     try {
       await apiClient.delete(`/admin/bookings/${id}`);
-      setBookings((prev) => prev.filter((b) => b.id !== id));
-    } catch {
-      alert('Failed to delete booking');
+      if (bookings.length === 1 && page > 1) {
+        setPage((p) => p - 1);
+      } else {
+        setBookings((prev) => prev.filter((b) => b.id !== id));
+      }
+      toast.success('Booking deleted.');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Failed to delete booking');
     } finally {
       setActionLoading(false);
       setDeleteTarget(null);
@@ -310,7 +344,7 @@ function AdminBookings() {
         <h1 className="text-2xl font-bold text-[#0B0B45]">Bookings</h1>
         <Dropdown
           value={statusFilter}
-          onChange={setStatusFilter}
+          onChange={(v) => { setPage(1); setStatusFilter(v); }}
           options={[
             { value: '', label: 'All Statuses' },
             { value: 'PENDING', label: 'Pending' },
@@ -328,7 +362,7 @@ function AdminBookings() {
           <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
@@ -372,11 +406,22 @@ function AdminBookings() {
                     <td className="py-3 px-4">{b.guests}</td>
                     <td className="py-3 px-4 font-semibold">KES {b.total.toLocaleString()}</td>
                     <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
-                        b.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
-                        'bg-yellow-100 text-yellow-700'
-                      }`}>{b.status}</span>
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
+                          b.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
+                          'bg-yellow-100 text-yellow-700'
+                        }`}>{b.status}</span>
+                        {b.status === 'CANCELLED' && b.refundStatus === 'REFUND_PENDING' && (
+                          <span className="px-2 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">Refund pending</span>
+                        )}
+                        {b.status === 'CANCELLED' && b.refundStatus === 'REFUNDED' && (
+                          <span className="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Refunded</span>
+                        )}
+                        {b.status === 'CANCELLED' && b.refundStatus === 'REFUND_DECLINED' && (
+                          <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">Refund declined</span>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3 px-4">
                       {b.paidAt ? (
@@ -437,6 +482,26 @@ function AdminBookings() {
                           </>
                         )}
 
+                        {isAdmin && b.status === 'CANCELLED' && b.refundStatus === 'REFUND_PENDING' && (
+                          <>
+                            <button
+                              onClick={() => handleRefundResolve(b.id, 'REFUNDED')}
+                              disabled={actionLoading}
+                              title="Send the guest's refund from the Paystack dashboard, then mark it done"
+                              className="px-3 py-1 text-xs font-semibold rounded-lg bg-emerald-100 text-emerald-700 hover:bg-emerald-200 disabled:opacity-50"
+                            >
+                              Mark refunded
+                            </button>
+                            <button
+                              onClick={() => handleRefundResolve(b.id, 'REFUND_DECLINED')}
+                              disabled={actionLoading}
+                              className="px-3 py-1 text-xs font-semibold rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50"
+                            >
+                              Decline refund
+                            </button>
+                          </>
+                        )}
+
                         {isAdmin && b.status === 'CANCELLED' && (
                           <button
                             onClick={() => setDeleteTarget(b)}
@@ -454,8 +519,23 @@ function AdminBookings() {
             </table>
           </div>
           {bookings.length === 0 && (
-            <div className="text-center py-12 text-[#6b7280]">No bookings found{statusFilter ? ` with status "${statusFilter}"` : ''}.</div>
+            <div className="text-center py-12 text-[#6b7280]">
+              {pagination && pagination.totalPages > 1
+                ? 'No bookings on this page.'
+                : `No bookings found${statusFilter ? ` with status "${statusFilter}"` : ''}.`}
+            </div>
           )}
+          <Pagination
+            page={pagination?.page ?? page}
+            totalPages={pagination?.totalPages ?? 1}
+            total={pagination?.total}
+            limit={PAGE_SIZE}
+            itemLabel="bookings"
+            onPageChange={(p) => {
+              setPage(p);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
         </div>
       )}
 

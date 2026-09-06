@@ -136,7 +136,11 @@ const ADMIN_USER_SELECT = {
   createdAt: true,
 } as const;
 
-export async function listAllUsers(filters: { role?: string; search?: string }) {
+export async function listAllUsers(
+  filters: { role?: string; search?: string },
+  page = 1,
+  limit = 20,
+) {
   const where: any = { deletedAt: null };
   if (filters.role && VALID_ROLES.includes(filters.role)) {
     where.role = filters.role;
@@ -149,21 +153,30 @@ export async function listAllUsers(filters: { role?: string; search?: string }) 
     ];
   }
 
-  const users = await prisma.user.findMany({
-    where,
-    select: {
-      ...ADMIN_USER_SELECT,
-      _count: { select: { properties: true, bookings: true } },
-      wallet: { select: { balance: true } },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+  const skip = (page - 1) * limit;
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      skip,
+      take: limit,
+      select: {
+        ...ADMIN_USER_SELECT,
+        _count: { select: { properties: true, bookings: true } },
+        wallet: { select: { balance: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.user.count({ where }),
+  ]);
   // Mask bank account numbers to last-4 in the list view; full value is
   // available when editing a single user via adminUpdateUser.
-  return users.map((u) => ({
-    ...u,
-    bankAccountNo: u.bankAccountNo ? `••••${u.bankAccountNo.slice(-4)}` : null,
-  }));
+  return {
+    users: users.map((u) => ({
+      ...u,
+      bankAccountNo: u.bankAccountNo ? `••••${u.bankAccountNo.slice(-4)}` : null,
+    })),
+    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+  };
 }
 
 export async function adminUpdateUser(

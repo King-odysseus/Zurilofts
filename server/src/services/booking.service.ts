@@ -747,6 +747,169 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
   return updated;
 }
 
+interface CancelActor {
+  role: 'GUEST' | 'ADMIN';
+  userId: string;
+}
+
+/**
+ * Self-serve cancellation for the booking's own guest (or any admin).
+ *
+ * Money handling is split on whether payment ever settled:
+ * - PENDING / unpaid bookings cancel instantly - no money has moved and the
+ *   date hold is simply released.
+ * - CONFIRMED bookings that were paid (paidAt set) flip to CANCELLED with
+ *   refundStatus=REFUND_PENDING. The host wallet credit is reversed as far as
+ *   the available balance allows (never below zero - if the host had already
+ *   withdrawn, the shortfall is logged for admin clawback), and an audit
+ *   PaymentLog records the reversal. An admin then sends the guest's refund
+ *   from the Paystack dashboard and resolves the booking via resolveBookingRefund.
+ *
+ * Scope mirrors getBooking: a non-owner, non-admin caller gets 404 so booking
+ * existence is never leaked. Guests may not cancel once check-in day has
+ * passed; admins may (e.g. to mediate a dispute).
+ */
+export async function cancelBooking(bookingId: string, actor: CancelActor) {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: { property: { select: { hostId: true, title: true } } },
+  });
+  if (!booking) throw new NotFoundError('Booking');
+  if (actor.role !== 'ADMIN' && booking.userId !== actor.userId) {
+    throw new NotFoundError('Booking');
+  }
+
+  if (booking.status === 'CANCELLED') {
+    throw new ValidationError('This booking has already been cancelled');
+  }
+  if (booking.status !== 'PENDING' && booking.status !== 'CONFIRMED') {
+    throw new ValidationError('This booking cannot be cancelled in its current state');
+  }
+  if (actor.role !== 'ADMIN') {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (new Date(booking.checkIn) < today) {
+      throw new ValidationError(
+        'This stay has already begun and cannot be cancelled online - please message your host or contact support.'
+      );
+    }
+  }
+
+  const wasPaid = booking.paidAt != null;
+  const hostNet = wasPaid && booking.hostNetAmount != null ? booking.hostNetAmount : 0;
+  const hostId = booking.property?.hostId ?? null;
+
+  let debited = 0;
+  let shortfall = 0;
+
+  await prisma.$transaction(async (tx) => {
+    // Reverse the host's earnings for the cancelled stay. Reversal is capped at
+    // the wallet's current balance: if the funds were already paid out, the
+    // difference is recorded so admin can claw it back on the next payout.
+    if (wasPaid && hostNet > 0 && hostId) {
+      const wallet = await tx.hostWallet.findUnique({
+        where: { hostId },
+        select: { id: true, balance: true },
+      });
+      if (wallet) {
+        const available = Math.max(0, wallet.balance);
+        debited = Math.min(hostNet, available);
+        shortfall = hostNet - debited;
+        if (debited > 0) {
+          await tx.hostWallet.update({
+            where: { id: wallet.id },
+            data: { balance: { decrement: debited }, totalEarned: { decrement: debited } },
+          });
+        }
+      } else {
+        shortfall = hostNet;
+      }
+    }
+
+    await tx.booking.update({
+      where: { id: bookingId },
+      data: {
+        status: 'CANCELLED',
+        cancelledAt: new Date(),
+        cancelledBy: actor.role === 'ADMIN' ? 'ADMIN' : 'GUEST',
+        cancelledById: actor.userId,
+        refundStatus: wasPaid ? 'REFUND_PENDING' : null,
+      },
+    });
+
+    await tx.paymentLog.create({
+      data: {
+        bookingId,
+        event: wasPaid ? 'booking.cancelled.refund_pending' : 'booking.cancelled',
+        payload: JSON.stringify({
+          cancelledBy: actor.role === 'ADMIN' ? 'ADMIN' : 'GUEST',
+          cancelledById: actor.userId,
+          wasPaid,
+          hostNet,
+          walletDebited: debited,
+          walletShortfall: shortfall,
+        }),
+      },
+    });
+  });
+
+  // Best-effort push notifications after the money writes commit - a failed
+  // push must never roll back a cancellation.
+  try {
+    const { sendPushToUser } = await import('./push.service.js');
+    sendPushToUser(
+      booking.userId,
+      'Booking Cancelled',
+      wasPaid
+        ? 'Your booking was cancelled. Your refund has been flagged for processing.'
+        : 'Your booking request was cancelled and the dates released.',
+      '/bookings'
+    );
+    if (hostId) {
+      sendPushToUser(
+        hostId,
+        'Booking Cancelled',
+        `A booking at ${booking.property?.title ?? 'your property'} was cancelled and the dates freed up.`,
+        '/host/today'
+      );
+    }
+  } catch { /* push is best-effort, don't block the cancellation */ }
+
+  const updated = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    include: {
+      property: true,
+      promoCode: { select: { code: true, discountPercent: true } },
+      addOns: { include: { addOn: true } },
+    },
+  });
+  return normalizeBooking(updated);
+}
+
+// Admin resolves a REFUND_PENDING booking after sending the guest's refund from
+// the Paystack dashboard (or declining it). Just records the outcome for audit
+// and closes the admin refund queue item.
+export async function resolveBookingRefund(
+  bookingId: string,
+  action: 'REFUNDED' | 'REFUND_DECLINED',
+  adminId: string
+) {
+  const booking = await prisma.booking.findUnique({
+    where: { id: bookingId },
+    select: { id: true, status: true, refundStatus: true },
+  });
+  if (!booking) throw new NotFoundError('Booking');
+  if (booking.status !== 'CANCELLED' || booking.refundStatus !== 'REFUND_PENDING') {
+    throw new ValidationError('This booking is not awaiting a refund');
+  }
+
+  const updated = await prisma.booking.update({
+    where: { id: bookingId },
+    data: { refundStatus: action, refundedAt: new Date(), refundedBy: adminId },
+  });
+  return updated;
+}
+
 interface UpdateBookingInput {
   checkIn?: string;
   checkOut?: string;

@@ -95,8 +95,10 @@ export async function updatePayoutFrequency(req: Request, res: Response, next: N
 export async function adminListUsers(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { role, search } = req.query as { role?: string; search?: string };
-    const users = await userService.listAllUsers({ role, search });
-    res.json({ success: true, data: users });
+    const page = req.query.page ? Math.max(1, Number(req.query.page) || 1) : 1;
+    const limit = req.query.limit ? Math.min(100, Math.max(1, Number(req.query.limit) || 20)) : 20;
+    const result = await userService.listAllUsers({ role, search }, page, limit);
+    res.json({ success: true, data: result.users, pagination: result.pagination });
   } catch (error) {
     next(error);
   }

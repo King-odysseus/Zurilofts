@@ -117,10 +117,44 @@ export async function hostToday(req: Request, res: Response, next: NextFunction)
   }
 }
 
-// Admin: update booking status
+// Admin: update booking status. Cancelling goes through the money-aware
+// cancelBooking path (flags paid bookings for refund + reverses host credit);
+// confirming keeps the historical updateBookingStatus behaviour.
 export async function updateStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const booking = await bookingService.updateBookingStatus(req.params.id, req.body.status);
+    const status = req.body.status as 'CONFIRMED' | 'CANCELLED';
+    const booking = status === 'CANCELLED'
+      ? await bookingService.cancelBooking(req.params.id, { role: 'ADMIN', userId: req.user!.sub })
+      : await bookingService.updateBookingStatus(req.params.id, status);
+    res.json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Guest: cancel their own booking before check-in (admins may cancel any).
+// A non-owner, non-admin caller gets a 404 so booking existence is not leaked.
+export async function cancel(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const isAdmin = req.user!.role === 'ADMIN';
+    const booking = await bookingService.cancelBooking(req.params.id, {
+      role: isAdmin ? 'ADMIN' : 'GUEST',
+      userId: req.user!.sub,
+    });
+    res.json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Admin: mark a cancelled-paid booking's manual refund as processed/declined.
+export async function resolveRefund(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const booking = await bookingService.resolveBookingRefund(
+      req.params.id,
+      req.body.action,
+      req.user!.sub
+    );
     res.json({ success: true, data: booking });
   } catch (error) {
     next(error);

@@ -22,6 +22,7 @@ router.get('/host/earnings', authenticate, requireHostWorkspace, ctrl.propertyEa
 router.get('/host/today', authenticate, requireHostWorkspace, ctrl.hostToday);
 
 router.post('/:id/payment', authenticate, validate(bookingPaymentInitSchema), ctrl.initializePayment);
+router.post('/:id/cancel', authenticate, ctrl.cancel);
 router.get('/:id', authenticate, ctrl.getById);
 
 export default router;

@@ -299,6 +299,12 @@ model Booking {
   paidAt           DateTime?
   hostNetAmount    Int?
   withholdingTax   Int?
+  cancelledAt      DateTime?
+  cancelledBy      String?
+  cancelledById    String?
+  refundStatus     String?
+  refundedAt       DateTime?
+  refundedBy       String?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   review          Review?
@@ -312,6 +318,7 @@ model Booking {
   @@index([propertyId, checkIn])
   @@index([userId, createdAt])
   @@index([status])
+  @@index([refundStatus])
 }
 
 // Guest-facing identity verification, separate from the host's own

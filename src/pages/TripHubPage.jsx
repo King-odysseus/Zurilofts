@@ -5,6 +5,7 @@ import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
+import CancelBookingDialog, { canCancelBooking } from "../components/CancelBookingDialog.jsx";
 
 const STATUS_LABELS = {
   PENDING: "Awaiting confirmation",
@@ -31,13 +32,14 @@ function getNights(checkIn, checkOut) {
   return Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000);
 }
 
-function BookingCard({ booking, isPast }) {
+function BookingCard({ booking, isPast, onRequestCancel }) {
   const p = booking.property || {};
   const host = p.host || {};
   const image = p.images?.[0] || p.coverImage;
   const reviewSubmitted = booking.review && booking.review.id;
   const nights = getNights(booking.checkIn, booking.checkOut);
   const navigate = useNavigate();
+  const cancellable = canCancelBooking(booking);
 
   // Open (or create) the reservation conversation for this booking, then go to it.
   // The endpoint is idempotent, so it is safe to click repeatedly.
@@ -52,7 +54,7 @@ function BookingCard({ booking, isPast }) {
   }
 
   return (
-    <article className="group bg-white border border-[#D9D9D9]/50 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
+    <article className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-200">
       <div className="flex flex-col sm:flex-row">
         {/* Property image */}
         <Link
@@ -126,7 +128,7 @@ function BookingCard({ booking, isPast }) {
             <span className="text-sm font-semibold text-[#0B0B45]">
               KES {booking.total?.toLocaleString()}
             </span>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center justify-end gap-2">
               {isPast && !reviewSubmitted && (
                 <Link
                   to={`/property/${p.id}?review=true`}
@@ -159,10 +161,21 @@ function BookingCard({ booking, isPast }) {
                   passing booking.id here left the page stuck on "Loading property..." */}
               <Link
                 to={`/property/${p.id}`}
-                className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold border-2 border-[#0B0B45] text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
               >
                 View details
               </Link>
+              {cancellable && (
+                <button
+                  onClick={() => onRequestCancel?.(booking)}
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                  Cancel booking
+                </button>
+              )}
               <Link
                 to={`/disputes/new?bookingId=${booking.id}`}
                 className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold text-[#6b7280] hover:text-red-600 transition-colors"
@@ -204,6 +217,7 @@ BookingCard.propTypes = {
     }),
   }).isRequired,
   isPast: PropTypes.bool,
+  onRequestCancel: PropTypes.func,
 };
 
 function EmptyState({ isPast }) {
@@ -244,7 +258,7 @@ EmptyState.propTypes = {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white border border-[#D9D9D9]/50 rounded-2xl overflow-hidden shadow-md">
+    <div className="bg-white rounded-2xl overflow-hidden shadow-md">
       <div className="flex flex-col sm:flex-row">
         <div className="sm:w-48 lg:w-56 h-40 sm:h-36 bg-[#D9D9D9]/40 animate-pulse" />
         <div className="flex-1 p-4 sm:p-5 space-y-3">
@@ -267,6 +281,7 @@ export default function TripHubPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [cancelTarget, setCancelTarget] = useState(null);
 
   useEffect(() => {
     document.title = "Trips | ZuriLofts";
@@ -380,11 +395,23 @@ export default function TripHubPage() {
         ) : (
           <div className="space-y-4">
             {displayed.map((b) => (
-              <BookingCard key={b.id} booking={b} isPast={activeTab === "past"} />
+              <BookingCard
+                key={b.id}
+                booking={b}
+                isPast={activeTab === "past"}
+                onRequestCancel={setCancelTarget}
+              />
             ))}
           </div>
         )}
       </main>
+      <CancelBookingDialog
+        booking={cancelTarget}
+        onClose={() => setCancelTarget(null)}
+        onSuccess={(cancelled) =>
+          setBookings((prev) => prev.map((b) => (b.id === cancelled.id ? { ...b, status: "CANCELLED" } : b)))
+        }
+      />
       <Footer />
     </div>
   );

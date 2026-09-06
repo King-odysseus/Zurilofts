@@ -284,6 +284,12 @@ model Booking {
   paidAt               DateTime? // When payment was confirmed
   hostNetAmount        Int? // What the host actually earns from this booking
   withholdingTax       Int? // KRA withholding tax amount (5% of host gross)
+  cancelledAt          DateTime? // When the booking was cancelled
+  cancelledBy          String? // Who cancelled: "GUEST" | "ADMIN" | "SYSTEM"
+  cancelledById        String? // userId of the canceller (GUEST/ADMIN)
+  refundStatus         String? // Paid bookings cancelled after payment: "REFUND_PENDING" | "REFUNDED" | "REFUND_DECLINED"
+  refundedAt           DateTime?
+  refundedBy           String? // admin userId who resolved the refund
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
   review               Review?
@@ -297,6 +303,7 @@ model Booking {
   @@index([propertyId, checkIn])
   @@index([userId, createdAt])
   @@index([status])
+  @@index([refundStatus])
 }
 
 // Guest-facing identity verification, separate from the host's own
