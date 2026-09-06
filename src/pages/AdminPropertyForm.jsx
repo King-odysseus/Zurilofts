@@ -2,11 +2,15 @@ import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import Dropdown from '../components/Dropdown.jsx';
+import PropertyLocationPicker from '../components/PropertyLocationPicker.jsx';
 import apiClient from '../api/client.js';
 
 const EMPTY = {
   title: '',
   location: '',
+  lat: null,
+  lng: null,
+  address: '',
   price: '',
   price1Bed: '',
   price2Bed: '',
@@ -63,6 +67,9 @@ function AdminPropertyForm() {
         setForm({
           title: p.title || '',
           location: p.location || '',
+          lat: p.lat ?? null,
+          lng: p.lng ?? null,
+          address: p.address || '',
           price: p.price ?? '',
           price1Bed: p.price1Bed ?? '',
           price2Bed: p.price2Bed ?? '',
@@ -127,6 +134,12 @@ function AdminPropertyForm() {
       title: form.title,
       location: form.location,
       price: Number(form.price),
+      // Pin-confirmed coordinates + address. Only sent when present (null would
+      // fail zod's optional-number check on update).
+      ...(Number.isFinite(form.lat) && Number.isFinite(form.lng)
+        ? { lat: Number(form.lat), lng: Number(form.lng) }
+        : {}),
+      ...(form.address ? { address: form.address } : {}),
       bedrooms: Number(form.bedrooms),
       bathrooms: Number(form.bathrooms),
       area: Number(form.area),
@@ -146,6 +159,14 @@ function AdminPropertyForm() {
 
     if (payload.images.length === 0) {
       setError('Add at least one image');
+      setSaving(false);
+      return;
+    }
+
+    // New listings must pin their exact location so guests can get directions.
+    // Edits to legacy listings without a pin are still allowed to save.
+    if (!isEdit && (form.lat == null || form.lng == null)) {
+      setError('Confirm the exact property location by dropping a pin on the map.');
       setSaving(false);
       return;
     }
@@ -221,6 +242,21 @@ function AdminPropertyForm() {
           <div>
             <label className={labelCls}>Location</label>
             <input className={inputCls} value={form.location} onChange={(e) => update('location', e.target.value)} required />
+          </div>
+          <div className="bg-canvas rounded-2xl p-4 sm:p-5">
+            <p className="text-sm font-semibold text-[#0B0B45]">Confirm exact location on a map</p>
+            <p className="text-xs text-[#6b7280] mb-3">
+              Drop a pin at the property&apos;s entrance. Guests see this pin and can open it in Google Maps for directions.
+            </p>
+            <PropertyLocationPicker
+              lat={form.lat}
+              lng={form.lng}
+              address={form.address}
+              onChange={(part) => setForm((f) => ({ ...f, ...part }))}
+            />
+            {form.lat != null && form.lng != null && (
+              <p className="text-xs text-[#6b7280] mt-2">Coordinates: {Number(form.lat).toFixed(5)}, {Number(form.lng).toFixed(5)}</p>
+            )}
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
@@ -412,7 +448,12 @@ function AdminPropertyForm() {
           </div>
         </div>
 
-        {isEdit && <SeasonalPricing propertyId={id} />}
+        {isEdit && (
+          <div className="space-y-6">
+            <SeasonalPricing propertyId={id} />
+            <AutomatedMessages propertyId={id} />
+          </div>
+        )}
 
         <div className="flex items-center gap-3">
           <button
@@ -803,5 +844,224 @@ function SeasonalPricing({ propertyId }) {
     </div>
   );
 }
+
+// Placeholders hosts can drop into an automated message. Rendered server-side
+// against each booking; unknown tokens are left as-is so text stays safe.
+const MESSAGE_TOKENS = [
+  '{guestFirstName}',
+  '{guestName}',
+  '{hostFirstName}',
+  '{property}',
+  '{location}',
+  '{neighborhood}',
+  '{address}',
+  '{checkIn}',
+  '{checkOut}',
+  '{guests}',
+  '{nights}',
+  '{totalKes}',
+  '{daysUntilCheckIn}',
+  '{checkInTime}',
+  '{checkOutTime}',
+];
+
+function Toggle({ on, onClick, label }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+      onClick={onClick}
+      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${on ? 'bg-[#C49A6C]' : 'bg-[#D9D9D9]'}`}
+    >
+      <span
+        className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${on ? 'translate-x-5' : ''}`}
+      />
+    </button>
+  );
+}
+
+Toggle.propTypes = {
+  on: PropTypes.bool.isRequired,
+  onClick: PropTypes.func.isRequired,
+  label: PropTypes.string.isRequired,
+};
+
+function AutomatedMessages({ propertyId }) {
+  // trigger -> { label, description, offsetLabel }
+  const [meta, setMeta] = useState({});
+  // Canonical order from the server: full 5-trigger set, defaults merged in.
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [savedAt, setSavedAt] = useState('');
+  const [error, setError] = useState('');
+
+  const load = useCallback(async () => {
+    try {
+      const res = await apiClient.get(`/properties/${propertyId}/auto-messages`);
+      setMeta(res.data.data?.triggers || {});
+      setRows(res.data.data?.templates || []);
+    } catch (err) {
+      setError(err.response?.data?.error || err.response?.data?.message || 'Failed to load automated messages');
+    } finally {
+      setLoading(false);
+    }
+  }, [propertyId]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  function patchRow(trigger, patch) {
+    setRows((rs) => rs.map((r) => (r.trigger === trigger ? { ...r, ...patch } : r)));
+    setDirty(true);
+    setError('');
+  }
+
+  function insertToken(trigger, token) {
+    setRows((rs) =>
+      rs.map((r) => (r.trigger === trigger ? { ...r, body: `${r.body}${r.body ? ' ' : ''}${token}` } : r))
+    );
+    setDirty(true);
+    setError('');
+  }
+
+  async function save() {
+    setSaving(true);
+    setError('');
+    try {
+      const res = await apiClient.put(`/properties/${propertyId}/auto-messages`, {
+        templates: rows.map((r) => ({
+          trigger: r.trigger,
+          enabled: r.enabled,
+          offsetDays: meta[r.trigger]?.offsetLabel ? (r.offsetDays ?? null) : null,
+          body: r.body,
+        })),
+      });
+      setRows(res.data.data?.templates || rows);
+      setDirty(false);
+      setSavedAt(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
+    } catch (err) {
+      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to save automated messages');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-2xl p-6 shadow-sm">
+      <div className="flex items-start justify-between gap-4 mb-1">
+        <div>
+          <h2 className="text-lg font-bold text-[#0B0B45]">Automated Messages</h2>
+          <p className="text-sm text-[#6b7280] max-w-2xl">
+            Send your guests helpful messages automatically as their booking progresses. Each message is delivered
+            to the booking&apos;s chat thread from your account. Write in your own voice, or start from a template
+            and drop in placeholders like {'{guestFirstName}'} or {'{checkIn}'}.
+          </p>
+        </div>
+        {!loading && (
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <span className={`text-xs font-medium ${dirty ? 'text-[#C49A6C]' : 'text-[#6b7280]'}`}>
+              {dirty ? 'Unsaved changes' : savedAt ? `Saved at ${savedAt}` : ''}
+            </span>
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving || !dirty}
+              className="bg-[#0B0B45] text-white font-semibold px-5 py-2 rounded-full hover:bg-[#06062a] transition-colors disabled:opacity-40"
+            >
+              {saving ? 'Saving…' : 'Save messages'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 mb-4 mt-3 text-sm">{error}</div>}
+
+      {loading ? (
+        <p className="text-sm text-[#6b7280] mt-4">Loading…</p>
+      ) : rows.length === 0 ? (
+        <p className="text-sm text-[#6b7280] mt-4">No message triggers available.</p>
+      ) : (
+        <div className="space-y-3 mt-4">
+          {rows.map((row) => {
+            const m = meta[row.trigger] || {};
+            return (
+              <div key={row.trigger} className="bg-canvas rounded-2xl p-4 sm:p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-[#0B0B45] flex items-center gap-2">
+                      {m.label || row.trigger}
+                      {row.enabled && row.saved && (
+                        <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">ON</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-[#6b7280]">{m.description}</p>
+                  </div>
+                  <Toggle
+                    on={row.enabled}
+                    onClick={() => patchRow(row.trigger, { enabled: !row.enabled })}
+                    label={`Toggle ${m.label || row.trigger}`}
+                  />
+                </div>
+
+                {row.enabled && (
+                  <div className="mt-3 space-y-3">
+                    <div>
+                      {m.offsetLabel && (
+                        <div className="flex items-center gap-2 mb-2">
+                          <label className="text-xs font-semibold text-[#1f2937]" htmlFor={`offset-${row.trigger}`}>
+                            {m.offsetLabel}
+                          </label>
+                          <input
+                            id={`offset-${row.trigger}`}
+                            type="number"
+                            min={1}
+                            max={60}
+                            className="w-20 px-3 py-1.5 rounded-xl bg-white text-sm text-[#1f2937] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
+                            value={row.offsetDays ?? ''}
+                            onChange={(e) => patchRow(row.trigger, { offsetDays: e.target.value === '' ? null : Number(e.target.value) })}
+                          />
+                        </div>
+                      )}
+                      <textarea
+                        rows={3}
+                        aria-label={`Message body for ${m.label || row.trigger}`}
+                        className={inputCls}
+                        value={row.body}
+                        maxLength={2000}
+                        onChange={(e) => patchRow(row.trigger, { body: e.target.value })}
+                      />
+                      <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                        <span className="text-xs text-[#6b7280] mr-1">Insert:</span>
+                        {MESSAGE_TOKENS.map((tok) => (
+                          <button
+                            key={tok}
+                            type="button"
+                            onClick={() => insertToken(row.trigger, tok)}
+                            className="text-[11px] font-medium text-[#0B0B45] bg-white rounded-full px-2 py-0.5 shadow-sm hover:text-[#C49A6C] transition-colors"
+                          >
+                            {tok}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+AutomatedMessages.propTypes = {
+  propertyId: PropTypes.string.isRequired,
+};
 
 export default AdminPropertyForm;

@@ -1,5 +1,6 @@
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import PropTypes from 'prop-types';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import Lightbox from './Lightbox.jsx';
@@ -9,9 +10,22 @@ import PropertyTrustPanel from './PropertyTrustPanel';
 import SimilarProperties from './SimilarProperties';
 import AddOnsSection from './AddOnsSection';
 
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
+
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow,
+});
+
 import apiClient from '../api/client.js';
 import { recordView } from '../utils/recentlyViewed.js';
-import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
+import { googleMapsDirectionsUrl, hasMapCoordinates } from '../utils/googleMaps.js';
 
 /** Safely coerce a value to an array, no matter what the API sends. */
 function safeArray(value) {
@@ -368,6 +382,20 @@ function PropertyPage() {
               </section>
             )}
 
+            {/* Where you'll be - only when the host confirmed coordinates */}
+            {hasMapCoordinates(property.lat, property.lng) && (
+              <section className="mb-8 md:mb-10" aria-labelledby="location-heading">
+                <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#0B0B45] mb-4">Where you&apos;ll be</h2>
+                <PropertyPinMap
+                  lat={property.lat}
+                  lng={property.lng}
+                  address={property.address}
+                  location={property.location}
+                  title={property.title}
+                />
+              </section>
+            )}
+
             {/* Add-ons - renders nothing when the property has none */}
             <AddOnsSection propertyId={property.id} />
 
@@ -419,5 +447,63 @@ function PropertyPage() {
     </div>
   );
 }
+
+// Static pin map for a pinned property. Rendered only when the host dropped
+// coordinates during listing, so it never needs an empty-state.
+function PropertyPinMap({ lat, lng, address, location, title }) {
+  const mapElRef = useRef(null);
+  const directionsUrl = googleMapsDirectionsUrl({ lat, lng, label: address || location });
+
+  useEffect(() => {
+    const el = mapElRef.current;
+    if (!el) return;
+    const map = L.map(el, {
+      scrollWheelZoom: false,
+      center: [Number(lat), Number(lng)],
+      zoom: 15,
+    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map);
+    L.marker([Number(lat), Number(lng)], { title, alt: `Map pin for ${title}` })
+      .addTo(map)
+      .bindPopup(location || title || 'Property');
+    return () => map.remove();
+  }, [lat, lng, title, location]);
+
+  return (
+    <div className="rounded-2xl overflow-hidden shadow-md bg-white">
+      <div ref={mapElRef} className="h-64 md:h-80 w-full" aria-label={`Map showing the location of ${title}`} />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 sm:p-5">
+        <div className="min-w-0 flex-1">
+          <p className="font-semibold text-[#0B0B45] text-sm">{location}</p>
+          {address && (
+            <p className="text-sm text-[#6b7280] mt-0.5 break-words">{address}</p>
+          )}
+        </div>
+        <a
+          href={directionsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 shrink-0 rounded-full bg-[#0B0B45] text-white font-semibold px-5 py-2.5 text-sm hover:bg-[#C49A6C] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+          </svg>
+          Get directions
+        </a>
+      </div>
+    </div>
+  );
+}
+
+PropertyPinMap.propTypes = {
+  lat: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  lng: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+  address: PropTypes.string,
+  location: PropTypes.string,
+  title: PropTypes.string,
+};
 
 export default PropertyPage;

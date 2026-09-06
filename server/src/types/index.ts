@@ -80,6 +80,11 @@ export const propertyCreateSchema = z.object({
   type: z.enum(['apartment', 'studio', 'penthouse']),
   available: z.boolean().default(true),
   featured: z.boolean().default(false),
+  // Pin-confirmed location (see the drop-a-pin picker in AdminPropertyForm).
+  // lat/lng are the map coordinates; address is the host-confirmed street label.
+  lat: z.number().min(-90).max(90).optional(),
+  lng: z.number().min(-180).max(180).optional(),
+  address: z.string().max(300).optional(),
 });
 
 export const propertyUpdateSchema = propertyCreateSchema.partial();
@@ -93,6 +98,28 @@ export const propertyReviewSchema = z.object({
 }).refine((data) => data.action !== 'reject' || (data.note && data.note.trim().length > 0), {
   message: 'A reason is required to reject a listing',
   path: ['note'],
+});
+
+// Per-property automated host messages. PUT /properties/:id/auto-messages
+// accepts the full trigger set (or a subset to upsert). See
+// automated-message.service.ts for the default bodies and engine.
+export const autoMessageTriggerSchema = z.enum([
+  'BOOKING_CONFIRMED',
+  'PRE_ARRIVAL',
+  'CHECK_IN_DAY',
+  'CHECK_OUT_DAY',
+  'POST_STAY_REVIEW',
+]);
+
+export const autoMessageTemplateItemSchema = z.object({
+  trigger: autoMessageTriggerSchema,
+  enabled: z.boolean(),
+  offsetDays: z.number().int().min(1).max(60).nullable().optional(),
+  body: z.string().trim().min(1).max(2000),
+});
+
+export const autoMessageTemplatesSchema = z.object({
+  templates: z.array(autoMessageTemplateItemSchema).min(1).max(5),
 });
 
 /** The checkout methods a guest can pick. Mapped to Paystack channels in

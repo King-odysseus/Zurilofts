@@ -122,6 +122,9 @@ function buildCreateData(data: any) {
       status: 'DRAFT',
     };
     if (data.hostId) base.hostId = data.hostId;
+    if (data.lat !== undefined) base.lat = data.lat;
+    if (data.lng !== undefined) base.lng = data.lng;
+    if (data.address !== undefined) base.address = data.address;
     if (data.price1Bed !== undefined) base.price1Bed = data.price1Bed;
     if (data.price2Bed !== undefined) base.price2Bed = data.price2Bed;
     if (data.bathrooms1Bed !== undefined) base.bathrooms1Bed = data.bathrooms1Bed;

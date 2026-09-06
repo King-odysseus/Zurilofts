@@ -1,9 +1,10 @@
 import { Router } from 'express';
 import { authenticate, requireHost, requireHostWorkspace } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { propertyCreateSchema, propertyUpdateSchema } from '../types/index.js';
+import { propertyCreateSchema, propertyUpdateSchema, autoMessageTemplatesSchema } from '../types/index.js';
 import * as ctrl from '../controllers/property.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
+import * as autoMsgCtrl from '../controllers/auto-message.controller.js';
 
 const router = Router();
 
@@ -23,6 +24,11 @@ router.get('/:id/calendar/:token.ics', calendarCtrl.publicFeed);
 router.get('/:id/availability', calendarCtrl.availability);
 // Similar properties (public discovery)
 router.get('/:id/similar', ctrl.getSimilar);
+
+// Per-property automated host messages (host or admin; ownership enforced in
+// the service). Placed before '/:id' so the longer path matches first.
+router.get('/:id/auto-messages', authenticate, requireHostWorkspace, autoMsgCtrl.getTemplates);
+router.put('/:id/auto-messages', authenticate, requireHostWorkspace, validate(autoMessageTemplatesSchema), autoMsgCtrl.saveTemplates);
 
 
 // Public reviews for a property

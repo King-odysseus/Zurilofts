@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { isRangeAvailable } from './calendar.service.js';
 import { calculateNights, computeExtraGuestFee } from '../utils/pricing.js';
 import { sendTelegramAlert } from './chat.service.js';
+import { fireBookingConfirmed } from './automated-message.service.js';
 
 const SERVICE_FEE_PERCENT = Number(env.SERVICE_FEE_PERCENT) / 100;
 const WITHHOLDING_TAX_RATE = Number(env.WITHHOLDING_TAX_RATE) / 100;
@@ -167,6 +168,10 @@ export async function verifyAndConfirmPayment(
     return { confirmed: false, reason: 'not_found', message: 'No booking found for this payment reference' };
   }
   if (isTerminalBookingStatus(existing.status)) {
+    // A re-verify of an already-CONFIRMED booking (callback + webhook raced).
+    // Fire the confirmation message again - the dedupe log makes it a no-op if
+    // it already went out, so this is just covering a lost-first-delivery.
+    if (existing.status === 'CONFIRMED') void fireBookingConfirmed(existing.id);
     return { confirmed: true, bookingId: existing.id, message: 'Already confirmed' };
   }
 
@@ -202,6 +207,12 @@ export async function verifyAndConfirmPayment(
     channel: verification.channel,
     paidAt: verification.paid_at,
   });
+
+  // Fire-and-forget host confirmation message after the booking is CONFIRMED.
+  // If the range check flipped it to CONFLICT instead, deliverTrigger sees a
+  // non-CONFIRMED status and sends nothing; the log stays empty so the admin
+  // resolution path (updateBookingStatus -> CONFIRMED) still sends it later.
+  void fireBookingConfirmed(existing.id);
 
   return { confirmed: true, bookingId: existing.id, message: 'Payment confirmed' };
 }

@@ -5,6 +5,7 @@ import app from './app.js';
 import { env } from './config/env.js';
 import { startTelegramPoller } from './services/chat.service.js';
 import { syncAll } from './services/ical.service.js';
+import { runDueAutoMessages } from './services/automated-message.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +26,7 @@ app.listen(Number(env.PORT), () => {
   console.log(`   Health: http://localhost:${env.PORT}/api/health`);
   startTelegramPoller();
   startCalendarSync();
+  startAutomatedMessageScheduler();
 });
 
 // Unhandled promise rejections and process errors crash hard so Railway can
@@ -51,5 +53,21 @@ function startCalendarSync() {
   };
   // First run shortly after boot, then on the interval
   setTimeout(run, 30 * 1000);
+  setInterval(run, INTERVAL_MS);
+}
+
+// Periodically deliver time-based automated host messages (pre-arrival
+// reminders, check-in/check-out day messages, post-stay review nudges). Runs
+// every 15 minutes; per-booking dedupe logs make overlapping runs a no-op.
+function startAutomatedMessageScheduler() {
+  const INTERVAL_MS = 15 * 60 * 1000;
+  const run = () => {
+    runDueAutoMessages()
+      .then(({ sent }) => {
+        if (sent > 0) console.log(`💬 Automated messages sent for ${sent} booking(s)`);
+      })
+      .catch((err) => console.error('Automated message scan failed:', err?.message || err));
+  };
+  setTimeout(run, 45 * 1000);
   setInterval(run, INTERVAL_MS);
 }

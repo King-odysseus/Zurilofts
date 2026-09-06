@@ -4,6 +4,7 @@ import { NotFoundError, ValidationError, ConflictError } from '../types/index.js
 import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
 import { isRangeAvailable, isRangeAvailableWithDb, PENDING_HOLD_MINUTES } from './calendar.service.js';
 import { isBookable } from './property.service.js';
+import { fireBookingConfirmed } from './automated-message.service.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
 function normalizeBooking(booking: any) {
@@ -743,6 +744,11 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
       sendPushToUser(booking.userId, title, body, '/bookings');
     } catch { /* push is best-effort, don't block the status update */ }
   }
+
+  // Host confirmation message after a CONFLICT -> CONFIRMED resolution (the
+  // payment path already covers the normal confirm). Fire-and-forget; the dedupe
+  // log makes it a no-op if it went out before, or the booking isn't CONFIRMED.
+  if (status === 'CONFIRMED') void fireBookingConfirmed(bookingId);
 
   return updated;
 }

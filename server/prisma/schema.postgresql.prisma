@@ -200,6 +200,7 @@ model Property {
   neighborhood String?                  // Kilimani | Westlands | Karen | Gigiri | Lavington
   lat          Float?                   // map coordinate
   lng          Float?                   // map coordinate
+  address      String?                  // host-confirmed street address for the pin
   description String
   imagesJson   String    @default("[]")
   amenitiesJson String   @default("[]")
@@ -218,6 +219,7 @@ model Property {
   favoritedBy     Favorite[]
   shortlistItems ShortlistItem[]
   addOns          PropertyAddOn[]
+  messageTemplates PropertyMessageTemplate[]
 
   @@index([hostId])
   @@index([status])
@@ -312,6 +314,7 @@ model Booking {
   addOns          BookingAddOn[]
   conversation    Conversation?
   disputes        Dispute[]
+  autoMessageLogs AutomatedMessageLog[]
 
   // Hot query paths: availability overlap checks (property + window), a user's
   // booking history, and status-filtered admin/host lists.
@@ -637,6 +640,46 @@ model ConversationMessage {
 
   @@index([conversationId, createdAt])
 }
+
+// Host-set automated message templates, per property. The automation engine
+// (automated-message.service.ts) renders a template's `body` against a booking
+// and delivers it into the booking conversation as the host when the matching
+// trigger fires. offsetDays only applies to PRE_ARRIVAL (days before check-in)
+// and POST_STAY_REVIEW (days after check-out); the other triggers are day-exact.
+// Lifecycle trigger values:
+//   BOOKING_CONFIRMED  | PRE_ARRIVAL | CHECK_IN_DAY | CHECK_OUT_DAY | POST_STAY_REVIEW
+model PropertyMessageTemplate {
+  id         String   @id @default(uuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  trigger    String
+  enabled    Boolean  @default(true)
+  offsetDays Int?
+  body       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([propertyId, trigger])
+  @@index([propertyId])
+}
+
+// Delivery ledger for the automation engine - one row per booking+trigger so a
+// message is sent at most once, even with multiple server instances racing the
+// scheduler or a booking crossing a time window several times. messageId links
+// to the ConversationMessage that was inserted (null if nothing was sent, e.g.
+// the property has no host to author as).
+model AutomatedMessageLog {
+  id         String   @id @default(uuid())
+  bookingId  String
+  booking    Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  trigger    String
+  messageId  String?
+  createdAt  DateTime @default(now())
+
+  @@unique([bookingId, trigger])
+  @@index([bookingId])
+}
+
 model AddOn {
   id          String          @id @default(uuid())
   name        String
