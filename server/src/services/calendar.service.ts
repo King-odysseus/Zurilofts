@@ -100,6 +100,25 @@ export async function deleteBlock(id: string) {
   return prisma.calendarBlock.delete({ where: { id } });
 }
 
+/** Remove one calendar day from a manual block, preserving the other days. */
+export async function unblockCalendarDate(id: string, date: Date) {
+  const block = await prisma.calendarBlock.findUnique({ where: { id } });
+  if (!block) throw new NotFoundError('Calendar block');
+  if (block.sourceId !== null) throw new ValidationError('Imported blocks can only be changed in their source calendar');
+
+  const day = new Date(date);
+  day.setHours(0, 0, 0, 0);
+  const nextDay = new Date(day);
+  nextDay.setDate(nextDay.getDate() + 1);
+  if (day < block.start || day >= block.end) throw new ValidationError('Selected date is outside this block');
+
+  await prisma.$transaction(async (tx) => {
+    await tx.calendarBlock.delete({ where: { id } });
+    if (block.start < day) await tx.calendarBlock.create({ data: { propertyId: block.propertyId, start: block.start, end: day, summary: block.summary } });
+    if (nextDay < block.end) await tx.calendarBlock.create({ data: { propertyId: block.propertyId, start: nextDay, end: block.end, summary: block.summary } });
+  });
+}
+
 /**
  * Public availability: the unavailable date ranges for a property (imported +
  * manual calendar blocks and existing non-cancelled bookings), from today

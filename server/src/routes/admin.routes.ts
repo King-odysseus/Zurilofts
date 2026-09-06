@@ -108,6 +108,7 @@ router.post('/properties/:id/calendar/sources', validate(calendarSourceSchema), 
 router.delete('/properties/:id/calendar/sources/:sourceId', calendarCtrl.deleteSource);
 router.post('/properties/:id/calendar/sync', calendarCtrl.syncNow);
 router.post('/properties/:id/calendar/blocks', validate(calendarBlockSchema), calendarCtrl.addBlock);
+router.post('/properties/:id/calendar/blocks/:blockId/unblock-date', calendarCtrl.unblockDate);
 router.delete('/properties/:id/calendar/blocks/:blockId', calendarCtrl.deleteBlock);
 
 // Seasonal price rules (per property)

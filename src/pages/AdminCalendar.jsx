@@ -8,6 +8,7 @@ const inputCls =
   'w-full px-4 py-2.5 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] bg-white text-[#1f2937]';
 
 const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+const toLocalDate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
 function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, selectedStart, selectedEnd }) {
   const start = new Date(month.getFullYear(), month.getMonth(), 1);
@@ -27,7 +28,7 @@ function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, se
       const isToday = sameDay(date, new Date());
       const isSelected = selectedStart && (selectedEnd ? date >= selectedStart && date <= selectedEnd : sameDay(date, selectedStart));
       const canClick = inMonth && !booking && (Boolean(onSelectDate) || Boolean(block?.manual && onBlockClick));
-      return <button type="button" key={index} disabled={!canClick} onClick={() => block?.manual ? onBlockClick?.(block) : onSelectDate?.(date)} className={`min-h-[108px] rounded-xl p-3 text-left transition-colors ${inMonth ? 'bg-white border border-[#D9D9D9]' : 'bg-transparent'} ${block ? 'bg-[#0B0B45]/5' : ''} ${isSelected ? 'bg-[#C49A6C]/20 ring-2 ring-inset ring-[#C49A6C]' : ''} ${canClick ? 'hover:bg-[#C49A6C]/10 cursor-pointer' : 'cursor-not-allowed'} ${booking ? 'opacity-80' : ''}`}>
+      return <button type="button" key={index} disabled={!canClick} onClick={() => block?.manual ? onBlockClick?.(block, date) : onSelectDate?.(date)} className={`min-h-[108px] rounded-xl p-3 text-left transition-colors ${inMonth ? 'bg-white border border-[#D9D9D9]' : 'bg-transparent'} ${block ? 'bg-[#0B0B45]/5' : ''} ${isSelected ? 'bg-[#C49A6C]/20 ring-2 ring-inset ring-[#C49A6C]' : ''} ${canClick ? 'hover:bg-[#C49A6C]/10 cursor-pointer' : 'cursor-not-allowed'} ${booking ? 'opacity-80' : ''}`}>
         {inMonth && <span className={`inline-flex w-9 h-9 items-center justify-center rounded-full text-sm font-bold ${isSelected || isToday ? 'bg-[#C49A6C] text-white' : 'text-[#0B0B45]'}`}>{day}</span>}
         {booking && <div className="mt-3 rounded-lg bg-[#0B0B45] text-white px-2 py-1.5 text-xs font-semibold truncate" title={`${booking.guestName} · ${booking.guests} guests`}>{booking.guestName}</div>}
         {!booking && block && <div className="mt-3 rounded-lg bg-[#C49A6C]/20 text-[#0B0B45] px-2 py-1.5 text-xs font-semibold truncate">{block.summary || 'Blocked'}</div>}
@@ -132,6 +133,7 @@ function AdminCalendar() {
   const [monthCursor, setMonthCursor] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [calendarTab, setCalendarTab] = useState('view');
   const [selectedBlockEnd, setSelectedBlockEnd] = useState(null);
+  const [pendingUnblock, setPendingUnblock] = useState(null);
 
   const [sourceDraft, setSourceDraft] = useState({ name: '', url: '' });
   const [blockDraft, setBlockDraft] = useState({ start: '', end: '', summary: '' });
@@ -231,8 +233,19 @@ function AdminCalendar() {
     }
   }
 
-  function handleCalendarBlockClick(block) {
-    if (window.confirm(`Unblock ${fmt(block.start)} to ${fmt(block.end)}?`)) removeBlock(block.id);
+  function handleCalendarBlockClick(block, date) {
+    setPendingUnblock({ block, date });
+  }
+
+  async function confirmUnblockDate() {
+    if (!pendingUnblock) return;
+    try {
+      await apiClient.post(`/admin/properties/${id}/calendar/blocks/${pendingUnblock.block.id}/unblock-date`, { date: toLocalDate(pendingUnblock.date) });
+      setPendingUnblock(null);
+      await load();
+    } catch (err) {
+      setError(err.response?.data?.error || 'Could not unblock this date.');
+    }
   }
 
   function copyFeed() {
@@ -384,6 +397,13 @@ function AdminCalendar() {
           <button type="submit" disabled={!blockDraft.start || !blockDraft.end} className="md:col-span-2 bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors disabled:opacity-50">Block dates</button>
         </form>
       </section>}
+      {pendingUnblock && <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0B0B45]/40 p-4" role="dialog" aria-modal="true" aria-labelledby="unblock-title">
+        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+          <h2 id="unblock-title" className="text-xl font-bold text-[#0B0B45]">Unblock this date?</h2>
+          <p className="mt-2 text-sm text-[#6b7280]">{fmt(pendingUnblock.date)} will become available. Other dates in this blocked range will remain blocked.</p>
+          <div className="mt-6 flex justify-end gap-3"><button type="button" onClick={() => setPendingUnblock(null)} className="rounded-full px-4 py-2 text-sm font-semibold text-[#0B0B45] hover:bg-[#f8f9fa]">Cancel</button><button type="button" onClick={confirmUnblockDate} className="rounded-full bg-[#C49A6C] px-5 py-2 text-sm font-semibold text-white hover:bg-[#b8895c]">Unblock date</button></div>
+        </div>
+      </div>}
     </div>
   );
 }

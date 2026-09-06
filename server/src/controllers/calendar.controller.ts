@@ -81,6 +81,15 @@ export async function deleteBlock(req: Request, res: Response, next: NextFunctio
   }
 }
 
+export async function unblockDate(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    await calendarService.unblockCalendarDate(req.params.blockId, new Date(req.body.date));
+    res.json({ success: true, message: 'Date unblocked' });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // ---- Admin: seasonal price rules ----
 
 export async function listPriceRules(req: Request, res: Response, next: NextFunction): Promise<void> {
