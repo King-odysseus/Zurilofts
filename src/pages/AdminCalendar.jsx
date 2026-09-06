@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useParams, useLocation, Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 
@@ -38,6 +38,7 @@ CalendarMonth.propTypes = { month: PropTypes.instanceOf(Date).isRequired, blocks
 // The calendar is per-property, so /host/calendar (no id) shows a picker of the
 // host's own listings. Reuses the existing /properties/mine endpoint.
 function CalendarPropertyPicker({ base }) {
+  const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -55,6 +56,10 @@ function CalendarPropertyPicker({ base }) {
     })();
     return () => { cancelled = true; };
   }, []);
+
+  useEffect(() => {
+    if (!loading && properties.length > 0) navigate(`${base}/calendar/${properties[0].id}`, { replace: true });
+  }, [base, loading, navigate, properties]);
 
   return (
     <div className="w-full">
@@ -126,6 +131,7 @@ function AdminCalendar() {
   const [syncing, setSyncing] = useState(false);
   const [copied, setCopied] = useState(false);
   const [monthCursor, setMonthCursor] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [calendarTab, setCalendarTab] = useState('view');
 
   const [sourceDraft, setSourceDraft] = useState({ name: '', url: '' });
   const [blockDraft, setBlockDraft] = useState({ start: '', end: '', summary: '' });
@@ -240,17 +246,21 @@ function AdminCalendar() {
 
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">{error}</div>}
 
-      <section className="bg-white rounded-2xl border border-[#D9D9D9] p-5 sm:p-6 mb-6">
+      <div className="flex gap-1 border-b border-[#D9D9D9] mb-6" role="tablist" aria-label="Calendar sections">
+        {[['view', 'View'], ['availability', 'Availability'], ['settings', 'Settings']].map(([value, label]) => <button key={value} type="button" role="tab" aria-selected={calendarTab === value} onClick={() => setCalendarTab(value)} className={`px-4 py-2.5 text-sm font-semibold border-b-2 ${calendarTab === value ? 'border-[#C49A6C] text-[#0B0B45]' : 'border-transparent text-[#6b7280]'}`}>{label}</button>)}
+      </div>
+
+      {calendarTab === 'view' && <section className="bg-white rounded-2xl border border-[#D9D9D9] p-5 sm:p-6 mb-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div><p className="text-xs font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Availability</p><h2 className="text-2xl font-bold text-[#0B0B45] mt-1">{monthCursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h2></div>
           <div className="flex gap-2"><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1))} className="w-10 h-10 rounded-full border border-[#D9D9D9] text-[#0B0B45]">←</button><button type="button" onClick={() => setMonthCursor(new Date())} className="px-4 rounded-full border border-[#D9D9D9] text-sm font-semibold text-[#0B0B45]">Today</button><button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1))} className="w-10 h-10 rounded-full border border-[#D9D9D9] text-[#0B0B45]">→</button></div>
         </div>
         <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} />
         <div className="flex flex-wrap gap-4 mt-4 text-xs text-[#6b7280]"><span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-[#0B0B45] mr-1.5" />Booking</span><span><i className="inline-block w-2.5 h-2.5 rounded-sm bg-[#C49A6C]/30 mr-1.5" />Blocked date</span></div>
-      </section>
+      </section>}
 
       {/* Outbound feed */}
-      <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
+      {calendarTab === 'settings' && <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Export this calendar</h2>
         <p className="text-sm text-[#6b7280] mb-4">Paste this link into Airbnb / Booking.com so they block the dates booked on ZuriLofts.</p>
         <div className="flex items-center gap-2">
@@ -259,10 +269,10 @@ function AdminCalendar() {
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
-      </section>
+      </section>}
 
       {/* Imported feeds */}
-      <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
+      {calendarTab === 'settings' && <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-lg font-bold text-[#0B0B45]">Imported calendars</h2>
           <button
@@ -306,10 +316,10 @@ function AdminCalendar() {
           </div>
           <button type="submit" className="md:col-span-2 bg-[#C49A6C] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#b8895c] transition-colors">Add feed</button>
         </form>
-      </section>
+      </section>}
 
       {/* Blocked dates */}
-      <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
+      {calendarTab === 'availability' && <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
         <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Blocked dates</h2>
         <p className="text-sm text-[#6b7280] mb-4">Imported bookings (read-only) and manual blocks. Blocked ranges can&apos;t be booked on ZuriLofts.</p>
 
@@ -349,7 +359,7 @@ function AdminCalendar() {
           </div>
           <button type="submit" className="md:col-span-2 bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors">Block</button>
         </form>
-      </section>
+      </section>}
     </div>
   );
 }
