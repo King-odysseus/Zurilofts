@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useLocation, Link, useNavigate } from 'react-router-dom';
+import { useParams, useLocation, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 
@@ -39,7 +39,6 @@ CalendarMonth.propTypes = { month: PropTypes.instanceOf(Date).isRequired, blocks
 // The calendar is per-property, so /host/calendar (no id) shows a picker of the
 // host's own listings. Reuses the existing /properties/mine endpoint.
 function CalendarPropertyPicker({ base }) {
-  const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -58,15 +57,11 @@ function CalendarPropertyPicker({ base }) {
     return () => { cancelled = true; };
   }, []);
 
-  useEffect(() => {
-    if (!loading && properties.length > 0) navigate(`${base}/calendar/${properties[0].id}`, { replace: true });
-  }, [base, loading, navigate, properties]);
-
   return (
     <div className="w-full">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-[#0B0B45]">Calendar</h1>
-        <p className="text-sm text-[#6b7280]">Pick a property to manage its iCal feeds and blocked dates.</p>
+        <p className="text-sm text-[#6b7280]">Choose a listing to view its availability, block dates, and sync its own external calendar.</p>
       </div>
 
       {loading ? (
@@ -259,7 +254,7 @@ function AdminCalendar() {
   return (
     <div className="w-full">
       <div className="mb-6">
-        <Link to={`${base}/properties/${id}/edit`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to property</Link>
+        <Link to={`${base}/calendar`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; All listing calendars</Link>
         <h1 className="text-2xl font-bold text-[#0B0B45] mt-1">Calendar: {data.property.title}</h1>
         <p className="text-sm text-[#6b7280]">Two-way sync with Airbnb, Booking.com, VRBO and other platforms using iCal feeds.</p>
       </div>
