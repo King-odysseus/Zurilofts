@@ -444,12 +444,12 @@ function ProfilePage() {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-[#D9D9D9] mb-8">
+          <div className="flex overflow-x-auto no-scrollbar border-b border-[#D9D9D9] mb-8">
             {['info', 'bookings', 'favorites', 'verification'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 font-semibold text-sm transition-colors border-b-2 -mb-px ${
+                className={`px-6 py-3 font-semibold text-sm whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   activeTab === tab
                     ? 'border-[#C49A6C] text-[#0B0B45]'
                     : 'border-transparent text-[#6b7280] hover:text-[#0B0B45]'

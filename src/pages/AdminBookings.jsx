@@ -131,7 +131,7 @@ function EditBookingModal({ booking, onClose, onSaved }) {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-[#6b7280] mb-1">Check-in</label>
               <input
@@ -154,7 +154,7 @@ function EditBookingModal({ booking, onClose, onSaved }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-[#6b7280] mb-1">Guests</label>
               <input
@@ -180,7 +180,7 @@ function EditBookingModal({ booking, onClose, onSaved }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold text-[#6b7280] mb-1">Check-in Time</label>
               <input

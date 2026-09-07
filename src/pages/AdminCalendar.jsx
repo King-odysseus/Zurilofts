@@ -17,7 +17,8 @@ function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, se
   const cells = Array.from({ length: Math.ceil((offset + days) / 7) * 7 }, (_, index) => index - offset + 1);
   const sameDay = (a, b) => a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
   const occupied = (date, item) => date >= new Date(item.start) && date < new Date(item.end);
-  return <div>
+  return <div className="overflow-x-auto">
+    <div className="min-w-[560px]">
     <div className="grid grid-cols-7 gap-2 mb-2">{['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => <div key={day} className="p-2 text-center text-xs font-semibold text-[#6b7280]">{day}</div>)}</div>
     <div className="grid grid-cols-7 gap-2">
     {cells.map((day, index) => {
@@ -34,6 +35,7 @@ function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, se
         {!booking && block && <div className="mt-3 rounded-lg bg-[#C49A6C]/20 text-[#0B0B45] px-2 py-1.5 text-xs font-semibold truncate">{block.summary || 'Blocked'}</div>}
       </button>;
     })}
+    </div>
     </div>
   </div>;
 }

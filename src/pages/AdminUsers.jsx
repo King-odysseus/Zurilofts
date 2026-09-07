@@ -447,7 +447,7 @@ function AdminUsers() {
             <form onSubmit={handleSave} className="p-6 space-y-4">
               {formError && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{formError}</div>}
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field label="First Name" value={formData.firstName} onChange={(v) => setFormData({ ...formData, firstName: v })} />
                 <Field label="Last Name" value={formData.lastName} onChange={(v) => setFormData({ ...formData, lastName: v })} />
               </div>
@@ -457,7 +457,7 @@ function AdminUsers() {
               <div className="pt-2 border-t border-[#D9D9D9]">
                 <p className="text-sm font-semibold text-[#0B0B45] mt-3 mb-1">Host Payout Details</p>
                 <p className="text-xs text-[#6b7280] mb-3">Used for bank transfers to hosts. Leave blank for non-hosts.</p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Bank Name" value={formData.bankName} onChange={(v) => setFormData({ ...formData, bankName: v })} />
                   <Field label="Account No." value={formData.bankAccountNo} onChange={(v) => setFormData({ ...formData, bankAccountNo: v })} />
                   <Field label="Bank Code" value={formData.bankCode} onChange={(v) => setFormData({ ...formData, bankCode: v })} />

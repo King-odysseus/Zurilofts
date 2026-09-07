@@ -23,7 +23,7 @@ function PropertyCardRow({ title, properties, emptyMessage, align = 'left' }) {
       {cards.length === 0 ? (
         <p className={`text-[#6b7280] ${centered ? 'text-center' : ''}`}>{emptyMessage}</p>
       ) : (
-        <div className={`flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar ${centered ? 'justify-center' : ''}`}>
+        <div className={`flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar ${centered ? 'lg:justify-center' : ''}`}>
           {cards.map((property) => (
             <div key={property.id} className="snap-start flex-shrink-0 w-64 sm:w-72">
               <PropertyCard property={{ ...property, image: firstImage(property) }} />

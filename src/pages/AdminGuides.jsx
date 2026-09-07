@@ -165,7 +165,7 @@ function AdminGuides() {
       )}
 
       {/* Posts list */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-[#0B0B45]/5 text-left">
             <tr>

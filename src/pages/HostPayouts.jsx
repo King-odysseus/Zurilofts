@@ -216,6 +216,7 @@ function HostPayouts() {
               <p className="text-sm text-[#6b7280] mb-4">
                 Period: {whtMonth || 'All time'} | WHT Rate: 5% | Remitted to KRA
               </p>
+              <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
                   <tr className="border-b border-[#D9D9D9] text-left">
@@ -243,6 +244,7 @@ function HostPayouts() {
                   </tr>
                 </tbody>
               </table>
+              </div>
               <p className="text-xs text-[#6b7280] mt-3">
                 This statement confirms that ZuriLofts has deducted and remitted the above withholding tax amounts to KRA on your behalf.
                 Use this document to claim tax credits when filing your annual returns.

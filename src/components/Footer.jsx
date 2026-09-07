@@ -67,7 +67,7 @@ function Footer() {
           <p className="text-white/60 text-sm">
             © {new Date().getFullYear()} ZuriLofts. All rights reserved.
           </p>
-          <div className="flex space-x-6 mt-4 md:mt-0">
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4 md:mt-0">
             <a href="/privacy" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Privacy Policy</a>
             <a href="/terms" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Terms of Service</a>
             <a href="/privacy#cookies" className="text-white/60 hover:text-[#C49A6C] text-sm transition-colors duration-200">Cookie Policy</a>

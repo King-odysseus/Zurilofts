@@ -44,7 +44,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
         <button
           type="submit"
           disabled={loading}
-          className="bg-[#C49A6C] text-white font-bold px-8 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
+          className="bg-[#C49A6C] text-white font-bold px-5 sm:px-8 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? 'Searching…' : 'Search'}
         </button>

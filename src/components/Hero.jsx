@@ -161,7 +161,7 @@ function SearchBar() {
   return (
     <div className="max-w-[680px] mx-auto relative" ref={containerRef}>
       <div className="bg-white rounded-full shadow-2xl px-2 py-2 flex items-center transform hover:scale-[1.02] transition-transform duration-200">
-        <div className="flex-1 flex items-center px-5">
+        <div className="flex-1 flex items-center px-4 sm:px-5">
           {loading ? (
             <div className="w-5 h-5 border-2 border-[#C49A6C] border-t-transparent rounded-full animate-spin mr-3 flex-shrink-0" />
           ) : (
@@ -181,7 +181,7 @@ function SearchBar() {
         </div>
         <button
           onClick={handleSearch}
-          className="bg-[#C49A6C] text-white font-bold px-8 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg"
+          className="bg-[#C49A6C] text-white font-bold px-5 sm:px-8 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg"
         >
           Search
         </button>

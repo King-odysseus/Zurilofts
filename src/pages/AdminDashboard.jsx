@@ -177,6 +177,10 @@ function AdminLayout() {
   const [notif, setNotif] = useState({ unreadMessages: 0, pendingBookings: 0 });
   const lastNotifRef = useRef({ unreadMessages: 0, pendingBookings: 0 });
 
+  // Mobile pill nav "More" overflow menu
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
+  const mobileMoreRef = useRef(null);
+
   useEffect(() => {
     let active = true;
     const poll = async () => {
@@ -199,6 +203,17 @@ function AdminLayout() {
     return () => { active = false; clearInterval(t); };
   }, []);
 
+  // Close the mobile "More" menu when tapping outside it
+  useEffect(() => {
+    function handleClick(e) {
+      if (mobileMoreRef.current && !mobileMoreRef.current.contains(e.target)) {
+        setMobileMoreOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
   function handleLogout() {
     logout();
     navigate('/');
@@ -211,6 +226,14 @@ function AdminLayout() {
       return next;
     });
   }
+
+  // Mobile pill nav: show the first few sections, tuck the rest behind "More"
+  const MOBILE_NAV_VISIBLE = 3;
+  const mobileVisibleItems = navItems.slice(0, MOBILE_NAV_VISIBLE);
+  const mobileMoreItems = navItems.slice(MOBILE_NAV_VISIBLE);
+  const moreItemActive = mobileMoreItems.some(({ path, exact }) =>
+    exact ? location.pathname === path : location.pathname.startsWith(path)
+  );
 
   return (
     <div className="min-h-screen bg-canvas flex">
@@ -319,63 +342,120 @@ function AdminLayout() {
       </aside>
 
       {/* Mobile nav */}
-      <div className="md:hidden fixed top-0 w-full bg-[#0B0B45] z-10 p-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="bg-white rounded-lg px-2 py-1">
-            <img src={logoImg} alt="ZuriLofts" className="h-6 w-auto" />
-          </div>
-          <span className="text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">{isAdmin ? 'Admin' : 'Host'}</span>
-        </Link>
-        <div className="flex items-center space-x-2">
-          {navItems.map(({ path, label, icon }) => (
-            <Link
-              key={path}
-              to={path}
-              className={`p-2 rounded-lg text-xs font-medium transition-colors ${
-                location.pathname === path
-                  ? 'bg-[#C49A6C] text-white'
-                  : 'text-white/70'
-              }`}
-            >
-              <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-              </svg>
-              <span className="sr-only">{label}</span>
-            </Link>
-          ))}
-          <Link
-            to="/"
-            className="p-2 rounded-lg text-xs font-medium text-white/70 hover:text-white transition-colors"
-            title="Go back to client view"
-          >
-            <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span className="sr-only">Go back to client view</span>
+      <div className="md:hidden fixed top-0 w-full bg-[#0B0B45] z-10">
+        <div className="p-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center space-x-2">
+            <div className="bg-white rounded-lg px-2 py-1">
+              <img src={logoImg} alt="ZuriLofts" className="h-6 w-auto" />
+            </div>
+            <span className="text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">{isAdmin ? 'Admin' : 'Host'}</span>
           </Link>
-          {/* Mobile bell */}
-          <div className="relative">
-            <button
-              className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-              title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
-            </button>
-            {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                {(() => {
-                  const t = notif.unreadMessages + notif.pendingBookings;
-                  return t > 99 ? '99+' : t;
-                })()}
-              </span>
-            )}
-          </div>
-          <div className="bg-white/95 rounded-full">
-            <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+          <div className="flex items-center space-x-2">
+            {/* Mobile bell */}
+            <div className="relative">
+              <button
+                className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+              </button>
+              {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+                  {(() => {
+                    const t = notif.unreadMessages + notif.pendingBookings;
+                    return t > 99 ? '99+' : t;
+                  })()}
+                </span>
+              )}
+            </div>
+            <div className="bg-white/95 rounded-full">
+              <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+            </div>
           </div>
         </div>
+        {/* Mobile pill nav */}
+        <nav className="relative flex items-center gap-1.5 px-3 pb-3" aria-label="Admin sections">
+          {mobileVisibleItems.map(({ path, label, exact }) => {
+            const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+            return (
+              <Link
+                key={path}
+                to={path}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  active ? 'bg-[#C49A6C] text-white' : 'bg-white/10 text-white/80'
+                }`}
+              >
+                {label}
+              </Link>
+            );
+          })}
+
+          {mobileMoreItems.length > 0 ? (
+            <div className="relative shrink-0" ref={mobileMoreRef}>
+              <button
+                type="button"
+                onClick={() => setMobileMoreOpen((o) => !o)}
+                aria-expanded={mobileMoreOpen}
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
+                  mobileMoreOpen || moreItemActive ? 'bg-[#C49A6C] text-white' : 'bg-white/10 text-white/80'
+                }`}
+              >
+                More
+                <svg className={`w-3.5 h-3.5 transition-transform ${mobileMoreOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {mobileMoreOpen && (
+                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl py-2 z-30">
+                  {mobileMoreItems.map(({ path, label, icon, exact }) => {
+                    const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+                    return (
+                      <Link
+                        key={path}
+                        to={path}
+                        onClick={() => setMobileMoreOpen(false)}
+                        className={`flex items-center px-4 py-2.5 text-sm transition-colors ${
+                          active ? 'bg-[#C49A6C]/10 text-[#0B0B45] font-semibold' : 'text-[#1f2937] hover:bg-[#D9D9D9]/30'
+                        }`}
+                      >
+                        <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                        </svg>
+                        {label}
+                      </Link>
+                    );
+                  })}
+                  <div className="border-t border-[#D9D9D9] mt-1 pt-1">
+                    <Link
+                      to="/"
+                      onClick={() => setMobileMoreOpen(false)}
+                      className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+                    >
+                      <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                      </svg>
+                      Go back to client view
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link
+              to="/"
+              className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
+              title="Go back to client view"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              <span className="sr-only">Go back to client view</span>
+            </Link>
+          )}
+        </nav>
       </div>
 
       {/* Main content */}
@@ -408,7 +488,7 @@ function AdminLayout() {
           </div>
           <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
         </header>
-        <div className="p-4 md:p-8 pt-20 md:pt-8">
+        <div className="p-4 md:p-8 pt-28 md:pt-8">
           <Outlet />
         </div>
       </main>
