@@ -33,7 +33,7 @@ const adminOnlyItems = [
 
 // Avatar dropdown shown in the dashboard header - mirrors the client Navbar's
 // account menu so admins/hosts get the same affordance inside the panel.
-function HeaderUserMenu({ user, isAdmin, onLogout }) {
+function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -65,7 +65,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout }) {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-lg py-2 z-30">
+        <div className={`absolute right-0 w-56 bg-white rounded-2xl shadow-lg py-2 z-30 ${openUp ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
           <div className="px-4 py-3 border-b border-[#D9D9D9]">
             <p className="text-sm font-semibold text-[#0B0B45]">{user?.firstName} {user?.lastName}</p>
             <p className="text-xs text-[#6b7280]">{user?.email}</p>
@@ -127,6 +127,7 @@ HeaderUserMenu.propTypes = {
   }),
   isAdmin: PropTypes.bool,
   onLogout: PropTypes.func.isRequired,
+  openUp: PropTypes.bool,
 };
 
 /* ── StatCard - TijhaBooks-style dashboard metric card ── */
@@ -177,9 +178,8 @@ function AdminLayout() {
   const [notif, setNotif] = useState({ unreadMessages: 0, pendingBookings: 0 });
   const lastNotifRef = useRef({ unreadMessages: 0, pendingBookings: 0 });
 
-  // Mobile pill nav "More" overflow menu
-  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
-  const mobileMoreRef = useRef(null);
+  // Mobile pill nav "More" off-screen menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -196,22 +196,11 @@ function AdminLayout() {
 
         lastNotifRef.current = { unreadMessages: d.unreadMessages ?? 0, pendingBookings: d.pendingBookings ?? 0 };
         setNotif({ unreadMessages: d.unreadMessages ?? 0, pendingBookings: d.pendingBookings ?? 0 });
-      } catch { /* silently ignore */ }
+      } catch (err) { console.error(err); }
     };
     poll();
     const t = setInterval(poll, 25000);
     return () => { active = false; clearInterval(t); };
-  }, []);
-
-  // Close the mobile "More" menu when tapping outside it
-  useEffect(() => {
-    function handleClick(e) {
-      if (mobileMoreRef.current && !mobileMoreRef.current.contains(e.target)) {
-        setMobileMoreOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
   function handleLogout() {
@@ -222,16 +211,15 @@ function AdminLayout() {
   function toggleSidebar() {
     setCollapsed((prev) => {
       const next = !prev;
-      try { localStorage.setItem('zurilofts_admin_sidebar', next ? 'collapsed' : 'expanded'); } catch { /* ignore localStorage errors */ }
+      try { localStorage.setItem('zurilofts_admin_sidebar', next ? 'collapsed' : 'expanded'); } catch (err) { console.error(err); }
       return next;
     });
   }
 
-  // Mobile pill nav: show the first few sections, tuck the rest behind "More"
-  const MOBILE_NAV_VISIBLE = 3;
+  // Mobile pill nav: show the first four sections, tuck the rest behind "More"
+  const MOBILE_NAV_VISIBLE = 4;
   const mobileVisibleItems = navItems.slice(0, MOBILE_NAV_VISIBLE);
-  const mobileMoreItems = navItems.slice(MOBILE_NAV_VISIBLE);
-  const moreItemActive = mobileMoreItems.some(({ path, exact }) =>
+  const moreItemActive = navItems.slice(MOBILE_NAV_VISIBLE).some(({ path, exact }) =>
     exact ? location.pathname === path : location.pathname.startsWith(path)
   );
 
@@ -341,20 +329,64 @@ function AdminLayout() {
         </div>
       </aside>
 
-      {/* Mobile nav */}
-      <div className="md:hidden fixed top-0 w-full bg-[#0B0B45] z-10">
-        <div className="p-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="bg-white rounded-lg px-2 py-1">
-              <img src={logoImg} alt="ZuriLofts" className="h-6 w-auto" />
-            </div>
-            <span className="text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">{isAdmin ? 'Admin' : 'Host'}</span>
-          </Link>
-          <div className="flex items-center space-x-2">
-            {/* Mobile bell */}
-            <div className="relative">
+      {/* Mobile floating pill nav + off-screen drawer */}
+      <div className="md:hidden">
+        <div className="fixed inset-x-0 bottom-4 z-10 flex justify-center px-4">
+          <div className="flex items-center gap-1 bg-[#0B0B45] rounded-full p-1.5 shadow-2xl shadow-black/40">
+            {/* Logo -> client view */}
+            <Link
+              to="/"
+              className="shrink-0 flex items-center justify-center bg-white rounded-full p-1.5"
+              title="Go back to client view"
+            >
+              <img src={logoImg} alt="ZuriLofts" className="h-5 w-auto" />
+            </Link>
+
+            {/* Visible section links */}
+            {mobileVisibleItems.map(({ path, label, icon, exact }) => {
+              const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+              return (
+                <Link
+                  key={path}
+                  to={path}
+                  title={label}
+                  aria-label={label}
+                  className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
+                    active ? 'bg-[#C49A6C] text-white' : 'text-white/70 hover:bg-white/10'
+                  }`}
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                  </svg>
+                </Link>
+              );
+            })}
+
+            {/* More -> open the drawer */}
+            {navItems.length > MOBILE_NAV_VISIBLE && (
               <button
-                className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                type="button"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-haspopup="menu"
+                aria-expanded={mobileMenuOpen}
+                title="More"
+                aria-label="More"
+                className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
+                  mobileMenuOpen || moreItemActive ? 'bg-[#C49A6C] text-white' : 'text-white/70 hover:bg-white/10'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <circle cx="5" cy="12" r="1.6" />
+                  <circle cx="12" cy="12" r="1.6" />
+                  <circle cx="19" cy="12" r="1.6" />
+                </svg>
+              </button>
+            )}
+
+            {/* Bell */}
+            <div className="relative shrink-0">
+              <button
+                className="flex items-center justify-center w-8 h-8 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
                 title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -370,92 +402,74 @@ function AdminLayout() {
                 </span>
               )}
             </div>
-            <div className="bg-white/95 rounded-full">
-              <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+
+            {/* Avatar */}
+            <div className="shrink-0 bg-white/95 rounded-full">
+              <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} openUp />
             </div>
           </div>
         </div>
-        {/* Mobile pill nav */}
-        <nav className="relative flex items-center gap-1.5 px-3 pb-3" aria-label="Admin sections">
-          {mobileVisibleItems.map(({ path, label, exact }) => {
-            const active = exact ? location.pathname === path : location.pathname.startsWith(path);
-            return (
-              <Link
-                key={path}
-                to={path}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                  active ? 'bg-[#C49A6C] text-white' : 'bg-white/10 text-white/80'
-                }`}
-              >
-                {label}
-              </Link>
-            );
-          })}
 
-          {mobileMoreItems.length > 0 ? (
-            <div className="relative shrink-0" ref={mobileMoreRef}>
-              <button
-                type="button"
-                onClick={() => setMobileMoreOpen((o) => !o)}
-                aria-expanded={mobileMoreOpen}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold transition-colors ${
-                  mobileMoreOpen || moreItemActive ? 'bg-[#C49A6C] text-white' : 'bg-white/10 text-white/80'
-                }`}
-              >
-                More
-                <svg className={`w-3.5 h-3.5 transition-transform ${mobileMoreOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              {mobileMoreOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl py-2 z-30">
-                  {mobileMoreItems.map(({ path, label, icon, exact }) => {
-                    const active = exact ? location.pathname === path : location.pathname.startsWith(path);
-                    return (
-                      <Link
-                        key={path}
-                        to={path}
-                        onClick={() => setMobileMoreOpen(false)}
-                        className={`flex items-center px-4 py-2.5 text-sm transition-colors ${
-                          active ? 'bg-[#C49A6C]/10 text-[#0B0B45] font-semibold' : 'text-[#1f2937] hover:bg-[#D9D9D9]/30'
-                        }`}
-                      >
-                        <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-                        </svg>
-                        {label}
-                      </Link>
-                    );
-                  })}
-                  <div className="border-t border-[#D9D9D9] mt-1 pt-1">
-                    <Link
-                      to="/"
-                      onClick={() => setMobileMoreOpen(false)}
-                      className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
-                    >
-                      <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                      </svg>
-                      Go back to client view
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
-          ) : (
+        {/* Off-screen menu drawer (all sections) */}
+        <div
+          className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
+            mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+        <div
+          className={`fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ${
+            mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+          }`}
+          role="dialog"
+          aria-label="All sections"
+        >
+          <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#D9D9D9]">
+            <h2 className="text-lg font-bold text-[#0B0B45]">{isAdmin ? 'Admin Menu' : 'Host Menu'}</h2>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 rounded-full text-[#6b7280] hover:bg-[#D9D9D9]/30 transition-colors"
+              aria-label="Close menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <nav className="flex-1 overflow-y-auto py-2" aria-label="Admin sections">
+            {navItems.map(({ path, label, icon, exact }) => {
+              const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+              return (
+                <Link
+                  key={path}
+                  to={path}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center px-5 py-3 text-sm transition-colors ${
+                    active ? 'bg-[#C49A6C]/10 text-[#0B0B45] font-semibold' : 'text-[#1f2937] hover:bg-[#D9D9D9]/30'
+                  }`}
+                >
+                  <svg className="w-5 h-5 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                  </svg>
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="border-t border-[#D9D9D9] p-3">
             <Link
               to="/"
-              className="shrink-0 flex items-center justify-center w-8 h-8 rounded-full bg-white/10 text-white/80 hover:bg-white/20 transition-colors"
-              title="Go back to client view"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold text-[#0B0B45] shadow-sm hover:shadow-md transition-shadow"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              <span className="sr-only">Go back to client view</span>
+              Go back to client view
             </Link>
-          )}
-        </nav>
+          </div>
+        </div>
       </div>
 
       {/* Main content */}
@@ -488,7 +502,7 @@ function AdminLayout() {
           </div>
           <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
         </header>
-        <div className="p-4 md:p-8 pt-28 md:pt-8">
+        <div className="p-4 pb-24 md:p-8">
           <Outlet />
         </div>
       </main>
@@ -548,7 +562,7 @@ function DashboardOverview() {
           const ls = results[4].data.data || {};
           setLandingStats({ happyStays: String(ls.happyStays || '10'), starRating: String(ls.starRating || '5.0'), satisfaction: String(ls.satisfaction || '0') });
         }
-      } catch { /* silent */ }
+      } catch (err) { console.error(err); }
     }
     load();
   }, [isAdmin]);
