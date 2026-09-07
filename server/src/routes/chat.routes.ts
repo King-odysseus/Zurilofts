@@ -44,7 +44,7 @@ router.post('/send', chatLimiter, validate(chatSchema), async (req, res, next) =
     const safeMessage = escapeMarkdown(message);
 
     const text = [
-      `💬 *New website chat*`,
+      `*New website chat*`,
       safeEmail ? `${safeName} · ${safeEmail}` : safeName,
       ``,
       safeMessage,

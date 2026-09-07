@@ -2,7 +2,7 @@
 
 This document is the single source of truth for visual design. All AI agents and developers must follow these guidelines when building any page or component.
 
-> Last updated: 2026-08-08 — migrated from neumorphic to flat card/input system, merged TijhaBooks patterns.
+> Last updated: 2026-08-08 - migrated from neumorphic to flat card/input system, merged TijhaBooks patterns.
 
 ---
 
@@ -21,12 +21,12 @@ This document is the single source of truth for visual design. All AI agents and
 | Border Light    | Subtle Grey     | `#EFEFF2` | Card borders, light dividers                        |
 
 ### Color Rules
-- **Dark Navy `#0B0B45`** is the authority color — navbar, all headings, footer background, hero overlay tint, admin sidebar, section titles.
-- **Warm Bronze `#C49A6C`** is the action color — every CTA button, hover state, active nav indicator, badge, price highlight, and icon accent uses bronze. Never used as a large background fill.
-- **Silver Grey `#D9D9D9`** is the neutral surface — alternate section backgrounds, input borders, card dividers, skeleton loaders.
-- **White** is the default page and card background — keeps the layout breathing.
-- Never place bronze text on white — contrast is low. Use navy or charcoal for text on light backgrounds.
-- Bronze buttons use white text for readability against the gold background — never navy or charcoal on bronze.
+- **Dark Navy `#0B0B45`** is the authority color - navbar, all headings, footer background, hero overlay tint, admin sidebar, section titles.
+- **Warm Bronze `#C49A6C`** is the action color - every CTA button, hover state, active nav indicator, badge, price highlight, and icon accent uses bronze. Never used as a large background fill.
+- **Silver Grey `#D9D9D9`** is the neutral surface - alternate section backgrounds, input borders, card dividers, skeleton loaders.
+- **White** is the default page and card background - keeps the layout breathing.
+- Never place bronze text on white - contrast is low. Use navy or charcoal for text on light backgrounds.
+- Bronze buttons use white text for readability against the gold background - never navy or charcoal on bronze.
 - Dark navy and bronze can be paired directly (e.g. navy footer with bronze links/icons).
 
 ---
@@ -41,7 +41,7 @@ Fallback:  Helvetica, Arial, sans-serif
 
 ### Typography Scale & Text Conventions
 
-All text follows a consistent scale. Never use arbitrary `text-[Npx]` — use the mapped class below.
+All text follows a consistent scale. Never use arbitrary `text-[Npx]` - use the mapped class below.
 
 | Size | Tailwind | Usage |
 |------|----------|-------|
@@ -110,10 +110,10 @@ Use multiples of 4px (Tailwind's default scale).
 ## Layout
 
 - **Max content width:** `1280px` centered with `mx-auto px-6` (client pages only)
-- **Admin layout:** Full-bleed — no `max-w-7xl` wrapper; sidebar + content fills viewport
+- **Admin layout:** Full-bleed - no `max-w-7xl` wrapper; sidebar + content fills viewport
 - **Grid:** 12-column conceptual grid; use Tailwind `grid-cols-3` for card grids, `grid-cols-2` for split layouts
 - **Sidebar split:** 40% text / 60% image (or image grid)
-- **Card grid:** 3 columns desktop → 2 tablet → 1 mobile
+- **Card grid:** 3 columns desktop -&gt; 2 tablet -&gt; 1 mobile
 
 ---
 
@@ -151,7 +151,7 @@ When building structured cards, use these internal sections:
 
 ## Form Inputs
 
-All form inputs use flat bordered style — no inset shadows.
+All form inputs use flat bordered style - no inset shadows.
 
 ```css
 .neu-input {
@@ -188,7 +188,7 @@ All form inputs use flat bordered style — no inset shadows.
 
 ### Auth Cards
 
-Auth cards over dark photo backgrounds use a single soft drop shadow — no neumorphic white-glow.
+Auth cards over dark photo backgrounds use a single soft drop shadow - no neumorphic white-glow.
 
 ```css
 .auth-card { box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5); }
@@ -304,7 +304,7 @@ BackLink
 ### Navbar
 - White background with a subtle bottom border (`border-b border-[#EFEFF2]`)
 - Logo: Gold icon + Navy bold wordmark
-- Nav links: Navy, `font-medium`, hover state → gold underline
+- Nav links: Navy, `font-medium`, hover state -&gt; gold underline
 - Right side: outlined navy button ("Sign In") + solid gold button ("Get It Now")
 - Sticky on scroll with `shadow-sm`
 - Height: `64px`
@@ -428,7 +428,7 @@ Key properties:
 - **Mood:** aspirational, warm, trustworthy
 - **Overlay:** always use a dark overlay on hero images for text legibility
 - **Aspect ratios:** hero = `16:9` or full viewport height; cards = `4:3` or `16:9`
-- **No stock illustrations** — photos only
+- **No stock illustrations** - photos only
 
 ---
 
@@ -451,7 +451,7 @@ Key properties:
 - All interactive elements: `transition-all duration-200`
 - Card hover: `hover:-translate-y-1 hover:shadow-lg`
 - Button hover: `hover:opacity-90` or darken by one shade
-- No heavy animations — keep it fast and professional
+- No heavy animations - keep it fast and professional
 
 ### Advanced Animation Patterns
 
@@ -538,14 +538,14 @@ colors: {
 ## NEVER Use
 
 - Hardcoded hex colors in JSX (use Tailwind arbitrary `bg-[#...]` or config tokens)
-- Squared or `rounded-lg` inputs — use `.neu-input` or `rounded-xl`
-- Multiple border classes on the same element — `.neu-input` already provides the border
-- `rounded-lg` for cards — use `rounded-2xl`
-- `text-[10px]` outside of compact document templates — use `text-xs` minimum
+- Squared or `rounded-lg` inputs - use `.neu-input` or `rounded-xl`
+- Multiple border classes on the same element - `.neu-input` already provides the border
+- `rounded-lg` for cards - use `rounded-2xl`
+- `text-[10px]` outside of compact document templates - use `text-xs` minimum
 - Instant state changes without `transition-*`
 - Decorative orbs, gradient blobs, or bokeh circles as backgrounds
-- Black (`#000`) for text — use charcoal `#1f2937` instead
-- Gold/bronze as a large background fill — reserved for interactive elements only
+- Black (`#000`) for text - use charcoal `#1f2937` instead
+- Gold/bronze as a large background fill - reserved for interactive elements only
 - Raw `<input>`/`<select>`/`<textarea>` without `.neu-input` styling in form contexts
 - `border` + `neo-input` on the same element (double-border effect)
 

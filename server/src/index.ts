@@ -17,11 +17,11 @@ if (env.NODE_ENV === 'production') {
   app.get('*', (_req, res) => {
     res.sendFile(path.join(clientDist, 'index.html'));
   });
-  console.log(`📦 Serving static files from ${clientDist}`);
+  console.log(` Serving static files from ${clientDist}`);
 }
 
 app.listen(Number(env.PORT), () => {
-  console.log(`🚀 ZuriLofts running on port ${env.PORT}`);
+  console.log(` ZuriLofts running on port ${env.PORT}`);
   console.log(`   Environment: ${env.NODE_ENV}`);
   console.log(`   Health: http://localhost:${env.PORT}/api/health`);
   startTelegramPoller();
@@ -47,7 +47,7 @@ function startCalendarSync() {
   const run = () => {
     syncAll()
       .then((count) => {
-        if (count > 0) console.log(`📅 Calendar sync ran for ${count} source(s)`);
+        if (count > 0) console.log(` Calendar sync ran for ${count} source(s)`);
       })
       .catch((err) => console.error('Calendar sync failed:', err?.message || err));
   };
@@ -64,7 +64,7 @@ function startAutomatedMessageScheduler() {
   const run = () => {
     runDueAutoMessages()
       .then(({ sent }) => {
-        if (sent > 0) console.log(`💬 Automated messages sent for ${sent} booking(s)`);
+        if (sent > 0) console.log(` Automated messages sent for ${sent} booking(s)`);
       })
       .catch((err) => console.error('Automated message scan failed:', err?.message || err));
   };

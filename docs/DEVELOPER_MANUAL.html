@@ -222,10 +222,10 @@ USER'S BROWSER                    YOUR SERVER / COMPUTER
 │  React App        │  HTTP    │  Express Server             │
 │  (Vite)           │◄────────►│  (Node.js + TypeScript)     │
 │                   │  JSON    │                             │
-│  - Pages          │          │  Routes → Controllers       │
-│  - Components     │          │  Controllers → Services     │
-│  - Tailwind CSS   │          │  Services → Prisma          │
-│  - Axios (API)    │          │  Prisma → Database          │
+│  - Pages          │          │  Routes -&gt; Controllers       │
+│  - Components     │          │  Controllers -&gt; Services     │
+│  - Tailwind CSS   │          │  Services -&gt; Prisma          │
+│  - Axios (API)    │          │  Prisma -&gt; Database          │
 └──────────────────┘          └─────────────────────────────┘
 </pre>
 
@@ -279,30 +279,30 @@ USER'S BROWSER                    YOUR SERVER / COMPUTER
 <h2>Folder Map</h2>
 <pre>
 zurilofts/
-├── src/                         ← FRONTEND (React app)
-│   ├── pages/                   ← Full pages (LoginPage, BookingPage, etc.)
-│   ├── components/              ← Reusable UI pieces (Navbar, Dropdown, etc.)
-│   ├── context/                 ← Shared state (Auth, Favorites)
-│   ├── api/client.js            ← Axios HTTP client
-│   ├── App.jsx                  ← Routes + HomePage + layout
-│   ├── index.css                ← Global styles + Tailwind
-│   └── main.jsx                 ← Entry point
+├── src/                         &lt;- FRONTEND (React app)
+│   ├── pages/                   &lt;- Full pages (LoginPage, BookingPage, etc.)
+│   ├── components/              &lt;- Reusable UI pieces (Navbar, Dropdown, etc.)
+│   ├── context/                 &lt;- Shared state (Auth, Favorites)
+│   ├── api/client.js            &lt;- Axios HTTP client
+│   ├── App.jsx                  &lt;- Routes + HomePage + layout
+│   ├── index.css                &lt;- Global styles + Tailwind
+│   └── main.jsx                 &lt;- Entry point
 │
 ├── server/
-│   ├── prisma/schema.prisma     ← Database structure
-│   ├── prisma/dev.db            ← SQLite database file (dev)
+│   ├── prisma/schema.prisma     &lt;- Database structure
+│   ├── prisma/dev.db            &lt;- SQLite database file (dev)
 │   └── src/
-│       ├── routes/              ← URL definitions (e.g. /api/properties)
-│       ├── controllers/         ← Request handlers (parse input → response)
-│       ├── services/            ← Business logic + database queries
-│       ├── middleware/           ← Auth, validation, error handling
-│       ├── types/index.ts       ← Validation schemas + TypeScript types
-│       └── utils/               ← JWT, pricing helpers
+│       ├── routes/              &lt;- URL definitions (e.g. /api/properties)
+│       ├── controllers/         &lt;- Request handlers (parse input -&gt; response)
+│       ├── services/            &lt;- Business logic + database queries
+│       ├── middleware/           &lt;- Auth, validation, error handling
+│       ├── types/index.ts       &lt;- Validation schemas + TypeScript types
+│       └── utils/               &lt;- JWT, pricing helpers
 │
-├── public/                      ← Static files (images served directly)
-├── docs/                        ← THIS MANUAL (not part of the app)
-├── package.json                 ← Frontend dependencies
-└── vite.config.js               ← Vite configuration
+├── public/                      &lt;- Static files (images served directly)
+├── docs/                        &lt;- THIS MANUAL (not part of the app)
+├── package.json                 &lt;- Frontend dependencies
+└── vite.config.js               &lt;- Vite configuration
 </pre>
 
 <h2>Request Flow (What Happens When You Click a Button)</h2>
@@ -405,7 +405,7 @@ zurilofts/
 <div class="step"><div class="step-num">1</div><div class="step-body"><h4>Edit the schema</h4><p>Open <code>server/prisma/schema.prisma</code>. Add your field to an existing model.</p>
 <pre>model Property {
   // ... existing fields ...
-  wifiSpeed   Int?      // ← new field
+  wifiSpeed   Int?      // &lt;- new field
 }</pre></div></div>
 
 <div class="step"><div class="step-num">2</div><div class="step-body"><h4>Push to dev database</h4><pre>cd server
@@ -654,13 +654,13 @@ router.put('/settings/house-rules', async (req, res, next) => {
 <div class="file-path">src/pages/BookingPage.jsx</div>
 <p>Find the <code>BED_OPTIONS</code> array near the top:</p>
 <pre>const BED_OPTIONS = [
-  { type: '1bed', label: '1 Bed', price: 5100 },   // ← change this number
-  { type: '2bed', label: '2 Bed', price: 5500 },   // ← change this number
+  { type: '1bed', label: '1 Bed', price: 5100 },   // &lt;- change this number
+  { type: '2bed', label: '2 Bed', price: 5500 },   // &lt;- change this number
 ];</pre>
 <p>Also update <code>server/src/services/booking.service.ts</code>:</p>
 <pre>const BED_PRICES: Record<string, number> = {
-  '1bed': 5100,   // ← must match frontend
-  '2bed': 5500,   // ← must match frontend
+  '1bed': 5100,   // &lt;- must match frontend
+  '2bed': 5500,   // &lt;- must match frontend
 };</pre>
 
 <hr style="margin:32px 0;border-color:#D9D9D9">
@@ -686,7 +686,7 @@ router.put('/settings/house-rules', async (req, res, next) => {
 
 <h2>Example: Change the Google Maps Location</h2>
 <div class="file-path">src/pages/ContactPage.jsx</div>
-<p>Find the <code>&lt;iframe&gt;</code> element. Replace the <code>src</code> URL with a new Google Maps embed link. Go to Google Maps, find your location, click Share → Embed a map → copy the URL.</p>
+<p>Find the <code>&lt;iframe&gt;</code> element. Replace the <code>src</code> URL with a new Google Maps embed link. Go to Google Maps, find your location, click Share -&gt; Embed a map -&gt; copy the URL.</p>
 </section>
 
 <!-- ================================================================ -->
@@ -741,7 +741,7 @@ npx prisma db push</pre>
   <tr><td>Prisma client out of date</td><td>Run <code>cd server && npx prisma generate</code></td></tr>
   <tr><td>Port 3000 already in use</td><td>Kill the process: <code>taskkill /f /im node.exe</code> (Windows) or change PORT in .env</td></tr>
   <tr><td>Port 5173 already in use</td><td>Vite will auto-pick the next available port</td></tr>
-  <tr><td>White page in browser</td><td>Open browser dev tools (F12) → Console tab for errors</td></tr>
+  <tr><td>White page in browser</td><td>Open browser dev tools (F12) -&gt; Console tab for errors</td></tr>
   <tr><td>API calls failing (401 Unauthorized)</td><td>Your login token expired. Sign out and sign in again.</td></tr>
   <tr><td>Images not showing</td><td>Check <code>server/uploads/</code> folder exists and has files. Check the image path starts with <code>/uploads/</code>.</td></tr>
   <tr><td>Google sign-in not working</td><td>Check GOOGLE_CLIENT_ID + GOOGLE_CLIENT_SECRET in server/.env are correct. The callback URL must match Google Cloud Console settings.</td></tr>

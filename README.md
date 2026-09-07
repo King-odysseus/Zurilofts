@@ -89,15 +89,15 @@ A feature-rich card component displaying property listings with interactive elem
 **Props:**
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
-| `property.image` | string | ✓ | Property image URL |
-| `property.title` | string | ✓ | Property name |
-| `property.location` | string | ✓ | Location address |
-| `property.price` | number | ✓ | Price per night (KES) |
-| `property.rating` | number | ✓ | Star rating (e.g., 5.0) |
-| `property.reviews` | number | ✓ | Number of reviews |
-| `property.bedrooms` | number | ✓ | Bedroom count |
-| `property.bathrooms` | number | ✓ | Bathroom count |
-| `property.area` | number | ✓ | Area in sq ft |
+| `property.image` | string | Yes | Property image URL |
+| `property.title` | string | Yes | Property name |
+| `property.location` | string | Yes | Location address |
+| `property.price` | number | Yes | Price per night (KES) |
+| `property.rating` | number | Yes | Star rating (e.g., 5.0) |
+| `property.reviews` | number | Yes | Number of reviews |
+| `property.bedrooms` | number | Yes | Bedroom count |
+| `property.bathrooms` | number | Yes | Bathroom count |
+| `property.area` | number | Yes | Area in sq ft |
 | `property.badge` | string | | Optional badge text (e.g., "Featured") |
 
 **Design Techniques:**
@@ -333,7 +333,7 @@ A separate visual developer manual lives in the `manual/` folder. It documents t
 cd manual
 npm install
 npm run dev
-# → opens at http://localhost:5174
+# -&gt; opens at http://localhost:5174
 ```
 
 The manual is a standalone React app. It shares no code or dependencies with the main ZuriLofts app. The `manual/` folder is gitignored and never deployed.

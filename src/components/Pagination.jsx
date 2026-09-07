@@ -17,7 +17,7 @@ function pageList(page, totalPages) {
 }
 
 /**
- * Paged-list footer: a "x–y of z" summary plus prev/next + numbered pills.
+ * Paged-list footer: a "x-y of z" summary plus prev/next + numbered pills.
  * Renders nothing when there is only one page and no total was provided.
  */
 function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel }) {
@@ -30,7 +30,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 py-3">
       {total != null ? (
         <p className="text-sm text-[#6b7280]">
-          Showing {total === 0 ? 0 : from}–{to} of {total}
+          Showing {total === 0 ? 0 : from}-{to} of {total}
           {itemLabel ? ` ${itemLabel}` : ''}
         </p>
       ) : (

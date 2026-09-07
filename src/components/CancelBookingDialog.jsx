@@ -20,7 +20,7 @@ function formatDates(checkIn, checkOut) {
     const co = new Date(checkOut);
     const ciStr = ci.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     const coStr = co.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-    return `${ciStr} – ${coStr}`;
+    return `${ciStr} - ${coStr}`;
   } catch {
     return '';
   }

@@ -288,7 +288,7 @@ function AdminBookings() {
         status === 'CONFIRMED'
           ? 'Booking confirmed.'
           : updated.refundStatus === 'REFUND_PENDING'
-            ? 'Booking cancelled — refund flagged for processing.'
+            ? 'Booking cancelled - refund flagged for processing.'
             : 'Booking cancelled and dates released.'
       );
     } catch (err) {

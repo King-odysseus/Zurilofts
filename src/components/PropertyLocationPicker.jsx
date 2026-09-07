@@ -299,7 +299,7 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p className="text-sm text-[#1f2937]">
-              Pin dropped. Drag it or click elsewhere to adjust — or clear the pin to search a new place.
+              Pin dropped. Drag it or click elsewhere to adjust - or clear the pin to search a new place.
             </p>
           </>
         ) : (
@@ -374,10 +374,10 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
         {searchNote && <p className="text-xs text-red-600 mt-1.5">{searchNote}</p>}
         <p className="text-xs text-[#6b7280] mt-1.5">
           {lookupFailed
-            ? 'Automatic lookup did not find an address here — keep the text or type it manually.'
+            ? 'Automatic lookup did not find an address here - keep the text or type it manually.'
             : hasPin
               ? 'Found from the map. You can edit it to add the unit, floor or gate name.'
-              : 'Pick a search result or click the map — the address fills in automatically and stays editable.'}
+              : 'Pick a search result or click the map - the address fills in automatically and stays editable.'}
         </p>
       </div>
     </div>

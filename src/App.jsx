@@ -119,7 +119,7 @@ function HomePage() {
 
   // Weekly-rotating masonry images from property pool
   const masonryImages = useMemo(() => {
-    // ISO week number (1–53) as seed so layout rotates every Monday
+    // ISO week number (1-53) as seed so layout rotates every Monday
     const now = new Date();
     const startOfYear = new Date(now.getFullYear(), 0, 1);
     const daysSinceStart = Math.floor((now - startOfYear) / 86400000);

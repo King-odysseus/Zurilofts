@@ -38,19 +38,19 @@ const guides = [
     coverImage: '/images/place-two-rivers-mall.jpg',
     body: `
 <h2>JKIA to Nairobi - Your Options</h2>
-<p>Jomo Kenyatta International Airport (JKIA) is about 18 km from the city centre. Depending on traffic, the journey takes 25–60 minutes.</p>
+<p>Jomo Kenyatta International Airport (JKIA) is about 18 km from the city centre. Depending on traffic, the journey takes 25-60 minutes.</p>
 
 <h3>1. Ride-Hailing (Uber / Bolt / Little)</h3>
 <p>The most convenient option. Open the app once you clear customs - WiFi is available at JKIA. Pricing is dynamic but expect:</p>
 <ul>
-  <li>JKIA → Kilimani: KES 800–1,500</li>
-  <li>JKIA → Westlands: KES 900–1,700</li>
-  <li>JKIA → Karen: KES 1,200–2,000</li>
-  <li>JKIA → Gigiri: KES 1,100–1,900</li>
+  <li>JKIA to Kilimani: KES 800-1,500</li>
+  <li>JKIA to Westlands: KES 900-1,700</li>
+  <li>JKIA to Karen: KES 1,200-2,000</li>
+  <li>JKIA to Gigiri: KES 1,100-1,900</li>
 </ul>
 
 <h3>2. Airport Taxi</h3>
-<p>Official JKIA taxis are available at the arrivals hall. Fixed fares, generally 30–50% more expensive than Uber. Negotiate before getting in.</p>
+<p>Official JKIA taxis are available at the arrivals hall. Fixed fares, generally 30-50% more expensive than Uber. Negotiate before getting in.</p>
 
 <h3>3. Hotel / Host Transfer</h3>
 <p>Some ZuriLofts hosts offer airport pickup - check your booking details or message your host. This is often the most seamless option, especially for late-night arrivals.</p>
@@ -62,7 +62,7 @@ const guides = [
 <ul>
   <li><strong>SIM card:</strong> Buy a Safaricom or Airtel SIM in the arrivals hall. Mobile data makes everything easier.</li>
   <li><strong>M-Pesa:</strong> Set up M-Pesa on your Safaricom line - it's how Kenya pays for everything.</li>
-  <li><strong>Traffic:</strong> Avoid arriving between 7–9 AM and 4–7 PM on weekdays if possible - Nairobi traffic is real.</li>
+  <li><strong>Traffic:</strong> Avoid arriving between 7-9 AM and 4-7 PM on weekdays if possible - Nairobi traffic is real.</li>
   <li><strong>Cash:</strong> Have some KES on hand for small purchases. ATMs are available at the airport.</li>
 </ul>
     `.trim(),
@@ -116,7 +116,7 @@ async function main() {
       update: guide,
       create: guide,
     });
-    console.log(`  ✓ ${guide.slug}`);
+    console.log(`   ${guide.slug}`);
   }
   console.log(`Done - ${guides.length} guides seeded.`);
   await prisma.$disconnect();

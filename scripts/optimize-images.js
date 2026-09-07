@@ -27,7 +27,7 @@ for (const file of files) {
   const origSize = (fs.statSync(srcPath).size / 1024 / 1024).toFixed(1);
   const newSize = (info.size / 1024).toFixed(1);
 
-  console.log(`${file}: ${origSize} MB → ${newSize} KB (${((1 - info.size / fs.statSync(srcPath).size) * 100).toFixed(0)}% smaller)`);
+  console.log(`${file}: ${origSize} MB -&gt; ${newSize} KB (${((1 - info.size / fs.statSync(srcPath).size) * 100).toFixed(0)}% smaller)`);
 }
 
-console.log('\n✅ Done!');
+console.log('\n Done!');

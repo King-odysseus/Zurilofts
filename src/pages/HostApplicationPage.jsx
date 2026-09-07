@@ -31,8 +31,8 @@ const PROPERTY_TYPES = [
 ];
 
 const DOCUMENT_LABELS = {
-  IDENTITY_FRONT: 'Identity document — photo/details side',
-  IDENTITY_BACK: 'Identity document — reverse side',
+  IDENTITY_FRONT: 'Identity document - photo/details side',
+  IDENTITY_BACK: 'Identity document - reverse side',
   PROPERTY_AUTHORITY: 'Proof of ownership or authority to host',
   BUSINESS_REGISTRATION: 'Business registration certificate',
 };
@@ -305,6 +305,11 @@ function HostApplicationPage() {
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link to="/host/properties/new" className="inline-flex justify-center rounded-full bg-[#C49A6C] px-6 py-3 font-semibold text-white">Set up your first property</Link>
               <Link to="/host/today" className="inline-flex justify-center rounded-full bg-[#0B0B45]/5 px-6 py-3 font-semibold text-[#0B0B45] hover:bg-[#0B0B45]/10 transition-colors">Open host dashboard</Link>
+            </div>
+          ) : !application && user?.role !== 'USER' ? (
+            <div className="mt-8 rounded-3xl bg-[#0B0B45]/5 p-5">
+              <p className="font-semibold text-[#0B0B45]">No verification needed for this account</p>
+              <p className="text-sm text-[#6b7280] mt-1">Your account role ({user?.role?.toLowerCase()}) doesn&apos;t go through host verification.</p>
             </div>
           ) : (
             <button type="button" onClick={() => { setMode('travelling'); navigate('/'); }} className="mt-8 rounded-full bg-[#0B0B45]/5 px-6 py-3 font-semibold text-[#0B0B45] hover:bg-[#0B0B45]/10 transition-colors">Continue traveling</button>

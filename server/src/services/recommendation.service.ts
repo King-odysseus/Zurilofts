@@ -49,7 +49,7 @@ export async function getPersonalizedRecommendations(
     orderBy: { createdAt: "desc" },
   });
 
-  // No history → fallback to popular
+  // No history -&gt; fallback to popular
   if (bookings.length === 0) {
     const popular = await prisma.property.findMany({
       where: { NOT: suspendedFilter },

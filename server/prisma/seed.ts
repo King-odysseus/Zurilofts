@@ -9,7 +9,7 @@ function json(arr: string[]) {
 }
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log(' Seeding database...');
 
   // Create admin user
   const adminPassword = await bcrypt.hash('Admin@123', 12);
@@ -24,7 +24,7 @@ async function main() {
       role: 'ADMIN',
     },
   });
-  console.log('  ✅ Admin: admin@zurilofts.co.ke / Admin@123');
+  console.log('   Admin: admin@zurilofts.co.ke / Admin@123');
 
   // Create test user
   const userPassword = await bcrypt.hash('User@1234', 12);
@@ -39,7 +39,7 @@ async function main() {
       phone: '+254 700 000 000',
     },
   });
-  console.log('  ✅ User: user@example.com / User@1234');
+  console.log('   User: user@example.com / User@1234');
 
   // Build local image paths helper
   function img(n: number) {
@@ -95,7 +95,7 @@ async function main() {
       });
     }
   }
-  console.log(`  ✅ ${propertiesData.length} properties seeded`);
+  console.log(`   ${propertiesData.length} properties seeded`);
 
   // Seed promo codes
   const promos = [
@@ -110,11 +110,11 @@ async function main() {
       await prisma.promoCode.create({ data: promo });
     }
   }
-  console.log('  ✅ 3 promo codes seeded: WELCOME10, SUMMER2026, STAYLONG');
+  console.log('   3 promo codes seeded: WELCOME10, SUMMER2026, STAYLONG');
 
-  console.log('\n✅ Seed complete!');
+  console.log('\n Seed complete!');
 }
 
 main()
-  .catch((e) => { console.error('❌ Seed failed:', e); process.exit(1); })
+  .catch((e) => { console.error(' Seed failed:', e); process.exit(1); })
   .finally(async () => { await prisma.$disconnect(); });

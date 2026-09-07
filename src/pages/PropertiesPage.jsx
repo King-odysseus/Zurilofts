@@ -357,7 +357,7 @@ function PropertiesPage() {
                 options={[
                   { value: 'all', label: 'All Prices' },
                   { value: 'low', label: 'Under KES 5,000' },
-                  { value: 'mid', label: 'KES 5,000 – 8,000' },
+                  { value: 'mid', label: 'KES 5,000 - 8,000' },
                   { value: 'high', label: 'Above KES 8,000' },
                 ]}
                 triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C]"
@@ -413,7 +413,7 @@ function PropertiesPage() {
                         : 'bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0]'
                     }`}
                   >
-                    ⭐ {label}
+                    {label}
                   </button>
                 ))}
               </div>

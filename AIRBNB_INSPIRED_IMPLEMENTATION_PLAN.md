@@ -21,8 +21,8 @@ through ZuriLofts' own visual language and tailored to the Kenyan market.
 
 ### Component Patterns We Own
 
-- **Neumorphic cards** (`.neu-card`, `.neu-card-hover`) — legacy soft raised surfaces with layered `box-shadow` on white backgrounds. Still used in some existing components (`BookingSummaryCard`, `NearbySection`, `ChatWidget`). New components use flat Tailwind shadows (`shadow-md`, `shadow-lg`) per DESIGN.md. Full migration pending.
-- **Pill CTAs** — `rounded-full` bronze background with white text (`bg-[#C49A6C] text-white`) for primary actions; white background with navy border/text for secondary (`border-2 border-[#0B0B45] text-[#0B0B45]`). Never square-cornered buttons.
+- **Neumorphic cards** (`.neu-card`, `.neu-card-hover`) - legacy soft raised surfaces with layered `box-shadow` on white backgrounds. Still used in some existing components (`BookingSummaryCard`, `NearbySection`, `ChatWidget`). New components use flat Tailwind shadows (`shadow-md`, `shadow-lg`) per DESIGN.md. Full migration pending.
+- **Pill CTAs** - `rounded-full` bronze background with white text (`bg-[#C49A6C] text-white`) for primary actions; white background with navy border/text for secondary (`border-2 border-[#0B0B45] text-[#0B0B45]`). Never square-cornered buttons.
 - **Bronze as the sole action colour** - never used as a large background fill.
   Reserved for interactive elements: buttons, icons, rating stars, active states,
   focus rings, hover underlines.
@@ -40,7 +40,7 @@ through ZuriLofts' own visual language and tailored to the Kenyan market.
 ### Typography & Spacing
 
 - Font: Inter, `system-ui` fallback
-- Headings: `font-bold`, navy, `text-2xl`→`text-4xl`, `leading-tight`
+- Headings: `font-bold`, navy, `text-2xl`-&gt;`text-4xl`, `leading-tight`
 - Body: `text-base` (16px), charcoal, `leading-relaxed`
 - Section vertical rhythm: `py-10` mobile, `py-16` desktop
 - Card padding: `p-5` mobile, `p-6` desktop
@@ -93,8 +93,8 @@ These are implemented, tested, and ready to compose into new phases without refa
 The backend has two namespaced route groups with misaligned role guards:
 
 ```
-/api/properties/*     → requireHost (allows HOST + ADMIN)
-/api/admin/*          → requireAdmin (allows ADMIN only)
+/api/properties/*     -&gt; requireHost (allows HOST + ADMIN)
+/api/admin/*          -&gt; requireAdmin (allows ADMIN only)
 ```
 
 ### Three Specific Defects
@@ -152,7 +152,7 @@ Booking Confidence).
 
 ### Phase 1A: Search & Discovery
 
-**Status**: ✅ IMPLEMENTED (2026-08-07)
+**Status**:  IMPLEMENTED (2026-08-07)
 
 **Credits**: TripSearchBar component by **Qwen/DeepSeek**. Integration into
 `PropertiesPage`, editorial `PropertyCard` redesign, draft-vs-submitted search
@@ -173,8 +173,8 @@ results and no dead ends.
 - [x] Filter controls (using existing `Dropdown` component):
   - Property type: Apartment / Studio / Penthouse / All
   - Bedrooms: 1 / 2 (via bed-variant pills)
-  - Price range: KES preset bands (under 5K, 5K–8K, above 8K)
-- [x] Sort selector: Default, Price (low→high, high→low), Top Rated, Newest
+  - Price range: KES preset bands (under 5K, 5K-8K, above 8K)
+- [x] Sort selector: Default, Price (low-&gt;high, high-&gt;low), Top Rated, Newest
 - [x] Results grid of `PropertyCard` components: image, title, location, price,
       rating badge, bed-variant quick links (1-bed / 2-bed)
 - [x] Empty state: friendly illustration + try adjusting filters message
@@ -261,7 +261,7 @@ feat: add empty state for zero-result searches
 
 ### Phase 1B: Property Detail & Booking Confidence
 
-**Status**: ✅ IMPLEMENTED (2026-08-07)
+**Status**:  IMPLEMENTED (2026-08-07)
 
 **User outcome**: A guest viewing a property sees a clear, trustworthy,
 information-rich page that answers "what is this place like?" and "can I book
@@ -270,8 +270,8 @@ with confidence?" using only verified data the API actually supplies.
 #### What Was Implemented
 
 **PropertyPage.jsx (rewritten)**
-- **Information hierarchy**: Title → location + rating → trust panel → gallery →
-  quick facts → description → amenities → nearby → booking card. Each section
+- **Information hierarchy**: Title -&gt; location + rating -&gt; trust panel -&gt; gallery -&gt;
+  quick facts -&gt; description -&gt; amenities -&gt; nearby -&gt; booking card. Each section
   is independently conditional - no rendering of empty `<section>` wrappers.
 - **Safe data handling**: `safeArray()` helper guards against `null`/`undefined`
   arrays from the API. Description has a fallback string. Amenities and nearby
@@ -283,7 +283,7 @@ with confidence?" using only verified data the API actually supplies.
   `useCallback` hooks defined above conditional early returns (Rules of Hooks).
 - **Quick facts**: Bedrooms, bathrooms, area (sq ft), property type badge.
   Singular/plural labels ("1 Bedroom" vs "3 Bedrooms"). Type label from lookup
-  map (apartment→Apartment, studio→Studio, penthouse→Penthouse).
+  map (apartment-&gt;Apartment, studio-&gt;Studio, penthouse-&gt;Penthouse).
 - **Booking card**: Replaced inline markup with `<BookingSummaryCard>` component.
 - **Removed unverified claims**: No "Best price guarantee", "Instant confirmation",
   or "24/7 customer support".
@@ -324,7 +324,7 @@ with confidence?" using only verified data the API actually supplies.
 
 #### Verification
 
-- `npm run build` - ✅ passes
+- `npm run build` -  passes
 - Manual: visit `/property/:id` with a seeded property; all sections render
 - Manual: visit with `?variant=1bed`; price/bedrooms change
 - Manual: visit with `?variant=2bed`; 2-bed price/bedrooms/bathrooms shown
@@ -353,7 +353,7 @@ docs: add Airbnb-inspired phased implementation plan
 
 ## Phase 2: Trip Hub
 
-**Status**: ✅ IMPLEMENTED (2026-08-08) - `TripHubPage.jsx` at `/trips`
+**Status**:  IMPLEMENTED (2026-08-08) - `TripHubPage.jsx` at `/trips`
 
 **User outcome**: After booking, a guest has a single dashboard for their
 upcoming and past stays - itinerary details, host contact, and rebooking.
@@ -367,7 +367,7 @@ upcoming and past stays - itinerary details, host contact, and rebooking.
       property.host join), Paystack reference
 - [ ] Past tab: same layout + "Book again" CTA and "Leave a review" button
 - [ ] Review button disabled with tooltip if guest already reviewed this booking
-- [ ] Empty state: "Ready for your first stay?" → link to `/properties`
+- [ ] Empty state: "Ready for your first stay?" -&gt; link to `/properties`
 - [ ] Loading skeleton while bookings fetch
 
 ### Backend
@@ -427,7 +427,7 @@ feat: add empty state and loading skeleton to trip hub
 
 ## Phase 3: Host "Today" Workspace
 
-**Status**: ✅ IMPLEMENTED (2026-08-08) - `HostTodayPage.jsx` at `/host/today`
+**Status**:  IMPLEMENTED (2026-08-08) - `HostTodayPage.jsx` at `/host/today`
 
 **User outcome**: A host logs in and sees a focused, scannable dashboard for
 today's operations - arrivals, departures, in-house guests, and quick actions.
@@ -442,8 +442,8 @@ today's operations - arrivals, departures, in-house guests, and quick actions.
   - **In-house** (currently staying): guest name, property name, days remaining
 - [ ] Each panel: empty state when no matching bookings ("No check-ins today"
       with calm illustration)
-- [ ] Quick actions: "View booking details" → booking detail page,
-      "Message guest" → messaging thread (Phase 5)
+- [ ] Quick actions: "View booking details" -&gt; booking detail page,
+      "Message guest" -&gt; messaging thread (Phase 5)
 - [ ] Loading skeleton per panel
 
 ### Backend
@@ -506,7 +506,7 @@ feat: add quick-action buttons (view details, message guest) to today cards
 
 ## Phase 4: Collaborative Shortlists
 
-**Status**: ✅ IMPLEMENTED (2026-08-08) - `Shortlist`/`ShortlistItem` models, shortlist pages + shared view
+**Status**:  IMPLEMENTED (2026-08-08) - `Shortlist`/`ShortlistItem` models, shortlist pages + shared view
 
 **User outcome**: A group planning a trip can save properties to a named
 shortlist, share a link, and coordinate choices without a group chat.
@@ -526,10 +526,10 @@ shortlist, share a link, and coordinate choices without a group chat.
 
 ### Backend
 
-- [ ] New `Shortlist` model: `id`, `name`, `ownerId` (FK→User), `shareToken`
+- [ ] New `Shortlist` model: `id`, `name`, `ownerId` (FK-&gt;User), `shareToken`
       (unique, unguessable), `createdAt`, `updatedAt`
-- [ ] New `ShortlistItem` model: `id`, `shortlistId` (FK→Shortlist),
-      `propertyId` (FK→Property), `addedBy` (FK→User), `note` (text, nullable),
+- [ ] New `ShortlistItem` model: `id`, `shortlistId` (FK-&gt;Shortlist),
+      `propertyId` (FK-&gt;Property), `addedBy` (FK-&gt;User), `note` (text, nullable),
       `createdAt`
 - [ ] Routes:
   - `POST /api/shortlists` - create (auth'd)
@@ -597,7 +597,7 @@ feat: add "Save to shortlist" button on PropertyCard and PropertyPage
 
 ## Phase 5: Reservation Messaging
 
-**Status**: ✅ IMPLEMENTED (2026-08-08) - `Conversation`/`ConversationMessage` models,
+**Status**:  IMPLEMENTED (2026-08-08) - `Conversation`/`ConversationMessage` models,
 `/api/conversations`, inbox at `/inbox`. Note: the pre-existing `Message` model and
 `/messages` page are a separate admin-user support inbox, deliberately left untouched.
 
@@ -620,10 +620,10 @@ phone-number sharing required.
 
 ### Backend
 
-- [ ] New `Conversation` model: `id`, `bookingId` (FK→Booking, unique - one
+- [ ] New `Conversation` model: `id`, `bookingId` (FK-&gt;Booking, unique - one
       conversation per booking), `createdAt`, `updatedAt`
-- [ ] New `ConversationMessage` model: `id`, `conversationId` (FK→Conversation),
-      `senderId` (FK→User), `content` (text), `read` (boolean, default false),
+- [ ] New `ConversationMessage` model: `id`, `conversationId` (FK-&gt;Conversation),
+      `senderId` (FK-&gt;User), `content` (text), `read` (boolean, default false),
       `createdAt`
 - [ ] Routes:
   - `POST /api/conversations` - create conversation for a booking (auth'd,
@@ -694,7 +694,7 @@ feat: add navbar unread-message badge with polling
 
 ## Phase 6: Local Add-ons
 
-**Status**: ✅ IMPLEMENTED (2026-08-08) - `AddOn`/`PropertyAddOn`/`BookingAddOn` models,
+**Status**:  IMPLEMENTED (2026-08-08) - `AddOn`/`PropertyAddOn`/`BookingAddOn` models,
 10 endpoints, add-ons in the booking flow, admin CRUD at `/admin/addons`. Booking totals
 and Paystack re-initialisation include add-ons (see `POST /api/bookings/:id/payment`).
 
@@ -704,7 +704,7 @@ priced transparently and added as line items to the booking.
 
 ### Frontend
 
-- [ ] Add-ons section on `PropertyPage`: "Enhance your stay" heading with 2–4
+- [ ] Add-ons section on `PropertyPage`: "Enhance your stay" heading with 2-4
       curated service cards per property. Each card: icon, name, description,
       price (KES), "Add" checkbox.
 - [ ] Add-ons selection during booking flow: list of selected add-ons with
@@ -719,10 +719,10 @@ priced transparently and added as line items to the booking.
 - [ ] New `AddOn` model: `id`, `name`, `description`, `price` (KES, number),
       `image` (URL, optional), `category` (enum: transport | catering |
       housekeeping | concierge), `active` (boolean)
-- [ ] New `PropertyAddOn` join model: `id`, `propertyId` (FK→Property),
-      `addOnId` (FK→AddOn)
-- [ ] New `BookingAddOn` model: `id`, `bookingId` (FK→Booking), `addOnId`
-      (FK→AddOn), `quantity` (int), `unitPrice` (snapshot of add-on price at
+- [ ] New `PropertyAddOn` join model: `id`, `propertyId` (FK-&gt;Property),
+      `addOnId` (FK-&gt;AddOn)
+- [ ] New `BookingAddOn` model: `id`, `bookingId` (FK-&gt;Booking), `addOnId`
+      (FK-&gt;AddOn), `quantity` (int), `unitPrice` (snapshot of add-on price at
       booking time)
 - [ ] Routes:
   - `GET /api/properties/:id/addons` - public, returns add-ons available for
@@ -799,7 +799,7 @@ feat: add add-on management CRUD to admin dashboard
 
 ## Phase 7: Personalization
 
-**Status**: ✅ IMPLEMENTED (2026-08-08) - recently-viewed (localStorage), similar
+**Status**:  IMPLEMENTED (2026-08-08) - recently-viewed (localStorage), similar
 properties, `GET /api/recommendations` and `GET /api/properties/:id/similar`.
 Server-side view tracking was deliberately not built; localStorage is the
 privacy-first option this plan recommends.
@@ -917,7 +917,7 @@ Each commit is one logical, atomic change. Phases are independent where
 dependencies allow; no phase's commits block another phase's start.
 
 ```
-# Phase 1B - IMPLEMENTED ✅
+# Phase 1B - IMPLEMENTED
 feat: add BookingSummaryCard - factual booking sidebar, no invented claims
 feat: add PropertyTrustPanel - verified-facts confidence strip
 refactor: rewrite PropertyPage - hierarchy, safety, a11y, remove unverified claims
@@ -925,7 +925,7 @@ fix: move useCallback above early returns in PropertyPage (Rules of Hooks)
 fix: add null-safety guard for price.toLocaleString in BookingSummaryCard
 docs: add Airbnb-inspired phased implementation plan
 
-# Phase 1A - IMPLEMENTED ✅ (2026-08-07)
+# Phase 1A - IMPLEMENTED (2026-08-07)
 # TripSearchBar by Qwen/DeepSeek; integration & PropertyCard redesign by Claude CLI
 feat: add TripSearchBar - compact mobile-first search bar (Qwen/DeepSeek)
 feat: add draft-vs-submitted search state - typing does not fire API calls
@@ -993,7 +993,7 @@ feat: add "Recommended for you" sort option to search
 
 - **No calendar dates in this plan** - effort estimates depend on team capacity
   and availability. Phases are scoped by outcome, not by sprint.
-- **Phases are parallelisable**: Phases 2–7 can begin independently once their
+- **Phases are parallelisable**: Phases 2-7 can begin independently once their
   listed dependencies are met. Phase 1A (search) and Phase 1B (detail) are the
   only foundational dependencies.
 - **Mobile-first always**: Every phase tests at 375px viewport width first.

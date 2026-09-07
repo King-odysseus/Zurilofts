@@ -186,7 +186,7 @@ function TermsPage() {
               <p>Our standard cancellation policy is as follows:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>More than 14 days before check-in:</strong> Full refund of the Nightly Rate and Cleaning Fee. The Service Fee is non-refundable.</li>
-                <li><strong>7–14 days before check-in:</strong> 50% refund of the Nightly Rate. Cleaning Fee and Service Fee are non-refundable.</li>
+                <li><strong>7-14 days before check-in:</strong> 50% refund of the Nightly Rate. Cleaning Fee and Service Fee are non-refundable.</li>
                 <li><strong>Less than 7 days before check-in:</strong> No refund. All fees are non-refundable.</li>
                 <li><strong>No-show:</strong> If you do not check in on the check-in date and have not cancelled, the full booking amount is charged and is non-refundable.</li>
               </ul>
@@ -235,7 +235,7 @@ function TermsPage() {
 
               <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">7.2 Noise and Nuisance</h3>
               <p>
-                You must respect quiet hours (10:00 PM – 7:00 AM) and avoid creating excessive
+                You must respect quiet hours (10:00 PM - 7:00 AM) and avoid creating excessive
                 noise, nuisance, or disturbance to neighbours and other residents. Parties,
                 events, and gatherings exceeding the booked guest count are strictly prohibited.
               </p>
@@ -280,7 +280,7 @@ function TermsPage() {
             <section>
               <h2 className="text-xl font-bold text-[#0B0B45] mb-3">8. Post-Stay Reviews</h2>
               <p>
-                After your Stay, you may submit a star rating (1–5) and optional private
+                After your Stay, you may submit a star rating (1-5) and optional private
                 feedback. By submitting a review:
               </p>
               <ul className="list-disc pl-6 space-y-2 mt-2">

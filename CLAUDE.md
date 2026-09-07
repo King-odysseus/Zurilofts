@@ -3,10 +3,12 @@
 ## Session checklist (do this FIRST)
 1. Sync brain from GitHub
 2. Call MCP tool `session_start` with `project_path` and `task` - auto-claims project and delivers briefing.
-3. Before every task: `brain_recall "topic"` - always.
-4. After learning: `brain_learn` to feed it back.
-5. If leaving: `brain_handoff` with status and next steps.
-6. End: commit + push, `session_end "summary"`, push brain.
+3. Restate scope, approach, and assumptions to the user, then call `recap_check` with `action="log"`.
+4. Before every task: `brain_recall "topic"` - always.
+5. Before editing: check `active_list` for other agents already working here.
+6. After learning: `brain_learn` to feed it back.
+7. If leaving: `brain_handoff` with status and next steps.
+8. End: commit + push, `session_end "summary"`, push brain.
 
 
 # ZuriLofts - Premium Short-Let Apartments
@@ -74,13 +76,13 @@ server/               # Express + Prisma backend
 
 **Rounding:** cards `rounded-2xl`, pills/buttons `rounded-full`, inputs/thumbnails `rounded-xl`.
 
-**Admin:** sidebar bg `#0B0B45`, active nav `bg-[#C49A6C]`, collapsible w-64↔w-16, routes nested under `/admin` via `<Outlet/>`.
+**Admin:** sidebar bg `#0B0B45`, active nav `bg-[#C49A6C]`, collapsible w-64<->w-16, routes nested under `/admin` via `<Outlet/>`.
 
 ## Key Patterns
 
 - PropTypes required on all new components
 - Use existing Dropdown component (not native selects) for app-styled fly-outs
-- Responsive-first: mobile hamburger, grid-cols-1→lg:grid-cols-2→3
+- Responsive-first: mobile hamburger, grid-cols-1-&gt;lg:grid-cols-2-&gt;3
 - Images: `aspect-[4/3] object-cover` in cards, server optimizes uploads with sharp
 - Interaction: group hover, IntersectionObserver for scroll-triggered animations
 - Admin full-bleed layout (not max-w-3xl), client pages use standard widths

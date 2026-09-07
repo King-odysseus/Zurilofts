@@ -64,7 +64,7 @@ const envSchema = z.object({
       // else. Payment/payout endpoints fail with a clear error only when used.
       if (!data.PAYSTACK_SECRET_KEY || !data.PAYSTACK_PUBLIC_KEY) {
         console.warn(
-          '⚠️  Paystack keys are not fully configured (PAYSTACK_SECRET_KEY, PAYSTACK_PUBLIC_KEY). Payments and payouts are disabled until these are set.'
+          '  Paystack keys are not fully configured (PAYSTACK_SECRET_KEY, PAYSTACK_PUBLIC_KEY). Payments and payouts are disabled until these are set.'
         );
       }
       // Require Cloudinary in production - Railway's filesystem is ephemeral, so
@@ -78,7 +78,7 @@ const envSchema = z.object({
       }
       if (!data.VAPID_PUBLIC_KEY || !data.VAPID_PRIVATE_KEY) {
         console.warn(
-          '⚠️  VAPID keys are not configured (VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY). Push notifications are disabled until these are set.'
+          '  VAPID keys are not configured (VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY). Push notifications are disabled until these are set.'
         );
       }
     }
@@ -87,7 +87,7 @@ const envSchema = z.object({
 const parsed = envSchema.safeParse(process.env);
 
 if (!parsed.success) {
-  console.error('❌ Invalid environment variables:');
+  console.error(' Invalid environment variables:');
   console.error(parsed.error.format());
   process.exit(1);
 }

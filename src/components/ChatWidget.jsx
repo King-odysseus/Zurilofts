@@ -122,7 +122,7 @@ function ChatWidget() {
       if (!sent) {
         setMessages((prev) => [
           ...prev,
-          { from: 'bot', text: 'Thanks! Your message has been sent. We typically reply within 2 hours during business hours. Keep this chat open and replies will appear here. ✨' },
+          { from: 'bot', text: 'Thanks! Your message has been sent. We typically reply within 2 hours during business hours. Keep this chat open and replies will appear here. ' },
         ]);
         setSent(true);
       }

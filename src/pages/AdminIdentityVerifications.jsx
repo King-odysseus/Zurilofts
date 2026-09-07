@@ -6,7 +6,7 @@ const STATUS_STYLES = {
   APPROVED: 'bg-green-100 text-green-700', REJECTED: 'bg-red-100 text-red-700',
 };
 
-const DOCUMENT_LABELS = { ID_FRONT: 'ID — front', ID_BACK: 'ID — back', SELFIE: 'Selfie with ID' };
+const DOCUMENT_LABELS = { ID_FRONT: 'ID - front', ID_BACK: 'ID - back', SELFIE: 'Selfie with ID' };
 
 function AdminIdentityVerifications() {
   const [rows, setRows] = useState([]);
@@ -91,7 +91,7 @@ function AdminIdentityVerifications() {
                     <p className="font-semibold text-[#1f2937]">{v.fullName || `${v.user?.firstName || ''} ${v.user?.lastName || ''}`}</p>
                     <p className="text-xs text-[#6b7280]">{v.user?.email}</p>
                   </td>
-                  <td className="p-4">{v.idType || '—'}</td>
+                  <td className="p-4">{v.idType || '-'}</td>
                   <td className="p-4">{v.documents?.length || 0}</td>
                   <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[v.status]}`}>{v.status.replaceAll('_', ' ')}</span></td>
                   <td className="p-4"><button onClick={() => open(v.id)} disabled={busy === v.id} className="rounded-full border border-[#C49A6C] px-4 py-2 text-xs font-semibold text-[#C49A6C] hover:bg-[#C49A6C] hover:text-white disabled:opacity-50">Review</button></td>
@@ -111,9 +111,9 @@ function AdminIdentityVerifications() {
             </div>
             <div className="space-y-7 p-6">
               <div className="grid sm:grid-cols-2 gap-3">
-                <div className="rounded-2xl bg-canvas p-3"><p className="text-xs text-[#6b7280]">Date of birth</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.dateOfBirth || '—'}</p></div>
-                <div className="rounded-2xl bg-canvas p-3"><p className="text-xs text-[#6b7280]">ID type</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idType || '—'}</p></div>
-                <div className="rounded-2xl bg-canvas p-3"><p className="text-xs text-[#6b7280]">ID number</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idNumber || '—'}</p></div>
+                <div className="rounded-2xl bg-canvas p-3"><p className="text-xs text-[#6b7280]">Date of birth</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.dateOfBirth || '-'}</p></div>
+                <div className="rounded-2xl bg-canvas p-3"><p className="text-xs text-[#6b7280]">ID type</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idType || '-'}</p></div>
+                <div className="rounded-2xl bg-canvas p-3"><p className="text-xs text-[#6b7280]">ID number</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idNumber || '-'}</p></div>
               </div>
               <div>
                 <h3 className="font-bold text-[#0B0B45] mb-3">Encrypted documents</h3>

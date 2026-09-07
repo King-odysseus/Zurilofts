@@ -100,7 +100,7 @@ export function lateCheckoutFee(checkOutTime: string | null | undefined, nightly
   if (minutes <= standardMinutes) return 0;
   const hoursLate = Math.ceil((minutes - standardMinutes) / 60);
   const capped = Math.min(hoursLate, LATE_CHECKOUT_FULL_NIGHT_HOURS);
-  // night * 2^(capped - 5): capped=5 → full night; each earlier hour halves it.
+  // night * 2^(capped - 5): capped=5 -&gt; full night; each earlier hour halves it.
   return Math.round(nightlyPrice * Math.pow(2, capped - LATE_CHECKOUT_FULL_NIGHT_HOURS));
 }
 

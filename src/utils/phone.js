@@ -33,7 +33,7 @@ export function validatePhone(raw, country) {
   if (digits.startsWith(dialDigits)) {
     digits = digits.slice(dialDigits.length);
   } else if (digits.startsWith('00')) {
-    // Strip "00" + country code prefix - e.g. "00254" → ""
+    // Strip "00" + country code prefix - e.g. "00254" -> ""
     const without00 = digits.slice(2);
     if (without00.startsWith(dialDigits)) {
       digits = without00.slice(dialDigits.length);

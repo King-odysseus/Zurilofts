@@ -12,7 +12,7 @@ const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 /**
- * Airbnb-style availability calendar with check-in → check-out range selection.
+ * Airbnb-style availability calendar with check-in -> check-out range selection.
  * Disables past dates and any date inside an unavailable range (imported
  * Airbnb/Booking.com blocks + existing bookings). `end` of a range is exclusive,
  * so the check-out day of a previous stay is bookable.
