@@ -91,8 +91,8 @@ function ConversationPage() {
         if (cancelled) return;
         const found = (res.data.data || []).find((c) => c.id === conversationId);
         setConversation(found || null);
-      } catch {
-        // Non-fatal: thread still renders with messages
+      } catch (err) {
+        console.error('Failed to load conversation:', err);
       }
     }
     loadConversation();
@@ -122,8 +122,8 @@ function ConversationPage() {
     async function markRead() {
       try {
         await apiClient.patch(`/conversations/${conversationId}/read`);
-      } catch {
-        // Ignore read-marking failures
+      } catch (err) {
+        console.error('Failed to mark conversation read:', err);
       }
     }
 

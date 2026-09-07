@@ -34,8 +34,8 @@ function OAuthCallback() {
         if (requestedMode === 'hosting' && result.user?.role === 'USER' && !result.user?.hostApplicationStatus) {
           try {
             await apiClient.post('/host-application');
-          } catch {
-            // non-fatal - the applicant can still reach /host/application manually
+          } catch (err) {
+            console.error('Failed to create host application:', err);
           }
         }
 

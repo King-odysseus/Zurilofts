@@ -14,7 +14,7 @@ function MessagesPage() {
     try {
       const res = await apiClient.get('/messages');
       setMessages(res.data.data || []);
-    } catch { /* ignore */ } finally {
+    } catch (err) { console.error(err); } finally {
       setLoading(false);
     }
   }, []);
@@ -38,7 +38,7 @@ function MessagesPage() {
       const res = await apiClient.post('/messages', { body: text });
       setMessages((prev) => [...prev, res.data.data]);
       setBody('');
-    } catch { /* ignore */ } finally {
+    } catch (err) { console.error(err); } finally {
       setSending(false);
     }
   }

@@ -57,7 +57,7 @@ export async function createPromoCode(data: any) {
         `Use code ${promo.code} for ${promo.discountPercent}% off your next stay.`,
         '/properties',
       );
-    } catch { /* push is best-effort */ }
+    } catch (err) { console.error('Push notification failed:', err); }
   }
 
   return promo;

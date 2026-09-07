@@ -508,7 +508,7 @@ function AdminPropertyForm() {
 }
 
 // Derive the bed count shown on a card from the bed-variant selection.
-// 1-Bed → 1, 2-Bed → 2, both → "1 & 2", neither → the raw Bedrooms field.
+// 1-Bed -> 1, 2-Bed -> 2, both -> "1 & 2", neither -> the raw Bedrooms field.
 function bedLabel(form) {
   const has1 = form.price1Bed !== '' && form.price1Bed != null;
   const has2 = form.price2Bed !== '' && form.price2Bed != null;
@@ -755,8 +755,8 @@ function SeasonalPricing({ propertyId }) {
     try {
       const res = await apiClient.get(`/admin/properties/${propertyId}/price-rules`);
       setRules(res.data.data || []);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }

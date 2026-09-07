@@ -251,7 +251,7 @@ export async function refreshTokens(
   }
 
   if (session.expiresAt < new Date()) {
-    await prisma.refreshSession.delete({ where: { id: session.id } }).catch(() => {});
+    await prisma.refreshSession.delete({ where: { id: session.id } }).catch((err) => console.error('Failed to delete expired refresh session:', err));
     throw new UnauthorizedError('Invalid or expired refresh token');
   }
 

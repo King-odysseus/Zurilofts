@@ -21,7 +21,7 @@ export function usePushNotifications() {
   useEffect(() => {
     apiClient.get('/push/vapid-public-key').then((res) => {
       setVapidKey(res.data.data?.publicKey || '');
-    }).catch(() => {});
+    }).catch((err) => console.error('Failed to load VAPID key:', err));
   }, []);
 
   const subscribe = useCallback(async () => {
@@ -57,7 +57,7 @@ export function usePushNotifications() {
         await subscription.unsubscribe();
       }
       setPermission('denied');
-    } catch { /* ignore */ }
+    } catch (err) { console.error('Failed to unsubscribe from push:', err); }
   }, []);
 
   return {

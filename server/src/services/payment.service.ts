@@ -195,8 +195,8 @@ export async function verifyAndConfirmPayment(
       await prisma.paymentLog.create({
         data: { event: 'verify.rejected', reference, bookingId: existing.id, payload: check.message.slice(0, 2000) },
       });
-    } catch {
-      // Best-effort audit log - never turn a rejection into a 500.
+    } catch (err) {
+      console.error('Failed to write payment audit log:', err);
     }
     return { confirmed: false, bookingId: existing.id, reason: check.reason, message: check.message };
   }

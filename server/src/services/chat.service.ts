@@ -156,7 +156,7 @@ export async function sendTelegramAlert(text: string): Promise<void> {
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) return;
-  const line0 = text.length > 4000 ? `⚠️ ALERT:\n` : `⚠️ `;
+  const line0 = text.length > 4000 ? 'ALERT:\n' : '';
   try {
     await fetch(
       `https://api.telegram.org/bot${token}/sendMessage`,
@@ -169,19 +169,19 @@ export async function sendTelegramAlert(text: string): Promise<void> {
         }),
       },
     );
-  } catch {
-    // best-effort – never block on notification delivery
+  } catch (err) {
+    console.error('Telegram alert failed:', err);
   }
 }
 
 export function startTelegramPoller(): void {
   const token = env.TELEGRAM_BOT_TOKEN;
   if (!token) {
-    console.log('💬 Telegram reply poller not started (TELEGRAM_BOT_TOKEN not set)');
+    console.log(' Telegram reply poller not started (TELEGRAM_BOT_TOKEN not set)');
     return;
   }
   if (pollerStarted) return;
   pollerStarted = true;
-  console.log('💬 Telegram reply poller started');
+  console.log(' Telegram reply poller started');
   void pollLoop(token);
 }

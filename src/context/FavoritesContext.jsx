@@ -20,8 +20,8 @@ export function FavoritesProvider({ children }) {
       const props = res.data.data || [];
       setFavorites(props);
       setIds(new Set(props.map((p) => p.id)));
-    } catch {
-      /* ignore - keep current state */
+    } catch (err) {
+      console.error('Failed to load favorites:', err);
     }
   }, [isAuthenticated]);
 

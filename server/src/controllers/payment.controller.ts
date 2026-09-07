@@ -76,8 +76,8 @@ export async function webhook(req: Request, res: Response, next: NextFunction): 
     let event = '';
     try {
       event = JSON.parse(rawBody)?.event || '';
-    } catch {
-      // Malformed JSON - leave event blank; the signature check will reject it.
+    } catch (err) {
+      console.error('Failed to parse webhook body:', err);
     }
 
     const result = await paymentService.handleWebhookEvent(event, rawBody, signature);

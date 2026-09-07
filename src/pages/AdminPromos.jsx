@@ -50,7 +50,7 @@ function AdminPromos() {
     try {
       const res = await apiClient.get('/promo');
       setPromos(res.data.data || []);
-    } catch { /* silent */ }
+    } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }
 
@@ -58,7 +58,7 @@ function AdminPromos() {
     try {
       const res = await apiClient.get('/properties/mine');
       setProperties(res.data.data || []);
-    } catch { /* silent */ }
+    } catch (err) { console.error(err); }
   }
 
   async function handleSubmit(e) {

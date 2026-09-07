@@ -15,7 +15,7 @@ function AdminMessages() {
     try {
       const res = await apiClient.get('/admin/messages');
       setConversations(res.data.data || []);
-    } catch { /* ignore */ } finally {
+    } catch (err) { console.error(err); } finally {
       setLoadingList(false);
     }
   }, []);
@@ -34,7 +34,7 @@ function AdminMessages() {
       setThread(res.data.data || []);
       // clear unread badge locally
       setConversations((prev) => prev.map((c) => (c.userId === conv.userId ? { ...c, unread: 0 } : c)));
-    } catch { /* ignore */ } finally {
+    } catch (err) { console.error(err); } finally {
       setLoadingThread(false);
     }
   }, []);
@@ -53,7 +53,7 @@ function AdminMessages() {
       setThread((prev) => [...prev, res.data.data]);
       setBody('');
       loadConversations();
-    } catch { /* ignore */ } finally {
+    } catch (err) { console.error(err); } finally {
       setSending(false);
     }
   }

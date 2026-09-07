@@ -29,8 +29,8 @@ function AdminProperties() {
         ? await apiClient.get('/admin/properties', { params: { limit: 100, status: statusFilter || undefined } })
         : await apiClient.get('/properties/mine', { params: { limit: 100 } });
       setProperties(res.data.data || []);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }

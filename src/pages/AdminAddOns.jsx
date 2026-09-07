@@ -67,7 +67,7 @@ function AdminAddOns() {
     try {
       const res = await apiClient.get('/admin/addons');
       setAddOns(res.data.data || []);
-    } catch { /* silent */ }
+    } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }
 
@@ -87,10 +87,10 @@ function AdminAddOns() {
             if (!map[a.id]) map[a.id] = new Set();
             map[a.id].add(p.id);
           });
-        } catch { /* skip property */ }
+        } catch (err) { console.error(err); }
       }));
       setAssignments(map);
-    } catch { /* silent */ }
+    } catch (err) { console.error(err); }
   }
 
   async function handleSubmit(e) {

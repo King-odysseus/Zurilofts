@@ -165,7 +165,7 @@ function ProfilePage() {
       .then((res) => {
         if (res.data?.data) setBanks(res.data.data);
       })
-      .catch(() => {})
+      .catch((err) => console.error('Failed to load payout banks:', err))
       .finally(() => setBanksLoading(false));
   }, [hostRole]);
 

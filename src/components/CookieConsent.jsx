@@ -79,8 +79,8 @@ function CookieConsent() {
         policyVersion: POLICY_VERSION,
         visitorId: getVisitorId(),
       })
-      .catch(() => {
-        // Silent - local choice already stored.
+      .catch((err) => {
+        console.error('Failed to save consent:', err);
       });
   }
 

@@ -71,12 +71,12 @@ const PERIOD_OPTIONS = [
 ];
 
 const SORT_OPTIONS = [
-  { value: 'earnings-desc', label: 'Earnings (High → Low)' },
-  { value: 'earnings-asc', label: 'Earnings (Low → High)' },
-  { value: 'bookings-desc', label: 'Bookings (High → Low)' },
-  { value: 'bookings-asc', label: 'Bookings (Low → High)' },
-  { value: 'name-asc', label: 'Property Name (A → Z)' },
-  { value: 'name-desc', label: 'Property Name (Z → A)' },
+  { value: 'earnings-desc', label: 'Earnings (High -> Low)' },
+  { value: 'earnings-asc', label: 'Earnings (Low -> High)' },
+  { value: 'bookings-desc', label: 'Bookings (High -> Low)' },
+  { value: 'bookings-asc', label: 'Bookings (Low -> High)' },
+  { value: 'name-asc', label: 'Property Name (A -> Z)' },
+  { value: 'name-desc', label: 'Property Name (Z -> A)' },
 ];
 
 function EarningsLineChart({ points }) {
@@ -264,7 +264,7 @@ function AdminEarnings() {
       if (!customFrom && !customTo) return 'Custom Range';
       const f = customFrom ? formatDate(customFrom) : 'Start';
       const t = customTo ? formatDate(customTo) : 'End';
-      return `${f} – ${t}`;
+      return `${f} - ${t}`;
     }
     const opt = PERIOD_OPTIONS.find((o) => o.value === period);
     return opt?.label || '';
@@ -746,7 +746,7 @@ function AdminEarnings() {
             </svg>
             {/* - WHT */}
             <div className="bg-purple-50 rounded-xl p-3 text-center min-w-[120px] flex-1">
-              <p className="text-xs text-purple-700 uppercase tracking-wide">- WHT (5% → KRA)</p>
+              <p className="text-xs text-purple-700 uppercase tracking-wide">- WHT (5% {'->'} KRA)</p>
               <p className="text-lg font-bold text-purple-700">KES {filteredTotals.wht.toLocaleString()}</p>
             </div>
             <svg className="w-4 h-4 text-[#C49A6C] flex-shrink-0 hidden lg:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">

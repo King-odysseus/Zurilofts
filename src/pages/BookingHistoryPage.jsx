@@ -76,7 +76,7 @@ function generateInvoice(booking) {
     doc.text('This is a computer-generated invoice.', 14, y + 2);
 
     doc.save(`ZuriLofts_Invoice_${booking.id ? booking.id.slice(0, 8) : 'booking'}.pdf`);
-  }).catch(() => {});
+  }).catch((err) => console.error('Failed to generate invoice:', err));
 }
 
 function BookingHistoryPage() {

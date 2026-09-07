@@ -71,13 +71,13 @@ const DEFAULT_BODY: Record<AutoMessageTrigger, string> = {
   BOOKING_CONFIRMED:
     "Hi {guestFirstName}, welcome to {property} in {location}! Your stay is confirmed from {checkIn} to {checkOut} for {guests} guest(s). We're here if you need directions, an early check-in or any recommendations. Can't wait to host you!",
   PRE_ARRIVAL:
-    "Hi {guestFirstName}, your check-in at {property} is on {checkIn}. The apartment is at {address} — open it in Google Maps for directions. Reply here if you'd like an early check-in, airport pickup or any local tips.",
+    "Hi {guestFirstName}, your check-in at {property} is on {checkIn}. The apartment is at {address} - open it in Google Maps for directions. Reply here if you'd like an early check-in, airport pickup or any local tips.",
   CHECK_IN_DAY:
-    "Hi {guestFirstName}, today's the day — welcome to {property}! Your apartment at {address} is ready for you. If anything isn't perfect, message us right away and we'll make it right.",
+    "Hi {guestFirstName}, today's the day - welcome to {property}! Your apartment at {address} is ready for you. If anything isn't perfect, message us right away and we'll make it right.",
   CHECK_OUT_DAY:
-    "Hi {guestFirstName}, we hope you've had a lovely stay at {property}! Take your time this morning — check-out is by 10:00 AM and you're welcome to leave the keys with security. Travel safely and do come back soon!",
+    "Hi {guestFirstName}, we hope you've had a lovely stay at {property}! Take your time this morning - check-out is by 10:00 AM and you're welcome to leave the keys with security. Travel safely and do come back soon!",
   POST_STAY_REVIEW:
-    "Hi {guestFirstName}, thank you for staying at {property}! Your feedback helps us and future guests. If you enjoyed your stay, a review would mean the world — and if anything fell short, tell us here first so we can make it right.",
+    "Hi {guestFirstName}, thank you for staying at {property}! Your feedback helps us and future guests. If you enjoyed your stay, a review would mean the world - and if anything fell short, tell us here first so we can make it right.",
 };
 
 export function getDefaultBody(trigger: AutoMessageTrigger): string {
@@ -288,7 +288,7 @@ export async function deliverTrigger(bookingId: string, trigger: AutoMessageTrig
     });
 
     if (result.sent && result.conversationId) {
-      notifyGuestOfNewMessage(bookingId, result.conversationId).catch(() => {});
+      notifyGuestOfNewMessage(bookingId, result.conversationId).catch((err) => console.error('Push notification failed:', err));
     }
     return result;
   } catch (err: any) {
@@ -363,8 +363,8 @@ async function notifyGuestOfNewMessage(bookingId: string, conversationId: string
       'Your host sent you a message about your stay.',
       `/inbox/${conversationId}`,
     );
-  } catch {
-    // Push is best-effort; never fail a delivered message.
+  } catch (err) {
+    console.error('Push notification failed:', err);
   }
 }
 

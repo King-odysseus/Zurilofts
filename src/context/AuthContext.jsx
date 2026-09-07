@@ -118,8 +118,8 @@ export function AuthProvider({ children }) {
   const logout = useCallback(async () => {
     try {
       await apiClient.post('/auth/logout');
-    } catch {
-      // ignore logout API errors
+    } catch (err) {
+      console.error('Logout request failed:', err);
     }
     clearAccessToken();
     clearRecentlyViewed();

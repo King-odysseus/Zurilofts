@@ -24,7 +24,7 @@ export async function subscribe(userId: string, endpoint: string, keys: { p256dh
 export async function unsubscribe(endpoint: string) {
   try {
     await prisma.pushSubscription.delete({ where: { endpoint } });
-  } catch { /* already gone */ }
+  } catch (err) { console.error('Failed to remove push subscription:', err); }
   return { ok: true };
 }
 
@@ -65,7 +65,7 @@ export async function sendPush(
       } catch (err: any) {
         // Remove dead subscriptions (410 Gone or 404)
         if (err.statusCode === 410 || err.statusCode === 404) {
-          try { await prisma.pushSubscription.delete({ where: { endpoint: sub.endpoint } }); } catch { /* ignore */ }
+          try { await prisma.pushSubscription.delete({ where: { endpoint: sub.endpoint } }); } catch (err) { console.error('Failed to remove dead push subscription:', err); }
         }
         results.push({ endpoint: sub.endpoint, ok: false });
       }

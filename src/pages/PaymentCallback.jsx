@@ -34,8 +34,8 @@ function PaymentCallback() {
             try {
               const bookingRes = await apiClient.get(`/bookings/${data.data.bookingId}`);
               setBooking(bookingRes.data.data);
-            } catch {
-              // booking details fetch is optional for success display
+            } catch (err) {
+              console.error('Failed to fetch booking details:', err);
             }
           }
         } else {
@@ -130,7 +130,7 @@ function PaymentCallback() {
                         }}
                         className="mt-2 text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
                       >
-                        Yes, save to favourites →
+                        Yes, save to favourites
                       </button>
                     </div>
                   </div>

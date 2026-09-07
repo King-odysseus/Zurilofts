@@ -29,8 +29,8 @@ function HostPayouts() {
       setWallet(res.data.data.wallet);
       setDestination(res.data.data.destination || null);
       setPayouts(res.data.data.payouts || []);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -69,8 +69,8 @@ function HostPayouts() {
     try {
       const res = await apiClient.get('/host/wht', { params });
       setWhtData(res.data.data);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error(err);
     }
   }
 

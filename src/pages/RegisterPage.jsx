@@ -99,8 +99,8 @@ function RegisterPage() {
         });
         // Update auth context with the avatar URL
         setUser(avatarRes.data.data);
-      } catch {
-        // Non-fatal - account is created, avatar can be added later
+      } catch (err) {
+        console.error('Failed to upload avatar:', err);
       }
     }
 

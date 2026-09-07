@@ -20,7 +20,7 @@ function AdminGuides() {
     try {
       const res = await apiClient.get('/admin/guides');
       setPosts(res.data.data || []);
-    } catch { /* ignore */ }
+    } catch (err) { console.error(err); }
     setLoading(false);
   };
 
@@ -34,7 +34,7 @@ function AdminGuides() {
       setForm({ title: p.title, slug: p.slug, excerpt: p.excerpt || '', body: p.body, coverImage: p.coverImage || '', published: p.published });
       setEditing(id);
       setError('');
-    } catch { /* ignore */ }
+    } catch (err) { console.error(err); }
   };
   const handleCancel = () => { setEditing(null); setForm(EMPTY); setError(''); };
 
@@ -59,7 +59,7 @@ function AdminGuides() {
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this guide?')) return;
-    try { await apiClient.delete(`/admin/guides/${id}`); fetchPosts(); } catch { /* ignore */ }
+    try { await apiClient.delete(`/admin/guides/${id}`); fetchPosts(); } catch (err) { console.error(err); }
   };
 
   const handleTitleChange = (t) => {

@@ -60,8 +60,8 @@ export async function deleteImage(url: string | null | undefined): Promise<void>
   if (url.startsWith('/uploads/')) {
     try {
       await fs.promises.unlink(path.join(UPLOAD_DIR, path.basename(url)));
-    } catch {
-      /* old file may already be gone */
+    } catch (err) {
+      console.error('Failed to delete local image:', err);
     }
     return;
   }
@@ -71,8 +71,8 @@ export async function deleteImage(url: string | null | undefined): Promise<void>
     if (publicId) {
       try {
         await cloudinary.uploader.destroy(publicId);
-      } catch {
-        /* best effort - leave orphan rather than fail the request */
+      } catch (err) {
+        console.error('Failed to delete Cloudinary image:', err);
       }
     }
   }

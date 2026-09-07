@@ -28,10 +28,10 @@ export default function SaveToShortlistButton({ propertyId }) {
             (item) => item.propertyId === propertyId
           );
           if (has) saved.add(sl.id);
-        } catch { /* ignore */ }
+        } catch (err) { console.error(err); }
       }
       setSavedIds(saved);
-    } catch { /* ignore */ }
+    } catch (err) { console.error(err); }
     finally { setLoading(false); }
   }, [isAuthenticated, propertyId]);
 
@@ -48,7 +48,7 @@ export default function SaveToShortlistButton({ propertyId }) {
         await apiClient.post(`/shortlists/${shortlistId}/items`, { propertyId });
         setSavedIds((prev) => new Set(prev).add(shortlistId));
       }
-    } catch { /* ignore */ }
+    } catch (err) { console.error(err); }
   };
 
   const handleCreate = async () => {
@@ -61,7 +61,7 @@ export default function SaveToShortlistButton({ propertyId }) {
       setSavedIds((prev) => new Set(prev).add(sl.id));
       setNewName("");
       setShowCreate(false);
-    } catch { /* ignore */ }
+    } catch (err) { console.error(err); }
   };
 
   if (!isAuthenticated) return null;

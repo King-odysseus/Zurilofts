@@ -31,8 +31,8 @@ function readStorage() {
 function writeStorage(entries) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  } catch {
-    // Safari private mode / quota exceeded - degrade gracefully.
+  } catch (err) {
+    console.error('Failed to persist recently viewed:', err);
   }
 }
 
@@ -65,7 +65,7 @@ export function getRecentlyViewed() {
 export function clearRecentlyViewed() {
   try {
     window.localStorage.removeItem(STORAGE_KEY);
-  } catch {
-    // Ignore - nothing to clear on failure.
+  } catch (err) {
+    console.error('Failed to clear recently viewed:', err);
   }
 }

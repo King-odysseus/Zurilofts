@@ -34,7 +34,7 @@ export async function sendUserMessage(userId: string, body: string) {
         sendPushToUser(a.id, 'New Support Message', 'A guest sent a new message.', '/admin/messages')
       )
     );
-  } catch { /* push is best-effort */ }
+  } catch (err) { console.error('Push notification failed:', err); }
 
   return message;
 }
@@ -101,7 +101,7 @@ export async function sendAdminMessage(userId: string, body: string) {
   try {
     const { sendPushToUser } = await import('./push.service.js');
     sendPushToUser(userId, 'New Message from ZuriLofts', 'Support has replied to your message.', '/messages');
-  } catch { /* push is best-effort */ }
+  } catch (err) { console.error('Push notification failed:', err); }
 
   return message;
 }

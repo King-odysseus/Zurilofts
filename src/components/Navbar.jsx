@@ -40,6 +40,10 @@ function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const { mode, setMode, canSelectHosting } = useMode();
   const hasVerifiedHostAccess = user?.role === 'HOST' || user?.role === 'ADMIN';
+  // An applicant with an in-progress application (any status) can already use
+  // the host workspace - draft listings, calendar, messages - even before
+  // approval. Only Payouts and publishing require full verification.
+  const hasHostIntent = hasVerifiedHostAccess || user?.hostApplicationStatus != null;
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -100,7 +104,7 @@ function Navbar() {
           if (count > lastMsgRef.current) playMessageSound();
           lastMsgRef.current = count;
           setUnreadMessages(count);
-        } catch { /* ignore */ }
+        } catch (err) { console.error(err); }
       }
 
       // Reservation conversation unread count (separate from the support inbox)
@@ -108,7 +112,7 @@ function Navbar() {
         const r = await apiClient.get('/conversations/unread-count');
         if (!active) return;
         setConversationUnread(r.data.data?.count || 0);
-      } catch { /* ignore */ }
+      } catch (err) { console.error(err); }
     }
     loadUnread();
     const t = setInterval(loadUnread, 30000);
@@ -148,12 +152,13 @@ function Navbar() {
     navigate('/');
   }
 
-  // An applicant can enter the host workspace, but must complete the host
-  // verification page before receiving operational host navigation.
+  // An applicant with an in-progress application already gets the full host
+  // workspace navigation; only a brand-new applicant (no application yet)
+  // sees just the setup link until they start one.
   const activeLinks = !isAuthenticated
     ? navLinks
     : mode === 'hosting'
-      ? hasVerifiedHostAccess ? activeHostingLinks : hostingOnboardingLinks
+      ? hasHostIntent ? activeHostingLinks : hostingOnboardingLinks
       : travellingLinks;
 
   function handleSwitchMode() {
@@ -161,7 +166,7 @@ function Navbar() {
     setMode(next);
     setDropdownOpen(false);
     setMenuOpen(false);
-    navigate(next === 'hosting' ? (hasVerifiedHostAccess ? '/host/today' : '/host/application') : '/');
+    navigate(next === 'hosting' ? (hasHostIntent ? '/host/today' : '/host/application') : '/');
   }
 
   return (

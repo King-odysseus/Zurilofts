@@ -154,8 +154,8 @@ function BookingPage() {
           setPhoneCountryCode(cc);
           setPhoneNumber(pn);
         }
-      } catch {
-        // not fatal - user can fill the fields manually
+      } catch (err) {
+        console.error('Failed to load profile:', err);
       }
     }
     fetchProfile();
@@ -198,7 +198,7 @@ function BookingPage() {
       .then((r) => {
         if (!cancelled) setUnavailableRanges(r.data.data || []);
       })
-      .catch(() => { /* calendar still works, just nothing disabled */ });
+      .catch((err) => console.error('Failed to load availability:', err));
 
     return () => { cancelled = true; };
   }, [id, urlVariant]);
@@ -974,7 +974,7 @@ function BookingPage() {
               onClick={() => { setPromoCode(''); setPromoResult(null); setPromoError(''); }}
               className="px-4 py-3 rounded-xl text-sm font-semibold bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
             >
-              Applied ✓
+              Applied
             </button>
           ) : (
             <button

@@ -47,8 +47,8 @@ function IdentityVerificationPanel({ onApproved }) {
         idType: v.idType || 'NATIONAL_ID',
         idNumber: v.idNumber || '',
       });
-    } catch {
-      // silent - the form still renders with UNVERIFIED defaults
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }

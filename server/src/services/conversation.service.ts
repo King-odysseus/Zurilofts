@@ -236,7 +236,7 @@ export async function sendMessage(conversationId: string, senderId: string, rawC
     try {
       const { sendPushToUser } = await import('./push.service.js');
       sendPushToUser(recipientId, 'New Message', 'You have a new message about your booking.', `/inbox/${conversationId}`);
-    } catch { /* push is best-effort */ }
+    } catch (err) { console.error('Push notification failed:', err); }
   }
 
   return message;

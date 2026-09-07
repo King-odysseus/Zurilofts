@@ -47,8 +47,8 @@ export function setConsent({ analytics, marketing }) {
   };
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(consent));
-  } catch {
-    // Safari private mode / quota exceeded - degrade gracefully.
+  } catch (err) {
+    console.error('Failed to persist consent:', err);
   }
   return consent;
 }

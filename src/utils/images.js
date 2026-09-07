@@ -28,8 +28,8 @@ export function firstImage(property) {
       if (Array.isArray(parsed) && parsed.length > 0) {
         return parsed[0];
       }
-    } catch {
-      // Malformed JSON must never break rendering - fall through to null.
+    } catch (err) {
+      console.error('Failed to parse property images:', err);
     }
   }
 

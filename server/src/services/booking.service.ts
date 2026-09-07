@@ -311,7 +311,7 @@ export async function createBooking(input: CreateBookingInput) {
         `You have a new booking request for ${property.title}.`,
         `/host/today`,
       );
-    } catch { /* push is best-effort */ }
+    } catch (err) { console.error('Push notification failed:', err); }
   }
 
   return normalizeBooking(booking);
@@ -742,7 +742,7 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
         ? 'Your stay at this property has been confirmed. View your bookings for details.'
         : 'Your booking has been cancelled. View your bookings for details.';
       sendPushToUser(booking.userId, title, body, '/bookings');
-    } catch { /* push is best-effort, don't block the status update */ }
+    } catch (err) { console.error('Push notification failed:', err); }
   }
 
   // Host confirmation message after a CONFLICT -> CONFIRMED resolution (the
@@ -879,7 +879,7 @@ export async function cancelBooking(bookingId: string, actor: CancelActor) {
         '/host/today'
       );
     }
-  } catch { /* push is best-effort, don't block the cancellation */ }
+  } catch (err) { console.error('Push notification failed:', err); }
 
   const updated = await prisma.booking.findUnique({
     where: { id: bookingId },

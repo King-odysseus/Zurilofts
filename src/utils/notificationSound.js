@@ -43,8 +43,8 @@ export function playMessageSound() {
     osc2.connect(gain);
     osc2.start(now + 0.12);
     osc2.stop(now + 0.45);
-  } catch {
-    // Audio not supported or blocked - silently ignore
+  } catch (err) {
+    console.error('Failed to play message sound:', err);
   }
 }
 
@@ -60,7 +60,7 @@ export function playBookingSound() {
     gain.gain.setValueAtTime(0.14, now);
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.9);
 
-    // C6 → E6 → G6
+    // C6 -> E6 -> G6
     const freqs = [1047, 1319, 1568];
     freqs.forEach((freq, i) => {
       const osc = ctx.createOscillator();
@@ -70,7 +70,7 @@ export function playBookingSound() {
       osc.start(now + i * 0.15);
       osc.stop(now + i * 0.15 + 0.3);
     });
-  } catch {
-    // Audio not supported or blocked - silently ignore
+  } catch (err) {
+    console.error('Failed to play booking sound:', err);
   }
 }

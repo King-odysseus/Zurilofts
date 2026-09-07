@@ -24,8 +24,8 @@ function AdminPayouts() {
       const params = status ? { status } : {};
       const res = await apiClient.get('/admin/payouts', { params });
       setPayouts(res.data.data || []);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }

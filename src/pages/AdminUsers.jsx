@@ -58,8 +58,8 @@ function AdminUsers() {
       const res = await apiClient.get('/admin/users', { params });
       setUsers(res.data.data || []);
       setPagination(res.data.pagination || null);
-    } catch {
-      // silent
+    } catch (err) {
+      console.error(err);
     } finally {
       setLoading(false);
     }

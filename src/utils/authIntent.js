@@ -7,9 +7,8 @@ export function rememberPostAuthMode(mode) {
       POST_AUTH_MODE_STORAGE_KEY,
       mode === 'hosting' ? 'hosting' : 'travelling',
     );
-  } catch {
-    // Storage can be unavailable in private browsing. OAuth still signs in;
-    // the safe fallback after callback is travelling mode.
+  } catch (err) {
+    console.error('Failed to persist post-auth mode:', err);
   }
 }
 
@@ -29,7 +28,7 @@ export function rememberNavMode(mode) {
       NAV_MODE_STORAGE_KEY,
       mode === 'hosting' ? 'hosting' : 'travelling',
     );
-  } catch {
-    // Keep routing functional even when persistence is unavailable.
+  } catch (err) {
+    console.error('Failed to persist nav mode:', err);
   }
 }
