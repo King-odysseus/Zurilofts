@@ -176,6 +176,25 @@ function HomePage() {
         </div>
       )}
 
+      {/* Compact value section - keeps the marquee and hero presentation intact. */}
+      <section className="max-w-7xl mx-auto px-4 md:px-6 mt-16 md:mt-20" aria-label="Why stay with ZuriLofts">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
+          {[
+            { title: 'Verified stays', copy: 'Thoughtfully reviewed apartments in Nairobi neighbourhoods you can trust.', icon: 'M5 13l4 4L19 7' },
+            { title: 'Ready to live', copy: 'Comfortable, furnished spaces with the essentials already taken care of.', icon: 'M3 10h18M5 10v10h14V10M8 10V7a4 4 0 018 0v3' },
+            { title: 'Local support', copy: 'A responsive team is here before, during, and after your stay.', icon: 'M18 8A6 6 0 106 8c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4' },
+          ].map((item) => (
+            <div key={item.title} className="rounded-[14px] border border-[#E5E7EB] bg-white p-5 md:p-6 shadow-sm">
+              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-[#2563EB]/10 text-[#2563EB]">
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d={item.icon} /></svg>
+              </div>
+              <h3 className="text-base font-bold text-[#222222]">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-[#6b7280]">{item.copy}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Experience Luxury Section */}
       <div className="text-center mb-10 mt-32 md:mt-44 px-4">
         <h2 className="text-2xl md:text-3xl font-bold text-[#222222]">Experience Luxury and Class</h2>
