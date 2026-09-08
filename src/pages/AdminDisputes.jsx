@@ -182,7 +182,7 @@ function AdminDisputes() {
                   <textarea value={resolution} onChange={(e) => setResolution(e.target.value)} rows="3" className="w-full rounded-[14px] border border-[#E5E7EB] px-5 py-3 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20" />
                   <div className="mt-4 flex flex-wrap gap-3">
                     {selected.status === 'OPEN' && (
-                      <button onClick={() => handleStatus('UNDER_REVIEW')} disabled={Boolean(busy)} className="min-h-[44px] rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Mark under review</button>
+                      <button onClick={() => handleStatus('UNDER_REVIEW')} disabled={Boolean(busy)} className="min-h-[44px] rounded-lg bg-[#d97706] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50 hover:bg-[#b45309]">Mark under review</button>
                     )}
                     <button onClick={() => handleStatus('RESOLVED')} disabled={Boolean(busy)} className="min-h-[44px] rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Resolve</button>
                     <button onClick={() => handleStatus('DISMISSED')} disabled={Boolean(busy)} className="min-h-[44px] rounded-lg border border-red-200 shadow-sm hover:shadow-md transition-shadow px-5 py-2.5 text-sm font-semibold text-red-600 disabled:opacity-50">Dismiss</button>
