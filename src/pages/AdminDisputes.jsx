@@ -98,6 +98,14 @@ function AdminDisputes() {
           <option value="DISMISSED">Dismissed</option>
         </select>
       </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          ['Disputes in view', rows.length],
+          ['Open', rows.filter((row) => row.status === 'OPEN').length],
+          ['Under review', rows.filter((row) => row.status === 'UNDER_REVIEW').length],
+          ['Resolved', rows.filter((row) => row.status === 'RESOLVED').length],
+        ].map(([label, value]) => <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p></div>)}
+      </div>
       {message && <div className="rounded-[14px] bg-[#222222]/5 px-4 py-3 text-sm text-[#222222]">{message}</div>}
       {loading ? (
         <div className="py-16 text-center text-[#6b7280]">Loading disputes...</div>
