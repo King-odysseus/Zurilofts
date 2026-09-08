@@ -59,6 +59,10 @@ function AdminFeedback() {
           <span className="text-sm text-[#6b7280]">Total Reviews</span>
           <p className="text-2xl font-bold text-[#222222] mt-2">{summary.totalReviews || 0}</p>
         </div>
+        <div className="bg-white rounded-[14px] border border-[#E5E7EB] p-5 shadow-sm">
+          <span className="text-sm text-[#6b7280]">Private Notes</span>
+          <p className="text-2xl font-bold text-[#222222] mt-2">{reviews.filter((review) => review.privateNote).length}</p>
+        </div>
       </div>
 
       {loading ? (
