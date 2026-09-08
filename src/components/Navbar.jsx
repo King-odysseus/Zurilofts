@@ -697,27 +697,6 @@ function Navbar({ solid = false }) {
                     Booking History
                   </Link>
                   <Link
-                    to="/favourites"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Favourites
-                  </Link>
-                  <Link
-                    to="/messages"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Contact Support{unreadMessages > 0 ? ` (${unreadMessages})` : ''}
-                  </Link>
-                  <Link
-                    to="/inbox"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
-                    onClick={() => setMenuOpen(false)}
-                  >
-                    Messages{conversationUnread > 0 ? ` (${conversationUnread})` : ''}
-                  </Link>
-                  <Link
                     to="/terms"
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
