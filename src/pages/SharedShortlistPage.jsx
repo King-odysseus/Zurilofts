@@ -49,10 +49,12 @@ export default function SharedShortlistPage() {
           </div>
         ) : shortlist ? (
           <>
+            <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-6 sm:px-7 shadow-sm mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-[#222222] mb-1">{shortlist.name}</h1>
-            <p className="text-[#6b7280] mb-8">
+            <p className="text-[#6b7280]">
               {shortlist.items?.length ?? 0} {shortlist.items?.length === 1 ? "property" : "properties"} saved
             </p>
+            </div>
 
             {(!shortlist.items || shortlist.items.length === 0) ? (
               <div className="text-center py-16">
