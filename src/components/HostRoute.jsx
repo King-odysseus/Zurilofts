@@ -2,13 +2,14 @@ import { Navigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useAuth } from '../context/AuthContext.jsx';
 
-// Guards the host workspace (/host/*). Admins may legitimately view the host
-// view, so both HOST and ADMIN are admitted. A plain USER who has expressed
-// hosting intent (an in-progress host application, any status) is admitted
-// too - they land straight in the dashboard and can prepare draft listings
-// while verification is still pending; only publishing and payouts are
-// gated behind an APPROVED application (enforced server-side). Unauthenticated
-// visitors are sent to /login; anyone else sees the Access Denied panel.
+// Guards the host workspace (/host/*). Only an approved HOST, or a plain USER
+// who has expressed hosting intent (a host application, any status), is
+// admitted - applicants land straight in the dashboard and can prepare draft
+// listings while verification is still pending; only publishing and payouts are
+// gated behind an APPROVED application (enforced server-side). ADMINS are
+// intentionally excluded: they administer the platform through /admin routes
+// and are not treated as hosts. Unauthenticated visitors are sent to /login;
+// anyone else sees the Access Denied panel.
 function HostRoute({ children }) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const hasHostIntent = user?.hostApplicationStatus != null;
@@ -28,7 +29,7 @@ function HostRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (user?.role !== 'ADMIN' && user?.role !== 'HOST' && !hasHostIntent) {
+  if (user?.role !== 'HOST' && !hasHostIntent) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">

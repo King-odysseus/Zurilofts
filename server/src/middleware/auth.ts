@@ -57,30 +57,34 @@ export function requireAdmin(req: Request, _res: Response, next: NextFunction): 
 }
 
 /**
- * Require at least host-level access (HOST or ADMIN) in addition to valid JWT.
+ * Require an approved HOST role in addition to valid JWT.
  * This is the *verified* gate: only an approved host account may reach it.
- * Used for money-adjacent actions (payouts, bank/payout-destination details)
- * where a mid-verification account should not yet participate.
+ * ADMINS are intentionally excluded - they administer the platform through
+ * /admin routes and are not treated as hosts. Used for money-adjacent actions
+ * (payouts, bank/payout-destination details) where a mid-verification account
+ * should not yet participate.
  * Must be used after `authenticate`.
  */
 export function requireHost(req: Request, _res: Response, next: NextFunction): void {
   if (!req.user) {
     return next(new UnauthorizedError());
   }
-  if (req.user.role !== 'HOST' && req.user.role !== 'ADMIN') {
-    return next(new ForbiddenError('Host access required'));
+  if (req.user.role !== 'HOST') {
+    return next(new ForbiddenError('Approved host access required'));
   }
   next();
 }
 
 /**
- * Require access to the host workspace: an approved HOST/ADMIN, or a plain
- * USER who has expressed hosting intent (any HostApplication row, regardless
- * of status). This is what lets a brand-new applicant land straight in their
- * dashboard and prepare draft listings while verification is still pending -
- * see the host onboarding/verification plan. It intentionally does NOT grant
- * publish or payout access; those stay behind `requireHost` (approved) or
- * per-listing status checks in property.service.ts.
+ * Require access to the host workspace: an approved HOST, or a plain USER who
+ * has expressed hosting intent (any HostApplication row, regardless of status).
+ * ADMINS are intentionally excluded - they administer the platform through
+ * /admin routes and are not treated as hosts. This is what lets a brand-new
+ * applicant land straight in their dashboard and prepare draft listings while
+ * verification is still pending - see the host onboarding/verification plan. It
+ * intentionally does NOT grant publish or payout access; those stay behind
+ * `requireHost` (approved HOST) or per-listing status checks in
+ * property.service.ts.
  * Must be used after `authenticate`.
  */
 export async function requireHostWorkspace(req: Request, _res: Response, next: NextFunction): Promise<void> {
@@ -88,7 +92,7 @@ export async function requireHostWorkspace(req: Request, _res: Response, next: N
     if (!req.user) {
       return next(new UnauthorizedError());
     }
-    if (req.user.role === 'HOST' || req.user.role === 'ADMIN') {
+    if (req.user.role === 'HOST') {
       return next();
     }
     if (req.user.role === 'USER') {

@@ -37,7 +37,10 @@ function Navbar() {
 
   const { user, isAuthenticated, logout } = useAuth();
   const { mode, setMode, canSelectHosting } = useMode();
-  const hasVerifiedHostAccess = user?.role === 'HOST' || user?.role === 'ADMIN';
+  // Only an approved HOST account has verified host access. ADMINS are excluded
+  // here (they administer the platform through /admin), so they get no Payouts
+  // or other verified-host affordances.
+  const hasVerifiedHostAccess = user?.role === 'HOST';
   // An applicant with an in-progress application (any status) can already use
   // the host workspace - draft listings, calendar, messages - even before
   // approval. Only Payouts and publishing require full verification.

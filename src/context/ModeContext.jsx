@@ -19,15 +19,23 @@ export function ModeProvider({ children }) {
   const { user } = useAuth();
 
   // A plain USER who has expressed hosting intent (any HostApplication, no
-  // matter its status) may also enter the host workspace - only verified
-  // HOST/ADMIN accounts may publish listings or take payouts.
-  const canHost = user?.role === 'HOST' || user?.role === 'ADMIN' || user?.hostApplicationStatus != null;
-  const canSelectHosting = Boolean(user);
+  // matter its status) may also enter the host workspace - only a verified
+  // HOST account may publish listings or take payouts. ADMINS are excluded
+  // from host mode entirely: they administer the platform through /admin and
+  // are not treated as hosts.
+  const canHost = user?.role === 'HOST' || user?.hostApplicationStatus != null;
+  // Any authenticated non-admin account may choose hosting mode: HOST and
+  // hosting-intent USERs open the host workspace, while a plain USER is routed
+  // to Host Setup (/host/application) to begin an application. ADMINS (who use
+  // /admin) and guests are excluded.
+  const canSelectHosting = Boolean(user) && user.role !== 'ADMIN';
 
   const [mode, setModeState] = useState(() => readStoredMode());
 
-  // Every authenticated account may enter Hosting mode. For unapproved users it
-  // opens host onboarding; only HOST/ADMIN accounts receive dashboard access.
+  // Only HOST accounts and hosting-intent USERs may enter Hosting mode. For
+  // an unapproved (pending) applicant the workspace opens so they can prepare
+  // draft listings; publishing and payouts still require an approved HOST
+  // account. ADMINS are forced back to travelling mode - they use /admin.
   useEffect(() => {
     setModeState(canSelectHosting ? readStoredMode() : 'travelling');
   }, [canSelectHosting]);
