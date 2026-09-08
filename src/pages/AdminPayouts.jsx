@@ -17,6 +17,7 @@ function AdminPayouts() {
   const [message, setMessage] = useState('');
   const [triggering, setTriggering] = useState('');
   const [scheduledRunning, setScheduledRunning] = useState(false);
+  const [selectedPayout, setSelectedPayout] = useState(null);
 
   async function loadPayouts(status) {
     setLoading(true);
@@ -164,15 +165,18 @@ function AdminPayouts() {
                     {p.completedAt ? new Date(p.completedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                   </td>
                   <td className="p-4">
-                    {(p.status === 'FAILED' || p.status === 'PENDING') && (
-                      <button
-                        onClick={() => triggerPayout(p.hostId)}
-                        disabled={triggering === p.hostId}
-                        className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors disabled:opacity-50"
-                      >
-                        {triggering === p.hostId ? '...' : 'Retry'}
-                      </button>
-                    )}
+                    <div className="flex items-center gap-3">
+                      <button type="button" onClick={() => setSelectedPayout(p)} className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors">Review</button>
+                      {(p.status === 'FAILED' || p.status === 'PENDING') && (
+                        <button
+                          onClick={() => triggerPayout(p.hostId)}
+                          disabled={triggering === p.hostId}
+                          className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors disabled:opacity-50"
+                        >
+                          {triggering === p.hostId ? '...' : 'Retry'}
+                        </button>
+                      )}
+                    </div>
                     {p.failureReason && (
                       <p className="text-xs text-red-500 mt-1">{p.failureReason}</p>
                     )}
@@ -181,6 +185,26 @@ function AdminPayouts() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {selectedPayout && (
+        <div className="fixed inset-0 z-30 bg-black/20" onClick={() => setSelectedPayout(null)}>
+          <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-[#E5E7EB] bg-white p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-start justify-between gap-4">
+              <div><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Payout review</p><h2 className="mt-1 text-xl font-bold text-[#222222]">{selectedPayout.host?.firstName} {selectedPayout.host?.lastName}</h2></div>
+              <button type="button" onClick={() => setSelectedPayout(null)} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close payout review">×</button>
+            </div>
+            <div className="mt-6 space-y-4 text-sm">
+              <div className="flex items-center justify-between"><span className="text-[#6b7280]">Amount</span><span className="text-lg font-bold text-[#222222]">KES {selectedPayout.amount?.toLocaleString()}</span></div>
+              <div className="flex items-center justify-between"><span className="text-[#6b7280]">Bookings</span><span className="font-semibold text-[#222222]">{selectedPayout.bookingsCount}</span></div>
+              <div className="flex items-center justify-between"><span className="text-[#6b7280]">Status</span><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${statusColors[selectedPayout.status] || 'bg-gray-100 text-gray-700'}`}>{selectedPayout.status}</span></div>
+              <div className="flex items-center justify-between"><span className="text-[#6b7280]">Initiated</span><span className="font-semibold text-[#222222]">{selectedPayout.createdAt ? new Date(selectedPayout.createdAt).toLocaleDateString('en-GB') : '-'}</span></div>
+              <div className="flex items-center justify-between"><span className="text-[#6b7280]">Completed</span><span className="font-semibold text-[#222222]">{selectedPayout.completedAt ? new Date(selectedPayout.completedAt).toLocaleDateString('en-GB') : '-'}</span></div>
+            </div>
+            {selectedPayout.failureReason && <p className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{selectedPayout.failureReason}</p>}
+            {(selectedPayout.status === 'FAILED' || selectedPayout.status === 'PENDING') && <button type="button" onClick={() => triggerPayout(selectedPayout.hostId)} disabled={triggering === selectedPayout.hostId} className="mt-6 min-h-[44px] w-full rounded-lg bg-[#C49A6C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#B8895C] disabled:opacity-50">{triggering === selectedPayout.hostId ? 'Retrying...' : 'Retry payout'}</button>}
+          </aside>
         </div>
       )}
     </div>
