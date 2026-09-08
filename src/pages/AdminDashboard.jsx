@@ -547,12 +547,15 @@ function AdminLayout() {
 function DashboardOverview() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
-  const [stats, setStats] = useState({ properties: 0, bookings: 0, promos: 0, revenue: 0 });
+  // setStats is retained so load() still fetches and computes the same data;
+  // the redesigned "Needs attention" overview no longer surfaces these totals.
+  const [, setStats] = useState({ properties: 0, bookings: 0, promos: 0, revenue: 0 });
   const [recentBookings, setRecentBookings] = useState([]);
   const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0', satisfaction: '0' });
   const [savingLanding, setSavingLanding] = useState(false);
   const [landingMsg, setLandingMsg] = useState('');
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('All');
   const quickRef = useRef(null);
   const navigate = useNavigate();
 
@@ -609,7 +612,15 @@ function DashboardOverview() {
     finally { setSavingLanding(false); }
   }
 
-  const greeting = (() => { const h = new Date().getHours(); return h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening'; })();
+  // "Needs attention" buckets derived from already-fetched bookings. Absent
+  // fields simply produce empty buckets (count 0) - no extra fetch, no fallback.
+  const pendingApprovals = recentBookings.filter((b) => b.status === 'PENDING');
+  const paymentIssues = recentBookings.filter((b) => b.paymentStatus === 'FAILED' || b.paymentStatus === 'REFUND_PENDING');
+  const openDisputes = recentBookings.filter((b) => b.status === 'DISPUTED' || b.disputeStatus === 'OPEN');
+  const TAB_ORDER = ['All', 'Approvals', 'Payments', 'Disputes'];
+  const buckets = { All: recentBookings, Approvals: pendingApprovals, Payments: paymentIssues, Disputes: openDisputes };
+  const reviewRows = buckets[activeTab];
+
   const quickLinks = [
     ...(isAdmin ? [
       { to: '/admin/bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label: 'View bookings' },
@@ -625,53 +636,61 @@ function DashboardOverview() {
 
   return (
     <div>
-      {/* Header panel */}
+      {/* Header panel - Needs attention */}
       <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-6">
-        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-[#6b7280]">{greeting}</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#222222] sm:text-3xl">
-              Welcome back{user?.firstName ? `, ${user.firstName}` : ''}
-            </h1>
-            <p className="mt-2 max-w-md text-sm text-[#6b7280]">
-              {isAdmin ? 'Manage properties, bookings, and users from one place.' : 'Track your listings, earnings, and upcoming guests.'}
-            </p>
+            <h1 className="text-2xl font-bold tracking-tight text-[#222222] sm:text-3xl">Needs attention</h1>
+            <p className="mt-2 max-w-md text-sm text-[#6b7280]">Review pending work and resolve issues.</p>
           </div>
-          {quickLinks.length > 0 && (
-            <div className="relative self-start" ref={quickRef}>
-              <button
-                type="button"
-                aria-haspopup="menu"
-                aria-expanded={quickActionsOpen}
-                onClick={() => setQuickActionsOpen((o) => !o)}
-                className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1D4ED8] transition-colors"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                Quick actions
-                <svg className={`w-4 h-4 transition-transform ${quickActionsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-              </button>
-              {quickActionsOpen && (
-                <div className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-[14px] border border-[#E5E7EB] bg-white p-1.5 shadow-lg sm:left-auto sm:right-0" role="menu">
-                  {quickLinks.map((link) => (
-                    <button key={link.label} type="button" role="menuitem" onClick={() => { setQuickActionsOpen(false); navigate(link.to); }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] transition-colors">
-                      <svg className="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} /></svg>
-                      {link.label}
-                    </button>
-                  ))}
-                </div>
+          <div className="flex flex-wrap items-center gap-3 self-start">
+            {/* Prominent Open approvals action */}
+            <button
+              type="button"
+              onClick={() => navigate('/admin/bookings')}
+              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1D4ED8] transition-colors"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Open approvals
+              {pendingApprovals.length > 0 && (
+                <span className="ml-1 inline-flex min-w-[20px] items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-bold">{pendingApprovals.length}</span>
               )}
-            </div>
-          )}
+            </button>
+            {quickLinks.length > 0 && (
+              <div className="relative" ref={quickRef}>
+                <button
+                  type="button"
+                  aria-haspopup="menu"
+                  aria-expanded={quickActionsOpen}
+                  onClick={() => setQuickActionsOpen((o) => !o)}
+                  className="inline-flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#222222] hover:bg-[#F7F7F5] transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                  Quick actions
+                  <svg className={`w-4 h-4 transition-transform ${quickActionsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </button>
+                {quickActionsOpen && (
+                  <div className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-[14px] border border-[#E5E7EB] bg-white p-1.5 shadow-lg sm:left-auto sm:right-0" role="menu">
+                    {quickLinks.map((link) => (
+                      <button key={link.label} type="button" role="menuitem" onClick={() => { setQuickActionsOpen(false); navigate(link.to); }}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] transition-colors">
+                        <svg className="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} /></svg>
+                        {link.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <StatCardView label="Total Properties" value={stats.properties} icon="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" tone="primary" />
-        <StatCardView label="Active Bookings" value={stats.bookings} icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" tone="info" />
-        {isAdmin && <StatCardView label="Active Promos" value={stats.promos} icon="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" tone="success" />}
-        <StatCardView label="Revenue (KES)" value={stats.revenue.toLocaleString()} icon="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" tone="warning" />
+      {/* Compact metric cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <StatCardView label="Pending approvals" value={pendingApprovals.length} icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" tone="warning" />
+        <StatCardView label="Payment issues" value={paymentIssues.length} icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" tone="danger" />
+        <StatCardView label="Open dispute" value={openDisputes.length} icon="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" tone="info" />
       </div>
 
       {/* Landing Page Stats Editor - admin only */}
@@ -704,39 +723,57 @@ function DashboardOverview() {
       </div>
       )}
 
-      {/* Recent Bookings */}
+      {/* Review queue - tabbed compact table */}
       <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-[#222222]">Recent Bookings</h2>
-          <Link to="/admin/bookings" className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors">View all</Link>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
+          <h2 className="text-lg font-bold text-[#222222]">Review queue</h2>
+          <div className="inline-flex flex-wrap gap-1 rounded-lg border border-[#E5E7EB] p-1" role="tablist" aria-label="Filter review queue">
+            {TAB_ORDER.map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab}
+                onClick={() => setActiveTab(tab)}
+                className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
+                  activeTab === tab ? 'bg-[#2563EB] text-white' : 'text-[#6b7280] hover:bg-[#F7F7F5]'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
         </div>
-        {recentBookings.length === 0 ? (
-          <p className="text-[#6b7280] text-sm py-8 text-center">No bookings yet.</p>
+        {reviewRows.length === 0 ? (
+          <p className="text-[#6b7280] text-sm py-8 text-center">Nothing needs attention.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left border-b border-[#E5E7EB]">
-                  <th className="pb-3 font-semibold text-[#222222]">Guest</th>
-                  <th className="pb-3 font-semibold text-[#222222]">Property</th>
-                  <th className="pb-3 font-semibold text-[#222222] hidden sm:table-cell">Dates</th>
-                  <th className="pb-3 font-semibold text-[#222222]">Total</th>
+                  <th className="pb-3 font-semibold text-[#222222]">Item</th>
                   <th className="pb-3 font-semibold text-[#222222]">Status</th>
+                  <th className="pb-3 font-semibold text-[#222222] hidden sm:table-cell">Updated</th>
+                  <th className="pb-3 font-semibold text-[#222222] text-right">Action</th>
                 </tr>
               </thead>
               <tbody>
-                {recentBookings.map((b) => (
+                {reviewRows.map((b) => (
                   <tr key={b.id} className="border-b border-[#E5E7EB]/60 hover:bg-[#F7F7F5] transition-colors">
-                    <td className="py-3">{b.user?.firstName} {b.user?.lastName}</td>
-                    <td className="py-3 max-w-[140px] truncate">{b.property?.title}</td>
-                    <td className="py-3 text-xs text-[#6b7280] hidden sm:table-cell">{new Date(b.checkIn).toLocaleDateString()} - {new Date(b.checkOut).toLocaleDateString()}</td>
-                    <td className="py-3 font-semibold">KES {b.total?.toLocaleString()}</td>
+                    <td className="py-3">
+                      <p className="font-medium text-[#222222] max-w-[180px] truncate">{b.property?.title}</p>
+                      <p className="text-xs text-[#6b7280]">{b.user?.firstName} {b.user?.lastName}</p>
+                    </td>
                     <td className="py-3">
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
                         b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
                         b.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
                         'bg-amber-100 text-amber-700'
                       }`}>{b.status}</span>
+                    </td>
+                    <td className="py-3 text-xs text-[#6b7280] hidden sm:table-cell">{new Date(b.updatedAt || b.createdAt || b.checkIn).toLocaleDateString()}</td>
+                    <td className="py-3 text-right">
+                      <button type="button" onClick={() => navigate('/admin/bookings')} className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors">Review</button>
                     </td>
                   </tr>
                 ))}
