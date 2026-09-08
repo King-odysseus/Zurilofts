@@ -271,10 +271,10 @@ function PropertiesPage() {
             Premium furnished apartments in Nairobi&apos;s most desirable neighbourhoods.
           </p>
           <div className="max-w-4xl mx-auto rounded-[18px] border border-[#E5E7EB] bg-white p-2 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-left">
-            <div className="hidden md:grid grid-cols-3 divide-x divide-[#E5E7EB] px-4 pt-2 pb-1" aria-hidden="true">
-              <span className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Where</span>
-              <span className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Dates</span>
-              <span className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Guests</span>
+            <div className="hidden md:grid grid-cols-3 divide-x divide-[#E5E7EB] px-4 pt-2 pb-1">
+              <div className="px-3"><span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Where</span><span className="mt-1 block truncate text-sm font-medium text-[#222222]">{searchInput || 'Anywhere in Nairobi'}</span></div>
+              <div className="px-3"><span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Dates</span><span className="mt-1 block text-sm font-medium text-[#222222]">Add dates</span></div>
+              <div className="px-3"><span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Guests</span><span className="mt-1 block text-sm font-medium text-[#222222]">{minGuests ? `${minGuests}+ guests` : 'Add guests'}</span></div>
             </div>
             <TripSearchBar
               value={searchInput}
