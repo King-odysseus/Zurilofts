@@ -49,7 +49,7 @@ function MessagesPage() {
       <div className="flex-1 pt-24 pb-16">
         <div className="max-w-2xl mx-auto px-4 md:px-6">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-[#0B0B45]">Messages</h1>
+            <h1 className="text-2xl font-bold text-[#222222]">Messages</h1>
             <p className="text-[#6b7280] text-sm">Chat with the ZuriLofts team. We usually reply within a few hours.</p>
           </div>
 
@@ -59,8 +59,8 @@ function MessagesPage() {
                 <p className="text-sm text-[#6b7280] text-center py-10">Loading…</p>
               ) : messages.length === 0 ? (
                 <div className="text-center py-10">
-                  <div className="w-14 h-14 bg-[#C49A6C]/15 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg className="w-7 h-7 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-14 h-14 bg-[#2563EB]/15 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-7 h-7 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
@@ -70,10 +70,10 @@ function MessagesPage() {
                 messages.map((m) => (
                   <div key={m.id} className={`flex ${m.senderRole === 'USER' ? 'justify-end' : 'justify-start'}`}>
                     <div
-                      className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${
+                      className={`max-w-[75%] px-4 py-2.5 rounded-[14px] text-sm ${
                         m.senderRole === 'USER'
-                          ? 'bg-[#C49A6C] text-white rounded-br-md'
-                          : 'bg-[#f0f0f5] text-[#1f2937] rounded-bl-md'
+                          ? 'bg-[#2563EB] text-white rounded-br-md'
+                          : 'bg-[#f0f0f5] text-[#222222] rounded-bl-md'
                       }`}
                     >
                       {m.body}
@@ -86,17 +86,17 @@ function MessagesPage() {
               )}
               <div ref={bottomRef} />
             </div>
-            <form onSubmit={handleSend} className="p-3 border-t border-[#D9D9D9] flex gap-2">
+            <form onSubmit={handleSend} className="p-3 border-t border-[#E5E7EB] flex gap-2">
               <input
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 placeholder="Type a message…"
-                className="flex-1 px-4 py-3 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 text-sm bg-white text-[#1f2937]"
+                className="flex-1 min-h-[44px] px-4 py-3 rounded-xl border border-[#E5E7EB] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 text-sm bg-white text-[#222222]"
               />
               <button
                 type="submit"
                 disabled={sending || !body.trim()}
-                className="px-6 py-3 rounded-full bg-[#C49A6C] text-white text-sm font-semibold hover:bg-[#b8895c] transition-all disabled:opacity-50"
+                className="min-h-[44px] px-6 py-3 rounded-lg bg-[#2563EB] text-white text-sm font-semibold hover:bg-[#1D4ED8] transition-all disabled:opacity-50"
               >
                 Send
               </button>

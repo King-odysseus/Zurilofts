@@ -15,7 +15,7 @@ const STATUS_STYLES = {
   OPEN: 'bg-amber-100 text-amber-800',
   UNDER_REVIEW: 'bg-blue-100 text-blue-800',
   RESOLVED: 'bg-green-100 text-green-700',
-  DISMISSED: 'bg-[#D9D9D9]/40 text-[#1f2937]',
+  DISMISSED: 'bg-[#E5E7EB]/40 text-[#222222]',
 };
 
 function NewDisputeForm({ bookingId, onCreated }) {
@@ -39,33 +39,33 @@ function NewDisputeForm({ bookingId, onCreated }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-6 shadow-md space-y-4 max-w-xl">
-      <h2 className="text-lg font-semibold text-[#0B0B45]">Report an issue with this booking</h2>
+    <form onSubmit={handleSubmit} className="bg-white rounded-[14px] p-6 shadow-md space-y-4 max-w-xl">
+      <h2 className="text-lg font-semibold text-[#222222]">Report an issue with this booking</h2>
       {error && <p className="text-sm text-red-600">{error}</p>}
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-1">Category</label>
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full px-3 py-2 rounded-xl shadow-sm">
+        <label className="block text-sm font-semibold text-[#222222] mb-1">Category</label>
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#E5E7EB] bg-white focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20">
           {Object.entries(CATEGORY_LABELS).map(([value, label]) => (
             <option key={value} value={value}>{label}</option>
           ))}
         </select>
       </div>
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-1">What happened?</label>
+        <label className="block text-sm font-semibold text-[#222222] mb-1">What happened?</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           rows={5}
           minLength={10}
           required
-          className="w-full px-3 py-2 rounded-xl shadow-sm"
+          className="w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#E5E7EB] bg-white focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
           placeholder="Describe the issue in detail - our team and the other party will see this."
         />
       </div>
       <button
         type="submit"
         disabled={submitting}
-        className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-colors disabled:opacity-50"
+        className="min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
       >
         {submitting ? 'Submitting...' : 'Open dispute'}
       </button>
@@ -169,7 +169,7 @@ function DisputeThreadPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -191,15 +191,15 @@ function DisputeThreadPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
-        <Link to="/trips" className="text-sm text-[#C49A6C] font-semibold hover:text-[#0B0B45]">&larr; Back to trips</Link>
-        <div className="bg-white rounded-2xl p-6 shadow-md mt-4">
+        <Link to="/trips" className="text-sm text-[#2563EB] font-semibold hover:text-[#1D4ED8]">&larr; Back to trips</Link>
+        <div className="bg-white rounded-[14px] p-6 shadow-md mt-4">
           <div className="flex items-center gap-3 mb-2 flex-wrap">
-            <h1 className="text-xl font-bold text-[#0B0B45]">{CATEGORY_LABELS[dispute.category] || dispute.category}</h1>
+            <h1 className="text-xl font-bold text-[#222222]">{CATEGORY_LABELS[dispute.category] || dispute.category}</h1>
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[dispute.status] || ''}`}>
               {dispute.status.replace('_', ' ')}
             </span>
           </div>
-          <p className="text-[#1f2937] mb-4 whitespace-pre-wrap">{dispute.description}</p>
+          <p className="text-[#222222] mb-4 whitespace-pre-wrap">{dispute.description}</p>
 
           {dispute.resolution && (
             <div className="mb-4 bg-green-50 border border-green-200 rounded-xl p-4">
@@ -210,13 +210,13 @@ function DisputeThreadPage() {
 
           {/* Evidence */}
           <div className="mb-6">
-            <p className="text-sm font-semibold text-[#1f2937] mb-2">Evidence</p>
+            <p className="text-sm font-semibold text-[#222222] mb-2">Evidence</p>
             <ul className="space-y-1 mb-2">
               {dispute.evidence.map((e) => (
                 <li key={e.id}>
                   <button
                     onClick={() => handleDownloadEvidence(e)}
-                    className="text-sm text-[#C49A6C] hover:text-[#0B0B45] underline"
+                    className="text-sm text-[#2563EB] hover:text-[#1D4ED8] underline"
                   >
                     {e.originalName}
                   </button>
@@ -225,7 +225,7 @@ function DisputeThreadPage() {
               {dispute.evidence.length === 0 && <li className="text-sm text-[#6b7280]">No evidence uploaded yet.</li>}
             </ul>
             {!closed && (
-              <label className="inline-block px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm hover:shadow-md text-[#6b7280] hover:text-[#C49A6C] cursor-pointer transition-all">
+              <label className="inline-block px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm hover:shadow-md text-[#6b7280] hover:text-[#2563EB] cursor-pointer transition-all">
                 {uploading ? 'Uploading...' : 'Upload evidence'}
                 <input
                   type="file"
@@ -242,13 +242,13 @@ function DisputeThreadPage() {
           </div>
 
           {/* Messages */}
-          <div className="border-t border-[#D9D9D9] pt-4">
-            <p className="text-sm font-semibold text-[#1f2937] mb-3">Messages</p>
+          <div className="border-t border-[#E5E7EB] pt-4">
+            <p className="text-sm font-semibold text-[#222222] mb-3">Messages</p>
             <ul className="space-y-3 mb-4 max-h-96 overflow-y-auto">
               {dispute.messages.map((m) => (
                 <li key={m.id} className="bg-canvas rounded-xl p-3">
-                  <p className="text-xs font-semibold text-[#0B0B45] mb-1">{m.senderRole}</p>
-                  <p className="text-sm text-[#1f2937] whitespace-pre-wrap">{m.body}</p>
+                  <p className="text-xs font-semibold text-[#222222] mb-1">{m.senderRole}</p>
+                  <p className="text-sm text-[#222222] whitespace-pre-wrap">{m.body}</p>
                 </li>
               ))}
               {dispute.messages.length === 0 && <li className="text-sm text-[#6b7280]">No messages yet.</li>}
@@ -260,12 +260,12 @@ function DisputeThreadPage() {
                   value={messageBody}
                   onChange={(e) => setMessageBody(e.target.value)}
                   placeholder="Write a message..."
-                  className="flex-1 px-3 py-2 rounded-xl shadow-sm"
+                  className="flex-1 min-h-[44px] px-3 py-2 rounded-xl border border-[#E5E7EB] bg-white focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
                 />
                 <button
                   type="submit"
                   disabled={sending}
-                  className="px-4 py-2 rounded-full text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-colors disabled:opacity-50"
+                  className="min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
                 >
                   Send
                 </button>

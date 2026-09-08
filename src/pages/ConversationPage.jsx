@@ -36,10 +36,10 @@ function MessageBubble({ message, isMine }) {
     <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
       <div className={`max-w-[80%] sm:max-w-[70%] ${isMine ? 'text-right' : 'text-left'}`}>
         <div
-          className={`px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap break-words ${
+          className={`px-4 py-2.5 rounded-[14px] text-sm whitespace-pre-wrap break-words ${
             isMine
-              ? 'bg-[#0B0B45] text-white rounded-br-md'
-              : 'bg-white shadow-sm text-[#1f2937] rounded-bl-md'
+              ? 'bg-[#2563EB] text-white rounded-br-md'
+              : 'bg-white shadow-sm text-[#222222] rounded-bl-md'
           }`}
         >
           {message.content}
@@ -171,7 +171,7 @@ function ConversationPage() {
         <div className="flex items-center gap-3 mb-4">
           <Link
             to="/inbox"
-            className="p-2 rounded-full hover:bg-[#D9D9D9]/40 transition-colors text-[#0B0B45]"
+            className="p-2 rounded-full hover:bg-[#E5E7EB]/40 transition-colors text-[#222222]"
             aria-label="Back to inbox"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,7 +179,7 @@ function ConversationPage() {
             </svg>
           </Link>
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold text-[#0B0B45] truncate">{other.name}</h1>
+            <h1 className="text-lg font-bold text-[#222222] truncate">{other.name}</h1>
             <p className="text-sm text-[#6b7280] truncate">{property.title || 'Property'}</p>
           </div>
           {image && (
@@ -188,7 +188,7 @@ function ConversationPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto bg-white rounded-2xl shadow-sm p-4 space-y-3 min-h-[50vh]">
+        <div className="flex-1 overflow-y-auto bg-white rounded-[14px] shadow-sm p-4 space-y-3 min-h-[50vh]">
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <Spinner />
@@ -198,7 +198,7 @@ function ConversationPage() {
               <p className="text-[#6b7280] mb-4">{error}</p>
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200"
+                className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
               >
                 Try again
               </button>
@@ -220,7 +220,7 @@ function ConversationPage() {
 
         {/* Composer */}
         <div className="mt-4 pb-4">
-          <div className="flex items-end gap-2 bg-white rounded-2xl shadow-sm p-2">
+          <div className="flex items-end gap-2 bg-white rounded-[14px] shadow-sm p-2">
             <textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
@@ -232,15 +232,15 @@ function ConversationPage() {
               }}
               rows={1}
               placeholder="Write a message..."
-              className="flex-1 resize-none bg-transparent outline-none px-3 py-2 text-sm text-[#1f2937] placeholder-[#6b7280] max-h-32"
+              className="flex-1 resize-none bg-transparent outline-none px-3 py-2 text-sm text-[#222222] placeholder-[#6b7280] max-h-32"
             />
             <button
               onClick={handleSend}
               disabled={!canSend}
-              className={`flex-shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
+              className={`flex-shrink-0 inline-flex items-center gap-1.5 min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 canSend
-                  ? 'bg-[#C49A6C] text-white hover:bg-[#b8895c]'
-                  : 'bg-[#D9D9D9] text-[#6b7280] cursor-not-allowed'
+                  ? 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]'
+                  : 'bg-[#E5E7EB] text-[#6b7280] cursor-not-allowed'
               }`}
             >
               {sending ? (

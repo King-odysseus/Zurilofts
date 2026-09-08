@@ -45,11 +45,11 @@ function ConversationRow({ conversation, currentUserId }) {
   return (
     <Link
       to={`/inbox/${conversation.id}`}
-      className="block bg-white rounded-2xl neu-card p-4 hover:shadow-md transition-all duration-200"
+      className="block bg-white rounded-[14px] neu-card p-4 hover:shadow-md transition-all duration-200"
     >
       <div className="flex items-center gap-4">
         {/* Property thumbnail */}
-        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-[#D9D9D9]/30">
+        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-[#E5E7EB]/30">
           {image ? (
             <img src={image} alt={property.title} className="w-full h-full object-cover" />
           ) : (
@@ -64,18 +64,18 @@ function ConversationRow({ conversation, currentUserId }) {
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="font-semibold text-[#0B0B45] truncate">{other.name}</h3>
+            <h3 className="font-semibold text-[#222222] truncate">{other.name}</h3>
             <span className="text-xs text-[#6b7280] flex-shrink-0">
               {formatRelativeTime(lastMessage ? lastMessage.createdAt : conversation.updatedAt)}
             </span>
           </div>
           <p className="text-sm text-[#6b7280] truncate">{property.title || 'Property'}</p>
           <div className="flex items-center justify-between gap-2 mt-1">
-            <p className={`text-sm truncate ${unread ? 'font-semibold text-[#1f2937]' : 'text-[#6b7280]'}`}>
+            <p className={`text-sm truncate ${unread ? 'font-semibold text-[#222222]' : 'text-[#6b7280]'}`}>
               {preview}
             </p>
             {unread && (
-              <span className="w-2.5 h-2.5 rounded-full bg-[#C49A6C] flex-shrink-0" aria-label="Unread" />
+              <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] flex-shrink-0" aria-label="Unread" />
             )}
           </div>
         </div>
@@ -136,7 +136,7 @@ function InboxPage() {
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#0B0B45]">Inbox</h1>
+          <h1 className="text-3xl font-bold text-[#222222]">Inbox</h1>
           <p className="text-[#6b7280] mt-1">Messages about your bookings and stays.</p>
         </div>
 
@@ -149,19 +149,19 @@ function InboxPage() {
             <p className="text-[#6b7280] mb-4">{error}</p>
             <button
               onClick={fetchConversations}
-              className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200"
+              className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
             >
               Try again
             </button>
           </div>
         ) : conversations.length === 0 ? (
           <div className="text-center py-16 px-4">
-            <div className="w-20 h-20 bg-[#D9D9D9]/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-[#E5E7EB]/30 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg className="w-10 h-10 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-[#0B0B45] mb-1">No messages yet</h3>
+            <h3 className="text-lg font-semibold text-[#222222] mb-1">No messages yet</h3>
             <p className="text-[#6b7280] max-w-sm mx-auto">
               Messages about your bookings will appear here once you make a reservation.
             </p>
