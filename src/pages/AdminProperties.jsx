@@ -206,6 +206,20 @@ function AdminProperties() {
         </div>
       </div>
 
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        {[
+          ['Total listings', properties.length],
+          ['Published', properties.filter((p) => p.status === 'PUBLISHED').length],
+          ['Pending review', properties.filter((p) => p.status === 'PENDING_REVIEW').length],
+          ['Unavailable', properties.filter((p) => p.available === false).length],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p>
+            <p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p>
+          </div>
+        ))}
+      </div>
+
       {loading ? (
         <div className="flex flex-col items-center justify-center py-16 text-[#6b7280]">
           <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
