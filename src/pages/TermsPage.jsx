@@ -10,14 +10,14 @@ function TermsPage() {
       <Navbar />
       <div className="pt-24 pb-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-2">Terms of Service</h1>
+          <h1 className="text-3xl md:text-4xl font-bold text-[#222222] mb-2">Terms of Service</h1>
           <p className="text-sm text-[#6b7280] mb-8">Last updated: {lastUpdated}</p>
 
-          <div className="prose prose-slate max-w-none space-y-8 text-[#1f2937] leading-relaxed">
+          <div className="prose prose-slate max-w-none space-y-8 text-[#222222] leading-relaxed">
 
             {/* 1. Acceptance */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">1. Acceptance of Terms</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">1. Acceptance of Terms</h2>
               <p>
                 By accessing or using the {companyName} Platform - including the website{' '}
                 <strong>thezurilofts.com</strong>, the {companyName} progressive web application,
@@ -36,7 +36,7 @@ function TermsPage() {
 
             {/* 2. Definitions */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">2. Definitions</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">2. Definitions</h2>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>&ldquo;Booking&rdquo;</strong> means a confirmed reservation for a stay at a listed property.</li>
                 <li><strong>&ldquo;Guest&rdquo;</strong> means any individual who books or stays at a property, including the account holder and any additional guests named in the booking.</li>
@@ -49,8 +49,8 @@ function TermsPage() {
 
             {/* 3. Account */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">3. Account Registration and Security</h2>
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">3.1 Account Creation</h3>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">3. Account Registration and Security</h2>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">3.1 Account Creation</h3>
               <p>
                 To make a booking, you must create an account by providing accurate, current,
                 and complete information including your full legal name, a valid email address,
@@ -59,7 +59,7 @@ function TermsPage() {
                 authorise us to access the profile information Google provides.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">3.2 Account Security</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">3.2 Account Security</h3>
               <p>
                 You are solely responsible for maintaining the confidentiality of your account
                 credentials and for all activities that occur under your account. You agree to:
@@ -74,7 +74,7 @@ function TermsPage() {
                 with this section.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">3.3 One Account Per Person</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">3.3 One Account Per Person</h3>
               <p>
                 You may maintain only one account. Duplicate accounts, accounts created using
                 false information, and accounts created to circumvent a prior suspension or
@@ -84,9 +84,9 @@ function TermsPage() {
 
             {/* 4. Bookings */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">4. Bookings and Reservations</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">4. Bookings and Reservations</h2>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">4.1 Booking Process</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">4.1 Booking Process</h3>
               <p>
                 A booking is made in three steps: (1) selecting dates, guest count, and Bed
                 Option; (2) providing guest information; and (3) selecting a payment method
@@ -96,7 +96,7 @@ function TermsPage() {
                 with your account.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">4.2 Pricing</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">4.2 Pricing</h3>
               <p>
                 The total price of a booking comprises:
               </p>
@@ -113,7 +113,7 @@ function TermsPage() {
                 to adjust base pricing at any time. Price changes do not affect confirmed bookings.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">4.3 Bed Options and Occupancy</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">4.3 Bed Options and Occupancy</h3>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>1-Bed configuration:</strong> Includes 2 guests in the base rate. Maximum occupancy is 4 guests. Each guest beyond 2 incurs the Extra Guest Fee.</li>
                 <li><strong>2-Bed configuration:</strong> Includes 4 guests in the base rate. Maximum occupancy is 6 guests. Each guest beyond 4 incurs the Extra Guest Fee.</li>
@@ -124,7 +124,7 @@ function TermsPage() {
                 immediate removal from the property without refund.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">4.4 Check-in and Check-out</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">4.4 Check-in and Check-out</h3>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Check-in:</strong> From 3:00 PM (15:00) on the check-in date.</li>
                 <li><strong>Check-out:</strong> By 10:00 AM on the check-out date. A later check-out time may be selected at the time of booking; late check-out fees apply (see Section 4.2).</li>
@@ -140,8 +140,8 @@ function TermsPage() {
 
             {/* 5. Payment */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">5. Payment Terms</h2>
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">5.1 Payment Methods</h3>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">5. Payment Terms</h2>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">5.1 Payment Methods</h3>
               <p>We accept payment via:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Credit/Debit Card:</strong> Processed through a PCI-DSS compliant payment gateway.</li>
@@ -149,21 +149,21 @@ function TermsPage() {
                 <li><strong>Bank Transfer:</strong> Direct deposit to our designated bank account. Instructions are provided at checkout.</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">5.2 Payment Timing</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">5.2 Payment Timing</h3>
               <p>
                 Full payment is required at the time of booking to confirm the reservation.
                 Your booking is not confirmed and the dates are not reserved until payment
                 is successfully processed.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">5.3 Taxes</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">5.3 Taxes</h3>
               <p>
                 All prices include applicable taxes (including VAT where required by Kenyan
                 law). You are responsible for any additional taxes or duties that may apply.
                 We will issue an electronic receipt for every booking.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">5.4 Promo Codes</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">5.4 Promo Codes</h3>
               <p>
                 Promo codes are subject to the specific terms stated at issuance - including
                 validity period, minimum booking amount, maximum discount, and usage limits.
@@ -180,9 +180,9 @@ function TermsPage() {
 
             {/* 6. Cancellation and Refunds */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">6. Cancellation and Refunds</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">6. Cancellation and Refunds</h2>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">6.1 Guest Cancellation</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">6.1 Guest Cancellation</h3>
               <p>Our standard cancellation policy is as follows:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>More than 14 days before check-in:</strong> Full refund of the Nightly Rate and Cleaning Fee. The Service Fee is non-refundable.</li>
@@ -196,7 +196,7 @@ function TermsPage() {
                 the date and time we receive and acknowledge your request.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">6.2 Cancellation by ZuriLofts</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">6.2 Cancellation by ZuriLofts</h3>
               <p>
                 We reserve the right to cancel a booking at any time if:
               </p>
@@ -211,7 +211,7 @@ function TermsPage() {
                 exclusive remedy.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">6.3 Refund Processing</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">6.3 Refund Processing</h3>
               <p>
                 Approved refunds are processed within 14 business days to the original payment
                 method. The time it takes for the refund to appear in your account depends on
@@ -221,10 +221,10 @@ function TermsPage() {
 
             {/* 7. Guest Obligations */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">7. Guest Obligations and Conduct</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">7. Guest Obligations and Conduct</h2>
               <p>As a Guest, you agree to the following:</p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">7.1 Occupancy Limits</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">7.1 Occupancy Limits</h3>
               <p>
                 The total number of guests staying overnight (including the booking account
                 holder and all additional named guests) must not exceed the maximum occupancy
@@ -233,14 +233,14 @@ function TermsPage() {
                 without refund.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">7.2 Noise and Nuisance</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">7.2 Noise and Nuisance</h3>
               <p>
                 You must respect quiet hours (10:00 PM - 7:00 AM) and avoid creating excessive
                 noise, nuisance, or disturbance to neighbours and other residents. Parties,
                 events, and gatherings exceeding the booked guest count are strictly prohibited.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">7.3 Property Care</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">7.3 Property Care</h3>
               <p>
                 You must treat the property and its contents with reasonable care. You are
                 financially responsible for:
@@ -255,7 +255,7 @@ function TermsPage() {
                 and to provide an itemised breakdown of charges upon request.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">7.4 Prohibited Activities</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">7.4 Prohibited Activities</h3>
               <p>The following are strictly prohibited on any property:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li>Smoking indoors (including vaping and e-cigarettes). A deep-cleaning fee of KES 15,000 will be charged for violations.</li>
@@ -266,7 +266,7 @@ function TermsPage() {
                 <li>Tampering with safety equipment (smoke detectors, fire extinguishers, security cameras in common areas).</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">7.5 Accurate Information</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">7.5 Accurate Information</h3>
               <p>
                 All guest names provided at the time of booking must be accurate and complete.
                 All adults staying at the property must be listed. You may not book on behalf
@@ -278,7 +278,7 @@ function TermsPage() {
 
             {/* 8. Reviews */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">8. Post-Stay Reviews</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">8. Post-Stay Reviews</h2>
               <p>
                 After your Stay, you may submit a star rating (1-5) and optional private
                 feedback. By submitting a review:
@@ -293,7 +293,7 @@ function TermsPage() {
 
             {/* 9. Messaging */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">9. In-App Messaging</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">9. In-App Messaging</h2>
               <p>
                 Our in-app messaging system is provided for communication between Guests and
                 the {companyName} team regarding bookings, check-in/check-out arrangements,
@@ -312,7 +312,7 @@ function TermsPage() {
 
             {/* 10. Favourites */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">10. Favourites and Personalisation</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">10. Favourites and Personalisation</h2>
               <p>
                 The Platform allows you to save properties as favourites. This feature is
                 provided for your convenience. Favourites data is associated with your account
@@ -323,7 +323,7 @@ function TermsPage() {
 
             {/* 11. Intellectual Property */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">11. Intellectual Property</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">11. Intellectual Property</h2>
               <p>
                 The Platform and all its content - including but not limited to the {companyName}{' '}
                 name, logo, design, text, graphics, images, photographs, software code, user
@@ -346,7 +346,7 @@ function TermsPage() {
 
             {/* 12. Limitation of Liability */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">12. Limitation of Liability</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">12. Limitation of Liability</h2>
               <p className="font-semibold">
                 PLEASE READ THIS SECTION CAREFULLY. IT LIMITS OUR LIABILITY TO YOU.
               </p>
@@ -367,7 +367,7 @@ function TermsPage() {
 
             {/* 13. Indemnification */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">13. Indemnification</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">13. Indemnification</h2>
               <p>
                 You agree to indemnify, defend, and hold harmless {companyName}, its owners,
                 officers, employees, agents, and affiliates from and against any and all claims,
@@ -384,7 +384,7 @@ function TermsPage() {
 
             {/* 14. Disclaimer of Warranties */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">14. Disclaimer of Warranties</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">14. Disclaimer of Warranties</h2>
               <p>
                 THE PLATFORM AND ALL SERVICES ARE PROVIDED ON AN &ldquo;AS IS&rdquo; AND
                 &ldquo;AS AVAILABLE&rdquo; BASIS WITHOUT WARRANTIES OF ANY KIND, EITHER
@@ -403,7 +403,7 @@ function TermsPage() {
 
             {/* 15. Force Majeure */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">15. Force Majeure</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">15. Force Majeure</h2>
               <p>
                 Neither party shall be liable for any failure or delay in performance under
                 these Terms due to events beyond their reasonable control, including but not
@@ -421,7 +421,7 @@ function TermsPage() {
 
             {/* 16. Termination */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">16. Suspension and Termination</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">16. Suspension and Termination</h2>
               <p>
                 We reserve the right, at our sole discretion and without prior notice, to:
               </p>
@@ -439,8 +439,8 @@ function TermsPage() {
 
             {/* 17. Dispute Resolution */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">17. Dispute Resolution</h2>
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">17.1 Informal Resolution</h3>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">17. Dispute Resolution</h2>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">17.1 Informal Resolution</h3>
               <p>
                 Before initiating any formal legal action, you agree to first contact us at{' '}
                 <strong>enquires@zurilofts.com</strong> and attempt to resolve the dispute
@@ -448,13 +448,13 @@ function TermsPage() {
                 least 30 days.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">17.2 Governing Law</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">17.2 Governing Law</h3>
               <p>
                 These Terms are governed by and construed in accordance with the laws of the
                 Republic of Kenya, without regard to its conflict of law principles.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">17.3 Jurisdiction</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">17.3 Jurisdiction</h3>
               <p>
                 Any legal action or proceeding arising from or related to these Terms shall
                 be brought exclusively in the courts of Nairobi, Kenya. You consent to the
@@ -462,7 +462,7 @@ function TermsPage() {
                 inconvenient forum.
               </p>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">17.4 Class Action Waiver</h3>
+              <h3 className="text-lg font-semibold text-[#222222] mt-4 mb-2">17.4 Class Action Waiver</h3>
               <p>
                 To the fullest extent permitted by law, you agree that any dispute resolution
                 proceedings will be conducted on an individual basis only, and not in a class,
@@ -473,7 +473,7 @@ function TermsPage() {
 
             {/* 18. Changes to Terms */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">18. Modifications to These Terms</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">18. Modifications to These Terms</h2>
               <p>
                 We reserve the right to modify these Terms at any time. When we make material
                 changes, we will:
@@ -493,7 +493,7 @@ function TermsPage() {
 
             {/* 19. General Provisions */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">19. General Provisions</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">19. General Provisions</h2>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Entire Agreement:</strong> These Terms, together with our Privacy Policy, constitute the entire agreement between you and {companyName} regarding the Platform and supersede all prior agreements and understandings.</li>
                 <li><strong>Severability:</strong> If any provision of these Terms is held invalid or unenforceable by a court of competent jurisdiction, the remaining provisions shall remain in full force and effect.</li>
@@ -507,7 +507,7 @@ function TermsPage() {
 
             {/* Contact */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">20. Contact</h2>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">20. Contact</h2>
               <p>
                 For questions, concerns, or legal notices regarding these Terms of Service,
                 contact us at:
