@@ -33,6 +33,19 @@ function getNights(checkIn, checkOut) {
   return Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000);
 }
 
+// checkInTime is stored as a 24h "HH:MM" string (or already am/pm). Normalise
+// it to a compact 12h label for the arrivals list.
+function formatTime(time) {
+  if (!time) return "";
+  if (/am|pm/i.test(time)) return time;
+  const [h, m] = time.split(":");
+  const hour = parseInt(h, 10);
+  if (Number.isNaN(hour)) return time;
+  const period = hour >= 12 ? "PM" : "AM";
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${m || "00"} ${period}`;
+}
+
 function TodayCard({ booking, type }) {
   const p = booking.property || {};
   const guest = booking.user || {};
@@ -273,25 +286,6 @@ OnboardingChecklist.propTypes = {
   role: PropTypes.string,
 };
 
-function PanelSkeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden shadow-sm">
-        <div className="h-36 bg-[#F7F7F5] animate-pulse" />
-        <div className="p-4 space-y-3">
-          <div className="h-4 w-2/3 bg-[#F7F7F5] rounded animate-pulse" />
-          <div className="h-3 w-1/3 bg-[#F7F7F5] rounded animate-pulse" />
-          <div className="h-3 w-1/2 bg-[#F7F7F5] rounded animate-pulse" />
-          <div className="flex gap-2 pt-3 border-t border-[#E5E7EB]">
-            <div className="h-8 flex-1 bg-[#F7F7F5] rounded-lg animate-pulse" />
-            <div className="h-8 flex-1 bg-[#F7F7F5] rounded-lg animate-pulse" />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function EmptyPanel({ label, icon }) {
   return (
     <div className="text-center py-12 px-4 bg-white rounded-[14px] border border-[#E5E7EB]">
@@ -308,6 +302,233 @@ function EmptyPanel({ label, icon }) {
 EmptyPanel.propTypes = {
   label: PropTypes.string.isRequired,
   icon: PropTypes.node,
+};
+
+// Compact horizontal metric: an icon circle beside a value + label.
+function MetricCard({ label, value, icon, iconClass }) {
+  return (
+    <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 flex items-center gap-4">
+      <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${iconClass}`}>
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {icon}
+        </svg>
+      </div>
+      <div className="min-w-0">
+        <p className="text-2xl font-bold text-[#222222] leading-none">{value}</p>
+        <p className="text-sm text-[#6b7280] mt-1 truncate">{label}</p>
+      </div>
+    </div>
+  );
+}
+
+MetricCard.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  icon: PropTypes.node,
+  iconClass: PropTypes.string,
+};
+
+// A single compact guest row for the "Arriving today" card.
+function ArrivalRow({ booking }) {
+  const p = booking.property || {};
+  const guest = booking.user || {};
+  const image = firstImage(p) || p.coverImage;
+  const guestName = [guest.firstName, guest.lastName].filter(Boolean).join(" ") || "Guest";
+  const arrivalTime = formatTime(booking.checkInTime);
+
+  return (
+    <li className="flex items-center gap-3 px-5 py-3">
+      <Link
+        to={`/property/${p.id}`}
+        className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-[#F7F7F5] border border-[#E5E7EB]"
+      >
+        {image ? (
+          <img src={image} alt={p.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+          </div>
+        )}
+      </Link>
+
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-semibold text-[#222222] truncate">{guestName}</p>
+        <Link to={`/property/${p.id}`} className="block text-xs text-[#6b7280] truncate hover:text-[#2563EB] transition-colors">
+          {p.title}
+        </Link>
+      </div>
+
+      <div className="hidden sm:block text-right flex-shrink-0">
+        <p className="text-sm font-medium text-[#222222]">
+          {booking.guests} guest{booking.guests !== 1 ? "s" : ""}
+        </p>
+        <p className="text-xs text-[#6b7280]">
+          {arrivalTime ? `Arrives ${arrivalTime}` : "Arrives today"}
+        </p>
+      </div>
+
+      <Link
+        to={`/messages?booking=${booking.id}`}
+        className="flex-shrink-0 inline-flex items-center justify-center min-h-[40px] px-3 rounded-lg text-xs font-semibold bg-white text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-all duration-200"
+      >
+        Message
+      </Link>
+    </li>
+  );
+}
+
+ArrivalRow.propTypes = {
+  booking: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    checkInTime: PropTypes.string,
+    guests: PropTypes.number.isRequired,
+    user: PropTypes.shape({
+      firstName: PropTypes.string,
+      lastName: PropTypes.string,
+    }),
+    property: PropTypes.shape({
+      id: PropTypes.string,
+      title: PropTypes.string,
+      images: PropTypes.arrayOf(PropTypes.string),
+      coverImage: PropTypes.string,
+    }),
+  }).isRequired,
+};
+
+function ArrivingTodayCard({ arrivals }) {
+  return (
+    <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm overflow-hidden">
+      <header className="flex items-center justify-between px-5 py-4 border-b border-[#E5E7EB]">
+        <h2 className="text-lg font-bold text-[#222222] flex items-center gap-2">
+          <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+          Arriving today
+        </h2>
+        <Link to="/host/calendar" className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors">
+          View calendar
+        </Link>
+      </header>
+
+      {arrivals.length === 0 ? (
+        <div className="text-center py-12 px-4">
+          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center">
+            <svg className="w-6 h-6 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <p className="text-sm text-[#6b7280]">No arrivals today</p>
+        </div>
+      ) : (
+        <ul className="divide-y divide-[#E5E7EB]">
+          {arrivals.map((b) => (
+            <ArrivalRow key={b.id} booking={b} />
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}
+
+ArrivingTodayCard.propTypes = {
+  arrivals: PropTypes.array.isRequired,
+};
+
+// The single most important next action for the host, derived from real
+// onboarding records (verification status + listing lifecycle). Approved hosts
+// get a compact, non-intrusive reminder here instead of the full checklist.
+function NextStepCard({ hostApplicationStatus, properties, role }) {
+  const needsVerification = role === 'USER';
+  const isApproved = hostApplicationStatus === 'APPROVED';
+  const hasDraft = properties.some((p) => p.status === 'DRAFT' || p.status === 'REJECTED');
+  const hasSubmitted = properties.some((p) => p.status === 'PENDING_REVIEW');
+  const hasPublished = properties.some((p) => p.status === 'PUBLISHED');
+  const hasAnyProperty = properties.length > 0;
+
+  const badgeTones = {
+    warning: 'bg-amber-50 text-amber-700 border border-amber-200',
+    info: 'bg-blue-50 text-[#2563EB] border border-blue-200',
+    success: 'bg-green-50 text-green-700 border border-green-200',
+  };
+
+  let step;
+
+  if (needsVerification && !isApproved) {
+    step = {
+      badge: { label: 'Action needed', tone: 'warning' },
+      title: 'Verify your host account',
+      copy: hostApplicationStatus === 'SUBMITTED'
+        ? 'Your verification is under review. We will let you know once it is approved.'
+        : hostApplicationStatus === 'CHANGES_REQUESTED'
+          ? 'The team requested changes. Update and resubmit to continue.'
+          : 'Verification is required before your listings can go live and take bookings.',
+      cta: { label: 'Go to verification', to: '/host/application' },
+      image: null,
+    };
+  } else if (!hasAnyProperty) {
+    step = {
+      badge: { label: 'Action needed', tone: 'warning' },
+      title: 'Add your first listing',
+      copy: 'Create your first listing to start hosting and accept bookings.',
+      cta: { label: 'Add a property', to: '/host/properties/new' },
+      image: null,
+    };
+  } else if (!hasSubmitted && !hasPublished && hasDraft) {
+    step = {
+      badge: { label: 'Action needed', tone: 'warning' },
+      title: 'Submit your listing for review',
+      copy: 'You have a draft ready. Submit it so the team can review and publish it.',
+      cta: { label: 'Manage listings', to: '/host/listings' },
+      image: firstImage(properties.find((p) => p.status === 'DRAFT' || p.status === 'REJECTED')),
+    };
+  } else if (hasSubmitted && !hasPublished) {
+    step = {
+      badge: { label: 'In review', tone: 'info' },
+      title: 'Your listing is under review',
+      copy: 'The team is reviewing your listing. We will notify you as soon as it is live.',
+      cta: { label: 'View listings', to: '/host/listings' },
+      image: firstImage(properties.find((p) => p.status === 'PENDING_REVIEW')),
+    };
+  } else {
+    step = {
+      badge: { label: 'All set', tone: 'success' },
+      title: 'You are all set',
+      copy: 'Your listing is live and ready to welcome guests.',
+      cta: { label: 'View calendar', to: '/host/calendar' },
+      image: firstImage(properties.find((p) => p.status === 'PUBLISHED')),
+    };
+  }
+
+  return (
+    <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm overflow-hidden flex flex-col">
+      {step.image && (
+        <img
+          src={step.image}
+          alt={step.title}
+          className="w-full h-32 object-cover"
+        />
+      )}
+      <div className="p-5 flex flex-col flex-1">
+        <span className={`inline-flex items-center self-start px-2 py-0.5 rounded-full text-xs font-semibold ${badgeTones[step.badge.tone]}`}>
+          {step.badge.label}
+        </span>
+        <h2 className="mt-3 text-lg font-bold text-[#222222]">{step.title}</h2>
+        <p className="mt-1 text-sm text-[#6b7280]">{step.copy}</p>
+        <Link
+          to={step.cta.to}
+          className="mt-4 self-start inline-flex items-center justify-center min-h-[44px] px-5 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
+        >
+          {step.cta.label}
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+NextStepCard.propTypes = {
+  hostApplicationStatus: PropTypes.string,
+  properties: PropTypes.arrayOf(PropTypes.shape({ status: PropTypes.string })).isRequired,
+  role: PropTypes.string,
 };
 
 function RecentMessagesPanel({ conversations, loading }) {
@@ -450,14 +671,16 @@ export default function HostTodayPage() {
     return () => { cancelled = true; };
   }, [isAuthenticated]);
 
-  // Recent guest conversations for the host's daily-operations hub.
+  // Recent guest conversations for the host's daily-operations hub. The full
+  // list is kept so the unread total (for the metric) is accurate; only the
+  // first three are rendered in the panel.
   useEffect(() => {
     if (!isAuthenticated) return;
     let cancelled = false;
     async function fetchConversations() {
       try {
         const res = await apiClient.get("/conversations");
-        if (!cancelled) setConversations((res.data.data || []).slice(0, 3));
+        if (!cancelled) setConversations(res.data.data || []);
       } catch {
         if (!cancelled) setConversations([]);
       } finally {
@@ -468,7 +691,8 @@ export default function HostTodayPage() {
     return () => { cancelled = true; };
   }, [isAuthenticated]);
 
-  // Own listings, across every lifecycle status, to drive the onboarding checklist.
+  // Own listings, across every lifecycle status, to drive the onboarding
+  // checklist and the compact "next step" reminder.
   useEffect(() => {
     if (!isAuthenticated) return;
     let cancelled = false;
@@ -493,19 +717,40 @@ export default function HostTodayPage() {
             <div className="h-8 w-48 bg-[#E5E7EB] rounded animate-pulse mb-2" />
             <div className="h-4 w-64 bg-[#E5E7EB] rounded animate-pulse" />
           </div>
-          {/* Summary skeleton */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
+          {/* Metric skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
-                <div className="h-4 w-16 bg-[#E5E7EB] rounded animate-pulse mb-2" />
-                <div className="h-8 w-12 bg-[#E5E7EB] rounded animate-pulse" />
+              <div key={i} className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 flex items-center gap-4">
+                <div className="w-11 h-11 rounded-full bg-[#E5E7EB] animate-pulse flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="h-6 w-10 bg-[#E5E7EB] rounded animate-pulse mb-2" />
+                  <div className="h-3 w-16 bg-[#E5E7EB] rounded animate-pulse" />
+                </div>
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <PanelSkeleton />
-            <PanelSkeleton />
-            <PanelSkeleton />
+          {/* Arrivals + next-step skeleton */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
+              <div className="h-5 w-32 bg-[#E5E7EB] rounded animate-pulse mb-4" />
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="flex items-center gap-3 py-3">
+                  <div className="w-12 h-12 rounded-xl bg-[#E5E7EB] animate-pulse flex-shrink-0" />
+                  <div className="flex-1">
+                    <div className="h-3 w-32 bg-[#E5E7EB] rounded animate-pulse mb-2" />
+                    <div className="h-3 w-24 bg-[#E5E7EB] rounded animate-pulse" />
+                  </div>
+                  <div className="h-8 w-16 bg-[#E5E7EB] rounded animate-pulse flex-shrink-0" />
+                </div>
+              ))}
+            </div>
+            <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
+              <div className="h-4 w-20 bg-[#E5E7EB] rounded-full animate-pulse mb-4" />
+              <div className="h-5 w-40 bg-[#E5E7EB] rounded animate-pulse mb-2" />
+              <div className="h-3 w-full bg-[#E5E7EB] rounded animate-pulse mb-2" />
+              <div className="h-3 w-2/3 bg-[#E5E7EB] rounded animate-pulse mb-4" />
+              <div className="h-9 w-32 bg-[#E5E7EB] rounded animate-pulse" />
+            </div>
           </div>
         </main>
       </div>
@@ -531,88 +776,68 @@ export default function HostTodayPage() {
     );
   }
 
-  const { arrivals = [], departures = [], inHouse = [], summary = {} } = data || {};
+  const { arrivals = [], departures = [], inHouse = [] } = data || {};
+  const unreadCount = conversations.reduce((n, c) => n + (c.unreadCount || 0), 0);
+
+  // A plain USER with an in-progress (non-approved) application gets the full
+  // step-by-step checklist. Approved hosts (and pre-verified HOST accounts)
+  // see only the compact "next step" card so the checklist never crowds their
+  // daily operations view.
+  const isPendingUserApplicant = user?.role === 'USER' && user?.hostApplicationStatus !== 'APPROVED';
 
   return (
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        {/* Header panel */}
-        <div className="rounded-[14px] border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-8">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#6b7280]">{new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}</p>
+        {/* Title block */}
+        <div className="mb-8">
+          <p className="text-sm text-[#6b7280]">
+            {new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          </p>
           <h1 className="mt-1 text-2xl font-bold text-[#222222] sm:text-3xl">
             Today{user?.firstName ? `, ${user.firstName}` : ""}
           </h1>
-          <p className="mt-2 max-w-md text-sm text-[#6b7280]">Your arrivals, in-house guests, and departures at a glance.</p>
         </div>
 
-        <OnboardingChecklist hostApplicationStatus={user?.hostApplicationStatus} properties={myProperties} role={user?.role} />
+        {isPendingUserApplicant && (
+          <OnboardingChecklist hostApplicationStatus={user?.hostApplicationStatus} properties={myProperties} role={user?.role} />
+        )}
 
-        {/* Summary cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
-          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
-            <p className="text-sm text-[#6b7280] mb-1">Arrivals</p>
-            <p className="text-2xl font-bold text-[#222222]">{summary.arrivals}</p>
+        {/* Metric cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+          <MetricCard
+            label="Arrivals"
+            value={arrivals.length}
+            iconClass="bg-amber-50 text-amber-600"
+            icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />}
+          />
+          <MetricCard
+            label="Departures"
+            value={departures.length}
+            iconClass="bg-blue-50 text-[#2563EB]"
+            icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />}
+          />
+          <MetricCard
+            label="Unread messages"
+            value={unreadCount}
+            iconClass="bg-green-50 text-green-600"
+            icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />}
+          />
+        </div>
+
+        {/* Primary operations: arrivals + next step */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          <div className="lg:col-span-2">
+            <ArrivingTodayCard arrivals={arrivals} />
           </div>
-          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
-            <p className="text-sm text-[#6b7280] mb-1">Departures</p>
-            <p className="text-2xl font-bold text-[#222222]">{summary.departures}</p>
-          </div>
-          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
-            <p className="text-sm text-[#6b7280] mb-1">In house</p>
-            <p className="text-2xl font-bold text-green-600">{summary.inHouse}</p>
+          <div>
+            <NextStepCard hostApplicationStatus={user?.hostApplicationStatus} properties={myProperties} role={user?.role} />
           </div>
         </div>
 
-        {/* Three-panel grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Arrivals */}
-          <section>
-            <h2 className="text-lg font-bold text-[#222222] mb-4 flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
-              Arriving today
-              {arrivals.length > 0 && (
-                <span className="text-sm font-normal text-[#6b7280] ml-auto">{arrivals.length}</span>
-              )}
-            </h2>
-            {arrivals.length === 0 ? (
-              <EmptyPanel
-                label="Arrivals"
-                icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />}
-              />
-            ) : (
-              <div className="space-y-4">
-                {arrivals.map((b) => (
-                  <TodayCard key={b.id} booking={b} type="arrival" />
-                ))}
-              </div>
-            )}
-          </section>
-
-          {/* In-house */}
-          <section>
-            <h2 className="text-lg font-bold text-[#222222] mb-4 flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
-              In house
-              {inHouse.length > 0 && (
-                <span className="text-sm font-normal text-[#6b7280] ml-auto">{inHouse.length}</span>
-              )}
-            </h2>
-            {inHouse.length === 0 ? (
-              <EmptyPanel
-                label="In-house guests"
-                icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />}
-              />
-            ) : (
-              <div className="space-y-4">
-                {inHouse.map((b) => (
-                  <TodayCard key={b.id} booking={b} type="inhouse" />
-                ))}
-              </div>
-            )}
-          </section>
-
-          {/* Departures */}
+        {/* Secondary operations: departures + in-house (full cards preserve the
+            "view details" / "message" / "report an issue" actions) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           <section>
             <h2 className="text-lg font-bold text-[#222222] mb-4 flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
@@ -634,12 +859,32 @@ export default function HostTodayPage() {
               </div>
             )}
           </section>
+
+          <section>
+            <h2 className="text-lg font-bold text-[#222222] mb-4 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
+              In house
+              {inHouse.length > 0 && (
+                <span className="text-sm font-normal text-[#6b7280] ml-auto">{inHouse.length}</span>
+              )}
+            </h2>
+            {inHouse.length === 0 ? (
+              <EmptyPanel
+                label="In-house guests"
+                icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />}
+              />
+            ) : (
+              <div className="space-y-4">
+                {inHouse.map((b) => (
+                  <TodayCard key={b.id} booking={b} type="inhouse" />
+                ))}
+              </div>
+            )}
+          </section>
         </div>
 
         {/* Recent guest messages */}
-        <div className="mt-10">
-          <RecentMessagesPanel conversations={conversations} loading={conversationsLoading} />
-        </div>
+        <RecentMessagesPanel conversations={conversations.slice(0, 3)} loading={conversationsLoading} />
       </main>
     </div>
   );
