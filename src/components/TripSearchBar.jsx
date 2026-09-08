@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 
 function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveSearch }) {
   return (
-    <form onSubmit={onSubmit} role="search" className="w-full">
+    <form onSubmit={onSubmit} role="search" className="w-full max-w-full">
       <div className="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-lg transition-shadow focus-within:border-[#2563EB] focus-within:ring-2 focus-within:ring-[#2563EB]/20 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full">
-        <div className="flex flex-1 items-center px-2 sm:px-4">
+        <div className="flex min-w-0 flex-1 items-center px-2 sm:px-4">
           {loading ? (
             <div className="h-5 w-5 flex-shrink-0 animate-spin rounded-full border-2 border-[#2563EB] border-t-transparent mr-2 sm:mr-3" />
           ) : (
@@ -22,7 +22,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
             onChange={onChange}
             placeholder="Search by location or property name..."
             autoComplete="address-level2"
-            className="min-h-[44px] w-full bg-transparent py-3 text-base text-[#222222] placeholder-[#6b7280] focus:outline-none"
+            className="min-h-[44px] w-full min-w-0 max-w-full bg-transparent py-3 text-base text-[#222222] placeholder-[#6b7280] focus:outline-none"
           />
           {hasActiveSearch && (
             <button

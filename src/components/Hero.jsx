@@ -3,7 +3,6 @@ import TripSearchBar from './TripSearchBar.jsx';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { heroImage } from '../assets/images';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -183,7 +182,7 @@ function SearchBar() {
 
   return (
     <div
-      className="max-w-[680px] mx-auto relative"
+      className="w-full min-w-0 max-w-[680px] mx-auto relative"
       ref={containerRef}
       onKeyDownCapture={handleKeyDownCapture}
       onFocusCapture={handleFocusCapture}
@@ -248,141 +247,75 @@ function SearchBar() {
   );
 }
 
-function RoleToggle({ mode, onChange }) {
-  return (
-    <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full p-1 gap-1">
-      <button
-        type="button"
-        onClick={() => onChange('traveler')}
-        className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-          mode === 'traveler'
-            ? 'bg-white text-[#2563EB] shadow-md'
-            : 'text-white/70 hover:text-white'
-        }`}
-      >
-        I&apos;m traveling
-      </button>
-      <button
-        type="button"
-        onClick={() => onChange('host')}
-        className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-          mode === 'host'
-            ? 'bg-white text-[#2563EB] shadow-md'
-            : 'text-white/70 hover:text-white'
-        }`}
-      >
-        I&apos;m a host
-      </button>
-    </div>
-  );
-}
-
-RoleToggle.propTypes = {
-  mode: PropTypes.oneOf(['traveler', 'host']).isRequired,
-  onChange: PropTypes.func.isRequired,
-};
-
+/**
+ * Compact light discovery header (board-01): Navbar over an off-white canvas,
+ * a single charcoal headline, the shared blue search bar, a subtle trust/stat
+ * row, and a secondary host CTA for logged-out visitors.
+ */
 function Hero({ stats }) {
   const { rating = '5.0', stays = '50', satisfaction = '100' } = stats || {};
-  const [mode, setMode] = useState('traveler');
   const { isAuthenticated } = useAuth();
 
-  const isHost = mode === 'host';
-  const showToggle = !isAuthenticated;
-
   return (
-    <section className="relative min-h-[600px] md:min-h-[700px] flex flex-col overflow-hidden">
-      {/* Background Image */}
-      <div className="absolute inset-0 overflow-hidden">
-        <img
-          src={heroImage}
-          alt="ZuriLofts"
-          className="w-full h-full object-cover scale-110 hero-bg-img"
-        />
-      </div>
-
-      {/* Gradient overlay - dark navy tint, kept only for photo legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B45]/70 via-[#0B0B45]/40 to-[#0B0B45]/70"></div>
-
+    <section className="relative bg-[#F7F7F5]">
       {/* Navbar */}
       <Navbar />
 
-      <div className="relative flex-1 flex items-center">
-        <div className="max-w-7xl mx-auto px-6 w-full py-28 md:py-32">
-          {/* Role Toggle - Airbnb-style pill (hidden when authenticated) */}
-          {showToggle && (
-          <div className="flex justify-center mb-10">
-            <RoleToggle mode={mode} onChange={setMode} />
-          </div>
-          )}
-
-          {/* Headline and Description */}
-          <div className="text-center mb-14">
-            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-              <span className={`w-2 h-2 rounded-full animate-pulse ${isHost ? 'bg-[#2563EB]' : 'bg-green-500'}`}></span>
-              <span className="text-white/90 text-sm font-medium">
-                {isHost ? 'List Your Property' : 'Available for Booking'}
-              </span>
-            </div>
-
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-10 leading-tight tracking-tight drop-shadow-lg hero-heading">
-              {isHost ? (
-                <>Earn More by Hosting on ZuriLofts</>
-              ) : (
-                <>Choose Luxury &amp; Comfort for Your Time Away</>
-              )}
-            </h1>
-            <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed mb-4">
-              {isHost
-                ? 'List your furnished apartment and start earning today. We handle the bookings - you focus on hospitality.'
-                : 'Premium furnished apartments in Nairobi. Experience comfort, convenience, and luxury all in one place.'
-              }
-            </p>
-          </div>
-
-          {/* Search - reuses the shared, blue-accented TripSearchBar */}
-          <div className="mt-14">
-            <SearchBar />
-          </div>
-
-          {/* Host CTA (unauthenticated only) */}
-          {isHost && showToggle ? (
-            <div className="mt-14 flex justify-center">
-              <Link
-                to="/register?role=HOST"
-                className="inline-flex items-center gap-2 min-h-[44px] bg-[#2563EB] text-white font-bold px-10 py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 shadow-lg hover:shadow-xl text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0B45]"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                </svg>
-                Get Started as a Host
-              </Link>
-            </div>
-          ) : (
-            <div className="mt-20 flex justify-center items-center space-x-8 md:space-x-16">
-              <div className="text-center group cursor-default">
-                <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 group-hover:scale-110">
-                  <AnimatedNumber value={String(rating)} />
-                </div>
-                <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Star Rating</div>
-              </div>
-              <div className="w-px h-12 bg-white/20"></div>
-              <div className="text-center group cursor-default">
-                <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 group-hover:scale-110">
-                  <AnimatedNumber value={String(stays)} suffix="+" />
-                </div>
-                <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Happy Stays</div>
-              </div>
-              <div className="w-px h-12 bg-white/20 hidden md:block"></div>
-              <div className="text-center hidden md:block group cursor-default">
-                <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 group-hover:scale-110">
-                  <AnimatedNumber value={String(satisfaction)} suffix="%" />
-                </div>
-                <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Satisfaction</div>
-              </div>
-            </div>
-          )}
+      <div className="max-w-7xl mx-auto px-6 pt-24 md:pt-28 pb-10 md:pb-14">
+        {/* Headline and subtext */}
+        <div className="text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#C49A6C]">ZuriLofts</p>
+          <h1 className="mt-3 text-3xl md:text-4xl lg:text-5xl font-extrabold text-[#222222] leading-tight tracking-tight">
+            Find your place in Nairobi
+          </h1>
+          <p className="mt-3 text-base md:text-lg text-[#6b7280] max-w-2xl mx-auto leading-relaxed">
+            Handpicked furnished apartments in Nairobi&apos;s prime neighbourhoods — comfortable, convenient and ready when you are.
+          </p>
         </div>
+
+        {/* Search - the shared, blue-accented TripSearchBar with live results */}
+        <div className="mt-8 md:mt-10">
+          <SearchBar />
+        </div>
+
+        {/* Trust / stat row */}
+        <div className="mt-10 md:mt-12 flex justify-center items-center gap-6 md:gap-10">
+          <div className="text-center">
+            <div className="text-xl md:text-2xl font-bold text-[#222222]">
+              <AnimatedNumber value={String(rating)} />
+            </div>
+            <div className="text-xs text-[#6b7280] mt-1 font-medium">Star rating</div>
+          </div>
+          <div className="w-px h-8 bg-[#E5E7EB]"></div>
+          <div className="text-center">
+            <div className="text-xl md:text-2xl font-bold text-[#222222]">
+              <AnimatedNumber value={String(stays)} suffix="+" />
+            </div>
+            <div className="text-xs text-[#6b7280] mt-1 font-medium">Happy stays</div>
+          </div>
+          <div className="w-px h-8 bg-[#E5E7EB]"></div>
+          <div className="text-center">
+            <div className="text-xl md:text-2xl font-bold text-[#222222]">
+              <AnimatedNumber value={String(satisfaction)} suffix="%" />
+            </div>
+            <div className="text-xs text-[#6b7280] mt-1 font-medium">Satisfaction</div>
+          </div>
+        </div>
+
+        {/* Host CTA - secondary link for logged-out visitors only */}
+        {!isAuthenticated && (
+          <div className="mt-8 flex justify-center">
+            <Link
+              to="/register?role=HOST"
+              className="inline-flex items-center gap-2 min-h-[44px] px-4 text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2"
+            >
+              Earn by hosting your apartment
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

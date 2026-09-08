@@ -27,7 +27,6 @@ function isActiveHref(pathname, href) {
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const location = useLocation();
@@ -45,12 +44,6 @@ function Navbar() {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   // Poll unread message count + booking updates for badge + sound alerts
   const [bookingUpdates, setBookingUpdates] = useState(0);
@@ -154,9 +147,6 @@ function Navbar() {
     return () => document.removeEventListener('keydown', handleKey);
   }, []);
 
-  const isHomePage = location.pathname === '/';
-  const needsWhiteNav = !isHomePage || scrolled;
-
   function handleLogout() {
     setDropdownOpen(false);
     setMenuOpen(false);
@@ -210,9 +200,7 @@ function Navbar() {
     `group relative flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
       isActive
         ? 'text-[#2563EB]'
-        : needsWhiteNav
-          ? 'text-[#222222] hover:text-[#2563EB]'
-          : 'text-white hover:text-[#2563EB]'
+        : 'text-[#222222] hover:text-[#2563EB]'
     }`;
 
   const underlineClass = (isActive) =>
@@ -231,11 +219,7 @@ function Navbar() {
   const accountItemClass = 'flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#2563EB]/10 transition-colors';
 
   return (
-    <nav className={`fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
-      needsWhiteNav
-        ? 'bg-white border-b border-[#E5E7EB] shadow-sm'
-        : 'bg-transparent'
-    }`}>
+    <nav className="fixed w-full z-20 top-0 start-0 transition-all duration-300 bg-white border-b border-[#E5E7EB] shadow-sm">
       <div className="max-w-screen-xl mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -327,9 +311,7 @@ function Navbar() {
                     aria-haspopup="true"
                     aria-expanded={notifOpen}
                     aria-label="Notifications"
-                    className={`p-2 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
-                      needsWhiteNav ? 'text-[#222222] hover:bg-[#2563EB]/10' : 'text-white hover:bg-white/10'
-                    }`}
+                    className="p-2 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 text-[#222222] hover:bg-[#2563EB]/10"
                     title="Notifications"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -423,10 +405,10 @@ function Navbar() {
                         <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
                       )}
                     </div>
-                    <span className={`hidden md:block text-sm font-semibold ${needsWhiteNav ? 'text-[#222222]' : 'text-white'}`}>
+                    <span className="hidden md:block text-sm font-semibold text-[#222222]">
                       {user?.firstName}
                     </span>
-                    <svg className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''} ${needsWhiteNav ? 'text-[#222222]' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''} text-[#222222]`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
                   </button>
@@ -562,11 +544,7 @@ function Navbar() {
               /* Logged out - Sign In / Sign Up */
               <Link
                 to="/login"
-                className={`hidden md:inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
-                  needsWhiteNav
-                    ? 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]'
-                    : 'bg-white text-[#222222] hover:bg-[#F7F7F5]'
-                }`}
+                className="hidden md:inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 bg-[#2563EB] text-white hover:bg-[#1D4ED8]"
               >
                 Sign In / Sign Up
               </Link>
@@ -576,11 +554,7 @@ function Navbar() {
             <button
               type="button"
               onClick={() => setMenuOpen(!menuOpen)}
-              className={`inline-flex items-center p-2 w-11 h-11 justify-center rounded-lg md:hidden transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
-                needsWhiteNav
-                  ? 'text-[#222222] hover:bg-[#2563EB]/10'
-                  : 'text-white hover:bg-white/10'
-              }`}
+              className="inline-flex items-center p-2 w-11 h-11 justify-center rounded-lg md:hidden transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 text-[#222222] hover:bg-[#2563EB]/10"
               aria-controls="navbar-main"
               aria-expanded={menuOpen}
               aria-label="Toggle navigation menu"
