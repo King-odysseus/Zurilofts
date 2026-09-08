@@ -95,6 +95,15 @@ function AdminPayouts() {
         </div>
       </div>
 
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          ['Payouts in view', payouts.length],
+          ['Pending', payouts.filter((p) => p.status === 'PENDING').length],
+          ['Successful', payouts.filter((p) => p.status === 'SUCCESS').length],
+          ['Failed', payouts.filter((p) => p.status === 'FAILED').length],
+        ].map(([label, value]) => <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p></div>)}
+      </div>
+
       {message && (
         <div className={`p-3 rounded-xl text-sm font-medium ${message.includes('Failed') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
           {message}

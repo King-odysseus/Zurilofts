@@ -48,14 +48,14 @@ function AdminFeedback() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-[14px] p-5 shadow-sm">
+        <div className="bg-white rounded-[14px] border border-[#E5E7EB] p-5 shadow-sm">
           <span className="text-sm text-[#6b7280]">Average Rating</span>
           <div className="flex items-center gap-2 mt-2">
             <p className="text-2xl font-bold text-[#222222]">{summary.averageRating || 0}</p>
             <StarRow rating={Math.round(summary.averageRating)} />
           </div>
         </div>
-        <div className="bg-white rounded-[14px] p-5 shadow-sm">
+        <div className="bg-white rounded-[14px] border border-[#E5E7EB] p-5 shadow-sm">
           <span className="text-sm text-[#6b7280]">Total Reviews</span>
           <p className="text-2xl font-bold text-[#222222] mt-2">{summary.totalReviews || 0}</p>
         </div>
