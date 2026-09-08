@@ -618,7 +618,7 @@ function Navbar({ solid = false }) {
               if (hasChildren) {
                 const children = item.href ? [{ name: item.name, href: item.href }, ...item.children] : item.children;
                 return (
-                  <li key={item.name} className="pt-1">
+                  <li key={item.name} className="pt-1 md:hidden">
                     <p className="px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6b7280]">{item.name}</p>
                     <ul className="space-y-1">
                       {children.map((child) => (
@@ -641,7 +641,7 @@ function Navbar({ solid = false }) {
                 );
               }
               return (
-                <li key={item.name}>
+                <li key={item.name} className="md:hidden">
                   <Link
                     to={item.href}
                     onClick={() => setMenuOpen(false)}
