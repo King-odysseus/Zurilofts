@@ -305,7 +305,7 @@ function AdminCalendar() {
             <span className="inline-flex items-center gap-1.5"><i className="inline-block w-2.5 h-2.5 rounded-sm bg-white border border-[#E5E7EB]" />Available</span>
             <span>Click a start date, then the final night to block. Click a manual block to unblock it.</span>
           </div>
-          <button type="button" disabled={!blockDraft.start || !blockDraft.end} onClick={() => addBlock({ preventDefault() {} })} className="bg-[#2563EB] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#1D4ED8] transition-colors disabled:opacity-50">Block selected dates</button>
+          <button type="button" disabled={!blockDraft.start || !blockDraft.end} onClick={() => addBlock({ preventDefault() {} })} className="bg-[#C49A6C] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#B8895C] transition-colors disabled:opacity-50">Block selected dates</button>
         </div>
       </section>}
 
@@ -315,7 +315,7 @@ function AdminCalendar() {
         <p className="text-sm text-[#6b7280] mb-4">Paste this link into Airbnb / Booking.com so they block the dates booked on ZuriLofts.</p>
         <div className="flex items-center gap-2">
           <input readOnly value={data.feedUrl} className={`${inputCls} font-mono text-xs`} onFocus={(e) => e.target.select()} />
-          <button onClick={copyFeed} className="shrink-0 bg-[#2563EB] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-colors text-sm">
+          <button onClick={copyFeed} className="shrink-0 bg-[#C49A6C] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#B8895C] transition-colors text-sm">
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
@@ -364,7 +364,7 @@ function AdminCalendar() {
             <label className={labelCls}>iCal URL</label>
             <input className={inputCls} placeholder="https://www.airbnb.com/calendar/ical/....ics" value={sourceDraft.url} onChange={(e) => setSourceDraft({ ...sourceDraft, url: e.target.value })} required />
           </div>
-          <button type="submit" className="md:col-span-2 bg-[#2563EB] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-colors">Add feed</button>
+          <button type="submit" className="md:col-span-2 bg-[#C49A6C] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#B8895C] transition-colors">Add feed</button>
         </form>
       </section>}
 
@@ -405,7 +405,7 @@ function AdminCalendar() {
             <label className={labelCls}>Reason</label>
             <input className={inputCls} placeholder="Maintenance" value={blockDraft.summary} onChange={(e) => setBlockDraft({ ...blockDraft, summary: e.target.value })} />
           </div>
-          <button type="submit" disabled={!blockDraft.start || !blockDraft.end} className="md:col-span-2 bg-[#2563EB] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-colors disabled:opacity-50">Block dates</button>
+          <button type="submit" disabled={!blockDraft.start || !blockDraft.end} className="md:col-span-2 bg-[#C49A6C] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#B8895C] transition-colors disabled:opacity-50">Block dates</button>
         </form>
       </section>}
       {pendingUnblock && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="unblock-title">
@@ -414,7 +414,7 @@ function AdminCalendar() {
           <p className="mt-2 text-sm text-[#6b7280]">{fmt(pendingUnblock.date)} will become available. Other dates in this blocked range will remain blocked.</p>
           <div className="mt-6 flex justify-end gap-3">
             <button type="button" onClick={() => setPendingUnblock(null)} className="rounded-lg px-4 py-2 text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors">Cancel</button>
-            <button type="button" onClick={confirmUnblockDate} className="rounded-lg bg-[#2563EB] px-5 py-2 text-sm font-semibold text-white hover:bg-[#1D4ED8] transition-colors">Unblock date</button>
+            <button type="button" onClick={confirmUnblockDate} className="rounded-lg bg-[#C49A6C] px-5 py-2 text-sm font-semibold text-white hover:bg-[#B8895C] transition-colors">Unblock date</button>
           </div>
         </div>
       </div>}
