@@ -4,8 +4,10 @@ import './index.css';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
 import PropertyCardRow from './components/PropertyCardRow';
+import PropertyCard from './components/PropertyCard';
 import apiClient from './api/client.js';
 import { getRecentlyViewed } from './utils/recentlyViewed.js';
+import { firstImage } from './utils/images.js';
 import NearbySection from './components/NearbySection.jsx';
 import { PLACES_TO_VISIT, PLACES_TO_EAT, AREAS, PLACE_CATEGORIES, EAT_CATEGORIES } from './data/nearby.js';
 
@@ -146,9 +148,9 @@ function HomePage() {
       <Hero stats={heroStats} />
 
       {/* Our Listings Header */}
-      <div className="pt-24 md:pt-32 pb-8 px-4 md:px-6 max-w-7xl mx-auto text-center">
-        <h2 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-4">Our Listings</h2>
-        <p className="text-cool-grey max-w-2xl mx-auto text-lg">
+      <div className="pt-16 md:pt-24 pb-8 px-4 md:px-6 max-w-7xl mx-auto text-center">
+        <h2 className="text-2xl md:text-3xl font-bold text-[#222222] mb-3">Our Listings</h2>
+        <p className="text-[#6b7280] max-w-2xl mx-auto text-base md:text-lg">
           Discover our carefully curated selection of premium furnished apartments
           in prime Nairobi locations. Each property is designed for comfort and convenience.
         </p>
@@ -161,43 +163,14 @@ function HomePage() {
         </div>
       )}
 
-      {/* Auto-scrolling Premium Property Row - full-width */}
+      {/* Auto-scrolling Premium Property Row - full-width, reuses PropertyCard */}
       {premiumProperties.length > 0 && (
         <div className="marquee-container w-full overflow-hidden pb-8 px-10 md:px-20 lg:px-32">
           <div className="marquee-track flex w-max">
             {marqueeItems.map((property, i) => (
-              <a
-                key={`${property.id}-${i}`}
-                href={`/property/${property.id}`}
-                className="flex-shrink-0 w-64 mr-6 group cursor-pointer no-underline"
-              >
-                {/* Image */}
-                <div className="relative aspect-[4/3] overflow-hidden rounded-2xl neu-card shadow-md mb-3">
-                  <img
-                    src={property.images?.[0] || property.coverImage || 'https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80'}
-                    alt={property.title}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  {/* Star rating badge */}
-                  <div className="absolute top-3 left-3 flex items-center gap-1 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-xs font-semibold text-[#0B0B45] shadow-sm">
-                    <svg className="w-3.5 h-3.5 text-[#C49A6C] fill-current" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
-                    {property.rating || '5.0'}
-                  </div>
-                </div>
-                {/* Name & Location */}
-                <h3 className="text-sm font-semibold text-[#1f2937] truncate">{property.title}</h3>
-                <div className="flex items-center text-[#6b7280] mt-0.5">
-                  <svg className="w-3.5 h-3.5 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                  <span className="text-xs truncate">{property.location || 'Nairobi'}</span>
-                </div>
-              </a>
+              <div key={`${property.id}-${i}`} className="flex-shrink-0 w-64 sm:w-72 mr-6">
+                <PropertyCard property={{ ...property, image: firstImage(property) }} />
+              </div>
             ))}
           </div>
         </div>
@@ -205,8 +178,8 @@ function HomePage() {
 
       {/* Experience Luxury Section */}
       <div className="text-center mb-10 mt-32 md:mt-44 px-4">
-        <h2 className="text-3xl md:text-4xl font-bold text-[#0B0B45]">Experience Luxury and Class</h2>
-        <p className="text-cool-grey max-w-2xl mx-auto text-lg mt-3">
+        <h2 className="text-2xl md:text-3xl font-bold text-[#222222]">Experience Luxury and Class</h2>
+        <p className="text-[#6b7280] max-w-2xl mx-auto text-base md:text-lg mt-3">
           At our lofts you get comfort delivered with a touch of luxury
         </p>
       </div>

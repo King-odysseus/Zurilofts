@@ -1,4 +1,5 @@
 import Navbar from './Navbar';
+import TripSearchBar from './TripSearchBar.jsx';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
@@ -75,6 +76,11 @@ AnimatedNumber.defaultProps = {
   duration: 2000,
 };
 
+/**
+ * Hero search: same debounced live-results/navigation behaviour as before,
+ * presented with the shared TripSearchBar (already updated to the blue
+ * design system) instead of a bespoke pill input.
+ */
 function SearchBar() {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
@@ -143,13 +149,6 @@ function SearchBar() {
     navigate(`/property/${propertyId}`);
   }
 
-  function handleKeyDown(e) {
-    if (e.key === 'Escape') {
-      setOpen(false);
-      e.target.blur();
-    }
-  }
-
   const handleSearch = useCallback(() => {
     if (query.trim().length >= 2) {
       navigate(`/properties?search=${encodeURIComponent(query.trim())}`);
@@ -158,45 +157,56 @@ function SearchBar() {
     }
   }, [query, navigate]);
 
+  function handleSubmit(e) {
+    e.preventDefault();
+    handleSearch();
+  }
+
+  function handleClear() {
+    setQuery('');
+    setResults([]);
+    setOpen(false);
+  }
+
+  function handleKeyDownCapture(e) {
+    if (e.key === 'Escape') {
+      setOpen(false);
+      e.target.blur();
+    }
+  }
+
+  function handleFocusCapture(e) {
+    if (e.target.id === 'trip-search-destination' && results.length > 0) {
+      setOpen(true);
+    }
+  }
+
   return (
-    <div className="max-w-[680px] mx-auto relative" ref={containerRef}>
-      <div className="bg-white rounded-full shadow-2xl px-2 py-2 flex items-center transform hover:scale-[1.02] transition-transform duration-200">
-        <div className="flex-1 flex items-center px-4 sm:px-5">
-          {loading ? (
-            <div className="w-5 h-5 border-2 border-[#C49A6C] border-t-transparent rounded-full animate-spin mr-3 flex-shrink-0" />
-          ) : (
-            <svg className="w-5 h-5 text-[#C49A6C] mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          )}
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => { if (results.length > 0) setOpen(true); }}
-            onKeyDown={handleKeyDown}
-            placeholder="Search by location or property name..."
-            className="w-full py-3 text-[#1f2937] placeholder-[#6b7280] focus:outline-none bg-transparent text-base"
-          />
-        </div>
-        <button
-          onClick={handleSearch}
-          className="bg-[#C49A6C] text-white font-bold px-5 sm:px-8 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 whitespace-nowrap shadow-md hover:shadow-lg"
-        >
-          Search
-        </button>
-      </div>
+    <div
+      className="max-w-[680px] mx-auto relative"
+      ref={containerRef}
+      onKeyDownCapture={handleKeyDownCapture}
+      onFocusCapture={handleFocusCapture}
+    >
+      <TripSearchBar
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        onSubmit={handleSubmit}
+        onClear={handleClear}
+        loading={loading}
+        hasActiveSearch={query.length > 0}
+      />
 
       {/* Dropdown results */}
       {open && results.length > 0 && (
-        <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl shadow-2xl overflow-hidden z-50">
+        <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-[#E5E7EB] shadow-xl overflow-hidden z-50">
           <ul>
             {results.map((p) => (
               <li key={p.id}>
                 <button
                   type="button"
                   onClick={() => handleSelect(p.id)}
-                  className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-canvas transition-colors border-b border-[#D9D9D9]/50 last:border-b-0"
+                  className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-[#F7F7F5] transition-colors border-b border-[#E5E7EB] last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2563EB]"
                 >
                   {p.images?.[0] ? (
                     <img
@@ -205,18 +215,18 @@ function SearchBar() {
                       className="w-12 h-12 object-cover rounded-xl flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-[#D9D9D9]/30 flex items-center justify-center">
-                      <svg className="w-5 h-5 text-[#D9D9D9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-[#F7F7F5] flex items-center justify-center">
+                      <svg className="w-5 h-5 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#0B0B45] truncate">{p.title}</p>
+                    <p className="text-sm font-semibold text-[#222222] truncate">{p.title}</p>
                     <p className="text-xs text-[#6b7280] truncate">{p.location}</p>
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <p className="text-sm font-bold text-[#C49A6C]">KES {p.price.toLocaleString()}</p>
+                    <p className="text-sm font-bold text-[#2563EB]">KES {p.price.toLocaleString()}</p>
                     <p className="text-xs text-[#6b7280]">/ night</p>
                   </div>
                 </button>
@@ -227,7 +237,7 @@ function SearchBar() {
             <button
               type="button"
               onClick={handleSearch}
-              className="w-full py-3 text-sm font-semibold text-[#C49A6C] hover:bg-canvas text-center border-t border-[#D9D9D9]"
+              className="w-full py-3 text-sm font-semibold text-[#2563EB] hover:bg-[#F7F7F5] text-center border-t border-[#E5E7EB]"
             >
               View all results &rarr;
             </button>
@@ -246,7 +256,7 @@ function RoleToggle({ mode, onChange }) {
         onClick={() => onChange('traveler')}
         className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
           mode === 'traveler'
-            ? 'bg-white text-[#0B0B45] shadow-md'
+            ? 'bg-white text-[#2563EB] shadow-md'
             : 'text-white/70 hover:text-white'
         }`}
       >
@@ -257,7 +267,7 @@ function RoleToggle({ mode, onChange }) {
         onClick={() => onChange('host')}
         className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
           mode === 'host'
-            ? 'bg-white text-[#0B0B45] shadow-md'
+            ? 'bg-white text-[#2563EB] shadow-md'
             : 'text-white/70 hover:text-white'
         }`}
       >
@@ -282,7 +292,7 @@ function Hero({ stats }) {
 
   return (
     <section className="relative min-h-[600px] md:min-h-[700px] flex flex-col overflow-hidden">
-      {/* Background Image with Blur */}
+      {/* Background Image */}
       <div className="absolute inset-0 overflow-hidden">
         <img
           src={heroImage}
@@ -291,7 +301,7 @@ function Hero({ stats }) {
         />
       </div>
 
-      {/* Gradient overlay - dark navy tint */}
+      {/* Gradient overlay - dark navy tint, kept only for photo legibility */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B45]/70 via-[#0B0B45]/40 to-[#0B0B45]/70"></div>
 
       {/* Navbar */}
@@ -309,7 +319,7 @@ function Hero({ stats }) {
           {/* Headline and Description */}
           <div className="text-center mb-14">
             <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-              <span className={`w-2 h-2 rounded-full animate-pulse ${isHost ? 'bg-[#C49A6C]' : 'bg-green-500'}`}></span>
+              <span className={`w-2 h-2 rounded-full animate-pulse ${isHost ? 'bg-[#2563EB]' : 'bg-green-500'}`}></span>
               <span className="text-white/90 text-sm font-medium">
                 {isHost ? 'List Your Property' : 'Available for Booking'}
               </span>
@@ -317,9 +327,9 @@ function Hero({ stats }) {
 
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-10 leading-tight tracking-tight drop-shadow-lg hero-heading">
               {isHost ? (
-                <>Earn More by <span className="text-[#C49A6C]">Hosting</span> on ZuriLofts</>
+                <>Earn More by Hosting on ZuriLofts</>
               ) : (
-                <>Choose <span className="text-[#C49A6C]">Luxury & Comfort</span> for Your Time Away</>
+                <>Choose Luxury &amp; Comfort for Your Time Away</>
               )}
             </h1>
             <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed mb-4">
@@ -330,7 +340,7 @@ function Hero({ stats }) {
             </p>
           </div>
 
-          {/* Pill-shaped Search Bar with live results */}
+          {/* Search - reuses the shared, blue-accented TripSearchBar */}
           <div className="mt-14">
             <SearchBar />
           </div>
@@ -340,7 +350,7 @@ function Hero({ stats }) {
             <div className="mt-14 flex justify-center">
               <Link
                 to="/register?role=HOST"
-                className="inline-flex items-center gap-2 bg-[#C49A6C] text-white font-bold px-10 py-4 rounded-full hover:bg-[#b8895c] transition-all duration-200 shadow-lg hover:shadow-xl text-lg"
+                className="inline-flex items-center gap-2 min-h-[44px] bg-[#2563EB] text-white font-bold px-10 py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 shadow-lg hover:shadow-xl text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0B45]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
@@ -351,21 +361,21 @@ function Hero({ stats }) {
           ) : (
             <div className="mt-20 flex justify-center items-center space-x-8 md:space-x-16">
               <div className="text-center group cursor-default">
-                <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 hover:scale-110 hover:text-[#C49A6C]">
+                <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 group-hover:scale-110">
                   <AnimatedNumber value={String(rating)} />
                 </div>
                 <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Star Rating</div>
               </div>
               <div className="w-px h-12 bg-white/20"></div>
               <div className="text-center group cursor-default">
-                <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 hover:scale-110 hover:text-[#C49A6C]">
+                <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 group-hover:scale-110">
                   <AnimatedNumber value={String(stays)} suffix="+" />
                 </div>
                 <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Happy Stays</div>
               </div>
               <div className="w-px h-12 bg-white/20 hidden md:block"></div>
               <div className="text-center hidden md:block group cursor-default">
-                <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 hover:scale-110 hover:text-[#C49A6C]">
+                <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 group-hover:scale-110">
                   <AnimatedNumber value={String(satisfaction)} suffix="%" />
                 </div>
                 <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Satisfaction</div>
@@ -377,6 +387,18 @@ function Hero({ stats }) {
     </section>
   );
 }
+
+Hero.propTypes = {
+  stats: PropTypes.shape({
+    rating: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    stays: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    satisfaction: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  }),
+};
+
+Hero.defaultProps = {
+  stats: null,
+};
 
 export { SearchBar };
 export default Hero;
