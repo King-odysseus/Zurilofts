@@ -138,7 +138,7 @@ function AdminMessages() {
                 <button
                   type="submit"
                   disabled={sending || !body.trim()}
-                  className="min-h-[44px] px-5 py-2.5 rounded-lg bg-[#2563EB] text-white text-sm font-semibold hover:bg-[#1D4ED8] transition-all disabled:opacity-50"
+                  className="min-h-[44px] px-5 py-2.5 rounded-lg bg-[#C49A6C] text-white text-sm font-semibold hover:bg-[#B8895C] transition-all disabled:opacity-50"
                 >
                   Send
                 </button>
