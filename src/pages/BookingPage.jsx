@@ -454,14 +454,14 @@ function BookingPage() {
     <div className="space-y-6">
       <button
         onClick={() => navigate(`/property/${id}${urlVariant ? `?variant=${urlVariant}` : ''}`)}
-        className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
+        className="min-h-[44px] text-gray-500 hover:text-gray-900 font-medium flex items-center transition-colors"
       >
         <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
         Back to property
       </button>
-      <h2 className="text-2xl font-bold text-[#0B0B45]">Select Dates & Guests</h2>
+      <h2 className="text-2xl font-bold text-[#0B0B45]">Stay details</h2>
       
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Select your dates *</label>
@@ -493,7 +493,7 @@ function BookingPage() {
             value: num,
             label: `${num} ${num === 1 ? 'guest' : 'guests'}`,
           }))}
-          triggerClassName="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
+          triggerClassName="neu-input min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
           ariaLabel="Number of guests"
         />
         {bedOption && (
@@ -551,7 +551,7 @@ function BookingPage() {
             name="checkInTime"
             value={bookingData.checkInTime}
             onChange={handleInputChange}
-            className="date-input neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
+            className="date-input neu-input min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
           />
           <p className="text-xs text-[#6b7280] mt-1">From 3:00 PM</p>
         </div>
@@ -567,7 +567,7 @@ function BookingPage() {
                 label: `${formatTime12h(time)}${fee > 0 ? ` (+KES ${fee.toLocaleString()})` : ' (Standard)'}`,
               };
             })}
-            triggerClassName=" w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
+            triggerClassName="min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
             ariaLabel="Check-out time"
           />
           {pricing.lateCheckoutFee > 0 && (
@@ -592,7 +592,7 @@ function BookingPage() {
       <button
         onClick={() => setStep(2)}
         disabled={!bookingData.checkIn || !bookingData.checkOut || pricing.nights <= 0 || !bedOption}
-        className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full min-h-[44px] bg-blue-600 text-white py-3 rounded-full font-semibold hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
       </button>
@@ -605,7 +605,7 @@ function BookingPage() {
       <div className="flex items-center mb-4">
         <button
           onClick={() => setStep(1)}
-          className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
+          className="min-h-[44px] text-gray-500 hover:text-gray-900 font-medium flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -628,7 +628,7 @@ function BookingPage() {
             value={bookingData.firstName}
             onChange={handleInputChange}
             placeholder="John"
-            className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+            className="neu-input min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
             required
           />
         </div>
@@ -640,7 +640,7 @@ function BookingPage() {
             value={bookingData.lastName}
             onChange={handleInputChange}
             placeholder="Doe"
-            className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+            className="neu-input min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
             required
           />
         </div>
@@ -666,7 +666,7 @@ function BookingPage() {
             value={phoneCountryCode}
             onChange={(val) => handlePhoneChange(val, phoneNumber)}
             options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
-            triggerClassName=" px-3 py-3 bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0"
+            triggerClassName="min-h-[44px] px-3 py-3 bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0"
             ariaLabel="Select country code"
           />
           <input
@@ -675,7 +675,7 @@ function BookingPage() {
             onChange={(e) => handlePhoneChange(phoneCountryCode, e.target.value.replace(/\D/g, ''))}
             maxLength={15}
             placeholder={COUNTRY_CODES.find((c) => c.code === phoneCountryCode)?.example || ''}
-            className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+            className="neu-input min-h-[44px] flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
             required
           />
         </div>
@@ -716,7 +716,7 @@ function BookingPage() {
                     value={g.firstName}
                     onChange={(e) => updateAdditionalGuest(i, 'firstName', e.target.value)}
                     placeholder="First name"
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
                   />
                 </div>
                 <div className="flex-1">
@@ -726,13 +726,13 @@ function BookingPage() {
                     value={g.lastName}
                     onChange={(e) => updateAdditionalGuest(i, 'lastName', e.target.value)}
                     placeholder="Last name"
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => removeGuest(i)}
-                  className="mb-1 w-10 h-10 flex items-center justify-center rounded-xl text-[#6b7280] hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0"
+                  className="mb-1 w-11 h-11 flex items-center justify-center rounded-xl text-[#6b7280] hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0"
                   aria-label="Remove guest"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -759,9 +759,9 @@ function BookingPage() {
       <button
         onClick={goToAddOns}
         disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone || creatingBooking}
-        className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full min-h-[44px] bg-blue-600 text-white py-3 rounded-full font-semibold hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {creatingBooking ? 'Starting your booking...' : 'Continue to Add-ons'}
+        {creatingBooking ? 'Starting your booking...' : 'Continue to extras'}
       </button>
     </div>
   );
@@ -772,7 +772,7 @@ function BookingPage() {
       <div className="flex items-center mb-4">
         <button
           onClick={() => setStep(2)}
-          className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
+          className="min-h-[44px] text-gray-500 hover:text-gray-900 font-medium flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -782,6 +782,7 @@ function BookingPage() {
       </div>
 
       <div>
+        <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Details &middot; Extras</p>
         <h2 className="text-2xl font-bold text-[#0B0B45]">Enhance your stay</h2>
         <p className="text-sm text-[#6b7280] mt-1">
           Add optional services to your booking. You can change quantities any time before payment.
@@ -829,7 +830,7 @@ function BookingPage() {
                       type="button"
                       onClick={() => changeAddOnQuantity(addOn, qty - 1)}
                       disabled={busy || qty === 0}
-                      className="w-9 h-9 rounded-full shadow-sm hover:shadow-md text-[#0B0B45] font-bold hover:text-[#C49A6C] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-11 h-11 rounded-full shadow-sm hover:shadow-md text-[#0B0B45] font-bold hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       aria-label={`Decrease ${addOn.name} quantity`}
                     >
                       −
@@ -841,7 +842,7 @@ function BookingPage() {
                       type="button"
                       onClick={() => changeAddOnQuantity(addOn, qty + 1)}
                       disabled={busy || qty >= 20}
-                      className="w-9 h-9 rounded-full shadow-sm hover:shadow-md text-[#0B0B45] font-bold hover:text-[#C49A6C] transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-11 h-11 rounded-full shadow-sm hover:shadow-md text-[#0B0B45] font-bold hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       aria-label={`Increase ${addOn.name} quantity`}
                     >
                       +
@@ -864,7 +865,7 @@ function BookingPage() {
 
       <button
         onClick={() => setStep(4)}
-        className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200"
+        className="w-full min-h-[44px] bg-blue-600 text-white py-3 rounded-full font-semibold hover:bg-blue-700 transition-all duration-200"
       >
         Continue to Payment
       </button>
@@ -877,7 +878,7 @@ function BookingPage() {
       <div className="flex items-center mb-4">
         <button
           onClick={() => setStep(3)}
-          className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
+          className="min-h-[44px] text-gray-500 hover:text-gray-900 font-medium flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -898,7 +899,7 @@ function BookingPage() {
             value="card"
             checked={bookingData.paymentMethod === 'card'}
             onChange={handleInputChange}
-            className="w-5 h-5 text-[#C49A6C] focus:ring-[#C49A6C]"
+            className="w-5 h-5 text-blue-600 focus:ring-blue-600"
           />
           <div className="ml-4 flex items-center flex-1">
             <svg className="w-8 h-8 text-[#0B0B45] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -920,7 +921,7 @@ function BookingPage() {
             value="mpesa"
             checked={bookingData.paymentMethod === 'mpesa'}
             onChange={handleInputChange}
-            className="w-5 h-5 text-[#C49A6C] focus:ring-[#C49A6C]"
+            className="w-5 h-5 text-blue-600 focus:ring-blue-600"
           />
           <div className="ml-4 flex items-center flex-1">
             <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
@@ -942,7 +943,7 @@ function BookingPage() {
             value="bank"
             checked={bookingData.paymentMethod === 'bank'}
             onChange={handleInputChange}
-            className="w-5 h-5 text-[#C49A6C] focus:ring-[#C49A6C]"
+            className="w-5 h-5 text-blue-600 focus:ring-blue-600"
           />
           <div className="ml-4 flex items-center flex-1">
             <svg className="w-8 h-8 text-[#0B0B45] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -965,14 +966,14 @@ function BookingPage() {
             value={promoCode}
             onChange={(e) => { setPromoCode(e.target.value); setPromoError(''); }}
             placeholder="Enter code"
-            className=" flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] uppercase"
+            className="neu-input min-h-[44px] flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] uppercase"
             disabled={!!promoResult}
           />
           {promoResult ? (
             <button
               type="button"
               onClick={() => { setPromoCode(''); setPromoResult(null); setPromoError(''); }}
-              className="px-4 py-3 rounded-xl text-sm font-semibold bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+              className="min-h-[44px] px-4 py-3 rounded-xl text-sm font-semibold bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
             >
               Applied
             </button>
@@ -981,7 +982,7 @@ function BookingPage() {
               type="button"
               onClick={handleApplyPromo}
               disabled={validatingPromo || !promoCode.trim()}
-              className="px-4 py-3 rounded-xl text-sm font-semibold bg-[#0B0B45] text-white hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
+              className="min-h-[44px] px-4 py-3 rounded-xl text-sm font-semibold bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition-all duration-200 disabled:opacity-50"
             >
               {validatingPromo ? '...' : 'Apply'}
             </button>
@@ -1050,11 +1051,11 @@ function BookingPage() {
         <button
           type="submit"
           disabled={isProcessing}
-          className="w-full bg-[#C49A6C] text-white py-4 rounded-full font-bold hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full min-h-[44px] bg-blue-600 text-white py-4 rounded-full font-bold hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {isProcessing ? (
             <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#0B0B45]" fill="none" viewBox="0 0 24 24">
+              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -1126,13 +1127,13 @@ function BookingPage() {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/')}
-                className="w-full bg-[#C49A6C] text-white py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+                className="w-full min-h-[44px] bg-blue-600 text-white py-3 rounded-full font-semibold hover:bg-blue-700 transition-all duration-200"
               >
                 Return to Home
               </button>
               <button
                 onClick={() => window.print()}
-                className="w-full bg-[#0B0B45]/5 text-[#0B0B45] py-3 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                className="w-full min-h-[44px] bg-gray-100 text-gray-700 border border-gray-300 py-3 rounded-full font-semibold hover:bg-gray-200 transition-all duration-200"
               >
                 Print Confirmation
               </button>
@@ -1178,13 +1179,13 @@ function BookingPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200"
+                className="min-h-[44px] px-6 py-2.5 rounded-full font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200"
               >
                 Try again
               </button>
               <button
                 onClick={() => navigate('/properties')}
-                className="px-6 py-2.5 rounded-full font-semibold bg-[#0B0B45]/5 text-[#0B0B45] hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                className="min-h-[44px] px-6 py-2.5 rounded-full font-semibold bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200 transition-all duration-200"
               >
                 Browse properties
               </button>
@@ -1195,36 +1196,63 @@ function BookingPage() {
     );
   }
 
+  // Visual-only grouping: internal step state (1-4) is untouched, but the
+  // progress hierarchy is presented as Stay / Details / Payment, with the
+  // add-ons step (3) folded under "Details" alongside guest info (2).
+  const STAGES = [
+    { label: 'Stay', steps: [1] },
+    { label: 'Details', steps: [2, 3] },
+    { label: 'Payment', steps: [4] },
+  ];
+  const currentStageIndex = STAGES.findIndex((s) => s.steps.includes(step));
+
   return (
     <div className="min-h-screen bg-canvas">
       <Navbar />
-      
-      <div className="pt-20 md:pt-24 pb-12 md:pb-16">
+
+      {/* Persistent concise summary - stays visible while the checkout steps scroll */}
+      <div className="sticky top-16 md:top-20 z-10 bg-white/95 backdrop-blur border-b border-[#D9D9D9] shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-2.5 flex items-center justify-between gap-3 text-sm">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="font-semibold text-[#0B0B45] truncate">{property?.title}</span>
+            {pricing.nights > 0 && (
+              <span className="hidden sm:inline text-[#6b7280] whitespace-nowrap">
+                {pricing.nights} {pricing.nights === 1 ? 'night' : 'nights'} &middot; {bookingData.guests} {bookingData.guests === 1 ? 'guest' : 'guests'}
+              </span>
+            )}
+          </div>
+          <span className="font-bold text-[#0B0B45] whitespace-nowrap">
+            {pricing.total > 0 ? `KES ${pricing.total.toLocaleString()}` : 'Select dates'}
+          </span>
+        </div>
+      </div>
+
+      <div className="pt-6 md:pt-8 pb-12 md:pb-16">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
-          {/* Progress Steps */}
+          {/* Progress: Stay / Details / Payment */}
           <div className="max-w-md md:max-w-2xl mx-auto mb-8 md:mb-10">
             <div className="flex items-start justify-center">
-              {[1, 2, 3, 4].map((s, i) => (
-                <div key={s} className="flex items-center">
+              {STAGES.map((stage, i) => (
+                <div key={stage.label} className="flex items-center">
                   {i > 0 && (
                     <div
                       className={`w-8 md:w-16 h-1 mx-1 md:mx-2 transition-colors ${
-                        step > i ? 'bg-[#C49A6C]' : 'bg-[#D9D9D9]'
+                        currentStageIndex > i - 1 ? 'bg-blue-600' : 'bg-[#D9D9D9]'
                       }`}
                     />
                   )}
                   <div className="flex flex-col items-center">
                     <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors ${
-                        step >= s
-                          ? 'bg-[#C49A6C] text-white'
+                      className={`w-11 h-11 rounded-full flex items-center justify-center font-semibold transition-colors ${
+                        currentStageIndex >= i
+                          ? 'bg-blue-600 text-white'
                           : 'bg-[#D9D9D9] text-[#6b7280]'
                       }`}
                     >
-                      {s}
+                      {i + 1}
                     </div>
                     <span className="text-xs text-[#6b7280] mt-2 whitespace-nowrap">
-                      {s === 1 ? 'Dates' : s === 2 ? 'Details' : s === 3 ? 'Add-ons' : 'Payment'}
+                      {stage.label}
                     </span>
                   </div>
                 </div>
