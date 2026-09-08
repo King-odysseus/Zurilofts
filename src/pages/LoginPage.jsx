@@ -128,7 +128,7 @@ function LoginPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full min-h-[44px] bg-[#2563EB] text-white font-semibold py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
+              className="w-full min-h-[44px] bg-[#C49A6C] text-white font-semibold py-3 rounded-lg hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
             >
               {submitting ? 'Signing in...' : 'Sign In'}
             </button>

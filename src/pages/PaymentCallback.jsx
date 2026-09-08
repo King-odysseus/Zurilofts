@@ -140,7 +140,7 @@ function PaymentCallback() {
               <div className="space-y-3">
                 <button
                   onClick={() => navigate('/')}
-                  className="w-full min-h-[44px] bg-[#2563EB] text-white py-3 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200"
+                  className="w-full min-h-[44px] bg-[#C49A6C] text-white py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200"
                 >
                   Return to Home
                 </button>
@@ -169,7 +169,7 @@ function PaymentCallback() {
               <div className="space-y-3">
                 <button
                   onClick={() => navigate('/')}
-                  className="w-full min-h-[44px] bg-[#2563EB] text-white py-3 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200"
+                  className="w-full min-h-[44px] bg-[#C49A6C] text-white py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200"
                 >
                   Return to Home
                 </button>
