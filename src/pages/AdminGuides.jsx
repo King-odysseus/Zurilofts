@@ -78,7 +78,7 @@ function AdminGuides() {
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold text-[#222222]">Travel Guides</h2>
         {!editing && (
-          <button onClick={handleCreate} className="bg-[#2563EB] text-white min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#1D4ED8] transition-all duration-200">
+          <button onClick={handleCreate} className="bg-[#C49A6C] text-white min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#B8895C] transition-all duration-200">
             + New Guide
           </button>
         )}
@@ -152,7 +152,7 @@ function AdminGuides() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-[#2563EB] text-white min-h-[44px] px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
+                className="bg-[#C49A6C] text-white min-h-[44px] px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save'}
               </button>
