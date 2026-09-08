@@ -51,7 +51,7 @@ function GuideDetailPage() {
           <div className="text-center max-w-md px-6">
             <h1 className="text-3xl font-bold text-[#222222] mb-4">Guide Not Found</h1>
             <p className="text-[#6b7280] mb-6">This guide may have been removed or moved.</p>
-            <Link to="/guides" className="inline-block min-h-[44px] bg-[#2563EB] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200">
+            <Link to="/guides" className="inline-block min-h-[44px] bg-[#C49A6C] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200">
               Browse Guides
             </Link>
           </div>
