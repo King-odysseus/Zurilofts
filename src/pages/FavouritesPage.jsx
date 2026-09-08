@@ -182,6 +182,13 @@ function FavouritesPage() {
           )}
         </div>
 
+        {!sharedIds && (
+          <div className="mb-6 flex items-center gap-5 border-b border-[#E5E7EB]" role="tablist" aria-label="Saved stays">
+            <Link to="/favourites" role="tab" aria-selected="true" className="border-b-2 border-[#2563EB] px-1 pb-3 text-sm font-semibold text-[#2563EB]">All saved ({favorites.length})</Link>
+            <Link to="/shortlists" role="tab" aria-selected="false" className="border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-[#6b7280] hover:text-[#222222]">My lists</Link>
+          </div>
+        )}
+
         {SharedBanner}
 
         {/* Empty shared list */}
