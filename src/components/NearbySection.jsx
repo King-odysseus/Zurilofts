@@ -17,9 +17,9 @@ function NearbyCard({ item, areaLabels }) {
   return (
     <div className="neu-card overflow-hidden transition-shadow duration-300 group">
       <div className="h-48 overflow-hidden relative">
-        <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-2xl" src={item.image} alt={item.name} />
+        <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-[14px]" src={item.image} alt={item.name} />
         <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
-           className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-[#C49A6C] hover:text-white transition-all duration-200 z-10">
+           className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-[#2563EB] hover:text-white transition-all duration-200 z-10">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -27,16 +27,16 @@ function NearbyCard({ item, areaLabels }) {
         </a>
       </div>
       <div className="p-5">
-        <span className="inline-block bg-[#C49A6C]/10 text-[#C49A6C] text-xs font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide">
+        <span className="inline-block bg-[#2563EB]/10 text-[#2563EB] text-xs font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide">
           {areaLabels[item.area] || item.area}
         </span>
-        <h3 className="text-lg font-bold text-[#0B0B45] mb-2">{item.name}</h3>
+        <h3 className="text-lg font-bold text-[#222222] mb-2">{item.name}</h3>
         <p className="text-charcoal text-sm leading-relaxed">{item.desc}</p>
         <a
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#0B0B45] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#C49A6C]"
+          className="mt-4 inline-flex items-center gap-2 min-h-[44px] rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D4ED8]"
         >
           Get directions
           <span aria-hidden="true">↗</span>
@@ -72,7 +72,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
     <div className="mt-32 md:mt-44 mb-16">
       {/* Centered Header */}
       <div className="text-center mb-8 px-4 md:px-0">
-        <h2 className="text-3xl md:text-4xl font-bold text-[#0B0B45]">{title}</h2>
+        <h2 className="text-3xl md:text-4xl font-bold text-[#222222]">{title}</h2>
         <p className="text-cool-grey max-w-2xl mx-auto text-base md:text-lg mt-3 px-2 md:px-0">{subtitle}</p>
       </div>
 
@@ -82,7 +82,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
           value={areaFilter}
           onChange={setAreaFilter}
           options={areaOptions}
-          triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px] shadow-sm"
+          triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#222222] rounded-xl text-sm min-w-[160px] shadow-sm"
           ariaLabel="Filter by area"
         />
         {catOptions && (
@@ -90,7 +90,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             value={categoryFilter}
             onChange={setCategoryFilter}
             options={catOptions}
-            triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm min-w-[160px] shadow-sm"
+            triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#222222] rounded-xl text-sm min-w-[160px] shadow-sm"
             ariaLabel="Filter by category"
           />
         )}
@@ -98,7 +98,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
         <div className="flex items-center gap-1">
           <button
             onClick={() => setViewMode('grid')}
-            className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#C49A6C] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#2563EB] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
             aria-label="Grid view"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +107,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
           </button>
           <button
             onClick={() => setViewMode('map')}
-            className={`p-2 rounded-lg transition-colors ${viewMode === 'map' ? 'bg-[#C49A6C] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
+            className={`p-2 rounded-lg transition-colors ${viewMode === 'map' ? 'bg-[#2563EB] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
             aria-label="Map view"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -136,7 +136,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             <div className="text-center mt-10">
               <Link
                 to={viewMoreLink}
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-[#0B0B45] font-semibold shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                className="inline-flex items-center gap-2 min-h-[44px] px-8 py-3 rounded-lg border border-[#E5E7EB] text-[#222222] font-semibold hover:bg-[#F7F7F5] transition-all duration-200"
               >
                 View All {filtered.length} Places
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
