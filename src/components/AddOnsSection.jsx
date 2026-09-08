@@ -55,7 +55,7 @@ function AddOnsSection({ propertyId }) {
         {addOns.map((addOn) => (
           <div
             key={addOn.id}
-            className="bg-white rounded-2xl shadow-[0_1px_3px_rgb(38_34_98_/_0.06),0_6px_20px_-6px_rgb(38_34_98_/_0.10)] p-5 flex flex-col"
+            className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 flex flex-col"
           >
             <div className="flex items-start justify-between gap-3 mb-2">
               <h3 className="font-semibold text-[#0B0B45]">{addOn.name}</h3>
