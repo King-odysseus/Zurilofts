@@ -241,6 +241,20 @@ function AdminPropertyForm() {
           </div>
         ))}
       </div>
+      <div className="mb-6 rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-4 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div><p className="text-sm font-bold text-[#222222]">Publish readiness</p><p className="mt-1 text-xs text-[#6b7280]">Complete the essentials below before sending your listing for review.</p></div>
+          <span className="rounded-full bg-[#2563EB]/10 px-3 py-1 text-xs font-semibold text-[#2563EB]">Draft workspace</span>
+        </div>
+        <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
+          {[['Title and location', Boolean(form.title && form.location)], ['Pricing and capacity', Boolean(form.price && form.bedrooms !== '' && form.bathrooms !== '')], ['Photos and description', Boolean((form.images || []).length && form.description)]].map(([label, complete]) => (
+            <div key={label} className="flex items-center gap-2 text-xs font-medium text-[#6b7280]">
+              <span className={`flex h-5 w-5 items-center justify-center rounded-full ${complete ? 'bg-green-100 text-green-700' : 'bg-[#F7F7F5] text-[#6b7280]'}`}>{complete ? '✓' : '·'}</span>
+              {label}
+            </div>
+          ))}
+        </div>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
