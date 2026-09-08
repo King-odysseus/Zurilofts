@@ -75,13 +75,21 @@ function AdminGuides() {
   // p-4 md:p-8, and admin pages are full-bleed (see CLAUDE.md).
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-[#222222]">Travel Guides</h2>
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex items-center justify-between mb-6">
+        <div><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Content workspace</p><h2 className="mt-1 text-2xl font-bold text-[#222222]">Travel Guides</h2><p className="mt-1 text-sm text-[#6b7280]">Create and publish practical Nairobi guidance for guests.</p></div>
         {!editing && (
           <button onClick={handleCreate} className="bg-[#C49A6C] text-white min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#B8895C] transition-all duration-200">
             + New Guide
           </button>
         )}
+      </div>
+
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+        {[
+          ['Total guides', posts.length],
+          ['Published', posts.filter((post) => post.published).length],
+          ['Drafts', posts.filter((post) => !post.published).length],
+        ].map(([label, value]) => <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p></div>)}
       </div>
 
       {/* Edit form */}
