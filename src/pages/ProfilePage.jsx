@@ -384,7 +384,7 @@ function ProfilePage() {
           <button
             type="button"
             onClick={() => setReloadKey((k) => k + 1)}
-            className="min-h-[44px] bg-[#2563EB] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200"
+            className="min-h-[44px] bg-[#C49A6C] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200"
           >
             Try Again
           </button>
@@ -472,7 +472,7 @@ function ProfilePage() {
                   </p>
                   <Link
                     to="/host/application"
-                    className="inline-flex min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors"
+                    className="inline-flex min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors"
                   >
                     Go to host verification
                   </Link>
@@ -563,7 +563,7 @@ function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="min-h-[44px] bg-[#2563EB] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
+                    className="min-h-[44px] bg-[#C49A6C] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -623,7 +623,7 @@ function ProfilePage() {
                   <button
                     type="submit"
                     disabled={passwordSaving}
-                    className="min-h-[44px] bg-[#2563EB] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
+                    className="min-h-[44px] bg-[#C49A6C] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
                   >
                     {passwordSaving ? 'Changing password...' : 'Change password'}
                   </button>
@@ -657,7 +657,7 @@ function ProfilePage() {
                       type="button"
                       onClick={handleExportData}
                       disabled={exporting}
-                      className="flex-shrink-0 inline-flex items-center gap-2 min-h-[44px] bg-[#2563EB] text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
+                      className="flex-shrink-0 inline-flex items-center gap-2 min-h-[44px] bg-[#C49A6C] text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
                     >
                       {exporting ? (
                         <>
@@ -681,7 +681,7 @@ function ProfilePage() {
                     <button
                       type="button"
                       onClick={openConsentManager}
-                      className="flex-shrink-0 min-h-[44px] bg-[#2563EB] text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200"
+                      className="flex-shrink-0 min-h-[44px] bg-[#C49A6C] text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-[#B8895C] transition-all duration-200"
                     >
                       Manage preferences
                     </button>
@@ -839,7 +839,7 @@ function ProfilePage() {
                 <button
                   type="submit"
                   disabled={bankSaving}
-                  className="min-h-[44px] bg-[#2563EB] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50 text-sm"
+                  className="min-h-[44px] bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50 text-sm"
                 >
                   {bankSaving ? 'Saving...' : 'Save Payout Destination'}
                 </button>
@@ -865,7 +865,7 @@ function ProfilePage() {
                     type="button"
                     onClick={handleFrequencySave}
                     disabled={bankSaving}
-                    className="min-h-[44px] bg-[#2563EB] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50 text-sm"
+                    className="min-h-[44px] bg-[#C49A6C] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50 text-sm"
                   >
                     Save
                   </button>
@@ -1033,7 +1033,7 @@ function ProfilePage() {
                               type="button"
                               onClick={() => handleSubmitReview(booking.id)}
                               disabled={reviewForms[booking.id]?.submitting}
-                              className="mt-3 min-h-[44px] bg-[#2563EB] text-white font-semibold px-5 py-2 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
+                              className="mt-3 min-h-[44px] bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-lg text-sm hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
                             >
                               {reviewForms[booking.id]?.submitting ? 'Submitting...' : 'Submit Review'}
                             </button>
@@ -1072,7 +1072,7 @@ function ProfilePage() {
                   </div>
                   <h3 className="text-lg font-bold text-[#222222] mb-1">No favourites yet</h3>
                   <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
-                  <Link to="/properties" className="inline-block min-h-[44px] bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200">
+                  <Link to="/properties" className="inline-block min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200">
                     Browse properties
                   </Link>
                 </div>
