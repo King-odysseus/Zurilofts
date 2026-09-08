@@ -135,7 +135,7 @@ function InboxPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        <div className="mb-8">
+        <div className="mb-8 rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm">
           <h1 className="text-3xl font-bold text-[#222222]">Inbox</h1>
           <p className="text-[#6b7280] mt-1">Messages about your bookings and stays.</p>
         </div>

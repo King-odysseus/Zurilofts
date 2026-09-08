@@ -179,10 +179,12 @@ function BookingHistoryPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm mb-6">
         <h1 className="text-2xl font-bold text-[#222222] mb-2">My Bookings</h1>
         <p className="text-[#6b7280] mb-6">
           {filtered.length} booking{filtered.length !== 1 ? 's' : ''}
         </p>
+        </div>
 
         {/* Filter pills */}
         <div className="flex flex-wrap items-center gap-3 mb-8">
