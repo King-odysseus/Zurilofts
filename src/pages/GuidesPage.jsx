@@ -34,12 +34,14 @@ function GuidesPage() {
       <Navbar />
 
       {/* Hero */}
-      <div className="bg-[#222222] pt-24 pb-16 px-4 sm:px-6 md:px-8">
+      <div className="bg-canvas pt-24 pb-10 px-4 sm:px-6 md:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Nairobi Travel Guides</h1>
-          <p className="text-lg text-white/70 max-w-2xl mx-auto">
+          <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-6 py-8 md:py-10 shadow-sm">
+          <h1 className="text-3xl md:text-4xl font-bold text-[#222222] mb-3">Nairobi Travel Guides</h1>
+          <p className="text-base text-[#6b7280] max-w-2xl mx-auto">
             Tips, recommendations, and insider knowledge to make the most of your stay in Nairobi.
           </p>
+          </div>
         </div>
       </div>
 
@@ -55,7 +57,7 @@ function GuidesPage() {
             <p className="text-[#6b7280]">Our travel guides are being written. Check back soon!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (
               <Link
                 key={post.id}

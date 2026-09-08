@@ -9,7 +9,8 @@ function NotFoundPage() {
     <div className="min-h-screen bg-[#F7F7F5] flex flex-col">
       <Navbar />
       <div className="flex-1 flex items-center justify-center px-6">
-        <div className="text-center max-w-md">
+        <div className="text-center max-w-md rounded-[14px] border border-[#E5E7EB] bg-white p-8 sm:p-10 shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6b7280] mb-3">ZuriLofts</p>
           <h1 className="text-2xl font-bold text-[#222222] mb-2">This page is unavailable</h1>
           <p className="text-sm text-[#6b7280] mb-6">
             The page you are looking for may have been moved or no longer exists.

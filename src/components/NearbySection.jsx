@@ -69,9 +69,9 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   const catOptions = categories && Object.entries(categoryLabels).map(([k, v]) => ({ value: k, label: v }));
 
   return (
-    <div className="mt-32 md:mt-44 mb-16">
+    <div className="mt-20 md:mt-28 mb-16">
       {/* Centered Header */}
-      <div className="text-center mb-8 px-4 md:px-0">
+      <div className="text-center mb-8 px-5 py-8 md:px-8 md:py-10 rounded-[14px] border border-[#E5E7EB] bg-white shadow-sm">
         <h2 className="text-3xl md:text-4xl font-bold text-[#222222]">{title}</h2>
         <p className="text-cool-grey max-w-2xl mx-auto text-base md:text-lg mt-3 px-2 md:px-0">{subtitle}</p>
       </div>
@@ -126,7 +126,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
         </Suspense>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {visible.map((item) => (
               <NearbyCard key={item.name} item={item} areaLabels={areaLabels} />
             ))}
