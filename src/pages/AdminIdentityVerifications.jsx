@@ -64,10 +64,10 @@ function AdminIdentityVerifications() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#0B0B45]">Identity Verifications</h1>
+          <h1 className="text-2xl font-bold text-[#222222]">Identity Verifications</h1>
           <p className="text-sm text-[#6b7280] mt-1">Guest identity checks - gates payment on a booking, separate from host account review.</p>
         </div>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className="rounded-full bg-white px-5 py-2.5 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30">
+        <select value={status} onChange={(e) => setStatus(e.target.value)} className="min-h-[44px] rounded-xl border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20">
           <option value="">All statuses</option>
           <option value="SUBMITTED">Submitted</option>
           <option value="APPROVED">Approved</option>
@@ -75,26 +75,26 @@ function AdminIdentityVerifications() {
           <option value="UNVERIFIED">Unverified</option>
         </select>
       </div>
-      {message && <div className="rounded-2xl bg-[#0B0B45]/5 px-4 py-3 text-sm text-[#0B0B45]">{message}</div>}
+      {message && <div className="rounded-[14px] bg-[#222222]/5 px-4 py-3 text-sm text-[#222222]">{message}</div>}
       {loading ? (
         <div className="py-16 text-center text-[#6b7280]">Loading verifications...</div>
       ) : rows.length === 0 ? (
-        <div className="rounded-3xl bg-white p-12 text-center text-[#6b7280] shadow-sm">No verifications in this view.</div>
+        <div className="rounded-[14px] bg-white p-12 text-center text-[#6b7280] shadow-sm">No verifications in this view.</div>
       ) : (
-        <div className="overflow-x-auto rounded-3xl bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-[14px] bg-white shadow-sm">
           <table className="w-full text-sm">
-            <thead><tr className="border-b border-[#D9D9D9] text-left"><th className="p-4">Guest</th><th className="p-4">ID type</th><th className="p-4">Documents</th><th className="p-4">Status</th><th className="p-4"></th></tr></thead>
+            <thead><tr className="border-b border-[#E5E7EB] text-left"><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Guest</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">ID type</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Documents</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]"></th></tr></thead>
             <tbody>
               {rows.map((v) => (
-                <tr key={v.id} className="border-b border-[#D9D9D9]/60 hover:bg-[#0B0B45]/5">
+                <tr key={v.id} className="border-b border-[#E5E7EB]/60 hover:bg-[#222222]/5">
                   <td className="p-4">
-                    <p className="font-semibold text-[#1f2937]">{v.fullName || `${v.user?.firstName || ''} ${v.user?.lastName || ''}`}</p>
+                    <p className="font-semibold text-[#222222]">{v.fullName || `${v.user?.firstName || ''} ${v.user?.lastName || ''}`}</p>
                     <p className="text-xs text-[#6b7280]">{v.user?.email}</p>
                   </td>
                   <td className="p-4">{v.idType || '-'}</td>
                   <td className="p-4">{v.documents?.length || 0}</td>
                   <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[v.status]}`}>{v.status.replaceAll('_', ' ')}</span></td>
-                  <td className="p-4"><button onClick={() => open(v.id)} disabled={busy === v.id} className="rounded-full border border-[#C49A6C] px-4 py-2 text-xs font-semibold text-[#C49A6C] hover:bg-[#C49A6C] hover:text-white disabled:opacity-50">Review</button></td>
+                  <td className="p-4"><button onClick={() => open(v.id)} disabled={busy === v.id} className="rounded-lg border border-[#2563EB] px-4 py-2 text-xs font-semibold text-[#2563EB] hover:bg-[#2563EB] hover:text-white disabled:opacity-50">Review</button></td>
                 </tr>
               ))}
             </tbody>
@@ -104,35 +104,35 @@ function AdminIdentityVerifications() {
 
       {selected && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => !busy && setSelected(null)}>
-          <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#D9D9D9] bg-white px-6 py-5">
-              <div><h2 className="text-xl font-bold text-[#0B0B45]">{selected.fullName || 'Unnamed'}</h2><p className="text-sm text-[#6b7280]">{selected.user?.email}</p></div>
+          <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[14px] bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E5E7EB] bg-white px-6 py-5">
+              <div><h2 className="text-xl font-bold text-[#222222]">{selected.fullName || 'Unnamed'}</h2><p className="text-sm text-[#6b7280]">{selected.user?.email}</p></div>
               <button onClick={() => setSelected(null)} className="rounded-full px-3 py-2 text-xl text-[#6b7280] hover:bg-gray-100">&times;</button>
             </div>
             <div className="space-y-7 p-6">
               <div className="grid sm:grid-cols-2 gap-3">
-                <div className="rounded-2xl bg-canvas p-3"><p className="text-xs text-[#6b7280]">Date of birth</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.dateOfBirth || '-'}</p></div>
-                <div className="rounded-2xl bg-canvas p-3"><p className="text-xs text-[#6b7280]">ID type</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idType || '-'}</p></div>
-                <div className="rounded-2xl bg-canvas p-3"><p className="text-xs text-[#6b7280]">ID number</p><p className="mt-1 text-sm font-semibold text-[#1f2937]">{selected.idNumber || '-'}</p></div>
+                <div className="rounded-[14px] bg-canvas p-3"><p className="text-xs text-[#6b7280]">Date of birth</p><p className="mt-1 text-sm font-semibold text-[#222222]">{selected.dateOfBirth || '-'}</p></div>
+                <div className="rounded-[14px] bg-canvas p-3"><p className="text-xs text-[#6b7280]">ID type</p><p className="mt-1 text-sm font-semibold text-[#222222]">{selected.idType || '-'}</p></div>
+                <div className="rounded-[14px] bg-canvas p-3"><p className="text-xs text-[#6b7280]">ID number</p><p className="mt-1 text-sm font-semibold text-[#222222]">{selected.idNumber || '-'}</p></div>
               </div>
               <div>
-                <h3 className="font-bold text-[#0B0B45] mb-3">Encrypted documents</h3>
+                <h3 className="font-bold text-[#222222] mb-3">Encrypted documents</h3>
                 <div className="grid sm:grid-cols-2 gap-3">
                   {selected.documents?.map((document) => (
-                    <button key={document.id} onClick={() => downloadDocument(document)} disabled={busy === document.id} className="rounded-3xl shadow-sm p-4 text-left hover:shadow-md disabled:opacity-50">
-                      <p className="font-semibold text-[#1f2937]">{DOCUMENT_LABELS[document.kind] || document.kind}</p>
+                    <button key={document.id} onClick={() => downloadDocument(document)} disabled={busy === document.id} className="rounded-[14px] shadow-sm p-4 text-left hover:shadow-md disabled:opacity-50">
+                      <p className="font-semibold text-[#222222]">{DOCUMENT_LABELS[document.kind] || document.kind}</p>
                       <p className="mt-1 text-xs text-[#6b7280] break-all">{document.originalName} · {(document.size / 1024 / 1024).toFixed(1)} MB</p>
                     </button>
                   ))}
                 </div>
               </div>
               {selected.status === 'SUBMITTED' && (
-                <div className="rounded-3xl border border-[#D9D9D9] p-5">
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-2">Reviewer note (required for rejection)</label>
-                  <textarea value={note} onChange={(e) => setNote(e.target.value)} rows="3" maxLength="2000" className="w-full rounded-3xl bg-white px-5 py-3 shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30" />
+                <div className="rounded-[14px] border border-[#E5E7EB] p-5">
+                  <label className="block text-sm font-semibold text-[#222222] mb-2">Reviewer note (required for rejection)</label>
+                  <textarea value={note} onChange={(e) => setNote(e.target.value)} rows="3" maxLength="2000" className="w-full rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-3 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20" />
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <button onClick={() => review('approve')} disabled={Boolean(busy)} className="rounded-full bg-green-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Approve</button>
-                    <button onClick={() => review('reject')} disabled={Boolean(busy)} className="rounded-full border border-red-300 px-5 py-2.5 text-sm font-semibold text-red-600 disabled:opacity-50">Reject</button>
+                    <button onClick={() => review('approve')} disabled={Boolean(busy)} className="min-h-[44px] rounded-lg bg-green-600 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50">Approve</button>
+                    <button onClick={() => review('reject')} disabled={Boolean(busy)} className="min-h-[44px] rounded-lg border border-red-300 px-5 py-2.5 text-sm font-semibold text-red-600 disabled:opacity-50">Reject</button>
                   </div>
                 </div>
               )}

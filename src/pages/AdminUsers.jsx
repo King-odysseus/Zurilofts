@@ -7,8 +7,8 @@ import Pagination from '../components/Pagination.jsx';
 
 const roleColors = {
   USER: 'bg-gray-100 text-gray-700',
-  HOST: 'bg-[#C49A6C]/20 text-[#8a6a3f]',
-  ADMIN: 'bg-[#0B0B45]/10 text-[#0B0B45]',
+  HOST: 'bg-[#2563EB]/20 text-[#2563EB]',
+  ADMIN: 'bg-[#222222]/10 text-[#222222]',
 };
 
 const EMPTY_FORM = {
@@ -236,14 +236,14 @@ function AdminUsers() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-bold text-[#0B0B45]">Users &amp; Hosts</h1>
+        <h1 className="text-2xl font-bold text-[#222222]">Users &amp; Hosts</h1>
         <div className="flex items-center gap-3 flex-wrap">
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search name or email"
-            className="px-4 py-2 rounded-xl bg-white text-[#1f2937] text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30 w-56"
+            className="min-h-[44px] px-4 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 w-56"
           />
           <Dropdown
             value={roleFilter}
@@ -254,7 +254,7 @@ function AdminUsers() {
               { value: 'HOST', label: 'Hosts' },
               { value: 'ADMIN', label: 'Admins' },
             ]}
-            triggerClassName=" px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm"
+            triggerClassName=" min-h-[44px] px-4 py-2 bg-white border border-[#E5E7EB] text-[#222222] rounded-xl text-sm"
             ariaLabel="Filter by role"
           />
         </div>
@@ -268,7 +268,7 @@ function AdminUsers() {
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-[#6b7280]">Loading users...</p>
         </div>
       ) : users.length === 0 ? (
@@ -280,17 +280,17 @@ function AdminUsers() {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-lg overflow-x-auto">
+        <div className="bg-white rounded-[14px] shadow-lg overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#D9D9D9] text-left">
-                <th className="p-4 font-semibold text-[#0B0B45]">Name</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Contact</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Role</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Properties</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Wallet (KES)</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Status</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Actions</th>
+              <tr className="border-b border-[#E5E7EB] text-left">
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Name</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Contact</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Role</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Properties</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Wallet (KES)</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -298,15 +298,15 @@ function AdminUsers() {
                 const isSelf = u.id === currentUser?.id;
                 const busy = busyId === u.id;
                 return (
-                  <tr key={u.id} className={`border-b border-[#D9D9D9]/50 hover:bg-[#0B0B45]/5 ${u.suspended ? 'opacity-60' : ''}`}>
+                  <tr key={u.id} className={`border-b border-[#E5E7EB]/50 hover:bg-[#222222]/5 ${u.suspended ? 'opacity-60' : ''}`}>
                     <td className="p-4">
-                      <div className="font-medium text-[#1f2937]">
+                      <div className="font-medium text-[#222222]">
                         {u.firstName} {u.lastName}
-                        {isSelf && <span className="ml-2 text-xs text-[#C49A6C]">(you)</span>}
+                        {isSelf && <span className="ml-2 text-xs text-[#2563EB]">(you)</span>}
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="text-[#1f2937]">{u.email}</div>
+                      <div className="text-[#222222]">{u.email}</div>
                       <div className="text-xs text-[#6b7280]">{u.phone || '-'}</div>
                     </td>
                     <td className="p-4">
@@ -321,7 +321,7 @@ function AdminUsers() {
                             { value: 'HOST', label: 'Host' },
                             { value: 'ADMIN', label: 'Admin' },
                           ]}
-                          triggerClassName="px-3 py-1.5 bg-white text-[#1f2937] rounded-lg text-xs shadow-sm"
+                          triggerClassName="px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#222222] rounded-lg text-xs"
                           ariaLabel="Change role"
                         />
                       )}
@@ -337,7 +337,7 @@ function AdminUsers() {
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => openEdit(u)}
-                          className="text-xs font-semibold text-[#C49A6C] hover:text-[#0B0B45] transition-colors"
+                          className="text-xs font-semibold text-[#2563EB] hover:text-[#222222] transition-colors"
                         >
                           Edit
                         </button>
@@ -353,7 +353,7 @@ function AdminUsers() {
                             <button
                               onClick={() => openPasswordReset(u)}
                               disabled={busy}
-                              className="text-xs font-semibold text-[#0B0B45] hover:text-[#C49A6C] transition-colors disabled:opacity-50"
+                              className="text-xs font-semibold text-[#222222] hover:text-[#2563EB] transition-colors disabled:opacity-50"
                             >
                               Set password
                             </button>
@@ -391,9 +391,9 @@ function AdminUsers() {
       {/* Password replacement modal */}
       {passwordTarget && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closePasswordReset}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b border-[#D9D9D9]">
-              <h2 className="text-lg font-bold text-[#0B0B45]">Set user password</h2>
+          <div className="bg-white rounded-[14px] shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+            <div className="p-6 border-b border-[#E5E7EB]">
+              <h2 className="text-lg font-bold text-[#222222]">Set user password</h2>
               <p className="text-sm text-[#6b7280] mt-2">
                 Set a replacement password for {passwordTarget.firstName} {passwordTarget.lastName}. This immediately signs them out on all devices. Share it with them securely.
               </p>
@@ -401,7 +401,7 @@ function AdminUsers() {
             <form onSubmit={handlePasswordReset} className="p-6 space-y-4" autoComplete="off">
               {passwordError && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm" role="alert">{passwordError}</div>}
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1" htmlFor="admin-new-password">New password</label>
+                <label className="block text-sm font-semibold text-[#222222] mb-1" htmlFor="admin-new-password">New password</label>
                 <input
                   id="admin-new-password"
                   type="password"
@@ -409,12 +409,12 @@ function AdminUsers() {
                   onChange={(e) => setReplacementPassword(e.target.value)}
                   minLength={8}
                   required
-                  className="w-full px-3 py-2 rounded-xl bg-white text-[#1f2937] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
                 />
                 <p className="text-xs text-[#6b7280] mt-1">At least 8 characters, with an uppercase letter and a number.</p>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1" htmlFor="admin-confirm-password">Confirm new password</label>
+                <label className="block text-sm font-semibold text-[#222222] mb-1" htmlFor="admin-confirm-password">Confirm new password</label>
                 <input
                   id="admin-confirm-password"
                   type="password"
@@ -422,12 +422,12 @@ function AdminUsers() {
                   onChange={(e) => setConfirmReplacementPassword(e.target.value)}
                   minLength={8}
                   required
-                  className="w-full px-3 py-2 rounded-xl bg-white text-[#1f2937] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
+                  className="w-full min-h-[44px] px-3 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={closePasswordReset} disabled={busyId === passwordTarget.id} className="px-5 py-2 rounded-full text-sm font-semibold text-[#6b7280] hover:text-[#0B0B45] disabled:opacity-50">Cancel</button>
-                <button type="submit" disabled={busyId === passwordTarget.id} className="bg-[#0B0B45] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#06062a] disabled:opacity-50">
+                <button type="button" onClick={closePasswordReset} disabled={busyId === passwordTarget.id} className="inline-flex items-center min-h-[44px] px-5 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] disabled:opacity-50">Cancel</button>
+                <button type="submit" disabled={busyId === passwordTarget.id} className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg text-sm hover:bg-[#1D4ED8] disabled:opacity-50">
                   {busyId === passwordTarget.id ? 'Saving...' : 'Set password'}
                 </button>
               </div>
@@ -439,10 +439,10 @@ function AdminUsers() {
       {/* Edit modal */}
       {editing && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closeEdit}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-[#D9D9D9]">
-              <h2 className="text-lg font-bold text-[#0B0B45]">Edit {editing.firstName} {editing.lastName}</h2>
-              <button onClick={closeEdit} className="text-[#6b7280] hover:text-[#0B0B45] text-xl leading-none">&times;</button>
+          <div className="bg-white rounded-[14px] shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-6 border-b border-[#E5E7EB]">
+              <h2 className="text-lg font-bold text-[#222222]">Edit {editing.firstName} {editing.lastName}</h2>
+              <button onClick={closeEdit} className="text-[#6b7280] hover:text-[#222222] text-xl leading-none">&times;</button>
             </div>
             <form onSubmit={handleSave} className="p-6 space-y-4">
               {formError && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{formError}</div>}
@@ -454,15 +454,15 @@ function AdminUsers() {
               <Field label="Email" type="email" value={formData.email} onChange={(v) => setFormData({ ...formData, email: v })} />
               <Field label="Phone" value={formData.phone} onChange={(v) => setFormData({ ...formData, phone: v })} />
 
-              <div className="pt-2 border-t border-[#D9D9D9]">
-                <p className="text-sm font-semibold text-[#0B0B45] mt-3 mb-1">Host Payout Details</p>
+              <div className="pt-2 border-t border-[#E5E7EB]">
+                <p className="text-sm font-semibold text-[#222222] mt-3 mb-1">Host Payout Details</p>
                 <p className="text-xs text-[#6b7280] mb-3">Used for bank transfers to hosts. Leave blank for non-hosts.</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Bank Name" value={formData.bankName} onChange={(v) => setFormData({ ...formData, bankName: v })} />
                   <Field label="Account No." value={formData.bankAccountNo} onChange={(v) => setFormData({ ...formData, bankAccountNo: v })} />
                   <Field label="Bank Code" value={formData.bankCode} onChange={(v) => setFormData({ ...formData, bankCode: v })} />
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-1">Payout Frequency</label>
+                    <label className="block text-sm font-semibold text-[#222222] mb-1">Payout Frequency</label>
                     <Dropdown
                       value={formData.payoutFrequency}
                       onChange={(v) => setFormData({ ...formData, payoutFrequency: v })}
@@ -472,7 +472,7 @@ function AdminUsers() {
                         { value: 'biweekly', label: 'Biweekly' },
                         { value: 'monthly', label: 'Monthly' },
                       ]}
-                      triggerClassName="w-full px-3 py-2 bg-white text-[#1f2937] rounded-xl text-sm shadow-sm"
+                      triggerClassName="w-full min-h-[44px] px-3 py-2 bg-white border border-[#E5E7EB] text-[#222222] rounded-xl text-sm"
                       ariaLabel="Payout frequency"
                     />
                   </div>
@@ -480,10 +480,10 @@ function AdminUsers() {
               </div>
 
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={closeEdit} className="px-5 py-2 rounded-full text-sm font-semibold text-[#6b7280] hover:text-[#0B0B45] transition-colors">
+                <button type="button" onClick={closeEdit} className="inline-flex items-center min-h-[44px] px-5 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors">
                   Cancel
                 </button>
-                <button type="submit" disabled={saving} className="bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50">
+                <button type="submit" disabled={saving} className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50">
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
@@ -495,7 +495,7 @@ function AdminUsers() {
       {/* Account erasure modal */}
       {deleteTarget && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closeDelete}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white rounded-[14px] shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 border-b border-red-100">
               <h2 className="text-lg font-bold text-red-700">Delete user account</h2>
               <p className="text-sm text-[#6b7280] mt-2">
@@ -507,36 +507,36 @@ function AdminUsers() {
             <div className="p-6 space-y-4">
               {deleteError && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{deleteError}</div>}
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Reason for deletion</label>
+                <label className="block text-sm font-semibold text-[#222222] mb-1">Reason for deletion</label>
                 <textarea
                   value={deleteReason}
                   onChange={(e) => { setDeleteReason(e.target.value); setDeleteError(''); }}
                   rows={3}
                   maxLength={500}
                   placeholder="For example: Customer requested account erasure"
-                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-red-400"
+                  className="w-full px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-red-400"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">
+                <label className="block text-sm font-semibold text-[#222222] mb-1">
                   Type <span className="font-mono text-red-700">DELETE</span> to confirm
                 </label>
                 <input
                   type="text"
                   value={deleteConfirm}
                   onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
-                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-red-400"
+                  className="w-full px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-red-400"
                 />
               </div>
               <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={closeDelete} disabled={Boolean(busyId)} className="px-5 py-2 rounded-full text-sm font-semibold text-[#6b7280] hover:text-[#0B0B45] disabled:opacity-50">
+                <button type="button" onClick={closeDelete} disabled={Boolean(busyId)} className="inline-flex items-center min-h-[44px] px-5 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] disabled:opacity-50">
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleDeleteUser}
                   disabled={Boolean(busyId) || deleteConfirm !== 'DELETE' || deleteReason.trim().length < 3}
-                  className="bg-red-600 text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-red-700 disabled:opacity-50"
+                  className="bg-red-600 text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg text-sm hover:bg-red-700 disabled:opacity-50"
                 >
                   {busyId ? 'Deleting...' : 'Delete account'}
                 </button>
@@ -552,12 +552,12 @@ function AdminUsers() {
 function Field({ label, value, onChange, type = 'text' }) {
   return (
     <div>
-      <label className="block text-sm font-semibold text-[#1f2937] mb-1">{label}</label>
+      <label className="block text-sm font-semibold text-[#222222] mb-1">{label}</label>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-xl bg-white text-[#1f2937] text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
+        className="w-full min-h-[44px] px-3 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
       />
     </div>
   );
