@@ -603,9 +603,17 @@ function Navbar({ solid = false }) {
         </div>
 
         {/* Secondary navigation drawer */}
+        {menuOpen && (
+          <button
+            type="button"
+            aria-label="Close menu"
+            onClick={() => setMenuOpen(false)}
+            className="fixed inset-0 top-16 z-10 bg-black/20"
+          />
+        )}
         <div
           id="navbar-main"
-          className={`fixed right-0 top-16 h-[calc(100dvh-4rem)] w-full max-w-sm overflow-y-auto bg-white border-l border-[#E5E7EB] shadow-2xl transition-transform duration-200 ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+          className={`fixed right-0 top-16 z-30 h-[calc(100dvh-4rem)] w-full max-w-sm overflow-y-auto border-l border-[#E5E7EB] bg-white shadow-2xl transition-transform duration-200 ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
         >
           <ul className="px-2 py-3 space-y-1 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain">
             {navItems.map((item) => {
