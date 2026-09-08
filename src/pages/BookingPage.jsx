@@ -592,7 +592,7 @@ function BookingPage() {
       <button
         onClick={() => setStep(2)}
         disabled={!bookingData.checkIn || !bookingData.checkOut || pricing.nights <= 0 || !bedOption}
-        className="w-full min-h-[44px] bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full min-h-[44px] bg-[#C49A6C] text-white py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Continue
       </button>
@@ -759,7 +759,7 @@ function BookingPage() {
       <button
         onClick={goToAddOns}
         disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone || creatingBooking}
-        className="w-full min-h-[44px] bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full min-h-[44px] bg-[#C49A6C] text-white py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {creatingBooking ? 'Starting your booking...' : 'Continue to extras'}
       </button>
@@ -865,7 +865,7 @@ function BookingPage() {
 
       <button
         onClick={() => setStep(4)}
-        className="w-full min-h-[44px] bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200"
+        className="w-full min-h-[44px] bg-[#C49A6C] text-white py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200"
       >
         Continue to Payment
       </button>
@@ -1051,7 +1051,7 @@ function BookingPage() {
         <button
           type="submit"
           disabled={isProcessing}
-          className="w-full min-h-[44px] bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full min-h-[44px] bg-[#C49A6C] text-white py-4 rounded-lg font-bold hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
         >
           {isProcessing ? (
             <>
@@ -1127,7 +1127,7 @@ function BookingPage() {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/')}
-                className="w-full min-h-[44px] bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all duration-200"
+                className="w-full min-h-[44px] bg-[#C49A6C] text-white py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200"
               >
                 Return to Home
               </button>
@@ -1179,7 +1179,7 @@ function BookingPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
                 onClick={() => window.location.reload()}
-                className="min-h-[44px] px-6 py-2.5 rounded-lg font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200"
+                className="min-h-[44px] px-6 py-2.5 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
               >
                 Try again
               </button>
