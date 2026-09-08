@@ -272,6 +272,10 @@ export default function ShortlistsPage() {
             </button>
           )}
         </div>
+        <div className="mt-5 flex items-center gap-5 border-b border-[#E5E7EB]" role="tablist" aria-label="Saved stays">
+          <Link to="/favourites" role="tab" aria-selected="false" className="border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-[#6b7280] hover:text-[#222222]">All saved</Link>
+          <Link to="/shortlists" role="tab" aria-selected="true" className="border-b-2 border-[#2563EB] px-1 pb-3 text-sm font-semibold text-[#2563EB]">My lists ({shortlists.length})</Link>
+        </div>
         <p className="text-sm text-[#6b7280] mb-8">Save and organize your favourite properties into shareable collections.</p>
 
         {showCreate && (
