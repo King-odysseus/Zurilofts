@@ -69,7 +69,7 @@ function AdminPayouts() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-bold text-[#0B0B45]">Payouts</h1>
+        <h1 className="text-2xl font-bold text-[#222222]">Payouts</h1>
         <div className="flex items-center gap-3">
           <Dropdown
             value={statusFilter}
@@ -82,13 +82,13 @@ function AdminPayouts() {
               { value: 'FAILED', label: 'Failed' },
               { value: 'REVERSED', label: 'Reversed' },
             ]}
-            triggerClassName=" px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm"
+            triggerClassName=" min-h-[44px] px-4 py-2 bg-white border border-[#E5E7EB] text-[#222222] rounded-xl text-sm"
             ariaLabel="Filter by status"
           />
           <button
             onClick={runScheduled}
             disabled={scheduledRunning}
-            className="bg-[#0B0B45] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#06062a] transition-colors disabled:opacity-50"
+            className="bg-[#2563EB] text-white text-sm font-semibold min-h-[44px] px-4 py-2 rounded-lg hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
           >
             {scheduledRunning ? 'Running...' : 'Run Scheduled Payouts'}
           </button>
@@ -103,7 +103,7 @@ function AdminPayouts() {
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-[#6b7280]">Loading payouts...</p>
         </div>
       ) : payouts.length === 0 ? (
@@ -111,24 +111,24 @@ function AdminPayouts() {
           <p className="text-[#6b7280]">No payouts found</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-lg overflow-x-auto">
+        <div className="bg-white rounded-[14px] shadow-lg overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#D9D9D9] text-left">
-                <th className="p-4 font-semibold text-[#0B0B45]">Host</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Amount (KES)</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Bookings</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Status</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Initiated</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Completed</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Actions</th>
+              <tr className="border-b border-[#E5E7EB] text-left">
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Host</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Amount (KES)</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Bookings</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Initiated</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Completed</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Actions</th>
               </tr>
             </thead>
             <tbody>
               {payouts.map((p) => (
-                <tr key={p.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#0B0B45]/5">
+                <tr key={p.id} className="border-b border-[#E5E7EB]/50 hover:bg-[#222222]/5">
                   <td className="p-4">
-                    <div className="font-medium text-[#1f2937]">
+                    <div className="font-medium text-[#222222]">
                       {p.host?.firstName} {p.host?.lastName}
                     </div>
                     <div className="text-xs text-[#6b7280]">{p.host?.email}</div>
@@ -153,7 +153,7 @@ function AdminPayouts() {
                       <button
                         onClick={() => triggerPayout(p.hostId)}
                         disabled={triggering === p.hostId}
-                        className="text-xs font-semibold text-[#C49A6C] hover:text-[#0B0B45] transition-colors disabled:opacity-50"
+                        className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors disabled:opacity-50"
                       >
                         {triggering === p.hostId ? '...' : 'Retry'}
                       </button>
