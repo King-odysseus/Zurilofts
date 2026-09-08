@@ -170,10 +170,10 @@ function AdminAddOns() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#0B0B45]">Add-ons</h1>
+        <h1 className="text-2xl font-bold text-[#222222]">Add-ons</h1>
         <button
           onClick={openCreate}
-          className="bg-[#C49A6C] text-white px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
+          className="bg-[#2563EB] text-white min-h-[44px] px-5 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200 text-sm"
         >
           + Create Add-on
         </button>
@@ -182,43 +182,43 @@ function AdminAddOns() {
       {/* Create / Edit Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-bold text-[#0B0B45] mb-4">{editingId ? 'Edit Add-on' : 'Create Add-on'}</h2>
+          <div className="bg-white rounded-[14px] p-6 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-lg font-bold text-[#222222] mb-4">{editingId ? 'Edit Add-on' : 'Create Add-on'}</h2>
             {formError && <div className="bg-red-50 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{formError}</div>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Name</label>
+                <label className="block text-sm font-semibold text-[#222222] mb-1">Name</label>
                 <input
                   type="text" value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] bg-white text-[#1f2937]"
+                  className="w-full min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 bg-white text-[#222222]"
                   placeholder="Airport pickup" required
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Description</label>
+                <label className="block text-sm font-semibold text-[#222222] mb-1">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] bg-white text-[#1f2937] h-20 resize-none"
+                  className="w-full min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 bg-white text-[#222222] h-20 resize-none"
                   placeholder="Describe the service" required
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-1">Price (KES)</label>
+                  <label className="block text-sm font-semibold text-[#222222] mb-1">Price (KES)</label>
                   <input
                     type="number" value={formData.price}
                     onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] bg-white" min="1" required
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 bg-white" min="1" required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-1">Category</label>
+                  <label className="block text-sm font-semibold text-[#222222] mb-1">Category</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] bg-white text-[#1f2937]"
+                    className="w-full min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 bg-white text-[#222222]"
                   >
                     {CATEGORIES.map((c) => (
                       <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
@@ -227,11 +227,11 @@ function AdminAddOns() {
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Image URL (optional)</label>
+                <label className="block text-sm font-semibold text-[#222222] mb-1">Image URL (optional)</label>
                 <input
                   type="text" value={formData.image}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] bg-white text-[#1f2937]"
+                  className="w-full min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 bg-white text-[#222222]"
                   placeholder="https://..."
                 />
               </div>
@@ -240,15 +240,15 @@ function AdminAddOns() {
                   type="checkbox"
                   checked={formData.active}
                   onChange={(e) => setFormData({ ...formData, active: e.target.checked })}
-                  className="w-4 h-4 accent-[#C49A6C]"
+                  className="w-4 h-4 accent-[#2563EB]"
                 />
-                <span className="text-sm font-semibold text-[#1f2937]">Active</span>
+                <span className="text-sm font-semibold text-[#222222]">Active</span>
               </label>
 
               {/* Property assignment - only when editing an existing add-on */}
               {editingId && (
                 <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-2">Assigned to Properties</label>
+                  <label className="block text-sm font-semibold text-[#222222] mb-2">Assigned to Properties</label>
                   <div className="shadow-sm rounded-xl p-3 max-h-40 overflow-y-auto">
                     {properties.length === 0 ? (
                       <p className="text-xs text-[#6b7280]">No properties available.</p>
@@ -262,9 +262,9 @@ function AdminAddOns() {
                               checked={assigned}
                               onChange={() => toggleAssignment(prop.id, editingId, assigned)}
                               disabled={assigning}
-                              className="w-4 h-4 accent-[#C49A6C]"
+                              className="w-4 h-4 accent-[#2563EB]"
                             />
-                            <span className="text-sm text-[#1f2937]">{prop.title}</span>
+                            <span className="text-sm text-[#222222]">{prop.title}</span>
                           </label>
                         );
                       })
@@ -275,10 +275,10 @@ function AdminAddOns() {
               )}
 
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={closeForm} className="flex-1 py-2.5 rounded-full font-semibold text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#0B0B45] transition-shadow text-sm">
+                <button type="button" onClick={closeForm} className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-shadow text-sm">
                   Cancel
                 </button>
-                <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 text-sm disabled:opacity-50">
+                <button type="submit" disabled={saving} className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 text-sm disabled:opacity-50">
                   {saving ? (editingId ? 'Saving...' : 'Creating...') : (editingId ? 'Save Changes' : 'Create')}
                 </button>
               </div>
@@ -290,37 +290,37 @@ function AdminAddOns() {
       {/* Table */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-[14px] shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-canvas border-b border-[#D9D9D9]">
+              <thead className="bg-canvas border-b border-[#E5E7EB]">
                 <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Name</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Category</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Price</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Properties</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Status</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#0B0B45]">Actions</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Name</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Category</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Price</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Properties</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th>
+                  <th className="text-right py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {addOns.map((a) => {
                   const assignedProps = assignments[a.id] || new Set();
                   return (
-                    <tr key={a.id} className="border-b border-[#D9D9D9]/50 hover:bg-canvas">
-                      <td className="py-3 px-4 font-semibold text-[#0B0B45]">{a.name}</td>
+                    <tr key={a.id} className="border-b border-[#E5E7EB]/50 hover:bg-canvas">
+                      <td className="py-3 px-4 font-semibold text-[#222222]">{a.name}</td>
                       <td className="py-3 px-4">
-                        <span className="px-2.5 py-0.5 bg-[#C49A6C]/10 text-[#0B0B45] rounded-full text-xs font-semibold capitalize">
+                        <span className="px-2.5 py-0.5 bg-[#2563EB]/10 text-[#222222] rounded-full text-xs font-semibold capitalize">
                           {CATEGORY_LABELS[a.category] || a.category}
                         </span>
                       </td>
                       <td className="py-3 px-4">KES {a.price.toLocaleString()}</td>
                       <td className="py-3 px-4 text-xs">
                         {assignedProps.size > 0 ? (
-                          <span className="text-[#0B0B45]">{assignedProps.size} property{assignedProps.size > 1 ? 'ies' : 'y'}</span>
+                          <span className="text-[#222222]">{assignedProps.size} property{assignedProps.size > 1 ? 'ies' : 'y'}</span>
                         ) : (
                           <span className="text-[#6b7280]">None</span>
                         )}
@@ -339,7 +339,7 @@ function AdminAddOns() {
                         <div className="flex items-center justify-end space-x-2">
                           <button
                             onClick={() => openEdit(a)}
-                            className="px-3 py-1.5 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#C49A6C] transition-shadow"
+                            className="px-3 py-1.5 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#2563EB] transition-shadow"
                           >
                             Edit
                           </button>

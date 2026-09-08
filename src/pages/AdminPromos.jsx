@@ -113,10 +113,10 @@ function AdminPromos() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#0B0B45]">Promo Codes</h1>
+        <h1 className="text-2xl font-bold text-[#222222]">Promo Codes</h1>
         <button
           onClick={openCreate}
-          className="bg-[#C49A6C] text-white px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
+          className="bg-[#2563EB] text-white min-h-[44px] px-5 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200 text-sm"
         >
           + Create Promo
         </button>
@@ -125,76 +125,76 @@ function AdminPromos() {
       {/* Create / Edit Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
-            <h2 className="text-lg font-bold text-[#0B0B45] mb-4">{editingId ? 'Edit Promo Code' : 'Create Promo Code'}</h2>
+          <div className="bg-white rounded-[14px] p-6 w-full max-w-md shadow-xl">
+            <h2 className="text-lg font-bold text-[#222222] mb-4">{editingId ? 'Edit Promo Code' : 'Create Promo Code'}</h2>
             {formError && <div className="bg-red-50 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{formError}</div>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Code</label>
+                <label className="block text-sm font-semibold text-[#222222] mb-1">Code</label>
                 <input
                   type="text" value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white text-[#1f2937] uppercase"
+                  className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none bg-white text-[#222222] uppercase"
                   placeholder="SUMMER2026" required
                 />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-1">Discount %</label>
+                  <label className="block text-sm font-semibold text-[#222222] mb-1">Discount %</label>
                   <input
                     type="number" value={formData.discountPercent}
                     onChange={(e) => setFormData({ ...formData, discountPercent: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" min="1" max="100" required
+                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none bg-white" min="1" max="100" required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-1">Max Discount (KES)</label>
+                  <label className="block text-sm font-semibold text-[#222222] mb-1">Max Discount (KES)</label>
                   <input
                     type="number" value={formData.maxDiscount}
                     onChange={(e) => setFormData({ ...formData, maxDiscount: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="Optional"
+                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="Optional"
                   />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-1">Valid From</label>
+                  <label className="block text-sm font-semibold text-[#222222] mb-1">Valid From</label>
                   <input
                     type="date" value={formData.validFrom}
                     onChange={(e) => setFormData({ ...formData, validFrom: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" required
+                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none bg-white" required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-1">Valid Until</label>
+                  <label className="block text-sm font-semibold text-[#222222] mb-1">Valid Until</label>
                   <input
                     type="date" value={formData.validUntil}
                     onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" required
+                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none bg-white" required
                   />
                 </div>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-1">Max Uses</label>
+                  <label className="block text-sm font-semibold text-[#222222] mb-1">Max Uses</label>
                   <input
                     type="number" value={formData.maxUses}
                     onChange={(e) => setFormData({ ...formData, maxUses: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="Unlimited"
+                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="Unlimited"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#1f2937] mb-1">Min Booking (KES)</label>
+                  <label className="block text-sm font-semibold text-[#222222] mb-1">Min Booking (KES)</label>
                   <input
                     type="number" value={formData.minBookingAmount}
                     onChange={(e) => setFormData({ ...formData, minBookingAmount: e.target.value })}
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="No minimum"
+                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none bg-white" placeholder="No minimum"
                   />
                 </div>
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-semibold text-[#1f2937]">Applies to Properties</label>
+                  <label className="text-sm font-semibold text-[#222222]">Applies to Properties</label>
                   <button
                     type="button"
                     onClick={() => {
@@ -202,7 +202,7 @@ function AdminPromos() {
                       const allSelected = allIds.length > 0 && allIds.every((id) => formData.propertyIds.includes(id));
                       setFormData({ ...formData, propertyIds: allSelected ? [] : allIds });
                     }}
-                    className="text-xs font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
+                    className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
                   >
                     {properties.length > 0 && properties.every((p) => formData.propertyIds.includes(p.id)) ? 'Clear All' : 'Select All'}
                   </button>
@@ -222,9 +222,9 @@ function AdminPromos() {
                               : formData.propertyIds.filter((id) => id !== prop.id);
                             setFormData({ ...formData, propertyIds: ids });
                           }}
-                          className="w-4 h-4 accent-[#C49A6C]"
+                          className="w-4 h-4 accent-[#2563EB]"
                         />
-                        <span className="text-sm text-[#1f2937]">{prop.title}</span>
+                        <span className="text-sm text-[#222222]">{prop.title}</span>
                       </label>
                     ))
                   )}
@@ -232,10 +232,10 @@ function AdminPromos() {
                 <p className="text-xs text-[#6b7280] mt-1">Leave unchecked to apply to all properties.</p>
               </div>
               <div className="flex gap-3 pt-2">
-                <button type="button" onClick={closeForm} className="flex-1 py-2.5 rounded-full font-semibold text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#0B0B45] transition-colors text-sm">
+                <button type="button" onClick={closeForm} className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors text-sm">
                   Cancel
                 </button>
-                <button type="submit" disabled={saving} className="flex-1 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 text-sm disabled:opacity-50">
+                <button type="submit" disabled={saving} className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 text-sm disabled:opacity-50">
                   {saving ? (editingId ? 'Saving...' : 'Creating...') : (editingId ? 'Save Changes' : 'Create')}
                 </button>
               </div>
@@ -247,27 +247,27 @@ function AdminPromos() {
       {/* Table */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div className="bg-white rounded-[14px] shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-canvas border-b border-[#D9D9D9]">
+              <thead className="bg-canvas border-b border-[#E5E7EB]">
                 <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Code</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Discount</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Usage</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Valid Period</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Properties</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Status</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#0B0B45]">Actions</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Code</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Discount</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Usage</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Valid Period</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Properties</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th>
+                  <th className="text-right py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {promos.map((p) => (
-                  <tr key={p.id} className="border-b border-[#D9D9D9]/50 hover:bg-canvas">
-                    <td className="py-3 px-4 font-mono font-bold text-[#0B0B45]">{p.code}</td>
+                  <tr key={p.id} className="border-b border-[#E5E7EB]/50 hover:bg-canvas">
+                    <td className="py-3 px-4 font-mono font-bold text-[#222222]">{p.code}</td>
                     <td className="py-3 px-4">
                       {p.discountPercent}%
                       {p.maxDiscount && <span className="text-[#6b7280] text-xs ml-1">(max KES {p.maxDiscount.toLocaleString()})</span>}
@@ -282,7 +282,7 @@ function AdminPromos() {
                       {p.properties?.length > 0 ? (
                         <span className="inline-flex flex-wrap gap-1">
                           {p.properties.map((prop) => (
-                            <span key={prop.id} className="px-2 py-0.5 bg-canvas rounded-md text-[#0B0B45]">{prop.title}</span>
+                            <span key={prop.id} className="px-2 py-0.5 bg-canvas rounded-md text-[#222222]">{prop.title}</span>
                           ))}
                         </span>
                       ) : (
@@ -303,7 +303,7 @@ function AdminPromos() {
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => openEdit(p)}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#C49A6C] transition-colors"
+                          className="px-3 py-1.5 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#2563EB] transition-colors"
                         >
                           Edit
                         </button>
