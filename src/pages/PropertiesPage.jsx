@@ -266,8 +266,8 @@ function PropertiesPage() {
       {/* Compact Search Header */}
       <section className="bg-white border-b border-[#E5E7EB] pt-24 pb-8 md:pb-10">
         <div className="w-full mx-auto text-center px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#222222] mb-1">Find your stay</h1>
-          <p className="text-[#6b7280] text-sm mb-5 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#222222] mb-2">Find your place in Nairobi</h1>
+          <p className="text-[#6b7280] text-sm mb-6 md:mb-7">
             Premium furnished apartments in Nairobi&apos;s most desirable neighbourhoods.
           </p>
           <div className="max-w-3xl mx-auto">
