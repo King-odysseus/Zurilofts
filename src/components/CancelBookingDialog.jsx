@@ -5,6 +5,8 @@ import { useToast } from '../context/ToastContext.jsx';
 
 /** A booking a guest may still cancel themselves: an unpaid PENDING request, or
  *  a CONFIRMED stay whose check-in day has not yet begun. */
+// This utility is intentionally exported alongside the dialog for booking-card guards.
+// eslint-disable-next-line react-refresh/only-export-components
 export function canCancelBooking(booking) {
   if (!booking) return false;
   if (booking.status === 'PENDING') return true;
