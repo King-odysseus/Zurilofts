@@ -208,7 +208,7 @@ export default function ShortlistDetailPage() {
             <p className="text-[#6b7280] mb-4">{error}</p>
             <button
               onClick={fetchShortlist}
-              className="min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
+              className="min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
             >
               Try again
             </button>
@@ -239,7 +239,7 @@ export default function ShortlistDetailPage() {
                       autoFocus
                       onKeyDown={(e) => { if (e.key === "Enter") handleRename(); if (e.key === "Escape") setRenaming(false); }}
                     />
-                    <button onClick={handleRename} className="min-h-[44px] px-3 py-2 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8]">Save</button>
+                    <button onClick={handleRename} className="min-h-[44px] px-3 py-2 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C]">Save</button>
                     <button onClick={() => setRenaming(false)} className="min-h-[44px] px-3 py-2 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]">Cancel</button>
                   </div>
                 ) : (
@@ -279,7 +279,7 @@ export default function ShortlistDetailPage() {
                 </p>
                 <Link
                   to="/properties"
-                  className="inline-flex items-center min-h-[44px] px-5 py-2.5 rounded-lg font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
+                  className="inline-flex items-center min-h-[44px] px-5 py-2.5 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
                 >
                   Browse properties
                 </Link>
