@@ -104,6 +104,12 @@ function AdminPayouts() {
         ].map(([label, value]) => <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p></div>)}
       </div>
 
+      <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Payout status">
+        {[['', 'All'], ['PENDING', 'Pending'], ['PROCESSING', 'Processing'], ['SUCCESS', 'Success'], ['FAILED', 'Failed']].map(([value, label]) => (
+          <button key={value || 'all'} type="button" role="tab" aria-selected={statusFilter === value} onClick={() => setStatusFilter(value)} className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${statusFilter === value ? 'bg-[#2563EB] text-white' : 'border border-[#E5E7EB] bg-white text-[#222222] hover:bg-[#F7F7F5]'}`}>{label}</button>
+        ))}
+      </div>
+
       {message && (
         <div className={`p-3 rounded-xl text-sm font-medium ${message.includes('Failed') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
           {message}
