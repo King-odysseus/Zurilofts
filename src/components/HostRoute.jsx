@@ -7,9 +7,10 @@ import { useAuth } from '../context/AuthContext.jsx';
 // admitted - applicants land straight in the dashboard and can prepare draft
 // listings while verification is still pending; only publishing and payouts are
 // gated behind an APPROVED application (enforced server-side). ADMINS are
-// intentionally excluded: they administer the platform through /admin routes
-// and are not treated as hosts. Unauthenticated visitors are sent to /login;
-// anyone else sees the Access Denied panel.
+// intentionally excluded from the host workspace: they administer the platform
+// through /admin routes and are redirected there rather than being treated as
+// hosts or shown the Access Denied panel. Unauthenticated visitors are sent to
+// /login; any other non-host/non-intent user sees the Access Denied panel.
 function HostRoute({ children }) {
   const { user, isAuthenticated, isLoading } = useAuth();
   const hasHostIntent = user?.hostApplicationStatus != null;
@@ -27,6 +28,10 @@ function HostRoute({ children }) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role === 'ADMIN') {
+    return <Navigate to="/admin" replace />;
   }
 
   if (user?.role !== 'HOST' && !hasHostIntent) {
