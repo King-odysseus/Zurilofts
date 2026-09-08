@@ -40,12 +40,14 @@ function IdentityVerificationPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
+        <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm mb-8">
         <h1 className="text-2xl font-bold text-[#222222] mb-2">Verify your identity</h1>
         <p className="text-[#6b7280] mb-8">
           {bookingId
             ? "We need to verify who you are before confirming payment. Your booking dates are held while you complete this - you won't lose your spot."
             : 'We verify every guest before confirming payment on a booking.'}
         </p>
+        </div>
 
         {bookingId && approved && (
           <div className="mb-8 bg-green-50 border border-green-200 rounded-[14px] p-5">
