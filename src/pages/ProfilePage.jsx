@@ -362,7 +362,7 @@ function ProfilePage() {
       <div className="min-h-screen bg-canvas">
         <Navbar />
         <div className="pt-24 flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
         </div>
         <Footer />
       </div>
@@ -379,12 +379,12 @@ function ProfilePage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h1 className="text-lg font-bold text-[#0B0B45] mb-2">Something went wrong</h1>
+          <h1 className="text-lg font-bold text-[#222222] mb-2">Something went wrong</h1>
           <p className="text-[#6b7280] mb-6 max-w-md text-sm">{loadError}</p>
           <button
             type="button"
             onClick={() => setReloadKey((k) => k + 1)}
-            className="bg-[#C49A6C] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+            className="min-h-[44px] bg-[#2563EB] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200"
           >
             Try Again
           </button>
@@ -410,7 +410,7 @@ function ProfilePage() {
                     className="w-16 h-16 rounded-full object-cover shadow-md"
                   />
                 ) : (
-                  <div className="w-16 h-16 bg-[#C49A6C] rounded-full flex items-center justify-center">
+                  <div className="w-16 h-16 bg-[#2563EB] rounded-full flex items-center justify-center">
                     <span className="text-white font-bold text-2xl">
                       {user?.firstName?.[0]}{user?.lastName?.[0]}
                     </span>
@@ -435,7 +435,7 @@ function ProfilePage() {
                 />
               </label>
               <div className="ml-4">
-                <h1 className="text-2xl font-bold text-[#0B0B45]">
+                <h1 className="text-2xl font-bold text-[#222222]">
                   {profile?.firstName} {profile?.lastName}
                 </h1>
                 <p className="text-[#6b7280]">{profile?.email}</p>
@@ -444,15 +444,15 @@ function ProfilePage() {
           </div>
 
           {/* Tabs */}
-          <div className="flex overflow-x-auto no-scrollbar border-b border-[#D9D9D9] mb-8">
+          <div className="flex overflow-x-auto no-scrollbar border-b border-[#E5E7EB] mb-8">
             {['info', 'bookings', 'favorites', 'verification'].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-3 font-semibold text-sm whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   activeTab === tab
-                    ? 'border-[#C49A6C] text-[#0B0B45]'
-                    : 'border-transparent text-[#6b7280] hover:text-[#0B0B45]'
+                    ? 'border-[#2563EB] text-[#222222]'
+                    : 'border-transparent text-[#6b7280] hover:text-[#222222]'
                 }`}
               >
                 {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : tab === 'verification' ? 'Verification' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
@@ -465,14 +465,14 @@ function ProfilePage() {
             <div className="space-y-10">
               <IdentityVerificationPanel />
               {(profile?.role === 'HOST' || user?.hostApplicationStatus != null) && (
-                <div className="pt-8 border-t border-[#D9D9D9]">
-                  <h3 className="text-lg font-semibold text-[#0B0B45] mb-2">Host account verification</h3>
+                <div className="pt-8 border-t border-[#E5E7EB]">
+                  <h3 className="text-lg font-semibold text-[#222222] mb-2">Host account verification</h3>
                   <p className="text-sm text-[#6b7280] mb-4">
                     Separate from guest identity verification above - this is your host business/KYC application, required before any listing can be submitted for review.
                   </p>
                   <Link
                     to="/host/application"
-                    className="inline-flex px-5 py-2.5 rounded-full text-sm font-semibold bg-[#0B0B45] text-white hover:bg-[#0B0B45]/90 transition-colors"
+                    className="inline-flex min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors"
                   >
                     Go to host verification
                   </Link>
@@ -485,18 +485,18 @@ function ProfilePage() {
           {activeTab === 'info' && (
             <div>
               {showCompletionBanner && (
-                <div className="mb-6 bg-[#C49A6C]/10 border border-[#C49A6C] rounded-2xl p-5 flex items-start gap-3">
-                  <svg className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mb-6 bg-[#2563EB]/10 border border-[#2563EB] rounded-[14px] p-5 flex items-start gap-3">
+                  <svg className="w-5 h-5 text-[#2563EB] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div>
-                    <p className="font-semibold text-[#0B0B45] text-sm">Complete your profile</p>
+                    <p className="font-semibold text-[#222222] text-sm">Complete your profile</p>
                     <p className="text-sm text-[#6b7280] mt-1">Fill in your details below to get the most out of ZuriLofts.</p>
                   </div>
                 </div>
               )}
               <div className="neu-card p-6">
-                <h2 className="text-lg font-bold text-[#0B0B45] mb-6">Personal Information</h2>
+                <h2 className="text-lg font-bold text-[#222222] mb-6">Personal Information</h2>
                 {message && (
                   <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
                     message.includes('success')
@@ -508,43 +508,43 @@ function ProfilePage() {
                 )}
                 <form onSubmit={handleProfileUpdate} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">First Name</label>
+                    <label className="block text-sm font-semibold text-[#222222] mb-2">First Name</label>
                     <input
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Last Name</label>
+                    <label className="block text-sm font-semibold text-[#222222] mb-2">Last Name</label>
                     <input
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email</label>
+                    <label className="block text-sm font-semibold text-[#222222] mb-2">Email</label>
                     <input
                       type="email"
                       value={formData.email}
                       onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
                     />
                     {emailError && (
                       <p className="text-red-500 text-xs mt-1">{emailError}</p>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label>
+                    <label className="block text-sm font-semibold text-[#222222] mb-2">Phone</label>
                     <div className="flex gap-2">
                       <Dropdown
                         value={countryCode}
                         onChange={(val) => handlePhoneChange(val, phoneNumber)}
                         options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
-                        triggerClassName=" px-3 py-3 bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0"
+                        triggerClassName=" px-3 py-3 bg-white text-[#222222] border border-[#E5E7EB] rounded-xl w-[120px] flex-shrink-0"
                         ariaLabel="Select country code"
                       />
                       <input
@@ -553,7 +553,7 @@ function ProfilePage() {
                         onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
                         maxLength={15}
                         placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
-                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] rounded-xl"
                       />
                     </div>
                     {phoneError && (
@@ -563,7 +563,7 @@ function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="bg-[#C49A6C] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                    className="min-h-[44px] bg-[#2563EB] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -571,7 +571,7 @@ function ProfilePage() {
               </div>
 
               <div className="neu-card p-6 mt-6">
-                <h2 className="text-lg font-bold text-[#0B0B45] mb-2">Change password</h2>
+                <h2 className="text-lg font-bold text-[#222222] mb-2">Change password</h2>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Choose a strong, unique password. For your security, changing it signs you out on all devices.
                 </p>
@@ -582,7 +582,7 @@ function ProfilePage() {
                 )}
                 <form onSubmit={handlePasswordChange} className="space-y-4" autoComplete="on">
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2" htmlFor="current-password">Current password</label>
+                    <label className="block text-sm font-semibold text-[#222222] mb-2" htmlFor="current-password">Current password</label>
                     <input
                       id="current-password"
                       type="password"
@@ -590,11 +590,11 @@ function ProfilePage() {
                       value={passwordForm.currentPassword}
                       onChange={(e) => setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
                       required
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2" htmlFor="new-password">New password</label>
+                    <label className="block text-sm font-semibold text-[#222222] mb-2" htmlFor="new-password">New password</label>
                     <input
                       id="new-password"
                       type="password"
@@ -603,12 +603,12 @@ function ProfilePage() {
                       onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
                       minLength={8}
                       required
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
                     />
                     <p className="text-xs text-[#6b7280] mt-1">At least 8 characters, with one uppercase letter and one number.</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2" htmlFor="confirm-password">Confirm new password</label>
+                    <label className="block text-sm font-semibold text-[#222222] mb-2" htmlFor="confirm-password">Confirm new password</label>
                     <input
                       id="confirm-password"
                       type="password"
@@ -617,13 +617,13 @@ function ProfilePage() {
                       onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
                       minLength={8}
                       required
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={passwordSaving}
-                    className="bg-[#0B0B45] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
+                    className="min-h-[44px] bg-[#2563EB] text-white font-semibold px-6 py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
                   >
                     {passwordSaving ? 'Changing password...' : 'Change password'}
                   </button>
@@ -631,11 +631,11 @@ function ProfilePage() {
               </div>
 
               {/* Privacy and data */}
-              <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
-                <h3 className="text-xl font-bold text-[#0B0B45] mb-1">Privacy and data</h3>
+              <div className="mt-10 pt-8 border-t-2 border-[#E5E7EB]">
+                <h3 className="text-xl font-bold text-[#222222] mb-1">Privacy and data</h3>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Manage your personal data and consent choices. See our{' '}
-                  <Link to="/privacy" className="text-[#C49A6C] hover:underline font-medium">Privacy Policy</Link>{' '}
+                  <Link to="/privacy" className="text-[#2563EB] hover:underline font-medium">Privacy Policy</Link>{' '}
                   for full details.
                 </p>
 
@@ -643,7 +643,7 @@ function ProfilePage() {
                   {/* Download my data */}
                   <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h4 className="font-semibold text-[#1f2937]">Download my data</h4>
+                      <h4 className="font-semibold text-[#222222]">Download my data</h4>
                       <p className="text-sm text-[#6b7280] mt-1">
                         Get a copy of the personal data we hold about you in a portable format.
                       </p>
@@ -657,7 +657,7 @@ function ProfilePage() {
                       type="button"
                       onClick={handleExportData}
                       disabled={exporting}
-                      className="flex-shrink-0 inline-flex items-center gap-2 bg-[#0B0B45] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
+                      className="flex-shrink-0 inline-flex items-center gap-2 min-h-[44px] bg-[#2563EB] text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
                     >
                       {exporting ? (
                         <>
@@ -673,7 +673,7 @@ function ProfilePage() {
                   {/* Cookie preferences */}
                   <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h4 className="font-semibold text-[#1f2937]">Cookie preferences</h4>
+                      <h4 className="font-semibold text-[#222222]">Cookie preferences</h4>
                       <p className="text-sm text-[#6b7280] mt-1">
                         Review or change which optional cookies we may use. You can withdraw consent at any time.
                       </p>
@@ -681,14 +681,14 @@ function ProfilePage() {
                     <button
                       type="button"
                       onClick={openConsentManager}
-                      className="flex-shrink-0 bg-[#0B0B45] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200"
+                      className="flex-shrink-0 min-h-[44px] bg-[#2563EB] text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200"
                     >
                       Manage preferences
                     </button>
                   </div>
 
                   {/* Delete my account */}
-                  <div className="rounded-2xl border-2 border-red-200 bg-red-50/50 p-5">
+                  <div className="rounded-[14px] border-2 border-red-200 bg-red-50/50 p-5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
                         <h4 className="font-semibold text-red-700">Delete my account</h4>
@@ -701,7 +701,7 @@ function ProfilePage() {
                       <button
                         type="button"
                         onClick={() => { setShowDeleteDialog(true); setDeleteConfirm(''); setDeleteError(''); }}
-                        className="flex-shrink-0 bg-red-600 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-red-700 transition-all duration-200"
+                        className="flex-shrink-0 min-h-[44px] bg-red-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-red-700 transition-all duration-200"
                       >
                         Delete my account
                       </button>
@@ -709,7 +709,7 @@ function ProfilePage() {
 
                     {showDeleteDialog && (
                       <div className="mt-5 pt-5 border-t border-red-200">
-                        <p className="text-sm font-semibold text-[#1f2937] mb-2">
+                        <p className="text-sm font-semibold text-[#222222] mb-2">
                           To confirm, type <span className="font-mono font-bold text-red-700">DELETE</span> below.
                         </p>
                         <input
@@ -717,7 +717,7 @@ function ProfilePage() {
                           value={deleteConfirm}
                           onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
                           placeholder="Type DELETE to confirm"
-                          className="neu-input w-full sm:w-72 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                          className="neu-input w-full sm:w-72 px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] rounded-xl"
                         />
                         {deleteError && <p className="text-red-500 text-xs mt-2">{deleteError}</p>}
                         <div className="flex gap-3 mt-4">
@@ -725,7 +725,7 @@ function ProfilePage() {
                             type="button"
                             onClick={handleDeleteAccount}
                             disabled={deleteConfirm !== 'DELETE' || deleting}
-                            className="bg-red-600 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-red-700 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="min-h-[44px] bg-red-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-red-700 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             {deleting ? 'Deleting...' : 'Permanently delete my account'}
                           </button>
@@ -733,7 +733,7 @@ function ProfilePage() {
                             type="button"
                             onClick={() => setShowDeleteDialog(false)}
                             disabled={deleting}
-                            className="px-5 py-2.5 rounded-full text-[#1f2937] text-sm font-semibold shadow-sm hover:shadow-md hover:bg-canvas transition-colors duration-200 disabled:opacity-50"
+                            className="min-h-[44px] px-5 py-2.5 rounded-lg border border-[#E5E7EB] text-[#222222] text-sm font-semibold hover:bg-canvas transition-colors duration-200 disabled:opacity-50"
                           >
                             Cancel
                           </button>
@@ -748,17 +748,17 @@ function ProfilePage() {
 
           {/* Payout Settings - HOST only */}
           {activeTab === 'info' && profile?.role === 'HOST' && (
-            <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
-              <h3 className="text-xl font-bold text-[#0B0B45] mb-1">Payout Settings</h3>
+            <div className="mt-10 pt-8 border-t-2 border-[#E5E7EB]">
+              <h3 className="text-xl font-bold text-[#222222] mb-1">Payout Settings</h3>
               <p className="text-sm text-[#6b7280] mb-6">
                 Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
               </p>
 
               {/* Payout destination */}
               <form onSubmit={handlePayoutDestinationSave} className="space-y-4 mb-8">
-                <h4 className="font-semibold text-[#1f2937]">Payout Destination</h4>
+                <h4 className="font-semibold text-[#222222]">Payout Destination</h4>
 
-                <div className="grid grid-cols-2 gap-2 rounded-full bg-[#0B0B45]/5 p-1">
+                <div className="grid grid-cols-2 gap-2 rounded-full bg-[#222222]/5 p-1">
                   {[
                     { value: 'bank', label: 'Bank account' },
                     { value: 'mpesa', label: 'M-PESA' },
@@ -769,8 +769,8 @@ function ProfilePage() {
                       onClick={() => setPayoutMethod(option.value)}
                       className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                         payoutMethod === option.value
-                          ? 'bg-[#0B0B45] text-white shadow-sm'
-                          : 'text-[#6b7280] hover:text-[#0B0B45]'
+                          ? 'bg-[#2563EB] text-white shadow-sm'
+                          : 'text-[#6b7280] hover:text-[#222222]'
                       }`}
                     >
                       {option.label}
@@ -781,7 +781,7 @@ function ProfilePage() {
                 {payoutMethod === 'bank' ? (
                   <>
                     <div>
-                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Bank Name *</label>
+                      <label className="block text-sm font-semibold text-[#222222] mb-2">Bank Name *</label>
                       {banksLoading ? (
                         <p className="text-sm text-[#6b7280]">Loading banks...</p>
                       ) : banks.length > 0 ? (
@@ -792,7 +792,7 @@ function ProfilePage() {
                             setBankForm((prev) => ({ ...prev, bankCode: code, bankName: bank?.name || '' }));
                           }}
                           options={banks.map((b) => ({ value: b.code, label: b.name }))}
-                          triggerClassName=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl"
+                          triggerClassName=" w-full px-4 py-3 focus:outline-none bg-white text-[#222222] border border-[#E5E7EB] rounded-xl"
                           ariaLabel="Select your bank"
                         />
                       ) : (
@@ -801,35 +801,35 @@ function ProfilePage() {
                           value={bankForm.bankName}
                           onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
                           placeholder="e.g. KCB Bank"
-                          className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                          className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
                           required
                         />
                       )}
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Account Number *</label>
+                      <label className="block text-sm font-semibold text-[#222222] mb-2">Account Number *</label>
                       <input
                         type="text"
                         value={bankForm.bankAccountNo}
                         onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 20) }))}
                         maxLength={20}
                         placeholder="Bank account number"
-                        className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                        className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
                         required
                       />
                     </div>
                   </>
                 ) : (
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Safaricom M-PESA Number *</label>
+                    <label className="block text-sm font-semibold text-[#222222] mb-2">Safaricom M-PESA Number *</label>
                     <input
                       type="tel"
                       value={mpesaPhone}
                       onChange={(e) => setMpesaPhone(e.target.value)}
                       placeholder="0712 345 678"
                       autoComplete="tel"
-                      className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                      className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
                       required
                     />
                     <p className="text-xs text-[#6b7280] mt-2">Use the Safaricom number registered to receive your host payouts.</p>
@@ -839,7 +839,7 @@ function ProfilePage() {
                 <button
                   type="submit"
                   disabled={bankSaving}
-                  className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 text-sm"
+                  className="min-h-[44px] bg-[#2563EB] text-white font-semibold px-6 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50 text-sm"
                 >
                   {bankSaving ? 'Saving...' : 'Save Payout Destination'}
                 </button>
@@ -847,7 +847,7 @@ function ProfilePage() {
 
               {/* Payout Frequency */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-[#1f2937]">Payout Frequency</h4>
+                <h4 className="font-semibold text-[#222222]">Payout Frequency</h4>
                 <p className="text-xs text-[#6b7280]">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
                 <div className="flex items-center gap-3">
                   <Dropdown
@@ -858,14 +858,14 @@ function ProfilePage() {
                       { value: 'biweekly', label: 'Bi-Weekly (every other Monday)' },
                       { value: 'monthly', label: 'Monthly (1st of month)' },
                     ]}
-                    triggerClassName=" px-4 py-3 bg-white text-[#1f2937] rounded-xl w-64"
+                    triggerClassName=" px-4 py-3 bg-white text-[#222222] border border-[#E5E7EB] rounded-xl w-64"
                     ariaLabel="Select payout frequency"
                   />
                   <button
                     type="button"
                     onClick={handleFrequencySave}
                     disabled={bankSaving}
-                    className="bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50 text-sm"
+                    className="min-h-[44px] bg-[#2563EB] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50 text-sm"
                   >
                     Save
                   </button>
@@ -885,12 +885,12 @@ function ProfilePage() {
             <div className="space-y-4">
               {bookings.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-[#E5E7EB] rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[#0B0B45] mb-1">No bookings yet</h3>
+                  <h3 className="text-lg font-bold text-[#222222] mb-1">No bookings yet</h3>
                   <p className="text-[#6b7280]">Your upcoming stays will appear here.</p>
                 </div>
               ) : (
@@ -907,7 +907,7 @@ function ProfilePage() {
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-bold text-[#0B0B45]">{booking.property?.title}</h3>
+                            <h3 className="font-bold text-[#222222]">{booking.property?.title}</h3>
                             <p className="text-sm text-[#6b7280]">{booking.property?.location}</p>
                           </div>
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[booking.status]}`}>
@@ -925,7 +925,7 @@ function ProfilePage() {
                           </div>
                           <div>
                             <span className="text-[#6b7280]">Total</span>
-                            <p className="font-semibold text-[#C49A6C]">KES {booking.total.toLocaleString()}</p>
+                            <p className="font-semibold text-[#2563EB]">KES {booking.total.toLocaleString()}</p>
                           </div>
                         </div>
                         {booking.promoCode && (
@@ -938,13 +938,13 @@ function ProfilePage() {
 
                         {/* Post-stay review */}
                         {booking.review ? (
-                          <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
-                            <p className="text-sm font-semibold text-[#0B0B45] mb-1">Your rating</p>
+                          <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
+                            <p className="text-sm font-semibold text-[#222222] mb-1">Your rating</p>
                             <div className="flex items-center gap-1">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <svg
                                   key={star}
-                                  className={`w-5 h-5 ${star <= booking.review.rating ? 'text-[#C49A6C]' : 'text-[#D9D9D9]'}`}
+                                  className={`w-5 h-5 ${star <= booking.review.rating ? 'text-[#2563EB]' : 'text-[#E5E7EB]'}`}
                                   fill="currentColor"
                                   viewBox="0 0 20 20"
                                 >
@@ -955,8 +955,8 @@ function ProfilePage() {
                             </div>
                           </div>
                         ) : isStayCompleted(booking) ? (
-                          <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
-                            <p className="text-sm font-semibold text-[#0B0B45] mb-2">Rate your stay</p>
+                          <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
+                            <p className="text-sm font-semibold text-[#222222] mb-2">Rate your stay</p>
                             <div className="flex items-center gap-1 mb-3">
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const current = reviewForms[booking.id]?.rating || 0;
@@ -969,7 +969,7 @@ function ProfilePage() {
                                     aria-label={`${star} star${star > 1 ? 's' : ''}`}
                                   >
                                     <svg
-                                      className={`w-7 h-7 ${star <= current ? 'text-[#C49A6C]' : 'text-[#D9D9D9]'}`}
+                                      className={`w-7 h-7 ${star <= current ? 'text-[#2563EB]' : 'text-[#E5E7EB]'}`}
                                       fill="currentColor"
                                       viewBox="0 0 20 20"
                                     >
@@ -997,7 +997,7 @@ function ProfilePage() {
                                     className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all ${
                                       current === key
                                         ? color
-                                        : 'border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C]'
+                                        : 'border-[#E5E7EB] text-[#6b7280] hover:border-[#2563EB]'
                                     }`}
                                   >
                                     <span className="text-2xl">{emoji}</span>
@@ -1014,7 +1014,7 @@ function ProfilePage() {
                               onChange={(e) => setReviewField(booking.id, 'publicComment', e.target.value)}
                               placeholder="Share what other guests should know about this stay. This appears publicly with your first name."
                               maxLength={1000}
-                              className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm mb-4"
+                              className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] h-20 resize-none text-sm mb-4 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
                             />
                             <label className="block text-xs font-semibold text-[#6b7280] mb-1">
                               Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
@@ -1024,7 +1024,7 @@ function ProfilePage() {
                               onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
                               placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
                               maxLength={2000}
-                              className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
+                              className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] h-20 resize-none text-sm focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
                             />
                             {reviewForms[booking.id]?.error && (
                               <p className="text-red-500 text-xs mt-1">{reviewForms[booking.id].error}</p>
@@ -1033,7 +1033,7 @@ function ProfilePage() {
                               type="button"
                               onClick={() => handleSubmitReview(booking.id)}
                               disabled={reviewForms[booking.id]?.submitting}
-                              className="mt-3 bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                              className="mt-3 min-h-[44px] bg-[#2563EB] text-white font-semibold px-5 py-2 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
                             >
                               {reviewForms[booking.id]?.submitting ? 'Submitting...' : 'Submit Review'}
                             </button>
@@ -1048,7 +1048,7 @@ function ProfilePage() {
                 <div className="mt-6 text-center">
                   <Link
                     to="/bookings"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
                   >
                     View all bookings
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1065,14 +1065,14 @@ function ProfilePage() {
             <div>
               {favorites.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <div className="w-16 h-16 bg-[#E5E7EB] rounded-full flex items-center justify-center mx-auto mb-4">
                     <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[#0B0B45] mb-1">No favourites yet</h3>
+                  <h3 className="text-lg font-bold text-[#222222] mb-1">No favourites yet</h3>
                   <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
-                  <Link to="/properties" className="inline-block bg-[#C49A6C] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+                  <Link to="/properties" className="inline-block min-h-[44px] bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200">
                     Browse properties
                   </Link>
                 </div>

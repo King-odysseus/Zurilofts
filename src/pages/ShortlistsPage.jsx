@@ -9,11 +9,11 @@ import Footer from "../components/Footer.jsx";
 function SkeletonCard() {
   return (
     <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
-      <div className="h-5 w-2/3 bg-[#D9D9D9]/40 rounded animate-pulse mb-3" />
-      <div className="h-4 w-1/3 bg-[#D9D9D9]/40 rounded animate-pulse mb-4" />
+      <div className="h-5 w-2/3 bg-[#E5E7EB]/40 rounded animate-pulse mb-3" />
+      <div className="h-4 w-1/3 bg-[#E5E7EB]/40 rounded animate-pulse mb-4" />
       <div className="flex gap-2">
-        <div className="h-11 w-20 bg-[#D9D9D9]/40 rounded-lg animate-pulse" />
-        <div className="h-11 w-20 bg-[#D9D9D9]/40 rounded-lg animate-pulse" />
+        <div className="h-11 w-20 bg-[#E5E7EB]/40 rounded-lg animate-pulse" />
+        <div className="h-11 w-20 bg-[#E5E7EB]/40 rounded-lg animate-pulse" />
       </div>
     </div>
   );
