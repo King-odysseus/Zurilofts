@@ -169,7 +169,7 @@ function AdminAddOns() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-[#222222]">Add-ons</h1>
         <button
           onClick={openCreate}

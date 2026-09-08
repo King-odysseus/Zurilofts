@@ -60,8 +60,10 @@ function AdminMessages() {
 
   return (
     <div className="w-full">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm mb-6">
       <h1 className="text-2xl font-bold text-[#222222] mb-1">Messages</h1>
       <p className="text-[#6b7280] mb-6">Conversations with your guests.</p>
+      </div>
 
       <div className="bg-white rounded-[14px] shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-3 min-h-[60vh]">
         {/* Conversation list */}

@@ -41,8 +41,10 @@ function AdminFeedback() {
 
   return (
     <div className="w-full">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm mb-6">
       <h1 className="text-2xl font-bold text-[#222222] mb-1">Guest Feedback</h1>
       <p className="text-[#6b7280] mb-6">Star ratings, public reviews, and private notes from guests. Private notes are never shown publicly.</p>
+      </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">

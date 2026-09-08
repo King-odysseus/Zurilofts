@@ -68,7 +68,7 @@ function AdminPayouts() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex items-center justify-between flex-wrap gap-4">
         <h1 className="text-2xl font-bold text-[#222222]">Payouts</h1>
         <div className="flex items-center gap-3">
           <Dropdown
