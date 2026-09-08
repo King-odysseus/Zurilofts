@@ -25,6 +25,14 @@ const STATUS_COPY = {
   REJECTED: 'Your application was not approved. Contact support if you need help.',
 };
 
+const STATUS_BADGE = {
+  DRAFT: 'bg-[#F7F7F5] text-[#6b7280] border border-[#E5E7EB]',
+  CHANGES_REQUESTED: 'bg-amber-50 text-amber-700 border border-amber-200',
+  SUBMITTED: 'bg-amber-50 text-amber-700 border border-amber-200',
+  APPROVED: 'bg-green-50 text-green-700 border border-green-200',
+  REJECTED: 'bg-red-50 text-red-600 border border-red-200',
+};
+
 const PROPERTY_TYPES = [
   ['apartment', 'Apartment'], ['studio', 'Studio'], ['penthouse', 'Penthouse'],
   ['house', 'House'], ['villa', 'Villa'], ['other', 'Other'],
@@ -214,16 +222,21 @@ function HostApplicationPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-5xl mx-auto px-4 md:px-6 pt-28 pb-20">
-        <div className="bg-white rounded-[2rem] shadow-md p-6 md:p-10">
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#C49A6C] mb-2">Become a ZuriLofts host</p>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45]">Host verification</h1>
+        <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 md:p-10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6b7280] mb-2">Become a ZuriLofts host</p>
+          <h1 className="text-2xl md:text-4xl font-bold text-[#222222]">Host verification</h1>
           <p className="text-[#6b7280] mt-3 max-w-3xl">Tell us who you are, how you manage your properties, and provide the documents needed to protect guests and legitimate hosts. Save at any time and continue later.</p>
 
           {application && (
-            <div className="mt-6 rounded-3xl bg-[#0B0B45]/5 p-5">
-              <p className="font-semibold text-[#0B0B45]">Status: {application.status.replaceAll('_', ' ')}</p>
-              <p className="text-sm text-[#6b7280] mt-1">{STATUS_COPY[application.status]}</p>
-              {application.reviewNote && <p className="text-sm text-red-700 mt-3">Reviewer note: {application.reviewNote}</p>}
+            <div className="mt-6 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] p-5">
+              <div className="flex flex-wrap items-center gap-2">
+                <p className="font-semibold text-[#222222]">Status:</p>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_BADGE[application.status] || STATUS_BADGE.DRAFT}`}>
+                  {application.status.replaceAll('_', ' ')}
+                </span>
+              </div>
+              <p className="text-sm text-[#6b7280] mt-2">{STATUS_COPY[application.status]}</p>
+              {application.reviewNote && <p className="text-sm text-red-600 mt-3">Reviewer note: {application.reviewNote}</p>}
             </div>
           )}
           {message && <Notice tone="success">{message}</Notice>}
@@ -233,26 +246,26 @@ function HostApplicationPage() {
             <form onSubmit={handleSave} className="mt-8 space-y-10">
               <Section title="Identity & contact" description="Your legal details must match the identity document you upload.">
                 <div className="grid md:grid-cols-2 gap-5">
-                  <PillField label="Full legal name" value={form.legalName} onChange={(v) => update('legalName', v)} required />
-                  <PillField label="Date of birth" type="date" value={form.dateOfBirth} onChange={(v) => update('dateOfBirth', v)} required />
-                  <PillField label="Nationality" value={form.nationality} onChange={(v) => update('nationality', v)} required />
-                  <PillSelect label="Identity document" value={form.identityType} onChange={(v) => update('identityType', v)} options={[
+                  <Field label="Full legal name" value={form.legalName} onChange={(v) => update('legalName', v)} required />
+                  <Field label="Date of birth" type="date" value={form.dateOfBirth} onChange={(v) => update('dateOfBirth', v)} required />
+                  <Field label="Nationality" value={form.nationality} onChange={(v) => update('nationality', v)} required />
+                  <SelectField label="Identity document" value={form.identityType} onChange={(v) => update('identityType', v)} options={[
                     ['NATIONAL_ID', 'Kenyan national ID'], ['PASSPORT', 'Passport'], ['ALIEN_ID', 'Alien ID'],
                   ]} />
-                  <PillField label="Contact email" type="email" value={form.contactEmail} onChange={(v) => update('contactEmail', v)} required />
-                  <PillField label="Contact phone" type="tel" value={form.contactPhone} onChange={(v) => update('contactPhone', v)} required />
-                  <PillField label="KRA PIN" value={form.kraPin} onChange={(v) => update('kraPin', v.toUpperCase())} placeholder="A123456789B" required />
+                  <Field label="Contact email" type="email" value={form.contactEmail} onChange={(v) => update('contactEmail', v)} required />
+                  <Field label="Contact phone" type="tel" value={form.contactPhone} onChange={(v) => update('contactPhone', v)} required />
+                  <Field label="KRA PIN" value={form.kraPin} onChange={(v) => update('kraPin', v.toUpperCase())} placeholder="A123456789B" required />
                 </div>
               </Section>
 
               <Section title="Hosting business" description="Individuals can use their public host or trading name.">
                 <div className="grid md:grid-cols-2 gap-5">
-                  <PillSelect label="Host type" value={form.businessType} onChange={(v) => update('businessType', v)} options={[
+                  <SelectField label="Host type" value={form.businessType} onChange={(v) => update('businessType', v)} options={[
                     ['individual', 'Individual'], ['company', 'Registered company'],
                   ]} />
-                  <PillField label="Host or business name" value={form.businessName} onChange={(v) => update('businessName', v)} required />
-                  {form.businessType === 'company' && <PillField label="Company registration number" value={form.companyRegistrationNo} onChange={(v) => update('companyRegistrationNo', v)} required />}
-                  <PillSelect label="Preferred payout" value={form.preferredPayoutMethod} onChange={(v) => update('preferredPayoutMethod', v)} options={[
+                  <Field label="Host or business name" value={form.businessName} onChange={(v) => update('businessName', v)} required />
+                  {form.businessType === 'company' && <Field label="Company registration number" value={form.companyRegistrationNo} onChange={(v) => update('companyRegistrationNo', v)} required />}
+                  <SelectField label="Preferred payout" value={form.preferredPayoutMethod} onChange={(v) => update('preferredPayoutMethod', v)} options={[
                     ['mpesa', 'M-PESA'], ['bank', 'Bank transfer'],
                   ]} />
                 </div>
@@ -260,24 +273,56 @@ function HostApplicationPage() {
 
               <Section title="Properties & experience" description="These details help our team verify that you are authorised to list the accommodation.">
                 <div className="grid md:grid-cols-2 gap-5">
-                  <PillField label="Primary city or area" value={form.city} onChange={(v) => update('city', v)} required />
-                  <PillField label="Number of properties" type="number" min="1" max="1000" value={form.propertyCount} onChange={(v) => update('propertyCount', v)} required />
-                  <PillSelect label="Your relationship to the properties" value={form.propertyRelationship} onChange={(v) => update('propertyRelationship', v)} options={[
+                  <Field label="Primary city or area" value={form.city} onChange={(v) => update('city', v)} required />
+                  <Field label="Number of properties" type="number" min="1" max="1000" value={form.propertyCount} onChange={(v) => update('propertyCount', v)} required />
+                  <SelectField label="Your relationship to the properties" value={form.propertyRelationship} onChange={(v) => update('propertyRelationship', v)} options={[
                     ['OWNER', 'Owner'], ['MANAGER', 'Property manager'], ['AGENT', 'Authorised agent'], ['TENANT', 'Tenant with permission'],
                   ]} />
-                  <PillField label="Years of hosting experience" type="number" min="0" max="80" value={form.yearsHosting} onChange={(v) => update('yearsHosting', v)} required />
+                  <Field label="Years of hosting experience" type="number" min="0" max="80" value={form.yearsHosting} onChange={(v) => update('yearsHosting', v)} required />
                 </div>
                 <div className="mt-5">
-                  <p className="text-sm font-semibold text-[#1f2937] mb-2">Property types</p>
+                  <p className="text-sm font-medium text-[#222222] mb-2">Property types</p>
                   <div className="flex flex-wrap gap-2">
                     {PROPERTY_TYPES.map(([value, label]) => (
-                      <button key={value} type="button" onClick={() => togglePropertyType(value)} className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${form.propertyTypes.includes(value) ? 'bg-[#0B0B45] text-white' : 'bg-white text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#C49A6C]'}`}>{label}</button>
+                      <button
+                        key={value}
+                        type="button"
+                        onClick={() => togglePropertyType(value)}
+                        className={`min-h-[44px] rounded-full px-4 text-sm font-semibold border transition-all duration-200 ${
+                          form.propertyTypes.includes(value)
+                            ? 'bg-[#2563EB] text-white border-[#2563EB]'
+                            : 'bg-white text-[#222222] border-[#E5E7EB] hover:bg-[#F7F7F5]'
+                        }`}
+                      >
+                        {label}
+                      </button>
                     ))}
                   </div>
                 </div>
                 <div className="mt-5 grid gap-5">
-                  <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">Property locations</span><textarea value={form.propertyLocations} onChange={(e) => update('propertyLocations', e.target.value)} rows="3" maxLength="500" className="w-full rounded-[2rem] border border-transparent shadow-sm px-5 py-4 focus:outline-none focus:border-[#C49A6C]" placeholder="Neighbourhoods, towns, or addresses you intend to list" required /></label>
-                  <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">Hosting experience</span><textarea value={form.experience} onChange={(e) => update('experience', e.target.value)} rows="4" maxLength="2000" className="w-full rounded-[2rem] border border-transparent shadow-sm px-5 py-4 focus:outline-none focus:border-[#C49A6C]" placeholder="Tell us about your experience, team, and how guests will be supported." /></label>
+                  <label className="block">
+                    <span className="block text-sm font-medium text-[#222222] mb-2">Property locations</span>
+                    <textarea
+                      value={form.propertyLocations}
+                      onChange={(e) => update('propertyLocations', e.target.value)}
+                      rows="3"
+                      maxLength="500"
+                      className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+                      placeholder="Neighbourhoods, towns, or addresses you intend to list"
+                      required
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="block text-sm font-medium text-[#222222] mb-2">Hosting experience</span>
+                    <textarea
+                      value={form.experience}
+                      onChange={(e) => update('experience', e.target.value)}
+                      rows="4"
+                      maxLength="2000"
+                      className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+                      placeholder="Tell us about your experience, team, and how guests will be supported."
+                    />
+                  </label>
                 </div>
               </Section>
 
@@ -290,29 +335,29 @@ function HostApplicationPage() {
                 </div>
               </Section>
 
-              <label className="flex items-start gap-3 rounded-3xl bg-[#0B0B45]/5 p-5">
-                <input type="checkbox" checked={form.agreedTerms} onChange={(e) => update('agreedTerms', e.target.checked)} className="mt-1 h-5 w-5 accent-[#C49A6C]" />
-                <span className="text-sm text-[#1f2937]">I confirm the information is accurate, I am authorised to list these properties, and I agree to the <Link to="/terms" className="font-semibold text-[#C49A6C] hover:underline">Terms of Service</Link> and verification checks.</span>
+              <label className="flex items-start gap-3 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] p-5">
+                <input type="checkbox" checked={form.agreedTerms} onChange={(e) => update('agreedTerms', e.target.checked)} className="mt-1 h-5 w-5 accent-[#2563EB]" />
+                <span className="text-sm text-[#222222]">I confirm the information is accurate, I am authorised to list these properties, and I agree to the <Link to="/terms" className="font-medium text-[#2563EB] hover:text-[#1D4ED8] hover:underline">Terms of Service</Link> and verification checks.</span>
               </label>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
-                <button type="submit" disabled={saving || Boolean(uploadingKind)} className="rounded-full bg-[#0B0B45]/5 px-6 py-3 font-semibold text-[#0B0B45] disabled:opacity-50 hover:bg-[#0B0B45]/10 transition-colors">{saving ? 'Saving...' : 'Save draft'}</button>
-                <button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)} className="rounded-full bg-[#C49A6C] px-6 py-3 font-semibold text-white hover:bg-[#b8895c] disabled:opacity-50">{saving ? 'Working...' : 'Submit for review'}</button>
-                <button type="button" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)} className="rounded-full px-6 py-3 font-semibold text-[#6b7280] hover:text-[#0B0B45] disabled:opacity-50">Save &amp; continue traveling</button>
+                <button type="submit" disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg bg-white border border-[#E5E7EB] px-6 font-semibold text-[#222222] disabled:opacity-50 hover:bg-[#F7F7F5] transition-all duration-200">{saving ? 'Saving...' : 'Save draft'}</button>
+                <button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg bg-[#2563EB] px-6 font-semibold text-white hover:bg-[#1D4ED8] disabled:opacity-50 transition-all duration-200">{saving ? 'Working...' : 'Submit for review'}</button>
+                <button type="button" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg px-6 font-semibold text-[#6b7280] hover:text-[#222222] disabled:opacity-50 transition-all duration-200">Save &amp; continue traveling</button>
               </div>
             </form>
           ) : application?.status === 'APPROVED' || user?.role === 'HOST' ? (
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link to="/host/properties/new" className="inline-flex justify-center rounded-full bg-[#C49A6C] px-6 py-3 font-semibold text-white">Set up your first property</Link>
-              <Link to="/host/today" className="inline-flex justify-center rounded-full bg-[#0B0B45]/5 px-6 py-3 font-semibold text-[#0B0B45] hover:bg-[#0B0B45]/10 transition-colors">Open host dashboard</Link>
+              <Link to="/host/properties/new" className="min-h-[44px] inline-flex items-center justify-center rounded-lg bg-[#2563EB] px-6 font-semibold text-white hover:bg-[#1D4ED8] transition-all duration-200">Set up your first property</Link>
+              <Link to="/host/today" className="min-h-[44px] inline-flex items-center justify-center rounded-lg bg-white border border-[#E5E7EB] px-6 font-semibold text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200">Open host dashboard</Link>
             </div>
           ) : !application && user?.role !== 'USER' ? (
-            <div className="mt-8 rounded-3xl bg-[#0B0B45]/5 p-5">
-              <p className="font-semibold text-[#0B0B45]">No verification needed for this account</p>
+            <div className="mt-8 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] p-5">
+              <p className="font-semibold text-[#222222]">No verification needed for this account</p>
               <p className="text-sm text-[#6b7280] mt-1">Your account role ({user?.role?.toLowerCase()}) doesn&apos;t go through host verification.</p>
             </div>
           ) : (
-            <button type="button" onClick={() => { setMode('travelling'); navigate('/'); }} className="mt-8 rounded-full bg-[#0B0B45]/5 px-6 py-3 font-semibold text-[#0B0B45] hover:bg-[#0B0B45]/10 transition-colors">Continue traveling</button>
+            <button type="button" onClick={() => { setMode('travelling'); navigate('/'); }} className="mt-8 min-h-[44px] rounded-lg bg-white border border-[#E5E7EB] px-6 font-semibold text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200">Continue traveling</button>
           )}
         </div>
       </main>
@@ -322,28 +367,80 @@ function HostApplicationPage() {
 }
 
 function Section({ title, description, children }) {
-  return <section><div className="mb-5"><h2 className="text-xl font-bold text-[#0B0B45]">{title}</h2><p className="text-sm text-[#6b7280] mt-1">{description}</p></div>{children}</section>;
+  return (
+    <section>
+      <div className="mb-5">
+        <h2 className="text-lg font-bold text-[#222222]">{title}</h2>
+        <p className="text-sm text-[#6b7280] mt-1">{description}</p>
+      </div>
+      {children}
+    </section>
+  );
 }
 
-function PillField({ label, value, onChange, type = 'text', ...props }) {
-  return <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">{label}</span><input type={type} value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-full border border-transparent shadow-sm px-5 py-3.5 focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/15" {...props} /></label>;
+function Field({ label, value, onChange, type = 'text', ...props }) {
+  return (
+    <label className="block">
+      <span className="block text-sm font-medium text-[#222222] mb-2">{label}</span>
+      <input
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] px-4 text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+        {...props}
+      />
+    </label>
+  );
 }
 
-function PillSelect({ label, value, onChange, options }) {
-  return <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">{label}</span><select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-full border border-transparent shadow-sm bg-white px-5 py-3.5 focus:outline-none focus:border-[#C49A6C]">{options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}</select></label>;
+function SelectField({ label, value, onChange, options }) {
+  return (
+    <label className="block">
+      <span className="block text-sm font-medium text-[#222222] mb-2">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] bg-white px-4 text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+      >
+        {options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}
+      </select>
+    </label>
+  );
 }
 
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
-  return <div className="rounded-3xl shadow-sm p-5"><p className="font-semibold text-[#1f2937]">{DOCUMENT_LABELS[kind]}</p>{document ? <><p className="text-xs text-green-700 mt-2 break-all">Uploaded: {document.originalName}</p><button type="button" onClick={() => onRemove(kind)} disabled={busy} className="mt-3 rounded-full bg-red-50 px-4 py-2 text-xs font-semibold text-red-600 disabled:opacity-50 hover:bg-red-100 transition-colors">{busy ? 'Working...' : 'Remove & replace'}</button></> : <label className="mt-3 inline-flex cursor-pointer rounded-full bg-[#0B0B45] px-4 py-2 text-xs font-semibold text-white"><input type="file" className="hidden" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={busy} onChange={(e) => onUpload(kind, e.target.files?.[0])} />{busy ? 'Uploading...' : 'Choose document'}</label>}</div>;
+  return (
+    <div className="rounded-xl border border-[#E5E7EB] p-5">
+      <p className="font-semibold text-[#222222] text-sm">{DOCUMENT_LABELS[kind]}</p>
+      {document ? (
+        <>
+          <p className="text-xs text-green-700 mt-2 break-all">Uploaded: {document.originalName}</p>
+          <button
+            type="button"
+            onClick={() => onRemove(kind)}
+            disabled={busy}
+            className="mt-3 min-h-[44px] rounded-lg bg-red-50 px-4 text-xs font-semibold text-red-600 disabled:opacity-50 hover:bg-red-100 transition-colors duration-200"
+          >
+            {busy ? 'Working...' : 'Remove & replace'}
+          </button>
+        </>
+      ) : (
+        <label className="mt-3 inline-flex min-h-[44px] items-center cursor-pointer rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] transition-all duration-200">
+          <input type="file" className="hidden" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={busy} onChange={(e) => onUpload(kind, e.target.files?.[0])} />
+          {busy ? 'Uploading...' : 'Choose document'}
+        </label>
+      )}
+    </div>
+  );
 }
 
 function Notice({ tone, children }) {
-  return <div className={`mt-6 rounded-3xl border px-5 py-4 ${tone === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-700'}`}>{children}</div>;
+  return <div className={`mt-6 rounded-xl border px-5 py-4 text-sm ${tone === 'success' ? 'bg-green-50 border-green-200 text-green-700' : 'bg-red-50 border-red-200 text-red-600'}`}>{children}</div>;
 }
 
 Section.propTypes = { title: PropTypes.string.isRequired, description: PropTypes.string.isRequired, children: PropTypes.node.isRequired };
-PillField.propTypes = { label: PropTypes.string.isRequired, value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired, onChange: PropTypes.func.isRequired, type: PropTypes.string };
-PillSelect.propTypes = { label: PropTypes.string.isRequired, value: PropTypes.string.isRequired, onChange: PropTypes.func.isRequired, options: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired };
+Field.propTypes = { label: PropTypes.string.isRequired, value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired, onChange: PropTypes.func.isRequired, type: PropTypes.string };
+SelectField.propTypes = { label: PropTypes.string.isRequired, value: PropTypes.string.isRequired, onChange: PropTypes.func.isRequired, options: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired };
 DocumentUpload.propTypes = { kind: PropTypes.string.isRequired, document: PropTypes.shape({ originalName: PropTypes.string }), busy: PropTypes.bool.isRequired, onUpload: PropTypes.func.isRequired, onRemove: PropTypes.func.isRequired };
 Notice.propTypes = { tone: PropTypes.oneOf(['success', 'error']).isRequired, children: PropTypes.node.isRequired };
 
