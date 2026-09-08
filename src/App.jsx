@@ -179,6 +179,12 @@ function HomePage() {
         </div>
       )}
 
+      {allProperties.length > 6 && (
+        <div className="pt-10 md:pt-14">
+          <PropertyCardRow title="More stays to explore" properties={allProperties.slice(6, 14)} align="left" />
+        </div>
+      )}
+
       {/* Compact value section - keeps the marquee and hero presentation intact. */}
       <section className="max-w-7xl mx-auto px-4 md:px-6 mt-16 md:mt-20" aria-label="Why stay with ZuriLofts">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
