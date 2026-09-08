@@ -895,7 +895,7 @@ function ProfilePage() {
                 </div>
               ) : (
                 bookings.map((booking) => (
-                  <div key={booking.id} className="shadow-sm p-6">
+                  <div key={booking.id} className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-4 md:p-6">
                     <div className="flex flex-col md:flex-row gap-4">
                       {booking.property?.images?.[0] && (
                         <img

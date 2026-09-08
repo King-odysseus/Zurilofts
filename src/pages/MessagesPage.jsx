@@ -77,7 +77,7 @@ function MessagesPage() {
                       }`}
                     >
                       {m.body}
-                      <div className={`text-[10px] mt-1 ${m.senderRole === 'USER' ? 'text-white/70' : 'text-[#6b7280]'}`}>
+                      <div className={`text-[11px] mt-1 ${m.senderRole === 'USER' ? 'text-white/70' : 'text-[#6b7280]'}`}>
                         {new Date(m.createdAt).toLocaleString()}
                       </div>
                     </div>
