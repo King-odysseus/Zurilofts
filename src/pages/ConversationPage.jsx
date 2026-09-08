@@ -168,7 +168,7 @@ function ConversationPage() {
       <Navbar />
       <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-4 flex flex-col">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-4 rounded-[14px] border border-[#E5E7EB] bg-white px-4 py-3 shadow-sm">
           <Link
             to="/inbox"
             className="p-2 rounded-full hover:bg-[#E5E7EB]/40 transition-colors text-[#222222]"
@@ -188,7 +188,7 @@ function ConversationPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto bg-white rounded-[14px] shadow-sm p-4 space-y-3 min-h-[50vh]">
+        <div className="flex-1 overflow-y-auto rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm space-y-3 min-h-[50vh]">
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <Spinner />
