@@ -66,6 +66,10 @@ function AdminProperties() {
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState('grid');
 
+  const visibleProperties = isAdminView || !statusFilter
+    ? properties
+    : properties.filter((property) => (statusFilter === 'IN_REVIEW' ? property.status === 'PENDING_REVIEW' : property.status === statusFilter));
+
   useEffect(() => {
     fetchProperties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -154,7 +158,7 @@ function AdminProperties() {
     <div>
       <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 mb-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#222222]">Properties</h1>
+          <h1 className="text-2xl font-bold text-[#222222]">{isAdminView ? 'Properties' : 'Your listings'}</h1>
           <p className="mt-1 text-sm text-[#6b7280]">
             {isAdminView ? 'Review and manage every listing across the platform.' : 'Manage your listings, availability and review status.'}
           </p>
@@ -201,7 +205,7 @@ function AdminProperties() {
             to={`${base}/properties/new`}
             className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-lg bg-[#C49A6C] text-white font-semibold text-sm hover:bg-[#B8895C] transition-all active:translate-y-px"
           >
-            + Add Property
+            {isAdminView ? '+ Add Property' : '+ Add listing'}
           </Link>
         </div>
       </div>
@@ -219,6 +223,16 @@ function AdminProperties() {
           </div>
         ))}
       </div>
+
+      {!isAdminView && (
+        <div className="mb-5 flex flex-wrap items-center gap-2 border-b border-[#E5E7EB] pb-3" role="tablist" aria-label="Listing status">
+          {[['', `All (${properties.length})`], ['PUBLISHED', `Published (${properties.filter((p) => p.status === 'PUBLISHED').length})`], ['DRAFT', `Drafts (${properties.filter((p) => p.status === 'DRAFT').length})`], ['IN_REVIEW', `In review (${properties.filter((p) => p.status === 'PENDING_REVIEW').length})`]].map(([value, label]) => (
+            <button key={value || 'all'} type="button" role="tab" aria-selected={statusFilter === value} onClick={() => setStatusFilter(value)} className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${statusFilter === value ? 'border-b-2 border-[#2563EB] text-[#2563EB]' : 'text-[#6b7280] hover:text-[#222222]'}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-16 text-[#6b7280]">
@@ -241,7 +255,7 @@ function AdminProperties() {
                 </tr>
               </thead>
               <tbody>
-                {properties.map((p) => (
+                {visibleProperties.map((p) => (
                   <tr key={p.id} className="border-b border-[#E5E7EB]/60 last:border-0 hover:bg-[#F7F7F5]">
                     <td className="py-3 px-4 align-top">
                       <div className="flex items-center space-x-3">
@@ -304,19 +318,19 @@ function AdminProperties() {
               </tbody>
             </table>
           </div>
-          {properties.length === 0 && (
+          {visibleProperties.length === 0 && (
             <div className="text-center py-16 text-[#6b7280]">
               <p className="text-sm">{isAdminView ? 'No listings match this status.' : 'No properties found. Add your first property!'}</p>
             </div>
           )}
         </div>
-      ) : properties.length === 0 ? (
+      ) : visibleProperties.length === 0 ? (
         <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm text-center py-16 text-[#6b7280]">
           <p className="text-sm">{isAdminView ? 'No listings match this status.' : 'No properties found. Add your first property!'}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {properties.map((p) => (
+          {visibleProperties.map((p) => (
             <article key={p.id} className="bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <Link to={`/property/${p.id}`} className="block aspect-[4/3] bg-[#F7F7F5]">
                 {p.images?.[0] ? (
