@@ -112,7 +112,7 @@ function RegisterPage() {
       {/* Background Image */}
       <div className="absolute inset-0">
         <img src={bgImage} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#0B0B45]/70"></div>
+        <div className="absolute inset-0 bg-[#222222]/70"></div>
       </div>
 
       {/* Back button */}
@@ -127,13 +127,13 @@ function RegisterPage() {
       </Link>
 
       <div className="max-w-md w-full relative z-10">
-        <div className="auth-card p-8 bg-white/95 backdrop-blur-sm rounded-2xl">
+        <div className="auth-card p-8 bg-white/95 backdrop-blur-sm rounded-[14px]">
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-block mb-6">
               <img src={logoImg} alt="ZuriLofts" className="h-20 w-auto mx-auto" />
             </Link>
-            <h1 className="text-2xl font-bold text-[#0B0B45]">
+            <h1 className="text-2xl font-bold text-[#222222]">
               {isHost ? 'Become a Host' : 'Create Account'}
             </h1>
             <p className="text-[#6b7280] mt-2">
@@ -162,7 +162,7 @@ function RegisterPage() {
                   value={formData.firstName}
                   onChange={handleChange}
                   placeholder="John"
-                  className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
                   required
                 />
               </div>
@@ -175,7 +175,7 @@ function RegisterPage() {
                   value={formData.lastName}
                   onChange={handleChange}
                   placeholder="Doe"
-                  className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
                   required
                 />
               </div>
@@ -189,7 +189,7 @@ function RegisterPage() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="you@example.com"
-                className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
                 required
               />
             </div>
@@ -203,7 +203,7 @@ function RegisterPage() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Min. 8 chars, 1 uppercase, 1 number"
-                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
                   required
                 />
                 <PasswordToggle
@@ -222,7 +222,7 @@ function RegisterPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="Re-enter your password"
-                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
                   required
                 />
                 <PasswordToggle
@@ -241,7 +241,7 @@ function RegisterPage() {
                     className="w-20 h-20 rounded-full object-cover shadow-md"
                   />
                 ) : (
-                  <div className="w-20 h-20 bg-[#D9D9D9]/30 rounded-full flex items-center justify-center border-2 border-dashed border-[#D9D9D9]">
+                  <div className="w-20 h-20 bg-[#E5E7EB]/30 rounded-full flex items-center justify-center border-2 border-dashed border-[#E5E7EB]">
                     <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
@@ -280,9 +280,9 @@ function RegisterPage() {
           </form>
 
           <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-[#D9D9D9]"></div>
+            <div className="flex-1 h-px bg-[#E5E7EB]"></div>
             <span className="px-4 text-sm text-[#6b7280]">or</span>
-            <div className="flex-1 h-px bg-[#D9D9D9]"></div>
+            <div className="flex-1 h-px bg-[#E5E7EB]"></div>
           </div>
 
           <a
@@ -316,36 +316,36 @@ function RegisterPage() {
 
         {/* Selling Points - Host Registration */}
         {isHost && (
-          <div className="mt-6 auth-card rounded-2xl p-6 bg-white/95 backdrop-blur-sm max-w-md w-full">
-            <h3 className="text-lg font-bold text-[#0B0B45] mb-4">Why Host with ZuriLofts</h3>
+          <div className="mt-6 auth-card rounded-[14px] p-6 bg-white/95 backdrop-blur-sm max-w-md w-full">
+            <h3 className="text-lg font-bold text-[#222222] mb-4">Why Host with ZuriLofts</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex gap-3">
                 <span className="text-[#2563EB] font-bold flex-shrink-0">7.5%</span>
-                <span className="text-[#1f2937]"><span className="font-semibold">Lowest platform fee in Kenya</span> - less than half of Booking.com (15%)</span>
+                <span className="text-[#222222]"><span className="font-semibold">Lowest platform fee in Kenya</span> - less than half of Booking.com (15%)</span>
               </li>
               <li className="flex gap-3">
                 <span className="text-[#2563EB] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
-                <span className="text-[#1f2937]"><span className="font-semibold">Guests pay zero markup</span> - unlike Airbnb&apos;s 14% guest fee, your listed price IS the guest price</span>
+                <span className="text-[#222222]"><span className="font-semibold">Guests pay zero markup</span> - unlike Airbnb&apos;s 14% guest fee, your listed price IS the guest price</span>
               </li>
               <li className="flex gap-3">
                 <span className="text-[#2563EB] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
-                <span className="text-[#1f2937]"><span className="font-semibold">Tax handled for you</span> - WHT auto-deducted, remitted to KRA, and you get a downloadable statement anytime</span>
+                <span className="text-[#222222]"><span className="font-semibold">Tax handled for you</span> - WHT auto-deducted, remitted to KRA, and you get a downloadable statement anytime</span>
               </li>
               <li className="flex gap-3">
                 <span className="text-[#2563EB] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
-                <span className="text-[#1f2937]"><span className="font-semibold">Flexible payouts</span> - choose weekly, bi-weekly, or monthly transfers to your bank account</span>
+                <span className="text-[#222222]"><span className="font-semibold">Flexible payouts</span> - choose weekly, bi-weekly, or monthly transfers to your bank account</span>
               </li>
             </ul>
 
             {/* Airbnb comparison */}
             <div className="mt-5 bg-[#F7F7F5] rounded-xl p-4">
-              <p className="text-xs font-semibold text-[#0B0B45] mb-2 uppercase tracking-wide">Cost Comparison - Guest Pays</p>
+              <p className="text-xs font-semibold text-[#222222] mb-2 uppercase tracking-wide">Cost Comparison - Guest Pays</p>
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-[#6b7280] border-b border-[#E5E7EB]">

@@ -349,7 +349,7 @@ function PrivacyPage() {
               <p className="mt-2">
                 You also have the right to lodge a complaint with the{' '}
                 <strong>Office of the Data Protection Commissioner (ODPC)</strong> of Kenya
-                at <a href="https://www.odpc.go.ke" className="text-[#C49A6C] hover:underline" target="_blank" rel="noopener noreferrer">www.odpc.go.ke</a>.
+                at <a href="https://www.odpc.go.ke" className="text-[#2563EB] hover:underline" target="_blank" rel="noopener noreferrer">www.odpc.go.ke</a>.
               </p>
             </section>
 

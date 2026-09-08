@@ -61,7 +61,7 @@ function LoginPage() {
       {/* Background Image */}
       <div className="absolute inset-0">
         <img src={bgImage} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#0B0B45]/70"></div>
+        <div className="absolute inset-0 bg-[#222222]/70"></div>
       </div>
 
       {/* Back button */}
@@ -76,13 +76,13 @@ function LoginPage() {
       </Link>
 
       <div className="max-w-md w-full relative z-10">
-        <div className="auth-card p-8 bg-white/95 backdrop-blur-sm rounded-2xl">
+        <div className="auth-card p-8 bg-white/95 backdrop-blur-sm rounded-[14px]">
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-block mb-6">
               <img src={logoImg} alt="ZuriLofts" className="h-20 w-auto mx-auto" />
             </Link>
-            <h1 className="text-2xl font-bold text-[#0B0B45]">Welcome Back</h1>
+            <h1 className="text-2xl font-bold text-[#222222]">Welcome Back</h1>
             <p className="text-[#6b7280] mt-2">Sign in, then choose Traveling or Hosting</p>
           </div>
 
@@ -103,7 +103,7 @@ function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
-                className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
                 required
               />
             </div>
@@ -116,7 +116,7 @@ function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
-                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
                   required
                 />
                 <PasswordToggle
@@ -136,9 +136,9 @@ function LoginPage() {
 
           {/* Divider */}
           <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-[#D9D9D9]"></div>
+            <div className="flex-1 h-px bg-[#E5E7EB]"></div>
             <span className="px-4 text-sm text-[#6b7280]">or</span>
-            <div className="flex-1 h-px bg-[#D9D9D9]"></div>
+            <div className="flex-1 h-px bg-[#E5E7EB]"></div>
           </div>
 
           {/* Google OAuth */}
