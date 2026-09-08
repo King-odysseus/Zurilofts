@@ -85,7 +85,7 @@ function AdminDisputes() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#222222]">Disputes</h1>
           <p className="text-sm text-[#6b7280] mt-1">Booking-linked disputes between guests and hosts.</p>
