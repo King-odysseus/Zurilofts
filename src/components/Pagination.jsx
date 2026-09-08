@@ -42,7 +42,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
             aria-label="Previous page"
-            className="w-9 h-9 inline-flex items-center justify-center rounded-full text-[#0B0B45] bg-white shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all"
+            className="w-9 h-9 inline-flex items-center justify-center rounded-full text-[#222222] bg-white shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -58,8 +58,8 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
                 aria-current={p === page ? 'page' : undefined}
                 className={`min-w-[2.25rem] h-9 px-2 inline-flex items-center justify-center rounded-full text-sm font-semibold transition-all ${
                   p === page
-                    ? 'bg-[#C49A6C] text-white shadow-md'
-                    : 'bg-white text-[#0B0B45] shadow-sm hover:shadow-md'
+                    ? 'bg-[#2563EB] text-white shadow-md'
+                    : 'bg-white text-[#222222] shadow-sm hover:shadow-md'
                 }`}
               >
                 {p}
@@ -70,7 +70,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
             aria-label="Next page"
-            className="w-9 h-9 inline-flex items-center justify-center rounded-full text-[#0B0B45] bg-white shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all"
+            className="w-9 h-9 inline-flex items-center justify-center rounded-full text-[#222222] bg-white shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

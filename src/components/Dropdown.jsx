@@ -75,12 +75,12 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
                   setOpen(false);
                 }}
                 className={`flex items-center w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                  isSel ? 'bg-[#C49A6C]/10 text-[#0B0B45] font-semibold' : 'text-[#1f2937] hover:bg-[#D9D9D9]/30'
+                  isSel ? 'bg-[#2563EB]/10 text-[#2563EB] font-semibold' : 'text-[#222222] hover:bg-[#F7F7F5]'
                 }`}
               >
                 <span className="flex-1">{o.label}</span>
                 {isSel && (
-                  <svg className="w-4 h-4 text-[#C49A6C] flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-[#2563EB] flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
