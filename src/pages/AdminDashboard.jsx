@@ -8,28 +8,37 @@ import logoImg from '../assets/zurilofts-logo.png';
 
 // Shared: both hosts and admins - routes gated by requireHost (or weaker).
 const sharedNavItems = [
-  { path: '/admin', label: 'Dashboard', icon: 'M4 6h16M4 10h16M4 14h16M4 18h16', exact: true },
-  { path: '/admin/properties', label: 'Properties', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-  { path: '/admin/earnings', label: 'Earnings', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+  { path: '/admin', label: 'Dashboard', icon: 'M4 6h16M4 10h16M4 14h16M4 18h16', exact: true, group: 'Overview' },
+  { path: '/admin/properties', label: 'Properties', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', group: 'Listings' },
+  { path: '/admin/earnings', label: 'Earnings', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', group: 'Payments' },
 ];
 
 // Admin-only: backend is requireAdmin. Hosts must not see these - clicking
 // them would 403. Separated from sharedNavItems so the host sidebar stays
 // functional and doesn't invite users to dead-end pages.
 const adminOnlyItems = [
-  { path: '/admin/bookings', label: 'Bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-  { path: '/admin/users', label: 'Users & Hosts', icon: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65' },
-  { path: '/admin/host-applications', label: 'Host Applications', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414A1 1 0 0118 8.414V19a2 2 0 01-2 2z' },
-  { path: '/admin/identity-verifications', label: 'Identity Verifications', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
-  { path: '/admin/disputes', label: 'Disputes', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z' },
-  { path: '/admin/promos', label: 'Promo Codes', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
-  { path: '/admin/addons', label: 'Add-ons', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4' },
-  { path: '/admin/guides', label: 'Guides', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
-  { path: '/admin/feedback', label: 'Feedback', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z' },
-  { path: '/admin/messages', label: 'Messages', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
-  { path: '/admin/payouts', label: 'Payouts', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z' },
+  { path: '/admin/bookings', label: 'Bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', group: 'Bookings' },
+  { path: '/admin/users', label: 'Users & Hosts', icon: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65', group: 'People' },
+  { path: '/admin/host-applications', label: 'Host Applications', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414A1 1 0 0118 8.414V19a2 2 0 01-2 2z', group: 'People' },
+  { path: '/admin/identity-verifications', label: 'Identity Verifications', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', group: 'People' },
+  { path: '/admin/disputes', label: 'Disputes', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z', group: 'Bookings' },
+  { path: '/admin/promos', label: 'Promo Codes', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z', group: 'Payments' },
+  { path: '/admin/addons', label: 'Add-ons', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4', group: 'Listings' },
+  { path: '/admin/guides', label: 'Guides', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', group: 'Listings' },
+  { path: '/admin/feedback', label: 'Feedback', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', group: 'Content' },
+  { path: '/admin/messages', label: 'Messages', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', group: 'Content' },
+  { path: '/admin/payouts', label: 'Payouts', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z', group: 'Payments' },
 ];
 
+// Grouped section order for the sidebar nav - matches the design system's
+// Admin Navigation grouping (Overview, Listings, Bookings, Payments, People, Content).
+const GROUP_ORDER = ['Overview', 'Listings', 'Bookings', 'Payments', 'People', 'Content'];
+
+function groupNavItems(items) {
+  return GROUP_ORDER
+    .map((group) => ({ group, items: items.filter((item) => item.group === group) }))
+    .filter((g) => g.items.length > 0);
+}
 
 // Avatar dropdown shown in the dashboard header - mirrors the client Navbar's
 // account menu so admins/hosts get the same affordance inside the panel.
@@ -49,7 +58,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center space-x-2 px-2 py-1.5 rounded-full hover:bg-[#D9D9D9]/40 transition-all duration-200"
+        className="flex items-center space-x-2 px-2 py-1.5 rounded-full hover:bg-[#F7F7F5] transition-all duration-200"
       >
         <div className="w-9 h-9 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
           {user?.avatar ? (
@@ -58,23 +67,23 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
             <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
           )}
         </div>
-        <span className="hidden sm:block text-sm font-semibold text-[#0B0B45]">{user?.firstName}</span>
-        <svg className={`w-4 h-4 text-[#0B0B45] transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <span className="hidden sm:block text-sm font-semibold text-[#222222]">{user?.firstName}</span>
+        <svg className={`w-4 h-4 text-[#222222] transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
 
       {open && (
-        <div className={`absolute right-0 w-56 bg-white rounded-2xl shadow-lg py-2 z-30 ${openUp ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
-          <div className="px-4 py-3 border-b border-[#D9D9D9]">
-            <p className="text-sm font-semibold text-[#0B0B45]">{user?.firstName} {user?.lastName}</p>
+        <div className={`absolute right-0 w-56 bg-white rounded-[14px] border border-[#E5E7EB] shadow-lg py-2 z-30 ${openUp ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
+          <div className="px-4 py-3 border-b border-[#E5E7EB]">
+            <p className="text-sm font-semibold text-[#222222]">{user?.firstName} {user?.lastName}</p>
             <p className="text-xs text-[#6b7280]">{user?.email}</p>
-            <span className="inline-block mt-1.5 text-[10px] font-bold uppercase tracking-wider text-[#C49A6C]">{isAdmin ? 'Admin' : 'Host'}</span>
+            <span className="inline-block mt-1.5 text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">{isAdmin ? 'Admin' : 'Host'}</span>
           </div>
           <Link
             to="/profile#info"
             onClick={() => setOpen(false)}
-            className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+            className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
           >
             <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -84,7 +93,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
           <Link
             to="/admin/messages"
             onClick={() => setOpen(false)}
-            className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+            className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
           >
             <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -94,14 +103,14 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
           <Link
             to="/"
             onClick={() => setOpen(false)}
-            className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+            className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
           >
             <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
             Go back to client view
           </Link>
-          <div className="border-t border-[#D9D9D9] mt-1 pt-1">
+          <div className="border-t border-[#E5E7EB] mt-1 pt-1">
             <button
               onClick={() => { setOpen(false); onLogout(); }}
               className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
@@ -130,20 +139,19 @@ HeaderUserMenu.propTypes = {
   openUp: PropTypes.bool,
 };
 
-/* ── StatCard - TijhaBooks-style dashboard metric card ── */
+/* ── StatCard - blue-primary dashboard metric card ── */
 const TONE_STYLES = {
-  primary: { bg: 'bg-[#0B0B45]', icon: 'text-white' },
-  gold:    { bg: 'bg-[#C49A6C]', icon: 'text-white' },
+  primary: { bg: 'bg-[#2563EB]', icon: 'text-white' },
   success: { bg: 'bg-green-600', icon: 'text-white' },
   warning: { bg: 'bg-amber-500', icon: 'text-white' },
   danger:  { bg: 'bg-red-600', icon: 'text-white' },
-  info:    { bg: 'bg-blue-600', icon: 'text-white' },
+  info:    { bg: 'bg-sky-600', icon: 'text-white' },
 };
 
 function StatCardView({ label, value, icon, tone }) {
   const t = TONE_STYLES[tone] || TONE_STYLES.primary;
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-5 hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm text-[#6b7280]">{label}</span>
         <div className={`w-10 h-10 ${t.bg} rounded-xl flex items-center justify-center`}>
@@ -152,7 +160,7 @@ function StatCardView({ label, value, icon, tone }) {
           </svg>
         </div>
       </div>
-      <p className="text-2xl font-bold text-[#0B0B45]">{value}</p>
+      <p className="text-2xl font-bold text-[#222222]">{value}</p>
     </div>
   );
 }
@@ -161,7 +169,7 @@ StatCardView.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   icon: PropTypes.string.isRequired,
-  tone: PropTypes.oneOf(['primary', 'gold', 'success', 'warning', 'danger', 'info']),
+  tone: PropTypes.oneOf(['primary', 'success', 'warning', 'danger', 'info']),
 };
 
 function AdminLayout() {
@@ -173,6 +181,7 @@ function AdminLayout() {
   });
   const isAdmin = user?.role === 'ADMIN';
   const navItems = isAdmin ? [...sharedNavItems, ...adminOnlyItems] : sharedNavItems;
+  const navGroups = groupNavItems(navItems);
 
   // ── Notification polling (messages + new bookings) ──
   const [notif, setNotif] = useState({ unreadMessages: 0, pendingBookings: 0 });
@@ -223,21 +232,61 @@ function AdminLayout() {
     exact ? location.pathname === path : location.pathname.startsWith(path)
   );
 
+  function NavLink({ path, label, icon, exact }) {
+    const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+    return (
+      <Link
+        key={path}
+        to={path}
+        title={collapsed ? label : ''}
+        aria-current={active ? 'page' : undefined}
+        className={`flex items-center rounded-lg mb-1 text-sm font-medium transition-all duration-200 ${
+          active
+            ? 'bg-[#2563EB] text-white'
+            : 'text-[#222222] hover:bg-[#F7F7F5]'
+        } ${collapsed ? 'justify-center w-11 h-11' : 'px-4 py-3'}`}
+      >
+        <div className="relative">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+          </svg>
+          {path === '/admin/messages' && notif.unreadMessages > 0 && (
+            <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
+            </span>
+          )}
+          {path === '/admin/bookings' && notif.pendingBookings > 0 && (
+            <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+              {notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}
+            </span>
+          )}
+        </div>
+        {!collapsed && <span className="ml-3">{label}</span>}
+      </Link>
+    );
+  }
+  NavLink.propTypes = {
+    path: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    icon: PropTypes.string.isRequired,
+    exact: PropTypes.bool,
+  };
+
   return (
     <div className="min-h-screen bg-canvas flex">
       {/* Sidebar */}
       <aside
-        className={`bg-[#0B0B45] text-white hidden md:flex flex-col fixed inset-y-0 left-0 z-10 transition-all duration-300 ${
+        className={`bg-white border-r border-[#E5E7EB] text-[#222222] hidden md:flex flex-col fixed inset-y-0 left-0 z-10 transition-all duration-300 ${
           collapsed ? 'w-[88px]' : 'w-64'
         }`}
       >
         <div className={`flex ${collapsed ? 'flex-col items-center gap-2 pt-12 pb-2 px-2' : 'items-center justify-between pt-16 pb-4 px-6'}`}>
-          <Link to="/" className="inline-block bg-white rounded-xl px-1.5 py-1">
+          <Link to="/">
             <img src={logoImg} alt="ZuriLofts" className={`w-auto ${collapsed ? 'h-7' : 'h-10'}`} />
           </Link>
           <button
             onClick={toggleSidebar}
-            className="p-1 rounded-lg hover:bg-white/10 transition-colors"
+            className="p-1 rounded-lg text-[#6b7280] hover:bg-[#F7F7F5] transition-colors"
             title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             <svg
@@ -251,50 +300,27 @@ function AdminLayout() {
           </button>
         </div>
         {!collapsed && (
-          <span className="block px-6 pb-4 text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">
+          <span className="block px-6 pb-4 text-[#6b7280] text-xs font-semibold uppercase tracking-wider">
             {isAdmin ? 'Admin Panel' : 'Host Dashboard'}
           </span>
         )}
-        <nav className={`flex-1 ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
-          {navItems.map(({ path, label, icon, exact }) => {
-            const active = exact ? location.pathname === path : location.pathname.startsWith(path);
-            return (
-              <Link
-                key={path}
-                to={path}
-                title={collapsed ? label : ''}
-                aria-current={active ? 'page' : undefined}
-                className={`flex items-center rounded-full mb-2 text-sm font-medium transition-all duration-200 ${
-                  active
-                    ? 'bg-[#C49A6C] text-white'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                } ${collapsed ? 'justify-center w-11 h-11' : 'px-4 py-4'}`}
-              >
-                <div className="relative">
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-                  </svg>
-                  {path === '/admin/messages' && notif.unreadMessages > 0 && (
-                    <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
-                    </span>
-                  )}
-                  {path === '/admin/bookings' && notif.pendingBookings > 0 && (
-                    <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}
-                    </span>
-                  )}
-                </div>
-                {!collapsed && <span className="ml-3">{label}</span>}
-              </Link>
-            );
-          })}
+        <nav className={`flex-1 overflow-y-auto ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
+          {navGroups.map(({ group, items }) => (
+            <div key={group} className={collapsed ? 'mb-2' : 'mb-4'}>
+              {!collapsed && (
+                <span className="block px-4 mb-1.5 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
+                  {group}
+                </span>
+              )}
+              {items.map((item) => <NavLink key={item.path} {...item} />)}
+            </div>
+          ))}
         </nav>
-        <div className={`border-t border-white/10 ${collapsed ? 'p-3 flex flex-col items-center' : 'p-5'}`}>
+        <div className={`border-t border-[#E5E7EB] ${collapsed ? 'p-3 flex flex-col items-center' : 'p-5'}`}>
           <Link
             to="/"
             title={collapsed ? 'Go back to client view' : ''}
-            className={`flex items-center rounded-full text-sm font-semibold bg-white/10 text-white hover:bg-[#C49A6C] hover:text-white transition-all duration-200 ${
+            className={`flex items-center rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200 ${
               collapsed ? 'justify-center w-11 h-11 mb-4' : 'justify-center mb-5 px-4 py-2.5'
             }`}
           >
@@ -309,15 +335,15 @@ function AdminLayout() {
             </div>
             {!collapsed && (
               <div className="text-sm">
-                <p className="font-medium">{user?.firstName}</p>
-                <p className="text-white/50 text-xs">{isAdmin ? 'Admin' : 'Host'}</p>
+                <p className="font-medium text-[#222222]">{user?.firstName}</p>
+                <p className="text-[#6b7280] text-xs">{isAdmin ? 'Admin' : 'Host'}</p>
               </div>
             )}
           </div>
           <button
             onClick={handleLogout}
             title={collapsed ? 'Sign Out' : ''}
-            className={`flex items-center text-white/60 hover:text-white transition-colors mt-3 ${
+            className={`flex items-center text-[#6b7280] hover:text-[#222222] transition-colors mt-3 ${
               collapsed ? 'justify-center w-full text-base' : 'text-[15px]'
             }`}
           >
@@ -332,11 +358,11 @@ function AdminLayout() {
       {/* Mobile floating pill nav + off-screen drawer */}
       <div className="md:hidden">
         <div className="fixed inset-x-0 bottom-4 z-10 flex justify-center px-4">
-          <div className="flex items-center gap-1 bg-[#0B0B45] rounded-full p-1.5 shadow-2xl shadow-black/40">
+          <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-full p-1.5 shadow-lg">
             {/* Logo -> client view */}
             <Link
               to="/"
-              className="shrink-0 flex items-center justify-center bg-white rounded-full p-1.5"
+              className="shrink-0 flex items-center justify-center p-1.5"
               title="Go back to client view"
             >
               <img src={logoImg} alt="ZuriLofts" className="h-5 w-auto" />
@@ -352,7 +378,7 @@ function AdminLayout() {
                   title={label}
                   aria-label={label}
                   className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
-                    active ? 'bg-[#C49A6C] text-white' : 'text-white/70 hover:bg-white/10'
+                    active ? 'bg-[#2563EB] text-white' : 'text-[#6b7280] hover:bg-[#F7F7F5]'
                   }`}
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -372,7 +398,7 @@ function AdminLayout() {
                 title="More"
                 aria-label="More"
                 className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
-                  mobileMenuOpen || moreItemActive ? 'bg-[#C49A6C] text-white' : 'text-white/70 hover:bg-white/10'
+                  mobileMenuOpen || moreItemActive ? 'bg-[#2563EB] text-white' : 'text-[#6b7280] hover:bg-[#F7F7F5]'
                 }`}
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -386,7 +412,7 @@ function AdminLayout() {
             {/* Bell */}
             <div className="relative shrink-0">
               <button
-                className="flex items-center justify-center w-8 h-8 rounded-full text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-full text-[#6b7280] hover:text-[#222222] hover:bg-[#F7F7F5] transition-colors"
                 title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -404,7 +430,7 @@ function AdminLayout() {
             </div>
 
             {/* Avatar */}
-            <div className="shrink-0 bg-white/95 rounded-full">
+            <div className="shrink-0">
               <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} openUp />
             </div>
           </div>
@@ -425,11 +451,11 @@ function AdminLayout() {
           role="dialog"
           aria-label="All sections"
         >
-          <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#D9D9D9]">
-            <h2 className="text-lg font-bold text-[#0B0B45]">{isAdmin ? 'Admin Menu' : 'Host Menu'}</h2>
+          <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#E5E7EB]">
+            <h2 className="text-lg font-bold text-[#222222]">{isAdmin ? 'Admin Menu' : 'Host Menu'}</h2>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-full text-[#6b7280] hover:bg-[#D9D9D9]/30 transition-colors"
+              className="p-2 rounded-full text-[#6b7280] hover:bg-[#F7F7F5] transition-colors"
               aria-label="Close menu"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -438,30 +464,37 @@ function AdminLayout() {
             </button>
           </div>
           <nav className="flex-1 overflow-y-auto py-2" aria-label="Admin sections">
-            {navItems.map(({ path, label, icon, exact }) => {
-              const active = exact ? location.pathname === path : location.pathname.startsWith(path);
-              return (
-                <Link
-                  key={path}
-                  to={path}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center px-5 py-3 text-sm transition-colors ${
-                    active ? 'bg-[#C49A6C]/10 text-[#0B0B45] font-semibold' : 'text-[#1f2937] hover:bg-[#D9D9D9]/30'
-                  }`}
-                >
-                  <svg className="w-5 h-5 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-                  </svg>
-                  {label}
-                </Link>
-              );
-            })}
+            {navGroups.map(({ group, items }) => (
+              <div key={group} className="mb-2">
+                <span className="block px-5 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
+                  {group}
+                </span>
+                {items.map(({ path, label, icon, exact }) => {
+                  const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+                  return (
+                    <Link
+                      key={path}
+                      to={path}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`flex items-center px-5 py-3 text-sm transition-colors ${
+                        active ? 'bg-blue-50 text-[#2563EB] font-semibold' : 'text-[#222222] hover:bg-[#F7F7F5]'
+                      }`}
+                    >
+                      <svg className="w-5 h-5 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                      </svg>
+                      {label}
+                    </Link>
+                  );
+                })}
+              </div>
+            ))}
           </nav>
-          <div className="border-t border-[#D9D9D9] p-3">
+          <div className="border-t border-[#E5E7EB] p-3">
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold text-[#0B0B45] shadow-sm hover:shadow-md transition-shadow"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -479,12 +512,12 @@ function AdminLayout() {
         }`}
       >
         {/* Desktop header with notification bell and avatar dropdown */}
-        <header className="hidden md:flex items-center justify-end gap-3 h-16 px-8 bg-white shadow-sm sticky top-0 z-[5]">
+        <header className="hidden md:flex items-center justify-end gap-3 h-16 px-8 bg-white border-b border-[#E5E7EB] sticky top-0 z-[5]">
           {/* Bell - unread messages + pending bookings */}
           <div className="relative">
             <button
               onClick={() => { /* just a visual indicator for now */ }}
-              className="p-2 rounded-full hover:bg-[#D9D9D9]/40 transition-colors text-[#0B0B45]"
+              className="p-2 rounded-full hover:bg-[#F7F7F5] transition-colors text-[#222222]"
               title={`${notif.unreadMessages} unread messages, ${notif.pendingBookings} pending bookings`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -510,7 +543,6 @@ function AdminLayout() {
   );
 }
 
-// Dashboard Overview
 // Dashboard Overview
 function DashboardOverview() {
   const { user } = useAuth();
@@ -593,15 +625,15 @@ function DashboardOverview() {
 
   return (
     <div>
-      {/* Hero panel */}
-      <div className="bg-gradient-to-br from-[#0B0B45] to-[#07072e] rounded-2xl p-6 sm:p-8 text-white mb-6">
+      {/* Header panel */}
+      <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-6">
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wider text-white/50">{greeting}</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">
+            <p className="text-xs font-semibold uppercase tracking-wider text-[#6b7280]">{greeting}</p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-[#222222] sm:text-3xl">
               Welcome back{user?.firstName ? `, ${user.firstName}` : ''}
             </h1>
-            <p className="mt-2 max-w-md text-sm text-white/60">
+            <p className="mt-2 max-w-md text-sm text-[#6b7280]">
               {isAdmin ? 'Manage properties, bookings, and users from one place.' : 'Track your listings, earnings, and upcoming guests.'}
             </p>
           </div>
@@ -612,18 +644,18 @@ function DashboardOverview() {
                 aria-haspopup="menu"
                 aria-expanded={quickActionsOpen}
                 onClick={() => setQuickActionsOpen((o) => !o)}
-                className="inline-flex items-center gap-2 rounded-full bg-[#C49A6C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#b8895c] transition-colors shadow-md"
+                className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1D4ED8] transition-colors"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                 Quick actions
                 <svg className={`w-4 h-4 transition-transform ${quickActionsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
               </button>
               {quickActionsOpen && (
-                <div className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-xl bg-white p-1.5 shadow-lg sm:left-auto sm:right-0" role="menu">
+                <div className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-[14px] border border-[#E5E7EB] bg-white p-1.5 shadow-lg sm:left-auto sm:right-0" role="menu">
                   {quickLinks.map((link) => (
                     <button key={link.label} type="button" role="menuitem" onClick={() => { setQuickActionsOpen(false); navigate(link.to); }}
-                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F8F9FA] hover:text-[#1f2937] transition-colors">
-                      <svg className="w-4 h-4 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} /></svg>
+                      className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] transition-colors">
+                      <svg className="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} /></svg>
                       {link.label}
                     </button>
                   ))}
@@ -637,34 +669,34 @@ function DashboardOverview() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <StatCardView label="Total Properties" value={stats.properties} icon="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" tone="primary" />
-        <StatCardView label="Active Bookings" value={stats.bookings} icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" tone="gold" />
+        <StatCardView label="Active Bookings" value={stats.bookings} icon="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" tone="info" />
         {isAdmin && <StatCardView label="Active Promos" value={stats.promos} icon="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" tone="success" />}
-        <StatCardView label="Revenue (KES)" value={stats.revenue.toLocaleString()} icon="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" tone="info" />
+        <StatCardView label="Revenue (KES)" value={stats.revenue.toLocaleString()} icon="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" tone="warning" />
       </div>
 
       {/* Landing Page Stats Editor - admin only */}
       {isAdmin && (
-      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-2">Landing Page Stats</h2>
+      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 mb-6">
+        <h2 className="text-lg font-bold text-[#222222] mb-2">Landing Page Stats</h2>
         <p className="text-sm text-[#6b7280] mb-4">These appear in the hero section. Set to 0 to use live data from reviews and bookings.</p>
         <form onSubmit={saveLandingStats} className="flex flex-wrap items-end gap-4">
           <div>
-            <label className="block text-sm font-semibold text-[#1f2937] mb-1">Happy Stays</label>
+            <label className="block text-sm font-medium text-[#222222] mb-1">Happy Stays</label>
             <input type="number" min="0" value={landingStats.happyStays} onChange={(e) => setLandingStats({ ...landingStats, happyStays: e.target.value })}
-              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20" />
+              className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#1f2937] mb-1">Star Rating</label>
+            <label className="block text-sm font-medium text-[#222222] mb-1">Star Rating</label>
             <input type="number" min="0" max="5" step="0.1" value={landingStats.starRating} onChange={(e) => setLandingStats({ ...landingStats, starRating: e.target.value })}
-              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20" />
+              className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]" />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#1f2937] mb-1">Satisfaction %</label>
+            <label className="block text-sm font-medium text-[#222222] mb-1">Satisfaction %</label>
             <input type="number" min="0" max="100" value={landingStats.satisfaction} onChange={(e) => setLandingStats({ ...landingStats, satisfaction: e.target.value })}
-              className="w-32 px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20" />
+              className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]" />
           </div>
           <button type="submit" disabled={savingLanding}
-            className="bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50">
+            className="bg-[#2563EB] text-white font-semibold px-5 py-2 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50">
             {savingLanding ? 'Saving...' : 'Update'}
           </button>
           {landingMsg && <span className="text-sm text-green-600 self-center">{landingMsg}</span>}
@@ -673,10 +705,10 @@ function DashboardOverview() {
       )}
 
       {/* Recent Bookings */}
-      <div className="bg-white rounded-2xl shadow-sm p-6">
+      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-bold text-[#0B0B45]">Recent Bookings</h2>
-          <Link to="/admin/bookings" className="text-sm font-medium text-[#C49A6C] hover:text-[#b8895c] transition-colors">View all</Link>
+          <h2 className="text-lg font-bold text-[#222222]">Recent Bookings</h2>
+          <Link to="/admin/bookings" className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors">View all</Link>
         </div>
         {recentBookings.length === 0 ? (
           <p className="text-[#6b7280] text-sm py-8 text-center">No bookings yet.</p>
@@ -684,17 +716,17 @@ function DashboardOverview() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left border-b border-[#EFEFF2]">
-                  <th className="pb-3 font-semibold text-[#0B0B45]">Guest</th>
-                  <th className="pb-3 font-semibold text-[#0B0B45]">Property</th>
-                  <th className="pb-3 font-semibold text-[#0B0B45] hidden sm:table-cell">Dates</th>
-                  <th className="pb-3 font-semibold text-[#0B0B45]">Total</th>
-                  <th className="pb-3 font-semibold text-[#0B0B45]">Status</th>
+                <tr className="text-left border-b border-[#E5E7EB]">
+                  <th className="pb-3 font-semibold text-[#222222]">Guest</th>
+                  <th className="pb-3 font-semibold text-[#222222]">Property</th>
+                  <th className="pb-3 font-semibold text-[#222222] hidden sm:table-cell">Dates</th>
+                  <th className="pb-3 font-semibold text-[#222222]">Total</th>
+                  <th className="pb-3 font-semibold text-[#222222]">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {recentBookings.map((b) => (
-                  <tr key={b.id} className="border-b border-[#EFEFF2]/50 hover:bg-[#F8F9FA] transition-colors">
+                  <tr key={b.id} className="border-b border-[#E5E7EB]/60 hover:bg-[#F7F7F5] transition-colors">
                     <td className="py-3">{b.user?.firstName} {b.user?.lastName}</td>
                     <td className="py-3 max-w-[140px] truncate">{b.property?.title}</td>
                     <td className="py-3 text-xs text-[#6b7280] hidden sm:table-cell">{new Date(b.checkIn).toLocaleDateString()} - {new Date(b.checkOut).toLocaleDateString()}</td>
