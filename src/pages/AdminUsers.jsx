@@ -427,7 +427,7 @@ function AdminUsers() {
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={closePasswordReset} disabled={busyId === passwordTarget.id} className="inline-flex items-center min-h-[44px] px-5 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] disabled:opacity-50">Cancel</button>
-                <button type="submit" disabled={busyId === passwordTarget.id} className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg text-sm hover:bg-[#1D4ED8] disabled:opacity-50">
+                <button type="submit" disabled={busyId === passwordTarget.id} className="bg-[#C49A6C] text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg text-sm hover:bg-[#B8895C] disabled:opacity-50">
                   {busyId === passwordTarget.id ? 'Saving...' : 'Set password'}
                 </button>
               </div>
@@ -483,7 +483,7 @@ function AdminUsers() {
                 <button type="button" onClick={closeEdit} className="inline-flex items-center min-h-[44px] px-5 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors">
                   Cancel
                 </button>
-                <button type="submit" disabled={saving} className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50">
+                <button type="submit" disabled={saving} className="bg-[#C49A6C] text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg text-sm hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50">
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
