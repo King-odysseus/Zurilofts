@@ -129,7 +129,7 @@ function PropertyPage() {
             </div>
             <h2 className="text-xl font-bold text-[#222222] mb-2">Property Not Found</h2>
             <p className="text-[#6b7280] mb-4">{error || 'This property could not be loaded.'}</p>
-            <Link to="/properties" className="inline-flex items-center justify-center min-h-[44px] bg-[#2563EB] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#1D4ED8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors duration-200">
+            <Link to="/properties" className="inline-flex items-center justify-center min-h-[44px] bg-[#C49A6C] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors duration-200">
               View All Properties
             </Link>
           </div>
@@ -473,7 +473,7 @@ function PropertyPinMap({ lat, lng, address, location, title }) {
   }, [lat, lng, title, location]);
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-[#E5E7EB] shadow-sm bg-white">
+    <div className="rounded-[14px] overflow-hidden border border-[#E5E7EB] shadow-sm bg-white">
       <div ref={mapElRef} className="h-64 md:h-80 w-full" aria-label={`Map showing the location of ${title}`} />
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 sm:p-5">
         <div className="min-w-0 flex-1">
