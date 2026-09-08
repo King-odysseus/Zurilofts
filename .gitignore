@@ -28,6 +28,9 @@ server/.env
 server/node_modules
 server/dist
 
+# Runtime auth cookies (captured by curl during local debugging) - secrets, never commit
+server/cookies.txt
+
 # Admin-uploaded property images (runtime data, not source)
 server/uploads
 
