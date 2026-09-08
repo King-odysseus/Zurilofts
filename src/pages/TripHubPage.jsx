@@ -349,7 +349,7 @@ export default function TripHubPage() {
       <Navbar />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         {/* Header panel */}
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-8">
+        <div className="rounded-[14px] border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-8">
           <p className="text-xs font-semibold uppercase tracking-wider text-[#6b7280]">Your stays</p>
           <h1 className="mt-1 text-2xl font-bold text-[#222222] sm:text-3xl">Trips</h1>
           <p className="mt-2 max-w-md text-sm text-[#6b7280]">Upcoming adventures and past memories - all in one place.</p>
