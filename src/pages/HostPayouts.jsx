@@ -203,7 +203,7 @@ function HostPayouts() {
           />
           <button
             onClick={downloadWht}
-            className="min-h-[44px] bg-[#2563EB] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-colors"
+            className="min-h-[44px] bg-[#C49A6C] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-[#B8895C] transition-colors"
           >
             View Statement
           </button>
@@ -253,7 +253,7 @@ function HostPayouts() {
             <div className="flex flex-wrap gap-3 mt-4">
               <button
                 onClick={printWht}
-                className="min-h-[44px] bg-[#2563EB] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-colors"
+                className="min-h-[44px] bg-[#C49A6C] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-[#B8895C] transition-colors"
               >
                 Print PDF
               </button>
