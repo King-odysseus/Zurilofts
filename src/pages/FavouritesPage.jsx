@@ -64,7 +64,7 @@ function FavouritesPage() {
             <div className="space-y-3">
               <Link
                 to="/login?returnUrl=/favourites"
-                className="inline-flex items-center justify-center w-full min-h-[44px] bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                className="inline-flex items-center justify-center w-full min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
               >
                 Sign In
               </Link>
@@ -131,7 +131,7 @@ function FavouritesPage() {
               </p>
               <Link
                 to="/properties"
-                className="inline-flex items-center justify-center min-h-[44px] bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                className="inline-flex items-center justify-center min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
               >
                 Browse Properties
               </Link>
