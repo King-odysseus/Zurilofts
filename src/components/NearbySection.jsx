@@ -69,7 +69,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   const catOptions = categories && Object.entries(categoryLabels).map(([k, v]) => ({ value: k, label: v }));
 
   return (
-    <div className="mt-20 md:mt-28 mb-16">
+    <div className="mt-8 md:mt-12 mb-16">
       {/* Centered Header */}
       <div className="text-center mb-8 px-5 py-8 md:px-8 md:py-10 rounded-[14px] border border-[#E5E7EB] bg-white shadow-sm">
         <h2 className="text-3xl md:text-4xl font-bold text-[#222222]">{title}</h2>
