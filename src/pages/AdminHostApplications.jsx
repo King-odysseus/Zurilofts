@@ -68,13 +68,34 @@ function AdminHostApplications() {
     finally { setBusy(''); }
   }
 
+  const applicationMetrics = [
+    { label: 'In view', value: applications.length },
+    { label: 'Submitted', value: applications.filter((app) => app.status === 'SUBMITTED').length },
+    { label: 'Approved', value: applications.filter((app) => app.status === 'APPROVED').length },
+    { label: 'Changes requested', value: applications.filter((app) => app.status === 'CHANGES_REQUESTED').length },
+  ];
+  const statusOptions = [
+    { value: 'SUBMITTED', label: 'Submitted' },
+    { value: 'CHANGES_REQUESTED', label: 'Changes requested' },
+    { value: 'APPROVED', label: 'Approved' },
+    { value: 'REJECTED', label: 'Rejected' },
+    { value: 'DRAFT', label: 'Draft' },
+    { value: '', label: 'All statuses' },
+  ];
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
         <div><h1 className="text-2xl font-bold text-[#222222]">Host Applications</h1><p className="text-sm text-[#6b7280] mt-1">Verify identity, authority, and hosting details before granting access.</p></div>
         <select value={status} onChange={(e) => setStatus(e.target.value)} className="min-h-[44px] rounded-xl border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20">
-          <option value="">All statuses</option><option value="SUBMITTED">Submitted</option><option value="CHANGES_REQUESTED">Changes requested</option><option value="APPROVED">Approved</option><option value="REJECTED">Rejected</option><option value="DRAFT">Draft</option>
+          {statusOptions.map((option) => <option key={option.value || 'all'} value={option.value}>{option.label}</option>)}
         </select>
+      </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {applicationMetrics.map((metric) => <div key={metric.label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{metric.label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{metric.value}</p></div>)}
+      </div>
+      <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Host application status">
+        {statusOptions.map((option) => <button key={option.value || 'all'} type="button" role="tab" aria-selected={status === option.value} onClick={() => setStatus(option.value)} className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${status === option.value ? 'bg-[#2563EB] text-white' : 'border border-[#E5E7EB] bg-white text-[#222222] hover:bg-[#F7F7F5]'}`}>{option.label}</button>)}
       </div>
       {message && <div className="rounded-[14px] bg-[#222222]/5 px-4 py-3 text-sm text-[#222222]">{message}</div>}
       {loading ? <div className="py-16 text-center text-[#6b7280]">Loading applications...</div> : applications.length === 0 ? <div className="rounded-[14px] shadow-sm bg-white p-12 text-center text-[#6b7280]">No applications in this view.</div> : (
