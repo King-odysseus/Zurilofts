@@ -115,7 +115,7 @@ function ActionButton({ variant = 'secondary', size = 'sm', className = '', disa
     md: 'min-h-[44px] px-4 py-2 text-sm',
   };
   const variants = {
-    primary: 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]',
+    primary: 'bg-[#C49A6C] text-white hover:bg-[#B8895C]',
     secondary: 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]',
     danger: 'bg-[#dc2626] text-white hover:bg-[#b91c1c]',
   };
@@ -436,7 +436,7 @@ function EditBookingModal({ booking, onClose, onSaved }) {
           <button
             type="submit"
             disabled={saving}
-            className="w-full min-h-[44px] rounded-lg bg-[#2563EB] text-white font-semibold text-sm hover:bg-[#1D4ED8] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="w-full min-h-[44px] rounded-lg bg-[#C49A6C] text-white font-semibold text-sm hover:bg-[#B8895C] disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
             {saving ? 'Saving...' : 'Save Changes'}
           </button>
