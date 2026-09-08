@@ -128,11 +128,11 @@ function AdminIdentityVerifications() {
       )}
 
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={() => !busy && setSelected(null)}>
-          <div className="max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-[14px] bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/20" onClick={() => !busy && setSelected(null)}>
+          <div className="h-full w-full max-w-2xl overflow-y-auto border-l border-[#E5E7EB] bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E5E7EB] bg-white px-6 py-5">
-              <div><h2 className="text-xl font-bold text-[#222222]">{selected.fullName || 'Unnamed'}</h2><p className="text-sm text-[#6b7280]">{selected.user?.email}</p></div>
-              <button onClick={() => setSelected(null)} className="rounded-full px-3 py-2 text-xl text-[#6b7280] hover:bg-gray-100">&times;</button>
+              <div><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Identity review</p><h2 className="mt-1 text-xl font-bold text-[#222222]">{selected.fullName || 'Unnamed'}</h2><p className="text-sm text-[#6b7280]">{selected.user?.email}</p></div>
+              <button onClick={() => setSelected(null)} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close identity review">&times;</button>
             </div>
             <div className="space-y-7 p-6">
               <div className="grid sm:grid-cols-2 gap-3">
