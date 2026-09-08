@@ -59,7 +59,11 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
           disabled={loading}
           className={`min-h-[44px] w-full whitespace-nowrap rounded-full bg-[#C49A6C] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-8 ${discovery ? 'sm:h-12 sm:w-12 sm:px-0 sm:text-transparent' : ''}`}
         >
-          {discovery ? <span aria-hidden="true" className="text-white">⌕</span> : (loading ? 'Searching…' : 'Search')}
+          {discovery ? (
+            <svg className="mx-auto h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" />
+            </svg>
+          ) : (loading ? 'Searching…' : 'Search')}
           {discovery && <span className="sr-only">Search</span>}
         </button>
       </div>
