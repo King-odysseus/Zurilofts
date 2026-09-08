@@ -153,6 +153,7 @@ function BookingActions({
   onCancel,
   onEdit,
   onDelete,
+  onView,
   onMarkRefunded,
   onDeclineRefund,
 }) {
@@ -162,6 +163,7 @@ function BookingActions({
 
   return (
     <div className={`flex flex-wrap items-center gap-2 ${className}`}>
+      <ActionButton variant="secondary" size={size} onClick={() => onView(booking)}>View</ActionButton>
       {booking.status === 'PENDING' && (
         <>
           <ActionButton variant="primary" size={size} disabled={actionLoading} onClick={() => onConfirm(booking.id)}>
@@ -223,6 +225,7 @@ BookingActions.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
+  onView: PropTypes.func.isRequired,
   onMarkRefunded: PropTypes.func.isRequired,
   onDeclineRefund: PropTypes.func.isRequired,
 };
@@ -482,6 +485,7 @@ function AdminBookings() {
   const [editingBooking, setEditingBooking] = useState(null);
   const [cancelTarget, setCancelTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [viewingBooking, setViewingBooking] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchBookings = useCallback(async () => {
@@ -564,6 +568,7 @@ function AdminBookings() {
     onCancel: setCancelTarget,
     onEdit: setEditingBooking,
     onDelete: setDeleteTarget,
+    onView: setViewingBooking,
     onMarkRefunded: (id) => handleRefundResolve(id, 'REFUNDED'),
     onDeclineRefund: (id) => handleRefundResolve(id, 'REFUND_DECLINED'),
   };
@@ -743,6 +748,33 @@ function AdminBookings() {
       )}
 
       {/* Edit Modal */}
+      {viewingBooking && (
+        <div className="fixed inset-0 z-30 bg-black/20" onClick={() => setViewingBooking(null)}>
+          <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-[#E5E7EB] bg-white p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Booking details</p>
+                <h2 className="mt-1 text-xl font-bold text-[#222222]">{viewingBooking.id}</h2>
+              </div>
+              <button type="button" onClick={() => setViewingBooking(null)} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close booking details">×</button>
+            </div>
+            <div className="mt-5 space-y-4">
+              <div className="flex items-center gap-3">
+                {viewingBooking.property?.images?.[0] && <img src={viewingBooking.property.images[0]} alt="" className="h-16 w-20 rounded-xl object-cover" />}
+                <div><p className="font-semibold text-[#222222]">{viewingBooking.property?.title}</p><p className="text-sm text-[#6b7280]">{viewingBooking.property?.location}</p></div>
+              </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-xl bg-[#F7F7F5] p-3"><p className="text-xs text-[#6b7280]">Guest</p><p className="mt-1 font-semibold text-[#222222]">{viewingBooking.user?.firstName} {viewingBooking.user?.lastName}</p></div>
+                <div className="rounded-xl bg-[#F7F7F5] p-3"><p className="text-xs text-[#6b7280]">Guests</p><p className="mt-1 font-semibold text-[#222222]">{viewingBooking.guests}</p></div>
+                <div className="rounded-xl bg-[#F7F7F5] p-3"><p className="text-xs text-[#6b7280]">Check-in</p><p className="mt-1 font-semibold text-[#222222]">{new Date(viewingBooking.checkIn).toLocaleDateString()}</p></div>
+                <div className="rounded-xl bg-[#F7F7F5] p-3"><p className="text-xs text-[#6b7280]">Check-out</p><p className="mt-1 font-semibold text-[#222222]">{new Date(viewingBooking.checkOut).toLocaleDateString()}</p></div>
+              </div>
+              <div className="flex items-center justify-between border-t border-[#E5E7EB] pt-4"><span className="text-sm text-[#6b7280]">Total</span><span className="text-lg font-bold text-[#222222]">KES {viewingBooking.total.toLocaleString()}</span></div>
+              <div className="flex flex-wrap gap-2"><StatusBadges booking={viewingBooking} /><PaymentBadge booking={viewingBooking} /></div>
+            </div>
+          </aside>
+        </div>
+      )}
       <EditBookingModal
         booking={editingBooking}
         onClose={() => setEditingBooking(null)}
