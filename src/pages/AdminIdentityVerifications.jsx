@@ -94,7 +94,7 @@ function AdminIdentityVerifications() {
                   <td className="p-4">{v.idType || '-'}</td>
                   <td className="p-4">{v.documents?.length || 0}</td>
                   <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[v.status]}`}>{v.status.replaceAll('_', ' ')}</span></td>
-                  <td className="p-4"><button onClick={() => open(v.id)} disabled={busy === v.id} className="rounded-lg border border-[#2563EB] px-4 py-2 text-xs font-semibold text-[#2563EB] hover:bg-[#2563EB] hover:text-white disabled:opacity-50">Review</button></td>
+                  <td className="p-4"><button onClick={() => open(v.id)} disabled={busy === v.id} className="rounded-lg bg-[#C49A6C] px-4 py-2 text-xs font-semibold text-white hover:bg-[#B8895C] disabled:opacity-50">Review</button></td>
                 </tr>
               ))}
             </tbody>
