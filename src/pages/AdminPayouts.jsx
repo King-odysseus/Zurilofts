@@ -88,7 +88,7 @@ function AdminPayouts() {
           <button
             onClick={runScheduled}
             disabled={scheduledRunning}
-            className="bg-[#2563EB] text-white text-sm font-semibold min-h-[44px] px-4 py-2 rounded-lg hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
+            className="bg-[#C49A6C] text-white text-sm font-semibold min-h-[44px] px-4 py-2 rounded-lg hover:bg-[#B8895C] transition-colors disabled:opacity-50"
           >
             {scheduledRunning ? 'Running...' : 'Run Scheduled Payouts'}
           </button>
