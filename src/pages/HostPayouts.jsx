@@ -142,9 +142,18 @@ function HostPayouts() {
 
   return (
     <div className="space-y-6">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Host finance</p>
+        <h1 className="mt-1 text-2xl font-bold text-[#222222]">Payouts</h1>
+        <p className="mt-1 text-sm text-[#6b7280]">Track your available balance, payout destination, tax statements, and payout history.</p>
+      </div>
+
       {/* Wallet card */}
       <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
-        <h2 className="text-lg font-bold text-[#222222] mb-4">My Earnings Wallet</h2>
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+          <div><h2 className="text-lg font-bold text-[#222222]">My earnings wallet</h2><p className="mt-1 text-sm text-[#6b7280]">Your current balance and lifetime payout totals.</p></div>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${destination?.method ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>{destination?.method ? 'Payouts enabled' : 'Setup required'}</span>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-[#F7F7F5] rounded-xl p-4">
             <p className="text-xs text-[#6b7280] uppercase tracking-wide">Current Balance</p>
