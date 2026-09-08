@@ -637,7 +637,7 @@ function DashboardOverview() {
   return (
     <div>
       {/* Header panel - Needs attention */}
-      <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-6">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-6">
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-[#222222] sm:text-3xl">Needs attention</h1>
