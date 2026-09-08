@@ -270,7 +270,12 @@ function PropertiesPage() {
           <p className="text-[#6b7280] text-sm mb-6 md:mb-7">
             Premium furnished apartments in Nairobi&apos;s most desirable neighbourhoods.
           </p>
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto rounded-[18px] border border-[#E5E7EB] bg-white p-2 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-left">
+            <div className="hidden md:grid grid-cols-3 divide-x divide-[#E5E7EB] px-4 pt-2 pb-1" aria-hidden="true">
+              <span className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Where</span>
+              <span className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Dates</span>
+              <span className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Guests</span>
+            </div>
             <TripSearchBar
               value={searchInput}
               onChange={handleSearchChange}
@@ -565,7 +570,7 @@ function PropertiesPage() {
 
           {/* Results grid */}
           {!loading && !error && viewMode !== 'map' && sortedListings.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
               {sortedListings.map((listing) => (
                 <PropertyCard
                   key={`${listing.id}-${listing.variant || 'base'}`}
