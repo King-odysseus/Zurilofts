@@ -198,7 +198,7 @@ function ConversationPage() {
               <p className="text-[#6b7280] mb-4">{error}</p>
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
+                className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
               >
                 Try again
               </button>
@@ -239,7 +239,7 @@ function ConversationPage() {
               disabled={!canSend}
               className={`flex-shrink-0 inline-flex items-center gap-1.5 min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 canSend
-                  ? 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]'
+                  ? 'bg-[#C49A6C] text-white hover:bg-[#B8895C]'
                   : 'bg-[#E5E7EB] text-[#6b7280] cursor-not-allowed'
               }`}
             >
