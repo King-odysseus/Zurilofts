@@ -197,7 +197,7 @@ function AdminPropertyForm() {
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between mb-6">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <Link to={`${base}/properties`} className="text-sm text-[#6b7280] hover:text-[#2563EB]">&larr; Back to properties</Link>
           <h1 className="text-2xl font-bold text-[#222222] mt-1">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
@@ -455,7 +455,7 @@ function AdminPropertyForm() {
           </div>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="sticky bottom-4 z-20 rounded-[14px] border border-[#E5E7EB] bg-white/95 backdrop-blur px-4 py-3 shadow-lg flex items-center gap-3">
           <button
             type="submit"
             disabled={saving}
