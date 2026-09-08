@@ -28,9 +28,9 @@ const EMPTY = {
   nearby: '',
 };
 
-const labelCls = 'block text-sm font-semibold text-[#1f2937] mb-2';
+const labelCls = 'block text-sm font-medium text-[#222222] mb-2';
 const inputCls =
-  'w-full px-4 py-2.5 rounded-xl bg-white text-[#1f2937] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30';
+  'w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20';
 
 // textarea where each non-empty line is one array item
 function linesToArray(text) {
@@ -190,7 +190,7 @@ function AdminPropertyForm() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
       </div>
     );
   }
@@ -199,14 +199,14 @@ function AdminPropertyForm() {
     <div className="w-full">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <Link to={`${base}/properties`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to properties</Link>
-          <h1 className="text-2xl font-bold text-[#0B0B45] mt-1">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
+          <Link to={`${base}/properties`} className="text-sm text-[#6b7280] hover:text-[#2563EB]">&larr; Back to properties</Link>
+          <h1 className="text-2xl font-bold text-[#222222] mt-1">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setShowFullPreview(true)}
-            className="flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-[#0B0B45] text-white hover:bg-[#06062a] transition-colors"
+            className="flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -217,7 +217,7 @@ function AdminPropertyForm() {
           {isEdit && (
             <Link
               to={`${base}/properties/${id}/calendar`}
-              className="px-4 py-2 rounded-full text-sm font-semibold text-[#0B0B45] shadow-sm hover:shadow-md hover:text-[#C49A6C] transition-colors"
+              className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors"
             >
               Manage Calendar &rarr;
             </Link>
@@ -234,7 +234,7 @@ function AdminPropertyForm() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-2xl p-6 space-y-5 shadow-sm">
+        <div className="bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
           <div>
             <label className={labelCls}>Title</label>
             <input className={inputCls} value={form.title} onChange={(e) => update('title', e.target.value)} required />
@@ -243,8 +243,8 @@ function AdminPropertyForm() {
             <label className={labelCls}>Location</label>
             <input className={inputCls} value={form.location} onChange={(e) => update('location', e.target.value)} required />
           </div>
-          <div className="bg-canvas rounded-2xl p-4 sm:p-5">
-            <p className="text-sm font-semibold text-[#0B0B45]">Confirm exact location on a map</p>
+          <div className="bg-canvas rounded-[14px] p-4 sm:p-5">
+            <p className="text-sm font-semibold text-[#222222]">Confirm exact location on a map</p>
             <p className="text-xs text-[#6b7280] mb-3">
               Drop a pin at the property&apos;s entrance. Guests see this pin and can open it in Google Maps for directions.
             </p>
@@ -279,13 +279,13 @@ function AdminPropertyForm() {
 
           {/* Bed variant pricing */}
           <div className="bg-canvas rounded-xl p-4 space-y-4">
-            <p className="text-sm font-semibold text-[#0B0B45]">Bed Variant Pricing &amp; Bathrooms</p>
+            <p className="text-sm font-semibold text-[#222222]">Bed Variant Pricing &amp; Bathrooms</p>
             <p className="text-xs text-[#6b7280] -mt-3">Each variant can have its own price and bathroom count. Leave unchecked to not list.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#C49A6C]/20 transition-all duration-200">
+              <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#2563EB]/20 transition-all duration-200">
                 <input
                   type="checkbox"
-                  className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
+                  className="accent-[#2563EB] w-5 h-5 mt-0.5 flex-shrink-0"
                   checked={form.price1Bed !== ''}
                   onChange={(e) => {
                     update('price1Bed', e.target.checked ? (form.price || '') : '');
@@ -293,7 +293,7 @@ function AdminPropertyForm() {
                   }}
                 />
                 <div className="flex-1">
-                  <span className="block text-sm font-semibold text-[#1f2937]">List as 1-Bed</span>
+                  <span className="block text-sm font-semibold text-[#222222]">List as 1-Bed</span>
                   <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 1-bed card</span>
                   {form.price1Bed !== '' && (
                     <div className="space-y-3">
@@ -318,10 +318,10 @@ function AdminPropertyForm() {
                   )}
                 </div>
               </label>
-              <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#C49A6C]/20 transition-all duration-200">
+              <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#2563EB]/20 transition-all duration-200">
                 <input
                   type="checkbox"
-                  className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
+                  className="accent-[#2563EB] w-5 h-5 mt-0.5 flex-shrink-0"
                   checked={form.price2Bed !== ''}
                   onChange={(e) => {
                     update('price2Bed', e.target.checked ? (form.price || '') : '');
@@ -329,7 +329,7 @@ function AdminPropertyForm() {
                   }}
                 />
                 <div className="flex-1">
-                  <span className="block text-sm font-semibold text-[#1f2937]">List as 2-Bed</span>
+                  <span className="block text-sm font-semibold text-[#222222]">List as 2-Bed</span>
                   <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 2-bed card</span>
                   {form.price2Bed !== '' && (
                     <div className="space-y-3">
@@ -372,12 +372,12 @@ function AdminPropertyForm() {
               />
             </div>
             <div className="flex items-end gap-6 pb-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-[#1f2937]">
-                <input type="checkbox" checked={form.available} onChange={(e) => update('available', e.target.checked)} className="accent-[#C49A6C] w-4 h-4" />
+              <label className="flex items-center gap-2 text-sm font-medium text-[#222222]">
+                <input type="checkbox" checked={form.available} onChange={(e) => update('available', e.target.checked)} className="accent-[#2563EB] w-4 h-4" />
                 Available
               </label>
-              <label className="flex items-center gap-2 text-sm font-medium text-[#1f2937]">
-                <input type="checkbox" checked={form.featured} onChange={(e) => update('featured', e.target.checked)} className="accent-[#C49A6C] w-4 h-4" />
+              <label className="flex items-center gap-2 text-sm font-medium text-[#222222]">
+                <input type="checkbox" checked={form.featured} onChange={(e) => update('featured', e.target.checked)} className="accent-[#2563EB] w-4 h-4" />
                 Featured
               </label>
             </div>
@@ -388,7 +388,7 @@ function AdminPropertyForm() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl p-6 space-y-5 shadow-sm">
+        <div className="bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
           <div>
             <label className={labelCls}>Photos</label>
             <p className="text-sm text-[#6b7280] mb-3">Upload images from your device. They&apos;re automatically resized and compressed for the website. The first photo is used as the cover.</p>
@@ -399,7 +399,7 @@ function AdminPropertyForm() {
                   <div key={src + i} className="relative group aspect-[4/3] rounded-xl overflow-hidden shadow-sm">
                     <img src={src} alt={`Property photo ${i + 1}`} className="w-full h-full object-cover" />
                     {i === 0 && (
-                      <span className="absolute top-1.5 left-1.5 bg-[#C49A6C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Cover</span>
+                      <span className="absolute top-1.5 left-1.5 bg-[#2563EB] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Cover</span>
                     )}
                     <button
                       type="button"
@@ -416,18 +416,18 @@ function AdminPropertyForm() {
               </div>
             )}
 
-            <label className={`flex flex-col items-center justify-center w-full border-2 border-dashed border-[#D9D9D9] rounded-xl py-8 cursor-pointer hover:border-[#C49A6C] hover:bg-[#C49A6C]/5 transition-colors ${uploading ? 'opacity-60 pointer-events-none' : ''}`}>
+            <label className={`flex flex-col items-center justify-center w-full border-2 border-dashed border-[#E5E7EB] rounded-xl py-8 cursor-pointer hover:border-[#2563EB] hover:bg-[#2563EB]/5 transition-colors ${uploading ? 'opacity-60 pointer-events-none' : ''}`}>
               {uploading ? (
                 <>
-                  <div className="w-6 h-6 border-2 border-[#C49A6C] border-t-transparent rounded-full animate-spin mb-2"></div>
+                  <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mb-2"></div>
                   <span className="text-sm text-[#6b7280]">Uploading & optimizing...</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-8 h-8 text-[#C49A6C] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 text-[#2563EB] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  <span className="text-sm font-semibold text-[#0B0B45]">Click to upload photos</span>
+                  <span className="text-sm font-semibold text-[#222222]">Click to upload photos</span>
                   <span className="text-xs text-[#6b7280] mt-1">JPEG, PNG or WebP · up to 10 at a time</span>
                 </>
               )}
@@ -459,11 +459,11 @@ function AdminPropertyForm() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+            className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-6 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
           >
             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Property'}
           </button>
-          <Link to={`${base}/properties`} className="px-6 py-2.5 rounded-full font-semibold text-[#6b7280] hover:text-[#0B0B45]">Cancel</Link>
+          <Link to={`${base}/properties`} className="inline-flex items-center min-h-[44px] px-6 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]">Cancel</Link>
         </div>
       </form>
 
@@ -472,7 +472,7 @@ function AdminPropertyForm() {
         type="button"
         onClick={() => setPreviewOpen((o) => !o)}
         aria-label={previewOpen ? 'Hide preview' : 'Show preview'}
-        className={`fixed top-1/2 -translate-y-1/2 z-40 bg-[#0B0B45] text-white px-2 py-4 rounded-l-xl shadow-lg hover:bg-[#06062a] transition-all duration-300 ${
+        className={`fixed top-1/2 -translate-y-1/2 z-40 bg-[#2563EB] text-white px-2 py-4 rounded-l-xl shadow-lg hover:bg-[#1D4ED8] transition-all duration-300 ${
           previewOpen ? 'right-[372px]' : 'right-0'
         }`}
         style={{ writingMode: 'vertical-rl' }}
@@ -492,8 +492,8 @@ function AdminPropertyForm() {
       >
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-[#0B0B45]">Live preview</p>
-            <button type="button" onClick={() => setPreviewOpen(false)} className="text-[#6b7280] hover:text-[#0B0B45]" aria-label="Collapse preview">
+            <p className="text-sm font-semibold text-[#222222]">Live preview</p>
+            <button type="button" onClick={() => setPreviewOpen(false)} className="text-[#6b7280] hover:text-[#222222]" aria-label="Collapse preview">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -547,7 +547,7 @@ function PropertyPreview({ form }) {
   const area = form.area === '' ? '-' : form.area;
 
   return (
-    <div className="bg-white rounded-2xl shadow-md overflow-hidden max-w-sm">
+    <div className="bg-white rounded-[14px] shadow-md overflow-hidden max-w-sm">
       <div className="relative aspect-[4/3] overflow-hidden bg-[#f0f0f0]">
         {cover ? (
           <img src={cover} alt={form.title || 'Property'} className="w-full h-full object-cover" />
@@ -555,15 +555,15 @@ function PropertyPreview({ form }) {
           <div className="w-full h-full flex items-center justify-center text-[#6b7280] text-sm">No photo yet</div>
         )}
         {form.featured && (
-          <span className="absolute top-4 left-4 bg-[#C49A6C] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
+          <span className="absolute top-4 left-4 bg-[#2563EB] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
         )}
         {!form.available && (
-          <span className="absolute top-4 right-4 bg-[#0B0B45] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
+          <span className="absolute top-4 right-4 bg-[#6b7280] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
         )}
       </div>
 
       <div className="p-4">
-        <h3 className="text-base font-semibold text-[#1f2937] leading-tight">{form.title || 'Property title'}</h3>
+        <h3 className="text-base font-semibold text-[#222222] leading-tight">{form.title || 'Property title'}</h3>
         <div className="flex items-center text-[#6b7280] mt-1 mb-3">
           <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -572,17 +572,17 @@ function PropertyPreview({ form }) {
           <span className="text-sm truncate">{form.location || 'Location'}</span>
         </div>
 
-        <div className="flex items-center justify-between mb-3 py-3 border-y border-[#D9D9D9] text-center">
+        <div className="flex items-center justify-between mb-3 py-3 border-y border-[#E5E7EB] text-center">
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#0B0B45]">{bedrooms}</p>
+            <p className="text-sm font-semibold text-[#222222]">{bedrooms}</p>
             <p className="text-xs text-[#6b7280]">Beds</p>
           </div>
-          <div className="flex-1 border-x border-[#D9D9D9]">
-            <p className="text-sm font-semibold text-[#0B0B45]">{bathrooms}</p>
+          <div className="flex-1 border-x border-[#E5E7EB]">
+            <p className="text-sm font-semibold text-[#222222]">{bathrooms}</p>
             <p className="text-xs text-[#6b7280]">Baths</p>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#0B0B45]">{area}</p>
+            <p className="text-sm font-semibold text-[#222222]">{area}</p>
             <p className="text-xs text-[#6b7280]">Sqft</p>
           </div>
         </div>
@@ -590,9 +590,9 @@ function PropertyPreview({ form }) {
         <div className="flex items-center justify-between">
           <div>
             <span className="text-xs text-[#6b7280]">per night</span>
-            <div className="text-xl font-bold text-[#C49A6C]">KES {price.toLocaleString()}</div>
+            <div className="text-xl font-bold text-[#222222]">KES {price.toLocaleString()}</div>
           </div>
-          <span className="bg-[#C49A6C] text-white font-semibold px-4 py-2 rounded-full text-sm">Book Now</span>
+          <span className="bg-[#2563EB] text-white font-semibold px-4 py-2 rounded-lg text-sm">Book Now</span>
         </div>
       </div>
     </div>
@@ -614,11 +614,11 @@ function FullPagePreview({ form, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl w-full max-w-5xl my-8 shadow-2xl overflow-hidden">
+      <div className="bg-white rounded-[14px] w-full max-w-5xl my-8 shadow-2xl overflow-hidden">
         {/* Bar */}
-        <div className="sticky top-0 z-10 flex items-center justify-between bg-[#0B0B45] text-white px-5 py-3">
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-white border-b border-[#E5E7EB] text-[#222222] px-5 py-3">
           <span className="text-sm font-semibold">Page preview - not yet saved</span>
-          <button onClick={onClose} className="text-white/70 hover:text-white" aria-label="Close preview">
+          <button onClick={onClose} className="text-[#6b7280] hover:text-[#222222]" aria-label="Close preview">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -627,7 +627,7 @@ function FullPagePreview({ form, onClose }) {
 
         <div className="p-5 md:p-8">
           {/* Title */}
-          <h1 className="text-2xl md:text-3xl font-bold text-[#0B0B45] mb-1">{form.title || 'Property title'}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#222222] mb-1">{form.title || 'Property title'}</h1>
           <div className="flex items-center text-[#6b7280] mb-6">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -639,7 +639,7 @@ function FullPagePreview({ form, onClose }) {
           {/* Gallery */}
           {images.length > 0 ? (
             <div className="mb-8">
-              <img src={featured} alt={form.title} className="w-full h-64 md:h-[420px] object-cover rounded-2xl" />
+              <img src={featured} alt={form.title} className="w-full h-64 md:h-[420px] object-cover rounded-[14px]" />
               {images.length > 1 && (
                 <div className="grid grid-cols-5 gap-2 md:gap-3 mt-3">
                   {images.slice(0, 5).map((img, i) => (
@@ -647,7 +647,7 @@ function FullPagePreview({ form, onClose }) {
                       type="button"
                       key={img + i}
                       onClick={() => setActive(i)}
-                      className={`overflow-hidden rounded-xl transition-all ${active === i ? 'ring-2 ring-[#C49A6C]' : 'opacity-70 hover:opacity-100'}`}
+                      className={`overflow-hidden rounded-xl transition-all ${active === i ? 'ring-2 ring-[#2563EB]' : 'opacity-70 hover:opacity-100'}`}
                     >
                       <img src={img} alt={`${form.title} ${i + 1}`} className="w-full h-16 md:h-20 object-cover" />
                     </button>
@@ -656,43 +656,43 @@ function FullPagePreview({ form, onClose }) {
               )}
             </div>
           ) : (
-            <div className="mb-8 w-full h-64 md:h-[420px] rounded-2xl bg-[#f0f0f0] flex items-center justify-center text-[#6b7280]">No photos uploaded yet</div>
+            <div className="mb-8 w-full h-64 md:h-[420px] rounded-[14px] bg-[#f0f0f0] flex items-center justify-center text-[#6b7280]">No photos uploaded yet</div>
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               {/* Stats */}
-              <div className="flex flex-wrap gap-8 pb-6 mb-6 border-b border-[#D9D9D9]">
+              <div className="flex flex-wrap gap-8 pb-6 mb-6 border-b border-[#E5E7EB]">
                 <div>
-                  <p className="font-bold text-[#0B0B45]">{bedLabel(form)}</p>
+                  <p className="font-bold text-[#222222]">{bedLabel(form)}</p>
                   <p className="text-sm text-[#6b7280]">Bedrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B0B45]">{bedBathLabel(form)}</p>
+                  <p className="font-bold text-[#222222]">{bedBathLabel(form)}</p>
                   <p className="text-sm text-[#6b7280]">Bathrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B0B45]">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
+                  <p className="font-bold text-[#222222]">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
                   <p className="text-sm text-[#6b7280]">Area</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B0B45] capitalize">{form.type}</p>
+                  <p className="font-bold text-[#222222] capitalize">{form.type}</p>
                   <p className="text-sm text-[#6b7280]">Type</p>
                 </div>
               </div>
 
               {/* Description */}
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">About this property</h2>
-              <p className="text-[#1f2937] leading-relaxed whitespace-pre-line mb-8">{form.description || 'No description yet.'}</p>
+              <h2 className="text-xl font-bold text-[#222222] mb-3">About this property</h2>
+              <p className="text-[#222222] leading-relaxed whitespace-pre-line mb-8">{form.description || 'No description yet.'}</p>
 
               {/* Amenities */}
               {amenities.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="text-xl font-bold text-[#0B0B45] mb-3">Amenities</h2>
+                  <h2 className="text-xl font-bold text-[#222222] mb-3">Amenities</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {amenities.map((a, i) => (
-                      <div key={i} className="flex items-center text-[#1f2937]">
-                        <svg className="w-5 h-5 text-[#C49A6C] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <div key={i} className="flex items-center text-[#222222]">
+                        <svg className="w-5 h-5 text-[#2563EB] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                         {a}
@@ -705,11 +705,11 @@ function FullPagePreview({ form, onClose }) {
               {/* Nearby */}
               {nearby.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-bold text-[#0B0B45] mb-3">What&apos;s nearby</h2>
+                  <h2 className="text-xl font-bold text-[#222222] mb-3">What&apos;s nearby</h2>
                   <ul className="space-y-2">
                     {nearby.map((n, i) => (
-                      <li key={i} className="flex items-center text-[#1f2937]">
-                        <svg className="w-5 h-5 text-[#C49A6C] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <li key={i} className="flex items-center text-[#222222]">
+                        <svg className="w-5 h-5 text-[#2563EB] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
@@ -723,10 +723,10 @@ function FullPagePreview({ form, onClose }) {
 
             {/* Booking card */}
             <div className="lg:col-span-1">
-              <div className="rounded-2xl p-6 sticky top-20 shadow-sm bg-white">
-                <span className="text-3xl font-bold text-[#0B0B45]">KES {price.toLocaleString()}</span>
+              <div className="rounded-[14px] p-6 sticky top-20 shadow-sm bg-white">
+                <span className="text-3xl font-bold text-[#222222]">KES {price.toLocaleString()}</span>
                 <span className="text-[#6b7280]"> / night</span>
-                <div className="block w-full bg-[#C49A6C] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
+                <div className="block w-full bg-[#2563EB] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
                 {!form.available && (
                   <p className="text-center text-sm text-red-600 mt-3 font-medium">Currently marked unavailable</p>
                 )}
@@ -795,8 +795,8 @@ function SeasonalPricing({ propertyId }) {
   const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
-      <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Seasonal Pricing</h2>
+    <div className="bg-white rounded-[14px] p-6 shadow-sm">
+      <h2 className="text-lg font-bold text-[#222222] mb-1">Seasonal Pricing</h2>
       <p className="text-sm text-[#6b7280] mb-4">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
 
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{error}</div>}
@@ -808,11 +808,11 @@ function SeasonalPricing({ propertyId }) {
           {rules.map((r) => (
             <div key={r.id} className="flex items-center justify-between bg-canvas rounded-xl px-4 py-2.5 text-sm">
               <div>
-                <span className="font-semibold text-[#0B0B45]">{r.name || 'Rate'}</span>
+                <span className="font-semibold text-[#222222]">{r.name || 'Rate'}</span>
                 <span className="text-[#6b7280] ml-2">{fmt(r.start)} &rarr; {fmt(r.end)}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="font-semibold text-[#0B0B45]">KES {r.price.toLocaleString()}/night</span>
+                <span className="font-semibold text-[#222222]">KES {r.price.toLocaleString()}/night</span>
                 <button type="button" onClick={() => removeRule(r.id)} className="text-red-600 hover:text-red-800 text-xs font-semibold">Remove</button>
               </div>
             </div>
@@ -839,7 +839,7 @@ function SeasonalPricing({ propertyId }) {
           <label className={labelCls}>Price/Night</label>
           <input type="number" min="1" className={inputCls} value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
         </div>
-        <button type="button" onClick={addRule} className="bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors">Add</button>
+        <button type="button" onClick={addRule} className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-4 rounded-lg hover:bg-[#1D4ED8] transition-colors">Add</button>
       </div>
     </div>
   );
@@ -873,7 +873,7 @@ function Toggle({ on, onClick, label }) {
       aria-checked={on}
       aria-label={label}
       onClick={onClick}
-      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${on ? 'bg-[#C49A6C]' : 'bg-[#D9D9D9]'}`}
+      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${on ? 'bg-[#2563EB]' : 'bg-[#E5E7EB]'}`}
     >
       <span
         className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${on ? 'translate-x-5' : ''}`}
@@ -952,10 +952,10 @@ function AutomatedMessages({ propertyId }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
+    <div className="bg-white rounded-[14px] p-6 shadow-sm">
       <div className="flex items-start justify-between gap-4 mb-1">
         <div>
-          <h2 className="text-lg font-bold text-[#0B0B45]">Automated Messages</h2>
+          <h2 className="text-lg font-bold text-[#222222]">Automated Messages</h2>
           <p className="text-sm text-[#6b7280] max-w-2xl">
             Send your guests helpful messages automatically as their booking progresses. Each message is delivered
             to the booking&apos;s chat thread from your account. Write in your own voice, or start from a template
@@ -964,14 +964,14 @@ function AutomatedMessages({ propertyId }) {
         </div>
         {!loading && (
           <div className="flex items-center gap-3 flex-shrink-0">
-            <span className={`text-xs font-medium ${dirty ? 'text-[#C49A6C]' : 'text-[#6b7280]'}`}>
+            <span className={`text-xs font-medium ${dirty ? 'text-amber-600' : 'text-[#6b7280]'}`}>
               {dirty ? 'Unsaved changes' : savedAt ? `Saved at ${savedAt}` : ''}
             </span>
             <button
               type="button"
               onClick={save}
               disabled={saving || !dirty}
-              className="bg-[#0B0B45] text-white font-semibold px-5 py-2 rounded-full hover:bg-[#06062a] transition-colors disabled:opacity-40"
+              className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg hover:bg-[#1D4ED8] transition-colors disabled:opacity-40"
             >
               {saving ? 'Saving…' : 'Save messages'}
             </button>
@@ -990,10 +990,10 @@ function AutomatedMessages({ propertyId }) {
           {rows.map((row) => {
             const m = meta[row.trigger] || {};
             return (
-              <div key={row.trigger} className="bg-canvas rounded-2xl p-4 sm:p-5">
+              <div key={row.trigger} className="bg-canvas rounded-[14px] p-4 sm:p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-semibold text-[#0B0B45] flex items-center gap-2">
+                    <p className="font-semibold text-[#222222] flex items-center gap-2">
                       {m.label || row.trigger}
                       {row.enabled && row.saved && (
                         <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">ON</span>
@@ -1013,7 +1013,7 @@ function AutomatedMessages({ propertyId }) {
                     <div>
                       {m.offsetLabel && (
                         <div className="flex items-center gap-2 mb-2">
-                          <label className="text-xs font-semibold text-[#1f2937]" htmlFor={`offset-${row.trigger}`}>
+                          <label className="text-xs font-semibold text-[#222222]" htmlFor={`offset-${row.trigger}`}>
                             {m.offsetLabel}
                           </label>
                           <input
@@ -1021,7 +1021,7 @@ function AutomatedMessages({ propertyId }) {
                             type="number"
                             min={1}
                             max={60}
-                            className="w-20 px-3 py-1.5 rounded-xl bg-white text-sm text-[#1f2937] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
+                            className="w-20 px-3 py-1.5 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
                             value={row.offsetDays ?? ''}
                             onChange={(e) => patchRow(row.trigger, { offsetDays: e.target.value === '' ? null : Number(e.target.value) })}
                           />
@@ -1042,7 +1042,7 @@ function AutomatedMessages({ propertyId }) {
                             key={tok}
                             type="button"
                             onClick={() => insertToken(row.trigger, tok)}
-                            className="text-[11px] font-medium text-[#0B0B45] bg-white rounded-full px-2 py-0.5 shadow-sm hover:text-[#C49A6C] transition-colors"
+                            className="text-[11px] font-medium text-[#222222] bg-white rounded-full px-2 py-0.5 shadow-sm hover:text-[#2563EB] transition-colors"
                           >
                             {tok}
                           </button>
