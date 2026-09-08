@@ -429,9 +429,6 @@ function Navbar({ solid = false }) {
                     <span className={`hidden md:block text-sm font-semibold ${needsWhiteNav ? 'text-[#222222]' : 'text-white'}`}>
                       {user?.firstName}
                     </span>
-                    <svg className={`w-4 h-4 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''} ${needsWhiteNav ? 'text-[#222222]' : 'text-white'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
                   </button>
 
                   {dropdownOpen && (
