@@ -1,5 +1,5 @@
-import { useState, useEffect, Suspense, lazy } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css';
 import Hero from './components/Hero';
 import Footer from './components/Footer';
@@ -77,7 +77,6 @@ function HomePage() {
   const [allProperties, setAllProperties] = useState([]);
   const [heroStats, setHeroStats] = useState(null);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
@@ -93,8 +92,6 @@ function HomePage() {
         setHeroStats({ rating: d.averageRating || 5.0, stays: d.happyStays || d.confirmedStays || 0, satisfaction: d.satisfaction || 100 });
       } catch (err) {
         console.error('HomePage load error', err);
-      } finally {
-        setLoading(false);
       }
     }
     load();
@@ -112,61 +109,122 @@ function HomePage() {
     setRecentlyViewed(viewed);
   }, [allProperties]);
 
+  // Build a seamless, duplicating loop for the auto-scrolling premium marquee.
+  const marqueeItems = useMemo(() => {
+    if (premiumProperties.length === 0) return [];
+
+    let loopSegment = [...premiumProperties];
+    while (loopSegment.length < 12) {
+      loopSegment = [...loopSegment, ...premiumProperties];
+    }
+
+    loopSegment = loopSegment.slice(0, Math.max(12, premiumProperties.length));
+    return [...loopSegment, ...loopSegment];
+  }, [premiumProperties]);
+
+  // Weekly-rotating masonry images from the property pool.
+  const masonryImages = useMemo(() => {
+    const now = new Date();
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+    const daysSinceStart = Math.floor((now - startOfYear) / 86400000);
+    const weekNumber = Math.ceil((daysSinceStart + startOfYear.getDay() + 1) / 7);
+
+    let propImages = allProperties.flatMap((p) => p.images || []);
+
+    if (propImages.length === 0) return [];
+
+    while (propImages.length < 12) {
+      propImages = [...propImages, ...propImages];
+    }
+    propImages = propImages.slice(0, 12);
+
+    const offset = (weekNumber * 12) % propImages.length;
+    return [...propImages.slice(offset), ...propImages.slice(0, offset)].slice(0, 12);
+  }, [allProperties]);
+
   return (
     <>
       {/* Hero Section with integrated Navbar */}
       <Hero stats={heroStats} />
 
-      {/* Stays guests love */}
-      <section className="max-w-7xl mx-auto px-4 md:px-6 pt-16 md:pt-24 pb-12">
-        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-[#222222]">Stays guests love</h2>
-            <p className="text-[#6b7280] mt-2 max-w-2xl text-base md:text-lg">
-              A hand-picked selection of our highest-rated furnished apartments in prime Nairobi locations.
-            </p>
-          </div>
-          <Link
-            to="/properties"
-            className="inline-flex items-center justify-center h-11 px-5 rounded-full border-2 border-[#2563EB] text-[#2563EB] font-semibold text-sm hover:bg-[#2563EB] hover:text-white transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
-          >
-            View all stays
-          </Link>
-        </div>
-
-        {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" aria-label="Loading stays">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden">
-                <div className="aspect-[4/3] bg-[#F7F7F5] animate-pulse" />
-                <div className="p-4 space-y-3">
-                  <div className="h-4 w-3/4 bg-[#F7F7F5] animate-pulse rounded" />
-                  <div className="h-3 w-1/2 bg-[#F7F7F5] animate-pulse rounded" />
-                  <div className="h-10 w-full bg-[#F7F7F5] animate-pulse rounded" />
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : premiumProperties.length === 0 ? (
-          <div className="bg-white rounded-[14px] border border-[#E5E7EB] py-16 px-6 text-center">
-            <p className="text-[#222222] font-semibold mb-2">No stays available right now</p>
-            <p className="text-[#6b7280] max-w-md mx-auto">
-              We&apos;re refreshing our collection. Check back shortly for new premium stays in Nairobi.
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {premiumProperties.slice(0, 8).map((property) => (
-              <PropertyCard key={property.id} property={{ ...property, image: firstImage(property) }} />
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Our Listings Header */}
+      <div className="pt-16 md:pt-24 pb-8 px-4 md:px-6 max-w-7xl mx-auto text-center">
+        <h2 className="text-2xl md:text-3xl font-bold text-[#222222] mb-3">Our Listings</h2>
+        <p className="text-[#6b7280] max-w-2xl mx-auto text-base md:text-lg">
+          Discover our carefully curated selection of premium furnished apartments
+          in prime Nairobi locations. Each property is designed for comfort and convenience.
+        </p>
+      </div>
 
       {/* Recently viewed - renders nothing for a first-time visitor */}
       {recentlyViewed.length > 0 && (
         <div className="mb-12 md:mb-16">
           <PropertyCardRow title="Recently viewed" properties={recentlyViewed} align="center" />
+        </div>
+      )}
+
+      {/* Auto-scrolling Premium Property Row - full-width, reuses PropertyCard */}
+      {premiumProperties.length > 0 && (
+        <div className="marquee-container w-full overflow-hidden pb-8 px-10 md:px-20 lg:px-32">
+          <div className="marquee-track flex w-max">
+            {marqueeItems.map((property, i) => (
+              <div key={`${property.id}-${i}`} className="flex-shrink-0 w-64 sm:w-72 mr-6">
+                <PropertyCard property={{ ...property, image: firstImage(property) }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Experience Luxury Section */}
+      <div className="text-center mb-10 mt-32 md:mt-44 px-4">
+        <h2 className="text-2xl md:text-3xl font-bold text-[#222222]">Experience Luxury and Class</h2>
+        <p className="text-[#6b7280] max-w-2xl mx-auto text-base md:text-lg mt-3">
+          At our lofts you get comfort delivered with a touch of luxury
+        </p>
+      </div>
+
+      {/* Masonry Gallery - weekly rotation from property images */}
+      {masonryImages.length > 0 && (
+        <div className="max-w-7xl mx-auto px-4 md:px-6 mb-16">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 auto-rows-[120px] md:auto-rows-[150px]">
+            <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[0]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[1]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[2]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[3]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[4]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[5]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[6]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[7]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[8]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-2 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[9]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[10]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+            <div className="row-span-1 col-span-1 overflow-hidden rounded-xl">
+              <img className="w-full h-full object-cover hover:scale-110 transition-transform duration-500" src={masonryImages[11]} alt="A curated loft apartment in Nairobi" loading="lazy" decoding="async" />
+            </div>
+          </div>
         </div>
       )}
 
