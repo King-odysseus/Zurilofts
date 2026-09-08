@@ -34,7 +34,7 @@ function GuidesPage() {
       <Navbar />
 
       {/* Hero */}
-      <div className="bg-[#0B0B45] pt-24 pb-16 px-4 sm:px-6 md:px-8">
+      <div className="bg-[#222222] pt-24 pb-16 px-4 sm:px-6 md:px-8">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Nairobi Travel Guides</h1>
           <p className="text-lg text-white/70 max-w-2xl mx-auto">
@@ -46,12 +46,12 @@ function GuidesPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
         {posts.length === 0 ? (
           <div className="text-center py-16">
-            <div className="w-20 h-20 bg-[#D9D9D9]/30 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-[#E5E7EB]/30 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg className="w-10 h-10 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-[#0B0B45] mb-2">Coming Soon</h3>
+            <h3 className="text-xl font-semibold text-[#222222] mb-2">Coming Soon</h3>
             <p className="text-[#6b7280]">Our travel guides are being written. Check back soon!</p>
           </div>
         ) : (
@@ -60,7 +60,7 @@ function GuidesPage() {
               <Link
                 key={post.id}
                 to={`/guides/${post.slug}`}
-                className="group bg-white rounded-2xl overflow-hidden neu-card neu-card-hover transition-all duration-300 no-underline"
+                className="group bg-white rounded-[14px] overflow-hidden neu-card neu-card-hover transition-all duration-300 no-underline"
               >
                 {/* Cover image */}
                 <div className="aspect-[16/9] overflow-hidden">
@@ -71,8 +71,8 @@ function GuidesPage() {
                       className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full bg-[#0B0B45]/5 flex items-center justify-center">
-                      <svg className="w-12 h-12 text-[#D9D9D9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-full h-full bg-[#222222]/5 flex items-center justify-center">
+                      <svg className="w-12 h-12 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                       </svg>
                     </div>
@@ -82,13 +82,13 @@ function GuidesPage() {
                   <p className="text-xs text-[#6b7280] mb-2">
                     {new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                   </p>
-                  <h3 className="text-lg font-bold text-[#0B0B45] mb-2 group-hover:text-[#C49A6C] transition-colors">
+                  <h3 className="text-lg font-bold text-[#222222] mb-2 group-hover:text-[#2563EB] transition-colors">
                     {post.title}
                   </h3>
                   {post.excerpt && (
                     <p className="text-sm text-[#6b7280] line-clamp-2">{post.excerpt}</p>
                   )}
-                  <span className="inline-flex items-center gap-1 mt-3 text-sm font-semibold text-[#C49A6C]">
+                  <span className="inline-flex items-center gap-1 mt-3 text-sm font-semibold text-[#2563EB]">
                     Read More
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

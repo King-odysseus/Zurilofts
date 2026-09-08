@@ -49,9 +49,9 @@ function GuideDetailPage() {
         <Navbar />
         <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
           <div className="text-center max-w-md px-6">
-            <h1 className="text-3xl font-bold text-[#0B0B45] mb-4">Guide Not Found</h1>
+            <h1 className="text-3xl font-bold text-[#222222] mb-4">Guide Not Found</h1>
             <p className="text-[#6b7280] mb-6">This guide may have been removed or moved.</p>
-            <Link to="/guides" className="inline-block bg-[#C49A6C] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+            <Link to="/guides" className="inline-block min-h-[44px] bg-[#2563EB] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200">
               Browse Guides
             </Link>
           </div>
@@ -69,7 +69,7 @@ function GuideDetailPage() {
       <div className="pt-24 max-w-3xl mx-auto px-4 sm:px-6">
         <Link
           to="/guides"
-          className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-[#C49A6C] transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-[#2563EB] transition-colors"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -84,19 +84,19 @@ function GuideDetailPage() {
           <img
             src={post.coverImage}
             alt={post.title}
-            className="w-full aspect-[2/1] object-cover rounded-2xl mt-4 mb-8"
+            className="w-full aspect-[2/1] object-cover rounded-[14px] mt-4 mb-8"
           />
         )}
 
         {/* Title + meta */}
-        <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-3">{post.title}</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-[#222222] mb-3">{post.title}</h1>
         <p className="text-[#6b7280] text-sm mb-8">
           {new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
 
         {/* Body */}
         <div
-          className="prose prose-lg max-w-none prose-headings:text-[#0B0B45] prose-a:text-[#C49A6C] prose-img:rounded-2xl prose-p:text-[#1f2937] prose-li:text-[#1f2937]"
+          className="prose prose-lg max-w-none prose-headings:text-[#222222] prose-a:text-[#2563EB] prose-img:rounded-[14px] prose-p:text-[#222222] prose-li:text-[#222222]"
           dangerouslySetInnerHTML={{ __html: post.body }}
         />
       </article>
