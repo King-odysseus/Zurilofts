@@ -206,7 +206,7 @@ function AdminPropertyForm() {
           <button
             type="button"
             onClick={() => setShowFullPreview(true)}
-            className="flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors"
+            className="flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -459,7 +459,7 @@ function AdminPropertyForm() {
           <button
             type="submit"
             disabled={saving}
-            className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-6 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
+            className="bg-[#C49A6C] text-white font-semibold min-h-[44px] px-6 py-2.5 rounded-lg hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
           >
             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Property'}
           </button>
@@ -472,7 +472,7 @@ function AdminPropertyForm() {
         type="button"
         onClick={() => setPreviewOpen((o) => !o)}
         aria-label={previewOpen ? 'Hide preview' : 'Show preview'}
-        className={`fixed top-1/2 -translate-y-1/2 z-40 bg-[#2563EB] text-white px-2 py-4 rounded-l-xl shadow-lg hover:bg-[#1D4ED8] transition-all duration-300 ${
+        className={`fixed top-1/2 -translate-y-1/2 z-40 bg-[#C49A6C] text-white px-2 py-4 rounded-l-xl shadow-lg hover:bg-[#B8895C] transition-all duration-300 ${
           previewOpen ? 'right-[372px]' : 'right-0'
         }`}
         style={{ writingMode: 'vertical-rl' }}
@@ -839,7 +839,7 @@ function SeasonalPricing({ propertyId }) {
           <label className={labelCls}>Price/Night</label>
           <input type="number" min="1" className={inputCls} value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
         </div>
-        <button type="button" onClick={addRule} className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-4 rounded-lg hover:bg-[#1D4ED8] transition-colors">Add</button>
+        <button type="button" onClick={addRule} className="bg-[#C49A6C] text-white font-semibold min-h-[44px] px-4 rounded-lg hover:bg-[#B8895C] transition-colors">Add</button>
       </div>
     </div>
   );
@@ -971,7 +971,7 @@ function AutomatedMessages({ propertyId }) {
               type="button"
               onClick={save}
               disabled={saving || !dirty}
-              className="bg-[#2563EB] text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg hover:bg-[#1D4ED8] transition-colors disabled:opacity-40"
+              className="bg-[#C49A6C] text-white font-semibold min-h-[44px] px-5 py-2 rounded-lg hover:bg-[#B8895C] transition-colors disabled:opacity-40"
             >
               {saving ? 'Saving…' : 'Save messages'}
             </button>
