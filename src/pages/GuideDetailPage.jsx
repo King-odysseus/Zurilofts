@@ -89,10 +89,12 @@ function GuideDetailPage() {
         )}
 
         {/* Title + meta */}
+        <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-6 sm:px-7 mb-8 shadow-sm">
         <h1 className="text-3xl md:text-4xl font-bold text-[#222222] mb-3">{post.title}</h1>
-        <p className="text-[#6b7280] text-sm mb-8">
+        <p className="text-[#6b7280] text-sm">
           {new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
+        </div>
 
         {/* Body */}
         <div
