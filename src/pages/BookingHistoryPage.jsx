@@ -61,7 +61,7 @@ function generateInvoice(booking) {
   import('jspdf').then(({ jsPDF }) => {
     const doc = new jsPDF();
     doc.setFontSize(16);
-    doc.setTextColor(11, 11, 69); // #0B0B45
+    doc.setTextColor(34, 34, 34); // #222222
     doc.text('ZuriLofts - Booking Invoice', 14, 22);
     doc.setFontSize(10);
     doc.setTextColor(107, 114, 128); // #6b7280
@@ -92,7 +92,7 @@ function generateInvoice(booking) {
 
     items.forEach(([label, value]) => {
       doc.setFontSize(9);
-      doc.setTextColor(11, 11, 69);
+      doc.setTextColor(34, 34, 34);
       doc.text(label, 14, y);
       doc.setFontSize(8);
       doc.setTextColor(107, 114, 128);
