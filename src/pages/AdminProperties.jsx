@@ -152,7 +152,7 @@ function AdminProperties() {
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 mb-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#222222]">Properties</h1>
           <p className="mt-1 text-sm text-[#6b7280]">
@@ -301,7 +301,7 @@ function AdminProperties() {
           <p className="text-sm">{isAdminView ? 'No listings match this status.' : 'No properties found. Add your first property!'}</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {properties.map((p) => (
             <article key={p.id} className="bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden shadow-sm hover:shadow-md transition-shadow">
               <Link to={`/property/${p.id}`} className="block aspect-[4/3] bg-[#F7F7F5]">

@@ -141,7 +141,7 @@ function HostPayouts() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Wallet card */}
       <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
         <h2 className="text-lg font-bold text-[#222222] mb-4">My Earnings Wallet</h2>

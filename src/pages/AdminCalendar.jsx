@@ -65,7 +65,7 @@ function CalendarPropertyPicker({ base }) {
 
   return (
     <div className="w-full">
-      <div className="mb-6">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 mb-6 shadow-sm">
         <h1 className="text-2xl font-bold text-[#222222]">Calendar</h1>
         <p className="text-sm text-[#6b7280]">Choose a listing to view its availability, block dates, and sync its own external calendar.</p>
       </div>
