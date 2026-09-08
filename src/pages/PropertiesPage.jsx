@@ -260,14 +260,14 @@ function PropertiesPage() {
   const showComingSoon = !hasActiveFilters && sort === 'default' && !loading && !error;
 
   return (
-    <div className="min-h-screen bg-canvas">
+    <div className="min-h-screen overflow-x-hidden bg-canvas">
       <Navbar />
 
       {/* Compact Search Header */}
       <section className="bg-white border-b border-[#E5E7EB] pt-24 pb-8 md:pb-10">
-        <div className="w-full mx-auto text-center px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl">
-          <h1 className="text-2xl md:text-3xl font-bold text-[#222222] mb-2">Find your place in Nairobi</h1>
-          <p className="text-[#6b7280] text-sm mb-6 md:mb-7">
+        <div className="w-full max-w-full mx-auto text-center px-4 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl overflow-hidden">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#222222] mb-2 break-words">Find your place in Nairobi</h1>
+          <p className="text-[#6b7280] text-sm mb-6 md:mb-7 break-words">
             Premium furnished apartments in Nairobi&apos;s most desirable neighbourhoods.
           </p>
           <div className="max-w-4xl mx-auto rounded-[18px] border border-[#E5E7EB] bg-white p-2 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-left">
@@ -291,9 +291,9 @@ function PropertiesPage() {
       {/* Sticky Filters Bar */}
       <section className="sticky top-0 z-10 bg-white shadow-sm">
         <div className="w-full mx-auto px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl py-3">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div className="flex min-w-0 flex-col md:flex-row md:items-center md:justify-between gap-3">
             {/* Left: property type pills + bed variant pills + available toggle */}
-            <div className="flex flex-wrap gap-1.5 items-center">
+            <div className="flex min-w-0 flex-wrap gap-1.5 items-center">
               {filterButtons.map(({ key, label }) => (
                 <button
                   key={key}
