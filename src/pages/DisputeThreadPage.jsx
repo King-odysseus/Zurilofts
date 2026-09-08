@@ -160,6 +160,11 @@ function DisputeThreadPage() {
       <div className="min-h-screen bg-canvas">
         <Navbar />
         <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
+          <div className="mb-6 rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Guest support</p>
+            <h1 className="mt-2 text-2xl font-bold text-[#222222]">Report a booking issue</h1>
+            <p className="mt-1 text-sm text-[#6b7280]">Tell us what happened and our team will review it with the other party.</p>
+          </div>
           <NewDisputeForm bookingId={bookingId} onCreated={(d) => navigate(`/disputes/${d.id}`, { replace: true })} />
         </main>
       </div>
@@ -198,6 +203,11 @@ function DisputeThreadPage() {
             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[dispute.status] || ''}`}>
               {dispute.status.replace('_', ' ')}
             </span>
+          </div>
+          <div className="mb-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-[#6b7280]">
+            <span>Opened {new Date(dispute.createdAt).toLocaleDateString()}</span>
+            <span>{dispute.messages.length} message{dispute.messages.length === 1 ? '' : 's'}</span>
+            <span>{dispute.evidence.length} evidence file{dispute.evidence.length === 1 ? '' : 's'}</span>
           </div>
           <p className="text-[#222222] mb-4 whitespace-pre-wrap">{dispute.description}</p>
 
