@@ -4,11 +4,11 @@ import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const statusColors = {
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  PROCESSING: 'bg-blue-100 text-blue-700',
-  SUCCESS: 'bg-green-100 text-green-700',
-  FAILED: 'bg-red-100 text-red-700',
-  REVERSED: 'bg-orange-100 text-orange-700',
+  PENDING: 'bg-amber-500 text-white',
+  PROCESSING: 'bg-[#2563EB] text-white',
+  SUCCESS: 'bg-green-600 text-white',
+  FAILED: 'bg-red-600 text-white',
+  REVERSED: 'bg-amber-600 text-white',
 };
 
 function HostPayouts() {
@@ -47,12 +47,12 @@ function HostPayouts() {
     return (
       <div className="min-h-screen bg-canvas flex items-center justify-center">
         <div className="text-center max-w-sm px-6">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h1 className="text-xl font-bold text-[#0B0B45] mb-2">Access Denied</h1>
+          <h1 className="text-xl font-bold text-[#222222] mb-2">Access Denied</h1>
           <p className="text-[#6b7280]">This page is for hosts and administrators only.</p>
         </div>
       </div>
@@ -90,11 +90,11 @@ function HostPayouts() {
     printWindow.document.write(`
       <html><head><title>WHT Statement</title>
       <style>
-        body { font-family: Inter, sans-serif; padding: 30px; color: #1f2937; }
-        h2 { color: #0B0B45; }
+        body { font-family: Inter, sans-serif; padding: 30px; color: #222222; }
+        h2 { color: #222222; }
         table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        th, td { padding: 10px; border-bottom: 1px solid #D9D9D9; text-align: left; }
-        th { background: #0B0B45; color: white; }
+        th, td { padding: 10px; border-bottom: 1px solid #E5E7EB; text-align: left; }
+        th { background: #2563EB; color: white; }
         .total { font-weight: bold; }
         .num { text-align: right; }
       </style></head><body>
@@ -134,7 +134,7 @@ function HostPayouts() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
         <p className="text-[#6b7280]">Loading payout info...</p>
       </div>
     );
@@ -143,18 +143,18 @@ function HostPayouts() {
   return (
     <div className="space-y-8">
       {/* Wallet card */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-4">My Earnings Wallet</h2>
+      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
+        <h2 className="text-lg font-bold text-[#222222] mb-4">My Earnings Wallet</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-[#0B0B45]/5 rounded-xl p-4">
+          <div className="bg-[#F7F7F5] rounded-xl p-4">
             <p className="text-xs text-[#6b7280] uppercase tracking-wide">Current Balance</p>
-            <p className="text-2xl font-bold text-[#0B0B45]">
+            <p className="text-2xl font-bold text-[#222222]">
               KES {wallet?.balance?.toLocaleString() || '0'}
             </p>
           </div>
-          <div className="bg-[#C49A6C]/10 rounded-xl p-4">
+          <div className="bg-blue-50 rounded-xl p-4">
             <p className="text-xs text-[#6b7280] uppercase tracking-wide">Total Earned</p>
-            <p className="text-2xl font-bold text-[#0B0B45]">
+            <p className="text-2xl font-bold text-[#222222]">
               KES {wallet?.totalEarned?.toLocaleString() || '0'}
             </p>
           </div>
@@ -168,29 +168,29 @@ function HostPayouts() {
         {wallet?.nextPayoutAt && (
           <p className="text-sm text-[#6b7280] mt-4">
             Next scheduled payout:{' '}
-            <span className="font-semibold text-[#1f2937]">
+            <span className="font-semibold text-[#222222]">
               {new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
           </p>
         )}
-        <div className="mt-4 pt-4 border-t border-[#D9D9D9]/60 flex flex-wrap items-center justify-between gap-3">
+        <div className="mt-4 pt-4 border-t border-[#E5E7EB] flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-xs text-[#6b7280] uppercase tracking-wide">Payout destination</p>
-            <p className="text-sm font-semibold text-[#1f2937] mt-1">
+            <p className="text-sm font-semibold text-[#222222] mt-1">
               {destination?.label
                 ? `${destination.label} · ${destination.maskedAccount || 'details saved'}`
                 : 'Not configured'}
             </p>
           </div>
-          <Link to="/profile" className="text-sm font-semibold text-[#C49A6C] hover:text-[#0B0B45]">
+          <Link to="/profile" className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8]">
             {destination?.method ? 'Change destination' : 'Set up payouts'}
           </Link>
         </div>
       </div>
 
       {/* WHT Statement */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-4">WHT Statement (Tax Certificate)</h2>
+      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
+        <h2 className="text-lg font-bold text-[#222222] mb-4">WHT Statement (Tax Certificate)</h2>
         <p className="text-sm text-[#6b7280] mb-4">
           Download your withholding tax statement to claim KRA tax credits. WHT at 5% is automatically deducted and remitted on your behalf.
         </p>
@@ -199,11 +199,11 @@ function HostPayouts() {
             type="month"
             value={whtMonth}
             onChange={(e) => setWhtMonth(e.target.value)}
-            className=" px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm"
+            className="min-h-[44px] px-4 py-2 bg-white border border-[#E5E7EB] text-[#222222] rounded-xl text-sm focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
           />
           <button
             onClick={downloadWht}
-            className="bg-[#C49A6C] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#b8895c] transition-colors"
+            className="min-h-[44px] bg-[#2563EB] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-colors"
           >
             View Statement
           </button>
@@ -212,24 +212,24 @@ function HostPayouts() {
         {whtData && (
           <div className="mt-4">
             <div ref={whtRef}>
-              <h2 className="text-lg font-bold text-[#0B0B45] mb-2">ZuriLofts - WHT Statement</h2>
+              <h2 className="text-lg font-bold text-[#222222] mb-2">ZuriLofts - WHT Statement</h2>
               <p className="text-sm text-[#6b7280] mb-4">
                 Period: {whtMonth || 'All time'} | WHT Rate: 5% | Remitted to KRA
               </p>
               <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="border-b border-[#D9D9D9] text-left">
-                    <th className="p-2 font-semibold text-[#0B0B45]">Property</th>
-                    <th className="p-2 font-semibold text-[#0B0B45]">Paid Date</th>
-                    <th className="p-2 font-semibold text-[#0B0B45] text-right">Earnings (KES)</th>
-                    <th className="p-2 font-semibold text-[#0B0B45] text-right">WHT (KES)</th>
+                  <tr className="border-b border-[#E5E7EB] text-left">
+                    <th className="p-2 font-semibold text-[#222222]">Property</th>
+                    <th className="p-2 font-semibold text-[#222222]">Paid Date</th>
+                    <th className="p-2 font-semibold text-[#222222] text-right">Earnings (KES)</th>
+                    <th className="p-2 font-semibold text-[#222222] text-right">WHT (KES)</th>
                   </tr>
                 </thead>
                 <tbody>
                   {whtData.bookings.map((b, i) => (
-                    <tr key={i} className="border-b border-[#D9D9D9]/50">
-                      <td className="p-2 text-[#1f2937]">{b.property?.title}</td>
+                    <tr key={i} className="border-b border-[#E5E7EB]">
+                      <td className="p-2 text-[#222222]">{b.property?.title}</td>
                       <td className="p-2 text-[#6b7280]">
                         {b.paidAt ? new Date(b.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                       </td>
@@ -237,10 +237,10 @@ function HostPayouts() {
                       <td className="p-2 text-right">{b.withholdingTax?.toLocaleString()}</td>
                     </tr>
                   ))}
-                  <tr className="font-bold border-t-2 border-[#0B0B45]/20">
-                    <td className="p-2 text-[#0B0B45]" colSpan="2">Total</td>
-                    <td className="p-2 text-right text-[#0B0B45]">{whtData.totalEarnings?.toLocaleString()}</td>
-                    <td className="p-2 text-right text-[#0B0B45]">{whtData.totalWht?.toLocaleString()}</td>
+                  <tr className="font-bold border-t-2 border-[#E5E7EB]">
+                    <td className="p-2 text-[#222222]" colSpan="2">Total</td>
+                    <td className="p-2 text-right text-[#222222]">{whtData.totalEarnings?.toLocaleString()}</td>
+                    <td className="p-2 text-right text-[#222222]">{whtData.totalWht?.toLocaleString()}</td>
                   </tr>
                 </tbody>
               </table>
@@ -250,16 +250,16 @@ function HostPayouts() {
                 Use this document to claim tax credits when filing your annual returns.
               </p>
             </div>
-            <div className="flex gap-3 mt-4">
+            <div className="flex flex-wrap gap-3 mt-4">
               <button
                 onClick={printWht}
-                className="bg-[#0B0B45] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#06062a] transition-colors"
+                className="min-h-[44px] bg-[#2563EB] text-white text-sm font-semibold px-5 py-2.5 rounded-lg hover:bg-[#1D4ED8] transition-colors"
               >
                 Print PDF
               </button>
               <button
                 onClick={csvWht}
-                className="bg-[#0B0B45]/5 text-[#0B0B45] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#0B0B45] hover:text-white transition-colors"
+                className="min-h-[44px] bg-white text-[#222222] text-sm font-semibold px-5 py-2.5 rounded-lg border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
               >
                 Download CSV
               </button>
@@ -269,32 +269,32 @@ function HostPayouts() {
       </div>
 
       {/* Payout History */}
-      <div className="bg-white rounded-2xl shadow-lg p-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-4">Payout History</h2>
+      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
+        <h2 className="text-lg font-bold text-[#222222] mb-4">Payout History</h2>
         {payouts.length === 0 ? (
           <p className="text-[#6b7280] text-sm">No payouts yet. Your first payout will appear here.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#D9D9D9] text-left">
-                  <th className="p-3 font-semibold text-[#0B0B45]">Amount (KES)</th>
-                  <th className="p-3 font-semibold text-[#0B0B45]">Bookings</th>
-                  <th className="p-3 font-semibold text-[#0B0B45]">Status</th>
-                  <th className="p-3 font-semibold text-[#0B0B45]">Date</th>
+                <tr className="border-b border-[#E5E7EB] text-left">
+                  <th className="p-3 font-semibold text-[#222222]">Amount (KES)</th>
+                  <th className="p-3 font-semibold text-[#222222]">Bookings</th>
+                  <th className="p-3 font-semibold text-[#222222]">Status</th>
+                  <th className="p-3 font-semibold text-[#222222]">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {payouts.map((p) => (
-                  <tr key={p.id} className="border-b border-[#D9D9D9]/50">
+                  <tr key={p.id} className="border-b border-[#E5E7EB]">
                     <td className="p-3 font-medium">KES {p.amount?.toLocaleString()}</td>
                     <td className="p-3">{p.bookingsCount}</td>
                     <td className="p-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[p.status] || 'bg-gray-100 text-gray-700'}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[p.status] || 'bg-[#6b7280] text-white'}`}>
                         {p.status}
                       </span>
                       {p.failureReason && (
-                        <p className="text-xs text-red-500 mt-1">{p.failureReason}</p>
+                        <p className="text-xs text-red-600 mt-1">{p.failureReason}</p>
                       )}
                     </td>
                     <td className="p-3 text-[#6b7280]">
