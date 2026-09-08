@@ -26,9 +26,6 @@ function PropertyCard({ property }) {
     price,
     rating,
     reviewCount,
-    bedrooms,
-    bathrooms,
-    area,
     badge,
     variantLabel,
     variant,
@@ -144,38 +141,6 @@ function PropertyCard({ property }) {
           <span className="text-xs truncate">{location || 'TBA'}</span>
         </div>
 
-        {/* Stats row - beds, baths, area */}
-        <div className="flex items-center justify-between mb-3 py-2.5 border-y border-[#E5E7EB]">
-          <div className="flex-1 text-center">
-            <div className="flex items-center justify-center text-[#222222] mb-0.5">
-              <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-              <span className="text-xs font-semibold">{bedrooms != null ? bedrooms : '-'}</span>
-            </div>
-            <span className="text-xs text-[#6b7280]">{bedrooms === 1 ? 'Bed' : 'Beds'}</span>
-          </div>
-          <div className="flex-1 text-center">
-            <div className="flex items-center justify-center text-[#222222] mb-0.5">
-              <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-              </svg>
-              <span className="text-xs font-semibold">{bathrooms != null ? bathrooms : '-'}</span>
-            </div>
-            <span className="text-xs text-[#6b7280]">{bathrooms === 1 ? 'Bath' : 'Baths'}</span>
-          </div>
-          <div className="flex-1 text-center">
-            <div className="flex items-center justify-center text-[#222222] mb-0.5">
-              <svg className="w-3.5 h-3.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-              </svg>
-              <span className="text-xs font-semibold">{area != null ? area : '-'}</span>
-            </div>
-            <span className="text-xs text-[#6b7280]">Sqft</span>
-          </div>
-        </div>
-
-        {/* Price + CTA - pinned to bottom */}
         <div className="flex items-center justify-between mt-auto">
           <div>
             <span className="text-xs text-[#6b7280]">per night</span>
