@@ -282,6 +282,20 @@ function AdminCalendar() {
         <p className="text-sm text-[#6b7280]">Two-way sync with Airbnb, Booking.com, VRBO and other platforms using iCal feeds.</p>
       </div>
 
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        {[
+          ['Upcoming stays', data.bookings?.filter((booking) => new Date(booking.checkOut || booking.end) >= new Date()).length || 0],
+          ['Blocked ranges', data.blocks?.length || 0],
+          ['Connected calendars', data.sources?.length || 0],
+          ['Calendar status', data.sources?.some((source) => source.lastStatus?.startsWith('ERROR')) ? 'Action needed' : 'Synced'],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p>
+            <p className="mt-2 text-xl font-bold text-[#222222]">{value}</p>
+          </div>
+        ))}
+      </div>
+
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">{error}</div>}
 
       <div className="flex gap-1 border-b border-[#E5E7EB] mb-6" role="tablist" aria-label="Calendar sections">
