@@ -54,10 +54,10 @@ function OAuthCallback() {
   }, [searchParams, handleOAuthCallback, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#D9D9D9]">
+    <div className="min-h-screen flex items-center justify-center bg-[#F7F7F5]">
       <div className="text-center">
-        <div className="w-12 h-12 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-[#0B0B45] font-semibold text-lg">Signing you in...</p>
+        <div className="w-12 h-12 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p className="text-[#222222] font-semibold text-lg">Signing you in...</p>
         <p className="text-[#6b7280] text-sm mt-1">Please wait a moment</p>
       </div>
     </div>
