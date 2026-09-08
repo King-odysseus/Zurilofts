@@ -65,6 +65,7 @@ function AdminProperties() {
   const [deleting, setDeleting] = useState(null);
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState('grid');
+  const [selectedProperty, setSelectedProperty] = useState(null);
 
   const visibleProperties = isAdminView || !statusFilter
     ? properties
@@ -143,6 +144,7 @@ function AdminProperties() {
     try {
       const res = await apiClient.patch(`/admin/properties/${property.id}/review`, { action, note });
       setProperties((prev) => prev.map((p) => (p.id === property.id ? res.data.data : p)));
+      setSelectedProperty(res.data.data);
     } catch (err) {
       alert(err.response?.data?.error || 'Failed to update listing status');
     } finally {
@@ -296,6 +298,7 @@ function AdminProperties() {
                         )}
                         {isAdminView && p.status === 'PENDING_REVIEW' && (
                           <>
+                            <button onClick={() => setSelectedProperty(p)} className={secondaryBtn}>Review</button>
                             <button onClick={() => handleReview(p, 'approve')} disabled={submitting === p.id} className={successBtn}>Approve</button>
                             <button onClick={() => handleReview(p, 'reject')} disabled={submitting === p.id} className={dangerBtn}>Reject</button>
                           </>
@@ -364,6 +367,7 @@ function AdminProperties() {
                     </button>
                   )}
                   {isAdminView && p.status === 'PENDING_REVIEW' && <>
+                    <button onClick={() => setSelectedProperty(p)} className={secondaryBtn}>Review</button>
                     <button onClick={() => handleReview(p, 'approve')} disabled={submitting === p.id} className={successBtn}>Approve</button>
                     <button onClick={() => handleReview(p, 'reject')} disabled={submitting === p.id} className={dangerBtn}>Reject</button>
                   </>}
@@ -376,6 +380,36 @@ function AdminProperties() {
               </div>
             </article>
           ))}
+        </div>
+      )}
+
+      {isAdminView && selectedProperty && (
+        <div className="fixed inset-0 z-30 bg-black/20" onClick={() => setSelectedProperty(null)}>
+          <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-[#E5E7EB] bg-white p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Listing review</p>
+                <h2 className="mt-1 text-xl font-bold text-[#222222]">{selectedProperty.title}</h2>
+              </div>
+              <button type="button" onClick={() => setSelectedProperty(null)} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close review panel">×</button>
+            </div>
+            {selectedProperty.images?.[0] && <img src={selectedProperty.images[0]} alt="" className="mt-5 aspect-[4/3] w-full rounded-[14px] object-cover" />}
+            <div className="mt-5 space-y-3 text-sm">
+              <div className="flex items-center justify-between gap-4"><span className="text-[#6b7280]">Location</span><span className="font-semibold text-[#222222]">{selectedProperty.location}</span></div>
+              <div className="flex items-center justify-between gap-4"><span className="text-[#6b7280]">Host</span><span className="font-semibold text-[#222222]">{selectedProperty.host?.firstName || selectedProperty.owner?.firstName || 'Host'}</span></div>
+              <div className="flex items-center justify-between gap-4"><span className="text-[#6b7280]">Type</span><span className="font-semibold capitalize text-[#222222]">{selectedProperty.type || 'Apartment'}</span></div>
+              <div className="flex items-center justify-between gap-4"><span className="text-[#6b7280]">Price/night</span><span className="font-semibold text-[#222222]">KES {selectedProperty.price?.toLocaleString()}</span></div>
+              <div className="flex items-center justify-between gap-4"><span className="text-[#6b7280]">Status</span><StatusPill status={selectedProperty.status} /></div>
+            </div>
+            {selectedProperty.description && <p className="mt-5 rounded-[14px] bg-[#F7F7F5] p-4 text-sm leading-6 text-[#222222]">{selectedProperty.description}</p>}
+            <div className="mt-6 flex flex-wrap gap-2 border-t border-[#E5E7EB] pt-5">
+              {selectedProperty.status === 'PENDING_REVIEW' && <>
+                <button onClick={() => handleReview(selectedProperty, 'approve')} disabled={submitting === selectedProperty.id} className={successBtn}>Approve</button>
+                <button onClick={() => handleReview(selectedProperty, 'reject')} disabled={submitting === selectedProperty.id} className={dangerBtn}>Reject</button>
+              </>}
+              <Link to={`/property/${selectedProperty.id}`} className={secondaryBtn}>Open listing</Link>
+            </div>
+          </aside>
         </div>
       )}
     </div>
