@@ -277,7 +277,7 @@ function BookingHistoryPage() {
                     <div className="flex flex-wrap gap-2 mt-4">
                       <button
                         onClick={() => openConversation(booking.id)}
-                        className="flex items-center gap-1.5 min-h-[44px] bg-[#2563EB] text-white px-4 rounded-lg text-sm font-semibold hover:bg-[#1D4ED8] transition-all duration-200"
+                        className="flex items-center gap-1.5 min-h-[44px] bg-[#C49A6C] text-white px-4 rounded-lg text-sm font-semibold hover:bg-[#B8895C] transition-all duration-200"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
