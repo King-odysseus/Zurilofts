@@ -227,6 +227,15 @@ function HostApplicationPage() {
           <h1 className="text-2xl md:text-4xl font-bold text-[#222222]">Host verification</h1>
           <p className="text-[#6b7280] mt-3 max-w-3xl">Tell us who you are, how you manage your properties, and provide the documents needed to protect guests and legitimate hosts. Save at any time and continue later.</p>
 
+          <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Host setup progress">
+            {['Your details', 'Business', 'Documents', 'Review'].map((label, index) => (
+              <div key={label} className="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-3 shadow-sm">
+                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${index === 0 ? 'bg-[#2563EB] text-white' : 'bg-[#F7F7F5] text-[#6b7280]'}`}>{index + 1}</span>
+                <span className="text-xs font-semibold text-[#222222] sm:text-sm">{label}</span>
+              </div>
+            ))}
+          </div>
+
           {application && (
             <div className="mt-6 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] p-5">
               <div className="flex flex-wrap items-center gap-2">
