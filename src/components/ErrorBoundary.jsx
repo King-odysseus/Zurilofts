@@ -19,7 +19,7 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-white flex flex-col">
+        <div className="min-h-screen bg-[#F7F7F5] flex flex-col">
           <Navbar />
           <div className="flex-1 flex items-center justify-center px-6">
             <div className="text-center max-w-md">
@@ -28,13 +28,13 @@ class ErrorBoundary extends Component {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-[#0B0B45] mb-2">Something went wrong</h1>
+              <h1 className="text-2xl font-bold text-[#222222] mb-2">Something went wrong</h1>
               <p className="text-[#6b7280] mb-6">
                 We&apos;re sorry - an unexpected error occurred. Try refreshing the page.
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="bg-[#C49A6C] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+                className="bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200"
               >
                 Refresh Page
               </button>
