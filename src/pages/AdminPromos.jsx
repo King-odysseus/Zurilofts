@@ -116,7 +116,7 @@ function AdminPromos() {
         <h1 className="text-2xl font-bold text-[#222222]">Promo Codes</h1>
         <button
           onClick={openCreate}
-          className="bg-[#2563EB] text-white min-h-[44px] px-5 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200 text-sm"
+          className="bg-[#C49A6C] text-white min-h-[44px] px-5 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 text-sm"
         >
           + Create Promo
         </button>
@@ -235,7 +235,7 @@ function AdminPromos() {
                 <button type="button" onClick={closeForm} className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors text-sm">
                   Cancel
                 </button>
-                <button type="submit" disabled={saving} className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 text-sm disabled:opacity-50">
+                <button type="submit" disabled={saving} className="flex-1 min-h-[44px] py-2.5 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200 text-sm disabled:opacity-50">
                   {saving ? (editingId ? 'Saving...' : 'Creating...') : (editingId ? 'Save Changes' : 'Create')}
                 </button>
               </div>
