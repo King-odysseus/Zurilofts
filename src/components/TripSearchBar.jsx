@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 
-function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveSearch }) {
+function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveSearch, discovery }) {
   return (
     <form onSubmit={onSubmit} role="search" className="w-full max-w-full">
-      <div className="flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-lg transition-shadow focus-within:border-[#2563EB] focus-within:ring-2 focus-within:ring-[#2563EB]/20 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full">
-        <div className="flex min-w-0 flex-1 items-center px-2 sm:px-4">
+      <div className={`flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-lg transition-shadow focus-within:border-[#2563EB] focus-within:ring-2 focus-within:ring-[#2563EB]/20 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full ${discovery ? 'sm:p-2' : ''}`}>
+        <div className={`flex min-w-0 flex-1 items-center px-2 sm:px-4 ${discovery ? 'sm:border-r sm:border-[#E5E7EB]' : ''}`}>
           {loading ? (
             <div className="h-5 w-5 flex-shrink-0 animate-spin rounded-full border-2 border-[#2563EB] border-t-transparent mr-2 sm:mr-3" />
           ) : (
@@ -15,12 +15,13 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
           <label htmlFor="trip-search-destination" className="sr-only">
             Search destinations or neighbourhoods
           </label>
+          {discovery && <span className="mr-3 hidden shrink-0 text-sm font-semibold text-[#222222] sm:inline">Where</span>}
           <input
             id="trip-search-destination"
             type="search"
             value={value}
             onChange={onChange}
-            placeholder="Search by location or property name..."
+            placeholder={discovery ? 'Search destinations' : 'Search by location or property name...'}
             autoComplete="address-level2"
             className="min-h-[44px] w-full min-w-0 max-w-full bg-transparent py-3 text-base text-[#222222] placeholder-[#6b7280] focus:outline-none"
           />
@@ -41,12 +42,25 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
             </button>
           )}
         </div>
+        {discovery && (
+          <div className="hidden min-w-[150px] border-r border-[#E5E7EB] px-6 py-1 sm:block">
+            <p className="text-sm font-semibold text-[#222222]">When</p>
+            <p className="text-sm text-[#6b7280]">Add dates</p>
+          </div>
+        )}
+        {discovery && (
+          <div className="hidden min-w-[140px] px-6 py-1 sm:block">
+            <p className="text-sm font-semibold text-[#222222]">Who</p>
+            <p className="text-sm text-[#6b7280]">Add guests</p>
+          </div>
+        )}
         <button
           type="submit"
           disabled={loading}
-          className="min-h-[44px] w-full whitespace-nowrap rounded-full bg-[#C49A6C] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-8"
+          className={`min-h-[44px] w-full whitespace-nowrap rounded-full bg-[#C49A6C] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-8 ${discovery ? 'sm:h-12 sm:w-12 sm:px-0 sm:text-transparent' : ''}`}
         >
-          {loading ? 'Searching…' : 'Search'}
+          {discovery ? <span aria-hidden="true" className="text-white">⌕</span> : (loading ? 'Searching…' : 'Search')}
+          {discovery && <span className="sr-only">Search</span>}
         </button>
       </div>
     </form>
@@ -60,11 +74,13 @@ TripSearchBar.propTypes = {
   onClear: PropTypes.func.isRequired,
   loading: PropTypes.bool,
   hasActiveSearch: PropTypes.bool,
+  discovery: PropTypes.bool,
 };
 
 TripSearchBar.defaultProps = {
   loading: false,
   hasActiveSearch: false,
+  discovery: false,
 };
 
 export default TripSearchBar;

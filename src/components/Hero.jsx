@@ -81,7 +81,7 @@ AnimatedNumber.defaultProps = {
  * presented with the shared TripSearchBar (already updated to the blue
  * design system) instead of a bespoke pill input.
  */
-function SearchBar() {
+function SearchBar({ discovery = false }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -195,6 +195,7 @@ function SearchBar() {
         onClear={handleClear}
         loading={loading}
         hasActiveSearch={query.length > 0}
+        discovery={discovery}
       />
 
       {/* Dropdown results */}

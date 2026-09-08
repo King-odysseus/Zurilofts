@@ -25,7 +25,7 @@ function isActiveHref(pathname, href) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function Navbar() {
+function Navbar({ solid = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -158,7 +158,7 @@ function Navbar() {
   }, []);
 
   const isHomePage = location.pathname === '/';
-  const needsWhiteNav = !isHomePage || scrolled;
+  const needsWhiteNav = solid || !isHomePage || scrolled;
 
   function handleLogout() {
     setDropdownOpen(false);
@@ -193,8 +193,8 @@ function Navbar() {
       return items;
     }
     return [
-      { name: 'Explore', children: exploreLinks },
-      { name: 'Saved', children: savedLinks },
+      { name: 'Explore', href: '/properties' },
+      { name: 'Saved', href: '/favourites' },
       { name: 'Trips', href: '/trips' },
       { name: 'Messages', href: '/inbox' },
     ];
@@ -413,10 +413,10 @@ function Navbar() {
                 {/* Account / Profile menu */}
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    onClick={() => { setDropdownOpen(false); setMenuOpen(true); }}
                     aria-haspopup="true"
-                    aria-expanded={dropdownOpen}
-                    aria-label="Account menu"
+                    aria-expanded={menuOpen}
+                    aria-label="Open menu"
                     className="flex items-center space-x-2 px-2 py-2 rounded-full hover:bg-[#2563EB]/10 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2"
                   >
                     <div className="relative w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
@@ -579,7 +579,7 @@ function Navbar() {
             <button
               type="button"
               onClick={() => setMenuOpen(!menuOpen)}
-              className={`inline-flex items-center p-2 w-11 h-11 justify-center rounded-lg md:hidden transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
+              className={`inline-flex items-center p-2 w-11 h-11 justify-center rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
                 needsWhiteNav
                   ? 'text-[#222222] hover:bg-[#2563EB]/10'
                   : 'text-white hover:bg-white/10'
@@ -602,10 +602,10 @@ function Navbar() {
           </div>
         </div>
 
-        {/* Mobile menu - full-width dropdown below the bar */}
+        {/* Secondary navigation drawer */}
         <div
           id="navbar-main"
-          className={`md:hidden ${menuOpen ? 'block' : 'hidden'} bg-white border-t border-[#E5E7EB]`}
+          className={`fixed right-0 top-16 h-[calc(100dvh-4rem)] w-full max-w-sm overflow-y-auto bg-white border-l border-[#E5E7EB] shadow-2xl transition-transform duration-200 ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
         >
           <ul className="px-2 py-3 space-y-1 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain">
             {navItems.map((item) => {
@@ -656,6 +656,22 @@ function Navbar() {
                 </li>
               );
             })}
+
+            <li className="mt-3 border-t border-[#E5E7EB] pt-3">
+              <p className="px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6b7280]">More to explore</p>
+              <div className="space-y-1">
+                {exploreLinks.filter((link) => link.href !== '/properties').map((link) => (
+                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-lg px-3 py-2.5 text-sm font-medium text-[#222222] hover:bg-[#2563EB]/10 hover:text-[#2563EB]">
+                    {link.name}
+                  </Link>
+                ))}
+                {savedLinks.map((link) => (
+                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-lg px-3 py-2.5 text-sm font-medium text-[#222222] hover:bg-[#2563EB]/10 hover:text-[#2563EB]">
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+            </li>
 
             {/* Mobile CTA buttons */}
             <li className="pt-3 space-y-2 border-t border-[#E5E7EB] mt-3">

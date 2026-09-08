@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css';
-import Hero from './components/Hero';
+import Navbar from './components/Navbar';
+import { SearchBar } from './components/Hero';
 import Footer from './components/Footer';
 import PropertyCardRow from './components/PropertyCardRow';
 import PropertyCard from './components/PropertyCard';
@@ -75,21 +76,15 @@ const PaymentCallback = lazy(() => import('./pages/PaymentCallback.jsx'));
 function HomePage() {
   const [premiumProperties, setPremiumProperties] = useState([]);
   const [allProperties, setAllProperties] = useState([]);
-  const [heroStats, setHeroStats] = useState(null);
   const [recentlyViewed, setRecentlyViewed] = useState([]);
 
   useEffect(() => {
     async function load() {
       try {
-        const [propsRes, statsRes] = await Promise.all([
-          apiClient.get('/properties'),
-          apiClient.get('/reviews/summary'),
-        ]);
+        const [propsRes] = await Promise.all([apiClient.get('/properties')]);
         const properties = propsRes.data.data || [];
         setPremiumProperties(properties.filter(p => p.rating >= 3.0));
         setAllProperties(properties);
-        const d = statsRes.data.data;
-        setHeroStats({ rating: d.averageRating || 5.0, stays: d.happyStays || d.confirmedStays || 0, satisfaction: d.satisfaction || 100 });
       } catch (err) {
         console.error('HomePage load error', err);
       }
@@ -144,17 +139,22 @@ function HomePage() {
 
   return (
     <>
-      {/* Hero Section with integrated Navbar */}
-      <Hero stats={heroStats} />
+      {/* Guest discovery header: the existing marquee remains below the search-led presentation. */}
+      <section className="border-b border-[#E5E7EB] bg-white">
+        <Navbar solid />
+        <div className="mx-auto max-w-7xl px-4 pb-8 pt-24 md:px-6 md:pb-10 md:pt-28">
+          <div className="flex flex-wrap items-center justify-center gap-8 border-b border-[#E5E7EB] pb-6 text-sm font-semibold text-[#6b7280] sm:gap-12">
+            {['All stays', 'Homes', 'Long stays', 'Local experiences'].map((category, index) => (
+              <span key={category} className={`border-b-2 pb-3 ${index === 0 ? 'border-[#222222] text-[#222222]' : 'border-transparent'}`}>{category}</span>
+            ))}
+          </div>
+          <div className="mx-auto mt-7 max-w-4xl">
+            <SearchBar discovery />
+          </div>
+        </div>
+      </section>
 
-      {/* Our Listings Header */}
-      <div className="pt-16 md:pt-24 pb-8 px-4 md:px-6 max-w-7xl mx-auto text-center">
-        <h2 className="text-2xl md:text-3xl font-bold text-[#222222] mb-3">Our Listings</h2>
-        <p className="text-[#6b7280] max-w-2xl mx-auto text-base md:text-lg">
-          Discover our carefully curated selection of premium furnished apartments
-          in prime Nairobi locations. Each property is designed for comfort and convenience.
-        </p>
-      </div>
+      {allProperties.length > 0 && <div className="pt-10 md:pt-14"><PropertyCardRow title="Popular homes in Nairobi" properties={allProperties.slice(0, 8)} align="left" /></div>}
 
       {/* Recently viewed - renders nothing for a first-time visitor */}
       {recentlyViewed.length > 0 && (
@@ -165,13 +165,16 @@ function HomePage() {
 
       {/* Auto-scrolling Premium Property Row - full-width, reuses PropertyCard */}
       {premiumProperties.length > 0 && (
-        <div className="marquee-container w-full overflow-hidden pb-8 px-10 md:px-20 lg:px-32">
+        <div className="mt-10 border-y border-[#E5E7EB] bg-[#F7F7F5] py-8">
+          <p className="mx-auto mb-5 max-w-7xl px-4 text-sm font-semibold uppercase tracking-[0.12em] text-[#6b7280] md:px-6">Featured stays</p>
+          <div className="marquee-container w-full overflow-hidden px-10 md:px-20 lg:px-32">
           <div className="marquee-track flex w-max">
             {marqueeItems.map((property, i) => (
               <div key={`${property.id}-${i}`} className="flex-shrink-0 w-64 sm:w-72 mr-6">
                 <PropertyCard property={{ ...property, image: firstImage(property) }} />
               </div>
             ))}
+          </div>
           </div>
         </div>
       )}
