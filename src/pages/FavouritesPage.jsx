@@ -147,7 +147,7 @@ function FavouritesPage() {
     <div className="min-h-screen bg-[#F7F7F5]">
       <Navbar />
       <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-2xl font-bold text-[#222222] mb-2">
               {sharedIds ? 'Shared Wishlist' : 'My Favourites'}

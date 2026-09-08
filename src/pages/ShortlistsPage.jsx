@@ -257,7 +257,7 @@ export default function ShortlistsPage() {
     <div className="min-h-screen bg-[#F7F7F5]">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        <div className="flex items-center justify-between gap-3 mb-2">
+        <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex items-center justify-between gap-3 mb-2">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#222222]">My Shortlists</h1>
           {shortlists.length > 0 && !showCreate && (
             <button

@@ -400,7 +400,7 @@ function ProfilePage() {
       <div className="pt-24 pb-16">
         <div className="max-w-5xl mx-auto px-4 md:px-6">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-8 rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm">
             <div className="flex items-center mb-4">
               <label className="relative cursor-pointer group">
                 {profile?.avatar ? (
