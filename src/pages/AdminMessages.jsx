@@ -65,6 +65,19 @@ function AdminMessages() {
       <p className="text-[#6b7280] mb-6">Conversations with your guests.</p>
       </div>
 
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+        {[
+          ['Conversations', conversations.length],
+          ['Unread', conversations.reduce((total, conversation) => total + (conversation.unread || 0), 0)],
+          ['Selected thread', activeUser ? `${activeUser.firstName} ${activeUser.lastName}` : 'None'],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p>
+            <p className="mt-2 truncate text-xl font-bold text-[#222222]">{value}</p>
+          </div>
+        ))}
+      </div>
+
       <div className="bg-white rounded-[14px] shadow-sm overflow-hidden grid grid-cols-1 md:grid-cols-3 min-h-[60vh]">
         {/* Conversation list */}
         <div className="border-b md:border-b-0 md:border-r border-[#E5E7EB] overflow-y-auto max-h-[70vh]">
