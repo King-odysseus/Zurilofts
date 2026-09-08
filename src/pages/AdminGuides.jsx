@@ -76,9 +76,9 @@ function AdminGuides() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-[#0B0B45]">Travel Guides</h2>
+        <h2 className="text-2xl font-bold text-[#222222]">Travel Guides</h2>
         {!editing && (
-          <button onClick={handleCreate} className="bg-[#C49A6C] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b8895c] transition-all duration-200">
+          <button onClick={handleCreate} className="bg-[#2563EB] text-white min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#1D4ED8] transition-all duration-200">
             + New Guide
           </button>
         )}
@@ -86,55 +86,55 @@ function AdminGuides() {
 
       {/* Edit form */}
       {editing && (
-        <div className="bg-white rounded-2xl shadow-sm p-4 md:p-6 mb-6">
-          <h3 className="text-lg font-bold text-[#0B0B45] mb-4">{editing === 'new' ? 'New Guide' : 'Edit Guide'}</h3>
+        <div className="bg-white rounded-[14px] shadow-sm p-4 md:p-6 mb-6">
+          <h3 className="text-lg font-bold text-[#222222] mb-4">{editing === 'new' ? 'New Guide' : 'Edit Guide'}</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-1">Title</label>
+              <label className="block text-sm font-semibold text-[#222222] mb-1">Title</label>
               <input
                 type="text"
                 value={form.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
-                className="w-full rounded-xl border border-[#D9D9D9] px-4 py-2.5 focus:outline-none focus:border-[#C49A6C] transition-colors"
+                className="w-full rounded-xl border border-[#E5E7EB] min-h-[44px] px-4 py-2.5 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Slug</label>
+                <label className="block text-sm font-semibold text-[#222222] mb-1">Slug</label>
                 <input
                   type="text"
                   value={form.slug}
                   onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  className="w-full rounded-xl border border-[#D9D9D9] px-4 py-2.5 focus:outline-none focus:border-[#C49A6C] transition-colors"
+                  className="w-full rounded-xl border border-[#E5E7EB] min-h-[44px] px-4 py-2.5 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Cover Image URL</label>
+                <label className="block text-sm font-semibold text-[#222222] mb-1">Cover Image URL</label>
                 <input
                   type="text"
                   value={form.coverImage}
                   onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
                   placeholder="/images/..."
-                  className="w-full rounded-xl border border-[#D9D9D9] px-4 py-2.5 focus:outline-none focus:border-[#C49A6C] transition-colors"
+                  className="w-full rounded-xl border border-[#E5E7EB] min-h-[44px] px-4 py-2.5 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-1">Excerpt</label>
+              <label className="block text-sm font-semibold text-[#222222] mb-1">Excerpt</label>
               <input
                 type="text"
                 value={form.excerpt}
                 onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-                className="w-full rounded-xl border border-[#D9D9D9] px-4 py-2.5 focus:outline-none focus:border-[#C49A6C] transition-colors"
+                className="w-full rounded-xl border border-[#E5E7EB] min-h-[44px] px-4 py-2.5 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-1">Body (HTML)</label>
+              <label className="block text-sm font-semibold text-[#222222] mb-1">Body (HTML)</label>
               <textarea
                 value={form.body}
                 onChange={(e) => setForm({ ...form, body: e.target.value })}
                 rows={12}
-                className="w-full rounded-xl border border-[#D9D9D9] px-4 py-3 focus:outline-none focus:border-[#C49A6C] transition-colors font-mono text-sm"
+                className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors font-mono text-sm"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -143,20 +143,20 @@ function AdminGuides() {
                 id="published"
                 checked={form.published}
                 onChange={(e) => setForm({ ...form, published: e.target.checked })}
-                className="w-4 h-4 text-[#C49A6C] rounded"
+                className="w-4 h-4 text-[#2563EB] rounded"
               />
-              <label htmlFor="published" className="text-sm font-semibold text-[#1f2937]">Published</label>
+              <label htmlFor="published" className="text-sm font-semibold text-[#222222]">Published</label>
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <div className="flex gap-3">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-[#C49A6C] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                className="bg-[#2563EB] text-white min-h-[44px] px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save'}
               </button>
-              <button onClick={handleCancel} className="text-[#6b7280] px-6 py-2.5 rounded-full text-sm font-semibold shadow-sm hover:shadow-md hover:bg-[#D9D9D9]/20 transition-shadow">
+              <button onClick={handleCancel} className="min-h-[44px] px-6 py-2.5 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-shadow">
                 Cancel
               </button>
             </div>
@@ -165,24 +165,24 @@ function AdminGuides() {
       )}
 
       {/* Posts list */}
-      <div className="bg-white rounded-2xl shadow-sm overflow-x-auto">
+      <div className="bg-white rounded-[14px] shadow-sm overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-[#0B0B45]/5 text-left">
+          <thead className="bg-[#222222]/5 text-left">
             <tr>
-              <th className="px-4 py-3 font-semibold text-[#0B0B45]">Title</th>
-              <th className="px-4 py-3 font-semibold text-[#0B0B45] hidden md:table-cell">Status</th>
-              <th className="px-4 py-3 font-semibold text-[#0B0B45] hidden md:table-cell">Date</th>
-              <th className="px-4 py-3 font-semibold text-[#0B0B45] text-right">Actions</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Title</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hidden md:table-cell">Status</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hidden md:table-cell">Date</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#D9D9D9]">
+          <tbody className="divide-y divide-[#E5E7EB]">
             {posts.length === 0 && (
               <tr><td colSpan={4} className="px-4 py-8 text-center text-[#6b7280]">No guides yet. Create your first one.</td></tr>
             )}
             {posts.map((p) => (
-              <tr key={p.id} className="hover:bg-[#D9D9D9]/10 transition-colors">
+              <tr key={p.id} className="hover:bg-[#E5E7EB]/10 transition-colors">
                 <td className="px-4 py-3">
-                  <span className="font-semibold text-[#0B0B45]">{p.title}</span>
+                  <span className="font-semibold text-[#222222]">{p.title}</span>
                   <span className="block text-xs text-[#6b7280] md:hidden">{p.published ? 'Published' : 'Draft'} · {new Date(p.createdAt).toLocaleDateString()}</span>
                 </td>
                 <td className="px-4 py-3 hidden md:table-cell">
@@ -194,7 +194,7 @@ function AdminGuides() {
                   {new Date(p.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleEdit(p.id)} className="text-[#C49A6C] font-semibold hover:text-[#b8895c] transition-colors mr-3">
+                  <button onClick={() => handleEdit(p.id)} className="text-[#2563EB] font-semibold hover:text-[#1D4ED8] transition-colors mr-3">
                     Edit
                   </button>
                   <button onClick={() => handleDelete(p.id)} className="text-red-500 font-semibold hover:text-red-600 transition-colors">
