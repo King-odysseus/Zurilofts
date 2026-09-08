@@ -342,13 +342,13 @@ function HostApplicationPage() {
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
                 <button type="submit" disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg bg-white border border-[#E5E7EB] px-6 font-semibold text-[#222222] disabled:opacity-50 hover:bg-[#F7F7F5] transition-all duration-200">{saving ? 'Saving...' : 'Save draft'}</button>
-                <button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg bg-[#2563EB] px-6 font-semibold text-white hover:bg-[#1D4ED8] disabled:opacity-50 transition-all duration-200">{saving ? 'Working...' : 'Submit for review'}</button>
+                <button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg bg-[#C49A6C] px-6 font-semibold text-white hover:bg-[#B8895C] disabled:opacity-50 transition-all duration-200">{saving ? 'Working...' : 'Submit for review'}</button>
                 <button type="button" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg px-6 font-semibold text-[#6b7280] hover:text-[#222222] disabled:opacity-50 transition-all duration-200">Save &amp; continue traveling</button>
               </div>
             </form>
           ) : application?.status === 'APPROVED' || user?.role === 'HOST' ? (
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link to="/host/properties/new" className="min-h-[44px] inline-flex items-center justify-center rounded-lg bg-[#2563EB] px-6 font-semibold text-white hover:bg-[#1D4ED8] transition-all duration-200">Set up your first property</Link>
+              <Link to="/host/properties/new" className="min-h-[44px] inline-flex items-center justify-center rounded-lg bg-[#C49A6C] px-6 font-semibold text-white hover:bg-[#B8895C] transition-all duration-200">Set up your first property</Link>
               <Link to="/host/today" className="min-h-[44px] inline-flex items-center justify-center rounded-lg bg-white border border-[#E5E7EB] px-6 font-semibold text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200">Open host dashboard</Link>
             </div>
           ) : !application && user?.role !== 'USER' ? (
@@ -425,7 +425,7 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
           </button>
         </>
       ) : (
-        <label className="mt-3 inline-flex min-h-[44px] items-center cursor-pointer rounded-lg bg-[#2563EB] px-4 text-xs font-semibold text-white hover:bg-[#1D4ED8] transition-all duration-200">
+        <label className="mt-3 inline-flex min-h-[44px] items-center cursor-pointer rounded-lg bg-[#C49A6C] px-4 text-xs font-semibold text-white hover:bg-[#B8895C] transition-all duration-200">
           <input type="file" className="hidden" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={busy} onChange={(e) => onUpload(kind, e.target.files?.[0])} />
           {busy ? 'Uploading...' : 'Choose document'}
         </label>
