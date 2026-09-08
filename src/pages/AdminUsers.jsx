@@ -452,11 +452,15 @@ function AdminUsers() {
 
       {/* Edit modal */}
       {editing && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closeEdit}>
-          <div className="bg-white rounded-[14px] shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-black/20 z-50 flex justify-end" onClick={closeEdit}>
+          <div className="bg-white border-l border-[#E5E7EB] shadow-2xl w-full max-w-md h-full overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between p-6 border-b border-[#E5E7EB]">
-              <h2 className="text-lg font-bold text-[#222222]">Edit {editing.firstName} {editing.lastName}</h2>
-              <button onClick={closeEdit} className="text-[#6b7280] hover:text-[#222222] text-xl leading-none">&times;</button>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">People</p>
+                <h2 className="mt-1 text-lg font-bold text-[#222222]">Edit user</h2>
+                <p className="mt-1 text-sm text-[#6b7280]">{editing.firstName} {editing.lastName}</p>
+              </div>
+              <button onClick={closeEdit} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close edit panel">&times;</button>
             </div>
             <form onSubmit={handleSave} className="p-6 space-y-4">
               {formError && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{formError}</div>}
