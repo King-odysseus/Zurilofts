@@ -174,7 +174,7 @@ function Navbar({ solid = false }) {
   // visitors see just Explore (the Sign In / Sign Up CTA sits on the right).
   const navItems = (() => {
     if (!isAuthenticated) {
-      return [{ name: 'Explore', children: exploreLinks }];
+      return [{ name: 'Explore', href: '/properties' }];
     }
     if (mode === 'hosting') {
       if (!hasHostIntent) {
