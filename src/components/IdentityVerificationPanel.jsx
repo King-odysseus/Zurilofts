@@ -112,7 +112,7 @@ function IdentityVerificationPanel({ onApproved }) {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -122,7 +122,7 @@ function IdentityVerificationPanel({ onApproved }) {
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-4">
-        <h3 className="text-lg font-semibold text-[#0B0B45]">Identity verification</h3>
+        <h3 className="text-lg font-bold text-[#222222]">Identity verification</h3>
         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[data?.status] || STATUS_STYLES.UNVERIFIED}`}>
           {STATUS_LABELS[data?.status] || STATUS_LABELS.UNVERIFIED}
         </span>
@@ -151,32 +151,35 @@ function IdentityVerificationPanel({ onApproved }) {
       <form onSubmit={handleSave} className="space-y-4 mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-semibold text-[#1f2937] mb-1">Full legal name</label>
+            <label htmlFor="iv-fullName" className="block text-sm font-medium text-[#222222] mb-1">Full legal name</label>
             <input
+              id="iv-fullName"
               type="text"
               disabled={!editable}
               value={form.fullName}
               onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-canvas disabled:text-[#6b7280]"
+              className="neu-input w-full px-3 py-2 disabled:bg-canvas disabled:text-[#6b7280]"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#1f2937] mb-1">Date of birth</label>
+            <label htmlFor="iv-dateOfBirth" className="block text-sm font-medium text-[#222222] mb-1">Date of birth</label>
             <input
+              id="iv-dateOfBirth"
               type="date"
               disabled={!editable}
               value={form.dateOfBirth}
               onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-canvas disabled:text-[#6b7280]"
+              className="neu-input w-full px-3 py-2 disabled:bg-canvas disabled:text-[#6b7280]"
             />
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#1f2937] mb-1">ID type</label>
+            <label htmlFor="iv-idType" className="block text-sm font-medium text-[#222222] mb-1">ID type</label>
             <select
+              id="iv-idType"
               disabled={!editable}
               value={form.idType}
               onChange={(e) => setForm({ ...form, idType: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-canvas disabled:text-[#6b7280]"
+              className="neu-input w-full px-3 py-2 disabled:bg-canvas disabled:text-[#6b7280]"
             >
               <option value="NATIONAL_ID">National ID</option>
               <option value="PASSPORT">Passport</option>
@@ -184,13 +187,14 @@ function IdentityVerificationPanel({ onApproved }) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-[#1f2937] mb-1">ID number</label>
+            <label htmlFor="iv-idNumber" className="block text-sm font-medium text-[#222222] mb-1">ID number</label>
             <input
+              id="iv-idNumber"
               type="text"
               disabled={!editable}
               value={form.idNumber}
               onChange={(e) => setForm({ ...form, idNumber: e.target.value })}
-              className="w-full px-3 py-2 rounded-xl shadow-sm disabled:bg-canvas disabled:text-[#6b7280]"
+              className="neu-input w-full px-3 py-2 disabled:bg-canvas disabled:text-[#6b7280]"
             />
           </div>
         </div>
@@ -198,7 +202,7 @@ function IdentityVerificationPanel({ onApproved }) {
           <button
             type="submit"
             disabled={saving}
-            className="px-5 py-2 rounded-full text-sm font-semibold bg-[#0B0B45] text-white hover:bg-[#0B0B45]/90 transition-colors disabled:opacity-50"
+            className="min-h-[44px] px-5 py-2 rounded-lg text-sm font-semibold bg-white text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save details'}
           </button>
@@ -207,14 +211,14 @@ function IdentityVerificationPanel({ onApproved }) {
 
       {editable && (
         <div className="space-y-3 mb-6">
-          <p className="text-sm font-semibold text-[#1f2937]">Documents</p>
+          <p className="text-sm font-medium text-[#222222]">Documents</p>
           {DOCUMENT_KINDS.map(({ kind, label, required }) => (
-            <div key={kind} className="flex items-center justify-between gap-3 rounded-xl shadow-sm p-3">
+            <div key={kind} className="flex items-center justify-between gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3">
               <div>
-                <p className="text-sm text-[#1f2937]">{label}{required && <span className="text-red-500"> *</span>}</p>
+                <p className="text-sm text-[#222222]">{label}{required && <span className="text-red-500"> *</span>}</p>
                 {uploadedKinds.has(kind) && <p className="text-xs text-green-700">Uploaded</p>}
               </div>
-              <label className="px-3 py-1.5 text-xs font-semibold rounded-lg shadow-sm hover:shadow-md text-[#6b7280] hover:text-[#C49A6C] cursor-pointer transition-all">
+              <label className="min-h-[44px] inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] hover:text-[#2563EB] cursor-pointer transition-all">
                 {uploading === kind ? 'Uploading...' : uploadedKinds.has(kind) ? 'Replace' : 'Upload'}
                 <input
                   type="file"
@@ -237,7 +241,7 @@ function IdentityVerificationPanel({ onApproved }) {
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="px-5 py-2.5 rounded-full text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-colors disabled:opacity-50"
+          className="min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
         >
           Submit for review
         </button>

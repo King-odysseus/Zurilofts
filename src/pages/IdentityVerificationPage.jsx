@@ -54,21 +54,21 @@ function IdentityVerificationPage() {
             <button
               onClick={handleContinueToPayment}
               disabled={resuming}
-              className="px-6 py-2.5 rounded-full font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+              className="min-h-[44px] px-6 py-2.5 rounded-lg font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
             >
               {resuming ? 'Redirecting...' : 'Continue to payment'}
             </button>
           </div>
         )}
 
-        <div className="bg-white rounded-2xl p-6 shadow-md">
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-6 shadow-md">
           <IdentityVerificationPanel onApproved={() => setApproved(true)} />
         </div>
 
         {bookingId && (
           <p className="text-sm text-[#6b7280] mt-6">
             Verification is usually reviewed within a day. You can safely close this page - your booking will be waiting for you in{' '}
-            <Link to="/trips" className="text-[#C49A6C] font-semibold hover:text-[#0B0B45]">My Trips</Link> once you return.
+            <Link to="/trips" className="text-[#2563EB] font-semibold hover:text-[#1D4ED8]">My Trips</Link> once you return.
           </p>
         )}
       </main>

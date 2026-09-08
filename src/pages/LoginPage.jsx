@@ -67,7 +67,7 @@ function LoginPage() {
       {/* Back button */}
       <Link
         to="/"
-        className="fixed top-6 left-6 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors"
+        className="fixed top-6 left-6 z-20 flex items-center justify-center w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors"
         aria-label="Back to home"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -96,8 +96,9 @@ function LoginPage() {
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email</label>
+              <label htmlFor="login-email" className="block text-sm font-medium text-[#222222] mb-2">Email</label>
               <input
+                id="login-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -107,9 +108,10 @@ function LoginPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-2">Password</label>
+              <label htmlFor="login-password" className="block text-sm font-medium text-[#222222] mb-2">Password</label>
               <div className="relative">
                 <input
+                  id="login-password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -126,7 +128,7 @@ function LoginPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-[#C49A6C] text-white font-semibold py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+              className="w-full min-h-[44px] bg-[#2563EB] text-white font-semibold py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
             >
               {submitting ? 'Signing in...' : 'Sign In'}
             </button>
@@ -142,7 +144,7 @@ function LoginPage() {
           {/* Google OAuth */}
           <a
             href={googleHref}
-            className="flex items-center justify-center w-full py-3 rounded-full shadow-sm hover:shadow-md text-[#1f2937] font-semibold hover:bg-[#C49A6C]/5 transition-all duration-200"
+            className="flex items-center justify-center w-full min-h-[44px] py-3 rounded-lg border border-[#E5E7EB] bg-white text-[#222222] font-semibold hover:bg-[#F7F7F5] transition-all duration-200"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -155,14 +157,14 @@ function LoginPage() {
 
           <Link
             to="/properties"
-            className="flex items-center justify-center w-full py-3 mt-4 rounded-full shadow-sm hover:shadow-md text-[#6b7280] font-semibold hover:text-[#C49A6C] transition-all duration-200 text-sm"
+            className="flex items-center justify-center w-full min-h-[44px] py-3 mt-4 rounded-lg text-[#6b7280] font-semibold hover:text-[#2563EB] transition-all duration-200 text-sm"
           >
             Continue Browsing Properties
           </Link>
 
           <p className="text-center text-sm text-[#6b7280] mt-6">
             Don&apos;t have an account?{' '}
-            <Link to="/register" className="text-[#C49A6C] font-semibold hover:text-[#0B0B45] transition-colors">
+            <Link to="/register" className="text-[#2563EB] font-semibold hover:text-[#1D4ED8] transition-colors">
               Sign up
             </Link>
           </p>
@@ -179,7 +181,7 @@ function PasswordToggle({ shown, onClick }) {
       type="button"
       onClick={onClick}
       aria-label={shown ? 'Hide password' : 'Show password'}
-      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#0B0B45] transition-colors"
+      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#2563EB] transition-colors"
     >
       {shown ? (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

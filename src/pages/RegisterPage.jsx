@@ -118,7 +118,7 @@ function RegisterPage() {
       {/* Back button */}
       <Link
         to="/"
-        className="fixed top-6 left-6 z-20 flex items-center justify-center w-10 h-10 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors"
+        className="fixed top-6 left-6 z-20 flex items-center justify-center w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors"
         aria-label="Back to home"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,8 +154,9 @@ function RegisterPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-2">First Name</label>
+                <label htmlFor="register-firstName" className="block text-sm font-medium text-[#222222] mb-2">First Name</label>
                 <input
+                  id="register-firstName"
                   type="text"
                   name="firstName"
                   value={formData.firstName}
@@ -166,8 +167,9 @@ function RegisterPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-2">Last Name</label>
+                <label htmlFor="register-lastName" className="block text-sm font-medium text-[#222222] mb-2">Last Name</label>
                 <input
+                  id="register-lastName"
                   type="text"
                   name="lastName"
                   value={formData.lastName}
@@ -179,8 +181,9 @@ function RegisterPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email</label>
+              <label htmlFor="register-email" className="block text-sm font-medium text-[#222222] mb-2">Email</label>
               <input
+                id="register-email"
                 type="email"
                 name="email"
                 value={formData.email}
@@ -191,9 +194,10 @@ function RegisterPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-2">Password</label>
+              <label htmlFor="register-password" className="block text-sm font-medium text-[#222222] mb-2">Password</label>
               <div className="relative">
                 <input
+                  id="register-password"
                   type={showPassword ? 'text' : 'password'}
                   name="password"
                   value={formData.password}
@@ -209,9 +213,10 @@ function RegisterPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-2">Confirm Password</label>
+              <label htmlFor="register-confirmPassword" className="block text-sm font-medium text-[#222222] mb-2">Confirm Password</label>
               <div className="relative">
                 <input
+                  id="register-confirmPassword"
                   type={showConfirm ? 'text' : 'password'}
                   name="confirmPassword"
                   value={formData.confirmPassword}
@@ -227,7 +232,7 @@ function RegisterPage() {
               </div>
             </div>
             <div className="flex flex-col items-center pt-2">
-              <p className="block text-sm font-semibold text-[#1f2937] mb-3">Profile Picture (optional)</p>
+              <p className="block text-sm font-medium text-[#222222] mb-3">Profile Picture (optional)</p>
               <label className="relative cursor-pointer group">
                 {avatarPreview ? (
                   <img
@@ -266,7 +271,7 @@ function RegisterPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-[#C49A6C] text-white font-semibold py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 mt-6"
+              className="w-full min-h-[44px] bg-[#2563EB] text-white font-semibold py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50 mt-6"
             >
               {submitting
                 ? 'Creating Account...'
@@ -283,7 +288,7 @@ function RegisterPage() {
           <a
             href={googleHref}
             onClick={() => rememberPostAuthMode(isHost ? 'hosting' : 'travelling')}
-            className="flex items-center justify-center w-full py-3 rounded-full text-[#1f2937] font-semibold shadow-sm hover:shadow-md hover:bg-[#C49A6C]/5 transition-all duration-200"
+            className="flex items-center justify-center w-full min-h-[44px] py-3 rounded-lg border border-[#E5E7EB] bg-white text-[#222222] font-semibold hover:bg-[#F7F7F5] transition-all duration-200"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
@@ -296,14 +301,14 @@ function RegisterPage() {
 
           <Link
             to="/properties"
-            className="flex items-center justify-center w-full py-3 mt-4 rounded-full text-[#6b7280] font-semibold shadow-sm hover:shadow-md hover:text-[#C49A6C] transition-all duration-200 text-sm"
+            className="flex items-center justify-center w-full min-h-[44px] py-3 mt-4 rounded-lg text-[#6b7280] font-semibold hover:text-[#2563EB] transition-all duration-200 text-sm"
           >
             Continue Browsing Properties
           </Link>
 
           <p className="text-center text-sm text-[#6b7280] mt-6">
             Already have an account?{' '}
-            <Link to="/login" className="text-[#C49A6C] font-semibold hover:text-[#0B0B45] transition-colors">
+            <Link to="/login" className="text-[#2563EB] font-semibold hover:text-[#1D4ED8] transition-colors">
               Sign in
             </Link>
           </p>
@@ -315,23 +320,23 @@ function RegisterPage() {
             <h3 className="text-lg font-bold text-[#0B0B45] mb-4">Why Host with ZuriLofts</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex gap-3">
-                <span className="text-[#C49A6C] font-bold flex-shrink-0">7.5%</span>
+                <span className="text-[#2563EB] font-bold flex-shrink-0">7.5%</span>
                 <span className="text-[#1f2937]"><span className="font-semibold">Lowest platform fee in Kenya</span> - less than half of Booking.com (15%)</span>
               </li>
               <li className="flex gap-3">
-                <span className="text-[#C49A6C] flex-shrink-0">
+                <span className="text-[#2563EB] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
                 <span className="text-[#1f2937]"><span className="font-semibold">Guests pay zero markup</span> - unlike Airbnb&apos;s 14% guest fee, your listed price IS the guest price</span>
               </li>
               <li className="flex gap-3">
-                <span className="text-[#C49A6C] flex-shrink-0">
+                <span className="text-[#2563EB] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
                 <span className="text-[#1f2937]"><span className="font-semibold">Tax handled for you</span> - WHT auto-deducted, remitted to KRA, and you get a downloadable statement anytime</span>
               </li>
               <li className="flex gap-3">
-                <span className="text-[#C49A6C] flex-shrink-0">
+                <span className="text-[#2563EB] flex-shrink-0">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                 </span>
                 <span className="text-[#1f2937]"><span className="font-semibold">Flexible payouts</span> - choose weekly, bi-weekly, or monthly transfers to your bank account</span>
@@ -339,31 +344,31 @@ function RegisterPage() {
             </ul>
 
             {/* Airbnb comparison */}
-            <div className="mt-5 bg-[#0B0B45]/5 rounded-xl p-4">
+            <div className="mt-5 bg-[#F7F7F5] rounded-xl p-4">
               <p className="text-xs font-semibold text-[#0B0B45] mb-2 uppercase tracking-wide">Cost Comparison - Guest Pays</p>
               <table className="w-full text-xs">
                 <thead>
-                  <tr className="text-[#6b7280] border-b border-[#D9D9D9]">
+                  <tr className="text-[#6b7280] border-b border-[#E5E7EB]">
                     <th className="text-left py-1">Property at KES 8,000/night</th>
                     <th className="text-right py-1">Airbnb</th>
-                    <th className="text-right py-1 text-[#C49A6C]">ZuriLofts</th>
+                    <th className="text-right py-1 text-[#2563EB]">ZuriLofts</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b border-[#D9D9D9]/50">
+                  <tr className="border-b border-[#E5E7EB]/50">
                     <td className="py-1">Nightly rate</td>
                     <td className="text-right">KES 8,000</td>
-                    <td className="text-right text-[#C49A6C] font-medium">KES 8,000</td>
+                    <td className="text-right text-[#2563EB] font-medium">KES 8,000</td>
                   </tr>
-                  <tr className="border-b border-[#D9D9D9]/50">
+                  <tr className="border-b border-[#E5E7EB]/50">
                     <td className="py-1">Guest service fee</td>
                     <td className="text-right text-red-500">+KES 1,120 (14%)</td>
-                    <td className="text-right text-[#C49A6C] font-bold">KES 0</td>
+                    <td className="text-right text-[#2563EB] font-bold">KES 0</td>
                   </tr>
                   <tr>
                     <td className="py-1 font-semibold">Guest pays</td>
                     <td className="text-right font-semibold text-red-500">KES 9,120</td>
-                    <td className="text-right font-bold text-[#C49A6C]">KES 8,000</td>
+                    <td className="text-right font-bold text-[#2563EB]">KES 8,000</td>
                   </tr>
                 </tbody>
               </table>
@@ -385,17 +390,18 @@ function AuthModeToggle({ activeMode, basePath }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-2 rounded-full bg-[#0B0B45]/5 p-1 mb-6">
+    <div className="grid grid-cols-2 gap-2 rounded-full bg-[#F7F7F5] p-1 mb-6">
       {modes.map((mode) => {
         const active = activeMode === mode.key;
         return (
           <Link
             key={mode.key}
             to={mode.to}
-            className={`text-center rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+            aria-current={active ? 'true' : undefined}
+            className={`text-center rounded-full px-4 py-2 min-h-[44px] flex items-center justify-center text-sm font-semibold transition-all ${
               active
-                ? 'bg-[#0B0B45] text-white shadow-sm'
-                : 'text-[#6b7280] hover:text-[#0B0B45] hover:bg-white/70'
+                ? 'bg-[#2563EB] text-white shadow-sm'
+                : 'text-[#6b7280] hover:text-[#2563EB] hover:bg-white/70'
             }`}
           >
             {mode.label}
@@ -413,7 +419,7 @@ function PasswordToggle({ shown, onClick }) {
       type="button"
       onClick={onClick}
       aria-label={shown ? 'Hide password' : 'Show password'}
-      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#0B0B45] transition-colors"
+      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#2563EB] transition-colors"
     >
       {shown ? (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
