@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import Spinner from '../components/Spinner.jsx';
@@ -8,9 +9,37 @@ import apiClient from '../api/client.js';
 
 // --- Helpers ---
 const STATUS_STYLES = {
-  PENDING:   { bg: 'bg-amber-100 border-amber-200 text-amber-700', label: 'Pending' },
-  CONFIRMED: { bg: 'bg-emerald-100 border-emerald-200 text-emerald-700', label: 'Confirmed' },
-  CANCELLED: { bg: 'bg-red-100 border-red-200 text-red-700', label: 'Cancelled' },
+  PENDING:   { bg: 'bg-amber-500', label: 'Pending', icon: 'clock' },
+  CONFIRMED: { bg: 'bg-green-600', label: 'Confirmed', icon: 'check' },
+  CANCELLED: { bg: 'bg-red-600', label: 'Cancelled', icon: 'x' },
+};
+
+function StatusBadge({ status }) {
+  const meta = STATUS_STYLES[status] || { bg: 'bg-[#6b7280]', label: status, icon: null };
+  return (
+    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold text-white ${meta.bg}`}>
+      {meta.icon === 'check' && (
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+        </svg>
+      )}
+      {meta.icon === 'x' && (
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      )}
+      {meta.icon === 'clock' && (
+        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      )}
+      {meta.label}
+    </span>
+  );
+}
+
+StatusBadge.propTypes = {
+  status: PropTypes.string.isRequired,
 };
 
 function formatDate(iso) {
@@ -150,7 +179,7 @@ function BookingHistoryPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <h1 className="text-3xl font-bold text-[#0B0B45] mb-2">My Bookings</h1>
+        <h1 className="text-2xl font-bold text-[#222222] mb-2">My Bookings</h1>
         <p className="text-[#6b7280] mb-6">
           {filtered.length} booking{filtered.length !== 1 ? 's' : ''}
         </p>
@@ -161,10 +190,10 @@ function BookingHistoryPage() {
             <button
               key={sf.value}
               onClick={() => setStatusFilter(sf.value)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
+              className={`min-h-[44px] px-4 rounded-full text-sm font-semibold transition-all duration-200 ${
                 statusFilter === sf.value
-                  ? 'bg-[#C49A6C] text-white'
-                  : 'bg-white shadow-sm hover:shadow-md transition-shadow text-[#0B0B45]'
+                  ? 'bg-[#2563EB] text-white'
+                  : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
               }`}
             >
               {sf.label}
@@ -176,15 +205,15 @@ function BookingHistoryPage() {
         {filtered.length === 0 ? (
           <div className="flex items-center justify-center min-h-[30vh] py-12">
             <div className="text-center max-w-md">
-              <div className="w-20 h-20 bg-[#D9D9D9]/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-[#F7F7F5] border border-[#E5E7EB] rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg className="w-10 h-10 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-[#0B0B45] mb-1">No bookings found</h3>
+              <h3 className="text-lg font-bold text-[#222222] mb-1">No bookings found</h3>
               <p className="text-[#6b7280]">
                 Try adjusting your filters or{' '}
-                <Link to="/properties" className="text-[#C49A6C] font-semibold hover:underline">
+                <Link to="/properties" className="text-[#2563EB] font-semibold hover:underline">
                   browse properties
                 </Link>
                 .
@@ -196,7 +225,7 @@ function BookingHistoryPage() {
             {filtered.map((booking) => (
               <div
                 key={booking.id}
-                className="bg-white rounded-2xl neu-card p-4 md:p-6"
+                className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-4 md:p-6"
               >
                 <div className="flex flex-col md:flex-row gap-4">
                   {/* Property image */}
@@ -210,7 +239,10 @@ function BookingHistoryPage() {
 
                   <div className="flex-1">
                     {/* Title + Location */}
-                    <h3 className="font-semibold text-[#0B0B45]">{booking.property?.title || 'Property'}</h3>
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-bold text-[#222222]">{booking.property?.title || 'Property'}</h3>
+                      <StatusBadge status={booking.status} />
+                    </div>
                     <div className="flex items-center text-[#6b7280] text-sm mt-0.5">
                       <svg className="w-3.5 h-3.5 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -219,38 +251,33 @@ function BookingHistoryPage() {
                       {booking.property?.location || 'Nairobi'}
                     </div>
 
-                    {/* Status badge */}
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold mt-2 ${STATUS_STYLES[booking.status]?.bg || 'bg-[#D9D9D9]'}`}>
-                      {STATUS_STYLES[booking.status]?.label || booking.status}
-                    </span>
-
                     {/* Dates */}
                     <div className="mt-3 flex gap-4 text-sm">
                       <div>
                         <span className="text-xs text-[#6b7280] block">Check-in</span>
-                        <span className="font-medium">{formatDate(booking.checkIn)}</span>
+                        <span className="font-medium text-[#222222]">{formatDate(booking.checkIn)}</span>
                       </div>
                       <div>
                         <span className="text-xs text-[#6b7280] block">Check-out</span>
-                        <span className="font-medium">{formatDate(booking.checkOut)}</span>
+                        <span className="font-medium text-[#222222]">{formatDate(booking.checkOut)}</span>
                       </div>
                       <div>
                         <span className="text-xs text-[#6b7280] block">Guests</span>
-                        <span className="font-medium">{booking.guests || 1}</span>
+                        <span className="font-medium text-[#222222]">{booking.guests || 1}</span>
                       </div>
                       {booking.total != null && (
                         <div>
                           <span className="text-xs text-[#6b7280] block">Total</span>
-                          <span className="font-medium text-[#0B0B45]">{formatCurrency(booking.total)}</span>
+                          <span className="font-medium text-[#222222]">{formatCurrency(booking.total)}</span>
                         </div>
                       )}
                     </div>
 
                     {/* Action buttons */}
-                    <div className="flex gap-2 mt-4">
+                    <div className="flex flex-wrap gap-2 mt-4">
                       <button
                         onClick={() => openConversation(booking.id)}
-                        className="flex items-center gap-1.5 bg-[#C49A6C] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b8895c] transition-all duration-200"
+                        className="flex items-center gap-1.5 min-h-[44px] bg-[#2563EB] text-white px-4 rounded-lg text-sm font-semibold hover:bg-[#1D4ED8] transition-all duration-200"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -259,7 +286,7 @@ function BookingHistoryPage() {
                       </button>
                       <button
                         onClick={() => generateInvoice(booking)}
-                        className="flex items-center gap-1.5 bg-[#0B0B45] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200"
+                        className="flex items-center gap-1.5 min-h-[44px] bg-white text-[#222222] border border-[#E5E7EB] px-4 rounded-lg text-sm font-semibold hover:bg-[#F7F7F5] transition-all duration-200"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -268,7 +295,7 @@ function BookingHistoryPage() {
                       </button>
                       <Link
                         to={`/property/${booking.propertyId}`}
-                        className="flex items-center gap-1.5 bg-[#0B0B45]/5 text-[#0B0B45] px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
+                        className="flex items-center gap-1.5 min-h-[44px] bg-white text-[#222222] border border-[#E5E7EB] px-4 rounded-lg text-sm font-semibold hover:bg-[#F7F7F5] transition-all duration-200"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -279,7 +306,7 @@ function BookingHistoryPage() {
                       {canCancelBooking(booking) && (
                         <button
                           onClick={() => setCancelTarget(booking)}
-                          className="flex items-center gap-1.5 bg-red-50 text-red-600 px-4 py-2 rounded-full text-sm font-semibold hover:bg-red-100 transition-colors duration-200"
+                          className="flex items-center gap-1.5 min-h-[44px] bg-red-50 text-red-600 px-4 rounded-lg text-sm font-semibold hover:bg-red-100 transition-colors duration-200"
                         >
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
