@@ -233,6 +233,15 @@ function AdminPropertyForm() {
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">{error}</div>
       )}
 
+      <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Listing setup progress">
+        {['Basics', 'Details', 'Photos', 'Publish'].map((label, index) => (
+          <div key={label} className="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-3 shadow-sm">
+            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${index === 0 ? 'bg-[#2563EB] text-white' : 'bg-[#F7F7F5] text-[#6b7280]'}`}>{index + 1}</span>
+            <span className="text-xs font-semibold text-[#222222] sm:text-sm">{label}</span>
+          </div>
+        ))}
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
           <div>
