@@ -587,7 +587,7 @@ function PropertiesPage() {
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-[#222222]/40"></div>
-                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#222222] text-[10px] font-bold px-3 py-1 rounded-full">
+                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#222222] text-xs font-bold px-3 py-1 rounded-full">
                         Coming Soon
                       </div>
                     </div>
@@ -597,20 +597,20 @@ function PropertiesPage() {
                       <div className="flex items-center justify-between mb-3 py-2 border-y border-[#E5E7EB]">
                         <div className="flex-1 text-center">
                           <span className="text-xs text-[#6b7280]">-</span>
-                          <p className="text-[10px] text-[#6b7280]">Beds</p>
+                          <p className="text-xs text-[#6b7280]">Beds</p>
                         </div>
                         <div className="flex-1 text-center">
                           <span className="text-xs text-[#6b7280]">-</span>
-                          <p className="text-[10px] text-[#6b7280]">Baths</p>
+                          <p className="text-xs text-[#6b7280]">Baths</p>
                         </div>
                         <div className="flex-1 text-center">
                           <span className="text-xs text-[#6b7280]">-</span>
-                          <p className="text-[10px] text-[#6b7280]">Sqft</p>
+                          <p className="text-xs text-[#6b7280]">Sqft</p>
                         </div>
                       </div>
                       <div className="flex items-center justify-between mt-auto">
                         <div>
-                          <span className="text-[10px] text-[#6b7280]">per night</span>
+                          <span className="text-xs text-[#6b7280]">per night</span>
                           <p className="text-base font-bold text-[#6b7280]">KES -</p>
                         </div>
                         <span className="bg-[#F7F7F5] text-[#6b7280] font-semibold px-3 py-1.5 rounded-full text-xs">

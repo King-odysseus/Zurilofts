@@ -129,7 +129,7 @@ function PropertyPage() {
             </div>
             <h2 className="text-xl font-bold text-[#222222] mb-2">Property Not Found</h2>
             <p className="text-[#6b7280] mb-4">{error || 'This property could not be loaded.'}</p>
-            <Link to="/properties" className="inline-flex items-center justify-center min-h-[44px] bg-[#C49A6C] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors duration-200">
+            <Link to="/properties" className="inline-flex items-center justify-center min-h-[44px] bg-[#C49A6C] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors duration-200">
               View All Properties
             </Link>
           </div>
@@ -486,7 +486,7 @@ function PropertyPinMap({ lat, lng, address, location, title }) {
           href={directionsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 shrink-0 min-h-[44px] rounded-full bg-[#2563EB] text-white font-semibold px-5 py-2.5 text-sm hover:bg-[#1D4ED8] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+          className="inline-flex items-center justify-center gap-2 shrink-0 min-h-[44px] rounded-lg bg-[#2563EB] text-white font-semibold px-5 py-2.5 text-sm hover:bg-[#1D4ED8] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />

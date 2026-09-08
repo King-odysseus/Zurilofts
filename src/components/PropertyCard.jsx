@@ -82,13 +82,13 @@ function PropertyCard({ property }) {
 
         {/* Badges: Featured + variant */}
         {badge && (
-          <span className="absolute top-2.5 left-2.5 bg-[#2563EB] text-white text-[10px] font-bold px-3 py-1 rounded-full">
+          <span className="absolute top-2.5 left-2.5 bg-[#2563EB] text-white text-xs font-bold px-3 py-1 rounded-full">
             {badge}
           </span>
         )}
         {variantLabel && (
           <span
-            className={`absolute ${badge ? 'top-9' : 'top-2.5'} left-2.5 bg-white/90 backdrop-blur-sm text-[#222222] text-[10px] font-bold px-3 py-1 rounded-full`}
+            className={`absolute ${badge ? 'top-9' : 'top-2.5'} left-2.5 bg-white/90 backdrop-blur-sm text-[#222222] text-xs font-bold px-3 py-1 rounded-full`}
           >
             {variantLabel}
           </span>
@@ -153,7 +153,7 @@ function PropertyCard({ property }) {
               </svg>
               <span className="text-xs font-semibold">{bedrooms != null ? bedrooms : '-'}</span>
             </div>
-            <span className="text-[10px] text-[#6b7280]">{bedrooms === 1 ? 'Bed' : 'Beds'}</span>
+            <span className="text-xs text-[#6b7280]">{bedrooms === 1 ? 'Bed' : 'Beds'}</span>
           </div>
           <div className="flex-1 text-center">
             <div className="flex items-center justify-center text-[#222222] mb-0.5">
@@ -162,7 +162,7 @@ function PropertyCard({ property }) {
               </svg>
               <span className="text-xs font-semibold">{bathrooms != null ? bathrooms : '-'}</span>
             </div>
-            <span className="text-[10px] text-[#6b7280]">{bathrooms === 1 ? 'Bath' : 'Baths'}</span>
+            <span className="text-xs text-[#6b7280]">{bathrooms === 1 ? 'Bath' : 'Baths'}</span>
           </div>
           <div className="flex-1 text-center">
             <div className="flex items-center justify-center text-[#222222] mb-0.5">
@@ -171,14 +171,14 @@ function PropertyCard({ property }) {
               </svg>
               <span className="text-xs font-semibold">{area != null ? area : '-'}</span>
             </div>
-            <span className="text-[10px] text-[#6b7280]">Sqft</span>
+            <span className="text-xs text-[#6b7280]">Sqft</span>
           </div>
         </div>
 
         {/* Price + CTA - pinned to bottom */}
         <div className="flex items-center justify-between mt-auto">
           <div>
-            <span className="text-[10px] text-[#6b7280]">per night</span>
+            <span className="text-xs text-[#6b7280]">per night</span>
             <div className="text-lg font-bold text-[#222222]">
               {formattedPrice ? `KES ${formattedPrice}` : 'KES -'}
             </div>
