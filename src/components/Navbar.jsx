@@ -564,7 +564,7 @@ function Navbar() {
                 to="/login"
                 className={`hidden md:inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
                   needsWhiteNav
-                    ? 'bg-[#2563EB] text-white hover:bg-[#1D4ED8]'
+                    ? 'bg-[#C49A6C] text-white hover:bg-[#B8895C]'
                     : 'bg-white text-[#222222] hover:bg-[#F7F7F5]'
                 }`}
               >
@@ -660,7 +660,7 @@ function Navbar() {
                 <>
                   <Link
                     to="/profile#info"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     My Profile
@@ -710,7 +710,7 @@ function Navbar() {
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
                       to={user?.role === 'ADMIN' ? '/admin' : '/host/today'}
-                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors duration-200 text-center"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
                       onClick={() => setMenuOpen(false)}
                     >
                       {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
@@ -735,7 +735,7 @@ function Navbar() {
                 <>
                   <Link
                     to="/login"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     Sign In / Sign Up

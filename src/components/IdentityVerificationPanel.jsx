@@ -241,7 +241,7 @@ function IdentityVerificationPanel({ onApproved }) {
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-colors disabled:opacity-50"
+          className="min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors disabled:opacity-50"
         >
           Submit for review
         </button>

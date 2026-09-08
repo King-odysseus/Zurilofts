@@ -36,7 +36,7 @@ function NearbyCard({ item, areaLabels }) {
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-2 min-h-[44px] rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D4ED8]"
+          className="mt-4 inline-flex items-center gap-2 min-h-[44px] rounded-lg bg-[#C49A6C] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]"
         >
           Get directions
           <span aria-hidden="true">↗</span>

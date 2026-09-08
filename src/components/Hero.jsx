@@ -355,7 +355,7 @@ function Hero({ stats }) {
             <div className="mt-14 flex justify-center">
               <Link
                 to="/register?role=HOST"
-                className="inline-flex items-center gap-2 min-h-[44px] bg-[#2563EB] text-white font-bold px-10 py-3 rounded-lg hover:bg-[#1D4ED8] transition-all duration-200 shadow-lg hover:shadow-xl text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0B45]"
+                className="inline-flex items-center gap-2 min-h-[44px] bg-[#C49A6C] text-white font-bold px-10 py-3 rounded-lg hover:bg-[#B8895C] transition-all duration-200 shadow-lg hover:shadow-xl text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0B45]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />

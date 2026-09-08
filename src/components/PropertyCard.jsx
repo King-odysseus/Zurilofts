@@ -183,7 +183,7 @@ function PropertyCard({ property }) {
               {formattedPrice ? `KES ${formattedPrice}` : 'KES -'}
             </div>
           </div>
-          <span className="bg-[#2563EB] text-white font-semibold px-3.5 py-1.5 rounded-full text-xs transition-colors duration-200 group-hover:bg-[#1D4ED8]">
+          <span className="bg-[#C49A6C] text-white font-semibold px-3.5 py-1.5 rounded-full text-xs transition-colors duration-200 group-hover:bg-[#B8895C]">
             Book Now
           </span>
         </div>
