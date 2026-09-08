@@ -157,7 +157,7 @@ function AdminDisputes() {
                 {!closed && (
                   <div className="flex gap-2">
                     <input value={messageBody} onChange={(e) => setMessageBody(e.target.value)} placeholder="Message both parties..." className="min-h-[44px] flex-1 rounded-xl border border-[#E5E7EB] px-3 py-2 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20" />
-                    <button onClick={handleSendMessage} disabled={busy === 'message'} className="min-h-[44px] rounded-lg bg-[#2563EB] px-4 py-2 text-xs font-semibold text-white disabled:opacity-50">Send</button>
+                    <button onClick={handleSendMessage} disabled={busy === 'message'} className="min-h-[44px] rounded-lg bg-[#C49A6C] px-4 py-2 text-xs font-semibold text-white disabled:opacity-50 hover:bg-[#B8895C]">Send</button>
                   </div>
                 )}
               </div>
