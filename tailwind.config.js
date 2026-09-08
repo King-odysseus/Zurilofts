@@ -10,14 +10,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        indigo:   '#0B0B45', // Dark Navy
-        bronze:   '#C49A6C',
-        silver:   '#D9D9D9',
-        charcoal: '#1f2937',
-        'cool-grey': '#6b7280',
+        primary:        '#2563EB',
+        'primary-hover': '#1D4ED8',
+        navy:           '#0B0B45',
+        indigo:         '#0B0B45', // Backward-compatible alias to navy
+        bronze:         '#C49A6C', // Branding
+        silver:         '#D9D9D9',
+        charcoal:       '#222222',
+        'cool-grey':    '#6b7280',
+        border:         '#E5E7EB',
         // App canvas: cards are white and float on this grey. Tune the tone
         // here (one place) rather than editing page backgrounds everywhere.
-        canvas:   '#EEF1F5',
+        canvas:         '#F7F7F5',
       },
       // Whole-app elevation scale. Default Tailwind shadows are too faint for
       // borderless cards, so each level is a tight contact edge + a soft base.
@@ -40,16 +44,16 @@ export default {
     themes: [
       {
         zuriloft: {
-          primary:            '#0B0B45',  // Dark Navy
-          secondary:          '#C49A6C',  // Warm Bronze
+          primary:            '#2563EB',  // Blue
+          secondary:          '#0B0B45',  // Dark Navy
           accent:             '#C49A6C',  // Warm Bronze
-          neutral:            '#D9D9D9',  // Silver Grey
+          neutral:            '#E5E7EB',  // Border Grey
           'base-100':         '#ffffff',  // White
-          'base-200':         '#D9D9D9',  // Silver Grey
-          'base-300':         '#b0b0b0',  // Darker grey
-          'base-content':     '#1f2937',  // Charcoal
-          'primary-content':  '#ffffff',  // White on navy
-          'secondary-content':'#ffffff',  // White on bronze
+          'base-200':         '#F7F7F5',  // Canvas
+          'base-300':         '#D1D5DB',  // Darker grey
+          'base-content':     '#222222',  // Charcoal
+          'primary-content':  '#ffffff',  // White on blue
+          'secondary-content':'#ffffff',  // White on navy
         },
       },
     ],

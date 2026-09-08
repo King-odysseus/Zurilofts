@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .ui-btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1D4ED8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .ui-btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-4 py-2 text-sm font-semibold text-[#222222] transition hover:bg-[#F7F7F5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .ui-surface {
+    @apply rounded-[14px] border border-[#E5E7EB] bg-white text-[#222222] shadow-[0_1px_2px_rgb(0_0_0_/_0.04),0_2px_8px_-2px_rgb(0_0_0_/_0.05)];
+  }
+
+  .ui-input {
+    @apply rounded-[12px] border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#222222] placeholder:text-[#6b7280] transition focus:border-[#2563EB] focus:outline-none focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .ui-status-success {
+    @apply text-[#16A34A];
+  }
+
+  .ui-status-warning {
+    @apply text-[#D97706];
+  }
+
+  .ui-status-danger {
+    @apply text-[#DC2626];
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -15,14 +45,16 @@ html {
 body {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+  background-color: #F7F7F5;
+  color: #222222;
 }
 
 /* Keyboard focus must stay visible even where components set Tailwind's
    outline-none. Mouse clicks don't trigger :focus-visible, so this never
-   adds a ring for pointer users. currentColor adapts to whatever the
-   element sits on (white text on navy stays legible, charcoal on white too). */
+   adds a ring for pointer users. Interactive focus uses the approved brand
+   blue so it reads as an "active" signal distinct from branding navy. */
 :is(a, button, input, select, textarea, summary, [role='button'], [tabindex]):focus-visible {
-  outline: 2px solid currentColor;
+  outline: 2px solid #2563EB;
   outline-offset: 2px;
 }
 
@@ -52,36 +84,32 @@ body {
   }
 }
 
-/* ===== Card System - borderless, elevation carried entirely by shadow =====
-   Cards float on the light-grey app canvas (bg-canvas, tuned in
-   tailwind.config.js), so elevation reads as a layered shadow: a tight
-   contact edge + a large soft base. */
+/* ===== Card System - flat, bordered, restrained surfaces =====
+   Cards sit on the light-grey app canvas (bg-canvas, tuned in
+   tailwind.config.js) with a thin neutral border and a subtle layered
+   shadow for gentle elevation. */
 .neu-card {
   background-color: #ffffff;
-  border: none;
-  border-radius: 1rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
   box-shadow:
-    0 1px 2px rgb(15 23 42 / 0.05),
-    0 2px 4px -1px rgb(15 23 42 / 0.06),
-    0 12px 28px -8px rgb(15 23 42 / 0.13);
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 2px 8px -2px rgb(0 0 0 / 0.05);
   transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
 .neu-card-hover:hover {
   box-shadow:
-    0 2px 4px rgb(15 23 42 / 0.06),
-    0 6px 12px -4px rgb(15 23 42 / 0.08),
-    0 26px 52px -12px rgb(15 23 42 / 0.22);
-  transform: translateY(-4px);
+    0 4px 16px -4px rgb(0 0 0 / 0.08);
+  transform: translateY(-2px);
 }
 
-/* ===== Form inputs - borderless, resting on a soft shadow instead of an outline ===== */
+/* ===== Form inputs - flat, bordered, restrained surfaces ===== */
 .neu-input {
   background-color: #ffffff;
-  border: 1px solid transparent;
-  border-radius: 0.75rem;
-  color: #1f2937;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 3px 10px -4px rgb(15 23 42 / 0.10);
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  color: #222222;
   transition: box-shadow 0.15s ease;
 }
 
@@ -91,29 +119,32 @@ body {
 
 .neu-input:focus {
   outline: none;
-  border-color: #C49A6C;
-  box-shadow: 0 0 0 3px rgba(196, 154, 108, 0.2);
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
 }
 
 /* ===== Radio / option cards - borderless, shadow communicates the surface ===== */
 .neu-radio-card {
   background-color: #ffffff;
-  border: 1px solid transparent;
-  border-radius: 1rem;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 6px 18px -8px rgb(15 23 42 / 0.12);
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.04),
+    0 2px 8px -2px rgb(0 0 0 / 0.05);
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .neu-radio-card:hover {
-  box-shadow: 0 4px 10px -4px rgb(196 154 108 / 0.16), 0 14px 30px -10px rgb(196 154 108 / 0.28);
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
   transform: translateY(-2px);
 }
 
 .neu-radio-selected {
   background-color: #ffffff;
-  border: 2px solid #C49A6C;
-  border-radius: 1rem;
-  box-shadow: 0 2px 6px rgb(196 154 108 / 0.14), 0 16px 32px -12px rgb(196 154 108 / 0.32);
+  border: 2px solid #2563EB;
+  border-radius: 14px;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
 }
 
 /* Auth cards sit over a dark photo background - use a single soft drop
@@ -122,18 +153,22 @@ body {
   box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.5);
 }
 
-/* Borderless inputs for auth forms (login/register) and filter dropdowns -
-   soft shadow gives definition instead of an outline */
+/* Bordered inputs for auth forms (login/register) and filter dropdowns -
+   light border gives definition, blue ring marks the active state. */
 .auth-input,
 .filter-input {
-  border: 1px solid transparent;
+  background-color: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
+  color: #222222;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 1px 8px -2px rgb(0 0 0 / 0.06);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .auth-input:focus,
 .filter-input:focus {
-  border-color: #C49A6C;
-  box-shadow: 0 0 0 3px rgba(196, 154, 108, 0.18);
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
   outline: none;
 }
 
@@ -141,11 +176,11 @@ body {
 .date-input {
   color-scheme: light;
   cursor: pointer;
-  accent-color: #C49A6C;
+  accent-color: #2563EB;
 }
 
 .date-input::-webkit-calendar-picker-indicator {
-  background-color: #C49A6C;
+  background-color: #2563EB;
   padding: 5px;
   border-radius: 8px;
   cursor: pointer;
@@ -161,12 +196,12 @@ body {
 }
 
 .date-input::-webkit-datetime-edit-fields-wrapper {
-  color: #1f2937;
+  color: #222222;
   font-weight: 500;
 }
 
 .date-input::-webkit-datetime-edit-text {
-  color: #C49A6C;
+  color: #2563EB;
   padding: 0 2px;
   font-weight: 600;
 }
@@ -176,17 +211,17 @@ body {
 .date-input::-webkit-datetime-edit-year-field:focus,
 .date-input::-webkit-datetime-edit-hour-field:focus,
 .date-input::-webkit-datetime-edit-minute-field:focus {
-  background-color: #C49A6C20;
-  color: #0B0B45;
+  background-color: #EFF6FF;
+  color: #1D4ED8;
   border-radius: 4px;
 }
 
-/* Select Dropdown Styling - neumorphic selects get bronze chevron */
+/* Select Dropdown Styling - neumorphic selects get blue chevron */
 select.neu-input {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C49A6C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232563EB' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 16px center;
   background-size: 14px;
@@ -195,14 +230,14 @@ select.neu-input {
 
 select.neu-input option {
   background: #ffffff;
-  color: #1f2937;
+  color: #222222;
   padding: 12px;
 }
 
 select.neu-input option:hover,
 select.neu-input option:checked {
-  background: #C49A6C20;
-  color: #0B0B45;
+  background: #EFF6FF;
+  color: #1D4ED8;
 }
 
 /* All other selects (admin filters/forms, price filter) get the same app
@@ -220,20 +255,7 @@ select:not(.neu-input) {
 
 select:not(.neu-input) option {
   background: #ffffff;
-  color: #1f2937;
-}
-
-/* Flat bordered inputs - for auth forms (login/register) and filter dropdowns only */
-.auth-input,
-.filter-input {
-  border: 1px solid #D9D9D9;
-}
-
-.auth-input:focus,
-.filter-input:focus {
-  border-color: #C49A6C;
-  box-shadow: 0 0 0 1px rgba(196, 154, 108, 0.3);
-  outline: none;
+  color: #222222;
 }
 
 /* Marquee scroll - continuous auto-scrolling track */

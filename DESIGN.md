@@ -2,32 +2,44 @@
 
 This document is the single source of truth for visual design. All AI agents and developers must follow these guidelines when building any page or component.
 
-> Last updated: 2026-08-08 - migrated from neumorphic to flat card/input system, merged TijhaBooks patterns.
+> Last updated: 2026-09-08 - redesign: blue is now the primary interactive color; navy and bronze are reserved for brand/logo accents, not actions. Admin navigation is a light surface, not navy; buttons default to `rounded-lg` (12px), with pills reserved for filters/status badges.
 
 ---
 
 ## Brand Colors
 
-| Role            | Name            | Hex       | Usage                                               |
-|-----------------|-----------------|-----------|-----------------------------------------------------|
-| Primary         | Dark Navy     | `#0B0B45` | Navbar, headings, footer, primary text, hero overlay|
-| Accent          | Warm Bronze/Gold| `#C49A6C` | CTA buttons, highlights, badges, hover states, icons|
-| Surface         | Silver Grey     | `#D9D9D9` | Section backgrounds, input borders, dividers, disabled|
-| Background      | White           | `#ffffff` | Page background, cards                              |
-| Body Text       | Dark Charcoal   | `#1f2937` | Paragraphs, labels, secondary text                  |
-| Muted Text      | Cool Grey       | `#6b7280` | Captions, placeholders, meta info                   |
-| White Text      | White           | `#ffffff` | Text on navy or bronze backgrounds                |
-| Surface Secondary| Soft Grey      | `#F8F9FA` | Page backgrounds, hover states                      |
-| Border Light    | Subtle Grey     | `#EFEFF2` | Card borders, light dividers                        |
+| Role              | Name            | Hex       | Usage                                                        |
+|-------------------|-----------------|-----------|---------------------------------------------------------------|
+| Primary Action    | Interactive Blue| `#2563EB` | Primary buttons, links, active nav/tab state, focus rings, checked controls |
+| Primary Hover     | Blue Hover      | `#1D4ED8` | Hover/active state for anything using Interactive Blue        |
+| Brand             | Dark Navy       | `#0B0B45` | Logo wordmark, footer background, brand headers/dividers, brand-only accents |
+| Brand Accent      | Warm Bronze     | `#C49A6C` | Logo mark, brand accent details - not for buttons or active states |
+| Canvas            | Off-White       | `#F7F7F5` | Page background                                                |
+| Surface           | White           | `#ffffff` | Cards, inputs, modals, navbar - flat surfaces                  |
+| Border            | Neutral Grey    | `#E5E7EB` | Card borders, input borders, dividers, outlined secondary buttons |
+| Body Text         | Charcoal        | `#222222` | Paragraphs, labels, headings on light backgrounds              |
+| Muted Text        | Cool Grey       | `#6b7280` | Captions, placeholders, meta info                               |
+| White Text        | White           | `#ffffff` | Text on navy, blue, or dark backgrounds                        |
 
 ### Color Rules
-- **Dark Navy `#0B0B45`** is the authority color - navbar, all headings, footer background, hero overlay tint, admin sidebar, section titles.
-- **Warm Bronze `#C49A6C`** is the action color - every CTA button, hover state, active nav indicator, badge, price highlight, and icon accent uses bronze. Never used as a large background fill.
-- **Silver Grey `#D9D9D9`** is the neutral surface - alternate section backgrounds, input borders, card dividers, skeleton loaders.
-- **White** is the default page and card background - keeps the layout breathing.
-- Never place bronze text on white - contrast is low. Use navy or charcoal for text on light backgrounds.
-- Bronze buttons use white text for readability against the gold background - never navy or charcoal on bronze.
-- Dark navy and bronze can be paired directly (e.g. navy footer with bronze links/icons).
+- **Interactive Blue `#2563EB`** is the action color - every primary button, link, active nav/tab indicator, checked/selected state, and focus ring uses blue. Hover/active state darkens to `#1D4ED8`.
+- **Dark Navy `#0B0B45`** and **Warm Bronze `#C49A6C`** are brand colors, reserved mainly for the logo, footer background, small dividers/decorative accents, and occasional brand headers. They are not used for buttons, links, active states, or to signal interactivity anywhere else, and are not an admin navigation background.
+- **Canvas `#F7F7F5`** is the page background. **White `#ffffff`** is reserved for cards, inputs, modals, and other flat surfaces sitting on the canvas.
+- **Neutral Grey `#E5E7EB`** is the shared border color for cards, inputs, dividers, and outlined secondary buttons.
+- Secondary/tertiary controls are **outlined and neutral** (white background, `#E5E7EB` border, charcoal text) - never bronze or navy outlines.
+- Semantic status colors (green/amber/red) are used for success/pending/error/danger states only, and must always be paired with a text label or icon, never color alone (see Semantic Status Colors below).
+- Never place bronze or navy text on white for body copy - use charcoal. Bronze/navy appear only inside their reserved brand contexts (logo, footer, brand headers, dividers/decorative accents).
+- Blue buttons use white text; outlined neutral buttons use charcoal text with a grey border.
+
+### Semantic Status Colors
+
+| Status  | Color              | Usage                                              |
+|---------|--------------------|-----------------------------------------------------|
+| Success | Green `#16a34a`    | Confirmed, paid, approved, published                |
+| Pending | Amber `#d97706`    | Awaiting review, processing, draft submitted        |
+| Danger  | Red `#dc2626`      | Failed, rejected, suspended, destructive actions    |
+
+Every status indicator (badge, banner, icon) pairs its color with a readable text label and/or icon - color is never the only signal. "Pending" must never look or read like "confirmed"; only mark a payment confirmed after verification succeeds.
 
 ---
 
@@ -59,20 +71,20 @@ All text follows a consistent scale. Never use arbitrary `text-[Npx]` - use the 
 
 | Context | Class |
 |---------|-------|
-| Page title | `text-2xl font-bold text-[#0B0B45]` |
-| Card heading | `text-sm font-bold text-[#0B0B45]` |
-| Dialog title | `text-lg font-bold text-[#0B0B45]` |
-| Section heading | `text-sm font-semibold text-[#1f2937]` |
-| Body text | `text-sm text-[#1f2937]` |
+| Page title | `text-2xl font-bold text-[#222222]` |
+| Card heading | `text-sm font-bold text-[#222222]` |
+| Dialog title | `text-lg font-bold text-[#222222]` |
+| Section heading | `text-sm font-semibold text-[#222222]` |
+| Body text | `text-sm text-[#222222]` |
 | Description | `text-sm text-[#6b7280]` |
 | Metadata / hints | `text-xs text-[#6b7280]` |
-| Form field label | `text-sm font-medium text-[#1f2937]` |
+| Form field label | `text-sm font-medium text-[#222222]` |
 | Form field hint | `text-xs text-[#6b7280]` |
-| Eyebrow | `text-[11px] font-bold uppercase tracking-[0.12em] text-[#C49A6C]` |
-| Price / amount | `font-semibold text-[#0B0B45]` |
+| Eyebrow | `text-[11px] font-bold uppercase tracking-[0.12em] text-[#6b7280]` |
+| Price / amount | `font-semibold text-[#222222]` |
 | Error text | `text-sm text-red-600` |
 | Success text | `text-sm text-green-600` |
-| Link | `text-sm font-medium text-[#0B0B45] hover:text-[#15155c]` |
+| Link | `text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8]` |
 | Badge / pill | `text-xs font-semibold` |
 | Placeholder | `text-sm text-[#6b7280]` |
 
@@ -119,19 +131,19 @@ Use multiples of 4px (Tailwind's default scale).
 
 ## Card System
 
-Cards use a flat style with subtle border + single drop shadow (migrated from neumorphic dual shadows in 2026-08).
+Cards are flat white surfaces on the off-white canvas: a neutral border plus one restrained shadow. No dual/inset neumorphic shadows, no heavy elevation.
 
 ```css
 .neu-card {
   background: #ffffff;
-  border: 1px solid #EFEFF2;
-  border-radius: 1rem;         /* rounded-2xl */
-  box-shadow: 0 1px 2px rgb(38 34 98 / 0.04), 0 4px 16px -4px rgb(38 34 98 / 0.06);
-  transition: box-shadow 0.25s ease, transform 0.25s ease;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;          /* rounded-[14px] */
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 2px 8px -2px rgb(0 0 0 / 0.05);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .neu-card-hover:hover {
-  box-shadow: 0 8px 30px -6px rgb(38 34 98 / 0.12), 0 4px 12px -6px rgb(38 34 98 / 0.06);
-  transform: translateY(-3px);
+  box-shadow: 0 4px 16px -4px rgb(0 0 0 / 0.08);
+  transform: translateY(-2px);
 }
 ```
 
@@ -142,28 +154,28 @@ When building structured cards, use these internal sections:
 | Element | Class/Usage |
 |---------|-------------|
 | Card Header | `flex items-start justify-between gap-4 px-6 pt-6 pb-5` |
-| Card Title | `text-lg font-bold tracking-tight text-[#0B0B45]` |
+| Card Title | `text-lg font-bold tracking-tight text-[#222222]` |
 | Card Description | `mt-1 text-sm text-[#6b7280]` |
 | Card Content | `p-6 pb-7` with `space-y-4` for form fields |
-| Card Footer | `flex items-center gap-3 border-t border-[#EFEFF2] px-6 py-4` |
+| Card Footer | `flex items-center gap-3 border-t border-[#E5E7EB] px-6 py-4` |
 
 ---
 
 ## Form Inputs
 
-All form inputs use flat bordered style - no inset shadows.
+All form inputs are flat and bordered - no inset shadows.
 
 ```css
 .neu-input {
   background: #ffffff;
-  border: 1px solid #D9D9D9;
-  border-radius: 0.75rem;       /* rounded-xl */
-  color: #1f2937;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;          /* rounded-xl */
+  color: #222222;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .neu-input:focus {
-  border-color: #C49A6C;
-  box-shadow: 0 0 0 3px rgba(196, 154, 108, 0.18);
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
   outline: none;
 }
 ```
@@ -172,17 +184,17 @@ All form inputs use flat bordered style - no inset shadows.
 
 ```css
 .neu-radio-card {
-  border: 1px solid #D9D9D9;
-  border-radius: 1rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .neu-radio-card:hover {
-  border-color: #C49A6C;
-  box-shadow: 0 2px 8px rgb(196 154 108 / 0.15);
+  border-color: #2563EB;
+  box-shadow: 0 2px 8px rgb(37 99 235 / 0.12);
 }
 .neu-radio-selected {
-  border: 2px solid #C49A6C;
-  border-radius: 1rem;
+  border: 2px solid #2563EB;
+  border-radius: 14px;
 }
 ```
 
@@ -200,13 +212,14 @@ Auth cards over dark photo backgrounds use a single soft drop shadow - no neumor
 
 | Variant        | Background | Text       | Border         | Hover              |
 |----------------|------------|------------|----------------|--------------------|
-| Primary (CTA)  | `#C49A6C`  | `#ffffff` | None           | `#b0895a` darken   |
-| Secondary      | Transparent| `#0B0B45` | 2px `#0B0B45`  | Navy bg, white text|
-| Outline        | Transparent| `#1f2937` | 1px `#D9D9D9`  | Surface-secondary bg|
-| Ghost          | Transparent| `#C49A6C` | None           | Gold underline     |
+| Primary (CTA)  | `#2563EB`  | `#ffffff` | None           | `#1D4ED8` darken   |
+| Secondary (outlined, neutral) | White | `#222222` | 1px `#E5E7EB` | `#F7F7F5` bg |
+| Ghost          | Transparent| `#2563EB` | None           | Blue underline     |
 | Danger         | `#dc2626`  | `#ffffff` | None           | `#b91c1c` darken   |
 
-All buttons: `rounded-full`, `px-6 py-2.5`, `font-semibold`, `transition-all`, inline-flex with gap-2.
+Secondary/tertiary controls are always the outlined neutral style above - never navy or bronze outlines/fills. Reserve navy and bronze for the logo, footer, and brand-only accents.
+
+All buttons: `rounded-lg` (12px), `px-6 py-2.5`, `font-semibold`, `transition-all`, inline-flex with gap-2. Fully rounded (`rounded-full`) is reserved for filter chips and status/badge pills, not general buttons.
 
 **Button sizes:**
 - `sm`: `px-3 py-1.5 text-xs`
@@ -234,7 +247,7 @@ Dashboard stat cards use a consistent pattern:
 | `label` | string | Stat description (e.g. "Total Revenue") |
 | `value` | string/number | Display value |
 | `icon` | LucideIcon | Icon component |
-| `tone` | `"primary"` / `"gold"` / `"success"` / `"warning"` / `"danger"` / `"info"` | Color theme |
+| `tone` | `"primary"` / `"success"` / `"warning"` / `"danger"` / `"info"` | Color theme (primary = blue; success/warning/danger are semantic status colors, always paired with a label/icon) |
 | `hint` | string? | Small hint text below value |
 
 StatCards sit in responsive grids: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4`.
@@ -302,17 +315,17 @@ BackLink
 ## Components
 
 ### Navbar
-- White background with a subtle bottom border (`border-b border-[#EFEFF2]`)
-- Logo: Gold icon + Navy bold wordmark
-- Nav links: Navy, `font-medium`, hover state -&gt; gold underline
-- Right side: outlined navy button ("Sign In") + solid gold button ("Get It Now")
+- White background with a subtle bottom border (`border-b border-[#E5E7EB]`)
+- Logo: Bronze icon + Navy bold wordmark (the one place bronze/navy pairing is expected)
+- Nav links: Charcoal, `font-medium`, hover state -&gt; blue underline
+- Right side: outlined neutral button ("Sign In") + solid blue button ("Get It Now")
 - Sticky on scroll with `shadow-sm`
 - Height: `64px`
 
 **Design Techniques:**
 - **Scroll-aware styling**: Uses `useState` and `useEffect` with scroll listener to toggle between transparent (hero) and white (scrolled) states
 - **Dynamic color transitions**: Text and border colors change based on scroll position (`scrolled` state)
-- **Animated underline**: Gold underline expands on hover using `group-hover:w-full` with `transition-all duration-200`
+- **Animated underline**: Blue underline expands on hover using `group-hover:w-full` with `transition-all duration-200`
 - **Responsive mobile menu**: Hamburger menu with slide-down animation and mobile-specific CTA buttons
 - **Fixed positioning**: `fixed w-full z-20 top-0` for persistent navigation
 
@@ -330,7 +343,7 @@ useEffect(() => {
 - Full-width photographic background (property exterior, dusk/golden hour preferred)
 - Dark overlay: `bg-black/40` for text legibility
 - Centered content: large white heading + short white subtext
-- Search bar: white pill-shaped input, gold "Search" button on the right
+- Search bar: white pill-shaped input, blue "Search" button on the right
 - Search bar width: max `680px`, centered
 
 **Design Techniques:**
@@ -347,15 +360,15 @@ useEffect(() => {
 - Background: White `#ffffff`
 - Border radius: `9999px` (fully rounded pill)
 - Padding: `px-5 py-3`
-- Left icon: magnifying glass in gold
-- Button: Gold background `#C49A6C`, white text, `rounded-full`, `px-6 py-3`
+- Left icon: magnifying glass in charcoal
+- Button: Blue background `#2563EB`, white text, `rounded-full`, `px-6 py-3`
 - Box shadow: `shadow-lg`
 
 ### Property Card
-- White background, `rounded-2xl`, `shadow-md hover:shadow-lg`
-- Image: top of card, `aspect-[4/3]`, `object-cover`, `rounded-t-2xl`
+- White background, `rounded-[14px]`, restrained shadow (`shadow-sm hover:shadow-md`)
+- Image: top of card, `aspect-[4/3]`, `object-cover`, rounded to match card top corners
 - Price stats row: 3 columns (each with a label and bold value)
-- Gold `+` floating action button on image corner
+- Blue `+` floating action button on image corner
 - Hover: slight lift (`hover:-translate-y-1 transition-all`)
 
 **Design Techniques:**
@@ -366,9 +379,9 @@ useEffect(() => {
 - **Interactive heart icon**: State-driven color change (red when liked, gray when not)
 - **Badge positioning**: `absolute top-4 left-4` with shadow for depth
 - **Stats divider**: Absolute positioned vertical dividers between stat items
-- **Price highlight**: Bronze color `#C49A6C` for price to draw attention
-- **Rating badge**: Bronze background with 10% opacity `bg-[#C49A6C]/10`
-- **Border separator**: `border-y border-[#D9D9D9]` for stats section
+- **Price highlight**: Charcoal `#222222`, bold, to draw attention without borrowing a brand color
+- **Rating badge**: Neutral background with amber star icon (rating uses the conventional star color, independent of brand palette)
+- **Border separator**: `border-y border-[#E5E7EB]` for stats section
 
 ```jsx
 // Group hover pattern
@@ -386,39 +399,42 @@ useEffect(() => {
 **Design Techniques:**
 - **Asymmetric image gallery**: Main large image + stacked smaller images using `md:col-span-2`
 - **Sticky sidebar**: `sticky top-24` for booking card that follows scroll
-- **Icon + text pairs**: Consistent pattern of gold icon + label + value
-- **Form input styling**: Uses `.neu-input` with `focus:border-[#C49A6C]` focus ring
-- **Custom Tailwind colors**: Uses extended colors from `tailwind.config.js` (`text-gold`, `text-navy`, etc.)
+- **Icon + text pairs**: Consistent pattern of charcoal icon + label + value
+- **Form input styling**: Uses `.neu-input` with `focus:border-[#2563EB]` focus ring
+- **Custom Tailwind colors**: Uses extended colors from `tailwind.config.js` (`text-primary`, `text-navy`, `text-bronze`, etc.)
 - **Back navigation**: Styled link with icon for intuitive navigation
 
-### Dashboard Hero Panel (navy-panel)
+### Dashboard Header Panel
 
-Used on admin dashboard, trip hub, and host today pages:
+Used on the guest Trip Hub, host Today page, and admin Overview. Defaults to a light surface with a concise, task-focused header - not a navy fill:
 
 ```jsx
-<div className="bg-gradient-to-br from-[#0B0B45] to-[#07072e] rounded-2xl p-6 sm:p-8 text-white">
-  <p className="text-xs font-semibold uppercase tracking-wider text-white/50">Greeting</p>
-  <h1 className="mt-1 text-2xl font-bold sm:text-3xl">Welcome back, Name</h1>
-  <p className="mt-2 max-w-md text-sm text-white/60">Contextual description.</p>
-  {/* Quick actions dropdown in gold */}
+<div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 sm:p-8">
+  <p className="text-xs font-semibold uppercase tracking-wider text-[#6b7280]">Greeting</p>
+  <h1 className="mt-1 text-2xl font-bold text-[#222222] sm:text-3xl">Welcome back, Name</h1>
+  <p className="mt-2 max-w-md text-sm text-[#6b7280]">Contextual description.</p>
+  {/* Quick actions dropdown in blue */}
 </div>
 ```
 
+A navy gradient variant (`from-[#0B0B45] to-[#07072e]`, white text) is available as an optional brand/promotional moment - not the default header, and used sparingly rather than as a template for buttons or interactive surfaces elsewhere.
+
 Key properties:
-- Gradient: `from-[#0B0B45] to-[#07072e]`
+- Default: light surface (`bg-white`), `rounded-2xl`, `border-[#E5E7EB]`, charcoal/cool-grey text
+- Optional navy brand variant: `bg-gradient-to-br from-[#0B0B45] to-[#07072e]`, white text
 - Never use decorative orbs/blobs behind text
-- Quick actions button: gold `bg-[#C49A6C]` with `Plus` icon
+- Quick actions button: blue `bg-[#2563EB]` with `Plus` icon
 - Quick actions menu: white card with `shadow-elevated`, `rounded-xl`, `animate-fade-in`
 
 ### Contact Section
 - Two-column layout: form (left) + contact info (right)
-- Silver grey background `#D9D9D9`
-- Form card with white background and shadow
+- Canvas background `#F7F7F5`
+- Form card with white background and restrained shadow
 
 ### Footer
-- Dark Navy `#0B0B45` background
+- Dark Navy `#0B0B45` background (one of the few brand-only large fills)
 - White text for links and headings
-- Gold for link hover states and logo accent
+- Blue for link hover states; bronze reserved for the logo accent only
 - Minimal: copyright left, social icons right
 
 ---
@@ -434,14 +450,17 @@ Key properties:
 
 ## Shadows & Radius
 
-| Element        | Radius      | Shadow          |
-|----------------|-------------|-----------------|
-| Cards          | `rounded-2xl` | `.neu-card` (border + subtle shadow) |
-| Buttons        | `rounded-full`| None           |
-| Input / Search | `rounded-xl` | `shadow-lg` (pill), border (input) |
-| Modals         | `rounded-2xl` | `shadow-xl`   |
+| Element        | Radius        | Shadow          |
+|----------------|---------------|-----------------|
+| Cards          | `14px` (`rounded-[14px]`) | `.neu-card` (border + restrained shadow) |
+| Buttons        | `12px` (`rounded-lg`) | None           |
+| Filter chips / status badges | `rounded-full` | None |
+| Input / Search | `12px` (`rounded-xl`) | `shadow-lg` (pill search), border (standard input) |
+| Modals         | `14px` (`rounded-[14px]`) | `shadow-xl`, restrained |
 | Navbar         | None          | `shadow-sm`   |
-| Stat cards     | `rounded-2xl` | Same as `.neu-card` |
+| Stat cards     | `14px` (`rounded-[14px]`) | Same as `.neu-card` |
+
+Corner radius across the system sits in the 12-14px range (cards, buttons, inputs, modals, stat cards). Fully rounded (`rounded-full`) is reserved for filter chips, status badges, and the pill search bar - a deliberate shape choice for those specific elements, not the general button radius.
 
 ---
 
@@ -525,27 +544,81 @@ Used with gradient mask edges (`mask-image: linear-gradient(...)`) for smooth fa
 ### Custom Colors (tailwind.config.js)
 ```javascript
 colors: {
-  navy:     '#0B0B45',    // Dark Navy
-  bronze:   '#C49A6C',    // Warm Bronze
-  silver:   '#D9D9D9',    // Silver Grey
-  charcoal: '#1f2937',    // Dark Charcoal
+  primary:        '#2563EB', // Interactive Blue
+  'primary-hover':'#1D4ED8', // Blue Hover
+  navy:     '#0B0B45',    // Dark Navy (brand-only)
+  bronze:   '#C49A6C',    // Warm Bronze (brand-only)
+  canvas:   '#F7F7F5',    // Off-White page background
+  border:   '#E5E7EB',    // Neutral Grey
+  charcoal: '#222222',    // Body text
   'cool-grey': '#6b7280', // Muted Text
 }
 ```
 
 ---
 
+## Navigation Rules
+
+### Guest Navigation
+Explore, Saved, Trips, Messages, Profile.
+- **Saved** combines favourites and shortlists into one section.
+- **Explore** groups local guides and places (`/places`, `/guides`) together.
+- Support stays reachable from within Messages rather than as a separate nav item.
+- Guest-facing pages (bookings, trips, profile) must never render admin navigation, even when reached through a page also used by admins (e.g. the shared profile page). Payout preferences appear only for eligible hosts, even on that shared page.
+
+### Host Navigation
+Today, Calendar, Listings, Messages, Earnings.
+- **Payouts** live inside Earnings, not as a separate top-level item.
+- Administrative actions (moderation, platform-wide settings) stay inside the admin workspace, never surfaced in the host nav.
+
+### Admin Navigation
+Grouped: Overview, Listings, Bookings, Payments, People, Content.
+- Expanded submenus must retain access to every existing admin route (properties, bookings, earnings, users, host applications, identity verifications, disputes, promos, addons, feedback, messages, guides, payouts).
+- Admin sidebar uses a light background (white or `#F7F7F5`) with collapsible `w-64 <-> w-16` behavior; active nav item uses blue, not navy or bronze.
+
+---
+
+## Booking Flow
+
+Three steps: **Stay -> Details -> Payment.**
+- Optional extras/add-ons expand inline within the Details step rather than becoming a fourth step.
+- Dates, guest count, and running total stay visible throughout all three steps.
+- Preserve entered details across identity verification and payment recovery/retry flows - never make the guest re-enter them.
+- Prices show a nightly rate before dates are chosen, and a full stay total (nightly x nights + fees) once dates are selected.
+- Payment success, pending, and failure are mutually exclusive states; a pending payment must never present another "pay now" prompt. Only mark a payment confirmed after verification succeeds.
+- Hide secondary/global navigation during the checkout/payment steps to keep guests focused.
+
+### Host Listing & Moderation States
+- Draft, submitted, approved, published, and suspended are distinct listing/application states - never collapse them into a single "active/inactive" flag.
+- Hosts may keep preparing a draft listing while a prior submission is under review.
+- Reserved calendar dates are read-only in the availability editor; hosts can only change availability on unreserved dates. Reservation changes happen through the booking flow, not the calendar editor.
+- Moderation notes (private, admin/host-facing) and public review replies (guest-facing) must be visibly separate fields - private feedback is never exposed to guests.
+
+---
+
+## Responsive & Accessibility Rules
+
+- Tables collapse into labelled cards or a horizontal-scroll table on mobile - never truncate columns silently.
+- Mobile uses full-screen drawers for filters, menus, and multi-field forms rather than small popovers.
+- Maintain a minimum 44px touch target for tappable actions on mobile.
+- Hide secondary/global navigation during checkout on mobile to reduce distraction and accidental exits.
+- Every reusable page pattern (list, form, detail) needs empty, loading, failed-load, and inline validation states - not just the happy path.
+- Icon-only buttons require `aria-label`; interactive elements require visible `focus-visible` states, using the blue focus ring defined above.
+
+---
+
 ## NEVER Use
 
 - Hardcoded hex colors in JSX (use Tailwind arbitrary `bg-[#...]` or config tokens)
-- Squared or `rounded-lg` inputs - use `.neu-input` or `rounded-xl`
+- Squared inputs - use `.neu-input` or `rounded-xl` (12px)
 - Multiple border classes on the same element - `.neu-input` already provides the border
-- `rounded-lg` for cards - use `rounded-2xl`
+- `rounded-lg` for cards - use the `rounded-[14px]` card radius
 - `text-[10px]` outside of compact document templates - use `text-xs` minimum
 - Instant state changes without `transition-*`
 - Decorative orbs, gradient blobs, or bokeh circles as backgrounds
-- Black (`#000`) for text - use charcoal `#1f2937` instead
-- Gold/bronze as a large background fill - reserved for interactive elements only
+- Black (`#000`) for text - use charcoal `#222222` instead
+- Bronze or navy as a button, link, active-state, or large interactive fill - they are brand/logo colors only; blue `#2563EB` is the sole interactive color
+- Status color (green/amber/red) used alone without an accompanying text label or icon
 - Raw `<input>`/`<select>`/`<textarea>` without `.neu-input` styling in form contexts
 - `border` + `neo-input` on the same element (double-border effect)
 
@@ -555,8 +628,9 @@ colors: {
 
 When implementing new components:
 
-- [ ] Use correct brand colors from the palette
-- [ ] Apply appropriate border-radius (rounded-2xl for cards, rounded-full for buttons, rounded-xl for inputs)
+- [ ] Use blue for all interactive/primary elements; keep navy and bronze to the logo and their reserved brand surfaces only
+- [ ] Pair every status color (success/warning/danger) with a text label or icon
+- [ ] Apply appropriate border-radius (`rounded-[14px]` for cards/modals/stat cards, `rounded-lg` for buttons, `rounded-xl` for inputs, `rounded-full` for filter chips/status badges)
 - [ ] Add `transition-all duration-200` for interactive elements
 - [ ] Include hover states with shadow and/or transform
 - [ ] Use group hover for coordinated child animations
