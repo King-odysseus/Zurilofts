@@ -156,12 +156,18 @@ TodayCard.propTypes = {
 // properties), not local-only flags, so it stays correct across devices and
 // after a refresh. Hidden entirely once verification is APPROVED and at least
 // one listing is PUBLISHED - a returning fully-onboarded host never sees it.
-function OnboardingChecklist({ hostApplicationStatus, properties }) {
+function OnboardingChecklist({ hostApplicationStatus, properties, role }) {
+  const needsVerification = role === 'USER';
   const isApproved = hostApplicationStatus === 'APPROVED';
   const hasDraft = properties.some((p) => p.status === 'DRAFT' || p.status === 'REJECTED');
   const hasSubmitted = properties.some((p) => p.status === 'PENDING_REVIEW');
   const hasPublished = properties.some((p) => p.status === 'PUBLISHED');
   const hasAnyProperty = properties.length > 0;
+
+  // ADMIN/HOST accounts do not go through host verification, so treat them as
+  // already verified. This keeps the remaining listing steps ungated without
+  // surfacing a "Verify your host account" step they never need.
+  const isVerified = needsVerification ? isApproved : true;
 
   const steps = [
     {
@@ -188,12 +194,12 @@ function OnboardingChecklist({ hostApplicationStatus, properties }) {
       key: 'submit',
       label: 'Submit a listing for review',
       done: hasSubmitted || hasPublished,
-      description: !isApproved
+      description: !isVerified
         ? 'Available once your host account is verified.'
         : hasDraft
           ? 'You have a draft ready to submit.'
           : 'Submit a draft listing so the team can review it.',
-      cta: hasDraft && isApproved ? { label: 'Manage listings', to: '/host/listings' } : null,
+      cta: hasDraft && isVerified ? { label: 'Manage listings', to: '/host/listings' } : null,
     },
     {
       key: 'publish',
@@ -204,7 +210,7 @@ function OnboardingChecklist({ hostApplicationStatus, properties }) {
         : 'The team reviews submitted listings before they go live.',
       cta: null,
     },
-  ];
+  ].filter((step) => step.key !== 'verify' || needsVerification);
 
   if (steps.every((s) => s.done)) return null;
 
@@ -264,6 +270,7 @@ function OnboardingChecklist({ hostApplicationStatus, properties }) {
 OnboardingChecklist.propTypes = {
   hostApplicationStatus: PropTypes.string,
   properties: PropTypes.arrayOf(PropTypes.shape({ status: PropTypes.string })).isRequired,
+  role: PropTypes.string,
 };
 
 function PanelSkeleton() {
@@ -539,7 +546,7 @@ export default function HostTodayPage() {
           <p className="mt-2 max-w-md text-sm text-[#6b7280]">Your arrivals, in-house guests, and departures at a glance.</p>
         </div>
 
-        <OnboardingChecklist hostApplicationStatus={user?.hostApplicationStatus} properties={myProperties} />
+        <OnboardingChecklist hostApplicationStatus={user?.hostApplicationStatus} properties={myProperties} role={user?.role} />
 
         {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
