@@ -170,7 +170,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
               )}
               <button
                 onClick={openConversation}
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-lg text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-lg text-xs font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -263,7 +263,7 @@ function EmptyState({ isPast }) {
       {!isPast && (
         <Link
           to="/properties"
-          className="inline-flex items-center min-h-[44px] px-6 rounded-lg font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
+          className="inline-flex items-center min-h-[44px] px-6 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
         >
           Browse properties
         </Link>
@@ -405,7 +405,7 @@ export default function TripHubPage() {
             <p className="text-[#6b7280] mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
+              className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
             >
               Try again
             </button>
