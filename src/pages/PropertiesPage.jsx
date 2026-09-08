@@ -515,7 +515,7 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={fetchProperties}
-                className="min-h-[44px] bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                className="min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
               >
                 Try Again
               </button>
@@ -547,7 +547,7 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={clearAllFilters}
-                className="min-h-[44px] bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                className="min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
               >
                 Clear All Filters
               </button>
