@@ -264,10 +264,10 @@ function PropertiesPage() {
       <Navbar />
 
       {/* Compact Search Header */}
-      <section className="bg-[#0B0B45] pt-24 pb-8 md:pb-10">
+      <section className="bg-white border-b border-[#E5E7EB] pt-24 pb-8 md:pb-10">
         <div className="w-full mx-auto text-center px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">Find your stay</h1>
-          <p className="text-white/70 text-sm mb-5 md:mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#222222] mb-1">Find your stay</h1>
+          <p className="text-[#6b7280] text-sm mb-5 md:mb-6">
             Premium furnished apartments in Nairobi&apos;s most desirable neighbourhoods.
           </p>
           <div className="max-w-3xl mx-auto">
@@ -294,25 +294,25 @@ function PropertiesPage() {
                   key={key}
                   type="button"
                   onClick={() => updateParam('type', key)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                     filter === key
-                      ? 'bg-[#C49A6C] text-white'
-                      : 'bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0]'
+                      ? 'bg-[#2563EB] text-white'
+                      : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
                   }`}
                 >
                   {label}
                 </button>
               ))}
-              <span className="w-px h-5 bg-[#D9D9D9] mx-1 hidden md:block" aria-hidden="true" />
+              <span className="w-px h-5 bg-[#E5E7EB] mx-1 hidden md:block" aria-hidden="true" />
               {bedFilterButtons.map(({ key, label }) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => updateParam('beds', key)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                     bedFilter === key
-                      ? 'bg-[#C49A6C] text-white'
-                      : 'bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0]'
+                      ? 'bg-[#2563EB] text-white'
+                      : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
                   }`}
                 >
                   {label}
@@ -321,10 +321,10 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={() => updateParam('available', availableOnly ? '' : 'true')}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                   availableOnly
-                    ? 'bg-[#C49A6C] text-white'
-                    : 'bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0]'
+                    ? 'bg-[#2563EB] text-white'
+                    : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
                 }`}
               >
                 Available to Book
@@ -334,10 +334,10 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                   moreFiltersOpen
-                    ? 'bg-[#C49A6C] text-white'
-                    : 'bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0]'
+                    ? 'bg-[#2563EB] text-white'
+                    : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
                 }`}
               >
                 <span className="flex items-center gap-1.5">
@@ -360,7 +360,7 @@ function PropertiesPage() {
                   { value: 'mid', label: 'KES 5,000 - 8,000' },
                   { value: 'high', label: 'Above KES 8,000' },
                 ]}
-                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C]"
+                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
                 placeholder="All Prices"
                 menuClassName="left-auto right-0"
                 ariaLabel="Price range"
@@ -369,7 +369,7 @@ function PropertiesPage() {
                 value={sort}
                 onChange={(v) => updateParam('sort', v)}
                 options={SORT_OPTIONS}
-                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C]"
+                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
                 placeholder="Sort"
                 menuClassName="left-auto right-0"
                 ariaLabel="Sort order"
@@ -379,13 +379,13 @@ function PropertiesPage() {
 
           {/* More Filters (collapsible) */}
           {moreFiltersOpen && (
-            <div className="mt-3 pt-3 border-t border-[#D9D9D9] flex flex-wrap items-center gap-3">
+            <div className="mt-3 pt-3 border-t border-[#E5E7EB] flex flex-wrap items-center gap-3">
               {/* Area */}
               <Dropdown
                 value={neighborhood}
                 onChange={(v) => updateParam('neighborhood', v)}
                 options={NEIGHBORHOODS}
-                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C]"
+                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
                 placeholder="All Areas"
                 ariaLabel="Neighborhood"
               />
@@ -395,7 +395,7 @@ function PropertiesPage() {
                 value={minGuests}
                 onChange={(v) => updateParam('minGuests', v)}
                 options={GUEST_OPTIONS}
-                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C]"
+                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
                 placeholder="Any Guests"
                 ariaLabel="Guest count"
               />
@@ -407,10 +407,10 @@ function PropertiesPage() {
                     key={value}
                     type="button"
                     onClick={() => updateParam('minRating', minRating === value ? '' : value)}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                       minRating === value
-                        ? 'bg-[#C49A6C] text-white'
-                        : 'bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0]'
+                        ? 'bg-[#2563EB] text-white'
+                        : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
                     }`}
                   >
                     {label}
@@ -423,7 +423,7 @@ function PropertiesPage() {
                 <button
                   type="button"
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${viewMode === 'list' ? 'bg-[#C49A6C] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
+                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${viewMode === 'list' ? 'bg-[#2563EB] text-white' : 'bg-white border border-[#E5E7EB] text-[#6b7280] hover:bg-[#F7F7F5]'}`}
                   aria-label="List view"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -433,7 +433,7 @@ function PropertiesPage() {
                 <button
                   type="button"
                   onClick={() => setViewMode('map')}
-                  className={`p-2 rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${viewMode === 'map' ? 'bg-[#C49A6C] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
+                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${viewMode === 'map' ? 'bg-[#2563EB] text-white' : 'bg-white border border-[#E5E7EB] text-[#6b7280] hover:bg-[#F7F7F5]'}`}
                   aria-label="Map view"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -456,10 +456,10 @@ function PropertiesPage() {
                         return next;
                       });
                     }}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                       selectedAmenities.has(a)
-                        ? 'bg-[#C49A6C] text-white'
-                        : 'bg-[#f0f0f0] text-[#1f2937] hover:bg-[#e0e0e0]'
+                        ? 'bg-[#2563EB] text-white'
+                        : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
                     }`}
                   >
                     {a}
@@ -481,11 +481,11 @@ function PropertiesPage() {
                 'Searching...'
               ) : (
                 <>
-                  <span className="font-semibold text-[#0B0B45]">{sortedListings.length}</span>{' '}
+                  <span className="font-semibold text-[#222222]">{sortedListings.length}</span>{' '}
                   {sortedListings.length === 1 ? 'place' : 'places'}
                   {searchQuery && (
                     <>
-                      {' '}in <span className="font-medium text-[#0B0B45]">&ldquo;{searchQuery}&rdquo;</span>
+                      {' '}in <span className="font-medium text-[#222222]">&ldquo;{searchQuery}&rdquo;</span>
                     </>
                   )}
                 </>
@@ -495,7 +495,7 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={clearAllFilters}
-                className="text-sm text-[#C49A6C] hover:text-[#0B0B45] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] rounded"
+                className="text-sm text-[#2563EB] hover:text-[#1D4ED8] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] rounded"
               >
                 Clear all filters
               </button>
@@ -510,12 +510,12 @@ function PropertiesPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-[#0B0B45] mb-2">Something went wrong</h3>
+              <h3 className="text-lg font-bold text-[#222222] mb-2">Something went wrong</h3>
               <p className="text-[#6b7280] mb-4 max-w-md mx-auto">{error}</p>
               <button
                 type="button"
                 onClick={fetchProperties}
-                className="bg-[#C49A6C] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+                className="min-h-[44px] bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
               >
                 Try Again
               </button>
@@ -525,7 +525,7 @@ function PropertiesPage() {
           {/* Loading state */}
           {loading && (
             <div className="text-center py-16" role="status" aria-label="Loading properties">
-              <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
               <p className="text-[#6b7280] text-sm">Loading properties...</p>
             </div>
           )}
@@ -533,12 +533,12 @@ function PropertiesPage() {
           {/* Empty state */}
           {!loading && !error && sortedListings.length === 0 && (
             <div className="text-center py-16">
-              <div className="w-20 h-20 bg-[#0B0B45]/5 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-[#0B0B45]/40" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <div className="w-20 h-20 bg-[#F7F7F5] rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-10 h-10 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-[#0B0B45] mb-2">No places found</h3>
+              <h3 className="text-lg font-bold text-[#222222] mb-2">No places found</h3>
               <p className="text-[#6b7280] mb-4 max-w-sm mx-auto text-sm">
                 {searchQuery
                   ? `We couldn't find any listings matching "${searchQuery}". Try a different neighbourhood or adjust your filters.`
@@ -547,7 +547,7 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={clearAllFilters}
-                className="bg-[#C49A6C] text-white px-6 py-2 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+                className="min-h-[44px] bg-[#2563EB] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#1D4ED8] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
               >
                 Clear All Filters
               </button>
@@ -578,7 +578,7 @@ function PropertiesPage() {
                 [18, 16, 15, 14].map((imgIndex, i) => (
                   <div
                     key={`coming-soon-${i}`}
-                    className="group overflow-hidden rounded-2xl shadow-[0_4px_16px_-4px_rgba(38,34,98,0.08)] bg-white h-full flex flex-col"
+                    className="group overflow-hidden rounded-[14px] border border-[#E5E7EB] shadow-sm bg-white h-full flex flex-col"
                   >
                     <div className="relative aspect-[4/3] flex-shrink-0">
                       <img
@@ -586,15 +586,15 @@ function PropertiesPage() {
                         alt="Coming soon property"
                         className="w-full h-full object-cover"
                       />
-                      <div className="absolute inset-0 bg-[#0B0B45]/40"></div>
-                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#0B0B45] text-[10px] font-bold px-3 py-1 rounded-full">
+                      <div className="absolute inset-0 bg-[#222222]/40"></div>
+                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#222222] text-[10px] font-bold px-3 py-1 rounded-full">
                         Coming Soon
                       </div>
                     </div>
                     <div className="p-4 flex flex-col flex-1">
-                      <h3 className="text-sm font-semibold text-[#0B0B45] mb-1">Coming Soon</h3>
+                      <h3 className="text-sm font-semibold text-[#222222] mb-1">Coming Soon</h3>
                       <p className="text-xs text-[#6b7280] mb-3">TBA</p>
-                      <div className="flex items-center justify-between mb-3 py-2 border-y border-[#D9D9D9]/60">
+                      <div className="flex items-center justify-between mb-3 py-2 border-y border-[#E5E7EB]">
                         <div className="flex-1 text-center">
                           <span className="text-xs text-[#6b7280]">-</span>
                           <p className="text-[10px] text-[#6b7280]">Beds</p>
@@ -613,7 +613,7 @@ function PropertiesPage() {
                           <span className="text-[10px] text-[#6b7280]">per night</span>
                           <p className="text-base font-bold text-[#6b7280]">KES -</p>
                         </div>
-                        <span className="bg-[#D9D9D9]/50 text-[#6b7280] font-semibold px-3 py-1.5 rounded-full text-xs">
+                        <span className="bg-[#F7F7F5] text-[#6b7280] font-semibold px-3 py-1.5 rounded-full text-xs">
                           Coming Soon
                         </span>
                       </div>

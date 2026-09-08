@@ -54,7 +54,7 @@ function PropertyResultsMap({ listings }) {
       const propertyLink = document.createElement('a');
       propertyLink.href = `/property/${encodeURIComponent(listing.id)}`;
       propertyLink.textContent = 'View property';
-      propertyLink.style.cssText = 'display:inline-block;margin-right:12px;color:#0B0B45;font-weight:700;text-decoration:underline;';
+      propertyLink.style.cssText = 'display:inline-block;margin-right:12px;color:#222222;font-weight:700;text-decoration:underline;';
       popup.appendChild(propertyLink);
 
       const directionsLink = document.createElement('a');
@@ -63,7 +63,7 @@ function PropertyResultsMap({ listings }) {
       directionsLink.rel = 'noopener noreferrer';
       directionsLink.textContent = 'Google Maps ↗';
       directionsLink.setAttribute('aria-label', `Get directions to ${listing.title} in Google Maps`);
-      directionsLink.style.cssText = 'display:inline-block;color:#C49A6C;font-weight:700;text-decoration:underline;';
+      directionsLink.style.cssText = 'display:inline-block;color:#2563EB;font-weight:700;text-decoration:underline;';
       popup.appendChild(directionsLink);
 
       const marker = L.marker([Number(listing.lat), Number(listing.lng)], {
@@ -87,14 +87,14 @@ function PropertyResultsMap({ listings }) {
 
   if (!hasCoordinates) {
     return (
-      <div className="rounded-2xl bg-white shadow-sm px-6 py-12 text-center text-[#6b7280]">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white shadow-sm px-6 py-12 text-center text-[#6b7280]">
         Map coordinates are not available for these properties yet. Open a property to use its address in Google Maps.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl shadow-md">
+    <div className="overflow-hidden rounded-[14px] border border-[#E5E7EB] shadow-sm">
       <div ref={mapElementRef} className="h-[520px] w-full md:h-[600px]" aria-label="Property locations map" />
       <p className="bg-white px-4 py-3 text-center text-sm text-[#6b7280]">
         Tap a property pin to view the listing or open turn-by-turn directions in Google Maps.
