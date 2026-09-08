@@ -113,7 +113,7 @@ function TodayCard({ booking, type }) {
           </Link>
           <Link
             to={`/messages?booking=${booking.id}`}
-            className="flex-1 min-h-[44px] flex items-center justify-center text-center px-3 rounded-lg text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
+            className="flex-1 min-h-[44px] flex items-center justify-center text-center px-3 rounded-lg text-xs font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
           >
             Message guest
           </Link>
@@ -249,7 +249,7 @@ function OnboardingChecklist({ hostApplicationStatus, properties }) {
             {step.cta && (
               <Link
                 to={step.cta.to}
-                className="flex-shrink-0 self-center min-h-[44px] inline-flex items-center px-3 rounded-lg text-xs font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
+                className="flex-shrink-0 self-center min-h-[44px] inline-flex items-center px-3 rounded-lg text-xs font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
               >
                 {step.cta.label}
               </Link>
@@ -514,7 +514,7 @@ export default function HostTodayPage() {
             <p className="text-[#6b7280] mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="inline-flex items-center min-h-[44px] px-6 rounded-lg text-sm font-semibold bg-[#2563EB] text-white hover:bg-[#1D4ED8] transition-all duration-200"
+              className="inline-flex items-center min-h-[44px] px-6 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
             >
               Try again
             </button>
