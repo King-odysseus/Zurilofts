@@ -9,7 +9,7 @@ import { useFavorites } from '../context/FavoritesContext.jsx';
  * badge and bed-variant tag, matching the design system's brand-accent rules.
  *
  * Behaviour preserved exactly: favourite toggle, variant badge, bed-variant
- * link, rating badge, location, bed/bath/area stats, nightly price, CTA.
+ * link, rating badge, location, nightly price, and card navigation CTA.
  *
  * All optional fields guard against null/undefined.
  */
