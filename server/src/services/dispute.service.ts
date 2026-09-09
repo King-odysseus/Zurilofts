@@ -60,6 +60,11 @@ function toParticipantView(d: any) {
     messages: (d.messages || []).map((m: any) => ({
       id: m.id, senderId: m.senderId, senderRole: m.senderRole, body: m.body, createdAt: m.createdAt,
     })),
+    // A participant-safe projection of the audit trail: action + note +
+    // timestamp only, never `actorId` - that can be another participant's or
+    // an admin's internal user id, which stays admin-only (see toAdminView's
+    // full `auditLogs`). This is real recorded history, not synthesised.
+    timeline: (d.auditLogs || []).map((a: any) => ({ action: a.action, note: a.note ?? null, createdAt: a.createdAt })),
     // notes are deliberately never included here - admin-only, see toAdminView.
   };
 }

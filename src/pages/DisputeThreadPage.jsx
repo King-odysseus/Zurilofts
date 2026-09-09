@@ -18,6 +18,17 @@ const STATUS_STYLES = {
   DISMISSED: 'bg-[#E5E7EB]/40 text-[#222222]',
 };
 
+// Real dispute lifecycle events (server-recorded DisputeAudit rows), not a
+// synthesised or invented history.
+const TIMELINE_LABELS = {
+  OPENED: 'Dispute opened',
+  EVIDENCE_ADDED: 'Evidence added',
+  MESSAGE_SENT: 'Message sent',
+  STATUS_CHANGED: 'Status changed',
+  RESOLVED: 'Resolved',
+  DISMISSED: 'Dismissed',
+};
+
 function NewDisputeForm({ bookingId, onCreated }) {
   const [category, setCategory] = useState('PROPERTY_CONDITION');
   const [description, setDescription] = useState('');
@@ -215,6 +226,27 @@ function DisputeThreadPage() {
             <div className="mb-4 bg-green-50 border border-green-200 rounded-xl p-4">
               <p className="text-sm font-semibold text-green-800 mb-1">Resolution</p>
               <p className="text-sm text-green-800">{dispute.resolution}</p>
+            </div>
+          )}
+
+          {/* Timeline - real recorded events, not a synthesised history */}
+          {dispute.timeline?.length > 0 && (
+            <div className="mb-6 border-t border-[#E5E7EB] pt-4">
+              <p className="text-sm font-semibold text-[#222222] mb-3">Timeline</p>
+              <ol className="space-y-3">
+                {dispute.timeline.map((event, idx) => (
+                  <li key={`${event.action}-${event.createdAt}-${idx}`} className="flex gap-3">
+                    <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-[#2563EB]" aria-hidden="true" />
+                    <div>
+                      <p className="text-sm text-[#222222]">
+                        {TIMELINE_LABELS[event.action] || event.action}
+                        {event.note && <span className="text-[#6b7280]"> - {event.note}</span>}
+                      </p>
+                      <p className="text-xs text-[#6b7280]">{new Date(event.createdAt).toLocaleString()}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
             </div>
           )}
 
