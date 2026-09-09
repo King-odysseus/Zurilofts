@@ -552,6 +552,7 @@ function DashboardOverview() {
   // the redesigned "Needs attention" overview no longer surfaces these totals.
   const [, setStats] = useState({ properties: 0, bookings: 0, promos: 0, revenue: 0 });
   const [recentBookings, setRecentBookings] = useState([]);
+  const [reviewQueue, setReviewQueue] = useState([]);
   const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0', satisfaction: '0' });
   const [savingLanding, setSavingLanding] = useState(false);
   const [landingMsg, setLandingMsg] = useState('');
@@ -579,6 +580,9 @@ function DashboardOverview() {
         if (isAdmin) {
           fetches.push(apiClient.get('/promo'));
           fetches.push(apiClient.get('/admin/settings/landing-stats'));
+          fetches.push(apiClient.get('/admin/host-applications', { params: { status: 'SUBMITTED' } }));
+          fetches.push(apiClient.get('/admin/identity-verifications', { params: { status: 'SUBMITTED' } }));
+          fetches.push(apiClient.get('/admin/disputes', { params: { status: 'OPEN' } }));
         }
         const results = await Promise.all(fetches);
         const propsRes = results[0];
@@ -597,6 +601,50 @@ function DashboardOverview() {
         if (isAdmin && results[4]) {
           const ls = results[4].data.data || {};
           setLandingStats({ happyStays: String(ls.happyStays || '10'), starRating: String(ls.starRating || '5.0'), satisfaction: String(ls.satisfaction || '0') });
+          const hostApplications = results[5]?.data.data || [];
+          const identityChecks = results[6]?.data.data || [];
+          const disputes = results[7]?.data.data || [];
+          const bookingItems = bookings
+            .filter((booking) => booking.status === 'PENDING' || booking.paymentStatus === 'FAILED' || booking.paymentStatus === 'REFUND_PENDING')
+            .map((booking) => ({
+              id: `booking-${booking.id}`,
+              category: booking.status === 'PENDING' ? 'Approvals' : 'Payments',
+              title: booking.property?.title || 'Booking review',
+              subtitle: `${booking.user?.firstName || ''} ${booking.user?.lastName || ''}`.trim() || 'Guest booking',
+              status: booking.status === 'PENDING' ? 'PENDING' : booking.paymentStatus,
+              updatedAt: booking.updatedAt || booking.createdAt || booking.checkIn,
+              to: '/admin/bookings',
+            }));
+          setReviewQueue([
+            ...hostApplications.map((application) => ({
+              id: `host-${application.id}`,
+              category: 'Approvals',
+              title: application.legalName || application.businessName || 'Host application',
+              subtitle: application.contactEmail || application.user?.email || 'Host application',
+              status: application.status,
+              updatedAt: application.updatedAt || application.createdAt,
+              to: '/admin/host-applications',
+            })),
+            ...identityChecks.map((verification) => ({
+              id: `identity-${verification.id}`,
+              category: 'Approvals',
+              title: verification.fullName || `${verification.user?.firstName || ''} ${verification.user?.lastName || ''}`.trim() || 'Identity verification',
+              subtitle: 'Guest identity verification',
+              status: verification.status,
+              updatedAt: verification.updatedAt || verification.createdAt,
+              to: '/admin/identity-verifications',
+            })),
+            ...disputes.map((dispute) => ({
+              id: `dispute-${dispute.id}`,
+              category: 'Disputes',
+              title: dispute.booking?.property?.title || 'Booking dispute',
+              subtitle: dispute.category?.replaceAll('_', ' ') || 'Open dispute',
+              status: dispute.status,
+              updatedAt: dispute.updatedAt || dispute.createdAt,
+              to: '/admin/disputes',
+            })),
+            ...bookingItems,
+          ]);
         }
       } catch (err) { console.error(err); }
     }
@@ -613,13 +661,21 @@ function DashboardOverview() {
     finally { setSavingLanding(false); }
   }
 
-  // "Needs attention" buckets derived from already-fetched bookings. Absent
-  // fields simply produce empty buckets (count 0) - no extra fetch, no fallback.
-  const pendingApprovals = recentBookings.filter((b) => b.status === 'PENDING');
-  const paymentIssues = recentBookings.filter((b) => b.paymentStatus === 'FAILED' || b.paymentStatus === 'REFUND_PENDING');
-  const openDisputes = recentBookings.filter((b) => b.status === 'DISPUTED' || b.disputeStatus === 'OPEN');
+  const hostQueue = recentBookings.map((booking) => ({
+    id: `booking-${booking.id}`,
+    category: booking.status === 'PENDING' ? 'Approvals' : booking.paymentStatus === 'FAILED' || booking.paymentStatus === 'REFUND_PENDING' ? 'Payments' : 'All',
+    title: booking.property?.title || 'Booking',
+    subtitle: `${booking.user?.firstName || ''} ${booking.user?.lastName || ''}`.trim() || 'Guest booking',
+    status: booking.paymentStatus === 'FAILED' || booking.paymentStatus === 'REFUND_PENDING' ? booking.paymentStatus : booking.status,
+    updatedAt: booking.updatedAt || booking.createdAt || booking.checkIn,
+    to: '/admin/bookings',
+  }));
+  const operationalQueue = isAdmin ? reviewQueue : hostQueue;
+  const pendingApprovals = operationalQueue.filter((item) => item.category === 'Approvals');
+  const paymentIssues = operationalQueue.filter((item) => item.category === 'Payments');
+  const openDisputes = operationalQueue.filter((item) => item.category === 'Disputes');
   const TAB_ORDER = ['All', 'Approvals', 'Payments', 'Disputes'];
-  const buckets = { All: recentBookings, Approvals: pendingApprovals, Payments: paymentIssues, Disputes: openDisputes };
+  const buckets = { All: operationalQueue, Approvals: pendingApprovals, Payments: paymentIssues, Disputes: openDisputes };
   const reviewRows = buckets[activeTab];
 
   const quickLinks = [
@@ -648,7 +704,7 @@ function DashboardOverview() {
             {/* Prominent Open approvals action */}
             <button
               type="button"
-              onClick={() => navigate('/admin/bookings')}
+              onClick={() => navigate(isAdmin ? '/admin/host-applications' : '/admin/bookings')}
               className="inline-flex items-center gap-2 rounded-lg bg-[#C49A6C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#B8895C] transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -759,22 +815,22 @@ function DashboardOverview() {
                 </tr>
               </thead>
               <tbody>
-                {reviewRows.map((b) => (
-                  <tr key={b.id} className="border-b border-[#E5E7EB]/60 hover:bg-[#F7F7F5] transition-colors">
+                {reviewRows.map((item) => (
+                  <tr key={item.id} className="border-b border-[#E5E7EB]/60 hover:bg-[#F7F7F5] transition-colors">
                     <td className="py-3">
-                      <p className="font-medium text-[#222222] max-w-[180px] truncate">{b.property?.title}</p>
-                      <p className="text-xs text-[#6b7280]">{b.user?.firstName} {b.user?.lastName}</p>
+                      <p className="font-medium text-[#222222] max-w-[240px] truncate">{item.title}</p>
+                      <p className="text-xs text-[#6b7280]">{item.subtitle}</p>
                     </td>
                     <td className="py-3">
                       <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
-                        b.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
+                        item.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
+                        item.status === 'CANCELLED' || item.status === 'FAILED' ? 'bg-red-100 text-red-700' :
                         'bg-amber-100 text-amber-700'
-                      }`}>{b.status}</span>
+                      }`}>{item.status?.replaceAll('_', ' ')}</span>
                     </td>
-                    <td className="py-3 text-xs text-[#6b7280] hidden sm:table-cell">{new Date(b.updatedAt || b.createdAt || b.checkIn).toLocaleDateString()}</td>
+                    <td className="py-3 text-xs text-[#6b7280] hidden sm:table-cell">{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : '-'}</td>
                     <td className="py-3 text-right">
-                      <button type="button" onClick={() => navigate('/admin/bookings')} className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors">Review</button>
+                      <button type="button" onClick={() => navigate(item.to)} className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors">Review</button>
                     </td>
                   </tr>
                 ))}
