@@ -34,7 +34,7 @@ function getOtherParticipant(conversation, currentUserId) {
   return { name: `${guest.firstName || ''} ${guest.lastName || ''}`.trim() || 'Guest', isHost: false };
 }
 
-function ConversationRow({ conversation, currentUserId }) {
+export function ConversationRow({ conversation, currentUserId, compact = false, active = false }) {
   const booking = conversation.booking || {};
   const property = booking.property || {};
   const image = firstImage(property);
@@ -46,7 +46,8 @@ function ConversationRow({ conversation, currentUserId }) {
   return (
     <Link
       to={`/inbox/${conversation.id}`}
-      className="block bg-white rounded-[14px] neu-card p-4 hover:shadow-md transition-all duration-200"
+      aria-current={active ? 'page' : undefined}
+      className={`block bg-white p-4 hover:bg-[#F7F7F5] transition-all duration-200 ${compact ? 'border-b border-[#E5E7EB] last:border-b-0' : 'rounded-[14px] neu-card'} ${active ? 'bg-[#F7F7F5] shadow-[inset_3px_0_0_#2563EB]' : ''}`}
     >
       <div className="flex items-center gap-4">
         {/* Property thumbnail */}
@@ -108,6 +109,8 @@ ConversationRow.propTypes = {
     }),
   }).isRequired,
   currentUserId: PropTypes.string.isRequired,
+  compact: PropTypes.bool,
+  active: PropTypes.bool,
 };
 
 function InboxPage() {

@@ -6,6 +6,7 @@ import apiClient from '../api/client.js';
 import Navbar from '../components/Navbar.jsx';
 import Spinner from '../components/Spinner.jsx';
 import { firstImage } from '../utils/images.js';
+import { ConversationRow } from './InboxPage.jsx';
 
 function formatMessageTime(iso) {
   if (!iso) return '';
@@ -69,6 +70,7 @@ function ConversationPage() {
   const { conversationId } = useParams();
   const { user } = useAuth();
   const [conversation, setConversation] = useState(null);
+  const [conversations, setConversations] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -89,7 +91,9 @@ function ConversationPage() {
       try {
         const res = await apiClient.get('/conversations');
         if (cancelled) return;
-        const found = (res.data.data || []).find((c) => c.id === conversationId);
+        const list = res.data.data || [];
+        const found = list.find((c) => c.id === conversationId);
+        setConversations(list);
         setConversation(found || null);
       } catch (err) {
         console.error('Failed to load conversation:', err);
@@ -166,7 +170,20 @@ function ConversationPage() {
   return (
     <div className="min-h-screen bg-canvas flex flex-col">
       <Navbar />
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-4 flex flex-col">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-4 flex min-h-0 gap-5">
+        <aside className="hidden lg:flex w-[360px] flex-shrink-0 flex-col overflow-hidden rounded-[14px] border border-[#E5E7EB] bg-white shadow-sm" aria-label="Conversations">
+          <div className="border-b border-[#E5E7EB] px-5 py-4">
+            <h1 className="text-xl font-bold text-[#222222]">Inbox</h1>
+            <p className="mt-1 text-sm text-[#6b7280]">Messages about bookings and stays.</p>
+          </div>
+          <div className="overflow-y-auto">
+            {conversations.map((item) => (
+              <ConversationRow key={item.id} conversation={item} currentUserId={user?.id} compact active={item.id === conversationId} />
+            ))}
+            {conversations.length === 0 && <p className="p-5 text-sm text-[#6b7280]">No conversations yet.</p>}
+          </div>
+        </aside>
+        <section className="flex min-w-0 flex-1 flex-col">
         {/* Header */}
         <div className="flex items-center gap-3 mb-4 rounded-[14px] border border-[#E5E7EB] bg-white px-4 py-3 shadow-sm">
           <Link
@@ -254,6 +271,7 @@ function ConversationPage() {
             </button>
           </div>
         </div>
+        </section>
       </main>
     </div>
   );
