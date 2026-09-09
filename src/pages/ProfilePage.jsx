@@ -483,7 +483,41 @@ function ProfilePage() {
 
           {/* My Info Tab */}
           {activeTab === 'info' && (
-            <div>
+            <div className="lg:grid lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8 lg:items-start">
+              {/* Account sidebar (desktop) / compact section selector (mobile) -
+                  anchors into the sections below rather than separate tab
+                  state, so nothing about the existing info/bookings/
+                  favorites/verification tabs had to change. */}
+              <nav aria-label="Account sections" className="mb-6 lg:sticky lg:top-24 lg:mb-0">
+                <ul className="flex gap-2 overflow-x-auto no-scrollbar lg:block lg:space-y-1 lg:overflow-visible">
+                  {[
+                    { id: 'section-personal', label: 'Personal details' },
+                    { id: 'section-security', label: 'Security' },
+                    { id: 'section-privacy', label: 'Privacy' },
+                    ...(profile?.role === 'HOST' ? [{ id: 'section-preferences', label: 'Preferences' }] : []),
+                  ].map((item) => (
+                    <li key={item.id} className="flex-shrink-0 lg:flex-shrink">
+                      <a
+                        href={`#${item.id}`}
+                        className="block whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] lg:rounded-lg lg:whitespace-normal"
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ))}
+                  <li className="flex-shrink-0 lg:flex-shrink">
+                    <button
+                      type="button"
+                      onClick={() => setActiveTab('verification')}
+                      className="block min-h-[44px] whitespace-nowrap rounded-full px-3.5 py-2 text-left text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] lg:min-h-0 lg:w-full lg:rounded-lg lg:whitespace-normal"
+                    >
+                      Verification
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+
+              <div className="min-w-0">
               {showCompletionBanner && (
                 <div className="mb-6 bg-[#2563EB]/10 border border-[#2563EB] rounded-[14px] p-5 flex items-start gap-3">
                   <svg className="w-5 h-5 text-[#2563EB] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -495,7 +529,7 @@ function ProfilePage() {
                   </div>
                 </div>
               )}
-              <div className="neu-card p-6">
+              <div id="section-personal" className="neu-card p-6 scroll-mt-24">
                 <h2 className="text-lg font-bold text-[#222222] mb-6">Personal Information</h2>
                 {message && (
                   <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
@@ -570,7 +604,7 @@ function ProfilePage() {
                 </form>
               </div>
 
-              <div className="neu-card p-6 mt-6">
+              <div id="section-security" className="neu-card p-6 mt-6 scroll-mt-24">
                 <h2 className="text-lg font-bold text-[#222222] mb-2">Change password</h2>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Choose a strong, unique password. For your security, changing it signs you out on all devices.
@@ -631,7 +665,7 @@ function ProfilePage() {
               </div>
 
               {/* Privacy and data */}
-              <div className="mt-10 pt-8 border-t-2 border-[#E5E7EB]">
+              <div id="section-privacy" className="mt-10 pt-8 border-t-2 border-[#E5E7EB] scroll-mt-24">
                 <h3 className="text-xl font-bold text-[#222222] mb-1">Privacy and data</h3>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Manage your personal data and consent choices. See our{' '}
@@ -743,12 +777,13 @@ function ProfilePage() {
                   </div>
                 </div>
               </div>
+              </div>
             </div>
           )}
 
           {/* Payout Settings - HOST only */}
           {activeTab === 'info' && profile?.role === 'HOST' && (
-            <div className="mt-10 pt-8 border-t-2 border-[#E5E7EB]">
+            <div id="section-preferences" className="mt-10 pt-8 border-t-2 border-[#E5E7EB] scroll-mt-24">
               <h3 className="text-xl font-bold text-[#222222] mb-1">Payout Settings</h3>
               <p className="text-sm text-[#6b7280] mb-6">
                 Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
