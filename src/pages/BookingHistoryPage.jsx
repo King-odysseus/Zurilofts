@@ -6,6 +6,7 @@ import Footer from '../components/Footer.jsx';
 import Spinner from '../components/Spinner.jsx';
 import CancelBookingDialog, { canCancelBooking } from '../components/CancelBookingDialog.jsx';
 import apiClient from '../api/client.js';
+import { generateInvoice } from '../utils/invoice.js';
 
 // --- Helpers ---
 const STATUS_STYLES = {
@@ -54,58 +55,6 @@ function formatDate(iso) {
 function formatCurrency(n) {
   if (n == null) return '-';
   return `KES ${Number(n).toLocaleString()}`;
-}
-
-function generateInvoice(booking) {
-  // Dynamic import to avoid bundling jsPDF unless invoice is actually downloaded
-  import('jspdf').then(({ jsPDF }) => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.setTextColor(34, 34, 34); // #222222
-    doc.text('ZuriLofts - Booking Invoice', 14, 22);
-    doc.setFontSize(10);
-    doc.setTextColor(107, 114, 128); // #6b7280
-    doc.text(`Booking #${booking.id ? booking.id.slice(0, 8) : '-'}`, 14, 28);
-
-    let y = 36;
-    const items = [
-      ['Property', booking.property?.title || '-'],
-      ['Location', booking.property?.location || 'Nairobi'],
-      ['Check-in', formatDate(booking.checkIn)],
-      ['Check-out', formatDate(booking.checkOut)],
-      ['Guests', String(booking.guests || 1)],
-      ['Status', STATUS_STYLES[booking.status]?.label || booking.status],
-    ];
-    if (booking.subtotal != null) {
-      items.push(
-        ['Subtotal', formatCurrency(booking.subtotal)],
-        ['Cleaning Fee', formatCurrency(booking.cleaningFee || 0)],
-        ['Service Fee', formatCurrency(booking.serviceFee || 0)],
-      );
-    }
-    if (booking.discountAmount) items.push(['Discount', `-KES ${Number(booking.discountAmount).toLocaleString()}`]);
-    if (booking.lateCheckoutFee) items.push(['Late Check-out Fee', formatCurrency(booking.lateCheckoutFee)]);
-    items.push(
-      ['Total', formatCurrency(booking.total)],
-      ['Payment Ref', booking.paymentReference ? booking.paymentReference.slice(0, 16) : '-'],
-    );
-
-    items.forEach(([label, value]) => {
-      doc.setFontSize(9);
-      doc.setTextColor(34, 34, 34);
-      doc.text(label, 14, y);
-      doc.setFontSize(8);
-      doc.setTextColor(107, 114, 128);
-      doc.text(value, 14, y + 5);
-      y += 11;
-    });
-
-    doc.setFontSize(7);
-    doc.setTextColor(156, 163, 175);
-    doc.text('This is a computer-generated invoice.', 14, y + 2);
-
-    doc.save(`ZuriLofts_Invoice_${booking.id ? booking.id.slice(0, 8) : 'booking'}.pdf`);
-  }).catch((err) => console.error('Failed to generate invoice:', err));
 }
 
 function BookingHistoryPage() {

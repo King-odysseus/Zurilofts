@@ -6,6 +6,8 @@ import apiClient from "../api/client.js";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 import CancelBookingDialog, { canCancelBooking } from "../components/CancelBookingDialog.jsx";
+import { googleMapsDirectionsUrl } from "../utils/googleMaps.js";
+import { generateInvoice } from "../utils/invoice.js";
 
 const STATUS_META = {
   PENDING: { label: "Awaiting confirmation", bg: "bg-amber-500", icon: "clock" },
@@ -240,6 +242,117 @@ BookingCard.propTypes = {
   onRequestCancel: PropTypes.func,
 };
 
+/**
+ * The single soonest upcoming stay, prioritised above the rest of the list:
+ * image, status, dates, check-in details, message host, directions and
+ * receipt - per design2.md G2. Receipt is only offered once payment is
+ * confirmed (a PENDING booking has nothing to receipt yet).
+ */
+function NextStayCard({ booking }) {
+  const p = booking.property || {};
+  const host = p.host || {};
+  const image = p.images?.[0] || p.coverImage;
+  const nights = getNights(booking.checkIn, booking.checkOut);
+  const navigate = useNavigate();
+
+  async function openConversation() {
+    try {
+      const res = await apiClient.post("/conversations", { bookingId: booking.id });
+      navigate(`/inbox/${res.data.data.id}`);
+    } catch (err) {
+      console.error("Failed to open conversation", err);
+    }
+  }
+
+  return (
+    <div className="rounded-[14px] border border-[#E5E7EB] bg-white overflow-hidden shadow-sm mb-8">
+      <div className="flex flex-col sm:flex-row">
+        <div className="sm:w-64 lg:w-72 flex-shrink-0">
+          <img
+            src={image || "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&q=80"}
+            alt={p.title}
+            className="w-full h-48 sm:h-full object-cover"
+          />
+        </div>
+        <div className="flex-1 p-5 sm:p-6">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#2563EB] mb-1">Your next stay</p>
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h2 className="text-lg font-bold text-[#222222]">{p.title}</h2>
+            <StatusBadge status={booking.status} />
+          </div>
+          <p className="text-sm text-[#6b7280] mb-3">{formatDateRange(booking.checkIn, booking.checkOut)} &middot; {nights} night{nights !== 1 ? "s" : ""}</p>
+
+          {host.firstName && (
+            <div className="flex items-center gap-2 text-sm text-[#6b7280] mb-4">
+              <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-xs font-semibold text-[#2563EB]">
+                {host.firstName[0]}{host.lastName?.[0]}
+              </div>
+              <span>
+                Hosted by <span className="font-medium text-[#222222]">{host.firstName} {host.lastName}</span>
+              </span>
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to={`/property/${p.id}`}
+              className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
+            >
+              View check-in details
+            </Link>
+            <button
+              onClick={openConversation}
+              className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-lg text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
+            >
+              Message host
+            </button>
+            {(p.lat != null && p.lng != null) || p.location ? (
+              <a
+                href={googleMapsDirectionsUrl({ lat: p.lat, lng: p.lng, label: p.location })}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-lg text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
+              >
+                Directions
+              </a>
+            ) : null}
+            {booking.status === "CONFIRMED" && (
+              <button
+                onClick={() => generateInvoice(booking)}
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-lg text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
+              >
+                Receipt
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+NextStayCard.propTypes = {
+  booking: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    checkIn: PropTypes.string.isRequired,
+    checkOut: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    property: PropTypes.shape({
+      id: PropTypes.string,
+      title: PropTypes.string,
+      location: PropTypes.string,
+      lat: PropTypes.number,
+      lng: PropTypes.number,
+      images: PropTypes.arrayOf(PropTypes.string),
+      coverImage: PropTypes.string,
+      host: PropTypes.shape({
+        firstName: PropTypes.string,
+        lastName: PropTypes.string,
+      }),
+    }),
+  }).isRequired,
+};
+
 function EmptyState({ isPast }) {
   return (
     <div className="text-center py-16 px-4">
@@ -339,10 +452,16 @@ export default function TripHubPage() {
         u.push(b);
       }
     }
+    u.sort((a, b) => new Date(a.checkIn) - new Date(b.checkIn));
     return { upcoming: u, past: p };
   }, [bookings]);
 
-  const displayed = activeTab === "upcoming" ? upcoming : past;
+  // The soonest upcoming stay gets the priority "next stay" treatment above
+  // the tabs; the regular list on the Upcoming tab shows the rest, so a
+  // guest with exactly one upcoming trip sees it once, not twice.
+  const nextStay = upcoming[0] || null;
+  const displayed = activeTab === "upcoming" ? upcoming.slice(nextStay ? 1 : 0) : past;
+  const tabIsEmpty = activeTab === "upcoming" ? upcoming.length === 0 : past.length === 0;
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -354,6 +473,10 @@ export default function TripHubPage() {
           <h1 className="mt-1 text-2xl font-bold text-[#222222] sm:text-3xl">Trips</h1>
           <p className="mt-2 max-w-md text-sm text-[#6b7280]">Upcoming adventures and past memories - all in one place.</p>
         </div>
+
+        {!loading && !error && activeTab === "upcoming" && nextStay && (
+          <NextStayCard booking={nextStay} />
+        )}
 
         {/* Tabs */}
         <div className="flex border-b border-[#E5E7EB] mb-8">
@@ -410,10 +533,13 @@ export default function TripHubPage() {
               Try again
             </button>
           </div>
-        ) : displayed.length === 0 ? (
+        ) : tabIsEmpty ? (
           <EmptyState isPast={activeTab === "past"} />
-        ) : (
+        ) : displayed.length > 0 ? (
           <div className="space-y-4">
+            {activeTab === "upcoming" && (
+              <p className="text-sm font-semibold text-[#6b7280]">Other upcoming stays</p>
+            )}
             {displayed.map((b) => (
               <BookingCard
                 key={b.id}
@@ -423,7 +549,7 @@ export default function TripHubPage() {
               />
             ))}
           </div>
-        )}
+        ) : null}
       </main>
       <CancelBookingDialog
         booking={cancelTarget}
