@@ -34,11 +34,13 @@ function BookingPage() {
   // No paymentUrl state: the URL a booking was created with is always stale by
   // the time the guest picks a payment method, so checkout always re-initializes.
   const [availableAddOns, setAvailableAddOns] = useState([]);
-  const [selectedAddOns, setSelectedAddOns] = useState([]); // { addOn, quantity }
+  const [selectedAddOns, setSelectedAddOns] = useState([]); // { addOn, quantity, synced }
   const [loadingAddOns, setLoadingAddOns] = useState(false);
   const [creatingBooking, setCreatingBooking] = useState(false);
+  const [syncingAddOns, setSyncingAddOns] = useState(false);
   const [addOnsError, setAddOnsError] = useState('');
   const [pendingAddOnId, setPendingAddOnId] = useState(null); // guards double-submit
+  const [extrasExpanded, setExtrasExpanded] = useState(false); // Details' optional-extras accordion
 
   // Bed option driven by URL variant (from property card click)
   // Properties define their own 1-bed / 2-bed prices via price1Bed / price2Bed
@@ -203,6 +205,18 @@ function BookingPage() {
     return () => { cancelled = true; };
   }, [id, urlVariant]);
 
+  // Load the property's optional extras as soon as the guest reaches Details,
+  // so the accordion has content immediately rather than only after a
+  // separate step - no booking is required yet (loadAddOns handles a null
+  // bookingId by fetching only the available list). Runs once per visit to
+  // step 2, not on every render.
+  useEffect(() => {
+    if (step === 2 && availableAddOns.length === 0 && !loadingAddOns) {
+      loadAddOns();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
+
   // ── Cost calculations (memoised - expensive enough to matter on every date pick / guest toggle) ──
   const pricing = useMemo(() => {
     const nights = (() => {
@@ -315,10 +329,14 @@ function BookingPage() {
       setAvailableAddOns(avail);
       const existing = Array.isArray(bookingRes.data.data) ? bookingRes.data.data : [];
       // Map existing booking add-ons (which include the addOn relation) into
-      // the { addOn, quantity } shape used by the steppers.
+      // the { addOn, quantity, synced } shape used by the steppers. These
+      // came straight from the server, so they're already synced; anything
+      // the guest picks locally before a booking exists starts unsynced (see
+      // changeAddOnQuantity) and is pushed to the server in goToPayment.
       setSelectedAddOns(existing.map((item) => ({
         addOn: item.addOn || item,
         quantity: item.quantity || 0,
+        synced: true,
       })));
     } catch {
       setAddOnsError('Could not load add-ons. Please try again.');
@@ -327,28 +345,34 @@ function BookingPage() {
     }
   }
 
-  // Advance from guest details to the add-ons step, creating the booking first.
-  async function goToAddOns() {
-    const createdId = await ensureBooking();
-    if (!createdId) return; // error already surfaced via addOnsError
-    setStep(3);
-    loadAddOns(createdId);
-  }
-
-  // Change the quantity of an add-on on the booking. 0 -> N is a POST, N -> M
-  // (both > 0) is a PATCH, and N -> 0 is a DELETE. Never sends a price.
+  // Change the quantity of an add-on. Before a booking exists there is
+  // nothing to attach it to yet, so this only updates local state (marked
+  // unsynced) - goToPayment pushes those choices to the server once the
+  // booking is created. Once a booking exists, changes sync immediately:
+  // 0 -> N is a POST, N -> M (both > 0) is a PATCH, N -> 0 is a DELETE.
+  // Never sends a price either way.
   async function changeAddOnQuantity(addOn, nextQty) {
-    if (!bookingId || pendingAddOnId) return;
+    if (pendingAddOnId) return;
     const clamped = Math.max(0, Math.min(20, nextQty));
     const current = selectedAddOns.find((s) => s.addOn.id === addOn.id);
     const currentQty = current?.quantity || 0;
+
+    if (!bookingId) {
+      setSelectedAddOns((prev) => {
+        if (clamped === 0) return prev.filter((s) => s.addOn.id !== addOn.id);
+        const exists = prev.some((s) => s.addOn.id === addOn.id);
+        if (exists) return prev.map((s) => (s.addOn.id === addOn.id ? { ...s, quantity: clamped, synced: false } : s));
+        return [...prev, { addOn, quantity: clamped, synced: false }];
+      });
+      return;
+    }
 
     // Optimistically update the UI, then reconcile with the server.
     setSelectedAddOns((prev) => {
       if (clamped === 0) return prev.filter((s) => s.addOn.id !== addOn.id);
       const exists = prev.some((s) => s.addOn.id === addOn.id);
-      if (exists) return prev.map((s) => (s.addOn.id === addOn.id ? { ...s, quantity: clamped } : s));
-      return [...prev, { addOn, quantity: clamped }];
+      if (exists) return prev.map((s) => (s.addOn.id === addOn.id ? { ...s, quantity: clamped, synced: true } : s));
+      return [...prev, { addOn, quantity: clamped, synced: true }];
     });
 
     setPendingAddOnId(addOn.id);
@@ -366,11 +390,42 @@ function BookingPage() {
       // Revert the optimistic update on failure.
       setSelectedAddOns((prev) => {
         if (currentQty === 0) return prev.filter((s) => s.addOn.id !== addOn.id);
-        return prev.map((s) => (s.addOn.id === addOn.id ? { ...s, quantity: currentQty } : s));
+        return prev.map((s) => (s.addOn.id === addOn.id ? { ...s, quantity: currentQty, synced: true } : s));
       });
     } finally {
       setPendingAddOnId(null);
     }
+  }
+
+  // Advance from Details to Payment: creates the booking (idempotent - a
+  // no-op if one already exists) with the guest's current details, then
+  // pushes any add-ons the guest picked before the booking existed (those
+  // marked unsynced). Only the first-time creation path has unsynced items
+  // to push; a returning guest's edits already went through
+  // changeAddOnQuantity's immediate-sync path above. Stops and surfaces the
+  // error rather than advancing if either step fails, so a guest never
+  // reaches Payment with an add-on silently dropped.
+  async function goToPayment() {
+    const createdId = await ensureBooking();
+    if (!createdId) return; // error already surfaced via addOnsError
+
+    const unsynced = selectedAddOns.filter((s) => !s.synced && s.quantity > 0);
+    if (unsynced.length > 0) {
+      setSyncingAddOns(true);
+      setAddOnsError('');
+      for (const item of unsynced) {
+        try {
+          await apiClient.post(`/bookings/${createdId}/addons`, { addOnId: item.addOn.id, quantity: item.quantity });
+          setSelectedAddOns((prev) => prev.map((s) => (s.addOn.id === item.addOn.id ? { ...s, synced: true } : s)));
+        } catch (err) {
+          setAddOnsError(err.response?.data?.error || `Could not save ${item.addOn.name}. Please try again.`);
+          setSyncingAddOns(false);
+          return; // booking exists; unsynced items remain marked unsynced for retry
+        }
+      }
+      setSyncingAddOns(false);
+    }
+    setStep(4);
   }
 
   const handleSubmit = async (e) => {
@@ -756,118 +811,122 @@ function BookingPage() {
         />
       </div>
 
+      {/* Optional extras - an accordion inside Details, not a separate
+          Continue screen. Selecting extras here never requires leaving this
+          screen; they're pushed to the server when the guest continues to
+          Payment (or immediately, if a booking already exists - see
+          changeAddOnQuantity). */}
+      <div className="rounded-[14px] border border-[#E5E7EB]">
+        <button
+          type="button"
+          onClick={() => setExtrasExpanded((v) => !v)}
+          aria-expanded={extrasExpanded}
+          aria-controls="booking-extras-panel"
+          className="flex w-full min-h-[44px] items-center justify-between gap-3 p-4 text-left"
+        >
+          <span>
+            <span className="block font-semibold text-[#222222]">Optional extras</span>
+            <span className="block text-sm text-[#6b7280]">
+              {pricing.addOnsTotal > 0
+                ? `${selectedAddOns.filter((s) => s.quantity > 0).length} selected · KES ${pricing.addOnsTotal.toLocaleString()}`
+                : 'Add services like airport pickup or extra cleaning'}
+            </span>
+          </span>
+          <svg
+            className={`h-5 w-5 flex-shrink-0 text-[#6b7280] transition-transform ${extrasExpanded ? 'rotate-180' : ''}`}
+            fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        {extrasExpanded && (
+          <div id="booking-extras-panel" className="space-y-3 border-t border-[#E5E7EB] p-4">
+            {addOnsError && (
+              <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">
+                {addOnsError}
+              </div>
+            )}
+
+            {loadingAddOns ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : availableAddOns.length === 0 ? (
+              <div className="bg-[#E5E7EB]/40 rounded-xl p-6 text-center">
+                <p className="text-[#6b7280]">No add-ons are available for this property.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {availableAddOns.map((addOn) => {
+                  const selected = selectedAddOns.find((s) => s.addOn.id === addOn.id);
+                  const qty = selected?.quantity || 0;
+                  const subtotal = qty * (addOn.price || 0);
+                  const busy = pendingAddOnId === addOn.id;
+                  return (
+                    <div key={addOn.id} className="shadow-sm rounded-[14px] p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-[#222222]">{addOn.name}</h3>
+                          <span className="bg-[#2563EB]/10 text-[#222222] text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize">
+                            {addOn.category}
+                          </span>
+                        </div>
+                        <p className="text-sm text-[#6b7280] mt-1">{addOn.description}</p>
+                        <p className="text-sm font-semibold text-[#222222] mt-1">
+                          KES {addOn.price != null ? addOn.price.toLocaleString() : '-'} each
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 sm:flex-col sm:items-end">
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => changeAddOnQuantity(addOn, qty - 1)}
+                            disabled={busy || qty === 0}
+                            className="w-11 h-11 rounded-full shadow-sm hover:shadow-md text-[#222222] font-bold hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                            aria-label={`Decrease ${addOn.name} quantity`}
+                          >
+                            −
+                          </button>
+                          <span className="w-8 text-center font-semibold text-[#222222]" aria-live="polite">
+                            {busy ? '…' : qty}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => changeAddOnQuantity(addOn, qty + 1)}
+                            disabled={busy || qty >= 20}
+                            className="w-11 h-11 rounded-full shadow-sm hover:shadow-md text-[#222222] font-bold hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                            aria-label={`Increase ${addOn.name} quantity`}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <p className="text-sm font-semibold text-[#222222]">
+                          {qty > 0 ? `KES ${subtotal.toLocaleString()}` : '-'}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {pricing.addOnsTotal > 0 && (
+              <div className="bg-[#E5E7EB] rounded-xl p-4 flex justify-between items-center">
+                <span className="font-semibold text-[#222222]">Add-ons total</span>
+                <span className="font-bold text-[#222222]">KES {pricing.addOnsTotal.toLocaleString()}</span>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <button
-        onClick={goToAddOns}
-        disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone || creatingBooking}
+        onClick={goToPayment}
+        disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone || creatingBooking || syncingAddOns}
         className="w-full min-h-[44px] bg-[#C49A6C] text-white py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {creatingBooking ? 'Starting your booking...' : 'Continue to extras'}
-      </button>
-    </div>
-  );
-
-  // Step 3: Add-ons
-  const renderStep3 = () => (
-    <div className="space-y-6">
-      <div className="flex items-center mb-4">
-        <button
-          onClick={() => setStep(2)}
-          className="min-h-[44px] text-gray-500 hover:text-gray-900 font-medium flex items-center transition-colors"
-        >
-          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Back
-        </button>
-      </div>
-
-      <div>
-        <p className="text-xs font-semibold text-blue-600 uppercase tracking-wide">Details &middot; Extras</p>
-        <h2 className="text-2xl font-bold text-[#222222]">Enhance your stay</h2>
-        <p className="text-sm text-[#6b7280] mt-1">
-          Add optional services to your booking. You can change quantities any time before payment.
-        </p>
-      </div>
-
-      {addOnsError && (
-        <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">
-          {addOnsError}
-        </div>
-      )}
-
-      {loadingAddOns ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
-        </div>
-      ) : availableAddOns.length === 0 ? (
-        <div className="bg-[#E5E7EB]/40 rounded-xl p-6 text-center">
-          <p className="text-[#6b7280]">No add-ons are available for this property.</p>
-        </div>
-      ) : (
-        <div className="space-y-3">
-          {availableAddOns.map((addOn) => {
-            const selected = selectedAddOns.find((s) => s.addOn.id === addOn.id);
-            const qty = selected?.quantity || 0;
-            const subtotal = qty * (addOn.price || 0);
-            const busy = pendingAddOnId === addOn.id;
-            return (
-              <div key={addOn.id} className="shadow-sm rounded-[14px] p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-[#222222]">{addOn.name}</h3>
-                    <span className="bg-[#2563EB]/10 text-[#222222] text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize">
-                      {addOn.category}
-                    </span>
-                  </div>
-                  <p className="text-sm text-[#6b7280] mt-1">{addOn.description}</p>
-                  <p className="text-sm font-semibold text-[#222222] mt-1">
-                    KES {addOn.price != null ? addOn.price.toLocaleString() : '-'} each
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 sm:flex-col sm:items-end">
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => changeAddOnQuantity(addOn, qty - 1)}
-                      disabled={busy || qty === 0}
-                      className="w-11 h-11 rounded-full shadow-sm hover:shadow-md text-[#222222] font-bold hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                      aria-label={`Decrease ${addOn.name} quantity`}
-                    >
-                      −
-                    </button>
-                    <span className="w-8 text-center font-semibold text-[#222222]" aria-live="polite">
-                      {busy ? '…' : qty}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => changeAddOnQuantity(addOn, qty + 1)}
-                      disabled={busy || qty >= 20}
-                      className="w-11 h-11 rounded-full shadow-sm hover:shadow-md text-[#222222] font-bold hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                      aria-label={`Increase ${addOn.name} quantity`}
-                    >
-                      +
-                    </button>
-                  </div>
-                  <p className="text-sm font-semibold text-[#222222]">
-                    {qty > 0 ? `KES ${subtotal.toLocaleString()}` : '-'}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <div className="bg-[#E5E7EB] rounded-xl p-4 flex justify-between items-center">
-        <span className="font-semibold text-[#222222]">Add-ons total</span>
-        <span className="font-bold text-[#222222]">KES {pricing.addOnsTotal.toLocaleString()}</span>
-      </div>
-
-      <button
-        onClick={() => setStep(4)}
-        className="w-full min-h-[44px] bg-[#C49A6C] text-white py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200"
-      >
-        Continue to Payment
+        {creatingBooking ? 'Starting your booking...' : syncingAddOns ? 'Saving extras...' : 'Continue to Payment'}
       </button>
     </div>
   );
@@ -877,7 +936,7 @@ function BookingPage() {
     <div className="space-y-6">
       <div className="flex items-center mb-4">
         <button
-          onClick={() => setStep(3)}
+          onClick={() => setStep(2)}
           className="min-h-[44px] text-gray-500 hover:text-gray-900 font-medium flex items-center transition-colors"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1196,12 +1255,11 @@ function BookingPage() {
     );
   }
 
-  // Visual-only grouping: internal step state (1-4) is untouched, but the
-  // progress hierarchy is presented as Stay / Details / Payment, with the
-  // add-ons step (3) folded under "Details" alongside guest info (2).
+  // Three real stages: internal step state keeps values 1/2/4 (3 is retired -
+  // add-ons are an accordion inside Details, step 2, not a separate screen).
   const STAGES = [
     { label: 'Stay', steps: [1] },
-    { label: 'Details', steps: [2, 3] },
+    { label: 'Details', steps: [2] },
     { label: 'Payment', steps: [4] },
   ];
   const currentStageIndex = STAGES.findIndex((s) => s.steps.includes(step));
@@ -1266,7 +1324,6 @@ function BookingPage() {
               <div className="bg-white rounded-[14px] shadow-lg p-5 md:p-8">
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
-                {step === 3 && renderStep3()}
                 {step === 4 && renderStep4()}
               </div>
             </div>
