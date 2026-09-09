@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
+import MessagesTabBar from '../components/MessagesTabBar.jsx';
 import apiClient from '../api/client.js';
 
 function MessagesPage() {
@@ -52,6 +53,8 @@ function MessagesPage() {
             <h1 className="text-2xl font-bold text-[#222222]">Messages</h1>
             <p className="text-[#6b7280] text-sm">Chat with the ZuriLofts team. We usually reply within a few hours.</p>
           </div>
+
+          <MessagesTabBar active="support" />
 
           <div className="neu-card flex flex-col h-[60vh]">
             <div className="flex-1 overflow-y-auto p-4 space-y-3">

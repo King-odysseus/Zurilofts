@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import Navbar from '../components/Navbar.jsx';
 import Spinner from '../components/Spinner.jsx';
+import MessagesTabBar from '../components/MessagesTabBar.jsx';
 import { firstImage } from '../utils/images.js';
 
 function formatRelativeTime(iso) {
@@ -139,6 +140,8 @@ function InboxPage() {
           <h1 className="text-3xl font-bold text-[#222222]">Inbox</h1>
           <p className="text-[#6b7280] mt-1">Messages about your bookings and stays.</p>
         </div>
+
+        <MessagesTabBar active="inbox" />
 
         {loading ? (
           <div className="flex items-center justify-center py-20">
