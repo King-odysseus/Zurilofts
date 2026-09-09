@@ -19,10 +19,13 @@ function getSoftUser(req: Request): { sub: string; role: string } | null {
 
 export async function list(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minRating, available, featured, status, page, limit } = req.query;
+    const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minRating, available, featured, status, page, limit, checkIn, checkOut } = req.query;
     // Only the admin listing queue (mounted behind requireAdmin) may see every
     // lifecycle status and filter by one; the public route always sees PUBLISHED only.
     const isAdmin = req.user?.role === 'ADMIN';
+    // Both dates are required together - a lone checkIn/checkOut can't define
+    // a range, so it's ignored rather than silently misinterpreted.
+    const dateRange = propertyService.parseAvailabilityDateRange(checkIn, checkOut);
     const result = await propertyService.listProperties({
       type: type as string | undefined,
       minPrice: minPrice ? Number(minPrice) : undefined,
@@ -37,6 +40,8 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
       includeAllStatuses: isAdmin,
       page: page ? Number(page) : 1,
       limit: limit ? Number(limit) : 12,
+      checkIn: dateRange?.checkIn,
+      checkOut: dateRange?.checkOut,
     });
 
     res.json({

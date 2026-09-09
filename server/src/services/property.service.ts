@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ForbiddenError, ConflictError } from '../types/index.js';
+import { isRangeAvailable } from './calendar.service.js';
 
 // Listing publication lifecycle - independent of the host's own account
 // verification (User.role / HostApplication).
@@ -17,6 +18,24 @@ export type ListingReviewAction = 'approve' | 'reject' | 'suspend' | 'unsuspend'
 /** Only a PUBLISHED listing may take bookings - draft/pending/rejected/
  *  suspended listings are never publicly bookable, independent of the host's
  *  own account verification. Used by booking.service.createBooking. */
+/**
+ * Validates a pair of raw `checkIn`/`checkOut` query values into real Dates
+ * for the list availability filter, or `null` when the pair can't define a
+ * real range (missing half, unparseable, or checkOut not after checkIn).
+ * A lone date is intentionally ignored rather than guessed at.
+ */
+export function parseAvailabilityDateRange(
+  checkIn: unknown,
+  checkOut: unknown
+): { checkIn: Date; checkOut: Date } | null {
+  if (typeof checkIn !== 'string' || !checkIn || typeof checkOut !== 'string' || !checkOut) return null;
+  const checkInDate = new Date(checkIn);
+  const checkOutDate = new Date(checkOut);
+  if (isNaN(checkInDate.getTime()) || isNaN(checkOutDate.getTime())) return null;
+  if (checkOutDate <= checkInDate) return null;
+  return { checkIn: checkInDate, checkOut: checkOutDate };
+}
+
 export function isBookable(status: string): boolean {
   return status === 'PUBLISHED';
 }
@@ -180,10 +199,14 @@ interface PropertyFilters {
   includeAllStatuses?: boolean;
   page?: number;
   limit?: number;
+  // Optional stay dates for real availability filtering (see below) - not a
+  // Prisma `where` column, since availability depends on bookings/blocks.
+  checkIn?: Date;
+  checkOut?: Date;
 }
 
 export async function listProperties(filters: PropertyFilters) {
-  const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minRating, available, featured, hostId, status, includeAllStatuses, page = 1, limit = 12 } = filters;
+  const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minRating, available, featured, hostId, status, includeAllStatuses, page = 1, limit = 12, checkIn, checkOut } = filters;
   const skip = (page - 1) * limit;
 
   const where: any = {};
@@ -220,6 +243,35 @@ export async function listProperties(filters: PropertyFilters) {
       { title: { contains: search } },
       { location: { contains: search } },
     ];
+  }
+
+  // Real stay-date availability filtering: reuses the same isRangeAvailable
+  // check the booking flow validates against (calendar blocks + non-cancelled
+  // bookings), so a listing that survives this filter is authoritatively
+  // free for the requested dates - not a text-search guess. Pagination must
+  // apply to the filtered set, so this fetches every `where` match first and
+  // pages the availability-filtered result in memory rather than at the DB
+  // level; acceptable at this catalogue's scale.
+  if (checkIn && checkOut) {
+    const candidates = await prisma.property.findMany({
+      where,
+      orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
+    });
+    const availabilityFlags = await Promise.all(
+      candidates.map((p) => isRangeAvailable(p.id, checkIn, checkOut))
+    );
+    const available = candidates.filter((_, i) => availabilityFlags[i]);
+    const total = available.length;
+    const paged = available.slice(skip, skip + limit);
+    return {
+      properties: normalizeProperties(paged),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
   }
 
   const [properties, total] = await Promise.all([
