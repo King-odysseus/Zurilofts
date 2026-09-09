@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 
 const statusColors = {
   PENDING: 'bg-amber-500 text-white',
-  PROCESSING: 'bg-[#2563EB] text-white',
+  PROCESSING: 'bg-amber-100 text-amber-800',
   SUCCESS: 'bg-green-600 text-white',
   FAILED: 'bg-red-600 text-white',
   REVERSED: 'bg-amber-600 text-white',

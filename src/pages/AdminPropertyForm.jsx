@@ -618,7 +618,7 @@ function PropertyPreview({ form }) {
             <span className="text-xs text-[#6b7280]">per night</span>
             <div className="text-xl font-bold text-[#222222]">KES {price.toLocaleString()}</div>
           </div>
-          <span className="bg-[#2563EB] text-white font-semibold px-4 py-2 rounded-lg text-sm">Book Now</span>
+          <span className="bg-[#C49A6C] text-white font-semibold px-4 py-2 rounded-lg text-sm">Book Now</span>
         </div>
       </div>
     </div>
@@ -752,7 +752,7 @@ function FullPagePreview({ form, onClose }) {
               <div className="rounded-[14px] p-6 sticky top-20 shadow-sm bg-white">
                 <span className="text-3xl font-bold text-[#222222]">KES {price.toLocaleString()}</span>
                 <span className="text-[#6b7280]"> / night</span>
-                <div className="block w-full bg-[#2563EB] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
+                <div className="block w-full bg-[#C49A6C] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
                 {!form.available && (
                   <p className="text-center text-sm text-red-600 mt-3 font-medium">Currently marked unavailable</p>
                 )}

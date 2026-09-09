@@ -22,9 +22,9 @@ const adminOnlyItems = [
   { path: '/admin/host-applications', label: 'Host Applications', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414A1 1 0 0118 8.414V19a2 2 0 01-2 2z', group: 'People' },
   { path: '/admin/identity-verifications', label: 'Identity Verifications', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', group: 'People' },
   { path: '/admin/disputes', label: 'Disputes', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z', group: 'Bookings' },
-  { path: '/admin/promos', label: 'Promo Codes', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z', group: 'Payments' },
-  { path: '/admin/addons', label: 'Add-ons', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4', group: 'Listings' },
-  { path: '/admin/guides', label: 'Guides', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', group: 'Listings' },
+  { path: '/admin/promos', label: 'Promo Codes', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z', group: 'Content' },
+  { path: '/admin/addons', label: 'Add-ons', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4', group: 'Content' },
+  { path: '/admin/guides', label: 'Guides', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', group: 'Content' },
   { path: '/admin/feedback', label: 'Feedback', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', group: 'Content' },
   { path: '/admin/messages', label: 'Messages', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', group: 'Content' },
   { path: '/admin/payouts', label: 'Payouts', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z', group: 'Payments' },
@@ -189,6 +189,7 @@ function AdminLayout() {
 
   // Mobile pill nav "More" off-screen menu
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [expandedGroups, setExpandedGroups] = useState(() => Object.fromEntries(GROUP_ORDER.map((group) => [group, true])));
 
   useEffect(() => {
     let active = true;
@@ -308,11 +309,11 @@ function AdminLayout() {
           {navGroups.map(({ group, items }) => (
             <div key={group} className={collapsed ? 'mb-2' : 'mb-4'}>
               {!collapsed && (
-                <span className="block px-4 mb-1.5 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-                  {group}
-                </span>
+                <button type="button" onClick={() => setExpandedGroups((current) => ({ ...current, [group]: !current[group] }))} aria-expanded={expandedGroups[group]} className="mb-1.5 flex min-h-[32px] w-full items-center justify-between rounded-lg px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hover:bg-[#F7F7F5]">
+                  {group}<span aria-hidden="true">{expandedGroups[group] ? '−' : '+'}</span>
+                </button>
               )}
-              {items.map((item) => <NavLink key={item.path} {...item} />)}
+              {(collapsed || expandedGroups[group]) && items.map((item) => <NavLink key={item.path} {...item} />)}
             </div>
           ))}
         </nav>
@@ -648,7 +649,7 @@ function DashboardOverview() {
             <button
               type="button"
               onClick={() => navigate('/admin/bookings')}
-              className="inline-flex items-center gap-2 rounded-lg bg-[#2563EB] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#1D4ED8] transition-colors"
+              className="inline-flex items-center gap-2 rounded-lg bg-[#C49A6C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#B8895C] transition-colors"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               Open approvals
@@ -715,7 +716,7 @@ function DashboardOverview() {
               className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]" />
           </div>
           <button type="submit" disabled={savingLanding}
-            className="bg-[#2563EB] text-white font-semibold px-5 py-2 rounded-lg text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50">
+            className="bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-lg text-sm hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50">
             {savingLanding ? 'Saving...' : 'Update'}
           </button>
           {landingMsg && <span className="text-sm text-green-600 self-center">{landingMsg}</span>}
