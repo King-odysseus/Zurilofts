@@ -1,21 +1,27 @@
+import { useRef } from 'react';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
+import { LegalPageContentsMobile, LegalPageContentsDesktop } from '../components/LegalPageContents.jsx';
 import { POLICY_VERSION } from '../utils/consent.js';
 
 function PrivacyPage() {
   const lastUpdated = '8 August 2026';
+  const articleRef = useRef(null);
 
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       <div className="pt-24 pb-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 lg:grid lg:grid-cols-[minmax(0,1fr)_200px] lg:gap-10 lg:items-start">
+        <div className="max-w-3xl min-w-0">
           <h1 className="text-3xl md:text-4xl font-bold text-[#222222] mb-2">Privacy Policy</h1>
           <p className="text-sm text-[#6b7280] mb-8">
             Last updated: {lastUpdated} · Policy version: {POLICY_VERSION}
           </p>
 
-          <div className="prose prose-slate max-w-none space-y-8 text-[#222222] leading-relaxed">
+          <LegalPageContentsMobile containerRef={articleRef} />
+
+          <div ref={articleRef} className="prose prose-slate max-w-none space-y-8 text-[#222222] leading-relaxed">
 
             {/* 1. Introduction */}
             <section>
@@ -354,6 +360,9 @@ function PrivacyPage() {
             </section>
 
           </div>
+        </div>
+
+        <LegalPageContentsDesktop containerRef={articleRef} />
         </div>
       </div>
       <Footer />
