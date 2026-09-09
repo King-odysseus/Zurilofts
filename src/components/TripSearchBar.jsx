@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
+import SearchDateGuestFields from './SearchDateGuestFields.jsx';
 
-function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveSearch, discovery }) {
+function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveSearch, discovery, dates, onDatesChange, guests, onGuestsChange }) {
   return (
     <form onSubmit={onSubmit} role="search" className="w-full max-w-full">
       <div className={`flex flex-col gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-lg transition-shadow focus-within:border-[#2563EB] focus-within:ring-2 focus-within:ring-[#2563EB]/20 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full ${discovery ? 'sm:p-2' : ''}`}>
@@ -43,16 +44,12 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
           )}
         </div>
         {discovery && (
-          <div className="hidden min-w-[150px] border-r border-[#E5E7EB] px-6 py-1 sm:block">
-            <p className="text-sm font-semibold text-[#222222]">When</p>
-            <p className="text-sm text-[#6b7280]">Add dates</p>
-          </div>
-        )}
-        {discovery && (
-          <div className="hidden min-w-[140px] px-6 py-1 sm:block">
-            <p className="text-sm font-semibold text-[#222222]">Who</p>
-            <p className="text-sm text-[#6b7280]">Add guests</p>
-          </div>
+          <SearchDateGuestFields
+            dates={dates}
+            onDatesChange={onDatesChange}
+            guests={guests}
+            onGuestsChange={onGuestsChange}
+          />
         )}
         <button
           type="submit"
@@ -79,12 +76,20 @@ TripSearchBar.propTypes = {
   loading: PropTypes.bool,
   hasActiveSearch: PropTypes.bool,
   discovery: PropTypes.bool,
+  dates: PropTypes.shape({ checkIn: PropTypes.string, checkOut: PropTypes.string }),
+  onDatesChange: PropTypes.func,
+  guests: PropTypes.number,
+  onGuestsChange: PropTypes.func,
 };
 
 TripSearchBar.defaultProps = {
   loading: false,
   hasActiveSearch: false,
   discovery: false,
+  dates: { checkIn: '', checkOut: '' },
+  onDatesChange: () => {},
+  guests: 1,
+  onGuestsChange: () => {},
 };
 
 export default TripSearchBar;

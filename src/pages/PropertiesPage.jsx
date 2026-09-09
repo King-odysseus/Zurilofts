@@ -19,14 +19,6 @@ const NEIGHBORHOODS = [
   { value: 'lavington', label: 'Lavington' },
 ];
 
-const GUEST_OPTIONS = [
-  { value: '', label: 'Any Guests' },
-  { value: '1', label: '1+ guest' },
-  { value: '2', label: '2+ guests' },
-  { value: '3', label: '3+ guests' },
-  { value: '4', label: '4+ guests' },
-];
-
 const RATING_OPTIONS = [
   { value: '', label: 'Any Rating' },
   { value: '4', label: '4.0+' },
@@ -55,7 +47,9 @@ function PropertiesPage() {
   const availableOnly = searchParams.get('available') === 'true';
   const neighborhood = searchParams.get('neighborhood') || '';
   const minRating = searchParams.get('minRating') || '';
-  const minGuests = searchParams.get('minGuests') || '';
+  const checkIn = searchParams.get('checkIn') || '';
+  const checkOut = searchParams.get('checkOut') || '';
+  const guests = Number(searchParams.get('guests')) || 1;
 
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -93,6 +87,26 @@ function PropertiesPage() {
     setSearchParams(new URLSearchParams());
     setSelectedAmenities(new Set());
   }, [setSearchParams]);
+
+  // Dates and guests come from the discovery search bar, not the advanced
+  // filter panel - update() sets or clears both dates together since a lone
+  // checkIn/checkOut can't define a range.
+  const handleDatesChange = useCallback(
+    ({ checkIn: nextCheckIn, checkOut: nextCheckOut }) => {
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (nextCheckIn) next.set('checkIn', nextCheckIn); else next.delete('checkIn');
+        if (nextCheckOut) next.set('checkOut', nextCheckOut); else next.delete('checkOut');
+        return next;
+      });
+    },
+    [setSearchParams]
+  );
+
+  const handleGuestsChange = useCallback(
+    (n) => updateParam('guests', n > 1 ? String(n) : ''),
+    [updateParam]
+  );
 
   // Handle search form submit from TripSearchBar
   const handleSearchSubmit = useCallback(
@@ -210,10 +224,16 @@ function PropertiesPage() {
       if (availableOnly) params.available = true;
       if (neighborhood) params.neighborhood = neighborhood;
       if (minRating) params.minRating = Number(minRating);
-      // Map guest count to minimum bedrooms
-      if (minGuests) {
-        const g = Number(minGuests);
-        params.minBedrooms = g <= 2 ? 1 : g <= 4 ? 2 : 3;
+      // Map guest count to minimum bedrooms. guests===1 is the unset default
+      // (just me) and shouldn't restrict results - a studio fits one guest.
+      if (guests > 1) {
+        params.minBedrooms = guests <= 2 ? 1 : guests <= 4 ? 2 : 3;
+      }
+      // Real stay-date availability filtering (server checks calendar blocks
+      // and existing bookings - see property.service.ts#listProperties).
+      if (checkIn && checkOut) {
+        params.checkIn = checkIn;
+        params.checkOut = checkOut;
       }
       // Bed-variant expansion, amenity filtering, and sorting all happen
       // client-side (a listing can have separate 1-bed/2-bed prices), so we
@@ -232,7 +252,7 @@ function PropertiesPage() {
     } finally {
       if (!controller.signal.aborted) setLoading(false);
     }
-  }, [searchQuery, filter, priceRange, availableOnly, neighborhood, minRating, minGuests]);
+  }, [searchQuery, filter, priceRange, availableOnly, neighborhood, minRating, guests, checkIn, checkOut]);
 
   useEffect(() => {
     fetchProperties();
@@ -241,7 +261,7 @@ function PropertiesPage() {
 
   const hasActiveFilters =
     filter !== 'all' || priceRange !== 'all' || availableOnly || bedFilter !== 'all' || searchQuery !== '' ||
-    neighborhood || minRating || minGuests || selectedAmenities.size > 0;
+    neighborhood || minRating || guests > 1 || (checkIn && checkOut) || selectedAmenities.size > 0;
 
   const filterButtons = [
     { key: 'all', label: 'All' },
@@ -271,11 +291,8 @@ function PropertiesPage() {
             Premium furnished apartments in Nairobi&apos;s most desirable neighbourhoods.
           </p>
           <div className="max-w-4xl mx-auto rounded-[18px] border border-[#E5E7EB] bg-white p-2 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-left">
-            <div className="hidden md:grid grid-cols-3 divide-x divide-[#E5E7EB] px-4 pt-2 pb-1">
-              <div className="px-3"><span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Where</span><span className="mt-1 block truncate text-sm font-medium text-[#222222]">{searchInput || 'Anywhere in Nairobi'}</span></div>
-              <div className="px-3"><span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Dates</span><span className="mt-1 block text-sm font-medium text-[#222222]">Add dates</span></div>
-              <div className="px-3"><span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-[#6b7280]">Guests</span><span className="mt-1 block text-sm font-medium text-[#222222]">{minGuests ? `${minGuests}+ guests` : 'Add guests'}</span></div>
-            </div>
+            {/* One compact destination/date/guest/action composition - no
+                separate static summary above the working search bar. */}
             <TripSearchBar
               value={searchInput}
               onChange={handleSearchChange}
@@ -283,6 +300,11 @@ function PropertiesPage() {
               onClear={handleSearchClear}
               loading={loading}
               hasActiveSearch={searchQuery !== ''}
+              discovery
+              dates={{ checkIn, checkOut }}
+              onDatesChange={handleDatesChange}
+              guests={guests}
+              onGuestsChange={handleGuestsChange}
             />
           </div>
         </div>
@@ -349,7 +371,7 @@ function PropertiesPage() {
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
                   </svg>
-                  Filters {hasActiveFilters && `(${[filter !== 'all', priceRange !== 'all', availableOnly, bedFilter !== 'all', !!neighborhood, !!minRating, !!minGuests, selectedAmenities.size > 0].filter(Boolean).length})`}
+                  Filters {hasActiveFilters && `(${[filter !== 'all', priceRange !== 'all', availableOnly, bedFilter !== 'all', !!neighborhood, !!minRating, guests > 1, !!(checkIn && checkOut), selectedAmenities.size > 0].filter(Boolean).length})`}
                 </span>
               </button>
             </div>
@@ -395,15 +417,8 @@ function PropertiesPage() {
                 ariaLabel="Neighborhood"
               />
 
-              {/* Guests */}
-              <Dropdown
-                value={minGuests}
-                onChange={(v) => updateParam('minGuests', v)}
-                options={GUEST_OPTIONS}
-                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
-                placeholder="Any Guests"
-                ariaLabel="Guest count"
-              />
+              {/* Guest count now lives in the "Who" field of the search bar
+                  above - kept here would duplicate the same control. */}
 
               {/* Rating */}
               <div className="flex items-center gap-1.5">

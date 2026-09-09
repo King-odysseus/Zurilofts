@@ -87,6 +87,8 @@ function SearchBar({ discovery = false }) {
   const [results, setResults] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [dates, setDates] = useState({ checkIn: '', checkOut: '' });
+  const [guests, setGuests] = useState(1);
   const containerRef = useRef(null);
   const debounceRef = useRef(null);
   const searchRef = useRef(null); // in-flight search request, so it can be aborted
@@ -150,12 +152,17 @@ function SearchBar({ discovery = false }) {
   }
 
   const handleSearch = useCallback(() => {
-    if (query.trim().length >= 2) {
-      navigate(`/properties?search=${encodeURIComponent(query.trim())}`);
-      setOpen(false);
-      setQuery('');
+    const params = new URLSearchParams();
+    if (query.trim().length >= 2) params.set('search', query.trim());
+    if (dates.checkIn && dates.checkOut) {
+      params.set('checkIn', dates.checkIn);
+      params.set('checkOut', dates.checkOut);
     }
-  }, [query, navigate]);
+    if (guests > 1) params.set('guests', String(guests));
+    navigate(`/properties${params.toString() ? `?${params.toString()}` : ''}`);
+    setOpen(false);
+    setQuery('');
+  }, [query, dates, guests, navigate]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -196,6 +203,10 @@ function SearchBar({ discovery = false }) {
         loading={loading}
         hasActiveSearch={query.length > 0}
         discovery={discovery}
+        dates={dates}
+        onDatesChange={setDates}
+        guests={guests}
+        onGuestsChange={setGuests}
       />
 
       {/* Dropdown results */}
