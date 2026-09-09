@@ -200,10 +200,12 @@ function FavouritesPage() {
 
         {displayProperties.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {/* PropertyCard already renders its own full-card link and a
+                separate favourite-toggle button - wrapping it in another
+                <Link> nested anchor tags, which breaks keyboard/AT
+                navigation. */}
             {displayProperties.map((property) => (
-              <Link key={property.id} to={`/property/${property.id}`} className="no-underline">
-                <PropertyCard property={property} />
-              </Link>
+              <PropertyCard key={property.id} property={property} />
             ))}
           </div>
         )}
