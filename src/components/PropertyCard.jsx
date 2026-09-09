@@ -29,6 +29,8 @@ function PropertyCard({ property }) {
     badge,
     variantLabel,
     variant,
+    bedrooms,
+    bathrooms,
   } = property;
 
   const isLiked = id ? isFavorite(id) : false;
@@ -46,6 +48,12 @@ function PropertyCard({ property }) {
 
   // Safely format price - guard against null/undefined
   const formattedPrice = price != null ? price.toLocaleString() : null;
+
+  // Compact capacity summary - only what's actually known, never fabricated.
+  const capacityParts = [];
+  if (bedrooms != null) capacityParts.push(`${bedrooms} bed${bedrooms === 1 ? '' : 's'}`);
+  if (bathrooms != null) capacityParts.push(`${bathrooms} bath${bathrooms === 1 ? '' : 's'}`);
+  const capacityLabel = capacityParts.join(' · ');
 
   return (
     <article className="group relative bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden transition-all duration-200 shadow-sm hover:-translate-y-1 hover:shadow-md h-full flex flex-col">
@@ -95,11 +103,11 @@ function PropertyCard({ property }) {
         <button
           type="button"
           onClick={handleToggleFavorite}
-          className="absolute z-20 top-2.5 right-2.5 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white hover:scale-110 transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#2563EB]"
+          className="absolute z-20 top-1.5 right-1.5 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#2563EB]"
           aria-label={isLiked ? 'Remove from favourites' : 'Add to favourites'}
         >
           <svg
-            className={`w-4 h-4 transition-colors duration-200 ${isLiked ? 'text-red-500 fill-current' : 'text-[#6b7280] hover:text-red-400'}`}
+            className={`w-5 h-5 transition-colors duration-200 ${isLiked ? 'text-red-500 fill-current' : 'text-[#6b7280] hover:text-red-400'}`}
             fill={isLiked ? 'currentColor' : 'none'}
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -133,7 +141,7 @@ function PropertyCard({ property }) {
         </div>
 
         {/* Location */}
-        <div className="flex items-center text-[#6b7280] mb-2.5">
+        <div className="flex items-center text-[#6b7280] mb-1">
           <svg className="w-3.5 h-3.5 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -141,16 +149,18 @@ function PropertyCard({ property }) {
           <span className="text-xs truncate">{location || 'TBA'}</span>
         </div>
 
-        <div className="flex items-center justify-between mt-auto">
-          <div>
-            <span className="text-xs text-[#6b7280]">per night</span>
-            <div className="text-lg font-bold text-[#222222]">
-              {formattedPrice ? `KES ${formattedPrice}` : 'KES -'}
-            </div>
+        {/* Capacity - only rendered when at least one figure is known */}
+        {capacityLabel && (
+          <p className="mb-2.5 text-xs text-[#6b7280]">{capacityLabel}</p>
+        )}
+
+        {/* The card itself is the property link (see the overlay Link above),
+            so price is transparent detail rather than a duplicate "Book Now" CTA. */}
+        <div className="mt-auto">
+          <span className="text-xs text-[#6b7280]">per night</span>
+          <div className="text-lg font-bold text-[#222222]">
+            {formattedPrice ? `KES ${formattedPrice}` : 'KES -'}
           </div>
-          <span className="bg-[#C49A6C] text-white font-semibold px-3.5 py-1.5 rounded-full text-xs transition-colors duration-200 group-hover:bg-[#B8895C]">
-            Book Now
-          </span>
         </div>
       </div>
     </article>
