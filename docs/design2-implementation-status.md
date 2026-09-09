@@ -159,6 +159,63 @@ session 1 notes below.
    was not exhaustively re-audited against every G1 bullet this session - only the top-level
    gallery/summary grid layout was previously confirmed compliant.
 
+## Codex continuation — phases 3–5 (2026-09-09)
+
+Codex continued from Claude's `a379bef` handoff and preserved the established bronze
+`#C49A6C`, navy `#0B0B45`, and blue `#2563EB` role split. `DESIGN.md` and `design2.md`
+were not changed.
+
+### Closed guest integration gaps
+
+| Surface | Status | Evidence | Notes |
+|---|---|---|---|
+| `/booking/:id` | Implemented | commit `a463565` | Replaced the global navbar in every checkout state with a compact sticky back/logo header. Booking and payment behavior is unchanged. |
+| `/verify-identity` | Implemented | commit `a463565` | Added functional Details/Documents/Review anchors over the existing form and real verification states. |
+| `/auth/callback` | Implemented | commit `a463565`; `oauth-failure-390.png` | Added distinct checking, success and failed status cards. Successful authentication still redirects to the same role-aware destination after a short confirmation state. |
+| Cookie consent | Implemented | commit `a463565` | Aligned the overlay with the shared 14px card/dialog geometry and 44px rectangular actions while retaining Accept, Reject and Manage behavior. |
+| `/inbox/:conversationId` | Implemented | commit `20812ac` | Desktop now keeps a conversation list on the left and the active thread/composer on the right. Mobile retains its explicit back-to-inbox flow. The same real conversation API powers both panels. |
+
+### Host routes — boards 03, 09 and 10
+
+| Routes | Status | Evidence and assessment |
+|---|---|---|
+| `/host/today` | Verified in code; pre-existing implementation retained | Date-based task hierarchy, real arrivals/departures/in-house/unread counts, compact booking rows and prioritised next-step cards are implemented in `HostTodayPage.jsx`. No invented counts were added. |
+| `/host/application` | Verified in code; pre-existing implementation retained | Identity/Business/Documents/Review flow, draft persistence feedback and backend review states are already present. |
+| `/host/listings`, `/admin/properties/new`, `/admin/properties/:id/edit` | Improved | The shared editor now has real Basics/Photos/Location/Amenities/Pricing/Review anchor navigation instead of a decorative progress strip (`a463565`). Existing ownership and lifecycle checks remain server-backed. |
+| `/host/calendar`, `/host/calendar/:id` | Verified in code; pre-existing implementation retained | Multi-property selector, single-property calendar, reservation blocking and availability feedback use the existing authorised endpoints. |
+| `/host/earnings`, `/host/payouts` | Improved | Added local Overview/Payouts finance navigation and removed Payouts as a sixth primary host item (`a463565`). Processing payouts use an amber lifecycle treatment (`e48ba35`); balance and destination logic is unchanged. |
+| Host navigation | Implemented | commits `a463565`, `e48ba35` | Primary navigation is exactly Today, Calendar, Listings, Messages and Earnings. Hosting remains role-gated. |
+
+### Admin routes — boards 03 and 11–14
+
+| Routes | Status | Evidence and assessment |
+|---|---|---|
+| `/admin` | Implemented | commit `012b6d3`; `admin-overview-desktop.png` | The operational queue now aggregates pending host applications, submitted identity checks, open disputes and booking/payment exceptions from their real authorised endpoints. Counts, filters and row actions use the same normalized queue and link to the correct review screen. |
+| `/admin/properties`, `/admin/properties/new`, `/admin/properties/:id/edit`, `/admin/calendar/:id` | Implemented/verified | `admin-listings-desktop.png`; commit `a463565` | Existing search/status controls, table/card choice, detail drawer and moderation controls remain. Create/edit section links now scroll to real editor sections. |
+| `/admin/bookings`, `/admin/earnings`, `/admin/payouts`, `/admin/users` | Verified | `admin-bookings-desktop.png`, `admin-earnings-desktop.png`, `admin-payouts-desktop.png`, `admin-users-desktop.png` | Existing compact tables, filters, drawers, financial breakdowns and confirmed lifecycle actions already satisfy the board requirements. |
+| `/admin/host-applications`, `/admin/identity-verifications`, `/admin/disputes` | Verified | `admin-applications-desktop.png`, `admin-identity-desktop.png`, `admin-disputes-desktop.png` | Existing list/detail review layouts use real documents, notes, evidence and state transitions. |
+| `/admin/promos`, `/admin/addons`, `/admin/guides`, `/admin/feedback`, `/admin/messages` | Verified | matching `admin-*-desktop.png` files in the Codex evidence folder | Existing CRUD drawers/tables and support conversation layout were retained. Navigation now places these surfaces together under Content. |
+| Admin shell | Implemented | commit `e48ba35` | Sidebar groups follow Overview/Listings/Bookings/Payments/People/Content, can expand/collapse, and preserve blue only for current-route/selection feedback. Primary actions are bronze. |
+
+### Codex validation and evidence limits
+
+- `npm run lint` and `npm run build` pass after the final implementation batches.
+- `git diff --check` passes for Codex-owned changes.
+- Authenticated admin screenshots at 1440x1000 are stored outside the repository at
+  `C:/Users/Mega-Mind/Documents/ZuriLofts Design Audit/phase3-5-codex/`.
+- A responsive Playwright sweep measured zero horizontal document overflow at 1440, 768 and
+  390 pixels. Captures that redirected to Login after a hard navigation were discarded: the
+  access token is intentionally kept in module memory and the local refresh cookie did not
+  restore that automation session. They are not cited as authenticated visual evidence.
+- Host routes were assessed from their rendered component structure and real endpoint wiring;
+  the automation account password was unavailable, so this report does not claim authenticated
+  host screenshots. This is an evidence limitation, not a product fallback or fabricated pass.
+
+The former remaining-gap list above records the state at Claude's handoff. The five explicit
+presentation/integration gaps in items 1–5 are closed by the Codex commits listed here. Tablet
+and property-detail exhaustiveness remain evidence-depth limitations; no known implementation
+defect was found in those two areas.
+
 ## What Codex should do next (phases 3-5, plus flagged guest gaps)
 
 1. Guest phases 0-2 are now materially complete: every G1-G6 route in this table has either been
