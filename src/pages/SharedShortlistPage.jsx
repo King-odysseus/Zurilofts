@@ -4,9 +4,11 @@ import apiClient from "../api/client.js";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 import Spinner from "../components/Spinner.jsx";
+import { useAuth } from "../context/AuthContext.jsx";
 
 export default function SharedShortlistPage() {
   const { token } = useParams();
+  const { isAuthenticated } = useAuth();
   const [shortlist, setShortlist] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -53,8 +55,23 @@ export default function SharedShortlistPage() {
             <h1 className="text-2xl sm:text-3xl font-bold text-[#222222] mb-1">{shortlist.name}</h1>
             <p className="text-[#6b7280]">
               {shortlist.items?.length ?? 0} {shortlist.items?.length === 1 ? "property" : "properties"} saved
+              {shortlist.owner?.firstName && (
+                <> &middot; Shared by <span className="font-medium text-[#222222]">{shortlist.owner.firstName}</span></>
+              )}
             </p>
             </div>
+
+            {!isAuthenticated && (
+              <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-4 sm:px-7 shadow-sm mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <p className="text-sm text-[#222222]">Sign in to save these stays to your own favourites or shortlists.</p>
+                <Link
+                  to={`/login?returnUrl=${encodeURIComponent(`/s/${token}`)}`}
+                  className="inline-flex items-center justify-center min-h-[44px] px-5 rounded-full bg-[#C49A6C] text-white text-sm font-semibold hover:bg-[#B8895C] transition-all duration-200 flex-shrink-0"
+                >
+                  Sign in
+                </Link>
+              </div>
+            )}
 
             {(!shortlist.items || shortlist.items.length === 0) ? (
               <div className="text-center py-16">
