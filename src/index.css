@@ -53,6 +53,17 @@ body {
   color: #222222;
 }
 
+/* Reserve room for the fixed mobile bottom nav (MobileBottomNav.jsx toggles
+   this class per-route) so it never covers page content/actions. */
+.mobile-bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@media (max-width: 767px) {
+  body.has-mobile-bottom-nav {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  }
+}
+
 /* Keyboard focus must stay visible even where components set Tailwind's
    outline-none. Mouse clicks don't trigger :focus-visible, so this never
    adds a ring for pointer users. Interactive focus uses the approved brand

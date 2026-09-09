@@ -14,6 +14,7 @@ import { PLACES_TO_VISIT, PLACES_TO_EAT, AREAS, PLACE_CATEGORIES, EAT_CATEGORIES
 
 import CookieConsent from './components/CookieConsent';
 import PushNotificationPrompt from './components/PushNotificationPrompt';
+import MobileBottomNav from './components/MobileBottomNav.jsx';
 import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import Spinner from './components/Spinner.jsx';
@@ -295,6 +296,7 @@ function App() {
           /api/chat endpoints are untouched - re-enable by restoring <ChatWidget />. */}
       <CookieConsent />
       <PushNotificationPrompt />
+      <MobileBottomNav />
       <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Page><HomePage /></Page>} />
