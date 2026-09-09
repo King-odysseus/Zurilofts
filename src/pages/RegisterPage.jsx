@@ -108,31 +108,25 @@ function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 py-16 relative">
-      {/* Background Image */}
-      <div className="absolute inset-0">
-        <img src={bgImage} alt="" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#222222]/70"></div>
-      </div>
+    <div className="flex min-h-screen flex-col bg-white">
+      {/* Compact white header - no full-screen dark photo behind the form */}
+      <header className="flex h-16 flex-shrink-0 items-center border-b border-[#E5E7EB] px-4 md:px-6">
+        <Link to="/" className="inline-flex items-center gap-2" aria-label="ZuriLofts home">
+          <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" />
+        </Link>
+      </header>
 
-      {/* Back button */}
-      <Link
-        to="/"
-        className="fixed top-6 left-6 z-20 flex items-center justify-center w-11 h-11 rounded-full bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors"
-        aria-label="Back to home"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-      </Link>
+      <div className="grid flex-1 lg:grid-cols-2">
+        {/* Photo panel - desktop only, reduced/omitted on mobile per spec */}
+        <div className="relative hidden lg:block">
+          <img src={bgImage} alt="" className="h-full w-full object-cover" />
+        </div>
 
-      <div className="max-w-md w-full relative z-10">
-        <div className="auth-card p-8 bg-white/95 backdrop-blur-sm rounded-[14px]">
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <Link to="/" className="inline-block mb-6">
-              <img src={logoImg} alt="ZuriLofts" className="h-20 w-auto mx-auto" />
-            </Link>
+        {/* Light form panel */}
+        <div className="flex items-start justify-center px-4 py-12 md:px-8">
+        <div className="max-w-md w-full">
+          {/* Heading */}
+          <div className="mb-8">
             <h1 className="text-2xl font-bold text-[#222222]">
               {isHost ? 'Become a Host' : 'Create Account'}
             </h1>
@@ -312,11 +306,10 @@ function RegisterPage() {
               Sign in
             </Link>
           </p>
-        </div>
 
         {/* Selling Points - Host Registration */}
         {isHost && (
-          <div className="mt-6 auth-card rounded-[14px] p-6 bg-white/95 backdrop-blur-sm max-w-md w-full">
+          <div className="mt-6 ui-surface rounded-[14px] p-6 max-w-md w-full">
             <h3 className="text-lg font-bold text-[#222222] mb-4">Why Host with ZuriLofts</h3>
             <ul className="space-y-3 text-sm">
               <li className="flex gap-3">
@@ -378,6 +371,8 @@ function RegisterPage() {
             </div>
           </div>
         )}
+        </div>
+        </div>
       </div>
     </div>
   );
