@@ -45,6 +45,13 @@ function Navbar({ solid = false }) {
   // the host workspace - draft listings, calendar, messages - even before
   // approval. Only Payouts and publishing require full verification.
   const hasHostIntent = hasVerifiedHostAccess || user?.hostApplicationStatus != null;
+  // On the host workspace routes, always present the host navigation regardless
+  // of the persisted travelling/hosting toggle: a host arriving on /host/* (via
+  // login redirect, a bookmark, or a direct link) must see Today/Calendar/
+  // Listings/Messages/Earnings, not the guest destinations (design2 section 4).
+  // The stored mode still drives the account-menu switch action.
+  const onHostRoute = location.pathname.startsWith('/host');
+  const effectiveMode = onHostRoute && canSelectHosting ? 'hosting' : mode;
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -176,7 +183,7 @@ function Navbar({ solid = false }) {
     if (!isAuthenticated) {
       return [{ name: 'Explore', href: '/properties' }];
     }
-    if (mode === 'hosting') {
+    if (effectiveMode === 'hosting') {
       if (!hasHostIntent) {
         return [{ name: 'Host Setup', href: '/host/application' }];
       }
@@ -197,7 +204,7 @@ function Navbar({ solid = false }) {
   })();
 
   function handleSwitchMode() {
-    const next = mode === 'hosting' ? 'travelling' : 'hosting';
+    const next = effectiveMode === 'hosting' ? 'travelling' : 'hosting';
     setMode(next);
     setDropdownOpen(false);
     setMenuOpen(false);
@@ -535,7 +542,7 @@ function Navbar({ solid = false }) {
                             <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
-                            {mode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
+                            {effectiveMode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
                           </button>
                         </div>
                       )}
@@ -720,7 +727,7 @@ function Navbar({ solid = false }) {
                       onClick={handleSwitchMode}
                       className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold text-[#2563EB] hover:bg-[#2563EB]/10 transition-colors duration-200 text-center"
                     >
-                      {mode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
+                      {effectiveMode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
                     </button>
                   )}
                   <button
