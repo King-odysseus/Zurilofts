@@ -9,7 +9,7 @@ function PaymentCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const reference = searchParams.get('reference');
-  const [status, setStatus] = useState('loading'); // loading | success | failed
+  const [status, setStatus] = useState('loading'); // loading | success | pending | failed
   const [booking, setBooking] = useState(null);
   const [error, setError] = useState('');
   const { toggleFavorite, isFavorite } = useFavorites();
@@ -39,7 +39,16 @@ function PaymentCallback() {
             }
           }
         } else {
-          setStatus('failed');
+          // Paystack's own status distinguishes a payment still processing
+          // (pending/ongoing) from one that actually failed/was abandoned -
+          // a pending payment must never be shown or treated as a failure,
+          // and never invites another charge.
+          const providerStatus = data.data?.providerStatus;
+          if (providerStatus === 'pending' || providerStatus === 'ongoing') {
+            setStatus('pending');
+          } else {
+            setStatus('failed');
+          }
           setError(data.message || 'Payment verification failed. Please try again.');
         }
       } catch (err) {
@@ -156,6 +165,39 @@ function PaymentCallback() {
             </>
           )}
 
+          {/* Pending - still processing, distinct from a real failure. Never
+              offers to retry/charge again; the existing booking stays open
+              and the guest can check back (Trips reflects the real status
+              once the webhook/next verify confirms it). */}
+          {status === 'pending' && (
+            <>
+              <div className="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h1 className="text-2xl font-bold text-[#222222] mb-4">Payment Pending</h1>
+              <p className="text-[#6b7280] mb-6">
+                We haven&apos;t received final confirmation from the payment provider yet. This can take a few
+                minutes - your booking is held and you don&apos;t need to pay again.
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => navigate('/trips')}
+                  className="w-full min-h-[44px] bg-[#C49A6C] text-white py-3 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200"
+                >
+                  Check my trips
+                </button>
+                <button
+                  onClick={() => navigate('/')}
+                  className="w-full min-h-[44px] py-3 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200"
+                >
+                  Return to Home
+                </button>
+              </div>
+            </>
+          )}
+
           {/* Failed */}
           {status === 'failed' && (
             <>
@@ -164,7 +206,7 @@ function PaymentCallback() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </div>
-              <h1 className="text-2xl font-bold text-[#222222] mb-4">Payment {status === 'failed' ? 'Failed' : 'Pending'}</h1>
+              <h1 className="text-2xl font-bold text-[#222222] mb-4">Payment Failed</h1>
               <p className="text-[#6b7280] mb-6">{error}</p>
               <div className="space-y-3">
                 <button

@@ -47,7 +47,7 @@ export async function verify(req: Request, res: Response, next: NextFunction): P
     });
     res.json({
       success: result.confirmed,
-      data: { confirmed: result.confirmed, bookingId: result.bookingId },
+      data: { confirmed: result.confirmed, bookingId: result.bookingId, providerStatus: result.providerStatus },
       message: result.message,
     });
   } catch (error) {

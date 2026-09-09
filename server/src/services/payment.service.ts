@@ -95,7 +95,7 @@ interface VerifiedTransaction {
 
 export type PaymentCheckResult =
   | { ok: true }
-  | { ok: false; reason: string; message: string };
+  | { ok: false; reason: string; message: string; providerStatus?: string };
 
 /**
  * Decide whether a verified transaction may confirm a specific booking. Pure and
@@ -114,7 +114,11 @@ export function checkVerifiedPayment(params: {
   const { verification, expectedReference, expectedBookingId, expectedTotalKes } = params;
 
   if (verification.status !== 'success') {
-    return { ok: false, reason: 'not_success', message: `Transaction status is "${verification.status}", not success` };
+    // providerStatus carries Paystack's own status (e.g. "pending",
+    // "abandoned", "failed") so the client can distinguish a payment still
+    // processing from one that actually failed - never guessed, straight
+    // from the provider.
+    return { ok: false, reason: 'not_success', message: `Transaction status is "${verification.status}", not success`, providerStatus: verification.status };
   }
   if (verification.reference !== expectedReference) {
     return { ok: false, reason: 'reference_mismatch', message: 'Transaction reference does not match the booking' };
@@ -154,6 +158,7 @@ export async function verifyAndConfirmPayment(
   bookingId?: string;
   message: string;
   reason?: string;
+  providerStatus?: string;
 }> {
   // Check if this reference was already processed
   const existing = await prisma.booking.findUnique({
@@ -198,7 +203,7 @@ export async function verifyAndConfirmPayment(
     } catch (err) {
       console.error('Failed to write payment audit log:', err);
     }
-    return { confirmed: false, bookingId: existing.id, reason: check.reason, message: check.message };
+    return { confirmed: false, bookingId: existing.id, reason: check.reason, message: check.message, providerStatus: check.providerStatus };
   }
 
   // Confirm the booking
