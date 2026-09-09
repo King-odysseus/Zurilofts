@@ -107,7 +107,7 @@ function CookieConsent() {
         visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
       }`}
     >
-      <div className="bg-white rounded-2xl shadow-2xl p-5">
+      <div className="rounded-[14px] border border-[#E5E7EB] bg-white p-5 shadow-lg">
         <div className="flex items-start gap-3 mb-3">
           <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[#C49A6C]/15 flex items-center justify-center">
             <svg className="w-5 h-5 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -171,7 +171,7 @@ function CookieConsent() {
             <button
               type="button"
               onClick={handleSaveChoices}
-              className="px-5 py-2 rounded-full bg-[#C49A6C] text-[#0B0B45] text-sm font-semibold hover:brightness-105 transition-all duration-200"
+              className="min-h-[44px] rounded-lg bg-[#C49A6C] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]"
             >
               Save choices
             </button>
@@ -180,21 +180,21 @@ function CookieConsent() {
               <button
                 type="button"
                 onClick={handleAcceptAll}
-                className="px-5 py-2 rounded-full bg-[#C49A6C] text-[#0B0B45] text-sm font-semibold hover:brightness-105 transition-all duration-200"
+                className="min-h-[44px] rounded-lg bg-[#C49A6C] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]"
               >
                 Accept all
               </button>
               <button
                 type="button"
                 onClick={handleRejectAll}
-                className="px-5 py-2 rounded-full bg-[#0B0B45] text-white text-sm font-semibold hover:brightness-110 transition-all duration-200"
+                className="min-h-[44px] rounded-lg bg-[#0B0B45] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#07072e]"
               >
                 Reject all
               </button>
               <button
                 type="button"
                 onClick={() => setMode('manage')}
-                className="px-5 py-2 rounded-full bg-white shadow-sm hover:shadow-md text-[#0B0B45] text-sm font-semibold transition-all duration-200"
+                className="min-h-[44px] rounded-lg border border-[#E5E7EB] bg-white px-5 py-2 text-sm font-semibold text-[#222222] transition-colors hover:bg-[#F7F7F5]"
               >
                 Manage preferences
               </button>

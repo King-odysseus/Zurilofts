@@ -131,6 +131,18 @@ function IdentityVerificationPanel({ onApproved }) {
         We verify every guest&apos;s identity before confirming payment on a booking. Your documents are encrypted and only visible to the ZuriLofts trust &amp; safety team.
       </p>
 
+      <nav className="mb-6 grid grid-cols-3 gap-2" aria-label="Identity verification sections">
+        {[
+          ['Details', '#verification-details', '1'],
+          ['Documents', '#verification-documents', '2'],
+          ['Review', '#verification-review', '3'],
+        ].map(([label, href, number]) => (
+          <a key={label} href={href} className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-2 text-xs font-semibold text-[#222222] hover:border-[#2563EB] sm:text-sm">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#2563EB]/10 text-xs text-[#2563EB]">{number}</span>{label}
+          </a>
+        ))}
+      </nav>
+
       {data?.status === 'REJECTED' && data?.reviewNote && (
         <div className="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
           {data.reviewNote}
@@ -148,7 +160,8 @@ function IdentityVerificationPanel({ onApproved }) {
       )}
       {message && <p className="text-sm text-[#6b7280] mb-4">{message}</p>}
 
-      <form onSubmit={handleSave} className="space-y-4 mb-6">
+      <form id="verification-details" onSubmit={handleSave} className="scroll-mt-24 space-y-4 mb-6">
+        <h4 className="text-sm font-semibold text-[#222222]">Details</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="iv-fullName" className="block text-sm font-medium text-[#222222] mb-1">Full legal name</label>
@@ -210,8 +223,8 @@ function IdentityVerificationPanel({ onApproved }) {
       </form>
 
       {editable && (
-        <div className="space-y-3 mb-6">
-          <p className="text-sm font-medium text-[#222222]">Documents</p>
+        <div id="verification-documents" className="scroll-mt-24 space-y-3 mb-6">
+          <p className="text-sm font-semibold text-[#222222]">Documents</p>
           {DOCUMENT_KINDS.map(({ kind, label, required }) => (
             <div key={kind} className="flex items-center justify-between gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3">
               <div>
@@ -237,6 +250,9 @@ function IdentityVerificationPanel({ onApproved }) {
         </div>
       )}
 
+      <div id="verification-review" className="scroll-mt-24 border-t border-[#E5E7EB] pt-5">
+        <p className="mb-1 text-sm font-semibold text-[#222222]">Review</p>
+        <p className="mb-4 text-xs text-[#6b7280]">Check your details and required documents before submitting.</p>
       {editable && (
         <button
           onClick={handleSubmit}
@@ -246,6 +262,8 @@ function IdentityVerificationPanel({ onApproved }) {
           Submit for review
         </button>
       )}
+      {!editable && <p className="text-sm text-[#6b7280]">Your submitted information is shown above.</p>}
+      </div>
     </div>
   );
 }

@@ -142,6 +142,10 @@ function HostPayouts() {
 
   return (
     <div className="space-y-6">
+      <nav className="flex border-b border-[#E5E7EB]" aria-label="Host finance">
+        <Link to="/host/earnings" className="min-h-[44px] border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-[#6b7280] hover:text-[#222222]">Overview</Link>
+        <Link to="/host/payouts" aria-current="page" className="min-h-[44px] border-b-2 border-[#2563EB] px-4 py-2.5 text-sm font-semibold text-[#222222]">Payouts</Link>
+      </nav>
       <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
         <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Host finance</p>
         <h1 className="mt-1 text-2xl font-bold text-[#222222]">Payouts</h1>

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import Dropdown from '../components/Dropdown.jsx';
@@ -503,6 +503,12 @@ function AdminEarnings() {
 
   return (
     <div className="w-full">
+      {!isAdmin && (
+        <nav className="mb-6 flex border-b border-[#E5E7EB]" aria-label="Host finance">
+          <Link to="/host/earnings" aria-current="page" className="min-h-[44px] border-b-2 border-[#2563EB] px-4 py-2.5 text-sm font-semibold text-[#222222]">Overview</Link>
+          <Link to="/host/payouts" className="min-h-[44px] border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-[#6b7280] hover:text-[#222222]">Payouts</Link>
+        </nav>
+      )}
       <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 mb-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#222222] mb-1">Earnings</h1>

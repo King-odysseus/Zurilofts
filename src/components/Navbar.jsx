@@ -180,17 +180,13 @@ function Navbar({ solid = false }) {
       if (!hasHostIntent) {
         return [{ name: 'Host Setup', href: '/host/application' }];
       }
-      const items = [
+      return [
         { name: 'Today', href: '/host/today' },
         { name: 'Calendar', href: '/host/calendar' },
         { name: 'Listings', href: '/host/listings' },
         { name: 'Messages', href: '/inbox' },
         { name: 'Earnings', href: '/host/earnings' },
       ];
-      if (hasVerifiedHostAccess) {
-        items.push({ name: 'Payouts', href: '/host/payouts' });
-      }
-      return items;
     }
     return [
       { name: 'Explore', href: '/properties' },

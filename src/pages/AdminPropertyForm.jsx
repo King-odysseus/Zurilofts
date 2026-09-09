@@ -233,14 +233,17 @@ function AdminPropertyForm() {
         <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">{error}</div>
       )}
 
-      <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Listing setup progress">
-        {['Basics', 'Details', 'Photos', 'Publish'].map((label, index) => (
-          <div key={label} className="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-3 shadow-sm">
-            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${index === 0 ? 'bg-[#2563EB] text-white' : 'bg-[#F7F7F5] text-[#6b7280]'}`}>{index + 1}</span>
+      <nav className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6" aria-label="Listing editor sections">
+        {[
+          ['Basics', '#listing-basics'], ['Photos', '#listing-photos'], ['Location', '#listing-location'],
+          ['Amenities', '#listing-amenities'], ['Pricing', '#listing-pricing'], ['Review', '#listing-review'],
+        ].map(([label, href], index) => (
+          <a key={label} href={href} className="flex min-h-[44px] items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 shadow-sm hover:border-[#2563EB]">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#2563EB]/10 text-xs font-bold text-[#2563EB]">{index + 1}</span>
             <span className="text-xs font-semibold text-[#222222] sm:text-sm">{label}</span>
-          </div>
+          </a>
         ))}
-      </div>
+      </nav>
       <div className="mb-6 rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div><p className="text-sm font-bold text-[#222222]">Publish readiness</p><p className="mt-1 text-xs text-[#6b7280]">Complete the essentials below before sending your listing for review.</p></div>
@@ -257,7 +260,7 @@ function AdminPropertyForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
+        <div id="listing-basics" className="scroll-mt-24 bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
           <div>
             <label className={labelCls}>Title</label>
             <input className={inputCls} value={form.title} onChange={(e) => update('title', e.target.value)} required />
@@ -266,7 +269,7 @@ function AdminPropertyForm() {
             <label className={labelCls}>Location</label>
             <input className={inputCls} value={form.location} onChange={(e) => update('location', e.target.value)} required />
           </div>
-          <div className="bg-canvas rounded-[14px] p-4 sm:p-5">
+          <div id="listing-location" className="scroll-mt-24 bg-canvas rounded-[14px] p-4 sm:p-5">
             <p className="text-sm font-semibold text-[#222222]">Confirm exact location on a map</p>
             <p className="text-xs text-[#6b7280] mb-3">
               Drop a pin at the property&apos;s entrance. Guests see this pin and can open it in Google Maps for directions.
@@ -301,7 +304,7 @@ function AdminPropertyForm() {
           </div>
 
           {/* Bed variant pricing */}
-          <div className="bg-canvas rounded-xl p-4 space-y-4">
+          <div id="listing-pricing" className="scroll-mt-24 bg-canvas rounded-xl p-4 space-y-4">
             <p className="text-sm font-semibold text-[#222222]">Bed Variant Pricing &amp; Bathrooms</p>
             <p className="text-xs text-[#6b7280] -mt-3">Each variant can have its own price and bathroom count. Leave unchecked to not list.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -411,7 +414,7 @@ function AdminPropertyForm() {
           </div>
         </div>
 
-        <div className="bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
+        <div id="listing-photos" className="scroll-mt-24 bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
           <div>
             <label className={labelCls}>Photos</label>
             <p className="text-sm text-[#6b7280] mb-3">Upload images from your device. They&apos;re automatically resized and compressed for the website. The first photo is used as the cover.</p>
@@ -458,7 +461,7 @@ function AdminPropertyForm() {
             </label>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div id="listing-amenities" className="scroll-mt-24 grid grid-cols-1 md:grid-cols-2 gap-4">
             <p className="md:col-span-2 text-sm text-[#6b7280] -mb-1">Enter one item per line.</p>
             <div>
               <label className={labelCls}>Amenities</label>
@@ -478,7 +481,7 @@ function AdminPropertyForm() {
           </div>
         )}
 
-        <div className="sticky bottom-4 z-20 rounded-[14px] border border-[#E5E7EB] bg-white/95 backdrop-blur px-4 py-3 shadow-lg flex items-center gap-3">
+        <div id="listing-review" className="scroll-mt-24 sticky bottom-4 z-20 rounded-[14px] border border-[#E5E7EB] bg-white/95 backdrop-blur px-4 py-3 shadow-lg flex items-center gap-3">
           <button
             type="submit"
             disabled={saving}

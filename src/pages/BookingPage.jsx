@@ -1,11 +1,25 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import Navbar from '../components/Navbar';
+import logoImg from '../assets/zurilofts-logo.png';
 import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
 
 import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
+
+function CheckoutHeader() {
+  return (
+    <header className="sticky top-0 z-30 border-b border-[#E5E7EB] bg-white">
+      <div className="mx-auto flex min-h-[64px] max-w-7xl items-center justify-between px-4 sm:px-6">
+        <button type="button" onClick={() => window.history.back()} className="inline-flex min-h-[44px] items-center gap-2 rounded-lg px-3 text-sm font-semibold text-[#222222] hover:bg-[#F7F7F5]" aria-label="Go back">
+          <span aria-hidden="true">←</span><span className="hidden sm:inline">Back</span>
+        </button>
+        <Link to="/" aria-label="ZuriLofts home"><img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" /></Link>
+        <span className="w-11 sm:w-[70px]" aria-hidden="true" />
+      </div>
+    </header>
+  );
+}
 
 function BookingPage() {
   const { id } = useParams();
@@ -1136,7 +1150,7 @@ function BookingPage() {
   if (bookingComplete) {
     return (
       <div className="min-h-screen bg-canvas">
-        <Navbar />
+        <CheckoutHeader />
         <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
           <div className="max-w-md mx-auto px-6 text-center">
             <div className="w-24 h-24 bg-[#2563EB]/20 rounded-full flex items-center justify-center mx-auto mb-6">
@@ -1207,7 +1221,7 @@ function BookingPage() {
   if (loadingProperty) {
     return (
       <div className="min-h-screen bg-canvas">
-        <Navbar />
+        <CheckoutHeader />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -1223,7 +1237,7 @@ function BookingPage() {
   if (!property) {
     return (
       <div className="min-h-screen bg-canvas">
-        <Navbar />
+        <CheckoutHeader />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]" role="alert">
           <div className="text-center px-4 max-w-md">
             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1266,10 +1280,10 @@ function BookingPage() {
 
   return (
     <div className="min-h-screen bg-canvas">
-      <Navbar />
+      <CheckoutHeader />
 
       {/* Persistent concise summary - stays visible while the checkout steps scroll */}
-      <div className="sticky top-16 md:top-20 z-10 bg-white/95 backdrop-blur border-b border-[#E5E7EB] shadow-sm">
+      <div className="sticky top-16 z-10 bg-white/95 backdrop-blur border-b border-[#E5E7EB] shadow-sm">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-2.5 flex items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-3 min-w-0">
             <span className="font-semibold text-[#222222] truncate">{property?.title}</span>
