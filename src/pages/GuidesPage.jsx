@@ -57,8 +57,52 @@ function GuidesPage() {
             <p className="text-[#6b7280]">Our travel guides are being written. Check back soon!</p>
           </div>
         ) : (
+          <>
+            {/* Featured article - the most recent guide gets a larger
+                treatment above the regular grid, per design2.md G3. */}
+            {posts[0] && (
+              <Link
+                to={`/guides/${posts[0].slug}`}
+                className="group mb-10 grid grid-cols-1 overflow-hidden rounded-[14px] neu-card neu-card-hover no-underline transition-all duration-300 md:grid-cols-2"
+              >
+                <div className="aspect-[16/9] overflow-hidden md:aspect-auto">
+                  {posts[0].coverImage ? (
+                    <img
+                      src={posts[0].coverImage}
+                      alt={posts[0].title}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center bg-[#222222]/5">
+                      <svg className="h-12 w-12 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col justify-center p-6 md:p-8">
+                  <span className="mb-2 inline-flex w-fit items-center rounded-full bg-[#2563EB]/10 px-2.5 py-1 text-xs font-semibold text-[#2563EB]">Featured</span>
+                  <p className="mb-2 text-xs text-[#6b7280]">
+                    {new Date(posts[0].createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                  </p>
+                  <h2 className="mb-2 text-2xl font-bold text-[#222222] group-hover:text-[#2563EB] transition-colors">
+                    {posts[0].title}
+                  </h2>
+                  {posts[0].excerpt && (
+                    <p className="text-sm text-[#6b7280] line-clamp-3">{posts[0].excerpt}</p>
+                  )}
+                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#2563EB]">
+                    Read More
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </span>
+                </div>
+              </Link>
+            )}
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post) => (
+            {posts.slice(1).map((post) => (
               <Link
                 key={post.id}
                 to={`/guides/${post.slug}`}
@@ -100,6 +144,7 @@ function GuidesPage() {
               </Link>
             ))}
           </div>
+          </>
         )}
       </div>
       <Footer />
