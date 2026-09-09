@@ -36,6 +36,26 @@ export function parseAvailabilityDateRange(
   return { checkIn: checkInDate, checkOut: checkOutDate };
 }
 
+/**
+ * First image URL for a property row, regardless of whether the DB stores
+ * images as a native Postgres array (`images`) or a SQLite JSON string
+ * (`imagesJson`) - same duck-typing normalizeProperty uses. Returns null
+ * when there's no image rather than fabricating one; callers (e.g. a
+ * shortlist collage) must handle that themselves.
+ */
+export function firstPropertyImage(property: any): string | null {
+  if (Array.isArray(property?.images)) return property.images[0] ?? null;
+  if (typeof property?.imagesJson === 'string') {
+    try {
+      const parsed = JSON.parse(property.imagesJson);
+      return Array.isArray(parsed) ? (parsed[0] ?? null) : null;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 export function isBookable(status: string): boolean {
   return status === 'PUBLISHED';
 }

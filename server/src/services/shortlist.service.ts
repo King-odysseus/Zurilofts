@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError } from '../types/index.js';
+import { firstPropertyImage } from './property.service.js';
 
 interface CreateShortlistInput {
   userId: string;
@@ -26,14 +27,34 @@ export async function createShortlist(input: CreateShortlistInput) {
   return shortlist;
 }
 
+// A small preview set per shortlist for the collage on the list page - real
+// saved-property images, not a placeholder pretending to be one. Capped at 4
+// (a 2x2 collage) so this stays cheap even for a large shortlist.
+const COLLAGE_PREVIEW_COUNT = 4;
+
 export async function listUserShortlists(userId: string) {
-  return prisma.shortlist.findMany({
+  const shortlists = await prisma.shortlist.findMany({
     where: { ownerId: userId },
     include: {
       _count: { select: { items: true } },
+      items: {
+        take: COLLAGE_PREVIEW_COUNT,
+        orderBy: { addedAt: 'desc' },
+        select: { property: true },
+      },
     },
     orderBy: { updatedAt: 'desc' },
   });
+
+  // Flatten each shortlist's preview items into plain image URLs and drop
+  // the raw property rows - the list page only needs a collage, not full
+  // property records (that's what getShortlist/the detail route is for).
+  return shortlists.map(({ items, ...rest }) => ({
+    ...rest,
+    previewImages: items
+      .map((item) => firstPropertyImage(item.property))
+      .filter((url): url is string => Boolean(url)),
+  }));
 }
 
 export async function getShortlist(shortlistId: string, userId: string) {
@@ -156,6 +177,9 @@ export async function getSharedShortlist(token: string) {
   const shortlist = await prisma.shortlist.findUnique({
     where: { token },
     include: {
+      // First name only - a public share link must not leak the owner's
+      // email, phone or any other private profile field.
+      owner: { select: { firstName: true } },
       items: {
         include: {
           property: {

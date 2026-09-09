@@ -116,9 +116,35 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
   };
 
   const itemLabel = shortlist._count?.items === 1 ? "property" : "properties";
+  const previews = shortlist.previewImages || [];
 
   return (
-    <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all duration-200 p-5">
+    <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+      {/* Image collage - a deliberate placeholder for an empty/imageless
+          shortlist, not a broken grid of missing images. */}
+      <Link to={`/shortlists/${shortlist.id}`} className="block aspect-[16/7] overflow-hidden bg-[#F7F7F5]">
+        {previews.length === 0 ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <svg className="h-8 w-8 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        ) : previews.length === 1 ? (
+          <img src={previews[0]} alt="" className="h-full w-full object-cover" />
+        ) : (
+          <div className="grid h-full grid-cols-2 gap-0.5">
+            <img src={previews[0]} alt="" className="h-full w-full object-cover" />
+            <div className="grid h-full grid-rows-2 gap-0.5">
+              {previews.slice(1, 3).map((src, i) => (
+                <img key={i} src={src} alt="" className="h-full w-full object-cover" />
+              ))}
+              {previews.length < 3 && <div className="bg-[#F7F7F5]" />}
+            </div>
+          </div>
+        )}
+      </Link>
+
+      <div className="p-5">
       <div className="flex items-start justify-between gap-3 mb-2">
         {renaming ? (
           <form onSubmit={handleRenameSubmit} className="flex-1 flex gap-2">
@@ -177,6 +203,7 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
           Delete
         </button>
       </div>
+      </div>
     </div>
   );
 }
@@ -190,6 +217,7 @@ ShortlistCard.propTypes = {
     _count: PropTypes.shape({
       items: PropTypes.number,
     }),
+    previewImages: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
   onDelete: PropTypes.func.isRequired,
   onRename: PropTypes.func.isRequired,
