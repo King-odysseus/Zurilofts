@@ -4,7 +4,11 @@
 
 @layer components {
   .ui-btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1D4ED8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-xl bg-[#C49A6C] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#B8895C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .ui-btn-strong {
+    @apply inline-flex items-center justify-center rounded-xl bg-[#0B0B45] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#07072e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .ui-btn-secondary {
