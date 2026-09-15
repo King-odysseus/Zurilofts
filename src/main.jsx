@@ -5,6 +5,7 @@ import { AuthProvider } from './context/AuthContext.jsx'
 import { ModeProvider } from './context/ModeContext.jsx'
 import { FavoritesProvider } from './context/FavoritesContext.jsx'
 import { ToastProvider } from './context/ToastContext.jsx'
+import { LanguageProvider } from './context/LanguageContext.jsx'
 import './index.css'
 
 // PWA update handling - when a new service worker activates, reload so the
@@ -17,14 +18,16 @@ if ('serviceWorker' in navigator) {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ToastProvider>
-      <AuthProvider>
-        <ModeProvider>
-          <FavoritesProvider>
-            <App />
-          </FavoritesProvider>
-        </ModeProvider>
-      </AuthProvider>
-    </ToastProvider>
+    <LanguageProvider>
+      <ToastProvider>
+        <AuthProvider>
+          <ModeProvider>
+            <FavoritesProvider>
+              <App />
+            </FavoritesProvider>
+          </ModeProvider>
+        </AuthProvider>
+      </ToastProvider>
+    </LanguageProvider>
   </React.StrictMode>,
 )

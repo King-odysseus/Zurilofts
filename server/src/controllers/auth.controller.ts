@@ -5,14 +5,22 @@ import { clientUrlForRequest } from '../utils/publicUrl.js';
 
 const REFRESH_COOKIE = 'zuri_refresh_token';
 
-function setRefreshCookie(res: Response, token: string): void {
-  res.cookie(REFRESH_COOKIE, token, {
+// persistent (== "remember me" checked) survives 7 days like today. Unchecked,
+// the cookie carries no maxAge at all, so the browser treats it as a session
+// cookie and drops it on close - the server-side session is also shorter-lived
+// (see auth.service) as a backstop for browsers that never really close.
+export function refreshCookieOptions(persistent: boolean) {
+  return {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'lax' as const,
     path: '/api/auth',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-  });
+    ...(persistent ? { maxAge: 7 * 24 * 60 * 60 * 1000 } : {}),
+  };
+}
+
+function setRefreshCookie(res: Response, token: string, persistent: boolean): void {
+  res.cookie(REFRESH_COOKIE, token, refreshCookieOptions(persistent));
 }
 
 function clearRefreshCookie(res: Response): void {
@@ -35,7 +43,7 @@ export async function register(req: Request, res: Response, next: NextFunction):
   try {
     const { email, password, firstName, lastName, role } = req.body;
     const { user, tokens } = await authService.registerUser(email, password, firstName, lastName, role, sessionMetaFor(req));
-    setRefreshCookie(res, tokens.refreshToken);
+    setRefreshCookie(res, tokens.refreshToken, tokens.persistent);
 
     res.status(201).json({
       success: true,
@@ -51,9 +59,11 @@ export async function register(req: Request, res: Response, next: NextFunction):
  */
 export async function login(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { email, password } = req.body;
-    const { user, tokens } = await authService.loginUser(email, password, sessionMetaFor(req));
-    setRefreshCookie(res, tokens.refreshToken);
+    const { email, password, remember } = req.body;
+    // Default to remembered (today's behavior) when the field is omitted, e.g. older clients.
+    const rememberMe = remember !== false;
+    const { user, tokens } = await authService.loginUser(email, password, sessionMetaFor(req), rememberMe);
+    setRefreshCookie(res, tokens.refreshToken, tokens.persistent);
 
     res.json({
       success: true,
@@ -71,7 +81,7 @@ export async function refresh(req: Request, res: Response, next: NextFunction): 
   try {
     const token = req.cookies?.[REFRESH_COOKIE] || req.body?.refreshToken;
     const { user, tokens } = await authService.refreshTokens(token, sessionMetaFor(req));
-    setRefreshCookie(res, tokens.refreshToken);
+    setRefreshCookie(res, tokens.refreshToken, tokens.persistent);
 
     res.json({
       success: true,
@@ -126,7 +136,7 @@ export async function googleCallback(req: Request, res: Response, next: NextFunc
       sessionMetaFor(req)
     );
 
-    setRefreshCookie(res, tokens.refreshToken);
+    setRefreshCookie(res, tokens.refreshToken, tokens.persistent);
     const redirectUrl = new URL('/auth/callback', clientUrl);
     redirectUrl.searchParams.set('token', tokens.accessToken);
     res.redirect(redirectUrl.toString());

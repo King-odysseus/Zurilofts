@@ -2,9 +2,12 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
+import Dropdown from './Dropdown.jsx';
+import { languageOptions } from '../i18n/translations.js';
 
 const exploreLinks = [
   { name: 'Properties', href: '/properties' },
@@ -37,6 +40,7 @@ function Navbar({ solid = false }) {
 
   const { user, isAuthenticated, logout } = useAuth();
   const { mode, setMode, canSelectHosting } = useMode();
+  const { lang, setLang, t } = useLanguage();
   // Only an approved HOST account has verified host access. ADMINS are excluded
   // here (they administer the platform through /admin), so they get no Payouts
   // or other verified-host affordances.
@@ -179,27 +183,29 @@ function Navbar({ solid = false }) {
   // a nav link. Host navigation keeps Today/Calendar/Listings/Messages/Earnings,
   // with Payouts surfaced inside Earnings only for verified hosts. Logged-out
   // visitors see just Explore (the Sign In / Sign Up CTA sits on the right).
+  // Each item keeps a stable `name` (used for badge/logic checks below) plus a
+  // `key` into translations.js so the visible label follows the language switch.
   const navItems = (() => {
     if (!isAuthenticated) {
-      return [{ name: 'Explore', href: '/properties' }];
+      return [{ name: 'Explore', key: 'explore', href: '/properties' }];
     }
     if (effectiveMode === 'hosting') {
       if (!hasHostIntent) {
-        return [{ name: 'Host Setup', href: '/host/application' }];
+        return [{ name: 'Host Setup', key: 'hostSetup', href: '/host/application' }];
       }
       return [
-        { name: 'Today', href: '/host/today' },
-        { name: 'Calendar', href: '/host/calendar' },
-        { name: 'Listings', href: '/host/listings' },
-        { name: 'Messages', href: '/inbox' },
-        { name: 'Earnings', href: '/host/earnings' },
+        { name: 'Today', key: 'today', href: '/host/today' },
+        { name: 'Calendar', key: 'calendar', href: '/host/calendar' },
+        { name: 'Listings', key: 'listings', href: '/host/listings' },
+        { name: 'Messages', key: 'messages', href: '/inbox' },
+        { name: 'Earnings', key: 'earnings', href: '/host/earnings' },
       ];
     }
     return [
-      { name: 'Explore', href: '/properties' },
-      { name: 'Saved', href: '/favourites' },
-      { name: 'Trips', href: '/trips' },
-      { name: 'Messages', href: '/inbox' },
+      { name: 'Explore', key: 'explore', href: '/properties' },
+      { name: 'Saved', key: 'saved', href: '/favourites' },
+      { name: 'Trips', key: 'trips', href: '/trips' },
+      { name: 'Messages', key: 'messages', href: '/inbox' },
     ];
   })();
 
@@ -269,7 +275,7 @@ function Navbar({ solid = false }) {
                         onClick={() => setOpenSubmenu(null)}
                         className={navItemClass(isActive)}
                       >
-                        {item.name}
+                        {item.key ? t(`nav.${item.key}`) : item.name}
                         {item.name === 'Messages' && conversationUnread > 0 && (
                           <span className={badgeClass}>
                             {conversationUnread > 9 ? '9+' : conversationUnread}
@@ -448,7 +454,7 @@ function Navbar({ solid = false }) {
                         <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                         </svg>
-                        My Profile
+                        {t('nav.myProfile')}
                       </Link>
                       <Link
                         to="/messages"
@@ -458,7 +464,7 @@ function Navbar({ solid = false }) {
                         <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                         </svg>
-                        <span className="flex-1">Contact Support</span>
+                        <span className="flex-1">{t('nav.contactSupport')}</span>
                         {unreadMessages > 0 && (
                           <span className="min-w-[18px] h-[18px] px-1 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                             {unreadMessages > 9 ? '9+' : unreadMessages}
@@ -473,7 +479,7 @@ function Navbar({ solid = false }) {
                         <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                         </svg>
-                        <span className="flex-1">Messages</span>
+                        <span className="flex-1">{t('nav.messages')}</span>
                         {conversationUnread > 0 && (
                           <span className="min-w-[18px] h-[18px] px-1 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                             {conversationUnread > 9 ? '9+' : conversationUnread}
@@ -488,7 +494,7 @@ function Navbar({ solid = false }) {
                         <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
-                        Booking History
+                        {t('nav.bookingHistory')}
                       </Link>
                       <Link
                         to="/favourites"
@@ -498,7 +504,7 @@ function Navbar({ solid = false }) {
                         <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
-                        Favourites
+                        {t('nav.favourites')}
                       </Link>
                       <Link
                         to="/terms"
@@ -508,7 +514,7 @@ function Navbar({ solid = false }) {
                         <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
-                        Terms of Service
+                        {t('nav.termsOfService')}
                       </Link>
                       <Link
                         to="/privacy"
@@ -518,7 +524,7 @@ function Navbar({ solid = false }) {
                         <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                         </svg>
-                        Privacy Policy
+                        {t('nav.privacyPolicy')}
                       </Link>
                       {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                         <Link
@@ -530,7 +536,7 @@ function Navbar({ solid = false }) {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           </svg>
-                          {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
+                          {user?.role === 'ADMIN' ? t('nav.adminPanel') : t('nav.hostDashboard')}
                         </Link>
                       )}
                       {canSelectHosting && (
@@ -542,7 +548,7 @@ function Navbar({ solid = false }) {
                             <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                             </svg>
-                            {effectiveMode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
+                            {effectiveMode === 'hosting' ? t('nav.switchToTravelling') : t('nav.switchToHosting')}
                           </button>
                         </div>
                       )}
@@ -554,7 +560,7 @@ function Navbar({ solid = false }) {
                           <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                           </svg>
-                          Sign Out
+                          {t('nav.signOut')}
                         </button>
                       </div>
                     </div>
@@ -571,9 +577,21 @@ function Navbar({ solid = false }) {
                     : 'bg-white text-[#222222] hover:bg-[#F7F7F5]'
                 }`}
               >
-                Sign In / Sign Up
+                {t('nav.signInSignUp')}
               </Link>
             )}
+
+            {/* Language switcher */}
+            <Dropdown
+              value={lang}
+              onChange={setLang}
+              options={languageOptions}
+              ariaLabel={t('nav.language')}
+              triggerClassName={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+                needsWhiteNav ? 'text-[#222222] hover:bg-[#2563EB]/10' : 'text-white hover:bg-white/10'
+              }`}
+              menuClassName="right-0"
+            />
 
             {/* Hamburger */}
             <button
@@ -654,7 +672,7 @@ function Navbar({ solid = false }) {
                         : 'text-[#222222] hover:bg-[#2563EB]/10 hover:text-[#2563EB]'
                     }`}
                   >
-                    <span>{item.name}</span>
+                    <span>{item.key ? t(`nav.${item.key}`) : item.name}</span>
                     {item.name === 'Messages' && conversationUnread > 0 && (
                       <span className={badgeClass}>
                         {conversationUnread > 9 ? '9+' : conversationUnread}
@@ -666,7 +684,7 @@ function Navbar({ solid = false }) {
             })}
 
             <li className="mt-3 border-t border-[#E5E7EB] pt-3">
-              <p className="px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6b7280]">More to explore</p>
+              <p className="px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6b7280]">{t('nav.moreToExplore')}</p>
               <div className="space-y-1">
                 {exploreLinks.filter((link) => link.href !== '/properties').map((link) => (
                   <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-lg px-3 py-2.5 text-sm font-medium text-[#222222] hover:bg-[#2563EB]/10 hover:text-[#2563EB]">
@@ -690,28 +708,28 @@ function Navbar({ solid = false }) {
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    My Profile
+                    {t('nav.myProfile')}
                   </Link>
                   <Link
                     to="/bookings"
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Booking History
+                    {t('nav.bookingHistory')}
                   </Link>
                   <Link
                     to="/terms"
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Terms of Service
+                    {t('nav.termsOfService')}
                   </Link>
                   <Link
                     to="/privacy"
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Privacy Policy
+                    {t('nav.privacyPolicy')}
                   </Link>
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
@@ -719,7 +737,7 @@ function Navbar({ solid = false }) {
                       className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
                       onClick={() => setMenuOpen(false)}
                     >
-                      {user?.role === 'ADMIN' ? 'Admin Panel' : 'Host Dashboard'}
+                      {user?.role === 'ADMIN' ? t('nav.adminPanel') : t('nav.hostDashboard')}
                     </Link>
                   )}
                   {canSelectHosting && (
@@ -727,14 +745,14 @@ function Navbar({ solid = false }) {
                       onClick={handleSwitchMode}
                       className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold text-[#2563EB] hover:bg-[#2563EB]/10 transition-colors duration-200 text-center"
                     >
-                      {effectiveMode === 'hosting' ? 'Switch to Travelling' : 'Switch to Hosting'}
+                      {effectiveMode === 'hosting' ? t('nav.switchToTravelling') : t('nav.switchToHosting')}
                     </button>
                   )}
                   <button
                     onClick={handleLogout}
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold text-red-600 hover:bg-red-50 transition-colors duration-200 text-center border border-red-200"
                   >
-                    Sign Out
+                    {t('nav.signOut')}
                   </button>
                 </>
               ) : (
@@ -744,21 +762,21 @@ function Navbar({ solid = false }) {
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Sign In / Sign Up
+                    {t('nav.signInSignUp')}
                   </Link>
                   <Link
                     to="/terms"
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Terms of Service
+                    {t('nav.termsOfService')}
                   </Link>
                   <Link
                     to="/privacy"
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    Privacy Policy
+                    {t('nav.privacyPolicy')}
                   </Link>
                 </>
               )}

@@ -12,11 +12,23 @@ const SALT_ROUNDS = 12;
 // (two tabs sharing one cookie, < GRACE) from real token theft (a rotated token
 // presented again much later).
 const REFRESH_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+// "Remember me" unchecked: the cookie itself is a browser-session cookie (no
+// maxAge, gone when the browser closes), but a browser that never closes -
+// or a tab restore - can outlive that intent, so the *server* record still
+// expires this session on its own after one day as a hard backstop.
+const REFRESH_LIFETIME_MS_TRANSIENT = 24 * 60 * 60 * 1000;
 const ROTATE_GRACE_MS = 60 * 1000;
+
+/** Exported for tests: how long a refresh session lives given its "remember me" choice. */
+export function refreshLifetimeMs(persistent: boolean): number {
+  return persistent ? REFRESH_LIFETIME_MS : REFRESH_LIFETIME_MS_TRANSIENT;
+}
 
 export interface AuthTokens {
   accessToken: string;
   refreshToken: string;
+  /** Echoes the session's "remember me" choice so the controller can set a matching cookie. */
+  persistent: boolean;
 }
 
 export interface UserResponse {
@@ -76,13 +88,14 @@ function hashToken(token: string): string {
 }
 
 /** Create a refresh session row and return its opaque token. */
-async function createRefreshSession(userId: string, meta?: SessionMeta): Promise<string> {
+async function createRefreshSession(userId: string, meta?: SessionMeta, persistent = true): Promise<string> {
   const token = crypto.randomBytes(48).toString('base64url');
   await prisma.refreshSession.create({
     data: {
       userId,
       tokenHash: hashToken(token),
-      expiresAt: new Date(Date.now() + REFRESH_LIFETIME_MS),
+      expiresAt: new Date(Date.now() + refreshLifetimeMs(persistent)),
+      persistent,
       ip: meta?.ip ?? null,
       userAgent: meta?.userAgent ?? null,
     },
@@ -90,9 +103,13 @@ async function createRefreshSession(userId: string, meta?: SessionMeta): Promise
   return token;
 }
 
-/** Rotate a session to a fresh opaque token; the presented hash becomes previousHash. */
+/**
+ * Rotate a session to a fresh opaque token; the presented hash becomes
+ * previousHash. Rotation preserves the session's original "remember me"
+ * choice - a refresh never upgrades a transient session into a persistent one.
+ */
 async function rotateRefreshSession(
-  session: { id: string; tokenHash: string; userId: string },
+  session: { id: string; tokenHash: string; userId: string; persistent: boolean },
   meta?: SessionMeta
 ): Promise<string> {
   const token = crypto.randomBytes(48).toString('base64url');
@@ -101,7 +118,7 @@ async function rotateRefreshSession(
     data: {
       tokenHash: hashToken(token),
       previousHash: session.tokenHash,
-      expiresAt: new Date(Date.now() + REFRESH_LIFETIME_MS),
+      expiresAt: new Date(Date.now() + refreshLifetimeMs(session.persistent)),
       ip: meta?.ip ?? undefined,
       userAgent: meta?.userAgent ?? undefined,
     },
@@ -116,11 +133,12 @@ async function revokeAllSessions(userId: string): Promise<void> {
 /** Issue an access token + a fresh stored refresh session for a user. */
 async function generateTokens(
   user: { id: string; email: string; role: string },
-  meta?: SessionMeta
+  meta?: SessionMeta,
+  persistent = true
 ): Promise<AuthTokens> {
   const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN' });
-  const refreshToken = await createRefreshSession(user.id, meta);
-  return { accessToken, refreshToken };
+  const refreshToken = await createRefreshSession(user.id, meta, persistent);
+  return { accessToken, refreshToken, persistent };
 }
 
 /**
@@ -184,7 +202,8 @@ export async function registerUser(
 export async function loginUser(
   email: string,
   password: string,
-  meta?: SessionMeta
+  meta?: SessionMeta,
+  remember = true
 ): Promise<{ user: UserResponse; tokens: AuthTokens }> {
   const user = await prisma.user.findUnique({ where: { email: email.trim().toLowerCase() } });
   if (!user || !user.passwordHash) {
@@ -200,7 +219,7 @@ export async function loginUser(
     throw new UnauthorizedError('This account has been suspended. Please contact support.');
   }
 
-  const tokens = await generateTokens(user, meta);
+  const tokens = await generateTokens(user, meta, remember);
   return { user: toUserResponse(user, await loadUserStatusExtras(user.id)), tokens };
 }
 
@@ -240,6 +259,7 @@ export async function refreshTokens(
           tokens: {
             accessToken: signAccessToken({ sub: reused.user.id, email: reused.user.email, role: reused.user.role as 'USER' | 'HOST' | 'ADMIN' }),
             refreshToken: token,
+            persistent: reused.persistent,
           },
         };
       }
@@ -267,6 +287,7 @@ export async function refreshTokens(
     tokens: {
       accessToken: signAccessToken({ sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN' }),
       refreshToken: token,
+      persistent: session.persistent,
     },
   };
 }

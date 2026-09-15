@@ -85,10 +85,10 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener('auth:logout', handleForceLogout);
   }, []);
 
-  const login = useCallback(async (email, password) => {
+  const login = useCallback(async (email, password, remember = true) => {
     dispatch({ type: 'AUTH_START' });
     try {
-      const res = await apiClient.post('/auth/login', { email, password });
+      const res = await apiClient.post('/auth/login', { email, password, remember });
       const { user, accessToken } = res.data.data;
       setAccessToken(accessToken);
       dispatch({ type: 'AUTH_SUCCESS', payload: { user, accessToken } });

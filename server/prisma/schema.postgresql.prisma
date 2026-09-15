@@ -76,6 +76,7 @@ model RefreshSession {
   tokenHash    String    @unique // sha256 of the opaque refresh token
   previousHash String?   // hash of the token this session rotated FROM, for reuse detection
   expiresAt    DateTime
+  persistent   Boolean   @default(true) // false = "remember me" was unchecked; short-lived + session cookie
   ip           String?
   userAgent    String?
   createdAt    DateTime  @default(now())

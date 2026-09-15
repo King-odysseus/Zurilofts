@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
+import Dropdown from '../components/Dropdown.jsx';
 import logoImg from '../assets/zurilofts-logo.png';
 import { zuriImages } from '../assets/images';
 import { googleOAuthUrl } from '../utils/authUrls.js';
+import { languageOptions } from '../i18n/translations.js';
 
 // Use a consistent background image with a dark overlay
 const bgImage = zuriImages[14]; // Ely Homes Photography (15 of 20)
@@ -19,10 +22,12 @@ function getDashboardPath(user) {
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const { user, login, isAuthenticated, isLoading, error, clearError } = useAuth();
+  const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const googleHref = googleOAuthUrl();
@@ -49,7 +54,7 @@ function LoginPage() {
     e.preventDefault();
     setSubmitting(true);
     setLocalError('');
-    const result = await login(email, password);
+    const result = await login(email, password, rememberMe);
     if (!result.success) {
       setLocalError(result.message);
     }
@@ -57,25 +62,71 @@ function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Compact white header - no full-screen dark photo behind the form */}
-      <header className="flex h-16 flex-shrink-0 items-center border-b border-[#E5E7EB] px-4 md:px-6">
-        <Link to="/" className="inline-flex items-center gap-2" aria-label="ZuriLofts home">
-          <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" />
-        </Link>
-      </header>
+    <div className="flex min-h-screen flex-col lg:flex-row bg-white">
+      {/* Story panel - photo + pitch, desktop only */}
+      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-[#0B0B45] px-10 py-10 lg:flex lg:w-[42%] lg:px-14 lg:py-12">
+        <img src={bgImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-[#0B0B45]/80" />
 
-      <div className="grid flex-1 lg:grid-cols-2">
-        {/* Photo panel - desktop only, reduced/omitted on mobile per spec */}
-        <div className="relative hidden lg:block">
-          <img src={bgImage} alt="" className="h-full w-full object-cover" />
+        <div className="relative z-10">
+          <Link to="/" className="inline-flex items-center gap-2.5" aria-label="ZuriLofts home">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-1.5">
+              <img src={logoImg} alt="" className="h-full w-full object-contain" />
+            </span>
+            <span className="text-lg font-bold text-white">ZuriLofts</span>
+          </Link>
         </div>
 
-        {/* Light form panel */}
-        <div className="flex flex-1 items-center justify-center px-4 py-12 md:px-8">
+        <div className="relative z-10 mt-10">
+          <h1 className="text-3xl font-bold leading-tight text-white lg:text-4xl">
+            {t('login.headline')}
+          </h1>
+          <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
+            {t('login.subheadline')}
+          </p>
+
+          <ul className="mt-8 space-y-3">
+            {[t('login.point1'), t('login.point2'), t('login.point3')].map((point) => (
+              <li key={point} className="flex items-start gap-3 text-sm text-white/90">
+                <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-white/15">
+                  <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </span>
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div />
+      </div>
+
+      {/* Form panel */}
+      <div className="flex flex-1 flex-col">
+        <header className="flex h-16 flex-shrink-0 items-center justify-between px-4 md:px-8">
+          <Link to="/" className="inline-flex items-center gap-2 lg:hidden" aria-label="ZuriLofts home">
+            <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" />
+          </Link>
+          <div className="ml-auto flex items-center gap-4">
+            <a href="mailto:enquires@zurilofts.com" className="text-sm text-[#6b7280] hover:text-[#2563EB] transition-colors">
+              {t('login.needHelp')}
+            </a>
+            <Dropdown
+              value={lang}
+              onChange={setLang}
+              options={languageOptions}
+              ariaLabel={t('nav.language')}
+              triggerClassName="rounded-full border border-[#D9D9D9] px-3 py-1.5 text-sm text-[#1f2937] hover:border-[#C49A6C] transition-colors"
+              menuClassName="right-0"
+            />
+          </div>
+        </header>
+
+        <div className="flex flex-1 items-center justify-center px-4 py-8 md:px-8">
           <div className="w-full max-w-sm">
-            <h1 className="text-2xl font-bold text-[#222222]">Welcome back</h1>
-            <p className="mt-2 text-sm text-[#6b7280]">Sign in, then choose Traveling or Hosting</p>
+            <h1 className="text-2xl font-bold text-[#0B0B45]">{t('login.welcomeBack')}</h1>
+            <p className="mt-2 text-sm text-[#6b7280]">{t('login.subtitle')}</p>
 
             {/* Error */}
             {(localError || error) && (
@@ -87,27 +138,43 @@ function LoginPage() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="mt-6 space-y-5">
               <div>
-                <label htmlFor="login-email" className="mb-2 block text-sm font-medium text-[#222222]">Email</label>
-                <input
-                  id="login-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="ui-input w-full py-3 text-base"
-                  required
-                />
+                <label htmlFor="login-email" className="mb-2 block text-sm font-medium text-[#1f2937]">
+                  {t('login.email')}
+                </label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </span>
+                  <input
+                    id="login-email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full rounded-xl border-0 bg-[#F3F4F6] py-3 pl-12 pr-4 text-base text-[#1f2937] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                    required
+                  />
+                </div>
               </div>
               <div>
-                <label htmlFor="login-password" className="mb-2 block text-sm font-medium text-[#222222]">Password</label>
+                <label htmlFor="login-password" className="mb-2 block text-sm font-medium text-[#1f2937]">
+                  {t('login.password')}
+                </label>
                 <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </span>
                   <input
                     id="login-password"
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="ui-input w-full py-3 pr-12 text-base"
+                    className="w-full rounded-xl border-0 bg-[#F3F4F6] py-3 pl-12 pr-12 text-base text-[#1f2937] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
                     required
                   />
                   <PasswordToggle
@@ -116,47 +183,71 @@ function LoginPage() {
                   />
                 </div>
               </div>
+
+              <div className="flex items-center justify-between">
+                <label className="flex items-center gap-2 text-sm text-[#1f2937] cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="h-4 w-4 rounded border-[#D9D9D9] text-[#0B0B45] focus:ring-[#C49A6C]"
+                  />
+                  {t('login.rememberMe')}
+                </label>
+                <a href="mailto:enquires@zurilofts.com" className="text-sm font-medium text-[#0B0B45] hover:text-[#C49A6C] transition-colors">
+                  {t('login.forgotPassword')}
+                </a>
+              </div>
+
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full min-h-[44px] rounded-full bg-[#C49A6C] py-3 font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] disabled:opacity-50"
+                className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#C49A6C] py-3 font-semibold text-[#0B0B45] transition-all duration-200 hover:bg-[#B8895C] disabled:opacity-50"
               >
-                {submitting ? 'Signing in...' : 'Sign In'}
+                {submitting ? t('login.signingIn') : (
+                  <>
+                    {t('login.signIn')}
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </>
+                )}
               </button>
             </form>
 
             {/* Divider */}
             <div className="my-6 flex items-center">
               <div className="h-px flex-1 bg-[#E5E7EB]"></div>
-              <span className="px-4 text-sm text-[#6b7280]">or</span>
+              <span className="px-4 text-sm text-[#6b7280]">{t('login.orContinueWith')}</span>
               <div className="h-px flex-1 bg-[#E5E7EB]"></div>
             </div>
 
-            {/* Google OAuth */}
+            {/* Google OAuth - follows Google's sign-in button branding guidelines:
+                white background, #747775 border, #1F1F1F text, official 4-colour "G". */}
             <a
               href={googleHref}
-              className="flex min-h-[44px] w-full items-center justify-center rounded-full border border-[#E5E7EB] bg-white py-3 font-semibold text-[#222222] transition-all duration-200 hover:bg-[#F7F7F5]"
+              className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl border border-[#747775] bg-white py-3 text-sm font-medium text-[#1F1F1F] transition-colors duration-150 hover:bg-[#F8F9FA] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1a73e8]"
             >
-              <svg className="mr-2 w-5 h-5" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+              <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                <path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.94 23.94 0 000 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19z" />
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.97 6.19C6.51 42.62 14.62 48 24 48z" />
               </svg>
-              Continue with Google
+              {t('login.continueWithGoogle')}
             </a>
 
             <Link
               to="/properties"
               className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-full py-3 text-sm font-semibold text-[#6b7280] transition-all duration-200 hover:text-[#2563EB]"
             >
-              Continue Browsing Properties
+              {t('login.continueBrowsing')}
             </Link>
 
             <p className="mt-6 text-center text-sm text-[#6b7280]">
-              Don&apos;t have an account?{' '}
-              <Link to="/register" className="font-semibold text-[#2563EB] transition-colors hover:text-[#1D4ED8]">
-                Sign up
+              {t('login.newToZuriLofts')}{' '}
+              <Link to="/register" className="font-semibold text-[#0B0B45] transition-colors hover:text-[#C49A6C]">
+                {t('login.createAccount')}
               </Link>
             </p>
           </div>
