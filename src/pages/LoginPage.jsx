@@ -209,7 +209,7 @@ function LoginPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#C49A6C] py-3 font-semibold text-[#0B0B45] transition-all duration-200 hover:bg-[#B8895C] disabled:opacity-50"
+                className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#C49A6C] py-3 font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] disabled:opacity-50"
               >
                 {submitting ? t('login.signingIn') : (
                   <>

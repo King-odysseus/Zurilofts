@@ -121,7 +121,7 @@ function RegisterPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white lg:h-screen lg:flex-row lg:overflow-hidden">
       {/* Story panel - photo + pitch, desktop only. Fixed in place; only the form panel scrolls. */}
-      <div className="relative hidden w-full flex-col overflow-hidden bg-[#0B0B45] px-10 py-10 lg:flex lg:h-full lg:w-[70%] lg:px-14 lg:py-12">
+      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-[#0B0B45] px-10 py-10 lg:flex lg:h-full lg:w-[70%] lg:px-14 lg:py-12">
         <img src={bgImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-[#0B0B45]/80" />
 
@@ -135,11 +135,7 @@ function RegisterPage() {
         </div>
 
         <div className="relative z-10 mt-6">
-          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#C49A6C]" />
-            <span className="text-xs font-medium text-white/80">{t('register.badge')}</span>
-          </span>
-          <h1 className="mt-5 font-montserrat text-5xl font-bold leading-tight text-white lg:text-6xl">
+          <h1 className="font-montserrat text-5xl font-bold leading-tight text-white lg:text-6xl">
             {t('register.headline')}
           </h1>
           <p className="mt-5 max-w-md font-roboto text-lg leading-relaxed text-white/70">
@@ -158,18 +154,9 @@ function RegisterPage() {
               </li>
             ))}
           </ul>
-
-          <div className="mt-9 flex items-center gap-4">
-            <div className="flex gap-1">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <svg key={i} className="h-4 w-4 text-[#C49A6C]" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
-                </svg>
-              ))}
-            </div>
-            <span className="max-w-[15rem] text-sm text-white/60">{t('register.trustText')}</span>
-          </div>
         </div>
+
+        <div className="h-16" />
       </div>
 
       {/* Form panel - scrolls independently of the fixed story panel */}
@@ -388,7 +375,7 @@ function RegisterPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#C49A6C] py-3 font-semibold text-[#0B0B45] transition-all duration-200 hover:bg-[#B8895C] disabled:opacity-50"
+                className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#C49A6C] py-3 font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] disabled:opacity-50"
               >
                 {submitting ? t('register.creatingAccount') : (
                   <>
