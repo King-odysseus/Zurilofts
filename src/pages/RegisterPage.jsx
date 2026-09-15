@@ -119,9 +119,9 @@ function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col lg:flex-row bg-white">
-      {/* Story panel - photo + pitch, desktop only */}
-      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-[#0B0B45] px-10 py-10 lg:flex lg:w-[70%] lg:px-14 lg:py-12">
+    <div className="flex min-h-screen flex-col bg-white lg:h-screen lg:flex-row lg:overflow-hidden">
+      {/* Story panel - photo + pitch, desktop only. Fixed in place; only the form panel scrolls. */}
+      <div className="relative hidden w-full flex-col overflow-hidden bg-[#0B0B45] px-10 py-10 lg:flex lg:h-full lg:w-[70%] lg:px-14 lg:py-12">
         <img src={bgImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-[#0B0B45]/80" />
 
@@ -158,22 +158,22 @@ function RegisterPage() {
               </li>
             ))}
           </ul>
-        </div>
 
-        <div className="relative z-10 flex items-center gap-4">
-          <div className="flex gap-1">
-            {[0, 1, 2, 3, 4].map((i) => (
-              <svg key={i} className="h-4 w-4 text-[#C49A6C]" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
-              </svg>
-            ))}
+          <div className="mt-9 flex items-center gap-4">
+            <div className="flex gap-1">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <svg key={i} className="h-4 w-4 text-[#C49A6C]" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
+                </svg>
+              ))}
+            </div>
+            <span className="max-w-[15rem] text-sm text-white/60">{t('register.trustText')}</span>
           </div>
-          <span className="max-w-[15rem] text-sm text-white/60">{t('register.trustText')}</span>
         </div>
       </div>
 
-      {/* Form panel */}
-      <div className="flex flex-1 flex-col">
+      {/* Form panel - scrolls independently of the fixed story panel */}
+      <div className="flex flex-1 flex-col lg:h-full lg:overflow-y-auto">
         <header className="flex h-16 flex-shrink-0 items-center justify-between px-4 md:px-8">
           <Link to="/" className="inline-flex items-center gap-2 lg:hidden" aria-label="ZuriLofts home">
             <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" />
