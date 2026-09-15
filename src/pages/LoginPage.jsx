@@ -109,7 +109,7 @@ function LoginPage() {
             <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" />
           </Link>
           <div className="ml-auto flex items-center gap-4">
-            <a href="mailto:enquires@zurilofts.com" className="text-sm text-[#6b7280] hover:text-[#2563EB] transition-colors">
+            <a href="mailto:enquires@zurilofts.com" className="text-sm text-[#6b7280] hover:text-[#C49A6C] transition-colors">
               {t('login.needHelp')}
             </a>
             <Dropdown
@@ -123,7 +123,7 @@ function LoginPage() {
           </div>
         </header>
 
-        <div className="flex flex-1 items-center justify-center px-4 py-8 md:px-8">
+        <div className="flex flex-1 items-start justify-center px-4 py-8 md:px-8 lg:items-center">
           <div className="w-full max-w-sm">
             <h1 className="text-2xl font-bold text-[#0B0B45]">{t('login.welcomeBack')}</h1>
             <p className="mt-2 text-sm text-[#6b7280]">{t('login.subtitle')}</p>
@@ -185,13 +185,20 @@ function LoginPage() {
               </div>
 
               <div className="flex items-center justify-between">
-                <label className="flex items-center gap-2 text-sm text-[#1f2937] cursor-pointer select-none">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 rounded border-[#D9D9D9] text-[#0B0B45] focus:ring-[#C49A6C]"
-                  />
+                <label className="flex items-center gap-2.5 text-sm text-[#1f2937] cursor-pointer select-none">
+                  <span className="relative flex-shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="peer sr-only"
+                    />
+                    <span className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] border border-[#D9D9D9] bg-white peer-checked:bg-[#0B0B45] peer-checked:border-[#0B0B45] peer-focus-visible:ring-2 peer-focus-visible:ring-[#C49A6C] transition-colors">
+                      <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ opacity: rememberMe ? 1 : 0 }}>
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </span>
+                  </span>
                   {t('login.rememberMe')}
                 </label>
                 <a href="mailto:enquires@zurilofts.com" className="text-sm font-medium text-[#0B0B45] hover:text-[#C49A6C] transition-colors">
@@ -239,7 +246,7 @@ function LoginPage() {
 
             <Link
               to="/properties"
-              className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-full py-3 text-sm font-semibold text-[#6b7280] transition-all duration-200 hover:text-[#2563EB]"
+              className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-full py-3 text-sm font-semibold text-[#6b7280] transition-all duration-200 hover:text-[#C49A6C]"
             >
               {t('login.continueBrowsing')}
             </Link>

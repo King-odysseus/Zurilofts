@@ -36,6 +36,7 @@ function RegisterPage() {
     password: '',
     confirmPassword: '',
   });
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -77,6 +78,12 @@ function RegisterPage() {
       return;
     }
 
+    if (!agreedToTerms) {
+      setLocalError('Please agree to the Terms & Privacy Policy to continue');
+      setSubmitting(false);
+      return;
+    }
+
     const result = await register({
       firstName: formData.firstName,
       lastName: formData.lastName,
@@ -112,285 +119,390 @@ function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Compact white header - no full-screen dark photo behind the form */}
-      <header className="flex h-16 flex-shrink-0 items-center justify-between border-b border-[#E5E7EB] px-4 md:px-6">
-        <Link to="/" className="inline-flex items-center gap-2" aria-label="ZuriLofts home">
-          <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" />
-        </Link>
-        <div className="flex items-center gap-4">
-          <a href="mailto:enquires@zurilofts.com" className="text-sm text-[#6b7280] hover:text-[#2563EB] transition-colors">
-            {t('register.needHelp')}
-          </a>
-          <Dropdown
-            value={lang}
-            onChange={setLang}
-            options={languageOptions}
-            ariaLabel={t('nav.language')}
-            triggerClassName="rounded-full border border-[#D9D9D9] px-3 py-1.5 text-sm text-[#1f2937] hover:border-[#C49A6C] transition-colors"
-            menuClassName="right-0"
-          />
-        </div>
-      </header>
+    <div className="flex min-h-screen flex-col lg:flex-row bg-white">
+      {/* Story panel - photo + pitch, desktop only */}
+      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-[#0B0B45] px-10 py-10 lg:flex lg:w-[70%] lg:px-14 lg:py-12">
+        <img src={bgImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-[#0B0B45]/80" />
 
-      <div className="grid flex-1 lg:grid-cols-2">
-        {/* Photo panel - desktop only, reduced/omitted on mobile per spec */}
-        <div className="relative hidden lg:block">
-          <img src={bgImage} alt="" className="h-full w-full object-cover" />
-        </div>
-
-        {/* Light form panel */}
-        <div className="flex items-start justify-center px-4 py-12 md:px-8">
-        <div className="max-w-md w-full">
-          {/* Heading */}
-          <div className="mb-8">
-            <h1 className="text-2xl font-bold text-[#222222]">
-              {isHost ? 'Become a Host' : t('register.title')}
-            </h1>
-            <p className="text-[#6b7280] mt-2">
-              {isHost
-                ? 'List your property and start earning with ZuriLofts'
-                : t('register.subtitle')}
-            </p>
-          </div>
-
-          <AuthModeToggle activeMode={isHost ? 'host' : 'guest'} basePath="/register" />
-
-          {(localError || error) && (
-            <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">
-              {localError || error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="register-firstName" className="block text-sm font-medium text-[#222222] mb-2">First Name</label>
-                <input
-                  id="register-firstName"
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  placeholder="John"
-                  className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
-                  required
-                />
-              </div>
-              <div>
-                <label htmlFor="register-lastName" className="block text-sm font-medium text-[#222222] mb-2">Last Name</label>
-                <input
-                  id="register-lastName"
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  placeholder="Doe"
-                  className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
-                  required
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="register-email" className="block text-sm font-medium text-[#222222] mb-2">Email</label>
-              <input
-                id="register-email"
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="you@example.com"
-                className="auth-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="register-password" className="block text-sm font-medium text-[#222222] mb-2">Password</label>
-              <div className="relative">
-                <input
-                  id="register-password"
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Min. 8 chars, 1 uppercase, 1 number"
-                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
-                  required
-                />
-                <PasswordToggle
-                  shown={showPassword}
-                  onClick={() => setShowPassword((v) => !v)}
-                />
-              </div>
-            </div>
-            <div>
-              <label htmlFor="register-confirmPassword" className="block text-sm font-medium text-[#222222] mb-2">Confirm Password</label>
-              <div className="relative">
-                <input
-                  id="register-confirmPassword"
-                  type={showConfirm ? 'text' : 'password'}
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Re-enter your password"
-                  className="auth-input w-full px-4 py-3 pr-12 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280]"
-                  required
-                />
-                <PasswordToggle
-                  shown={showConfirm}
-                  onClick={() => setShowConfirm((v) => !v)}
-                />
-              </div>
-            </div>
-            <div className="flex flex-col items-center pt-2">
-              <p className="block text-sm font-medium text-[#222222] mb-3">Profile Picture (optional)</p>
-              <label className="relative cursor-pointer group">
-                {avatarPreview ? (
-                  <img
-                    src={avatarPreview}
-                    alt="Preview"
-                    className="w-20 h-20 rounded-full object-cover shadow-md"
-                  />
-                ) : (
-                  <div className="w-20 h-20 bg-[#E5E7EB]/30 rounded-full flex items-center justify-center border-2 border-dashed border-[#E5E7EB]">
-                    <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </div>
-                )}
-                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setAvatarFile(file);
-                      setAvatarPreview(URL.createObjectURL(file));
-                    }
-                  }}
-                  className="hidden"
-                />
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full min-h-[44px] bg-[#C49A6C] text-white font-semibold py-3 rounded-lg hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50 mt-6"
-            >
-              {submitting
-                ? 'Creating Account...'
-                : isHost ? 'Create Host Account' : 'Create Account'}
-            </button>
-          </form>
-
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-[#E5E7EB]"></div>
-            <span className="px-4 text-sm text-[#6b7280]">or</span>
-            <div className="flex-1 h-px bg-[#E5E7EB]"></div>
-          </div>
-
-          {/* Google OAuth - follows Google's sign-in button branding guidelines:
-              white background, #747775 border, #1F1F1F text, official 4-colour "G". */}
-          <a
-            href={googleHref}
-            onClick={() => rememberPostAuthMode(isHost ? 'hosting' : 'travelling')}
-            className="flex items-center justify-center gap-3 w-full min-h-[44px] py-3 rounded-lg border border-[#747775] bg-white text-[#1F1F1F] text-sm font-medium hover:bg-[#F8F9FA] hover:shadow-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1a73e8]"
-          >
-            <svg className="w-5 h-5" viewBox="0 0 48 48" aria-hidden="true">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
-              <path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.94 23.94 0 000 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19z" />
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.97 6.19C6.51 42.62 14.62 48 24 48z" />
-            </svg>
-            Continue with Google
-          </a>
-
-          <Link
-            to="/properties"
-            className="flex items-center justify-center w-full min-h-[44px] py-3 mt-4 rounded-lg text-[#6b7280] font-semibold hover:text-[#2563EB] transition-all duration-200 text-sm"
-          >
-            Continue Browsing Properties
+        <div className="relative z-10">
+          <Link to="/" className="inline-flex items-center gap-2.5" aria-label="ZuriLofts home">
+            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white p-1.5">
+              <img src={logoImg} alt="" className="h-full w-full object-contain" />
+            </span>
+            <span className="text-lg font-bold text-white">ZuriLofts</span>
           </Link>
+        </div>
 
-          <p className="text-center text-sm text-[#6b7280] mt-6">
-            Already have an account?{' '}
-            <Link to="/login" className="text-[#2563EB] font-semibold hover:text-[#1D4ED8] transition-colors">
-              Sign in
-            </Link>
+        <div className="relative z-10 mt-6">
+          <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1.5">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#C49A6C]" />
+            <span className="text-xs font-medium text-white/80">{t('register.badge')}</span>
+          </span>
+          <h1 className="mt-5 font-montserrat text-5xl font-bold leading-tight text-white lg:text-6xl">
+            {t('register.headline')}
+          </h1>
+          <p className="mt-5 max-w-md font-roboto text-lg leading-relaxed text-white/70">
+            {t('register.subheadline')}
           </p>
 
-        {/* Selling Points - Host Registration */}
-        {isHost && (
-          <div className="mt-6 ui-surface rounded-[14px] p-6 max-w-md w-full">
-            <h3 className="text-lg font-bold text-[#222222] mb-4">Why Host with ZuriLofts</h3>
-            <ul className="space-y-3 text-sm">
-              <li className="flex gap-3">
-                <span className="text-[#2563EB] font-bold flex-shrink-0">7.5%</span>
-                <span className="text-[#222222]"><span className="font-semibold">Lowest platform fee in Kenya</span> - less than half of Booking.com (15%)</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-[#2563EB] flex-shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+          <ul className="mt-9 space-y-4">
+            {[t('register.benefit1'), t('register.benefit2'), t('register.benefit3')].map((point) => (
+              <li key={point} className="flex items-start gap-3 font-roboto text-lg text-white/90">
+                <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-white/15">
+                  <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
                 </span>
-                <span className="text-[#222222]"><span className="font-semibold">Guests pay zero markup</span> - unlike Airbnb&apos;s 14% guest fee, your listed price IS the guest price</span>
+                {point}
               </li>
-              <li className="flex gap-3">
-                <span className="text-[#2563EB] flex-shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                </span>
-                <span className="text-[#222222]"><span className="font-semibold">Tax handled for you</span> - WHT auto-deducted, remitted to KRA, and you get a downloadable statement anytime</span>
-              </li>
-              <li className="flex gap-3">
-                <span className="text-[#2563EB] flex-shrink-0">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                </span>
-                <span className="text-[#222222]"><span className="font-semibold">Flexible payouts</span> - choose weekly, bi-weekly, or monthly transfers to your bank account</span>
-              </li>
-            </ul>
-
-            {/* Airbnb comparison */}
-            <div className="mt-5 bg-[#F7F7F5] rounded-xl p-4">
-              <p className="text-xs font-semibold text-[#222222] mb-2 uppercase tracking-wide">Cost Comparison - Guest Pays</p>
-              <table className="w-full text-xs">
-                <thead>
-                  <tr className="text-[#6b7280] border-b border-[#E5E7EB]">
-                    <th className="text-left py-1">Property at KES 8,000/night</th>
-                    <th className="text-right py-1">Airbnb</th>
-                    <th className="text-right py-1 text-[#2563EB]">ZuriLofts</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="border-b border-[#E5E7EB]/50">
-                    <td className="py-1">Nightly rate</td>
-                    <td className="text-right">KES 8,000</td>
-                    <td className="text-right text-[#2563EB] font-medium">KES 8,000</td>
-                  </tr>
-                  <tr className="border-b border-[#E5E7EB]/50">
-                    <td className="py-1">Guest service fee</td>
-                    <td className="text-right text-red-500">+KES 1,120 (14%)</td>
-                    <td className="text-right text-[#2563EB] font-bold">KES 0</td>
-                  </tr>
-                  <tr>
-                    <td className="py-1 font-semibold">Guest pays</td>
-                    <td className="text-right font-semibold text-red-500">KES 9,120</td>
-                    <td className="text-right font-bold text-[#2563EB]">KES 8,000</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p className="text-xs text-[#6b7280] mt-2 italic">
-                Guests save 12% booking direct - your property attracts more bookings at the same listed price.
-              </p>
-            </div>
-          </div>
-        )}
+            ))}
+          </ul>
         </div>
+
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="flex gap-1">
+            {[0, 1, 2, 3, 4].map((i) => (
+              <svg key={i} className="h-4 w-4 text-[#C49A6C]" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 1.5l2.6 5.27 5.82.85-4.21 4.1.99 5.79L10 14.9l-5.2 2.73.99-5.79-4.21-4.1 5.82-.85L10 1.5z" />
+              </svg>
+            ))}
+          </div>
+          <span className="max-w-[15rem] text-sm text-white/60">{t('register.trustText')}</span>
+        </div>
+      </div>
+
+      {/* Form panel */}
+      <div className="flex flex-1 flex-col">
+        <header className="flex h-16 flex-shrink-0 items-center justify-between px-4 md:px-8">
+          <Link to="/" className="inline-flex items-center gap-2 lg:hidden" aria-label="ZuriLofts home">
+            <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" />
+          </Link>
+          <div className="ml-auto flex items-center gap-4">
+            <a href="mailto:enquires@zurilofts.com" className="text-sm text-[#6b7280] hover:text-[#C49A6C] transition-colors">
+              {t('register.needHelp')}
+            </a>
+            <Dropdown
+              value={lang}
+              onChange={setLang}
+              options={languageOptions}
+              ariaLabel={t('nav.language')}
+              triggerClassName="rounded-full border border-[#D9D9D9] px-3 py-1.5 text-sm text-[#1f2937] hover:border-[#C49A6C] transition-colors"
+              menuClassName="right-0"
+            />
+          </div>
+        </header>
+
+        <div className="flex flex-1 items-start justify-center px-4 py-8 md:px-8">
+          <div className="w-full max-w-sm">
+            <h1 className="text-2xl font-bold text-[#0B0B45]">
+              {isHost ? t('register.hostTitle') : t('register.title')}
+            </h1>
+            <p className="mt-2 text-sm text-[#6b7280]">
+              {isHost ? t('register.hostSubtitle') : t('register.subtitle')}
+            </p>
+
+            <AuthModeToggle activeMode={isHost ? 'host' : 'guest'} basePath="/register" />
+
+            {(localError || error) && (
+              <div className="mt-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {localError || error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="register-firstName" className="mb-2 block text-sm font-medium text-[#1f2937]">
+                    {t('register.firstName')}
+                  </label>
+                  <input
+                    id="register-firstName"
+                    type="text"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    placeholder="Jane"
+                    className="w-full rounded-xl border-0 bg-[#F7F7F5] py-3 px-4 text-base text-[#1f2937] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="register-lastName" className="mb-2 block text-sm font-medium text-[#1f2937]">
+                    {t('register.lastName')}
+                  </label>
+                  <input
+                    id="register-lastName"
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    placeholder="Muthoni"
+                    className="w-full rounded-xl border-0 bg-[#F7F7F5] py-3 px-4 text-base text-[#1f2937] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="register-email" className="mb-2 block text-sm font-medium text-[#1f2937]">
+                  {t('register.email')}
+                </label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </span>
+                  <input
+                    id="register-email"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="you@example.com"
+                    className="w-full rounded-xl border-0 bg-[#F7F7F5] py-3 pl-12 pr-4 text-base text-[#1f2937] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="register-password" className="mb-2 block text-sm font-medium text-[#1f2937]">
+                  {t('register.password')}
+                </label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </span>
+                  <input
+                    id="register-password"
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    placeholder={t('register.passwordHint')}
+                    className="w-full rounded-xl border-0 bg-[#F7F7F5] py-3 pl-12 pr-12 text-base text-[#1f2937] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                    required
+                  />
+                  <PasswordToggle
+                    shown={showPassword}
+                    onClick={() => setShowPassword((v) => !v)}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="register-confirmPassword" className="mb-2 block text-sm font-medium text-[#1f2937]">
+                  {t('register.confirmPassword')}
+                </label>
+                <div className="relative">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                  </span>
+                  <input
+                    id="register-confirmPassword"
+                    type={showConfirm ? 'text' : 'password'}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleChange}
+                    placeholder={t('register.confirmPasswordHint')}
+                    className="w-full rounded-xl border-0 bg-[#F7F7F5] py-3 pl-12 pr-12 text-base text-[#1f2937] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                    required
+                  />
+                  <PasswordToggle
+                    shown={showConfirm}
+                    onClick={() => setShowConfirm((v) => !v)}
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center pt-2">
+                <p className="mb-3 text-sm font-medium text-[#1f2937]">{t('register.profilePicture')}</p>
+                <label className="relative cursor-pointer group">
+                  {avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt="Preview"
+                      className="w-20 h-20 rounded-full object-cover shadow-md"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 bg-[#F7F7F5] rounded-full flex items-center justify-center border-2 border-dashed border-[#D9D9D9]">
+                      <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setAvatarFile(file);
+                        setAvatarPreview(URL.createObjectURL(file));
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              <label className="flex items-start gap-2.5 cursor-pointer select-none">
+                <span className="relative flex-shrink-0 mt-0.5">
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="peer sr-only"
+                    required
+                  />
+                  <span className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] border border-[#D9D9D9] bg-white peer-checked:bg-[#0B0B45] peer-checked:border-[#0B0B45] peer-focus-visible:ring-2 peer-focus-visible:ring-[#C49A6C] transition-colors">
+                    <svg className="h-3 w-3 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ opacity: agreedToTerms ? 1 : 0 }}>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </span>
+                </span>
+                <span className="flex flex-wrap gap-x-1 text-sm text-[#6b7280]">
+                  {t('register.agreeTermsPrefix')}{' '}
+                  <a href="/terms" target="_blank" rel="noopener noreferrer" className="font-medium text-[#0B0B45] hover:text-[#C49A6C] transition-colors">
+                    {t('register.terms')}
+                  </a>{' '}
+                  {t('register.and')}{' '}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer" className="font-medium text-[#0B0B45] hover:text-[#C49A6C] transition-colors">
+                    {t('register.privacyPolicy')}
+                  </a>
+                </span>
+              </label>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#C49A6C] py-3 font-semibold text-[#0B0B45] transition-all duration-200 hover:bg-[#B8895C] disabled:opacity-50"
+              >
+                {submitting ? t('register.creatingAccount') : (
+                  <>
+                    {isHost ? t('register.createHostAccount') : t('register.createAccount')}
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="my-6 flex items-center">
+              <div className="h-px flex-1 bg-[#E5E7EB]"></div>
+              <span className="px-4 text-sm text-[#6b7280]">{t('register.orSignUpWith')}</span>
+              <div className="h-px flex-1 bg-[#E5E7EB]"></div>
+            </div>
+
+            {/* Google OAuth - follows Google's sign-in button branding guidelines:
+                white background, #747775 border, #1F1F1F text, official 4-colour "G". */}
+            <a
+              href={googleHref}
+              onClick={() => rememberPostAuthMode(isHost ? 'hosting' : 'travelling')}
+              className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl border border-[#747775] bg-white py-3 text-sm font-medium text-[#1F1F1F] transition-colors duration-150 hover:bg-[#F8F9FA] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1a73e8]"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+                <path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 019.5 24c0-1.59.27-3.13.76-4.59l-7.98-6.19A23.94 23.94 0 000 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19z" />
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.97 6.19C6.51 42.62 14.62 48 24 48z" />
+              </svg>
+              {t('register.continueWithGoogle')}
+            </a>
+
+            <Link
+              to="/properties"
+              className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-full py-3 text-sm font-semibold text-[#6b7280] transition-all duration-200 hover:text-[#C49A6C]"
+            >
+              {t('register.continueBrowsing')}
+            </Link>
+
+            <p className="mt-6 text-center text-sm text-[#6b7280]">
+              {t('register.alreadyHaveAccount')}{' '}
+              <Link to="/login" className="font-semibold text-[#0B0B45] transition-colors hover:text-[#C49A6C]">
+                {t('register.signIn')}
+              </Link>
+            </p>
+
+            {/* Selling Points - Host Registration */}
+            {isHost && (
+              <div className="mt-6 ui-surface rounded-[14px] p-6 max-w-sm w-full">
+                <h3 className="text-lg font-bold text-[#222222] mb-4">Why Host with ZuriLofts</h3>
+                <ul className="space-y-3 text-sm">
+                  <li className="flex gap-3">
+                    <span className="text-[#0B0B45] font-bold flex-shrink-0">7.5%</span>
+                    <span className="text-[#222222]"><span className="font-semibold">Lowest platform fee in Kenya</span> - less than half of Booking.com (15%)</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-[#0B0B45] flex-shrink-0">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                    </span>
+                    <span className="text-[#222222]"><span className="font-semibold">Guests pay zero markup</span> - unlike Airbnb&apos;s 14% guest fee, your listed price IS the guest price</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-[#0B0B45] flex-shrink-0">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                    </span>
+                    <span className="text-[#222222]"><span className="font-semibold">Tax handled for you</span> - WHT auto-deducted, remitted to KRA, and you get a downloadable statement anytime</span>
+                  </li>
+                  <li className="flex gap-3">
+                    <span className="text-[#0B0B45] flex-shrink-0">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                    </span>
+                    <span className="text-[#222222]"><span className="font-semibold">Flexible payouts</span> - choose weekly, bi-weekly, or monthly transfers to your bank account</span>
+                  </li>
+                </ul>
+
+                {/* Airbnb comparison */}
+                <div className="mt-5 bg-[#F7F7F5] rounded-xl p-4">
+                  <p className="text-xs font-semibold text-[#222222] mb-2 uppercase tracking-wide">Cost Comparison - Guest Pays</p>
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="text-[#6b7280] border-b border-[#E5E7EB]">
+                        <th className="text-left py-1">Property at KES 8,000/night</th>
+                        <th className="text-right py-1">Airbnb</th>
+                        <th className="text-right py-1 text-[#0B0B45]">ZuriLofts</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-[#E5E7EB]/50">
+                        <td className="py-1">Nightly rate</td>
+                        <td className="text-right">KES 8,000</td>
+                        <td className="text-right text-[#0B0B45] font-medium">KES 8,000</td>
+                      </tr>
+                      <tr className="border-b border-[#E5E7EB]/50">
+                        <td className="py-1">Guest service fee</td>
+                        <td className="text-right text-red-500">+KES 1,120 (14%)</td>
+                        <td className="text-right text-[#0B0B45] font-bold">KES 0</td>
+                      </tr>
+                      <tr>
+                        <td className="py-1 font-semibold">Guest pays</td>
+                        <td className="text-right font-semibold text-red-500">KES 9,120</td>
+                        <td className="text-right font-bold text-[#0B0B45]">KES 8,000</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p className="text-xs text-[#6b7280] mt-2 italic">
+                    Guests save 12% booking direct - your property attracts more bookings at the same listed price.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
@@ -404,7 +516,7 @@ function AuthModeToggle({ activeMode, basePath }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-2 rounded-full bg-[#F7F7F5] p-1 mb-6">
+    <div className="mt-6 grid grid-cols-2 gap-2 rounded-full bg-[#F7F7F5] p-1">
       {modes.map((mode) => {
         const active = activeMode === mode.key;
         return (
@@ -414,8 +526,8 @@ function AuthModeToggle({ activeMode, basePath }) {
             aria-current={active ? 'true' : undefined}
             className={`text-center rounded-full px-4 py-2 min-h-[44px] flex items-center justify-center text-sm font-semibold transition-all ${
               active
-                ? 'bg-[#2563EB] text-white shadow-sm'
-                : 'text-[#6b7280] hover:text-[#2563EB] hover:bg-white/70'
+                ? 'bg-[#0B0B45] text-white shadow-sm'
+                : 'text-[#6b7280] hover:text-[#0B0B45] hover:bg-white/70'
             }`}
           >
             {mode.label}
@@ -433,7 +545,7 @@ function PasswordToggle({ shown, onClick }) {
       type="button"
       onClick={onClick}
       aria-label={shown ? 'Hide password' : 'Show password'}
-      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#2563EB] transition-colors"
+      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#C49A6C] transition-colors"
     >
       {shown ? (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
