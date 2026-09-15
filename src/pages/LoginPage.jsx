@@ -64,7 +64,7 @@ function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col lg:flex-row bg-white">
       {/* Story panel - photo + pitch, desktop only */}
-      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-[#0B0B45] px-10 py-10 lg:flex lg:w-[42%] lg:px-14 lg:py-12">
+      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-[#0B0B45] px-10 py-10 lg:flex lg:w-[70%] lg:px-14 lg:py-12">
         <img src={bgImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-[#0B0B45]/80" />
 
