@@ -36,6 +36,8 @@ export default {
       },
       fontFamily: {
         inter: ['Inter', 'system-ui', 'sans-serif'],
+        montserrat: ['Montserrat', 'system-ui', 'sans-serif'],
+        roboto: ['Roboto', 'system-ui', 'sans-serif'],
       },
     },
   },

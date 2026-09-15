@@ -77,17 +77,17 @@ function LoginPage() {
           </Link>
         </div>
 
-        <div className="relative z-10 mt-10">
-          <h1 className="text-3xl font-bold leading-tight text-white lg:text-4xl">
+        <div className="relative z-10 mt-6">
+          <h1 className="font-montserrat text-5xl font-bold leading-tight text-white lg:text-6xl">
             {t('login.headline')}
           </h1>
-          <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
+          <p className="mt-5 max-w-md font-roboto text-lg leading-relaxed text-white/70">
             {t('login.subheadline')}
           </p>
 
-          <ul className="mt-8 space-y-3">
+          <ul className="mt-9 space-y-4">
             {[t('login.point1'), t('login.point2'), t('login.point3')].map((point) => (
-              <li key={point} className="flex items-start gap-3 text-sm text-white/90">
+              <li key={point} className="flex items-start gap-3 font-roboto text-lg text-white/90">
                 <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-white/15">
                   <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -99,7 +99,7 @@ function LoginPage() {
           </ul>
         </div>
 
-        <div />
+        <div className="h-16" />
       </div>
 
       {/* Form panel */}
