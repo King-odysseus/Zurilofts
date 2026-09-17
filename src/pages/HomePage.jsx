@@ -248,7 +248,7 @@ export default function HomePage() {
 
         <section className="mx-auto max-w-[1240px] px-5 py-14 md:px-8 md:py-16">
           <div className="flex items-end justify-between gap-4">
-            <div><h2 className="text-2xl font-semibold tracking-tight md:text-[30px]">Stays in Nairobi</h2><p className="mt-1 text-xs text-[#5B6B82]">Handpicked homes, verified by our team</p></div>
+            <div><h2 className="mt-4 text-2xl font-semibold tracking-tight md:mt-6 md:text-[30px]">Stays in Nairobi</h2><p className="mt-1 text-xs text-[#5B6B82]">Handpicked homes, verified by our team</p></div>
             <Link to="/properties" className="hidden items-center gap-2 text-xs font-medium sm:flex">See all <Icon name="arrow" className="h-4 w-4" /></Link>
           </div>
           <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
