@@ -98,7 +98,7 @@ function HomeHeader() {
               onClick={() => setSearchOpen((open) => !open)}
               aria-label={searchOpen ? 'Close search' : 'Open search'}
               aria-expanded={searchOpen}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
             >
               <Icon name="search" className="h-3.5 w-3.5" />
             </button>
@@ -214,9 +214,9 @@ function HomeFooter() {
           <div>
             <h3 className="text-[11px] font-semibold uppercase tracking-wider">Stay updated</h3>
             <p className="mt-5 text-[12px] leading-5 text-white/75">New homes and off-season rates, once a month. No spam.</p>
-            <form className="mt-4 flex h-11 items-center rounded-full bg-white px-4" onSubmit={(e) => e.preventDefault()}>
+            <form className="mt-4 flex h-11 items-center rounded-full bg-white px-4 focus-within:ring-2 focus-within:ring-white/30" onSubmit={(e) => e.preventDefault()}>
               <label className="sr-only" htmlFor="home-newsletter">Email address</label>
-              <input id="home-newsletter" type="email" placeholder="you@email.com" className="min-w-0 flex-1 bg-transparent text-xs text-[#0B1F42] outline-none" />
+              <input id="home-newsletter" type="email" placeholder="you@email.com" className="min-w-0 flex-1 border-0 bg-transparent text-xs text-[#0B1F42] outline-none ring-0 placeholder:text-slate-400 focus:border-0 focus:outline-none focus:ring-0" />
               <button type="submit" className="flex h-8 w-8 items-center justify-center rounded-full bg-[#C89B6D]" aria-label="Subscribe"><Icon name="arrow" className="h-4 w-4" /></button>
             </form>
           </div>
