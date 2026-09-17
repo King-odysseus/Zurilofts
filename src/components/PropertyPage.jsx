@@ -556,8 +556,9 @@ function PropertyPinMap({ lat, lng, address, location, title }) {
       center: [Number(lat), Number(lng)],
       zoom: 15,
     });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
+      subdomains: 'abcd',
       maxZoom: 19,
     }).addTo(map);
     L.marker([Number(lat), Number(lng)], { title, alt: `Map pin for ${title}` })
