@@ -75,7 +75,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label="Choose dates"
-            className="fixed inset-0 z-[100] overflow-y-auto bg-white p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[640px] sm:rounded-2xl sm:border sm:border-[#E5E7EB] sm:p-5 sm:shadow-2xl"
+            className="fixed inset-0 z-[100] overflow-y-auto bg-white p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[min(640px,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E5E7EB] sm:p-5 sm:shadow-2xl"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
               <span className="text-base font-semibold text-[#222222]">Choose dates</span>
@@ -128,7 +128,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label="Choose guests"
-            className="fixed inset-0 z-[100] bg-white p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-72 sm:rounded-2xl sm:border sm:border-[#E5E7EB] sm:p-5 sm:shadow-2xl"
+            className="fixed inset-0 z-[100] bg-white p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-[min(18rem,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E5E7EB] sm:p-5 sm:shadow-2xl"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
               <span className="text-base font-semibold text-[#222222]">Guests</span>
