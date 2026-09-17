@@ -1,13 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import Dropdown from '../components/Dropdown.jsx';
-import apiClient from '../api/client.js';
 import logoImg from '../assets/zurilofts-logo.png';
 import { zuriImages } from '../assets/images';
 import { googleOAuthUrl } from '../utils/authUrls.js';
-import { rememberNavMode, rememberPostAuthMode } from '../utils/authIntent.js';
 import { languageOptions } from '../i18n/translations.js';
 
 // Use the same background treatment as the login page for consistency
@@ -15,18 +13,13 @@ const bgImage = zuriImages[14];
 
 function getDashboardPath(user) {
   if (user?.role === 'ADMIN') return '/admin';
-  // A plain USER who registered with hosting intent (registerUser creates a
-  // DRAFT HostApplication atomically) lands in their dashboard immediately -
-  // see HostRoute. They can prepare draft listings while verification,
-  // reachable from Settings -> Verification, is still pending.
+  // Existing host users and users with an application continue into the host
+  // workspace when they revisit this route after authentication.
   if (user?.role === 'HOST' || user?.hostApplicationStatus != null) return '/host/today';
   return '/';
 }
 
 function RegisterPage() {
-  const [searchParams] = useSearchParams();
-  const urlRole = (searchParams.get('role') || '').toUpperCase();
-  const isHost = urlRole === 'HOST';
   const googleHref = googleOAuthUrl();
 
   const [formData, setFormData] = useState({
@@ -41,9 +34,7 @@ function RegisterPage() {
   const [localError, setLocalError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [avatarFile, setAvatarFile] = useState(null);
-  const [avatarPreview, setAvatarPreview] = useState(null);
-  const { user, register, isAuthenticated, isLoading, error, clearError, setUser } = useAuth();
+  const { user, register, isAuthenticated, isLoading, error, clearError } = useAuth();
   const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
 
@@ -89,30 +80,13 @@ function RegisterPage() {
       lastName: formData.lastName,
       email: formData.email,
       password: formData.password,
-      role: isHost ? 'HOST' : 'USER',
+      role: 'USER',
     });
 
     if (!result.success) {
       setLocalError(result.message);
       setSubmitting(false);
       return;
-    }
-
-    rememberNavMode(isHost ? 'hosting' : 'travelling');
-
-    // Upload avatar if one was selected
-    if (avatarFile) {
-      try {
-        const form = new FormData();
-        form.append('avatar', avatarFile);
-        const avatarRes = await apiClient.post('/users/avatar', form, {
-          headers: { 'Content-Type': 'multipart/form-data' },
-        });
-        // Update auth context with the avatar URL
-        setUser(avatarRes.data.data);
-      } catch (err) {
-        console.error('Failed to upload avatar:', err);
-      }
     }
 
     setSubmitting(false);
@@ -182,14 +156,8 @@ function RegisterPage() {
 
         <div className="flex flex-1 items-start justify-center px-4 py-8 md:px-8">
           <div className="w-full max-w-sm">
-            <h1 className="text-2xl font-bold text-[#0B0B45]">
-              {isHost ? t('register.hostTitle') : t('register.title')}
-            </h1>
-            <p className="mt-2 text-sm text-[#6b7280]">
-              {isHost ? t('register.hostSubtitle') : t('register.subtitle')}
-            </p>
-
-            <AuthModeToggle activeMode={isHost ? 'host' : 'guest'} basePath="/register" />
+            <h1 className="text-2xl font-bold text-[#0B0B45]">{t('register.title')}</h1>
+            <p className="mt-2 text-sm text-[#6b7280]">{t('register.subtitle')}</p>
 
             {(localError || error) && (
               <div className="mt-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -308,43 +276,6 @@ function RegisterPage() {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center pt-2">
-                <p className="mb-3 text-sm font-medium text-[#1f2937]">{t('register.profilePicture')}</p>
-                <label className="relative cursor-pointer group">
-                  {avatarPreview ? (
-                    <img
-                      src={avatarPreview}
-                      alt="Preview"
-                      className="w-20 h-20 rounded-full object-cover shadow-md"
-                    />
-                  ) : (
-                    <div className="w-20 h-20 bg-[#F7F7F5] rounded-full flex items-center justify-center border-2 border-dashed border-[#D9D9D9]">
-                      <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        setAvatarFile(file);
-                        setAvatarPreview(URL.createObjectURL(file));
-                      }
-                    }}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-
               <label className="flex items-start gap-2.5 cursor-pointer select-none">
                 <span className="relative flex-shrink-0 mt-0.5">
                   <input
@@ -379,7 +310,7 @@ function RegisterPage() {
               >
                 {submitting ? t('register.creatingAccount') : (
                   <>
-                    {isHost ? t('register.createHostAccount') : t('register.createAccount')}
+                    {t('register.createAccount')}
                     <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                     </svg>
@@ -399,7 +330,6 @@ function RegisterPage() {
                 white background, #747775 border, #1F1F1F text, official 4-colour "G". */}
             <a
               href={googleHref}
-              onClick={() => rememberPostAuthMode(isHost ? 'hosting' : 'travelling')}
               className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl border border-[#747775] bg-white py-3 text-sm font-medium text-[#1F1F1F] transition-colors duration-150 hover:bg-[#F8F9FA] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1a73e8]"
             >
               <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
@@ -425,102 +355,9 @@ function RegisterPage() {
               </Link>
             </p>
 
-            {/* Selling Points - Host Registration */}
-            {isHost && (
-              <div className="mt-6 ui-surface rounded-[14px] p-6 max-w-sm w-full">
-                <h3 className="text-lg font-bold text-[#222222] mb-4">Why Host with ZuriLofts</h3>
-                <ul className="space-y-3 text-sm">
-                  <li className="flex gap-3">
-                    <span className="text-[#0B0B45] font-bold flex-shrink-0">7.5%</span>
-                    <span className="text-[#222222]"><span className="font-semibold">Lowest platform fee in Kenya</span> - less than half of Booking.com (15%)</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#0B0B45] flex-shrink-0">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                    </span>
-                    <span className="text-[#222222]"><span className="font-semibold">Guests pay zero markup</span> - unlike Airbnb&apos;s 14% guest fee, your listed price IS the guest price</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#0B0B45] flex-shrink-0">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                    </span>
-                    <span className="text-[#222222]"><span className="font-semibold">Tax handled for you</span> - WHT auto-deducted, remitted to KRA, and you get a downloadable statement anytime</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-[#0B0B45] flex-shrink-0">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                    </span>
-                    <span className="text-[#222222]"><span className="font-semibold">Flexible payouts</span> - choose weekly, bi-weekly, or monthly transfers to your bank account</span>
-                  </li>
-                </ul>
-
-                {/* Airbnb comparison */}
-                <div className="mt-5 bg-[#F7F7F5] rounded-xl p-4">
-                  <p className="text-xs font-semibold text-[#222222] mb-2 uppercase tracking-wide">Cost Comparison - Guest Pays</p>
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="text-[#6b7280] border-b border-[#E5E7EB]">
-                        <th className="text-left py-1">Property at KES 8,000/night</th>
-                        <th className="text-right py-1">Airbnb</th>
-                        <th className="text-right py-1 text-[#0B0B45]">ZuriLofts</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-[#E5E7EB]/50">
-                        <td className="py-1">Nightly rate</td>
-                        <td className="text-right">KES 8,000</td>
-                        <td className="text-right text-[#0B0B45] font-medium">KES 8,000</td>
-                      </tr>
-                      <tr className="border-b border-[#E5E7EB]/50">
-                        <td className="py-1">Guest service fee</td>
-                        <td className="text-right text-red-500">+KES 1,120 (14%)</td>
-                        <td className="text-right text-[#0B0B45] font-bold">KES 0</td>
-                      </tr>
-                      <tr>
-                        <td className="py-1 font-semibold">Guest pays</td>
-                        <td className="text-right font-semibold text-red-500">KES 9,120</td>
-                        <td className="text-right font-bold text-[#0B0B45]">KES 8,000</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <p className="text-xs text-[#6b7280] mt-2 italic">
-                    Guests save 12% booking direct - your property attracts more bookings at the same listed price.
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function AuthModeToggle({ activeMode, basePath }) {
-  const modes = [
-    { key: 'guest', label: 'Traveling', to: basePath },
-    { key: 'host', label: 'Hosting', to: `${basePath}?role=HOST` },
-  ];
-
-  return (
-    <div className="mt-6 grid grid-cols-2 gap-2 rounded-full bg-[#F7F7F5] p-1">
-      {modes.map((mode) => {
-        const active = activeMode === mode.key;
-        return (
-          <Link
-            key={mode.key}
-            to={mode.to}
-            aria-current={active ? 'true' : undefined}
-            className={`text-center rounded-full px-4 py-2 min-h-[44px] flex items-center justify-center text-sm font-semibold transition-all ${
-              active
-                ? 'bg-[#0B0B45] text-white shadow-sm'
-                : 'text-[#6b7280] hover:text-[#0B0B45] hover:bg-white/70'
-            }`}
-          >
-            {mode.label}
-          </Link>
-        );
-      })}
     </div>
   );
 }
