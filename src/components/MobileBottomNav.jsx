@@ -2,10 +2,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
 // Paths where global navigation (including these tabs) is intentionally
-// hidden: checkout (compact logo/back header only) and the host/admin
-// workspaces, which have their own role-specific navigation.
+// hidden: the design-led home page, checkout (compact logo/back header only),
+// and the host/admin workspaces, which have their own navigation.
 function isHiddenPath(pathname) {
   return (
+    pathname === '/' ||
     pathname.startsWith('/booking/') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/host')

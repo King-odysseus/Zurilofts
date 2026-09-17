@@ -190,7 +190,7 @@ function SearchBar({ discovery = false }) {
 
   return (
     <div
-      className="w-full min-w-0 max-w-[680px] mx-auto relative"
+      className={`w-full min-w-0 mx-auto relative ${discovery ? 'max-w-[940px]' : 'max-w-[680px]'}`}
       ref={containerRef}
       onKeyDownCapture={handleKeyDownCapture}
       onFocusCapture={handleFocusCapture}
