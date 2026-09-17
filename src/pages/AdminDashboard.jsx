@@ -1231,8 +1231,195 @@ function DashboardOverview() {
         ))}
       </div>
 
-      {/* Header panel - Needs attention */}
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-6">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <h2 className="text-[17px] font-semibold text-[#0B1F42]">
+                Revenue overview
+              </h2>
+              <p className="mt-2 text-2xl font-bold text-[#0B1F42]">
+                {stats.revenue
+                  ? `KSh ${Number(stats.revenue).toLocaleString()}`
+                  : "KSh 0"}
+              </p>
+            </div>
+            <span className="rounded-lg border border-[#E3E8EF] bg-[#F8FAFC] px-3 py-2 text-xs text-[#5B6B82]">
+              12 months⌄
+            </span>
+          </div>
+          <div className="mt-7 flex h-44 items-end gap-3 border-t border-[#E3E8EF] pt-5">
+            {[38, 52, 44, 66, 58, 74, 62, 88, 70, 82, 76, 96].map(
+              (height, index) => (
+                <div
+                  key={index}
+                  className="flex flex-1 flex-col items-center gap-2"
+                >
+                  <div
+                    className="w-full rounded-t-md bg-[#0B1F42] transition-opacity hover:opacity-80"
+                    style={{ height: `${height}%` }}
+                  />
+                  <span className="text-[10px] text-[#94A3B8]">
+                    {
+                      [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                      ][index]
+                    }
+                  </span>
+                </div>
+              ),
+            )}
+          </div>
+        </section>
+        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <h2 className="text-[17px] font-semibold text-[#0B1F42]">
+            Occupancy
+          </h2>
+          <p className="mt-2 text-xs text-[#94A3B8]">This month vs. capacity</p>
+          <div className="mx-auto mt-5 flex h-40 w-40 items-center justify-center rounded-full border-[14px] border-[#EEF2F7] border-t-[#0B1F42] border-r-[#0B1F42]">
+            <span className="text-3xl font-bold text-[#0B1F42]">78%</span>
+          </div>
+          <p className="mt-3 text-center text-xs text-[#94A3B8]">
+            Occupied nights
+          </p>
+          <div className="mt-5 grid grid-cols-2 gap-3">
+            <div className="rounded-xl bg-[#F8FAFC] p-3">
+              <p className="text-[11px] text-[#94A3B8]">Booked nights</p>
+              <p className="mt-1 text-lg font-bold text-[#0B1F42]">1,842</p>
+            </div>
+            <div className="rounded-xl bg-[#F8FAFC] p-3">
+              <p className="text-[11px] text-[#94A3B8]">Available</p>
+              <p className="mt-1 text-lg font-bold text-[#0B1F42]">520</p>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
+        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[17px] font-semibold text-[#0B1F42]">
+                Recent bookings
+              </h2>
+              <p className="mt-1 text-xs text-[#94A3B8]">
+                Latest activity across your properties
+              </p>
+            </div>
+            <Link
+              to="/admin/bookings"
+              className="text-xs font-semibold text-[#B8895C] hover:text-[#C49A6C]"
+            >
+              View all ↗
+            </Link>
+          </div>
+          <div className="mt-5 overflow-x-auto">
+            <table className="w-full min-w-[560px] text-left text-xs">
+              <thead className="border-b border-[#E3E8EF] text-[#94A3B8]">
+                <tr>
+                  <th className="pb-3 font-medium">Guest / property</th>
+                  <th className="pb-3 font-medium">Dates</th>
+                  <th className="pb-3 font-medium">Amount</th>
+                  <th className="pb-3 text-right font-medium">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentBookings.slice(0, 5).map((booking) => (
+                  <tr
+                    key={booking.id}
+                    className="border-b border-[#E3E8EF]/70 last:border-0"
+                  >
+                    <td className="py-4">
+                      <p className="font-semibold text-[#0B1F42]">
+                        {booking.property?.title || "Booking"}
+                      </p>
+                      <p className="mt-1 text-[#94A3B8]">
+                        {`${booking.user?.firstName || ""} ${booking.user?.lastName || ""}`.trim() ||
+                          "Guest"}
+                      </p>
+                    </td>
+                    <td className="py-4 text-[#5B6B82]">
+                      {booking.checkIn
+                        ? new Date(booking.checkIn).toLocaleDateString()
+                        : "—"}
+                    </td>
+                    <td className="py-4 font-semibold text-[#0B1F42]">
+                      {booking.total
+                        ? `KSh ${Number(booking.total).toLocaleString()}`
+                        : "—"}
+                    </td>
+                    <td className="py-4 text-right">
+                      <span className="rounded-full bg-[#ECFDF5] px-2.5 py-1 font-semibold text-[#059669]">
+                        {booking.status || "PENDING"}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {recentBookings.length === 0 && (
+              <p className="py-8 text-center text-sm text-[#94A3B8]">
+                No recent bookings yet.
+              </p>
+            )}
+          </div>
+        </section>
+        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[17px] font-semibold text-[#0B1F42]">
+                Approvals
+              </h2>
+              <p className="mt-1 text-xs text-[#94A3B8]">
+                Items needing review
+              </p>
+            </div>
+            <span className="rounded-full bg-[#FEF3C7] px-2.5 py-1 text-xs font-semibold text-[#B45309]">
+              {pendingApprovals.length}
+            </span>
+          </div>
+          <div className="mt-5 space-y-3">
+            {pendingApprovals.slice(0, 4).map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => navigate(item.to)}
+                className="flex w-full items-center justify-between gap-3 rounded-xl bg-[#F8FAFC] p-3 text-left hover:bg-[#F1F5F9]"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold text-[#0B1F42]">
+                    {item.title}
+                  </span>
+                  <span className="mt-1 block truncate text-xs text-[#94A3B8]">
+                    {item.subtitle}
+                  </span>
+                </span>
+                <span className="shrink-0 text-xs font-semibold text-[#B8895C]">
+                  Review ↗
+                </span>
+              </button>
+            ))}
+            {pendingApprovals.length === 0 && (
+              <p className="py-8 text-center text-sm text-[#94A3B8]">
+                All caught up.
+              </p>
+            )}
+          </div>
+        </section>
+      </div>
+
+      {/* Header panel - retained for operational actions, visually secondary */}
+      <div className="hidden rounded-[14px] border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-6">
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight text-[#222222] sm:text-3xl">
@@ -1374,7 +1561,7 @@ function DashboardOverview() {
 
       {/* Landing Page Stats Editor - admin only */}
       {isAdmin && (
-        <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 mb-6">
+        <div className="hidden bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 mb-6">
           <h2 className="text-lg font-bold text-[#222222] mb-2">
             Landing Page Stats
           </h2>
@@ -1457,7 +1644,7 @@ function DashboardOverview() {
       )}
 
       {/* Review queue - tabbed compact table */}
-      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
+      <div className="hidden bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
           <h2 className="text-lg font-bold text-[#222222]">Review queue</h2>
           <div
