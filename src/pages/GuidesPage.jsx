@@ -9,6 +9,7 @@ import { PLACES_TO_EAT, PLACES_TO_VISIT } from "../data/nearby.js";
 const EDITORIAL_GUIDES = [
   {
     title: "A first weekend in Nairobi",
+    slug: "first-weekend-in-nairobi",
     eyebrow: "Getting started",
     description:
       "Land in Nairobi with a plan that still leaves room for surprise. We map out a gentle first weekend: a slow coffee, one museum, a leafy walk, and the golden-hour view locals keep coming back to.",
@@ -17,6 +18,7 @@ const EDITORIAL_GUIDES = [
   },
   {
     title: "Where to eat like a local",
+    slug: "where-to-eat-like-a-local",
     eyebrow: "Food & drink",
     description:
       "Nairobi’s best meals are often tucked behind an unassuming door. This guide moves from smoky nyama choma and crisp samosas to thoughtful tasting menus, with notes on when to go and what to order.",
@@ -25,6 +27,7 @@ const EDITORIAL_GUIDES = [
   },
   {
     title: "Nairobi outdoors",
+    slug: "nairobi-outdoors",
     eyebrow: "Nature & wellness",
     description:
       "Trade traffic for birdsong, red earth, and wide-open skies. We share three easy escapes, what to pack, and the small details that make a Nairobi outdoor day feel unhurried.",
@@ -197,8 +200,9 @@ function GuidesPage() {
                 <>
                   <div className="mb-7 grid gap-5 md:grid-cols-3">
                     {EDITORIAL_GUIDES.map((guide) => (
-                      <article
+                      <Link
                         key={guide.title}
+                        to={`/guides/${guide.slug}`}
                         className="group relative min-w-0"
                       >
                         <div className="aspect-[16/10] overflow-hidden rounded-2xl bg-[#E7EDF4]">
@@ -215,10 +219,10 @@ function GuidesPage() {
                             {guide.description}
                           </p>
                           <span className="mt-4 inline-flex text-xs font-semibold text-[#B8895C]">
-                            {guide.readTime} · Editorial preview
+                            {guide.readTime} · Read guide ↗
                           </span>
                         </div>
-                      </article>
+                      </Link>
                     ))}
                   </div>
                   <div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 text-center">
