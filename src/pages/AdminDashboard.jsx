@@ -941,6 +941,9 @@ function DashboardOverview() {
     bookings: 0,
     promos: 0,
     revenue: 0,
+    occupancyRate: null,
+    bookedNights: null,
+    availableNights: null,
   });
   const [recentBookings, setRecentBookings] = useState([]);
   const [reviewQueue, setReviewQueue] = useState([]);
@@ -1008,6 +1011,9 @@ function DashboardOverview() {
           bookings: totals.bookings || bookingsRes.data.pagination?.total || 0,
           promos: results[3]?.data.data?.length || 0,
           revenue: totals.earnings || totalRevenue,
+          occupancyRate: totals.occupancyRate ?? totals.occupancy ?? null,
+          bookedNights: totals.bookedNights ?? null,
+          availableNights: totals.availableNights ?? null,
         });
         setRecentBookings(bookings);
         if (isAdmin && results[4]) {
@@ -1200,7 +1206,7 @@ function DashboardOverview() {
             "Total Revenue",
             stats.revenue
               ? `KSh ${Number(stats.revenue).toLocaleString()}`
-              : "KSh 0",
+              : "—",
             "+12.4%",
             "text-[#0B1F42]",
             "bg-[#EDF3F9]",
@@ -1212,7 +1218,13 @@ function DashboardOverview() {
             "text-[#0B1F42]",
             "bg-[#E8F0FE]",
           ],
-          ["Occupancy Rate", "78%", "+3.1%", "text-[#0B1F42]", "bg-[#E6F6F0]"],
+          [
+            "Occupancy Rate",
+            stats.occupancyRate != null ? `${stats.occupancyRate}%` : "—",
+            "From analytics",
+            "text-[#0B1F42]",
+            "bg-[#E6F6F0]",
+          ],
           [
             "Pending Approvals",
             pendingApprovals.length.toString(),
@@ -1268,45 +1280,16 @@ function DashboardOverview() {
               <p className="mt-2 text-2xl font-bold text-[#0B1F42]">
                 {stats.revenue
                   ? `KSh ${Number(stats.revenue).toLocaleString()}`
-                  : "KSh 0"}
+                  : "—"}
               </p>
             </div>
             <span className="rounded-lg border border-[#E3E8EF] bg-[#F8FAFC] px-3 py-2 text-xs text-[#5B6B82]">
               12 months⌄
             </span>
           </div>
-          <div className="mt-5 flex h-36 items-end gap-2 border-t border-[#E3E8EF] pt-4">
-            {[38, 52, 44, 66, 58, 74, 62, 88, 70, 82, 76, 96].map(
-              (height, index) => (
-                <div
-                  key={index}
-                  className="flex flex-1 flex-col items-center gap-2"
-                >
-                  <div
-                    className="w-full rounded-t-md bg-[#0B1F42] transition-opacity hover:opacity-80"
-                    style={{ height: `${height}%` }}
-                  />
-                  <span className="text-[10px] text-[#94A3B8]">
-                    {
-                      [
-                        "Jan",
-                        "Feb",
-                        "Mar",
-                        "Apr",
-                        "May",
-                        "Jun",
-                        "Jul",
-                        "Aug",
-                        "Sep",
-                        "Oct",
-                        "Nov",
-                        "Dec",
-                      ][index]
-                    }
-                  </span>
-                </div>
-              ),
-            )}
+          <div className="mt-5 flex h-36 items-center justify-center border-t border-[#E3E8EF] pt-4 text-center text-xs text-[#94A3B8]">
+            Monthly revenue history will appear when analytics data is
+            available.
           </div>
         </section>
         <section className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
@@ -1314,8 +1297,10 @@ function DashboardOverview() {
             Occupancy
           </h2>
           <p className="mt-2 text-xs text-[#94A3B8]">This month vs. capacity</p>
-          <div className="mx-auto mt-4 flex h-32 w-32 items-center justify-center rounded-full border-[11px] border-[#EEF2F7] border-t-[#0B1F42] border-r-[#0B1F42]">
-            <span className="text-2xl font-bold text-[#0B1F42]">78%</span>
+          <div className="mx-auto mt-4 flex h-32 w-32 items-center justify-center rounded-full border-[11px] border-[#EEF2F7]">
+            <span className="text-2xl font-bold text-[#0B1F42]">
+              {stats.occupancyRate != null ? `${stats.occupancyRate}%` : "—"}
+            </span>
           </div>
           <p className="mt-3 text-center text-xs text-[#94A3B8]">
             Occupied nights
@@ -1323,11 +1308,15 @@ function DashboardOverview() {
           <div className="mt-5 grid grid-cols-2 gap-3">
             <div className="rounded-xl bg-[#F8FAFC] p-3">
               <p className="text-[11px] text-[#94A3B8]">Booked nights</p>
-              <p className="mt-1 text-lg font-bold text-[#0B1F42]">1,842</p>
+              <p className="mt-1 text-lg font-bold text-[#0B1F42]">
+                {stats.bookedNights ?? "—"}
+              </p>
             </div>
             <div className="rounded-xl bg-[#F8FAFC] p-3">
               <p className="text-[11px] text-[#94A3B8]">Available</p>
-              <p className="mt-1 text-lg font-bold text-[#0B1F42]">520</p>
+              <p className="mt-1 text-lg font-bold text-[#0B1F42]">
+                {stats.availableNights ?? "—"}
+              </p>
             </div>
           </div>
         </section>
