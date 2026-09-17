@@ -221,14 +221,14 @@ function Navbar({ solid = false }) {
   const navItemClass = (isActive) =>
     `group relative flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
       isActive
-        ? 'text-[#2563EB]'
+        ? 'text-[#C89B6D]'
         : needsWhiteNav
           ? 'text-[#222222] hover:text-[#2563EB]'
           : 'text-white hover:text-[#2563EB]'
     }`;
 
   const underlineClass = (isActive) =>
-    `absolute bottom-0 left-0 h-0.5 bg-[#2563EB] transition-all duration-200 ${
+    `absolute bottom-0 left-0 h-0.5 bg-[#C89B6D] transition-all duration-200 ${
       isActive ? 'w-full' : 'w-0 group-hover:w-full'
     }`;
 

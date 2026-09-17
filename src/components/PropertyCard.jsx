@@ -13,7 +13,7 @@ import { useFavorites } from '../context/FavoritesContext.jsx';
  *
  * All optional fields guard against null/undefined.
  */
-function PropertyCard({ property }) {
+function PropertyCard({ property, cardVariant }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -34,6 +34,7 @@ function PropertyCard({ property }) {
   } = property;
 
   const isLiked = id ? isFavorite(id) : false;
+  const resultsCard = cardVariant === 'results';
   const propertyHref = id
     ? `/property/${id}${variant ? `?variant=${variant}` : ''}`
     : '/properties';
@@ -56,7 +57,7 @@ function PropertyCard({ property }) {
   const capacityLabel = capacityParts.join(' · ');
 
   return (
-    <article className="group relative bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden transition-all duration-200 shadow-sm hover:-translate-y-1 hover:shadow-md h-full flex flex-col">
+    <article className={`group relative bg-white overflow-hidden transition-all duration-200 h-full flex flex-col ${resultsCard ? 'rounded-[16px] shadow-none' : 'rounded-[14px] border border-[#E5E7EB] shadow-sm hover:-translate-y-1 hover:shadow-md'}`}>
       <Link
         to={propertyHref}
         className="absolute inset-0 z-10 rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
@@ -66,7 +67,7 @@ function PropertyCard({ property }) {
       </Link>
 
       {/* Image area */}
-      <div className="relative aspect-[4/3] overflow-hidden flex-shrink-0 bg-[#F7F7F5]">
+      <div className={`relative overflow-hidden flex-shrink-0 bg-[#F7F7F5] ${resultsCard ? 'aspect-[3/2]' : 'aspect-[4/3]'}`}>
         {image ? (
           <img
             src={image}
@@ -119,10 +120,10 @@ function PropertyCard({ property }) {
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col flex-1">
+      <div className={`flex flex-1 flex-col ${resultsCard ? 'pt-3' : 'p-4'}`}>
         {/* Title + Rating */}
         <div className="flex justify-between items-start gap-2 mb-1">
-          <h3 className="text-sm font-semibold text-[#222222] leading-snug line-clamp-1">
+          <h3 className={`${resultsCard ? 'text-[17px]' : 'text-sm'} font-semibold leading-snug text-[#0B1F42] line-clamp-1`}>
             {title || 'Property'}
           </h3>
           {rating != null && (
@@ -141,7 +142,7 @@ function PropertyCard({ property }) {
         </div>
 
         {/* Location */}
-        <div className="flex items-center text-[#6b7280] mb-1">
+        <div className="mb-1 flex items-center text-[#6b7280]">
           <svg className="w-3.5 h-3.5 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -158,7 +159,7 @@ function PropertyCard({ property }) {
             so price is transparent detail rather than a duplicate "Book Now" CTA. */}
         <div className="mt-auto">
           <span className="text-xs text-[#6b7280]">per night</span>
-          <div className="text-lg font-bold text-[#222222]">
+          <div className={`${resultsCard ? 'text-[17px] font-semibold text-[#0B1F42]' : 'text-lg font-bold text-[#222222]'}`}>
             {formattedPrice ? `KES ${formattedPrice}` : 'KES -'}
           </div>
         </div>
@@ -183,6 +184,11 @@ PropertyCard.propTypes = {
     variantLabel: PropTypes.string,
     variant: PropTypes.string,
   }).isRequired,
+  cardVariant: PropTypes.string,
+};
+
+PropertyCard.defaultProps = {
+  cardVariant: 'default',
 };
 
 export default PropertyCard;

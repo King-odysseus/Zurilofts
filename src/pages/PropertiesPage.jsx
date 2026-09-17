@@ -541,7 +541,7 @@ function PropertiesPage() {
 
       {/* Results */}
       <section className="bg-white py-6 md:py-10" aria-live="polite">
-        <div className="w-full mx-auto px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl">
+        <div className="mx-auto w-full max-w-[1200px] px-4 md:px-8">
           {/* Results summary bar */}
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-[#6b7280]">
@@ -633,11 +633,12 @@ function PropertiesPage() {
 
           {/* Results grid */}
           {!loading && !error && viewMode !== 'map' && sortedListings.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-10">
+            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
               {sortedListings.map((listing) => (
                 <PropertyCard
                   key={`${listing.id}-${listing.variant || 'base'}`}
                   property={listing}
+                  cardVariant="results"
                 />
               ))}
 
