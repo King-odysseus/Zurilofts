@@ -110,7 +110,7 @@ function HomeHeader() {
                 onKeyDown={(event) => { if (event.key === 'Escape') setSearchOpen(false); }}
                 placeholder="Search stays"
                 aria-label="Search stays"
-                className="min-w-0 flex-1 bg-transparent px-2 text-xs text-[#0B1F42] outline-none placeholder:text-slate-400"
+                className="header-search-input min-w-0 flex-1 border-0 bg-transparent px-2 text-xs text-[#0B1F42] outline-none placeholder:text-slate-400 focus:border-0 focus:outline-none focus:ring-0"
               />
             )}
             {!searchOpen && <span className="sr-only">Search</span>}
