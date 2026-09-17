@@ -231,7 +231,7 @@ function HomeFooter() {
       <div className="mx-auto max-w-[1240px] px-5 py-12 md:px-8 md:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_.7fr_.7fr_1fr]">
           <div>
-            <div className="inline-flex rounded-lg bg-white p-1.5"><img src={logoImg} alt="ZuriLofts" className="h-9 w-[100px] object-contain" /></div>
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white p-1.5"><img src={logoImg} alt="ZuriLofts" className="h-full w-full object-contain" /></div>
             <p className="mt-5 max-w-[280px] text-[13px] leading-6 text-white/75">{t('home.footerDescription')}</p>
           </div>
           <div>
