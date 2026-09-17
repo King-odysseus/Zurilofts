@@ -400,13 +400,11 @@ function PropertyPage() {
             {hasMapCoordinates(property.lat, property.lng) && (
               <section className="mb-8 md:mb-10" aria-labelledby="location-heading">
                 <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#222222] mb-4">Where you&apos;ll be</h2>
-                <PropertyPinMap
-                  lat={property.lat}
-                  lng={property.lng}
-                  address={property.address}
-                  location={property.location}
-                  title={property.title}
-                />
+                <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(11,31,66,0.06)]">
+                  <p className="font-semibold text-[#0B1F42]">{property.location}</p>
+                  {property.address && <p className="mt-1 text-sm text-[#5B6B82]">{property.address}</p>}
+                  <a href={googleMapsDirectionsUrl({ lat: property.lat, lng: property.lng, label: property.address || property.location })} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-10 items-center rounded-full bg-[#C49A6C] px-4 text-xs font-semibold text-white hover:bg-[#B8895C]">Get directions ↗</a>
+                </div>
               </section>
             )}
 
