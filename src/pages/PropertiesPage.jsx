@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import { HomeHeader } from './HomePage.jsx';
 import Footer from '../components/Footer';
 import PropertyCard from '../components/PropertyCard';
 import Dropdown from '../components/Dropdown.jsx';
@@ -44,9 +45,9 @@ function PropertiesResultsScene({
 }) {
   return (
     <div className="min-h-screen overflow-x-hidden bg-[#F8FAFC] text-[#0B1F42]">
-      <Navbar />
+      <HomeHeader propertiesPage />
 
-      <main className="pt-16 md:pt-[72px]">
+      <main>
         <section className="mx-auto max-w-[1200px] px-4 pb-5 pt-7 md:px-8 md:pb-6 md:pt-8">
           <p className="text-xs text-[#5B6B82]">Home <span className="mx-1">›</span> Properties</p>
           <h1 className="mt-2 text-2xl font-semibold tracking-tight md:text-[32px]">Properties in Nairobi</h1>
