@@ -187,7 +187,7 @@ function Navbar({ solid = false }) {
   // `key` into translations.js so the visible label follows the language switch.
   const navItems = (() => {
     if (!isAuthenticated) {
-      return [{ name: 'Explore', key: 'explore', href: '/properties' }];
+      return [{ name: 'Stays', key: 'stays', href: '/properties' }];
     }
     if (effectiveMode === 'hosting') {
       if (!hasHostIntent) {
@@ -202,7 +202,7 @@ function Navbar({ solid = false }) {
       ];
     }
     return [
-      { name: 'Explore', key: 'explore', href: '/properties' },
+      { name: 'Stays', key: 'stays', href: '/properties' },
       { name: 'Saved', key: 'saved', href: '/favourites' },
       { name: 'Trips', key: 'trips', href: '/trips' },
       { name: 'Messages', key: 'messages', href: '/inbox' },

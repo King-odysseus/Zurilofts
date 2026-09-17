@@ -7,6 +7,7 @@ import Dropdown from '../components/Dropdown.jsx';
 import TripSearchBar from '../components/TripSearchBar.jsx';
 import { zuriImages } from '../assets/images';
 import apiClient from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const PropertyResultsMap = lazy(() => import('../components/PropertyResultsMap.jsx'));
 
@@ -36,6 +37,7 @@ const SORT_OPTIONS = [
 ];
 
 function PropertiesPage() {
+  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ── Derive filter state from URL query params ──────────────────────
@@ -286,10 +288,9 @@ function PropertiesPage() {
       {/* Compact Search Header */}
       <section className="bg-white border-b border-[#E5E7EB] pt-24 pb-8 md:pb-10">
         <div className="w-full max-w-full mx-auto text-center px-4 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl overflow-hidden">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#222222] mb-2 break-words">Find your place in Nairobi</h1>
-          <p className="text-[#6b7280] text-sm mb-6 md:mb-7 break-words">
-            Premium furnished apartments in Nairobi&apos;s most desirable neighbourhoods.
-          </p>
+          <p className="mb-2 text-[11px] text-[#6b7280]">Home <span className="mx-1">›</span> Stays</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#0B1F42] mb-2 break-words">{t('home.staysTitle')}</h1>
+          <p className="text-[#6b7280] text-sm mb-6 md:mb-7 break-words">{t('home.staysDescription')}</p>
           <div className="max-w-4xl mx-auto rounded-[18px] border border-[#E5E7EB] bg-white p-2 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-left">
             {/* One compact destination/date/guest/action composition - no
                 separate static summary above the working search bar. */}
@@ -311,7 +312,7 @@ function PropertiesPage() {
       </section>
 
       {/* Sticky Filters Bar */}
-      <section className="sticky top-0 z-10 bg-white shadow-sm">
+      <section className="hidden sticky top-0 z-10 bg-white shadow-sm md:block">
         <div className="w-full mx-auto px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl py-3">
             <div className="flex min-w-0 flex-col md:flex-row md:items-center md:justify-between gap-3">
             {/* Left: property type pills + bed variant pills + available toggle */}
@@ -491,8 +492,46 @@ function PropertiesPage() {
         </div>
       </section>
 
+      {/* Mobile stays controls mirror the compact OpenPencil results scene. */}
+      <section className="border-b border-[#E5E7EB] bg-white px-4 py-3 md:hidden">
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            onClick={() => setMoreFiltersOpen((open) => !open)}
+            className="min-h-[44px] rounded-full border border-[#D8E0E9] bg-white px-4 text-xs font-semibold text-[#0B1F42] transition-colors hover:border-[#C89B6D] hover:text-[#B8895C]"
+          >
+            <span className="inline-flex items-center gap-2">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 6h16M7 12h10M10 18h4" /></svg>
+              Filters{hasActiveFilters ? ` (${[filter !== 'all', priceRange !== 'all', availableOnly, bedFilter !== 'all', !!neighborhood, !!minRating, guests > 1, !!(checkIn && checkOut), selectedAmenities.size > 0].filter(Boolean).length})` : ''}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
+            className={`min-h-[44px] rounded-full border px-4 text-xs font-semibold transition-colors ${viewMode === 'map' ? 'border-[#0B1F42] bg-[#0B1F42] text-white' : 'border-[#D8E0E9] bg-white text-[#0B1F42] hover:border-[#C89B6D] hover:text-[#B8895C]'}`}
+          >
+            <span className="inline-flex items-center gap-2">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z" /><path d="M9 3v15M15 6v15" /></svg>
+              {viewMode === 'map' ? 'Show list' : 'Show map'}
+            </span>
+          </button>
+        </div>
+        {moreFiltersOpen && (
+          <div className="mt-3 flex flex-wrap gap-2 border-t border-[#E5E7EB] pt-3">
+            {filterButtons.map(({ key, label }) => (
+              <button key={key} type="button" onClick={() => updateParam('type', key)} className={`rounded-full px-3 py-2 text-xs font-medium ${filter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#D8E0E9] bg-white text-[#44546A]'}`}>{label}</button>
+            ))}
+            {bedFilterButtons.map(({ key, label }) => (
+              <button key={key} type="button" onClick={() => updateParam('beds', key)} className={`rounded-full px-3 py-2 text-xs font-medium ${bedFilter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#D8E0E9] bg-white text-[#44546A]'}`}>{label}</button>
+            ))}
+            <button type="button" onClick={() => updateParam('available', availableOnly ? '' : 'true')} className={`rounded-full px-3 py-2 text-xs font-medium ${availableOnly ? 'bg-[#0B1F42] text-white' : 'border border-[#D8E0E9] bg-white text-[#44546A]'}`}>Available</button>
+            {hasActiveFilters && <button type="button" onClick={clearAllFilters} className="rounded-full px-3 py-2 text-xs font-semibold text-[#B8895C]">Clear all</button>}
+          </div>
+        )}
+      </section>
+
       {/* Results */}
-      <section className="py-8 md:py-10 bg-white" aria-live="polite">
+      <section className="bg-white py-6 md:py-10" aria-live="polite">
         <div className="w-full mx-auto px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl">
           {/* Results summary bar */}
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
