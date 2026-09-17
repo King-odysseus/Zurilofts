@@ -35,6 +35,86 @@ const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest' },
 ];
 
+function PropertiesResultsScene({
+  searchInput, onSearchChange, onSearchSubmit, onSearchClear, loading, searchQuery,
+  dates, onDatesChange, guests, onGuestsChange, clearAllFilters, hasActiveFilters,
+  sortedListings, sort, updateParam, filter, bedFilter, filterButtons,
+  bedFilterButtons, error, fetchProperties, viewMode, setViewMode, moreFiltersOpen,
+  setMoreFiltersOpen,
+}) {
+  return (
+    <div className="min-h-screen overflow-x-hidden bg-[#F8FAFC] text-[#0B1F42]">
+      <Navbar />
+
+      <main className="pt-16 md:pt-[72px]">
+        <section className="mx-auto max-w-[1200px] px-4 pb-5 pt-7 md:px-8 md:pb-6 md:pt-8">
+          <p className="text-xs text-[#5B6B82]">Home <span className="mx-1">›</span> Properties</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight md:text-[32px]">Properties in Nairobi</h1>
+          <p className="mt-2 text-sm text-[#5B6B82] md:text-base">Find a verified, furnished home that fits your plans.</p>
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-[10px] font-semibold uppercase tracking-[.12em] text-[#64748B]">Active search</span>
+            {searchQuery && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{searchQuery}</span>}
+            {dates.checkIn && dates.checkOut && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{dates.checkIn} – {dates.checkOut}</span>}
+            {guests > 1 && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{guests} guests</span>}
+            {hasActiveFilters && <button type="button" onClick={clearAllFilters} className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs font-semibold hover:border-[#C89B6D] hover:text-[#B8895C]">Clear all</button>}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[1200px] px-4 pb-6 md:px-8">
+          <div className="rounded-[18px] border border-[#E3E8EF] bg-white p-2 shadow-[0_8px_24px_rgba(11,31,66,0.08)]">
+            <TripSearchBar
+              value={searchInput}
+              onChange={onSearchChange}
+              onSubmit={onSearchSubmit}
+              onClear={onSearchClear}
+              loading={loading}
+              hasActiveSearch={Boolean(searchQuery)}
+              discovery
+              dates={dates}
+              onDatesChange={onDatesChange}
+              guests={guests}
+              onGuestsChange={onGuestsChange}
+            />
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[1200px] px-4 pb-6 md:px-8">
+          <div className="hidden items-center justify-between gap-4 md:flex">
+            <div className="flex flex-wrap gap-2">
+              {filterButtons.map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('type', key)} className={`rounded-full px-4 py-2 text-xs font-medium ${filter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF] bg-white text-[#33415C] hover:border-[#C89B6D]'}`}>{label}</button>)}
+              {bedFilterButtons.slice(1).map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('beds', key)} className={`rounded-full px-4 py-2 text-xs font-medium ${bedFilter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF] bg-white text-[#33415C] hover:border-[#C89B6D]'}`}>{label}</button>)}
+              <button type="button" onClick={() => setMoreFiltersOpen(!moreFiltersOpen)} className="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#33415C] hover:border-[#C89B6D]">Filters{hasActiveFilters ? ' ·' : ''}</button>
+              <button type="button" onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')} className="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#33415C] hover:border-[#C89B6D]">{viewMode === 'map' ? 'Show list' : 'Show map'}</button>
+            </div>
+            <Dropdown value={sort} onChange={(value) => updateParam('sort', value)} options={SORT_OPTIONS} placeholder="Recommended" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#0B1F42]" menuClassName="right-0 left-auto" ariaLabel="Sort properties" />
+          </div>
+          <div className="md:hidden">
+            <div className="grid grid-cols-2 gap-3">
+              <button type="button" onClick={() => setMoreFiltersOpen(!moreFiltersOpen)} className="min-h-[44px] rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold text-[#0B1F42]">Filters{hasActiveFilters ? ' ·' : ''}</button>
+              <button type="button" onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')} className="min-h-[44px] rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold text-[#0B1F42]">{viewMode === 'map' ? 'Show list' : 'Show map'}</button>
+            </div>
+            {moreFiltersOpen && <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-3">{filterButtons.map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('type', key)} className={`rounded-full px-3 py-2 text-xs ${filter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{label}</button>)}{bedFilterButtons.slice(1).map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('beds', key)} className={`rounded-full px-3 py-2 text-xs ${bedFilter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{label}</button>)}<button type="button" onClick={clearAllFilters} className="rounded-full px-3 py-2 text-xs font-semibold text-[#B8895C]">Clear all</button></div>}
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-8" aria-live="polite">
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <p className="text-sm font-medium text-[#5B6B82]">{loading ? 'Searching...' : `Showing 1–${Math.min(sortedListings.length, 6)} of ${sortedListings.length} furnished properties in Nairobi`}</p>
+            <div className="md:hidden"><Dropdown value={sort} onChange={(value) => updateParam('sort', value)} options={SORT_OPTIONS} placeholder="Recommended" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs font-medium text-[#0B1F42]" menuClassName="right-0 left-auto" ariaLabel="Sort properties" /></div>
+          </div>
+
+          {error && !loading && <div className="mx-auto max-w-md rounded-2xl border border-[#E3E8EF] bg-white p-8 text-center"><h2 className="text-base font-semibold">Something went wrong.</h2><p className="mt-2 text-sm text-[#5B6B82]">We couldn&apos;t load properties right now. Check your connection and try again.</p><button type="button" onClick={fetchProperties} className="mt-5 min-h-[44px] rounded-full bg-[#C89B6D] px-6 text-sm font-semibold text-white hover:bg-[#B8895C]">Try again</button></div>}
+          {loading && <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">{[1, 2, 3, 4].map((item) => <div key={item} className="rounded-2xl border border-[#E3E8EF] bg-white p-3"><div className="aspect-[3/2] animate-pulse rounded-xl bg-[#E7EDF4]" /><div className="mt-3 h-4 w-2/3 animate-pulse rounded bg-[#E7EDF4]" /><div className="mt-2 h-3 w-4/5 animate-pulse rounded bg-[#EDF1F6]" /><div className="mt-4 h-4 w-1/2 animate-pulse rounded bg-[#E7EDF4]" /></div>)}</div>}
+          {!loading && !error && viewMode === 'map' && sortedListings.length > 0 && <Suspense fallback={<div className="h-[520px] animate-pulse rounded-2xl bg-[#E7EDF4]" />}><PropertyResultsMap listings={sortedListings} /></Suspense>}
+          {!loading && !error && viewMode !== 'map' && sortedListings.length > 0 && <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">{sortedListings.slice(0, 8).map((listing) => <PropertyCard key={`${listing.id}-${listing.variant || 'base'}`} property={listing} cardVariant="results" />)}</div>}
+          {!loading && !error && sortedListings.length === 0 && <div className="mx-auto max-w-md rounded-2xl border border-[#E3E8EF] bg-white p-8 text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#F4F7FB] text-[#C89B6D]">⌕</div><h2 className="mt-4 text-base font-semibold">No properties match your search.</h2><p className="mt-2 text-sm text-[#5B6B82]">Try adjusting your dates, guests, or neighbourhood.</p><button type="button" onClick={clearAllFilters} className="mt-5 min-h-[44px] rounded-full bg-[#0B1F42] px-6 text-sm font-semibold text-white">Clear filters</button></div>}
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+}
+
 function PropertiesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -279,6 +359,38 @@ function PropertiesPage() {
   // Show Coming Soon placeholders only on default unfiltered view
   const showComingSoon = !hasActiveFilters && sort === 'default' && !loading && !error;
 
+  return (
+    <PropertiesResultsScene
+      searchInput={searchInput}
+      onSearchChange={handleSearchChange}
+      onSearchSubmit={handleSearchSubmit}
+      onSearchClear={handleSearchClear}
+      loading={loading}
+      searchQuery={searchQuery}
+      dates={{ checkIn, checkOut }}
+      onDatesChange={handleDatesChange}
+      guests={guests}
+      onGuestsChange={handleGuestsChange}
+      clearAllFilters={clearAllFilters}
+      hasActiveFilters={hasActiveFilters}
+      sortedListings={sortedListings}
+      sort={sort}
+      updateParam={updateParam}
+      filter={filter}
+      bedFilter={bedFilter}
+      filterButtons={filterButtons}
+      bedFilterButtons={bedFilterButtons}
+      error={error}
+      fetchProperties={fetchProperties}
+      viewMode={viewMode}
+      setViewMode={setViewMode}
+      moreFiltersOpen={moreFiltersOpen}
+      setMoreFiltersOpen={setMoreFiltersOpen}
+    />
+  );
+
+  // The legacy layout remains below for reference while the scene above is canonical.
+  // eslint-disable-next-line no-unreachable
   return (
     <div className="min-h-screen overflow-x-hidden bg-canvas">
       <Navbar />
