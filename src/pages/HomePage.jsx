@@ -237,7 +237,7 @@ export default function HomePage() {
         <section className="relative z-20 isolate overflow-visible bg-[#102B62] text-white">
           <img src={heroImage} alt="A furnished ZuriLofts apartment in Nairobi" className="absolute inset-0 -z-20 h-full w-full object-cover" />
           <div className="absolute inset-0 -z-10 bg-[#123878]/80" />
-          <div className="mx-auto flex min-h-[440px] max-w-[1240px] flex-col items-center justify-center px-5 py-14 text-center md:px-8">
+          <div className="mx-auto flex min-h-[440px] max-w-[1240px] flex-col items-center justify-center px-5 py-20 text-center md:px-8 md:py-24">
             <span className="rounded-full bg-[#C89B6D] px-4 py-2 text-[10px] font-semibold uppercase tracking-[.1em] text-white">100+ verified homes · Nairobi</span>
             <h1 className="mt-6 text-4xl font-semibold tracking-[-.03em] sm:text-5xl">Find your place in Nairobi</h1>
             <p className="mt-4 max-w-[650px] text-sm leading-6 text-white/90 sm:text-base">Handpicked apartments across the city&apos;s best neighbourhoods — verified, furnished, and ready to move in.</p>
