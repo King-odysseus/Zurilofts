@@ -6,6 +6,7 @@ import logoImg from '../assets/zurilofts-logo.png';
 import { heroImage } from '../assets/images.js';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 import { firstImage } from '../utils/images.js';
 import { clearRecentlyViewed, getRecentlyViewed } from '../utils/recentlyViewed.js';
@@ -65,6 +66,7 @@ function Icon({ name, className = 'h-5 w-5' }) {
 
 function HomeHeader() {
   const { user, isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -96,7 +98,7 @@ function HomeHeader() {
             <button
               type="button"
               onClick={() => setSearchOpen((open) => !open)}
-              aria-label={searchOpen ? 'Close search' : 'Open search'}
+              aria-label={searchOpen ? t('nav.closeSearch') : t('nav.openSearch')}
               aria-expanded={searchOpen}
               className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[#C89B6D]/15 hover:text-[#B8895C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
             >
@@ -108,8 +110,8 @@ function HomeHeader() {
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 onKeyDown={(event) => { if (event.key === 'Escape') setSearchOpen(false); }}
-                placeholder="Search stays"
-                aria-label="Search stays"
+                placeholder={t('nav.searchStays')}
+                aria-label={t('nav.searchStays')}
                 className="header-search-input min-w-0 flex-1 border-0 bg-transparent px-2 text-xs text-[#0B1F42] outline-none placeholder:text-slate-400 focus:border-0 focus:outline-none focus:ring-0"
               />
             )}

@@ -27,6 +27,9 @@ export const translations = {
       signOut: 'Sign Out',
       moreToExplore: 'More to explore',
       language: 'Language',
+      searchStays: 'Search stays',
+      openSearch: 'Open search',
+      closeSearch: 'Close search',
     },
     login: {
       needHelp: 'Need help?',
@@ -107,6 +110,9 @@ export const translations = {
       signOut: 'Toka',
       moreToExplore: 'Zaidi ya kuvinjari',
       language: 'Lugha',
+      searchStays: 'Tafuta makazi',
+      openSearch: 'Fungua utafutaji',
+      closeSearch: 'Funga utafutaji',
     },
     login: {
       needHelp: 'Unahitaji usaidizi?',
