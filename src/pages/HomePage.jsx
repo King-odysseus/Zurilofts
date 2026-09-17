@@ -65,7 +65,7 @@ function Icon({ name, className = 'h-5 w-5' }) {
   );
 }
 
-function HomeHeader({ propertiesPage = false }) {
+function HomeHeader({ propertiesPage = false, searchLabel = '', searchPath = '/properties' }) {
   const { user, isAuthenticated } = useAuth();
   const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
@@ -76,7 +76,7 @@ function HomeHeader({ propertiesPage = false }) {
   function submitHeaderSearch(event) {
     event.preventDefault();
     const query = searchQuery.trim();
-    navigate(query ? `/properties?search=${encodeURIComponent(query)}` : '/properties');
+    navigate(query ? `${searchPath}?search=${encodeURIComponent(query)}` : searchPath);
     setSearchOpen(false);
   }
 
@@ -117,7 +117,7 @@ function HomeHeader({ propertiesPage = false }) {
                 className="header-search-input min-w-0 flex-1 border-0 bg-transparent px-2 text-xs text-[#0B1F42] outline-none placeholder:text-slate-400 focus:border-0 focus:outline-none focus:ring-0"
               />
             )}
-            {!searchOpen && <span className={propertiesPage ? 'pr-3 text-xs text-slate-500' : 'sr-only'}>{propertiesPage ? 'Search properties' : 'Search'}</span>}
+            {!searchOpen && <span className={propertiesPage || searchLabel ? 'pr-3 text-xs text-slate-500' : 'sr-only'}>{searchLabel || (propertiesPage ? 'Search properties' : 'Search')}</span>}
           </form>
           <Link to="/host/application" className="hidden text-xs font-medium hover:text-[#C89B6D] lg:block">{t('nav.becomeHost')}</Link>
           <Link to="/favourites" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-50" aria-label="Favourites">
