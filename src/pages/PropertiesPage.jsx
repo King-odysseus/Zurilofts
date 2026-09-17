@@ -40,6 +40,7 @@ function PropertiesResultsScene({
   searchInput, onSearchChange, onSearchSubmit, onSearchClear, loading, searchQuery,
   dates, onDatesChange, guests, onGuestsChange, clearAllFilters, hasActiveFilters,
   sortedListings, sort, updateParam, filter, bedFilter, filterButtons,
+  priceRange, neighborhood, minRating, availableOnly, selectedAmenities, setSelectedAmenities,
   bedFilterButtons, error, fetchProperties, viewMode, setViewMode, moreFiltersOpen,
   setMoreFiltersOpen,
 }) {
@@ -87,12 +88,19 @@ function PropertiesResultsScene({
             </div>
             <Dropdown value={sort} onChange={(value) => updateParam('sort', value)} options={SORT_OPTIONS} placeholder="Recommended" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#0B1F42]" menuClassName="right-0 left-auto" ariaLabel="Sort properties" />
           </div>
+          {moreFiltersOpen && <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-3">
+            <Dropdown value={priceRange} onChange={(value) => updateParam('price', value)} options={[{ value: 'all', label: 'All Prices' }, { value: 'low', label: 'Under KES 5,000' }, { value: 'mid', label: 'KES 5,000–8,000' }, { value: 'high', label: 'Above KES 8,000' }]} placeholder="All Prices" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs text-[#33415C]" menuClassName="left-0" ariaLabel="Price range" />
+            <Dropdown value={neighborhood} onChange={(value) => updateParam('neighborhood', value)} options={NEIGHBORHOODS} placeholder="All Areas" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs text-[#33415C]" menuClassName="left-0" ariaLabel="Neighborhood" />
+            <Dropdown value={minRating} onChange={(value) => updateParam('minRating', value)} options={RATING_OPTIONS} placeholder="Any Rating" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs text-[#33415C]" menuClassName="left-0" ariaLabel="Minimum rating" />
+            <button type="button" onClick={() => updateParam('available', availableOnly ? '' : 'true')} className={`rounded-full px-3 py-2 text-xs ${availableOnly ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF] text-[#33415C]'}`}>Available to book</button>
+            {COMMON_AMENITIES.map((amenity) => <button key={amenity} type="button" onClick={() => setSelectedAmenities((previous) => { const next = new Set(previous); if (next.has(amenity)) next.delete(amenity); else next.add(amenity); return next; })} className={`rounded-full px-3 py-2 text-xs ${selectedAmenities.has(amenity) ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF] text-[#33415C]'}`}>{amenity}</button>)}
+          </div>}
           <div className="md:hidden">
             <div className="grid grid-cols-2 gap-3">
               <button type="button" onClick={() => setMoreFiltersOpen(!moreFiltersOpen)} className="min-h-[44px] rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold text-[#0B1F42]">Filters{hasActiveFilters ? ' ·' : ''}</button>
               <button type="button" onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')} className="min-h-[44px] rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold text-[#0B1F42]">{viewMode === 'map' ? 'Show list' : 'Show map'}</button>
             </div>
-            {moreFiltersOpen && <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-3">{filterButtons.map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('type', key)} className={`rounded-full px-3 py-2 text-xs ${filter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{label}</button>)}{bedFilterButtons.slice(1).map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('beds', key)} className={`rounded-full px-3 py-2 text-xs ${bedFilter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{label}</button>)}<button type="button" onClick={clearAllFilters} className="rounded-full px-3 py-2 text-xs font-semibold text-[#B8895C]">Clear all</button></div>}
+            {moreFiltersOpen && <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-3">{filterButtons.map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('type', key)} className={`rounded-full px-3 py-2 text-xs ${filter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{label}</button>)}{bedFilterButtons.slice(1).map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('beds', key)} className={`rounded-full px-3 py-2 text-xs ${bedFilter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{label}</button>)}<Dropdown value={priceRange} onChange={(value) => updateParam('price', value)} options={[{ value: 'all', label: 'All Prices' }, { value: 'low', label: 'Under KES 5,000' }, { value: 'mid', label: 'KES 5,000–8,000' }, { value: 'high', label: 'Above KES 8,000' }]} placeholder="All Prices" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs" menuClassName="left-0" ariaLabel="Price range" /><Dropdown value={neighborhood} onChange={(value) => updateParam('neighborhood', value)} options={NEIGHBORHOODS} placeholder="All Areas" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs" menuClassName="left-0" ariaLabel="Neighborhood" /><Dropdown value={minRating} onChange={(value) => updateParam('minRating', value)} options={RATING_OPTIONS} placeholder="Any Rating" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs" menuClassName="left-0" ariaLabel="Minimum rating" /><button type="button" onClick={() => updateParam('available', availableOnly ? '' : 'true')} className={`rounded-full px-3 py-2 text-xs ${availableOnly ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>Available</button>{COMMON_AMENITIES.slice(0, 4).map((amenity) => <button key={amenity} type="button" onClick={() => setSelectedAmenities((previous) => { const next = new Set(previous); if (next.has(amenity)) next.delete(amenity); else next.add(amenity); return next; })} className={`rounded-full px-3 py-2 text-xs ${selectedAmenities.has(amenity) ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{amenity}</button>)}<button type="button" onClick={clearAllFilters} className="rounded-full px-3 py-2 text-xs font-semibold text-[#B8895C]">Clear all</button></div>}
           </div>
         </section>
 
@@ -377,6 +385,12 @@ function PropertiesPage() {
       updateParam={updateParam}
       filter={filter}
       bedFilter={bedFilter}
+      priceRange={priceRange}
+      neighborhood={neighborhood}
+      minRating={minRating}
+      availableOnly={availableOnly}
+      selectedAmenities={selectedAmenities}
+      setSelectedAmenities={setSelectedAmenities}
       filterButtons={filterButtons}
       bedFilterButtons={bedFilterButtons}
       error={error}
