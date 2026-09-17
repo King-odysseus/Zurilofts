@@ -54,7 +54,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
         <button
           type="submit"
           disabled={loading}
-          className={`min-h-[44px] w-full whitespace-nowrap rounded-full bg-[#C49A6C] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-8 ${discovery ? 'sm:h-12 sm:w-12 sm:px-0 sm:text-transparent' : ''}`}
+          className={`min-h-[44px] w-full whitespace-nowrap rounded-full bg-[#C49A6C] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${discovery ? 'sm:h-12 sm:w-12 sm:px-0 sm:text-transparent' : 'sm:w-auto sm:px-8'}`}
         >
           {discovery ? (
             <svg className="mx-auto h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
