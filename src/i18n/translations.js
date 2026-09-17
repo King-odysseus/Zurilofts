@@ -55,7 +55,7 @@ export const translations = {
       subtitle: 'Join ZuriLofts to book or host premium stays in Nairobi',
       headline: 'Join ZuriLofts.',
       subheadline: 'Create your account to book verified stays across Nairobi, save your favourites, or list your own property and start earning.',
-      benefit1: 'Verified hosts and escrow-protected payments',
+      benefit1: 'Verified and fast payments',
       benefit2: 'Save favourites and track every booking in one dashboard',
       benefit3: 'List your property free and start earning as a host',
       firstName: 'First name',
