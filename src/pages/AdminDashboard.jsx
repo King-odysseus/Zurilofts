@@ -1,43 +1,125 @@
-import { useState, useEffect, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext.jsx';
-import apiClient from '../api/client.js';
-import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
-import logoImg from '../assets/zurilofts-logo.png';
+import { useState, useEffect, useRef } from "react";
+import PropTypes from "prop-types";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
+import apiClient from "../api/client.js";
+import {
+  playMessageSound,
+  playBookingSound,
+} from "../utils/notificationSound.js";
+import logoImg from "../assets/zurilofts-logo.png";
 
 // Shared: both hosts and admins - routes gated by requireHost (or weaker).
 const sharedNavItems = [
-  { path: '/admin', label: 'Dashboard', icon: 'M4 6h16M4 10h16M4 14h16M4 18h16', exact: true, group: 'Overview' },
-  { path: '/admin/properties', label: 'Properties', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', group: 'Listings' },
-  { path: '/admin/earnings', label: 'Earnings', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z', group: 'Payments' },
+  {
+    path: "/admin",
+    label: "Dashboard",
+    icon: "M4 6h16M4 10h16M4 14h16M4 18h16",
+    exact: true,
+    group: "Overview",
+  },
+  {
+    path: "/admin/properties",
+    label: "Properties",
+    icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
+    group: "Listings",
+  },
+  {
+    path: "/admin/earnings",
+    label: "Earnings",
+    icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
+    group: "Payments",
+  },
 ];
 
 // Admin-only: backend is requireAdmin. Hosts must not see these - clicking
 // them would 403. Separated from sharedNavItems so the host sidebar stays
 // functional and doesn't invite users to dead-end pages.
 const adminOnlyItems = [
-  { path: '/admin/bookings', label: 'Bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', group: 'Bookings' },
-  { path: '/admin/users', label: 'Users & Hosts', icon: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65', group: 'People' },
-  { path: '/admin/host-applications', label: 'Host Applications', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414A1 1 0 0118 8.414V19a2 2 0 01-2 2z', group: 'People' },
-  { path: '/admin/identity-verifications', label: 'Identity Verifications', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', group: 'People' },
-  { path: '/admin/disputes', label: 'Disputes', icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z', group: 'Bookings' },
-  { path: '/admin/promos', label: 'Promo Codes', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z', group: 'Content' },
-  { path: '/admin/addons', label: 'Add-ons', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4', group: 'Content' },
-  { path: '/admin/guides', label: 'Guides', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253', group: 'Content' },
-  { path: '/admin/feedback', label: 'Feedback', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z', group: 'Content' },
-  { path: '/admin/messages', label: 'Messages', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', group: 'Content' },
-  { path: '/admin/payouts', label: 'Payouts', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z', group: 'Payments' },
+  {
+    path: "/admin/bookings",
+    label: "Bookings",
+    icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+    group: "Bookings",
+  },
+  {
+    path: "/admin/users",
+    label: "Users & Hosts",
+    icon: "M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65",
+    group: "People",
+  },
+  {
+    path: "/admin/host-applications",
+    label: "Host Applications",
+    icon: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414A1 1 0 0118 8.414V19a2 2 0 01-2 2z",
+    group: "People",
+  },
+  {
+    path: "/admin/identity-verifications",
+    label: "Identity Verifications",
+    icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
+    group: "People",
+  },
+  {
+    path: "/admin/disputes",
+    label: "Disputes",
+    icon: "M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z",
+    group: "Bookings",
+  },
+  {
+    path: "/admin/promos",
+    label: "Promo Codes",
+    icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z",
+    group: "Content",
+  },
+  {
+    path: "/admin/addons",
+    label: "Add-ons",
+    icon: "M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4",
+    group: "Content",
+  },
+  {
+    path: "/admin/guides",
+    label: "Guides",
+    icon: "M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253",
+    group: "Content",
+  },
+  {
+    path: "/admin/feedback",
+    label: "Feedback",
+    icon: "M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z",
+    group: "Content",
+  },
+  {
+    path: "/admin/messages",
+    label: "Messages",
+    icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
+    group: "Content",
+  },
+  {
+    path: "/admin/payouts",
+    label: "Payouts",
+    icon: "M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z",
+    group: "Payments",
+  },
 ];
 
 // Grouped section order for the sidebar nav - matches the design system's
 // Admin Navigation grouping (Overview, Listings, Bookings, Payments, People, Content).
-const GROUP_ORDER = ['Overview', 'Listings', 'Bookings', 'Payments', 'People', 'Content'];
+const GROUP_ORDER = [
+  "Overview",
+  "Listings",
+  "Bookings",
+  "Payments",
+  "People",
+  "Content",
+];
 
 function groupNavItems(items) {
-  return GROUP_ORDER
-    .map((group) => ({ group, items: items.filter((item) => item.group === group) }))
-    .filter((g) => g.items.length > 0);
+  return GROUP_ORDER.map((group) => ({
+    group,
+    items: items.filter((item) => item.group === group),
+  })).filter((g) => g.items.length > 0);
 }
 
 // Avatar dropdown shown in the dashboard header - mirrors the client Navbar's
@@ -48,10 +130,11 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
 
   useEffect(() => {
     function handleClick(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
+      if (menuRef.current && !menuRef.current.contains(e.target))
+        setOpen(false);
     }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   return (
@@ -62,31 +145,66 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
       >
         <div className="w-9 h-9 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
           {user?.avatar ? (
-            <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+            <img
+              src={user.avatar}
+              alt=""
+              className="w-full h-full object-cover"
+            />
           ) : (
-            <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
+            <>
+              {user?.firstName?.[0]}
+              {user?.lastName?.[0]}
+            </>
           )}
         </div>
-        <span className="hidden sm:block text-sm font-semibold text-[#222222]">{user?.firstName}</span>
-        <svg className={`w-4 h-4 text-[#222222] transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        <span className="hidden sm:block text-sm font-semibold text-[#222222]">
+          {user?.firstName}
+        </span>
+        <svg
+          className={`w-4 h-4 text-[#222222] transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
 
       {open && (
-        <div className={`absolute right-0 w-56 bg-white rounded-[14px] border border-[#E5E7EB] shadow-lg py-2 z-30 ${openUp ? 'bottom-full mb-2' : 'top-full mt-2'}`}>
+        <div
+          className={`absolute right-0 w-56 bg-white rounded-[14px] border border-[#E5E7EB] shadow-lg py-2 z-30 ${openUp ? "bottom-full mb-2" : "top-full mt-2"}`}
+        >
           <div className="px-4 py-3 border-b border-[#E5E7EB]">
-            <p className="text-sm font-semibold text-[#222222]">{user?.firstName} {user?.lastName}</p>
+            <p className="text-sm font-semibold text-[#222222]">
+              {user?.firstName} {user?.lastName}
+            </p>
             <p className="text-xs text-[#6b7280]">{user?.email}</p>
-            <span className="inline-block mt-1.5 text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">{isAdmin ? 'Admin' : 'Host'}</span>
+            <span className="inline-block mt-1.5 text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+              {isAdmin ? "Admin" : "Host"}
+            </span>
           </div>
           <Link
             to="/profile#info"
             onClick={() => setOpen(false)}
             className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
           >
-            <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            <svg
+              className="w-4 h-4 mr-3 text-[#6b7280]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+              />
             </svg>
             My Profile
           </Link>
@@ -95,8 +213,18 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
             onClick={() => setOpen(false)}
             className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
           >
-            <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            <svg
+              className="w-4 h-4 mr-3 text-[#6b7280]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+              />
             </svg>
             Messages
           </Link>
@@ -105,18 +233,41 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
             onClick={() => setOpen(false)}
             className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
           >
-            <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-4 h-4 mr-3 text-[#6b7280]"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
             Go back to client view
           </Link>
           <div className="border-t border-[#E5E7EB] mt-1 pt-1">
             <button
-              onClick={() => { setOpen(false); onLogout(); }}
+              onClick={() => {
+                setOpen(false);
+                onLogout();
+              }}
               className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
             >
-              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              <svg
+                className="w-4 h-4 mr-3"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                />
               </svg>
               Sign Out
             </button>
@@ -141,11 +292,11 @@ HeaderUserMenu.propTypes = {
 
 /* ── StatCard - blue-primary dashboard metric card ── */
 const TONE_STYLES = {
-  primary: { bg: 'bg-[#2563EB]', icon: 'text-white' },
-  success: { bg: 'bg-green-600', icon: 'text-white' },
-  warning: { bg: 'bg-amber-500', icon: 'text-white' },
-  danger:  { bg: 'bg-red-600', icon: 'text-white' },
-  info:    { bg: 'bg-sky-600', icon: 'text-white' },
+  primary: { bg: "bg-[#2563EB]", icon: "text-white" },
+  success: { bg: "bg-green-600", icon: "text-white" },
+  warning: { bg: "bg-amber-500", icon: "text-white" },
+  danger: { bg: "bg-red-600", icon: "text-white" },
+  info: { bg: "bg-sky-600", icon: "text-white" },
 };
 
 function StatCardView({ label, value, icon, tone }) {
@@ -154,9 +305,21 @@ function StatCardView({ label, value, icon, tone }) {
     <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-center justify-between mb-3">
         <span className="text-sm text-[#6b7280]">{label}</span>
-        <div className={`w-10 h-10 ${t.bg} rounded-xl flex items-center justify-center`}>
-          <svg className={`w-5 h-5 ${t.icon}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+        <div
+          className={`w-10 h-10 ${t.bg} rounded-xl flex items-center justify-center`}
+        >
+          <svg
+            className={`w-5 h-5 ${t.icon}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d={icon}
+            />
           </svg>
         </div>
       </div>
@@ -169,7 +332,7 @@ StatCardView.propTypes = {
   label: PropTypes.string.isRequired,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
   icon: PropTypes.string.isRequired,
-  tone: PropTypes.oneOf(['primary', 'success', 'warning', 'danger', 'info']),
+  tone: PropTypes.oneOf(["primary", "success", "warning", "danger", "info"]),
 };
 
 function AdminLayout() {
@@ -177,10 +340,16 @@ function AdminLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(() => {
-    try { return localStorage.getItem('zurilofts_admin_sidebar') === 'collapsed'; } catch { return false; }
+    try {
+      return localStorage.getItem("zurilofts_admin_sidebar") === "collapsed";
+    } catch {
+      return false;
+    }
   });
-  const isAdmin = user?.role === 'ADMIN';
-  const navItems = isAdmin ? [...sharedNavItems, ...adminOnlyItems] : sharedNavItems;
+  const isAdmin = user?.role === "ADMIN";
+  const navItems = isAdmin
+    ? [...sharedNavItems, ...adminOnlyItems]
+    : sharedNavItems;
   const navGroups = groupNavItems(navItems);
 
   // ── Notification polling (messages + new bookings) ──
@@ -189,13 +358,15 @@ function AdminLayout() {
 
   // Mobile pill nav "More" off-screen menu
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [expandedGroups, setExpandedGroups] = useState(() => Object.fromEntries(GROUP_ORDER.map((group) => [group, true])));
+  const [expandedGroups, setExpandedGroups] = useState(() =>
+    Object.fromEntries(GROUP_ORDER.map((group) => [group, true])),
+  );
 
   useEffect(() => {
     let active = true;
     const poll = async () => {
       try {
-        const r = await apiClient.get('/notifications');
+        const r = await apiClient.get("/notifications");
         if (!active) return;
         const d = r.data.data || {};
         const prev = lastNotifRef.current;
@@ -204,24 +375,42 @@ function AdminLayout() {
         if (d.unreadMessages > prev.unreadMessages) playMessageSound();
         if (d.pendingBookings > prev.pendingBookings) playBookingSound();
 
-        lastNotifRef.current = { unreadMessages: d.unreadMessages ?? 0, pendingBookings: d.pendingBookings ?? 0 };
-        setNotif({ unreadMessages: d.unreadMessages ?? 0, pendingBookings: d.pendingBookings ?? 0 });
-      } catch (err) { console.error(err); }
+        lastNotifRef.current = {
+          unreadMessages: d.unreadMessages ?? 0,
+          pendingBookings: d.pendingBookings ?? 0,
+        };
+        setNotif({
+          unreadMessages: d.unreadMessages ?? 0,
+          pendingBookings: d.pendingBookings ?? 0,
+        });
+      } catch (err) {
+        console.error(err);
+      }
     };
     poll();
     const t = setInterval(poll, 25000);
-    return () => { active = false; clearInterval(t); };
+    return () => {
+      active = false;
+      clearInterval(t);
+    };
   }, []);
 
   function handleLogout() {
     logout();
-    navigate('/');
+    navigate("/");
   }
 
   function toggleSidebar() {
     setCollapsed((prev) => {
       const next = !prev;
-      try { localStorage.setItem('zurilofts_admin_sidebar', next ? 'collapsed' : 'expanded'); } catch (err) { console.error(err); }
+      try {
+        localStorage.setItem(
+          "zurilofts_admin_sidebar",
+          next ? "collapsed" : "expanded",
+        );
+      } catch (err) {
+        console.error(err);
+      }
       return next;
     });
   }
@@ -229,36 +418,50 @@ function AdminLayout() {
   // Mobile pill nav: show the first four sections, tuck the rest behind "More"
   const MOBILE_NAV_VISIBLE = 4;
   const mobileVisibleItems = navItems.slice(0, MOBILE_NAV_VISIBLE);
-  const moreItemActive = navItems.slice(MOBILE_NAV_VISIBLE).some(({ path, exact }) =>
-    exact ? location.pathname === path : location.pathname.startsWith(path)
-  );
+  const moreItemActive = navItems
+    .slice(MOBILE_NAV_VISIBLE)
+    .some(({ path, exact }) =>
+      exact ? location.pathname === path : location.pathname.startsWith(path),
+    );
 
   function NavLink({ path, label, icon, exact }) {
-    const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+    const active = exact
+      ? location.pathname === path
+      : location.pathname.startsWith(path);
     return (
       <Link
         key={path}
         to={path}
-        title={collapsed ? label : ''}
-        aria-current={active ? 'page' : undefined}
+        title={collapsed ? label : ""}
+        aria-current={active ? "page" : undefined}
         className={`flex items-center rounded-lg mb-1 text-sm font-medium transition-all duration-200 ${
           active
-            ? 'bg-[#2563EB] text-white'
-            : 'text-[#222222] hover:bg-[#F7F7F5]'
-        } ${collapsed ? 'justify-center w-11 h-11' : 'px-4 py-3'}`}
+            ? "bg-white/10 text-white"
+            : "text-white/70 hover:bg-white/10 hover:text-white"
+        } ${collapsed ? "justify-center w-11 h-11" : "px-4 py-3"}`}
       >
         <div className="relative">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d={icon}
+            />
           </svg>
-          {path === '/admin/messages' && notif.unreadMessages > 0 && (
+          {path === "/admin/messages" && notif.unreadMessages > 0 && (
             <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-              {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
+              {notif.unreadMessages > 99 ? "99+" : notif.unreadMessages}
             </span>
           )}
-          {path === '/admin/bookings' && notif.pendingBookings > 0 && (
+          {path === "/admin/bookings" && notif.pendingBookings > 0 && (
             <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-              {notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}
+              {notif.pendingBookings > 99 ? "99+" : notif.pendingBookings}
             </span>
           )}
         </div>
@@ -274,82 +477,140 @@ function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-canvas flex">
+    <div className="min-h-screen bg-[#F8FAFC] flex">
       {/* Sidebar */}
       <aside
-        className={`bg-white border-r border-[#E5E7EB] text-[#222222] hidden md:flex flex-col fixed inset-y-0 left-0 z-10 transition-all duration-300 ${
-          collapsed ? 'w-[88px]' : 'w-64'
+        className={`bg-[#0B1F42] border-r border-[#17345C] text-white hidden md:flex flex-col fixed inset-y-0 left-0 z-10 transition-all duration-300 ${
+          collapsed ? "w-[88px]" : "w-64"
         }`}
       >
-        <div className={`flex ${collapsed ? 'flex-col items-center gap-2 pt-12 pb-2 px-2' : 'items-center justify-between pt-16 pb-4 px-6'}`}>
+        <div
+          className={`flex ${collapsed ? "flex-col items-center gap-2 pt-12 pb-2 px-2" : "items-center justify-between pt-16 pb-4 px-6"}`}
+        >
           <Link to="/">
-            <img src={logoImg} alt="ZuriLofts" className={`w-auto ${collapsed ? 'h-7' : 'h-10'}`} />
+            <img
+              src={logoImg}
+              alt="ZuriLofts"
+              className={`w-auto ${collapsed ? "h-7" : "h-10"}`}
+            />
           </Link>
           <button
             onClick={toggleSidebar}
-            className="p-1 rounded-lg text-[#6b7280] hover:bg-[#F7F7F5] transition-colors"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            className="p-1 rounded-lg text-white/60 hover:bg-white/10 transition-colors"
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <svg
-              className={`w-5 h-5 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}
+              className={`w-5 h-5 transition-transform duration-300 ${collapsed ? "rotate-180" : ""}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 19l-7-7 7-7m8 14l-7-7 7-7"
+              />
             </svg>
           </button>
         </div>
         {!collapsed && (
-          <span className="block px-6 pb-4 text-[#6b7280] text-xs font-semibold uppercase tracking-wider">
-            {isAdmin ? 'Admin Panel' : 'Host Dashboard'}
+          <span className="block px-6 pb-4 text-white/45 text-xs font-semibold uppercase tracking-wider">
+            {isAdmin ? "Admin Panel" : "Host Dashboard"}
           </span>
         )}
-        <nav className={`flex-1 overflow-y-auto ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
+        <nav
+          className={`flex-1 overflow-y-auto ${collapsed ? "flex flex-col items-center" : "px-3"}`}
+        >
           {navGroups.map(({ group, items }) => (
-            <div key={group} className={collapsed ? 'mb-2' : 'mb-4'}>
+            <div key={group} className={collapsed ? "mb-2" : "mb-4"}>
               {!collapsed && (
-                <button type="button" onClick={() => setExpandedGroups((current) => ({ ...current, [group]: !current[group] }))} aria-expanded={expandedGroups[group]} className="mb-1.5 flex min-h-[32px] w-full items-center justify-between rounded-lg px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hover:bg-[#F7F7F5]">
-                  {group}<span aria-hidden="true">{expandedGroups[group] ? '−' : '+'}</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setExpandedGroups((current) => ({
+                      ...current,
+                      [group]: !current[group],
+                    }))
+                  }
+                  aria-expanded={expandedGroups[group]}
+                  className="mb-1.5 flex min-h-[32px] w-full items-center justify-between rounded-lg px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hover:bg-[#F7F7F5]"
+                >
+                  {group}
+                  <span aria-hidden="true">
+                    {expandedGroups[group] ? "−" : "+"}
+                  </span>
                 </button>
               )}
-              {(collapsed || expandedGroups[group]) && items.map((item) => <NavLink key={item.path} {...item} />)}
+              {(collapsed || expandedGroups[group]) &&
+                items.map((item) => <NavLink key={item.path} {...item} />)}
             </div>
           ))}
         </nav>
-        <div className={`border-t border-[#E5E7EB] ${collapsed ? 'p-3 flex flex-col items-center' : 'p-5'}`}>
+        <div
+          className={`border-t border-white/10 ${collapsed ? "p-3 flex flex-col items-center" : "p-5"}`}
+        >
           <Link
             to="/"
-            title={collapsed ? 'Go back to client view' : ''}
-            className={`flex items-center rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200 ${
-              collapsed ? 'justify-center w-11 h-11 mb-4' : 'justify-center mb-5 px-4 py-2.5'
+            title={collapsed ? "Go back to client view" : ""}
+            className={`flex items-center rounded-lg text-sm font-semibold border border-white/15 text-white/80 hover:bg-white/10 transition-all duration-200 ${
+              collapsed
+                ? "justify-center w-11 h-11 mb-4"
+                : "justify-center mb-5 px-4 py-2.5"
             }`}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
             </svg>
-            {!collapsed && <span className="ml-2.5">Go back to client view</span>}
+            {!collapsed && (
+              <span className="ml-2.5">Go back to client view</span>
+            )}
           </Link>
-          <div className={`flex items-center my-5 ${collapsed ? 'justify-center' : 'space-x-3'}`}>
-            <div className="w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-xs font-bold text-white">
-              {user?.firstName?.[0]}{user?.lastName?.[0]}
+          <div
+            className={`flex items-center my-5 ${collapsed ? "justify-center" : "space-x-3"}`}
+          >
+            <div className="w-8 h-8 bg-[#38BDF8] rounded-full flex items-center justify-center text-xs font-bold text-[#0B1F42]">
+              {user?.firstName?.[0]}
+              {user?.lastName?.[0]}
             </div>
             {!collapsed && (
               <div className="text-sm">
-                <p className="font-medium text-[#222222]">{user?.firstName}</p>
-                <p className="text-[#6b7280] text-xs">{isAdmin ? 'Admin' : 'Host'}</p>
+                <p className="font-medium text-white">{user?.firstName}</p>
+                <p className="text-white/50 text-xs">
+                  {isAdmin ? "Admin" : "Host"}
+                </p>
               </div>
             )}
           </div>
           <button
             onClick={handleLogout}
-            title={collapsed ? 'Sign Out' : ''}
-            className={`flex items-center text-[#6b7280] hover:text-[#222222] transition-colors mt-3 ${
-              collapsed ? 'justify-center w-full text-base' : 'text-[15px]'
+            title={collapsed ? "Sign Out" : ""}
+            className={`flex items-center text-white/60 hover:text-white transition-colors mt-3 ${
+              collapsed ? "justify-center w-full text-base" : "text-[15px]"
             }`}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+              />
             </svg>
             {!collapsed && <span className="ml-2.5">Sign Out</span>}
           </button>
@@ -371,7 +632,9 @@ function AdminLayout() {
 
             {/* Visible section links */}
             {mobileVisibleItems.map(({ path, label, icon, exact }) => {
-              const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+              const active = exact
+                ? location.pathname === path
+                : location.pathname.startsWith(path);
               return (
                 <Link
                   key={path}
@@ -379,11 +642,23 @@ function AdminLayout() {
                   title={label}
                   aria-label={label}
                   className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
-                    active ? 'bg-[#2563EB] text-white' : 'text-[#6b7280] hover:bg-[#F7F7F5]'
+                    active
+                      ? "bg-[#2563EB] text-white"
+                      : "text-[#6b7280] hover:bg-[#F7F7F5]"
                   }`}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d={icon}
+                    />
                   </svg>
                 </Link>
               );
@@ -399,10 +674,16 @@ function AdminLayout() {
                 title="More"
                 aria-label="More"
                 className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
-                  mobileMenuOpen || moreItemActive ? 'bg-[#2563EB] text-white' : 'text-[#6b7280] hover:bg-[#F7F7F5]'
+                  mobileMenuOpen || moreItemActive
+                    ? "bg-[#2563EB] text-white"
+                    : "text-[#6b7280] hover:bg-[#F7F7F5]"
                 }`}
               >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-5 h-5"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <circle cx="5" cy="12" r="1.6" />
                   <circle cx="12" cy="12" r="1.6" />
                   <circle cx="19" cy="12" r="1.6" />
@@ -416,15 +697,25 @@ function AdminLayout() {
                 className="flex items-center justify-center w-8 h-8 rounded-full text-[#6b7280] hover:text-[#222222] hover:bg-[#F7F7F5] transition-colors"
                 title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                  />
                 </svg>
               </button>
               {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
                   {(() => {
                     const t = notif.unreadMessages + notif.pendingBookings;
-                    return t > 99 ? '99+' : t;
+                    return t > 99 ? "99+" : t;
                   })()}
                 </span>
               )}
@@ -432,7 +723,12 @@ function AdminLayout() {
 
             {/* Avatar */}
             <div className="shrink-0">
-              <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} openUp />
+              <HeaderUserMenu
+                user={user}
+                isAdmin={isAdmin}
+                onLogout={handleLogout}
+                openUp
+              />
             </div>
           </div>
         </div>
@@ -440,49 +736,78 @@ function AdminLayout() {
         {/* Off-screen menu drawer (all sections) */}
         <div
           className={`fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 ${
-            mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            mobileMenuOpen ? "opacity-100" : "opacity-0 pointer-events-none"
           }`}
           onClick={() => setMobileMenuOpen(false)}
           aria-hidden="true"
         />
         <div
           className={`fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ${
-            mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+            mobileMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
           role="dialog"
           aria-label="All sections"
         >
           <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#E5E7EB]">
-            <h2 className="text-lg font-bold text-[#222222]">{isAdmin ? 'Admin Menu' : 'Host Menu'}</h2>
+            <h2 className="text-lg font-bold text-[#222222]">
+              {isAdmin ? "Admin Menu" : "Host Menu"}
+            </h2>
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="p-2 rounded-full text-[#6b7280] hover:bg-[#F7F7F5] transition-colors"
               aria-label="Close menu"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
-          <nav className="flex-1 overflow-y-auto py-2" aria-label="Admin sections">
+          <nav
+            className="flex-1 overflow-y-auto py-2"
+            aria-label="Admin sections"
+          >
             {navGroups.map(({ group, items }) => (
               <div key={group} className="mb-2">
                 <span className="block px-5 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
                   {group}
                 </span>
                 {items.map(({ path, label, icon, exact }) => {
-                  const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+                  const active = exact
+                    ? location.pathname === path
+                    : location.pathname.startsWith(path);
                   return (
                     <Link
                       key={path}
                       to={path}
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center px-5 py-3 text-sm transition-colors ${
-                        active ? 'bg-blue-50 text-[#2563EB] font-semibold' : 'text-[#222222] hover:bg-[#F7F7F5]'
+                        active
+                          ? "bg-blue-50 text-[#2563EB] font-semibold"
+                          : "text-[#222222] hover:bg-[#F7F7F5]"
                       }`}
                     >
-                      <svg className="w-5 h-5 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                      <svg
+                        className="w-5 h-5 mr-3 text-[#6b7280]"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d={icon}
+                        />
                       </svg>
                       {label}
                     </Link>
@@ -497,8 +822,18 @@ function AdminLayout() {
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
               </svg>
               Go back to client view
             </Link>
@@ -509,32 +844,56 @@ function AdminLayout() {
       {/* Main content */}
       <main
         className={`flex-1 transition-all duration-300 ${
-          collapsed ? 'md:ml-[88px]' : 'md:ml-64'
+          collapsed ? "md:ml-[88px]" : "md:ml-64"
         }`}
       >
         {/* Desktop header with notification bell and avatar dropdown */}
-        <header className="hidden md:flex items-center justify-end gap-3 h-16 px-8 bg-white border-b border-[#E5E7EB] sticky top-0 z-[5]">
+        <header className="hidden md:flex items-center justify-between gap-3 h-[72px] px-8 bg-white border-b border-[#E3E8EF] sticky top-0 z-[5]">
+          <div>
+            <p className="text-lg font-semibold text-[#0B1F42]">
+              Dashboard overview
+            </p>
+            <p className="text-xs text-[#94A3B8]">
+              Monitor your ZuriLofts operation at a glance.
+            </p>
+          </div>
           {/* Bell - unread messages + pending bookings */}
           <div className="relative">
             <button
-              onClick={() => { /* just a visual indicator for now */ }}
+              onClick={() => {
+                /* just a visual indicator for now */
+              }}
               className="p-2 rounded-full hover:bg-[#F7F7F5] transition-colors text-[#222222]"
               title={`${notif.unreadMessages} unread messages, ${notif.pendingBookings} pending bookings`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+                />
               </svg>
             </button>
             {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
               <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                 {(() => {
                   const t = notif.unreadMessages + notif.pendingBookings;
-                  return t > 99 ? '99+' : t;
+                  return t > 99 ? "99+" : t;
                 })()}
               </span>
             )}
           </div>
-          <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+          <HeaderUserMenu
+            user={user}
+            isAdmin={isAdmin}
+            onLogout={handleLogout}
+          />
         </header>
         <div className="p-4 pb-24 md:p-8">
           <Outlet />
@@ -547,49 +906,75 @@ function AdminLayout() {
 // Dashboard Overview
 function DashboardOverview() {
   const { user } = useAuth();
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = user?.role === "ADMIN";
   // setStats is retained so load() still fetches and computes the same data;
   // the redesigned "Needs attention" overview no longer surfaces these totals.
-  const [, setStats] = useState({ properties: 0, bookings: 0, promos: 0, revenue: 0 });
+  const [stats, setStats] = useState({
+    properties: 0,
+    bookings: 0,
+    promos: 0,
+    revenue: 0,
+  });
   const [recentBookings, setRecentBookings] = useState([]);
   const [reviewQueue, setReviewQueue] = useState([]);
-  const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0', satisfaction: '0' });
+  const [landingStats, setLandingStats] = useState({
+    happyStays: "10",
+    starRating: "5.0",
+    satisfaction: "0",
+  });
   const [savingLanding, setSavingLanding] = useState(false);
-  const [landingMsg, setLandingMsg] = useState('');
+  const [landingMsg, setLandingMsg] = useState("");
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('All');
+  const [activeTab, setActiveTab] = useState("All");
   const quickRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    function handleClick(e) { if (quickRef.current && !quickRef.current.contains(e.target)) setQuickActionsOpen(false); }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    function handleClick(e) {
+      if (quickRef.current && !quickRef.current.contains(e.target))
+        setQuickActionsOpen(false);
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   useEffect(() => {
     async function load() {
       try {
-        const bookingsUrl = isAdmin ? '/admin/bookings' : '/bookings/host';
-        const earningsUrl = isAdmin ? '/admin/analytics/properties' : '/bookings/host/earnings';
+        const bookingsUrl = isAdmin ? "/admin/bookings" : "/bookings/host";
+        const earningsUrl = isAdmin
+          ? "/admin/analytics/properties"
+          : "/bookings/host/earnings";
         const fetches = [
-          apiClient.get('/properties/mine'),
+          apiClient.get("/properties/mine"),
           apiClient.get(bookingsUrl, { params: { limit: 5 } }),
           apiClient.get(earningsUrl),
         ];
         if (isAdmin) {
-          fetches.push(apiClient.get('/promo'));
-          fetches.push(apiClient.get('/admin/settings/landing-stats'));
-          fetches.push(apiClient.get('/admin/host-applications', { params: { status: 'SUBMITTED' } }));
-          fetches.push(apiClient.get('/admin/identity-verifications', { params: { status: 'SUBMITTED' } }));
-          fetches.push(apiClient.get('/admin/disputes', { params: { status: 'OPEN' } }));
+          fetches.push(apiClient.get("/promo"));
+          fetches.push(apiClient.get("/admin/settings/landing-stats"));
+          fetches.push(
+            apiClient.get("/admin/host-applications", {
+              params: { status: "SUBMITTED" },
+            }),
+          );
+          fetches.push(
+            apiClient.get("/admin/identity-verifications", {
+              params: { status: "SUBMITTED" },
+            }),
+          );
+          fetches.push(
+            apiClient.get("/admin/disputes", { params: { status: "OPEN" } }),
+          );
         }
         const results = await Promise.all(fetches);
         const propsRes = results[0];
         const bookingsRes = results[1];
         const earningsRes = results[2];
         const bookings = bookingsRes.data.data || [];
-        const totalRevenue = bookings.filter((b) => b.status !== 'CANCELLED').reduce((sum, b) => sum + b.total, 0);
+        const totalRevenue = bookings
+          .filter((b) => b.status !== "CANCELLED")
+          .reduce((sum, b) => sum + b.total, 0);
         const totals = earningsRes.data.data?.totals || {};
         setStats({
           properties: propsRes.data.pagination?.total || 0,
@@ -600,117 +985,292 @@ function DashboardOverview() {
         setRecentBookings(bookings);
         if (isAdmin && results[4]) {
           const ls = results[4].data.data || {};
-          setLandingStats({ happyStays: String(ls.happyStays || '10'), starRating: String(ls.starRating || '5.0'), satisfaction: String(ls.satisfaction || '0') });
+          setLandingStats({
+            happyStays: String(ls.happyStays || "10"),
+            starRating: String(ls.starRating || "5.0"),
+            satisfaction: String(ls.satisfaction || "0"),
+          });
           const hostApplications = results[5]?.data.data || [];
           const identityChecks = results[6]?.data.data || [];
           const disputes = results[7]?.data.data || [];
           const bookingItems = bookings
-            .filter((booking) => booking.status === 'PENDING' || booking.paymentStatus === 'FAILED' || booking.paymentStatus === 'REFUND_PENDING')
+            .filter(
+              (booking) =>
+                booking.status === "PENDING" ||
+                booking.paymentStatus === "FAILED" ||
+                booking.paymentStatus === "REFUND_PENDING",
+            )
             .map((booking) => ({
               id: `booking-${booking.id}`,
-              category: booking.status === 'PENDING' ? 'Approvals' : 'Payments',
-              title: booking.property?.title || 'Booking review',
-              subtitle: `${booking.user?.firstName || ''} ${booking.user?.lastName || ''}`.trim() || 'Guest booking',
-              status: booking.status === 'PENDING' ? 'PENDING' : booking.paymentStatus,
-              updatedAt: booking.updatedAt || booking.createdAt || booking.checkIn,
-              to: '/admin/bookings',
+              category: booking.status === "PENDING" ? "Approvals" : "Payments",
+              title: booking.property?.title || "Booking review",
+              subtitle:
+                `${booking.user?.firstName || ""} ${booking.user?.lastName || ""}`.trim() ||
+                "Guest booking",
+              status:
+                booking.status === "PENDING"
+                  ? "PENDING"
+                  : booking.paymentStatus,
+              updatedAt:
+                booking.updatedAt || booking.createdAt || booking.checkIn,
+              to: "/admin/bookings",
             }));
           setReviewQueue([
             ...hostApplications.map((application) => ({
               id: `host-${application.id}`,
-              category: 'Approvals',
-              title: application.legalName || application.businessName || 'Host application',
-              subtitle: application.contactEmail || application.user?.email || 'Host application',
+              category: "Approvals",
+              title:
+                application.legalName ||
+                application.businessName ||
+                "Host application",
+              subtitle:
+                application.contactEmail ||
+                application.user?.email ||
+                "Host application",
               status: application.status,
               updatedAt: application.updatedAt || application.createdAt,
-              to: '/admin/host-applications',
+              to: "/admin/host-applications",
             })),
             ...identityChecks.map((verification) => ({
               id: `identity-${verification.id}`,
-              category: 'Approvals',
-              title: verification.fullName || `${verification.user?.firstName || ''} ${verification.user?.lastName || ''}`.trim() || 'Identity verification',
-              subtitle: 'Guest identity verification',
+              category: "Approvals",
+              title:
+                verification.fullName ||
+                `${verification.user?.firstName || ""} ${verification.user?.lastName || ""}`.trim() ||
+                "Identity verification",
+              subtitle: "Guest identity verification",
               status: verification.status,
               updatedAt: verification.updatedAt || verification.createdAt,
-              to: '/admin/identity-verifications',
+              to: "/admin/identity-verifications",
             })),
             ...disputes.map((dispute) => ({
               id: `dispute-${dispute.id}`,
-              category: 'Disputes',
-              title: dispute.booking?.property?.title || 'Booking dispute',
-              subtitle: dispute.category?.replaceAll('_', ' ') || 'Open dispute',
+              category: "Disputes",
+              title: dispute.booking?.property?.title || "Booking dispute",
+              subtitle:
+                dispute.category?.replaceAll("_", " ") || "Open dispute",
               status: dispute.status,
               updatedAt: dispute.updatedAt || dispute.createdAt,
-              to: '/admin/disputes',
+              to: "/admin/disputes",
             })),
             ...bookingItems,
           ]);
         }
-      } catch (err) { console.error(err); }
+      } catch (err) {
+        console.error(err);
+      }
     }
     load();
   }, [isAdmin]);
 
   async function saveLandingStats(e) {
     e.preventDefault();
-    setSavingLanding(true); setLandingMsg('');
+    setSavingLanding(true);
+    setLandingMsg("");
     try {
-      await apiClient.put('/admin/settings/landing-stats', { happyStays: Number(landingStats.happyStays), starRating: Number(landingStats.starRating), satisfaction: Number(landingStats.satisfaction) });
-      setLandingMsg('Saved.');
-    } catch { setLandingMsg('Save failed.'); }
-    finally { setSavingLanding(false); }
+      await apiClient.put("/admin/settings/landing-stats", {
+        happyStays: Number(landingStats.happyStays),
+        starRating: Number(landingStats.starRating),
+        satisfaction: Number(landingStats.satisfaction),
+      });
+      setLandingMsg("Saved.");
+    } catch {
+      setLandingMsg("Save failed.");
+    } finally {
+      setSavingLanding(false);
+    }
   }
 
   const hostQueue = recentBookings.map((booking) => ({
     id: `booking-${booking.id}`,
-    category: booking.status === 'PENDING' ? 'Approvals' : booking.paymentStatus === 'FAILED' || booking.paymentStatus === 'REFUND_PENDING' ? 'Payments' : 'All',
-    title: booking.property?.title || 'Booking',
-    subtitle: `${booking.user?.firstName || ''} ${booking.user?.lastName || ''}`.trim() || 'Guest booking',
-    status: booking.paymentStatus === 'FAILED' || booking.paymentStatus === 'REFUND_PENDING' ? booking.paymentStatus : booking.status,
+    category:
+      booking.status === "PENDING"
+        ? "Approvals"
+        : booking.paymentStatus === "FAILED" ||
+            booking.paymentStatus === "REFUND_PENDING"
+          ? "Payments"
+          : "All",
+    title: booking.property?.title || "Booking",
+    subtitle:
+      `${booking.user?.firstName || ""} ${booking.user?.lastName || ""}`.trim() ||
+      "Guest booking",
+    status:
+      booking.paymentStatus === "FAILED" ||
+      booking.paymentStatus === "REFUND_PENDING"
+        ? booking.paymentStatus
+        : booking.status,
     updatedAt: booking.updatedAt || booking.createdAt || booking.checkIn,
-    to: '/admin/bookings',
+    to: "/admin/bookings",
   }));
   const operationalQueue = isAdmin ? reviewQueue : hostQueue;
-  const pendingApprovals = operationalQueue.filter((item) => item.category === 'Approvals');
-  const paymentIssues = operationalQueue.filter((item) => item.category === 'Payments');
-  const openDisputes = operationalQueue.filter((item) => item.category === 'Disputes');
-  const TAB_ORDER = ['All', 'Approvals', 'Payments', 'Disputes'];
-  const buckets = { All: operationalQueue, Approvals: pendingApprovals, Payments: paymentIssues, Disputes: openDisputes };
+  const pendingApprovals = operationalQueue.filter(
+    (item) => item.category === "Approvals",
+  );
+  const paymentIssues = operationalQueue.filter(
+    (item) => item.category === "Payments",
+  );
+  const openDisputes = operationalQueue.filter(
+    (item) => item.category === "Disputes",
+  );
+  const TAB_ORDER = ["All", "Approvals", "Payments", "Disputes"];
+  const buckets = {
+    All: operationalQueue,
+    Approvals: pendingApprovals,
+    Payments: paymentIssues,
+    Disputes: openDisputes,
+  };
   const reviewRows = buckets[activeTab];
 
   const quickLinks = [
-    ...(isAdmin ? [
-      { to: '/admin/bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label: 'View bookings' },
-      { to: '/admin/users', icon: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65', label: 'Manage users' },
-      { to: '/admin/properties/new', icon: 'M12 4v16m8-8H4', label: 'Add property' },
-      { to: '/admin/promos', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z', label: 'Manage promos' },
-    ] : [
-      { to: '/admin/properties/new', icon: 'M12 4v16m8-8H4', label: 'Add property' },
-      { to: '/admin/bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label: 'View bookings' },
-      { to: '/admin/earnings', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', label: 'View earnings' },
-    ]),
+    ...(isAdmin
+      ? [
+          {
+            to: "/admin/bookings",
+            icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+            label: "View bookings",
+          },
+          {
+            to: "/admin/users",
+            icon: "M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65",
+            label: "Manage users",
+          },
+          {
+            to: "/admin/properties/new",
+            icon: "M12 4v16m8-8H4",
+            label: "Add property",
+          },
+          {
+            to: "/admin/promos",
+            icon: "M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z",
+            label: "Manage promos",
+          },
+        ]
+      : [
+          {
+            to: "/admin/properties/new",
+            icon: "M12 4v16m8-8H4",
+            label: "Add property",
+          },
+          {
+            to: "/admin/bookings",
+            icon: "M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z",
+            label: "View bookings",
+          },
+          {
+            to: "/admin/earnings",
+            icon: "M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+            label: "View earnings",
+          },
+        ]),
   ];
 
   return (
     <div>
+      {/* OpenPencil dashboard KPI row */}
+      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {[
+          [
+            "Total Revenue",
+            stats.revenue
+              ? `KSh ${Number(stats.revenue).toLocaleString()}`
+              : "KSh 0",
+            "+12.4%",
+            "text-[#0B1F42]",
+            "bg-[#EDF3F9]",
+          ],
+          [
+            "Total Bookings",
+            stats.bookings.toLocaleString(),
+            "+8.2%",
+            "text-[#0B1F42]",
+            "bg-[#E8F0FE]",
+          ],
+          ["Occupancy Rate", "78%", "+3.1%", "text-[#0B1F42]", "bg-[#E6F6F0]"],
+          [
+            "Pending Approvals",
+            pendingApprovals.length.toString(),
+            "Needs review",
+            "text-[#0B1F42]",
+            "bg-[#FEF3C7]",
+          ],
+        ].map(([label, value, change, valueClass, badgeClass]) => (
+          <div
+            key={label}
+            className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
+          >
+            <div className="flex items-start justify-between">
+              <p className="text-[13px] font-medium text-[#5B6B82]">{label}</p>
+              <span
+                className={`flex h-10 w-10 items-center justify-center rounded-xl ${badgeClass}`}
+              >
+                <span className="text-sm font-bold text-[#0B1F42]">
+                  {label === "Total Revenue"
+                    ? "KSh"
+                    : label === "Total Bookings"
+                      ? "▣"
+                      : label === "Occupancy Rate"
+                        ? "%"
+                        : "!"}
+                </span>
+              </span>
+            </div>
+            <p className={`mt-2 text-[28px] font-bold leading-9 ${valueClass}`}>
+              {value}
+            </p>
+            <p
+              className={`mt-3 text-xs font-semibold ${label === "Pending Approvals" ? "text-[#B45309]" : "text-[#059669]"}`}
+            >
+              {change}
+              {label !== "Pending Approvals" && (
+                <span className="ml-2 font-normal text-[#94A3B8]">
+                  vs last month
+                </span>
+              )}
+            </p>
+          </div>
+        ))}
+      </div>
+
       {/* Header panel - Needs attention */}
       <div className="rounded-[14px] border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-6">
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#222222] sm:text-3xl">Needs attention</h1>
-            <p className="mt-2 max-w-md text-sm text-[#6b7280]">Review pending work and resolve issues.</p>
+            <h1 className="text-2xl font-bold tracking-tight text-[#222222] sm:text-3xl">
+              Needs attention
+            </h1>
+            <p className="mt-2 max-w-md text-sm text-[#6b7280]">
+              Review pending work and resolve issues.
+            </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 self-start">
             {/* Prominent Open approvals action */}
             <button
               type="button"
-              onClick={() => navigate(isAdmin ? '/admin/host-applications' : '/admin/bookings')}
+              onClick={() =>
+                navigate(
+                  isAdmin ? "/admin/host-applications" : "/admin/bookings",
+                )
+              }
               className="inline-flex items-center gap-2 rounded-lg bg-[#C49A6C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#B8895C] transition-colors"
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
               Open approvals
               {pendingApprovals.length > 0 && (
-                <span className="ml-1 inline-flex min-w-[20px] items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-bold">{pendingApprovals.length}</span>
+                <span className="ml-1 inline-flex min-w-[20px] items-center justify-center rounded-full bg-white/20 px-1.5 text-xs font-bold">
+                  {pendingApprovals.length}
+                </span>
               )}
             </button>
             {quickLinks.length > 0 && (
@@ -722,16 +1282,63 @@ function DashboardOverview() {
                   onClick={() => setQuickActionsOpen((o) => !o)}
                   className="inline-flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#222222] hover:bg-[#F7F7F5] transition-colors"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 4v16m8-8H4"
+                    />
+                  </svg>
                   Quick actions
-                  <svg className={`w-4 h-4 transition-transform ${quickActionsOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                  <svg
+                    className={`w-4 h-4 transition-transform ${quickActionsOpen ? "rotate-180" : ""}`}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
                 </button>
                 {quickActionsOpen && (
-                  <div className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-[14px] border border-[#E5E7EB] bg-white p-1.5 shadow-lg sm:left-auto sm:right-0" role="menu">
+                  <div
+                    className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-[14px] border border-[#E5E7EB] bg-white p-1.5 shadow-lg sm:left-auto sm:right-0"
+                    role="menu"
+                  >
                     {quickLinks.map((link) => (
-                      <button key={link.label} type="button" role="menuitem" onClick={() => { setQuickActionsOpen(false); navigate(link.to); }}
-                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] transition-colors">
-                        <svg className="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} /></svg>
+                      <button
+                        key={link.label}
+                        type="button"
+                        role="menuitem"
+                        onClick={() => {
+                          setQuickActionsOpen(false);
+                          navigate(link.to);
+                        }}
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] transition-colors"
+                      >
+                        <svg
+                          className="w-4 h-4 text-[#2563EB]"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d={link.icon}
+                          />
+                        </svg>
                         {link.label}
                       </button>
                     ))}
@@ -743,48 +1350,121 @@ function DashboardOverview() {
         </div>
       </div>
 
-      {/* Compact metric cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <StatCardView label="Pending approvals" value={pendingApprovals.length} icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" tone="warning" />
-        <StatCardView label="Payment issues" value={paymentIssues.length} icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" tone="danger" />
-        <StatCardView label="Open dispute" value={openDisputes.length} icon="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" tone="info" />
+      {/* Operational queue summary */}
+      <div className="hidden">
+        <StatCardView
+          label="Pending approvals"
+          value={pendingApprovals.length}
+          icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+          tone="warning"
+        />
+        <StatCardView
+          label="Payment issues"
+          value={paymentIssues.length}
+          icon="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+          tone="danger"
+        />
+        <StatCardView
+          label="Open dispute"
+          value={openDisputes.length}
+          icon="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
+          tone="info"
+        />
       </div>
 
       {/* Landing Page Stats Editor - admin only */}
       {isAdmin && (
-      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 mb-6">
-        <h2 className="text-lg font-bold text-[#222222] mb-2">Landing Page Stats</h2>
-        <p className="text-sm text-[#6b7280] mb-4">These appear in the hero section. Set to 0 to use live data from reviews and bookings.</p>
-        <form onSubmit={saveLandingStats} className="flex flex-wrap items-end gap-4">
-          <div>
-            <label className="block text-sm font-medium text-[#222222] mb-1">Happy Stays</label>
-            <input type="number" min="0" value={landingStats.happyStays} onChange={(e) => setLandingStats({ ...landingStats, happyStays: e.target.value })}
-              className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[#222222] mb-1">Star Rating</label>
-            <input type="number" min="0" max="5" step="0.1" value={landingStats.starRating} onChange={(e) => setLandingStats({ ...landingStats, starRating: e.target.value })}
-              className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]" />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-[#222222] mb-1">Satisfaction %</label>
-            <input type="number" min="0" max="100" value={landingStats.satisfaction} onChange={(e) => setLandingStats({ ...landingStats, satisfaction: e.target.value })}
-              className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]" />
-          </div>
-          <button type="submit" disabled={savingLanding}
-            className="bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-lg text-sm hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50">
-            {savingLanding ? 'Saving...' : 'Update'}
-          </button>
-          {landingMsg && <span className="text-sm text-green-600 self-center">{landingMsg}</span>}
-        </form>
-      </div>
+        <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-bold text-[#222222] mb-2">
+            Landing Page Stats
+          </h2>
+          <p className="text-sm text-[#6b7280] mb-4">
+            These appear in the hero section. Set to 0 to use live data from
+            reviews and bookings.
+          </p>
+          <form
+            onSubmit={saveLandingStats}
+            className="flex flex-wrap items-end gap-4"
+          >
+            <div>
+              <label className="block text-sm font-medium text-[#222222] mb-1">
+                Happy Stays
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={landingStats.happyStays}
+                onChange={(e) =>
+                  setLandingStats({
+                    ...landingStats,
+                    happyStays: e.target.value,
+                  })
+                }
+                className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#222222] mb-1">
+                Star Rating
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="5"
+                step="0.1"
+                value={landingStats.starRating}
+                onChange={(e) =>
+                  setLandingStats({
+                    ...landingStats,
+                    starRating: e.target.value,
+                  })
+                }
+                className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-[#222222] mb-1">
+                Satisfaction %
+              </label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={landingStats.satisfaction}
+                onChange={(e) =>
+                  setLandingStats({
+                    ...landingStats,
+                    satisfaction: e.target.value,
+                  })
+                }
+                className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={savingLanding}
+              className="bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-lg text-sm hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
+            >
+              {savingLanding ? "Saving..." : "Update"}
+            </button>
+            {landingMsg && (
+              <span className="text-sm text-green-600 self-center">
+                {landingMsg}
+              </span>
+            )}
+          </form>
+        </div>
       )}
 
       {/* Review queue - tabbed compact table */}
       <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
           <h2 className="text-lg font-bold text-[#222222]">Review queue</h2>
-          <div className="inline-flex flex-wrap gap-1 rounded-lg border border-[#E5E7EB] p-1" role="tablist" aria-label="Filter review queue">
+          <div
+            className="inline-flex flex-wrap gap-1 rounded-lg border border-[#E5E7EB] p-1"
+            role="tablist"
+            aria-label="Filter review queue"
+          >
             {TAB_ORDER.map((tab) => (
               <button
                 key={tab}
@@ -793,7 +1473,9 @@ function DashboardOverview() {
                 aria-selected={activeTab === tab}
                 onClick={() => setActiveTab(tab)}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
-                  activeTab === tab ? 'bg-[#2563EB] text-white' : 'text-[#6b7280] hover:bg-[#F7F7F5]'
+                  activeTab === tab
+                    ? "bg-[#2563EB] text-white"
+                    : "text-[#6b7280] hover:bg-[#F7F7F5]"
                 }`}
               >
                 {tab}
@@ -802,7 +1484,9 @@ function DashboardOverview() {
           </div>
         </div>
         {reviewRows.length === 0 ? (
-          <p className="text-[#6b7280] text-sm py-8 text-center">Nothing needs attention.</p>
+          <p className="text-[#6b7280] text-sm py-8 text-center">
+            Nothing needs attention.
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -810,27 +1494,53 @@ function DashboardOverview() {
                 <tr className="text-left border-b border-[#E5E7EB]">
                   <th className="pb-3 font-semibold text-[#222222]">Item</th>
                   <th className="pb-3 font-semibold text-[#222222]">Status</th>
-                  <th className="pb-3 font-semibold text-[#222222] hidden sm:table-cell">Updated</th>
-                  <th className="pb-3 font-semibold text-[#222222] text-right">Action</th>
+                  <th className="pb-3 font-semibold text-[#222222] hidden sm:table-cell">
+                    Updated
+                  </th>
+                  <th className="pb-3 font-semibold text-[#222222] text-right">
+                    Action
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {reviewRows.map((item) => (
-                  <tr key={item.id} className="border-b border-[#E5E7EB]/60 hover:bg-[#F7F7F5] transition-colors">
+                  <tr
+                    key={item.id}
+                    className="border-b border-[#E5E7EB]/60 hover:bg-[#F7F7F5] transition-colors"
+                  >
                     <td className="py-3">
-                      <p className="font-medium text-[#222222] max-w-[240px] truncate">{item.title}</p>
+                      <p className="font-medium text-[#222222] max-w-[240px] truncate">
+                        {item.title}
+                      </p>
                       <p className="text-xs text-[#6b7280]">{item.subtitle}</p>
                     </td>
                     <td className="py-3">
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        item.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
-                        item.status === 'CANCELLED' || item.status === 'FAILED' ? 'bg-red-100 text-red-700' :
-                        'bg-amber-100 text-amber-700'
-                      }`}>{item.status?.replaceAll('_', ' ')}</span>
+                      <span
+                        className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${
+                          item.status === "CONFIRMED"
+                            ? "bg-green-100 text-green-700"
+                            : item.status === "CANCELLED" ||
+                                item.status === "FAILED"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-amber-100 text-amber-700"
+                        }`}
+                      >
+                        {item.status?.replaceAll("_", " ")}
+                      </span>
                     </td>
-                    <td className="py-3 text-xs text-[#6b7280] hidden sm:table-cell">{item.updatedAt ? new Date(item.updatedAt).toLocaleDateString() : '-'}</td>
+                    <td className="py-3 text-xs text-[#6b7280] hidden sm:table-cell">
+                      {item.updatedAt
+                        ? new Date(item.updatedAt).toLocaleDateString()
+                        : "-"}
+                    </td>
                     <td className="py-3 text-right">
-                      <button type="button" onClick={() => navigate(item.to)} className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors">Review</button>
+                      <button
+                        type="button"
+                        onClick={() => navigate(item.to)}
+                        className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
+                      >
+                        Review
+                      </button>
                     </td>
                   </tr>
                 ))}
