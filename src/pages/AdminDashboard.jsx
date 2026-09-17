@@ -1196,7 +1196,7 @@ function DashboardOverview() {
         ].map(([label, value, change, valueClass, badgeClass]) => (
           <div
             key={label}
-            className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
+            className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
           >
             <div className="flex items-start justify-between">
               <p className="text-[13px] font-medium text-[#5B6B82]">{label}</p>
@@ -1214,11 +1214,11 @@ function DashboardOverview() {
                 </span>
               </span>
             </div>
-            <p className={`mt-2 text-[28px] font-bold leading-9 ${valueClass}`}>
+            <p className={`mt-1 text-[24px] font-bold leading-8 ${valueClass}`}>
               {value}
             </p>
             <p
-              className={`mt-3 text-xs font-semibold ${label === "Pending Approvals" ? "text-[#B45309]" : "text-[#059669]"}`}
+              className={`mt-2 text-[11px] font-semibold ${label === "Pending Approvals" ? "text-[#B45309]" : "text-[#059669]"}`}
             >
               {change}
               {label !== "Pending Approvals" && (
@@ -1232,7 +1232,7 @@ function DashboardOverview() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
-        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-[17px] font-semibold text-[#0B1F42]">
@@ -1248,7 +1248,7 @@ function DashboardOverview() {
               12 months⌄
             </span>
           </div>
-          <div className="mt-7 flex h-44 items-end gap-3 border-t border-[#E3E8EF] pt-5">
+          <div className="mt-5 flex h-36 items-end gap-2 border-t border-[#E3E8EF] pt-4">
             {[38, 52, 44, 66, 58, 74, 62, 88, 70, 82, 76, 96].map(
               (height, index) => (
                 <div
@@ -1282,13 +1282,13 @@ function DashboardOverview() {
             )}
           </div>
         </section>
-        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
           <h2 className="text-[17px] font-semibold text-[#0B1F42]">
             Occupancy
           </h2>
           <p className="mt-2 text-xs text-[#94A3B8]">This month vs. capacity</p>
-          <div className="mx-auto mt-5 flex h-40 w-40 items-center justify-center rounded-full border-[14px] border-[#EEF2F7] border-t-[#0B1F42] border-r-[#0B1F42]">
-            <span className="text-3xl font-bold text-[#0B1F42]">78%</span>
+          <div className="mx-auto mt-4 flex h-32 w-32 items-center justify-center rounded-full border-[11px] border-[#EEF2F7] border-t-[#0B1F42] border-r-[#0B1F42]">
+            <span className="text-2xl font-bold text-[#0B1F42]">78%</span>
           </div>
           <p className="mt-3 text-center text-xs text-[#94A3B8]">
             Occupied nights
@@ -1306,7 +1306,7 @@ function DashboardOverview() {
         </section>
       </div>
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(300px,1fr)]">
-        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-[17px] font-semibold text-[#0B1F42]">
