@@ -83,10 +83,10 @@ function HomeHeader() {
           <img src={logoImg} alt="ZuriLofts" className="h-11 w-[118px] object-contain" />
         </Link>
         <nav className="hidden items-center gap-8 text-[13px] font-medium text-[#0B1F42] md:flex" aria-label="Main navigation">
-          <Link className="hover:text-[#2563EB]" to="/properties">Stays</Link>
-          <Link className="hover:text-[#2563EB]" to="/places">Places</Link>
-          <Link className="hover:text-[#2563EB]" to="/restaurants">Restaurants</Link>
-          <Link className="hover:text-[#2563EB]" to="/guides">Guides</Link>
+          <Link className="hover:text-[#C89B6D]" to="/properties">Stays</Link>
+          <Link className="hover:text-[#C89B6D]" to="/places">Places</Link>
+          <Link className="hover:text-[#C89B6D]" to="/restaurants">Restaurants</Link>
+          <Link className="hover:text-[#C89B6D]" to="/guides">Guides</Link>
         </nav>
         <div className="flex items-center gap-1.5 text-[#0B1F42] sm:gap-3">
           <form
@@ -98,7 +98,7 @@ function HomeHeader() {
               onClick={() => setSearchOpen((open) => !open)}
               aria-label={searchOpen ? 'Close search' : 'Open search'}
               aria-expanded={searchOpen}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[#C89B6D]/15 hover:text-[#B8895C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
             >
               <Icon name="search" className="h-3.5 w-3.5" />
             </button>
@@ -115,7 +115,7 @@ function HomeHeader() {
             )}
             {!searchOpen && <span className="sr-only">Search</span>}
           </form>
-          <Link to="/host/application" className="hidden text-xs font-medium hover:text-[#2563EB] lg:block">Become a host</Link>
+          <Link to="/host/application" className="hidden text-xs font-medium hover:text-[#C89B6D] lg:block">Become a host</Link>
           <Link to="/favourites" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-50" aria-label="Favourites">
             <Icon name="heart" className="h-[18px] w-[18px]" />
           </Link>
@@ -217,7 +217,7 @@ function HomeFooter() {
             <form className="mt-4 flex h-11 items-center rounded-full bg-white px-4 focus-within:ring-2 focus-within:ring-white/30" onSubmit={(e) => e.preventDefault()}>
               <label className="sr-only" htmlFor="home-newsletter">Email address</label>
               <input id="home-newsletter" type="email" placeholder="you@email.com" className="min-w-0 flex-1 border-0 bg-transparent text-xs text-[#0B1F42] outline-none ring-0 placeholder:text-slate-400 focus:border-0 focus:outline-none focus:ring-0" />
-              <button type="submit" className="flex h-8 w-8 items-center justify-center rounded-full bg-[#C89B6D]" aria-label="Subscribe"><Icon name="arrow" className="h-4 w-4" /></button>
+              <button type="submit" className="flex h-8 w-8 items-center justify-center rounded-full bg-[#C89B6D] transition-colors hover:bg-[#B8895C]" aria-label="Subscribe"><Icon name="arrow" className="h-4 w-4" /></button>
             </form>
           </div>
         </div>
