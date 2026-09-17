@@ -265,7 +265,7 @@ export default function HomePage() {
 
         {recentlyViewed.length > 0 && <section className="bg-[#EFF3F9]"><div className="mx-auto max-w-[1240px] px-5 py-12 md:px-8"><div className="flex items-center justify-between"><h2 className="text-xl font-semibold">Recently viewed</h2><button type="button" onClick={() => { clearRecentlyViewed(); setRecentlyViewed([]); }} className="text-[11px] text-[#5B6B82]">Clear history</button></div><div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-5 lg:gap-4">{recentlyViewed.map((property) => <RecentCard key={property.id} property={property} />)}</div></div></section>}
 
-        <section className="mx-auto max-w-[1240px] px-5 py-16 text-center md:px-8 md:py-20">
+        <section className="mx-auto max-w-[1240px] px-5 py-20 text-center md:px-8 md:py-24">
           <h2 className="text-2xl font-semibold md:text-[30px]">Why stay with ZuriLofts</h2>
           <p className="mt-2 text-xs text-[#5B6B82]">A calmer, clearer way to book a home in Nairobi</p>
           <div className="mt-8 grid gap-5 text-left md:grid-cols-3">
