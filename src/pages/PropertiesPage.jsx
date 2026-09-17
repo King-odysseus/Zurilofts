@@ -7,7 +7,6 @@ import Dropdown from '../components/Dropdown.jsx';
 import TripSearchBar from '../components/TripSearchBar.jsx';
 import { zuriImages } from '../assets/images';
 import apiClient from '../api/client.js';
-import { useLanguage } from '../context/LanguageContext.jsx';
 
 const PropertyResultsMap = lazy(() => import('../components/PropertyResultsMap.jsx'));
 
@@ -37,7 +36,6 @@ const SORT_OPTIONS = [
 ];
 
 function PropertiesPage() {
-  const { t } = useLanguage();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ── Derive filter state from URL query params ──────────────────────
