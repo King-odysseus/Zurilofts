@@ -62,21 +62,19 @@ function PropertiesResultsScene({
         </section>
 
         <section className="mx-auto max-w-[1200px] px-4 pb-6 md:px-8">
-          <div className="rounded-[18px] border border-[#E3E8EF] bg-white p-2 shadow-[0_8px_24px_rgba(11,31,66,0.08)]">
-            <TripSearchBar
-              value={searchInput}
-              onChange={onSearchChange}
-              onSubmit={onSearchSubmit}
-              onClear={onSearchClear}
-              loading={loading}
-              hasActiveSearch={Boolean(searchQuery)}
-              discovery
-              dates={dates}
-              onDatesChange={onDatesChange}
-              guests={guests}
-              onGuestsChange={onGuestsChange}
-            />
-          </div>
+          <TripSearchBar
+            value={searchInput}
+            onChange={onSearchChange}
+            onSubmit={onSearchSubmit}
+            onClear={onSearchClear}
+            loading={loading}
+            hasActiveSearch={Boolean(searchQuery)}
+            discovery
+            dates={dates}
+            onDatesChange={onDatesChange}
+            guests={guests}
+            onGuestsChange={onGuestsChange}
+          />
         </section>
 
         <section className="mx-auto max-w-[1200px] px-4 pb-6 md:px-8">
