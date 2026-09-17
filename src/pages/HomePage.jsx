@@ -65,6 +65,17 @@ function Icon({ name, className = 'h-5 w-5' }) {
 
 function HomeHeader() {
   const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  function submitHeaderSearch(event) {
+    event.preventDefault();
+    const query = searchQuery.trim();
+    navigate(query ? `/properties?search=${encodeURIComponent(query)}` : '/properties');
+    setSearchOpen(false);
+  }
+
   return (
     <header className="relative z-30 border-b border-slate-200 bg-white">
       <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-5 md:px-8">
@@ -78,9 +89,32 @@ function HomeHeader() {
           <Link className="hover:text-[#2563EB]" to="/guides">Guides</Link>
         </nav>
         <div className="flex items-center gap-1.5 text-[#0B1F42] sm:gap-3">
-          <Link to="/properties" className="hidden h-9 items-center gap-2 rounded-full bg-slate-50 px-4 text-xs text-slate-500 lg:flex">
-            <Icon name="search" className="h-3.5 w-3.5" /> Search
-          </Link>
+          <form
+            onSubmit={submitHeaderSearch}
+            className={`hidden h-9 items-center overflow-hidden rounded-full text-xs text-slate-500 transition-[width,background-color,box-shadow] duration-300 ease-out lg:flex ${searchOpen ? 'w-64 bg-white pl-3 pr-1 shadow-sm ring-1 ring-slate-200' : 'w-9 bg-slate-50'}`}
+          >
+            <button
+              type="button"
+              onClick={() => setSearchOpen((open) => !open)}
+              aria-label={searchOpen ? 'Close search' : 'Open search'}
+              aria-expanded={searchOpen}
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+            >
+              <Icon name="search" className="h-3.5 w-3.5" />
+            </button>
+            {searchOpen && (
+              <input
+                autoFocus
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                onKeyDown={(event) => { if (event.key === 'Escape') setSearchOpen(false); }}
+                placeholder="Search stays"
+                aria-label="Search stays"
+                className="min-w-0 flex-1 bg-transparent px-2 text-xs text-[#0B1F42] outline-none placeholder:text-slate-400"
+              />
+            )}
+            {!searchOpen && <span className="sr-only">Search</span>}
+          </form>
           <Link to="/host/application" className="hidden text-xs font-medium hover:text-[#2563EB] lg:block">Become a host</Link>
           <Link to="/favourites" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-50" aria-label="Favourites">
             <Icon name="heart" className="h-[18px] w-[18px]" />
