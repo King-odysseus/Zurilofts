@@ -14,6 +14,28 @@ class ErrorBoundary extends Component {
 
   componentDidCatch(error, errorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    // A deploy can leave an older service-worker shell pointing at a removed
+    // lazy chunk. Recover once instead of trapping users on the error screen.
+    const message = String(error?.message || '');
+    const isChunkLoadFailure = /dynamically imported module|Loading chunk|ChunkLoadError|importing a module script failed/i.test(message);
+    if (isChunkLoadFailure) {
+      try {
+        const recoveryKey = 'zurilofts-chunk-recovery';
+        if (!sessionStorage.getItem(recoveryKey)) {
+          sessionStorage.setItem(recoveryKey, '1');
+          if (navigator.serviceWorker) {
+            navigator.serviceWorker.getRegistrations().then((registrations) => {
+              registrations.forEach((registration) => registration.update());
+              window.location.reload();
+            }).catch(() => window.location.reload());
+          } else {
+            window.location.reload();
+          }
+        }
+      } catch {
+        // Storage and service-worker APIs can be unavailable in private mode.
+      }
+    }
   }
 
   render() {
