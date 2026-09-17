@@ -144,7 +144,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
             <div className="flex items-center justify-between py-2">
               <div>
                 <p className="text-sm font-semibold text-[#222222]">Guests</p>
-                <p className="text-xs text-[#6b7280]">Ages 1 and up</p>
+                <p className="text-xs text-[#6b7280]">Ages 18 and up</p>
               </div>
               <div className="flex items-center gap-3">
                 <button
