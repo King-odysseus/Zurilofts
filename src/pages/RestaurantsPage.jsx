@@ -1,12 +1,9 @@
-import { lazy, Suspense, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { HomeHeader } from "./HomePage.jsx";
 import Footer from "../components/Footer.jsx";
 import Dropdown from "../components/Dropdown.jsx";
-import Spinner from "../components/Spinner.jsx";
 import { AREAS, EAT_CATEGORIES, PLACES_TO_EAT } from "../data/nearby.js";
 import { googleMapsDirectionsUrl } from "../utils/googleMaps.js";
-
-const NearbyMap = lazy(() => import("../components/NearbyMap.jsx"));
 
 function RestaurantCard({ item }) {
   const directionsUrl = googleMapsDirectionsUrl({
@@ -57,7 +54,6 @@ function RestaurantsPage() {
   const [query, setQuery] = useState("");
   const [area, setArea] = useState("all");
   const [category, setCategory] = useState("all");
-  const [viewMode, setViewMode] = useState("list");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -156,13 +152,6 @@ function RestaurantsPage() {
                 menuClassName="left-0"
                 ariaLabel="Filter restaurants by cuisine"
               />
-              <button
-                type="button"
-                onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
-                className="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium"
-              >
-                {viewMode === "map" ? "Show list" : "Show map"}
-              </button>
               {hasFilters && (
                 <button
                   type="button"
@@ -185,13 +174,6 @@ function RestaurantsPage() {
                 className="min-h-11 rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold"
               >
                 Filters{hasFilters ? " ·" : ""}
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
-                className="min-h-11 rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold"
-              >
-                {viewMode === "map" ? "Show list" : "Show map"}
               </button>
             </div>
             {filtersOpen && (
@@ -224,17 +206,7 @@ function RestaurantsPage() {
           </div>
         </section>
         <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-8">
-          {viewMode === "map" && filtered.length ? (
-            <Suspense
-              fallback={
-                <div className="flex h-[420px] items-center justify-center rounded-2xl bg-white">
-                  <Spinner />
-                </div>
-              }
-            >
-              <NearbyMap items={filtered} title="Places to eat in Nairobi" />
-            </Suspense>
-          ) : filtered.length ? (
+          {filtered.length ? (
             <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
               {filtered.map((item) => (
                 <RestaurantCard key={item.name} item={item} />

@@ -1,47 +1,91 @@
-import { useState, useEffect, useCallback, useMemo, useRef, lazy, Suspense } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import { HomeHeader } from './HomePage.jsx';
-import Footer from '../components/Footer';
-import PropertyCard from '../components/PropertyCard';
-import Dropdown from '../components/Dropdown.jsx';
-import TripSearchBar from '../components/TripSearchBar.jsx';
-import { zuriImages } from '../assets/images';
-import apiClient from '../api/client.js';
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  lazy,
+  Suspense,
+} from "react";
+import { useSearchParams } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import { HomeHeader } from "./HomePage.jsx";
+import Footer from "../components/Footer";
+import PropertyCard from "../components/PropertyCard";
+import Dropdown from "../components/Dropdown.jsx";
+import TripSearchBar from "../components/TripSearchBar.jsx";
+import { zuriImages } from "../assets/images";
+import apiClient from "../api/client.js";
 
-const PropertyResultsMap = lazy(() => import('../components/PropertyResultsMap.jsx'));
+const PropertyResultsMap = lazy(
+  () => import("../components/PropertyResultsMap.jsx"),
+);
 
 const NEIGHBORHOODS = [
-  { value: '', label: 'All Areas' },
-  { value: 'kilimani', label: 'Kilimani' },
-  { value: 'westlands', label: 'Westlands' },
-  { value: 'karen', label: 'Karen' },
-  { value: 'gigiri', label: 'Gigiri' },
-  { value: 'lavington', label: 'Lavington' },
+  { value: "", label: "All Areas" },
+  { value: "kilimani", label: "Kilimani" },
+  { value: "westlands", label: "Westlands" },
+  { value: "karen", label: "Karen" },
+  { value: "gigiri", label: "Gigiri" },
+  { value: "lavington", label: "Lavington" },
 ];
 
 const RATING_OPTIONS = [
-  { value: '', label: 'Any Rating' },
-  { value: '4', label: '4.0+' },
-  { value: '4.5', label: '4.5+' },
+  { value: "", label: "Any Rating" },
+  { value: "4", label: "4.0+" },
+  { value: "4.5", label: "4.5+" },
 ];
 
-const COMMON_AMENITIES = ['WiFi', 'Parking', 'Pool', 'Gym', 'AC', 'Kitchen', 'TV', 'Washer'];
+const COMMON_AMENITIES = [
+  "WiFi",
+  "Parking",
+  "Pool",
+  "Gym",
+  "AC",
+  "Kitchen",
+  "TV",
+  "Washer",
+];
 
 const SORT_OPTIONS = [
-  { value: 'default', label: 'Default' },
-  { value: 'price_asc', label: 'Price: Low to High' },
-  { value: 'price_desc', label: 'Price: High to Low' },
-  { value: 'rating', label: 'Top Rated' },
-  { value: 'newest', label: 'Newest' },
+  { value: "default", label: "Default" },
+  { value: "price_asc", label: "Price: Low to High" },
+  { value: "price_desc", label: "Price: High to Low" },
+  { value: "rating", label: "Top Rated" },
+  { value: "newest", label: "Newest" },
 ];
 
 function PropertiesResultsScene({
-  searchInput, onSearchChange, onSearchSubmit, onSearchClear, loading, searchQuery,
-  dates, onDatesChange, guests, onGuestsChange, clearAllFilters, hasActiveFilters,
-  sortedListings, sort, updateParam, filter, bedFilter, filterButtons,
-  priceRange, neighborhood, minRating, availableOnly, selectedAmenities, setSelectedAmenities,
-  bedFilterButtons, error, fetchProperties, viewMode, setViewMode, moreFiltersOpen,
+  searchInput,
+  onSearchChange,
+  onSearchSubmit,
+  onSearchClear,
+  loading,
+  searchQuery,
+  dates,
+  onDatesChange,
+  guests,
+  onGuestsChange,
+  clearAllFilters,
+  hasActiveFilters,
+  sortedListings,
+  sort,
+  updateParam,
+  filter,
+  bedFilter,
+  filterButtons,
+  priceRange,
+  neighborhood,
+  minRating,
+  availableOnly,
+  selectedAmenities,
+  setSelectedAmenities,
+  bedFilterButtons,
+  error,
+  fetchProperties,
+  viewMode,
+  setViewMode,
+  moreFiltersOpen,
   setMoreFiltersOpen,
 }) {
   return (
@@ -50,15 +94,43 @@ function PropertiesResultsScene({
 
       <main>
         <section className="mx-auto max-w-[1200px] px-4 pb-5 pt-7 md:px-8 md:pb-6 md:pt-8">
-          <p className="text-xs text-[#5B6B82]">Home <span className="mx-1">›</span> Properties</p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight md:text-[32px]">Properties in Nairobi</h1>
-          <p className="mt-2 text-sm text-[#5B6B82] md:text-base">Find a verified, furnished home that fits your plans.</p>
+          <p className="text-xs text-[#5B6B82]">
+            Home <span className="mx-1">›</span> Properties
+          </p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight md:text-[32px]">
+            Properties in Nairobi
+          </h1>
+          <p className="mt-2 text-sm text-[#5B6B82] md:text-base">
+            Find a verified, furnished home that fits your plans.
+          </p>
           <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="mr-1 text-[10px] font-semibold uppercase tracking-[.12em] text-[#64748B]">Active search</span>
-            {searchQuery && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{searchQuery}</span>}
-            {dates.checkIn && dates.checkOut && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{dates.checkIn} – {dates.checkOut}</span>}
-            {guests > 1 && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{guests} guests</span>}
-            {hasActiveFilters && <button type="button" onClick={clearAllFilters} className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs font-semibold hover:border-[#C89B6D] hover:text-[#B8895C]">Clear all</button>}
+            <span className="mr-1 text-[10px] font-semibold uppercase tracking-[.12em] text-[#64748B]">
+              Active search
+            </span>
+            {searchQuery && (
+              <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">
+                {searchQuery}
+              </span>
+            )}
+            {dates.checkIn && dates.checkOut && (
+              <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">
+                {dates.checkIn} – {dates.checkOut}
+              </span>
+            )}
+            {guests > 1 && (
+              <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">
+                {guests} guests
+              </span>
+            )}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs font-semibold hover:border-[#C89B6D] hover:text-[#B8895C]"
+              >
+                Clear all
+              </button>
+            )}
           </div>
         </section>
 
@@ -81,40 +153,293 @@ function PropertiesResultsScene({
         <section className="mx-auto max-w-[1200px] px-4 pb-6 md:px-8">
           <div className="hidden items-center justify-between gap-4 md:flex">
             <div className="flex flex-wrap gap-2">
-              {filterButtons.map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('type', key)} className={`rounded-full px-4 py-2 text-xs font-medium ${filter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF] bg-white text-[#33415C] hover:border-[#C89B6D]'}`}>{label}</button>)}
-              {bedFilterButtons.slice(1).map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('beds', key)} className={`rounded-full px-4 py-2 text-xs font-medium ${bedFilter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF] bg-white text-[#33415C] hover:border-[#C89B6D]'}`}>{label}</button>)}
-              <button type="button" onClick={() => setMoreFiltersOpen(!moreFiltersOpen)} className="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#33415C] hover:border-[#C89B6D]">Filters{hasActiveFilters ? ' ·' : ''}</button>
-              <button type="button" onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')} className="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#33415C] hover:border-[#C89B6D]">{viewMode === 'map' ? 'Show list' : 'Show map'}</button>
+              {filterButtons.map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => updateParam("type", key)}
+                  className={`rounded-full px-4 py-2 text-xs font-medium ${filter === key ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF] bg-white text-[#33415C] hover:border-[#C89B6D]"}`}
+                >
+                  {label}
+                </button>
+              ))}
+              {bedFilterButtons.slice(1).map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => updateParam("beds", key)}
+                  className={`rounded-full px-4 py-2 text-xs font-medium ${bedFilter === key ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF] bg-white text-[#33415C] hover:border-[#C89B6D]"}`}
+                >
+                  {label}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
+                className="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#33415C] hover:border-[#C89B6D]"
+              >
+                Filters{hasActiveFilters ? " ·" : ""}
+              </button>
             </div>
-            <Dropdown value={sort} onChange={(value) => updateParam('sort', value)} options={SORT_OPTIONS} placeholder="Recommended" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#0B1F42]" menuClassName="right-0 left-auto" ariaLabel="Sort properties" />
+            <Dropdown
+              value={sort}
+              onChange={(value) => updateParam("sort", value)}
+              options={SORT_OPTIONS}
+              placeholder="Recommended"
+              triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#0B1F42]"
+              menuClassName="right-0 left-auto"
+              ariaLabel="Sort properties"
+            />
           </div>
-          {moreFiltersOpen && <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-3">
-            <Dropdown value={priceRange} onChange={(value) => updateParam('price', value)} options={[{ value: 'all', label: 'All Prices' }, { value: 'low', label: 'Under KES 5,000' }, { value: 'mid', label: 'KES 5,000–8,000' }, { value: 'high', label: 'Above KES 8,000' }]} placeholder="All Prices" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs text-[#33415C]" menuClassName="left-0" ariaLabel="Price range" />
-            <Dropdown value={neighborhood} onChange={(value) => updateParam('neighborhood', value)} options={NEIGHBORHOODS} placeholder="All Areas" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs text-[#33415C]" menuClassName="left-0" ariaLabel="Neighborhood" />
-            <Dropdown value={minRating} onChange={(value) => updateParam('minRating', value)} options={RATING_OPTIONS} placeholder="Any Rating" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs text-[#33415C]" menuClassName="left-0" ariaLabel="Minimum rating" />
-            <button type="button" onClick={() => updateParam('available', availableOnly ? '' : 'true')} className={`rounded-full px-3 py-2 text-xs ${availableOnly ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF] text-[#33415C]'}`}>Available to book</button>
-            {COMMON_AMENITIES.map((amenity) => <button key={amenity} type="button" onClick={() => setSelectedAmenities((previous) => { const next = new Set(previous); if (next.has(amenity)) next.delete(amenity); else next.add(amenity); return next; })} className={`rounded-full px-3 py-2 text-xs ${selectedAmenities.has(amenity) ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF] text-[#33415C]'}`}>{amenity}</button>)}
-          </div>}
+          {moreFiltersOpen && (
+            <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-3">
+              <Dropdown
+                value={priceRange}
+                onChange={(value) => updateParam("price", value)}
+                options={[
+                  { value: "all", label: "All Prices" },
+                  { value: "low", label: "Under KES 5,000" },
+                  { value: "mid", label: "KES 5,000–8,000" },
+                  { value: "high", label: "Above KES 8,000" },
+                ]}
+                placeholder="All Prices"
+                triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs text-[#33415C]"
+                menuClassName="left-0"
+                ariaLabel="Price range"
+              />
+              <Dropdown
+                value={neighborhood}
+                onChange={(value) => updateParam("neighborhood", value)}
+                options={NEIGHBORHOODS}
+                placeholder="All Areas"
+                triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs text-[#33415C]"
+                menuClassName="left-0"
+                ariaLabel="Neighborhood"
+              />
+              <Dropdown
+                value={minRating}
+                onChange={(value) => updateParam("minRating", value)}
+                options={RATING_OPTIONS}
+                placeholder="Any Rating"
+                triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs text-[#33415C]"
+                menuClassName="left-0"
+                ariaLabel="Minimum rating"
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  updateParam("available", availableOnly ? "" : "true")
+                }
+                className={`rounded-full px-3 py-2 text-xs ${availableOnly ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF] text-[#33415C]"}`}
+              >
+                Available to book
+              </button>
+              {COMMON_AMENITIES.map((amenity) => (
+                <button
+                  key={amenity}
+                  type="button"
+                  onClick={() =>
+                    setSelectedAmenities((previous) => {
+                      const next = new Set(previous);
+                      if (next.has(amenity)) next.delete(amenity);
+                      else next.add(amenity);
+                      return next;
+                    })
+                  }
+                  className={`rounded-full px-3 py-2 text-xs ${selectedAmenities.has(amenity) ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF] text-[#33415C]"}`}
+                >
+                  {amenity}
+                </button>
+              ))}
+            </div>
+          )}
           <div className="md:hidden">
             <div className="grid grid-cols-2 gap-3">
-              <button type="button" onClick={() => setMoreFiltersOpen(!moreFiltersOpen)} className="min-h-[44px] rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold text-[#0B1F42]">Filters{hasActiveFilters ? ' ·' : ''}</button>
-              <button type="button" onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')} className="min-h-[44px] rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold text-[#0B1F42]">{viewMode === 'map' ? 'Show list' : 'Show map'}</button>
+              <button
+                type="button"
+                onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
+                className="min-h-[44px] rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold text-[#0B1F42]"
+              >
+                Filters{hasActiveFilters ? " ·" : ""}
+              </button>
             </div>
-            {moreFiltersOpen && <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-3">{filterButtons.map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('type', key)} className={`rounded-full px-3 py-2 text-xs ${filter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{label}</button>)}{bedFilterButtons.slice(1).map(({ key, label }) => <button key={key} type="button" onClick={() => updateParam('beds', key)} className={`rounded-full px-3 py-2 text-xs ${bedFilter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{label}</button>)}<Dropdown value={priceRange} onChange={(value) => updateParam('price', value)} options={[{ value: 'all', label: 'All Prices' }, { value: 'low', label: 'Under KES 5,000' }, { value: 'mid', label: 'KES 5,000–8,000' }, { value: 'high', label: 'Above KES 8,000' }]} placeholder="All Prices" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs" menuClassName="left-0" ariaLabel="Price range" /><Dropdown value={neighborhood} onChange={(value) => updateParam('neighborhood', value)} options={NEIGHBORHOODS} placeholder="All Areas" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs" menuClassName="left-0" ariaLabel="Neighborhood" /><Dropdown value={minRating} onChange={(value) => updateParam('minRating', value)} options={RATING_OPTIONS} placeholder="Any Rating" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs" menuClassName="left-0" ariaLabel="Minimum rating" /><button type="button" onClick={() => updateParam('available', availableOnly ? '' : 'true')} className={`rounded-full px-3 py-2 text-xs ${availableOnly ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>Available</button>{COMMON_AMENITIES.slice(0, 4).map((amenity) => <button key={amenity} type="button" onClick={() => setSelectedAmenities((previous) => { const next = new Set(previous); if (next.has(amenity)) next.delete(amenity); else next.add(amenity); return next; })} className={`rounded-full px-3 py-2 text-xs ${selectedAmenities.has(amenity) ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF]'}`}>{amenity}</button>)}<button type="button" onClick={clearAllFilters} className="rounded-full px-3 py-2 text-xs font-semibold text-[#B8895C]">Clear all</button></div>}
+            {moreFiltersOpen && (
+              <div className="mt-3 flex flex-wrap gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-3">
+                {filterButtons.map(({ key, label }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => updateParam("type", key)}
+                    className={`rounded-full px-3 py-2 text-xs ${filter === key ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF]"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+                {bedFilterButtons.slice(1).map(({ key, label }) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => updateParam("beds", key)}
+                    className={`rounded-full px-3 py-2 text-xs ${bedFilter === key ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF]"}`}
+                  >
+                    {label}
+                  </button>
+                ))}
+                <Dropdown
+                  value={priceRange}
+                  onChange={(value) => updateParam("price", value)}
+                  options={[
+                    { value: "all", label: "All Prices" },
+                    { value: "low", label: "Under KES 5,000" },
+                    { value: "mid", label: "KES 5,000–8,000" },
+                    { value: "high", label: "Above KES 8,000" },
+                  ]}
+                  placeholder="All Prices"
+                  triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs"
+                  menuClassName="left-0"
+                  ariaLabel="Price range"
+                />
+                <Dropdown
+                  value={neighborhood}
+                  onChange={(value) => updateParam("neighborhood", value)}
+                  options={NEIGHBORHOODS}
+                  placeholder="All Areas"
+                  triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs"
+                  menuClassName="left-0"
+                  ariaLabel="Neighborhood"
+                />
+                <Dropdown
+                  value={minRating}
+                  onChange={(value) => updateParam("minRating", value)}
+                  options={RATING_OPTIONS}
+                  placeholder="Any Rating"
+                  triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs"
+                  menuClassName="left-0"
+                  ariaLabel="Minimum rating"
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    updateParam("available", availableOnly ? "" : "true")
+                  }
+                  className={`rounded-full px-3 py-2 text-xs ${availableOnly ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF]"}`}
+                >
+                  Available
+                </button>
+                {COMMON_AMENITIES.slice(0, 4).map((amenity) => (
+                  <button
+                    key={amenity}
+                    type="button"
+                    onClick={() =>
+                      setSelectedAmenities((previous) => {
+                        const next = new Set(previous);
+                        if (next.has(amenity)) next.delete(amenity);
+                        else next.add(amenity);
+                        return next;
+                      })
+                    }
+                    className={`rounded-full px-3 py-2 text-xs ${selectedAmenities.has(amenity) ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF]"}`}
+                  >
+                    {amenity}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={clearAllFilters}
+                  className="rounded-full px-3 py-2 text-xs font-semibold text-[#B8895C]"
+                >
+                  Clear all
+                </button>
+              </div>
+            )}
           </div>
         </section>
 
-        <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-8" aria-live="polite">
+        <section
+          className="mx-auto max-w-[1200px] px-4 pb-16 md:px-8"
+          aria-live="polite"
+        >
           <div className="mb-5 flex items-center justify-between gap-3">
-            <p className="text-sm font-medium text-[#5B6B82]">{loading ? 'Searching...' : `Showing 1–${Math.min(sortedListings.length, 6)} of ${sortedListings.length} furnished properties in Nairobi`}</p>
-            <div className="md:hidden"><Dropdown value={sort} onChange={(value) => updateParam('sort', value)} options={SORT_OPTIONS} placeholder="Recommended" triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs font-medium text-[#0B1F42]" menuClassName="right-0 left-auto" ariaLabel="Sort properties" /></div>
+            <p className="text-sm font-medium text-[#5B6B82]">
+              {loading
+                ? "Searching..."
+                : `Showing 1–${Math.min(sortedListings.length, 6)} of ${sortedListings.length} furnished properties in Nairobi`}
+            </p>
+            <div className="md:hidden">
+              <Dropdown
+                value={sort}
+                onChange={(value) => updateParam("sort", value)}
+                options={SORT_OPTIONS}
+                placeholder="Recommended"
+                triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3 py-2 text-xs font-medium text-[#0B1F42]"
+                menuClassName="right-0 left-auto"
+                ariaLabel="Sort properties"
+              />
+            </div>
           </div>
 
-          {error && !loading && <div className="mx-auto max-w-md rounded-2xl border border-[#E3E8EF] bg-white p-8 text-center"><h2 className="text-base font-semibold">Something went wrong.</h2><p className="mt-2 text-sm text-[#5B6B82]">We couldn&apos;t load properties right now. Check your connection and try again.</p><button type="button" onClick={fetchProperties} className="mt-5 min-h-[44px] rounded-full bg-[#C89B6D] px-6 text-sm font-semibold text-white hover:bg-[#B8895C]">Try again</button></div>}
-          {loading && <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">{[1, 2, 3, 4].map((item) => <div key={item} className="rounded-2xl border border-[#E3E8EF] bg-white p-3"><div className="aspect-[3/2] animate-pulse rounded-xl bg-[#E7EDF4]" /><div className="mt-3 h-4 w-2/3 animate-pulse rounded bg-[#E7EDF4]" /><div className="mt-2 h-3 w-4/5 animate-pulse rounded bg-[#EDF1F6]" /><div className="mt-4 h-4 w-1/2 animate-pulse rounded bg-[#E7EDF4]" /></div>)}</div>}
-          {!loading && !error && viewMode === 'map' && sortedListings.length > 0 && <Suspense fallback={<div className="h-[520px] animate-pulse rounded-2xl bg-[#E7EDF4]" />}><PropertyResultsMap listings={sortedListings} /></Suspense>}
-          {!loading && !error && viewMode !== 'map' && sortedListings.length > 0 && <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">{sortedListings.slice(0, 8).map((listing) => <PropertyCard key={`${listing.id}-${listing.variant || 'base'}`} property={listing} cardVariant="results" />)}</div>}
-          {!loading && !error && sortedListings.length === 0 && <div className="mx-auto max-w-md rounded-2xl border border-[#E3E8EF] bg-white p-8 text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#F4F7FB] text-[#C89B6D]">⌕</div><h2 className="mt-4 text-base font-semibold">No properties match your search.</h2><p className="mt-2 text-sm text-[#5B6B82]">Try adjusting your dates, guests, or neighbourhood.</p><button type="button" onClick={clearAllFilters} className="mt-5 min-h-[44px] rounded-full bg-[#0B1F42] px-6 text-sm font-semibold text-white">Clear filters</button></div>}
+          {error && !loading && (
+            <div className="mx-auto max-w-md rounded-2xl border border-[#E3E8EF] bg-white p-8 text-center">
+              <h2 className="text-base font-semibold">Something went wrong.</h2>
+              <p className="mt-2 text-sm text-[#5B6B82]">
+                We couldn&apos;t load properties right now. Check your
+                connection and try again.
+              </p>
+              <button
+                type="button"
+                onClick={fetchProperties}
+                className="mt-5 min-h-[44px] rounded-full bg-[#C89B6D] px-6 text-sm font-semibold text-white hover:bg-[#B8895C]"
+              >
+                Try again
+              </button>
+            </div>
+          )}
+          {loading && (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {[1, 2, 3, 4].map((item) => (
+                <div
+                  key={item}
+                  className="rounded-2xl border border-[#E3E8EF] bg-white p-3"
+                >
+                  <div className="aspect-[3/2] animate-pulse rounded-xl bg-[#E7EDF4]" />
+                  <div className="mt-3 h-4 w-2/3 animate-pulse rounded bg-[#E7EDF4]" />
+                  <div className="mt-2 h-3 w-4/5 animate-pulse rounded bg-[#EDF1F6]" />
+                  <div className="mt-4 h-4 w-1/2 animate-pulse rounded bg-[#E7EDF4]" />
+                </div>
+              ))}
+            </div>
+          )}
+          {!loading && !error && sortedListings.length > 0 && (
+            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+              {sortedListings.slice(0, 8).map((listing) => (
+                <PropertyCard
+                  key={`${listing.id}-${listing.variant || "base"}`}
+                  property={listing}
+                  cardVariant="results"
+                />
+              ))}
+            </div>
+          )}
+          {!loading && !error && sortedListings.length === 0 && (
+            <div className="mx-auto max-w-md rounded-2xl border border-[#E3E8EF] bg-white p-8 text-center">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[#F4F7FB] text-[#C89B6D]">
+                ⌕
+              </div>
+              <h2 className="mt-4 text-base font-semibold">
+                No properties match your search.
+              </h2>
+              <p className="mt-2 text-sm text-[#5B6B82]">
+                Try adjusting your dates, guests, or neighbourhood.
+              </p>
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="mt-5 min-h-[44px] rounded-full bg-[#0B1F42] px-6 text-sm font-semibold text-white"
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
         </section>
       </main>
       <Footer />
@@ -126,17 +451,17 @@ function PropertiesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // ── Derive filter state from URL query params ──────────────────────
-  const searchQuery = searchParams.get('search') || '';
-  const filter = searchParams.get('type') || 'all';
-  const bedFilter = searchParams.get('beds') || 'all';
-  const priceRange = searchParams.get('price') || 'all';
-  const sort = searchParams.get('sort') || 'default';
-  const availableOnly = searchParams.get('available') === 'true';
-  const neighborhood = searchParams.get('neighborhood') || '';
-  const minRating = searchParams.get('minRating') || '';
-  const checkIn = searchParams.get('checkIn') || '';
-  const checkOut = searchParams.get('checkOut') || '';
-  const guests = Number(searchParams.get('guests')) || 1;
+  const searchQuery = searchParams.get("search") || "";
+  const filter = searchParams.get("type") || "all";
+  const bedFilter = searchParams.get("beds") || "all";
+  const priceRange = searchParams.get("price") || "all";
+  const sort = searchParams.get("sort") || "default";
+  const availableOnly = searchParams.get("available") === "true";
+  const neighborhood = searchParams.get("neighborhood") || "";
+  const minRating = searchParams.get("minRating") || "";
+  const checkIn = searchParams.get("checkIn") || "";
+  const checkOut = searchParams.get("checkOut") || "";
+  const guests = Number(searchParams.get("guests")) || 1;
 
   const [properties, setProperties] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -145,7 +470,7 @@ function PropertiesPage() {
 
   // ── UI-only state (not in URL) ─────────────────────────────────────
   const [moreFiltersOpen, setMoreFiltersOpen] = useState(false);
-  const [viewMode, setViewMode] = useState('list'); // 'list' | 'map'
+  const [viewMode, setViewMode] = useState("list"); // 'list' | 'map'
   const [selectedAmenities, setSelectedAmenities] = useState(new Set());
 
   // Keep searchInput in sync when URL param changes (back/forward navigation, direct link)
@@ -158,7 +483,7 @@ function PropertiesPage() {
     (key, value) => {
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev);
-        if (value && value !== 'all' && value !== 'default' && value !== '') {
+        if (value && value !== "all" && value !== "default" && value !== "") {
           next.set(key, value);
         } else {
           next.delete(key);
@@ -166,7 +491,7 @@ function PropertiesPage() {
         return next;
       });
     },
-    [setSearchParams]
+    [setSearchParams],
   );
 
   // Clear all filters
@@ -182,26 +507,28 @@ function PropertiesPage() {
     ({ checkIn: nextCheckIn, checkOut: nextCheckOut }) => {
       setSearchParams((prev) => {
         const next = new URLSearchParams(prev);
-        if (nextCheckIn) next.set('checkIn', nextCheckIn); else next.delete('checkIn');
-        if (nextCheckOut) next.set('checkOut', nextCheckOut); else next.delete('checkOut');
+        if (nextCheckIn) next.set("checkIn", nextCheckIn);
+        else next.delete("checkIn");
+        if (nextCheckOut) next.set("checkOut", nextCheckOut);
+        else next.delete("checkOut");
         return next;
       });
     },
-    [setSearchParams]
+    [setSearchParams],
   );
 
   const handleGuestsChange = useCallback(
-    (n) => updateParam('guests', n > 1 ? String(n) : ''),
-    [updateParam]
+    (n) => updateParam("guests", n > 1 ? String(n) : ""),
+    [updateParam],
   );
 
   // Handle search form submit from TripSearchBar
   const handleSearchSubmit = useCallback(
     (e) => {
       e.preventDefault();
-      updateParam('search', searchInput.trim());
+      updateParam("search", searchInput.trim());
     },
-    [searchInput, updateParam]
+    [searchInput, updateParam],
   );
 
   // Handle search input change
@@ -211,10 +538,10 @@ function PropertiesPage() {
 
   // Handle search clear
   const handleSearchClear = useCallback(() => {
-    setSearchInput('');
+    setSearchInput("");
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
-      next.delete('search');
+      next.delete("search");
       return next;
     });
   }, [setSearchParams]);
@@ -236,17 +563,31 @@ function PropertiesPage() {
         bathrooms: p.bathrooms,
         guests: p.guests,
         area: p.area,
-        badge: p.featured ? 'Featured' : undefined,
+        badge: p.featured ? "Featured" : undefined,
         amenities: p.amenities || [],
         lat: p.lat,
         lng: p.lng,
         type: p.type,
       };
       if (has1Bed) {
-        result.push({ ...base, price: p.price1Bed, variant: '1bed', variantLabel: '1 Bed', bedrooms: 1, bathrooms: p.bathrooms1Bed ?? 1 });
+        result.push({
+          ...base,
+          price: p.price1Bed,
+          variant: "1bed",
+          variantLabel: "1 Bed",
+          bedrooms: 1,
+          bathrooms: p.bathrooms1Bed ?? 1,
+        });
       }
       if (has2Bed) {
-        result.push({ ...base, price: p.price2Bed, variant: '2bed', variantLabel: '2 Bed', bedrooms: 2, bathrooms: p.bathrooms2Bed ?? 2 });
+        result.push({
+          ...base,
+          price: p.price2Bed,
+          variant: "2bed",
+          variantLabel: "2 Bed",
+          bedrooms: 2,
+          bathrooms: p.bathrooms2Bed ?? 2,
+        });
       }
       if (!has1Bed && !has2Bed) {
         result.push({ ...base, price: p.price });
@@ -254,13 +595,17 @@ function PropertiesPage() {
     }
     // Filter by bed variant
     let filtered = result;
-    if (bedFilter === '1bed') filtered = filtered.filter((l) => l.variant === '1bed' || !l.variant);
-    if (bedFilter === '2bed') filtered = filtered.filter((l) => l.variant === '2bed' || !l.variant);
+    if (bedFilter === "1bed")
+      filtered = filtered.filter((l) => l.variant === "1bed" || !l.variant);
+    if (bedFilter === "2bed")
+      filtered = filtered.filter((l) => l.variant === "2bed" || !l.variant);
     // Amenities filter (client-side)
     if (selectedAmenities.size > 0) {
       filtered = filtered.filter((l) => {
         const lower = (l.amenities || []).map((a) => a.toLowerCase());
-        return [...selectedAmenities].every((a) => lower.includes(a.toLowerCase()));
+        return [...selectedAmenities].every((a) =>
+          lower.includes(a.toLowerCase()),
+        );
       });
     }
     return filtered;
@@ -270,16 +615,16 @@ function PropertiesPage() {
   const sortedListings = useMemo(() => {
     const sorted = [...listings];
     switch (sort) {
-      case 'price_asc':
+      case "price_asc":
         sorted.sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
         break;
-      case 'price_desc':
+      case "price_desc":
         sorted.sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
         break;
-      case 'rating':
+      case "rating":
         sorted.sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0));
         break;
-      case 'newest':
+      case "newest":
         // Properties are already returned newest-first by the API;
         // for variant-expanded entries, preserve relative order.
         break;
@@ -305,10 +650,16 @@ function PropertiesPage() {
     try {
       const params = {};
       if (searchQuery) params.search = searchQuery;
-      if (filter !== 'all') params.type = filter;
-      if (priceRange === 'low') { params.minPrice = 0; params.maxPrice = 4999; }
-      else if (priceRange === 'mid') { params.minPrice = 5000; params.maxPrice = 7999; }
-      else if (priceRange === 'high') { params.minPrice = 8000; }
+      if (filter !== "all") params.type = filter;
+      if (priceRange === "low") {
+        params.minPrice = 0;
+        params.maxPrice = 4999;
+      } else if (priceRange === "mid") {
+        params.minPrice = 5000;
+        params.maxPrice = 7999;
+      } else if (priceRange === "high") {
+        params.minPrice = 8000;
+      }
       if (availableOnly) params.available = true;
       if (neighborhood) params.neighborhood = neighborhood;
       if (minRating) params.minRating = Number(minRating);
@@ -330,17 +681,32 @@ function PropertiesPage() {
       params.page = 1;
       params.limit = 500;
 
-      const res = await apiClient.get('/properties', { params, signal: controller.signal });
+      const res = await apiClient.get("/properties", {
+        params,
+        signal: controller.signal,
+      });
       if (controller.signal.aborted) return;
       setProperties(res.data.data || []);
     } catch (err) {
       if (controller.signal.aborted) return; // superseded by a newer filter change
-      console.error('Failed to fetch properties:', err);
-      setError('We couldn\'t load properties right now. Please check your connection and try again.');
+      console.error("Failed to fetch properties:", err);
+      setError(
+        "We couldn't load properties right now. Please check your connection and try again.",
+      );
     } finally {
       if (!controller.signal.aborted) setLoading(false);
     }
-  }, [searchQuery, filter, priceRange, availableOnly, neighborhood, minRating, guests, checkIn, checkOut]);
+  }, [
+    searchQuery,
+    filter,
+    priceRange,
+    availableOnly,
+    neighborhood,
+    minRating,
+    guests,
+    checkIn,
+    checkOut,
+  ]);
 
   useEffect(() => {
     fetchProperties();
@@ -348,24 +714,33 @@ function PropertiesPage() {
   }, [fetchProperties]);
 
   const hasActiveFilters =
-    filter !== 'all' || priceRange !== 'all' || availableOnly || bedFilter !== 'all' || searchQuery !== '' ||
-    neighborhood || minRating || guests > 1 || (checkIn && checkOut) || selectedAmenities.size > 0;
+    filter !== "all" ||
+    priceRange !== "all" ||
+    availableOnly ||
+    bedFilter !== "all" ||
+    searchQuery !== "" ||
+    neighborhood ||
+    minRating ||
+    guests > 1 ||
+    (checkIn && checkOut) ||
+    selectedAmenities.size > 0;
 
   const filterButtons = [
-    { key: 'all', label: 'All' },
-    { key: 'apartment', label: 'Apartments' },
-    { key: 'studio', label: 'Studios' },
-    { key: 'penthouse', label: 'Penthouses' },
+    { key: "all", label: "All" },
+    { key: "apartment", label: "Apartments" },
+    { key: "studio", label: "Studios" },
+    { key: "penthouse", label: "Penthouses" },
   ];
 
   const bedFilterButtons = [
-    { key: 'all', label: 'All Beds' },
-    { key: '1bed', label: '1 Bed' },
-    { key: '2bed', label: '2 Bed' },
+    { key: "all", label: "All Beds" },
+    { key: "1bed", label: "1 Bed" },
+    { key: "2bed", label: "2 Bed" },
   ];
 
   // Show Coming Soon placeholders only on default unfiltered view
-  const showComingSoon = !hasActiveFilters && sort === 'default' && !loading && !error;
+  const showComingSoon =
+    !hasActiveFilters && sort === "default" && !loading && !error;
 
   return (
     <PropertiesResultsScene
@@ -412,15 +787,43 @@ function PropertiesPage() {
       {/* Stays Results intro */}
       <section className="bg-[#F8FAFC] pt-24 pb-5 md:pt-28 md:pb-7">
         <div className="mx-auto max-w-[1200px] px-4 md:px-8">
-          <p className="mb-2 text-xs text-[#5B6B82]">Home <span className="mx-1">›</span> Properties</p>
-          <h1 className="text-3xl font-semibold tracking-tight text-[#0B1F42]">Properties in Nairobi</h1>
-          <p className="mt-2 text-sm text-[#5B6B82] md:text-base">Find a verified, furnished home that fits your plans.</p>
+          <p className="mb-2 text-xs text-[#5B6B82]">
+            Home <span className="mx-1">›</span> Properties
+          </p>
+          <h1 className="text-3xl font-semibold tracking-tight text-[#0B1F42]">
+            Properties in Nairobi
+          </h1>
+          <p className="mt-2 text-sm text-[#5B6B82] md:text-base">
+            Find a verified, furnished home that fits your plans.
+          </p>
           <div className="mt-5 flex flex-wrap items-center gap-2">
-            <span className="mr-1 text-[10px] font-semibold uppercase tracking-[.12em] text-[#64748B]">Active search</span>
-            {searchQuery && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{searchQuery}</span>}
-            {checkIn && checkOut && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{checkIn} – {checkOut}</span>}
-            {guests > 1 && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{guests} guests</span>}
-            {hasActiveFilters && <button type="button" onClick={clearAllFilters} className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs font-semibold text-[#0B1F42] hover:border-[#C89B6D] hover:text-[#B8895C]">Clear all</button>}
+            <span className="mr-1 text-[10px] font-semibold uppercase tracking-[.12em] text-[#64748B]">
+              Active search
+            </span>
+            {searchQuery && (
+              <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">
+                {searchQuery}
+              </span>
+            )}
+            {checkIn && checkOut && (
+              <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">
+                {checkIn} – {checkOut}
+              </span>
+            )}
+            {guests > 1 && (
+              <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">
+                {guests} guests
+              </span>
+            )}
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs font-semibold text-[#0B1F42] hover:border-[#C89B6D] hover:text-[#B8895C]"
+              >
+                Clear all
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -435,7 +838,7 @@ function PropertiesPage() {
               onSubmit={handleSearchSubmit}
               onClear={handleSearchClear}
               loading={loading}
-              hasActiveSearch={searchQuery !== ''}
+              hasActiveSearch={searchQuery !== ""}
               discovery
               dates={{ checkIn, checkOut }}
               onDatesChange={handleDatesChange}
@@ -449,33 +852,36 @@ function PropertiesPage() {
       {/* Sticky Filters Bar */}
       <section className="hidden sticky top-0 z-10 bg-white shadow-sm md:block">
         <div className="w-full mx-auto px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl py-3">
-            <div className="flex min-w-0 flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div className="flex min-w-0 flex-col md:flex-row md:items-center md:justify-between gap-3">
             {/* Left: property type pills + bed variant pills + available toggle */}
             <div className="flex min-w-0 flex-wrap gap-1.5 items-center">
               {filterButtons.map(({ key, label }) => (
                 <button
                   key={key}
                   type="button"
-                  onClick={() => updateParam('type', key)}
+                  onClick={() => updateParam("type", key)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                     filter === key
-                      ? 'bg-[#2563EB] text-white'
-                      : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
+                      ? "bg-[#2563EB] text-white"
+                      : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
                   }`}
                 >
                   {label}
                 </button>
               ))}
-              <span className="w-px h-5 bg-[#E5E7EB] mx-1 hidden md:block" aria-hidden="true" />
+              <span
+                className="w-px h-5 bg-[#E5E7EB] mx-1 hidden md:block"
+                aria-hidden="true"
+              />
               {bedFilterButtons.map(({ key, label }) => (
                 <button
                   key={key}
                   type="button"
-                  onClick={() => updateParam('beds', key)}
+                  onClick={() => updateParam("beds", key)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                     bedFilter === key
-                      ? 'bg-[#2563EB] text-white'
-                      : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
+                      ? "bg-[#2563EB] text-white"
+                      : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
                   }`}
                 >
                   {label}
@@ -483,11 +889,13 @@ function PropertiesPage() {
               ))}
               <button
                 type="button"
-                onClick={() => updateParam('available', availableOnly ? '' : 'true')}
+                onClick={() =>
+                  updateParam("available", availableOnly ? "" : "true")
+                }
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                   availableOnly
-                    ? 'bg-[#2563EB] text-white'
-                    : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
+                    ? "bg-[#2563EB] text-white"
+                    : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
                 }`}
               >
                 Available to Book
@@ -499,15 +907,28 @@ function PropertiesPage() {
                 onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                   moreFiltersOpen
-                    ? 'bg-[#2563EB] text-white'
-                    : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
+                    ? "bg-[#2563EB] text-white"
+                    : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
                 }`}
               >
                 <span className="flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                  <svg
+                    className="w-3.5 h-3.5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                    />
                   </svg>
-                  Filters {hasActiveFilters && `(${[filter !== 'all', priceRange !== 'all', availableOnly, bedFilter !== 'all', !!neighborhood, !!minRating, guests > 1, !!(checkIn && checkOut), selectedAmenities.size > 0].filter(Boolean).length})`}
+                  Filters{" "}
+                  {hasActiveFilters &&
+                    `(${[filter !== "all", priceRange !== "all", availableOnly, bedFilter !== "all", !!neighborhood, !!minRating, guests > 1, !!(checkIn && checkOut), selectedAmenities.size > 0].filter(Boolean).length})`}
                 </span>
               </button>
             </div>
@@ -516,12 +937,12 @@ function PropertiesPage() {
             <div className="flex items-center gap-2">
               <Dropdown
                 value={priceRange}
-                onChange={(v) => updateParam('price', v)}
+                onChange={(v) => updateParam("price", v)}
                 options={[
-                  { value: 'all', label: 'All Prices' },
-                  { value: 'low', label: 'Under KES 5,000' },
-                  { value: 'mid', label: 'KES 5,000 - 8,000' },
-                  { value: 'high', label: 'Above KES 8,000' },
+                  { value: "all", label: "All Prices" },
+                  { value: "low", label: "Under KES 5,000" },
+                  { value: "mid", label: "KES 5,000 - 8,000" },
+                  { value: "high", label: "Above KES 8,000" },
                 ]}
                 triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
                 placeholder="All Prices"
@@ -530,7 +951,7 @@ function PropertiesPage() {
               />
               <Dropdown
                 value={sort}
-                onChange={(v) => updateParam('sort', v)}
+                onChange={(v) => updateParam("sort", v)}
                 options={SORT_OPTIONS}
                 triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
                 placeholder="Sort"
@@ -546,7 +967,7 @@ function PropertiesPage() {
               {/* Area */}
               <Dropdown
                 value={neighborhood}
-                onChange={(v) => updateParam('neighborhood', v)}
+                onChange={(v) => updateParam("neighborhood", v)}
                 options={NEIGHBORHOODS}
                 triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
                 placeholder="All Areas"
@@ -562,11 +983,13 @@ function PropertiesPage() {
                   <button
                     key={value}
                     type="button"
-                    onClick={() => updateParam('minRating', minRating === value ? '' : value)}
+                    onClick={() =>
+                      updateParam("minRating", minRating === value ? "" : value)
+                    }
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                       minRating === value
-                        ? 'bg-[#2563EB] text-white'
-                        : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
+                        ? "bg-[#2563EB] text-white"
+                        : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
                     }`}
                   >
                     {label}
@@ -578,22 +1001,44 @@ function PropertiesPage() {
               <div className="flex items-center gap-1 ml-auto">
                 <button
                   type="button"
-                  onClick={() => setViewMode('list')}
-                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${viewMode === 'list' ? 'bg-[#2563EB] text-white' : 'bg-white border border-[#E5E7EB] text-[#6b7280] hover:bg-[#F7F7F5]'}`}
+                  onClick={() => setViewMode("list")}
+                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${viewMode === "list" ? "bg-[#2563EB] text-white" : "bg-white border border-[#E5E7EB] text-[#6b7280] hover:bg-[#F7F7F5]"}`}
                   aria-label="List view"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6h16M4 10h16M4 14h16M4 18h16"
+                    />
                   </svg>
                 </button>
                 <button
                   type="button"
-                  onClick={() => setViewMode('map')}
-                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${viewMode === 'map' ? 'bg-[#2563EB] text-white' : 'bg-white border border-[#E5E7EB] text-[#6b7280] hover:bg-[#F7F7F5]'}`}
+                  onClick={() => setViewMode("map")}
+                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${viewMode === "map" ? "bg-[#2563EB] text-white" : "bg-white border border-[#E5E7EB] text-[#6b7280] hover:bg-[#F7F7F5]"}`}
                   aria-label="Map view"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    aria-hidden="true"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"
+                    />
                   </svg>
                 </button>
               </div>
@@ -608,14 +1053,15 @@ function PropertiesPage() {
                     onClick={() => {
                       setSelectedAmenities((prev) => {
                         const next = new Set(prev);
-                        if (next.has(a)) next.delete(a); else next.add(a);
+                        if (next.has(a)) next.delete(a);
+                        else next.add(a);
                         return next;
                       });
                     }}
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                       selectedAmenities.has(a)
-                        ? 'bg-[#2563EB] text-white'
-                        : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
+                        ? "bg-[#2563EB] text-white"
+                        : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
                     }`}
                   >
                     {a}
@@ -636,31 +1082,91 @@ function PropertiesPage() {
             className="min-h-[44px] rounded-full border border-[#D8E0E9] bg-white px-4 text-xs font-semibold text-[#0B1F42] transition-colors hover:border-[#C89B6D] hover:text-[#B8895C]"
           >
             <span className="inline-flex items-center gap-2">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="M4 6h16M7 12h10M10 18h4" /></svg>
-              Filters{hasActiveFilters ? ` (${[filter !== 'all', priceRange !== 'all', availableOnly, bedFilter !== 'all', !!neighborhood, !!minRating, guests > 1, !!(checkIn && checkOut), selectedAmenities.size > 0].filter(Boolean).length})` : ''}
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.8"
+                  d="M4 6h16M7 12h10M10 18h4"
+                />
+              </svg>
+              Filters
+              {hasActiveFilters
+                ? ` (${[filter !== "all", priceRange !== "all", availableOnly, bedFilter !== "all", !!neighborhood, !!minRating, guests > 1, !!(checkIn && checkOut), selectedAmenities.size > 0].filter(Boolean).length})`
+                : ""}
             </span>
           </button>
           <button
             type="button"
-            onClick={() => setViewMode(viewMode === 'map' ? 'list' : 'map')}
-            className={`min-h-[44px] rounded-full border px-4 text-xs font-semibold transition-colors ${viewMode === 'map' ? 'border-[#0B1F42] bg-[#0B1F42] text-white' : 'border-[#D8E0E9] bg-white text-[#0B1F42] hover:border-[#C89B6D] hover:text-[#B8895C]'}`}
+            onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
+            className={`min-h-[44px] rounded-full border px-4 text-xs font-semibold transition-colors ${viewMode === "map" ? "border-[#0B1F42] bg-[#0B1F42] text-white" : "border-[#D8E0E9] bg-white text-[#0B1F42] hover:border-[#C89B6D] hover:text-[#B8895C]"}`}
           >
             <span className="inline-flex items-center gap-2">
-              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.8" d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z" /><path d="M9 3v15M15 6v15" /></svg>
-              {viewMode === 'map' ? 'Show list' : 'Show map'}
+              <svg
+                className="h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="1.8"
+                  d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3Z"
+                />
+                <path d="M9 3v15M15 6v15" />
+              </svg>
+              {viewMode === "map" ? "Show list" : "Show map"}
             </span>
           </button>
         </div>
         {moreFiltersOpen && (
           <div className="mt-3 flex flex-wrap gap-2 border-t border-[#E5E7EB] pt-3">
             {filterButtons.map(({ key, label }) => (
-              <button key={key} type="button" onClick={() => updateParam('type', key)} className={`rounded-full px-3 py-2 text-xs font-medium ${filter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#D8E0E9] bg-white text-[#44546A]'}`}>{label}</button>
+              <button
+                key={key}
+                type="button"
+                onClick={() => updateParam("type", key)}
+                className={`rounded-full px-3 py-2 text-xs font-medium ${filter === key ? "bg-[#0B1F42] text-white" : "border border-[#D8E0E9] bg-white text-[#44546A]"}`}
+              >
+                {label}
+              </button>
             ))}
             {bedFilterButtons.map(({ key, label }) => (
-              <button key={key} type="button" onClick={() => updateParam('beds', key)} className={`rounded-full px-3 py-2 text-xs font-medium ${bedFilter === key ? 'bg-[#0B1F42] text-white' : 'border border-[#D8E0E9] bg-white text-[#44546A]'}`}>{label}</button>
+              <button
+                key={key}
+                type="button"
+                onClick={() => updateParam("beds", key)}
+                className={`rounded-full px-3 py-2 text-xs font-medium ${bedFilter === key ? "bg-[#0B1F42] text-white" : "border border-[#D8E0E9] bg-white text-[#44546A]"}`}
+              >
+                {label}
+              </button>
             ))}
-            <button type="button" onClick={() => updateParam('available', availableOnly ? '' : 'true')} className={`rounded-full px-3 py-2 text-xs font-medium ${availableOnly ? 'bg-[#0B1F42] text-white' : 'border border-[#D8E0E9] bg-white text-[#44546A]'}`}>Available</button>
-            {hasActiveFilters && <button type="button" onClick={clearAllFilters} className="rounded-full px-3 py-2 text-xs font-semibold text-[#B8895C]">Clear all</button>}
+            <button
+              type="button"
+              onClick={() =>
+                updateParam("available", availableOnly ? "" : "true")
+              }
+              className={`rounded-full px-3 py-2 text-xs font-medium ${availableOnly ? "bg-[#0B1F42] text-white" : "border border-[#D8E0E9] bg-white text-[#44546A]"}`}
+            >
+              Available
+            </button>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                className="rounded-full px-3 py-2 text-xs font-semibold text-[#B8895C]"
+              >
+                Clear all
+              </button>
+            )}
           </div>
         )}
       </section>
@@ -672,14 +1178,20 @@ function PropertiesPage() {
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-[#6b7280]">
               {loading ? (
-                'Searching...'
+                "Searching..."
               ) : (
                 <>
-                  <span className="font-semibold text-[#222222]">{sortedListings.length}</span>{' '}
-                  {sortedListings.length === 1 ? 'place' : 'places'}
+                  <span className="font-semibold text-[#222222]">
+                    {sortedListings.length}
+                  </span>{" "}
+                  {sortedListings.length === 1 ? "place" : "places"}
                   {searchQuery && (
                     <>
-                      {' '}in <span className="font-medium text-[#222222]">&ldquo;{searchQuery}&rdquo;</span>
+                      {" "}
+                      in{" "}
+                      <span className="font-medium text-[#222222]">
+                        &ldquo;{searchQuery}&rdquo;
+                      </span>
                     </>
                   )}
                 </>
@@ -700,11 +1212,24 @@ function PropertiesPage() {
           {error && !loading && (
             <div className="text-center py-16" role="alert">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                <svg
+                  className="w-8 h-8 text-red-500"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-[#222222] mb-2">Something went wrong</h3>
+              <h3 className="text-lg font-bold text-[#222222] mb-2">
+                Something went wrong
+              </h3>
               <p className="text-[#6b7280] mb-4 max-w-md mx-auto">{error}</p>
               <button
                 type="button"
@@ -718,7 +1243,11 @@ function PropertiesPage() {
 
           {/* Loading state */}
           {loading && (
-            <div className="text-center py-16" role="status" aria-label="Loading properties">
+            <div
+              className="text-center py-16"
+              role="status"
+              aria-label="Loading properties"
+            >
               <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
               <p className="text-[#6b7280] text-sm">Loading properties...</p>
             </div>
@@ -728,15 +1257,28 @@ function PropertiesPage() {
           {!loading && !error && sortedListings.length === 0 && (
             <div className="text-center py-16">
               <div className="w-20 h-20 bg-[#F7F7F5] rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-10 h-10 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <svg
+                  className="w-10 h-10 text-[#6b7280]"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-[#222222] mb-2">No places found</h3>
+              <h3 className="text-lg font-bold text-[#222222] mb-2">
+                No places found
+              </h3>
               <p className="text-[#6b7280] mb-4 max-w-sm mx-auto text-sm">
                 {searchQuery
                   ? `We couldn't find any listings matching "${searchQuery}". Try a different neighbourhood or adjust your filters.`
-                  : 'No properties match your current filters. Try adjusting or clearing them.'}
+                  : "No properties match your current filters. Try adjusting or clearing them."}
               </p>
               <button
                 type="button"
@@ -749,74 +1291,93 @@ function PropertiesPage() {
           )}
 
           {/* Map view */}
-          {!loading && !error && viewMode === 'map' && sortedListings.length > 0 && (
-            <div className="mb-8">
-              <Suspense fallback={<div className="h-[520px] animate-pulse rounded-2xl bg-[#f3f4f6]" aria-label="Loading property map" />}>
-                <PropertyResultsMap listings={sortedListings} />
-              </Suspense>
-            </div>
-          )}
+          {!loading &&
+            !error &&
+            viewMode === "map" &&
+            sortedListings.length > 0 && (
+              <div className="mb-8">
+                <Suspense
+                  fallback={
+                    <div
+                      className="h-[520px] animate-pulse rounded-2xl bg-[#f3f4f6]"
+                      aria-label="Loading property map"
+                    />
+                  }
+                >
+                  <PropertyResultsMap listings={sortedListings} />
+                </Suspense>
+              </div>
+            )}
 
           {/* Results grid */}
-          {!loading && !error && viewMode !== 'map' && sortedListings.length > 0 && (
-            <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
-              {sortedListings.map((listing) => (
-                <PropertyCard
-                  key={`${listing.id}-${listing.variant || 'base'}`}
-                  property={listing}
-                  cardVariant="results"
-                />
-              ))}
-
-              {/* Coming Soon placeholders */}
-              {showComingSoon &&
-                [18, 16, 15, 14].map((imgIndex, i) => (
-                  <div
-                    key={`coming-soon-${i}`}
-                    className="group overflow-hidden rounded-[14px] border border-[#E5E7EB] shadow-sm bg-white h-full flex flex-col"
-                  >
-                    <div className="relative aspect-[4/3] flex-shrink-0">
-                      <img
-                        src={zuriImages[imgIndex]}
-                        alt="Coming soon property"
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-[#222222]/40"></div>
-                      <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#222222] text-xs font-bold px-3 py-1 rounded-full">
-                        Coming Soon
-                      </div>
-                    </div>
-                    <div className="p-4 flex flex-col flex-1">
-                      <h3 className="text-sm font-semibold text-[#222222] mb-1">Coming Soon</h3>
-                      <p className="text-xs text-[#6b7280] mb-3">TBA</p>
-                      <div className="flex items-center justify-between mb-3 py-2 border-y border-[#E5E7EB]">
-                        <div className="flex-1 text-center">
-                          <span className="text-xs text-[#6b7280]">-</span>
-                          <p className="text-xs text-[#6b7280]">Beds</p>
-                        </div>
-                        <div className="flex-1 text-center">
-                          <span className="text-xs text-[#6b7280]">-</span>
-                          <p className="text-xs text-[#6b7280]">Baths</p>
-                        </div>
-                        <div className="flex-1 text-center">
-                          <span className="text-xs text-[#6b7280]">-</span>
-                          <p className="text-xs text-[#6b7280]">Sqft</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between mt-auto">
-                        <div>
-                          <span className="text-xs text-[#6b7280]">per night</span>
-                          <p className="text-base font-bold text-[#6b7280]">KES -</p>
-                        </div>
-                        <span className="bg-[#F7F7F5] text-[#6b7280] font-semibold px-3 py-1.5 rounded-full text-xs">
-                          Coming Soon
-                        </span>
-                      </div>
-                    </div>
-                  </div>
+          {!loading &&
+            !error &&
+            viewMode !== "map" &&
+            sortedListings.length > 0 && (
+              <div className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+                {sortedListings.map((listing) => (
+                  <PropertyCard
+                    key={`${listing.id}-${listing.variant || "base"}`}
+                    property={listing}
+                    cardVariant="results"
+                  />
                 ))}
-            </div>
-          )}
+
+                {/* Coming Soon placeholders */}
+                {showComingSoon &&
+                  [18, 16, 15, 14].map((imgIndex, i) => (
+                    <div
+                      key={`coming-soon-${i}`}
+                      className="group overflow-hidden rounded-[14px] border border-[#E5E7EB] shadow-sm bg-white h-full flex flex-col"
+                    >
+                      <div className="relative aspect-[4/3] flex-shrink-0">
+                        <img
+                          src={zuriImages[imgIndex]}
+                          alt="Coming soon property"
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-[#222222]/40"></div>
+                        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-[#222222] text-xs font-bold px-3 py-1 rounded-full">
+                          Coming Soon
+                        </div>
+                      </div>
+                      <div className="p-4 flex flex-col flex-1">
+                        <h3 className="text-sm font-semibold text-[#222222] mb-1">
+                          Coming Soon
+                        </h3>
+                        <p className="text-xs text-[#6b7280] mb-3">TBA</p>
+                        <div className="flex items-center justify-between mb-3 py-2 border-y border-[#E5E7EB]">
+                          <div className="flex-1 text-center">
+                            <span className="text-xs text-[#6b7280]">-</span>
+                            <p className="text-xs text-[#6b7280]">Beds</p>
+                          </div>
+                          <div className="flex-1 text-center">
+                            <span className="text-xs text-[#6b7280]">-</span>
+                            <p className="text-xs text-[#6b7280]">Baths</p>
+                          </div>
+                          <div className="flex-1 text-center">
+                            <span className="text-xs text-[#6b7280]">-</span>
+                            <p className="text-xs text-[#6b7280]">Sqft</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between mt-auto">
+                          <div>
+                            <span className="text-xs text-[#6b7280]">
+                              per night
+                            </span>
+                            <p className="text-base font-bold text-[#6b7280]">
+                              KES -
+                            </p>
+                          </div>
+                          <span className="bg-[#F7F7F5] text-[#6b7280] font-semibold px-3 py-1.5 rounded-full text-xs">
+                            Coming Soon
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            )}
         </div>
       </section>
 

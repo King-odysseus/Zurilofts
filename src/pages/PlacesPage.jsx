@@ -1,12 +1,9 @@
-import { lazy, Suspense, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { HomeHeader } from "./HomePage.jsx";
 import Footer from "../components/Footer.jsx";
 import Dropdown from "../components/Dropdown.jsx";
-import Spinner from "../components/Spinner.jsx";
 import { AREAS, PLACE_CATEGORIES, PLACES_TO_VISIT } from "../data/nearby.js";
 import { googleMapsDirectionsUrl } from "../utils/googleMaps.js";
-
-const NearbyMap = lazy(() => import("../components/NearbyMap.jsx"));
 
 function PlaceCard({ item }) {
   const directionsUrl = googleMapsDirectionsUrl({
@@ -57,7 +54,6 @@ function PlacesPage() {
   const [query, setQuery] = useState("");
   const [area, setArea] = useState("all");
   const [category, setCategory] = useState("all");
-  const [viewMode, setViewMode] = useState("list");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const filteredPlaces = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -159,13 +155,6 @@ function PlacesPage() {
                 menuClassName="left-0"
                 ariaLabel="Filter places by category"
               />
-              <button
-                type="button"
-                onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
-                className="rounded-full border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-medium text-[#33415C] hover:border-[#C89B6D]"
-              >
-                {viewMode === "map" ? "Show list" : "Show map"}
-              </button>
               {hasFilters && (
                 <button
                   type="button"
@@ -188,13 +177,6 @@ function PlacesPage() {
                 className="min-h-11 rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold"
               >
                 Filters{hasFilters ? " ·" : ""}
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode(viewMode === "map" ? "list" : "map")}
-                className="min-h-11 rounded-full border border-[#E3E8EF] bg-white text-xs font-semibold"
-              >
-                {viewMode === "map" ? "Show list" : "Show map"}
               </button>
             </div>
             {filtersOpen && (
@@ -230,20 +212,7 @@ function PlacesPage() {
           className="mx-auto max-w-[1200px] px-4 pb-16 md:px-8"
           aria-live="polite"
         >
-          {viewMode === "map" && filteredPlaces.length > 0 ? (
-            <Suspense
-              fallback={
-                <div className="flex h-[420px] items-center justify-center rounded-2xl bg-white">
-                  <Spinner />
-                </div>
-              }
-            >
-              <NearbyMap
-                items={filteredPlaces}
-                title="Places to visit in Nairobi"
-              />
-            </Suspense>
-          ) : filteredPlaces.length > 0 ? (
+          {filteredPlaces.length > 0 ? (
             <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
               {filteredPlaces.map((item) => (
                 <PlaceCard key={item.name} item={item} />
