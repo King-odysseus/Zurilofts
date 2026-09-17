@@ -234,7 +234,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-white text-[#0B1F42]">
       <HomeHeader />
       <main>
-        <section className="relative isolate overflow-hidden bg-[#102B62] text-white">
+        <section className="relative z-20 isolate overflow-visible bg-[#102B62] text-white">
           <img src={heroImage} alt="A furnished ZuriLofts apartment in Nairobi" className="absolute inset-0 -z-20 h-full w-full object-cover" />
           <div className="absolute inset-0 -z-10 bg-[#123878]/80" />
           <div className="mx-auto flex min-h-[440px] max-w-[1240px] flex-col items-center justify-center px-5 py-14 text-center md:px-8">

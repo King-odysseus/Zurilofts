@@ -55,9 +55,9 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
   }
 
   return (
-    <div ref={containerRef} className="flex w-full min-w-0 flex-col sm:contents">
+    <div ref={containerRef} className={`flex w-full min-w-0 flex-col sm:contents ${openField ? 'relative z-50' : ''}`}>
       {/* When */}
-      <div className="relative w-full min-w-0 px-4 py-2 sm:w-auto sm:min-w-[150px] sm:border-r sm:border-[#E5E7EB] sm:px-6 sm:py-1">
+      <div className={`relative w-full min-w-0 px-4 py-2 sm:w-auto sm:min-w-[150px] sm:border-r sm:border-[#E5E7EB] sm:px-6 sm:py-1 ${openField === 'dates' ? 'z-50' : ''}`}>
         <button
           type="button"
           onClick={() => setOpenField(openField === 'dates' ? null : 'dates')}
@@ -73,7 +73,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label="Choose dates"
-            className="fixed inset-0 z-50 overflow-y-auto bg-white p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-40 sm:mt-2 sm:w-[640px] sm:rounded-2xl sm:border sm:border-[#E5E7EB] sm:p-5 sm:shadow-2xl"
+            className="fixed inset-0 z-[100] overflow-y-auto bg-white p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[640px] sm:rounded-2xl sm:border sm:border-[#E5E7EB] sm:p-5 sm:shadow-2xl"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
               <span className="text-base font-semibold text-[#222222]">Choose dates</span>
@@ -110,7 +110,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
       </div>
 
       {/* Who */}
-      <div className="relative w-full min-w-0 px-4 py-2 sm:w-auto sm:min-w-[140px] sm:px-6 sm:py-1">
+      <div className={`relative w-full min-w-0 px-4 py-2 sm:w-auto sm:min-w-[140px] sm:px-6 sm:py-1 ${openField === 'guests' ? 'z-50' : ''}`}>
         <button
           type="button"
           onClick={() => setOpenField(openField === 'guests' ? null : 'guests')}
@@ -126,7 +126,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label="Choose guests"
-            className="fixed inset-0 z-50 bg-white p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-40 sm:mt-2 sm:w-72 sm:rounded-2xl sm:border sm:border-[#E5E7EB] sm:p-5 sm:shadow-2xl"
+            className="fixed inset-0 z-[100] bg-white p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-72 sm:rounded-2xl sm:border sm:border-[#E5E7EB] sm:p-5 sm:shadow-2xl"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
               <span className="text-base font-semibold text-[#222222]">Guests</span>

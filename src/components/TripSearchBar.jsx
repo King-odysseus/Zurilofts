@@ -24,7 +24,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
             onChange={onChange}
             placeholder={discovery ? 'Search destinations' : 'Search by location or property name...'}
             autoComplete="address-level2"
-            className="min-h-[44px] w-full min-w-0 max-w-full bg-transparent py-3 text-base text-[#222222] placeholder-[#6b7280] focus:outline-none"
+            className="search-input-clean min-h-[44px] w-full min-w-0 max-w-full bg-transparent py-3 text-base text-[#222222] placeholder-[#6b7280] focus:outline-none"
           />
           {hasActiveSearch && (
             <button

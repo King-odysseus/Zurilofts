@@ -53,6 +53,20 @@ body {
   color: #222222;
 }
 
+/* The search field owns its clear action so the browser's native cancel
+   affordance does not create a second close button beside it. */
+.search-input-clean::-webkit-search-cancel-button,
+.search-input-clean::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+  display: none;
+}
+
+.search-input-clean::-ms-clear,
+.search-input-clean::-ms-reveal {
+  display: none;
+}
+
 /* Reserve room for the fixed mobile bottom nav (MobileBottomNav.jsx toggles
    this class per-route) so it never covers page content/actions. */
 .mobile-bottom-nav {

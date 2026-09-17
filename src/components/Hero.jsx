@@ -211,7 +211,7 @@ function SearchBar({ discovery = false }) {
 
       {/* Dropdown results */}
       {open && results.length > 0 && (
-        <div className="absolute left-0 right-0 top-full mt-2 bg-white rounded-2xl border border-[#E5E7EB] shadow-xl overflow-hidden z-50">
+        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-xl">
           <ul>
             {results.map((p) => (
               <li key={p.id}>
@@ -308,7 +308,7 @@ function Hero({ stats }) {
   const showToggle = !isAuthenticated;
 
   return (
-    <section className="relative min-h-[600px] md:min-h-[700px] flex flex-col overflow-hidden">
+    <section className="relative z-20 min-h-[600px] overflow-visible md:min-h-[700px] flex flex-col">
       {/* Background Image */}
       <div className="absolute inset-0 overflow-hidden">
         <img
