@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import AvailabilityCalendar from './AvailabilityCalendar.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Local YYYY-MM-DD formatting, matching AvailabilityCalendar's own helper.
 function formatShort(iso) {
@@ -25,6 +26,7 @@ function formatShort(iso) {
  *  - onGuestsChange: (number) => void
  */
 function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange }) {
+  const { t } = useLanguage();
   const [openField, setOpenField] = useState(null); // 'dates' | 'guests' | null
   const containerRef = useRef(null);
 
@@ -47,8 +49,8 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
     ? dates.checkOut
       ? `${formatShort(dates.checkIn)} - ${formatShort(dates.checkOut)}`
       : `${formatShort(dates.checkIn)} - Add check-out`
-    : 'Add dates';
-  const guestsLabel = guests > 0 ? `${guests} guest${guests === 1 ? '' : 's'}` : 'Add guests';
+    : t('home.addDates');
+  const guestsLabel = guests > 0 ? `${guests} ${guests === 1 ? t('home.guest') : t('home.guests')}` : t('home.addGuests');
 
   function clampGuests(n) {
     return Math.min(16, Math.max(1, n));
@@ -65,7 +67,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           aria-expanded={openField === 'dates'}
           className="block w-full min-h-[44px] text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
         >
-          <span className="block text-sm font-semibold text-[#222222]">When</span>
+          <span className="block text-sm font-semibold text-[#222222]">{t('home.when')}</span>
           <span className="block truncate text-sm text-[#6b7280]">{datesLabel}</span>
         </button>
 
@@ -118,7 +120,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           aria-expanded={openField === 'guests'}
           className="block w-full min-h-[44px] text-left rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
         >
-          <span className="block text-sm font-semibold text-[#222222]">Who</span>
+          <span className="block text-sm font-semibold text-[#222222]">{t('home.who')}</span>
           <span className="block truncate text-sm text-[#6b7280]">{guestsLabel}</span>
         </button>
 

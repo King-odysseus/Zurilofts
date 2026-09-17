@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types';
 import SearchDateGuestFields from './SearchDateGuestFields.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveSearch, discovery, dates, onDatesChange, guests, onGuestsChange }) {
+  const { t } = useLanguage();
   return (
     <form onSubmit={onSubmit} role="search" className="w-full max-w-full">
       <div className={`flex flex-col gap-2 rounded-2xl border border-[#E5E7EB]/90 bg-white/90 p-2 shadow-lg backdrop-blur-sm transition-shadow focus-within:border-[#2563EB] focus-within:ring-2 focus-within:ring-[#2563EB]/20 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:bg-white sm:backdrop-blur-none ${discovery ? 'sm:p-2' : ''}`}>
@@ -16,13 +18,13 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
           <label htmlFor="trip-search-destination" className="sr-only">
             Search destinations or neighbourhoods
           </label>
-          {discovery && <span className="mr-3 hidden shrink-0 text-sm font-semibold text-[#222222] sm:inline">Where</span>}
+          {discovery && <span className="mr-3 hidden shrink-0 text-sm font-semibold text-[#222222] sm:inline">{t('home.where')}</span>}
           <input
             id="trip-search-destination"
             type="search"
             value={value}
             onChange={onChange}
-            placeholder={discovery ? 'Search destinations' : 'Search by location or property name...'}
+            placeholder={discovery ? t('home.searchDestination') : t('home.searchLocation')}
             autoComplete="address-level2"
             className="search-input-clean min-h-[44px] w-full min-w-0 max-w-full bg-transparent py-3 text-base text-[#222222] placeholder-[#6b7280] focus:outline-none"
           />
