@@ -136,12 +136,12 @@ function StayCard({ property }) {
 function RecentCard({ property }) {
   const image = firstImage(property);
   return (
-    <Link to={`/property/${property.id}`} className="min-w-[210px] flex-1 sm:min-w-0">
-      <div className="aspect-[1.65/1] overflow-hidden rounded-[12px] bg-slate-200">
+    <Link to={`/property/${property.id}`} className="block min-w-0">
+      <div className="aspect-[1.55/1] overflow-hidden rounded-[10px] bg-slate-200">
         {image && <img src={image} alt="" className="h-full w-full object-cover" loading="lazy" />}
       </div>
-      <h3 className="mt-2 truncate text-xs font-semibold text-[#0B1F42]">{property.title}</h3>
-      <p className="mt-1 truncate text-[10px] text-[#5B6B82]">{property.location} · KES {Number(property.price || 0).toLocaleString()}</p>
+      <h3 className="mt-1.5 truncate text-[11px] font-semibold text-[#0B1F42]">{property.title}</h3>
+      <p className="mt-0.5 truncate text-[9px] text-[#5B6B82]">{property.location} · KES {Number(property.price || 0).toLocaleString()}</p>
     </Link>
   );
 }
@@ -263,7 +263,7 @@ export default function HomePage() {
           {!loading && !error && stays.length > 0 && <div className="mt-6 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">{stays.map((property, index) => <div key={property.id} className={index >= 4 ? 'hidden sm:block' : ''}><StayCard property={property} /></div>)}</div>}
         </section>
 
-        {recentlyViewed.length > 0 && <section className="bg-[#EFF3F9]"><div className="mx-auto max-w-[1240px] px-5 py-12 md:px-8"><div className="flex items-center justify-between"><h2 className="text-xl font-semibold">Recently viewed</h2><button type="button" onClick={() => { clearRecentlyViewed(); setRecentlyViewed([]); }} className="text-[11px] text-[#5B6B82]">Clear history</button></div><div className="mt-6 flex gap-4 overflow-x-auto no-scrollbar">{recentlyViewed.map((property) => <RecentCard key={property.id} property={property} />)}</div></div></section>}
+        {recentlyViewed.length > 0 && <section className="bg-[#EFF3F9]"><div className="mx-auto max-w-[1240px] px-5 py-12 md:px-8"><div className="flex items-center justify-between"><h2 className="text-xl font-semibold">Recently viewed</h2><button type="button" onClick={() => { clearRecentlyViewed(); setRecentlyViewed([]); }} className="text-[11px] text-[#5B6B82]">Clear history</button></div><div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-5 lg:gap-4">{recentlyViewed.map((property) => <RecentCard key={property.id} property={property} />)}</div></div></section>}
 
         <section className="mx-auto max-w-[1240px] px-5 py-16 text-center md:px-8 md:py-20">
           <h2 className="text-2xl font-semibold md:text-[30px]">Why stay with ZuriLofts</h2>
