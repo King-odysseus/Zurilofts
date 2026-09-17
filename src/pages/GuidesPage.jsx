@@ -1,155 +1,26 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar.jsx';
+import { HomeHeader } from './HomePage.jsx';
 import Footer from '../components/Footer.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
+import { PLACES_TO_EAT, PLACES_TO_VISIT } from '../data/nearby.js';
+
+const EDITORIAL_GUIDES = [
+  { title: 'A first weekend in Nairobi', eyebrow: 'Getting started', description: 'A simple route through coffee, culture, and green spaces for your first city break.', image: PLACES_TO_VISIT.find((item) => item.category === 'culture')?.image, href: '/places' },
+  { title: 'Where to eat like a local', eyebrow: 'Food & drink', description: 'From Kenyan classics to late-night rooftops, these neighbourhood favourites are worth the detour.', image: PLACES_TO_EAT.find((item) => item.category === 'kenyan')?.image, href: '/restaurants' },
+  { title: 'Nairobi outdoors', eyebrow: 'Nature & wellness', description: 'Trade the city rush for forest trails, wildlife encounters, and quiet picnic spots.', image: PLACES_TO_VISIT.find((item) => item.category === 'nature')?.image, href: '/places' },
+];
+
+function GuideImage({ src, alt }) {
+  return src ? <img src={src} alt={alt} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" /> : <div className="flex h-full w-full items-center justify-center bg-[#EAF0F6] text-[#B8895C]"><svg className="h-10 w-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg></div>;
+}
 
 function GuidesPage() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiClient
-      .get('/guides')
-      .then((res) => setPosts(res.data.data || []))
-      .catch(() => setPosts([]))
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
-          <Spinner />
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-
-      {/* Hero */}
-      <div className="bg-canvas pt-24 pb-10 px-4 sm:px-6 md:px-8">
-        <div className="max-w-7xl mx-auto text-center">
-          <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-6 py-8 md:py-10 shadow-sm">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#222222] mb-3">Nairobi Travel Guides</h1>
-          <p className="text-base text-[#6b7280] max-w-2xl mx-auto">
-            Tips, recommendations, and insider knowledge to make the most of your stay in Nairobi.
-          </p>
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-12">
-        {posts.length === 0 ? (
-          <div className="text-center py-16">
-            <div className="w-20 h-20 bg-[#E5E7EB]/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-[#222222] mb-2">Coming Soon</h3>
-            <p className="text-[#6b7280]">Our travel guides are being written. Check back soon!</p>
-          </div>
-        ) : (
-          <>
-            {/* Featured article - the most recent guide gets a larger
-                treatment above the regular grid, per design2.md G3. */}
-            {posts[0] && (
-              <Link
-                to={`/guides/${posts[0].slug}`}
-                className="group mb-10 grid grid-cols-1 overflow-hidden rounded-[14px] neu-card neu-card-hover no-underline transition-all duration-300 md:grid-cols-2"
-              >
-                <div className="aspect-[16/9] overflow-hidden md:aspect-auto">
-                  {posts[0].coverImage ? (
-                    <img
-                      src={posts[0].coverImage}
-                      alt={posts[0].title}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center bg-[#222222]/5">
-                      <svg className="h-12 w-12 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-                <div className="flex flex-col justify-center p-6 md:p-8">
-                  <span className="mb-2 inline-flex w-fit items-center rounded-full bg-[#2563EB]/10 px-2.5 py-1 text-xs font-semibold text-[#2563EB]">Featured</span>
-                  <p className="mb-2 text-xs text-[#6b7280]">
-                    {new Date(posts[0].createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-                  </p>
-                  <h2 className="mb-2 text-2xl font-bold text-[#222222] group-hover:text-[#2563EB] transition-colors">
-                    {posts[0].title}
-                  </h2>
-                  {posts[0].excerpt && (
-                    <p className="text-sm text-[#6b7280] line-clamp-3">{posts[0].excerpt}</p>
-                  )}
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[#2563EB]">
-                    Read More
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </div>
-              </Link>
-            )}
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.slice(1).map((post) => (
-              <Link
-                key={post.id}
-                to={`/guides/${post.slug}`}
-                className="group bg-white rounded-[14px] overflow-hidden neu-card neu-card-hover transition-all duration-300 no-underline"
-              >
-                {/* Cover image */}
-                <div className="aspect-[16/9] overflow-hidden">
-                  {post.coverImage ? (
-                    <img
-                      src={post.coverImage}
-                      alt={post.title}
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-[#222222]/5 flex items-center justify-center">
-                      <svg className="w-12 h-12 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-                <div className="p-5">
-                  <p className="text-xs text-[#6b7280] mb-2">
-                    {new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-                  </p>
-                  <h3 className="text-lg font-bold text-[#222222] mb-2 group-hover:text-[#2563EB] transition-colors">
-                    {post.title}
-                  </h3>
-                  {post.excerpt && (
-                    <p className="text-sm text-[#6b7280] line-clamp-2">{post.excerpt}</p>
-                  )}
-                  <span className="inline-flex items-center gap-1 mt-3 text-sm font-semibold text-[#2563EB]">
-                    Read More
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </span>
-                </div>
-              </Link>
-            ))}
-          </div>
-          </>
-        )}
-      </div>
-      <Footer />
-    </div>
-  );
+  const [posts, setPosts] = useState([]); const [loading, setLoading] = useState(true); const [query, setQuery] = useState('');
+  useEffect(() => { apiClient.get('/guides').then((res) => setPosts(res.data.data || [])).catch(() => setPosts([])).finally(() => setLoading(false)); }, []);
+  const filteredPosts = useMemo(() => { const q = query.trim().toLowerCase(); return posts.filter((post) => !q || `${post.title} ${post.excerpt || ''}`.toLowerCase().includes(q)); }, [posts, query]);
+  return <div className="min-h-screen overflow-x-hidden bg-[#F8FAFC] text-[#0B1F42]"><HomeHeader propertiesPage searchLabel="Search guides" searchPath="/guides" /><main><section className="mx-auto max-w-[1200px] px-4 pb-6 pt-7 md:px-8 md:pt-8"><p className="text-xs text-[#5B6B82]">Home <span className="mx-1">›</span> Guides</p><div className="mt-2 flex flex-col justify-between gap-5 md:flex-row md:items-end"><div><h1 className="text-2xl font-semibold tracking-tight md:text-[32px]">Nairobi travel guides</h1><p className="mt-2 max-w-2xl text-sm text-[#5B6B82] md:text-base">Thoughtful recommendations and local context for making the most of your stay.</p></div><div className="flex min-h-11 w-full items-center rounded-full border border-[#E3E8EF] bg-white px-4 md:w-72"><svg className="mr-2 h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></svg><label htmlFor="guide-search" className="sr-only">Search guides</label><input id="guide-search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search guides" className="min-w-0 flex-1 bg-transparent py-2 text-xs outline-none placeholder:text-[#94A3B8]" /></div></div></section><section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-8">{loading ? <div className="flex min-h-[40vh] items-center justify-center"><Spinner /></div> : <>{filteredPosts.length > 0 && <Link to={`/guides/${filteredPosts[0].slug}`} className="group mb-8 grid overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_rgba(11,31,66,0.07)] ring-1 ring-[#E3E8EF] md:grid-cols-2"><div className="aspect-[16/10] overflow-hidden md:aspect-auto"><GuideImage src={filteredPosts[0].coverImage} alt={filteredPosts[0].title} /></div><div className="flex flex-col justify-center p-6 md:p-9"><span className="w-fit rounded-full bg-[#C49A6C]/15 px-3 py-1 text-[10px] font-semibold uppercase tracking-[.1em] text-[#B8895C]">Featured guide</span><h2 className="mt-4 text-2xl font-semibold tracking-tight group-hover:text-[#B8895C] md:text-[30px]">{filteredPosts[0].title}</h2>{filteredPosts[0].excerpt && <p className="mt-3 line-clamp-3 text-sm leading-6 text-[#5B6B82]">{filteredPosts[0].excerpt}</p>}<span className="mt-5 text-xs font-semibold text-[#B8895C]">Read guide ↗</span></div></Link>}{filteredPosts.length > 1 && <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">{filteredPosts.slice(1).map((post) => <Link key={post.id} to={`/guides/${post.slug}`} className="group overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_rgba(11,31,66,0.07)] ring-1 ring-[#E3E8EF]"><div className="aspect-[16/10] overflow-hidden"><GuideImage src={post.coverImage} alt={post.title} /></div><div className="p-5"><h2 className="text-lg font-semibold group-hover:text-[#B8895C]">{post.title}</h2>{post.excerpt && <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#5B6B82]">{post.excerpt}</p>}<span className="mt-4 inline-flex text-xs font-semibold text-[#B8895C]">Read guide ↗</span></div></Link>)}</div>}{filteredPosts.length === 0 && <><div className="mb-7 grid gap-5 md:grid-cols-3">{EDITORIAL_GUIDES.map((guide) => <Link key={guide.title} to={guide.href} className="group overflow-hidden rounded-2xl bg-white shadow-[0_8px_24px_rgba(11,31,66,0.07)] ring-1 ring-[#E3E8EF]"><div className="aspect-[16/10] overflow-hidden"><GuideImage src={guide.image} alt={guide.title} /></div><div className="p-5"><p className="text-[10px] font-semibold uppercase tracking-[.1em] text-[#B8895C]">{guide.eyebrow}</p><h2 className="mt-2 text-lg font-semibold group-hover:text-[#B8895C]">{guide.title}</h2><p className="mt-2 text-sm leading-6 text-[#5B6B82]">{guide.description}</p><span className="mt-4 inline-flex text-xs font-semibold text-[#B8895C]">Explore more ↗</span></div></Link>)}</div><div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 text-center"><p className="text-sm text-[#5B6B82]">More in-depth guides are on the way. Start exploring Nairobi’s neighbourhoods and restaurants meanwhile.</p></div></>}</>}</section></main><Footer /></div>;
 }
 
 export default GuidesPage;
