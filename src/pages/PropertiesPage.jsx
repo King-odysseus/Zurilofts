@@ -234,6 +234,7 @@ function PropertiesPage() {
         reviewCount: p.reviewCount ?? p.reviews?.length ?? 0,
         bedrooms: p.bedrooms,
         bathrooms: p.bathrooms,
+        guests: p.guests,
         area: p.area,
         badge: p.featured ? 'Featured' : undefined,
         amenities: p.amenities || [],

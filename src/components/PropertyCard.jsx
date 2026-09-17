@@ -39,7 +39,9 @@ function PropertyCard({ property, cardVariant }) {
     ? `/property/${id}${variant ? `?variant=${variant}` : ''}`
     : '/properties';
 
-  const handleToggleFavorite = () => {
+  const handleToggleFavorite = (event) => {
+    event?.preventDefault();
+    event?.stopPropagation();
     if (!isAuthenticated) {
       navigate('/login');
       return;
@@ -55,6 +57,30 @@ function PropertyCard({ property, cardVariant }) {
   if (bedrooms != null) capacityParts.push(`${bedrooms} bed${bedrooms === 1 ? '' : 's'}`);
   if (bathrooms != null) capacityParts.push(`${bathrooms} bath${bathrooms === 1 ? '' : 's'}`);
   const capacityLabel = capacityParts.join(' · ');
+
+  if (resultsCard) {
+    const resultsMeta = [location, property.guests ? `${property.guests} guests` : null, bedrooms != null ? `${bedrooms} bed${bedrooms === 1 ? '' : 's'}` : null].filter(Boolean).join(' · ');
+    return (
+      <article className="group relative min-w-0">
+        <Link to={propertyHref} className="block rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C89B6D]">
+          <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-[#E7EDF4]">
+            {image ? <img src={image} alt={title || 'Property image'} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" /> : <div className="h-full w-full bg-[#E7EDF4]" />}
+            <button type="button" onClick={handleToggleFavorite} className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#0B1F42] transition hover:scale-105 hover:bg-white" aria-label={isLiked ? 'Remove from favourites' : 'Add to favourites'}>
+              <svg className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.6" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" /></svg>
+            </button>
+          </div>
+          <div className="pt-3">
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="truncate text-[17px] font-semibold leading-5 text-[#0B1F42]">{title || 'Property'}</h3>
+              {rating != null && <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-[#33415C]"><span className="text-[#C89B6D]">★</span>{Number(rating).toFixed(2)}</span>}
+            </div>
+            <p className="mt-1 truncate text-[13px] font-medium text-[#5B6B82]">{resultsMeta || 'Nairobi'}</p>
+            <div className="mt-3 flex items-baseline gap-2"><span className="text-[17px] font-semibold text-[#0B1F42]">{formattedPrice ? `KSh ${formattedPrice}` : 'KSh -'}</span><span className="text-xs text-[#64748B]">per night</span></div>
+          </div>
+        </Link>
+      </article>
+    );
+  }
 
   return (
     <article className={`group relative bg-white overflow-hidden transition-all duration-200 h-full flex flex-col ${resultsCard ? 'rounded-[16px] shadow-none' : 'rounded-[14px] border border-[#E5E7EB] shadow-sm hover:-translate-y-1 hover:shadow-md'}`}>
@@ -179,6 +205,7 @@ PropertyCard.propTypes = {
     reviewCount: PropTypes.number,
     bedrooms: PropTypes.number,
     bathrooms: PropTypes.number,
+    guests: PropTypes.number,
     area: PropTypes.number,
     badge: PropTypes.string,
     variantLabel: PropTypes.string,
