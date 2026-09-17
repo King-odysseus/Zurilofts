@@ -87,7 +87,7 @@ function HomeHeader() {
           <img src={logoImg} alt="ZuriLofts" className="h-11 w-[118px] object-contain" />
         </Link>
         <nav className="hidden items-center gap-8 text-[13px] font-medium text-[#0B1F42] md:flex" aria-label="Main navigation">
-          <Link className="hover:text-[#C89B6D]" to="/properties">{t('nav.stays')}</Link>
+          <Link className="hover:text-[#C89B6D]" to="/properties">{t('nav.properties')}</Link>
           <Link className="hover:text-[#C89B6D]" to="/places">{t('nav.places')}</Link>
           <Link className="hover:text-[#C89B6D]" to="/restaurants">{t('nav.restaurants')}</Link>
           <Link className="hover:text-[#C89B6D]" to="/guides">{t('nav.guides')}</Link>

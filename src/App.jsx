@@ -90,7 +90,7 @@ function App() {
       <ErrorBoundary>
         <Routes>
           <Route path="/" element={<Page><HomePage /></Page>} />
-          <Route path="/properties" element={<Page title="Stays"><Lazy><PropertiesPage /></Lazy></Page>} />
+          <Route path="/properties" element={<Page title="Properties"><Lazy><PropertiesPage /></Lazy></Page>} />
           <Route path="/property/:id" element={<Lazy><PropertyPage /></Lazy>} />
           <Route path="/booking/:id" element={<Page title="Booking"><Lazy><ProtectedRoute><BookingPage /></ProtectedRoute></Lazy></Page>} />
           <Route path="/login" element={<Page title="Login"><Lazy><LoginPage /></Lazy></Page>} />

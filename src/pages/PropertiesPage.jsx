@@ -285,15 +285,26 @@ function PropertiesPage() {
     <div className="min-h-screen overflow-x-hidden bg-canvas">
       <Navbar />
 
-      {/* Compact Search Header */}
-      <section className="bg-white border-b border-[#E5E7EB] pt-24 pb-8 md:pb-10">
-        <div className="w-full max-w-full mx-auto text-center px-4 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl overflow-hidden">
-          <p className="mb-2 text-[11px] text-[#6b7280]">Home <span className="mx-1">›</span> Stays</p>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#0B1F42] mb-2 break-words">{t('home.staysTitle')}</h1>
-          <p className="text-[#6b7280] text-sm mb-6 md:mb-7 break-words">{t('home.staysDescription')}</p>
-          <div className="max-w-4xl mx-auto rounded-[18px] border border-[#E5E7EB] bg-white p-2 shadow-[0_8px_24px_rgba(0,0,0,0.08)] text-left">
-            {/* One compact destination/date/guest/action composition - no
-                separate static summary above the working search bar. */}
+      {/* Stays Results intro */}
+      <section className="bg-[#F8FAFC] pt-24 pb-5 md:pt-28 md:pb-7">
+        <div className="mx-auto max-w-[1200px] px-4 md:px-8">
+          <p className="mb-2 text-xs text-[#5B6B82]">Home <span className="mx-1">›</span> Properties</p>
+          <h1 className="text-3xl font-semibold tracking-tight text-[#0B1F42]">Properties in Nairobi</h1>
+          <p className="mt-2 text-sm text-[#5B6B82] md:text-base">Find a verified, furnished home that fits your plans.</p>
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <span className="mr-1 text-[10px] font-semibold uppercase tracking-[.12em] text-[#64748B]">Active search</span>
+            {searchQuery && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{searchQuery}</span>}
+            {checkIn && checkOut && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{checkIn} – {checkOut}</span>}
+            {guests > 1 && <span className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#33415C]">{guests} guests</span>}
+            {hasActiveFilters && <button type="button" onClick={clearAllFilters} className="rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs font-semibold text-[#0B1F42] hover:border-[#C89B6D] hover:text-[#B8895C]">Clear all</button>}
+          </div>
+        </div>
+      </section>
+
+      {/* Compact working search composition */}
+      <section className="bg-[#F8FAFC] pb-6 md:pb-8">
+        <div className="mx-auto max-w-[1200px] px-4 md:px-8">
+          <div className="rounded-[18px] border border-[#E3E8EF] bg-white p-2 shadow-[0_8px_24px_rgba(11,31,66,0.08)]">
             <TripSearchBar
               value={searchInput}
               onChange={handleSearchChange}
