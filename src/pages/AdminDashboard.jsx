@@ -857,6 +857,33 @@ function AdminLayout() {
               Monitor your ZuriLofts operation at a glance.
             </p>
           </div>
+          <div className="ml-auto flex items-center gap-4">
+            <label className="hidden h-10 w-56 items-center gap-2 rounded-lg border border-[#E3E8EF] bg-[#F8FAFC] px-3 text-[#94A3B8] lg:flex focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/15">
+              <svg
+                className="h-4 w-4 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-4-4" />
+              </svg>
+              <span className="sr-only">Search admin dashboard</span>
+              <input
+                type="search"
+                placeholder="Search"
+                className="admin-search-input min-w-0 flex-1 border-0 bg-transparent text-xs text-[#0B1F42] outline-none placeholder:text-[#94A3B8] focus:border-0 focus:outline-none focus:ring-0"
+              />
+              <kbd className="hidden rounded border border-[#E3E8EF] bg-white px-1.5 py-0.5 text-[10px] text-[#94A3B8] xl:inline">
+                ⌘ K
+              </kbd>
+            </label>
+            <span
+              className="hidden h-8 w-px bg-[#E3E8EF] lg:block"
+              aria-hidden="true"
+            />
+          </div>
           {/* Bell - unread messages + pending bookings */}
           <div className="relative">
             <button
