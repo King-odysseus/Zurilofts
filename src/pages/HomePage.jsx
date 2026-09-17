@@ -11,6 +11,7 @@ import { useFavorites } from '../context/FavoritesContext.jsx';
 import { firstImage } from '../utils/images.js';
 import { clearRecentlyViewed, getRecentlyViewed } from '../utils/recentlyViewed.js';
 import { PLACES_TO_VISIT, PLACES_TO_EAT } from '../data/nearby.js';
+import { languageOptions } from '../i18n/translations.js';
 
 const HOME_TYPE_CHIPS = [
   { key: 'all', label: 'All stays' },
@@ -66,10 +67,11 @@ function Icon({ name, className = 'h-5 w-5' }) {
 
 function HomeHeader() {
   const { user, isAuthenticated } = useAuth();
-  const { t } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
   const navigate = useNavigate();
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [languageOpen, setLanguageOpen] = useState(false);
 
   function submitHeaderSearch(event) {
     event.preventDefault();
@@ -121,9 +123,35 @@ function HomeHeader() {
           <Link to="/favourites" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-50" aria-label="Favourites">
             <Icon name="heart" className="h-[18px] w-[18px]" />
           </Link>
-          <button type="button" className="hidden h-11 w-11 items-center justify-center rounded-full hover:bg-slate-50 sm:flex" aria-label="Choose language">
-            <Icon name="globe" className="h-[18px] w-[18px]" />
-          </button>
+          <div className="relative hidden sm:block">
+            <button
+              type="button"
+              onClick={() => setLanguageOpen((open) => !open)}
+              className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-[#C89B6D]/15 hover:text-[#B8895C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
+              aria-label={t('nav.language')}
+              aria-haspopup="menu"
+              aria-expanded={languageOpen}
+            >
+              <Icon name="globe" className="h-[18px] w-[18px]" />
+            </button>
+            {languageOpen && (
+              <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg" role="menu" aria-label={t('nav.language')}>
+                {languageOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => { setLang(option.value); setLanguageOpen(false); }}
+                    className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-xs transition-colors hover:bg-[#C89B6D]/15 hover:text-[#B8895C] ${lang === option.value ? 'font-semibold text-[#B8895C]' : 'text-[#0B1F42]'}`}
+                    role="menuitemradio"
+                    aria-checked={lang === option.value}
+                  >
+                    {option.label}
+                    {lang === option.value && <span aria-hidden="true">✓</span>}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
           <Link to={isAuthenticated ? '/profile' : '/login'} className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-500" aria-label={isAuthenticated ? 'Profile' : 'Sign in'}>
             {user?.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : <Icon name="user" className="h-4 w-4" />}
           </Link>
