@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import Navbar from "../components/Navbar.jsx";
+import { HomeHeader } from "./HomePage.jsx";
 import Footer from "../components/Footer.jsx";
 import Spinner from "../components/Spinner.jsx";
 import PropertyCard from "../components/PropertyCard.jsx";
@@ -85,8 +85,8 @@ function GuideDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
+        <HomeHeader propertiesPage searchLabel="Search guides" searchPath="/guides" />
+        <div className="pt-7 pb-16 flex items-center justify-center min-h-[60vh] md:pt-8">
           <Spinner />
         </div>
         <Footer />
@@ -97,8 +97,8 @@ function GuideDetailPage() {
   if (notFound || !post) {
     return (
       <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
+        <HomeHeader propertiesPage searchLabel="Search guides" searchPath="/guides" />
+        <div className="pt-7 pb-16 flex items-center justify-center min-h-[60vh] md:pt-8">
           <div className="text-center max-w-md px-6">
             <h1 className="text-3xl font-bold text-[#222222] mb-4">
               Guide Not Found
@@ -121,10 +121,10 @@ function GuideDetailPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
+      <HomeHeader propertiesPage searchLabel="Search guides" searchPath="/guides" />
 
       {/* Back link */}
-      <div className="pt-24 max-w-5xl mx-auto px-4 sm:px-6">
+      <div className="pt-7 max-w-5xl mx-auto px-4 sm:px-6 md:pt-8">
         <Link
           to="/guides"
           className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-[#2563EB] transition-colors"
