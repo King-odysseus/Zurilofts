@@ -858,27 +858,34 @@ function AdminLayout() {
             </p>
           </div>
           <div className="ml-auto flex items-center gap-4">
-            <label className="flex h-10 w-40 items-center gap-2 rounded-lg border border-[#E3E8EF] bg-[#F8FAFC] px-3 text-[#94A3B8] focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/15 xl:w-56">
-              <svg
-                className="h-4 w-4 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
+            <form
+              role="search"
+              onSubmit={(event) => event.preventDefault()}
+              className="flex h-9 w-44 items-center overflow-hidden rounded-full border border-[#E3E8EF] bg-[#F4F7FB] px-1 text-xs text-slate-500 transition-colors focus-within:border-[#C49A6C] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#C49A6C]/20 xl:w-64"
+            >
+              <button
+                type="submit"
+                aria-label="Search admin dashboard"
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-colors hover:bg-[#C89B6D]/15 hover:text-[#B8895C] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-300"
               >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-4-4" />
-              </svg>
+                <svg
+                  className="h-3.5 w-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <path d="m20 20-4-4" />
+                </svg>
+              </button>
               <span className="sr-only">Search admin dashboard</span>
               <input
                 type="search"
                 placeholder="Search"
-                className="admin-search-input min-w-0 flex-1 border-0 bg-transparent text-xs text-[#0B1F42] outline-none placeholder:text-[#94A3B8] focus:border-0 focus:outline-none focus:ring-0"
+                className="header-search-input min-w-0 flex-1 border-0 bg-transparent px-2 text-xs text-[#0B1F42] outline-none placeholder:text-slate-400 focus:border-0 focus:outline-none focus:ring-0"
               />
-              <kbd className="hidden rounded border border-[#E3E8EF] bg-white px-1.5 py-0.5 text-[10px] text-[#94A3B8] xl:inline">
-                ⌘ K
-              </kbd>
-            </label>
+            </form>
             <span
               className="hidden h-8 w-px bg-[#E3E8EF] lg:block"
               aria-hidden="true"
