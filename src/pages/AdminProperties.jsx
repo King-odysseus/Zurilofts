@@ -468,7 +468,7 @@ function AdminProperties() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB]">
+              <thead className="border-b border-[#E3E8EF] bg-[#F8FAFC]">
                 <tr>
                   <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
                     Property
@@ -497,7 +497,7 @@ function AdminProperties() {
                 {visibleProperties.map((p) => (
                   <tr
                     key={p.id}
-                    className="border-b border-[#E5E7EB]/60 last:border-0 hover:bg-[#F7F7F5]"
+                    className="border-b border-[#EEF2F7] last:border-0 hover:bg-[#F8FAFC]"
                   >
                     <td className="py-3 px-4 align-top">
                       <div className="flex items-center space-x-3">
@@ -505,12 +505,12 @@ function AdminProperties() {
                           <img
                             src={p.images[0]}
                             alt=""
-                            className="w-12 h-12 object-cover rounded-lg"
+                            className="h-10 w-10 rounded-xl object-cover"
                           />
                         ) : (
-                          <div className="w-12 h-12 rounded-lg bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center flex-shrink-0">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#E3E8EF] bg-[#F8FAFC]">
                             <svg
-                              className="w-5 h-5 text-[#6b7280]"
+                              className="h-5 w-5 text-[#94A3B8]"
                               fill="none"
                               stroke="currentColor"
                               viewBox="0 0 24 24"
@@ -661,11 +661,11 @@ function AdminProperties() {
           {visibleProperties.map((p) => (
             <article
               key={p.id}
-              className="bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden shadow-sm hover:shadow-md transition-shadow"
+              className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)] transition-shadow hover:shadow-lg"
             >
               <Link
                 to={`/property/${p.id}`}
-                className="block aspect-[4/3] bg-[#F7F7F5]"
+                className="block aspect-[16/10] bg-[#F8FAFC]"
               >
                 {p.images?.[0] ? (
                   <img
@@ -679,27 +679,27 @@ function AdminProperties() {
                   </div>
                 )}
               </Link>
-              <div className="p-5">
+              <div className="p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <Link
                       to={`/property/${p.id}`}
-                      className="block font-bold text-[#222222] hover:text-[#2563EB] truncate"
+                      className="block truncate font-semibold text-[#0B1F42] hover:text-[#C49A6C]"
                     >
                       {p.title}
                     </Link>
-                    <p className="text-sm text-[#6b7280] mt-1 truncate">
+                    <p className="mt-1 truncate text-xs text-[#94A3B8]">
                       {p.location}
                     </p>
                   </div>
                   <StatusPill status={p.status} />
                 </div>
-                <div className="flex items-end justify-between mt-5 pt-4 border-t border-[#E5E7EB]">
+                <div className="mt-4 flex items-end justify-between border-t border-[#EEF2F7] pt-4">
                   <div>
-                    <p className="text-xs text-[#6b7280] capitalize">
+                    <p className="text-xs capitalize text-[#94A3B8]">
                       {p.type || "Apartment"}
                     </p>
-                    <p className="font-bold text-[#222222] mt-1">
+                    <p className="mt-1 font-bold text-[#0B1F42]">
                       KES {p.price?.toLocaleString()}{" "}
                       <span className="font-normal text-xs text-[#6b7280]">
                         / night
