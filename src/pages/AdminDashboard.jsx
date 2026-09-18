@@ -91,8 +91,8 @@ const adminOnlyItems = [
     group: "Content",
   },
   {
-    path: "/admin/messages",
-    label: "Messages",
+    path: "/admin/support",
+    label: "Support inbox",
     icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
     group: "Content",
   },
@@ -209,7 +209,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
             My Profile
           </Link>
           <Link
-            to="/admin/messages"
+            to="/admin/support"
             onClick={() => setOpen(false)}
             className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
           >
@@ -226,7 +226,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
                 d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
               />
             </svg>
-            Messages
+            Support inbox
           </Link>
           <Link
             to="/"
@@ -368,6 +368,10 @@ function AdminLayout() {
       "Support",
       "Respond to guest conversations and requests.",
     ],
+    "/admin/support": [
+      "Support",
+      "Respond to guest conversations and requests.",
+    ],
   };
   const [adminPageTitle, adminPageSubtitle] = adminPageMeta[
     location.pathname
@@ -479,11 +483,12 @@ function AdminLayout() {
               d={icon}
             />
           </svg>
-          {path === "/admin/messages" && notif.unreadMessages > 0 && (
-            <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-              {notif.unreadMessages > 99 ? "99+" : notif.unreadMessages}
-            </span>
-          )}
+          {(path === "/admin/messages" || path === "/admin/support") &&
+            notif.unreadMessages > 0 && (
+              <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {notif.unreadMessages > 99 ? "99+" : notif.unreadMessages}
+              </span>
+            )}
           {path === "/admin/bookings" && notif.pendingBookings > 0 && (
             <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
               {notif.pendingBookings > 99 ? "99+" : notif.pendingBookings}
