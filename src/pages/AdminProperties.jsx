@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
+import {
+  Checkbox,
+  Dropdown as FlowbiteDropdown,
+  DropdownDivider,
+  DropdownItem,
+} from "flowbite-react";
 import apiClient from "../api/client.js";
 import Dropdown from "../components/Dropdown.jsx";
 
@@ -59,6 +65,73 @@ function AvailabilityToggle({ available, onClick }) {
   );
 }
 
+function TableStatusPill({ property }) {
+  const status =
+    property.status === "SUSPENDED"
+      ? "MAINTENANCE"
+      : property.status === "DRAFT"
+        ? "DRAFT"
+        : property.status === "PENDING_REVIEW"
+          ? "PENDING_REVIEW"
+          : property.status === "REJECTED"
+            ? "REJECTED"
+            : property.available === false
+              ? "VACANT"
+              : "OCCUPIED";
+  const styles = {
+    OCCUPIED: "bg-[#DCFCE7] text-[#15803D]",
+    VACANT: "bg-[#FEF3C7] text-[#B45309]",
+    DRAFT: "bg-[#E2E8F0] text-[#475569]",
+    MAINTENANCE: "bg-[#FEE2E2] text-[#B91C1C]",
+    PENDING_REVIEW: "bg-[#DBEAFE] text-[#1D4ED8]",
+    REJECTED: "bg-[#FEE2E2] text-[#B91C1C]",
+  };
+  const labels = {
+    OCCUPIED: "Occupied",
+    VACANT: "Vacant",
+    DRAFT: "Draft",
+    MAINTENANCE: "Maintenance",
+    PENDING_REVIEW: "Pending review",
+    REJECTED: "Rejected",
+  };
+
+  return (
+    <span
+      className={`inline-flex min-w-[124px] items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium ${styles[status]}`}
+    >
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      {labels[status]}
+    </span>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14.25v4.125A2.625 2.625 0 0 1 15.375 21H5.625A2.625 2.625 0 0 1 3 18.375v-9.75A2.625 2.625 0 0 1 5.625 6H9.75" />
+    </svg>
+  );
+}
+
+function EllipsisIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <circle cx="5" cy="12" r="1.5" />
+      <circle cx="12" cy="12" r="1.5" />
+      <circle cx="19" cy="12" r="1.5" />
+    </svg>
+  );
+}
+
+function LocationIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M12 21s6-5.1 6-11a6 6 0 1 0-12 0c0 5.9 6 11 6 11Z" />
+      <circle cx="12" cy="10" r="2" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
 function AdminProperties() {
   const location = useLocation();
   // This component is shared between the admin control centre (/admin/*) and the
@@ -74,6 +147,8 @@ function AdminProperties() {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortOrder, setSortOrder] = useState("newest");
   const [selectedProperty, setSelectedProperty] = useState(null);
+  const [selectedPropertyIds, setSelectedPropertyIds] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const visibleProperties = properties
     .filter(
@@ -108,6 +183,49 @@ function AdminProperties() {
             String(a.createdAt || a.id),
           ),
     );
+  const rowsPerPage = 6;
+  const totalPages = Math.max(1, Math.ceil(visibleProperties.length / rowsPerPage));
+  const page = Math.min(currentPage, totalPages);
+  const paginatedProperties = visibleProperties.slice(
+    (page - 1) * rowsPerPage,
+    page * rowsPerPage,
+  );
+  const pageIds = paginatedProperties.map((property) => property.id);
+  const allPageRowsSelected =
+    pageIds.length > 0 && pageIds.every((id) => selectedPropertyIds.includes(id));
+
+  function togglePageSelection() {
+    setSelectedPropertyIds((selected) =>
+      allPageRowsSelected
+        ? selected.filter((id) => !pageIds.includes(id))
+        : [...new Set([...selected, ...pageIds])],
+    );
+  }
+
+  function togglePropertySelection(id) {
+    setSelectedPropertyIds((selected) =>
+      selected.includes(id)
+        ? selected.filter((propertyId) => propertyId !== id)
+        : [...selected, id],
+    );
+  }
+
+  function propertyReference(property) {
+    return (
+      property.referenceCode ||
+      property.code ||
+      `PRP-${String(property.id).replace(/[^a-z0-9]/gi, "").slice(-4).toUpperCase()}`
+    );
+  }
+
+  function propertyOccupancy(property) {
+    const value = Number(property.occupancyRate ?? property.occupancy);
+    return Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : null;
+  }
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [statusFilter, searchTerm, sortOrder]);
 
   useEffect(() => {
     fetchProperties();
@@ -467,174 +585,173 @@ function AdminProperties() {
             </div>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="border-b border-[#E3E8EF] bg-[#F8FAFC]">
-                <tr>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-                    Property
+            <table className="w-full min-w-[980px] table-fixed text-sm">
+              <colgroup>
+                <col className="w-[52px]" />
+                <col className="w-[29%]" />
+                <col className="w-[20%]" />
+                <col className="w-[17%]" />
+                <col className="w-[13%]" />
+                <col className="w-[15%]" />
+                <col className="w-[96px]" />
+              </colgroup>
+              <thead className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
+                <tr className="h-[52px]">
+                  <th className="pl-5 text-left">
+                    <Checkbox
+                      checked={allPageRowsSelected}
+                      onChange={togglePageSelection}
+                      aria-label="Select all properties on this page"
+                      className="h-5 w-5 rounded-md border-[#CBD5E1] text-[#0B1F42] focus:ring-[#0B1F42]"
+                    />
                   </th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-                    Location
-                  </th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-                    Type
-                  </th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-                    Price/Night
-                  </th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-                    Availability
-                  </th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-                    Listing status
-                  </th>
-                  <th className="text-right py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
-                    Actions
-                  </th>
+                  {[
+                    "Property",
+                    "Location",
+                    "Status",
+                    "Rent / night",
+                    "Occupancy",
+                    "Actions",
+                  ].map((heading) => (
+                    <th
+                      key={heading}
+                      className={`px-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#64748B] ${heading === "Actions" ? "text-right" : "text-left"}`}
+                    >
+                      {heading}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {visibleProperties.map((p) => (
-                  <tr
-                    key={p.id}
-                    className="border-b border-[#EEF2F7] last:border-0 hover:bg-[#F8FAFC]"
-                  >
-                    <td className="py-3 px-4 align-top">
-                      <div className="flex items-center space-x-3">
-                        {p.images?.[0] ? (
-                          <img
-                            src={p.images[0]}
-                            alt=""
-                            className="h-10 w-10 rounded-xl object-cover"
-                          />
-                        ) : (
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-[#E3E8EF] bg-[#F8FAFC]">
-                            <svg
-                              className="h-5 w-5 text-[#94A3B8]"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={1.5}
-                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                              />
-                            </svg>
-                          </div>
-                        )}
-                        <Link
-                          to={`/property/${p.id}`}
-                          className="font-semibold text-[#222222] hover:text-[#2563EB]"
-                        >
-                          {p.title}
-                        </Link>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4 align-top text-[#6b7280]">
-                      {p.location}
-                    </td>
-                    <td className="py-3 px-4 align-top capitalize text-[#222222]">
-                      {p.type}
-                    </td>
-                    <td className="py-3 px-4 align-top font-semibold text-[#222222]">
-                      KES {p.price.toLocaleString()}
-                    </td>
-                    <td className="py-3 px-4 align-top">
-                      <AvailabilityToggle
-                        available={p.available}
-                        onClick={() => handleToggleAvailable(p)}
-                      />
-                    </td>
-                    <td className="py-3 px-4 align-top">
-                      <StatusPill status={p.status} />
-                      {(p.status === "REJECTED" || p.status === "SUSPENDED") &&
-                        p.listingReviewNote && (
-                          <p className="text-xs text-red-600 mt-1 max-w-[200px]">
-                            {p.listingReviewNote}
-                          </p>
-                        )}
-                    </td>
-                    <td className="py-3 px-4 align-top text-right">
-                      <div className="flex items-center justify-end gap-2 flex-wrap">
-                        {!isAdminView &&
-                          (p.status === "DRAFT" || p.status === "REJECTED") && (
-                            <button
-                              onClick={() => handleSubmitForReview(p)}
-                              disabled={submitting === p.id}
-                              className="inline-flex items-center justify-center min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              {submitting === p.id
-                                ? "..."
-                                : "Submit for review"}
-                            </button>
+                {paginatedProperties.map((p) => {
+                  const occupancy = propertyOccupancy(p);
+                  return (
+                    <tr
+                      key={p.id}
+                      className="h-[72px] border-b border-[#E8EEF5] last:border-0 hover:bg-[#F8FAFC]"
+                    >
+                      <td className="pl-5">
+                        <Checkbox
+                          checked={selectedPropertyIds.includes(p.id)}
+                          onChange={() => togglePropertySelection(p.id)}
+                          aria-label={`Select ${p.title}`}
+                          className="h-5 w-5 rounded-md border-[#CBD5E1] text-[#0B1F42] focus:ring-[#0B1F42]"
+                        />
+                      </td>
+                      <td className="px-3">
+                        <div className="flex min-w-0 items-center gap-3">
+                          {p.images?.[0] ? (
+                            <img
+                              src={p.images[0]}
+                              alt=""
+                              className="h-11 w-11 shrink-0 rounded-xl object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#E2E8F0] bg-[#F1F5F9]">
+                              <svg className="h-5 w-5 text-[#94A3B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.6-4.6a2 2 0 0 1 2.8 0L16 16m-2-2 1.6-1.6a2 2 0 0 1 2.8 0L20 14M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z" />
+                              </svg>
+                            </div>
                           )}
-                        {isAdminView && p.status === "PENDING_REVIEW" && (
-                          <>
-                            <button
-                              onClick={() => setSelectedProperty(p)}
-                              className={secondaryBtn}
+                          <div className="min-w-0">
+                            <Link
+                              to={`/property/${p.id}`}
+                              className="block truncate font-semibold text-[#0B1F42] hover:text-[#2563EB]"
                             >
-                              Review
-                            </button>
-                            <button
-                              onClick={() => handleReview(p, "approve")}
-                              disabled={submitting === p.id}
-                              className={successBtn}
-                            >
-                              Approve
-                            </button>
-                            <button
-                              onClick={() => handleReview(p, "reject")}
-                              disabled={submitting === p.id}
-                              className={dangerBtn}
-                            >
-                              Reject
-                            </button>
-                          </>
-                        )}
-                        {isAdminView && p.status === "PUBLISHED" && (
-                          <button
-                            onClick={() => handleReview(p, "suspend")}
-                            disabled={submitting === p.id}
-                            className={dangerBtn}
+                              {p.title}
+                            </Link>
+                            <p className="mt-0.5 truncate text-xs text-[#94A3B8]">
+                              {propertyReference(p)} <span className="mx-1">·</span>{" "}
+                              <span className="capitalize">{p.type || "Property"}</span>
+                            </p>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-3 text-[13px] text-[#475569]">
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span className="h-4 w-4 shrink-0 text-[#94A3B8]">
+                            <LocationIcon />
+                          </span>
+                          <span className="truncate">{p.location || "—"}</span>
+                        </div>
+                      </td>
+                      <td className="px-3">
+                        <TableStatusPill property={p} />
+                      </td>
+                      <td className="px-3 font-semibold text-[#0B1F42]">
+                        KES {Number(p.price || 0).toLocaleString()}
+                      </td>
+                      <td className="px-3">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 min-w-[72px] flex-1 overflow-hidden rounded-full bg-[#E2E8F0]">
+                            {occupancy !== null && (
+                              <span
+                                className={`block h-full rounded-full ${occupancy >= 90 ? "bg-[#16A34A]" : "bg-[#0EA5E9]"}`}
+                                style={{ width: `${occupancy}%` }}
+                              />
+                            )}
+                          </span>
+                          <span className="w-9 text-[13px] text-[#475569]">
+                            {occupancy === null ? "—" : `${occupancy}%`}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-3">
+                        <div className="flex items-center justify-end gap-3 text-[#94A3B8]">
+                          <Link
+                            to={`${base}/properties/${p.id}/edit`}
+                            aria-label={`Edit ${p.title}`}
+                            title="Edit property"
+                            className="h-5 w-5 transition-colors hover:text-[#0B1F42]"
                           >
-                            Suspend
-                          </button>
-                        )}
-                        {isAdminView && p.status === "SUSPENDED" && (
-                          <button
-                            onClick={() => handleReview(p, "unsuspend")}
-                            disabled={submitting === p.id}
-                            className={successBtn}
+                            <PencilIcon />
+                          </Link>
+                          <FlowbiteDropdown
+                            inline
+                            arrowIcon={false}
+                            placement="bottom-end"
+                            renderTrigger={() => (
+                              <button
+                                type="button"
+                                aria-label={`More actions for ${p.title}`}
+                                title="More actions"
+                                className="flex h-7 w-7 items-center justify-center rounded-md transition-colors hover:bg-[#F1F5F9] hover:text-[#0B1F42]"
+                              >
+                                <span className="h-5 w-5"><EllipsisIcon /></span>
+                              </button>
+                            )}
                           >
-                            Unsuspend
-                          </button>
-                        )}
-                        <Link
-                          to={`${base}/properties/${p.id}/calendar`}
-                          className={secondaryBtn}
-                        >
-                          Calendar
-                        </Link>
-                        <Link
-                          to={`${base}/properties/${p.id}/edit`}
-                          className={secondaryBtn}
-                        >
-                          Edit
-                        </Link>
-                        <button
-                          onClick={() => handleDelete(p.id)}
-                          disabled={deleting === p.id}
-                          className={dangerBtn}
-                        >
-                          {deleting === p.id ? "..." : "Delete"}
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                              <DropdownItem as={Link} to={`/property/${p.id}`}>Open listing</DropdownItem>
+                              <DropdownItem as={Link} to={`${base}/properties/${p.id}/calendar`}>Calendar</DropdownItem>
+                              <DropdownItem onClick={() => handleToggleAvailable(p)}>
+                                Mark {p.available === false ? "available" : "unavailable"}
+                              </DropdownItem>
+                              {!isAdminView && (p.status === "DRAFT" || p.status === "REJECTED") && (
+                                <DropdownItem onClick={() => handleSubmitForReview(p)} disabled={submitting === p.id}>Submit for review</DropdownItem>
+                              )}
+                              {isAdminView && p.status === "PENDING_REVIEW" && (
+                                <>
+                                  <DropdownItem onClick={() => setSelectedProperty(p)}>Review</DropdownItem>
+                                  <DropdownItem onClick={() => handleReview(p, "approve")} disabled={submitting === p.id} className="text-green-700">Approve</DropdownItem>
+                                  <DropdownItem onClick={() => handleReview(p, "reject")} disabled={submitting === p.id} className="text-red-600">Reject</DropdownItem>
+                                </>
+                              )}
+                              {isAdminView && p.status === "PUBLISHED" && (
+                                <DropdownItem onClick={() => handleReview(p, "suspend")} disabled={submitting === p.id} className="text-red-600">Suspend</DropdownItem>
+                              )}
+                              {isAdminView && p.status === "SUSPENDED" && (
+                                <DropdownItem onClick={() => handleReview(p, "unsuspend")} disabled={submitting === p.id} className="text-green-700">Unsuspend</DropdownItem>
+                              )}
+                              <DropdownDivider />
+                              <DropdownItem onClick={() => handleDelete(p.id)} disabled={deleting === p.id} className="text-red-600">
+                                {deleting === p.id ? "Deleting…" : "Delete"}
+                              </DropdownItem>
+                          </FlowbiteDropdown>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -645,6 +762,20 @@ function AdminProperties() {
                   ? "No listings match this status."
                   : "No properties found. Add your first property!"}
               </p>
+            </div>
+          )}
+          {visibleProperties.length > 0 && (
+            <div className="flex min-h-[60px] flex-col items-center justify-between gap-3 border-t border-[#E2E8F0] px-5 py-3 text-[13px] text-[#64748B] sm:flex-row">
+              <p>
+                Showing {(page - 1) * rowsPerPage + 1}–{Math.min(page * rowsPerPage, visibleProperties.length)} of {visibleProperties.length} properties
+              </p>
+              <div className="flex items-center gap-2">
+                <button type="button" onClick={() => setCurrentPage((value) => Math.max(1, value - 1))} disabled={page === 1} className="h-9 rounded-lg border border-[#E2E8F0] px-3 font-medium text-[#334155] disabled:text-[#94A3B8]">Prev</button>
+                {Array.from({ length: totalPages }, (_, index) => index + 1).slice(Math.max(0, page - 2), Math.max(3, page + 1)).map((pageNumber) => (
+                  <button key={pageNumber} type="button" onClick={() => setCurrentPage(pageNumber)} aria-current={pageNumber === page ? "page" : undefined} className={`h-9 min-w-9 rounded-lg border px-2 font-medium ${pageNumber === page ? "border-[#0B1F42] bg-[#0B1F42] text-white" : "border-[#E2E8F0] bg-white text-[#334155]"}`}>{pageNumber}</button>
+                ))}
+                <button type="button" onClick={() => setCurrentPage((value) => Math.min(totalPages, value + 1))} disabled={page === totalPages} className="h-9 rounded-lg border border-[#E2E8F0] px-3 font-medium text-[#334155] disabled:text-[#94A3B8]">Next</button>
+              </div>
             </div>
           )}
         </div>
