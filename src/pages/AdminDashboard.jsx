@@ -347,6 +347,31 @@ function AdminLayout() {
     }
   });
   const isAdmin = user?.role === "ADMIN";
+  const adminPageMeta = {
+    "/admin": [
+      "Dashboard overview",
+      "Monitor your ZuriLofts operation at a glance.",
+    ],
+    "/admin/properties": [
+      "Properties",
+      "Manage listings, availability, and publishing status.",
+    ],
+    "/admin/earnings": [
+      "Earnings",
+      "Track revenue performance across your properties.",
+    ],
+    "/admin/identity-verifications": [
+      "Identity verifications",
+      "Review guest identity checks before payment.",
+    ],
+    "/admin/messages": [
+      "Support",
+      "Respond to guest conversations and requests.",
+    ],
+  };
+  const [adminPageTitle, adminPageSubtitle] = adminPageMeta[
+    location.pathname
+  ] || ["Admin workspace", "Manage your ZuriLofts operation."];
   const navItems = isAdmin
     ? [...sharedNavItems, ...adminOnlyItems]
     : sharedNavItems;
@@ -851,11 +876,9 @@ function AdminLayout() {
         <header className="hidden md:flex items-center justify-between gap-3 h-[72px] px-8 bg-white border-b border-[#E3E8EF] sticky top-0 z-[5]">
           <div>
             <p className="text-lg font-semibold text-[#0B1F42]">
-              Dashboard overview
+              {adminPageTitle}
             </p>
-            <p className="text-xs text-[#94A3B8]">
-              Monitor your ZuriLofts operation at a glance.
-            </p>
+            <p className="text-xs text-[#94A3B8]">{adminPageSubtitle}</p>
           </div>
           <div className="ml-auto flex items-center gap-4">
             <form
