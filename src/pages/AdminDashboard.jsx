@@ -376,8 +376,6 @@ function AdminLayout() {
   const [adminPageTitle, adminPageSubtitle] = adminPageMeta[
     location.pathname
   ] || ["Admin workspace", "Manage your ZuriLofts operation."];
-  const isPropertiesPage = location.pathname === "/admin/properties";
-  const isEarningsPage = location.pathname === "/admin/earnings";
   const navItems = isAdmin
     ? [...sharedNavItems, ...adminOnlyItems]
     : sharedNavItems;
@@ -881,49 +879,17 @@ function AdminLayout() {
       >
         {/* Desktop header with notification bell and avatar dropdown */}
         <header className="hidden md:flex items-center justify-between gap-3 h-[72px] px-8 bg-white border-b border-[#E3E8EF] sticky top-0 z-[5]">
-          {isPropertiesPage ? (
-            <form
-              role="search"
-              onSubmit={(event) => event.preventDefault()}
-              className="flex h-11 w-80 max-w-[45vw] items-center gap-2 rounded-xl border border-[#E3E8EF] bg-[#F8FAFC] px-3 text-[#94A3B8] focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/15"
-            >
-              <svg
-                className="h-4 w-4 shrink-0"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-4-4" />
-              </svg>
-              <input
-                aria-label="Search properties"
-                placeholder="Search properties"
-                className="min-w-0 flex-1 border-0 bg-transparent text-sm text-[#0B1F42] outline-none placeholder:text-[#94A3B8] focus:border-0 focus:outline-none focus:ring-0"
-              />
-            </form>
-          ) : (
-            <div>
-              <p className="text-lg font-semibold text-[#0B1F42]">
-                {adminPageTitle}
-              </p>
-              <p className="text-xs text-[#94A3B8]">{adminPageSubtitle}</p>
-            </div>
-          )}
+          <div>
+            <p className="text-lg font-semibold text-[#0B1F42]">
+              {adminPageTitle}
+            </p>
+            <p className="text-xs text-[#94A3B8]">{adminPageSubtitle}</p>
+          </div>
           <div className="ml-auto flex items-center gap-4">
-            {isEarningsPage && (
-              <button
-                type="button"
-                className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#0B1F42] px-4 text-xs font-semibold text-white hover:bg-[#17345C]"
-              >
-                ⇩ Export CSV
-              </button>
-            )}
             <form
               role="search"
               onSubmit={(event) => event.preventDefault()}
-              className={`${isPropertiesPage || isEarningsPage ? "hidden" : "flex"} h-9 w-44 items-center overflow-hidden rounded-full border border-[#E3E8EF] bg-[#F4F7FB] px-1 text-xs text-slate-500 transition-colors focus-within:border-[#C49A6C] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#C49A6C]/20 xl:w-64`}
+              className="flex h-9 w-44 items-center overflow-hidden rounded-full border border-[#E3E8EF] bg-[#F4F7FB] px-1 text-xs text-slate-500 transition-colors focus-within:border-[#C49A6C] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#C49A6C]/20 xl:w-64"
             >
               <button
                 type="submit"
