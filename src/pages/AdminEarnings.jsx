@@ -179,6 +179,196 @@ EarningsLineChart.propTypes = {
   ).isRequired,
 };
 
+function AdminEarningsDesign({
+  metrics,
+  filteredTotals,
+  monthlyTrend,
+  filteredRows,
+  loading,
+  period,
+  setPeriod,
+  handleExport,
+}) {
+  const ranges = [
+    { value: "this-year", label: "12M" },
+    { value: "this-month", label: "30D" },
+    { value: "this-week", label: "7D" },
+  ];
+  const gaugeCards = [
+    {
+      label: "Occupancy Rate",
+      value: metrics.confirmationRate ? `${metrics.confirmationRate}%` : "—",
+      caption: "Confirmed bookings",
+      color: "#0B1F42",
+    },
+    {
+      label: "Revenue Target",
+      value: filteredTotals.earnings
+        ? `KES ${filteredTotals.earnings.toLocaleString()}`
+        : "—",
+      caption: "Active earnings",
+      color: "#0E9F6E",
+    },
+    {
+      label: "Verification Rate",
+      value: metrics.confirmationRate ? `${metrics.confirmationRate}%` : "—",
+      caption: "Bookings confirmed",
+      color: "#2563EB",
+    },
+  ];
+  const areaRows = [...filteredRows]
+    .sort((a, b) => b.earnings - a.earnings)
+    .slice(0, 6);
+  const maxArea = Math.max(...areaRows.map((row) => row.earnings), 1);
+
+  return (
+    <div className="space-y-5">
+      <section className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-[15px] font-semibold text-[#0B1F42]">
+              Earnings overview
+            </p>
+            <p className="mt-1 text-2xl font-bold text-[#0B1F42]">
+              {filteredTotals.earnings
+                ? `KSh ${filteredTotals.earnings.toLocaleString()}`
+                : "—"}
+            </p>
+            <div className="mt-3 flex items-center gap-5 text-xs text-[#5B6B82]">
+              <span className="flex items-center gap-2">
+                <i className="h-2 w-2 rounded-full bg-[#0B1F42]" />
+                Revenue (KSh)
+              </span>
+              <span className="flex items-center gap-2">
+                <i className="h-2 w-2 rounded-full bg-[#0E9F6E]" />
+                Bookings
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 rounded-lg bg-[#F8FAFC] p-1">
+            {ranges.map((range) => (
+              <button
+                key={range.value}
+                type="button"
+                onClick={() => setPeriod(range.value)}
+                className={`rounded-md px-4 py-2 text-xs font-semibold ${period === range.value ? "bg-[#0B1F42] text-white" : "text-[#5B6B82] hover:text-[#0B1F42]"}`}
+              >
+                {range.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="mt-5 border-t border-[#EEF2F7] pt-4">
+          {loading ? (
+            <p className="py-16 text-center text-sm text-[#94A3B8]">
+              Loading earnings…
+            </p>
+          ) : monthlyTrend.length ? (
+            <EarningsLineChart points={monthlyTrend} />
+          ) : (
+            <p className="py-16 text-center text-sm text-[#94A3B8]">
+              Monthly revenue history will appear when analytics data is
+              available.
+            </p>
+          )}
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {gaugeCards.map((card) => (
+          <section
+            key={card.label}
+            className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
+          >
+            <p className="text-[15px] font-semibold text-[#0B1F42]">
+              {card.label}
+            </p>
+            <div
+              className="mx-auto mt-7 h-16 w-32 overflow-hidden rounded-t-full border-[11px] border-b-0 border-[#EEF2F7]"
+              style={{
+                borderLeftColor: card.color,
+                borderTopColor: card.color,
+                borderRightColor: card.color,
+              }}
+            />
+            <p className="-mt-12 text-center text-2xl font-bold text-[#0B1F42]">
+              {card.value}
+            </p>
+            <p className="mt-7 text-center text-xs text-[#94A3B8]">
+              {card.caption}
+            </p>
+            <div className="mt-5 rounded-lg bg-[#F8FAFC] px-3 py-2 text-xs text-[#5B6B82]">
+              {card.caption}
+            </div>
+          </section>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,2fr)_minmax(280px,1fr)]">
+        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <p className="text-[15px] font-semibold text-[#0B1F42]">
+            Revenue by area
+          </p>
+          <div className="mt-5 flex h-32 items-end justify-between gap-3">
+            {areaRows.map((row) => (
+              <div
+                key={row.id || row.title}
+                className="flex min-w-0 flex-1 flex-col items-center gap-2"
+              >
+                <div
+                  className="w-full max-w-[54px] rounded-t-md bg-[#0B1F42]"
+                  style={{
+                    height: `${Math.max((row.earnings / maxArea) * 100, 8)}%`,
+                  }}
+                />
+                <span className="w-full truncate text-center text-[10px] text-[#94A3B8]">
+                  {row.location || row.title}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+        <section className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <p className="text-[15px] font-semibold text-[#0B1F42]">
+            Top performing stays
+          </p>
+          <div className="mt-4 divide-y divide-[#EEF2F7]">
+            {areaRows.slice(0, 3).map((row) => (
+              <div
+                key={row.id || row.title}
+                className="flex items-center justify-between gap-3 py-3 text-xs"
+              >
+                <span className="truncate text-[#5B6B82]">{row.title}</span>
+                <strong className="shrink-0 text-[#0B1F42]">
+                  KSh {row.earnings.toLocaleString()}
+                </strong>
+              </div>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => handleExport("csv")}
+            className="mt-3 text-xs font-semibold text-[#C49A6C] hover:text-[#B8895C]"
+          >
+            Export earnings
+          </button>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+AdminEarningsDesign.propTypes = {
+  metrics: PropTypes.object.isRequired,
+  filteredTotals: PropTypes.object.isRequired,
+  monthlyTrend: PropTypes.array.isRequired,
+  filteredRows: PropTypes.array.isRequired,
+  loading: PropTypes.bool.isRequired,
+  period: PropTypes.string.isRequired,
+  setPeriod: PropTypes.func.isRequired,
+  handleExport: PropTypes.func.isRequired,
+};
+
 function AdminEarnings() {
   const { user } = useAuth();
   const isAdmin = user?.role === "ADMIN";
@@ -707,6 +897,21 @@ function AdminEarnings() {
       hint: `KES ${filteredTotals.bed2Earnings.toLocaleString()}`,
     },
   ];
+
+  if (isAdmin) {
+    return (
+      <AdminEarningsDesign
+        metrics={metrics}
+        filteredTotals={filteredTotals}
+        monthlyTrend={monthlyTrend}
+        filteredRows={filteredRows}
+        loading={loading}
+        period={period}
+        setPeriod={setPeriod}
+        handleExport={handleExport}
+      />
+    );
+  }
 
   const earningsTabs = [
     { value: "performance", label: "Performance" },
