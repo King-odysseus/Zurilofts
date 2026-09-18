@@ -281,19 +281,15 @@ function AdminProperties() {
 
       <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         {[
-          ["Total listings", properties.length],
+          ["Total properties", properties.length],
           [
-            "Published",
-            properties.filter((p) => p.status === "PUBLISHED").length,
+            "Occupied",
+            properties.filter(
+              (p) => p.status === "PUBLISHED" && p.available !== false,
+            ).length,
           ],
-          [
-            "Pending review",
-            properties.filter((p) => p.status === "PENDING_REVIEW").length,
-          ],
-          [
-            "Unavailable",
-            properties.filter((p) => p.available === false).length,
-          ],
+          ["Vacant", properties.filter((p) => p.available === false).length],
+          ["Revenue · this month", "—"],
         ].map(([label, value]) => (
           <div
             key={label}

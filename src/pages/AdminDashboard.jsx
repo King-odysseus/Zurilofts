@@ -376,6 +376,7 @@ function AdminLayout() {
   const [adminPageTitle, adminPageSubtitle] = adminPageMeta[
     location.pathname
   ] || ["Admin workspace", "Manage your ZuriLofts operation."];
+  const isPropertiesPage = location.pathname === "/admin/properties";
   const navItems = isAdmin
     ? [...sharedNavItems, ...adminOnlyItems]
     : sharedNavItems;
@@ -511,11 +512,11 @@ function AdminLayout() {
       {/* Sidebar */}
       <aside
         className={`bg-[#0B1F42] border-r border-[#17345C] text-white hidden md:flex flex-col fixed inset-y-0 left-0 z-10 transition-all duration-300 ${
-          collapsed ? "w-[88px]" : "w-64"
+          collapsed ? "w-[88px]" : "w-[240px]"
         }`}
       >
         <div
-          className={`flex ${collapsed ? "flex-col items-center gap-2 pt-12 pb-2 px-2" : "items-center justify-between pt-16 pb-4 px-6"}`}
+          className={`flex ${collapsed ? "flex-col items-center gap-2 pt-6 pb-2 px-2" : "items-center justify-between pt-6 pb-4 px-6"}`}
         >
           <Link to="/">
             <img
@@ -526,7 +527,7 @@ function AdminLayout() {
           </Link>
           <button
             onClick={toggleSidebar}
-            className="p-1 rounded-lg text-white/60 hover:bg-white/10 transition-colors"
+            className="hidden p-1 rounded-lg text-white/60 hover:bg-white/10 transition-colors"
             title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             <svg
@@ -546,7 +547,7 @@ function AdminLayout() {
         </div>
         {!collapsed && (
           <span className="block px-6 pb-4 text-white/45 text-xs font-semibold uppercase tracking-wider">
-            {isAdmin ? "Admin Panel" : "Host Dashboard"}
+            {isAdmin ? "Admin Console" : "Host Dashboard"}
           </span>
         )}
         <nav
@@ -564,7 +565,7 @@ function AdminLayout() {
                     }))
                   }
                   aria-expanded={expandedGroups[group]}
-                  className="mb-1.5 flex min-h-[32px] w-full items-center justify-between rounded-lg px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hover:bg-[#F7F7F5]"
+                  className="hidden mb-1.5 flex min-h-[32px] w-full items-center justify-between rounded-lg px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hover:bg-[#F7F7F5]"
                 >
                   {group}
                   <span aria-hidden="true">
@@ -874,22 +875,46 @@ function AdminLayout() {
       {/* Main content */}
       <main
         className={`flex-1 transition-all duration-300 ${
-          collapsed ? "md:ml-[88px]" : "md:ml-64"
+          collapsed ? "md:ml-[88px]" : "md:ml-[240px]"
         }`}
       >
         {/* Desktop header with notification bell and avatar dropdown */}
         <header className="hidden md:flex items-center justify-between gap-3 h-[72px] px-8 bg-white border-b border-[#E3E8EF] sticky top-0 z-[5]">
-          <div>
-            <p className="text-lg font-semibold text-[#0B1F42]">
-              {adminPageTitle}
-            </p>
-            <p className="text-xs text-[#94A3B8]">{adminPageSubtitle}</p>
-          </div>
+          {isPropertiesPage ? (
+            <form
+              role="search"
+              onSubmit={(event) => event.preventDefault()}
+              className="flex h-11 w-80 max-w-[45vw] items-center gap-2 rounded-xl border border-[#E3E8EF] bg-[#F8FAFC] px-3 text-[#94A3B8] focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/15"
+            >
+              <svg
+                className="h-4 w-4 shrink-0"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-4-4" />
+              </svg>
+              <input
+                aria-label="Search properties"
+                placeholder="Search properties"
+                className="min-w-0 flex-1 border-0 bg-transparent text-sm text-[#0B1F42] outline-none placeholder:text-[#94A3B8] focus:border-0 focus:outline-none focus:ring-0"
+              />
+            </form>
+          ) : (
+            <div>
+              <p className="text-lg font-semibold text-[#0B1F42]">
+                {adminPageTitle}
+              </p>
+              <p className="text-xs text-[#94A3B8]">{adminPageSubtitle}</p>
+            </div>
+          )}
           <div className="ml-auto flex items-center gap-4">
             <form
               role="search"
               onSubmit={(event) => event.preventDefault()}
-              className="flex h-9 w-44 items-center overflow-hidden rounded-full border border-[#E3E8EF] bg-[#F4F7FB] px-1 text-xs text-slate-500 transition-colors focus-within:border-[#C49A6C] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#C49A6C]/20 xl:w-64"
+              className={`${isPropertiesPage ? "hidden" : "flex"} h-9 w-44 items-center overflow-hidden rounded-full border border-[#E3E8EF] bg-[#F4F7FB] px-1 text-xs text-slate-500 transition-colors focus-within:border-[#C49A6C] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#C49A6C]/20 xl:w-64`}
             >
               <button
                 type="submit"
