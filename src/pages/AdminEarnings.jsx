@@ -114,8 +114,8 @@ function EarningsLineChart({ points }) {
       >
         <defs>
           <linearGradient id="earnings-area" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#2563EB" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#2563EB" stopOpacity="0" />
+            <stop offset="0%" stopColor="#0B1F42" stopOpacity="0.2" />
+            <stop offset="100%" stopColor="#0B1F42" stopOpacity="0" />
           </linearGradient>
         </defs>
         {[0, 0.25, 0.5, 0.75, 1].map((step) => {
@@ -136,7 +136,7 @@ function EarningsLineChart({ points }) {
         <path
           d={path}
           fill="none"
-          stroke="#2563EB"
+          stroke="#0B1F42"
           strokeWidth="4"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -148,7 +148,7 @@ function EarningsLineChart({ points }) {
               cy={point.y}
               r="5"
               fill="#ffffff"
-              stroke="#2563EB"
+              stroke="#0B1F42"
               strokeWidth="3"
             >
               <title>{`${point.label}: KES ${point.earnings.toLocaleString()}`}</title>

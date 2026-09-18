@@ -357,12 +357,12 @@ function AdminLayout() {
       "Manage listings, availability, and publishing status.",
     ],
     "/admin/earnings": [
-      "Earnings",
-      "Track revenue performance across your properties.",
+      "Earnings & Analytics",
+      "Revenue performance and payout health across every ZuriLoft property.",
     ],
     "/admin/identity-verifications": [
-      "Identity verifications",
-      "Review guest identity checks before payment.",
+      "Verifications",
+      "Review host and guest identity documents before granting access.",
     ],
     "/admin/messages": [
       "Support",
@@ -377,6 +377,7 @@ function AdminLayout() {
     location.pathname
   ] || ["Admin workspace", "Manage your ZuriLofts operation."];
   const isPropertiesPage = location.pathname === "/admin/properties";
+  const isEarningsPage = location.pathname === "/admin/earnings";
   const navItems = isAdmin
     ? [...sharedNavItems, ...adminOnlyItems]
     : sharedNavItems;
@@ -911,10 +912,18 @@ function AdminLayout() {
             </div>
           )}
           <div className="ml-auto flex items-center gap-4">
+            {isEarningsPage && (
+              <button
+                type="button"
+                className="inline-flex h-9 items-center gap-2 rounded-lg bg-[#0B1F42] px-4 text-xs font-semibold text-white hover:bg-[#17345C]"
+              >
+                ⇩ Export CSV
+              </button>
+            )}
             <form
               role="search"
               onSubmit={(event) => event.preventDefault()}
-              className={`${isPropertiesPage ? "hidden" : "flex"} h-9 w-44 items-center overflow-hidden rounded-full border border-[#E3E8EF] bg-[#F4F7FB] px-1 text-xs text-slate-500 transition-colors focus-within:border-[#C49A6C] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#C49A6C]/20 xl:w-64`}
+              className={`${isPropertiesPage || isEarningsPage ? "hidden" : "flex"} h-9 w-44 items-center overflow-hidden rounded-full border border-[#E3E8EF] bg-[#F4F7FB] px-1 text-xs text-slate-500 transition-colors focus-within:border-[#C49A6C] focus-within:bg-white focus-within:ring-1 focus-within:ring-[#C49A6C]/20 xl:w-64`}
             >
               <button
                 type="submit"
