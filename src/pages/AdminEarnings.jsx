@@ -88,9 +88,9 @@ const SORT_OPTIONS = [
 ];
 
 function EarningsLineChart({ points }) {
-  const width = 760;
-  const height = 300;
-  const padding = { top: 24, right: 20, bottom: 42, left: 20 };
+  const width = 900;
+  const height = 280;
+  const padding = { top: 20, right: 16, bottom: 36, left: 12 };
   const max = Math.max(...points.map((point) => point.earnings), 1);
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
@@ -103,18 +103,34 @@ function EarningsLineChart({ points }) {
     .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
     .join(" ");
   const areaPath = `${path} L ${coordinates.at(-1)?.x ?? padding.left} ${padding.top + chartHeight} L ${coordinates[0]?.x ?? padding.left} ${padding.top + chartHeight} Z`;
+  const bookings = points.some((point) => point.bookings);
+  const bookingsMax = Math.max(
+    ...points.map((point) => point.bookings || 0),
+    1,
+  );
+  const bookingsPath = points
+    .map((point, index) => {
+      const x =
+        padding.left + (chartWidth * index) / Math.max(points.length - 1, 1);
+      const y =
+        padding.top +
+        chartHeight -
+        ((point.bookings || 0) / bookingsMax) * chartHeight;
+      return `${index === 0 ? "M" : "L"} ${x} ${y}`;
+    })
+    .join(" ");
 
   return (
-    <div className="w-full overflow-x-auto">
+    <div className="w-full overflow-x-auto rounded-xl bg-white">
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        className="min-w-[620px] w-full"
+        className="h-auto min-w-[620px] w-full"
         role="img"
         aria-label="Monthly active earnings line chart"
       >
         <defs>
           <linearGradient id="earnings-area" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0%" stopColor="#0B1F42" stopOpacity="0.2" />
+            <stop offset="0%" stopColor="#0B1F42" stopOpacity="0.12" />
             <stop offset="100%" stopColor="#0B1F42" stopOpacity="0" />
           </linearGradient>
         </defs>
@@ -137,19 +153,29 @@ function EarningsLineChart({ points }) {
           d={path}
           fill="none"
           stroke="#0B1F42"
-          strokeWidth="4"
+          strokeWidth="3"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
+        {bookings && (
+          <path
+            d={bookingsPath}
+            fill="none"
+            stroke="#0E9F6E"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        )}
         {coordinates.map((point) => (
           <g key={point.key}>
             <circle
               cx={point.x}
               cy={point.y}
-              r="5"
-              fill="#ffffff"
+              r="4"
+              fill="#fff"
               stroke="#0B1F42"
-              strokeWidth="3"
+              strokeWidth="2"
             >
               <title>{`${point.label}: KES ${point.earnings.toLocaleString()}`}</title>
             </circle>
@@ -158,7 +184,7 @@ function EarningsLineChart({ points }) {
               y={height - 12}
               textAnchor="middle"
               fontSize="12"
-              fill="#6b7280"
+              fill="#94A3B8"
             >
               {point.label}
             </text>
@@ -175,6 +201,7 @@ EarningsLineChart.propTypes = {
       key: PropTypes.string.isRequired,
       label: PropTypes.string.isRequired,
       earnings: PropTypes.number.isRequired,
+      bookings: PropTypes.number,
     }),
   ).isRequired,
 };
