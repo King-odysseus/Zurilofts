@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import PropTypes from "prop-types";
+import ApexCharts from "apexcharts";
 import { Link } from "react-router-dom";
 import apiClient from "../api/client.js";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -87,7 +88,7 @@ const SORT_OPTIONS = [
   { value: "name-desc", label: "Property Name (Z -> A)" },
 ];
 
-function EarningsLineChart({ points }) {
+function LegacyEarningsLineChart({ points }) {
   const width = 900;
   const height = 280;
   const padding = { top: 20, right: 16, bottom: 36, left: 12 };
@@ -192,6 +193,79 @@ function EarningsLineChart({ points }) {
         ))}
       </svg>
     </div>
+  );
+}
+
+LegacyEarningsLineChart.propTypes = {
+  points: PropTypes.arrayOf(
+    PropTypes.shape({
+      key: PropTypes.string.isRequired,
+      label: PropTypes.string.isRequired,
+      earnings: PropTypes.number.isRequired,
+      bookings: PropTypes.number,
+    }),
+  ).isRequired,
+};
+
+function EarningsLineChart({ points }) {
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    if (!chartRef.current) return undefined;
+    const categories = points.map((point) => point.label);
+    const chart = new ApexCharts(chartRef.current, {
+      chart: {
+        type: "line",
+        height: 280,
+        fontFamily: "Inter, sans-serif",
+        toolbar: { show: false },
+        zoom: { enabled: false },
+      },
+      series: [
+        { name: "Revenue (KSh)", data: points.map((point) => point.earnings) },
+        { name: "Bookings", data: points.map((point) => point.bookings || 0) },
+      ],
+      colors: ["#0B1F42", "#0E9F6E"],
+      stroke: { curve: "smooth", width: [3, 2], lineCap: "round" },
+      markers: {
+        size: 4,
+        strokeWidth: 2,
+        strokeColors: "#fff",
+        hover: { size: 6 },
+      },
+      dataLabels: { enabled: false },
+      grid: {
+        show: true,
+        borderColor: "#E5E7EB",
+        strokeDashArray: 0,
+        padding: { left: 8, right: 8 },
+      },
+      xaxis: {
+        categories,
+        labels: { style: { colors: "#94A3B8", fontSize: "12px" } },
+        axisBorder: { show: false },
+        axisTicks: { show: false },
+      },
+      yaxis: {
+        labels: {
+          style: { colors: "#94A3B8", fontSize: "12px" },
+          formatter: (value) => Math.round(value).toLocaleString(),
+        },
+      },
+      legend: { show: false },
+      tooltip: { shared: true, intersect: false, theme: "light" },
+    });
+    chart.render();
+    return () => chart.destroy();
+  }, [points]);
+
+  return (
+    <div
+      ref={chartRef}
+      className="w-full"
+      role="img"
+      aria-label="Monthly active earnings line chart"
+    />
   );
 }
 
