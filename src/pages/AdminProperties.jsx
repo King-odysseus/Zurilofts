@@ -70,17 +70,44 @@ function AdminProperties() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(null);
   const [statusFilter, setStatusFilter] = useState("");
-  const [viewMode, setViewMode] = useState("grid");
+  const [viewMode, setViewMode] = useState("table");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortOrder, setSortOrder] = useState("newest");
   const [selectedProperty, setSelectedProperty] = useState(null);
 
-  const visibleProperties =
-    isAdminView || !statusFilter
-      ? properties
-      : properties.filter((property) =>
-          statusFilter === "IN_REVIEW"
-            ? property.status === "PENDING_REVIEW"
-            : property.status === statusFilter,
-        );
+  const visibleProperties = properties
+    .filter(
+      (property) =>
+        isAdminView ||
+        !statusFilter ||
+        (statusFilter === "IN_REVIEW"
+          ? property.status === "PENDING_REVIEW"
+          : property.status === "VACANT"
+            ? property.available === false
+            : statusFilter === "MAINTENANCE"
+              ? property.status === "SUSPENDED"
+              : property.status === statusFilter),
+    )
+    .filter((property) => {
+      if (statusFilter === "VACANT") return property.available === false;
+      if (statusFilter === "MAINTENANCE")
+        return property.status === "SUSPENDED";
+      return true;
+    })
+    .filter((property) => {
+      const query = searchTerm.trim().toLowerCase();
+      if (!query) return true;
+      return [property.title, property.location, property.type, property.id]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query));
+    })
+    .sort((a, b) =>
+      sortOrder === "price"
+        ? (b.price || 0) - (a.price || 0)
+        : String(b.createdAt || b.id).localeCompare(
+            String(a.createdAt || a.id),
+          ),
+    );
 
   useEffect(() => {
     fetchProperties();
@@ -94,7 +121,14 @@ function AdminProperties() {
       // the host workspace only ever sees the caller's own listings.
       const res = isAdminView
         ? await apiClient.get("/admin/properties", {
-            params: { limit: 100, status: statusFilter || undefined },
+            params: {
+              limit: 100,
+              status:
+                statusFilter &&
+                !["VACANT", "MAINTENANCE"].includes(statusFilter)
+                  ? statusFilter
+                  : undefined,
+            },
           })
         : await apiClient.get("/properties/mine", { params: { limit: 100 } });
       setProperties(res.data.data || []);
@@ -190,19 +224,27 @@ function AdminProperties() {
     <div>
       <div className="mb-6 flex flex-col gap-4 border-b border-[#E3E8EF] pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#C49A6C]">
-            Workspace / Listings
+          <p className="mb-2 text-xs text-[#94A3B8]">
+            Dashboard <span className="mx-1">/</span> Properties
           </p>
           <h1 className="text-2xl font-bold text-[#0B1F42]">
             {isAdminView ? "Properties" : "Your listings"}
           </h1>
           <p className="mt-1 text-sm text-[#5B6B82]">
             {isAdminView
-              ? "Review and manage every listing across the platform."
+              ? "Manage listings, availability and nightly rates across your portfolio."
               : "Manage your listings, availability and review status."}
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex flex-wrap items-center gap-3">
+          {isAdminView && (
+            <button
+              type="button"
+              className="inline-flex min-h-[40px] items-center gap-2 rounded-lg border border-[#E3E8EF] bg-white px-4 text-sm font-semibold text-[#0B1F42] hover:border-[#C49A6C]"
+            >
+              ⇩ Export
+            </button>
+          )}
           {isAdminView && (
             <Dropdown
               value={statusFilter}
@@ -221,7 +263,7 @@ function AdminProperties() {
             />
           )}
           <div
-            className="flex rounded-lg border border-[#E3E8EF] bg-white p-1"
+            className="hidden flex rounded-lg border border-[#E3E8EF] bg-white p-1"
             role="group"
             aria-label="Listings view"
           >
@@ -303,6 +345,55 @@ function AdminProperties() {
         ))}
       </div>
 
+      {isAdminView && (
+        <div className="mb-5 flex flex-wrap items-center gap-3">
+          <label className="flex h-10 min-w-[220px] flex-1 items-center gap-2 rounded-lg border border-[#E3E8EF] bg-white px-3 text-[#94A3B8] focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/15">
+            <svg
+              className="h-4 w-4 shrink-0"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-4-4" />
+            </svg>
+            <input
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Search by name, area or ID..."
+              aria-label="Search properties"
+              className="min-w-0 flex-1 bg-transparent text-sm text-[#0B1F42] outline-none placeholder:text-[#94A3B8]"
+            />
+          </label>
+          {[
+            ["", "All"],
+            ["PUBLISHED", "Occupied"],
+            ["VACANT", "Vacant"],
+            ["DRAFT", "Draft"],
+            ["MAINTENANCE", "Maintenance"],
+          ].map(([value, label]) => (
+            <button
+              key={value || "all"}
+              type="button"
+              onClick={() => setStatusFilter(value)}
+              className={`rounded-full px-4 py-2 text-xs font-semibold ${statusFilter === value ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF] bg-white text-[#5B6B82] hover:border-[#C49A6C]"}`}
+            >
+              {label}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              setSortOrder(sortOrder === "newest" ? "price" : "newest")
+            }
+            className="rounded-lg border border-[#E3E8EF] bg-white px-4 py-2 text-xs font-semibold text-[#0B1F42]"
+          >
+            ↕ {sortOrder === "price" ? "Price high" : "Newest first"}
+          </button>
+        </div>
+      )}
+
       {!isAdminView && (
         <div
           className="mb-5 flex flex-wrap items-center gap-2 border-b border-[#E5E7EB] pb-3"
@@ -344,7 +435,37 @@ function AdminProperties() {
           <p className="mt-3 text-sm">Loading properties…</p>
         </div>
       ) : viewMode === "table" ? (
-        <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <div className="flex items-center justify-between border-b border-[#E3E8EF] px-5 py-4">
+            <div className="flex items-center gap-3">
+              <h2 className="text-sm font-semibold text-[#0B1F42]">
+                All properties
+              </h2>
+              <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-[11px] font-semibold text-[#5B6B82]">
+                {visibleProperties.length}
+              </span>
+            </div>
+            <div
+              className="flex rounded-lg border border-[#E3E8EF] p-1"
+              role="group"
+              aria-label="Property view"
+            >
+              <button
+                type="button"
+                onClick={() => setViewMode("table")}
+                className={`rounded-md px-2 py-1 text-xs ${viewMode === "table" ? "bg-[#0B1F42] text-white" : "text-[#94A3B8]"}`}
+              >
+                ☷
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewMode("grid")}
+                className={`rounded-md px-2 py-1 text-xs ${viewMode === "grid" ? "bg-[#0B1F42] text-white" : "text-[#94A3B8]"}`}
+              >
+                ▦
+              </button>
+            </div>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB]">
