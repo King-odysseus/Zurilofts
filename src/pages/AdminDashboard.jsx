@@ -956,6 +956,7 @@ function DashboardOverview() {
   const [landingMsg, setLandingMsg] = useState("");
   const [quickActionsOpen, setQuickActionsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("All");
+  const [revenueRange, setRevenueRange] = useState("12");
   const quickRef = useRef(null);
   const navigate = useNavigate();
 
@@ -1283,9 +1284,27 @@ function DashboardOverview() {
                   : "—"}
               </p>
             </div>
-            <span className="rounded-lg border border-[#E3E8EF] bg-[#F8FAFC] px-3 py-2 text-xs text-[#5B6B82]">
-              12 months⌄
-            </span>
+            <label className="relative inline-flex items-center rounded-lg border border-[#E3E8EF] bg-[#F8FAFC] text-xs text-[#5B6B82] focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/15">
+              <span className="sr-only">Revenue period</span>
+              <select
+                aria-label="Revenue period"
+                value={revenueRange}
+                onChange={(event) => setRevenueRange(event.target.value)}
+                className="appearance-none rounded-lg bg-transparent py-2 pl-3 pr-8 text-xs text-[#5B6B82] outline-none"
+              >
+                <option value="3">3 months</option>
+                <option value="6">6 months</option>
+                <option value="12">12 months</option>
+              </select>
+              <svg
+                className="pointer-events-none absolute right-2 h-3.5 w-3.5 text-[#94A3B8]"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="m5.5 7.5 4.5 4 4.5-4" />
+              </svg>
+            </label>
           </div>
           <div className="mt-5 flex h-36 items-center justify-center border-t border-[#E3E8EF] pt-4 text-center text-xs text-[#94A3B8]">
             Monthly revenue history will appear when analytics data is
