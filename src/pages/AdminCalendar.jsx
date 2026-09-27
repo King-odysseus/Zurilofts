@@ -3,7 +3,7 @@ import { useParams, useLocation, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 
-const labelCls = 'block text-sm font-medium text-[#222222] mb-2';
+const labelCls = 'block text-sm font-medium text-[#0B1F42] mb-2';
 const inputCls =
   'h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40';
 
@@ -19,7 +19,7 @@ function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, se
   const occupied = (date, item) => date >= new Date(item.start) && date < new Date(item.end);
   return <div className="overflow-x-auto">
     <div className="min-w-[560px]">
-    <div className="grid grid-cols-7 border-b border-[#E5E7EB]">{['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => <div key={day} className="px-2 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-[#52606F]">{day}</div>)}</div>
+    <div className="grid grid-cols-7 border-b border-[#E3E8EF]">{['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => <div key={day} className="px-2 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-[#5B6B82]">{day}</div>)}</div>
     <div className="grid grid-cols-7">
     {cells.map((day, index) => {
       const date = new Date(month.getFullYear(), month.getMonth(), day);
@@ -29,7 +29,7 @@ function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, se
       const isToday = sameDay(date, new Date());
       const isSelected = selectedStart && (selectedEnd ? date >= selectedStart && date <= selectedEnd : sameDay(date, selectedStart));
       const canClick = inMonth && !booking && (Boolean(onSelectDate) || Boolean(block?.manual && onBlockClick));
-      return <button type="button" key={index} disabled={!canClick} onClick={() => block?.manual ? onBlockClick?.(block, date) : onSelectDate?.(date)} className={`min-h-[116px] border-b border-r border-[#E5E7EB] p-3 text-left transition-colors duration-200 ${inMonth ? 'bg-white' : 'bg-[#F7F4EF]/50'} ${block ? 'bg-[#EAF0F4]' : ''} ${isSelected ? 'bg-[#FDE8D8] ring-2 ring-inset ring-[#C49A6C]' : ''} ${canClick ? 'cursor-pointer hover:bg-[#FDE8D8]/60' : 'cursor-not-allowed'} ${booking ? 'bg-[#FDE8D8]' : ''}`}>
+      return <button type="button" key={index} disabled={!canClick} onClick={() => block?.manual ? onBlockClick?.(block, date) : onSelectDate?.(date)} className={`min-h-[116px] border-b border-r border-[#E3E8EF] p-3 text-left transition-colors duration-200 ${inMonth ? 'bg-white' : 'bg-[#F7F4EF]/50'} ${block ? 'bg-[#EAF0F4]' : ''} ${isSelected ? 'bg-[#FDE8D8] ring-2 ring-inset ring-[#C49A6C]' : ''} ${canClick ? 'cursor-pointer hover:bg-[#FDE8D8]/60' : 'cursor-not-allowed'} ${booking ? 'bg-[#FDE8D8]' : ''}`}>
         {inMonth && <span className={`inline-flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-sm font-semibold ${isSelected || isToday ? 'bg-[#0B1F42] text-white' : 'text-[#0B1F42]'}`}>{day}</span>}
         {booking && <div className="mt-3 truncate rounded-lg bg-[#C49A6C]/25 px-2 py-1.5 text-xs font-semibold text-[#0B1F42]" title={`${booking.guestName} · ${booking.guests} guests`}>{booking.guestName}</div>}
         {!booking && block && <div className="mt-3 truncate rounded-lg bg-[#DCE5EC] px-2 py-1.5 text-xs font-semibold text-[#52606F]">{block.summary || 'Blocked'}</div>}
@@ -65,7 +65,7 @@ function CalendarPropertyPicker({ base }) {
 
   return (
     <div className="w-full">
-      <div className="mb-6 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm">
+      <div className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 sm:px-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Host workspace</p>
         <h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">Calendar</h1>
         <p className="mt-1 text-sm text-[#52606F]">Choose a listing to view its Airbnb-style month availability.</p>
@@ -76,7 +76,7 @@ function CalendarPropertyPicker({ base }) {
           <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
         </div>
       ) : properties.length === 0 ? (
-        <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-10 text-center">
+        <div className="bg-white rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.08)] p-10 text-center">
           <p className="text-[#6b7280]">No properties yet. Add a property to manage its calendar.</p>
         </div>
       ) : (
@@ -85,7 +85,7 @@ function CalendarPropertyPicker({ base }) {
             <Link
               key={p.id}
               to={`${base}/calendar/${p.id}`}
-              className="bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group"
+              className="bg-white rounded-2xl border border-[#E3E8EF] overflow-hidden shadow-[0_8px_28px_rgba(11,31,66,0.08)] hover:shadow-[0_12px_32px_rgba(11,31,66,0.12)] transition-all duration-200 group"
             >
               <div className="aspect-[4/3] overflow-hidden bg-[#F7F7F5]">
                 {p.images?.[0] ? (
@@ -291,7 +291,7 @@ function AdminCalendar() {
           ['Connected calendars', data.sources?.length || 0],
           ['Calendar status', data.sources?.some((source) => source.lastStatus?.startsWith('ERROR')) ? 'Action needed' : 'Synced'],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
+          <div key={label} className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#52606F]">{label}</p>
             <p className="mt-2 text-xl font-bold text-[#0B1F42]">{value}</p>
           </div>
@@ -304,7 +304,7 @@ function AdminCalendar() {
         {[['view', 'View'], ['availability', 'Availability'], ['settings', 'Settings']].map(([value, label]) => <button key={value} type="button" role="tab" aria-selected={calendarTab === value} onClick={() => setCalendarTab(value)} className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors duration-200 ${calendarTab === value ? 'border-[#C49A6C] text-[#0B1F42]' : 'border-transparent text-[#5B6B82] hover:text-[#0B1F42]'}`}>{label}</button>)}
       </div>
 
-      {calendarTab === 'view' && <section className="mb-6 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm sm:p-6">
+      {calendarTab === 'view' && <section className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div><p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Availability</p><h2 className="mt-1 text-2xl font-bold text-[#0B1F42]">{monthCursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h2></div>
           <div className="flex gap-2">
@@ -315,7 +315,7 @@ function AdminCalendar() {
         </div>
         <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} onBlockClick={handleCalendarBlockClick} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
         <div className="flex flex-wrap items-center justify-between gap-4 mt-4">
-          <div className="flex flex-wrap items-center gap-4 text-xs text-[#6b7280]">
+          <div className="flex flex-wrap items-center gap-4 text-xs text-[#5B6B82]">
             <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-[#FDE8D8]" />Guest stay</span>
             <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-[#EAF0F4] border border-[#DCE5EC]" />Blocked</span>
             <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-white border border-[#E5E7EB]" />Available</span>
