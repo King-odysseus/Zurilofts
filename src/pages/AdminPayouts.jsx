@@ -143,12 +143,12 @@ function AdminPayouts() {
             </thead>
             <tbody>
               {payouts.map((p) => (
-                <tr key={p.id} className="border-b border-[#E5E7EB]/50 hover:bg-[#F7F4EF]">
+                <tr key={p.id} className="border-b border-[#E3E8EF]/50 hover:bg-[#F7F4EF]">
                   <td className="p-4">
                     <div className="font-medium text-[#0B1F42]">
                       {p.host?.firstName} {p.host?.lastName}
                     </div>
-                    <div className="text-xs text-[#6b7280]">{p.host?.email}</div>
+                    <div className="text-xs text-[#5B6B82]">{p.host?.email}</div>
                   </td>
                   <td className="p-4 font-medium">
                     {p.amount?.toLocaleString()}
@@ -159,10 +159,10 @@ function AdminPayouts() {
                       {p.status}
                     </span>
                   </td>
-                  <td className="p-4 text-[#6b7280]">
+                  <td className="p-4 text-[#5B6B82]">
                     {p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                   </td>
-                  <td className="p-4 text-[#6b7280]">
+                  <td className="p-4 text-[#5B6B82]">
                     {p.completedAt ? new Date(p.completedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                   </td>
                   <td className="p-4">
@@ -180,10 +180,10 @@ function AdminPayouts() {
 
       {selectedPayout && (
         <div className="fixed inset-0 z-30 bg-black/20" onClick={() => setSelectedPayout(null)}>
-          <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-[#E5E7EB] bg-white p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+          <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.14)]" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-start justify-between gap-4">
               <div><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Payout review</p><h2 className="mt-1 text-xl font-bold text-[#0B1F42]">{selectedPayout.host?.firstName} {selectedPayout.host?.lastName}</h2></div>
-              <button type="button" onClick={() => setSelectedPayout(null)} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close payout review">×</button>
+              <button type="button" onClick={() => setSelectedPayout(null)} className="rounded-[10px] p-2 text-xl leading-none text-[#5B6B82] hover:bg-[#F7F4EF]" aria-label="Close payout review">×</button>
             </div>
             <div className="mt-6 space-y-4 text-sm">
               <div className="flex items-center justify-between"><span className="text-[#6b7280]">Amount</span><span className="text-lg font-bold text-[#222222]">KES {selectedPayout.amount?.toLocaleString()}</span></div>
