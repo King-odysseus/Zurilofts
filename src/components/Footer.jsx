@@ -3,15 +3,15 @@ import { openConsentManager } from '../utils/consent.js';
 
 function Footer() {
   return (
-    <footer className="bg-[#0B0B45] text-white">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-12">
+    <footer className="bg-[#0B1F42] text-white">
+      <div className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="sm:col-span-2">
-            <div className="inline-flex bg-white rounded-xl p-3 mb-4">
+            <div className="mb-4 inline-flex rounded-2xl bg-white p-3">
               <img src={logoImg} alt="ZuriLofts" className="h-16 w-auto" />
             </div>
-              <p className="text-white/80 mb-6 max-w-sm">
+              <p className="mb-6 max-w-sm text-white/80">
                 Your trusted host in luxurious short-let apartment stays in Nairobi.
                 Premium comfort, unbeatable locations.
               </p>
