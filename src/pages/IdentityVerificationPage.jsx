@@ -39,10 +39,11 @@ function IdentityVerificationPage() {
   return (
     <div className="min-h-screen bg-canvas">
       <Navbar />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
-        <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm mb-8">
-        <h1 className="text-2xl font-bold text-[#222222] mb-2">Verify your identity</h1>
-        <p className="text-[#6b7280] mb-8">
+      <main className="mx-auto max-w-5xl px-4 pb-16 pt-28 sm:px-6">
+        <div className="mb-8 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Trust &amp; safety</p>
+        <h1 className="mb-2 mt-1 text-2xl font-bold text-[#0B1F42]">Verify your identity</h1>
+        <p className="mb-2 text-[#52606F]">
           {bookingId
             ? "We need to verify who you are before confirming payment. Your booking dates are held while you complete this - you won't lose your spot."
             : 'We verify every guest before confirming payment on a booking.'}
@@ -50,20 +51,20 @@ function IdentityVerificationPage() {
         </div>
 
         {bookingId && approved && (
-          <div className="mb-8 bg-green-50 border border-green-200 rounded-[14px] p-5">
+          <div className="mb-8 rounded-2xl border border-[#BDE2C8] bg-[#E8F4EC] p-5">
             <p className="text-green-800 font-semibold mb-3">You&apos;re verified! You can now complete payment.</p>
             {error && <p className="text-sm text-red-600 mb-3">{error}</p>}
             <button
               onClick={handleContinueToPayment}
               disabled={resuming}
-              className="min-h-[44px] px-6 py-2.5 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
+              className="min-h-[44px] rounded-lg bg-[#0B1F42] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50"
             >
               {resuming ? 'Redirecting...' : 'Continue to payment'}
             </button>
           </div>
         )}
 
-        <div className="bg-white border border-[#E5E7EB] rounded-[14px] p-6 shadow-md">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
           <IdentityVerificationPanel onApproved={() => setApproved(true)} />
         </div>
 

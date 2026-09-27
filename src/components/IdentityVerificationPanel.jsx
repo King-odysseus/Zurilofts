@@ -9,10 +9,10 @@ const DOCUMENT_KINDS = [
 ];
 
 const STATUS_STYLES = {
-  UNVERIFIED: 'bg-[#D9D9D9]/40 text-[#1f2937]',
-  SUBMITTED: 'bg-amber-100 text-amber-800',
-  APPROVED: 'bg-green-100 text-green-700',
-  REJECTED: 'bg-red-100 text-red-700',
+  UNVERIFIED: 'bg-[#EAF0F4] text-[#52606F]',
+  SUBMITTED: 'bg-[#FDE8D8] text-[#9A4A1D]',
+  APPROVED: 'bg-[#E8F4EC] text-[#287A45]',
+  REJECTED: 'bg-[#FDECEC] text-[#B42318]',
 };
 
 const STATUS_LABELS = {
@@ -121,13 +121,13 @@ function IdentityVerificationPanel({ onApproved }) {
 
   return (
     <div className="max-w-2xl">
-      <div className="flex items-center gap-3 mb-4">
-        <h3 className="text-lg font-bold text-[#222222]">Identity verification</h3>
+      <div className="mb-4 flex items-center gap-3">
+        <h3 className="text-xl font-bold text-[#0B1F42]">Identity verification</h3>
         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[data?.status] || STATUS_STYLES.UNVERIFIED}`}>
           {STATUS_LABELS[data?.status] || STATUS_LABELS.UNVERIFIED}
         </span>
       </div>
-      <p className="text-sm text-[#6b7280] mb-6">
+      <p className="mb-6 text-sm text-[#52606F]">
         We verify every guest&apos;s identity before confirming payment on a booking. Your documents are encrypted and only visible to the ZuriLofts trust &amp; safety team.
       </p>
 
@@ -137,8 +137,8 @@ function IdentityVerificationPanel({ onApproved }) {
           ['Documents', '#verification-documents', '2'],
           ['Review', '#verification-review', '3'],
         ].map(([label, href, number]) => (
-          <a key={label} href={href} className="flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-2 text-xs font-semibold text-[#222222] hover:border-[#2563EB] sm:text-sm">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#2563EB]/10 text-xs text-[#2563EB]">{number}</span>{label}
+          <a key={label} href={href} className="flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-2 text-xs font-semibold text-[#0B1F42] hover:border-[#C49A6C] sm:text-sm">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FDE8D8] text-xs text-[#9A4A1D]">{number}</span>{label}
           </a>
         ))}
       </nav>
@@ -171,7 +171,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.fullName}
               onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              className="neu-input w-full px-3 py-2 disabled:bg-canvas disabled:text-[#6b7280]"
+              className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:bg-[#EAF0F4] disabled:text-[#52606F]"
             />
           </div>
           <div>
@@ -182,7 +182,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.dateOfBirth}
               onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
-              className="neu-input w-full px-3 py-2 disabled:bg-canvas disabled:text-[#6b7280]"
+              className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:bg-[#EAF0F4] disabled:text-[#52606F]"
             />
           </div>
           <div>
@@ -192,7 +192,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.idType}
               onChange={(e) => setForm({ ...form, idType: e.target.value })}
-              className="neu-input w-full px-3 py-2 disabled:bg-canvas disabled:text-[#6b7280]"
+              className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:bg-[#EAF0F4] disabled:text-[#52606F]"
             >
               <option value="NATIONAL_ID">National ID</option>
               <option value="PASSPORT">Passport</option>
@@ -207,7 +207,7 @@ function IdentityVerificationPanel({ onApproved }) {
               disabled={!editable}
               value={form.idNumber}
               onChange={(e) => setForm({ ...form, idNumber: e.target.value })}
-              className="neu-input w-full px-3 py-2 disabled:bg-canvas disabled:text-[#6b7280]"
+              className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:bg-[#EAF0F4] disabled:text-[#52606F]"
             />
           </div>
         </div>
