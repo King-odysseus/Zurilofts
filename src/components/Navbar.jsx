@@ -219,12 +219,12 @@ function Navbar({ solid = false }) {
   }
 
   const navItemClass = (isActive) =>
-    `group relative flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
+    `group relative flex items-center gap-1 rounded-[10px] px-3 py-2 text-sm font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${
       isActive
         ? 'text-[#C89B6D]'
         : needsWhiteNav
-          ? 'text-[#222222] hover:text-[#2563EB]'
-          : 'text-white hover:text-[#2563EB]'
+          ? 'text-[#0B1F42] hover:text-[#C49A6C]'
+          : 'text-white hover:text-[#C49A6C]'
     }`;
 
   const underlineClass = (isActive) =>
@@ -240,12 +240,12 @@ function Navbar({ solid = false }) {
 
   const badgeClass = 'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 ml-1.5 bg-red-600 text-white text-[10px] font-bold rounded-full align-middle';
 
-  const accountItemClass = 'flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#2563EB]/10 transition-colors';
+  const accountItemClass = 'flex items-center rounded-[10px] px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors';
 
   return (
     <nav className={`fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
       needsWhiteNav
-        ? 'bg-white border-b border-[#E5E7EB] shadow-sm'
+        ? 'border-b border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.06)]'
         : 'bg-transparent'
     }`}>
       <div className="max-w-screen-xl mx-auto px-4 md:px-6">

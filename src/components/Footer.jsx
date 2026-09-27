@@ -19,7 +19,7 @@ function Footer() {
             <div className="flex space-x-4">
               {['Facebook', 'Twitter', 'Instagram'].map((name, i) => (
                 <a key={name} href="#" aria-label={name}
-                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-[#2563EB] hover:text-white transition-all duration-200">
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 transition-all duration-200 hover:bg-[#C49A6C] hover:text-white">
                   {i === 0 && (
                     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
@@ -46,7 +46,7 @@ function Footer() {
             <ul className="space-y-3">
               {[['Home','#home'],['Properties','#properties'],['About','#footer']].map(([label, href]) => (
                 <li key={label}>
-                  <a href={href} className="text-white/80 hover:text-[#2563EB] transition-colors duration-200">{label}</a>
+                  <a href={href} className="text-white/80 transition-colors duration-200 hover:text-[#C49A6C]">{label}</a>
                 </li>
               ))}
             </ul>
@@ -68,13 +68,13 @@ function Footer() {
             © {new Date().getFullYear()} ZuriLofts. All rights reserved.
           </p>
           <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 mt-4 md:mt-0">
-            <a href="/privacy" className="text-white/60 hover:text-[#2563EB] text-sm transition-colors duration-200">Privacy Policy</a>
-            <a href="/terms" className="text-white/60 hover:text-[#2563EB] text-sm transition-colors duration-200">Terms of Service</a>
-            <a href="/privacy#cookies" className="text-white/60 hover:text-[#2563EB] text-sm transition-colors duration-200">Cookie Policy</a>
+            <a href="/privacy" className="text-sm text-white/60 transition-colors duration-200 hover:text-[#C49A6C]">Privacy Policy</a>
+            <a href="/terms" className="text-sm text-white/60 transition-colors duration-200 hover:text-[#C49A6C]">Terms of Service</a>
+            <a href="/privacy#cookies" className="text-sm text-white/60 transition-colors duration-200 hover:text-[#C49A6C]">Cookie Policy</a>
             <button
               type="button"
               onClick={openConsentManager}
-              className="text-white/60 hover:text-[#2563EB] text-sm transition-colors duration-200"
+              className="text-sm text-white/60 transition-colors duration-200 hover:text-[#C49A6C]"
             >
               Cookie preferences
             </button>

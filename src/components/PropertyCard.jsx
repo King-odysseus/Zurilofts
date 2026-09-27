@@ -83,10 +83,10 @@ function PropertyCard({ property, cardVariant }) {
   }
 
   return (
-    <article className={`group relative bg-white overflow-hidden transition-all duration-200 h-full flex flex-col ${resultsCard ? 'rounded-[16px] shadow-none' : 'rounded-[14px] border border-[#E5E7EB] shadow-sm hover:-translate-y-1 hover:shadow-md'}`}>
+    <article className={`group relative flex h-full flex-col overflow-hidden bg-white transition-all duration-200 ${resultsCard ? 'rounded-2xl shadow-none' : 'rounded-2xl border border-[#E3E8EF] shadow-[0_4px_16px_rgba(11,31,66,0.04)] hover:-translate-y-1 hover:shadow-md'}`}>
       <Link
         to={propertyHref}
-        className="absolute inset-0 z-10 rounded-[14px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+        className="absolute inset-0 z-10 rounded-2xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
         aria-label={`View ${title || 'property'}`}
       >
         <span className="sr-only">View {title || 'property'}</span>
@@ -130,7 +130,7 @@ function PropertyCard({ property, cardVariant }) {
         <button
           type="button"
           onClick={handleToggleFavorite}
-          className="absolute z-20 top-1.5 right-1.5 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#2563EB]"
+          className="absolute right-1.5 top-1.5 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#C49A6C]"
           aria-label={isLiked ? 'Remove from favourites' : 'Add to favourites'}
         >
           <svg
@@ -157,7 +157,7 @@ function PropertyCard({ property, cardVariant }) {
               <svg className="w-3.5 h-3.5 text-amber-500 fill-current" viewBox="0 0 20 20" aria-hidden="true">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              <span className="text-xs font-bold text-[#222222]">
+              <span className="text-xs font-bold text-[#0B1F42]">
                 {typeof rating === 'number' ? rating.toFixed(1) : rating}
               </span>
               {reviewCount != null && reviewCount > 0 && (
