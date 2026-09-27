@@ -744,7 +744,7 @@ function BookingPage() {
             onChange={(e) => handlePhoneChange(phoneCountryCode, e.target.value.replace(/\D/g, ''))}
             maxLength={15}
             placeholder={COUNTRY_CODES.find((c) => c.code === phoneCountryCode)?.example || ''}
-            className="neu-input min-h-[44px] flex-1 px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] rounded-xl"
+            className="min-h-[44px] flex-1 rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-3 text-[#0B1F42] placeholder-[#5B6B82] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
             required
           />
         </div>
@@ -785,7 +785,7 @@ function BookingPage() {
                     value={g.firstName}
                     onChange={(e) => updateAdditionalGuest(i, 'firstName', e.target.value)}
                     placeholder="First name"
-                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#222222] placeholder-[#6b7280]"
+                    className="min-h-[44px] w-full rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2.5 text-[#0B1F42] placeholder-[#5B6B82] transition-all focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
                   />
                 </div>
                 <div className="flex-1">
@@ -795,7 +795,7 @@ function BookingPage() {
                     value={g.lastName}
                     onChange={(e) => updateAdditionalGuest(i, 'lastName', e.target.value)}
                     placeholder="Last name"
-                    className="neu-input min-h-[44px] w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#222222] placeholder-[#6b7280]"
+                    className="min-h-[44px] w-full rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2.5 text-[#0B1F42] placeholder-[#5B6B82] transition-all focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
                   />
                 </div>
                 <button
@@ -821,7 +821,7 @@ function BookingPage() {
           value={bookingData.specialRequests}
           onChange={handleInputChange}
           placeholder="Any special requirements or requests..."
-          className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#222222] placeholder-[#6b7280] h-24 resize-none"
+          className="h-24 w-full resize-none rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-3 text-[#0B1F42] placeholder-[#5B6B82] transition-all focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
         />
       </div>
 
@@ -1039,7 +1039,7 @@ function BookingPage() {
             value={promoCode}
             onChange={(e) => { setPromoCode(e.target.value); setPromoError(''); }}
             placeholder="Enter code"
-            className="neu-input min-h-[44px] flex-1 px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] uppercase"
+            className="min-h-[44px] flex-1 rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-3 uppercase text-[#0B1F42] placeholder-[#5B6B82] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
             disabled={!!promoResult}
           />
           {promoResult ? (
