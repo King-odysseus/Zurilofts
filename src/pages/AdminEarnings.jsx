@@ -314,7 +314,7 @@ function AdminEarningsDesign({
       label: "Verification Rate",
       value: metrics.confirmationRate ? `${metrics.confirmationRate}%` : "—",
       caption: "Bookings confirmed",
-      color: "#2563EB",
+      color: "#0B1F42",
     },
   ];
   const areaRows = [...filteredRows]
@@ -918,13 +918,13 @@ function AdminEarnings() {
     {
       label: "Active Bookings",
       value: filteredTotals.bookings.toLocaleString(),
-      color: "bg-[#2563EB]",
+      color: "bg-[#0B1F42]",
       sub: `${metrics.confirmationRate}% confirmed (ex. cancelled)`,
     },
     {
       label: "Gross Rent (KES)",
       value: filteredTotals.grossRent.toLocaleString(),
-      color: "bg-[#6b7280]",
+      color: "bg-[#5B6B82]",
       sub: "Subtotal before fees & discounts",
     },
     {
@@ -1213,7 +1213,7 @@ function AdminEarnings() {
         {period !== "all" && (
           <div className="mt-3 pt-3 border-t border-[#E5E7EB] flex items-center gap-2 text-sm text-[#6b7280]">
             <svg
-              className="w-4 h-4 text-[#2563EB]"
+              className="w-4 h-4 text-[#9A744A]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -1306,7 +1306,7 @@ function AdminEarnings() {
                   {value}
                 </p>
                 {hint && (
-                  <p className="text-xs text-[#2563EB] font-medium mt-0.5">
+                  <p className="text-xs text-[#9A744A] font-medium mt-0.5">
                     {hint}
                   </p>
                 )}
@@ -1331,7 +1331,7 @@ function AdminEarnings() {
                   </p>
                 </div>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 hidden lg:block"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 hidden lg:block"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1344,7 +1344,7 @@ function AdminEarnings() {
                   />
                 </svg>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 lg:hidden rotate-90"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 lg:hidden rotate-90"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1366,7 +1366,7 @@ function AdminEarnings() {
                   </p>
                 </div>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 hidden lg:block"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 hidden lg:block"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1379,7 +1379,7 @@ function AdminEarnings() {
                   />
                 </svg>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 lg:hidden rotate-90"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 lg:hidden rotate-90"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1401,7 +1401,7 @@ function AdminEarnings() {
                   </p>
                 </div>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 hidden lg:block"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 hidden lg:block"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1414,7 +1414,7 @@ function AdminEarnings() {
                   />
                 </svg>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 lg:hidden rotate-90"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 lg:hidden rotate-90"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1436,7 +1436,7 @@ function AdminEarnings() {
                   </p>
                 </div>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 hidden lg:block"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 hidden lg:block"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1449,7 +1449,7 @@ function AdminEarnings() {
                   />
                 </svg>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 lg:hidden rotate-90"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 lg:hidden rotate-90"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1471,7 +1471,7 @@ function AdminEarnings() {
                   </p>
                 </div>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 hidden lg:block"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 hidden lg:block"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1484,7 +1484,7 @@ function AdminEarnings() {
                   />
                 </svg>
                 <svg
-                  className="w-4 h-4 text-[#2563EB] flex-shrink-0 lg:hidden rotate-90"
+                  className="w-4 h-4 text-[#9A744A] flex-shrink-0 lg:hidden rotate-90"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1497,7 +1497,7 @@ function AdminEarnings() {
                   />
                 </svg>
                 {/* Take-Home */}
-                <div className="bg-blue-50 rounded-xl p-3 text-center min-w-[120px] flex-1 border-2 border-[#2563EB]">
+                <div className="bg-[#F6EFE7] rounded-[10px] p-3 text-center min-w-[120px] flex-1 border-2 border-[#C49A6C]">
                   <p className="text-xs text-[#222222] uppercase tracking-wide font-bold">
                     Take-Home
                   </p>
@@ -1519,7 +1519,7 @@ function AdminEarnings() {
         <div className="mb-8 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#2563EB]">
+              <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#9A744A]">
                 Monthly view
               </p>
               <h2 className="text-xl font-bold text-[#222222] mt-1">
@@ -1584,7 +1584,7 @@ function AdminEarnings() {
                           <span
                             className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
                               i < 3
-                                ? "bg-[#2563EB] text-white"
+                                ? "bg-[#0B1F42] text-white"
                                 : "bg-[#F7F7F5] text-[#6b7280]"
                             }`}
                           >
@@ -1625,14 +1625,14 @@ function AdminEarnings() {
                     const maxHostNet = hosts[0]?.hostNet || 1;
                     const pct = (h.hostNet / maxHostNet) * 100;
                     const colors = [
-                      "bg-[#2563EB]",
-                      "bg-[#1D4ED8]",
-                      "bg-[#6b7280]",
-                      "bg-blue-400",
-                      "bg-[#222222]",
-                      "bg-[#9ca3af]",
-                      "bg-blue-300",
-                      "bg-[#1D4ED8]/70",
+                      "bg-[#0B1F42]",
+                      "bg-[#9A744A]",
+                      "bg-[#5B6B82]",
+                      "bg-[#C49A6C]",
+                      "bg-[#287A45]",
+                      "bg-[#94A3B8]",
+                      "bg-[#D8B993]",
+                      "bg-[#9A744A]/70",
                     ];
                     return (
                       <div key={h.hostId}>
@@ -1649,7 +1649,7 @@ function AdminEarnings() {
                         </div>
                         <div className="h-2.5 bg-[#F7F7F5] rounded-full overflow-hidden">
                           <div
-                            className={`h-full ${colors[i] || "bg-[#2563EB]"} rounded-full transition-all duration-500`}
+                            className={`h-full ${colors[i] || "bg-[#0B1F42]"} rounded-full transition-all duration-500`}
                             style={{ width: `${Math.max(pct, 3)}%` }}
                           />
                         </div>
@@ -1715,7 +1715,7 @@ function AdminEarnings() {
                           )}
                           <Link
                             to={`/property/${r.id}`}
-                            className="font-semibold text-[#222222] hover:text-[#2563EB]"
+                            className="font-semibold text-[#0B1F42] hover:text-[#9A744A]"
                           >
                             {r.title}
                           </Link>
