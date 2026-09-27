@@ -162,7 +162,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
           {user?.firstName}
         </span>
         <svg
-          className={`w-4 h-4 text-[#222222] transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`w-4 h-4 text-[#0B1F42] transition-transform duration-200 ${open ? "rotate-180" : ""}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -303,9 +303,9 @@ const TONE_STYLES = {
 function StatCardView({ label, value, icon, tone }) {
   const t = TONE_STYLES[tone] || TONE_STYLES.primary;
   return (
-    <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 hover:shadow-md transition-shadow duration-200">
+    <div className="bg-white rounded-[14px] border border-[#E3E8EF] shadow-sm p-5 hover:shadow-md transition-shadow duration-200">
       <div className="flex items-center justify-between mb-3">
-        <span className="text-sm text-[#6b7280]">{label}</span>
+        <span className="text-sm text-[#5B6B82]">{label}</span>
         <div
           className={`w-10 h-10 ${t.bg} rounded-xl flex items-center justify-center`}
         >
@@ -324,7 +324,7 @@ function StatCardView({ label, value, icon, tone }) {
           </svg>
         </div>
       </div>
-      <p className="text-2xl font-bold text-[#222222]">{value}</p>
+      <p className="text-2xl font-bold text-[#0B1F42]">{value}</p>
     </div>
   );
 }
@@ -779,13 +779,13 @@ function AdminLayout() {
           role="dialog"
           aria-label="All sections"
         >
-          <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#E5E7EB]">
-            <h2 className="text-lg font-bold text-[#222222]">
+          <div className="flex items-center justify-between px-5 pt-5 pb-4 border-b border-[#E3E8EF]">
+            <h2 className="text-lg font-bold text-[#0B1F42]">
               {isAdmin ? "Admin Menu" : "Host Menu"}
             </h2>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-2 rounded-full text-[#6b7280] hover:bg-[#F7F7F5] transition-colors"
+              className="p-2 rounded-full text-[#5B6B82] hover:bg-[#F7F4EF] transition-colors"
               aria-label="Close menu"
             >
               <svg
@@ -809,7 +809,7 @@ function AdminLayout() {
           >
             {navGroups.map(({ group, items }) => (
               <div key={group} className="mb-2">
-                <span className="block px-5 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">
+                <span className="block px-5 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">
                   {group}
                 </span>
                 {items.map(({ path, label, icon, exact }) => {
@@ -824,11 +824,11 @@ function AdminLayout() {
                       className={`flex items-center px-5 py-3 text-sm transition-colors ${
                         active
                           ? "bg-[#F6EFE7] text-[#9A744A] font-semibold"
-                          : "text-[#222222] hover:bg-[#F7F7F5]"
+                          : "text-[#0B1F42] hover:bg-[#F7F4EF]"
                       }`}
                     >
                       <svg
-                        className="w-5 h-5 mr-3 text-[#6b7280]"
+                        className="w-5 h-5 mr-3 text-[#5B6B82]"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -847,11 +847,11 @@ function AdminLayout() {
               </div>
             ))}
           </nav>
-          <div className="border-t border-[#E5E7EB] p-3">
+          <div className="border-t border-[#E3E8EF] p-3">
             <Link
               to="/"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F4EF] transition-colors"
             >
               <svg
                 className="w-4 h-4"
@@ -926,7 +926,7 @@ function AdminLayout() {
               onClick={() => {
                 /* just a visual indicator for now */
               }}
-              className="p-2 rounded-full hover:bg-[#F7F7F5] transition-colors text-[#222222]"
+              className="p-2 rounded-full hover:bg-[#F7F4EF] transition-colors text-[#0B1F42]"
               title={`${notif.unreadMessages} unread messages, ${notif.pendingBookings} pending bookings`}
             >
               <svg
@@ -1490,13 +1490,13 @@ function DashboardOverview() {
       </div>
 
       {/* Header panel - retained for operational actions, visually secondary */}
-      <div className="hidden rounded-[14px] border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-6">
+      <div className="hidden rounded-[14px] border border-[#E3E8EF] bg-white p-6 sm:p-8 mb-6">
         <div className="relative flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-[#222222] sm:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-[#0B1F42] sm:text-3xl">
               Needs attention
             </h1>
-            <p className="mt-2 max-w-md text-sm text-[#6b7280]">
+            <p className="mt-2 max-w-md text-sm text-[#5B6B82]">
               Review pending work and resolve issues.
             </p>
           </div>
@@ -1538,7 +1538,7 @@ function DashboardOverview() {
                   aria-haspopup="menu"
                   aria-expanded={quickActionsOpen}
                   onClick={() => setQuickActionsOpen((o) => !o)}
-                  className="inline-flex items-center gap-2 rounded-lg border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm font-semibold text-[#222222] hover:bg-[#F7F7F5] transition-colors"
+                  className="inline-flex items-center gap-2 rounded-lg border border-[#E3E8EF] bg-white px-5 py-2.5 text-sm font-semibold text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors"
                 >
                   <svg
                     className="w-4 h-4"
@@ -1570,7 +1570,7 @@ function DashboardOverview() {
                 </button>
                 {quickActionsOpen && (
                   <div
-                    className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-[14px] border border-[#E5E7EB] bg-white p-1.5 shadow-lg sm:left-auto sm:right-0"
+                    className="absolute left-0 top-full z-50 mt-2 w-56 animate-fade-in rounded-[14px] border border-[#E3E8EF] bg-white p-1.5 shadow-lg sm:left-auto sm:right-0"
                     role="menu"
                   >
                     {quickLinks.map((link) => (
@@ -1582,7 +1582,7 @@ function DashboardOverview() {
                           setQuickActionsOpen(false);
                           navigate(link.to);
                         }}
-                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] transition-colors"
+                        className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#5B6B82] hover:bg-[#F7F4EF] hover:text-[#0B1F42] transition-colors"
                       >
                         <svg
                           className="w-4 h-4 text-[#9A744A]"
@@ -1632,11 +1632,11 @@ function DashboardOverview() {
 
       {/* Landing Page Stats Editor - admin only */}
       {isAdmin && (
-        <div className="hidden bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 mb-6">
-          <h2 className="text-lg font-bold text-[#222222] mb-2">
+        <div className="hidden bg-white rounded-[14px] border border-[#E3E8EF] shadow-sm p-6 mb-6">
+          <h2 className="text-lg font-bold text-[#0B1F42] mb-2">
             Landing Page Stats
           </h2>
-          <p className="text-sm text-[#6b7280] mb-4">
+          <p className="text-sm text-[#5B6B82] mb-4">
             These appear in the hero section. Set to 0 to use live data from
             reviews and bookings.
           </p>
@@ -1645,7 +1645,7 @@ function DashboardOverview() {
             className="flex flex-wrap items-end gap-4"
           >
             <div>
-              <label className="block text-sm font-medium text-[#222222] mb-1">
+              <label className="block text-sm font-medium text-[#0B1F42] mb-1">
                 Happy Stays
               </label>
               <input
@@ -1662,7 +1662,7 @@ function DashboardOverview() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#222222] mb-1">
+              <label className="block text-sm font-medium text-[#0B1F42] mb-1">
                 Star Rating
               </label>
               <input
@@ -1681,7 +1681,7 @@ function DashboardOverview() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#222222] mb-1">
+              <label className="block text-sm font-medium text-[#0B1F42] mb-1">
                 Satisfaction %
               </label>
               <input
@@ -1715,11 +1715,11 @@ function DashboardOverview() {
       )}
 
       {/* Review queue - tabbed compact table */}
-      <div className="hidden bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
+        <div className="hidden bg-white rounded-[14px] border border-[#E3E8EF] shadow-sm p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
-          <h2 className="text-lg font-bold text-[#222222]">Review queue</h2>
+          <h2 className="text-lg font-bold text-[#0B1F42]">Review queue</h2>
           <div
-            className="inline-flex flex-wrap gap-1 rounded-lg border border-[#E5E7EB] p-1"
+            className="inline-flex flex-wrap gap-1 rounded-lg border border-[#E3E8EF] p-1"
             role="tablist"
             aria-label="Filter review queue"
           >
@@ -1733,7 +1733,7 @@ function DashboardOverview() {
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeTab === tab
                     ? "bg-[#0B1F42] text-white"
-                    : "text-[#6b7280] hover:bg-[#F7F7F5]"
+                    : "text-[#5B6B82] hover:bg-[#F7F4EF]"
                 }`}
               >
                 {tab}
@@ -1742,20 +1742,20 @@ function DashboardOverview() {
           </div>
         </div>
         {reviewRows.length === 0 ? (
-          <p className="text-[#6b7280] text-sm py-8 text-center">
+          <p className="text-[#5B6B82] text-sm py-8 text-center">
             Nothing needs attention.
           </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left border-b border-[#E5E7EB]">
-                  <th className="pb-3 font-semibold text-[#222222]">Item</th>
-                  <th className="pb-3 font-semibold text-[#222222]">Status</th>
-                  <th className="pb-3 font-semibold text-[#222222] hidden sm:table-cell">
+                <tr className="text-left border-b border-[#E3E8EF]">
+                  <th className="pb-3 font-semibold text-[#0B1F42]">Item</th>
+                  <th className="pb-3 font-semibold text-[#0B1F42]">Status</th>
+                  <th className="pb-3 font-semibold text-[#0B1F42] hidden sm:table-cell">
                     Updated
                   </th>
-                  <th className="pb-3 font-semibold text-[#222222] text-right">
+                  <th className="pb-3 font-semibold text-[#0B1F42] text-right">
                     Action
                   </th>
                 </tr>
