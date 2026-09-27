@@ -1057,7 +1057,7 @@ function AdminEarnings() {
         </div>
         <div className="flex items-center gap-2">
           {isAdmin && (
-            <div className="flex items-center bg-[#F7F7F5] rounded-full p-0.5 border border-[#E5E7EB]">
+            <div className="flex items-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF] p-0.5">
               <button
                 type="button"
                 onClick={() => setViewMode("all")}
@@ -1211,7 +1211,7 @@ function AdminEarnings() {
         </div>
 
         {period !== "all" && (
-          <div className="mt-3 pt-3 border-t border-[#E5E7EB] flex items-center gap-2 text-sm text-[#6b7280]">
+          <div className="mt-3 flex items-center gap-2 border-t border-[#E3E8EF] pt-3 text-sm text-[#5B6B82]">
             <svg
               className="w-4 h-4 text-[#9A744A]"
               fill="none"
@@ -1234,7 +1234,7 @@ function AdminEarnings() {
       </div>
 
       <div
-        className="flex gap-1 border-b border-[#E5E7EB] mb-6"
+        className="mb-6 flex gap-1 border-b border-[#E3E8EF]"
         role="tablist"
         aria-label="Earnings views"
       >
@@ -1294,7 +1294,7 @@ function AdminEarnings() {
             {insights.map(({ label, value, hint }) => (
               <div
                 key={label}
-                className="bg-[#F7F7F5] rounded-xl border border-[#E5E7EB] px-4 py-3"
+                className="rounded-xl border border-[#E3E8EF] bg-[#F7F4EF] px-4 py-3"
               >
                 <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-1">
                   {label}
@@ -1322,7 +1322,7 @@ function AdminEarnings() {
               </h2>
               <div className="flex flex-col lg:flex-row items-center gap-3 text-sm">
                 {/* Gross Rent */}
-                <div className="bg-[#F7F7F5] rounded-xl p-3 text-center min-w-[120px] flex-1">
+                <div className="min-w-[120px] flex-1 rounded-xl bg-[#F7F4EF] p-3 text-center">
                   <p className="text-xs text-[#6b7280] uppercase tracking-wide">
                     Gross Rent
                   </p>
@@ -1578,14 +1578,14 @@ function AdminEarnings() {
                     {hosts.slice(0, 10).map((h, i) => (
                       <tr
                         key={h.hostId}
-                        className="border-b border-[#E5E7EB] hover:bg-[#F7F7F5]"
+                        className="border-b border-[#E3E8EF] hover:bg-[#F7F4EF]"
                       >
                         <td className="py-2.5">
                           <span
                             className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs font-bold ${
                               i < 3
                                 ? "bg-[#0B1F42] text-white"
-                                : "bg-[#F7F7F5] text-[#6b7280]"
+                                : "bg-[#F7F4EF] text-[#5B6B82]"
                             }`}
                           >
                             {i + 1}
@@ -1647,7 +1647,7 @@ function AdminEarnings() {
                             KES {h.hostNet.toLocaleString()}
                           </span>
                         </div>
-                        <div className="h-2.5 bg-[#F7F7F5] rounded-full overflow-hidden">
+                        <div className="h-2.5 overflow-hidden rounded-full bg-[#F7F4EF]">
                           <div
                             className={`h-full ${colors[i] || "bg-[#0B1F42]"} rounded-full transition-all duration-500`}
                             style={{ width: `${Math.max(pct, 3)}%` }}
@@ -1671,7 +1671,7 @@ function AdminEarnings() {
           <div className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB]">
+                <thead className="border-b border-[#E3E8EF] bg-[#F7F4EF]">
                   <tr>
                     <th className="text-left py-3 px-4 font-semibold text-[#222222] whitespace-nowrap">
                       Property
@@ -1700,7 +1700,7 @@ function AdminEarnings() {
                   {earningRows.map((r) => (
                     <tr
                       key={r.id}
-                      className="border-b border-[#E5E7EB] hover:bg-[#F7F7F5]"
+                      className="border-b border-[#E3E8EF] hover:bg-[#F7F4EF]"
                     >
                       <td className="py-3 px-4">
                         <div className="flex items-center space-x-3">
@@ -1742,7 +1742,7 @@ function AdminEarnings() {
                 </tbody>
                 {earningRows.length > 0 && (
                   <tfoot>
-                    <tr className="border-t-2 border-[#E5E7EB] bg-[#F7F7F5] font-bold text-[#222222]">
+                    <tr className="border-t-2 border-[#E3E8EF] bg-[#F7F4EF] font-bold text-[#0B1F42]">
                       <td className="py-3 px-4" colSpan={2}>
                         Active Totals (ex. cancelled)
                       </td>

@@ -244,7 +244,7 @@ function OnboardingChecklist({ hostApplicationStatus, properties, role }) {
           <li
             key={step.key}
             className={`flex items-start gap-3 rounded-xl p-3 border transition-colors ${
-              step.done ? 'bg-[#F7F7F5] border-transparent' : 'bg-white border-[#E3E8EF]'
+              step.done ? 'bg-[#F7F4EF] border-transparent' : 'bg-white border-[#E3E8EF]'
             }`}
           >
             <div
@@ -290,7 +290,7 @@ OnboardingChecklist.propTypes = {
 function EmptyPanel({ label, icon }) {
   return (
     <div className="text-center py-12 px-4 bg-white rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.06)]">
-      <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center">
+      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF]">
         <svg className="w-6 h-6 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {icon}
         </svg>
@@ -341,7 +341,7 @@ function ArrivalRow({ booking }) {
     <li className="flex items-center gap-3 px-5 py-3">
       <Link
         to={`/property/${p.id}`}
-        className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-[#F7F7F5] border border-[#E5E7EB]"
+        className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl border border-[#E3E8EF] bg-[#F7F4EF]"
       >
         {image ? (
           <img src={image} alt={p.title} className="w-full h-full object-cover" />
@@ -372,7 +372,7 @@ function ArrivalRow({ booking }) {
 
       <Link
         to={`/messages?booking=${booking.id}`}
-        className="flex-shrink-0 inline-flex items-center justify-center min-h-[40px] px-3 rounded-[10px] text-xs font-semibold bg-white text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F7F5] transition-all duration-200"
+        className="inline-flex min-h-[40px] flex-shrink-0 items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white px-3 text-xs font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
       >
         Message
       </Link>
@@ -413,7 +413,7 @@ function ArrivingTodayCard({ arrivals }) {
 
       {arrivals.length === 0 ? (
         <div className="text-center py-12 px-4">
-          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF]">
             <svg className="w-6 h-6 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
@@ -501,7 +501,7 @@ function NextStepCard({ hostApplicationStatus, properties, role }) {
   }
 
   return (
-    <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm overflow-hidden flex flex-col">
+    <section className="flex flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
       {step.image && (
         <img
           src={step.image}
@@ -535,14 +535,14 @@ NextStepCard.propTypes = {
 function RecentMessagesPanel({ conversations, loading }) {
   if (loading) {
     return (
-      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 flex items-center justify-center py-10">
+      <div className="flex items-center justify-center rounded-2xl border border-[#E3E8EF] bg-white p-6 py-10 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
         <Spinner />
       </div>
     );
   }
 
   return (
-    <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
+    <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-[#222222] flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-[#C49A6C]" />
@@ -558,7 +558,7 @@ function RecentMessagesPanel({ conversations, loading }) {
 
       {conversations.length === 0 ? (
         <div className="text-center py-10 px-4">
-          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF]">
             <svg className="w-6 h-6 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
@@ -582,7 +582,7 @@ function RecentMessagesPanel({ conversations, loading }) {
                   to={`/inbox/${c.id}`}
                   className="flex items-center gap-3 py-3 min-h-[44px] group"
                 >
-                  <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 bg-[#F7F7F5] border border-[#E5E7EB]">
+                  <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-[#E3E8EF] bg-[#F7F4EF]">
                     {image ? (
                       <img src={image} alt={property.title} className="w-full h-full object-cover" />
                     ) : (
