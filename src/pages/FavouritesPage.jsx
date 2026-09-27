@@ -52,25 +52,25 @@ function FavouritesPage() {
         <Navbar />
         <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
           <div className="max-w-md mx-auto px-6 text-center">
-            <div className="w-20 h-20 bg-[#2563EB]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDE8D8]">
+              <svg className="h-10 w-10 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-[#222222] mb-2">Sign in to save favourites</h1>
-            <p className="text-sm text-[#6b7280] mb-8">
+            <h1 className="mb-2 text-2xl font-bold text-[#0B1F42]">Sign in to save favourites</h1>
+            <p className="mb-8 text-sm text-[#5B6B82]">
               Create an account or sign in to save your favourite properties and access them anytime.
             </p>
             <div className="space-y-3">
               <Link
                 to="/login?returnUrl=/favourites"
-                className="inline-flex items-center justify-center w-full min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                className="inline-flex min-h-[44px] w-full items-center justify-center rounded-[10px] bg-[#0B1F42] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
               >
                 Sign In
               </Link>
               <Link
                 to="/register"
-                className="inline-flex items-center justify-center w-full min-h-[44px] bg-white border border-[#E5E7EB] text-[#222222] px-6 py-2.5 rounded-lg font-semibold hover:bg-[#F7F7F5] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                className="inline-flex min-h-[44px] w-full items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white px-6 py-2.5 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
               >
                 Create Account
               </Link>
@@ -147,13 +147,13 @@ function FavouritesPage() {
     <div className="min-h-screen bg-[#F7F7F5]">
       <Navbar />
       <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
-            <h1 className="text-2xl font-bold text-[#222222] mb-2">
+            <h1 className="mb-2 text-2xl font-bold text-[#0B1F42]">
               {sharedIds ? 'Shared Wishlist' : 'My Favourites'}
             </h1>
-            <p className="text-sm text-[#6b7280]">
-              <span className="font-semibold text-[#222222]">{displayProperties.length}</span>{' '}
+            <p className="text-sm text-[#5B6B82]">
+              <span className="font-semibold text-[#0B1F42]">{displayProperties.length}</span>{' '}
               propert{displayProperties.length !== 1 ? 'ies' : 'y'} saved
             </p>
           </div>
@@ -161,7 +161,7 @@ function FavouritesPage() {
             <button
               type="button"
               onClick={handleShare}
-              className="inline-flex items-center justify-center gap-2 min-h-[44px] bg-white border border-[#E5E7EB] text-[#222222] px-6 py-2.5 rounded-lg font-semibold hover:bg-[#F7F7F5] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] border border-[#E3E8EF] bg-white px-6 py-2.5 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
             >
               {copied ? (
                 <>
@@ -184,8 +184,8 @@ function FavouritesPage() {
 
         {!sharedIds && (
           <div className="mb-6 flex items-center gap-5 border-b border-[#E5E7EB]" role="tablist" aria-label="Saved stays">
-            <Link to="/favourites" role="tab" aria-selected="true" className="border-b-2 border-[#2563EB] px-1 pb-3 text-sm font-semibold text-[#2563EB]">All saved ({favorites.length})</Link>
-            <Link to="/shortlists" role="tab" aria-selected="false" className="border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-[#6b7280] hover:text-[#222222]">My lists</Link>
+            <Link to="/favourites" role="tab" aria-selected="true" className="border-b-2 border-[#C49A6C] px-1 pb-3 text-sm font-semibold text-[#0B1F42]">All saved ({favorites.length})</Link>
+            <Link to="/shortlists" role="tab" aria-selected="false" className="border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-[#5B6B82] hover:text-[#0B1F42]">My lists</Link>
           </div>
         )}
 
