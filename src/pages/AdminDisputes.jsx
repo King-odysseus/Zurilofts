@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import apiClient from '../api/client.js';
 
 const STATUS_STYLES = {
-  OPEN: 'bg-amber-100 text-amber-800', UNDER_REVIEW: 'bg-blue-100 text-blue-800',
-  RESOLVED: 'bg-green-100 text-green-700', DISMISSED: 'bg-gray-100 text-gray-700',
+  OPEN: 'bg-[#FDE8D8] text-[#9A4A1D]', UNDER_REVIEW: 'bg-[#EAF0F4] text-[#52606F]',
+  RESOLVED: 'bg-[#E8F4EC] text-[#287A45]', DISMISSED: 'bg-[#EAF0F4] text-[#52606F]',
 };
 
 const CATEGORY_LABELS = {
@@ -85,12 +85,13 @@ function AdminDisputes() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#222222]">Disputes</h1>
-          <p className="text-sm text-[#6b7280] mt-1">Booking-linked disputes between guests and hosts.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Trust &amp; safety</p>
+          <h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">Disputes</h1>
+          <p className="mt-1 text-sm text-[#52606F]">Booking-linked disputes between guests and hosts.</p>
         </div>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className="min-h-[44px] rounded-xl border border-[#E5E7EB] bg-white px-5 py-2.5 text-sm focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20">
+        <select value={status} onChange={(e) => setStatus(e.target.value)} className="h-12 rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40">
           <option value="">All statuses</option>
           <option value="OPEN">Open</option>
           <option value="UNDER_REVIEW">Under review</option>
@@ -104,7 +105,7 @@ function AdminDisputes() {
           ['Open', rows.filter((row) => row.status === 'OPEN').length],
           ['Under review', rows.filter((row) => row.status === 'UNDER_REVIEW').length],
           ['Resolved', rows.filter((row) => row.status === 'RESOLVED').length],
-        ].map(([label, value]) => <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p></div>)}
+        ].map(([label, value]) => <div key={label} className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#52606F]">{label}</p><p className="mt-2 text-2xl font-bold text-[#0B1F42]">{value}</p></div>)}
       </div>
       {message && <div className="rounded-[14px] bg-[#222222]/5 px-4 py-3 text-sm text-[#222222]">{message}</div>}
       {loading ? (
@@ -112,7 +113,7 @@ function AdminDisputes() {
       ) : rows.length === 0 ? (
         <div className="rounded-[14px] shadow-sm bg-white p-12 text-center text-[#6b7280]">No disputes in this view.</div>
       ) : (
-        <div className="overflow-x-auto rounded-[14px] bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-[#E5E7EB] text-left"><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Booking</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Raised by</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Category</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]"></th></tr></thead>
             <tbody>
@@ -122,7 +123,7 @@ function AdminDisputes() {
                   <td className="p-4">{d.raisedByRole}</td>
                   <td className="p-4">{CATEGORY_LABELS[d.category] || d.category}</td>
                   <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[d.status]}`}>{d.status.replaceAll('_', ' ')}</span></td>
-                  <td className="p-4"><button onClick={() => open(d.id)} disabled={busy === d.id} className="rounded-lg shadow-sm hover:shadow-md transition-shadow px-4 py-2 text-xs font-semibold text-[#2563EB] hover:bg-[#2563EB] hover:text-white disabled:opacity-50">Review</button></td>
+                  <td className="p-4"><button onClick={() => open(d.id)} disabled={busy === d.id} className="rounded-lg bg-[#0B1F42] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#07072E] disabled:opacity-50">Review</button></td>
                 </tr>
               ))}
             </tbody>
@@ -136,13 +137,13 @@ function AdminDisputes() {
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E5E7EB] bg-white px-6 py-5">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Dispute review</p>
-                <h2 className="mt-1 text-xl font-bold text-[#222222]">{CATEGORY_LABELS[selected.category] || selected.category}</h2>
+                <h2 className="mt-1 text-xl font-bold text-[#0B1F42]">{CATEGORY_LABELS[selected.category] || selected.category}</h2>
                 <p className="text-sm text-[#6b7280]">Booking {selected.bookingId}</p>
               </div>
               <button onClick={() => setSelected(null)} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close dispute review">&times;</button>
             </div>
             <div className="space-y-6 p-6">
-              <p className="rounded-[14px] bg-canvas p-4 text-sm text-[#222222] whitespace-pre-wrap">{selected.description}</p>
+              <p className="rounded-2xl bg-[#F7F4EF] p-4 text-sm text-[#0B1F42] whitespace-pre-wrap">{selected.description}</p>
 
               <div>
                 <h3 className="font-bold text-[#222222] mb-2">Evidence</h3>
