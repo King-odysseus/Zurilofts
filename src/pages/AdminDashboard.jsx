@@ -1319,7 +1319,7 @@ function DashboardOverview() {
                   : "—"}
               </p>
             </div>
-            <label className="relative inline-flex items-center rounded-lg border border-[#E3E8EF] bg-[#F8FAFC] text-xs text-[#5B6B82] focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/15">
+            <label className="relative inline-flex items-center rounded-lg border border-[#E3E8EF] bg-[#F7F4EF] text-xs text-[#5B6B82] focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/15">
               <span className="sr-only">Revenue period</span>
               <select
                 aria-label="Revenue period"
@@ -1360,13 +1360,13 @@ function DashboardOverview() {
             Occupied nights
           </p>
           <div className="mt-5 grid grid-cols-2 gap-3">
-            <div className="rounded-xl bg-[#F8FAFC] p-3">
+            <div className="rounded-xl bg-[#F7F4EF] p-3">
               <p className="text-[11px] text-[#94A3B8]">Booked nights</p>
               <p className="mt-1 text-lg font-bold text-[#0B1F42]">
                 {stats.bookedNights ?? "—"}
               </p>
             </div>
-            <div className="rounded-xl bg-[#F8FAFC] p-3">
+            <div className="rounded-xl bg-[#F7F4EF] p-3">
               <p className="text-[11px] text-[#94A3B8]">Available</p>
               <p className="mt-1 text-lg font-bold text-[#0B1F42]">
                 {stats.availableNights ?? "—"}
@@ -1464,7 +1464,7 @@ function DashboardOverview() {
                 key={item.id}
                 type="button"
                 onClick={() => navigate(item.to)}
-                className="flex w-full items-center justify-between gap-3 rounded-xl bg-[#F8FAFC] p-3 text-left hover:bg-[#F1F5F9]"
+                className="flex w-full items-center justify-between gap-3 rounded-xl bg-[#F7F4EF] p-3 text-left hover:bg-[#EEF2F7]"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-sm font-semibold text-[#0B1F42]">
