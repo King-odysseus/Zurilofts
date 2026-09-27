@@ -1316,7 +1316,7 @@ function AdminEarnings() {
 
           {/* Earnings Flow visualization (only when we have fee data) */}
           {!loading && filteredTotals.grossRent > 0 && (
-            <div className="mb-4 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+            <div className="mb-4 rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
               <h2 className="text-sm font-bold text-[#222222] mb-4">
                 Earnings Flow - How Your Money Moves
               </h2>
@@ -1516,7 +1516,7 @@ function AdminEarnings() {
       )}
 
       {activeTab === "performance" && !loading && (
-        <div className="mb-8 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm sm:p-7">
+        <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] sm:p-7">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#9A744A]">
@@ -1546,7 +1546,7 @@ function AdminEarnings() {
         hosts.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
             {/* Top Hosts Table */}
-            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+            <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
               <h2 className="text-sm font-bold text-[#222222] mb-4">
                 Top Hosts by Earnings
               </h2>
