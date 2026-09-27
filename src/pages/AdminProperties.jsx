@@ -10,19 +10,19 @@ import apiClient from "../api/client.js";
 import Dropdown from "../components/Dropdown.jsx";
 
 const LISTING_STATUS_STYLES = {
-  DRAFT: "bg-gray-50 text-gray-600 border-gray-200",
-  PENDING_REVIEW: "bg-amber-50 text-amber-700 border-amber-200",
-  PUBLISHED: "bg-green-50 text-green-700 border-green-200",
-  REJECTED: "bg-red-50 text-red-700 border-red-200",
-  SUSPENDED: "bg-red-50 text-red-700 border-red-200",
+  DRAFT: "bg-[#EAF0F4] text-[#52606F] border-[#D7E0E8]",
+  PENDING_REVIEW: "bg-[#FDE8D8] text-[#9A4A1D] border-[#EBC7AD]",
+  PUBLISHED: "bg-[#E8F4EC] text-[#287A45] border-[#B9DEC4]",
+  REJECTED: "bg-[#FDECEC] text-[#B42318] border-[#F1C9C9]",
+  SUSPENDED: "bg-[#FDECEC] text-[#B42318] border-[#F1C9C9]",
 };
 
 const LISTING_STATUS_DOTS = {
-  DRAFT: "bg-gray-400",
-  PENDING_REVIEW: "bg-amber-500",
-  PUBLISHED: "bg-green-500",
-  REJECTED: "bg-red-500",
-  SUSPENDED: "bg-red-500",
+  DRAFT: "bg-[#94A3B8]",
+  PENDING_REVIEW: "bg-[#C49A6C]",
+  PUBLISHED: "bg-[#287A45]",
+  REJECTED: "bg-[#B42318]",
+  SUSPENDED: "bg-[#B42318]",
 };
 
 const LISTING_STATUS_LABELS = {
@@ -97,7 +97,7 @@ function TableStatusPill({ property }) {
 
   return (
     <span
-      className={`inline-flex min-w-[124px] items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium ${styles[status]}`}
+      className={`inline-flex w-fit items-center gap-2 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium ${styles[status]}`}
     >
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {labels[status]}
@@ -332,11 +332,11 @@ function AdminProperties() {
   }
 
   const secondaryBtn =
-    "inline-flex items-center justify-center gap-1.5 min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center gap-1.5 min-h-[32px] rounded-[10px] border border-[#E3E8EF] px-3 py-1.5 text-xs font-semibold text-[#0B1F42] transition-all hover:bg-[#F7F4EF] disabled:cursor-not-allowed disabled:opacity-50";
   const successBtn =
-    "inline-flex items-center justify-center gap-1.5 min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-semibold bg-green-600 text-white hover:bg-green-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center gap-1.5 min-h-[32px] rounded-[10px] bg-[#0B1F42] px-3 py-1.5 text-xs font-semibold text-white transition-all hover:bg-[#07072E] disabled:cursor-not-allowed disabled:opacity-50";
   const dangerBtn =
-    "inline-flex items-center justify-center gap-1.5 min-h-[32px] px-3 py-1.5 rounded-lg text-xs font-semibold border border-red-200 text-red-600 hover:bg-red-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed";
+    "inline-flex items-center justify-center gap-1.5 min-h-[32px] rounded-[10px] border border-[#F1C9C9] px-3 py-1.5 text-xs font-semibold text-[#B42318] transition-all hover:bg-[#FDECEC] disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
     <div>
@@ -432,7 +432,7 @@ function AdminProperties() {
           </div>
           <Link
             to={`${base}/properties/new`}
-            className="inline-flex items-center justify-center gap-2 min-h-[44px] px-5 rounded-lg bg-[#C49A6C] text-white font-semibold text-sm hover:bg-[#B8895C] transition-all active:translate-y-px"
+            className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] bg-[#0B1F42] px-5 text-sm font-semibold text-white transition-all hover:bg-[#07072E] active:translate-y-px"
           >
             {isAdminView ? "+ Add Property" : "+ Add listing"}
           </Link>
@@ -539,7 +539,7 @@ function AdminProperties() {
               role="tab"
               aria-selected={statusFilter === value}
               onClick={() => setStatusFilter(value)}
-              className={`rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${statusFilter === value ? "border-b-2 border-[#2563EB] text-[#2563EB]" : "text-[#6b7280] hover:text-[#222222]"}`}
+              className={`rounded-[10px] px-3 py-2 text-sm font-semibold transition-colors ${statusFilter === value ? "border-b-2 border-[#C49A6C] text-[#0B1F42]" : "text-[#5B6B82] hover:text-[#0B1F42]"}`}
             >
               {label}
             </button>
