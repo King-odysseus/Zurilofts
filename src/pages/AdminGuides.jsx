@@ -108,7 +108,7 @@ function AdminGuides() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-semibold text-[#222222] mb-1">Slug</label>
+                <label className="block text-sm font-semibold text-[#0B1F42] mb-1">Slug</label>
                 <input
                   type="text"
                   value={form.slug}
@@ -117,7 +117,7 @@ function AdminGuides() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#222222] mb-1">Cover Image URL</label>
+                <label className="block text-sm font-semibold text-[#0B1F42] mb-1">Cover Image URL</label>
                 <input
                   type="text"
                   value={form.coverImage}
@@ -128,7 +128,7 @@ function AdminGuides() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#222222] mb-1">Excerpt</label>
+              <label className="block text-sm font-semibold text-[#0B1F42] mb-1">Excerpt</label>
               <input
                 type="text"
                 value={form.excerpt}
@@ -137,7 +137,7 @@ function AdminGuides() {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#222222] mb-1">Body (HTML)</label>
+              <label className="block text-sm font-semibold text-[#0B1F42] mb-1">Body (HTML)</label>
               <textarea
                 value={form.body}
                 onChange={(e) => setForm({ ...form, body: e.target.value })}
@@ -177,15 +177,15 @@ function AdminGuides() {
         <table className="w-full text-sm">
           <thead className="bg-[#F7F4EF] text-left">
             <tr>
-              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Title</th>
-              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hidden md:table-cell">Status</th>
-              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hidden md:table-cell">Date</th>
-              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] text-right">Actions</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Title</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82] hidden md:table-cell">Status</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82] hidden md:table-cell">Date</th>
+              <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82] text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#E5E7EB]">
+          <tbody className="divide-y divide-[#E3E8EF]">
             {posts.length === 0 && (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-[#6b7280]">No guides yet. Create your first one.</td></tr>
+              <tr><td colSpan={4} className="px-4 py-8 text-center text-[#5B6B82]">No guides yet. Create your first one.</td></tr>
             )}
             {posts.map((p) => (
                 <tr key={p.id} className="transition-colors hover:bg-[#F7F4EF]">

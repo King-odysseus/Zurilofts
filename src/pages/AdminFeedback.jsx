@@ -83,17 +83,17 @@ function AdminFeedback() {
             <table className="w-full text-sm">
               <thead className="bg-[#F7F4EF]">
                 <tr className="text-left">
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Property</th>
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Guest</th>
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Rating</th>
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Public review</th>
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Private note</th>
-                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Date</th>
+                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Property</th>
+                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Guest</th>
+                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Rating</th>
+                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Public review</th>
+                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Private note</th>
+                  <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {reviews.map((r) => (
-                  <tr key={r.id} className="border-t border-[#E5E7EB] align-top hover:bg-[#F7F4EF]">
+                  <tr key={r.id} className="border-t border-[#E3E8EF] align-top hover:bg-[#F7F4EF]">
                     <td className="px-4 py-3">
                       <p className="font-medium text-[#0B1F42]">{r.property?.title}</p>
                       <p className="text-xs text-[#5B6B82]">{r.property?.location}</p>

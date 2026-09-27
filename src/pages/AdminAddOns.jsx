@@ -257,9 +257,9 @@ function AdminAddOns() {
               {editingId && (
                 <div>
                   <label className="mb-2 block text-sm font-semibold text-[#0B1F42]">Assigned to Properties</label>
-                  <div className="shadow-sm rounded-xl p-3 max-h-40 overflow-y-auto">
+                  <div className="shadow-[0_8px_28px_rgba(11,31,66,0.06)] rounded-[10px] p-3 max-h-40 overflow-y-auto">
                     {properties.length === 0 ? (
-                      <p className="text-xs text-[#6b7280]">No properties available.</p>
+                      <p className="text-xs text-[#5B6B82]">No properties available.</p>
                     ) : (
                       properties.map((prop) => {
                         const assigned = (assignments[editingId] || new Set()).has(prop.id);
@@ -278,7 +278,7 @@ function AdminAddOns() {
                       })
                     )}
                   </div>
-                  <p className="text-xs text-[#6b7280] mt-1">Assign this add-on to the properties that should offer it.</p>
+                  <p className="text-xs text-[#5B6B82] mt-1">Assign this add-on to the properties that should offer it.</p>
                 </div>
               )}
 
@@ -304,14 +304,14 @@ function AdminAddOns() {
         <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-[#E5E7EB] bg-[#F7F4EF]">
+              <thead className="border-b border-[#E3E8EF] bg-[#F7F4EF]">
                 <tr>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Name</th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Category</th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Price</th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Properties</th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th>
-                  <th className="text-right py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Actions</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Name</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Category</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Price</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Properties</th>
+                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Status</th>
+                  <th className="text-right py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -366,7 +366,7 @@ function AdminAddOns() {
             </table>
           </div>
           {addOns.length === 0 && (
-            <div className="text-center py-12 text-[#6b7280]">No add-ons yet. Create your first!</div>
+            <div className="text-center py-12 text-[#5B6B82]">No add-ons yet. Create your first!</div>
           )}
         </div>
       )}
