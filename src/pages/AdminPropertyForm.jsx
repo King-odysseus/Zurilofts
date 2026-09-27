@@ -190,14 +190,14 @@ function AdminPropertyForm() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
       </div>
     );
   }
 
   return (
     <div className="w-full">
-      <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:flex-row sm:items-center sm:px-6">
+      <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:flex-row sm:items-center sm:px-6">
         <div>
           <Link to={`${base}/properties`} className="text-sm font-semibold text-[#52606F] transition-colors hover:text-[#C49A6C]">&larr; Back to properties</Link>
           <h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
@@ -238,7 +238,7 @@ function AdminPropertyForm() {
           ['Basics', '#listing-basics'], ['Photos', '#listing-photos'], ['Location', '#listing-location'],
           ['Amenities', '#listing-amenities'], ['Pricing', '#listing-pricing'], ['Review', '#listing-review'],
         ].map(([label, href], index) => (
-          <a key={label} href={href} className="flex min-h-[44px] items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 shadow-sm hover:border-[#C49A6C]">
+          <a key={label} href={href} className="flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] bg-white px-3 py-2 shadow-sm hover:border-[#C49A6C]">
             <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#FDE8D8] text-xs font-bold text-[#9A4A1D]">{index + 1}</span>
             <span className="text-xs font-semibold text-[#0B1F42] sm:text-sm">{label}</span>
           </a>
@@ -251,8 +251,8 @@ function AdminPropertyForm() {
         </div>
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
           {[['Title and location', Boolean(form.title && form.location)], ['Pricing and capacity', Boolean(form.price && form.bedrooms !== '' && form.bathrooms !== '')], ['Photos and description', Boolean((form.images || []).length && form.description)]].map(([label, complete]) => (
-            <div key={label} className="flex items-center gap-2 text-xs font-medium text-[#6b7280]">
-              <span className={`flex h-5 w-5 items-center justify-center rounded-full ${complete ? 'bg-green-100 text-green-700' : 'bg-[#F7F7F5] text-[#6b7280]'}`}>{complete ? '✓' : '·'}</span>
+            <div key={label} className="flex items-center gap-2 text-xs font-medium text-[#5B6B82]">
+              <span className={`flex h-5 w-5 items-center justify-center rounded-full ${complete ? 'bg-[#E8F4EC] text-[#287A45]' : 'bg-[#F7F4EF] text-[#5B6B82]'}`}>{complete ? '✓' : '·'}</span>
               {label}
             </div>
           ))}
@@ -260,7 +260,7 @@ function AdminPropertyForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div id="listing-basics" className="scroll-mt-24 space-y-5 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+        <div id="listing-basics" className="scroll-mt-24 space-y-5 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
           <div>
             <label className={labelCls}>Title</label>
             <input className={inputCls} value={form.title} onChange={(e) => update('title', e.target.value)} required />
@@ -305,13 +305,13 @@ function AdminPropertyForm() {
 
           {/* Bed variant pricing */}
           <div id="listing-pricing" className="scroll-mt-24 bg-canvas rounded-xl p-4 space-y-4">
-            <p className="text-sm font-semibold text-[#222222]">Bed Variant Pricing &amp; Bathrooms</p>
-            <p className="text-xs text-[#6b7280] -mt-3">Each variant can have its own price and bathroom count. Leave unchecked to not list.</p>
+            <p className="text-sm font-semibold text-[#0B1F42]">Bed Variant Pricing &amp; Bathrooms</p>
+            <p className="-mt-3 text-xs text-[#5B6B82]">Each variant can have its own price and bathroom count. Leave unchecked to not list.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#2563EB]/20 transition-all duration-200">
                 <input
                   type="checkbox"
-                  className="accent-[#2563EB] w-5 h-5 mt-0.5 flex-shrink-0"
+                  className="mt-0.5 h-5 w-5 flex-shrink-0 accent-[#C49A6C]"
                   checked={form.price1Bed !== ''}
                   onChange={(e) => {
                     update('price1Bed', e.target.checked ? (form.price || '') : '');
@@ -347,7 +347,7 @@ function AdminPropertyForm() {
               <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#2563EB]/20 transition-all duration-200">
                 <input
                   type="checkbox"
-                  className="accent-[#2563EB] w-5 h-5 mt-0.5 flex-shrink-0"
+                  className="mt-0.5 h-5 w-5 flex-shrink-0 accent-[#C49A6C]"
                   checked={form.price2Bed !== ''}
                   onChange={(e) => {
                     update('price2Bed', e.target.checked ? (form.price || '') : '');
@@ -399,11 +399,11 @@ function AdminPropertyForm() {
             </div>
             <div className="flex items-end gap-6 pb-2">
               <label className="flex items-center gap-2 text-sm font-medium text-[#222222]">
-                <input type="checkbox" checked={form.available} onChange={(e) => update('available', e.target.checked)} className="accent-[#2563EB] w-4 h-4" />
+                <input type="checkbox" checked={form.available} onChange={(e) => update('available', e.target.checked)} className="h-4 w-4 accent-[#C49A6C]" />
                 Available
               </label>
               <label className="flex items-center gap-2 text-sm font-medium text-[#222222]">
-                <input type="checkbox" checked={form.featured} onChange={(e) => update('featured', e.target.checked)} className="accent-[#2563EB] w-4 h-4" />
+                <input type="checkbox" checked={form.featured} onChange={(e) => update('featured', e.target.checked)} className="h-4 w-4 accent-[#C49A6C]" />
                 Featured
               </label>
             </div>
@@ -445,12 +445,12 @@ function AdminPropertyForm() {
             <label className={`flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#E5E7EB] py-8 transition-colors hover:border-[#C49A6C] hover:bg-[#FDE8D8]/40 ${uploading ? 'pointer-events-none opacity-60' : ''}`}>
               {uploading ? (
                 <>
-                  <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mb-2"></div>
-                  <span className="text-sm text-[#6b7280]">Uploading & optimizing...</span>
+                  <div className="mb-2 h-6 w-6 animate-spin rounded-full border-2 border-[#C49A6C] border-t-transparent"></div>
+                  <span className="text-sm text-[#5B6B82]">Uploading & optimizing...</span>
                 </>
               ) : (
                 <>
-                  <svg className="w-8 h-8 text-[#2563EB] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="mb-2 h-8 w-8 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                   <span className="text-sm font-semibold text-[#0B1F42]">Click to upload photos</span>
