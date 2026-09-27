@@ -223,14 +223,14 @@ function HostApplicationPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="mx-auto max-w-[1344px] px-4 pb-20 pt-28 md:px-6">
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm md:p-10">
+        <div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-10">
           <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Host setup</p>
           <h1 className="mt-1 text-2xl font-bold text-[#0B1F42] md:text-4xl">Host verification</h1>
           <p className="mt-3 max-w-3xl text-[#52606F]">Tell us who you are, how you manage your properties, and provide the documents needed to protect guests and legitimate hosts. Save at any time and continue later.</p>
 
           <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Host setup progress">
             {['Your details', 'Business', 'Documents', 'Review'].map((label, index) => (
-              <div key={label} className="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-3 shadow-sm">
+              <div key={label} className="flex items-center gap-2 rounded-[10px] border border-[#E3E8EF] bg-white px-3 py-3 shadow-[0_8px_28px_rgba(11,31,66,0.06)]">
                 <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${index === 0 ? 'bg-[#0B1F42] text-white' : 'bg-[#F7F4EF] text-[#52606F]'}`}>{index + 1}</span>
                 <span className="text-xs font-semibold text-[#0B1F42] sm:text-sm">{label}</span>
               </div>
@@ -238,7 +238,7 @@ function HostApplicationPage() {
           </div>
 
           {application && (
-            <div className="mt-6 rounded-2xl border border-[#E5E7EB] bg-[#F7F4EF] p-5">
+              <div className="mt-6 rounded-2xl border border-[#E3E8EF] bg-[#F7F4EF] p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="font-semibold text-[#0B1F42]">Status:</p>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_BADGE[application.status] || STATUS_BADGE.DRAFT}`}>
@@ -301,7 +301,7 @@ function HostApplicationPage() {
                         className={`min-h-[44px] rounded-full px-4 text-sm font-semibold border transition-all duration-200 ${
                           form.propertyTypes.includes(value)
                             ? 'bg-[#0B1F42] text-white border-[#0B1F42]'
-                            : 'bg-white text-[#0B1F42] border-[#E5E7EB] hover:bg-[#F7F4EF]'
+                            : 'bg-white text-[#0B1F42] border-[#E3E8EF] hover:bg-[#F7F4EF]'
                         }`}
                       >
                         {label}
@@ -345,7 +345,7 @@ function HostApplicationPage() {
                 </div>
               </Section>
 
-              <label className="flex items-start gap-3 rounded-2xl border border-[#E5E7EB] bg-[#F7F4EF] p-5">
+              <label className="flex items-start gap-3 rounded-2xl border border-[#E3E8EF] bg-[#F7F4EF] p-5">
                 <input type="checkbox" checked={form.agreedTerms} onChange={(e) => update('agreedTerms', e.target.checked)} className="mt-1 h-5 w-5 accent-[#0B1F42]" />
                 <span className="text-sm text-[#0B1F42]">I confirm the information is accurate, I am authorised to list these properties, and I agree to the <Link to="/terms" className="font-medium text-[#0B1F42] hover:text-[#C49A6C] hover:underline">Terms of Service</Link> and verification checks.</span>
               </label>

@@ -49,7 +49,7 @@ export function ConversationRow({ conversation, currentUserId, compact = false, 
     <Link
       to={`/inbox/${conversation.id}`}
       aria-current={active ? 'page' : undefined}
-      className={`block bg-white p-4 transition-all duration-200 hover:bg-[#F7F4EF] ${compact ? 'border-b border-[#E5E7EB] last:border-b-0' : 'rounded-2xl border border-[#E5E7EB] shadow-sm'} ${active ? 'bg-[#F7F4EF] shadow-[inset_3px_0_0_#C49A6C]' : ''}`}
+      className={`block bg-white p-4 transition-all duration-200 hover:bg-[#F7F4EF] ${compact ? 'border-b border-[#E3E8EF] last:border-b-0' : 'rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.08)]'} ${active ? 'bg-[#F7F4EF] shadow-[inset_3px_0_0_#C49A6C]' : ''}`}
     >
       <div className="flex items-center gap-4">
         {/* Property thumbnail */}
@@ -142,7 +142,7 @@ function InboxPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        <div className="mb-8 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
+        <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] sm:px-6">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Guest workspace</p>
           <h1 className="mt-1 text-3xl font-bold text-[#0B1F42]">Inbox</h1>
           <p className="mt-1 text-[#52606F]">Messages about your bookings and stays.</p>
@@ -151,10 +151,10 @@ function InboxPage() {
         <MessagesTabBar active="inbox" />
 
         {!loading && !error && (
-          <div className="hidden min-h-[560px] overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm lg:grid lg:grid-cols-[360px_minmax(0,1fr)]">
+          <div className="hidden min-h-[560px] overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:grid lg:grid-cols-[360px_minmax(0,1fr)]">
             <section className="border-r border-[#E5E7EB]" aria-label="Conversations">
               <div className="border-b border-[#E5E7EB] px-5 py-4">
-                <h2 className="font-bold text-[#222222]">Conversations</h2>
+                <h2 className="font-bold text-[#0B1F42]">Conversations</h2>
                 <p className="mt-1 text-sm text-[#6b7280]">Choose a thread to view its messages.</p>
               </div>
               {conversations.length > 0 ? conversations.map((conversation) => (
@@ -170,7 +170,7 @@ function InboxPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
-                <h2 className="text-xl font-bold text-[#222222]">{conversations.length ? 'Select a conversation' : 'No messages yet'}</h2>
+                <h2 className="text-xl font-bold text-[#0B1F42]">{conversations.length ? 'Select a conversation' : 'No messages yet'}</h2>
                 <p className="mt-2 text-sm text-[#6b7280]">
                   {conversations.length ? 'Choose a booking conversation from the list to read and reply.' : 'Messages about your bookings will appear here once you make a reservation.'}
                 </p>

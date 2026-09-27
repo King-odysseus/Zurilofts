@@ -171,7 +171,7 @@ function ConversationPage() {
     <div className="min-h-screen bg-canvas flex flex-col">
       <Navbar />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-4 flex min-h-0 gap-5">
-        <aside className="hidden w-[360px] flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm lg:flex" aria-label="Conversations">
+        <aside className="hidden w-[360px] flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:flex" aria-label="Conversations">
           <div className="border-b border-[#E5E7EB] px-5 py-4">
             <h1 className="text-xl font-bold text-[#0B1F42]">Inbox</h1>
             <p className="mt-1 text-sm text-[#52606F]">Messages about bookings and stays.</p>
@@ -185,7 +185,7 @@ function ConversationPage() {
         </aside>
         <section className="flex min-w-0 flex-1 flex-col">
         {/* Header */}
-        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 shadow-sm">
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-[#E3E8EF] bg-white px-4 py-3 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
           <Link
             to="/inbox"
             className="p-2 rounded-full hover:bg-[#E5E7EB]/40 transition-colors text-[#222222]"
@@ -205,7 +205,7 @@ function ConversationPage() {
         </div>
 
         {/* Messages */}
-        <div className="min-h-[50vh] flex-1 space-y-3 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
+        <div className="min-h-[50vh] flex-1 space-y-3 overflow-y-auto rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <Spinner />
@@ -237,7 +237,7 @@ function ConversationPage() {
 
         {/* Composer */}
         <div className="mt-4 pb-4">
-          <div className="flex items-end gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-sm">
+          <div className="flex items-end gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-2 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
             <textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
