@@ -6,9 +6,9 @@ import Dropdown from '../components/Dropdown';
 import Pagination from '../components/Pagination.jsx';
 
 const roleColors = {
-  USER: 'bg-gray-100 text-gray-700',
-  HOST: 'bg-[#2563EB]/20 text-[#2563EB]',
-  ADMIN: 'bg-[#222222]/10 text-[#222222]',
+  USER: 'bg-[#EAF0F4] text-[#52606F]',
+  HOST: 'bg-[#FDE8D8] text-[#9A4A1D]',
+  ADMIN: 'bg-[#0B1F42]/10 text-[#0B1F42]',
 };
 
 const EMPTY_FORM = {
@@ -235,15 +235,15 @@ function AdminUsers() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-bold text-[#222222]">Users &amp; Hosts</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
+        <div><p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">People</p><h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">Users &amp; Hosts</h1></div>
         <div className="flex items-center gap-3 flex-wrap">
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search name or email"
-            className="min-h-[44px] px-4 py-2 rounded-xl bg-white border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 w-56"
+            className="h-12 w-56 rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
           />
           <Dropdown
             value={roleFilter}
@@ -254,7 +254,7 @@ function AdminUsers() {
               { value: 'HOST', label: 'Hosts' },
               { value: 'ADMIN', label: 'Admins' },
             ]}
-            triggerClassName=" min-h-[44px] px-4 py-2 bg-white border border-[#E5E7EB] text-[#222222] rounded-xl text-sm"
+            triggerClassName="h-12 rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42]"
             ariaLabel="Filter by role"
           />
         </div>
@@ -267,9 +267,9 @@ function AdminUsers() {
           ['Admins', users.filter((u) => u.role === 'ADMIN').length],
           ['Suspended', users.filter((u) => u.suspended).length],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm">
+          <div key={label} className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p>
-            <p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p>
+            <p className="mt-2 text-2xl font-bold text-[#0B1F42]">{value}</p>
           </div>
         ))}
       </div>
@@ -294,7 +294,7 @@ function AdminUsers() {
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-[14px] shadow-lg overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#E5E7EB] text-left">
