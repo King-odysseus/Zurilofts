@@ -1316,7 +1316,7 @@ function AdminEarnings() {
 
           {/* Earnings Flow visualization (only when we have fee data) */}
           {!loading && filteredTotals.grossRent > 0 && (
-            <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 mb-4">
+            <div className="mb-4 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
               <h2 className="text-sm font-bold text-[#222222] mb-4">
                 Earnings Flow - How Your Money Moves
               </h2>
@@ -1516,7 +1516,7 @@ function AdminEarnings() {
       )}
 
       {activeTab === "performance" && !loading && (
-        <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 sm:p-7 mb-8">
+        <div className="mb-8 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm sm:p-7">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#2563EB]">
@@ -1546,7 +1546,7 @@ function AdminEarnings() {
         hosts.length > 0 && (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
             {/* Top Hosts Table */}
-            <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
               <h2 className="text-sm font-bold text-[#222222] mb-4">
                 Top Hosts by Earnings
               </h2>
@@ -1615,7 +1615,7 @@ function AdminEarnings() {
             </div>
 
             {/* Top Hosts Bar Chart */}
-            <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
+            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
               <h2 className="text-sm font-bold text-[#222222] mb-4">
                 Host Net Earnings Comparison
               </h2>
@@ -1668,7 +1668,7 @@ function AdminEarnings() {
             <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
           </div>
         ) : (
-          <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm overflow-hidden">
+          <div className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB]">
