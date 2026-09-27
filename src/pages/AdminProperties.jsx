@@ -83,7 +83,7 @@ function TableStatusPill({ property }) {
     VACANT: "bg-[#FEF3C7] text-[#B45309]",
     DRAFT: "bg-[#E2E8F0] text-[#475569]",
     MAINTENANCE: "bg-[#FEE2E2] text-[#B91C1C]",
-    PENDING_REVIEW: "bg-[#DBEAFE] text-[#1D4ED8]",
+    PENDING_REVIEW: "bg-[#FDE8D8] text-[#9A4A1D]",
     REJECTED: "bg-[#FEE2E2] text-[#B91C1C]",
   };
   const labels = {
@@ -514,7 +514,7 @@ function AdminProperties() {
 
       {!isAdminView && (
         <div
-          className="mb-5 flex flex-wrap items-center gap-2 border-b border-[#E5E7EB] pb-3"
+          className="mb-5 flex flex-wrap items-center gap-2 border-b border-[#E3E8EF] pb-3"
           role="tablist"
           aria-label="Listing status"
         >
@@ -548,8 +548,8 @@ function AdminProperties() {
       )}
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-16 text-[#6b7280]">
-          <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
+        <div className="flex flex-col items-center justify-center py-16 text-[#5B6B82]">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
           <p className="mt-3 text-sm">Loading properties…</p>
         </div>
       ) : viewMode === "table" ? (
@@ -656,7 +656,7 @@ function AdminProperties() {
                           <div className="min-w-0">
                             <Link
                               to={`/property/${p.id}`}
-                              className="block truncate font-semibold text-[#0B1F42] hover:text-[#2563EB]"
+                              className="block truncate font-semibold text-[#0B1F42] hover:text-[#9A744A]"
                             >
                               {p.title}
                             </Link>
@@ -780,7 +780,7 @@ function AdminProperties() {
           )}
         </div>
       ) : visibleProperties.length === 0 ? (
-        <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm text-center py-16 text-[#6b7280]">
+        <div className="rounded-2xl border border-[#E3E8EF] bg-white py-16 text-center text-[#5B6B82] shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
           <p className="text-sm">
             {isAdminView
               ? "No listings match this status."
@@ -935,22 +935,22 @@ function AdminProperties() {
           onClick={() => setSelectedProperty(null)}
         >
           <aside
-            className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-[#E5E7EB] bg-white p-6 shadow-2xl"
+            className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.14)]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5B6B82]">
                   Listing review
                 </p>
-                <h2 className="mt-1 text-xl font-bold text-[#222222]">
+                <h2 className="mt-1 text-xl font-bold text-[#0B1F42]">
                   {selectedProperty.title}
                 </h2>
               </div>
               <button
                 type="button"
                 onClick={() => setSelectedProperty(null)}
-                className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]"
+                className="rounded-[10px] p-2 text-xl leading-none text-[#5B6B82] hover:bg-[#F7F4EF]"
                 aria-label="Close review panel"
               >
                 ×
@@ -965,28 +965,28 @@ function AdminProperties() {
             )}
             <div className="mt-5 space-y-3 text-sm">
               <div className="flex items-center justify-between gap-4">
-                <span className="text-[#6b7280]">Location</span>
-                <span className="font-semibold text-[#222222]">
+                <span className="text-[#5B6B82]">Location</span>
+                <span className="font-semibold text-[#0B1F42]">
                   {selectedProperty.location}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-[#6b7280]">Host</span>
-                <span className="font-semibold text-[#222222]">
+                <span className="text-[#5B6B82]">Host</span>
+                <span className="font-semibold text-[#0B1F42]">
                   {selectedProperty.host?.firstName ||
                     selectedProperty.owner?.firstName ||
                     "Host"}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-[#6b7280]">Type</span>
-                <span className="font-semibold capitalize text-[#222222]">
+                <span className="text-[#5B6B82]">Type</span>
+                <span className="font-semibold capitalize text-[#0B1F42]">
                   {selectedProperty.type || "Apartment"}
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-[#6b7280]">Price/night</span>
-                <span className="font-semibold text-[#222222]">
+                <span className="text-[#5B6B82]">Price/night</span>
+                <span className="font-semibold text-[#0B1F42]">
                   KES {selectedProperty.price?.toLocaleString()}
                 </span>
               </div>
@@ -996,11 +996,11 @@ function AdminProperties() {
               </div>
             </div>
             {selectedProperty.description && (
-              <p className="mt-5 rounded-[14px] bg-[#F7F7F5] p-4 text-sm leading-6 text-[#222222]">
+              <p className="mt-5 rounded-2xl bg-[#F7F4EF] p-4 text-sm leading-6 text-[#0B1F42]">
                 {selectedProperty.description}
               </p>
             )}
-            <div className="mt-6 flex flex-wrap gap-2 border-t border-[#E5E7EB] pt-5">
+            <div className="mt-6 flex flex-wrap gap-2 border-t border-[#E3E8EF] pt-5">
               {selectedProperty.status === "PENDING_REVIEW" && (
                 <>
                   <button
