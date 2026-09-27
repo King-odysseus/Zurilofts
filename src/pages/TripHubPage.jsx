@@ -163,7 +163,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
                 </Link>
               )}
               {isPast && reviewSubmitted && (
-                <span className="text-xs text-[#6b7280] flex items-center gap-1">
+                <span className="text-xs text-[#5B6B82] flex items-center gap-1">
                   <svg className="w-3.5 h-3.5 text-[#C49A6C]" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
@@ -200,7 +200,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
               )}
               <Link
                 to={`/disputes/new?bookingId=${booking.id}`}
-                className="inline-flex items-center min-h-[44px] px-3 rounded-lg text-xs font-semibold text-[#6b7280] hover:text-red-600 transition-colors"
+                className="inline-flex items-center min-h-[44px] px-3 rounded-[10px] text-xs font-semibold text-[#5B6B82] hover:text-red-600 transition-colors"
               >
                 Report an issue
               </Link>
@@ -280,15 +280,15 @@ function NextStayCard({ booking }) {
             <h2 className="text-lg font-bold text-[#0B1F42]">{p.title}</h2>
             <StatusBadge status={booking.status} />
           </div>
-          <p className="text-sm text-[#6b7280] mb-3">{formatDateRange(booking.checkIn, booking.checkOut)} &middot; {nights} night{nights !== 1 ? "s" : ""}</p>
+              <p className="text-sm text-[#5B6B82] mb-3">{formatDateRange(booking.checkIn, booking.checkOut)} &middot; {nights} night{nights !== 1 ? "s" : ""}</p>
 
           {host.firstName && (
-            <div className="flex items-center gap-2 text-sm text-[#6b7280] mb-4">
+            <div className="flex items-center gap-2 text-sm text-[#5B6B82] mb-4">
               <div className="w-7 h-7 rounded-full bg-[#F6EFE7] flex items-center justify-center text-xs font-semibold text-[#9A744A]">
                 {host.firstName[0]}{host.lastName?.[0]}
               </div>
               <span>
-                Hosted by <span className="font-medium text-[#222222]">{host.firstName} {host.lastName}</span>
+                Hosted by <span className="font-medium text-[#0B1F42]">{host.firstName} {host.lastName}</span>
               </span>
             </div>
           )}
@@ -302,7 +302,7 @@ function NextStayCard({ booking }) {
             </Link>
             <button
               onClick={openConversation}
-              className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-lg text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
+              className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-[10px] text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F7F5] transition-colors"
             >
               Message host
             </button>
@@ -311,7 +311,7 @@ function NextStayCard({ booking }) {
                 href={googleMapsDirectionsUrl({ lat: p.lat, lng: p.lng, label: p.location })}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-lg text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-[10px] text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F7F5] transition-colors"
               >
                 Directions
               </a>
@@ -319,7 +319,7 @@ function NextStayCard({ booking }) {
             {booking.status === "CONFIRMED" && (
               <button
                 onClick={() => generateInvoice(booking)}
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-lg text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-[10px] text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F7F5] transition-colors"
               >
                 Receipt
               </button>

@@ -84,14 +84,14 @@ function FavouritesPage() {
 
   // Shared wishlist banner
   const SharedBanner = sharedIds && (
-    <div className="bg-white border border-[#E5E7EB] rounded-lg p-4 mb-8 text-center">
-      <p className="text-sm font-semibold text-[#222222] inline-flex items-center gap-2">
+    <div className="bg-white border border-[#E3E8EF] rounded-[10px] p-4 mb-8 text-center shadow-[0_8px_28px_rgba(11,31,66,0.06)]">
+      <p className="text-sm font-semibold text-[#0B1F42] inline-flex items-center gap-2">
         <svg className="w-4 h-4 text-[#9A744A]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
         </svg>
         Shared wishlist via ZuriLofts
       </p>
-      <p className="text-sm text-[#6b7280] mt-1">
+      <p className="text-sm text-[#5B6B82] mt-1">
         {sharedProperties.length} propert{sharedProperties.length !== 1 ? 'ies' : 'y'} saved
       </p>
     </div>
@@ -183,7 +183,7 @@ function FavouritesPage() {
         </div>
 
         {!sharedIds && (
-          <div className="mb-6 flex items-center gap-5 border-b border-[#E5E7EB]" role="tablist" aria-label="Saved stays">
+          <div className="mb-6 flex items-center gap-5 border-b border-[#E3E8EF]" role="tablist" aria-label="Saved stays">
             <Link to="/favourites" role="tab" aria-selected="true" className="border-b-2 border-[#C49A6C] px-1 pb-3 text-sm font-semibold text-[#0B1F42]">All saved ({favorites.length})</Link>
             <Link to="/shortlists" role="tab" aria-selected="false" className="border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-[#5B6B82] hover:text-[#0B1F42]">My lists</Link>
           </div>
@@ -194,7 +194,7 @@ function FavouritesPage() {
         {/* Empty shared list */}
         {sharedIds && sharedProperties.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-sm text-[#6b7280]">No properties found for this wishlist.</p>
+            <p className="text-sm text-[#5B6B82]">No properties found for this wishlist.</p>
           </div>
         )}
 
