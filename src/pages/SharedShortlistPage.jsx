@@ -41,22 +41,22 @@ export default function SharedShortlistPage() {
           </div>
         ) : error ? (
           <div className="text-center py-16">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#E5E7EB]/30 flex items-center justify-center">
-              <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#E3E8EF]/30 flex items-center justify-center">
+              <svg className="w-8 h-8 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
             <h3 className="mb-1 text-lg font-semibold text-[#0B1F42]">Not found</h3>
-            <p className="text-[#6b7280] max-w-sm mx-auto">{error}</p>
+            <p className="text-[#5B6B82] max-w-sm mx-auto">{error}</p>
           </div>
         ) : shortlist ? (
           <>
             <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-7">
             <h1 className="mb-1 text-2xl font-bold text-[#0B1F42] sm:text-3xl">{shortlist.name}</h1>
-            <p className="text-[#6b7280]">
+            <p className="text-[#5B6B82]">
               {shortlist.items?.length ?? 0} {shortlist.items?.length === 1 ? "property" : "properties"} saved
               {shortlist.owner?.firstName && (
-                <> &middot; Shared by <span className="font-medium text-[#222222]">{shortlist.owner.firstName}</span></>
+                <> &middot; Shared by <span className="font-medium text-[#0B1F42]">{shortlist.owner.firstName}</span></>
               )}
             </p>
             </div>
@@ -75,7 +75,7 @@ export default function SharedShortlistPage() {
 
             {(!shortlist.items || shortlist.items.length === 0) ? (
               <div className="text-center py-16">
-                <p className="text-[#6b7280]">This shortlist has no saved properties yet.</p>
+                <p className="text-[#5B6B82]">This shortlist has no saved properties yet.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -100,14 +100,14 @@ export default function SharedShortlistPage() {
                           <h3 className="line-clamp-1 text-sm font-semibold text-[#0B1F42] transition-colors group-hover:text-[#C49A6C]">
                             {p.title}
                           </h3>
-                          <p className="text-xs text-[#6b7280] mt-0.5 flex items-center gap-1">
+                          <p className="text-xs text-[#5B6B82] mt-0.5 flex items-center gap-1">
                             <svg className="h-3 w-3 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
                             {p.location || "Nairobi"}
                           </p>
-                          <div className="flex items-center gap-3 mt-2 text-xs text-[#6b7280]">
+                          <div className="flex items-center gap-3 mt-2 text-xs text-[#5B6B82]">
                             {p.rating > 0 && (
                               <span className="flex items-center gap-1">
                                 <svg className="h-3.5 w-3.5 fill-current text-[#C49A6C]" viewBox="0 0 20 20">
@@ -121,7 +121,7 @@ export default function SharedShortlistPage() {
                           </div>
                           <p className="mt-2 text-sm font-semibold text-[#0B1F42]">
                             KES {p.price?.toLocaleString()}
-                            <span className="text-xs font-normal text-[#6b7280]"> /night</span>
+                            <span className="text-xs font-normal text-[#5B6B82]"> /night</span>
                           </p>
                         </div>
                       </div>
@@ -131,8 +131,8 @@ export default function SharedShortlistPage() {
               </div>
             )}
 
-            <div className="mt-12 pt-6 border-t border-[#E5E7EB] text-center">
-              <p className="text-xs text-[#6b7280]">
+            <div className="mt-12 pt-6 border-t border-[#E3E8EF] text-center">
+              <p className="text-xs text-[#5B6B82]">
                 Created with{" "}
                 <Link to="/" className="font-medium text-[#0B1F42] transition-colors hover:text-[#C49A6C]">
                   ZuriLofts

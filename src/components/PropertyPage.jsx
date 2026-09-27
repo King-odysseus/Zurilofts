@@ -312,7 +312,7 @@ function PropertyPage() {
           {/* ── Left column - property details ─────────────────── */}
           <div className="lg:col-span-2">
             {/* Quick facts */}
-            <section className="flex flex-wrap gap-5 sm:gap-8 mb-8 py-8 md:py-10 border-b border-[#E5E7EB]" aria-label="Key facts">
+            <section className="flex flex-wrap gap-5 sm:gap-8 mb-8 py-8 md:py-10 border-b border-[#E3E8EF]" aria-label="Key facts">
               <div className="flex items-center gap-2">
                 <svg className="h-6 w-6 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />

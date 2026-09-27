@@ -93,7 +93,7 @@ function PropertyCard({ property, cardVariant }) {
       </Link>
 
       {/* Image area */}
-      <div className={`relative overflow-hidden flex-shrink-0 bg-[#F7F7F5] ${resultsCard ? 'aspect-[3/2]' : 'aspect-[4/3]'}`}>
+      <div className={`relative overflow-hidden flex-shrink-0 bg-[#F7F4EF] ${resultsCard ? 'aspect-[3/2]' : 'aspect-[4/3]'}`}>
         {image ? (
           <img
             src={image}

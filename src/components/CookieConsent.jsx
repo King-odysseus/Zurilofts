@@ -119,7 +119,7 @@ function CookieConsent() {
             <h2 className="text-base font-semibold text-[#0B1F42]">
               {mode === 'manage' ? 'Manage your preferences' : 'We value your privacy'}
             </h2>
-            <p className="text-sm text-[#6b7280] mt-1 leading-relaxed">
+            <p className="text-sm text-[#5B6B82] mt-1 leading-relaxed">
               {mode === 'manage'
                 ? 'Choose which optional cookies we may use. Strictly necessary cookies are always on.'
                 : 'We use essential cookies to keep you signed in and your bookings working, plus optional cookies to understand how the site is used. Read our '}
@@ -147,7 +147,7 @@ function CookieConsent() {
                   <p className="mt-0.5 text-xs leading-relaxed text-[#5B6B82]">{cat.description}</p>
                 </div>
                 {cat.alwaysOn ? (
-                  <span className="flex-shrink-0 text-xs font-medium text-[#6b7280] bg-canvas rounded-full px-3 py-1.5">
+                  <span className="flex-shrink-0 text-xs font-medium text-[#5B6B82] bg-canvas rounded-full px-3 py-1.5">
                     Always on
                   </span>
                 ) : (
