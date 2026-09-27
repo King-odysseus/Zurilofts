@@ -156,7 +156,7 @@ function PaymentCallback() {
                 {booking && (
                   <button
                     onClick={() => navigate(`/property/${booking.propertyId}`)}
-                    className="w-full min-h-[44px] py-3 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200"
+                    className="w-full min-h-[44px] py-3 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-all duration-200"
                   >
                     View Property
                   </button>
@@ -190,7 +190,7 @@ function PaymentCallback() {
                 </button>
                 <button
                   onClick={() => navigate('/')}
-                  className="w-full min-h-[44px] py-3 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200"
+                    className="w-full min-h-[44px] py-3 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-all duration-200"
                 >
                   Return to Home
                 </button>

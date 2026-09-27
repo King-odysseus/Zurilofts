@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 function NotFoundPage() {
   const { isAuthenticated } = useAuth();
   return (
-    <div className="min-h-screen bg-[#F7F7F5] flex flex-col">
+    <div className="min-h-screen bg-[#F7F4EF] flex flex-col">
       <Navbar />
       <div className="flex-1 flex items-center justify-center px-6">
         <div className="max-w-md rounded-2xl border border-[#E3E8EF] bg-white p-8 text-center shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:p-10">
