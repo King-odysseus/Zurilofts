@@ -39,8 +39,8 @@ function MessageBubble({ message, isMine }) {
         <div
           className={`px-4 py-2.5 rounded-[14px] text-sm whitespace-pre-wrap break-words ${
             isMine
-              ? 'bg-[#2563EB] text-white rounded-br-md'
-              : 'bg-white shadow-sm text-[#222222] rounded-bl-md'
+              ? 'bg-[#0B1F42] text-white rounded-br-md'
+              : 'bg-[#F7F4EF] text-[#0B1F42] rounded-bl-md'
           }`}
         >
           {message.content}
@@ -171,10 +171,10 @@ function ConversationPage() {
     <div className="min-h-screen bg-canvas flex flex-col">
       <Navbar />
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-4 flex min-h-0 gap-5">
-        <aside className="hidden lg:flex w-[360px] flex-shrink-0 flex-col overflow-hidden rounded-[14px] border border-[#E5E7EB] bg-white shadow-sm" aria-label="Conversations">
+        <aside className="hidden w-[360px] flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm lg:flex" aria-label="Conversations">
           <div className="border-b border-[#E5E7EB] px-5 py-4">
-            <h1 className="text-xl font-bold text-[#222222]">Inbox</h1>
-            <p className="mt-1 text-sm text-[#6b7280]">Messages about bookings and stays.</p>
+            <h1 className="text-xl font-bold text-[#0B1F42]">Inbox</h1>
+            <p className="mt-1 text-sm text-[#52606F]">Messages about bookings and stays.</p>
           </div>
           <div className="overflow-y-auto">
             {conversations.map((item) => (
@@ -185,7 +185,7 @@ function ConversationPage() {
         </aside>
         <section className="flex min-w-0 flex-1 flex-col">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-4 rounded-[14px] border border-[#E5E7EB] bg-white px-4 py-3 shadow-sm">
+        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-white px-4 py-3 shadow-sm">
           <Link
             to="/inbox"
             className="p-2 rounded-full hover:bg-[#E5E7EB]/40 transition-colors text-[#222222]"
@@ -196,8 +196,8 @@ function ConversationPage() {
             </svg>
           </Link>
           <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold text-[#222222] truncate">{other.name}</h1>
-            <p className="text-sm text-[#6b7280] truncate">{property.title || 'Property'}</p>
+            <h1 className="truncate text-lg font-bold text-[#0B1F42]">{other.name}</h1>
+            <p className="truncate text-sm text-[#52606F]">{property.title || 'Property'}</p>
           </div>
           {image && (
             <img src={image} alt={property.title} className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
@@ -205,7 +205,7 @@ function ConversationPage() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 overflow-y-auto rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm space-y-3 min-h-[50vh]">
+        <div className="min-h-[50vh] flex-1 space-y-3 overflow-y-auto rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
           {loading ? (
             <div className="flex items-center justify-center py-16">
               <Spinner />
@@ -237,7 +237,7 @@ function ConversationPage() {
 
         {/* Composer */}
         <div className="mt-4 pb-4">
-          <div className="flex items-end gap-2 bg-white rounded-[14px] shadow-sm p-2">
+          <div className="flex items-end gap-2 rounded-2xl border border-[#E5E7EB] bg-white p-2 shadow-sm">
             <textarea
               value={draft}
               onChange={(e) => setDraft(e.target.value)}
@@ -256,7 +256,7 @@ function ConversationPage() {
               disabled={!canSend}
               className={`flex-shrink-0 inline-flex items-center gap-1.5 min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 canSend
-                  ? 'bg-[#C49A6C] text-white hover:bg-[#B8895C]'
+                  ? 'bg-[#0B1F42] text-white hover:bg-[#07072E]'
                   : 'bg-[#E5E7EB] text-[#6b7280] cursor-not-allowed'
               }`}
             >

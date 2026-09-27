@@ -49,7 +49,7 @@ export function ConversationRow({ conversation, currentUserId, compact = false, 
     <Link
       to={`/inbox/${conversation.id}`}
       aria-current={active ? 'page' : undefined}
-      className={`block bg-white p-4 hover:bg-[#F7F7F5] transition-all duration-200 ${compact ? 'border-b border-[#E5E7EB] last:border-b-0' : 'rounded-[14px] neu-card'} ${active ? 'bg-[#F7F7F5] shadow-[inset_3px_0_0_#2563EB]' : ''}`}
+      className={`block bg-white p-4 transition-all duration-200 hover:bg-[#F7F4EF] ${compact ? 'border-b border-[#E5E7EB] last:border-b-0' : 'rounded-2xl border border-[#E5E7EB] shadow-sm'} ${active ? 'bg-[#F7F4EF] shadow-[inset_3px_0_0_#C49A6C]' : ''}`}
     >
       <div className="flex items-center gap-4">
         {/* Property thumbnail */}
@@ -79,7 +79,7 @@ export function ConversationRow({ conversation, currentUserId, compact = false, 
               {preview}
             </p>
             {unread && (
-              <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB] flex-shrink-0" aria-label="Unread" />
+              <span className="h-2.5 w-2.5 flex-shrink-0 rounded-full bg-[#C49A6C]" aria-label="Unread" />
             )}
           </div>
         </div>
@@ -142,15 +142,16 @@ function InboxPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        <div className="mb-8 rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm">
-          <h1 className="text-3xl font-bold text-[#222222]">Inbox</h1>
-          <p className="text-[#6b7280] mt-1">Messages about your bookings and stays.</p>
+        <div className="mb-8 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Guest workspace</p>
+          <h1 className="mt-1 text-3xl font-bold text-[#0B1F42]">Inbox</h1>
+          <p className="mt-1 text-[#52606F]">Messages about your bookings and stays.</p>
         </div>
 
         <MessagesTabBar active="inbox" />
 
         {!loading && !error && (
-          <div className="hidden min-h-[560px] overflow-hidden rounded-[14px] border border-[#E5E7EB] bg-white shadow-sm lg:grid lg:grid-cols-[360px_minmax(0,1fr)]">
+          <div className="hidden min-h-[560px] overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm lg:grid lg:grid-cols-[360px_minmax(0,1fr)]">
             <section className="border-r border-[#E5E7EB]" aria-label="Conversations">
               <div className="border-b border-[#E5E7EB] px-5 py-4">
                 <h2 className="font-bold text-[#222222]">Conversations</h2>
