@@ -860,8 +860,8 @@ function PropertiesPage() {
                   onClick={() => updateParam("type", key)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                     filter === key
-                      ? "bg-[#2563EB] text-white"
-                      : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
+                      ? "bg-[#0B1F42] text-white"
+                      : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
                   }`}
                 >
                   {label}
@@ -878,8 +878,8 @@ function PropertiesPage() {
                   onClick={() => updateParam("beds", key)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                     bedFilter === key
-                      ? "bg-[#2563EB] text-white"
-                      : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
+                      ? "bg-[#0B1F42] text-white"
+                      : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
                   }`}
                 >
                   {label}
@@ -892,8 +892,8 @@ function PropertiesPage() {
                 }
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                   availableOnly
-                    ? "bg-[#2563EB] text-white"
-                    : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
+                      ? "bg-[#0B1F42] text-white"
+                      : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
                 }`}
               >
                 Available to Book
@@ -905,8 +905,8 @@ function PropertiesPage() {
                 onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
                 className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                   moreFiltersOpen
-                    ? "bg-[#2563EB] text-white"
-                    : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
+                      ? "bg-[#0B1F42] text-white"
+                      : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
                 }`}
               >
                 <span className="flex items-center gap-1.5">
@@ -942,7 +942,7 @@ function PropertiesPage() {
                   { value: "mid", label: "KES 5,000 - 8,000" },
                   { value: "high", label: "Above KES 8,000" },
                 ]}
-                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
+                triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3.5 py-1.5 text-xs font-medium text-[#52606F] hover:bg-[#F7F4EF]"
                 placeholder="All Prices"
                 menuClassName="left-auto right-0"
                 ariaLabel="Price range"
@@ -951,7 +951,7 @@ function PropertiesPage() {
                 value={sort}
                 onChange={(v) => updateParam("sort", v)}
                 options={SORT_OPTIONS}
-                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
+                triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3.5 py-1.5 text-xs font-medium text-[#52606F] hover:bg-[#F7F4EF]"
                 placeholder="Sort"
                 menuClassName="left-auto right-0"
                 ariaLabel="Sort order"
@@ -967,7 +967,7 @@ function PropertiesPage() {
                 value={neighborhood}
                 onChange={(v) => updateParam("neighborhood", v)}
                 options={NEIGHBORHOODS}
-                triggerClassName="px-3.5 py-1.5 rounded-full text-xs font-medium bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB]"
+                triggerClassName="rounded-full border border-[#E3E8EF] bg-white px-3.5 py-1.5 text-xs font-medium text-[#52606F] hover:bg-[#F7F4EF]"
                 placeholder="All Areas"
                 ariaLabel="Neighborhood"
               />
@@ -986,8 +986,8 @@ function PropertiesPage() {
                     }
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
                       minRating === value
-                        ? "bg-[#2563EB] text-white"
-                        : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
+                        ? "bg-[#0B1F42] text-white"
+                        : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
                     }`}
                   >
                     {label}
@@ -1000,7 +1000,7 @@ function PropertiesPage() {
                 <button
                   type="button"
                   onClick={() => setViewMode("list")}
-                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${viewMode === "list" ? "bg-[#2563EB] text-white" : "bg-white border border-[#E5E7EB] text-[#6b7280] hover:bg-[#F7F7F5]"}`}
+                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-[10px] transition-colors ${viewMode === "list" ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"}`}
                   aria-label="List view"
                 >
                   <svg
@@ -1021,7 +1021,7 @@ function PropertiesPage() {
                 <button
                   type="button"
                   onClick={() => setViewMode("map")}
-                  className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${viewMode === "map" ? "bg-[#2563EB] text-white" : "bg-white border border-[#E5E7EB] text-[#6b7280] hover:bg-[#F7F7F5]"}`}
+                  className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-[10px] transition-colors ${viewMode === "map" ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"}`}
                   aria-label="Map view"
                 >
                   <svg
@@ -1232,7 +1232,7 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={fetchProperties}
-                className="min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
               >
                 Try Again
               </button>
@@ -1246,7 +1246,7 @@ function PropertiesPage() {
               role="status"
               aria-label="Loading properties"
             >
-              <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent" />
               <p className="text-[#6b7280] text-sm">Loading properties...</p>
             </div>
           )}
@@ -1281,7 +1281,7 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={clearAllFilters}
-                className="min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
               >
                 Clear All Filters
               </button>
@@ -1326,7 +1326,7 @@ function PropertiesPage() {
                   [18, 16, 15, 14].map((imgIndex, i) => (
                     <div
                       key={`coming-soon-${i}`}
-                      className="group overflow-hidden rounded-[14px] border border-[#E5E7EB] shadow-sm bg-white h-full flex flex-col"
+                      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
                     >
                       <div className="relative aspect-[4/3] flex-shrink-0">
                         <img

@@ -105,7 +105,7 @@ function PropertyPage() {
         <Navbar />
         <main className="pt-24 flex items-center justify-center min-h-[60vh]" role="status" aria-label="Loading property">
           <div className="text-center">
-            <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent" />
             <p className="text-[#6b7280]">Loading property...</p>
           </div>
         </main>
@@ -126,9 +126,9 @@ function PropertyPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-[#222222] mb-2">Property Not Found</h2>
+            <h2 className="mb-2 text-xl font-bold text-[#0B1F42]">Property Not Found</h2>
             <p className="text-[#6b7280] mb-4">{error || 'This property could not be loaded.'}</p>
-            <Link to="/properties" className="inline-flex items-center justify-center min-h-[44px] bg-[#C49A6C] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors duration-200">
+            <Link to="/properties" className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#0B1F42] px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-[#07072E]">
               View All Properties
             </Link>
           </div>
@@ -267,7 +267,7 @@ function PropertyPage() {
 
         {/* ── Property identity: title, location, rating ────────── */}
         <header className="mb-6 md:mb-8">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#222222] mb-2 leading-tight">
+          <h1 className="mb-2 text-2xl font-bold leading-tight text-[#0B1F42] sm:text-3xl md:text-4xl">
             {property.title}
           </h1>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[#6b7280]">
@@ -314,7 +314,7 @@ function PropertyPage() {
             {/* Quick facts */}
             <section className="flex flex-wrap gap-5 sm:gap-8 mb-8 py-8 md:py-10 border-b border-[#E5E7EB]" aria-label="Key facts">
               <div className="flex items-center gap-2">
-                <svg className="w-6 h-6 text-[#2563EB] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="h-6 w-6 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
                 </svg>
                 <div>
@@ -323,7 +323,7 @@ function PropertyPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-6 h-6 text-[#2563EB] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="h-6 w-6 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 <div>
@@ -332,7 +332,7 @@ function PropertyPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-6 h-6 text-[#2563EB] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="h-6 w-6 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                 </svg>
                 <div>
@@ -341,7 +341,7 @@ function PropertyPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-6 h-6 text-[#2563EB] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <svg className="h-6 w-6 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <div>
@@ -368,7 +368,7 @@ function PropertyPage() {
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="list">
                   {amenities.map((amenity, index) => (
                     <li key={index} className="flex items-center gap-3">
-                      <svg className="w-5 h-5 text-[#2563EB] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg className="h-5 w-5 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span className="text-[#1f2937]">{amenity}</span>
@@ -579,7 +579,7 @@ function PropertyPinMap({ lat, lng, address, location, title }) {
           href={directionsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 shrink-0 min-h-[44px] rounded-lg bg-[#2563EB] text-white font-semibold px-5 py-2.5 text-sm hover:bg-[#1D4ED8] transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+          className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] bg-[#0B1F42] px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#07072E]"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />

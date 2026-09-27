@@ -6,10 +6,10 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
   const { t } = useLanguage();
   return (
     <form onSubmit={onSubmit} role="search" className="w-full max-w-full">
-      <div className={`flex flex-col gap-2 rounded-2xl border border-[#E5E7EB]/90 bg-white/90 p-2 shadow-lg backdrop-blur-sm transition-shadow focus-within:border-[#2563EB] focus-within:ring-2 focus-within:ring-[#2563EB]/20 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:bg-white sm:backdrop-blur-none ${discovery ? 'sm:p-2' : ''}`}>
+      <div className={`flex flex-col gap-2 rounded-2xl border border-[#E3E8EF] bg-white/95 p-2 shadow-[0_8px_28px_rgba(11,31,66,0.12)] backdrop-blur-sm transition-shadow focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/20 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:bg-white sm:backdrop-blur-none ${discovery ? 'sm:p-2' : ''}`}>
         <div className={`flex min-w-0 flex-1 items-center px-2 sm:px-4 ${discovery ? 'sm:border-r sm:border-[#E5E7EB]' : ''}`}>
           {loading ? (
-            <div className="h-5 w-5 flex-shrink-0 animate-spin rounded-full border-2 border-[#2563EB] border-t-transparent mr-2 sm:mr-3" />
+            <div className="mr-2 h-5 w-5 flex-shrink-0 animate-spin rounded-full border-2 border-[#C49A6C] border-t-transparent sm:mr-3" />
           ) : (
             <svg className="h-5 w-5 flex-shrink-0 text-[#222222] mr-2 sm:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -26,7 +26,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
             onChange={onChange}
             placeholder={discovery ? t('home.searchDestination') : t('home.searchLocation')}
             autoComplete="address-level2"
-            className="search-input-clean min-h-[44px] w-full min-w-0 max-w-full bg-transparent py-3 text-base text-[#222222] placeholder-[#6b7280] focus:outline-none"
+            className="search-input-clean min-h-[44px] w-full min-w-0 max-w-full bg-transparent py-3 text-base text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none"
           />
           {hasActiveSearch && (
             <button
@@ -56,7 +56,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
         <button
           type="submit"
           disabled={loading}
-          className={`min-h-[44px] w-full whitespace-nowrap rounded-full bg-[#C49A6C] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${discovery ? 'sm:h-12 sm:w-12 sm:px-0 sm:text-transparent' : 'sm:w-auto sm:px-8'}`}
+          className={`min-h-[44px] w-full whitespace-nowrap rounded-full bg-[#0B1F42] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#07072E] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${discovery ? 'sm:h-12 sm:w-12 sm:px-0 sm:text-transparent' : 'sm:w-auto sm:px-8'}`}
         >
           {discovery ? (
             <svg className="mx-auto h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
