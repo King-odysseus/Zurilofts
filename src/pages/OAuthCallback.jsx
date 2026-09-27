@@ -58,23 +58,23 @@ function OAuthCallback() {
   }, [searchParams, handleOAuthCallback, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F7F7F5]">
-      <div className="mx-4 w-full max-w-lg rounded-[14px] border border-[#E5E7EB] bg-white p-8 text-center shadow-sm" role="status" aria-live="polite">
+    <div className="flex min-h-screen items-center justify-center bg-[#F7F4EF]">
+      <div className="mx-4 w-full max-w-lg rounded-2xl border border-[#E3E8EF] bg-white p-8 text-center shadow-[0_8px_28px_rgba(11,31,66,0.08)]" role="status" aria-live="polite">
         {status === 'checking' && <>
-          <div className="w-12 h-12 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#222222] font-semibold text-lg">Finishing sign-in</p>
-          <p className="text-[#6b7280] text-sm mt-1">Please wait while we complete your sign-in.</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
+          <p className="text-lg font-semibold text-[#0B1F42]">Finishing sign-in</p>
+          <p className="mt-1 text-sm text-[#5B6B82]">Please wait while we complete your sign-in.</p>
         </>}
         {status === 'success' && <>
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100 text-2xl text-green-700" aria-hidden="true">✓</div>
-          <p className="text-[#222222] font-semibold text-lg">You’re signed in</p>
-          <p className="text-[#6b7280] text-sm mt-1">Taking you to your account…</p>
+          <p className="text-lg font-semibold text-[#0B1F42]">You’re signed in</p>
+          <p className="mt-1 text-sm text-[#5B6B82]">Taking you to your account…</p>
           <Link to={destination} className="mt-5 inline-flex min-h-[44px] items-center rounded-lg bg-[#C49A6C] px-5 text-sm font-semibold text-white hover:bg-[#B8895C]">Continue</Link>
         </>}
         {status === 'failed' && <>
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-2xl text-red-700" aria-hidden="true">!</div>
-          <p className="text-[#222222] font-semibold text-lg">Sign-in could not be completed</p>
-          <p className="text-[#6b7280] text-sm mt-1">The sign-in link is missing or no longer valid. Please try again.</p>
+          <p className="text-lg font-semibold text-[#0B1F42]">Sign-in could not be completed</p>
+          <p className="mt-1 text-sm text-[#5B6B82]">The sign-in link is missing or no longer valid. Please try again.</p>
           <Link to="/login?error=oauth_failed" className="mt-5 inline-flex min-h-[44px] items-center rounded-lg bg-[#C49A6C] px-5 text-sm font-semibold text-white hover:bg-[#B8895C]">Return to sign in</Link>
         </>}
       </div>

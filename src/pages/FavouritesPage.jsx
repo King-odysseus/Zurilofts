@@ -116,22 +116,22 @@ function FavouritesPage() {
       <div className="min-h-screen bg-[#F7F7F5]">
         <Navbar />
         <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-          <h1 className="text-2xl font-bold text-[#222222] mb-2">My Favourites</h1>
-          <p className="text-sm text-[#6b7280] mb-8">Properties you&apos;ve saved for later.</p>
+          <h1 className="mb-2 text-2xl font-bold text-[#0B1F42]">My Favourites</h1>
+          <p className="mb-8 text-sm text-[#5B6B82]">Properties you&apos;ve saved for later.</p>
           <div className="flex items-center justify-center min-h-[40vh]">
             <div className="text-center max-w-md">
-              <div className="w-20 h-20 bg-[#2563EB]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDE8D8]">
+                <svg className="h-10 w-10 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-[#222222] mb-2">No favourites yet</h3>
-              <p className="text-sm text-[#6b7280] mb-6">
+              <h3 className="mb-2 text-lg font-bold text-[#0B1F42]">No favourites yet</h3>
+              <p className="mb-6 text-sm text-[#5B6B82]">
                 Tap the heart icon on any property to save it here for quick access later.
               </p>
               <Link
                 to="/properties"
-                className="inline-flex items-center justify-center min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#C49A6C] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
               >
                 Browse Properties
               </Link>
