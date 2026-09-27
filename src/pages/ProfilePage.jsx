@@ -412,7 +412,7 @@ function ProfilePage() {
           <div className="space-y-8">
           {/* Header */}
           <div className="relative z-0 min-w-0 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 sm:px-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:bg-[#F7F4EF] lg:p-6 lg:shadow-none">
-            <div className="flex items-center mb-4">
+            <div className="flex flex-wrap items-center gap-4 mb-4">
               <label className="relative cursor-pointer group">
                 {profile?.avatar ? (
                   <img
@@ -445,13 +445,13 @@ function ProfilePage() {
                   disabled={avatarUploading}
                 />
               </label>
-              <div className="ml-4">
+              <div className="min-w-0">
                 <h1 className="text-2xl font-bold text-[#0B1F42]">
                   {profile?.firstName} {profile?.lastName}
                 </h1>
                 <p className="text-[#5B6B82]">{profile?.email}</p>
               </div>
-              <button type="button" onClick={() => setShowAccountMenu(true)} className="mt-6 inline-flex min-h-[44px] items-center rounded-xl bg-[#C49A6C] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]">
+              <button type="button" onClick={() => setShowAccountMenu(true)} className="ml-auto mt-0 inline-flex min-h-[44px] shrink-0 items-center rounded-xl bg-[#C49A6C] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]">
                 Account menu
               </button>
             </div>
