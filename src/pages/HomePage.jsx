@@ -81,7 +81,7 @@ function HomeHeader({ propertiesPage = false, searchLabel = '', searchPath = '/p
   }
 
   return (
-    <header className="relative z-30 border-b border-slate-200 bg-white">
+    <header className="relative z-30 border-b border-[#E3E8EF] bg-white">
       <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-5 md:px-8">
         <Link to="/" className="shrink-0" aria-label="ZuriLofts home">
           <img src={logoImg} alt="ZuriLofts" className="h-11 w-[118px] object-contain" />
@@ -95,7 +95,7 @@ function HomeHeader({ propertiesPage = false, searchLabel = '', searchPath = '/p
         <div className="flex items-center gap-1.5 text-[#0B1F42] sm:gap-3">
           <form
             onSubmit={submitHeaderSearch}
-            className={`hidden h-9 items-center overflow-hidden rounded-full text-xs text-slate-500 transition-[width,background-color,box-shadow] duration-300 ease-out lg:flex ${searchOpen ? 'w-64 bg-white pl-3 pr-1 shadow-sm ring-1 ring-slate-200' : propertiesPage ? 'w-44 border border-[#E3E8EF] bg-[#F4F7FB] px-1' : 'w-9 bg-slate-50'}`}
+            className={`hidden h-9 items-center overflow-hidden rounded-full text-xs text-[#5B6B82] transition-[width,background-color,box-shadow] duration-300 ease-out lg:flex ${searchOpen ? 'w-64 bg-white pl-3 pr-1 shadow-[0_4px_16px_rgba(11,31,66,0.06)] ring-1 ring-[#E3E8EF]' : propertiesPage ? 'w-44 border border-[#E3E8EF] bg-[#F4F7FB] px-1' : 'w-9 bg-[#F7F4EF]'}`}
           >
             <button
               type="button"
@@ -117,7 +117,7 @@ function HomeHeader({ propertiesPage = false, searchLabel = '', searchPath = '/p
                 className="header-search-input min-w-0 flex-1 border-0 bg-transparent px-2 text-xs text-[#0B1F42] outline-none placeholder:text-slate-400 focus:border-0 focus:outline-none focus:ring-0"
               />
             )}
-            {!searchOpen && <span className={propertiesPage || searchLabel ? 'pr-3 text-xs text-slate-500' : 'sr-only'}>{searchLabel || (propertiesPage ? 'Search properties' : 'Search')}</span>}
+            {!searchOpen && <span className={propertiesPage || searchLabel ? 'pr-3 text-xs text-[#5B6B82]' : 'sr-only'}>{searchLabel || (propertiesPage ? 'Search properties' : 'Search')}</span>}
           </form>
           <Link to="/host/application" className="hidden text-xs font-medium hover:text-[#C89B6D] lg:block">{t('nav.becomeHost')}</Link>
           <Link to="/favourites" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-50" aria-label="Favourites">
@@ -135,7 +135,7 @@ function HomeHeader({ propertiesPage = false, searchLabel = '', searchPath = '/p
               <Icon name="globe" className="h-[18px] w-[18px]" />
             </button>
             {languageOpen && (
-              <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-xl border border-slate-200 bg-white p-1.5 shadow-lg" role="menu" aria-label={t('nav.language')}>
+              <div className="absolute right-0 top-full z-50 mt-2 w-40 rounded-[10px] border border-[#E3E8EF] bg-white p-1.5 shadow-[0_8px_28px_rgba(11,31,66,0.12)]" role="menu" aria-label={t('nav.language')}>
                 {languageOptions.map((option) => (
                   <button
                     key={option.value}
@@ -152,7 +152,7 @@ function HomeHeader({ propertiesPage = false, searchLabel = '', searchPath = '/p
               </div>
             )}
           </div>
-          <Link to={isAuthenticated ? '/profile' : '/login'} className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-slate-100 text-slate-500" aria-label={isAuthenticated ? 'Profile' : 'Sign in'}>
+          <Link to={isAuthenticated ? '/profile' : '/login'} className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full bg-[#F6EFE7] text-[#9A744A]" aria-label={isAuthenticated ? 'Profile' : 'Sign in'}>
             {user?.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : <Icon name="user" className="h-4 w-4" />}
           </Link>
         </div>
@@ -201,7 +201,7 @@ function RecentCard({ property }) {
   const image = firstImage(property);
   return (
     <Link to={`/property/${property.id}`} className="block min-w-0">
-      <div className="aspect-[1.55/1] overflow-hidden rounded-[10px] bg-slate-200">
+      <div className="aspect-[1.55/1] overflow-hidden rounded-[10px] bg-[#EEF2F7]">
         {image && <img src={image} alt="" className="h-full w-full object-cover" loading="lazy" />}
       </div>
       <h3 className="mt-1.5 truncate text-[11px] font-semibold text-[#0B1F42]">{property.title}</h3>
@@ -212,7 +212,7 @@ function RecentCard({ property }) {
 
 function ExploreCard({ card }) {
   return (
-    <Link to={card.href} className="group relative h-[320px] overflow-hidden rounded-[15px] bg-slate-300 md:h-[360px]">
+    <Link to={card.href} className="group relative h-[320px] overflow-hidden rounded-[15px] bg-[#DCE5EC] md:h-[360px]">
       {card.image && <img src={card.image} alt="" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" loading="lazy" />}
       <div className="absolute inset-0 bg-gradient-to-t from-[#06152f]/95 via-transparent to-transparent" />
       <span className="absolute left-5 top-5 rounded-full bg-white/90 px-4 py-1.5 text-[10px] font-medium text-[#0B1F42]">{card.eyebrow}</span>
