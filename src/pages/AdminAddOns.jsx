@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client.js';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const CATEGORIES = ['transport', 'catering', 'housekeeping', 'concierge'];
 
@@ -344,20 +345,7 @@ function AdminAddOns() {
                         </button>
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button
-                            onClick={() => openEdit(a)}
-                            className="rounded-[10px] px-3 py-1.5 text-xs font-semibold text-[#5B6B82] shadow-sm transition-colors hover:bg-[#F7F4EF] hover:text-[#9A744A]"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(a.id)}
-                            className="px-3 py-1.5 text-xs font-semibold rounded-lg text-red-600 shadow-sm hover:shadow-md hover:bg-red-50 transition-shadow"
-                          >
-                            Delete
-                          </button>
-                        </div>
+                        <TableActionsMenu actions={[{ label: 'Edit add-on', icon: '✎', onClick: () => openEdit(a) }, { label: 'Delete add-on', icon: '×', danger: true, onClick: () => handleDelete(a.id) }]} />
                       </td>
                     </tr>
                   );

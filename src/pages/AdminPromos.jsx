@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client.js';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 function AdminPromos() {
   const [promos, setPromos] = useState([]);
@@ -308,20 +309,7 @@ function AdminPromos() {
                       </button>
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button
-                          onClick={() => openEdit(p)}
-                          className="rounded-[10px] px-3 py-1.5 text-xs font-semibold text-[#5B6B82] shadow-sm transition-colors hover:bg-[#F7F4EF] hover:text-[#9A744A]"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(p.id)}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                      <TableActionsMenu actions={[{ label: 'Edit promo', icon: '✎', onClick: () => openEdit(p) }, { label: 'Delete promo', icon: '×', danger: true, onClick: () => handleDelete(p.id) }]} />
                     </td>
                   </tr>
                 ))}

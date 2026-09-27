@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client.js';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 import Spinner from '../components/Spinner.jsx';
 
 function slugify(text) {
@@ -202,12 +203,7 @@ function AdminGuides() {
                   {new Date(p.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleEdit(p.id)} className="mr-3 font-semibold text-[#0B1F42] transition-colors hover:text-[#07072E]">
-                    Edit
-                  </button>
-                  <button onClick={() => handleDelete(p.id)} className="text-red-500 font-semibold hover:text-red-600 transition-colors">
-                    Delete
-                  </button>
+                  <TableActionsMenu actions={[{ label: 'Edit guide', icon: '✎', onClick: () => handleEdit(p.id) }, { label: 'Delete guide', icon: '×', danger: true, onClick: () => handleDelete(p.id) }]} />
                 </td>
               </tr>
             ))}
