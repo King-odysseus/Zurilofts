@@ -75,10 +75,10 @@ function AdminGuides() {
   // p-4 md:p-8, and admin pages are full-bleed (see CLAUDE.md).
   return (
     <div>
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex items-center justify-between mb-6">
-        <div><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Content workspace</p><h2 className="mt-1 text-2xl font-bold text-[#222222]">Travel Guides</h2><p className="mt-1 text-sm text-[#6b7280]">Create and publish practical Nairobi guidance for guests.</p></div>
+      <div className="mb-6 flex items-center justify-between rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-6">
+        <div><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Content workspace</p><h2 className="mt-1 text-2xl font-bold text-[#0B1F42]">Travel Guides</h2><p className="mt-1 text-sm text-[#5B6B82]">Create and publish practical Nairobi guidance for guests.</p></div>
         {!editing && (
-          <button onClick={handleCreate} className="bg-[#C49A6C] text-white min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#B8895C] transition-all duration-200">
+          <button onClick={handleCreate} className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E]">
             + New Guide
           </button>
         )}
@@ -89,21 +89,21 @@ function AdminGuides() {
           ['Total guides', posts.length],
           ['Published', posts.filter((post) => post.published).length],
           ['Drafts', posts.filter((post) => !post.published).length],
-        ].map(([label, value]) => <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p></div>)}
+        ].map(([label, value]) => <div key={label} className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8]">{label}</p><p className="mt-2 text-2xl font-bold text-[#0B1F42]">{value}</p></div>)}
       </div>
 
       {/* Edit form */}
       {editing && (
-        <div className="bg-white rounded-[14px] shadow-sm p-4 md:p-6 mb-6">
-          <h3 className="text-lg font-bold text-[#222222] mb-4">{editing === 'new' ? 'New Guide' : 'Edit Guide'}</h3>
+        <div className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_4px_16px_rgba(11,31,66,0.04)] md:p-6">
+          <h3 className="mb-4 text-lg font-bold text-[#0B1F42]">{editing === 'new' ? 'New Guide' : 'Edit Guide'}</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-[#222222] mb-1">Title</label>
+              <label className="mb-1 block text-sm font-semibold text-[#0B1F42]">Title</label>
               <input
                 type="text"
                 value={form.title}
                 onChange={(e) => handleTitleChange(e.target.value)}
-                className="w-full rounded-xl border border-[#E5E7EB] min-h-[44px] px-4 py-2.5 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+                className="min-h-[44px] w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 transition-colors"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -113,7 +113,7 @@ function AdminGuides() {
                   type="text"
                   value={form.slug}
                   onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  className="w-full rounded-xl border border-[#E5E7EB] min-h-[44px] px-4 py-2.5 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+                  className="min-h-[44px] w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 transition-colors"
                 />
               </div>
               <div>
@@ -123,7 +123,7 @@ function AdminGuides() {
                   value={form.coverImage}
                   onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
                   placeholder="/images/..."
-                  className="w-full rounded-xl border border-[#E5E7EB] min-h-[44px] px-4 py-2.5 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+                  className="min-h-[44px] w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 transition-colors"
                 />
               </div>
             </div>
@@ -133,7 +133,7 @@ function AdminGuides() {
                 type="text"
                 value={form.excerpt}
                 onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-                className="w-full rounded-xl border border-[#E5E7EB] min-h-[44px] px-4 py-2.5 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+                className="min-h-[44px] w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 transition-colors"
               />
             </div>
             <div>
@@ -142,7 +142,7 @@ function AdminGuides() {
                 value={form.body}
                 onChange={(e) => setForm({ ...form, body: e.target.value })}
                 rows={12}
-                className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors font-mono text-sm"
+                className="w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-3 font-mono text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 transition-colors"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -151,20 +151,20 @@ function AdminGuides() {
                 id="published"
                 checked={form.published}
                 onChange={(e) => setForm({ ...form, published: e.target.checked })}
-                className="w-4 h-4 text-[#2563EB] rounded"
+                className="h-4 w-4 rounded text-[#0B1F42]"
               />
-              <label htmlFor="published" className="text-sm font-semibold text-[#222222]">Published</label>
+              <label htmlFor="published" className="text-sm font-semibold text-[#0B1F42]">Published</label>
             </div>
             {error && <p className="text-red-500 text-sm">{error}</p>}
             <div className="flex gap-3">
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="bg-[#C49A6C] text-white min-h-[44px] px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50"
+                className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50"
               >
                 {saving ? 'Saving...' : 'Save'}
               </button>
-              <button onClick={handleCancel} className="min-h-[44px] px-6 py-2.5 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-shadow">
+              <button onClick={handleCancel} className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] px-6 py-2.5 text-sm font-semibold text-[#0B1F42] hover:bg-[#F7F4EF] transition-shadow">
                 Cancel
               </button>
             </div>
@@ -173,9 +173,9 @@ function AdminGuides() {
       )}
 
       {/* Posts list */}
-      <div className="bg-white rounded-[14px] shadow-sm overflow-x-auto">
+      <div className="overflow-x-auto rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
         <table className="w-full text-sm">
-          <thead className="bg-[#222222]/5 text-left">
+          <thead className="bg-[#F7F4EF] text-left">
             <tr>
               <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Title</th>
               <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hidden md:table-cell">Status</th>
@@ -188,9 +188,9 @@ function AdminGuides() {
               <tr><td colSpan={4} className="px-4 py-8 text-center text-[#6b7280]">No guides yet. Create your first one.</td></tr>
             )}
             {posts.map((p) => (
-              <tr key={p.id} className="hover:bg-[#E5E7EB]/10 transition-colors">
+                <tr key={p.id} className="transition-colors hover:bg-[#F7F4EF]">
                 <td className="px-4 py-3">
-                  <span className="font-semibold text-[#222222]">{p.title}</span>
+                  <span className="font-semibold text-[#0B1F42]">{p.title}</span>
                   <span className="block text-xs text-[#6b7280] md:hidden">{p.published ? 'Published' : 'Draft'} · {new Date(p.createdAt).toLocaleDateString()}</span>
                 </td>
                 <td className="px-4 py-3 hidden md:table-cell">
@@ -202,7 +202,7 @@ function AdminGuides() {
                   {new Date(p.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleEdit(p.id)} className="text-[#2563EB] font-semibold hover:text-[#1D4ED8] transition-colors mr-3">
+                  <button onClick={() => handleEdit(p.id)} className="mr-3 font-semibold text-[#0B1F42] transition-colors hover:text-[#07072E]">
                     Edit
                   </button>
                   <button onClick={() => handleDelete(p.id)} className="text-red-500 font-semibold hover:text-red-600 transition-colors">

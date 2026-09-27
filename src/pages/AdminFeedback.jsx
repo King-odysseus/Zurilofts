@@ -7,7 +7,7 @@ function StarRow({ rating }) {
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
-          className={`w-4 h-4 ${star <= rating ? 'text-[#2563EB]' : 'text-[#E5E7EB]'}`}
+          className={`h-4 w-4 ${star <= rating ? 'text-[#C49A6C]' : 'text-[#E5E7EB]'}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -41,46 +41,47 @@ function AdminFeedback() {
 
   return (
     <div className="w-full">
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm mb-6">
-      <h1 className="text-2xl font-bold text-[#222222] mb-1">Guest Feedback</h1>
-      <p className="text-[#6b7280] mb-6">Star ratings, public reviews, and private notes from guests. Private notes are never shown publicly.</p>
+      <div className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-6">
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#C49A6C]">Workspace / Voice of guest</p>
+      <h1 className="text-2xl font-bold text-[#0B1F42] mb-1">Guest Feedback</h1>
+      <p className="text-[#5B6B82]">Star ratings, public reviews, and private notes from guests. Private notes are never shown publicly.</p>
       </div>
 
       {/* Summary cards */}
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-[14px] border border-[#E5E7EB] p-5 shadow-sm">
-          <span className="text-sm text-[#6b7280]">Average Rating</span>
+        <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <span className="text-sm text-[#5B6B82]">Average Rating</span>
           <div className="flex items-center gap-2 mt-2">
-            <p className="text-2xl font-bold text-[#222222]">{summary.averageRating || 0}</p>
+            <p className="text-2xl font-bold text-[#0B1F42]">{summary.averageRating || 0}</p>
             <StarRow rating={Math.round(summary.averageRating)} />
           </div>
         </div>
-        <div className="bg-white rounded-[14px] border border-[#E5E7EB] p-5 shadow-sm">
-          <span className="text-sm text-[#6b7280]">Total Reviews</span>
-          <p className="text-2xl font-bold text-[#222222] mt-2">{summary.totalReviews || 0}</p>
+        <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <span className="text-sm text-[#5B6B82]">Total Reviews</span>
+          <p className="mt-2 text-2xl font-bold text-[#0B1F42]">{summary.totalReviews || 0}</p>
         </div>
-        <div className="bg-white rounded-[14px] border border-[#E5E7EB] p-5 shadow-sm">
-          <span className="text-sm text-[#6b7280]">Private Notes</span>
-          <p className="text-2xl font-bold text-[#222222] mt-2">{reviews.filter((review) => review.privateNote).length}</p>
+        <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <span className="text-sm text-[#5B6B82]">Private Notes</span>
+          <p className="mt-2 text-2xl font-bold text-[#0B1F42]">{reviews.filter((review) => review.privateNote).length}</p>
         </div>
       </div>
 
       {loading ? (
         <div className="flex justify-center py-16">
-          <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
         </div>
       ) : error ? (
-        <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-4 text-sm">{error}</div>
+        <div className="rounded-2xl border border-[#F1C9C9] bg-[#FDECEC] p-4 text-sm text-[#B42318]">{error}</div>
       ) : reviews.length === 0 ? (
-        <div className="bg-white rounded-[14px] shadow-sm p-12 text-center">
-          <h3 className="text-lg font-bold text-[#222222] mb-1">No feedback yet</h3>
-          <p className="text-[#6b7280]">Guest reviews will appear here after completed stays.</p>
+        <div className="rounded-2xl border border-[#E3E8EF] bg-white p-12 text-center shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+          <h3 className="mb-1 text-lg font-bold text-[#0B1F42]">No feedback yet</h3>
+          <p className="text-[#5B6B82]">Guest reviews will appear here after completed stays.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-[14px] shadow-sm overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-canvas">
+              <thead className="bg-[#F7F4EF]">
                 <tr className="text-left">
                   <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Property</th>
                   <th className="px-4 py-3 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Guest</th>
@@ -92,27 +93,27 @@ function AdminFeedback() {
               </thead>
               <tbody>
                 {reviews.map((r) => (
-                  <tr key={r.id} className="border-t border-[#E5E7EB] hover:bg-canvas align-top">
+                  <tr key={r.id} className="border-t border-[#E5E7EB] align-top hover:bg-[#F7F4EF]">
                     <td className="px-4 py-3">
-                      <p className="font-medium text-[#222222]">{r.property?.title}</p>
-                      <p className="text-xs text-[#6b7280]">{r.property?.location}</p>
+                      <p className="font-medium text-[#0B1F42]">{r.property?.title}</p>
+                      <p className="text-xs text-[#5B6B82]">{r.property?.location}</p>
                     </td>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-[#222222]">{r.user?.firstName} {r.user?.lastName}</p>
-                      <p className="text-xs text-[#6b7280]">{r.user?.email}</p>
+                      <p className="font-medium text-[#0B1F42]">{r.user?.firstName} {r.user?.lastName}</p>
+                      <p className="text-xs text-[#5B6B82]">{r.user?.email}</p>
                     </td>
                     <td className="px-4 py-3"><StarRow rating={r.rating} /></td>
-                    <td className="px-4 py-3 text-[#222222] max-w-md">
+                    <td className="max-w-md px-4 py-3 text-[#0B1F42]">
                       {r.publicComment
                         ? <span>{r.publicComment}</span>
-                        : <span className="text-[#6b7280] italic">No public review</span>}
+                        : <span className="italic text-[#94A3B8]">No public review</span>}
                     </td>
-                    <td className="px-4 py-3 text-[#222222] max-w-md">
+                    <td className="max-w-md px-4 py-3 text-[#0B1F42]">
                       {r.privateNote
                         ? <span>{r.privateNote}</span>
-                        : <span className="text-[#6b7280] italic">No note</span>}
+                        : <span className="italic text-[#94A3B8]">No note</span>}
                     </td>
-                    <td className="px-4 py-3 text-xs text-[#6b7280] whitespace-nowrap">
+                    <td className="whitespace-nowrap px-4 py-3 text-xs text-[#5B6B82]">
                       {new Date(r.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
