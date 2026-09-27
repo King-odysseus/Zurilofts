@@ -848,7 +848,7 @@ function PropertiesPage() {
       </section>
 
       {/* Sticky Filters Bar */}
-      <section className="hidden sticky top-0 z-10 bg-white shadow-sm md:block">
+      <section className="hidden sticky top-0 z-10 bg-white shadow-[0_4px_16px_rgba(11,31,66,0.06)] md:block">
         <div className="w-full mx-auto px-5 md:px-8 lg:px-12 xl:px-16 max-w-screen-2xl py-3">
           <div className="flex min-w-0 flex-col md:flex-row md:items-center md:justify-between gap-3">
             {/* Left: property type pills + bed variant pills + available toggle */}
@@ -868,7 +868,7 @@ function PropertiesPage() {
                 </button>
               ))}
               <span
-                className="w-px h-5 bg-[#E5E7EB] mx-1 hidden md:block"
+                className="w-px h-5 bg-[#E3E8EF] mx-1 hidden md:block"
                 aria-hidden="true"
               />
               {bedFilterButtons.map(({ key, label }) => (
@@ -961,7 +961,7 @@ function PropertiesPage() {
 
           {/* More Filters (collapsible) */}
           {moreFiltersOpen && (
-            <div className="mt-3 pt-3 border-t border-[#E5E7EB] flex flex-wrap items-center gap-3">
+            <div className="mt-3 pt-3 border-t border-[#E3E8EF] flex flex-wrap items-center gap-3">
               {/* Area */}
               <Dropdown
                 value={neighborhood}
@@ -1043,7 +1043,7 @@ function PropertiesPage() {
 
               {/* Amenities (second line) */}
               <div className="w-full flex flex-wrap items-center gap-2 mt-1">
-                <span className="text-xs text-[#6b7280] mr-1">Amenities:</span>
+                <span className="text-xs text-[#5B6B82] mr-1">Amenities:</span>
                 {COMMON_AMENITIES.map((a) => (
                   <button
                     type="button"
@@ -1059,7 +1059,7 @@ function PropertiesPage() {
                     className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
                       selectedAmenities.has(a)
                         ? "bg-[#0B1F42] text-white"
-                        : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
+                        : "bg-white border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F7F5]"
                     }`}
                   >
                     {a}
@@ -1072,7 +1072,7 @@ function PropertiesPage() {
       </section>
 
       {/* Mobile stays controls mirror the compact OpenPencil results scene. */}
-      <section className="border-b border-[#E5E7EB] bg-white px-4 py-3 md:hidden">
+      <section className="border-b border-[#E3E8EF] bg-white px-4 py-3 md:hidden">
         <div className="grid grid-cols-2 gap-3">
           <button
             type="button"

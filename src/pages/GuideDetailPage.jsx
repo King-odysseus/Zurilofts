@@ -103,7 +103,7 @@ function GuideDetailPage() {
             <h1 className="mb-4 text-3xl font-bold text-[#0B1F42]">
               Guide Not Found
             </h1>
-            <p className="text-[#6b7280] mb-6">
+            <p className="text-[#5B6B82] mb-6">
               This guide may have been removed or moved.
             </p>
             <Link
@@ -162,7 +162,7 @@ function GuideDetailPage() {
             <h1 className="mb-3 text-3xl font-bold text-[#0B1F42] md:text-4xl">
               {post.title}
             </h1>
-            <p className="text-[#6b7280] text-sm">
+            <p className="text-[#5B6B82] text-sm">
               {new Date(post.createdAt).toLocaleDateString("en-GB", {
                 day: "numeric",
                 month: "long",
@@ -184,7 +184,7 @@ function GuideDetailPage() {
               >
                 Contents
                 <svg
-                  className={`h-4 w-4 text-[#6b7280] transition-transform ${tocOpen ? "rotate-180" : ""}`}
+                  className={`h-4 w-4 text-[#5B6B82] transition-transform ${tocOpen ? "rotate-180" : ""}`}
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -201,7 +201,7 @@ function GuideDetailPage() {
               {tocOpen && (
                 <ul
                   id="guide-toc-mobile"
-                  className="space-y-2 border-t border-[#E5E7EB] px-5 py-4"
+                  className="space-y-2 border-t border-[#E3E8EF] px-5 py-4"
                 >
                   {toc.map((item) => (
                     <li
@@ -230,8 +230,8 @@ function GuideDetailPage() {
 
           {/* Related stays */}
           {relatedStays.length > 0 && (
-            <div className="mt-12 border-t border-[#E5E7EB] pt-8">
-              <h2 className="mb-4 text-xl font-bold text-[#222222]">
+            <div className="mt-12 border-t border-[#E3E8EF] pt-8">
+              <h2 className="mb-4 text-xl font-bold text-[#0B1F42]">
                 Related stays
               </h2>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -249,10 +249,10 @@ function GuideDetailPage() {
             aria-label="Table of contents"
             className="hidden lg:sticky lg:top-24 lg:block"
           >
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#6b7280]">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#5B6B82]">
               Contents
             </p>
-            <ul className="space-y-2 border-l border-[#E5E7EB] pl-4">
+            <ul className="space-y-2 border-l border-[#E3E8EF] pl-4">
               {toc.map((item) => (
                 <li key={item.id} className={item.level === 3 ? "ml-3" : ""}>
                   <a
