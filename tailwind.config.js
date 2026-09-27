@@ -12,13 +12,15 @@ export default {
       colors: {
         primary:        '#2563EB',
         'primary-hover': '#1D4ED8',
-        navy:           '#0B0B45',
-        indigo:         '#0B0B45', // Backward-compatible alias to navy
+        navy:           '#0B1F42',
+        indigo:         '#0B1F42', // Backward-compatible alias to navy
         bronze:         '#C49A6C', // Branding
         silver:         '#D9D9D9',
-        charcoal:       '#222222',
-        'cool-grey':    '#6b7280',
-        border:         '#E5E7EB',
+        charcoal:       '#0B1F42',
+        muted:          '#5B6B82',
+        'cool-grey':    '#5B6B82',
+        border:         '#E3E8EF',
+        surface:        '#F7F4EF',
         // App canvas stays white; warm brand accents are applied intentionally
         // to sections, controls, and status surfaces rather than the whole app.
         canvas:         '#FFFFFF',

@@ -742,7 +742,7 @@ function ProfilePage() {
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
                         <h4 className="font-semibold text-red-700">Delete my account</h4>
-                        <p className="text-sm text-[#6b7280] mt-1">
+                        <p className="text-sm text-muted mt-1">
                           Permanently erase your account and personal data. Bookings and payment records are
                           retained for legal and tax reasons but are anonymised so they no longer identify you.
                           This action cannot be undone.
@@ -759,7 +759,7 @@ function ProfilePage() {
 
                     {showDeleteDialog && (
                       <div className="mt-5 pt-5 border-t border-red-200">
-                        <p className="text-sm font-semibold text-[#222222] mb-2">
+                        <p className="text-sm font-semibold text-navy mb-2">
                           To confirm, type <span className="font-mono font-bold text-red-700">DELETE</span> below.
                         </p>
                         <input
@@ -783,7 +783,7 @@ function ProfilePage() {
                             type="button"
                             onClick={() => setShowDeleteDialog(false)}
                             disabled={deleting}
-                            className="min-h-[44px] px-5 py-2.5 rounded-lg border border-[#E5E7EB] text-[#222222] text-sm font-semibold hover:bg-canvas transition-colors duration-200 disabled:opacity-50"
+                            className="min-h-[44px] px-5 py-2.5 rounded-lg border border-border text-navy text-sm font-semibold hover:bg-canvas transition-colors duration-200 disabled:opacity-50"
                           >
                             Cancel
                           </button>
@@ -832,9 +832,9 @@ function ProfilePage() {
                 {payoutMethod === 'bank' ? (
                   <>
                     <div>
-                      <label className="block text-sm font-semibold text-[#222222] mb-2">Bank Name *</label>
+                      <label className="block text-sm font-semibold text-navy mb-2">Bank Name *</label>
                       {banksLoading ? (
-                        <p className="text-sm text-[#6b7280]">Loading banks...</p>
+                        <p className="text-sm text-muted">Loading banks...</p>
                       ) : banks.length > 0 ? (
                         <Dropdown
                           value={bankForm.bankCode}
@@ -843,7 +843,7 @@ function ProfilePage() {
                             setBankForm((prev) => ({ ...prev, bankCode: code, bankName: bank?.name || '' }));
                           }}
                           options={banks.map((b) => ({ value: b.code, label: b.name }))}
-                          triggerClassName=" w-full px-4 py-3 focus:outline-none bg-white text-[#222222] border border-[#E5E7EB] rounded-xl"
+                          triggerClassName=" w-full px-4 py-3 focus:outline-none bg-white text-navy border border-border rounded-xl"
                           ariaLabel="Select your bank"
                         />
                       ) : (
@@ -859,7 +859,7 @@ function ProfilePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-[#222222] mb-2">Account Number *</label>
+                      <label className="block text-sm font-semibold text-navy mb-2">Account Number *</label>
                       <input
                         type="text"
                         value={bankForm.bankAccountNo}
@@ -873,7 +873,7 @@ function ProfilePage() {
                   </>
                 ) : (
                   <div>
-                    <label className="block text-sm font-semibold text-[#222222] mb-2">Safaricom M-PESA Number *</label>
+                    <label className="block text-sm font-semibold text-navy mb-2">Safaricom M-PESA Number *</label>
                     <input
                       type="tel"
                       value={mpesaPhone}
@@ -883,7 +883,7 @@ function ProfilePage() {
                       className="w-full min-h-[44px] rounded-[10px] border border-[#E3E8EF] px-4 py-3 focus:outline-none bg-white text-[#0B1F42] placeholder-[#94A3B8] focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20"
                       required
                     />
-                    <p className="text-xs text-[#6b7280] mt-2">Use the Safaricom number registered to receive your host payouts.</p>
+                    <p className="text-xs text-muted mt-2">Use the Safaricom number registered to receive your host payouts.</p>
                   </div>
                 )}
 
@@ -898,8 +898,8 @@ function ProfilePage() {
 
               {/* Payout Frequency */}
               <div className="space-y-3">
-                <h4 className="font-semibold text-[#222222]">Payout Frequency</h4>
-                <p className="text-xs text-[#6b7280]">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
+                <h4 className="font-semibold text-navy">Payout Frequency</h4>
+                <p className="text-xs text-muted">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
                 <div className="flex items-center gap-3">
                   <Dropdown
                     value={payoutFrequency}
@@ -909,7 +909,7 @@ function ProfilePage() {
                       { value: 'biweekly', label: 'Bi-Weekly (every other Monday)' },
                       { value: 'monthly', label: 'Monthly (1st of month)' },
                     ]}
-                    triggerClassName=" px-4 py-3 bg-white text-[#222222] border border-[#E5E7EB] rounded-xl w-64"
+                    triggerClassName=" px-4 py-3 bg-white text-navy border border-border rounded-xl w-64"
                     ariaLabel="Select payout frequency"
                   />
                   <button
@@ -936,13 +936,13 @@ function ProfilePage() {
             <div className="space-y-4">
               {bookings.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-[#E5E7EB] rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[#222222] mb-1">No bookings yet</h3>
-                  <p className="text-[#6b7280]">Your upcoming stays will appear here.</p>
+                  <h3 className="text-lg font-bold text-navy mb-1">No bookings yet</h3>
+                  <p className="text-muted">Your upcoming stays will appear here.</p>
                 </div>
               ) : (
                 bookings.map((booking) => (
@@ -958,8 +958,8 @@ function ProfilePage() {
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-bold text-[#222222]">{booking.property?.title}</h3>
-                            <p className="text-sm text-[#6b7280]">{booking.property?.location}</p>
+                            <h3 className="font-bold text-navy">{booking.property?.title}</h3>
+                            <p className="text-sm text-muted">{booking.property?.location}</p>
                           </div>
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[booking.status]}`}>
                             {booking.status}
@@ -967,15 +967,15 @@ function ProfilePage() {
                         </div>
                         <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
                           <div>
-                            <span className="text-[#6b7280]">Check-in</span>
+                            <span className="text-muted">Check-in</span>
                             <p className="font-semibold">{new Date(booking.checkIn).toLocaleDateString()}</p>
                           </div>
                           <div>
-                            <span className="text-[#6b7280]">Check-out</span>
+                            <span className="text-muted">Check-out</span>
                             <p className="font-semibold">{new Date(booking.checkOut).toLocaleDateString()}</p>
                           </div>
                           <div>
-                            <span className="text-[#6b7280]">Total</span>
+                            <span className="text-muted">Total</span>
                             <p className="font-semibold text-[#9A744A]">KES {booking.total.toLocaleString()}</p>
                           </div>
                         </div>
@@ -989,8 +989,8 @@ function ProfilePage() {
 
                         {/* Post-stay review */}
                         {booking.review ? (
-                          <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
-                            <p className="text-sm font-semibold text-[#222222] mb-1">Your rating</p>
+                          <div className="mt-4 pt-4 border-t border-border">
+                            <p className="text-sm font-semibold text-navy mb-1">Your rating</p>
                             <div className="flex items-center gap-1">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <svg
@@ -1006,8 +1006,8 @@ function ProfilePage() {
                             </div>
                           </div>
                         ) : isStayCompleted(booking) ? (
-                          <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
-                            <p className="text-sm font-semibold text-[#222222] mb-2">Rate your stay</p>
+                          <div className="mt-4 pt-4 border-t border-border">
+                            <p className="text-sm font-semibold text-navy mb-2">Rate your stay</p>
                             <div className="flex items-center gap-1 mb-3">
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const current = reviewForms[booking.id]?.rating || 0;
@@ -1030,7 +1030,7 @@ function ProfilePage() {
                                 );
                               })}
                             </div>
-                            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+                            <label className="block text-xs font-semibold text-muted mb-2">
                               How satisfied were you with your stay?
                             </label>
                             <div className="flex items-center gap-3 mb-4">
@@ -1057,7 +1057,7 @@ function ProfilePage() {
                                 );
                               })}
                             </div>
-                            <label className="block text-xs font-semibold text-[#6b7280] mb-1">
+                            <label className="block text-xs font-semibold text-muted mb-1">
                               Public review <span className="font-normal">(shown on the property page)</span>
                             </label>
                             <textarea
@@ -1067,7 +1067,7 @@ function ProfilePage() {
                               maxLength={1000}
                               className="w-full rounded-[10px] border border-[#E3E8EF] px-4 py-3 focus:outline-none bg-white text-[#0B1F42] placeholder-[#94A3B8] h-20 resize-none text-sm mb-4 focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20"
                             />
-                            <label className="block text-xs font-semibold text-[#6b7280] mb-1">
+                            <label className="block text-xs font-semibold text-muted mb-1">
                               Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
                             </label>
                             <textarea
@@ -1116,13 +1116,13 @@ function ProfilePage() {
             <div>
               {favorites.length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-[#E5E7EB] rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <div className="w-16 h-16 bg-surface rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                   </div>
-                  <h3 className="text-lg font-bold text-[#222222] mb-1">No favourites yet</h3>
-                  <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
+                  <h3 className="text-lg font-bold text-navy mb-1">No favourites yet</h3>
+                  <p className="text-muted mb-4">Tap the heart on any property to save it here.</p>
                   <Link to="/properties" className="inline-block min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200">
                     Browse properties
                   </Link>
