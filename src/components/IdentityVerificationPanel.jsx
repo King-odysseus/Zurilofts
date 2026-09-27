@@ -112,7 +112,7 @@ function IdentityVerificationPanel({ onApproved }) {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
       </div>
     );
   }
@@ -137,34 +137,34 @@ function IdentityVerificationPanel({ onApproved }) {
           ['Documents', '#verification-documents', '2'],
           ['Review', '#verification-review', '3'],
         ].map(([label, href, number]) => (
-          <a key={label} href={href} className="flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-2 text-xs font-semibold text-[#0B1F42] hover:border-[#C49A6C] sm:text-sm">
+          <a key={label} href={href} className="flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] border border-[#E3E8EF] bg-white px-2 text-xs font-semibold text-[#0B1F42] hover:border-[#C49A6C] sm:text-sm">
             <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FDE8D8] text-xs text-[#9A4A1D]">{number}</span>{label}
           </a>
         ))}
       </nav>
 
       {data?.status === 'REJECTED' && data?.reviewNote && (
-        <div className="mb-6 bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 text-sm">
+        <div className="mb-6 rounded-2xl border border-[#F1C9C9] bg-[#FDECEC] px-4 py-3 text-sm text-[#B42318]">
           {data.reviewNote}
         </div>
       )}
       {data?.status === 'SUBMITTED' && (
-        <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl px-4 py-3 text-sm">
+        <div className="mb-6 rounded-2xl border border-[#F2D5B8] bg-[#FFF4E8] px-4 py-3 text-sm text-[#9A4A1D]">
           Your verification is being reviewed. We&apos;ll notify you once it&apos;s complete.
         </div>
       )}
       {data?.status === 'APPROVED' && (
-        <div className="mb-6 bg-green-50 border border-green-200 text-green-700 rounded-xl px-4 py-3 text-sm">
+        <div className="mb-6 rounded-2xl border border-[#BFE3C9] bg-[#E8F4EC] px-4 py-3 text-sm text-[#287A45]">
           You&apos;re verified. You can complete payment on any pending booking.
         </div>
       )}
-      {message && <p className="text-sm text-[#6b7280] mb-4">{message}</p>}
+      {message && <p className="mb-4 text-sm text-[#5B6B82]">{message}</p>}
 
       <form id="verification-details" onSubmit={handleSave} className="scroll-mt-24 space-y-4 mb-6">
-        <h4 className="text-sm font-semibold text-[#222222]">Details</h4>
+        <h4 className="text-sm font-semibold text-[#0B1F42]">Details</h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="iv-fullName" className="block text-sm font-medium text-[#222222] mb-1">Full legal name</label>
+            <label htmlFor="iv-fullName" className="mb-1 block text-sm font-medium text-[#0B1F42]">Full legal name</label>
             <input
               id="iv-fullName"
               type="text"
@@ -175,7 +175,7 @@ function IdentityVerificationPanel({ onApproved }) {
             />
           </div>
           <div>
-            <label htmlFor="iv-dateOfBirth" className="block text-sm font-medium text-[#222222] mb-1">Date of birth</label>
+            <label htmlFor="iv-dateOfBirth" className="mb-1 block text-sm font-medium text-[#0B1F42]">Date of birth</label>
             <input
               id="iv-dateOfBirth"
               type="date"
@@ -186,7 +186,7 @@ function IdentityVerificationPanel({ onApproved }) {
             />
           </div>
           <div>
-            <label htmlFor="iv-idType" className="block text-sm font-medium text-[#222222] mb-1">ID type</label>
+            <label htmlFor="iv-idType" className="mb-1 block text-sm font-medium text-[#0B1F42]">ID type</label>
             <select
               id="iv-idType"
               disabled={!editable}
@@ -200,7 +200,7 @@ function IdentityVerificationPanel({ onApproved }) {
             </select>
           </div>
           <div>
-            <label htmlFor="iv-idNumber" className="block text-sm font-medium text-[#222222] mb-1">ID number</label>
+            <label htmlFor="iv-idNumber" className="mb-1 block text-sm font-medium text-[#0B1F42]">ID number</label>
             <input
               id="iv-idNumber"
               type="text"
@@ -215,7 +215,7 @@ function IdentityVerificationPanel({ onApproved }) {
           <button
             type="submit"
             disabled={saving}
-            className="min-h-[44px] px-5 py-2 rounded-lg text-sm font-semibold bg-white text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors disabled:opacity-50"
+            className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-white px-5 py-2 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF] disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save details'}
           </button>
@@ -224,14 +224,14 @@ function IdentityVerificationPanel({ onApproved }) {
 
       {editable && (
         <div id="verification-documents" className="scroll-mt-24 space-y-3 mb-6">
-          <p className="text-sm font-semibold text-[#222222]">Documents</p>
+          <p className="text-sm font-semibold text-[#0B1F42]">Documents</p>
           {DOCUMENT_KINDS.map(({ kind, label, required }) => (
-            <div key={kind} className="flex items-center justify-between gap-3 rounded-xl border border-[#E5E7EB] bg-white p-3">
+            <div key={kind} className="flex items-center justify-between gap-3 rounded-2xl border border-[#E3E8EF] bg-white p-3 shadow-[0_8px_28px_rgba(11,31,66,0.05)]">
               <div>
-                <p className="text-sm text-[#222222]">{label}{required && <span className="text-red-500"> *</span>}</p>
-                {uploadedKinds.has(kind) && <p className="text-xs text-green-700">Uploaded</p>}
+                <p className="text-sm text-[#0B1F42]">{label}{required && <span className="text-[#B42318]"> *</span>}</p>
+                {uploadedKinds.has(kind) && <p className="text-xs text-[#287A45]">Uploaded</p>}
               </div>
-              <label className="min-h-[44px] inline-flex items-center px-3 py-1.5 text-xs font-semibold rounded-lg border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] hover:text-[#2563EB] cursor-pointer transition-all">
+              <label className="inline-flex min-h-[44px] cursor-pointer items-center rounded-[10px] border border-[#E3E8EF] px-3 py-1.5 text-xs font-semibold text-[#0B1F42] transition-all hover:bg-[#F7F4EF] hover:text-[#9A744A]">
                 {uploading === kind ? 'Uploading...' : uploadedKinds.has(kind) ? 'Replace' : 'Upload'}
                 <input
                   type="file"
@@ -251,18 +251,18 @@ function IdentityVerificationPanel({ onApproved }) {
       )}
 
       <div id="verification-review" className="scroll-mt-24 border-t border-[#E5E7EB] pt-5">
-        <p className="mb-1 text-sm font-semibold text-[#222222]">Review</p>
-        <p className="mb-4 text-xs text-[#6b7280]">Check your details and required documents before submitting.</p>
+        <p className="mb-1 text-sm font-semibold text-[#0B1F42]">Review</p>
+        <p className="mb-4 text-xs text-[#5B6B82]">Check your details and required documents before submitting.</p>
       {editable && (
         <button
           onClick={handleSubmit}
           disabled={saving}
-          className="min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors disabled:opacity-50"
+          className="min-h-[44px] rounded-[10px] bg-[#C49A6C] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C] disabled:opacity-50"
         >
           Submit for review
         </button>
       )}
-      {!editable && <p className="text-sm text-[#6b7280]">Your submitted information is shown above.</p>}
+      {!editable && <p className="text-sm text-[#5B6B82]">Your submitted information is shown above.</p>}
       </div>
     </div>
   );
