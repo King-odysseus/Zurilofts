@@ -44,7 +44,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
         aria-label={ariaLabel}
         className={`flex items-center justify-between gap-2 ${triggerClassName}`}
       >
-        <span className={selected ? 'truncate' : 'truncate text-[#6b7280]'}>
+        <span className={selected ? 'truncate text-[#0B1F42]' : 'truncate text-[#94A3B8]'}>
           {selected ? selected.label : placeholder}
         </span>
         <svg

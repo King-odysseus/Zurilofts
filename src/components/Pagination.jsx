@@ -50,7 +50,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
           </button>
           {pageList(page, totalPages).map((p, i) =>
             p === '...' ? (
-              <span key={`e-${i}`} className="w-6 text-center text-[#6b7280] text-sm">…</span>
+              <span key={`e-${i}`} className="w-6 text-center text-[#5B6B82] text-sm">…</span>
             ) : (
               <button
                 key={p}

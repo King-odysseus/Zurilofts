@@ -59,7 +59,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
   return (
     <div ref={containerRef} className={`flex w-full min-w-0 flex-col sm:contents ${openField ? 'relative z-50' : ''}`}>
       {/* When */}
-      <div className={`relative w-full min-w-0 px-4 py-2 sm:w-auto sm:min-w-[150px] sm:border-r sm:border-[#E5E7EB] sm:px-6 sm:py-1 ${openField === 'dates' ? 'z-50' : ''}`}>
+      <div className={`relative w-full min-w-0 px-4 py-2 sm:w-auto sm:min-w-[150px] sm:border-r sm:border-[#E3E8EF] sm:px-6 sm:py-1 ${openField === 'dates' ? 'z-50' : ''}`}>
         <button
           type="button"
           onClick={() => setOpenField(openField === 'dates' ? null : 'dates')}

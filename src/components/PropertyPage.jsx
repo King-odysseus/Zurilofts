@@ -270,7 +270,7 @@ function PropertyPage() {
           <h1 className="mb-2 text-2xl font-bold leading-tight text-[#0B1F42] sm:text-3xl md:text-4xl">
             {property.title}
           </h1>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[#6b7280]">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[#5B6B82]">
             <a
               href={googleMapsDirectionsUrl({ lat: property.lat, lng: property.lng, label: property.location })}
               target="_blank"
@@ -278,7 +278,7 @@ function PropertyPage() {
               className="inline-flex items-center gap-1.5 min-h-[44px] rounded-full transition-colors hover:text-[#9A744A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
               title="Get directions in Google Maps"
             >
-              <svg className="w-5 h-5 text-[#6b7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="w-5 h-5 text-[#5B6B82] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -286,12 +286,12 @@ function PropertyPage() {
               <span className="text-xs font-semibold">Google Maps ↗</span>
             </a>
             {typeof property.rating === 'number' && property.rating > 0 && (
-              <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#222222]" aria-label={`Rated ${property.rating} out of 5 from ${property.reviews || 0} reviews`}>
+              <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#0B1F42]" aria-label={`Rated ${property.rating} out of 5 from ${property.reviews || 0} reviews`}>
                 <svg className="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
                 {property.rating}
-                <span className="font-normal text-[#6b7280]">
+                <span className="font-normal text-[#5B6B82]">
                   &middot; {property.reviews === 1 ? '1 review' : `${property.reviews || 0} reviews`}
                 </span>
               </span>
@@ -318,8 +318,8 @@ function PropertyPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
                 </svg>
                 <div>
-                  <p className="font-bold text-[#222222]">{displayBedrooms}</p>
-                  <p className="text-sm text-[#6b7280]">{displayBedrooms === 1 ? 'Bedroom' : 'Bedrooms'}</p>
+                  <p className="font-bold text-[#0B1F42]">{displayBedrooms}</p>
+                  <p className="text-sm text-[#5B6B82]">{displayBedrooms === 1 ? 'Bedroom' : 'Bedrooms'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -327,8 +327,8 @@ function PropertyPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                 </svg>
                 <div>
-                  <p className="font-bold text-[#222222]">{displayBathrooms}</p>
-                  <p className="text-sm text-[#6b7280]">{displayBathrooms === 1 ? 'Bathroom' : 'Bathrooms'}</p>
+                  <p className="font-bold text-[#0B1F42]">{displayBathrooms}</p>
+                  <p className="text-sm text-[#5B6B82]">{displayBathrooms === 1 ? 'Bathroom' : 'Bathrooms'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -336,8 +336,8 @@ function PropertyPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                 </svg>
                 <div>
-                  <p className="font-bold text-[#222222]">{property.area} sq ft</p>
-                  <p className="text-sm text-[#6b7280]">Area</p>
+                  <p className="font-bold text-[#0B1F42]">{property.area} sq ft</p>
+                  <p className="text-sm text-[#5B6B82]">Area</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -345,15 +345,15 @@ function PropertyPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
                 <div>
-                  <p className="font-bold text-[#222222]">{typeLabel}</p>
-                  <p className="text-sm text-[#6b7280]">Type</p>
+                  <p className="font-bold text-[#0B1F42]">{typeLabel}</p>
+                  <p className="text-sm text-[#5B6B82]">Type</p>
                 </div>
               </div>
             </section>
 
             {/* Description */}
             <section className="mb-8 md:mb-10" aria-labelledby="about-heading">
-              <h2 id="about-heading" className="text-xl sm:text-2xl font-bold text-[#222222] mb-4">About this {typeLabel.toLowerCase()}</h2>
+              <h2 id="about-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">About this {typeLabel.toLowerCase()}</h2>
               <div className="text-[#1f2937] leading-relaxed space-y-3">
                 {(property.description || 'No description provided.').replace(/<[^>]*>?/gm, '').split('\n').filter(Boolean).map((paragraph, i) => (
                   <p key={i}>{paragraph}</p>
@@ -364,7 +364,7 @@ function PropertyPage() {
             {/* Amenities */}
             {amenities.length > 0 && (
               <section className="mb-8 md:mb-10" aria-labelledby="amenities-heading">
-                <h2 id="amenities-heading" className="text-xl sm:text-2xl font-bold text-[#222222] mb-4">What this place offers</h2>
+                <h2 id="amenities-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">What this place offers</h2>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="list">
                   {amenities.map((amenity, index) => (
                     <li key={index} className="flex items-center gap-3">
@@ -381,11 +381,11 @@ function PropertyPage() {
             {/* Nearby */}
             {nearby.length > 0 && (
               <section className="mb-8 md:mb-10" aria-labelledby="nearby-heading">
-                <h2 id="nearby-heading" className="text-xl sm:text-2xl font-bold text-[#222222] mb-4">What&apos;s nearby</h2>
+                <h2 id="nearby-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">What&apos;s nearby</h2>
                 <ul className="space-y-3" role="list">
                   {nearby.map((item, index) => (
                     <li key={index} className="flex items-start gap-3 text-[#1f2937]">
-                      <svg className="w-5 h-5 text-[#6b7280] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <svg className="w-5 h-5 text-[#5B6B82] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -399,7 +399,7 @@ function PropertyPage() {
             {/* Where you'll be - only when the host confirmed coordinates */}
             {hasMapCoordinates(property.lat, property.lng) && (
               <section className="mb-8 md:mb-10" aria-labelledby="location-heading">
-                <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#222222] mb-4">Where you&apos;ll be</h2>
+                <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">Where you&apos;ll be</h2>
                 <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(11,31,66,0.06)]">
                   <p className="font-semibold text-[#0B1F42]">{property.location}</p>
                   {property.address && <p className="mt-1 text-sm text-[#5B6B82]">{property.address}</p>}
@@ -413,7 +413,7 @@ function PropertyPage() {
 
             {/* No-content fallback when all optional sections are empty */}
             {amenities.length === 0 && nearby.length === 0 && (
-              <p className="text-[#6b7280] py-4">Additional details about this property are being prepared.</p>
+              <p className="text-[#5B6B82] py-4">Additional details about this property are being prepared.</p>
             )}
           </div>
 
