@@ -134,7 +134,7 @@ function HostPayouts() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
         <p className="text-[#6b7280]">Loading payout info...</p>
       </div>
     );
@@ -143,19 +143,19 @@ function HostPayouts() {
   return (
     <div className="space-y-6">
       <nav className="flex border-b border-[#E5E7EB]" aria-label="Host finance">
-        <Link to="/host/earnings" className="min-h-[44px] border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-[#6b7280] hover:text-[#222222]">Overview</Link>
-        <Link to="/host/payouts" aria-current="page" className="min-h-[44px] border-b-2 border-[#2563EB] px-4 py-2.5 text-sm font-semibold text-[#222222]">Payouts</Link>
+        <Link to="/host/earnings" className="min-h-[44px] border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-[#5B6B82] hover:text-[#0B1F42]">Overview</Link>
+        <Link to="/host/payouts" aria-current="page" className="min-h-[44px] border-b-2 border-[#C49A6C] px-4 py-2.5 text-sm font-semibold text-[#0B1F42]">Payouts</Link>
       </nav>
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Host finance</p>
-        <h1 className="mt-1 text-2xl font-bold text-[#222222]">Payouts</h1>
-        <p className="mt-1 text-sm text-[#6b7280]">Track your available balance, payout destination, tax statements, and payout history.</p>
+      <div className="rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-6">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Host finance</p>
+        <h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">Payouts</h1>
+        <p className="mt-1 text-sm text-[#5B6B82]">Track your available balance, payout destination, tax statements, and payout history.</p>
       </div>
 
       {/* Wallet card */}
-      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
+      <div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
-          <div><h2 className="text-lg font-bold text-[#222222]">My earnings wallet</h2><p className="mt-1 text-sm text-[#6b7280]">Your current balance and lifetime payout totals.</p></div>
+          <div><h2 className="text-lg font-bold text-[#0B1F42]">My earnings wallet</h2><p className="mt-1 text-sm text-[#5B6B82]">Your current balance and lifetime payout totals.</p></div>
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${destination?.method ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>{destination?.method ? 'Payouts enabled' : 'Setup required'}</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -165,7 +165,7 @@ function HostPayouts() {
               KES {wallet?.balance?.toLocaleString() || '0'}
             </p>
           </div>
-          <div className="bg-blue-50 rounded-xl p-4">
+          <div className="rounded-xl bg-[#FDE8D8] p-4">
             <p className="text-xs text-[#6b7280] uppercase tracking-wide">Total Earned</p>
             <p className="text-2xl font-bold text-[#222222]">
               KES {wallet?.totalEarned?.toLocaleString() || '0'}
@@ -202,8 +202,8 @@ function HostPayouts() {
       </div>
 
       {/* WHT Statement */}
-      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
-        <h2 className="text-lg font-bold text-[#222222] mb-4">WHT Statement (Tax Certificate)</h2>
+      <div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+        <h2 className="mb-4 text-lg font-bold text-[#0B1F42]">WHT Statement (Tax Certificate)</h2>
         <p className="text-sm text-[#6b7280] mb-4">
           Download your withholding tax statement to claim KRA tax credits. WHT at 5% is automatically deducted and remitted on your behalf.
         </p>
@@ -212,7 +212,7 @@ function HostPayouts() {
             type="month"
             value={whtMonth}
             onChange={(e) => setWhtMonth(e.target.value)}
-            className="min-h-[44px] px-4 py-2 bg-white border border-[#E5E7EB] text-[#222222] rounded-xl text-sm focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+            className="min-h-[44px] rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
           />
           <button
             onClick={downloadWht}
@@ -282,8 +282,8 @@ function HostPayouts() {
       </div>
 
       {/* Payout History */}
-      <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
-        <h2 className="text-lg font-bold text-[#222222] mb-4">Payout History</h2>
+      <div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+        <h2 className="mb-4 text-lg font-bold text-[#0B1F42]">Payout History</h2>
         {payouts.length === 0 ? (
           <p className="text-[#6b7280] text-sm">No payouts yet. Your first payout will appear here.</p>
         ) : (
