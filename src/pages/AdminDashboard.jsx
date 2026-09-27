@@ -772,7 +772,7 @@ function AdminLayout() {
           aria-hidden="true"
         />
         <div
-          className={`fixed inset-y-0 right-0 w-80 max-w-[85vw] bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ${
+          className={`fixed inset-y-0 right-0 w-[288px] max-w-[85vw] bg-white z-50 shadow-2xl flex flex-col transition-transform duration-300 ${
             mobileMenuOpen ? "translate-x-0" : "translate-x-full"
           }`}
           role="dialog"
