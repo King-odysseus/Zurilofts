@@ -66,7 +66,7 @@ function NearbyMap({ items, title }) {
       directions.rel = 'noopener noreferrer';
       directions.textContent = 'Get directions in Google Maps';
       directions.setAttribute('aria-label', `Get directions to ${item.name} in Google Maps`);
-      directions.style.cssText = 'display:inline-block;color:#0B0B45;font-weight:700;text-decoration:underline;';
+      directions.style.cssText = 'display:inline-block;color:#9A744A;font-weight:700;text-decoration:underline;';
       popup.appendChild(directions);
 
       const marker = L.marker([Number(item.lat), Number(item.lng)], {
@@ -118,16 +118,16 @@ function NearbyMap({ items, title }) {
           aria-label={`${title} map`}
         />
         <aside className="max-h-80 overflow-y-auto border-t border-[#D9D9D9] bg-white lg:max-h-[520px] lg:border-l lg:border-t-0" aria-label={`${title} locations`}>
-          <div className="sticky top-0 z-10 border-b border-[#D9D9D9] bg-white px-4 py-3">
-            <p className="font-bold text-[#0B0B45]">{items.length} locations</p>
-            <p className="text-xs text-[#6b7280]">Select a venue to reveal its pin.</p>
+          <div className="sticky top-0 z-10 border-b border-[#E3E8EF] bg-white px-4 py-3">
+            <p className="font-bold text-[#0B1F42]">{items.length} locations</p>
+            <p className="text-xs text-[#5B6B82]">Select a venue to reveal its pin.</p>
           </div>
           {items.map((item) => (
             <div key={item.name} className="flex items-center gap-2 border-b border-[#D9D9D9]/70 px-3 py-3 last:border-0">
               <button
                 type="button"
                 onClick={() => focusVenue(item)}
-                className="min-w-0 flex-1 text-left text-sm font-semibold text-[#0B0B45] hover:text-[#C49A6C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+                className="min-w-0 flex-1 text-left text-sm font-semibold text-[#0B1F42] hover:text-[#C49A6C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
               >
                 {item.name}
               </button>
@@ -135,7 +135,7 @@ function NearbyMap({ items, title }) {
                 href={googleMapsDirectionsUrl({ ...item, label: item.mapsQuery || `${item.name}, Nairobi, Kenya`, preferLabel: true })}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="shrink-0 rounded-full bg-[#0B0B45] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#C49A6C]"
+                className="shrink-0 rounded-[10px] bg-[#0B1F42] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#C49A6C]"
                 aria-label={`Get directions to ${item.name}`}
               >
                 Directions ↗
@@ -144,8 +144,8 @@ function NearbyMap({ items, title }) {
           ))}
         </aside>
       </div>
-      <p className="bg-white px-4 py-3 text-center text-sm text-[#6b7280]">
-        Tap a pin or venue name, then choose <span className="font-semibold text-[#0B0B45]">Get directions in Google Maps</span>.
+      <p className="bg-white px-4 py-3 text-center text-sm text-[#5B6B82]">
+        Tap a pin or venue name, then choose <span className="font-semibold text-[#0B1F42]">Get directions in Google Maps</span>.
       </p>
     </div>
   );
