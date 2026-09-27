@@ -19,7 +19,7 @@ function NearbyCard({ item, areaLabels }) {
       <div className="h-48 overflow-hidden relative">
         <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-[14px]" src={item.image} alt={item.name} />
         <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
-           className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-md hover:bg-[#2563EB] hover:text-white transition-all duration-200 z-10">
+           className="absolute bottom-2 right-2 z-10 rounded-full bg-white/90 p-2 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-[#0B1F42] hover:text-white">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -27,10 +27,10 @@ function NearbyCard({ item, areaLabels }) {
         </a>
       </div>
       <div className="p-5">
-        <span className="inline-block bg-[#2563EB]/10 text-[#2563EB] text-xs font-semibold px-2 py-0.5 rounded-full mb-2 uppercase tracking-wide">
+        <span className="mb-2 inline-block rounded-full bg-[#FDE8D8] px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-[#9A4A1D]">
           {areaLabels[item.area] || item.area}
         </span>
-        <h3 className="text-lg font-bold text-[#222222] mb-2">{item.name}</h3>
+        <h3 className="mb-2 text-lg font-bold text-[#0B1F42]">{item.name}</h3>
         <p className="text-charcoal text-sm leading-relaxed">{item.desc}</p>
         <a
           href={mapsUrl}
@@ -71,8 +71,8 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   return (
     <div className="mt-8 md:mt-12 mb-16">
       {/* Centered Header */}
-      <div className="text-center mb-8 px-5 py-8 md:px-8 md:py-10 rounded-[14px] border border-[#E5E7EB] bg-white shadow-sm">
-        <h2 className="text-3xl md:text-4xl font-bold text-[#222222]">{title}</h2>
+      <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-8 text-center shadow-[0_4px_16px_rgba(11,31,66,0.04)] md:px-8 md:py-10">
+        <h2 className="text-3xl font-bold text-[#0B1F42] md:text-4xl">{title}</h2>
         <p className="text-cool-grey max-w-2xl mx-auto text-base md:text-lg mt-3 px-2 md:px-0">{subtitle}</p>
       </div>
 
@@ -98,7 +98,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
         <div className="flex items-center gap-1">
           <button
             onClick={() => setViewMode('grid')}
-            className={`p-2 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-[#2563EB] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
+            className={`rounded-[10px] p-2 transition-colors ${viewMode === 'grid' ? 'bg-[#0B1F42] text-white' : 'bg-[#F7F4EF] text-[#52606F]'}`}
             aria-label="Grid view"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -107,7 +107,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
           </button>
           <button
             onClick={() => setViewMode('map')}
-            className={`p-2 rounded-lg transition-colors ${viewMode === 'map' ? 'bg-[#2563EB] text-white' : 'bg-[#f0f0f0] text-[#6b7280]'}`}
+            className={`rounded-[10px] p-2 transition-colors ${viewMode === 'map' ? 'bg-[#0B1F42] text-white' : 'bg-[#F7F4EF] text-[#52606F]'}`}
             aria-label="Map view"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

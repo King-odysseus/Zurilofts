@@ -218,7 +218,7 @@ function SearchBar({ discovery = false }) {
                 <button
                   type="button"
                   onClick={() => handleSelect(p.id)}
-                  className="w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-[#F7F7F5] transition-colors border-b border-[#E5E7EB] last:border-b-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2563EB]"
+                  className="w-full border-b border-[#E3E8EF] px-5 py-3 text-left transition-colors last:border-b-0 hover:bg-[#F7F4EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] flex items-center gap-4"
                 >
                   {p.images?.[0] ? (
                     <img
@@ -234,11 +234,11 @@ function SearchBar({ discovery = false }) {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#222222] truncate">{p.title}</p>
+                    <p className="truncate text-sm font-semibold text-[#0B1F42]">{p.title}</p>
                     <p className="text-xs text-[#6b7280] truncate">{p.location}</p>
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <p className="text-sm font-bold text-[#2563EB]">KES {p.price.toLocaleString()}</p>
+                    <p className="text-sm font-bold text-[#0B1F42]">KES {p.price.toLocaleString()}</p>
                     <p className="text-xs text-[#6b7280]">/ night</p>
                   </div>
                 </button>
@@ -249,7 +249,7 @@ function SearchBar({ discovery = false }) {
             <button
               type="button"
               onClick={handleSearch}
-              className="w-full py-3 text-sm font-semibold text-[#2563EB] hover:bg-[#F7F7F5] text-center border-t border-[#E5E7EB]"
+              className="w-full border-t border-[#E3E8EF] py-3 text-center text-sm font-semibold text-[#0B1F42] hover:bg-[#F7F4EF]"
             >
               View all results &rarr;
             </button>
@@ -268,7 +268,7 @@ function RoleToggle({ mode, onChange }) {
         onClick={() => onChange('traveler')}
         className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
           mode === 'traveler'
-            ? 'bg-white text-[#2563EB] shadow-md'
+            ? 'bg-white text-[#0B1F42] shadow-md'
             : 'text-white/70 hover:text-white'
         }`}
       >
@@ -279,7 +279,7 @@ function RoleToggle({ mode, onChange }) {
         onClick={() => onChange('host')}
         className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
           mode === 'host'
-            ? 'bg-white text-[#2563EB] shadow-md'
+            ? 'bg-white text-[#0B1F42] shadow-md'
             : 'text-white/70 hover:text-white'
         }`}
       >
@@ -336,7 +336,7 @@ function Hero({ stats }) {
           {/* Headline and Description */}
           <div className="text-center mb-14">
             <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-              <span className={`w-2 h-2 rounded-full animate-pulse ${isHost ? 'bg-[#2563EB]' : 'bg-green-500'}`}></span>
+              <span className={`h-2 w-2 animate-pulse rounded-full ${isHost ? 'bg-[#C49A6C]' : 'bg-green-500'}`}></span>
               <span className="text-white/90 text-sm font-medium">
                 {isHost ? 'List Your Property' : 'Available for Booking'}
               </span>
