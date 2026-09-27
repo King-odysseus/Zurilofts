@@ -398,9 +398,10 @@ function ProfilePage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <div className="pt-24 pb-16">
-        <div className="max-w-5xl mx-auto px-4 md:px-6">
+        <div className="max-w-[1344px] mx-auto px-4 md:px-6">
+          <div className="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start lg:gap-6">
           {/* Header */}
-          <div className="mb-8 rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm">
+          <div className="mb-8 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm lg:sticky lg:top-24 lg:mb-0 lg:border-0 lg:bg-[#F7F4EF] lg:p-6 lg:shadow-none">
             <div className="flex items-center mb-4">
               <label className="relative cursor-pointer group">
                 {profile?.avatar ? (
@@ -440,11 +441,20 @@ function ProfilePage() {
                 </h1>
                 <p className="text-[#6b7280]">{profile?.email}</p>
               </div>
+              <nav aria-label="Account navigation" className="mt-6 hidden space-y-1 lg:block">
+                {[['info', 'Personal details'], ['verification', 'Security & verification'], ['bookings', 'Payments & bookings'], ['favorites', `Saved places${favorites.length ? ` (${favorites.length})` : ''}`]].map(([id, label]) => (
+                  <button key={id} type="button" onClick={() => setActiveTab(id)} className={`flex min-h-[44px] w-full items-center rounded-xl px-3 text-left text-sm font-medium transition-colors ${activeTab === id ? 'bg-white text-[#0B1F42] shadow-sm' : 'text-[#52606F] hover:bg-white/70 hover:text-[#0B1F42]'}`}>
+                    {label}
+                  </button>
+                ))}
+                <button type="button" onClick={logout} className="mt-5 flex min-h-[44px] w-full items-center rounded-xl px-3 text-left text-sm font-medium text-[#C65A24] hover:bg-white/70">Log out</button>
+              </nav>
             </div>
           </div>
 
+          <div className="min-w-0">
           {/* Tabs */}
-          <div className="flex overflow-x-auto no-scrollbar border-b border-[#E5E7EB] mb-8">
+          <div className="mb-8 flex overflow-x-auto no-scrollbar border-b border-[#E5E7EB] lg:hidden">
             {['info', 'bookings', 'favorites', 'verification'].map((tab) => (
               <button
                 key={tab}
@@ -1133,7 +1143,9 @@ function ProfilePage() {
               )}
             </div>
           )}
+          </div>
         </div>
+      </div>
       </div>
       <Footer />
     </div>
