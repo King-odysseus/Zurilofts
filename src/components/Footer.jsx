@@ -4,7 +4,7 @@ import { openConsentManager } from '../utils/consent.js';
 function Footer() {
   return (
     <footer className="bg-[#0B1F42] text-white">
-      <div className="mx-auto max-w-7xl px-4 py-10 md:px-6 md:py-12">
+      <div className="mx-auto w-full max-w-[1344px] px-4 py-10 md:px-6 md:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="sm:col-span-2">

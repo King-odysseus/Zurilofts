@@ -325,7 +325,7 @@ function Hero({ stats }) {
       <Navbar />
 
       <div className="relative flex-1 flex items-center">
-        <div className="max-w-7xl mx-auto px-6 w-full py-28 md:py-32">
+        <div className="mx-auto w-full max-w-[1344px] px-6 py-28 md:py-32">
           {/* Role Toggle - Airbnb-style pill (hidden when authenticated) */}
           {showToggle && (
           <div className="flex justify-center mb-10">

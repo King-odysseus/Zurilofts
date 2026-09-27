@@ -17,7 +17,7 @@ function PropertyCardRow({ title, properties, emptyMessage, align = 'left' }) {
   if (cards.length === 0 && !emptyMessage) return null;
 
   return (
-    <section className="max-w-7xl mx-auto px-4 md:px-6" aria-label={title}>
+    <section className="mx-auto w-full max-w-[1344px] px-4 md:px-6" aria-label={title}>
       <h2 className={`mb-6 text-2xl font-bold text-[#0B1F42] md:text-3xl ${centered ? 'text-center' : ''}`}>{title}</h2>
 
       {cards.length === 0 ? (

@@ -115,7 +115,7 @@ function FavouritesPage() {
     return (
       <div className="min-h-screen bg-[#F7F7F5]">
         <Navbar />
-        <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <div className="mx-auto w-full max-w-[1344px] px-4 pb-16 pt-24 sm:px-6 md:px-8">
           <h1 className="mb-2 text-2xl font-bold text-[#0B1F42]">My Favourites</h1>
           <p className="mb-8 text-sm text-[#5B6B82]">Properties you&apos;ve saved for later.</p>
           <div className="flex items-center justify-center min-h-[40vh]">
@@ -146,7 +146,7 @@ function FavouritesPage() {
   return (
     <div className="min-h-screen bg-[#F7F7F5]">
       <Navbar />
-      <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+      <div className="mx-auto w-full max-w-[1344px] px-4 pb-16 pt-24 sm:px-6 md:px-8">
         <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div>
             <h1 className="mb-2 text-2xl font-bold text-[#0B1F42]">

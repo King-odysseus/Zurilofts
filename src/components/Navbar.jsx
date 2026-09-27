@@ -248,7 +248,7 @@ function Navbar({ solid = false }) {
         ? 'border-b border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.06)]'
         : 'bg-transparent'
     }`}>
-      <div className="max-w-screen-xl mx-auto px-4 md:px-6">
+      <div className="mx-auto w-full max-w-[1344px] px-4 md:px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center flex-shrink-0">

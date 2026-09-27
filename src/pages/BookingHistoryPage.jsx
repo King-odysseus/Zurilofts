@@ -127,7 +127,7 @@ function BookingHistoryPage() {
   return (
     <div className="min-h-screen bg-canvas">
       <Navbar />
-      <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+      <div className="mx-auto w-full max-w-[1344px] px-4 pb-16 pt-24 sm:px-6 md:px-8">
         <div className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-6">
         <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Your stays</p>
         <h1 className="mb-2 text-2xl font-bold text-[#0B1F42]">My Bookings</h1>

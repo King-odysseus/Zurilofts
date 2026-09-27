@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../api/client';
 import Dropdown from '../components/Dropdown';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const statusColors = {
   PENDING: 'bg-[#FDE8D8] text-[#9A4A1D]',
@@ -165,18 +166,7 @@ function AdminPayouts() {
                     {p.completedAt ? new Date(p.completedAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                   </td>
                   <td className="p-4">
-                    <div className="flex items-center gap-3">
-                      <button type="button" onClick={() => setSelectedPayout(p)} className="text-xs font-semibold text-[#0B1F42] transition-colors hover:text-[#07072E]">Review</button>
-                      {(p.status === 'FAILED' || p.status === 'PENDING') && (
-                        <button
-                          onClick={() => triggerPayout(p.hostId)}
-                          disabled={triggering === p.hostId}
-                          className="text-xs font-semibold text-[#B8895C] transition-colors hover:text-[#9A744A] disabled:opacity-50"
-                        >
-                          {triggering === p.hostId ? '...' : 'Retry'}
-                        </button>
-                      )}
-                    </div>
+                    <TableActionsMenu actions={[{ label: 'Review payout', icon: '⌕', onClick: () => setSelectedPayout(p) }, ...((p.status === 'FAILED' || p.status === 'PENDING') ? [{ label: 'Retry payout', icon: '↻', onClick: () => triggerPayout(p.hostId), disabled: triggering === p.hostId }] : [])]} />
                     {p.failureReason && (
                       <p className="text-xs text-red-500 mt-1">{p.failureReason}</p>
                     )}

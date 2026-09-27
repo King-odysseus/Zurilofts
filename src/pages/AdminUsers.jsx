@@ -4,6 +4,7 @@ import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import Dropdown from '../components/Dropdown';
 import Pagination from '../components/Pagination.jsx';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const roleColors = {
   USER: 'bg-[#EAF0F4] text-[#52606F]',
@@ -348,39 +349,7 @@ function AdminUsers() {
                       </span>
                     </td>
                     <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => openEdit(u)}
-                          className="text-xs font-semibold text-[#0B1F42] transition-colors hover:text-[#C49A6C]"
-                        >
-                          Edit
-                        </button>
-                        {!isSelf && (
-                          <>
-                            <button
-                              onClick={() => toggleSuspend(u)}
-                              disabled={busy}
-                              className={`text-xs font-semibold transition-colors disabled:opacity-50 ${u.suspended ? 'text-green-600 hover:text-green-700' : 'text-red-500 hover:text-red-600'}`}
-                            >
-                              {busy ? '...' : u.suspended ? 'Reactivate' : 'Suspend'}
-                            </button>
-                            <button
-                              onClick={() => openPasswordReset(u)}
-                              disabled={busy}
-                              className="text-xs font-semibold text-[#0B1F42] transition-colors hover:text-[#C49A6C] disabled:opacity-50"
-                            >
-                              Set password
-                            </button>
-                            <button
-                              onClick={() => openDelete(u)}
-                              disabled={busy}
-                              className="text-xs font-semibold text-red-700 hover:text-red-900 transition-colors disabled:opacity-50"
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
-                      </div>
+                      <TableActionsMenu actions={[{ label: 'Edit user', icon: '✎', onClick: () => openEdit(u) }, ...(!isSelf ? [{ label: u.suspended ? 'Reactivate user' : 'Suspend user', icon: u.suspended ? '✓' : '–', onClick: () => toggleSuspend(u), disabled: busy }, { label: 'Set password', icon: '⌁', onClick: () => openPasswordReset(u), disabled: busy }, { label: 'Delete user', icon: '×', danger: true, onClick: () => openDelete(u), disabled: busy }] : [])]} />
                     </td>
                   </tr>
                 );
