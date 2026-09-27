@@ -3,11 +3,11 @@ import apiClient from '../api/client';
 import Dropdown from '../components/Dropdown';
 
 const statusColors = {
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  PROCESSING: 'bg-blue-100 text-blue-700',
-  SUCCESS: 'bg-green-100 text-green-700',
-  FAILED: 'bg-red-100 text-red-700',
-  REVERSED: 'bg-orange-100 text-orange-700',
+  PENDING: 'bg-[#FDE8D8] text-[#9A4A1D]',
+  PROCESSING: 'bg-[#EAF0F4] text-[#52606F]',
+  SUCCESS: 'bg-[#E8F4EC] text-[#287A45]',
+  FAILED: 'bg-[#FDECEC] text-[#B42318]',
+  REVERSED: 'bg-[#FEF3C7] text-[#B45309]',
 };
 
 function AdminPayouts() {
@@ -69,8 +69,8 @@ function AdminPayouts() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-bold text-[#222222]">Payouts</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-6">
+        <div><p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#C49A6C]">Workspace / Payments</p><h1 className="text-2xl font-bold text-[#0B1F42]">Payouts</h1></div>
         <div className="flex items-center gap-3">
           <Dropdown
             value={statusFilter}
@@ -83,13 +83,13 @@ function AdminPayouts() {
               { value: 'FAILED', label: 'Failed' },
               { value: 'REVERSED', label: 'Reversed' },
             ]}
-            triggerClassName=" min-h-[44px] px-4 py-2 bg-white border border-[#E5E7EB] text-[#222222] rounded-xl text-sm"
+            triggerClassName="h-12 rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2 text-sm text-[#0B1F42]"
             ariaLabel="Filter by status"
           />
           <button
             onClick={runScheduled}
             disabled={scheduledRunning}
-            className="bg-[#C49A6C] text-white text-sm font-semibold min-h-[44px] px-4 py-2 rounded-lg hover:bg-[#B8895C] transition-colors disabled:opacity-50"
+            className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#07072E] disabled:opacity-50"
           >
             {scheduledRunning ? 'Running...' : 'Run Scheduled Payouts'}
           </button>
@@ -102,32 +102,32 @@ function AdminPayouts() {
           ['Pending', payouts.filter((p) => p.status === 'PENDING').length],
           ['Successful', payouts.filter((p) => p.status === 'SUCCESS').length],
           ['Failed', payouts.filter((p) => p.status === 'FAILED').length],
-        ].map(([label, value]) => <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p></div>)}
+        ].map(([label, value]) => <div key={label} className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8]">{label}</p><p className="mt-2 text-2xl font-bold text-[#0B1F42]">{value}</p></div>)}
       </div>
 
       <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Payout status">
         {[['', 'All'], ['PENDING', 'Pending'], ['PROCESSING', 'Processing'], ['SUCCESS', 'Success'], ['FAILED', 'Failed']].map(([value, label]) => (
-          <button key={value || 'all'} type="button" role="tab" aria-selected={statusFilter === value} onClick={() => setStatusFilter(value)} className={`rounded-full px-4 py-2 text-xs font-semibold transition-colors ${statusFilter === value ? 'bg-[#2563EB] text-white' : 'border border-[#E5E7EB] bg-white text-[#222222] hover:bg-[#F7F7F5]'}`}>{label}</button>
+          <button key={value || 'all'} type="button" role="tab" aria-selected={statusFilter === value} onClick={() => setStatusFilter(value)} className={`rounded-[10px] px-4 py-2 text-xs font-semibold transition-colors ${statusFilter === value ? 'bg-[#0B1F42] text-white' : 'border border-[#E5E7EB] bg-white text-[#52606F] hover:bg-[#F7F4EF]'}`}>{label}</button>
         ))}
       </div>
 
       {message && (
-        <div className={`p-3 rounded-xl text-sm font-medium ${message.includes('Failed') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+        <div className={`rounded-2xl p-3 text-sm font-medium ${message.includes('Failed') ? 'bg-[#FDECEC] text-[#B42318]' : 'bg-[#E8F4EC] text-[#287A45]'}`}>
           {message}
         </div>
       )}
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#6b7280]">Loading payouts...</p>
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
+          <p className="text-[#5B6B82]">Loading payouts...</p>
         </div>
       ) : payouts.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-[#6b7280]">No payouts found</p>
+          <p className="text-[#5B6B82]">No payouts found</p>
         </div>
       ) : (
-        <div className="bg-white rounded-[14px] shadow-lg overflow-x-auto">
+        <div className="overflow-x-auto rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#E5E7EB] text-left">
@@ -142,9 +142,9 @@ function AdminPayouts() {
             </thead>
             <tbody>
               {payouts.map((p) => (
-                <tr key={p.id} className="border-b border-[#E5E7EB]/50 hover:bg-[#222222]/5">
+                <tr key={p.id} className="border-b border-[#E5E7EB]/50 hover:bg-[#F7F4EF]">
                   <td className="p-4">
-                    <div className="font-medium text-[#222222]">
+                    <div className="font-medium text-[#0B1F42]">
                       {p.host?.firstName} {p.host?.lastName}
                     </div>
                     <div className="text-xs text-[#6b7280]">{p.host?.email}</div>
@@ -166,12 +166,12 @@ function AdminPayouts() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center gap-3">
-                      <button type="button" onClick={() => setSelectedPayout(p)} className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors">Review</button>
+                      <button type="button" onClick={() => setSelectedPayout(p)} className="text-xs font-semibold text-[#0B1F42] transition-colors hover:text-[#07072E]">Review</button>
                       {(p.status === 'FAILED' || p.status === 'PENDING') && (
                         <button
                           onClick={() => triggerPayout(p.hostId)}
                           disabled={triggering === p.hostId}
-                          className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors disabled:opacity-50"
+                          className="text-xs font-semibold text-[#B8895C] transition-colors hover:text-[#9A744A] disabled:opacity-50"
                         >
                           {triggering === p.hostId ? '...' : 'Retry'}
                         </button>
@@ -192,7 +192,7 @@ function AdminPayouts() {
         <div className="fixed inset-0 z-30 bg-black/20" onClick={() => setSelectedPayout(null)}>
           <aside className="absolute right-0 top-0 h-full w-full max-w-md overflow-y-auto border-l border-[#E5E7EB] bg-white p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
             <div className="flex items-start justify-between gap-4">
-              <div><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Payout review</p><h2 className="mt-1 text-xl font-bold text-[#222222]">{selectedPayout.host?.firstName} {selectedPayout.host?.lastName}</h2></div>
+              <div><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Payout review</p><h2 className="mt-1 text-xl font-bold text-[#0B1F42]">{selectedPayout.host?.firstName} {selectedPayout.host?.lastName}</h2></div>
               <button type="button" onClick={() => setSelectedPayout(null)} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close payout review">×</button>
             </div>
             <div className="mt-6 space-y-4 text-sm">
@@ -203,7 +203,7 @@ function AdminPayouts() {
               <div className="flex items-center justify-between"><span className="text-[#6b7280]">Completed</span><span className="font-semibold text-[#222222]">{selectedPayout.completedAt ? new Date(selectedPayout.completedAt).toLocaleDateString('en-GB') : '-'}</span></div>
             </div>
             {selectedPayout.failureReason && <p className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{selectedPayout.failureReason}</p>}
-            {(selectedPayout.status === 'FAILED' || selectedPayout.status === 'PENDING') && <button type="button" onClick={() => triggerPayout(selectedPayout.hostId)} disabled={triggering === selectedPayout.hostId} className="mt-6 min-h-[44px] w-full rounded-lg bg-[#C49A6C] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#B8895C] disabled:opacity-50">{triggering === selectedPayout.hostId ? 'Retrying...' : 'Retry payout'}</button>}
+            {(selectedPayout.status === 'FAILED' || selectedPayout.status === 'PENDING') && <button type="button" onClick={() => triggerPayout(selectedPayout.hostId)} disabled={triggering === selectedPayout.hostId} className="mt-6 min-h-[44px] w-full rounded-[10px] bg-[#0B1F42] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#07072E] disabled:opacity-50">{triggering === selectedPayout.hostId ? 'Retrying...' : 'Retry payout'}</button>}
           </aside>
         </div>
       )}
