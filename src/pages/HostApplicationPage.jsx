@@ -27,11 +27,11 @@ const STATUS_COPY = {
 };
 
 const STATUS_BADGE = {
-  DRAFT: 'bg-[#F7F7F5] text-[#6b7280] border border-[#E5E7EB]',
-  CHANGES_REQUESTED: 'bg-amber-50 text-amber-700 border border-amber-200',
-  SUBMITTED: 'bg-amber-50 text-amber-700 border border-amber-200',
-  APPROVED: 'bg-green-50 text-green-700 border border-green-200',
-  REJECTED: 'bg-red-50 text-red-600 border border-red-200',
+  DRAFT: 'bg-[#EAF0F4] text-[#52606F] border border-[#DCE5EC]',
+  CHANGES_REQUESTED: 'bg-[#FDE8D8] text-[#9A4A1D] border border-[#F2C9A8]',
+  SUBMITTED: 'bg-[#FDE8D8] text-[#9A4A1D] border border-[#F2C9A8]',
+  APPROVED: 'bg-[#E8F4EC] text-[#287A45] border border-[#BDE2C8]',
+  REJECTED: 'bg-[#FDECEC] text-[#B42318] border border-[#F4C7C3]',
 };
 
 const PROPERTY_TYPES = [
@@ -222,30 +222,30 @@ function HostApplicationPage() {
   return (
     <div className="min-h-screen bg-canvas">
       <Navbar />
-      <main className="max-w-5xl mx-auto px-4 md:px-6 pt-28 pb-20">
-        <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 md:p-10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6b7280] mb-2">Become a ZuriLofts host</p>
-          <h1 className="text-2xl md:text-4xl font-bold text-[#222222]">Host verification</h1>
-          <p className="text-[#6b7280] mt-3 max-w-3xl">Tell us who you are, how you manage your properties, and provide the documents needed to protect guests and legitimate hosts. Save at any time and continue later.</p>
+      <main className="mx-auto max-w-[1344px] px-4 pb-20 pt-28 md:px-6">
+        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm md:p-10">
+          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Host setup</p>
+          <h1 className="mt-1 text-2xl font-bold text-[#0B1F42] md:text-4xl">Host verification</h1>
+          <p className="mt-3 max-w-3xl text-[#52606F]">Tell us who you are, how you manage your properties, and provide the documents needed to protect guests and legitimate hosts. Save at any time and continue later.</p>
 
           <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Host setup progress">
             {['Your details', 'Business', 'Documents', 'Review'].map((label, index) => (
               <div key={label} className="flex items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-3 shadow-sm">
-                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${index === 0 ? 'bg-[#2563EB] text-white' : 'bg-[#F7F7F5] text-[#6b7280]'}`}>{index + 1}</span>
-                <span className="text-xs font-semibold text-[#222222] sm:text-sm">{label}</span>
+                <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${index === 0 ? 'bg-[#0B1F42] text-white' : 'bg-[#F7F4EF] text-[#52606F]'}`}>{index + 1}</span>
+                <span className="text-xs font-semibold text-[#0B1F42] sm:text-sm">{label}</span>
               </div>
             ))}
           </div>
 
           {application && (
-            <div className="mt-6 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] p-5">
+            <div className="mt-6 rounded-2xl border border-[#E5E7EB] bg-[#F7F4EF] p-5">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="font-semibold text-[#222222]">Status:</p>
+                <p className="font-semibold text-[#0B1F42]">Status:</p>
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${STATUS_BADGE[application.status] || STATUS_BADGE.DRAFT}`}>
                   {application.status.replaceAll('_', ' ')}
                 </span>
               </div>
-              <p className="text-sm text-[#6b7280] mt-2">{STATUS_COPY[application.status]}</p>
+              <p className="mt-2 text-sm text-[#52606F]">{STATUS_COPY[application.status]}</p>
               {application.reviewNote && <p className="text-sm text-red-600 mt-3">Reviewer note: {application.reviewNote}</p>}
             </div>
           )}
@@ -300,8 +300,8 @@ function HostApplicationPage() {
                         onClick={() => togglePropertyType(value)}
                         className={`min-h-[44px] rounded-full px-4 text-sm font-semibold border transition-all duration-200 ${
                           form.propertyTypes.includes(value)
-                            ? 'bg-[#2563EB] text-white border-[#2563EB]'
-                            : 'bg-white text-[#222222] border-[#E5E7EB] hover:bg-[#F7F7F5]'
+                            ? 'bg-[#0B1F42] text-white border-[#0B1F42]'
+                            : 'bg-white text-[#0B1F42] border-[#E5E7EB] hover:bg-[#F7F4EF]'
                         }`}
                       >
                         {label}
@@ -317,7 +317,7 @@ function HostApplicationPage() {
                       onChange={(e) => update('propertyLocations', e.target.value)}
                       rows="3"
                       maxLength="500"
-                      className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+                      className="w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 py-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 transition-colors"
                       placeholder="Neighbourhoods, towns, or addresses you intend to list"
                       required
                     />
@@ -329,7 +329,7 @@ function HostApplicationPage() {
                       onChange={(e) => update('experience', e.target.value)}
                       rows="4"
                       maxLength="2000"
-                      className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+                      className="w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 py-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 transition-colors"
                       placeholder="Tell us about your experience, team, and how guests will be supported."
                     />
                   </label>
@@ -345,15 +345,15 @@ function HostApplicationPage() {
                 </div>
               </Section>
 
-              <label className="flex items-start gap-3 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] p-5">
-                <input type="checkbox" checked={form.agreedTerms} onChange={(e) => update('agreedTerms', e.target.checked)} className="mt-1 h-5 w-5 accent-[#2563EB]" />
-                <span className="text-sm text-[#222222]">I confirm the information is accurate, I am authorised to list these properties, and I agree to the <Link to="/terms" className="font-medium text-[#2563EB] hover:text-[#1D4ED8] hover:underline">Terms of Service</Link> and verification checks.</span>
+              <label className="flex items-start gap-3 rounded-2xl border border-[#E5E7EB] bg-[#F7F4EF] p-5">
+                <input type="checkbox" checked={form.agreedTerms} onChange={(e) => update('agreedTerms', e.target.checked)} className="mt-1 h-5 w-5 accent-[#0B1F42]" />
+                <span className="text-sm text-[#0B1F42]">I confirm the information is accurate, I am authorised to list these properties, and I agree to the <Link to="/terms" className="font-medium text-[#0B1F42] hover:text-[#C49A6C] hover:underline">Terms of Service</Link> and verification checks.</span>
               </label>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
-                <button type="submit" disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg bg-white border border-[#E5E7EB] px-6 font-semibold text-[#222222] disabled:opacity-50 hover:bg-[#F7F7F5] transition-all duration-200">{saving ? 'Saving...' : 'Save draft'}</button>
-                <button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg bg-[#C49A6C] px-6 font-semibold text-white hover:bg-[#B8895C] disabled:opacity-50 transition-all duration-200">{saving ? 'Working...' : 'Submit for review'}</button>
-                <button type="button" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg px-6 font-semibold text-[#6b7280] hover:text-[#222222] disabled:opacity-50 transition-all duration-200">Save &amp; continue traveling</button>
+                <button type="submit" disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg border border-[#E5E7EB] bg-white px-6 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF] disabled:opacity-50">{saving ? 'Saving...' : 'Save draft'}</button>
+                <button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg bg-[#0B1F42] px-6 font-semibold text-white transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50">{saving ? 'Working...' : 'Submit for review'}</button>
+                <button type="button" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg px-6 font-semibold text-[#52606F] transition-all duration-200 hover:text-[#0B1F42] disabled:opacity-50">Save &amp; continue traveling</button>
               </div>
             </form>
           ) : application?.status === 'APPROVED' || user?.role === 'HOST' ? (
@@ -381,8 +381,8 @@ function Section({ title, description, children }) {
   return (
     <section>
       <div className="mb-5">
-        <h2 className="text-lg font-bold text-[#222222]">{title}</h2>
-        <p className="text-sm text-[#6b7280] mt-1">{description}</p>
+        <h2 className="text-lg font-bold text-[#0B1F42]">{title}</h2>
+        <p className="mt-1 text-sm text-[#52606F]">{description}</p>
       </div>
       {children}
     </section>
@@ -392,12 +392,12 @@ function Section({ title, description, children }) {
 function Field({ label, value, onChange, type = 'text', ...props }) {
   return (
     <label className="block">
-      <span className="block text-sm font-medium text-[#222222] mb-2">{label}</span>
+      <span className="mb-2 block text-sm font-medium text-[#0B1F42]">{label}</span>
       <input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] px-4 text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+        className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 transition-colors"
         {...props}
       />
     </label>
@@ -407,11 +407,11 @@ function Field({ label, value, onChange, type = 'text', ...props }) {
 function SelectField({ label, value, onChange, options }) {
   return (
     <label className="block">
-      <span className="block text-sm font-medium text-[#222222] mb-2">{label}</span>
+      <span className="mb-2 block text-sm font-medium text-[#0B1F42]">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] bg-white px-4 text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 transition-colors"
+        className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 transition-colors"
       >
         {options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}
       </select>
@@ -421,8 +421,8 @@ function SelectField({ label, value, onChange, options }) {
 
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
   return (
-    <div className="rounded-xl border border-[#E5E7EB] p-5">
-      <p className="font-semibold text-[#222222] text-sm">{DOCUMENT_LABELS[kind]}</p>
+    <div className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EF] p-5">
+      <p className="text-sm font-semibold text-[#0B1F42]">{DOCUMENT_LABELS[kind]}</p>
       {document ? (
         <>
           <p className="text-xs text-green-700 mt-2 break-all">Uploaded: {document.originalName}</p>
@@ -436,7 +436,7 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
           </button>
         </>
       ) : (
-        <label className="mt-3 inline-flex min-h-[44px] items-center cursor-pointer rounded-lg bg-[#C49A6C] px-4 text-xs font-semibold text-white hover:bg-[#B8895C] transition-all duration-200">
+        <label className="mt-3 inline-flex min-h-[44px] cursor-pointer items-center rounded-lg bg-[#0B1F42] px-4 text-xs font-semibold text-white transition-all duration-200 hover:bg-[#07072E]">
           <input type="file" className="hidden" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={busy} onChange={(e) => onUpload(kind, e.target.files?.[0])} />
           {busy ? 'Uploading...' : 'Choose document'}
         </label>
