@@ -543,7 +543,7 @@ function Navbar({ solid = false }) {
                         <div className="border-t border-[#E5E7EB] mt-1 pt-1">
                           <button
                             onClick={handleSwitchMode}
-                            className="flex items-center w-full px-4 py-2.5 text-sm text-[#222222] hover:bg-[#2563EB]/10 transition-colors"
+                            className="flex items-center w-full px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-[#F6EFE7] transition-colors"
                           >
                             <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
@@ -571,7 +571,7 @@ function Navbar({ solid = false }) {
               /* Logged out - Sign In / Sign Up */
               <Link
                 to="/login"
-                className={`hidden md:inline-flex items-center justify-center px-5 py-2 rounded-lg text-sm font-semibold transition-all duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
+                className={`hidden md:inline-flex items-center justify-center px-5 py-2 rounded-[10px] text-sm font-semibold transition-all duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${
                   needsWhiteNav
                     ? 'bg-[#C49A6C] text-white hover:bg-[#B8895C]'
                     : 'bg-white text-[#222222] hover:bg-[#F7F7F5]'
@@ -588,7 +588,7 @@ function Navbar({ solid = false }) {
               options={languageOptions}
               ariaLabel={t('nav.language')}
               triggerClassName={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                needsWhiteNav ? 'text-[#222222] hover:bg-[#2563EB]/10' : 'text-white hover:bg-white/10'
+                needsWhiteNav ? 'text-[#0B1F42] hover:bg-[#F6EFE7]' : 'text-white hover:bg-white/10'
               }`}
               menuClassName="right-0"
             />
@@ -597,9 +597,9 @@ function Navbar({ solid = false }) {
             <button
               type="button"
               onClick={() => setMenuOpen(!menuOpen)}
-              className={`inline-flex items-center p-2 w-11 h-11 justify-center rounded-lg transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
+              className={`inline-flex items-center p-2 w-11 h-11 justify-center rounded-[10px] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${
                 needsWhiteNav
-                  ? 'text-[#222222] hover:bg-[#2563EB]/10'
+                  ? 'text-[#0B1F42] hover:bg-[#F6EFE7]'
                   : 'text-white hover:bg-white/10'
               }`}
               aria-controls="navbar-main"
@@ -647,10 +647,10 @@ function Navbar({ solid = false }) {
                           <Link
                             to={child.href}
                             onClick={() => setMenuOpen(false)}
-                            className={`flex items-center min-h-[44px] px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2563EB] ${
+                            className={`flex items-center min-h-[44px] px-3 py-2.5 rounded-[10px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] ${
                               isActiveHref(location.pathname, child.href)
-                                ? 'text-[#2563EB] bg-[#2563EB]/5'
-                                : 'text-[#222222] hover:bg-[#2563EB]/10 hover:text-[#2563EB]'
+                                ? 'text-[#9A744A] bg-[#F6EFE7]'
+                                : 'text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]'
                             }`}
                           >
                             {child.name}
@@ -666,10 +666,10 @@ function Navbar({ solid = false }) {
                   <Link
                     to={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`flex items-center justify-between min-h-[44px] px-3 py-2.5 rounded-lg text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2563EB] ${
+                    className={`flex items-center justify-between min-h-[44px] px-3 py-2.5 rounded-[10px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] ${
                       isActiveHref(location.pathname, item.href)
-                        ? 'text-[#2563EB] bg-[#2563EB]/5'
-                        : 'text-[#222222] hover:bg-[#2563EB]/10 hover:text-[#2563EB]'
+                        ? 'text-[#9A744A] bg-[#F6EFE7]'
+                        : 'text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]'
                     }`}
                   >
                     <span>{item.key ? t(`nav.${item.key}`) : item.name}</span>
@@ -687,12 +687,12 @@ function Navbar({ solid = false }) {
               <p className="px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#6b7280]">{t('nav.moreToExplore')}</p>
               <div className="space-y-1">
                 {exploreLinks.filter((link) => link.href !== '/properties').map((link) => (
-                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-lg px-3 py-2.5 text-sm font-medium text-[#222222] hover:bg-[#2563EB]/10 hover:text-[#2563EB]">
+                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-[10px] px-3 py-2.5 text-sm font-medium text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]">
                     {link.name}
                   </Link>
                 ))}
                 {savedLinks.map((link) => (
-                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-lg px-3 py-2.5 text-sm font-medium text-[#222222] hover:bg-[#2563EB]/10 hover:text-[#2563EB]">
+                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-[10px] px-3 py-2.5 text-sm font-medium text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]">
                     {link.name}
                   </Link>
                 ))}
@@ -743,7 +743,7 @@ function Navbar({ solid = false }) {
                   {canSelectHosting && (
                     <button
                       onClick={handleSwitchMode}
-                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold text-[#2563EB] hover:bg-[#2563EB]/10 transition-colors duration-200 text-center"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold text-[#9A744A] hover:bg-[#F6EFE7] transition-colors duration-200 text-center"
                     >
                       {effectiveMode === 'hosting' ? t('nav.switchToTravelling') : t('nav.switchToHosting')}
                     </button>

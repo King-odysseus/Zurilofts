@@ -308,7 +308,7 @@ function AdminPropertyForm() {
             <p className="text-sm font-semibold text-[#0B1F42]">Bed Variant Pricing &amp; Bathrooms</p>
             <p className="-mt-3 text-xs text-[#5B6B82]">Each variant can have its own price and bathroom count. Leave unchecked to not list.</p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#2563EB]/20 transition-all duration-200">
+              <label className="flex items-start gap-3 bg-white rounded-[10px] shadow-[0_8px_28px_rgba(11,31,66,0.08)] p-4 cursor-pointer hover:shadow-[0_10px_30px_rgba(196,154,108,0.18)] transition-all duration-200">
                 <input
                   type="checkbox"
                   className="mt-0.5 h-5 w-5 flex-shrink-0 accent-[#C49A6C]"
@@ -344,7 +344,7 @@ function AdminPropertyForm() {
                   )}
                 </div>
               </label>
-              <label className="flex items-start gap-3 bg-white rounded-xl shadow-sm p-4 cursor-pointer hover:shadow-md hover:shadow-[#2563EB]/20 transition-all duration-200">
+              <label className="flex items-start gap-3 bg-white rounded-[10px] shadow-[0_8px_28px_rgba(11,31,66,0.08)] p-4 cursor-pointer hover:shadow-[0_10px_30px_rgba(196,154,108,0.18)] transition-all duration-200">
                 <input
                   type="checkbox"
                   className="mt-0.5 h-5 w-5 flex-shrink-0 accent-[#C49A6C]"
@@ -581,7 +581,7 @@ function PropertyPreview({ form }) {
           <div className="w-full h-full flex items-center justify-center text-[#6b7280] text-sm">No photo yet</div>
         )}
         {form.featured && (
-          <span className="absolute top-4 left-4 bg-[#2563EB] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
+          <span className="absolute top-4 left-4 bg-[#0B1F42] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
         )}
         {!form.available && (
           <span className="absolute top-4 right-4 bg-[#6b7280] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
@@ -673,7 +673,7 @@ function FullPagePreview({ form, onClose }) {
                       type="button"
                       key={img + i}
                       onClick={() => setActive(i)}
-                      className={`overflow-hidden rounded-xl transition-all ${active === i ? 'ring-2 ring-[#2563EB]' : 'opacity-70 hover:opacity-100'}`}
+                      className={`overflow-hidden rounded-[10px] transition-all ${active === i ? 'ring-2 ring-[#C49A6C]' : 'opacity-70 hover:opacity-100'}`}
                     >
                       <img src={img} alt={`${form.title} ${i + 1}`} className="w-full h-16 md:h-20 object-cover" />
                     </button>
@@ -718,7 +718,7 @@ function FullPagePreview({ form, onClose }) {
                   <div className="grid grid-cols-2 gap-3">
                     {amenities.map((a, i) => (
                       <div key={i} className="flex items-center text-[#222222]">
-                        <svg className="w-5 h-5 text-[#2563EB] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-[#9A744A] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
                         {a}
@@ -735,7 +735,7 @@ function FullPagePreview({ form, onClose }) {
                   <ul className="space-y-2">
                     {nearby.map((n, i) => (
                       <li key={i} className="flex items-center text-[#222222]">
-                        <svg className="w-5 h-5 text-[#2563EB] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-5 h-5 text-[#9A744A] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
@@ -899,7 +899,7 @@ function Toggle({ on, onClick, label }) {
       aria-checked={on}
       aria-label={label}
       onClick={onClick}
-      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${on ? 'bg-[#2563EB]' : 'bg-[#E5E7EB]'}`}
+      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 ${on ? 'bg-[#0B1F42]' : 'bg-[#E3E8EF]'}`}
     >
       <span
         className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${on ? 'translate-x-5' : ''}`}
@@ -1047,7 +1047,7 @@ function AutomatedMessages({ propertyId }) {
                             type="number"
                             min={1}
                             max={60}
-                            className="w-20 px-3 py-1.5 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+                            className="w-20 px-3 py-1.5 rounded-[10px] bg-white border border-[#E3E8EF] text-sm text-[#0B1F42] focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20"
                             value={row.offsetDays ?? ''}
                             onChange={(e) => patchRow(row.trigger, { offsetDays: e.target.value === '' ? null : Number(e.target.value) })}
                           />
@@ -1068,7 +1068,7 @@ function AutomatedMessages({ propertyId }) {
                             key={tok}
                             type="button"
                             onClick={() => insertToken(row.trigger, tok)}
-                            className="text-[11px] font-medium text-[#222222] bg-white rounded-full px-2 py-0.5 shadow-sm hover:text-[#2563EB] transition-colors"
+                            className="text-[11px] font-medium text-[#0B1F42] bg-white rounded-full px-2 py-0.5 shadow-sm hover:text-[#9A744A] transition-colors"
                           >
                             {tok}
                           </button>
