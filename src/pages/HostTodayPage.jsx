@@ -99,7 +99,7 @@ function TodayCard({ booking, type }) {
 
         {/* Dates */}
         <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#6b7280] mb-3">
-          <svg className="w-3.5 h-3.5 flex-shrink-0 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3.5 h-3.5 flex-shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <span>{formatDate(type === "arrival" ? booking.checkIn : booking.checkOut)}</span>
@@ -249,7 +249,7 @@ function OnboardingChecklist({ hostApplicationStatus, properties, role }) {
           >
             <div
               className={`mt-0.5 w-6 h-6 flex-shrink-0 rounded-full flex items-center justify-center text-xs font-bold ${
-                step.done ? 'bg-green-100 text-green-700' : 'bg-blue-50 text-[#2563EB]'
+                step.done ? 'bg-[#E8F4EC] text-[#287A45]' : 'bg-[#FDE8D8] text-[#9A4A1D]'
               }`}
             >
               {step.done ? (
@@ -406,7 +406,7 @@ function ArrivingTodayCard({ arrivals }) {
           <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
           Arriving today
         </h2>
-        <Link to="/host/calendar" className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors">
+        <Link to="/host/calendar" className="text-sm font-semibold text-[#9A744A] transition-colors hover:text-[#C49A6C]">
           View calendar
         </Link>
       </header>
@@ -448,7 +448,7 @@ function NextStepCard({ hostApplicationStatus, properties, role }) {
 
   const badgeTones = {
     warning: 'bg-amber-50 text-amber-700 border border-amber-200',
-    info: 'bg-blue-50 text-[#2563EB] border border-blue-200',
+    info: 'bg-[#EAF0F4] text-[#52606F] border border-[#C9D3DF]',
     success: 'bg-green-50 text-green-700 border border-green-200',
   };
 
@@ -545,12 +545,12 @@ function RecentMessagesPanel({ conversations, loading }) {
     <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-bold text-[#222222] flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#2563EB]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#C49A6C]" />
           Recent guest messages
         </h2>
         <Link
           to="/inbox"
-          className="text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
+          className="text-sm font-semibold text-[#9A744A] transition-colors hover:text-[#C49A6C]"
         >
           View all
         </Link>

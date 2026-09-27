@@ -73,7 +73,7 @@ function CalendarPropertyPicker({ base }) {
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
         </div>
       ) : properties.length === 0 ? (
         <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-10 text-center">
@@ -266,7 +266,7 @@ function AdminCalendar() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
       </div>
     );
   }
@@ -301,7 +301,7 @@ function AdminCalendar() {
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">{error}</div>}
 
       <div className="flex gap-1 border-b border-[#E5E7EB] mb-6" role="tablist" aria-label="Calendar sections">
-        {[['view', 'View'], ['availability', 'Availability'], ['settings', 'Settings']].map(([value, label]) => <button key={value} type="button" role="tab" aria-selected={calendarTab === value} onClick={() => setCalendarTab(value)} className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors duration-200 ${calendarTab === value ? 'border-[#2563EB] text-[#222222]' : 'border-transparent text-[#6b7280] hover:text-[#222222]'}`}>{label}</button>)}
+        {[['view', 'View'], ['availability', 'Availability'], ['settings', 'Settings']].map(([value, label]) => <button key={value} type="button" role="tab" aria-selected={calendarTab === value} onClick={() => setCalendarTab(value)} className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors duration-200 ${calendarTab === value ? 'border-[#C49A6C] text-[#0B1F42]' : 'border-transparent text-[#5B6B82] hover:text-[#0B1F42]'}`}>{label}</button>)}
       </div>
 
       {calendarTab === 'view' && <section className="mb-6 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm sm:p-6">

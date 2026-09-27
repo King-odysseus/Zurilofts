@@ -33,7 +33,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
               type="button"
               onClick={onClear}
               aria-label="Clear search"
-              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-[#6b7280] transition-colors duration-150 hover:bg-[#F7F7F5] hover:text-[#222222] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB]"
+              className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-[#5B6B82] transition-colors duration-150 hover:bg-[#F7F4EF] hover:text-[#0B1F42] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
             >
               <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path
