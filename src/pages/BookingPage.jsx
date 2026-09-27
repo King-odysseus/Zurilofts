@@ -533,7 +533,7 @@ function BookingPage() {
       <h2 className="text-2xl font-bold text-[#0B1F42]">Stay details</h2>
       
       <div>
-        <label className="block text-sm font-semibold text-[#222222] mb-2">Select your dates *</label>
+        <label className="mb-2 block text-sm font-semibold text-[#0B1F42]">Select your dates *</label>
         <AvailabilityCalendar
           value={{ checkIn: bookingData.checkIn, checkOut: bookingData.checkOut }}
           onChange={({ checkIn, checkOut }) => setBookingData((prev) => ({ ...prev, checkIn, checkOut }))}
@@ -541,20 +541,20 @@ function BookingPage() {
         />
         {(bookingData.checkIn || bookingData.checkOut) && (
           <div className="flex gap-4 mt-3">
-            <div className="flex-1 neu-input px-4 py-2 bg-white">
-              <span className="text-xs text-[#6b7280] block">Check-in</span>
-              <span className="font-semibold text-[#222222]">{bookingData.checkIn || '-'}</span>
+            <div className="flex-1 rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2">
+              <span className="block text-xs text-[#5B6B82]">Check-in</span>
+              <span className="font-semibold text-[#0B1F42]">{bookingData.checkIn || '-'}</span>
             </div>
-            <div className="flex-1 neu-input px-4 py-2 bg-white">
-              <span className="text-xs text-[#6b7280] block">Check-out</span>
-              <span className="font-semibold text-[#222222]">{bookingData.checkOut || '-'}</span>
+            <div className="flex-1 rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2">
+              <span className="block text-xs text-[#5B6B82]">Check-out</span>
+              <span className="font-semibold text-[#0B1F42]">{bookingData.checkOut || '-'}</span>
             </div>
           </div>
         )}
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#222222] mb-2">Number of Guests *</label>
+        <label className="mb-2 block text-sm font-semibold text-[#0B1F42]">Number of Guests *</label>
         <Dropdown
           value={bookingData.guests}
           onChange={(v) => setGuestCount(Number(v))}
@@ -562,11 +562,11 @@ function BookingPage() {
             value: num,
             label: `${num} ${num === 1 ? 'guest' : 'guests'}`,
           }))}
-          triggerClassName="neu-input min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#222222] rounded-xl"
+          triggerClassName="min-h-[44px] w-full rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-3 text-[#0B1F42] transition-all focus:outline-none"
           ariaLabel="Number of guests"
         />
         {bedOption && (
-          <p className="text-xs text-[#6b7280] mt-1">
+          <p className="mt-1 text-xs text-[#5B6B82]">
             This apartment fits up to {pricing.maxGuests} guests ({pricing.baseGuests} included in the {bedOption === '2bed' ? '2-bed' : '1-bed'} rate). Each additional guest is KES {EXTRA_GUEST_FEE.toLocaleString()}/night.
             {bookingData.guests > pricing.baseGuests && (
               <span className="text-amber-600 font-medium"> {pricing.extraGuests} extra guest{pricing.extraGuests > 1 ? 's' : ''} &middot; +KES {pricing.extraGuestFee.toLocaleString()}</span>
@@ -577,7 +577,7 @@ function BookingPage() {
           <p className="text-red-500 text-xs mt-1 font-semibold">Maximum {pricing.maxGuests} guests for this room type. Exceeding this is grounds for removal.</p>
         )}
         {!bedOption && (
-          <p className="text-xs text-[#6b7280] mt-1">Select a bed option above to see guest limits.</p>
+          <p className="mt-1 text-xs text-[#5B6B82]">Select a bed option above to see guest limits.</p>
         )}
       </div>
 
@@ -585,10 +585,10 @@ function BookingPage() {
       {bedOption && (
         <div className="flex items-center justify-between rounded-xl bg-[#FDE8D8] p-4">
           <div>
-            <p className="text-sm font-semibold text-[#222222]">
+            <p className="text-sm font-semibold text-[#0B1F42]">
               {bedOption === '2bed' ? '2-Bed Configuration' : '1-Bed Configuration'}
             </p>
-            <p className="text-xs text-[#6b7280]">
+            <p className="text-xs text-[#5B6B82]">
               Apartment fits up to {pricing.maxGuests} guests &middot; KES {pricing.propertyPrice.toLocaleString()}/night
             </p>
           </div>
@@ -603,7 +603,7 @@ function BookingPage() {
         <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
-        <p className="text-sm text-[#222222]">
+        <p className="text-sm text-[#0B1F42]">
           Standard <span className="font-semibold">check-in from 3:00 PM</span> and{' '}
           <span className="font-semibold">check-out by 10:00 AM</span>. You may extend up to{' '}
           <span className="font-semibold">1:00 PM (3 hours max)</span>. The fee{' '}
@@ -614,18 +614,18 @@ function BookingPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-[#222222] mb-2">Estimated Check-in Time</label>
+          <label className="mb-2 block text-sm font-semibold text-[#0B1F42]">Estimated Check-in Time</label>
           <input
             type="time"
             name="checkInTime"
             value={bookingData.checkInTime}
             onChange={handleInputChange}
-            className="date-input neu-input min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#222222]"
+            className="date-input min-h-[44px] w-full rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-3 text-[#0B1F42] transition-all focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
           />
-          <p className="text-xs text-[#6b7280] mt-1">From 3:00 PM</p>
+          <p className="mt-1 text-xs text-[#5B6B82]">From 3:00 PM</p>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-[#222222] mb-2">Check-out Time</label>
+          <label className="mb-2 block text-sm font-semibold text-[#0B1F42]">Check-out Time</label>
           <Dropdown
             value={bookingData.checkOutTime}
             onChange={(v) => setBookingData((prev) => ({ ...prev, checkOutTime: v }))}
@@ -636,11 +636,11 @@ function BookingPage() {
                 label: `${formatTime12h(time)}${fee > 0 ? ` (+KES ${fee.toLocaleString()})` : ' (Standard)'}`,
               };
             })}
-            triggerClassName="min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#222222] rounded-xl border border-[#E5E7EB]"
+            triggerClassName="min-h-[44px] w-full rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-3 text-[#0B1F42] transition-all focus:outline-none"
             ariaLabel="Check-out time"
           />
           {pricing.lateCheckoutFee > 0 && (
-            <p className="text-xs text-[#2563EB] font-medium mt-1">
+            <p className="mt-1 text-xs font-medium text-[#9A744A]">
               Late check-out fee: KES {pricing.lateCheckoutFee.toLocaleString()}
             </p>
           )}
@@ -649,10 +649,10 @@ function BookingPage() {
 
       {pricing.nights > 0 && (
         <div className="rounded-xl bg-[#FDE8D8] p-4">
-          <p className="text-[#222222] font-medium">
+          <p className="font-medium text-[#0B1F42]">
             {pricing.nights} {pricing.nights === 1 ? 'night' : 'nights'} selected
           </p>
-          <p className="text-[#6b7280] text-sm">
+          <p className="text-sm text-[#5B6B82]">
             KES {pricing.propertyPrice.toLocaleString()} per night
           </p>
         </div>
@@ -685,57 +685,57 @@ function BookingPage() {
 
       <div>
         <h2 className="text-2xl font-bold text-[#0B1F42]">Guest Information</h2>
-        <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account. Edit anything that&apos;s changed.</p>
+        <p className="mt-1 text-sm text-[#5B6B82]">Pre-filled from your account. Edit anything that&apos;s changed.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-[#222222] mb-2">First Name *</label>
+          <label className="mb-2 block text-sm font-semibold text-[#0B1F42]">First Name *</label>
           <input
             type="text"
             name="firstName"
             value={bookingData.firstName}
             onChange={handleInputChange}
             placeholder="John"
-            className="neu-input min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#222222] placeholder-[#6b7280]"
+            className="min-h-[44px] w-full rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-3 text-[#0B1F42] placeholder-[#5B6B82] transition-all focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-[#222222] mb-2">Last Name *</label>
+          <label className="mb-2 block text-sm font-semibold text-[#0B1F42]">Last Name *</label>
           <input
             type="text"
             name="lastName"
             value={bookingData.lastName}
             onChange={handleInputChange}
             placeholder="Doe"
-            className="neu-input min-h-[44px] w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#222222] placeholder-[#6b7280]"
+            className="min-h-[44px] w-full rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-3 text-[#0B1F42] placeholder-[#5B6B82] transition-all focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
             required
           />
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#222222] mb-2">Email *</label>
+        <label className="mb-2 block text-sm font-semibold text-[#0B1F42]">Email *</label>
         <input
           type="email"
           name="email"
           value={bookingData.email}
           onChange={handleInputChange}
           placeholder="john@example.com"
-          className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#222222] placeholder-[#6b7280]"
+          className="w-full rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-3 text-[#0B1F42] placeholder-[#5B6B82] transition-all focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#222222] mb-2">Phone Number *</label>
+        <label className="mb-2 block text-sm font-semibold text-[#0B1F42]">Phone Number *</label>
         <div className="flex gap-2">
           <Dropdown
             value={phoneCountryCode}
             onChange={(val) => handlePhoneChange(val, phoneNumber)}
             options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
-            triggerClassName="min-h-[44px] px-3 py-3 bg-white text-[#222222] rounded-xl w-[120px] flex-shrink-0 border border-[#E5E7EB]"
+            triggerClassName="min-h-[44px] w-[120px] flex-shrink-0 rounded-[10px] border border-[#E3E8EF] bg-white px-3 py-3 text-[#0B1F42]"
             ariaLabel="Select country code"
           />
           <input
