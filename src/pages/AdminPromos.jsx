@@ -215,7 +215,7 @@ function AdminPromos() {
                     {properties.length > 0 && properties.every((p) => formData.propertyIds.includes(p.id)) ? 'Clear All' : 'Select All'}
                   </button>
                 </div>
-                <div className="max-h-40 overflow-y-auto rounded-xl border border-[#E3E8EF] bg-[#F7F4EF] p-3">
+                <div className="max-h-40 overflow-y-auto rounded-[10px] border border-[#E3E8EF] bg-[#F7F4EF] p-3 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
                   {properties.length === 0 ? (
                     <p className="text-xs text-[#5B6B82]">No properties available.</p>
                   ) : (

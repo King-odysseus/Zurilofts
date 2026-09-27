@@ -250,7 +250,7 @@ function IdentityVerificationPanel({ onApproved }) {
         </div>
       )}
 
-      <div id="verification-review" className="scroll-mt-24 border-t border-[#E5E7EB] pt-5">
+      <div id="verification-review" className="scroll-mt-24 border-t border-[#E3E8EF] pt-5">
         <p className="mb-1 text-sm font-semibold text-[#0B1F42]">Review</p>
         <p className="mb-4 text-xs text-[#5B6B82]">Check your details and required documents before submitting.</p>
       {editable && (
