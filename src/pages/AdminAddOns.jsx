@@ -169,8 +169,8 @@ function AdminAddOns() {
 
   return (
     <div>
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#222222]">Add-ons</h1>
+      <div className="mb-6 flex items-center justify-between rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-6">
+        <div><p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#C49A6C]">Workspace / Catalog</p><h1 className="text-2xl font-bold text-[#0B1F42]">Add-ons</h1></div>
         <button
           onClick={openCreate}
           className="bg-[#C49A6C] text-white min-h-[44px] px-5 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 text-sm"
@@ -184,14 +184,14 @@ function AdminAddOns() {
           ['Total add-ons', addOns.length],
           ['Active', addOns.filter((addOn) => addOn.active).length],
           ['Categories', new Set(addOns.map((addOn) => addOn.category)).size],
-        ].map(([label, value]) => <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p></div>)}
+        ].map(([label, value]) => <div key={label} className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8]">{label}</p><p className="mt-2 text-2xl font-bold text-[#0B1F42]">{value}</p></div>)}
       </div>
 
       {/* Create / Edit Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-[14px] p-6 w-full max-w-lg shadow-xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-lg font-bold text-[#222222] mb-4">{editingId ? 'Edit Add-on' : 'Create Add-on'}</h2>
+          <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-xl">
+            <h2 className="mb-4 text-lg font-bold text-[#0B1F42]">{editingId ? 'Edit Add-on' : 'Create Add-on'}</h2>
             {formError && <div className="bg-red-50 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{formError}</div>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -298,13 +298,13 @@ function AdminAddOns() {
       {/* Table */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
         </div>
       ) : (
-        <div className="bg-white rounded-[14px] shadow-sm overflow-hidden">
+        <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-canvas border-b border-[#E5E7EB]">
+              <thead className="border-b border-[#E5E7EB] bg-[#F7F4EF]">
                 <tr>
                   <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Name</th>
                   <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Category</th>
@@ -318,8 +318,8 @@ function AdminAddOns() {
                 {addOns.map((a) => {
                   const assignedProps = assignments[a.id] || new Set();
                   return (
-                    <tr key={a.id} className="border-b border-[#E5E7EB]/50 hover:bg-canvas">
-                      <td className="py-3 px-4 font-semibold text-[#222222]">{a.name}</td>
+                    <tr key={a.id} className="border-b border-[#E5E7EB]/50 hover:bg-[#F7F4EF]">
+                      <td className="px-4 py-3 font-semibold text-[#0B1F42]">{a.name}</td>
                       <td className="py-3 px-4">
                         <span className="px-2.5 py-0.5 bg-[#2563EB]/10 text-[#222222] rounded-full text-xs font-semibold capitalize">
                           {CATEGORY_LABELS[a.category] || a.category}
