@@ -11,7 +11,7 @@ function CheckoutHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-[#E5E7EB] bg-white">
       <div className="mx-auto flex min-h-[64px] max-w-7xl items-center justify-between px-4 sm:px-6">
-        <button type="button" onClick={() => window.history.back()} className="inline-flex min-h-[44px] items-center gap-2 rounded-lg px-3 text-sm font-semibold text-[#222222] hover:bg-[#F7F7F5]" aria-label="Go back">
+        <button type="button" onClick={() => window.history.back()} className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] px-3 text-sm font-semibold text-[#0B1F42] hover:bg-[#F7F4EF]" aria-label="Go back">
           <span aria-hidden="true">←</span><span className="hidden sm:inline">Back</span>
         </button>
         <Link to="/" aria-label="ZuriLofts home"><img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" /></Link>
@@ -530,7 +530,7 @@ function BookingPage() {
         </svg>
         Back to property
       </button>
-      <h2 className="text-2xl font-bold text-[#222222]">Stay details</h2>
+      <h2 className="text-2xl font-bold text-[#0B1F42]">Stay details</h2>
       
       <div>
         <label className="block text-sm font-semibold text-[#222222] mb-2">Select your dates *</label>
@@ -583,7 +583,7 @@ function BookingPage() {
 
       {/* Bed Option - shown as read-only since it was selected on the property card */}
       {bedOption && (
-        <div className="bg-[#2563EB]/10 rounded-xl p-4 flex items-center justify-between">
+        <div className="flex items-center justify-between rounded-xl bg-[#FDE8D8] p-4">
           <div>
             <p className="text-sm font-semibold text-[#222222]">
               {bedOption === '2bed' ? '2-Bed Configuration' : '1-Bed Configuration'}
@@ -592,15 +592,15 @@ function BookingPage() {
               Apartment fits up to {pricing.maxGuests} guests &middot; KES {pricing.propertyPrice.toLocaleString()}/night
             </p>
           </div>
-          <span className="bg-[#2563EB] text-white text-xs font-bold px-3 py-1 rounded-full">
+          <span className="rounded-full bg-[#0B1F42] px-3 py-1 text-xs font-bold text-white">
             {bedOption === '2bed' ? '2 Bed' : '1 Bed'}
           </span>
         </div>
       )}
 
       {/* Standard times note */}
-      <div className="bg-[#222222]/5 rounded-xl p-4 flex items-start gap-3">
-        <svg className="w-5 h-5 text-[#2563EB] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex items-start gap-3 rounded-xl bg-[#F7F4EF] p-4">
+        <svg className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p className="text-sm text-[#222222]">
@@ -648,7 +648,7 @@ function BookingPage() {
       </div>
 
       {pricing.nights > 0 && (
-        <div className="bg-[#2563EB]/10 rounded-xl p-4">
+        <div className="rounded-xl bg-[#FDE8D8] p-4">
           <p className="text-[#222222] font-medium">
             {pricing.nights} {pricing.nights === 1 ? 'night' : 'nights'} selected
           </p>
@@ -684,7 +684,7 @@ function BookingPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-[#222222]">Guest Information</h2>
+        <h2 className="text-2xl font-bold text-[#0B1F42]">Guest Information</h2>
         <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account. Edit anything that&apos;s changed.</p>
       </div>
 
@@ -864,7 +864,7 @@ function BookingPage() {
 
             {loadingAddOns ? (
               <div className="flex items-center justify-center py-12">
-                <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin" />
+                <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent" />
               </div>
             ) : availableAddOns.length === 0 ? (
               <div className="bg-[#E5E7EB]/40 rounded-xl p-6 text-center">
@@ -882,7 +882,7 @@ function BookingPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="font-semibold text-[#222222]">{addOn.name}</h3>
-                          <span className="bg-[#2563EB]/10 text-[#222222] text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize">
+                          <span className="rounded-full bg-[#FDE8D8] px-2.5 py-0.5 text-xs font-semibold capitalize text-[#9A4A1D]">
                             {addOn.category}
                           </span>
                         </div>
@@ -960,7 +960,7 @@ function BookingPage() {
         </button>
       </div>
 
-      <h2 className="text-2xl font-bold text-[#222222]">Payment</h2>
+        <h2 className="text-2xl font-bold text-[#0B1F42]">Payment</h2>
 
       <div className="space-y-3">
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
@@ -1153,12 +1153,12 @@ function BookingPage() {
         <CheckoutHeader />
         <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
           <div className="max-w-md mx-auto px-6 text-center">
-            <div className="w-24 h-24 bg-[#2563EB]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-12 h-12 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-[#E8F4EC]">
+              <svg className="h-12 w-12 text-[#287A45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="text-3xl font-bold text-[#222222] mb-4">Booking Confirmed!</h1>
+            <h1 className="mb-4 text-3xl font-bold text-[#0B1F42]">Booking Confirmed!</h1>
             <p className="text-[#6b7280] mb-6">
               Thank you for your booking. We have sent a confirmation email to {bookingData.email} with all the details.
             </p>
@@ -1224,7 +1224,7 @@ function BookingPage() {
         <CheckoutHeader />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
             <p className="text-[#6b7280]">Loading property...</p>
           </div>
         </div>
