@@ -650,7 +650,7 @@ function AdminLayout() {
       {/* Mobile floating pill nav + off-screen drawer */}
       <div className="md:hidden">
         <div className="fixed inset-x-0 bottom-4 z-10 flex justify-center px-4">
-          <div className="flex items-center gap-1 bg-white border border-[#E5E7EB] rounded-full p-1.5 shadow-lg">
+          <div className="flex items-center gap-1 rounded-2xl bg-[#0B1F42] p-2 text-white shadow-[0_12px_30px_rgba(11,31,66,0.28)]">
             {/* Logo -> client view */}
             <Link
               to="/"
@@ -672,9 +672,9 @@ function AdminLayout() {
                   title={label}
                   aria-label={label}
                   className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
-                    active
-                      ? "bg-[#2563EB] text-white"
-                      : "text-[#6b7280] hover:bg-[#F7F7F5]"
+                      active
+                      ? "bg-white text-[#0B1F42]"
+                      : "text-white/70 hover:bg-white/10 hover:text-white"
                   }`}
                 >
                   <svg
@@ -704,9 +704,9 @@ function AdminLayout() {
                 title="More"
                 aria-label="More"
                 className={`shrink-0 flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
-                  mobileMenuOpen || moreItemActive
-                    ? "bg-[#2563EB] text-white"
-                    : "text-[#6b7280] hover:bg-[#F7F7F5]"
+                    mobileMenuOpen || moreItemActive
+                    ? "bg-white text-[#0B1F42]"
+                    : "text-white/70 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 <svg
@@ -724,7 +724,7 @@ function AdminLayout() {
             {/* Bell */}
             <div className="relative shrink-0">
               <button
-                className="flex items-center justify-center w-8 h-8 rounded-full text-[#6b7280] hover:text-[#222222] hover:bg-[#F7F7F5] transition-colors"
+                className="flex h-8 w-8 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                 title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
               >
                 <svg
