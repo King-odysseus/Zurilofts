@@ -29,7 +29,7 @@ export default function HostMobileBottomNav() {
   }, []);
 
   return (
-    <nav aria-label="Host workspace" className="host-mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-[420px] items-center justify-between rounded-2xl bg-[#0B1F42] px-2 py-2 text-white shadow-[0_12px_30px_rgba(11,31,66,0.28)] md:hidden">
+    <nav aria-label="Host workspace" className="host-mobile-bottom-nav fixed inset-x-4 bottom-3 z-40 mx-auto flex max-w-[358px] items-center justify-between rounded-2xl bg-[#0B1F42] px-2 py-2 text-white shadow-[0_12px_30px_rgba(11,31,66,0.28)] md:hidden">
       {TABS.map((tab) => {
         const active = tab.match(location.pathname);
         return <Link key={tab.key} to={tab.to} aria-current={active ? 'page' : undefined} className={`flex min-h-[48px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] font-semibold transition-colors ${active ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}><Icon name={tab.key} active={active} /><span className="truncate">{tab.label}</span></Link>;

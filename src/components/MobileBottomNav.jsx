@@ -99,7 +99,7 @@ function MobileBottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-[420px] rounded-2xl bg-[#0B1F42] px-2 py-2 text-white shadow-[0_12px_30px_rgba(11,31,66,0.28)] md:hidden"
+      className="mobile-bottom-nav fixed inset-x-4 bottom-3 z-40 mx-auto flex max-w-[358px] rounded-2xl bg-[#0B1F42] px-2 py-2 text-white shadow-[0_12px_30px_rgba(11,31,66,0.28)] md:hidden"
     >
       {TABS.map((tab) => {
         const active = tab.match(location.pathname);
