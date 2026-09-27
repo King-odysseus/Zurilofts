@@ -105,7 +105,7 @@ function AdminMessages() {
         ].map(([label, value]) => (
           <div
             key={label}
-            className="rounded-xl border border-[#E3E8EF] bg-white p-4 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
+            className="rounded-[10px] border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)]"
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8]">
               {label}
@@ -129,7 +129,7 @@ function AdminMessages() {
               <button
                 key={c.userId}
                 onClick={() => openConversation(c)}
-                className={`w-full border-b border-[#E5E7EB] px-4 py-3 text-left transition-colors hover:bg-[#F7F4EF] ${
+                className={`w-full border-b border-[#E3E8EF] px-4 py-3 text-left transition-colors hover:bg-[#F7F4EF] ${
                   activeUser?.userId === c.userId ? "bg-[#FDE8D8]" : ""
                 }`}
               >
@@ -165,11 +165,11 @@ function AdminMessages() {
                 <p className="text-sm font-semibold text-[#0B1F42]">
                   {activeUser.firstName} {activeUser.lastName}
                 </p>
-                <p className="text-xs text-[#6b7280]">{activeUser.email}</p>
+                  <p className="text-xs text-[#5B6B82]">{activeUser.email}</p>
               </div>
               <div className="flex-1 overflow-y-auto p-4 space-y-2">
                 {loadingThread ? (
-                  <p className="text-xs text-[#6b7280] text-center py-6">
+                  <p className="text-xs text-[#5B6B82] text-center py-6">
                     Loading…
                   </p>
                 ) : (
@@ -187,7 +187,7 @@ function AdminMessages() {
                       >
                         {m.body}
                         <div
-                          className={`text-[10px] mt-1 ${m.senderRole === "ADMIN" ? "text-white/70" : "text-[#6b7280]"}`}
+                          className={`text-[10px] mt-1 ${m.senderRole === "ADMIN" ? "text-white/70" : "text-[#5B6B82]"}`}
                         >
                           {new Date(m.createdAt).toLocaleString()}
                         </div>

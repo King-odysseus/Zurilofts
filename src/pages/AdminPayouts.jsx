@@ -107,7 +107,7 @@ function AdminPayouts() {
 
       <div className="flex flex-wrap items-center gap-2" role="tablist" aria-label="Payout status">
         {[['', 'All'], ['PENDING', 'Pending'], ['PROCESSING', 'Processing'], ['SUCCESS', 'Success'], ['FAILED', 'Failed']].map(([value, label]) => (
-          <button key={value || 'all'} type="button" role="tab" aria-selected={statusFilter === value} onClick={() => setStatusFilter(value)} className={`rounded-[10px] px-4 py-2 text-xs font-semibold transition-colors ${statusFilter === value ? 'bg-[#0B1F42] text-white' : 'border border-[#E5E7EB] bg-white text-[#52606F] hover:bg-[#F7F4EF]'}`}>{label}</button>
+          <button key={value || 'all'} type="button" role="tab" aria-selected={statusFilter === value} onClick={() => setStatusFilter(value)} className={`rounded-[10px] px-4 py-2 text-xs font-semibold transition-colors ${statusFilter === value ? 'bg-[#0B1F42] text-white' : 'border border-[#E3E8EF] bg-white text-[#5B6B82] hover:bg-[#F7F4EF]'}`}>{label}</button>
         ))}
       </div>
 
@@ -130,14 +130,14 @@ function AdminPayouts() {
         <div className="overflow-x-auto rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-[#E5E7EB] text-left">
-                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Host</th>
-                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Amount (KES)</th>
-                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Bookings</th>
-                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th>
-                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Initiated</th>
-                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Completed</th>
-                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Actions</th>
+              <tr className="border-b border-[#E3E8EF] text-left">
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Host</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Amount (KES)</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Bookings</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Status</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Initiated</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Completed</th>
+                <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Actions</th>
               </tr>
             </thead>
             <tbody>
