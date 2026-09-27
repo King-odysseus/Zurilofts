@@ -103,13 +103,13 @@ function TodayCard({ booking, type }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <span>{formatDate(type === "arrival" ? booking.checkIn : booking.checkOut)}</span>
-          <span className="text-[#E5E7EB]">|</span>
+          <span className="text-[#E3E8EF]">|</span>
           <span>{nights} night{nights !== 1 ? "s" : ""}</span>
-          <span className="text-[#E5E7EB]">|</span>
+          <span className="text-[#E3E8EF]">|</span>
           <span>{booking.guests} guest{booking.guests !== 1 ? "s" : ""}</span>
           {booking.bedOption && (
             <>
-              <span className="text-[#E5E7EB]">|</span>
+              <span className="text-[#E3E8EF]">|</span>
               <span>{booking.bedOption === "1bed" ? "1 bed" : "2 bed"}</span>
             </>
           )}
@@ -134,7 +134,7 @@ function TodayCard({ booking, type }) {
         </div>
         <Link
           to={`/disputes/new?bookingId=${booking.id}`}
-          className="block text-center mt-2 min-h-[44px] leading-[44px] text-xs font-semibold text-[#6b7280] hover:text-red-600 transition-colors"
+          className="block text-center mt-2 min-h-[44px] leading-[44px] text-xs font-semibold text-[#5B6B82] hover:text-[#B42318] transition-colors"
         >
           Report an issue
         </Link>
@@ -513,8 +513,8 @@ function NextStepCard({ hostApplicationStatus, properties, role }) {
         <span className={`inline-flex items-center self-start px-2 py-0.5 rounded-full text-xs font-semibold ${badgeTones[step.badge.tone]}`}>
           {step.badge.label}
         </span>
-        <h2 className="mt-3 text-lg font-bold text-[#222222]">{step.title}</h2>
-        <p className="mt-1 text-sm text-[#6b7280]">{step.copy}</p>
+        <h2 className="mt-3 text-lg font-bold text-[#0B1F42]">{step.title}</h2>
+        <p className="mt-1 text-sm text-[#5B6B82]">{step.copy}</p>
         <Link
           to={step.cta.to}
           className="mt-4 self-start inline-flex items-center justify-center min-h-[44px] px-5 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
@@ -544,7 +544,7 @@ function RecentMessagesPanel({ conversations, loading }) {
   return (
     <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-bold text-[#222222] flex items-center gap-2">
+        <h2 className="text-lg font-bold text-[#0B1F42] flex items-center gap-2">
           <span className="h-2.5 w-2.5 rounded-full bg-[#C49A6C]" />
           Recent guest messages
         </h2>
@@ -563,8 +563,8 @@ function RecentMessagesPanel({ conversations, loading }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
-          <p className="text-sm text-[#6b7280]">No guest messages yet</p>
-          <p className="text-xs text-[#6b7280] mt-1">Messages from guests about their stays will appear here.</p>
+          <p className="text-sm text-[#5B6B82]">No guest messages yet</p>
+          <p className="text-xs text-[#5B6B82] mt-1">Messages from guests about their stays will appear here.</p>
         </div>
       ) : (
         <ul className="divide-y divide-[#E5E7EB]">
