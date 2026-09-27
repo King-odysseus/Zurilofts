@@ -151,11 +151,9 @@ body {
    shadow for gentle elevation. */
 .neu-card {
   background-color: #ffffff;
-  border: 1px solid #E5E7EB;
-  border-radius: 14px;
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.04),
-    0 2px 8px -2px rgb(0 0 0 / 0.05);
+  border: 1px solid #E3E8EF;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(11,31,66,0.08);
   transition: box-shadow 0.25s ease, transform 0.25s ease;
 }
 
@@ -168,44 +166,42 @@ body {
 /* ===== Form inputs - flat, bordered, restrained surfaces ===== */
 .neu-input {
   background-color: #ffffff;
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  color: #222222;
+  border: 1px solid #E3E8EF;
+  border-radius: 10px;
+  color: #0B1F42;
   transition: box-shadow 0.15s ease;
 }
 
 .neu-input::placeholder {
-  color: #6b7280;
+  color: #5B6B82;
 }
 
 .neu-input:focus {
   outline: none;
-  border-color: #2563EB;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  border-color: #C49A6C;
+  box-shadow: 0 0 0 3px rgba(196,154,108,0.18);
 }
 
 /* ===== Radio / option cards - borderless, shadow communicates the surface ===== */
 .neu-radio-card {
   background-color: #ffffff;
-  border: 1px solid #E5E7EB;
-  border-radius: 14px;
-  box-shadow:
-    0 1px 2px rgb(0 0 0 / 0.04),
-    0 2px 8px -2px rgb(0 0 0 / 0.05);
+  border: 1px solid #E3E8EF;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(11,31,66,0.08);
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .neu-radio-card:hover {
-  border-color: #2563EB;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  border-color: #C49A6C;
+  box-shadow: 0 0 0 3px rgba(196,154,108,0.18);
   transform: translateY(-2px);
 }
 
 .neu-radio-selected {
   background-color: #ffffff;
-  border: 2px solid #2563EB;
-  border-radius: 14px;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  border: 2px solid #C49A6C;
+  border-radius: 16px;
+  box-shadow: 0 0 0 3px rgba(196,154,108,0.18);
 }
 
 /* Auth cards sit over a dark photo background - use a single soft drop
@@ -219,17 +215,17 @@ body {
 .auth-input,
 .filter-input {
   background-color: #ffffff;
-  border: 1px solid #E5E7EB;
-  border-radius: 12px;
-  color: #222222;
+  border: 1px solid #E3E8EF;
+  border-radius: 10px;
+  color: #0B1F42;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 1px 8px -2px rgb(0 0 0 / 0.06);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
 .auth-input:focus,
 .filter-input:focus {
-  border-color: #2563EB;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  border-color: #C49A6C;
+  box-shadow: 0 0 0 3px rgba(196,154,108,0.18);
   outline: none;
 }
 
@@ -237,11 +233,11 @@ body {
 .date-input {
   color-scheme: light;
   cursor: pointer;
-  accent-color: #2563EB;
+  accent-color: #C49A6C;
 }
 
 .date-input::-webkit-calendar-picker-indicator {
-  background-color: #2563EB;
+  background-color: #C49A6C;
   padding: 5px;
   border-radius: 8px;
   cursor: pointer;
@@ -257,12 +253,12 @@ body {
 }
 
 .date-input::-webkit-datetime-edit-fields-wrapper {
-  color: #222222;
+  color: #0B1F42;
   font-weight: 500;
 }
 
 .date-input::-webkit-datetime-edit-text {
-  color: #2563EB;
+  color: #C49A6C;
   padding: 0 2px;
   font-weight: 600;
 }
@@ -272,8 +268,8 @@ body {
 .date-input::-webkit-datetime-edit-year-field:focus,
 .date-input::-webkit-datetime-edit-hour-field:focus,
 .date-input::-webkit-datetime-edit-minute-field:focus {
-  background-color: #EFF6FF;
-  color: #1D4ED8;
+  background-color: #FDE8D8;
+  color: #9A744A;
   border-radius: 4px;
 }
 
@@ -282,7 +278,7 @@ select.neu-input {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%232563EB' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23C49A6C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 16px center;
   background-size: 14px;
@@ -291,14 +287,14 @@ select.neu-input {
 
 select.neu-input option {
   background: #ffffff;
-  color: #222222;
+  color: #0B1F42;
   padding: 12px;
 }
 
 select.neu-input option:hover,
 select.neu-input option:checked {
-  background: #EFF6FF;
-  color: #1D4ED8;
+  background: #FDE8D8;
+  color: #9A744A;
 }
 
 /* All other selects (admin filters/forms, price filter) get the same app
@@ -307,7 +303,7 @@ select:not(.neu-input) {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235B6B82' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 14px center;
   background-size: 14px;
@@ -316,7 +312,7 @@ select:not(.neu-input) {
 
 select:not(.neu-input) option {
   background: #ffffff;
-  color: #222222;
+  color: #0B1F42;
 }
 
 /* Marquee scroll - continuous auto-scrolling track */
