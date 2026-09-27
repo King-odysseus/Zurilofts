@@ -82,7 +82,7 @@ function HomeHeader({ propertiesPage = false, searchLabel = '', searchPath = '/p
 
   return (
     <header className="relative z-30 border-b border-[#E3E8EF] bg-white">
-      <div className="mx-auto flex h-[72px] max-w-[1240px] items-center justify-between gap-4 px-5 md:px-8">
+      <div className="mx-auto flex h-[72px] max-w-[1344px] items-center justify-between gap-4 px-5 md:px-8">
         <Link to="/" className="shrink-0" aria-label="ZuriLofts home">
           <img src={logoImg} alt="ZuriLofts" className="h-11 w-[118px] object-contain" />
         </Link>
@@ -228,7 +228,7 @@ function HomeFooter() {
   const { t } = useLanguage();
   return (
     <footer className="bg-[#0B1F42] text-white">
-      <div className="mx-auto max-w-[1240px] px-5 py-12 md:px-8 md:py-16">
+      <div className="mx-auto max-w-[1344px] px-5 py-12 md:px-8 md:py-16">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_.7fr_.7fr_1fr]">
           <div>
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-white p-1.5"><img src={logoImg} alt="ZuriLofts" className="h-full w-full object-contain" /></div>
@@ -303,7 +303,7 @@ export default function HomePage() {
         <section className="relative z-20 isolate overflow-visible bg-[#102B62] text-white">
           <img src={heroImage} alt="A furnished ZuriLofts apartment in Nairobi" className="absolute inset-0 -z-20 h-full w-full object-cover" />
           <div className="absolute inset-0 -z-10 bg-[#123878]/80" />
-          <div className="mx-auto flex min-h-[440px] max-w-[1240px] flex-col items-center justify-center px-5 py-20 text-center md:px-8 md:py-24">
+          <div className="mx-auto flex min-h-[440px] max-w-[1344px] flex-col items-center justify-center px-5 py-20 text-center md:px-8 md:py-24">
             <span className="rounded-full bg-[#C89B6D] px-4 py-2 text-[10px] font-semibold uppercase tracking-[.1em] text-white">{t('home.verifiedHomes')}</span>
             <h1 className="mt-6 text-4xl font-semibold tracking-[-.03em] sm:text-5xl">{t('home.heroTitle')}</h1>
             <p className="mt-4 max-w-[650px] text-sm leading-6 text-white/90 sm:text-base">{t('home.heroDescription')}</p>
@@ -312,7 +312,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="mx-auto max-w-[1240px] px-5 py-14 md:px-8 md:py-16">
+        <section className="mx-auto max-w-[1344px] px-5 py-14 md:px-8 md:py-16">
           <div className="flex items-end justify-between gap-4">
             <div><h2 className="mt-4 text-2xl font-semibold tracking-tight md:mt-6 md:text-[30px]">{t('home.staysTitle')}</h2><p className="mt-1 text-xs text-[#5B6B82]">{t('home.staysDescription')}</p></div>
             <Link to="/properties" className="hidden items-center gap-2 text-xs font-medium sm:flex">{t('home.seeAll')} <Icon name="arrow" className="h-4 w-4" /></Link>
@@ -329,9 +329,9 @@ export default function HomePage() {
           {!loading && !error && stays.length > 0 && <div className="mt-6 grid grid-cols-1 gap-x-5 gap-y-9 sm:grid-cols-2 lg:grid-cols-4">{stays.map((property, index) => <div key={property.id} className={index >= 4 ? 'hidden sm:block' : ''}><StayCard property={property} /></div>)}</div>}
         </section>
 
-        {recentlyViewed.length > 0 && <section className="bg-[#EFF3F9]"><div className="mx-auto max-w-[1240px] px-5 py-12 md:px-8"><div className="flex items-center justify-between"><h2 className="text-xl font-semibold">{t('home.recentlyViewed')}</h2><button type="button" onClick={() => { clearRecentlyViewed(); setRecentlyViewed([]); }} className="text-[11px] text-[#5B6B82]">{t('home.clearHistory')}</button></div><div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-5 lg:gap-4">{recentlyViewed.map((property) => <RecentCard key={property.id} property={property} />)}</div></div></section>}
+        {recentlyViewed.length > 0 && <section className="bg-[#EFF3F9]"><div className="mx-auto max-w-[1344px] px-5 py-12 md:px-8"><div className="flex items-center justify-between"><h2 className="text-xl font-semibold">{t('home.recentlyViewed')}</h2><button type="button" onClick={() => { clearRecentlyViewed(); setRecentlyViewed([]); }} className="text-[11px] text-[#5B6B82]">{t('home.clearHistory')}</button></div><div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-4 lg:grid-cols-5 lg:gap-4">{recentlyViewed.map((property) => <RecentCard key={property.id} property={property} />)}</div></div></section>}
 
-        <section className="mx-auto max-w-[1240px] px-5 py-20 text-center md:px-8 md:py-24">
+        <section className="mx-auto max-w-[1344px] px-5 py-20 text-center md:px-8 md:py-24">
           <h2 className="text-2xl font-semibold md:text-[30px]">{t('home.whyTitle')}</h2>
           <p className="mt-2 text-xs text-[#5B6B82]">{t('home.whyDescription')}</p>
           <div className="mt-8 grid gap-5 text-left md:grid-cols-3">
@@ -343,7 +343,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="bg-[#F7F4EF]"><div className="mx-auto max-w-[1240px] px-5 py-16 md:px-8 md:py-20"><div className="flex items-end justify-between"><div><h2 className="text-2xl font-semibold md:text-[30px]">{t('home.exploreTitle')}</h2><p className="mt-2 text-xs text-[#5B6B82]">{t('home.exploreDescription')}</p></div><Link to="/guides" className="hidden items-center gap-2 text-xs font-medium sm:flex">{t('home.browseGuides')} <Icon name="arrow" className="h-4 w-4" /></Link></div><div className="mt-8 grid gap-5 md:grid-cols-3">{EXPLORE_CARDS.map((card) => <ExploreCard key={card.title} card={card} />)}</div></div></section>
+        <section className="bg-[#F7F4EF]"><div className="mx-auto max-w-[1344px] px-5 py-16 md:px-8 md:py-20"><div className="flex items-end justify-between"><div><h2 className="text-2xl font-semibold md:text-[30px]">{t('home.exploreTitle')}</h2><p className="mt-2 text-xs text-[#5B6B82]">{t('home.exploreDescription')}</p></div><Link to="/guides" className="hidden items-center gap-2 text-xs font-medium sm:flex">{t('home.browseGuides')} <Icon name="arrow" className="h-4 w-4" /></Link></div><div className="mt-8 grid gap-5 md:grid-cols-3">{EXPLORE_CARDS.map((card) => <ExploreCard key={card.title} card={card} />)}</div></div></section>
       </main>
       <HomeFooter />
     </div>
