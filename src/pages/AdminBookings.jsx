@@ -89,9 +89,9 @@ function BookingTimes({ booking }) {
   const checkoutLate = isLateCheckout(booking.checkOutTime);
   return (
     <span className="text-xs">
-      <span className="text-[#6b7280]">In </span>
+      <span className="text-[#5B6B82]">In </span>
       {formatTime12h(booking.checkInTime || '15:00')}
-      <span className="text-[#6b7280]"> · Out </span>
+      <span className="text-[#5B6B82]"> · Out </span>
       <span className={checkoutLate ? 'text-amber-600 font-semibold' : ''}>
         {formatTime12h(booking.checkOutTime || '10:00')}
       </span>
@@ -116,7 +116,7 @@ function ActionButton({ variant = 'secondary', size = 'sm', className = '', disa
   };
   const variants = {
     primary: 'bg-[#0B1F42] text-white hover:bg-[#07072E]',
-    secondary: 'bg-white border border-[#E5E7EB] text-[#0B1F42] hover:bg-[#F7F4EF]',
+    secondary: 'bg-white border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF]',
     danger: 'bg-[#dc2626] text-white hover:bg-[#b91c1c]',
   };
   return (
@@ -158,7 +158,7 @@ function BookingActions({
   onDeclineRefund,
 }) {
   if (!isAdmin) {
-    return <span className="text-xs text-[#6b7280]">View only</span>;
+    return <span className="text-xs text-[#5B6B82]">View only</span>;
   }
 
   return (
@@ -582,7 +582,7 @@ function AdminBookings() {
 
   return (
     <div>
-      <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:flex-row sm:items-center sm:px-6">
+      <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] sm:flex-row sm:items-center sm:px-6">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Operations</p>
           <h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">Bookings</h1>
@@ -609,11 +609,11 @@ function AdminBookings() {
           ['Pending', bookings.filter((b) => b.status === 'PENDING').length],
           ['Confirmed', bookings.filter((b) => b.status === 'CONFIRMED').length],
           ['Cancelled', bookings.filter((b) => b.status === 'CANCELLED').length],
-        ].map(([label, value]) => <div key={label} className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#52606F]">{label}</p><p className="mt-2 text-2xl font-bold text-[#0B1F42]">{value}</p></div>)}
+        ].map(([label, value]) => <div key={label} className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)]"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5B6B82]">{label}</p><p className="mt-2 text-2xl font-bold text-[#0B1F42]">{value}</p></div>)}
       </div>
 
       {loading ? (
-        <div className="flex flex-col items-center justify-center py-16 text-[#6b7280]">
+        <div className="flex flex-col items-center justify-center py-16 text-[#5B6B82]">
           <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
           <p className="mt-3 text-sm">Loading bookings…</p>
         </div>

@@ -453,7 +453,7 @@ function AdminProperties() {
         ].map(([label, value]) => (
           <div
             key={label}
-            className="rounded-xl border border-[#E3E8EF] bg-white p-4 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
+            className="rounded-[10px] border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)]"
           >
             <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#94A3B8]">
               {label}
@@ -644,10 +644,10 @@ function AdminProperties() {
                             <img
                               src={p.images[0]}
                               alt=""
-                              className="h-11 w-11 shrink-0 rounded-xl object-cover"
+                            className="h-11 w-11 shrink-0 rounded-[10px] object-cover"
                             />
                           ) : (
-                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#E2E8F0] bg-[#F1F5F9]">
+                            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-[#EEF2F7]">
                               <svg className="h-5 w-5 text-[#94A3B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.6-4.6a2 2 0 0 1 2.8 0L16 16m-2-2 1.6-1.6a2 2 0 0 1 2.8 0L20 14M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z" />
                               </svg>
@@ -756,7 +756,7 @@ function AdminProperties() {
             </table>
           </div>
           {visibleProperties.length === 0 && (
-            <div className="text-center py-16 text-[#6b7280]">
+            <div className="text-center py-16 text-[#5B6B82]">
               <p className="text-sm">
                 {isAdminView
                   ? "No listings match this status."
@@ -805,7 +805,7 @@ function AdminProperties() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[#6b7280] text-sm">
+                  <div className="w-full h-full flex items-center justify-center text-[#5B6B82] text-sm">
                     No image yet
                   </div>
                 )}
@@ -832,7 +832,7 @@ function AdminProperties() {
                     </p>
                     <p className="mt-1 font-bold text-[#0B1F42]">
                       KES {p.price?.toLocaleString()}{" "}
-                      <span className="font-normal text-xs text-[#6b7280]">
+                      <span className="font-normal text-xs text-[#5B6B82]">
                         / night
                       </span>
                     </p>
@@ -991,7 +991,7 @@ function AdminProperties() {
                 </span>
               </div>
               <div className="flex items-center justify-between gap-4">
-                <span className="text-[#6b7280]">Status</span>
+                <span className="text-[#5B6B82]">Status</span>
                 <StatusPill status={selectedProperty.status} />
               </div>
             </div>
