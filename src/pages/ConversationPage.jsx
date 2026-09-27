@@ -170,7 +170,7 @@ function ConversationPage() {
   return (
     <div className="min-h-screen bg-canvas flex flex-col">
       <Navbar />
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-4 flex min-h-0 gap-5">
+      <main className="flex-1 w-full max-w-[1344px] mx-auto px-4 sm:px-6 pt-24 pb-4 flex min-h-0 gap-5">
         <aside className="hidden w-[360px] flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:flex" aria-label="Conversations">
           <div className="border-b border-[#E5E7EB] px-5 py-4">
             <h1 className="text-xl font-bold text-[#0B1F42]">Inbox</h1>

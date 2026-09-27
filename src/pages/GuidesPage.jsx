@@ -90,7 +90,7 @@ function GuidesPage() {
         searchPath="/guides"
       />
       <main>
-        <section className="mx-auto max-w-[1200px] px-4 pb-6 pt-7 md:px-8 md:pt-8">
+        <section className="mx-auto max-w-[1344px] px-4 pb-6 pt-7 md:px-8 md:pt-8">
           <p className="text-xs text-[#5B6B82]">
             Home <span className="mx-1">›</span> Guides
           </p>
@@ -128,7 +128,7 @@ function GuidesPage() {
             </div>
           </div>
         </section>
-        <section className="mx-auto max-w-[1200px] px-4 pb-16 md:px-8">
+        <section className="mx-auto max-w-[1344px] px-4 pb-16 md:px-8">
           {loading ? (
             <div className="flex min-h-[40vh] items-center justify-center">
               <Spinner />

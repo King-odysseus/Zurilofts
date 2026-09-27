@@ -91,7 +91,7 @@ function PropertiesResultsScene({
       <HomeHeader propertiesPage />
 
       <main>
-        <section className="mx-auto max-w-[1200px] px-4 pb-5 pt-7 md:px-8 md:pb-6 md:pt-8">
+        <section className="mx-auto max-w-[1344px] px-4 pb-5 pt-7 md:px-8 md:pb-6 md:pt-8">
           <p className="text-xs text-[#5B6B82]">
             Home <span className="mx-1">›</span> Properties
           </p>
@@ -132,7 +132,7 @@ function PropertiesResultsScene({
           </div>
         </section>
 
-        <section className="mx-auto max-w-[1200px] px-4 pb-6 md:px-8">
+        <section className="mx-auto max-w-[1344px] px-4 pb-6 md:px-8">
           <TripSearchBar
             value={searchInput}
             onChange={onSearchChange}
@@ -148,7 +148,7 @@ function PropertiesResultsScene({
           />
         </section>
 
-        <section className="mx-auto max-w-[1200px] px-4 pb-6 md:px-8">
+        <section className="mx-auto max-w-[1344px] px-4 pb-6 md:px-8">
           <div className="hidden items-center justify-between gap-4 md:flex">
             <div className="flex flex-wrap gap-2">
               {filterButtons.map(({ key, label }) => (
@@ -354,7 +354,7 @@ function PropertiesResultsScene({
         </section>
 
         <section
-          className="mx-auto max-w-[1200px] px-4 pb-16 md:px-8"
+          className="mx-auto max-w-[1344px] px-4 pb-16 md:px-8"
           aria-live="polite"
         >
           <div className="mb-5 flex items-center justify-between gap-3">
@@ -784,7 +784,7 @@ function PropertiesPage() {
 
       {/* Stays Results intro */}
       <section className="bg-[#F7F4EF] pt-24 pb-5 md:pt-28 md:pb-7">
-        <div className="mx-auto max-w-[1200px] px-4 md:px-8">
+        <div className="mx-auto max-w-[1344px] px-4 md:px-8">
           <p className="mb-2 text-xs text-[#5B6B82]">
             Home <span className="mx-1">›</span> Properties
           </p>
@@ -828,7 +828,7 @@ function PropertiesPage() {
 
       {/* Compact working search composition */}
       <section className="bg-[#F7F4EF] pb-6 md:pb-8">
-        <div className="mx-auto max-w-[1200px] px-4 md:px-8">
+        <div className="mx-auto max-w-[1344px] px-4 md:px-8">
           <div className="rounded-[18px] border border-[#E3E8EF] bg-white p-2 shadow-[0_8px_24px_rgba(11,31,66,0.08)]">
             <TripSearchBar
               value={searchInput}
@@ -1171,7 +1171,7 @@ function PropertiesPage() {
 
       {/* Results */}
       <section className="bg-white py-6 md:py-10" aria-live="polite">
-        <div className="mx-auto w-full max-w-[1200px] px-4 md:px-8">
+        <div className="mx-auto w-full max-w-[1344px] px-4 md:px-8">
           {/* Results summary bar */}
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
             <p className="text-sm text-[#6b7280]">

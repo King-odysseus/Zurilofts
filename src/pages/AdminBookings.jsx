@@ -147,7 +147,6 @@ function BookingActions({
   booking,
   isAdmin,
   actionLoading,
-  size,
   className = '',
   onConfirm,
   onCancel,
@@ -157,59 +156,47 @@ function BookingActions({
   onMarkRefunded,
   onDeclineRefund,
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   if (!isAdmin) {
     return <span className="text-xs text-[#5B6B82]">View only</span>;
   }
 
+  const itemClass = 'flex w-full items-center gap-2 rounded-[10px] px-3 py-2 text-left text-xs font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF] disabled:cursor-not-allowed disabled:opacity-50';
+  const iconClass = 'h-4 w-4 shrink-0 text-[#5B6B82]';
+
   return (
-    <div className={`flex flex-wrap items-center gap-2 ${className}`}>
-      <ActionButton variant="secondary" size={size} onClick={() => onView(booking)}>View</ActionButton>
-      {booking.status === 'PENDING' && (
-        <>
-          <ActionButton variant="primary" size={size} disabled={actionLoading} onClick={() => onConfirm(booking.id)}>
-            Confirm
-          </ActionButton>
-          <ActionButton variant="secondary" size={size} disabled={actionLoading} onClick={() => onCancel(booking)}>
-            Cancel
-          </ActionButton>
-        </>
-      )}
-
-      {booking.status === 'CONFIRMED' && (
-        <>
-          <ActionButton variant="secondary" size={size} disabled={actionLoading} onClick={() => onEdit(booking)}>
-            Edit
-          </ActionButton>
-          <ActionButton variant="secondary" size={size} disabled={actionLoading} onClick={() => onCancel(booking)}>
-            Cancel
-          </ActionButton>
-          <ActionButton variant="danger" size={size} disabled={actionLoading} onClick={() => onDelete(booking)}>
-            Delete
-          </ActionButton>
-        </>
-      )}
-
-      {booking.status === 'CANCELLED' && booking.refundStatus === 'REFUND_PENDING' && (
-        <>
-          <ActionButton
-            variant="primary"
-            size={size}
-            disabled={actionLoading}
-            onClick={() => onMarkRefunded(booking.id)}
-            title="Send the guest's refund from the Paystack dashboard, then mark it done"
-          >
-            Mark refunded
-          </ActionButton>
-          <ActionButton variant="secondary" size={size} disabled={actionLoading} onClick={() => onDeclineRefund(booking.id)}>
-            Decline refund
-          </ActionButton>
-        </>
-      )}
-
-      {booking.status === 'CANCELLED' && (
-        <ActionButton variant="danger" size={size} disabled={actionLoading} onClick={() => onDelete(booking)}>
-          Delete
-        </ActionButton>
+    <div className={`relative flex items-center justify-end ${className}`}>
+      <button
+        type="button"
+        aria-label={`Actions for booking ${booking.id}`}
+        aria-expanded={menuOpen}
+        onClick={() => setMenuOpen((open) => !open)}
+        className="inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white text-[#0B1F42] transition-colors hover:bg-[#F7F4EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]/40"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-5 w-5" aria-hidden="true"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></svg>
+      </button>
+      {menuOpen && (
+        <div className="absolute right-0 top-full z-30 mt-2 w-48 rounded-2xl border border-[#E3E8EF] bg-white p-2 shadow-[0_12px_30px_rgba(11,31,66,0.14)]">
+          <button type="button" className={itemClass} onClick={() => { setMenuOpen(false); onView(booking); }}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={iconClass} aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z" /><circle cx="12" cy="12" r="2.5" /></svg>
+            View booking
+          </button>
+          {booking.status === 'PENDING' && <>
+            <button type="button" className={itemClass} disabled={actionLoading} onClick={() => { setMenuOpen(false); onConfirm(booking.id); }}><span className={`${iconClass} text-[#287A45]`}>✓</span>Confirm booking</button>
+            <button type="button" className={itemClass} disabled={actionLoading} onClick={() => { setMenuOpen(false); onCancel(booking); }}><span className={iconClass}>–</span>Cancel booking</button>
+          </>}
+          {booking.status === 'CONFIRMED' && <>
+            <button type="button" className={itemClass} disabled={actionLoading} onClick={() => { setMenuOpen(false); onEdit(booking); }}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className={iconClass} aria-hidden="true"><path d="m4 16.5-.7 3.2 3.2-.7L18.3 7.2a2.1 2.1 0 0 0-3-3L4 16.5Z" /><path d="m14.5 5.5 3 3" /></svg>Edit booking</button>
+            <button type="button" className={itemClass} disabled={actionLoading} onClick={() => { setMenuOpen(false); onCancel(booking); }}><span className={iconClass}>–</span>Cancel booking</button>
+            <button type="button" className={`${itemClass} text-[#B42318]`} disabled={actionLoading} onClick={() => { setMenuOpen(false); onDelete(booking); }}><span className={`${iconClass} text-[#B42318]`}>×</span>Delete booking</button>
+          </>}
+          {booking.status === 'CANCELLED' && booking.refundStatus === 'REFUND_PENDING' && <>
+            <button type="button" className={itemClass} disabled={actionLoading} onClick={() => { setMenuOpen(false); onMarkRefunded(booking.id); }}><span className={`${iconClass} text-[#287A45]`}>✓</span>Mark refunded</button>
+            <button type="button" className={itemClass} disabled={actionLoading} onClick={() => { setMenuOpen(false); onDeclineRefund(booking.id); }}><span className={iconClass}>–</span>Decline refund</button>
+          </>}
+          {booking.status === 'CANCELLED' && <button type="button" className={`${itemClass} text-[#B42318]`} disabled={actionLoading} onClick={() => { setMenuOpen(false); onDelete(booking); }}><span className={`${iconClass} text-[#B42318]`}>×</span>Delete booking</button>}
+        </div>
       )}
     </div>
   );

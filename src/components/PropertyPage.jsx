@@ -184,7 +184,7 @@ function PropertyPage() {
 
       {/* ── Compact breadcrumb / back row ────────────────────────── */}
       <nav className="border-b border-[#E3E8EF] bg-white px-4 pb-4 pt-24 sm:px-6" aria-label="Breadcrumb">
-        <div className="max-w-7xl mx-auto">
+        <div className="mx-auto w-full max-w-[1344px]">
           <ol className="flex items-center gap-2 text-sm">
             <li>
               <Link
@@ -203,7 +203,7 @@ function PropertyPage() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-16 py-6 md:py-10 lg:py-14">
+      <div className="mx-auto w-full max-w-[1344px] px-4 sm:px-6 md:px-8 lg:px-16 py-6 md:py-10 lg:py-14">
         {/* ── Image gallery: large primary + supporting thumbnail grid ── */}
         {images.length > 0 && (
           <section className="mb-6 md:mb-8" aria-label="Property photo gallery">
@@ -512,7 +512,7 @@ function PropertyPage() {
 
       {/* Public Reviews */}
       {property && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+        <div className="mx-auto w-full max-w-[1344px] px-4 sm:px-6 md:px-8">
           <ReviewSection propertyId={property.id} />
         </div>
       )}

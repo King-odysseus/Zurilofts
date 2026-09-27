@@ -90,7 +90,7 @@ function PlacesPage() {
         searchPath="/places"
       />
       <main>
-        <section className="mx-auto max-w-[1200px] px-4 pb-5 pt-7 md:px-8 md:pb-6 md:pt-8">
+        <section className="mx-auto max-w-[1344px] px-4 pb-5 pt-7 md:px-8 md:pb-6 md:pt-8">
           <p className="text-xs text-[#5B6B82]">
             Home <span className="mx-1">›</span> Places
           </p>
@@ -102,7 +102,7 @@ function PlacesPage() {
             your stay.
           </p>
         </section>
-        <section className="mx-auto max-w-[1200px] px-4 pb-6 md:px-8">
+        <section className="mx-auto max-w-[1344px] px-4 pb-6 md:px-8">
           <div className="flex min-h-14 w-full items-center rounded-full border border-[#E3E8EF] bg-white px-4 shadow-[0_8px_24px_rgba(11,31,66,0.06)] focus-within:border-[#C49A6C] focus-within:ring-2 focus-within:ring-[#C49A6C]/15">
             <svg
               className="mr-3 h-5 w-5 shrink-0 text-[#0B1F42]"
@@ -136,7 +136,7 @@ function PlacesPage() {
             )}
           </div>
         </section>
-        <section className="mx-auto max-w-[1200px] px-4 pb-6 md:px-8">
+        <section className="mx-auto max-w-[1344px] px-4 pb-6 md:px-8">
           <div className="hidden items-center justify-between gap-4 md:flex">
             <div className="flex flex-wrap gap-2">
               <Dropdown
@@ -209,7 +209,7 @@ function PlacesPage() {
           </div>
         </section>
         <section
-          className="mx-auto max-w-[1200px] px-4 pb-16 md:px-8"
+          className="mx-auto max-w-[1344px] px-4 pb-16 md:px-8"
           aria-live="polite"
         >
           {filteredPlaces.length > 0 ? (

@@ -141,7 +141,7 @@ function InboxPage() {
   return (
     <div className="min-h-screen bg-canvas">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <main className="mx-auto w-full max-w-[1344px] px-4 sm:px-6 pt-24 pb-16">
         <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] sm:px-6">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Guest workspace</p>
           <h1 className="mt-1 text-3xl font-bold text-[#0B1F42]">Inbox</h1>

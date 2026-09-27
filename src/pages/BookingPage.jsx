@@ -10,7 +10,7 @@ import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
 function CheckoutHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-[#E3E8EF] bg-white">
-      <div className="mx-auto flex min-h-[64px] max-w-7xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex min-h-[64px] w-full max-w-[1344px] items-center justify-between px-4 sm:px-6">
         <button type="button" onClick={() => window.history.back()} className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] px-3 text-sm font-semibold text-[#0B1F42] hover:bg-[#F7F4EF]" aria-label="Go back">
           <span aria-hidden="true">←</span><span className="hidden sm:inline">Back</span>
         </button>
@@ -1284,7 +1284,7 @@ function BookingPage() {
 
       {/* Persistent concise summary - stays visible while the checkout steps scroll */}
       <div className="sticky top-16 z-10 border-b border-[#E3E8EF] bg-white/95 shadow-[0_4px_16px_rgba(11,31,66,0.06)] backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-2.5 flex items-center justify-between gap-3 text-sm">
+        <div className="mx-auto flex w-full max-w-[1344px] items-center justify-between gap-3 px-4 py-2.5 text-sm md:px-6">
           <div className="flex items-center gap-3 min-w-0">
             <span className="truncate font-semibold text-[#0B1F42]">{property?.title}</span>
             {pricing.nights > 0 && (
@@ -1300,7 +1300,7 @@ function BookingPage() {
       </div>
 
       <div className="pt-6 md:pt-8 pb-12 md:pb-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+        <div className="mx-auto w-full max-w-[1344px] px-4 py-8 md:px-6 md:py-12">
           {/* Progress: Stay / Details / Payment */}
           <div className="max-w-md md:max-w-2xl mx-auto mb-8 md:mb-10">
             <div className="flex items-start justify-center">
@@ -1332,7 +1332,7 @@ function BookingPage() {
             </div>
           </div>
 
-          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-3">
+          <div className="mx-auto grid w-full max-w-[1344px] grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Left Column - Form */}
             <div className="lg:col-span-2">
               <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-8">
