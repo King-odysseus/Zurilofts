@@ -80,7 +80,7 @@ function AdminMessages() {
             Conversations with your guests.
           </p>
         </div>
-        <span className="inline-flex items-center gap-2 rounded-full bg-[#F8FAFC] px-3 py-2 text-xs font-semibold text-[#5B6B82]">
+        <span className="inline-flex items-center gap-2 rounded-full bg-[#F7F4EF] px-3 py-2 text-xs font-semibold text-[#5B6B82]">
           <span className="h-2 w-2 rounded-full bg-emerald-500" />
           Typical reply time &lt; 2 hours
         </span>
@@ -218,7 +218,7 @@ function AdminMessages() {
             </>
           )}
         </div>
-        <aside className="hidden border-l border-[#E3E8EF] bg-[#F8FAFC] p-5 xl:block">
+              <aside className="hidden border-l border-[#E3E8EF] bg-[#F7F4EF] p-5 xl:block">
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#94A3B8]">
             Conversation context
           </p>
