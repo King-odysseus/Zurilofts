@@ -141,7 +141,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex items-center space-x-2 px-2 py-1.5 rounded-full hover:bg-[#F7F7F5] transition-all duration-200"
+        className="flex items-center space-x-2 rounded-full px-2 py-1.5 transition-all duration-200 hover:bg-[#F7F4EF]"
       >
         <div className="w-9 h-9 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
           {user?.avatar ? (
@@ -157,7 +157,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
             </>
           )}
         </div>
-        <span className="hidden sm:block text-sm font-semibold text-[#222222]">
+        <span className="hidden text-sm font-semibold text-[#0B1F42] sm:block">
           {user?.firstName}
         </span>
         <svg
@@ -177,24 +177,24 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
 
       {open && (
         <div
-          className={`absolute right-0 w-56 bg-white rounded-[14px] border border-[#E5E7EB] shadow-lg py-2 z-30 ${openUp ? "bottom-full mb-2" : "top-full mt-2"}`}
+          className={`absolute right-0 z-30 w-56 rounded-2xl border border-[#E3E8EF] bg-white py-2 shadow-[0_8px_28px_rgba(11,31,66,0.14)] ${openUp ? "bottom-full mb-2" : "top-full mt-2"}`}
         >
-          <div className="px-4 py-3 border-b border-[#E5E7EB]">
-            <p className="text-sm font-semibold text-[#222222]">
+          <div className="border-b border-[#E3E8EF] px-4 py-3">
+            <p className="text-sm font-semibold text-[#0B1F42]">
               {user?.firstName} {user?.lastName}
             </p>
-            <p className="text-xs text-[#6b7280]">{user?.email}</p>
-            <span className="inline-block mt-1.5 text-[11px] font-bold uppercase tracking-wider text-[#2563EB]">
+            <p className="text-xs text-[#5B6B82]">{user?.email}</p>
+            <span className="mt-1.5 inline-block text-[11px] font-bold uppercase tracking-wider text-[#9A744A]">
               {isAdmin ? "Admin" : "Host"}
             </span>
           </div>
           <Link
             to="/profile#info"
             onClick={() => setOpen(false)}
-            className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
+            className="flex items-center px-4 py-2.5 text-sm text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
           >
             <svg
-              className="w-4 h-4 mr-3 text-[#6b7280]"
+              className="mr-3 h-4 w-4 text-[#5B6B82]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -211,10 +211,10 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
           <Link
             to="/admin/support"
             onClick={() => setOpen(false)}
-            className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
+            className="flex items-center px-4 py-2.5 text-sm text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
           >
             <svg
-              className="w-4 h-4 mr-3 text-[#6b7280]"
+              className="mr-3 h-4 w-4 text-[#5B6B82]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -231,10 +231,10 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
           <Link
             to="/"
             onClick={() => setOpen(false)}
-            className="flex items-center px-4 py-2.5 text-sm text-[#222222] hover:bg-[#F7F7F5] transition-colors"
+            className="flex items-center px-4 py-2.5 text-sm text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
           >
             <svg
-              className="w-4 h-4 mr-3 text-[#6b7280]"
+              className="mr-3 h-4 w-4 text-[#5B6B82]"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -248,13 +248,13 @@ function HeaderUserMenu({ user, isAdmin, onLogout, openUp }) {
             </svg>
             Go back to client view
           </Link>
-          <div className="border-t border-[#E5E7EB] mt-1 pt-1">
+          <div className="mt-1 border-t border-[#E3E8EF] pt-1">
             <button
               onClick={() => {
                 setOpen(false);
                 onLogout();
               }}
-              className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+              className="flex w-full items-center px-4 py-2.5 text-sm text-[#B42318] transition-colors hover:bg-[#FDECEC]"
             >
               <svg
                 className="w-4 h-4 mr-3"
