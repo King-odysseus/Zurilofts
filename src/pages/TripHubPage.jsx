@@ -117,13 +117,13 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
 
             <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[#5B6B82]">
               <span>{formatDateRange(booking.checkIn, booking.checkOut)}</span>
-              <span className="hidden sm:inline text-[#E5E7EB]">|</span>
+              <span className="hidden sm:inline text-[#E3E8EF]">|</span>
               <span>{nights} night{nights !== 1 ? "s" : ""}</span>
-              <span className="hidden sm:inline text-[#E5E7EB]">|</span>
+              <span className="hidden sm:inline text-[#E3E8EF]">|</span>
               <span>{booking.guests} guest{booking.guests !== 1 ? "s" : ""}</span>
               {booking.bedOption && (
                 <>
-                  <span className="hidden sm:inline text-[#E5E7EB]">|</span>
+                  <span className="hidden sm:inline text-[#E3E8EF]">|</span>
                   <span>{booking.bedOption === "1bed" ? "1 bed" : "2 bed"}</span>
                 </>
               )}
@@ -393,14 +393,14 @@ function SkeletonCard() {
   return (
     <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white">
       <div className="flex flex-col sm:flex-row">
-        <div className="sm:w-48 lg:w-56 h-40 sm:h-36 bg-[#E5E7EB]/60 animate-pulse" />
+        <div className="sm:w-48 lg:w-56 h-40 sm:h-36 bg-[#E3E8EF]/60 animate-pulse" />
         <div className="flex-1 p-4 sm:p-5 space-y-3">
-          <div className="h-5 w-2/3 bg-[#E5E7EB]/60 rounded animate-pulse" />
-          <div className="h-4 w-1/3 bg-[#E5E7EB]/60 rounded animate-pulse" />
-          <div className="h-4 w-1/2 bg-[#E5E7EB]/60 rounded animate-pulse" />
-          <div className="flex justify-between pt-3 border-t border-[#E5E7EB]">
-            <div className="h-4 w-20 bg-[#E5E7EB]/60 rounded animate-pulse" />
-            <div className="h-8 w-24 bg-[#E5E7EB]/60 rounded-lg animate-pulse" />
+          <div className="h-5 w-2/3 bg-[#E3E8EF]/60 rounded animate-pulse" />
+          <div className="h-4 w-1/3 bg-[#E3E8EF]/60 rounded animate-pulse" />
+          <div className="h-4 w-1/2 bg-[#E3E8EF]/60 rounded animate-pulse" />
+          <div className="flex justify-between pt-3 border-t border-[#E3E8EF]">
+            <div className="h-4 w-20 bg-[#E3E8EF]/60 rounded animate-pulse" />
+            <div className="h-8 w-24 bg-[#E3E8EF]/60 rounded-lg animate-pulse" />
           </div>
         </div>
       </div>
@@ -479,7 +479,7 @@ export default function TripHubPage() {
         )}
 
         {/* Tabs */}
-        <div className="flex border-b border-[#E5E7EB] mb-8">
+        <div className="flex border-b border-[#E3E8EF] mb-8">
           <button
             onClick={() => setActiveTab("upcoming")}
             className={`min-h-[44px] px-5 text-sm font-semibold transition-colors relative ${
