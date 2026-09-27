@@ -713,7 +713,7 @@ export default function HostTodayPage() {
     return (
       <div className="min-h-screen bg-canvas">
         <Navbar />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+        <main className="mx-auto w-full max-w-[1344px] px-4 pt-24 pb-16 sm:px-6">
           <div className="mb-8">
             <div className="h-8 w-48 bg-[#E5E7EB] rounded animate-pulse mb-2" />
             <div className="h-4 w-64 bg-[#E5E7EB] rounded animate-pulse" />
@@ -762,7 +762,7 @@ export default function HostTodayPage() {
     return (
       <div className="min-h-screen bg-canvas">
         <Navbar />
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+        <main className="mx-auto w-full max-w-[1344px] px-4 pt-24 pb-16 sm:px-6">
           <div className="text-center py-16">
             <p className="text-[#6b7280] mb-4">{error}</p>
             <button
@@ -789,7 +789,7 @@ export default function HostTodayPage() {
   return (
     <div className="min-h-screen bg-canvas">
       <Navbar />
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <main className="mx-auto w-full max-w-[1344px] px-4 pt-24 pb-16 sm:px-6">
         {/* Title block */}
         <div className="mb-8">
           <p className="text-sm text-[#6b7280]">
