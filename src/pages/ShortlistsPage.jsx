@@ -8,7 +8,7 @@ import Footer from "../components/Footer.jsx";
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5">
+    <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
       <div className="h-5 w-2/3 bg-[#E5E7EB]/40 rounded animate-pulse mb-3" />
       <div className="h-4 w-1/3 bg-[#E5E7EB]/40 rounded animate-pulse mb-4" />
       <div className="flex gap-2">
@@ -27,14 +27,14 @@ function EmptyState({ onCreateClick }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
       </div>
-      <h3 className="text-lg font-bold text-[#222222] mb-1">No shortlists yet</h3>
+      <h3 className="mb-1 text-lg font-bold text-[#0B1F42]">No shortlists yet</h3>
       <p className="text-sm text-[#6b7280] max-w-sm mx-auto mb-6">
         Save your favourite properties into collections and share them with friends or travel partners.
       </p>
       <button
         type="button"
         onClick={onCreateClick}
-        className="inline-flex items-center justify-center min-h-[44px] bg-[#C49A6C] text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+        className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#0B1F42] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
       >
         Create your first shortlist
       </button>
@@ -55,8 +55,8 @@ function CreateForm({ onSubmit, onCancel, saving }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 mb-6">
-      <label htmlFor="shortlist-name" className="block text-sm font-medium text-[#222222] mb-2">
+    <form onSubmit={handleSubmit} className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
+      <label htmlFor="shortlist-name" className="mb-2 block text-sm font-medium text-[#0B1F42]">
         Shortlist name
       </label>
       <input
@@ -67,13 +67,13 @@ function CreateForm({ onSubmit, onCancel, saving }) {
         placeholder="e.g. Weekend getaways, Honeymoon picks"
         maxLength={80}
         autoFocus
-        className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] bg-white px-4 py-2.5 text-sm text-[#222222] placeholder-[#6b7280] focus:outline-none focus:border-[#2563EB] focus-visible:ring-4 focus-visible:ring-[#2563EB]/20 mb-4"
+        className="mb-4 min-h-[44px] w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
       />
       <div className="flex items-center gap-2">
         <button
           type="submit"
           disabled={!name.trim() || saving}
-          className="inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#0B1F42] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {saving ? "Creating..." : "Create"}
         </button>
@@ -81,7 +81,7 @@ function CreateForm({ onSubmit, onCancel, saving }) {
           type="button"
           onClick={onCancel}
           disabled={saving}
-          className="inline-flex items-center justify-center min-h-[44px] px-4 py-2.5 rounded-lg text-sm font-semibold bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+          className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2.5 text-sm font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
         >
           Cancel
         </button>
@@ -119,7 +119,7 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
   const previews = shortlist.previewImages || [];
 
   return (
-    <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)] transition-all duration-200 hover:shadow-md">
       {/* Image collage - a deliberate placeholder for an empty/imageless
           shortlist, not a broken grid of missing images. */}
       <Link to={`/shortlists/${shortlist.id}`} className="block aspect-[16/7] overflow-hidden bg-[#F7F7F5]">
@@ -160,12 +160,12 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
         ) : (
           <Link
             to={`/shortlists/${shortlist.id}`}
-            className="text-base font-semibold text-[#222222] hover:text-[#2563EB] transition-colors truncate"
+            className="truncate text-base font-semibold text-[#0B1F42] transition-colors hover:text-[#C49A6C]"
           >
             {shortlist.name}
           </Link>
         )}
-        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-[#2563EB]/10 text-[#2563EB] flex-shrink-0">
+        <span className="inline-flex flex-shrink-0 items-center rounded-full bg-[#FDE8D8] px-2.5 py-1 text-xs font-semibold text-[#9A4A1D]">
           {shortlist._count?.items ?? 0} {itemLabel}
         </span>
       </div>
@@ -177,21 +177,21 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
       <div className="flex items-center gap-2 flex-wrap">
         <Link
           to={`/shortlists/${shortlist.id}`}
-          className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+          className="inline-flex min-h-[44px] items-center rounded-[10px] bg-[#0B1F42] px-4 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
         >
           Open
         </Link>
         <button
           type="button"
           onClick={handleCopyLink}
-          className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+          className="inline-flex min-h-[44px] items-center rounded-[10px] border border-[#E3E8EF] bg-white px-4 text-sm font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
         >
           {copied ? "Copied!" : "Share"}
         </button>
         <button
           type="button"
           onClick={() => { setNewName(shortlist.name); setRenaming(true); }}
-          className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+          className="inline-flex min-h-[44px] items-center rounded-[10px] border border-[#E3E8EF] bg-white px-4 text-sm font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
         >
           Rename
         </button>
@@ -285,13 +285,13 @@ export default function ShortlistsPage() {
     <div className="min-h-screen bg-[#F7F7F5]">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
-        <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex items-center justify-between gap-3 mb-2">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#222222]">My Shortlists</h1>
+        <div className="mb-2 flex items-center justify-between gap-3 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-6">
+          <h1 className="text-2xl font-bold text-[#0B1F42] sm:text-3xl">My Shortlists</h1>
           {shortlists.length > 0 && !showCreate && (
             <button
               type="button"
               onClick={() => setShowCreate(true)}
-              className="inline-flex items-center justify-center gap-2 min-h-[44px] px-4 sm:px-6 py-2.5 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+              className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] bg-[#0B1F42] px-4 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E] sm:px-6"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -301,8 +301,8 @@ export default function ShortlistsPage() {
           )}
         </div>
         <div className="mt-5 flex items-center gap-5 border-b border-[#E5E7EB]" role="tablist" aria-label="Saved stays">
-          <Link to="/favourites" role="tab" aria-selected="false" className="border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-[#6b7280] hover:text-[#222222]">All saved</Link>
-          <Link to="/shortlists" role="tab" aria-selected="true" className="border-b-2 border-[#2563EB] px-1 pb-3 text-sm font-semibold text-[#2563EB]">My lists ({shortlists.length})</Link>
+          <Link to="/favourites" role="tab" aria-selected="false" className="border-b-2 border-transparent px-1 pb-3 text-sm font-semibold text-[#5B6B82] hover:text-[#0B1F42]">All saved</Link>
+          <Link to="/shortlists" role="tab" aria-selected="true" className="border-b-2 border-[#C49A6C] px-1 pb-3 text-sm font-semibold text-[#0B1F42]">My lists ({shortlists.length})</Link>
         </div>
         <p className="text-sm text-[#6b7280] mb-8">Save and organize your favourite properties into shareable collections.</p>
 
