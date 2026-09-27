@@ -75,6 +75,22 @@
   .ui-alert-danger {
     @apply border-[#F4C7C3] bg-[#FDECEC] text-[#B42318];
   }
+
+  .ui-status-badge {
+    @apply inline-flex min-h-[28px] items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold;
+  }
+
+  .ui-status-badge-success {
+    @apply bg-[#E8F4EC] text-[#287A45];
+  }
+
+  .ui-status-badge-warning {
+    @apply bg-[#FDE8D8] text-[#9A4A1D];
+  }
+
+  .ui-status-badge-danger {
+    @apply bg-[#FDECEC] text-[#B42318];
+  }
 }
 
 * {
