@@ -37,15 +37,15 @@
   }
 
   .ui-status-success {
-    @apply text-[#16A34A];
+    @apply text-[#287A45];
   }
 
   .ui-status-warning {
-    @apply text-[#D97706];
+    @apply text-[#9A4A1D];
   }
 
   .ui-status-danger {
-    @apply text-[#DC2626];
+    @apply text-[#B42318];
   }
 }
 
