@@ -359,15 +359,15 @@ function HostApplicationPage() {
           ) : application?.status === 'APPROVED' || user?.role === 'HOST' ? (
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <Link to="/host/properties/new" className="min-h-[44px] inline-flex items-center justify-center rounded-lg bg-[#C49A6C] px-6 font-semibold text-white hover:bg-[#B8895C] transition-all duration-200">Set up your first property</Link>
-              <Link to="/host/today" className="min-h-[44px] inline-flex items-center justify-center rounded-lg bg-white border border-[#E5E7EB] px-6 font-semibold text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200">Open host dashboard</Link>
+              <Link to="/host/today" className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white px-6 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]">Open host dashboard</Link>
             </div>
           ) : !application && user?.role !== 'USER' ? (
-            <div className="mt-8 rounded-xl border border-[#E5E7EB] bg-[#F7F7F5] p-5">
-              <p className="font-semibold text-[#222222]">No verification needed for this account</p>
-              <p className="text-sm text-[#6b7280] mt-1">Your account role ({user?.role?.toLowerCase()}) doesn&apos;t go through host verification.</p>
+            <div className="mt-8 rounded-2xl border border-[#E3E8EF] bg-[#F7F4EF] p-5">
+              <p className="font-semibold text-[#0B1F42]">No verification needed for this account</p>
+              <p className="mt-1 text-sm text-[#5B6B82]">Your account role ({user?.role?.toLowerCase()}) doesn&apos;t go through host verification.</p>
             </div>
           ) : (
-            <button type="button" onClick={() => { setMode('travelling'); navigate('/'); }} className="mt-8 min-h-[44px] rounded-lg bg-white border border-[#E5E7EB] px-6 font-semibold text-[#222222] hover:bg-[#F7F7F5] transition-all duration-200">Continue traveling</button>
+            <button type="button" onClick={() => { setMode('travelling'); navigate('/'); }} className="mt-8 min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-white px-6 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]">Continue traveling</button>
           )}
         </div>
       </main>
@@ -421,7 +421,7 @@ function SelectField({ label, value, onChange, options }) {
 
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
   return (
-    <div className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EF] p-5">
+    <div className="rounded-2xl border border-[#E3E8EF] bg-[#F7F4EF] p-5">
       <p className="text-sm font-semibold text-[#0B1F42]">{DOCUMENT_LABELS[kind]}</p>
       {document ? (
         <>

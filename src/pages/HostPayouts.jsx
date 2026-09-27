@@ -241,24 +241,24 @@ function HostPayouts() {
                 </thead>
                 <tbody>
                   {whtData.bookings.map((b, i) => (
-                    <tr key={i} className="border-b border-[#E5E7EB]">
-                      <td className="p-2 text-[#222222]">{b.property?.title}</td>
-                      <td className="p-2 text-[#6b7280]">
+                    <tr key={i} className="border-b border-[#E3E8EF]">
+                      <td className="p-2 text-[#0B1F42]">{b.property?.title}</td>
+                      <td className="p-2 text-[#5B6B82]">
                         {b.paidAt ? new Date(b.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                       </td>
                       <td className="p-2 text-right">{b.hostNetAmount?.toLocaleString()}</td>
                       <td className="p-2 text-right">{b.withholdingTax?.toLocaleString()}</td>
                     </tr>
                   ))}
-                  <tr className="font-bold border-t-2 border-[#E5E7EB]">
-                    <td className="p-2 text-[#222222]" colSpan="2">Total</td>
-                    <td className="p-2 text-right text-[#222222]">{whtData.totalEarnings?.toLocaleString()}</td>
-                    <td className="p-2 text-right text-[#222222]">{whtData.totalWht?.toLocaleString()}</td>
+                  <tr className="border-t-2 border-[#E3E8EF] font-bold">
+                    <td className="p-2 text-[#0B1F42]" colSpan="2">Total</td>
+                    <td className="p-2 text-right text-[#0B1F42]">{whtData.totalEarnings?.toLocaleString()}</td>
+                    <td className="p-2 text-right text-[#0B1F42]">{whtData.totalWht?.toLocaleString()}</td>
                   </tr>
                 </tbody>
               </table>
               </div>
-              <p className="text-xs text-[#6b7280] mt-3">
+              <p className="mt-3 text-xs text-[#5B6B82]">
                 This statement confirms that ZuriLofts has deducted and remitted the above withholding tax amounts to KRA on your behalf.
                 Use this document to claim tax credits when filing your annual returns.
               </p>
@@ -272,7 +272,7 @@ function HostPayouts() {
               </button>
               <button
                 onClick={csvWht}
-                className="min-h-[44px] bg-white text-[#222222] text-sm font-semibold px-5 py-2.5 rounded-lg border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
+                className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-white px-5 py-2.5 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
               >
                 Download CSV
               </button>
@@ -290,16 +290,16 @@ function HostPayouts() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-[#E5E7EB] text-left">
-                  <th className="p-3 font-semibold text-[#222222]">Amount (KES)</th>
-                  <th className="p-3 font-semibold text-[#222222]">Bookings</th>
-                  <th className="p-3 font-semibold text-[#222222]">Status</th>
-                  <th className="p-3 font-semibold text-[#222222]">Date</th>
+                <tr className="border-b border-[#E3E8EF] text-left">
+                    <th className="p-3 font-semibold text-[#0B1F42]">Amount (KES)</th>
+                    <th className="p-3 font-semibold text-[#0B1F42]">Bookings</th>
+                    <th className="p-3 font-semibold text-[#0B1F42]">Status</th>
+                    <th className="p-3 font-semibold text-[#0B1F42]">Date</th>
                 </tr>
               </thead>
               <tbody>
                 {payouts.map((p) => (
-                  <tr key={p.id} className="border-b border-[#E5E7EB]">
+                  <tr key={p.id} className="border-b border-[#E3E8EF]">
                     <td className="p-3 font-medium">KES {p.amount?.toLocaleString()}</td>
                     <td className="p-3">{p.bookingsCount}</td>
                     <td className="p-3">
@@ -310,7 +310,7 @@ function HostPayouts() {
                         <p className="text-xs text-red-600 mt-1">{p.failureReason}</p>
                       )}
                     </td>
-                    <td className="p-3 text-[#6b7280]">
+                    <td className="p-3 text-[#5B6B82]">
                       {p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
                     </td>
                   </tr>
