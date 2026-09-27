@@ -3,11 +3,11 @@ import { useEffect } from 'react';
 import { useMode } from '../context/ModeContext.jsx';
 
 // Paths where global navigation (including these tabs) is intentionally
-// hidden: the design-led home page, checkout (compact logo/back header only),
-// and the host/admin workspaces, which have their own navigation.
+// hidden: checkout (compact logo/back header only), and the host/admin
+// workspaces, which have their own navigation. The home page keeps Explore
+// active so mobile guests always have a primary navigation surface.
 function isHiddenPath(pathname) {
   return (
-    pathname === '/' ||
     pathname.startsWith('/booking/') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/host')
