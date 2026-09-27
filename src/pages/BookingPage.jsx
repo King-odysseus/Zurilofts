@@ -897,7 +897,7 @@ function BookingPage() {
                             type="button"
                             onClick={() => changeAddOnQuantity(addOn, qty - 1)}
                             disabled={busy || qty === 0}
-                            className="w-11 h-11 rounded-full shadow-sm hover:shadow-md text-[#222222] font-bold hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="h-11 w-11 rounded-full text-[#0B1F42] font-bold shadow-sm transition-all hover:text-[#9A744A] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-40"
                             aria-label={`Decrease ${addOn.name} quantity`}
                           >
                             −
@@ -909,7 +909,7 @@ function BookingPage() {
                             type="button"
                             onClick={() => changeAddOnQuantity(addOn, qty + 1)}
                             disabled={busy || qty >= 20}
-                            className="w-11 h-11 rounded-full shadow-sm hover:shadow-md text-[#222222] font-bold hover:text-blue-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                            className="h-11 w-11 rounded-full text-[#0B1F42] font-bold shadow-sm transition-all hover:text-[#9A744A] hover:shadow-md disabled:cursor-not-allowed disabled:opacity-40"
                             aria-label={`Increase ${addOn.name} quantity`}
                           >
                             +
@@ -972,7 +972,7 @@ function BookingPage() {
             value="card"
             checked={bookingData.paymentMethod === 'card'}
             onChange={handleInputChange}
-            className="w-5 h-5 text-blue-600 focus:ring-blue-600"
+            className="h-5 w-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
             <svg className="w-8 h-8 text-[#222222] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -994,7 +994,7 @@ function BookingPage() {
             value="mpesa"
             checked={bookingData.paymentMethod === 'mpesa'}
             onChange={handleInputChange}
-            className="w-5 h-5 text-blue-600 focus:ring-blue-600"
+            className="h-5 w-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
             <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
@@ -1016,7 +1016,7 @@ function BookingPage() {
             value="bank"
             checked={bookingData.paymentMethod === 'bank'}
             onChange={handleInputChange}
-            className="w-5 h-5 text-blue-600 focus:ring-blue-600"
+            className="h-5 w-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
             <svg className="w-8 h-8 text-[#222222] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

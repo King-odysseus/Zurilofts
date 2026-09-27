@@ -942,7 +942,7 @@ function AdminEarnings() {
     {
       label: "WHT 5% (KES)",
       value: filteredTotals.wht.toLocaleString(),
-      color: "bg-purple-600",
+      color: "bg-[#9A744A]",
       sub: `Remitted to KRA · ~${metrics.whtPct}% of host net`,
     },
   ];
@@ -1462,11 +1462,11 @@ function AdminEarnings() {
                   />
                 </svg>
                 {/* - WHT */}
-                <div className="bg-purple-50 rounded-xl p-3 text-center min-w-[120px] flex-1">
-                  <p className="text-xs text-purple-700 uppercase tracking-wide">
+                <div className="min-w-[120px] flex-1 rounded-xl bg-[#FDE8D8] p-3 text-center">
+                  <p className="text-xs uppercase tracking-wide text-[#9A4A1D]">
                     - WHT (5% {"->"} KRA)
                   </p>
-                  <p className="text-lg font-bold text-purple-700">
+                  <p className="text-lg font-bold text-[#9A4A1D]">
                     KES {filteredTotals.wht.toLocaleString()}
                   </p>
                 </div>
@@ -1604,7 +1604,7 @@ function AdminEarnings() {
                         <td className="py-2.5 text-right font-bold text-green-700">
                           KES {h.hostNet.toLocaleString()}
                         </td>
-                        <td className="py-2.5 text-right text-purple-700">
+                        <td className="py-2.5 text-right text-[#9A744A]">
                           KES {h.wht.toLocaleString()}
                         </td>
                       </tr>
@@ -1734,7 +1734,7 @@ function AdminEarnings() {
                       <td className="py-3 px-4 text-right font-bold text-green-700">
                         KES {(r.hostNet || 0).toLocaleString()}
                       </td>
-                      <td className="py-3 px-4 text-right text-purple-700">
+                      <td className="py-3 px-4 text-right text-[#9A744A]">
                         KES {(r.wht || 0).toLocaleString()}
                       </td>
                     </tr>
@@ -1758,7 +1758,7 @@ function AdminEarnings() {
                       <td className="py-3 px-4 text-right text-green-700">
                         KES {filteredTotals.hostNet.toLocaleString()}
                       </td>
-                      <td className="py-3 px-4 text-right text-purple-700">
+                      <td className="py-3 px-4 text-right text-[#9A744A]">
                         KES {filteredTotals.wht.toLocaleString()}
                       </td>
                     </tr>

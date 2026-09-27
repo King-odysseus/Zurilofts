@@ -841,7 +841,7 @@ export default function HostTodayPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           <section>
             <h2 className="text-lg font-bold text-[#222222] mb-4 flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-400" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#C49A6C]" />
               Departing today
               {departures.length > 0 && (
                 <span className="text-sm font-normal text-[#6b7280] ml-auto">{departures.length}</span>
