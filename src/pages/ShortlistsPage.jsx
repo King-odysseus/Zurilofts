@@ -9,11 +9,11 @@ import Footer from "../components/Footer.jsx";
 function SkeletonCard() {
   return (
     <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
-      <div className="h-5 w-2/3 bg-[#E5E7EB]/40 rounded animate-pulse mb-3" />
-      <div className="h-4 w-1/3 bg-[#E5E7EB]/40 rounded animate-pulse mb-4" />
+      <div className="mb-3 h-5 w-2/3 animate-pulse rounded bg-[#EAF0F4]" />
+      <div className="mb-4 h-4 w-1/3 animate-pulse rounded bg-[#F1F4F7]" />
       <div className="flex gap-2">
-        <div className="h-11 w-20 bg-[#E5E7EB]/40 rounded-lg animate-pulse" />
-        <div className="h-11 w-20 bg-[#E5E7EB]/40 rounded-lg animate-pulse" />
+        <div className="h-11 w-20 animate-pulse rounded-[10px] bg-[#EAF0F4]" />
+        <div className="h-11 w-20 animate-pulse rounded-[10px] bg-[#EAF0F4]" />
       </div>
     </div>
   );
@@ -22,13 +22,13 @@ function SkeletonCard() {
 function EmptyState({ onCreateClick }) {
   return (
     <div className="text-center py-16 px-4">
-      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center">
-        <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF]">
+        <svg className="h-8 w-8 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
         </svg>
       </div>
       <h3 className="mb-1 text-lg font-bold text-[#0B1F42]">No shortlists yet</h3>
-      <p className="text-sm text-[#6b7280] max-w-sm mx-auto mb-6">
+      <p className="mx-auto mb-6 max-w-sm text-sm text-[#5B6B82]">
         Save your favourite properties into collections and share them with friends or travel partners.
       </p>
       <button
@@ -152,7 +152,7 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
               type="text"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
-              className="flex-1 min-h-[44px] rounded-lg border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus-visible:ring-4 focus-visible:ring-[#2563EB]/20"
+              className="min-h-[44px] flex-1 rounded-[10px] border border-[#E3E8EF] bg-white px-3 py-2 text-sm text-[#0B1F42] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
               autoFocus
               onBlur={() => setRenaming(false)}
             />
@@ -170,7 +170,7 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
         </span>
       </div>
 
-      <p className="text-xs text-[#6b7280] mb-4">
+      <p className="mb-4 text-xs text-[#5B6B82]">
         Updated {new Date(shortlist.updatedAt).toLocaleDateString("en-KE", { day: "numeric", month: "short", year: "numeric" })}
       </p>
 
@@ -198,7 +198,7 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
         <button
           type="button"
           onClick={() => onDelete(shortlist.id)}
-          className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold text-red-600 hover:bg-red-50 transition-colors duration-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] ml-auto"
+          className="ml-auto inline-flex min-h-[44px] items-center rounded-[10px] px-4 text-sm font-semibold text-[#B42318] transition-colors duration-200 hover:bg-[#FDECEC] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
         >
           Delete
         </button>
