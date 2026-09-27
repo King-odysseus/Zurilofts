@@ -100,7 +100,7 @@ function GuideDetailPage() {
         <HomeHeader propertiesPage searchLabel="Search guides" searchPath="/guides" />
         <div className="pt-7 pb-16 flex items-center justify-center min-h-[60vh] md:pt-8">
           <div className="text-center max-w-md px-6">
-            <h1 className="text-3xl font-bold text-[#222222] mb-4">
+            <h1 className="mb-4 text-3xl font-bold text-[#0B1F42]">
               Guide Not Found
             </h1>
             <p className="text-[#6b7280] mb-6">
@@ -127,7 +127,7 @@ function GuideDetailPage() {
       <div className="pt-7 max-w-5xl mx-auto px-4 sm:px-6 md:pt-8">
         <Link
           to="/guides"
-          className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-[#2563EB] transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-[#5B6B82] transition-colors hover:text-[#C49A6C]"
         >
           <svg
             className="w-4 h-4"
@@ -153,13 +153,13 @@ function GuideDetailPage() {
             <img
               src={post.coverImage}
               alt={post.title}
-              className="w-full aspect-[2/1] object-cover rounded-[14px] mt-4 mb-8"
+              className="mt-4 mb-8 aspect-[2/1] w-full rounded-2xl object-cover"
             />
           )}
 
           {/* Title + meta */}
-          <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-6 sm:px-7 mb-8 shadow-sm">
-            <h1 className="text-3xl md:text-4xl font-bold text-[#222222] mb-3">
+          <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-7">
+            <h1 className="mb-3 text-3xl font-bold text-[#0B1F42] md:text-4xl">
               {post.title}
             </h1>
             <p className="text-[#6b7280] text-sm">
@@ -174,13 +174,13 @@ function GuideDetailPage() {
           {/* Contents - collapsed accordion on mobile/tablet, hidden here on
               desktop where the sticky sidebar (right) covers the same job. */}
           {toc.length > 0 && (
-            <div className="mb-8 rounded-[14px] border border-[#E5E7EB] bg-white lg:hidden">
+            <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white lg:hidden">
               <button
                 type="button"
                 onClick={() => setTocOpen((v) => !v)}
                 aria-expanded={tocOpen}
                 aria-controls="guide-toc-mobile"
-                className="flex min-h-[44px] w-full items-center justify-between gap-2 px-5 py-3 text-left text-sm font-semibold text-[#222222]"
+                className="flex min-h-[44px] w-full items-center justify-between gap-2 px-5 py-3 text-left text-sm font-semibold text-[#0B1F42]"
               >
                 Contents
                 <svg
@@ -224,7 +224,7 @@ function GuideDetailPage() {
 
           {/* Body */}
           <div
-            className="prose prose-lg max-w-none prose-headings:text-[#222222] prose-a:text-[#2563EB] prose-img:rounded-[14px] prose-p:text-[#222222] prose-li:text-[#222222] prose-headings:scroll-mt-24"
+            className="prose prose-lg max-w-none prose-headings:text-[#0B1F42] prose-a:text-[#C49A6C] prose-img:rounded-2xl prose-p:text-[#0B1F42] prose-li:text-[#0B1F42] prose-headings:scroll-mt-24"
             dangerouslySetInnerHTML={{ __html: bodyHtml }}
           />
 
