@@ -1145,8 +1145,8 @@ function ProfilePage() {
       </div>
       </div>
       {showAccountMenu && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center bg-[#0B1F42]/35 px-4 pt-24" role="dialog" aria-modal="true" aria-label="Account menu">
-          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-[0_18px_48px_rgba(11,31,66,0.22)]">
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-[#0B1F42]/35 px-4 pt-24" role="dialog" aria-modal="true" aria-label="Account menu" onMouseDown={(event) => { if (event.target === event.currentTarget) setShowAccountMenu(false); }}>
+          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-[0_18px_48px_rgba(11,31,66,0.22)]" onMouseDown={(event) => event.stopPropagation()}>
             <div className="flex items-center justify-between border-b border-[#E3E8EF] px-5 py-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9A744A]">Account</p>
