@@ -107,7 +107,7 @@ function CookieConsent() {
         visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
       }`}
     >
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white p-5 shadow-lg">
+      <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
         <div className="flex items-start gap-3 mb-3">
           <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[#C49A6C]/15 flex items-center justify-center">
             <svg className="w-5 h-5 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -116,7 +116,7 @@ function CookieConsent() {
             </svg>
           </div>
           <div>
-            <h2 className="text-base font-semibold text-[#0B0B45]">
+            <h2 className="text-base font-semibold text-[#0B1F42]">
               {mode === 'manage' ? 'Manage your preferences' : 'We value your privacy'}
             </h2>
             <p className="text-sm text-[#6b7280] mt-1 leading-relaxed">
@@ -143,8 +143,8 @@ function CookieConsent() {
                 className="flex items-start justify-between gap-3 rounded-xl shadow-sm p-3"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#0B0B45]">{cat.label}</p>
-                  <p className="text-xs text-[#6b7280] mt-0.5 leading-relaxed">{cat.description}</p>
+                  <p className="text-sm font-semibold text-[#0B1F42]">{cat.label}</p>
+                  <p className="mt-0.5 text-xs leading-relaxed text-[#5B6B82]">{cat.description}</p>
                 </div>
                 {cat.alwaysOn ? (
                   <span className="flex-shrink-0 text-xs font-medium text-[#6b7280] bg-canvas rounded-full px-3 py-1.5">
@@ -171,7 +171,7 @@ function CookieConsent() {
             <button
               type="button"
               onClick={handleSaveChoices}
-              className="min-h-[44px] rounded-lg bg-[#C49A6C] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]"
+              className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#07072E]"
             >
               Save choices
             </button>
@@ -180,21 +180,21 @@ function CookieConsent() {
               <button
                 type="button"
                 onClick={handleAcceptAll}
-                className="min-h-[44px] rounded-lg bg-[#C49A6C] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]"
+                className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#07072E]"
               >
                 Accept all
               </button>
               <button
                 type="button"
                 onClick={handleRejectAll}
-                className="min-h-[44px] rounded-lg bg-[#0B0B45] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#07072e]"
+                className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#07072E]"
               >
                 Reject all
               </button>
               <button
                 type="button"
                 onClick={() => setMode('manage')}
-                className="min-h-[44px] rounded-lg border border-[#E5E7EB] bg-white px-5 py-2 text-sm font-semibold text-[#222222] transition-colors hover:bg-[#F7F7F5]"
+                className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-white px-5 py-2 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
               >
                 Manage preferences
               </button>

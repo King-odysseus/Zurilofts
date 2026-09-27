@@ -8,13 +8,13 @@ import PropTypes from 'prop-types';
  */
 function MessagesTabBar({ active }) {
   return (
-    <div className="mb-6 flex items-center gap-5 border-b border-[#E5E7EB]" role="tablist" aria-label="Messages">
+    <div className="mb-6 flex items-center gap-5 border-b border-[#E3E8EF]" role="tablist" aria-label="Messages">
       <Link
         to="/inbox"
         role="tab"
         aria-selected={active === 'inbox'}
         className={`border-b-2 px-1 pb-3 text-sm font-semibold transition-colors ${
-          active === 'inbox' ? 'border-[#2563EB] text-[#2563EB]' : 'border-transparent text-[#6b7280] hover:text-[#222222]'
+          active === 'inbox' ? 'border-[#C49A6C] text-[#0B1F42]' : 'border-transparent text-[#5B6B82] hover:text-[#0B1F42]'
         }`}
       >
         Inbox
@@ -24,7 +24,7 @@ function MessagesTabBar({ active }) {
         role="tab"
         aria-selected={active === 'support'}
         className={`border-b-2 px-1 pb-3 text-sm font-semibold transition-colors ${
-          active === 'support' ? 'border-[#2563EB] text-[#2563EB]' : 'border-transparent text-[#6b7280] hover:text-[#222222]'
+          active === 'support' ? 'border-[#C49A6C] text-[#0B1F42]' : 'border-transparent text-[#5B6B82] hover:text-[#0B1F42]'
         }`}
       >
         Support

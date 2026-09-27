@@ -140,7 +140,7 @@ function ChatWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#C49A6C] rounded-full shadow-lg flex items-center justify-center hover:scale-110 transition-all duration-200 hover:shadow-xl group"
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#0B1F42] shadow-lg transition-all duration-200 group hover:scale-110 hover:shadow-xl"
           aria-label="Open chat"
         >
           <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -154,9 +154,9 @@ function ChatWidget() {
       {open && (
         <div className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300" style={{ maxHeight: '520px' }}>
           {/* Header */}
-          <div className="bg-[#0B0B45] px-5 py-4 flex items-center justify-between">
+          <div className="flex items-center justify-between bg-[#0B1F42] px-5 py-4">
             <div className="flex items-center space-x-3">
-              <div className="w-9 h-9 bg-[#C49A6C] rounded-full flex items-center justify-center">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#C49A6C]">
                 <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
@@ -198,21 +198,21 @@ function ChatWidget() {
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError(''); }}
                   placeholder="Your name"
-                  className="neu-input w-full px-4 py-2.5 text-sm focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email (optional)"
-                  className="neu-input w-full px-4 py-2.5 text-sm focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                  className="w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                 />
                 {error && <p className="text-red-500 text-xs">{error}</p>}
                 <button
                   type="button"
                   onClick={handleStart}
                   disabled={sending}
-                  className="w-full bg-[#C49A6C] text-white py-2.5 rounded-full font-semibold text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                  className="w-full rounded-[10px] bg-[#0B1F42] py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50"
                 >
                   Start Chat
                 </button>
@@ -224,7 +224,7 @@ function ChatWidget() {
                   <button
                     type="button"
                     onClick={() => { setStarted(false); setName(''); setEmail(''); setMessages([{ from: 'bot', text: 'Hi! 👋 How can we help you today? Ask us anything about our apartments.' }]); setSent(false); }}
-                    className="text-xs text-[#C49A6C] hover:text-[#0B0B45]"
+                    className="text-xs text-[#C49A6C] hover:text-[#0B1F42]"
                   >
                     New chat
                   </button>
@@ -235,12 +235,12 @@ function ChatWidget() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Type your message..."
-                    className="neu-input flex-1 px-4 py-2.5 text-sm focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] disabled:opacity-50"
+                    className="min-w-0 flex-1 rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:opacity-50"
                   />
                   <button
                     type="submit"
                     disabled={sending}
-                    className="w-10 h-10 bg-[#C49A6C] rounded-full flex items-center justify-center flex-shrink-0 hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0B1F42] transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50"
                   >
                     {sending ? (
                       <div className="w-4 h-4 border-2 border-[#0B0B45] border-t-transparent rounded-full animate-spin"></div>
