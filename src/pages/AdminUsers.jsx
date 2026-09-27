@@ -275,14 +275,14 @@ function AdminUsers() {
       </div>
 
       {message && (
-        <div className={`p-3 rounded-xl text-sm font-medium ${message.toLowerCase().includes('fail') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
+        <div className={`rounded-2xl p-3 text-sm font-medium ${message.toLowerCase().includes('fail') ? 'bg-[#FDECEC] text-[#B42318]' : 'bg-[#E8F4EC] text-[#287A45]'}`}>
           {message}
         </div>
       )}
 
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
           <p className="text-[#6b7280]">Loading users...</p>
         </div>
       ) : users.length === 0 ? (
@@ -312,15 +312,15 @@ function AdminUsers() {
                 const isSelf = u.id === currentUser?.id;
                 const busy = busyId === u.id;
                 return (
-                  <tr key={u.id} className={`border-b border-[#E5E7EB]/50 hover:bg-[#222222]/5 ${u.suspended ? 'opacity-60' : ''}`}>
+                  <tr key={u.id} className={`border-b border-[#E5E7EB]/50 hover:bg-[#F7F4EF] ${u.suspended ? 'opacity-60' : ''}`}>
                     <td className="p-4">
-                      <div className="font-medium text-[#222222]">
+                      <div className="font-medium text-[#0B1F42]">
                         {u.firstName} {u.lastName}
-                        {isSelf && <span className="ml-2 text-xs text-[#2563EB]">(you)</span>}
+                        {isSelf && <span className="ml-2 text-xs text-[#C49A6C]">(you)</span>}
                       </div>
                     </td>
                     <td className="p-4">
-                      <div className="text-[#222222]">{u.email}</div>
+                      <div className="text-[#0B1F42]">{u.email}</div>
                       <div className="text-xs text-[#6b7280]">{u.phone || '-'}</div>
                     </td>
                     <td className="p-4">
@@ -335,7 +335,7 @@ function AdminUsers() {
                             { value: 'HOST', label: 'Host' },
                             { value: 'ADMIN', label: 'Admin' },
                           ]}
-                          triggerClassName="px-3 py-1.5 bg-white border border-[#E5E7EB] text-[#222222] rounded-lg text-xs"
+                          triggerClassName="rounded-[10px] border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs text-[#0B1F42]"
                           ariaLabel="Change role"
                         />
                       )}
@@ -343,7 +343,7 @@ function AdminUsers() {
                     <td className="p-4">{u._count?.properties ?? 0}</td>
                     <td className="p-4">{u.wallet?.balance != null ? u.wallet.balance.toLocaleString() : '-'}</td>
                     <td className="p-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${u.suspended ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                      <span className={`rounded-full px-2 py-1 text-xs font-semibold ${u.suspended ? 'bg-[#FDECEC] text-[#B42318]' : 'bg-[#E8F4EC] text-[#287A45]'}`}>
                         {u.suspended ? 'Suspended' : 'Active'}
                       </span>
                     </td>
@@ -351,7 +351,7 @@ function AdminUsers() {
                       <div className="flex items-center gap-3">
                         <button
                           onClick={() => openEdit(u)}
-                          className="text-xs font-semibold text-[#2563EB] hover:text-[#222222] transition-colors"
+                          className="text-xs font-semibold text-[#0B1F42] transition-colors hover:text-[#C49A6C]"
                         >
                           Edit
                         </button>
@@ -367,7 +367,7 @@ function AdminUsers() {
                             <button
                               onClick={() => openPasswordReset(u)}
                               disabled={busy}
-                              className="text-xs font-semibold text-[#222222] hover:text-[#2563EB] transition-colors disabled:opacity-50"
+                              className="text-xs font-semibold text-[#0B1F42] transition-colors hover:text-[#C49A6C] disabled:opacity-50"
                             >
                               Set password
                             </button>
@@ -405,9 +405,9 @@ function AdminUsers() {
       {/* Password replacement modal */}
       {passwordTarget && (
         <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closePasswordReset}>
-          <div className="bg-white rounded-[14px] shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
+          <div className="w-full max-w-lg rounded-2xl border border-[#E3E8EF] bg-white shadow-xl" onClick={(e) => e.stopPropagation()}>
             <div className="p-6 border-b border-[#E5E7EB]">
-              <h2 className="text-lg font-bold text-[#222222]">Set user password</h2>
+              <h2 className="text-lg font-bold text-[#0B1F42]">Set user password</h2>
               <p className="text-sm text-[#6b7280] mt-2">
                 Set a replacement password for {passwordTarget.firstName} {passwordTarget.lastName}. This immediately signs them out on all devices. Share it with them securely.
               </p>
