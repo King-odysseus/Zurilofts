@@ -235,14 +235,14 @@ function ConfirmDialog({ open, title, message, confirmLabel, confirmClass, onCon
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onCancel}></div>
-      <div className="relative bg-white rounded-[14px] border border-[#E5E7EB] shadow-xl p-6 w-full max-w-sm mx-4">
-        <h3 className="text-lg font-bold text-[#222222] mb-2">{title}</h3>
-        <p className="text-sm text-[#6b7280] mb-6">{message}</p>
+      <div className="relative mx-4 w-full max-w-sm rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+        <h3 className="mb-2 text-lg font-bold text-[#0B1F42]">{title}</h3>
+        <p className="mb-6 text-sm text-[#5B6B82]">{message}</p>
         <div className="flex justify-end gap-3">
           <button
             type="button"
             onClick={onCancel}
-            className="inline-flex items-center justify-center min-h-[44px] px-6 rounded-lg text-sm font-semibold bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-all"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white px-6 text-sm font-semibold text-[#0B1F42] transition-all hover:bg-[#F7F4EF]"
           >
             Keep
           </button>
@@ -332,19 +332,19 @@ function EditBookingModal({ booking, onClose, onSaved }) {
   if (!booking) return null;
 
   const fieldClass =
-    'w-full min-h-[44px] px-3 py-2 rounded-xl border border-[#E5E7EB] text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20';
+    'min-h-[44px] w-full rounded-[10px] border border-[#E3E8EF] px-3 py-2 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/40" onClick={onClose}></div>
-      <div className="relative bg-white rounded-[14px] border border-[#E5E7EB] shadow-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+      <div className="relative mx-4 max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-bold text-[#222222]">Edit Booking</h3>
+          <h3 className="text-lg font-bold text-[#0B1F42]">Edit Booking</h3>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="w-11 h-11 inline-flex items-center justify-center rounded-lg text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] transition-colors text-2xl leading-none"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-[10px] text-2xl leading-none text-[#5B6B82] transition-colors hover:bg-[#F7F4EF] hover:text-[#0B1F42]"
           >
             &times;
           </button>
@@ -614,16 +614,16 @@ function AdminBookings() {
 
       {loading ? (
         <div className="flex flex-col items-center justify-center py-16 text-[#6b7280]">
-          <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
           <p className="mt-3 text-sm">Loading bookings…</p>
         </div>
       ) : (
         <div className="space-y-4">
           {/* Desktop table */}
-          <div className="hidden overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm md:block">
+          <div className="hidden overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)] md:block">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB]">
+                <thead className="border-b border-[#E3E8EF] bg-[#F7F4EF]">
                   <tr>
                     <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Guest</th>
                     <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Property</th>
