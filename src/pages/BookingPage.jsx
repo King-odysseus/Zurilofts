@@ -1283,17 +1283,17 @@ function BookingPage() {
       <CheckoutHeader />
 
       {/* Persistent concise summary - stays visible while the checkout steps scroll */}
-      <div className="sticky top-16 z-10 bg-white/95 backdrop-blur border-b border-[#E5E7EB] shadow-sm">
+      <div className="sticky top-16 z-10 border-b border-[#E5E7EB] bg-white/95 shadow-sm backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-2.5 flex items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="font-semibold text-[#222222] truncate">{property?.title}</span>
+            <span className="truncate font-semibold text-[#0B1F42]">{property?.title}</span>
             {pricing.nights > 0 && (
-              <span className="hidden sm:inline text-[#6b7280] whitespace-nowrap">
+                <span className="hidden whitespace-nowrap text-[#52606F] sm:inline">
                 {pricing.nights} {pricing.nights === 1 ? 'night' : 'nights'} &middot; {bookingData.guests} {bookingData.guests === 1 ? 'guest' : 'guests'}
               </span>
             )}
           </div>
-          <span className="font-bold text-[#222222] whitespace-nowrap">
+          <span className="whitespace-nowrap font-bold text-[#0B1F42]">
             {pricing.total > 0 ? `KES ${pricing.total.toLocaleString()}` : 'Select dates'}
           </span>
         </div>
@@ -1308,8 +1308,8 @@ function BookingPage() {
                 <div key={stage.label} className="flex items-center">
                   {i > 0 && (
                     <div
-                      className={`w-8 md:w-16 h-1 mx-1 md:mx-2 transition-colors ${
-                        currentStageIndex > i - 1 ? 'bg-blue-600' : 'bg-[#E5E7EB]'
+                      className={`h-1 w-8 mx-1 transition-colors md:mx-2 md:w-16 ${
+                        currentStageIndex > i - 1 ? 'bg-[#C49A6C]' : 'bg-[#E5E7EB]'
                       }`}
                     />
                   )}
@@ -1317,7 +1317,7 @@ function BookingPage() {
                     <div
                       className={`w-11 h-11 rounded-full flex items-center justify-center font-semibold transition-colors ${
                         currentStageIndex >= i
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-[#0B1F42] text-white'
                           : 'bg-[#E5E7EB] text-[#6b7280]'
                       }`}
                     >
@@ -1332,10 +1332,10 @@ function BookingPage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Left Column - Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-[14px] shadow-lg p-5 md:p-8">
+              <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm md:p-8">
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 4 && renderStep4()}
@@ -1344,7 +1344,7 @@ function BookingPage() {
 
             {/* Right Column - Property Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-[14px] shadow-lg p-6 sticky top-24">
+              <div className="sticky top-24 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
                 <Link to={`/property/${property?.id}`} className="block">
                   <img
                     src={(property?.images?.[0] || '')}
@@ -1354,7 +1354,7 @@ function BookingPage() {
                 </Link>
                 <h3 className="font-bold text-[#222222] text-lg">{property?.title}</h3>
                 {bedOption && (
-                  <p className="text-sm text-[#2563EB] font-medium mt-1">
+                    <p className="mt-1 text-sm font-medium text-[#0B1F42]">
                     {bedOption === '2bed' ? '2 Bed' : '1 Bed'} &middot; KES {pricing.propertyPrice.toLocaleString()}/night
                   </p>
                 )}

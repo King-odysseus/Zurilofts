@@ -55,15 +55,15 @@ function TodayCard({ booking, type }) {
   const guestName = [guest.firstName, guest.lastName].filter(Boolean).join(" ") || "Guest";
 
   const badges = {
-    arrival: { label: "Arriving today", style: "bg-amber-50 text-amber-700 border border-amber-200" },
-    departure: { label: "Departing today", style: "bg-blue-50 text-[#2563EB] border border-blue-200" },
-    inhouse: { label: "In house", style: "bg-green-50 text-green-700 border border-green-200" },
+    arrival: { label: "Arriving today", style: "bg-[#FDE8D8] text-[#9A4A1D] border border-[#F2C9A8]" },
+    departure: { label: "Departing today", style: "bg-[#EAF0F4] text-[#52606F] border border-[#DCE5EC]" },
+    inhouse: { label: "In house", style: "bg-[#E8F4EC] text-[#287A45] border border-[#BDE2C8]" },
   };
 
   const badge = badges[type];
 
   return (
-    <article className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm overflow-hidden transition-shadow duration-200 hover:shadow-md">
+    <article className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
       <Link to={`/property/${p.id}`} className="block overflow-hidden">
         <img
           src={image || "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&q=80"}
@@ -75,7 +75,7 @@ function TodayCard({ booking, type }) {
         <div className="flex items-start justify-between gap-2 mb-2">
           <Link
             to={`/property/${p.id}`}
-            className="text-sm font-bold text-[#222222] hover:text-[#2563EB] transition-colors line-clamp-1"
+            className="line-clamp-1 text-sm font-bold text-[#0B1F42] transition-colors hover:text-[#C49A6C]"
           >
             {p.title}
           </Link>
@@ -86,11 +86,11 @@ function TodayCard({ booking, type }) {
 
         {/* Guest info */}
         <div className="flex items-center gap-2 mb-3">
-          <div className="w-7 h-7 rounded-full bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center text-xs font-bold text-[#222222]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-[#F7F4EF] text-xs font-bold text-[#0B1F42]">
             {guest.firstName?.[0]}{guest.lastName?.[0]}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-[#222222] truncate">{guestName}</p>
+            <p className="truncate text-sm font-medium text-[#0B1F42]">{guestName}</p>
             {guest.phone && (
               <p className="text-xs text-[#6b7280]">{guest.phone}</p>
             )}
@@ -121,13 +121,13 @@ function TodayCard({ booking, type }) {
               passing booking.id here left the page stuck on "Loading property..." */}
           <Link
             to={`/property/${p.id}`}
-            className="flex-1 min-h-[44px] flex items-center justify-center text-center px-3 rounded-lg text-xs font-semibold bg-white text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-all duration-200"
+            className="flex min-h-[44px] flex-1 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-3 text-center text-xs font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
           >
             View details
           </Link>
           <Link
             to={`/messages?booking=${booking.id}`}
-            className="flex-1 min-h-[44px] flex items-center justify-center text-center px-3 rounded-lg text-xs font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
+            className="flex min-h-[44px] flex-1 items-center justify-center rounded-lg bg-[#0B1F42] px-3 text-center text-xs font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
           >
             Message guest
           </Link>
@@ -308,15 +308,15 @@ EmptyPanel.propTypes = {
 // Compact horizontal metric: an icon circle beside a value + label.
 function MetricCard({ label, value, icon, iconClass }) {
   return (
-    <div className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 flex items-center gap-4">
+    <div className="flex items-center gap-4 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
       <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${iconClass}`}>
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {icon}
         </svg>
       </div>
       <div className="min-w-0">
-        <p className="text-2xl font-bold text-[#222222] leading-none">{value}</p>
-        <p className="text-sm text-[#6b7280] mt-1 truncate">{label}</p>
+        <p className="text-2xl font-bold leading-none text-[#0B1F42]">{value}</p>
+        <p className="mt-1 truncate text-sm text-[#52606F]">{label}</p>
       </div>
     </div>
   );
@@ -795,7 +795,7 @@ export default function HostTodayPage() {
           <p className="text-sm text-[#6b7280]">
             {new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
-          <h1 className="mt-1 text-2xl font-bold text-[#222222] sm:text-3xl">
+          <h1 className="mt-1 text-2xl font-bold text-[#0B1F42] sm:text-3xl">
             Today{user?.firstName ? `, ${user.firstName}` : ""}
           </h1>
         </div>
