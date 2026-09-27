@@ -2,25 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --zl-navy: #0B1F42;
+  --zl-navy-hover: #07072E;
+  --zl-bronze: #C49A6C;
+  --zl-bronze-hover: #B8895C;
+  --zl-canvas: #F7F4EF;
+  --zl-border: #E3E8EF;
+  --zl-text: #0B1F42;
+  --zl-muted: #5B6B82;
+  --zl-subtle: #94A3B8;
+  --zl-shadow: 0 8px 28px rgba(11, 31, 66, 0.08);
+}
+
 @layer components {
   .ui-btn-primary {
-    @apply inline-flex items-center justify-center rounded-xl bg-[#C49A6C] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#B8895C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#C49A6C] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#B8895C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .ui-btn-strong {
-    @apply inline-flex items-center justify-center rounded-xl bg-[#0B0B45] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#07072e] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#0B1F42] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#07072E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .ui-btn-secondary {
-    @apply inline-flex items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-4 py-2 text-sm font-semibold text-[#222222] transition hover:bg-[#F7F7F5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[44px] items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2 text-sm font-semibold text-[#0B1F42] transition hover:bg-[#F7F4EF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .ui-surface {
-    @apply rounded-[14px] border border-[#E5E7EB] bg-white text-[#222222] shadow-[0_1px_2px_rgb(0_0_0_/_0.04),0_2px_8px_-2px_rgb(0_0_0_/_0.05)];
+    @apply rounded-2xl border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-[0_8px_28px_rgba(11,31,66,0.08)];
   }
 
   .ui-input {
-    @apply rounded-[12px] border border-[#E5E7EB] bg-white px-3 py-2 text-sm text-[#222222] placeholder:text-[#6b7280] transition focus:border-[#2563EB] focus:outline-none focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)] disabled:cursor-not-allowed disabled:opacity-50;
+    @apply min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-white px-3 py-2 text-sm text-[#0B1F42] placeholder:text-[#5B6B82] transition focus:border-[#C49A6C] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .ui-status-success {
@@ -49,8 +62,8 @@ html {
 body {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: #F7F7F5;
-  color: #222222;
+  background-color: #F7F4EF;
+  color: #0B1F42;
 }
 
 /* The search field owns its clear action so the browser's native cancel
@@ -86,7 +99,7 @@ body {
    adds a ring for pointer users. Interactive focus uses the approved brand
    blue so it reads as an "active" signal distinct from branding navy. */
 :is(a, button, input, select, textarea, summary, [role='button'], [tabindex]):focus-visible {
-  outline: 2px solid #2563EB;
+  outline: 2px solid #C49A6C;
   outline-offset: 2px;
 }
 
