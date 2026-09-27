@@ -39,12 +39,12 @@ function PropertyItem({ item, onRemove }) {
           <div>
             <Link
               to={`/property/${p.id}`}
-              className="text-sm font-semibold text-[#222222] hover:text-[#2563EB] transition-colors line-clamp-1"
+              className="text-sm font-semibold text-[#0B1F42] hover:text-[#9A744A] transition-colors line-clamp-1"
             >
               {p.title}
             </Link>
             <p className="text-xs text-[#6b7280] mt-0.5 flex items-center gap-1">
-              <svg className="w-3 h-3 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3 h-3 text-[#9A744A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -218,7 +218,7 @@ export default function ShortlistDetailPage() {
             {/* Back link */}
             <Link
               to="/shortlists"
-              className="inline-flex items-center gap-1 text-sm text-[#6b7280] hover:text-[#2563EB] transition-colors mb-4"
+              className="inline-flex items-center gap-1 text-sm text-[#5B6B82] hover:text-[#9A744A] transition-colors mb-4"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -235,7 +235,7 @@ export default function ShortlistDetailPage() {
                       type="text"
                       value={newName}
                       onChange={(e) => setNewName(e.target.value)}
-                      className="flex-1 min-h-[44px] rounded-xl border border-[#E5E7EB] px-3 py-2 text-lg font-bold text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+                      className="flex-1 min-h-[44px] rounded-[10px] border border-[#E3E8EF] px-3 py-2 text-lg font-bold text-[#0B1F42] focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20"
                       autoFocus
                       onKeyDown={(e) => { if (e.key === "Enter") handleRename(); if (e.key === "Escape") setRenaming(false); }}
                     />

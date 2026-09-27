@@ -284,7 +284,7 @@ function NextStayCard({ booking }) {
 
           {host.firstName && (
             <div className="flex items-center gap-2 text-sm text-[#6b7280] mb-4">
-              <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-xs font-semibold text-[#2563EB]">
+              <div className="w-7 h-7 rounded-full bg-[#F6EFE7] flex items-center justify-center text-xs font-semibold text-[#9A744A]">
                 {host.firstName[0]}{host.lastName?.[0]}
               </div>
               <span>

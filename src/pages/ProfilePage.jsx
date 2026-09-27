@@ -362,7 +362,7 @@ function ProfilePage() {
       <div className="min-h-screen bg-canvas">
         <Navbar />
         <div className="pt-24 flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin"></div>
         </div>
         <Footer />
       </div>
@@ -411,7 +411,7 @@ function ProfilePage() {
                     className="w-16 h-16 rounded-full object-cover shadow-md"
                   />
                 ) : (
-                  <div className="w-16 h-16 bg-[#2563EB] rounded-full flex items-center justify-center">
+                  <div className="w-16 h-16 bg-[#0B1F42] rounded-full flex items-center justify-center">
                     <span className="text-white font-bold text-2xl">
                       {user?.firstName?.[0]}{user?.lastName?.[0]}
                     </span>
@@ -461,7 +461,7 @@ function ProfilePage() {
                 onClick={() => setActiveTab(tab)}
                 className={`px-6 py-3 font-semibold text-sm whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   activeTab === tab
-                    ? 'border-[#2563EB] text-[#222222]'
+                    ? 'border-[#C49A6C] text-[#0B1F42]'
                     : 'border-transparent text-[#6b7280] hover:text-[#222222]'
                 }`}
               >
@@ -529,8 +529,8 @@ function ProfilePage() {
 
               <div className="min-w-0">
               {showCompletionBanner && (
-                <div className="mb-6 bg-[#2563EB]/10 border border-[#2563EB] rounded-[14px] p-5 flex items-start gap-3">
-                  <svg className="w-5 h-5 text-[#2563EB] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="mb-6 bg-[#F6EFE7] border border-[#C49A6C] rounded-[14px] p-5 flex items-start gap-3">
+                  <svg className="w-5 h-5 text-[#9A744A] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div>
@@ -680,7 +680,7 @@ function ProfilePage() {
                 <h3 className="text-xl font-bold text-[#222222] mb-1">Privacy and data</h3>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Manage your personal data and consent choices. See our{' '}
-                  <Link to="/privacy" className="text-[#2563EB] hover:underline font-medium">Privacy Policy</Link>{' '}
+                  <Link to="/privacy" className="text-[#9A744A] hover:underline font-medium">Privacy Policy</Link>{' '}
                   for full details.
                 </p>
 
@@ -815,7 +815,7 @@ function ProfilePage() {
                       onClick={() => setPayoutMethod(option.value)}
                       className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                         payoutMethod === option.value
-                          ? 'bg-[#2563EB] text-white shadow-sm'
+                          ? 'bg-[#0B1F42] text-white shadow-sm'
                           : 'text-[#6b7280] hover:text-[#222222]'
                       }`}
                     >
@@ -847,7 +847,7 @@ function ProfilePage() {
                           value={bankForm.bankName}
                           onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
                           placeholder="e.g. KCB Bank"
-                          className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+                          className="w-full min-h-[44px] rounded-[10px] border border-[#E3E8EF] px-4 py-3 focus:outline-none bg-white text-[#0B1F42] placeholder-[#94A3B8] focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20"
                           required
                         />
                       )}
@@ -861,7 +861,7 @@ function ProfilePage() {
                         onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 20) }))}
                         maxLength={20}
                         placeholder="Bank account number"
-                        className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+                        className="w-full min-h-[44px] rounded-[10px] border border-[#E3E8EF] px-4 py-3 focus:outline-none bg-white text-[#0B1F42] placeholder-[#94A3B8] focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20"
                         required
                       />
                     </div>
@@ -875,7 +875,7 @@ function ProfilePage() {
                       onChange={(e) => setMpesaPhone(e.target.value)}
                       placeholder="0712 345 678"
                       autoComplete="tel"
-                      className="w-full min-h-[44px] rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+                      className="w-full min-h-[44px] rounded-[10px] border border-[#E3E8EF] px-4 py-3 focus:outline-none bg-white text-[#0B1F42] placeholder-[#94A3B8] focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20"
                       required
                     />
                     <p className="text-xs text-[#6b7280] mt-2">Use the Safaricom number registered to receive your host payouts.</p>
@@ -971,7 +971,7 @@ function ProfilePage() {
                           </div>
                           <div>
                             <span className="text-[#6b7280]">Total</span>
-                            <p className="font-semibold text-[#2563EB]">KES {booking.total.toLocaleString()}</p>
+                            <p className="font-semibold text-[#9A744A]">KES {booking.total.toLocaleString()}</p>
                           </div>
                         </div>
                         {booking.promoCode && (
@@ -990,7 +990,7 @@ function ProfilePage() {
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <svg
                                   key={star}
-                                  className={`w-5 h-5 ${star <= booking.review.rating ? 'text-[#2563EB]' : 'text-[#E5E7EB]'}`}
+                                  className={`w-5 h-5 ${star <= booking.review.rating ? 'text-[#C49A6C]' : 'text-[#E3E8EF]'}`}
                                   fill="currentColor"
                                   viewBox="0 0 20 20"
                                 >
@@ -1015,7 +1015,7 @@ function ProfilePage() {
                                     aria-label={`${star} star${star > 1 ? 's' : ''}`}
                                   >
                                     <svg
-                                      className={`w-7 h-7 ${star <= current ? 'text-[#2563EB]' : 'text-[#E5E7EB]'}`}
+                                      className={`w-7 h-7 ${star <= current ? 'text-[#C49A6C]' : 'text-[#E3E8EF]'}`}
                                       fill="currentColor"
                                       viewBox="0 0 20 20"
                                     >
@@ -1043,7 +1043,7 @@ function ProfilePage() {
                                     className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all ${
                                       current === key
                                         ? color
-                                        : 'border-[#E5E7EB] text-[#6b7280] hover:border-[#2563EB]'
+                                        : 'border-[#E3E8EF] text-[#5B6B82] hover:border-[#C49A6C]'
                                     }`}
                                   >
                                     <span className="text-2xl">{emoji}</span>
@@ -1060,7 +1060,7 @@ function ProfilePage() {
                               onChange={(e) => setReviewField(booking.id, 'publicComment', e.target.value)}
                               placeholder="Share what other guests should know about this stay. This appears publicly with your first name."
                               maxLength={1000}
-                              className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] h-20 resize-none text-sm mb-4 focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+                              className="w-full rounded-[10px] border border-[#E3E8EF] px-4 py-3 focus:outline-none bg-white text-[#0B1F42] placeholder-[#94A3B8] h-20 resize-none text-sm mb-4 focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20"
                             />
                             <label className="block text-xs font-semibold text-[#6b7280] mb-1">
                               Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
@@ -1070,7 +1070,7 @@ function ProfilePage() {
                               onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
                               placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
                               maxLength={2000}
-                              className="w-full rounded-xl border border-[#E5E7EB] px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] h-20 resize-none text-sm focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+                              className="w-full rounded-[10px] border border-[#E3E8EF] px-4 py-3 focus:outline-none bg-white text-[#0B1F42] placeholder-[#94A3B8] h-20 resize-none text-sm focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/20"
                             />
                             {reviewForms[booking.id]?.error && (
                               <p className="text-red-500 text-xs mt-1">{reviewForms[booking.id].error}</p>
@@ -1094,7 +1094,7 @@ function ProfilePage() {
                 <div className="mt-6 text-center">
                   <Link
                     to="/bookings"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#9A744A] hover:text-[#7D5C39] transition-colors"
                   >
                     View all bookings
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

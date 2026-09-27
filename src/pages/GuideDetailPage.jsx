@@ -211,7 +211,7 @@ function GuideDetailPage() {
                       <a
                         href={`#${item.id}`}
                         onClick={() => setTocOpen(false)}
-                        className="text-sm text-[#2563EB] hover:text-[#1D4ED8]"
+                        className="text-sm text-[#9A744A] hover:text-[#7D5C39]"
                       >
                         {item.text}
                       </a>
@@ -257,7 +257,7 @@ function GuideDetailPage() {
                 <li key={item.id} className={item.level === 3 ? "ml-3" : ""}>
                   <a
                     href={`#${item.id}`}
-                    className="text-sm text-[#6b7280] hover:text-[#2563EB] transition-colors"
+                        className="text-sm text-[#5B6B82] hover:text-[#9A744A] transition-colors"
                   >
                     {item.text}
                   </a>

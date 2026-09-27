@@ -389,7 +389,7 @@ function AdminCalendar() {
         <h2 className="text-lg font-bold text-[#222222] mb-1">Blocked dates</h2>
         <p className="text-sm text-[#6b7280] mb-4">Select a start date, then the final night to block it. Existing stays can&apos;t be selected.</p>
         <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} onBlockClick={handleCalendarBlockClick} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
-        <div className="flex items-center justify-between gap-3 mt-4 mb-6"><p className="text-xs text-[#6b7280]">{blockDraft.start ? selectedBlockEnd ? `Selected: ${fmt(blockDraft.start)} - ${fmt(selectedBlockEnd)}` : 'Now select the final night.' : 'Select a start date to begin.'}</p>{blockDraft.start && <button type="button" onClick={() => { setBlockDraft((draft) => ({ ...draft, start: '', end: '' })); setSelectedBlockEnd(null); }} className="text-xs font-semibold text-[#2563EB] hover:text-[#1D4ED8]">Clear selection</button>}</div>
+        <div className="flex items-center justify-between gap-3 mt-4 mb-6"><p className="text-xs text-[#5B6B82]">{blockDraft.start ? selectedBlockEnd ? `Selected: ${fmt(blockDraft.start)} - ${fmt(selectedBlockEnd)}` : 'Now select the final night.' : 'Select a start date to begin.'}</p>{blockDraft.start && <button type="button" onClick={() => { setBlockDraft((draft) => ({ ...draft, start: '', end: '' })); setSelectedBlockEnd(null); }} className="text-xs font-semibold text-[#9A744A] hover:text-[#7D5C39]">Clear selection</button>}</div>
 
         {data.blocks.length > 0 ? (
           <div className="space-y-2 mb-5">
@@ -398,7 +398,7 @@ function AdminCalendar() {
                 <div>
                   <span className="font-semibold text-[#222222]">{fmt(b.start)} &rarr; {fmt(b.end)}</span>
                   <span className="text-[#6b7280] ml-2">{b.summary || 'Blocked'}</span>
-                  <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${b.manual ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-[#2563EB]'}`}>
+                  <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${b.manual ? 'bg-[#FDE8D8] text-[#9A4A1D]' : 'bg-[#EEF2F7] text-[#0B1F42]'}`}>
                     {b.manual ? 'Manual' : b.sourceName || 'Imported'}
                   </span>
                 </div>

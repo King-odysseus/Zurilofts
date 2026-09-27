@@ -356,7 +356,7 @@ function ArrivalRow({ booking }) {
 
       <div className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-[#222222] truncate">{guestName}</p>
-        <Link to={`/property/${p.id}`} className="block text-xs text-[#6b7280] truncate hover:text-[#2563EB] transition-colors">
+        <Link to={`/property/${p.id}`} className="block text-xs text-[#5B6B82] truncate hover:text-[#9A744A] transition-colors">
           {p.title}
         </Link>
       </div>
@@ -595,7 +595,7 @@ function RecentMessagesPanel({ conversations, loading }) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <p className="font-semibold text-[#222222] text-sm truncate group-hover:text-[#2563EB] transition-colors">
+                      <p className="font-semibold text-[#0B1F42] text-sm truncate group-hover:text-[#9A744A] transition-colors">
                         {guestName}
                       </p>
                       <span className="text-xs text-[#6b7280] flex-shrink-0">
@@ -815,7 +815,7 @@ export default function HostTodayPage() {
           <MetricCard
             label="Departures"
             value={departures.length}
-            iconClass="bg-blue-50 text-[#2563EB]"
+            iconClass="bg-[#F6EFE7] text-[#9A744A]"
             icon={<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />}
           />
           <MetricCard
