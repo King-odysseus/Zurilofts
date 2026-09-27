@@ -28,9 +28,9 @@ const EMPTY = {
   nearby: '',
 };
 
-const labelCls = 'block text-sm font-medium text-[#222222] mb-2';
+const labelCls = 'mb-2 block text-sm font-medium text-[#0B1F42]';
 const inputCls =
-  'w-full min-h-[44px] px-4 py-2.5 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20';
+  'h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40';
 
 // textarea where each non-empty line is one array item
 function linesToArray(text) {
@@ -197,16 +197,16 @@ function AdminPropertyForm() {
 
   return (
     <div className="w-full">
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:flex-row sm:items-center sm:px-6">
         <div>
-          <Link to={`${base}/properties`} className="text-sm text-[#6b7280] hover:text-[#2563EB]">&larr; Back to properties</Link>
-          <h1 className="text-2xl font-bold text-[#222222] mt-1">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
+          <Link to={`${base}/properties`} className="text-sm font-semibold text-[#52606F] transition-colors hover:text-[#C49A6C]">&larr; Back to properties</Link>
+          <h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setShowFullPreview(true)}
-            className="flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors"
+            className="flex min-h-[44px] items-center rounded-lg bg-[#0B1F42] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#07072E]"
           >
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -217,7 +217,7 @@ function AdminPropertyForm() {
           {isEdit && (
             <Link
               to={`${base}/properties/${id}/calendar`}
-              className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors"
+              className="inline-flex min-h-[44px] items-center rounded-lg border border-[#E5E7EB] px-4 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
             >
               Manage Calendar &rarr;
             </Link>
@@ -238,16 +238,16 @@ function AdminPropertyForm() {
           ['Basics', '#listing-basics'], ['Photos', '#listing-photos'], ['Location', '#listing-location'],
           ['Amenities', '#listing-amenities'], ['Pricing', '#listing-pricing'], ['Review', '#listing-review'],
         ].map(([label, href], index) => (
-          <a key={label} href={href} className="flex min-h-[44px] items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 shadow-sm hover:border-[#2563EB]">
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#2563EB]/10 text-xs font-bold text-[#2563EB]">{index + 1}</span>
-            <span className="text-xs font-semibold text-[#222222] sm:text-sm">{label}</span>
+          <a key={label} href={href} className="flex min-h-[44px] items-center gap-2 rounded-xl border border-[#E5E7EB] bg-white px-3 py-2 shadow-sm hover:border-[#C49A6C]">
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#FDE8D8] text-xs font-bold text-[#9A4A1D]">{index + 1}</span>
+            <span className="text-xs font-semibold text-[#0B1F42] sm:text-sm">{label}</span>
           </a>
         ))}
       </nav>
-      <div className="mb-6 rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-4 shadow-sm">
+      <div className="mb-6 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div><p className="text-sm font-bold text-[#222222]">Publish readiness</p><p className="mt-1 text-xs text-[#6b7280]">Complete the essentials below before sending your listing for review.</p></div>
-          <span className="rounded-full bg-[#2563EB]/10 px-3 py-1 text-xs font-semibold text-[#2563EB]">Draft workspace</span>
+          <div><p className="text-sm font-bold text-[#0B1F42]">Publish readiness</p><p className="mt-1 text-xs text-[#52606F]">Complete the essentials below before sending your listing for review.</p></div>
+          <span className="rounded-full bg-[#FDE8D8] px-3 py-1 text-xs font-semibold text-[#9A4A1D]">Draft workspace</span>
         </div>
         <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">
           {[['Title and location', Boolean(form.title && form.location)], ['Pricing and capacity', Boolean(form.price && form.bedrooms !== '' && form.bathrooms !== '')], ['Photos and description', Boolean((form.images || []).length && form.description)]].map(([label, complete]) => (
@@ -260,7 +260,7 @@ function AdminPropertyForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div id="listing-basics" className="scroll-mt-24 bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
+        <div id="listing-basics" className="scroll-mt-24 space-y-5 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
           <div>
             <label className={labelCls}>Title</label>
             <input className={inputCls} value={form.title} onChange={(e) => update('title', e.target.value)} required />
@@ -269,9 +269,9 @@ function AdminPropertyForm() {
             <label className={labelCls}>Location</label>
             <input className={inputCls} value={form.location} onChange={(e) => update('location', e.target.value)} required />
           </div>
-          <div id="listing-location" className="scroll-mt-24 bg-canvas rounded-[14px] p-4 sm:p-5">
-            <p className="text-sm font-semibold text-[#222222]">Confirm exact location on a map</p>
-            <p className="text-xs text-[#6b7280] mb-3">
+          <div id="listing-location" className="scroll-mt-24 rounded-2xl bg-[#F7F4EF] p-4 sm:p-5">
+            <p className="text-sm font-semibold text-[#0B1F42]">Confirm exact location on a map</p>
+            <p className="mb-3 text-xs text-[#52606F]">
               Drop a pin at the property&apos;s entrance. Guests see this pin and can open it in Google Maps for directions.
             </p>
             <PropertyLocationPicker
@@ -414,7 +414,7 @@ function AdminPropertyForm() {
           </div>
         </div>
 
-        <div id="listing-photos" className="scroll-mt-24 bg-white rounded-[14px] p-6 space-y-5 shadow-sm">
+        <div id="listing-photos" className="scroll-mt-24 space-y-5 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
           <div>
             <label className={labelCls}>Photos</label>
             <p className="text-sm text-[#6b7280] mb-3">Upload images from your device. They&apos;re automatically resized and compressed for the website. The first photo is used as the cover.</p>
@@ -425,7 +425,7 @@ function AdminPropertyForm() {
                   <div key={src + i} className="relative group aspect-[4/3] rounded-xl overflow-hidden shadow-sm">
                     <img src={src} alt={`Property photo ${i + 1}`} className="w-full h-full object-cover" />
                     {i === 0 && (
-                      <span className="absolute top-1.5 left-1.5 bg-[#2563EB] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Cover</span>
+                      <span className="absolute left-1.5 top-1.5 rounded-full bg-[#C49A6C] px-2 py-0.5 text-[10px] font-bold text-white">Cover</span>
                     )}
                     <button
                       type="button"
@@ -442,7 +442,7 @@ function AdminPropertyForm() {
               </div>
             )}
 
-            <label className={`flex flex-col items-center justify-center w-full border-2 border-dashed border-[#E5E7EB] rounded-xl py-8 cursor-pointer hover:border-[#2563EB] hover:bg-[#2563EB]/5 transition-colors ${uploading ? 'opacity-60 pointer-events-none' : ''}`}>
+            <label className={`flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#E5E7EB] py-8 transition-colors hover:border-[#C49A6C] hover:bg-[#FDE8D8]/40 ${uploading ? 'pointer-events-none opacity-60' : ''}`}>
               {uploading ? (
                 <>
                   <div className="w-6 h-6 border-2 border-[#2563EB] border-t-transparent rounded-full animate-spin mb-2"></div>
@@ -453,7 +453,7 @@ function AdminPropertyForm() {
                   <svg className="w-8 h-8 text-[#2563EB] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
-                  <span className="text-sm font-semibold text-[#222222]">Click to upload photos</span>
+                  <span className="text-sm font-semibold text-[#0B1F42]">Click to upload photos</span>
                   <span className="text-xs text-[#6b7280] mt-1">JPEG, PNG or WebP · up to 10 at a time</span>
                 </>
               )}
@@ -481,7 +481,7 @@ function AdminPropertyForm() {
           </div>
         )}
 
-        <div id="listing-review" className="scroll-mt-24 sticky bottom-4 z-20 rounded-[14px] border border-[#E5E7EB] bg-white/95 backdrop-blur px-4 py-3 shadow-lg flex items-center gap-3">
+        <div id="listing-review" className="sticky bottom-4 z-20 flex scroll-mt-24 items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
           <button
             type="submit"
             disabled={saving}
@@ -489,7 +489,7 @@ function AdminPropertyForm() {
           >
             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Property'}
           </button>
-          <Link to={`${base}/properties`} className="inline-flex items-center min-h-[44px] px-6 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]">Cancel</Link>
+          <Link to={`${base}/properties`} className="inline-flex min-h-[44px] items-center rounded-lg border border-[#E5E7EB] px-6 font-semibold text-[#0B1F42] hover:bg-[#F7F4EF]">Cancel</Link>
         </div>
       </form>
 
