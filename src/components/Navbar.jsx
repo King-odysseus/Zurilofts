@@ -574,7 +574,7 @@ function Navbar({ solid = false }) {
                 className={`hidden md:inline-flex items-center justify-center px-5 py-2 rounded-[10px] text-sm font-semibold transition-all duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${
                   needsWhiteNav
                     ? 'bg-[#C49A6C] text-white hover:bg-[#B8895C]'
-                    : 'bg-white text-[#222222] hover:bg-[#F7F7F5]'
+                    : 'bg-white text-[#0B1F42] hover:bg-[#F7F4EF]'
                 }`}
               >
                 {t('nav.signInSignUp')}
@@ -712,21 +712,21 @@ function Navbar({ solid = false }) {
                   </Link>
                   <Link
                     to="/bookings"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.bookingHistory')}
                   </Link>
                   <Link
                     to="/terms"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.termsOfService')}
                   </Link>
                   <Link
                     to="/privacy"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.privacyPolicy')}
@@ -766,14 +766,14 @@ function Navbar({ solid = false }) {
                   </Link>
                   <Link
                     to="/terms"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.termsOfService')}
                   </Link>
                   <Link
                     to="/privacy"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors duration-200 text-center"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.privacyPolicy')}
