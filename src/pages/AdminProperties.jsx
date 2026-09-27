@@ -595,7 +595,7 @@ function AdminProperties() {
                 <col className="w-[15%]" />
                 <col className="w-[96px]" />
               </colgroup>
-              <thead className="border-b border-[#E2E8F0] bg-[#F8FAFC]">
+              <thead className="border-b border-[#E3E8EF] bg-[#F7F4EF]">
                 <tr className="h-[52px]">
                   <th className="pl-5 text-left">
                     <Checkbox
@@ -628,7 +628,7 @@ function AdminProperties() {
                   return (
                     <tr
                       key={p.id}
-                      className="h-[72px] border-b border-[#E8EEF5] last:border-0 hover:bg-[#F8FAFC]"
+                      className="h-[72px] border-b border-[#E3E8EF] last:border-0 hover:bg-[#F7F4EF]"
                     >
                       <td className="pl-5">
                         <Checkbox
@@ -796,7 +796,7 @@ function AdminProperties() {
             >
               <Link
                 to={`/property/${p.id}`}
-                className="block aspect-[16/10] bg-[#F8FAFC]"
+                className="block aspect-[16/10] bg-[#F7F4EF]"
               >
                 {p.images?.[0] ? (
                   <img
