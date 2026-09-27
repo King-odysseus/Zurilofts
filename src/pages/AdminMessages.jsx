@@ -121,20 +121,20 @@ function AdminMessages() {
         {/* Conversation list */}
         <div className="max-h-[70vh] overflow-y-auto border-b border-[#E3E8EF] md:border-b-0 md:border-r">
           {loadingList ? (
-            <p className="text-sm text-[#6b7280] p-4">Loading…</p>
+            <p className="p-4 text-sm text-[#5B6B82]">Loading…</p>
           ) : conversations.length === 0 ? (
-            <p className="text-sm text-[#6b7280] p-4">No conversations yet.</p>
+            <p className="p-4 text-sm text-[#5B6B82]">No conversations yet.</p>
           ) : (
             conversations.map((c) => (
               <button
                 key={c.userId}
                 onClick={() => openConversation(c)}
-                className={`w-full text-left px-4 py-3 border-b border-[#E5E7EB] hover:bg-canvas transition-colors ${
-                  activeUser?.userId === c.userId ? "bg-canvas" : ""
+                className={`w-full border-b border-[#E5E7EB] px-4 py-3 text-left transition-colors hover:bg-[#F7F4EF] ${
+                  activeUser?.userId === c.userId ? "bg-[#FDE8D8]" : ""
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-semibold text-[#222222] text-sm">
+                  <span className="text-sm font-semibold text-[#0B1F42]">
                     {c.firstName} {c.lastName}
                   </span>
                   {c.unread > 0 && (
@@ -143,7 +143,7 @@ function AdminMessages() {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-[#6b7280] truncate mt-0.5">
+                <p className="mt-0.5 truncate text-xs text-[#5B6B82]">
                   {c.lastMessage
                     ? `${c.lastMessage.senderRole === "ADMIN" ? "You: " : ""}${c.lastMessage.body}`
                     : ""}
@@ -156,13 +156,13 @@ function AdminMessages() {
         {/* Thread */}
         <div className="flex max-h-[70vh] flex-col md:col-span-2">
           {!activeUser ? (
-            <div className="flex-1 flex items-center justify-center text-[#6b7280] text-sm p-8">
+            <div className="flex flex-1 items-center justify-center p-8 text-sm text-[#5B6B82]">
               Select a conversation to read and reply.
             </div>
           ) : (
             <>
-              <div className="px-4 py-3 border-b border-[#E5E7EB]">
-                <p className="font-semibold text-[#222222] text-sm">
+              <div className="border-b border-[#E3E8EF] px-4 py-3">
+                <p className="text-sm font-semibold text-[#0B1F42]">
                   {activeUser.firstName} {activeUser.lastName}
                 </p>
                 <p className="text-xs text-[#6b7280]">{activeUser.email}</p>
@@ -181,8 +181,8 @@ function AdminMessages() {
                       <div
                         className={`max-w-[70%] px-3 py-2 rounded-[14px] text-sm ${
                           m.senderRole === "ADMIN"
-                            ? "bg-[#2563EB] text-white rounded-br-md"
-                            : "bg-[#f0f0f5] text-[#222222] rounded-bl-md"
+                            ? "bg-[#0B1F42] text-white rounded-br-md"
+                            : "bg-[#F7F4EF] text-[#0B1F42] rounded-bl-md"
                         }`}
                       >
                         {m.body}
@@ -205,12 +205,12 @@ function AdminMessages() {
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   placeholder="Type your reply…"
-                  className="flex-1 min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20 text-sm bg-white text-[#222222]"
+                  className="min-h-[44px] flex-1 rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                 />
                 <button
                   type="submit"
                   disabled={sending || !body.trim()}
-                  className="min-h-[44px] px-5 py-2.5 rounded-lg bg-[#C49A6C] text-white text-sm font-semibold hover:bg-[#B8895C] transition-all disabled:opacity-50"
+                  className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-[#07072E] disabled:opacity-50"
                 >
                   Send
                 </button>
