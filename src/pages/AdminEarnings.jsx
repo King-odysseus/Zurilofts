@@ -1030,13 +1030,13 @@ function AdminEarnings() {
           <Link
             to="/host/earnings"
             aria-current="page"
-            className="min-h-[44px] border-b-2 border-[#2563EB] px-4 py-2.5 text-sm font-semibold text-[#222222]"
+            className="min-h-[44px] border-b-2 border-[#C49A6C] px-4 py-2.5 text-sm font-semibold text-[#0B1F42]"
           >
             Overview
           </Link>
           <Link
             to="/host/payouts"
-            className="min-h-[44px] border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-[#6b7280] hover:text-[#222222]"
+            className="min-h-[44px] border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-[#5B6B82] hover:text-[#0B1F42]"
           >
             Payouts
           </Link>
@@ -1130,7 +1130,7 @@ function AdminEarnings() {
                   type="date"
                   value={customFrom}
                   onChange={(e) => setCustomFrom(e.target.value)}
-                  className="min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] bg-white text-sm text-[#222222] focus:outline-none focus:border-[#2563EB]"
+                  className="min-h-[44px] rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                 />
               </div>
               <div className="flex-shrink-0">
@@ -1141,7 +1141,7 @@ function AdminEarnings() {
                   type="date"
                   value={customTo}
                   onChange={(e) => setCustomTo(e.target.value)}
-                  className="min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] bg-white text-sm text-[#222222] focus:outline-none focus:border-[#2563EB]"
+                  className="min-h-[44px] rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                 />
               </div>
             </>
@@ -1157,7 +1157,7 @@ function AdminEarnings() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Type property or location name..."
-                className="min-h-[44px] w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E5E7EB] bg-white text-sm text-[#222222] focus:outline-none focus:border-[#2563EB]"
+                className="min-h-[44px] w-full rounded-[10px] border-0 bg-[#F7F4EF] py-2.5 pl-10 pr-4 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
               />
               <svg
                 className="w-4 h-4 text-[#6b7280] absolute left-3.5 top-1/2 -translate-y-1/2"
@@ -1203,7 +1203,7 @@ function AdminEarnings() {
               value={sortBy}
               onChange={setSortBy}
               options={SORT_OPTIONS}
-              triggerClassName="min-h-[44px] px-4 py-2.5 rounded-xl border border-[#E5E7EB] bg-white text-sm min-w-[200px] hover:border-[#2563EB]"
+              triggerClassName="min-h-[44px] min-w-[200px] rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-[#F3EDE5]"
               placeholder="Sort by"
               ariaLabel="Sort earnings table"
             />
@@ -1263,13 +1263,13 @@ function AdminEarnings() {
             {cards.map(({ label, value, color, sub }) => (
               <div
                 key={label}
-                className="bg-white rounded-[14px] border border-[#E5E7EB] p-5 shadow-sm"
+                className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-sm text-[#6b7280]">{label}</span>
                   <div className={`w-2.5 h-2.5 rounded-full ${color}`}></div>
                 </div>
-                <p className="text-2xl font-bold text-[#222222]">{value}</p>
+                <p className="text-2xl font-bold text-[#0B1F42]">{value}</p>
                 {sub && <p className="text-xs text-[#6b7280] mt-1">{sub}</p>}
               </div>
             ))}
@@ -1280,10 +1280,10 @@ function AdminEarnings() {
             {feeCards.map(({ label, value, sub }) => (
               <div
                 key={label}
-                className="bg-white rounded-[14px] border border-[#E5E7EB] p-5 shadow-sm"
+                className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
               >
                 <span className="text-sm text-[#6b7280]">{label}</span>
-                <p className="text-xl font-bold text-[#222222] mt-2">{value}</p>
+                <p className="mt-2 text-xl font-bold text-[#0B1F42]">{value}</p>
                 {sub && <p className="text-xs text-[#6b7280] mt-1">{sub}</p>}
               </div>
             ))}
@@ -1665,7 +1665,7 @@ function AdminEarnings() {
       {activeTab === "properties" &&
         (loading ? (
           <div className="text-center py-12">
-            <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
+                <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
