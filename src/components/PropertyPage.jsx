@@ -106,7 +106,7 @@ function PropertyPage() {
         <main className="pt-24 flex items-center justify-center min-h-[60vh]" role="status" aria-label="Loading property">
           <div className="text-center">
             <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent" />
-            <p className="text-[#6b7280]">Loading property...</p>
+            <p className="text-[#5B6B82]">Loading property...</p>
           </div>
         </main>
         <Footer />
@@ -127,7 +127,7 @@ function PropertyPage() {
               </svg>
             </div>
             <h2 className="mb-2 text-xl font-bold text-[#0B1F42]">Property Not Found</h2>
-            <p className="text-[#6b7280] mb-4">{error || 'This property could not be loaded.'}</p>
+            <p className="mb-4 text-[#5B6B82]">{error || 'This property could not be loaded.'}</p>
             <Link to="/properties" className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#0B1F42] px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-[#07072E]">
               View All Properties
             </Link>
@@ -183,13 +183,13 @@ function PropertyPage() {
       <Navbar />
 
       {/* ── Compact breadcrumb / back row ────────────────────────── */}
-      <nav className="bg-white border-b border-[#E5E7EB] py-4 px-4 sm:px-6 pt-24" aria-label="Breadcrumb">
+      <nav className="border-b border-[#E3E8EF] bg-white px-4 pb-4 pt-24 sm:px-6" aria-label="Breadcrumb">
         <div className="max-w-7xl mx-auto">
           <ol className="flex items-center gap-2 text-sm">
             <li>
               <Link
                 to="/properties"
-                className="inline-flex items-center min-h-[44px] text-[#222222] hover:text-[#2563EB] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] rounded transition-colors duration-200"
+                className="inline-flex min-h-[44px] items-center rounded text-[#0B1F42] transition-colors duration-200 hover:text-[#9A744A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
               >
                 <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -197,8 +197,8 @@ function PropertyPage() {
                 Back to Properties
               </Link>
             </li>
-            <li aria-hidden="true" className="text-[#6b7280]">/</li>
-            <li className="text-[#222222] font-medium truncate" aria-current="page">{typeLabel}</li>
+            <li aria-hidden="true" className="text-[#94A3B8]">/</li>
+            <li className="truncate font-medium text-[#0B1F42]" aria-current="page">{typeLabel}</li>
           </ol>
         </div>
       </nav>
@@ -209,7 +209,7 @@ function PropertyPage() {
           <section className="mb-6 md:mb-8" aria-label="Property photo gallery">
             {images.length === 1 ? (
               <img
-                className="w-full h-56 sm:h-72 md:h-[460px] object-cover rounded-2xl border border-[#E5E7EB] shadow-sm cursor-pointer"
+                className="h-56 w-full cursor-pointer rounded-2xl border border-[#E3E8EF] object-cover shadow-sm sm:h-72 md:h-[460px]"
                 src={images[0]}
                 alt={`${property.title} - photo 1 of 1`}
                 onClick={() => { setLightboxIndex(0); setLightboxOpen(true); }}
@@ -217,7 +217,7 @@ function PropertyPage() {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-2 md:gap-3">
                 {/* Primary image - spans two columns and rows on desktop */}
-                <div className="relative col-span-2 md:col-span-2 md:row-span-2 overflow-hidden rounded-2xl border border-[#E5E7EB] shadow-sm bg-white">
+                <div className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-sm md:col-span-2">
                   <img
                     className="w-full h-56 sm:h-72 md:h-full md:min-h-[440px] object-cover cursor-pointer"
                     src={images[featuredImage]}
@@ -230,7 +230,7 @@ function PropertyPage() {
                     className="absolute top-1/2 -translate-y-1/2 left-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors shadow-md"
                     aria-label="Previous photo"
                   >
-                    <svg className="w-5 h-5 text-[#222222]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </button>
@@ -239,7 +239,7 @@ function PropertyPage() {
                     className="absolute top-1/2 -translate-y-1/2 right-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors shadow-md"
                     aria-label="Next photo"
                   >
-                    <svg className="w-5 h-5 text-[#222222]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>
                   </button>
@@ -250,7 +250,7 @@ function PropertyPage() {
                   <button
                     key={i}
                     onClick={() => { setFeaturedImage(i); setLightboxIndex(i); setLightboxOpen(true); }}
-                    className="group relative overflow-hidden rounded-2xl border border-[#E5E7EB] shadow-sm cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+                    className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#E3E8EF] shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
                     aria-label={`View photo ${i + 1}`}
                   >
                     <img
@@ -419,18 +419,18 @@ function PropertyPage() {
 
           {/* ── Right column - sticky booking summary ─────────────── */}
           <aside className="lg:col-span-1" aria-label="Booking">
-            <div className="neu-card p-5 md:p-6 sticky top-24" role="complementary" aria-label="Booking summary">
+            <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
               {/* Price per night */}
               <div className="mb-5">
-                <span className="text-3xl font-bold text-[#0B0B45]">
+                <span className="text-3xl font-bold text-[#0B1F42]">
                   KES {displayPrice != null ? displayPrice.toLocaleString() : '-'}
                 </span>
-                <span className="text-[#6b7280]"> / night</span>
+                <span className="text-[#5B6B82]"> / night</span>
               </div>
 
               {/* Bed variant chip - only when arriving from a variant card */}
               {variantLabel && (
-                <div className="mb-5 inline-flex items-center gap-1.5 bg-[#C49A6C]/10 text-[#0B0B45] text-sm font-medium px-3 py-1.5 rounded-full">
+                <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#0B1F42]">
                   <svg className="w-4 h-4 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
                   </svg>
@@ -441,17 +441,17 @@ function PropertyPage() {
               {/* Dates & guests summary - selection happens on the booking flow */}
               <Link
                 to={bookingHref}
-                className="block border border-[#E5E7EB] rounded-xl p-4 mb-5 hover:border-[#2563EB] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors duration-200"
+                className="mb-5 block rounded-2xl border border-[#E3E8EF] p-4 transition-colors duration-200 hover:border-[#C49A6C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
                 aria-label="Choose check-in, check-out, and guests"
               >
-                <div className="grid grid-cols-2 divide-x divide-[#E5E7EB]">
+                <div className="grid grid-cols-2 divide-x divide-[#E3E8EF]">
                   <div className="pr-3">
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-[#6b7280]">Check-in / Check-out</p>
-                    <p className="mt-1 text-sm text-[#222222]">Add dates</p>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-[#5B6B82]">Check-in / Check-out</p>
+                    <p className="mt-1 text-sm text-[#0B1F42]">Add dates</p>
                   </div>
                   <div className="pl-3">
-                    <p className="text-[11px] font-bold uppercase tracking-wide text-[#6b7280]">Guests</p>
-                    <p className="mt-1 text-sm text-[#222222]">Add guests</p>
+                    <p className="text-[11px] font-bold uppercase tracking-wide text-[#5B6B82]">Guests</p>
+                    <p className="mt-1 text-sm text-[#0B1F42]">Add guests</p>
                   </div>
                 </div>
               </Link>
@@ -459,41 +459,41 @@ function PropertyPage() {
               {/* Continue to booking CTA */}
               <Link
                 to={bookingHref}
-                className="block w-full bg-[#C49A6C] text-white font-bold py-4 rounded-xl hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] active:bg-[#a6794d] transition-all duration-200 text-center"
+                className="block min-h-[48px] w-full rounded-[10px] bg-[#C49A6C] py-4 text-center font-bold text-white transition-colors duration-200 hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] active:bg-[#9A744A]"
                 aria-label={`Continue to booking for ${variantLabel ? variantLabel + ' option' : 'this property'} at KES ${displayPrice != null ? displayPrice.toLocaleString() : '-'} per night`}
               >
                 Continue to booking
               </Link>
 
-              <p className="text-center text-sm text-[#6b7280] mt-4">You won&apos;t be charged yet</p>
+              <p className="mt-4 text-center text-sm text-[#5B6B82]">You won&apos;t be charged yet</p>
 
               {/* Fee / total rows - resolved at checkout once dates are selected */}
-              <div className="mt-6 pt-6 border-t border-[#D9D9D9] space-y-2 text-sm">
-                <div className="flex justify-between text-[#1f2937]">
+              <div className="mt-6 space-y-2 border-t border-[#E3E8EF] pt-6 text-sm">
+                <div className="flex justify-between text-[#0B1F42]">
                   <span>Cleaning fee</span>
-                  <span className="text-[#6b7280]">Shown at checkout</span>
+                  <span className="text-[#5B6B82]">Shown at checkout</span>
                 </div>
-                <div className="flex justify-between text-[#1f2937]">
+                <div className="flex justify-between text-[#0B1F42]">
                   <span>Service fee</span>
-                  <span className="text-[#6b7280]">Shown at checkout</span>
+                  <span className="text-[#5B6B82]">Shown at checkout</span>
                 </div>
-                <div className="flex justify-between font-bold text-[#0B0B45] pt-2 border-t border-[#D9D9D9]">
+                <div className="flex justify-between border-t border-[#E3E8EF] pt-2 font-bold text-[#0B1F42]">
                   <span>Total</span>
-                  <span className="font-normal text-[#6b7280]">Add dates for total</span>
+                  <span className="font-normal text-[#5B6B82]">Add dates for total</span>
                 </div>
               </div>
 
               {/* Trust context - only facts from the API */}
-              <div className="mt-6 pt-6 border-t border-[#D9D9D9]">
-                <h4 className="font-semibold text-[#0B0B45] mb-3">About this listing</h4>
-                <ul className="space-y-2 text-sm text-[#6b7280]">
+              <div className="mt-6 border-t border-[#E3E8EF] pt-6">
+                <h4 className="mb-3 font-semibold text-[#0B1F42]">About this listing</h4>
+                <ul className="space-y-2 text-sm text-[#5B6B82]">
                   {hasReviews && (
                     <li className="flex items-start gap-2">
                       <svg className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                       </svg>
                       <span>
-                        <span className="font-semibold text-[#0B0B45]">{property.rating}</span> rating &middot; {reviewLabel}
+                        <span className="font-semibold text-[#0B1F42]">{property.rating}</span> rating &middot; {reviewLabel}
                       </span>
                     </li>
                   )}
@@ -566,13 +566,13 @@ function PropertyPinMap({ lat, lng, address, location, title }) {
   }, [lat, lng, title, location]);
 
   return (
-    <div className="rounded-[14px] overflow-hidden border border-[#E5E7EB] shadow-sm bg-white">
+    <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
       <div ref={mapElRef} className="h-64 md:h-80 w-full" aria-label={`Map showing the location of ${title}`} />
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 sm:p-5">
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-[#222222] text-sm">{location}</p>
+          <p className="text-sm font-semibold text-[#0B1F42]">{location}</p>
           {address && (
-            <p className="text-sm text-[#6b7280] mt-0.5 break-words">{address}</p>
+            <p className="mt-0.5 break-words text-sm text-[#5B6B82]">{address}</p>
           )}
         </div>
         <a

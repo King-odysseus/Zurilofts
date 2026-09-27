@@ -15,7 +15,7 @@ function NearbyCard({ item, areaLabels }) {
     preferLabel: true,
   });
   return (
-    <div className="neu-card overflow-hidden transition-shadow duration-300 group">
+    <div className="group overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)] transition-shadow duration-300">
       <div className="h-48 overflow-hidden relative">
         <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-[14px]" src={item.image} alt={item.name} />
         <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
@@ -82,7 +82,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
           value={areaFilter}
           onChange={setAreaFilter}
           options={areaOptions}
-          triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#222222] rounded-xl text-sm min-w-[160px] shadow-sm"
+          triggerClassName="w-full min-w-[160px] rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2 text-sm text-[#0B1F42] shadow-sm sm:w-auto"
           ariaLabel="Filter by area"
         />
         {catOptions && (
@@ -90,7 +90,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             value={categoryFilter}
             onChange={setCategoryFilter}
             options={catOptions}
-            triggerClassName=" w-full sm:w-auto px-4 py-2 bg-white text-[#222222] rounded-xl text-sm min-w-[160px] shadow-sm"
+            triggerClassName="w-full min-w-[160px] rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2 text-sm text-[#0B1F42] shadow-sm sm:w-auto"
             ariaLabel="Filter by category"
           />
         )}
@@ -119,7 +119,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
 
       {/* Grid or Map */}
       {filtered.length === 0 ? (
-        <p className="text-center text-[#6b7280] py-12">Nothing matches those filters - try a different area or category.</p>
+        <p className="py-12 text-center text-[#5B6B82]">Nothing matches those filters - try a different area or category.</p>
       ) : viewMode === 'map' ? (
         <Suspense fallback={<div className="flex items-center justify-center py-24"><Spinner /></div>}>
           <NearbyMap items={filtered} title={title} />
@@ -136,7 +136,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             <div className="text-center mt-10">
               <Link
                 to={viewMoreLink}
-                className="inline-flex items-center gap-2 min-h-[44px] px-8 py-3 rounded-lg border border-[#E5E7EB] text-[#222222] font-semibold hover:bg-[#F7F7F5] transition-all duration-200"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] px-8 py-3 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
               >
                 View All {filtered.length} Places
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
