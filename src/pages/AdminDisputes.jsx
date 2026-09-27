@@ -133,21 +133,21 @@ function AdminDisputes() {
 
       {selected && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/20" onClick={() => !busy && setSelected(null)}>
-          <div className="h-full w-full max-w-3xl overflow-y-auto border-l border-[#E5E7EB] bg-white shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E5E7EB] bg-white px-6 py-5">
+          <div className="h-full w-full max-w-3xl overflow-y-auto border-l border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.14)]" onClick={(e) => e.stopPropagation()}>
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E3E8EF] bg-white px-6 py-5">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Dispute review</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5B6B82]">Dispute review</p>
                 <h2 className="mt-1 text-xl font-bold text-[#0B1F42]">{CATEGORY_LABELS[selected.category] || selected.category}</h2>
-                <p className="text-sm text-[#6b7280]">Booking {selected.bookingId}</p>
+                <p className="text-sm text-[#5B6B82]">Booking {selected.bookingId}</p>
               </div>
-              <button onClick={() => setSelected(null)} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close dispute review">&times;</button>
+              <button onClick={() => setSelected(null)} className="rounded-[10px] p-2 text-xl leading-none text-[#5B6B82] hover:bg-[#F7F4EF]" aria-label="Close dispute review">&times;</button>
             </div>
             <div className="space-y-6 p-6">
               <p className="rounded-2xl bg-[#F7F4EF] p-4 text-sm text-[#0B1F42] whitespace-pre-wrap">{selected.description}</p>
 
               <div>
                 <h3 className="mb-2 font-bold text-[#0B1F42]">Evidence</h3>
-                <ul className="text-sm text-[#6b7280] space-y-1">
+                <ul className="space-y-1 text-sm text-[#5B6B82]">
                   {(selected.evidence || []).map((e) => <li key={e.id}>{e.originalName}</li>)}
                   {selected.evidence?.length === 0 && <li>No evidence uploaded.</li>}
                 </ul>

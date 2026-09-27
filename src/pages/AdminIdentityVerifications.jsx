@@ -268,22 +268,22 @@ function AdminIdentityVerifications() {
           onClick={() => !busy && setSelected(null)}
         >
           <div
-            className="h-full w-full max-w-2xl overflow-y-auto border-l border-[#E5E7EB] bg-white shadow-2xl"
+            className="h-full w-full max-w-2xl overflow-y-auto border-l border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.14)]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E5E7EB] bg-white px-6 py-5">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E3E8EF] bg-white px-6 py-5">
               <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#5B6B82]">
                   Identity review
                 </p>
                 <h2 className="mt-1 text-xl font-bold text-[#0B1F42]">
                   {selected.fullName || "Unnamed"}
                 </h2>
-                <p className="text-sm text-[#6b7280]">{selected.user?.email}</p>
+                <p className="text-sm text-[#5B6B82]">{selected.user?.email}</p>
               </div>
               <button
                 onClick={() => setSelected(null)}
-                className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]"
+                className="rounded-[10px] p-2 text-xl leading-none text-[#5B6B82] hover:bg-[#F7F4EF]"
                 aria-label="Close identity review"
               >
                 &times;
@@ -292,19 +292,19 @@ function AdminIdentityVerifications() {
             <div className="space-y-7 p-6">
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="rounded-2xl bg-[#F7F4EF] p-3">
-                  <p className="text-xs text-[#6b7280]">Date of birth</p>
+                  <p className="text-xs text-[#5B6B82]">Date of birth</p>
                   <p className="mt-1 text-sm font-semibold text-[#0B1F42]">
                     {selected.dateOfBirth || "-"}
                   </p>
                 </div>
                 <div className="rounded-2xl bg-[#F7F4EF] p-3">
-                  <p className="text-xs text-[#6b7280]">ID type</p>
+                  <p className="text-xs text-[#5B6B82]">ID type</p>
                   <p className="mt-1 text-sm font-semibold text-[#0B1F42]">
                     {selected.idType || "-"}
                   </p>
                 </div>
                 <div className="rounded-2xl bg-[#F7F4EF] p-3">
-                  <p className="text-xs text-[#6b7280]">ID number</p>
+                  <p className="text-xs text-[#5B6B82]">ID number</p>
                   <p className="mt-1 text-sm font-semibold text-[#0B1F42]">
                     {selected.idNumber || "-"}
                   </p>
@@ -320,12 +320,12 @@ function AdminIdentityVerifications() {
                       key={document.id}
                       onClick={() => downloadDocument(document)}
                       disabled={busy === document.id}
-                      className="rounded-2xl border border-[#E5E7EB] bg-[#F7F4EF] p-4 text-left hover:shadow-md disabled:opacity-50"
+                      className="rounded-2xl border border-[#E3E8EF] bg-[#F7F4EF] p-4 text-left shadow-[0_4px_16px_rgba(11,31,66,0.04)] hover:shadow-[0_8px_28px_rgba(11,31,66,0.08)] disabled:opacity-50"
                     >
                       <p className="font-semibold text-[#0B1F42]">
                         {DOCUMENT_LABELS[document.kind] || document.kind}
                       </p>
-                      <p className="mt-1 text-xs text-[#6b7280] break-all">
+                      <p className="mt-1 break-all text-xs text-[#5B6B82]">
                         {document.originalName} ·{" "}
                         {(document.size / 1024 / 1024).toFixed(1)} MB
                       </p>

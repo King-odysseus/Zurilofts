@@ -564,7 +564,7 @@ function AdminLayout() {
                     }))
                   }
                   aria-expanded={expandedGroups[group]}
-                  className="hidden mb-1.5 flex min-h-[32px] w-full items-center justify-between rounded-lg px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280] hover:bg-[#F7F7F5]"
+                  className="mb-1.5 hidden min-h-[32px] w-full items-center justify-between rounded-[10px] px-4 text-[11px] font-bold uppercase tracking-wider text-[#5B6B82] hover:bg-[#F7F4EF]"
                 >
                   {group}
                   <span aria-hidden="true">
