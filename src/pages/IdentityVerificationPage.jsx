@@ -40,7 +40,7 @@ function IdentityVerificationPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <main className="mx-auto max-w-5xl px-4 pb-16 pt-28 sm:px-6">
-        <div className="mb-8 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:px-6">
+        <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-6">
         <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Trust &amp; safety</p>
         <h1 className="mb-2 mt-1 text-2xl font-bold text-[#0B1F42]">Verify your identity</h1>
         <p className="mb-2 text-[#52606F]">
@@ -64,14 +64,14 @@ function IdentityVerificationPage() {
           </div>
         )}
 
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+        <div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
           <IdentityVerificationPanel onApproved={() => setApproved(true)} />
         </div>
 
         {bookingId && (
-          <p className="text-sm text-[#6b7280] mt-6">
+          <p className="mt-6 text-sm text-[#5B6B82]">
             Verification is usually reviewed within a day. You can safely close this page - your booking will be waiting for you in{' '}
-            <Link to="/trips" className="text-[#2563EB] font-semibold hover:text-[#1D4ED8]">My Trips</Link> once you return.
+            <Link to="/trips" className="font-semibold text-[#9A744A] hover:text-[#C49A6C]">My Trips</Link> once you return.
           </p>
         )}
       </main>
