@@ -5,7 +5,7 @@ import apiClient from '../api/client.js';
 
 const labelCls = 'block text-sm font-medium text-[#222222] mb-2';
 const inputCls =
-  'w-full px-4 py-2.5 rounded-xl border border-[#E5E7EB] focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)] bg-white text-[#222222]';
+  'h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40';
 
 const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 const toLocalDate = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
@@ -19,8 +19,8 @@ function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, se
   const occupied = (date, item) => date >= new Date(item.start) && date < new Date(item.end);
   return <div className="overflow-x-auto">
     <div className="min-w-[560px]">
-    <div className="grid grid-cols-7 gap-2 mb-2">{['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => <div key={day} className="p-2 text-center text-xs font-semibold text-[#6b7280]">{day}</div>)}</div>
-    <div className="grid grid-cols-7 gap-2">
+    <div className="grid grid-cols-7 border-b border-[#E5E7EB]">{['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map((day) => <div key={day} className="px-2 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-[#52606F]">{day}</div>)}</div>
+    <div className="grid grid-cols-7">
     {cells.map((day, index) => {
       const date = new Date(month.getFullYear(), month.getMonth(), day);
       const inMonth = day > 0 && day <= days;
@@ -29,10 +29,10 @@ function CalendarMonth({ month, blocks, bookings, onSelectDate, onBlockClick, se
       const isToday = sameDay(date, new Date());
       const isSelected = selectedStart && (selectedEnd ? date >= selectedStart && date <= selectedEnd : sameDay(date, selectedStart));
       const canClick = inMonth && !booking && (Boolean(onSelectDate) || Boolean(block?.manual && onBlockClick));
-      return <button type="button" key={index} disabled={!canClick} onClick={() => block?.manual ? onBlockClick?.(block, date) : onSelectDate?.(date)} className={`min-h-[108px] rounded-xl p-3 text-left transition-colors duration-200 ${inMonth ? 'bg-white border border-[#E5E7EB]' : 'bg-transparent'} ${block ? 'bg-amber-50' : ''} ${isSelected ? 'bg-blue-50 ring-2 ring-inset ring-[#2563EB]' : ''} ${canClick ? 'hover:bg-blue-50 cursor-pointer' : 'cursor-not-allowed'} ${booking ? 'opacity-90' : ''}`}>
-        {inMonth && <span className={`inline-flex w-9 h-9 items-center justify-center rounded-full text-sm font-bold ${isSelected || isToday ? 'bg-[#2563EB] text-white' : 'text-[#222222]'}`}>{day}</span>}
-        {booking && <div className="mt-3 rounded-lg bg-[#222222] text-white px-2 py-1.5 text-xs font-semibold truncate" title={`${booking.guestName} · ${booking.guests} guests`}>{booking.guestName}</div>}
-        {!booking && block && <div className="mt-3 rounded-lg bg-amber-100 text-amber-800 px-2 py-1.5 text-xs font-semibold truncate">{block.summary || 'Blocked'}</div>}
+      return <button type="button" key={index} disabled={!canClick} onClick={() => block?.manual ? onBlockClick?.(block, date) : onSelectDate?.(date)} className={`min-h-[116px] border-b border-r border-[#E5E7EB] p-3 text-left transition-colors duration-200 ${inMonth ? 'bg-white' : 'bg-[#F7F4EF]/50'} ${block ? 'bg-[#EAF0F4]' : ''} ${isSelected ? 'bg-[#FDE8D8] ring-2 ring-inset ring-[#C49A6C]' : ''} ${canClick ? 'cursor-pointer hover:bg-[#FDE8D8]/60' : 'cursor-not-allowed'} ${booking ? 'bg-[#FDE8D8]' : ''}`}>
+        {inMonth && <span className={`inline-flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-sm font-semibold ${isSelected || isToday ? 'bg-[#0B1F42] text-white' : 'text-[#0B1F42]'}`}>{day}</span>}
+        {booking && <div className="mt-3 truncate rounded-lg bg-[#C49A6C]/25 px-2 py-1.5 text-xs font-semibold text-[#0B1F42]" title={`${booking.guestName} · ${booking.guests} guests`}>{booking.guestName}</div>}
+        {!booking && block && <div className="mt-3 truncate rounded-lg bg-[#DCE5EC] px-2 py-1.5 text-xs font-semibold text-[#52606F]">{block.summary || 'Blocked'}</div>}
       </button>;
     })}
     </div>
@@ -65,9 +65,10 @@ function CalendarPropertyPicker({ base }) {
 
   return (
     <div className="w-full">
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 mb-6 shadow-sm">
-        <h1 className="text-2xl font-bold text-[#222222]">Calendar</h1>
-        <p className="text-sm text-[#6b7280]">Choose a listing to view its availability, block dates, and sync its own external calendar.</p>
+      <div className="mb-6 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Host workspace</p>
+        <h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">Calendar</h1>
+        <p className="mt-1 text-sm text-[#52606F]">Choose a listing to view its Airbnb-style month availability.</p>
       </div>
 
       {loading ? (
@@ -79,7 +80,7 @@ function CalendarPropertyPicker({ base }) {
           <p className="text-[#6b7280]">No properties yet. Add a property to manage its calendar.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {properties.map((p) => (
             <Link
               key={p.id}
@@ -98,9 +99,9 @@ function CalendarPropertyPicker({ base }) {
                 )}
               </div>
               <div className="p-4">
-                <p className="font-semibold text-[#222222] group-hover:text-[#2563EB] transition-colors line-clamp-1">{p.title}</p>
-                <p className="text-sm text-[#6b7280] mt-0.5">{p.location}</p>
-                <span className="inline-flex items-center mt-3 text-xs font-semibold text-[#2563EB]">
+                <p className="font-semibold text-[#0B1F42] group-hover:text-[#C49A6C] transition-colors line-clamp-1">{p.title}</p>
+                <p className="mt-0.5 text-sm text-[#52606F]">{p.location}</p>
+                <span className="mt-3 inline-flex items-center text-xs font-semibold text-[#0B1F42]">
                   View calendar
                   <svg className="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -277,9 +278,10 @@ function AdminCalendar() {
   return (
     <div className="w-full">
       <div className="mb-6">
-        <Link to={`${base}/calendar`} className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors">&larr; All listing calendars</Link>
-        <h1 className="text-2xl font-bold text-[#222222] mt-1">Calendar: {data.property.title}</h1>
-        <p className="text-sm text-[#6b7280]">Two-way sync with Airbnb, Booking.com, VRBO and other platforms using iCal feeds.</p>
+        <Link to={`${base}/calendar`} className="text-sm font-semibold text-[#0B1F42] hover:text-[#C49A6C] transition-colors">&larr; All listing calendars</Link>
+        <p className="mt-4 text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Host workspace</p>
+        <h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">{data.property.title}</h1>
+        <p className="mt-1 text-sm text-[#52606F]">Airbnb-style month availability with two-way calendar sync.</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
@@ -289,9 +291,9 @@ function AdminCalendar() {
           ['Connected calendars', data.sources?.length || 0],
           ['Calendar status', data.sources?.some((source) => source.lastStatus?.startsWith('ERROR')) ? 'Action needed' : 'Synced'],
         ].map(([label, value]) => (
-          <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p>
-            <p className="mt-2 text-xl font-bold text-[#222222]">{value}</p>
+          <div key={label} className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#52606F]">{label}</p>
+            <p className="mt-2 text-xl font-bold text-[#0B1F42]">{value}</p>
           </div>
         ))}
       </div>
@@ -302,9 +304,9 @@ function AdminCalendar() {
         {[['view', 'View'], ['availability', 'Availability'], ['settings', 'Settings']].map(([value, label]) => <button key={value} type="button" role="tab" aria-selected={calendarTab === value} onClick={() => setCalendarTab(value)} className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors duration-200 ${calendarTab === value ? 'border-[#2563EB] text-[#222222]' : 'border-transparent text-[#6b7280] hover:text-[#222222]'}`}>{label}</button>)}
       </div>
 
-      {calendarTab === 'view' && <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-5 sm:p-6 mb-6">
+      {calendarTab === 'view' && <section className="mb-6 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
-          <div><p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#6b7280]">Availability</p><h2 className="text-2xl font-bold text-[#222222] mt-1">{monthCursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h2></div>
+          <div><p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Availability</p><h2 className="mt-1 text-2xl font-bold text-[#0B1F42]">{monthCursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h2></div>
           <div className="flex gap-2">
             <button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1))} aria-label="Previous month" className="w-10 h-10 rounded-lg border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors text-[#222222]"><svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
             <button type="button" onClick={() => setMonthCursor(new Date())} className="px-4 rounded-lg border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors text-sm font-semibold text-[#222222]">Today</button>
@@ -314,9 +316,9 @@ function AdminCalendar() {
         <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} onBlockClick={handleCalendarBlockClick} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
         <div className="flex flex-wrap items-center justify-between gap-4 mt-4">
           <div className="flex flex-wrap items-center gap-4 text-xs text-[#6b7280]">
-            <span className="inline-flex items-center gap-1.5"><i className="inline-block w-2.5 h-2.5 rounded-sm bg-[#222222]" />Booked</span>
-            <span className="inline-flex items-center gap-1.5"><i className="inline-block w-2.5 h-2.5 rounded-sm bg-amber-100 border border-amber-300" />Blocked</span>
-            <span className="inline-flex items-center gap-1.5"><i className="inline-block w-2.5 h-2.5 rounded-sm bg-white border border-[#E5E7EB]" />Available</span>
+            <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-[#FDE8D8]" />Guest stay</span>
+            <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-[#EAF0F4] border border-[#DCE5EC]" />Blocked</span>
+            <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-white border border-[#E5E7EB]" />Available</span>
             <span>Click a start date, then the final night to block. Click a manual block to unblock it.</span>
           </div>
           <button type="button" disabled={!blockDraft.start || !blockDraft.end} onClick={() => addBlock({ preventDefault() {} })} className="bg-[#C49A6C] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#B8895C] transition-colors disabled:opacity-50">Block selected dates</button>
