@@ -379,8 +379,8 @@ function ProfilePage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h1 className="text-lg font-bold text-[#222222] mb-2">Something went wrong</h1>
-          <p className="text-[#6b7280] mb-6 max-w-md text-sm">{loadError}</p>
+          <h1 className="text-lg font-bold text-[#0B1F42] mb-2">Something went wrong</h1>
+          <p className="text-[#5B6B82] mb-6 max-w-md text-sm">{loadError}</p>
           <button
             type="button"
             onClick={() => setReloadKey((k) => k + 1)}
@@ -401,7 +401,7 @@ function ProfilePage() {
         <div className="max-w-[1344px] mx-auto px-4 md:px-6">
           <div className="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start lg:gap-6">
           {/* Header */}
-          <div className="mb-8 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm lg:sticky lg:top-24 lg:mb-0 lg:border-0 lg:bg-[#F7F4EF] lg:p-6 lg:shadow-none">
+          <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 sm:px-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:sticky lg:top-24 lg:mb-0 lg:border-0 lg:bg-[#F7F4EF] lg:p-6 lg:shadow-none">
             <div className="flex items-center mb-4">
               <label className="relative cursor-pointer group">
                 {profile?.avatar ? (
@@ -436,10 +436,10 @@ function ProfilePage() {
                 />
               </label>
               <div className="ml-4">
-                <h1 className="text-2xl font-bold text-[#222222]">
+                <h1 className="text-2xl font-bold text-[#0B1F42]">
                   {profile?.firstName} {profile?.lastName}
                 </h1>
-                <p className="text-[#6b7280]">{profile?.email}</p>
+                <p className="text-[#5B6B82]">{profile?.email}</p>
               </div>
               <nav aria-label="Account navigation" className="mt-6 hidden space-y-1 lg:block">
                 {[['info', 'Personal details'], ['verification', 'Security & verification'], ['bookings', 'Payments & bookings'], ['favorites', `Saved places${favorites.length ? ` (${favorites.length})` : ''}`]].map(([id, label]) => (
@@ -454,7 +454,7 @@ function ProfilePage() {
 
           <div className="min-w-0">
           {/* Tabs */}
-          <div className="mb-8 flex overflow-x-auto no-scrollbar border-b border-[#E5E7EB] lg:hidden">
+          <div className="mb-8 flex overflow-x-auto no-scrollbar border-b border-[#E3E8EF] lg:hidden">
             {['info', 'bookings', 'favorites', 'verification'].map((tab) => (
               <button
                 key={tab}
@@ -462,7 +462,7 @@ function ProfilePage() {
                 className={`px-6 py-3 font-semibold text-sm whitespace-nowrap transition-colors border-b-2 -mb-px ${
                   activeTab === tab
                     ? 'border-[#C49A6C] text-[#0B1F42]'
-                    : 'border-transparent text-[#6b7280] hover:text-[#222222]'
+                    : 'border-transparent text-[#5B6B82] hover:text-[#0B1F42]'
                 }`}
               >
                 {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : tab === 'verification' ? 'Verification' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
@@ -476,8 +476,8 @@ function ProfilePage() {
               <IdentityVerificationPanel />
               {(profile?.role === 'HOST' || user?.hostApplicationStatus != null) && (
                 <div className="pt-8 border-t border-[#E5E7EB]">
-                  <h3 className="text-lg font-semibold text-[#222222] mb-2">Host account verification</h3>
-                  <p className="text-sm text-[#6b7280] mb-4">
+                  <h3 className="text-lg font-semibold text-[#0B1F42] mb-2">Host account verification</h3>
+                  <p className="text-sm text-[#5B6B82] mb-4">
                     Separate from guest identity verification above - this is your host business/KYC application, required before any listing can be submitted for review.
                   </p>
                   <Link
@@ -534,12 +534,12 @@ function ProfilePage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <div>
-                    <p className="font-semibold text-[#222222] text-sm">Complete your profile</p>
-                    <p className="text-sm text-[#6b7280] mt-1">Fill in your details below to get the most out of ZuriLofts.</p>
+                    <p className="font-semibold text-[#0B1F42] text-sm">Complete your profile</p>
+                    <p className="text-sm text-[#5B6B82] mt-1">Fill in your details below to get the most out of ZuriLofts.</p>
                   </div>
                 </div>
               )}
-              <div id="section-personal" className="rounded-2xl border border-[#E5E7EB] bg-white p-6 scroll-mt-24">
+              <div id="section-personal" className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.06)] scroll-mt-24">
                 <h2 className="text-xl font-bold text-[#0B1F42] mb-1">Personal details</h2>
                 <p className="mb-6 text-sm text-[#52606F]">Keep your profile information up to date.</p>
                 {message && (
@@ -615,9 +615,9 @@ function ProfilePage() {
                 </form>
               </div>
 
-              <div id="section-security" className="mt-6 rounded-2xl border border-[#E5E7EB] bg-white p-6 scroll-mt-24">
-                <h2 className="text-lg font-bold text-[#222222] mb-2">Change password</h2>
-                <p className="text-sm text-[#6b7280] mb-6">
+              <div id="section-security" className="mt-6 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.06)] scroll-mt-24">
+                <h2 className="text-lg font-bold text-[#0B1F42] mb-2">Change password</h2>
+                <p className="text-sm text-[#5B6B82] mb-6">
                   Choose a strong, unique password. For your security, changing it signs you out on all devices.
                 </p>
                 {passwordMessage && (
@@ -676,9 +676,9 @@ function ProfilePage() {
               </div>
 
               {/* Privacy and data */}
-              <div id="section-privacy" className="mt-10 pt-8 border-t-2 border-[#E5E7EB] scroll-mt-24">
-                <h3 className="text-xl font-bold text-[#222222] mb-1">Privacy and data</h3>
-                <p className="text-sm text-[#6b7280] mb-6">
+              <div id="section-privacy" className="mt-10 pt-8 border-t-2 border-[#E3E8EF] scroll-mt-24">
+                <h3 className="text-xl font-bold text-[#0B1F42] mb-1">Privacy and data</h3>
+                <p className="text-sm text-[#5B6B82] mb-6">
                   Manage your personal data and consent choices. See our{' '}
                   <Link to="/privacy" className="text-[#9A744A] hover:underline font-medium">Privacy Policy</Link>{' '}
                   for full details.
@@ -686,7 +686,7 @@ function ProfilePage() {
 
                 <div className="space-y-4">
                   {/* Download my data */}
-                  <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h4 className="font-semibold text-[#222222]">Download my data</h4>
                       <p className="text-sm text-[#6b7280] mt-1">
@@ -716,7 +716,7 @@ function ProfilePage() {
                   </div>
 
                   {/* Cookie preferences */}
-                  <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h4 className="font-semibold text-[#222222]">Cookie preferences</h4>
                       <p className="text-sm text-[#6b7280] mt-1">
@@ -941,7 +941,7 @@ function ProfilePage() {
                 </div>
               ) : (
                 bookings.map((booking) => (
-                  <div key={booking.id} className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-4 md:p-6">
+                  <div key={booking.id} className="bg-white rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.08)] p-4 md:p-6">
                     <div className="flex flex-col md:flex-row gap-4">
                       {booking.property?.images?.[0] && (
                         <img
