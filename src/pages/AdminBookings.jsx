@@ -639,7 +639,7 @@ function AdminBookings() {
                 </thead>
                 <tbody>
                   {bookings.map((b) => (
-                    <tr key={b.id} className="border-b border-[#E5E7EB]/60 last:border-0 hover:bg-[#F7F7F5]">
+                    <tr key={b.id} className="border-b border-[#E3E8EF]/60 last:border-0 hover:bg-[#F7F4EF]">
                       <td className="py-3 px-4 align-top">
                         <p className="font-semibold text-[#222222]">{b.user?.firstName} {b.user?.lastName}</p>
                         <p className="text-xs text-[#6b7280]">{b.user?.email}</p>
@@ -757,7 +757,7 @@ function AdminBookings() {
                 <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">Booking details</p>
                 <h2 className="mt-1 text-xl font-bold text-[#222222]">{viewingBooking.id}</h2>
               </div>
-              <button type="button" onClick={() => setViewingBooking(null)} className="rounded-lg p-2 text-xl leading-none text-[#6b7280] hover:bg-[#F7F7F5]" aria-label="Close booking details">×</button>
+              <button type="button" onClick={() => setViewingBooking(null)} className="rounded-[10px] p-2 text-xl leading-none text-[#5B6B82] hover:bg-[#F7F4EF]" aria-label="Close booking details">×</button>
             </div>
             <div className="mt-5 space-y-4">
               <div className="flex items-center gap-3">
@@ -765,10 +765,10 @@ function AdminBookings() {
                 <div><p className="font-semibold text-[#222222]">{viewingBooking.property?.title}</p><p className="text-sm text-[#6b7280]">{viewingBooking.property?.location}</p></div>
               </div>
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-xl bg-[#F7F7F5] p-3"><p className="text-xs text-[#6b7280]">Guest</p><p className="mt-1 font-semibold text-[#222222]">{viewingBooking.user?.firstName} {viewingBooking.user?.lastName}</p></div>
-                <div className="rounded-xl bg-[#F7F7F5] p-3"><p className="text-xs text-[#6b7280]">Guests</p><p className="mt-1 font-semibold text-[#222222]">{viewingBooking.guests}</p></div>
-                <div className="rounded-xl bg-[#F7F7F5] p-3"><p className="text-xs text-[#6b7280]">Check-in</p><p className="mt-1 font-semibold text-[#222222]">{new Date(viewingBooking.checkIn).toLocaleDateString()}</p></div>
-                <div className="rounded-xl bg-[#F7F7F5] p-3"><p className="text-xs text-[#6b7280]">Check-out</p><p className="mt-1 font-semibold text-[#222222]">{new Date(viewingBooking.checkOut).toLocaleDateString()}</p></div>
+                <div className="rounded-[10px] bg-[#F7F4EF] p-3"><p className="text-xs text-[#5B6B82]">Guest</p><p className="mt-1 font-semibold text-[#0B1F42]">{viewingBooking.user?.firstName} {viewingBooking.user?.lastName}</p></div>
+                <div className="rounded-[10px] bg-[#F7F4EF] p-3"><p className="text-xs text-[#5B6B82]">Guests</p><p className="mt-1 font-semibold text-[#0B1F42]">{viewingBooking.guests}</p></div>
+                <div className="rounded-[10px] bg-[#F7F4EF] p-3"><p className="text-xs text-[#5B6B82]">Check-in</p><p className="mt-1 font-semibold text-[#0B1F42]">{new Date(viewingBooking.checkIn).toLocaleDateString()}</p></div>
+                <div className="rounded-[10px] bg-[#F7F4EF] p-3"><p className="text-xs text-[#5B6B82]">Check-out</p><p className="mt-1 font-semibold text-[#0B1F42]">{new Date(viewingBooking.checkOut).toLocaleDateString()}</p></div>
               </div>
               <div className="flex items-center justify-between border-t border-[#E5E7EB] pt-4"><span className="text-sm text-[#6b7280]">Total</span><span className="text-lg font-bold text-[#222222]">KES {viewingBooking.total.toLocaleString()}</span></div>
               <div className="flex flex-wrap gap-2"><StatusBadges booking={viewingBooking} /><PaymentBadge booking={viewingBooking} /></div>
