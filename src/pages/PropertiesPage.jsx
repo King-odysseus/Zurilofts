@@ -858,7 +858,7 @@ function PropertiesPage() {
                   key={key}
                   type="button"
                   onClick={() => updateParam("type", key)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
                     filter === key
                       ? "bg-[#0B1F42] text-white"
                       : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
@@ -876,7 +876,7 @@ function PropertiesPage() {
                   key={key}
                   type="button"
                   onClick={() => updateParam("beds", key)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
                     bedFilter === key
                       ? "bg-[#0B1F42] text-white"
                       : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
@@ -890,7 +890,7 @@ function PropertiesPage() {
                 onClick={() =>
                   updateParam("available", availableOnly ? "" : "true")
                 }
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
                   availableOnly
                       ? "bg-[#0B1F42] text-white"
                       : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
@@ -903,7 +903,7 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={() => setMoreFiltersOpen(!moreFiltersOpen)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
                   moreFiltersOpen
                       ? "bg-[#0B1F42] text-white"
                       : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
@@ -984,7 +984,7 @@ function PropertiesPage() {
                     onClick={() =>
                       updateParam("minRating", minRating === value ? "" : value)
                     }
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
                       minRating === value
                         ? "bg-[#0B1F42] text-white"
                         : "border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]"
@@ -1056,9 +1056,9 @@ function PropertiesPage() {
                         return next;
                       });
                     }}
-                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#2563EB] ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#C49A6C] ${
                       selectedAmenities.has(a)
-                        ? "bg-[#2563EB] text-white"
+                        ? "bg-[#0B1F42] text-white"
                         : "bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]"
                     }`}
                   >
@@ -1199,7 +1199,7 @@ function PropertiesPage() {
               <button
                 type="button"
                 onClick={clearAllFilters}
-                className="text-sm text-[#2563EB] hover:text-[#1D4ED8] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] rounded"
+                className="text-sm text-[#9A744A] hover:text-[#7D5C39] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] rounded"
               >
                 Clear all filters
               </button>

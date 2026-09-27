@@ -227,7 +227,7 @@ function PropertyPage() {
                   {/* Previous / Next - only show when there are multiple images */}
                   <button
                     onClick={goPrev}
-                    className="absolute top-1/2 -translate-y-1/2 left-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors shadow-md"
+                    className="absolute top-1/2 -translate-y-1/2 left-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] transition-colors shadow-md"
                     aria-label="Previous photo"
                   >
                     <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -236,7 +236,7 @@ function PropertyPage() {
                   </button>
                   <button
                     onClick={goNext}
-                    className="absolute top-1/2 -translate-y-1/2 right-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB] transition-colors shadow-md"
+                    className="absolute top-1/2 -translate-y-1/2 right-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] transition-colors shadow-md"
                     aria-label="Next photo"
                   >
                     <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -275,7 +275,7 @@ function PropertyPage() {
               href={googleMapsDirectionsUrl({ lat: property.lat, lng: property.lng, label: property.location })}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 min-h-[44px] rounded-full transition-colors hover:text-[#2563EB] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#2563EB]"
+              className="inline-flex items-center gap-1.5 min-h-[44px] rounded-full transition-colors hover:text-[#9A744A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
               title="Get directions in Google Maps"
             >
               <svg className="w-5 h-5 text-[#6b7280] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">

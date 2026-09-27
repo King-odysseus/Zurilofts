@@ -120,10 +120,10 @@ function PaymentCallback() {
 
               {/* Post-booking save prompt */}
               {booking && !saved && !isFavorite(booking.propertyId) && (
-                <div className="bg-white rounded-[14px] border-2 border-[#2563EB]/30 p-4 mb-6 text-left">
+                <div className="bg-white rounded-[14px] border-2 border-[#C49A6C]/30 p-4 mb-6 text-left">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-[#2563EB]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <svg className="w-5 h-5 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="w-10 h-10 bg-[#F6EFE7] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-5 h-5 text-[#9A744A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                       </svg>
                     </div>
@@ -137,7 +137,7 @@ function PaymentCallback() {
                           const ok = await toggleFavorite(booking.propertyId);
                           if (ok) setSaved(true);
                         }}
-                        className="mt-2 text-sm font-semibold text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
+                        className="mt-2 text-sm font-semibold text-[#9A744A] hover:text-[#7D5C39] transition-colors"
                       >
                         Yes, save to favourites
                       </button>

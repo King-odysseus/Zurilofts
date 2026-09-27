@@ -366,10 +366,10 @@ function Navbar({ solid = false }) {
                             <Link
                               to="/messages"
                               onClick={() => setNotifOpen(false)}
-                              className="flex items-center px-4 py-3 text-sm text-[#222222] hover:bg-[#2563EB]/10 transition-colors"
+                              className="flex items-center px-4 py-3 text-sm text-[#0B1F42] hover:bg-[#F6EFE7] transition-colors"
                             >
-                              <div className="w-8 h-8 rounded-full bg-[#2563EB]/10 flex items-center justify-center mr-3 flex-shrink-0">
-                                <svg className="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <div className="w-8 h-8 rounded-full bg-[#F6EFE7] flex items-center justify-center mr-3 flex-shrink-0">
+                                <svg className="w-4 h-4 text-[#9A744A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                                 </svg>
                               </div>
@@ -383,10 +383,10 @@ function Navbar({ solid = false }) {
                             <Link
                               to="/inbox"
                               onClick={() => setNotifOpen(false)}
-                              className="flex items-center px-4 py-3 text-sm text-[#222222] hover:bg-[#2563EB]/10 transition-colors"
+                              className="flex items-center px-4 py-3 text-sm text-[#0B1F42] hover:bg-[#F6EFE7] transition-colors"
                             >
-                              <div className="w-8 h-8 rounded-full bg-[#2563EB]/10 flex items-center justify-center mr-3 flex-shrink-0">
-                                <svg className="w-4 h-4 text-[#2563EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <div className="w-8 h-8 rounded-full bg-[#F6EFE7] flex items-center justify-center mr-3 flex-shrink-0">
+                                <svg className="w-4 h-4 text-[#9A744A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
                                 </svg>
                               </div>
@@ -400,7 +400,7 @@ function Navbar({ solid = false }) {
                             <Link
                               to="/profile#bookings"
                               onClick={() => { setNotifOpen(false); acknowledgeBookings(); }}
-                              className="flex items-center px-4 py-3 text-sm text-[#222222] hover:bg-[#2563EB]/10 transition-colors"
+                              className="flex items-center px-4 py-3 text-sm text-[#0B1F42] hover:bg-[#F6EFE7] transition-colors"
                             >
                               <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3 flex-shrink-0">
                                 <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -426,7 +426,7 @@ function Navbar({ solid = false }) {
                     aria-haspopup="true"
                     aria-expanded={menuOpen}
                     aria-label="Open menu"
-                    className="flex items-center space-x-2 px-2 py-2 rounded-full hover:bg-[#2563EB]/10 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2"
+                    className="flex items-center space-x-2 px-2 py-2 rounded-full hover:bg-[#F6EFE7] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2"
                   >
                     <div className="relative w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
                       {user?.avatar ? (

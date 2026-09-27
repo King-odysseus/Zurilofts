@@ -292,7 +292,7 @@ HeaderUserMenu.propTypes = {
 
 /* ── StatCard - blue-primary dashboard metric card ── */
 const TONE_STYLES = {
-  primary: { bg: "bg-[#2563EB]", icon: "text-white" },
+  primary: { bg: "bg-[#0B1F42]", icon: "text-white" },
   success: { bg: "bg-green-600", icon: "text-white" },
   warning: { bg: "bg-amber-500", icon: "text-white" },
   danger: { bg: "bg-red-600", icon: "text-white" },
@@ -822,7 +822,7 @@ function AdminLayout() {
                       onClick={() => setMobileMenuOpen(false)}
                       className={`flex items-center px-5 py-3 text-sm transition-colors ${
                         active
-                          ? "bg-blue-50 text-[#2563EB] font-semibold"
+                          ? "bg-[#F6EFE7] text-[#9A744A] font-semibold"
                           : "text-[#222222] hover:bg-[#F7F7F5]"
                       }`}
                     >
@@ -1584,7 +1584,7 @@ function DashboardOverview() {
                         className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] transition-colors"
                       >
                         <svg
-                          className="w-4 h-4 text-[#2563EB]"
+                          className="w-4 h-4 text-[#9A744A]"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -1657,7 +1657,7 @@ function DashboardOverview() {
                     happyStays: e.target.value,
                   })
                 }
-                className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]"
+                className="w-32 px-3 py-2 rounded-[10px] border border-[#E3E8EF] text-[#0B1F42] text-sm focus:outline-none focus:border-[#C49A6C] focus:ring-[3px] focus:ring-[rgba(196,154,108,0.18)]"
               />
             </div>
             <div>
@@ -1676,7 +1676,7 @@ function DashboardOverview() {
                     starRating: e.target.value,
                   })
                 }
-                className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]"
+                className="w-32 px-3 py-2 rounded-[10px] border border-[#E3E8EF] text-[#0B1F42] text-sm focus:outline-none focus:border-[#C49A6C] focus:ring-[3px] focus:ring-[rgba(196,154,108,0.18)]"
               />
             </div>
             <div>
@@ -1694,7 +1694,7 @@ function DashboardOverview() {
                     satisfaction: e.target.value,
                   })
                 }
-                className="w-32 px-3 py-2 rounded-xl border border-[#E5E7EB] text-[#222222] text-sm focus:outline-none focus:border-[#2563EB] focus:ring-[3px] focus:ring-[rgba(37,99,235,0.18)]"
+                className="w-32 px-3 py-2 rounded-[10px] border border-[#E3E8EF] text-[#0B1F42] text-sm focus:outline-none focus:border-[#C49A6C] focus:ring-[3px] focus:ring-[rgba(196,154,108,0.18)]"
               />
             </div>
             <button
@@ -1731,7 +1731,7 @@ function DashboardOverview() {
                 onClick={() => setActiveTab(tab)}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${
                   activeTab === tab
-                    ? "bg-[#2563EB] text-white"
+                    ? "bg-[#0B1F42] text-white"
                     : "text-[#6b7280] hover:bg-[#F7F7F5]"
                 }`}
               >
@@ -1794,7 +1794,7 @@ function DashboardOverview() {
                       <button
                         type="button"
                         onClick={() => navigate(item.to)}
-                        className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8] transition-colors"
+                        className="text-sm font-medium text-[#9A744A] hover:text-[#7D5C39] transition-colors"
                       >
                         Review
                       </button>
