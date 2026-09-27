@@ -185,7 +185,7 @@ function AdminIdentityVerifications() {
             role="tab"
             aria-selected={status === option.value}
             onClick={() => setStatus(option.value)}
-            className={`rounded-[10px] px-4 py-2 text-xs font-semibold transition-colors ${status === option.value ? "bg-[#0B1F42] text-white" : "border border-[#E5E7EB] bg-white text-[#52606F] hover:bg-[#F7F4EF]"}`}
+            className={`rounded-[10px] px-4 py-2 text-xs font-semibold transition-colors ${status === option.value ? "bg-[#0B1F42] text-white" : "border border-[#E3E8EF] bg-white text-[#5B6B82] hover:bg-[#F7F4EF]"}`}
           >
             {option.label}
           </button>
@@ -197,11 +197,11 @@ function AdminIdentityVerifications() {
         </div>
       )}
       {loading ? (
-        <div className="py-16 text-center text-[#6b7280]">
+        <div className="py-16 text-center text-[#5B6B82]">
           Loading verifications...
         </div>
       ) : rows.length === 0 ? (
-        <div className="rounded-2xl border border-[#E5E7EB] bg-white p-12 text-center text-[#52606F] shadow-sm">
+        <div className="rounded-2xl border border-[#E3E8EF] bg-white p-12 text-center text-[#5B6B82] shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
           No verifications in this view.
         </div>
       ) : (

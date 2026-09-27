@@ -109,11 +109,11 @@ function AdminDisputes() {
       </div>
       {message && <div className="rounded-2xl bg-[#F7F4EF] px-4 py-3 text-sm text-[#0B1F42]">{message}</div>}
       {loading ? (
-        <div className="py-16 text-center text-[#6b7280]">Loading disputes...</div>
+        <div className="py-16 text-center text-[#5B6B82]">Loading disputes...</div>
       ) : rows.length === 0 ? (
         <div className="rounded-2xl border border-[#E3E8EF] bg-white p-12 text-center text-[#5B6B82] shadow-[0_4px_16px_rgba(11,31,66,0.04)]">No disputes in this view.</div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
           <table className="w-full text-sm">
             <thead><tr className="border-b border-[#E5E7EB] text-left"><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Booking</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Raised by</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Category</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]"></th></tr></thead>
             <tbody>

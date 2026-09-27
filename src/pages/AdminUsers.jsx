@@ -283,18 +283,18 @@ function AdminUsers() {
       {loading ? (
         <div className="text-center py-12">
           <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
-          <p className="text-[#6b7280]">Loading users...</p>
+          <p className="text-[#5B6B82]">Loading users...</p>
         </div>
       ) : users.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-[#6b7280]">
+          <p className="text-[#5B6B82]">
             {pagination && pagination.totalPages > 1
               ? 'No users on this page.'
               : 'No users found.'}
           </p>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
+        <div className="overflow-x-auto rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-[#E5E7EB] text-left">
