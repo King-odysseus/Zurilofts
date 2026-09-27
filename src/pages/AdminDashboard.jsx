@@ -8,6 +8,7 @@ import {
   playBookingSound,
 } from "../utils/notificationSound.js";
 import logoImg from "../assets/zurilofts-logo.png";
+import TableActionsMenu from "../components/TableActionsMenu.jsx";
 
 // Shared: both hosts and admins - routes gated by requireHost (or weaker).
 const sharedNavItems = [
@@ -1763,13 +1764,13 @@ function DashboardOverview() {
                 {reviewRows.map((item) => (
                   <tr
                     key={item.id}
-                    className="border-b border-[#E5E7EB]/60 hover:bg-[#F7F7F5] transition-colors"
+                    className="border-b border-[#E3E8EF]/60 transition-colors hover:bg-[#F7F4EF]"
                   >
                     <td className="py-3">
-                      <p className="font-medium text-[#222222] max-w-[240px] truncate">
+                      <p className="max-w-[240px] truncate font-medium text-[#0B1F42]">
                         {item.title}
                       </p>
-                      <p className="text-xs text-[#6b7280]">{item.subtitle}</p>
+                      <p className="text-xs text-[#5B6B82]">{item.subtitle}</p>
                     </td>
                     <td className="py-3">
                       <span
@@ -1785,19 +1786,13 @@ function DashboardOverview() {
                         {item.status?.replaceAll("_", " ")}
                       </span>
                     </td>
-                    <td className="py-3 text-xs text-[#6b7280] hidden sm:table-cell">
+                    <td className="hidden py-3 text-xs text-[#5B6B82] sm:table-cell">
                       {item.updatedAt
                         ? new Date(item.updatedAt).toLocaleDateString()
                         : "-"}
                     </td>
                     <td className="py-3 text-right">
-                      <button
-                        type="button"
-                        onClick={() => navigate(item.to)}
-                        className="text-sm font-medium text-[#9A744A] hover:text-[#7D5C39] transition-colors"
-                      >
-                        Review
-                      </button>
+                      <TableActionsMenu actions={[{ label: 'Review item', icon: '⌕', onClick: () => navigate(item.to) }]} />
                     </td>
                   </tr>
                 ))}
