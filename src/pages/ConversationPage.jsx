@@ -45,7 +45,7 @@ function MessageBubble({ message, isMine }) {
         >
           {message.content}
         </div>
-        <p className={`text-[11px] text-[#6b7280] mt-1 ${isMine ? 'text-right' : 'text-left'}`}>
+        <p className={`text-[11px] text-[#5B6B82] mt-1 ${isMine ? 'text-right' : 'text-left'}`}>
           {isMine ? 'You' : senderName} · {formatMessageTime(message.createdAt)}
         </p>
       </div>
@@ -172,7 +172,7 @@ function ConversationPage() {
       <Navbar />
       <main className="flex-1 w-full max-w-[1344px] mx-auto px-4 sm:px-6 pt-24 pb-4 flex min-h-0 gap-5">
         <aside className="hidden w-[360px] flex-shrink-0 flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:flex" aria-label="Conversations">
-          <div className="border-b border-[#E5E7EB] px-5 py-4">
+          <div className="border-b border-[#E3E8EF] px-5 py-4">
             <h1 className="text-xl font-bold text-[#0B1F42]">Inbox</h1>
             <p className="mt-1 text-sm text-[#52606F]">Messages about bookings and stays.</p>
           </div>
@@ -180,7 +180,7 @@ function ConversationPage() {
             {conversations.map((item) => (
               <ConversationRow key={item.id} conversation={item} currentUserId={user?.id} compact active={item.id === conversationId} />
             ))}
-            {conversations.length === 0 && <p className="p-5 text-sm text-[#6b7280]">No conversations yet.</p>}
+            {conversations.length === 0 && <p className="p-5 text-sm text-[#5B6B82]">No conversations yet.</p>}
           </div>
         </aside>
         <section className="flex min-w-0 flex-1 flex-col">
@@ -188,7 +188,7 @@ function ConversationPage() {
         <div className="mb-4 flex items-center gap-3 rounded-2xl border border-[#E3E8EF] bg-white px-4 py-3 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
           <Link
             to="/inbox"
-            className="p-2 rounded-full hover:bg-[#E5E7EB]/40 transition-colors text-[#222222]"
+            className="p-2 rounded-full hover:bg-[#E3E8EF]/40 transition-colors text-[#0B1F42]"
             aria-label="Back to inbox"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -212,7 +212,7 @@ function ConversationPage() {
             </div>
           ) : error && messages.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-[#6b7280] mb-4">{error}</p>
+              <p className="text-[#5B6B82] mb-4">{error}</p>
               <button
                 onClick={() => window.location.reload()}
                 className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
@@ -222,7 +222,7 @@ function ConversationPage() {
             </div>
           ) : messages.length === 0 ? (
             <div className="text-center py-16">
-              <p className="text-[#6b7280]">No messages yet. Say hello to {other.name}.</p>
+              <p className="text-[#5B6B82]">No messages yet. Say hello to {other.name}.</p>
             </div>
           ) : (
             messages.map((m) => (
@@ -249,7 +249,7 @@ function ConversationPage() {
               }}
               rows={1}
               placeholder="Write a message..."
-              className="flex-1 resize-none bg-transparent outline-none px-3 py-2 text-sm text-[#222222] placeholder-[#6b7280] max-h-32"
+              className="flex-1 resize-none bg-transparent outline-none px-3 py-2 text-sm text-[#0B1F42] placeholder-[#5B6B82] max-h-32"
             />
             <button
               onClick={handleSend}
@@ -257,7 +257,7 @@ function ConversationPage() {
               className={`flex-shrink-0 inline-flex items-center gap-1.5 min-h-[44px] px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 canSend
                   ? 'bg-[#0B1F42] text-white hover:bg-[#07072E]'
-                  : 'bg-[#E5E7EB] text-[#6b7280] cursor-not-allowed'
+                  : 'bg-[#E3E8EF] text-[#5B6B82] cursor-not-allowed'
               }`}
             >
               {sending ? (

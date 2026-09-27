@@ -60,7 +60,7 @@ function MessagesPage() {
           <div className="flex h-[60vh] flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
               {loading ? (
-                <p className="text-sm text-[#6b7280] text-center py-10">Loading…</p>
+                <p className="text-sm text-[#5B6B82] text-center py-10">Loading…</p>
               ) : messages.length === 0 ? (
                 <div className="text-center py-10">
                   <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-[#FDE8D8]">
@@ -68,7 +68,7 @@ function MessagesPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                     </svg>
                   </div>
-                  <p className="text-sm text-[#6b7280]">No messages yet. Send us a message and we&apos;ll get back to you.</p>
+                  <p className="text-sm text-[#5B6B82]">No messages yet. Send us a message and we&apos;ll get back to you.</p>
                 </div>
               ) : (
                 messages.map((m) => (
@@ -81,7 +81,7 @@ function MessagesPage() {
                       }`}
                     >
                       {m.body}
-                      <div className={`text-[11px] mt-1 ${m.senderRole === 'USER' ? 'text-white/70' : 'text-[#6b7280]'}`}>
+                      <div className={`text-[11px] mt-1 ${m.senderRole === 'USER' ? 'text-white/70' : 'text-[#5B6B82]'}`}>
                         {new Date(m.createdAt).toLocaleString()}
                       </div>
                     </div>

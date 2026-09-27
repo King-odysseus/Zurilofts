@@ -302,7 +302,7 @@ function NextStayCard({ booking }) {
             </Link>
             <button
               onClick={openConversation}
-              className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-[10px] text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F7F5] transition-colors"
+              className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-[10px] text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F4EF] transition-colors"
             >
               Message host
             </button>
@@ -311,7 +311,7 @@ function NextStayCard({ booking }) {
                 href={googleMapsDirectionsUrl({ lat: p.lat, lng: p.lng, label: p.location })}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-[10px] text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F7F5] transition-colors"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-[10px] text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F4EF] transition-colors"
               >
                 Directions
               </a>
@@ -319,7 +319,7 @@ function NextStayCard({ booking }) {
             {booking.status === "CONFIRMED" && (
               <button
                 onClick={() => generateInvoice(booking)}
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-[10px] text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F7F5] transition-colors"
+                className="inline-flex items-center gap-1.5 min-h-[44px] px-4 rounded-[10px] text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F4EF] transition-colors"
               >
                 Receipt
               </button>
@@ -508,7 +508,7 @@ export default function TripHubPage() {
           >
             Past
             {past.length > 0 && (
-              <span className="ml-1.5 text-[#6b7280] text-xs">({past.length})</span>
+              <span className="ml-1.5 text-[#5B6B82] text-xs">({past.length})</span>
             )}
             {activeTab === "past" && (
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C49A6C]" />
@@ -525,7 +525,7 @@ export default function TripHubPage() {
           </div>
         ) : error ? (
           <div className="text-center py-16">
-            <p className="text-[#6b7280] mb-4">{error}</p>
+            <p className="text-[#5B6B82] mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
               className="inline-flex min-h-[44px] items-center rounded-[10px] bg-[#0B1F42] px-4 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
@@ -538,7 +538,7 @@ export default function TripHubPage() {
         ) : displayed.length > 0 ? (
           <div className="space-y-4">
             {activeTab === "upcoming" && (
-              <p className="text-sm font-semibold text-[#6b7280]">Other upcoming stays</p>
+              <p className="text-sm font-semibold text-[#5B6B82]">Other upcoming stays</p>
             )}
             {displayed.map((b) => (
               <BookingCard
