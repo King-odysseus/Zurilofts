@@ -138,7 +138,7 @@ function AdminPromos() {
             {formError && <div className="bg-red-50 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{formError}</div>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-[#222222] mb-1">Code</label>
+                <label className="mb-1 block text-sm font-semibold text-[#0B1F42]">Code</label>
                 <input
                   type="text" value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value })}
@@ -148,7 +148,7 @@ function AdminPromos() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#222222] mb-1">Discount %</label>
+                <label className="mb-1 block text-sm font-semibold text-[#0B1F42]">Discount %</label>
                   <input
                     type="number" value={formData.discountPercent}
                     onChange={(e) => setFormData({ ...formData, discountPercent: e.target.value })}
@@ -156,7 +156,7 @@ function AdminPromos() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#222222] mb-1">Max Discount (KES)</label>
+                <label className="mb-1 block text-sm font-semibold text-[#0B1F42]">Max Discount (KES)</label>
                   <input
                     type="number" value={formData.maxDiscount}
                     onChange={(e) => setFormData({ ...formData, maxDiscount: e.target.value })}
@@ -166,7 +166,7 @@ function AdminPromos() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#222222] mb-1">Valid From</label>
+                <label className="mb-1 block text-sm font-semibold text-[#0B1F42]">Valid From</label>
                   <input
                     type="date" value={formData.validFrom}
                     onChange={(e) => setFormData({ ...formData, validFrom: e.target.value })}
@@ -174,7 +174,7 @@ function AdminPromos() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#222222] mb-1">Valid Until</label>
+                <label className="mb-1 block text-sm font-semibold text-[#0B1F42]">Valid Until</label>
                   <input
                     type="date" value={formData.validUntil}
                     onChange={(e) => setFormData({ ...formData, validUntil: e.target.value })}
@@ -184,7 +184,7 @@ function AdminPromos() {
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-[#222222] mb-1">Max Uses</label>
+                <label className="mb-1 block text-sm font-semibold text-[#0B1F42]">Max Uses</label>
                   <input
                     type="number" value={formData.maxUses}
                     onChange={(e) => setFormData({ ...formData, maxUses: e.target.value })}
@@ -192,7 +192,7 @@ function AdminPromos() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-[#222222] mb-1">Min Booking (KES)</label>
+                <label className="mb-1 block text-sm font-semibold text-[#0B1F42]">Min Booking (KES)</label>
                   <input
                     type="number" value={formData.minBookingAmount}
                     onChange={(e) => setFormData({ ...formData, minBookingAmount: e.target.value })}
@@ -202,7 +202,7 @@ function AdminPromos() {
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="text-sm font-semibold text-[#222222]">Applies to Properties</label>
+                  <label className="text-sm font-semibold text-[#0B1F42]">Applies to Properties</label>
                   <button
                     type="button"
                     onClick={() => {
@@ -217,7 +217,7 @@ function AdminPromos() {
                 </div>
                 <div className="max-h-40 overflow-y-auto rounded-xl border border-[#E3E8EF] bg-[#F7F4EF] p-3">
                   {properties.length === 0 ? (
-                    <p className="text-xs text-[#6b7280]">No properties available.</p>
+                    <p className="text-xs text-[#5B6B82]">No properties available.</p>
                   ) : (
                     properties.map((prop) => (
                       <label key={prop.id} className="flex items-center space-x-2 py-1 cursor-pointer">
@@ -232,12 +232,12 @@ function AdminPromos() {
                           }}
                           className="h-4 w-4 accent-[#0B1F42]"
                         />
-                        <span className="text-sm text-[#222222]">{prop.title}</span>
+                        <span className="text-sm text-[#0B1F42]">{prop.title}</span>
                       </label>
                     ))
                   )}
                 </div>
-                <p className="text-xs text-[#6b7280] mt-1">Leave unchecked to apply to all properties.</p>
+                <p className="mt-1 text-xs text-[#5B6B82]">Leave unchecked to apply to all properties.</p>
               </div>
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={closeForm} className="min-h-[44px] flex-1 rounded-[10px] border border-[#E3E8EF] py-2.5 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]">
@@ -255,30 +255,30 @@ function AdminPromos() {
       {/* Table */}
       {loading ? (
         <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-[#2563EB] border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-[#E5E7EB] bg-[#F7F4EF]">
+              <thead className="border-b border-[#E3E8EF] bg-[#F7F4EF]">
                 <tr>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Code</th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Discount</th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Usage</th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Valid Period</th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Properties</th>
-                  <th className="text-left py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th>
-                  <th className="text-right py-3 px-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Actions</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Code</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Discount</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Usage</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Valid Period</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Properties</th>
+                  <th className="px-4 py-3 text-left text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Status</th>
+                  <th className="px-4 py-3 text-right text-[11px] font-bold uppercase tracking-wider text-[#5B6B82]">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {promos.map((p) => (
-                  <tr key={p.id} className="border-b border-[#E5E7EB]/50 hover:bg-[#F7F4EF]">
+                  <tr key={p.id} className="border-b border-[#E3E8EF]/70 hover:bg-[#F7F4EF]">
                     <td className="px-4 py-3 font-mono font-bold text-[#0B1F42]">{p.code}</td>
                     <td className="py-3 px-4">
                       {p.discountPercent}%
-                      {p.maxDiscount && <span className="text-[#6b7280] text-xs ml-1">(max KES {p.maxDiscount.toLocaleString()})</span>}
+                      {p.maxDiscount && <span className="ml-1 text-xs text-[#5B6B82]">(max KES {p.maxDiscount.toLocaleString()})</span>}
                     </td>
                     <td className="py-3 px-4">
                       {p.currentUses}{p.maxUses ? ` / ${p.maxUses}` : ''}
@@ -290,11 +290,11 @@ function AdminPromos() {
                       {p.properties?.length > 0 ? (
                         <span className="inline-flex flex-wrap gap-1">
                           {p.properties.map((prop) => (
-                            <span key={prop.id} className="px-2 py-0.5 bg-canvas rounded-md text-[#222222]">{prop.title}</span>
+                            <span key={prop.id} className="rounded-[10px] bg-[#EAF0F4] px-2 py-0.5 text-[#0B1F42]">{prop.title}</span>
                           ))}
                         </span>
                       ) : (
-                        <span className="text-[#6b7280]">All properties</span>
+                        <span className="text-[#5B6B82]">All properties</span>
                       )}
                     </td>
                     <td className="py-3 px-4">
@@ -311,7 +311,7 @@ function AdminPromos() {
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => openEdit(p)}
-                          className="px-3 py-1.5 text-xs font-semibold rounded-lg text-[#6b7280] shadow-sm hover:shadow-md hover:text-[#2563EB] transition-colors"
+                          className="rounded-[10px] px-3 py-1.5 text-xs font-semibold text-[#5B6B82] shadow-sm transition-colors hover:bg-[#F7F4EF] hover:text-[#9A744A]"
                         >
                           Edit
                         </button>
@@ -329,7 +329,7 @@ function AdminPromos() {
             </table>
           </div>
           {promos.length === 0 && (
-            <div className="text-center py-12 text-[#6b7280]">No promo codes yet. Create your first!</div>
+            <div className="py-12 text-center text-[#5B6B82]">No promo codes yet. Create your first!</div>
           )}
         </div>
       )}
