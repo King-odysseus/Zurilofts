@@ -9,7 +9,7 @@ import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
 
 function CheckoutHeader() {
   return (
-    <header className="sticky top-0 z-30 border-b border-[#E5E7EB] bg-white">
+    <header className="sticky top-0 z-30 border-b border-[#E3E8EF] bg-white">
       <div className="mx-auto flex min-h-[64px] max-w-7xl items-center justify-between px-4 sm:px-6">
         <button type="button" onClick={() => window.history.back()} className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] px-3 text-sm font-semibold text-[#0B1F42] hover:bg-[#F7F4EF]" aria-label="Go back">
           <span aria-hidden="true">←</span><span className="hidden sm:inline">Back</span>
@@ -1283,7 +1283,7 @@ function BookingPage() {
       <CheckoutHeader />
 
       {/* Persistent concise summary - stays visible while the checkout steps scroll */}
-      <div className="sticky top-16 z-10 border-b border-[#E5E7EB] bg-white/95 shadow-sm backdrop-blur">
+      <div className="sticky top-16 z-10 border-b border-[#E3E8EF] bg-white/95 shadow-[0_4px_16px_rgba(11,31,66,0.06)] backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-2.5 flex items-center justify-between gap-3 text-sm">
           <div className="flex items-center gap-3 min-w-0">
             <span className="truncate font-semibold text-[#0B1F42]">{property?.title}</span>
@@ -1335,7 +1335,7 @@ function BookingPage() {
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 lg:grid-cols-3">
             {/* Left Column - Form */}
             <div className="lg:col-span-2">
-              <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm md:p-8">
+              <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-8">
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 4 && renderStep4()}
@@ -1344,7 +1344,7 @@ function BookingPage() {
 
             {/* Right Column - Property Summary */}
             <div className="lg:col-span-1">
-              <div className="sticky top-24 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+              <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
                 <Link to={`/property/${property?.id}`} className="block">
                   <img
                     src={(property?.images?.[0] || '')}

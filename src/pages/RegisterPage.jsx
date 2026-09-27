@@ -321,16 +321,16 @@ function RegisterPage() {
 
             {/* Divider */}
             <div className="my-6 flex items-center">
-              <div className="h-px flex-1 bg-[#E5E7EB]"></div>
+              <div className="h-px flex-1 bg-[#E3E8EF]"></div>
               <span className="px-4 text-sm text-[#5B6B82]">{t('register.orSignUpWith')}</span>
-              <div className="h-px flex-1 bg-[#E5E7EB]"></div>
+              <div className="h-px flex-1 bg-[#E3E8EF]"></div>
             </div>
 
             {/* Google OAuth - follows Google's sign-in button branding guidelines:
                 white background, #747775 border, #1F1F1F text, official 4-colour "G". */}
             <a
               href={googleHref}
-              className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl border border-[#747775] bg-white py-3 text-sm font-medium text-[#1F1F1F] transition-colors duration-150 hover:bg-[#F8F9FA] hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1a73e8]"
+              className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-[10px] border border-[#E3E8EF] bg-white py-3 text-sm font-medium text-[#0B1F42] transition-colors duration-150 hover:bg-[#F7F4EF] hover:shadow-[0_8px_28px_rgba(11,31,66,0.08)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#C49A6C]"
             >
               <svg className="h-5 w-5" viewBox="0 0 48 48" aria-hidden="true">
                 <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
