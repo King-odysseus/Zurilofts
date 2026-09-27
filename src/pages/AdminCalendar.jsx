@@ -318,7 +318,7 @@ function AdminCalendar() {
           <div className="flex flex-wrap items-center gap-4 text-xs text-[#5B6B82]">
             <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-[#FDE8D8]" />Guest stay</span>
             <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-[#EAF0F4] border border-[#DCE5EC]" />Blocked</span>
-            <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-white border border-[#E5E7EB]" />Available</span>
+            <span className="inline-flex items-center gap-1.5"><i className="inline-block h-2.5 w-2.5 rounded-sm bg-white border border-[#E3E8EF]" />Available</span>
             <span>Click a start date, then the final night to block. Click a manual block to unblock it.</span>
           </div>
           <button type="button" disabled={!blockDraft.start || !blockDraft.end} onClick={() => addBlock({ preventDefault() {} })} className="bg-[#C49A6C] text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-[#B8895C] transition-colors disabled:opacity-50">Block selected dates</button>
@@ -327,8 +327,8 @@ function AdminCalendar() {
 
       {/* Outbound feed */}
       {calendarTab === 'settings' && <section className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
-        <h2 className="text-lg font-bold text-[#222222] mb-1">Export this calendar</h2>
-        <p className="text-sm text-[#6b7280] mb-4">Paste this link into Airbnb / Booking.com so they block the dates booked on ZuriLofts.</p>
+        <h2 className="text-lg font-bold text-[#0B1F42] mb-1">Export this calendar</h2>
+        <p className="text-sm text-[#5B6B82] mb-4">Paste this link into Airbnb / Booking.com so they block the dates booked on ZuriLofts.</p>
         <div className="flex items-center gap-2">
           <input readOnly value={data.feedUrl} className={`${inputCls} font-mono text-xs`} onFocus={(e) => e.target.select()} />
           <button onClick={copyFeed} className="shrink-0 bg-[#C49A6C] text-white font-semibold px-4 py-2.5 rounded-lg hover:bg-[#B8895C] transition-colors text-sm">
@@ -340,25 +340,25 @@ function AdminCalendar() {
       {/* Imported feeds */}
       {calendarTab === 'settings' && <section className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
         <div className="flex items-center justify-between mb-1">
-          <h2 className="text-lg font-bold text-[#222222]">Imported calendars</h2>
+          <h2 className="text-lg font-bold text-[#0B1F42]">Imported calendars</h2>
           <button
             onClick={syncNow}
             disabled={syncing || data.sources.length === 0}
-            className="text-sm font-semibold px-4 py-2 rounded-lg border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5] transition-colors disabled:opacity-50"
+            className="text-sm font-semibold px-4 py-2 rounded-lg border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors disabled:opacity-50"
           >
             {syncing ? 'Syncing...' : 'Sync now'}
           </button>
         </div>
-        <p className="text-sm text-[#6b7280] mb-4">Add the iCal export URL from each platform to pull in their bookings.</p>
-        <p className="text-sm text-[#6b7280] mb-4">Sync with Airbnb, Booking.com or Google Calendar - import their calendars to block your dates automatically, and share your ZuriLofts calendar with them.</p>
+        <p className="text-sm text-[#5B6B82] mb-4">Add the iCal export URL from each platform to pull in their bookings.</p>
+        <p className="text-sm text-[#5B6B82] mb-4">Sync with Airbnb, Booking.com or Google Calendar - import their calendars to block your dates automatically, and share your ZuriLofts calendar with them.</p>
 
         {data.sources.length > 0 ? (
           <div className="space-y-2 mb-5">
             {data.sources.map((s) => (
               <div key={s.id} className="flex items-center justify-between bg-canvas rounded-xl px-4 py-3 text-sm">
                 <div className="min-w-0">
-                  <p className="font-semibold text-[#222222]">{s.name}</p>
-                  <p className="text-[#6b7280] text-xs truncate max-w-md">{s.url}</p>
+                  <p className="font-semibold text-[#0B1F42]">{s.name}</p>
+                  <p className="text-[#5B6B82] text-xs truncate max-w-md">{s.url}</p>
                   <p className={`text-xs mt-0.5 ${s.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-green-600'}`}>
                     {s.lastSyncedAt ? `${s.lastStatus} · ${new Date(s.lastSyncedAt).toLocaleString()}` : 'Not synced yet'}
                   </p>
@@ -368,7 +368,7 @@ function AdminCalendar() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-[#6b7280] mb-5">No external calendars connected.</p>
+          <p className="text-sm text-[#5B6B82] mb-5">No external calendars connected.</p>
         )}
 
         <form onSubmit={addSource} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
@@ -386,8 +386,8 @@ function AdminCalendar() {
 
       {/* Blocked dates */}
       {calendarTab === 'availability' && <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
-        <h2 className="text-lg font-bold text-[#222222] mb-1">Blocked dates</h2>
-        <p className="text-sm text-[#6b7280] mb-4">Select a start date, then the final night to block it. Existing stays can&apos;t be selected.</p>
+        <h2 className="text-lg font-bold text-[#0B1F42] mb-1">Blocked dates</h2>
+        <p className="text-sm text-[#5B6B82] mb-4">Select a start date, then the final night to block it. Existing stays can&apos;t be selected.</p>
         <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} onBlockClick={handleCalendarBlockClick} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
         <div className="flex items-center justify-between gap-3 mt-4 mb-6"><p className="text-xs text-[#5B6B82]">{blockDraft.start ? selectedBlockEnd ? `Selected: ${fmt(blockDraft.start)} - ${fmt(selectedBlockEnd)}` : 'Now select the final night.' : 'Select a start date to begin.'}</p>{blockDraft.start && <button type="button" onClick={() => { setBlockDraft((draft) => ({ ...draft, start: '', end: '' })); setSelectedBlockEnd(null); }} className="text-xs font-semibold text-[#9A744A] hover:text-[#7D5C39]">Clear selection</button>}</div>
 
@@ -396,8 +396,8 @@ function AdminCalendar() {
             {data.blocks.map((b) => (
               <div key={b.id} className="flex items-center justify-between bg-canvas rounded-xl px-4 py-2.5 text-sm">
                 <div>
-                  <span className="font-semibold text-[#222222]">{fmt(b.start)} &rarr; {fmt(b.end)}</span>
-                  <span className="text-[#6b7280] ml-2">{b.summary || 'Blocked'}</span>
+                  <span className="font-semibold text-[#0B1F42]">{fmt(b.start)} &rarr; {fmt(b.end)}</span>
+                  <span className="text-[#5B6B82] ml-2">{b.summary || 'Blocked'}</span>
                   <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-semibold ${b.manual ? 'bg-[#FDE8D8] text-[#9A4A1D]' : 'bg-[#EEF2F7] text-[#0B1F42]'}`}>
                     {b.manual ? 'Manual' : b.sourceName || 'Imported'}
                   </span>
@@ -409,13 +409,13 @@ function AdminCalendar() {
             ))}
           </div>
         ) : (
-          <p className="text-sm text-[#6b7280] mb-5">No blocked dates.</p>
+          <p className="text-sm text-[#5B6B82] mb-5">No blocked dates.</p>
         )}
 
         <form onSubmit={addBlock} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
           <div className="md:col-span-5 rounded-xl bg-canvas px-4 py-2.5">
-            <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide">Selected dates</p>
-            <p className="text-sm font-semibold text-[#222222] mt-0.5">{blockDraft.start && selectedBlockEnd ? `${fmt(blockDraft.start)} - ${fmt(selectedBlockEnd)}` : 'Choose dates on the calendar above'}</p>
+            <p className="text-xs font-semibold text-[#5B6B82] uppercase tracking-wide">Selected dates</p>
+            <p className="text-sm font-semibold text-[#0B1F42] mt-0.5">{blockDraft.start && selectedBlockEnd ? `${fmt(blockDraft.start)} - ${fmt(selectedBlockEnd)}` : 'Choose dates on the calendar above'}</p>
           </div>
           <div className="md:col-span-5">
             <label className={labelCls}>Reason</label>
@@ -426,10 +426,10 @@ function AdminCalendar() {
       </section>}
       {pendingUnblock && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="unblock-title">
         <div className="w-full max-w-md rounded-[14px] bg-white p-6 shadow-xl">
-          <h2 id="unblock-title" className="text-lg font-bold text-[#222222]">Unblock this date?</h2>
-          <p className="mt-2 text-sm text-[#6b7280]">{fmt(pendingUnblock.date)} will become available. Other dates in this blocked range will remain blocked.</p>
+          <h2 id="unblock-title" className="text-lg font-bold text-[#0B1F42]">Unblock this date?</h2>
+          <p className="mt-2 text-sm text-[#5B6B82]">{fmt(pendingUnblock.date)} will become available. Other dates in this blocked range will remain blocked.</p>
           <div className="mt-6 flex justify-end gap-3">
-            <button type="button" onClick={() => setPendingUnblock(null)} className="rounded-lg px-4 py-2 text-sm font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors">Cancel</button>
+          <button type="button" onClick={() => setPendingUnblock(null)} className="rounded-lg px-4 py-2 text-sm font-semibold text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F4EF] transition-colors">Cancel</button>
             <button type="button" onClick={confirmUnblockDate} className="rounded-lg bg-[#C49A6C] px-5 py-2 text-sm font-semibold text-white hover:bg-[#B8895C] transition-colors">Unblock date</button>
           </div>
         </div>

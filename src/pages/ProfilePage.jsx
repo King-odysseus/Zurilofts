@@ -399,9 +399,9 @@ function ProfilePage() {
       <Navbar />
       <div className="pt-24 pb-16">
         <div className="max-w-[1344px] mx-auto px-4 md:px-6">
-          <div className="lg:grid lg:grid-cols-[280px_minmax(0,1fr)] lg:items-start lg:gap-6">
+          <div className="lg:grid lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start lg:gap-8">
           {/* Header */}
-          <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 sm:px-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:sticky lg:top-24 lg:mb-0 lg:border-0 lg:bg-[#F7F4EF] lg:p-6 lg:shadow-none">
+          <div className="relative z-0 mb-8 min-w-0 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 sm:px-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:sticky lg:top-24 lg:mb-0 lg:border-0 lg:bg-[#F7F4EF] lg:p-6 lg:shadow-none">
             <div className="flex items-center mb-4">
               <label className="relative cursor-pointer group">
                 {profile?.avatar ? (
@@ -441,7 +441,7 @@ function ProfilePage() {
                 </h1>
                 <p className="text-[#5B6B82]">{profile?.email}</p>
               </div>
-              <nav aria-label="Account navigation" className="mt-6 hidden space-y-1 lg:block">
+              <nav aria-label="Account navigation" className="relative z-0 mt-6 hidden w-full space-y-1 lg:block">
                 {[['info', 'Personal details'], ['verification', 'Security & verification'], ['bookings', 'Payments & bookings'], ['favorites', `Saved places${favorites.length ? ` (${favorites.length})` : ''}`]].map(([id, label]) => (
                   <button key={id} type="button" onClick={() => setActiveTab(id)} className={`flex min-h-[44px] w-full items-center rounded-xl px-3 text-left text-sm font-medium transition-colors ${activeTab === id ? 'bg-white text-[#0B1F42] shadow-sm' : 'text-[#52606F] hover:bg-white/70 hover:text-[#0B1F42]'}`}>
                     {label}
@@ -452,7 +452,7 @@ function ProfilePage() {
             </div>
           </div>
 
-          <div className="min-w-0">
+          <div className="relative z-10 min-w-0 lg:pl-1">
           {/* Tabs */}
           <div className="mb-8 flex overflow-x-auto no-scrollbar border-b border-[#E3E8EF] lg:hidden">
             {['info', 'bookings', 'favorites', 'verification'].map((tab) => (
