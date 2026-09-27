@@ -303,7 +303,7 @@ function HostPayouts() {
                     <td className="p-3 font-medium">KES {p.amount?.toLocaleString()}</td>
                     <td className="p-3">{p.bookingsCount}</td>
                     <td className="p-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[p.status] || 'bg-[#6b7280] text-white'}`}>
+                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[p.status] || 'bg-[#5B6B82] text-white'}`}>
                         {p.status}
                       </span>
                       {p.failureReason && (

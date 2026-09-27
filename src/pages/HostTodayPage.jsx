@@ -86,7 +86,7 @@ function TodayCard({ booking, type }) {
 
         {/* Guest info */}
         <div className="flex items-center gap-2 mb-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E5E7EB] bg-[#F7F4EF] text-xs font-bold text-[#0B1F42]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF] text-xs font-bold text-[#0B1F42]">
             {guest.firstName?.[0]}{guest.lastName?.[0]}
           </div>
           <div className="min-w-0">
@@ -234,7 +234,7 @@ function OnboardingChecklist({ hostApplicationStatus, properties, role }) {
     <section className="bg-white rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.08)] p-6 mb-8">
       <div className="flex items-center justify-between mb-1">
         <h2 className="text-lg font-bold text-[#0B1F42]">Get set up as a host</h2>
-        <span className="text-sm font-medium text-[#6b7280]">{completedCount}/{steps.length} done</span>
+        <span className="text-sm font-medium text-[#5B6B82]">{completedCount}/{steps.length} done</span>
       </div>
       <p className="text-sm text-[#5B6B82] mb-5">
         You can explore your dashboard and prepare draft listings right away. Publishing and accepting bookings need a verified account and an approved listing.
@@ -291,7 +291,7 @@ function EmptyPanel({ label, icon }) {
   return (
     <div className="text-center py-12 px-4 bg-white rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.06)]">
       <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF]">
-        <svg className="w-6 h-6 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-6 h-6 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {icon}
         </svg>
       </div>
@@ -346,7 +346,7 @@ function ArrivalRow({ booking }) {
         {image ? (
           <img src={image} alt={p.title} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
+          <div className="w-full h-full flex items-center justify-center text-[#5B6B82]">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
             </svg>
@@ -365,7 +365,7 @@ function ArrivalRow({ booking }) {
         <p className="text-sm font-medium text-[#0B1F42]">
           {booking.guests} guest{booking.guests !== 1 ? "s" : ""}
         </p>
-        <p className="text-xs text-[#6b7280]">
+        <p className="text-xs text-[#5B6B82]">
           {arrivalTime ? `Arrives ${arrivalTime}` : "Arrives today"}
         </p>
       </div>
@@ -414,11 +414,11 @@ function ArrivingTodayCard({ arrivals }) {
       {arrivals.length === 0 ? (
         <div className="text-center py-12 px-4">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF]">
-            <svg className="w-6 h-6 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <p className="text-sm text-[#6b7280]">No arrivals today</p>
+          <p className="text-sm text-[#5B6B82]">No arrivals today</p>
         </div>
       ) : (
         <ul className="divide-y divide-[#E3E8EF]">
@@ -559,7 +559,7 @@ function RecentMessagesPanel({ conversations, loading }) {
       {conversations.length === 0 ? (
         <div className="text-center py-10 px-4">
           <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF]">
-            <svg className="w-6 h-6 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
           </div>
@@ -567,7 +567,7 @@ function RecentMessagesPanel({ conversations, loading }) {
           <p className="text-xs text-[#5B6B82] mt-1">Messages from guests about their stays will appear here.</p>
         </div>
       ) : (
-        <ul className="divide-y divide-[#E5E7EB]">
+        <ul className="divide-y divide-[#E3E8EF]">
           {conversations.map((c) => {
             const booking = c.booking || {};
             const property = booking.property || {};
@@ -586,7 +586,7 @@ function RecentMessagesPanel({ conversations, loading }) {
                     {image ? (
                       <img src={image} alt={property.title} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
+                      <div className="w-full h-full flex items-center justify-center text-[#5B6B82]">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
                         </svg>
@@ -598,12 +598,12 @@ function RecentMessagesPanel({ conversations, loading }) {
                       <p className="font-semibold text-[#0B1F42] text-sm truncate group-hover:text-[#9A744A] transition-colors">
                         {guestName}
                       </p>
-                      <span className="text-xs text-[#6b7280] flex-shrink-0">
+                      <span className="text-xs text-[#5B6B82] flex-shrink-0">
                         {formatRelativeTime(lastMessage ? lastMessage.createdAt : c.updatedAt)}
                       </span>
                     </div>
-                    <p className="text-xs text-[#6b7280] truncate">{property.title || "Property"}</p>
-                    <p className="text-sm text-[#6b7280] truncate">{preview}</p>
+                    <p className="text-xs text-[#5B6B82] truncate">{property.title || "Property"}</p>
+                    <p className="text-sm text-[#5B6B82] truncate">{preview}</p>
                   </div>
                 </Link>
               </li>
@@ -764,7 +764,7 @@ export default function HostTodayPage() {
         <Navbar />
         <main className="mx-auto w-full max-w-[1344px] px-4 pt-24 pb-16 sm:px-6">
           <div className="text-center py-16">
-            <p className="text-[#6b7280] mb-4">{error}</p>
+            <p className="text-[#5B6B82] mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
               className="inline-flex items-center min-h-[44px] px-6 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
@@ -792,7 +792,7 @@ export default function HostTodayPage() {
       <main className="mx-auto w-full max-w-[1344px] px-4 pt-24 pb-16 sm:px-6">
         {/* Title block */}
         <div className="mb-8">
-          <p className="text-sm text-[#6b7280]">
+          <p className="text-sm text-[#5B6B82]">
             {new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
           </p>
           <h1 className="mt-1 text-2xl font-bold text-[#0B1F42] sm:text-3xl">
@@ -840,11 +840,11 @@ export default function HostTodayPage() {
             "view details" / "message" / "report an issue" actions) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
           <section>
-            <h2 className="text-lg font-bold text-[#222222] mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-[#0B1F42] mb-4 flex items-center gap-2">
               <span className="h-2.5 w-2.5 rounded-full bg-[#C49A6C]" />
               Departing today
               {departures.length > 0 && (
-                <span className="text-sm font-normal text-[#6b7280] ml-auto">{departures.length}</span>
+                <span className="text-sm font-normal text-[#5B6B82] ml-auto">{departures.length}</span>
               )}
             </h2>
             {departures.length === 0 ? (
@@ -862,11 +862,11 @@ export default function HostTodayPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-[#222222] mb-4 flex items-center gap-2">
+            <h2 className="text-lg font-bold text-[#0B1F42] mb-4 flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-green-400" />
               In house
               {inHouse.length > 0 && (
-                <span className="text-sm font-normal text-[#6b7280] ml-auto">{inHouse.length}</span>
+                <span className="text-sm font-normal text-[#5B6B82] ml-auto">{inHouse.length}</span>
               )}
             </h2>
             {inHouse.length === 0 ? (

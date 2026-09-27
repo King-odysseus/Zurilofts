@@ -291,7 +291,7 @@ function HostApplicationPage() {
                   <Field label="Years of hosting experience" type="number" min="0" max="80" value={form.yearsHosting} onChange={(v) => update('yearsHosting', v)} required />
                 </div>
                 <div className="mt-5">
-                  <p className="text-sm font-medium text-[#222222] mb-2">Property types</p>
+                  <p className="text-sm font-medium text-[#0B1F42] mb-2">Property types</p>
                   <div className="flex flex-wrap gap-2">
                     {PROPERTY_TYPES.map(([value, label]) => (
                       <button
@@ -311,7 +311,7 @@ function HostApplicationPage() {
                 </div>
                 <div className="mt-5 grid gap-5">
                   <label className="block">
-                    <span className="block text-sm font-medium text-[#222222] mb-2">Property locations</span>
+                    <span className="block text-sm font-medium text-[#0B1F42] mb-2">Property locations</span>
                     <textarea
                       value={form.propertyLocations}
                       onChange={(e) => update('propertyLocations', e.target.value)}
@@ -323,7 +323,7 @@ function HostApplicationPage() {
                     />
                   </label>
                   <label className="block">
-                    <span className="block text-sm font-medium text-[#222222] mb-2">Hosting experience</span>
+                    <span className="block text-sm font-medium text-[#0B1F42] mb-2">Hosting experience</span>
                     <textarea
                       value={form.experience}
                       onChange={(e) => update('experience', e.target.value)}
@@ -351,7 +351,7 @@ function HostApplicationPage() {
               </label>
 
               <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
-                <button type="submit" disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg border border-[#E5E7EB] bg-white px-6 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF] disabled:opacity-50">{saving ? 'Saving...' : 'Save draft'}</button>
+                <button type="submit" disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg border border-[#E3E8EF] bg-white px-6 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF] disabled:opacity-50">{saving ? 'Saving...' : 'Save draft'}</button>
                 <button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg bg-[#0B1F42] px-6 font-semibold text-white transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50">{saving ? 'Working...' : 'Submit for review'}</button>
                 <button type="button" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)} className="min-h-[44px] rounded-lg px-6 font-semibold text-[#52606F] transition-all duration-200 hover:text-[#0B1F42] disabled:opacity-50">Save &amp; continue traveling</button>
               </div>
