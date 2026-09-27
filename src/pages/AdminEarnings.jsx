@@ -144,7 +144,7 @@ function LegacyEarningsLineChart({ points }) {
               x2={width - padding.right}
               y1={y}
               y2={y}
-              stroke="#E5E7EB"
+              stroke="#E3E8EF"
               strokeWidth="1"
             />
           );
@@ -236,7 +236,7 @@ function EarningsLineChart({ points }) {
       dataLabels: { enabled: false },
       grid: {
         show: true,
-        borderColor: "#E5E7EB",
+        borderColor: "#E3E8EF",
         strokeDashArray: 0,
         padding: { left: 8, right: 8 },
       },
@@ -1024,7 +1024,7 @@ function AdminEarnings() {
     <div className="w-full">
       {!isAdmin && (
         <nav
-          className="mb-6 flex border-b border-[#E5E7EB]"
+          className="mb-6 flex border-b border-[#E3E8EF]"
           aria-label="Host finance"
         >
           <Link
@@ -1123,7 +1123,7 @@ function AdminEarnings() {
           {period === "custom" && (
             <>
               <div className="flex-shrink-0">
-                <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-[#5B6B82] mb-1.5 uppercase tracking-wider">
                   From
                 </label>
                 <input
@@ -1134,7 +1134,7 @@ function AdminEarnings() {
                 />
               </div>
               <div className="flex-shrink-0">
-                <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-[#5B6B82] mb-1.5 uppercase tracking-wider">
                   To
                 </label>
                 <input
@@ -1148,7 +1148,7 @@ function AdminEarnings() {
           )}
 
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">
+            <label className="block text-xs font-semibold text-[#5B6B82] mb-1.5 uppercase tracking-wider">
               Search Property
             </label>
             <div className="relative">
@@ -1160,7 +1160,7 @@ function AdminEarnings() {
                 className="min-h-[44px] w-full rounded-[10px] border-0 bg-[#F7F4EF] py-2.5 pl-10 pr-4 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
               />
               <svg
-                className="w-4 h-4 text-[#6b7280] absolute left-3.5 top-1/2 -translate-y-1/2"
+                className="w-4 h-4 text-[#5B6B82] absolute left-3.5 top-1/2 -translate-y-1/2"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -1175,7 +1175,7 @@ function AdminEarnings() {
               {search && (
                 <button
                   onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6b7280] hover:text-[#222222]"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#5B6B82] hover:text-[#0B1F42]"
                 >
                   <svg
                     className="w-4 h-4"
@@ -1196,7 +1196,7 @@ function AdminEarnings() {
           </div>
 
           <div className="flex-shrink-0">
-            <label className="block text-xs font-semibold text-[#6b7280] mb-1.5 uppercase tracking-wider">
+            <label className="block text-xs font-semibold text-[#5B6B82] mb-1.5 uppercase tracking-wider">
               Sort By
             </label>
             <Dropdown
@@ -1227,7 +1227,7 @@ function AdminEarnings() {
             </svg>
             <span>
               Showing data for:{" "}
-              <span className="font-semibold text-[#222222]">{rangeLabel}</span>
+              <span className="font-semibold text-[#0B1F42]">{rangeLabel}</span>
             </span>
           </div>
         )}
@@ -1266,11 +1266,11 @@ function AdminEarnings() {
                 className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm text-[#6b7280]">{label}</span>
+                  <span className="text-sm text-[#5B6B82]">{label}</span>
                   <div className={`w-2.5 h-2.5 rounded-full ${color}`}></div>
                 </div>
                 <p className="text-2xl font-bold text-[#0B1F42]">{value}</p>
-                {sub && <p className="text-xs text-[#6b7280] mt-1">{sub}</p>}
+                {sub && <p className="text-xs text-[#5B6B82] mt-1">{sub}</p>}
               </div>
             ))}
           </div>
@@ -1282,9 +1282,9 @@ function AdminEarnings() {
                 key={label}
                 className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)]"
               >
-                <span className="text-sm text-[#6b7280]">{label}</span>
+                <span className="text-sm text-[#5B6B82]">{label}</span>
                 <p className="mt-2 text-xl font-bold text-[#0B1F42]">{value}</p>
-                {sub && <p className="text-xs text-[#6b7280] mt-1">{sub}</p>}
+                {sub && <p className="text-xs text-[#5B6B82] mt-1">{sub}</p>}
               </div>
             ))}
           </div>
@@ -1296,11 +1296,11 @@ function AdminEarnings() {
                 key={label}
                 className="rounded-xl border border-[#E3E8EF] bg-[#F7F4EF] px-4 py-3"
               >
-                <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wider mb-1">
+                <p className="text-xs font-semibold text-[#5B6B82] uppercase tracking-wider mb-1">
                   {label}
                 </p>
                 <p
-                  className="text-base font-bold text-[#222222] truncate"
+                  className="text-base font-bold text-[#0B1F42] truncate"
                   title={value}
                 >
                   {value}
@@ -1317,16 +1317,16 @@ function AdminEarnings() {
           {/* Earnings Flow visualization (only when we have fee data) */}
           {!loading && filteredTotals.grossRent > 0 && (
             <div className="mb-4 rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
-              <h2 className="text-sm font-bold text-[#222222] mb-4">
+              <h2 className="text-sm font-bold text-[#0B1F42] mb-4">
                 Earnings Flow - How Your Money Moves
               </h2>
               <div className="flex flex-col lg:flex-row items-center gap-3 text-sm">
                 {/* Gross Rent */}
                 <div className="min-w-[120px] flex-1 rounded-xl bg-[#F7F4EF] p-3 text-center">
-                  <p className="text-xs text-[#6b7280] uppercase tracking-wide">
+                  <p className="text-xs text-[#5B6B82] uppercase tracking-wide">
                     Gross Rent
                   </p>
-                  <p className="text-lg font-bold text-[#222222]">
+                  <p className="text-lg font-bold text-[#0B1F42]">
                     KES {filteredTotals.grossRent.toLocaleString()}
                   </p>
                 </div>
@@ -1498,10 +1498,10 @@ function AdminEarnings() {
                 </svg>
                 {/* Take-Home */}
                 <div className="bg-[#F6EFE7] rounded-[10px] p-3 text-center min-w-[120px] flex-1 border-2 border-[#C49A6C]">
-                  <p className="text-xs text-[#222222] uppercase tracking-wide font-bold">
+                  <p className="text-xs text-[#0B1F42] uppercase tracking-wide font-bold">
                     Take-Home
                   </p>
-                  <p className="text-lg font-bold text-[#222222]">
+                  <p className="text-lg font-bold text-[#0B1F42]">
                     KES{" "}
                     {Math.max(
                       0,
@@ -1522,18 +1522,18 @@ function AdminEarnings() {
               <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#9A744A]">
                 Monthly view
               </p>
-              <h2 className="text-xl font-bold text-[#222222] mt-1">
+              <h2 className="text-xl font-bold text-[#0B1F42] mt-1">
                 Earnings performance
               </h2>
             </div>
-            <p className="text-sm text-[#6b7280]">
+            <p className="text-sm text-[#5B6B82]">
               Active booking value · last 12 months
             </p>
           </div>
           {monthlyTrend.length > 0 ? (
             <EarningsLineChart points={monthlyTrend} />
           ) : (
-            <p className="text-sm text-[#6b7280] py-12 text-center">
+            <p className="text-sm text-[#5B6B82] py-12 text-center">
               No earnings data is available for this period.
             </p>
           )}
@@ -1547,29 +1547,29 @@ function AdminEarnings() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-8">
             {/* Top Hosts Table */}
             <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
-              <h2 className="text-sm font-bold text-[#222222] mb-4">
+              <h2 className="text-sm font-bold text-[#0B1F42] mb-4">
                 Top Hosts by Earnings
               </h2>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-b border-[#E5E7EB] text-left">
-                      <th className="pb-2 font-semibold text-[#6b7280] text-xs uppercase tracking-wider">
+                    <tr className="border-b border-[#E3E8EF] text-left">
+                      <th className="pb-2 font-semibold text-[#5B6B82] text-xs uppercase tracking-wider">
                         #
                       </th>
-                      <th className="pb-2 font-semibold text-[#6b7280] text-xs uppercase tracking-wider">
+                      <th className="pb-2 font-semibold text-[#5B6B82] text-xs uppercase tracking-wider">
                         Host
                       </th>
-                      <th className="pb-2 font-semibold text-[#6b7280] text-xs uppercase tracking-wider text-right">
+                      <th className="pb-2 font-semibold text-[#5B6B82] text-xs uppercase tracking-wider text-right">
                         Props
                       </th>
-                      <th className="pb-2 font-semibold text-[#6b7280] text-xs uppercase tracking-wider text-right">
+                      <th className="pb-2 font-semibold text-[#5B6B82] text-xs uppercase tracking-wider text-right">
                         Bkgs
                       </th>
-                      <th className="pb-2 font-semibold text-[#6b7280] text-xs uppercase tracking-wider text-right">
+                      <th className="pb-2 font-semibold text-[#5B6B82] text-xs uppercase tracking-wider text-right">
                         Host Net
                       </th>
-                      <th className="pb-2 font-semibold text-[#6b7280] text-xs uppercase tracking-wider text-right">
+                      <th className="pb-2 font-semibold text-[#5B6B82] text-xs uppercase tracking-wider text-right">
                         WHT
                       </th>
                     </tr>
@@ -1592,10 +1592,10 @@ function AdminEarnings() {
                           </span>
                         </td>
                         <td className="py-2.5">
-                          <p className="font-semibold text-[#222222]">
+                          <p className="font-semibold text-[#0B1F42]">
                             {h.name}
                           </p>
-                          <p className="text-xs text-[#6b7280]">{h.email}</p>
+                          <p className="text-xs text-[#5B6B82]">{h.email}</p>
                         </td>
                         <td className="py-2.5 text-right">{h.propertyCount}</td>
                         <td className="py-2.5 text-right font-semibold">
@@ -1615,8 +1615,8 @@ function AdminEarnings() {
             </div>
 
             {/* Top Hosts Bar Chart */}
-            <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
-              <h2 className="text-sm font-bold text-[#222222] mb-4">
+            <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-sm">
+              <h2 className="text-sm font-bold text-[#0B1F42] mb-4">
                 Host Net Earnings Comparison
               </h2>
               {hosts.length > 0 && (
@@ -1638,12 +1638,12 @@ function AdminEarnings() {
                       <div key={h.hostId}>
                         <div className="flex items-center justify-between text-xs mb-1.5">
                           <span
-                            className="font-medium text-[#222222] truncate pr-3"
+                            className="font-medium text-[#0B1F42] truncate pr-3"
                             title={h.name}
                           >
                             {h.name}
                           </span>
-                          <span className="font-semibold text-[#222222] whitespace-nowrap">
+                          <span className="font-semibold text-[#0B1F42] whitespace-nowrap">
                             KES {h.hostNet.toLocaleString()}
                           </span>
                         </div>
@@ -1668,30 +1668,30 @@ function AdminEarnings() {
                 <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
+          <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-sm">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="border-b border-[#E3E8EF] bg-[#F7F4EF]">
                   <tr>
-                    <th className="text-left py-3 px-4 font-semibold text-[#222222] whitespace-nowrap">
+                    <th className="text-left py-3 px-4 font-semibold text-[#0B1F42] whitespace-nowrap">
                       Property
                     </th>
-                    <th className="text-left py-3 px-4 font-semibold text-[#222222] whitespace-nowrap">
+                    <th className="text-left py-3 px-4 font-semibold text-[#0B1F42] whitespace-nowrap">
                       Location
                     </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#222222] whitespace-nowrap">
+                    <th className="text-right py-3 px-4 font-semibold text-[#0B1F42] whitespace-nowrap">
                       Active Bkd
                     </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#222222] whitespace-nowrap">
+                    <th className="text-right py-3 px-4 font-semibold text-[#0B1F42] whitespace-nowrap">
                       Gross Rent
                     </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#222222] whitespace-nowrap">
+                    <th className="text-right py-3 px-4 font-semibold text-[#0B1F42] whitespace-nowrap">
                       Service Fee
                     </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#222222] whitespace-nowrap">
+                    <th className="text-right py-3 px-4 font-semibold text-[#0B1F42] whitespace-nowrap">
                       Host Net
                     </th>
-                    <th className="text-right py-3 px-4 font-semibold text-[#222222] whitespace-nowrap">
+                    <th className="text-right py-3 px-4 font-semibold text-[#0B1F42] whitespace-nowrap">
                       WHT
                     </th>
                   </tr>
@@ -1711,7 +1711,7 @@ function AdminEarnings() {
                               className="w-12 h-12 object-cover rounded-lg flex-shrink-0"
                             />
                           ) : (
-                            <div className="w-12 h-12 rounded-lg bg-[#E5E7EB] flex-shrink-0" />
+                            <div className="w-12 h-12 rounded-lg bg-[#F7F4EF] flex-shrink-0" />
                           )}
                           <Link
                             to={`/property/${r.id}`}
@@ -1721,7 +1721,7 @@ function AdminEarnings() {
                           </Link>
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-[#6b7280]">{r.location}</td>
+                      <td className="py-3 px-4 text-[#5B6B82]">{r.location}</td>
                       <td className="py-3 px-4 text-right font-semibold">
                         {r.bookings.toLocaleString()}
                       </td>
@@ -1767,7 +1767,7 @@ function AdminEarnings() {
               </table>
             </div>
             {earningRows.length === 0 && (
-              <div className="text-center py-12 text-[#6b7280]">
+              <div className="text-center py-12 text-[#5B6B82]">
                 No properties with earnings for the selected period.
               </div>
             )}
