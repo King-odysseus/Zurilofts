@@ -10,16 +10,16 @@ import { googleMapsDirectionsUrl } from "../utils/googleMaps.js";
 import { generateInvoice } from "../utils/invoice.js";
 
 const STATUS_META = {
-  PENDING: { label: "Awaiting confirmation", bg: "bg-amber-500", icon: "clock" },
-  CONFIRMED: { label: "Confirmed", bg: "bg-green-600", icon: "check" },
-  CANCELLED: { label: "Cancelled", bg: "bg-red-600", icon: "x" },
+  PENDING: { label: "Awaiting confirmation", bg: "bg-[#FDE8D8] text-[#9A4A1D]", icon: "clock" },
+  CONFIRMED: { label: "Confirmed", bg: "bg-[#E8F4EC] text-[#287A45]", icon: "check" },
+  CANCELLED: { label: "Cancelled", bg: "bg-[#FDECEC] text-[#B42318]", icon: "x" },
 };
 
 function StatusBadge({ status }) {
   const meta = STATUS_META[status] || { label: status, bg: "bg-[#6b7280]", icon: null };
   return (
     <span
-      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold text-white flex-shrink-0 ${meta.bg}`}
+      className={`inline-flex flex-shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${meta.bg}`}
     >
       {meta.icon === "check" && (
         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -80,7 +80,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
   }
 
   return (
-    <article className="group bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden shadow-sm hover:shadow-md transition-all duration-200">
+    <article className="group overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)] transition-all duration-200 hover:shadow-md">
       <div className="flex flex-col sm:flex-row">
         {/* Property image */}
         <Link
@@ -100,7 +100,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
             <div className="flex items-start justify-between gap-2 mb-1">
               <Link
                 to={`/property/${p.id}`}
-                className="text-base font-semibold text-[#222222] hover:text-[#2563EB] transition-colors truncate"
+                className="truncate text-base font-semibold text-[#0B1F42] transition-colors hover:text-[#C49A6C]"
               >
                 {p.title}
               </Link>
@@ -172,7 +172,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
               )}
               <button
                 onClick={openConversation}
-                className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-lg text-xs font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
+                className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[10px] bg-[#0B1F42] px-3 text-xs font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -183,7 +183,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
                   passing booking.id here left the page stuck on "Loading property..." */}
               <Link
                 to={`/property/${p.id}`}
-                className="inline-flex items-center min-h-[44px] px-3 rounded-lg text-xs font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-all duration-200"
+                className="inline-flex min-h-[44px] items-center rounded-[10px] border border-[#E3E8EF] px-3 text-xs font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
               >
                 View details
               </Link>
@@ -265,7 +265,7 @@ function NextStayCard({ booking }) {
   }
 
   return (
-    <div className="rounded-[14px] border border-[#E5E7EB] bg-white overflow-hidden shadow-sm mb-8">
+    <div className="mb-8 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
       <div className="flex flex-col sm:flex-row">
         <div className="sm:w-64 lg:w-72 flex-shrink-0">
           <img
@@ -275,9 +275,9 @@ function NextStayCard({ booking }) {
           />
         </div>
         <div className="flex-1 p-5 sm:p-6">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#2563EB] mb-1">Your next stay</p>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wider text-[#C49A6C]">Your next stay</p>
           <div className="flex items-start justify-between gap-2 mb-2">
-            <h2 className="text-lg font-bold text-[#222222]">{p.title}</h2>
+            <h2 className="text-lg font-bold text-[#0B1F42]">{p.title}</h2>
             <StatusBadge status={booking.status} />
           </div>
           <p className="text-sm text-[#6b7280] mb-3">{formatDateRange(booking.checkIn, booking.checkOut)} &middot; {nights} night{nights !== 1 ? "s" : ""}</p>
@@ -296,7 +296,7 @@ function NextStayCard({ booking }) {
           <div className="flex flex-wrap gap-2">
             <Link
               to={`/property/${p.id}`}
-              className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
+              className="inline-flex min-h-[44px] items-center rounded-[10px] bg-[#0B1F42] px-4 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
             >
               View check-in details
             </Link>
@@ -468,10 +468,10 @@ export default function TripHubPage() {
       <Navbar />
       <main className="max-w-4xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         {/* Header panel */}
-        <div className="rounded-[14px] border border-[#E5E7EB] bg-white p-6 sm:p-8 mb-8">
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#6b7280]">Your stays</p>
-          <h1 className="mt-1 text-2xl font-bold text-[#222222] sm:text-3xl">Trips</h1>
-          <p className="mt-2 max-w-md text-sm text-[#6b7280]">Upcoming adventures and past memories - all in one place.</p>
+          <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[#C49A6C]">Your stays</p>
+          <h1 className="mt-1 text-2xl font-bold text-[#0B1F42] sm:text-3xl">Trips</h1>
+          <p className="mt-2 max-w-md text-sm text-[#5B6B82]">Upcoming adventures and past memories - all in one place.</p>
         </div>
 
         {!loading && !error && activeTab === "upcoming" && nextStay && (
@@ -484,26 +484,26 @@ export default function TripHubPage() {
             onClick={() => setActiveTab("upcoming")}
             className={`min-h-[44px] px-5 text-sm font-semibold transition-colors relative ${
               activeTab === "upcoming"
-                ? "text-[#2563EB]"
-                : "text-[#6b7280] hover:text-[#222222]"
+                ? "text-[#0B1F42]"
+                : "text-[#5B6B82] hover:text-[#0B1F42]"
             }`}
           >
             Upcoming
             {upcoming.length > 0 && (
-              <span className="ml-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-blue-50 text-[#2563EB] text-xs font-bold rounded-full">
+                <span className="ml-1.5 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-[#FDE8D8] px-1.5 text-xs font-bold text-[#9A4A1D]">
                 {upcoming.length}
               </span>
             )}
             {activeTab === "upcoming" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563EB]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C49A6C]" />
             )}
           </button>
           <button
             onClick={() => setActiveTab("past")}
             className={`min-h-[44px] px-5 text-sm font-semibold transition-colors relative ${
               activeTab === "past"
-                ? "text-[#2563EB]"
-                : "text-[#6b7280] hover:text-[#222222]"
+                ? "text-[#0B1F42]"
+                : "text-[#5B6B82] hover:text-[#0B1F42]"
             }`}
           >
             Past
@@ -511,7 +511,7 @@ export default function TripHubPage() {
               <span className="ml-1.5 text-[#6b7280] text-xs">({past.length})</span>
             )}
             {activeTab === "past" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#2563EB]" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#C49A6C]" />
             )}
           </button>
         </div>
@@ -528,7 +528,7 @@ export default function TripHubPage() {
             <p className="text-[#6b7280] mb-4">{error}</p>
             <button
               onClick={() => window.location.reload()}
-              className="inline-flex items-center min-h-[44px] px-4 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
+              className="inline-flex min-h-[44px] items-center rounded-[10px] bg-[#0B1F42] px-4 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
             >
               Try again
             </button>
