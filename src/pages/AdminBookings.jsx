@@ -20,15 +20,15 @@ const CHECK_OUT_OPTIONS = [
 
 // ── Semantic status metadata (label + soft badge) ─────────────────────────
 const STATUS_META = {
-  PENDING: { label: 'Pending', badge: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-500' },
-  CONFIRMED: { label: 'Confirmed', badge: 'bg-green-50 text-green-700 border-green-200', dot: 'bg-green-500' },
-  CANCELLED: { label: 'Cancelled', badge: 'bg-red-50 text-red-700 border-red-200', dot: 'bg-red-500' },
+  PENDING: { label: 'Pending', badge: 'bg-[#FDE8D8] text-[#9A4A1D] border-[#F2C9A8]', dot: 'bg-[#C49A6C]' },
+  CONFIRMED: { label: 'Confirmed', badge: 'bg-[#E8F4EC] text-[#287A45] border-[#BDE2C8]', dot: 'bg-[#287A45]' },
+  CANCELLED: { label: 'Cancelled', badge: 'bg-[#FDECEC] text-[#B42318] border-[#F4C7C3]', dot: 'bg-[#B42318]' },
 };
 
 const REFUND_META = {
-  REFUND_PENDING: { label: 'Refund pending', badge: 'bg-amber-50 text-amber-700 border-amber-200', dot: 'bg-amber-500' },
-  REFUNDED: { label: 'Refunded', badge: 'bg-green-50 text-green-700 border-green-200', dot: 'bg-green-500' },
-  REFUND_DECLINED: { label: 'Refund declined', badge: 'bg-gray-50 text-gray-500 border-gray-200', dot: 'bg-gray-400' },
+  REFUND_PENDING: { label: 'Refund pending', badge: 'bg-[#FDE8D8] text-[#9A4A1D] border-[#F2C9A8]', dot: 'bg-[#C49A6C]' },
+  REFUNDED: { label: 'Refunded', badge: 'bg-[#E8F4EC] text-[#287A45] border-[#BDE2C8]', dot: 'bg-[#287A45]' },
+  REFUND_DECLINED: { label: 'Refund declined', badge: 'bg-[#EAF0F4] text-[#52606F] border-[#DCE5EC]', dot: 'bg-[#94A3B8]' },
 };
 
 function Badge({ label, className, dot }) {
@@ -115,8 +115,8 @@ function ActionButton({ variant = 'secondary', size = 'sm', className = '', disa
     md: 'min-h-[44px] px-4 py-2 text-sm',
   };
   const variants = {
-    primary: 'bg-[#C49A6C] text-white hover:bg-[#B8895C]',
-    secondary: 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]',
+    primary: 'bg-[#0B1F42] text-white hover:bg-[#07072E]',
+    secondary: 'bg-white border border-[#E5E7EB] text-[#0B1F42] hover:bg-[#F7F4EF]',
     danger: 'bg-[#dc2626] text-white hover:bg-[#b91c1c]',
   };
   return (
@@ -582,10 +582,11 @@ function AdminBookings() {
 
   return (
     <div>
-      <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 mb-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="mb-6 flex flex-col justify-between gap-4 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-5 shadow-sm sm:flex-row sm:items-center sm:px-6">
         <div>
-          <h1 className="text-2xl font-bold text-[#222222]">Bookings</h1>
-          <p className="mt-1 text-sm text-[#6b7280]">Review, confirm and manage every stay.</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Operations</p>
+          <h1 className="mt-1 text-2xl font-bold text-[#0B1F42]">Bookings</h1>
+          <p className="mt-1 text-sm text-[#52606F]">Review, confirm and manage every stay.</p>
         </div>
         <Dropdown
           value={statusFilter}
@@ -596,7 +597,7 @@ function AdminBookings() {
             { value: 'CONFIRMED', label: 'Confirmed' },
             { value: 'CANCELLED', label: 'Cancelled' },
           ]}
-          triggerClassName="w-48 min-h-[44px] px-4 rounded-xl bg-white border border-[#E5E7EB] text-sm text-[#222222] focus:outline-none focus:border-[#2563EB] focus:ring-2 focus:ring-[#2563EB]/20"
+          triggerClassName="h-12 w-48 rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
           placeholder="All Statuses"
           ariaLabel="Filter by status"
         />
@@ -608,7 +609,7 @@ function AdminBookings() {
           ['Pending', bookings.filter((b) => b.status === 'PENDING').length],
           ['Confirmed', bookings.filter((b) => b.status === 'CONFIRMED').length],
           ['Cancelled', bookings.filter((b) => b.status === 'CANCELLED').length],
-        ].map(([label, value]) => <div key={label} className="rounded-[14px] border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6b7280]">{label}</p><p className="mt-2 text-2xl font-bold text-[#222222]">{value}</p></div>)}
+        ].map(([label, value]) => <div key={label} className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm"><p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#52606F]">{label}</p><p className="mt-2 text-2xl font-bold text-[#0B1F42]">{value}</p></div>)}
       </div>
 
       {loading ? (
@@ -619,7 +620,7 @@ function AdminBookings() {
       ) : (
         <div className="space-y-4">
           {/* Desktop table */}
-          <div className="hidden md:block bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm overflow-hidden">
+          <div className="hidden overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm md:block">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="bg-[#F7F7F5] border-b border-[#E5E7EB]">
