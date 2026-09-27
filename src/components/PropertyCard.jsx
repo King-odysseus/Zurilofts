@@ -114,13 +114,13 @@ function PropertyCard({ property, cardVariant }) {
 
         {/* Badges: Featured + variant */}
         {badge && (
-          <span className="absolute top-2.5 left-2.5 bg-[#2563EB] text-white text-xs font-bold px-3 py-1 rounded-full">
+            <span className="absolute left-2.5 top-2.5 rounded-full bg-[#C49A6C] px-3 py-1 text-xs font-bold text-white">
             {badge}
           </span>
         )}
         {variantLabel && (
           <span
-            className={`absolute ${badge ? 'top-9' : 'top-2.5'} left-2.5 bg-white/90 backdrop-blur-sm text-[#222222] text-xs font-bold px-3 py-1 rounded-full`}
+            className={`absolute ${badge ? 'top-9' : 'top-2.5'} left-2.5 rounded-full bg-white/90 px-3 py-1 text-xs font-bold text-[#0B1F42] backdrop-blur-sm`}
           >
             {variantLabel}
           </span>
@@ -185,7 +185,7 @@ function PropertyCard({ property, cardVariant }) {
             so price is transparent detail rather than a duplicate "Book Now" CTA. */}
         <div className="mt-auto">
           <span className="text-xs text-[#6b7280]">per night</span>
-          <div className={`${resultsCard ? 'text-[17px] font-semibold text-[#0B1F42]' : 'text-lg font-bold text-[#222222]'}`}>
+          <div className={`${resultsCard ? 'text-[17px] font-semibold text-[#0B1F42]' : 'text-lg font-bold text-[#0B1F42]'}`}>
             {formattedPrice ? `KES ${formattedPrice}` : 'KES -'}
           </div>
         </div>
