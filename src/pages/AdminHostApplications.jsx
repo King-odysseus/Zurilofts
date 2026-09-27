@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const STATUS_STYLES = {
   DRAFT: 'bg-[#EAF0F4] text-[#52606F]', SUBMITTED: 'bg-[#FDE8D8] text-[#9A4A1D]',
@@ -101,7 +102,7 @@ function AdminHostApplications() {
       {loading ? <div className="py-16 text-center text-[#5B6B82]">Loading applications...</div> : applications.length === 0 ? <div className="rounded-2xl border border-[#E3E8EF] bg-white p-12 text-center text-[#5B6B82] shadow-[0_4px_16px_rgba(11,31,66,0.04)]">No applications in this view.</div> : (
         <div className="overflow-x-auto rounded-2xl border border-[#E5E7EB] bg-white shadow-sm">
           <table className="w-full text-sm"><thead><tr className="border-b border-[#E5E7EB] text-left"><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Applicant</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Business</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Properties</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Documents</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]">Status</th><th className="p-4 text-[11px] font-bold uppercase tracking-wider text-[#6b7280]"></th></tr></thead>
-            <tbody>{applications.map((app) => <tr key={app.id} className="border-b border-[#E5E7EB]/60 hover:bg-[#F7F4EF]"><td className="p-4"><p className="font-semibold text-[#0B1F42]">{app.legalName || `${app.user?.firstName || ''} ${app.user?.lastName || ''}`}</p><p className="text-xs text-[#5B6B82]">{app.contactEmail || app.user?.email}</p></td><td className="p-4">{app.businessName || '-'}</td><td className="p-4">{app.propertyCount || '-'}</td><td className="p-4">{app.documents?.length || 0}</td><td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[app.status]}`}>{app.status.replaceAll('_', ' ')}</span></td><td className="p-4"><button onClick={() => openApplication(app.id)} disabled={busy === app.id} className="rounded-[10px] bg-[#0B1F42] px-4 py-2 text-xs font-semibold text-white transition-shadow hover:bg-[#07072E] disabled:opacity-50">Review</button></td></tr>)}</tbody>
+            <tbody>{applications.map((app) => <tr key={app.id} className="border-b border-[#E3E8EF]/60 hover:bg-[#F7F4EF]"><td className="p-4"><p className="font-semibold text-[#0B1F42]">{app.legalName || `${app.user?.firstName || ''} ${app.user?.lastName || ''}`}</p><p className="text-xs text-[#5B6B82]">{app.contactEmail || app.user?.email}</p></td><td className="p-4">{app.businessName || '-'}</td><td className="p-4">{app.propertyCount || '-'}</td><td className="p-4">{app.documents?.length || 0}</td><td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[app.status]}`}>{app.status.replaceAll('_', ' ')}</span></td><td className="p-4"><TableActionsMenu actions={[{ label: 'Review application', icon: '⌕', onClick: () => openApplication(app.id), disabled: busy === app.id }]} /></td></tr>)}</tbody>
           </table>
         </div>
       )}
