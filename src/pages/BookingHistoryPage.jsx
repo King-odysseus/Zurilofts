@@ -10,15 +10,15 @@ import { generateInvoice } from '../utils/invoice.js';
 
 // --- Helpers ---
 const STATUS_STYLES = {
-  PENDING:   { bg: 'bg-amber-500', label: 'Pending', icon: 'clock' },
-  CONFIRMED: { bg: 'bg-green-600', label: 'Confirmed', icon: 'check' },
-  CANCELLED: { bg: 'bg-red-600', label: 'Cancelled', icon: 'x' },
+  PENDING:   { bg: 'bg-[#FDE8D8] text-[#9A4A1D]', label: 'Pending', icon: 'clock' },
+  CONFIRMED: { bg: 'bg-[#E8F4EC] text-[#287A45]', label: 'Confirmed', icon: 'check' },
+  CANCELLED: { bg: 'bg-[#FDECEC] text-[#B42318]', label: 'Cancelled', icon: 'x' },
 };
 
 function StatusBadge({ status }) {
   const meta = STATUS_STYLES[status] || { bg: 'bg-[#6b7280]', label: status, icon: null };
   return (
-    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold text-white ${meta.bg}`}>
+    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${meta.bg}`}>
       {meta.icon === 'check' && (
         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
@@ -128,9 +128,10 @@ function BookingHistoryPage() {
     <div className="min-h-screen bg-canvas">
       <Navbar />
       <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-        <div className="rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm mb-6">
-        <h1 className="text-2xl font-bold text-[#222222] mb-2">My Bookings</h1>
-        <p className="text-[#6b7280] mb-6">
+        <div className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 shadow-[0_4px_16px_rgba(11,31,66,0.04)] sm:px-6">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#C49A6C]">Your stays</p>
+        <h1 className="mb-2 text-2xl font-bold text-[#0B1F42]">My Bookings</h1>
+        <p className="mb-6 text-[#5B6B82]">
           {filtered.length} booking{filtered.length !== 1 ? 's' : ''}
         </p>
         </div>
@@ -143,8 +144,8 @@ function BookingHistoryPage() {
               onClick={() => setStatusFilter(sf.value)}
               className={`min-h-[44px] px-4 rounded-full text-sm font-semibold transition-all duration-200 ${
                 statusFilter === sf.value
-                  ? 'bg-[#2563EB] text-white'
-                  : 'bg-white border border-[#E5E7EB] text-[#222222] hover:bg-[#F7F7F5]'
+                  ? 'bg-[#0B1F42] text-white'
+                  : 'border border-[#E3E8EF] bg-white text-[#52606F] hover:bg-[#F7F4EF]'
               }`}
             >
               {sf.label}
@@ -161,10 +162,10 @@ function BookingHistoryPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-bold text-[#222222] mb-1">No bookings found</h3>
-              <p className="text-[#6b7280]">
+              <h3 className="mb-1 text-lg font-bold text-[#0B1F42]">No bookings found</h3>
+              <p className="text-[#5B6B82]">
                 Try adjusting your filters or{' '}
-                <Link to="/properties" className="text-[#2563EB] font-semibold hover:underline">
+                <Link to="/properties" className="font-semibold text-[#0B1F42] hover:text-[#C49A6C] hover:underline">
                   browse properties
                 </Link>
                 .
@@ -176,7 +177,7 @@ function BookingHistoryPage() {
             {filtered.map((booking) => (
               <div
                 key={booking.id}
-                className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-4 md:p-6"
+                className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_4px_16px_rgba(11,31,66,0.04)] md:p-6"
               >
                 <div className="flex flex-col md:flex-row gap-4">
                   {/* Property image */}
@@ -191,7 +192,7 @@ function BookingHistoryPage() {
                   <div className="flex-1">
                     {/* Title + Location */}
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-bold text-[#222222]">{booking.property?.title || 'Property'}</h3>
+                      <h3 className="font-bold text-[#0B1F42]">{booking.property?.title || 'Property'}</h3>
                       <StatusBadge status={booking.status} />
                     </div>
                     <div className="flex items-center text-[#6b7280] text-sm mt-0.5">
@@ -206,20 +207,20 @@ function BookingHistoryPage() {
                     <div className="mt-3 flex gap-4 text-sm">
                       <div>
                         <span className="text-xs text-[#6b7280] block">Check-in</span>
-                        <span className="font-medium text-[#222222]">{formatDate(booking.checkIn)}</span>
+                        <span className="font-medium text-[#0B1F42]">{formatDate(booking.checkIn)}</span>
                       </div>
                       <div>
                         <span className="text-xs text-[#6b7280] block">Check-out</span>
-                        <span className="font-medium text-[#222222]">{formatDate(booking.checkOut)}</span>
+                        <span className="font-medium text-[#0B1F42]">{formatDate(booking.checkOut)}</span>
                       </div>
                       <div>
                         <span className="text-xs text-[#6b7280] block">Guests</span>
-                        <span className="font-medium text-[#222222]">{booking.guests || 1}</span>
+                        <span className="font-medium text-[#0B1F42]">{booking.guests || 1}</span>
                       </div>
                       {booking.total != null && (
                         <div>
                           <span className="text-xs text-[#6b7280] block">Total</span>
-                          <span className="font-medium text-[#222222]">{formatCurrency(booking.total)}</span>
+                          <span className="font-medium text-[#0B1F42]">{formatCurrency(booking.total)}</span>
                         </div>
                       )}
                     </div>
@@ -228,7 +229,7 @@ function BookingHistoryPage() {
                     <div className="flex flex-wrap gap-2 mt-4">
                       <button
                         onClick={() => openConversation(booking.id)}
-                        className="flex items-center gap-1.5 min-h-[44px] bg-[#C49A6C] text-white px-4 rounded-lg text-sm font-semibold hover:bg-[#B8895C] transition-all duration-200"
+                        className="flex min-h-[44px] items-center gap-1.5 rounded-[10px] bg-[#0B1F42] px-4 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -237,7 +238,7 @@ function BookingHistoryPage() {
                       </button>
                       <button
                         onClick={() => generateInvoice(booking)}
-                        className="flex items-center gap-1.5 min-h-[44px] bg-white text-[#222222] border border-[#E5E7EB] px-4 rounded-lg text-sm font-semibold hover:bg-[#F7F7F5] transition-all duration-200"
+                        className="flex min-h-[44px] items-center gap-1.5 rounded-[10px] border border-[#E3E8EF] bg-white px-4 text-sm font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -246,7 +247,7 @@ function BookingHistoryPage() {
                       </button>
                       <Link
                         to={`/property/${booking.propertyId}`}
-                        className="flex items-center gap-1.5 min-h-[44px] bg-white text-[#222222] border border-[#E5E7EB] px-4 rounded-lg text-sm font-semibold hover:bg-[#F7F7F5] transition-all duration-200"
+                        className="flex min-h-[44px] items-center gap-1.5 rounded-[10px] border border-[#E3E8EF] bg-white px-4 text-sm font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
