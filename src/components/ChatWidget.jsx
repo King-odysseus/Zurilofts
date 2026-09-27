@@ -152,7 +152,7 @@ function ChatWidget() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 w-[360px] max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300" style={{ maxHeight: '520px' }}>
+        <div className="fixed bottom-6 right-6 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.14)] transition-all duration-300" style={{ maxHeight: '520px' }}>
           {/* Header */}
           <div className="flex items-center justify-between bg-[#0B1F42] px-5 py-4">
             <div className="flex items-center space-x-3">
@@ -190,7 +190,7 @@ function ChatWidget() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSend} className="p-4 bg-white border-t border-[#D9D9D9]">
+          <form onSubmit={handleSend} className="border-t border-[#E3E8EF] bg-white p-4">
             {!started ? (
               <div className="space-y-2">
                 <input
@@ -220,7 +220,7 @@ function ChatWidget() {
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#6b7280]">Chatting as <span className="font-semibold text-[#0B0B45]">{name}</span></span>
+                  <span className="text-xs text-[#5B6B82]">Chatting as <span className="font-semibold text-[#0B1F42]">{name}</span></span>
                   <button
                     type="button"
                     onClick={() => { setStarted(false); setName(''); setEmail(''); setMessages([{ from: 'bot', text: 'Hi! 👋 How can we help you today? Ask us anything about our apartments.' }]); setSent(false); }}
@@ -243,9 +243,9 @@ function ChatWidget() {
                     className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0B1F42] transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50"
                   >
                     {sending ? (
-                      <div className="w-4 h-4 border-2 border-[#0B0B45] border-t-transparent rounded-full animate-spin"></div>
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                     ) : (
-                      <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                       </svg>
                     )}
