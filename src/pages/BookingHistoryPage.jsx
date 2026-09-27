@@ -16,7 +16,7 @@ const STATUS_STYLES = {
 };
 
 function StatusBadge({ status }) {
-  const meta = STATUS_STYLES[status] || { bg: 'bg-[#6b7280]', label: status, icon: null };
+  const meta = STATUS_STYLES[status] || { bg: 'bg-[#5B6B82]', label: status, icon: null };
   return (
     <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${meta.bg}`}>
       {meta.icon === 'check' && (
@@ -157,8 +157,8 @@ function BookingHistoryPage() {
         {filtered.length === 0 ? (
           <div className="flex items-center justify-center min-h-[30vh] py-12">
             <div className="text-center max-w-md">
-              <div className="w-20 h-20 bg-[#F7F7F5] border border-[#E5E7EB] rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 bg-[#F7F4EF] border border-[#E3E8EF] rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -195,7 +195,7 @@ function BookingHistoryPage() {
                       <h3 className="font-bold text-[#0B1F42]">{booking.property?.title || 'Property'}</h3>
                       <StatusBadge status={booking.status} />
                     </div>
-                    <div className="flex items-center text-[#6b7280] text-sm mt-0.5">
+                    <div className="flex items-center text-[#5B6B82] text-sm mt-0.5">
                       <svg className="w-3.5 h-3.5 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -206,20 +206,20 @@ function BookingHistoryPage() {
                     {/* Dates */}
                     <div className="mt-3 flex gap-4 text-sm">
                       <div>
-                        <span className="text-xs text-[#6b7280] block">Check-in</span>
+                        <span className="text-xs text-[#5B6B82] block">Check-in</span>
                         <span className="font-medium text-[#0B1F42]">{formatDate(booking.checkIn)}</span>
                       </div>
                       <div>
-                        <span className="text-xs text-[#6b7280] block">Check-out</span>
+                        <span className="text-xs text-[#5B6B82] block">Check-out</span>
                         <span className="font-medium text-[#0B1F42]">{formatDate(booking.checkOut)}</span>
                       </div>
                       <div>
-                        <span className="text-xs text-[#6b7280] block">Guests</span>
+                        <span className="text-xs text-[#5B6B82] block">Guests</span>
                         <span className="font-medium text-[#0B1F42]">{booking.guests || 1}</span>
                       </div>
                       {booking.total != null && (
                         <div>
-                          <span className="text-xs text-[#6b7280] block">Total</span>
+                          <span className="text-xs text-[#5B6B82] block">Total</span>
                           <span className="font-medium text-[#0B1F42]">{formatCurrency(booking.total)}</span>
                         </div>
                       )}

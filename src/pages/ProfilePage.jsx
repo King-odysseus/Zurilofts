@@ -475,7 +475,7 @@ function ProfilePage() {
             <div className="space-y-10">
               <IdentityVerificationPanel />
               {(profile?.role === 'HOST' || user?.hostApplicationStatus != null) && (
-                <div className="pt-8 border-t border-[#E5E7EB]">
+                <div className="pt-8 border-t border-[#E3E8EF]">
                   <h3 className="text-lg font-semibold text-[#0B1F42] mb-2">Host account verification</h3>
                   <p className="text-sm text-[#5B6B82] mb-4">
                     Separate from guest identity verification above - this is your host business/KYC application, required before any listing can be submitted for review.
@@ -509,7 +509,7 @@ function ProfilePage() {
                     <li key={item.id} className="flex-shrink-0 lg:flex-shrink">
                       <a
                         href={`#${item.id}`}
-                        className="block whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] lg:rounded-lg lg:whitespace-normal"
+                        className="block whitespace-nowrap rounded-full px-3.5 py-2 text-sm font-medium text-[#5B6B82] hover:bg-[#F7F4EF] hover:text-[#0B1F42] lg:rounded-lg lg:whitespace-normal"
                       >
                         {item.label}
                       </a>
@@ -519,7 +519,7 @@ function ProfilePage() {
                     <button
                       type="button"
                       onClick={() => setActiveTab('verification')}
-                      className="block min-h-[44px] whitespace-nowrap rounded-full px-3.5 py-2 text-left text-sm font-medium text-[#6b7280] hover:bg-[#F7F7F5] hover:text-[#222222] lg:min-h-0 lg:w-full lg:rounded-lg lg:whitespace-normal"
+                      className="block min-h-[44px] whitespace-nowrap rounded-full px-3.5 py-2 text-left text-sm font-medium text-[#5B6B82] hover:bg-[#F7F4EF] hover:text-[#0B1F42] lg:min-h-0 lg:w-full lg:rounded-lg lg:whitespace-normal"
                     >
                       Verification
                     </button>
@@ -553,7 +553,7 @@ function ProfilePage() {
                 )}
                 <form onSubmit={handleProfileUpdate} className="space-y-4">
                   <div>
-                    <label className="block text-sm font-semibold text-[#222222] mb-2">First Name</label>
+                    <label className="block text-sm font-semibold text-[#0B1F42] mb-2">First Name</label>
                     <input
                       type="text"
                       value={formData.firstName}
@@ -562,7 +562,7 @@ function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#222222] mb-2">Last Name</label>
+                    <label className="block text-sm font-semibold text-[#0B1F42] mb-2">Last Name</label>
                     <input
                       type="text"
                       value={formData.lastName}
@@ -571,7 +571,7 @@ function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#222222] mb-2">Email</label>
+                    <label className="block text-sm font-semibold text-[#0B1F42] mb-2">Email</label>
                     <input
                       type="email"
                       value={formData.email}
@@ -583,13 +583,13 @@ function ProfilePage() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#222222] mb-2">Phone</label>
+                    <label className="block text-sm font-semibold text-[#0B1F42] mb-2">Phone</label>
                     <div className="flex gap-2">
                       <Dropdown
                         value={countryCode}
                         onChange={(val) => handlePhoneChange(val, phoneNumber)}
                         options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
-                        triggerClassName=" px-3 py-3 bg-white text-[#222222] border border-[#E5E7EB] rounded-xl w-[120px] flex-shrink-0"
+                        triggerClassName=" px-3 py-3 bg-white text-[#0B1F42] border border-[#E3E8EF] rounded-xl w-[120px] flex-shrink-0"
                         ariaLabel="Select country code"
                       />
                       <input
@@ -627,7 +627,7 @@ function ProfilePage() {
                 )}
                 <form onSubmit={handlePasswordChange} className="space-y-4" autoComplete="on">
                   <div>
-                    <label className="block text-sm font-semibold text-[#222222] mb-2" htmlFor="current-password">Current password</label>
+                    <label className="block text-sm font-semibold text-[#0B1F42] mb-2" htmlFor="current-password">Current password</label>
                     <input
                       id="current-password"
                       type="password"
@@ -639,7 +639,7 @@ function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#222222] mb-2" htmlFor="new-password">New password</label>
+                    <label className="block text-sm font-semibold text-[#0B1F42] mb-2" htmlFor="new-password">New password</label>
                     <input
                       id="new-password"
                       type="password"
@@ -650,10 +650,10 @@ function ProfilePage() {
                       required
                       className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                     />
-                    <p className="text-xs text-[#6b7280] mt-1">At least 8 characters, with one uppercase letter and one number.</p>
+                    <p className="text-xs text-[#5B6B82] mt-1">At least 8 characters, with one uppercase letter and one number.</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#222222] mb-2" htmlFor="confirm-password">Confirm new password</label>
+                    <label className="block text-sm font-semibold text-[#0B1F42] mb-2" htmlFor="confirm-password">Confirm new password</label>
                     <input
                       id="confirm-password"
                       type="password"
@@ -688,8 +688,8 @@ function ProfilePage() {
                   {/* Download my data */}
                   <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h4 className="font-semibold text-[#222222]">Download my data</h4>
-                      <p className="text-sm text-[#6b7280] mt-1">
+                      <h4 className="font-semibold text-[#0B1F42]">Download my data</h4>
+                      <p className="text-sm text-[#5B6B82] mt-1">
                         Get a copy of the personal data we hold about you in a portable format.
                       </p>
                       {exportMessage && (
@@ -718,8 +718,8 @@ function ProfilePage() {
                   {/* Cookie preferences */}
                   <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.06)] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                      <h4 className="font-semibold text-[#222222]">Cookie preferences</h4>
-                      <p className="text-sm text-[#6b7280] mt-1">
+                      <h4 className="font-semibold text-[#0B1F42]">Cookie preferences</h4>
+                      <p className="text-sm text-[#5B6B82] mt-1">
                         Review or change which optional cookies we may use. You can withdraw consent at any time.
                       </p>
                     </div>
@@ -794,17 +794,17 @@ function ProfilePage() {
 
           {/* Payout Settings - HOST only */}
           {activeTab === 'info' && profile?.role === 'HOST' && (
-            <div id="section-preferences" className="mt-10 pt-8 border-t-2 border-[#E5E7EB] scroll-mt-24">
-              <h3 className="text-xl font-bold text-[#222222] mb-1">Payout Settings</h3>
-              <p className="text-sm text-[#6b7280] mb-6">
+            <div id="section-preferences" className="mt-10 pt-8 border-t-2 border-[#E3E8EF] scroll-mt-24">
+              <h3 className="text-xl font-bold text-[#0B1F42] mb-1">Payout Settings</h3>
+              <p className="text-sm text-[#5B6B82] mb-6">
                 Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
               </p>
 
               {/* Payout destination */}
               <form onSubmit={handlePayoutDestinationSave} className="space-y-4 mb-8">
-                <h4 className="font-semibold text-[#222222]">Payout Destination</h4>
+                <h4 className="font-semibold text-[#0B1F42]">Payout Destination</h4>
 
-                <div className="grid grid-cols-2 gap-2 rounded-full bg-[#222222]/5 p-1">
+                <div className="grid grid-cols-2 gap-2 rounded-full bg-[#0B1F42]/5 p-1">
                   {[
                     { value: 'bank', label: 'Bank account' },
                     { value: 'mpesa', label: 'M-PESA' },
@@ -816,7 +816,7 @@ function ProfilePage() {
                       className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                         payoutMethod === option.value
                           ? 'bg-[#0B1F42] text-white shadow-sm'
-                          : 'text-[#6b7280] hover:text-[#222222]'
+                          : 'text-[#5B6B82] hover:text-[#0B1F42]'
                       }`}
                     >
                       {option.label}

@@ -53,11 +53,11 @@ export function ConversationRow({ conversation, currentUserId, compact = false, 
     >
       <div className="flex items-center gap-4">
         {/* Property thumbnail */}
-        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-[#E5E7EB]/30">
+        <div className="w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-[#E3E8EF]/30">
           {image ? (
             <img src={image} alt={property.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
+            <div className="w-full h-full flex items-center justify-center text-[#5B6B82]">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
               </svg>
@@ -68,14 +68,14 @@ export function ConversationRow({ conversation, currentUserId, compact = false, 
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <h3 className="font-semibold text-[#222222] truncate">{other.name}</h3>
-            <span className="text-xs text-[#6b7280] flex-shrink-0">
+            <h3 className="font-semibold text-[#0B1F42] truncate">{other.name}</h3>
+            <span className="text-xs text-[#5B6B82] flex-shrink-0">
               {formatRelativeTime(lastMessage ? lastMessage.createdAt : conversation.updatedAt)}
             </span>
           </div>
-          <p className="text-sm text-[#6b7280] truncate">{property.title || 'Property'}</p>
+          <p className="text-sm text-[#5B6B82] truncate">{property.title || 'Property'}</p>
           <div className="flex items-center justify-between gap-2 mt-1">
-            <p className={`text-sm truncate ${unread ? 'font-semibold text-[#222222]' : 'text-[#6b7280]'}`}>
+            <p className={`text-sm truncate ${unread ? 'font-semibold text-[#0B1F42]' : 'text-[#5B6B82]'}`}>
               {preview}
             </p>
             {unread && (
@@ -152,26 +152,26 @@ function InboxPage() {
 
         {!loading && !error && (
           <div className="hidden min-h-[560px] overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:grid lg:grid-cols-[360px_minmax(0,1fr)]">
-            <section className="border-r border-[#E5E7EB]" aria-label="Conversations">
-              <div className="border-b border-[#E5E7EB] px-5 py-4">
+            <section className="border-r border-[#E3E8EF]" aria-label="Conversations">
+              <div className="border-b border-[#E3E8EF] px-5 py-4">
                 <h2 className="font-bold text-[#0B1F42]">Conversations</h2>
-                <p className="mt-1 text-sm text-[#6b7280]">Choose a thread to view its messages.</p>
+                <p className="mt-1 text-sm text-[#5B6B82]">Choose a thread to view its messages.</p>
               </div>
               {conversations.length > 0 ? conversations.map((conversation) => (
                 <ConversationRow key={conversation.id} conversation={conversation} currentUserId={user?.id} compact />
               )) : (
-                <p className="px-5 py-8 text-sm text-[#6b7280]">No conversations yet.</p>
+                <p className="px-5 py-8 text-sm text-[#5B6B82]">No conversations yet.</p>
               )}
             </section>
-            <section className="flex items-center justify-center bg-[#F7F7F5]/60 px-8 text-center" aria-label="Conversation preview">
+            <section className="flex items-center justify-center bg-[#F7F4EF]/60 px-8 text-center" aria-label="Conversation preview">
               <div className="max-w-sm">
-                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white text-[#6b7280] shadow-sm">
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white text-[#5B6B82] shadow-sm">
                   <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                   </svg>
                 </div>
                 <h2 className="text-xl font-bold text-[#0B1F42]">{conversations.length ? 'Select a conversation' : 'No messages yet'}</h2>
-                <p className="mt-2 text-sm text-[#6b7280]">
+                <p className="mt-2 text-sm text-[#5B6B82]">
                   {conversations.length ? 'Choose a booking conversation from the list to read and reply.' : 'Messages about your bookings will appear here once you make a reservation.'}
                 </p>
               </div>
@@ -186,7 +186,7 @@ function InboxPage() {
           </div>
         ) : error ? (
           <div className="text-center py-16">
-            <p className="text-[#6b7280] mb-4">{error}</p>
+            <p className="text-[#5B6B82] mb-4">{error}</p>
             <button
               onClick={fetchConversations}
               className="inline-flex items-center min-h-[44px] px-4 py-2 rounded-lg text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-all duration-200"
@@ -196,13 +196,13 @@ function InboxPage() {
           </div>
         ) : conversations.length === 0 ? (
           <div className="text-center py-16 px-4">
-            <div className="w-20 h-20 bg-[#E5E7EB]/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-20 h-20 bg-[#E3E8EF]/30 rounded-full flex items-center justify-center mx-auto mb-6">
+              <svg className="w-10 h-10 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-[#222222] mb-1">No messages yet</h3>
-            <p className="text-[#6b7280] max-w-sm mx-auto">
+            <h3 className="text-lg font-semibold text-[#0B1F42] mb-1">No messages yet</h3>
+            <p className="text-[#5B6B82] max-w-sm mx-auto">
               Messages about your bookings will appear here once you make a reservation.
             </p>
           </div>
