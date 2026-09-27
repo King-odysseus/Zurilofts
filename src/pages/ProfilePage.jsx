@@ -539,8 +539,9 @@ function ProfilePage() {
                   </div>
                 </div>
               )}
-              <div id="section-personal" className="neu-card p-6 scroll-mt-24">
-                <h2 className="text-lg font-bold text-[#222222] mb-6">Personal Information</h2>
+              <div id="section-personal" className="rounded-2xl border border-[#E5E7EB] bg-white p-6 scroll-mt-24">
+                <h2 className="text-xl font-bold text-[#0B1F42] mb-1">Personal details</h2>
+                <p className="mb-6 text-sm text-[#52606F]">Keep your profile information up to date.</p>
                 {message && (
                   <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
                     message.includes('success')
@@ -557,7 +558,7 @@ function ProfilePage() {
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
+                      className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                     />
                   </div>
                   <div>
@@ -566,7 +567,7 @@ function ProfilePage() {
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
+                      className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                     />
                   </div>
                   <div>
@@ -575,7 +576,7 @@ function ProfilePage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
+                      className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                     />
                     {emailError && (
                       <p className="text-red-500 text-xs mt-1">{emailError}</p>
@@ -597,7 +598,7 @@ function ProfilePage() {
                         onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
                         maxLength={15}
                         placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
-                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] rounded-xl"
+                        className="h-12 flex-1 rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] placeholder-[#52606F] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                       />
                     </div>
                     {phoneError && (
@@ -614,7 +615,7 @@ function ProfilePage() {
                 </form>
               </div>
 
-              <div id="section-security" className="neu-card p-6 mt-6 scroll-mt-24">
+              <div id="section-security" className="mt-6 rounded-2xl border border-[#E5E7EB] bg-white p-6 scroll-mt-24">
                 <h2 className="text-lg font-bold text-[#222222] mb-2">Change password</h2>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Choose a strong, unique password. For your security, changing it signs you out on all devices.
@@ -634,7 +635,7 @@ function ProfilePage() {
                       value={passwordForm.currentPassword}
                       onChange={(e) => setPasswordForm((prev) => ({ ...prev, currentPassword: e.target.value }))}
                       required
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
+                      className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                     />
                   </div>
                   <div>
@@ -647,7 +648,7 @@ function ProfilePage() {
                       onChange={(e) => setPasswordForm((prev) => ({ ...prev, newPassword: e.target.value }))}
                       minLength={8}
                       required
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
+                      className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                     />
                     <p className="text-xs text-[#6b7280] mt-1">At least 8 characters, with one uppercase letter and one number.</p>
                   </div>
@@ -661,7 +662,7 @@ function ProfilePage() {
                       onChange={(e) => setPasswordForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
                       minLength={8}
                       required
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#222222]"
+                      className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                     />
                   </div>
                   <button
@@ -685,7 +686,7 @@ function ProfilePage() {
 
                 <div className="space-y-4">
                   {/* Download my data */}
-                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h4 className="font-semibold text-[#222222]">Download my data</h4>
                       <p className="text-sm text-[#6b7280] mt-1">
@@ -715,7 +716,7 @@ function ProfilePage() {
                   </div>
 
                   {/* Cookie preferences */}
-                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="rounded-2xl border border-[#E5E7EB] bg-white p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <h4 className="font-semibold text-[#222222]">Cookie preferences</h4>
                       <p className="text-sm text-[#6b7280] mt-1">
@@ -761,7 +762,7 @@ function ProfilePage() {
                           value={deleteConfirm}
                           onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
                           placeholder="Type DELETE to confirm"
-                          className="neu-input w-full sm:w-72 px-4 py-3 focus:outline-none bg-white text-[#222222] placeholder-[#6b7280] rounded-xl"
+                          className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] placeholder-[#52606F] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 sm:w-72"
                         />
                         {deleteError && <p className="text-red-500 text-xs mt-2">{deleteError}</p>}
                         <div className="flex gap-3 mt-4">
