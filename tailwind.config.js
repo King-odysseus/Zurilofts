@@ -19,9 +19,9 @@ export default {
         charcoal:       '#222222',
         'cool-grey':    '#6b7280',
         border:         '#E5E7EB',
-        // App canvas: cards are white and float on this grey. Tune the tone
-        // here (one place) rather than editing page backgrounds everywhere.
-        canvas:         '#F7F7F5',
+        // App canvas stays white; warm brand accents are applied intentionally
+        // to sections, controls, and status surfaces rather than the whole app.
+        canvas:         '#FFFFFF',
       },
       // Whole-app elevation scale. Default Tailwind shadows are too faint for
       // borderless cards, so each level is a tight contact edge + a soft base.

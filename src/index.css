@@ -7,7 +7,7 @@
   --zl-navy-hover: #07072E;
   --zl-bronze: #C49A6C;
   --zl-bronze-hover: #B8895C;
-  --zl-canvas: #F7F4EF;
+  --zl-canvas: #FFFFFF;
   --zl-border: #E3E8EF;
   --zl-text: #0B1F42;
   --zl-muted: #5B6B82;
@@ -106,7 +106,7 @@ html {
 body {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background-color: #F7F4EF;
+  background-color: #FFFFFF;
   color: #0B1F42;
 }
 
@@ -190,7 +190,7 @@ body {
 }
 
 /* ===== Card System - flat, bordered, restrained surfaces =====
-   Cards sit on the light-grey app canvas (bg-canvas, tuned in
+   Cards sit on the white app canvas (bg-canvas, tuned in
    tailwind.config.js) with a thin neutral border and a subtle layered
    shadow for gentle elevation. */
 .neu-card {

@@ -642,9 +642,9 @@ function FullPagePreview({ form, onClose }) {
     <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-[14px] w-full max-w-5xl my-8 shadow-2xl overflow-hidden">
         {/* Bar */}
-        <div className="sticky top-0 z-10 flex items-center justify-between bg-white border-b border-[#E5E7EB] text-[#222222] px-5 py-3">
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-white border-b border-[#E3E8EF] text-[#0B1F42] px-5 py-3">
           <span className="text-sm font-semibold">Page preview - not yet saved</span>
-          <button onClick={onClose} className="text-[#6b7280] hover:text-[#222222]" aria-label="Close preview">
+          <button onClick={onClose} className="text-[#5B6B82] hover:text-[#0B1F42]" aria-label="Close preview">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -653,8 +653,8 @@ function FullPagePreview({ form, onClose }) {
 
         <div className="p-5 md:p-8">
           {/* Title */}
-          <h1 className="text-2xl md:text-3xl font-bold text-[#222222] mb-1">{form.title || 'Property title'}</h1>
-          <div className="flex items-center text-[#6b7280] mb-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-[#0B1F42] mb-1">{form.title || 'Property title'}</h1>
+          <div className="flex items-center text-[#5B6B82] mb-6">
             <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -682,42 +682,42 @@ function FullPagePreview({ form, onClose }) {
               )}
             </div>
           ) : (
-            <div className="mb-8 w-full h-64 md:h-[420px] rounded-[14px] bg-[#f0f0f0] flex items-center justify-center text-[#6b7280]">No photos uploaded yet</div>
+            <div className="mb-8 w-full h-64 md:h-[420px] rounded-[14px] bg-[#F7F4EF] flex items-center justify-center text-[#5B6B82]">No photos uploaded yet</div>
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
               {/* Stats */}
-              <div className="flex flex-wrap gap-8 pb-6 mb-6 border-b border-[#E5E7EB]">
+              <div className="flex flex-wrap gap-8 pb-6 mb-6 border-b border-[#E3E8EF]">
                 <div>
-                  <p className="font-bold text-[#222222]">{bedLabel(form)}</p>
-                  <p className="text-sm text-[#6b7280]">Bedrooms</p>
+                  <p className="font-bold text-[#0B1F42]">{bedLabel(form)}</p>
+                  <p className="text-sm text-[#5B6B82]">Bedrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#222222]">{bedBathLabel(form)}</p>
-                  <p className="text-sm text-[#6b7280]">Bathrooms</p>
+                  <p className="font-bold text-[#0B1F42]">{bedBathLabel(form)}</p>
+                  <p className="text-sm text-[#5B6B82]">Bathrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#222222]">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
-                  <p className="text-sm text-[#6b7280]">Area</p>
+                  <p className="font-bold text-[#0B1F42]">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
+                  <p className="text-sm text-[#5B6B82]">Area</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#222222] capitalize">{form.type}</p>
-                  <p className="text-sm text-[#6b7280]">Type</p>
+                  <p className="font-bold text-[#0B1F42] capitalize">{form.type}</p>
+                  <p className="text-sm text-[#5B6B82]">Type</p>
                 </div>
               </div>
 
               {/* Description */}
-              <h2 className="text-xl font-bold text-[#222222] mb-3">About this property</h2>
-              <p className="text-[#222222] leading-relaxed whitespace-pre-line mb-8">{form.description || 'No description yet.'}</p>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">About this property</h2>
+              <p className="text-[#0B1F42] leading-relaxed whitespace-pre-line mb-8">{form.description || 'No description yet.'}</p>
 
               {/* Amenities */}
               {amenities.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="text-xl font-bold text-[#222222] mb-3">Amenities</h2>
+                  <h2 className="text-xl font-bold text-[#0B1F42] mb-3">Amenities</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {amenities.map((a, i) => (
-                      <div key={i} className="flex items-center text-[#222222]">
+                      <div key={i} className="flex items-center text-[#0B1F42]">
                         <svg className="w-5 h-5 text-[#9A744A] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                         </svg>
@@ -731,10 +731,10 @@ function FullPagePreview({ form, onClose }) {
               {/* Nearby */}
               {nearby.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-bold text-[#222222] mb-3">What&apos;s nearby</h2>
+                  <h2 className="text-xl font-bold text-[#0B1F42] mb-3">What&apos;s nearby</h2>
                   <ul className="space-y-2">
                     {nearby.map((n, i) => (
-                      <li key={i} className="flex items-center text-[#222222]">
+                      <li key={i} className="flex items-center text-[#0B1F42]">
                         <svg className="w-5 h-5 text-[#9A744A] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -750,8 +750,8 @@ function FullPagePreview({ form, onClose }) {
             {/* Booking card */}
             <div className="lg:col-span-1">
               <div className="rounded-[14px] p-6 sticky top-20 shadow-sm bg-white">
-                <span className="text-3xl font-bold text-[#222222]">KES {price.toLocaleString()}</span>
-                <span className="text-[#6b7280]"> / night</span>
+                <span className="text-3xl font-bold text-[#0B1F42]">KES {price.toLocaleString()}</span>
+                <span className="text-[#5B6B82]"> / night</span>
                 <div className="block w-full bg-[#C49A6C] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
                 {!form.available && (
                   <p className="text-center text-sm text-red-600 mt-3 font-medium">Currently marked unavailable</p>
@@ -822,30 +822,30 @@ function SeasonalPricing({ propertyId }) {
 
   return (
     <div className="bg-white rounded-[14px] p-6 shadow-sm">
-      <h2 className="text-lg font-bold text-[#222222] mb-1">Seasonal Pricing</h2>
-      <p className="text-sm text-[#6b7280] mb-4">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
+      <h2 className="text-lg font-bold text-[#0B1F42] mb-1">Seasonal Pricing</h2>
+      <p className="text-sm text-[#5B6B82] mb-4">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
 
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{error}</div>}
 
       {loading ? (
-        <p className="text-sm text-[#6b7280]">Loading...</p>
+        <p className="text-sm text-[#5B6B82]">Loading...</p>
       ) : rules.length > 0 ? (
         <div className="space-y-2 mb-4">
           {rules.map((r) => (
             <div key={r.id} className="flex items-center justify-between bg-canvas rounded-xl px-4 py-2.5 text-sm">
               <div>
-                <span className="font-semibold text-[#222222]">{r.name || 'Rate'}</span>
-                <span className="text-[#6b7280] ml-2">{fmt(r.start)} &rarr; {fmt(r.end)}</span>
+                <span className="font-semibold text-[#0B1F42]">{r.name || 'Rate'}</span>
+                <span className="text-[#5B6B82] ml-2">{fmt(r.start)} &rarr; {fmt(r.end)}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="font-semibold text-[#222222]">KES {r.price.toLocaleString()}/night</span>
+                <span className="font-semibold text-[#0B1F42]">KES {r.price.toLocaleString()}/night</span>
                 <button type="button" onClick={() => removeRule(r.id)} className="text-red-600 hover:text-red-800 text-xs font-semibold">Remove</button>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-[#6b7280] mb-4">No seasonal rates yet.</p>
+        <p className="text-sm text-[#5B6B82] mb-4">No seasonal rates yet.</p>
       )}
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
@@ -981,8 +981,8 @@ function AutomatedMessages({ propertyId }) {
     <div className="bg-white rounded-[14px] p-6 shadow-sm">
       <div className="flex items-start justify-between gap-4 mb-1">
         <div>
-          <h2 className="text-lg font-bold text-[#222222]">Automated Messages</h2>
-          <p className="text-sm text-[#6b7280] max-w-2xl">
+          <h2 className="text-lg font-bold text-[#0B1F42]">Automated Messages</h2>
+          <p className="text-sm text-[#5B6B82] max-w-2xl">
             Send your guests helpful messages automatically as their booking progresses. Each message is delivered
             to the booking&apos;s chat thread from your account. Write in your own voice, or start from a template
             and drop in placeholders like {'{guestFirstName}'} or {'{checkIn}'}.
@@ -990,7 +990,7 @@ function AutomatedMessages({ propertyId }) {
         </div>
         {!loading && (
           <div className="flex items-center gap-3 flex-shrink-0">
-            <span className={`text-xs font-medium ${dirty ? 'text-amber-600' : 'text-[#6b7280]'}`}>
+            <span className={`text-xs font-medium ${dirty ? 'text-amber-600' : 'text-[#5B6B82]'}`}>
               {dirty ? 'Unsaved changes' : savedAt ? `Saved at ${savedAt}` : ''}
             </span>
             <button
@@ -1008,9 +1008,9 @@ function AutomatedMessages({ propertyId }) {
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 mb-4 mt-3 text-sm">{error}</div>}
 
       {loading ? (
-        <p className="text-sm text-[#6b7280] mt-4">Loading…</p>
+        <p className="text-sm text-[#5B6B82] mt-4">Loading…</p>
       ) : rows.length === 0 ? (
-        <p className="text-sm text-[#6b7280] mt-4">No message triggers available.</p>
+        <p className="text-sm text-[#5B6B82] mt-4">No message triggers available.</p>
       ) : (
         <div className="space-y-3 mt-4">
           {rows.map((row) => {
@@ -1019,13 +1019,13 @@ function AutomatedMessages({ propertyId }) {
               <div key={row.trigger} className="bg-canvas rounded-[14px] p-4 sm:p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="font-semibold text-[#222222] flex items-center gap-2">
+                    <p className="font-semibold text-[#0B1F42] flex items-center gap-2">
                       {m.label || row.trigger}
                       {row.enabled && row.saved && (
                         <span className="text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">ON</span>
                       )}
                     </p>
-                    <p className="text-xs text-[#6b7280]">{m.description}</p>
+                    <p className="text-xs text-[#5B6B82]">{m.description}</p>
                   </div>
                   <Toggle
                     on={row.enabled}
@@ -1039,7 +1039,7 @@ function AutomatedMessages({ propertyId }) {
                     <div>
                       {m.offsetLabel && (
                         <div className="flex items-center gap-2 mb-2">
-                          <label className="text-xs font-semibold text-[#222222]" htmlFor={`offset-${row.trigger}`}>
+                          <label className="text-xs font-semibold text-[#0B1F42]" htmlFor={`offset-${row.trigger}`}>
                             {m.offsetLabel}
                           </label>
                           <input
@@ -1062,7 +1062,7 @@ function AutomatedMessages({ propertyId }) {
                         onChange={(e) => patchRow(row.trigger, { body: e.target.value })}
                       />
                       <div className="flex flex-wrap items-center gap-1.5 mt-2">
-                        <span className="text-xs text-[#6b7280] mr-1">Insert:</span>
+                        <span className="text-xs text-[#5B6B82] mr-1">Insert:</span>
                         {MESSAGE_TOKENS.map((tok) => (
                           <button
                             key={tok}
