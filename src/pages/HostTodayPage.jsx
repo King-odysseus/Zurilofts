@@ -63,7 +63,7 @@ function TodayCard({ booking, type }) {
   const badge = badges[type];
 
   return (
-    <article className="overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-sm transition-shadow duration-200 hover:shadow-md">
+    <article className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)] transition-shadow duration-200 hover:shadow-[0_12px_32px_rgba(11,31,66,0.12)]">
       <Link to={`/property/${p.id}`} className="block overflow-hidden">
         <img
           src={image || "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&q=80"}
@@ -92,13 +92,13 @@ function TodayCard({ booking, type }) {
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-[#0B1F42]">{guestName}</p>
             {guest.phone && (
-              <p className="text-xs text-[#6b7280]">{guest.phone}</p>
+              <p className="text-xs text-[#5B6B82]">{guest.phone}</p>
             )}
           </div>
         </div>
 
         {/* Dates */}
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#6b7280] mb-3">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[#5B6B82] mb-3">
           <svg className="w-3.5 h-3.5 flex-shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
@@ -116,12 +116,12 @@ function TodayCard({ booking, type }) {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 pt-3 border-t border-[#E5E7EB]">
+        <div className="flex items-center gap-2 pt-3 border-t border-[#E3E8EF]">
           {/* /booking/:id is the checkout route and takes a PROPERTY id, so
               passing booking.id here left the page stuck on "Loading property..." */}
           <Link
             to={`/property/${p.id}`}
-            className="flex min-h-[44px] flex-1 items-center justify-center rounded-lg border border-[#E5E7EB] bg-white px-3 text-center text-xs font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
+            className="flex min-h-[44px] flex-1 items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white px-3 text-center text-xs font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
           >
             View details
           </Link>
@@ -231,12 +231,12 @@ function OnboardingChecklist({ hostApplicationStatus, properties, role }) {
   const completedCount = steps.filter((s) => s.done).length;
 
   return (
-    <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 mb-8">
+    <section className="bg-white rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.08)] p-6 mb-8">
       <div className="flex items-center justify-between mb-1">
-        <h2 className="text-lg font-bold text-[#222222]">Get set up as a host</h2>
+        <h2 className="text-lg font-bold text-[#0B1F42]">Get set up as a host</h2>
         <span className="text-sm font-medium text-[#6b7280]">{completedCount}/{steps.length} done</span>
       </div>
-      <p className="text-sm text-[#6b7280] mb-5">
+      <p className="text-sm text-[#5B6B82] mb-5">
         You can explore your dashboard and prepare draft listings right away. Publishing and accepting bookings need a verified account and an approved listing.
       </p>
       <ol className="space-y-3">
@@ -244,7 +244,7 @@ function OnboardingChecklist({ hostApplicationStatus, properties, role }) {
           <li
             key={step.key}
             className={`flex items-start gap-3 rounded-xl p-3 border transition-colors ${
-              step.done ? 'bg-[#F7F7F5] border-transparent' : 'bg-white border-[#E5E7EB]'
+              step.done ? 'bg-[#F7F7F5] border-transparent' : 'bg-white border-[#E3E8EF]'
             }`}
           >
             <div
@@ -261,10 +261,10 @@ function OnboardingChecklist({ hostApplicationStatus, properties, role }) {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className={`text-sm font-semibold ${step.done ? 'text-[#6b7280] line-through' : 'text-[#222222]'}`}>
+              <p className={`text-sm font-semibold ${step.done ? 'text-[#5B6B82] line-through' : 'text-[#0B1F42]'}`}>
                 {step.label}
               </p>
-              <p className="text-xs text-[#6b7280] mt-0.5">{step.description}</p>
+              <p className="text-xs text-[#5B6B82] mt-0.5">{step.description}</p>
             </div>
             {step.cta && (
               <Link
@@ -289,13 +289,13 @@ OnboardingChecklist.propTypes = {
 
 function EmptyPanel({ label, icon }) {
   return (
-    <div className="text-center py-12 px-4 bg-white rounded-[14px] border border-[#E5E7EB]">
+    <div className="text-center py-12 px-4 bg-white rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.06)]">
       <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center">
         <svg className="w-6 h-6 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {icon}
         </svg>
       </div>
-      <p className="text-sm text-[#6b7280]">No {label.toLowerCase()} today</p>
+      <p className="text-sm text-[#5B6B82]">No {label.toLowerCase()} today</p>
     </div>
   );
 }
@@ -308,7 +308,7 @@ EmptyPanel.propTypes = {
 // Compact horizontal metric: an icon circle beside a value + label.
 function MetricCard({ label, value, icon, iconClass }) {
   return (
-    <div className="flex items-center gap-4 rounded-2xl border border-[#E5E7EB] bg-white p-5 shadow-sm">
+    <div className="flex items-center gap-4 rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
       <div className={`w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 ${iconClass}`}>
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {icon}
@@ -355,14 +355,14 @@ function ArrivalRow({ booking }) {
       </Link>
 
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-[#222222] truncate">{guestName}</p>
+        <p className="text-sm font-semibold text-[#0B1F42] truncate">{guestName}</p>
         <Link to={`/property/${p.id}`} className="block text-xs text-[#5B6B82] truncate hover:text-[#9A744A] transition-colors">
           {p.title}
         </Link>
       </div>
 
       <div className="hidden sm:block text-right flex-shrink-0">
-        <p className="text-sm font-medium text-[#222222]">
+        <p className="text-sm font-medium text-[#0B1F42]">
           {booking.guests} guest{booking.guests !== 1 ? "s" : ""}
         </p>
         <p className="text-xs text-[#6b7280]">
@@ -372,7 +372,7 @@ function ArrivalRow({ booking }) {
 
       <Link
         to={`/messages?booking=${booking.id}`}
-        className="flex-shrink-0 inline-flex items-center justify-center min-h-[40px] px-3 rounded-lg text-xs font-semibold bg-white text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-all duration-200"
+        className="flex-shrink-0 inline-flex items-center justify-center min-h-[40px] px-3 rounded-[10px] text-xs font-semibold bg-white text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F7F5] transition-all duration-200"
       >
         Message
       </Link>
@@ -400,9 +400,9 @@ ArrivalRow.propTypes = {
 
 function ArrivingTodayCard({ arrivals }) {
   return (
-    <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm overflow-hidden">
-      <header className="flex items-center justify-between px-5 py-4 border-b border-[#E5E7EB]">
-        <h2 className="text-lg font-bold text-[#222222] flex items-center gap-2">
+    <section className="bg-white rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.08)] overflow-hidden">
+      <header className="flex items-center justify-between px-5 py-4 border-b border-[#E3E8EF]">
+        <h2 className="text-lg font-bold text-[#0B1F42] flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
           Arriving today
         </h2>
@@ -421,7 +421,7 @@ function ArrivingTodayCard({ arrivals }) {
           <p className="text-sm text-[#6b7280]">No arrivals today</p>
         </div>
       ) : (
-        <ul className="divide-y divide-[#E5E7EB]">
+        <ul className="divide-y divide-[#E3E8EF]">
           {arrivals.map((b) => (
             <ArrivalRow key={b.id} booking={b} />
           ))}
