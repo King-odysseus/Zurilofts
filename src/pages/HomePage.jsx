@@ -120,7 +120,7 @@ function HomeHeader({ propertiesPage = false, searchLabel = '', searchPath = '/p
             {!searchOpen && <span className={propertiesPage || searchLabel ? 'pr-3 text-xs text-[#5B6B82]' : 'sr-only'}>{searchLabel || (propertiesPage ? 'Search properties' : 'Search')}</span>}
           </form>
           <Link to="/host/application" className="hidden text-xs font-medium hover:text-[#C89B6D] lg:block">{t('nav.becomeHost')}</Link>
-          <Link to="/favourites" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-50" aria-label="Favourites">
+          <Link to="/favourites" className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-[#F7F4EF]" aria-label="Favourites">
             <Icon name="heart" className="h-[18px] w-[18px]" />
           </Link>
           <div className="relative hidden sm:block">

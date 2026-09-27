@@ -346,7 +346,7 @@ function AdminEarningsDesign({
               </span>
             </div>
           </div>
-          <div className="flex items-center gap-2 rounded-lg bg-[#F8FAFC] p-1">
+          <div className="flex items-center gap-2 rounded-lg bg-[#F7F4EF] p-1">
             {ranges.map((range) => (
               <button
                 key={range.value}
@@ -398,7 +398,7 @@ function AdminEarningsDesign({
             <p className="mt-7 text-center text-xs text-[#94A3B8]">
               {card.caption}
             </p>
-            <div className="mt-5 rounded-lg bg-[#F8FAFC] px-3 py-2 text-xs text-[#5B6B82]">
+            <div className="mt-5 rounded-lg bg-[#F7F4EF] px-3 py-2 text-xs text-[#5B6B82]">
               {card.caption}
             </div>
           </section>
