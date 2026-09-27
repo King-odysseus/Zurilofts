@@ -162,7 +162,7 @@ function DisputeThreadPage() {
         <div className="min-h-screen bg-canvas">
           <Navbar />
           <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 pb-16">
-            <p className="text-[#6b7280]">A booking is required to open a dispute.</p>
+            <p className="text-[#5B6B82]">A booking is required to open a dispute.</p>
           </main>
         </div>
       );
@@ -215,7 +215,7 @@ function DisputeThreadPage() {
               {dispute.status.replace('_', ' ')}
             </span>
           </div>
-          <div className="mb-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-[#6b7280]">
+          <div className="mb-5 flex flex-wrap gap-x-6 gap-y-2 text-xs text-[#5B6B82]">
             <span>Opened {new Date(dispute.createdAt).toLocaleDateString()}</span>
             <span>{dispute.messages.length} message{dispute.messages.length === 1 ? '' : 's'}</span>
             <span>{dispute.evidence.length} evidence file{dispute.evidence.length === 1 ? '' : 's'}</span>
@@ -231,18 +231,18 @@ function DisputeThreadPage() {
 
           {/* Timeline - real recorded events, not a synthesised history */}
           {dispute.timeline?.length > 0 && (
-            <div className="mb-6 border-t border-[#E5E7EB] pt-4">
-              <p className="text-sm font-semibold text-[#222222] mb-3">Timeline</p>
+            <div className="mb-6 border-t border-[#E3E8EF] pt-4">
+              <p className="text-sm font-semibold text-[#0B1F42] mb-3">Timeline</p>
               <ol className="space-y-3">
                 {dispute.timeline.map((event, idx) => (
                   <li key={`${event.action}-${event.createdAt}-${idx}`} className="flex gap-3">
                     <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-[#C49A6C]" aria-hidden="true" />
                     <div>
-                      <p className="text-sm text-[#222222]">
+                      <p className="text-sm text-[#0B1F42]">
                         {TIMELINE_LABELS[event.action] || event.action}
-                        {event.note && <span className="text-[#6b7280]"> - {event.note}</span>}
+                        {event.note && <span className="text-[#5B6B82]"> - {event.note}</span>}
                       </p>
-                      <p className="text-xs text-[#6b7280]">{new Date(event.createdAt).toLocaleString()}</p>
+                      <p className="text-xs text-[#5B6B82]">{new Date(event.createdAt).toLocaleString()}</p>
                     </div>
                   </li>
                 ))}
@@ -264,7 +264,7 @@ function DisputeThreadPage() {
                   </button>
                 </li>
               ))}
-              {dispute.evidence.length === 0 && <li className="text-sm text-[#6b7280]">No evidence uploaded yet.</li>}
+              {dispute.evidence.length === 0 && <li className="text-sm text-[#5B6B82]">No evidence uploaded yet.</li>}
             </ul>
             {!closed && (
               <label className="inline-block cursor-pointer rounded-[10px] border border-[#E3E8EF] px-3 py-1.5 text-xs font-semibold text-[#0B1F42] transition-all hover:bg-[#F7F4EF]">
@@ -284,7 +284,7 @@ function DisputeThreadPage() {
           </div>
 
           {/* Messages */}
-          <div className="border-t border-[#E5E7EB] pt-4">
+          <div className="border-t border-[#E3E8EF] pt-4">
             <p className="mb-3 text-sm font-semibold text-[#0B1F42]">Messages</p>
             <ul className="space-y-3 mb-4 max-h-96 overflow-y-auto">
               {dispute.messages.map((m) => (
@@ -293,7 +293,7 @@ function DisputeThreadPage() {
                   <p className="whitespace-pre-wrap text-sm text-[#0B1F42]">{m.body}</p>
                 </li>
               ))}
-              {dispute.messages.length === 0 && <li className="text-sm text-[#6b7280]">No messages yet.</li>}
+              {dispute.messages.length === 0 && <li className="text-sm text-[#5B6B82]">No messages yet.</li>}
             </ul>
             {!closed && (
               <form onSubmit={handleSendMessage} className="flex gap-2">

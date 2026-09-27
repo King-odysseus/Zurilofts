@@ -225,18 +225,18 @@ function HostPayouts() {
         {whtData && (
           <div className="mt-4">
             <div ref={whtRef}>
-              <h2 className="text-lg font-bold text-[#222222] mb-2">ZuriLofts - WHT Statement</h2>
-              <p className="text-sm text-[#6b7280] mb-4">
+              <h2 className="text-lg font-bold text-[#0B1F42] mb-2">ZuriLofts - WHT Statement</h2>
+              <p className="text-sm text-[#5B6B82] mb-4">
                 Period: {whtMonth || 'All time'} | WHT Rate: 5% | Remitted to KRA
               </p>
               <div className="overflow-x-auto">
               <table className="w-full text-sm border-collapse">
                 <thead>
-                  <tr className="border-b border-[#E5E7EB] text-left">
-                    <th className="p-2 font-semibold text-[#222222]">Property</th>
-                    <th className="p-2 font-semibold text-[#222222]">Paid Date</th>
-                    <th className="p-2 font-semibold text-[#222222] text-right">Earnings (KES)</th>
-                    <th className="p-2 font-semibold text-[#222222] text-right">WHT (KES)</th>
+                  <tr className="border-b border-[#E3E8EF] text-left">
+                    <th className="p-2 font-semibold text-[#0B1F42]">Property</th>
+                    <th className="p-2 font-semibold text-[#0B1F42]">Paid Date</th>
+                    <th className="p-2 font-semibold text-[#0B1F42] text-right">Earnings (KES)</th>
+                    <th className="p-2 font-semibold text-[#0B1F42] text-right">WHT (KES)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -285,7 +285,7 @@ function HostPayouts() {
       <div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
         <h2 className="mb-4 text-lg font-bold text-[#0B1F42]">Payout History</h2>
         {payouts.length === 0 ? (
-          <p className="text-[#6b7280] text-sm">No payouts yet. Your first payout will appear here.</p>
+          <p className="text-[#5B6B82] text-sm">No payouts yet. Your first payout will appear here.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
