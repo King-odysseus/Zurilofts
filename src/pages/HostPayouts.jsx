@@ -52,8 +52,8 @@ function HostPayouts() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
           </div>
-          <h1 className="text-xl font-bold text-[#222222] mb-2">Access Denied</h1>
-          <p className="text-[#6b7280]">This page is for hosts and administrators only.</p>
+          <h1 className="mb-2 text-xl font-bold text-[#0B1F42]">Access Denied</h1>
+          <p className="text-[#5B6B82]">This page is for hosts and administrators only.</p>
         </div>
       </div>
     );
@@ -90,16 +90,16 @@ function HostPayouts() {
     printWindow.document.write(`
       <html><head><title>WHT Statement</title>
       <style>
-        body { font-family: Inter, sans-serif; padding: 30px; color: #222222; }
-        h2 { color: #222222; }
+        body { font-family: Inter, sans-serif; padding: 30px; color: #0B1F42; }
+        h2 { color: #0B1F42; }
         table { width: 100%; border-collapse: collapse; margin-top: 16px; }
-        th, td { padding: 10px; border-bottom: 1px solid #E5E7EB; text-align: left; }
-        th { background: #2563EB; color: white; }
+        th, td { padding: 10px; border-bottom: 1px solid #E3E8EF; text-align: left; }
+        th { background: #0B1F42; color: white; }
         .total { font-weight: bold; }
         .num { text-align: right; }
       </style></head><body>
       <h2>ZuriLofts - WHT Statement</h2>
-      <p style="color:#6b7280;font-size:14px;margin-bottom:16px">Period: ${escapeHtml(period)} | WHT Rate: 5% | Remitted to KRA</p>
+      <p style="color:#5B6B82;font-size:14px;margin-bottom:16px">Period: ${escapeHtml(period)} | WHT Rate: 5% | Remitted to KRA</p>
       <table><thead><tr><th>Property</th><th>Paid Date</th><th>Earnings (KES)</th><th>WHT (KES)</th></tr></thead><tbody>
       ${rowsHtml}
       ${totalHtml}
@@ -135,14 +135,14 @@ function HostPayouts() {
     return (
       <div className="text-center py-12">
           <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
-        <p className="text-[#6b7280]">Loading payout info...</p>
+        <p className="text-[#5B6B82]">Loading payout info...</p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <nav className="flex border-b border-[#E5E7EB]" aria-label="Host finance">
+      <nav className="flex border-b border-[#E3E8EF]" aria-label="Host finance">
         <Link to="/host/earnings" className="min-h-[44px] border-b-2 border-transparent px-4 py-2.5 text-sm font-semibold text-[#5B6B82] hover:text-[#0B1F42]">Overview</Link>
         <Link to="/host/payouts" aria-current="page" className="min-h-[44px] border-b-2 border-[#C49A6C] px-4 py-2.5 text-sm font-semibold text-[#0B1F42]">Payouts</Link>
       </nav>
@@ -159,43 +159,43 @@ function HostPayouts() {
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${destination?.method ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>{destination?.method ? 'Payouts enabled' : 'Setup required'}</span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-[#F7F7F5] rounded-xl p-4">
-            <p className="text-xs text-[#6b7280] uppercase tracking-wide">Current Balance</p>
-            <p className="text-2xl font-bold text-[#222222]">
+          <div className="rounded-2xl bg-[#F7F4EF] p-4">
+            <p className="text-xs uppercase tracking-wide text-[#5B6B82]">Current Balance</p>
+            <p className="text-2xl font-bold text-[#0B1F42]">
               KES {wallet?.balance?.toLocaleString() || '0'}
             </p>
           </div>
-          <div className="rounded-xl bg-[#FDE8D8] p-4">
-            <p className="text-xs text-[#6b7280] uppercase tracking-wide">Total Earned</p>
-            <p className="text-2xl font-bold text-[#222222]">
+          <div className="rounded-2xl bg-[#FDE8D8] p-4">
+            <p className="text-xs uppercase tracking-wide text-[#5B6B82]">Total Earned</p>
+            <p className="text-2xl font-bold text-[#0B1F42]">
               KES {wallet?.totalEarned?.toLocaleString() || '0'}
             </p>
           </div>
-          <div className="bg-green-50 rounded-xl p-4">
-            <p className="text-xs text-[#6b7280] uppercase tracking-wide">Total Paid Out</p>
+          <div className="rounded-2xl bg-[#E8F4EC] p-4">
+            <p className="text-xs uppercase tracking-wide text-[#5B6B82]">Total Paid Out</p>
             <p className="text-2xl font-bold text-green-700">
               KES {wallet?.totalPaidOut?.toLocaleString() || '0'}
             </p>
           </div>
         </div>
         {wallet?.nextPayoutAt && (
-          <p className="text-sm text-[#6b7280] mt-4">
+          <p className="mt-4 text-sm text-[#5B6B82]">
             Next scheduled payout:{' '}
-            <span className="font-semibold text-[#222222]">
+            <span className="font-semibold text-[#0B1F42]">
               {new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
           </p>
         )}
-        <div className="mt-4 pt-4 border-t border-[#E5E7EB] flex flex-wrap items-center justify-between gap-3">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-[#E3E8EF] pt-4">
           <div>
-            <p className="text-xs text-[#6b7280] uppercase tracking-wide">Payout destination</p>
-            <p className="text-sm font-semibold text-[#222222] mt-1">
+            <p className="text-xs uppercase tracking-wide text-[#5B6B82]">Payout destination</p>
+            <p className="mt-1 text-sm font-semibold text-[#0B1F42]">
               {destination?.label
                 ? `${destination.label} · ${destination.maskedAccount || 'details saved'}`
                 : 'Not configured'}
             </p>
           </div>
-          <Link to="/profile" className="text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8]">
+          <Link to="/profile" className="text-sm font-medium text-[#9A744A] hover:text-[#C49A6C]">
             {destination?.method ? 'Change destination' : 'Set up payouts'}
           </Link>
         </div>
@@ -204,7 +204,7 @@ function HostPayouts() {
       {/* WHT Statement */}
       <div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_4px_16px_rgba(11,31,66,0.04)]">
         <h2 className="mb-4 text-lg font-bold text-[#0B1F42]">WHT Statement (Tax Certificate)</h2>
-        <p className="text-sm text-[#6b7280] mb-4">
+        <p className="mb-4 text-sm text-[#5B6B82]">
           Download your withholding tax statement to claim KRA tax credits. WHT at 5% is automatically deducted and remitted on your behalf.
         </p>
         <div className="flex flex-wrap items-center gap-3">
