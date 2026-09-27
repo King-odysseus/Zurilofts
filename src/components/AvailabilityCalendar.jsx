@@ -127,11 +127,11 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
                 onClick={() => handleDayClick(date)}
                 disabled={disabled}
                 className={[
-                  'h-9 text-sm rounded-lg transition-colors',
+                  'h-9 rounded-[10px] text-sm transition-colors',
                   disabled
                     ? 'cursor-not-allowed bg-[#EAF0F4] text-[#94A3B8]'
                     : 'cursor-pointer text-[#0B1F42] hover:bg-[#FDE8D8]',
-                  isEndpoint ? 'bg-[#C49A6C] text-white font-bold hover:bg-[#b8895c]' : '',
+                  isEndpoint ? 'bg-[#C49A6C] font-bold text-white hover:bg-[#B8895C]' : '',
                   inRange ? 'rounded-none bg-[#FDE8D8]' : '',
                 ].join(' ')}
               >
@@ -148,26 +148,26 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
   const canGoBack = viewMonth > new Date(today.getFullYear(), today.getMonth(), 1);
 
   return (
-    <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm md:p-5">
+    <div className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-5">
       <div className="flex items-center justify-between mb-2">
         <button
           type="button"
           onClick={() => canGoBack && setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))}
           disabled={!canGoBack}
-          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-canvas disabled:opacity-30 disabled:cursor-not-allowed"
+          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F7F4EF] disabled:cursor-not-allowed disabled:opacity-30"
           aria-label="Previous month"
         >
-          <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <button
           type="button"
           onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))}
-          className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-canvas"
+          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F7F4EF]"
           aria-label="Next month"
         >
-          <svg className="w-5 h-5 text-[#0B0B45]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
@@ -178,7 +178,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
         <div className="hidden md:block flex-1">{renderMonth(nextMonth)}</div>
       </div>
 
-      <div className="flex items-center gap-4 mt-4 pt-3 border-t border-[#D9D9D9] text-xs text-[#6b7280]">
+      <div className="mt-4 flex items-center gap-4 border-t border-[#E3E8EF] pt-3 text-xs text-[#5B6B82]">
         <span className="flex items-center gap-1">
           <span className="inline-block h-3 w-3 rounded bg-[#C49A6C]" /> Selected
         </span>
