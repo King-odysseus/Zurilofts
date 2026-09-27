@@ -29,7 +29,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 py-3">
       {total != null ? (
-        <p className="text-sm text-[#6b7280]">
+        <p className="text-sm text-[#5B6B82]">
           Showing {total === 0 ? 0 : from}-{to} of {total}
           {itemLabel ? ` ${itemLabel}` : ''}
         </p>
@@ -42,7 +42,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
             aria-label="Previous page"
-            className="w-9 h-9 inline-flex items-center justify-center rounded-full text-[#222222] bg-white shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-sm transition-all hover:bg-[#F7F4EF] hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -58,8 +58,8 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
                 aria-current={p === page ? 'page' : undefined}
                 className={`min-w-[2.25rem] h-9 px-2 inline-flex items-center justify-center rounded-full text-sm font-semibold transition-all ${
                   p === page
-                    ? 'bg-[#2563EB] text-white shadow-md'
-                    : 'bg-white text-[#222222] shadow-sm hover:shadow-md'
+                    ? 'bg-[#0B1F42] text-white shadow-md'
+                    : 'border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-sm hover:bg-[#F7F4EF] hover:shadow-md'
                 }`}
               >
                 {p}
@@ -70,7 +70,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
             aria-label="Next page"
-            className="w-9 h-9 inline-flex items-center justify-center rounded-full text-[#222222] bg-white shadow-sm hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm transition-all"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-sm transition-all hover:bg-[#F7F4EF] hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

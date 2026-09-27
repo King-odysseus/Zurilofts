@@ -48,7 +48,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
           {selected ? selected.label : placeholder}
         </span>
         <svg
-          className={`w-4 h-4 flex-shrink-0 text-[#6b7280] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 flex-shrink-0 text-[#5B6B82] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -60,7 +60,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
       {open && (
         <div
           role="listbox"
-          className={`absolute left-0 mt-2 bg-white rounded-2xl shadow-xl py-2 z-30 max-h-72 overflow-y-auto min-w-full w-max max-w-[18rem] ${menuClassName}`}
+          className={`absolute left-0 z-30 mt-2 max-h-72 min-w-full w-max max-w-[18rem] overflow-y-auto rounded-2xl border border-[#E3E8EF] bg-white py-2 shadow-xl ${menuClassName}`}
         >
           {options.map((o) => {
             const isSel = String(o.value) === String(value);
@@ -75,12 +75,12 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
                   setOpen(false);
                 }}
                 className={`flex items-center w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                  isSel ? 'bg-[#2563EB]/10 text-[#2563EB] font-semibold' : 'text-[#222222] hover:bg-[#F7F7F5]'
+                  isSel ? 'bg-[#FDE8D8] font-semibold text-[#0B1F42]' : 'text-[#0B1F42] hover:bg-[#F7F4EF]'
                 }`}
               >
                 <span className="flex-1">{o.label}</span>
                 {isSel && (
-                  <svg className="w-4 h-4 text-[#2563EB] flex-shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="ml-2 h-4 w-4 flex-shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
                 )}
