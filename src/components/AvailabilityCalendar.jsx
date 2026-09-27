@@ -104,10 +104,10 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
 
     return (
       <div className="flex-1">
-        <div className="text-center font-semibold text-[#0B0B45] mb-3">{MONTHS[month]} {year}</div>
-        <div className="grid grid-cols-7 gap-1 mb-1">
+        <div className="mb-3 text-center font-semibold text-[#0B1F42]">{MONTHS[month]} {year}</div>
+        <div className="mb-1 grid grid-cols-7 gap-1">
           {WEEKDAYS.map((w) => (
-            <div key={w} className="text-center text-xs font-medium text-[#6b7280] py-1">{w}</div>
+            <div key={w} className="py-1 text-center text-xs font-medium text-[#52606F]">{w}</div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1">
@@ -129,10 +129,10 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
                 className={[
                   'h-9 text-sm rounded-lg transition-colors',
                   disabled
-                    ? 'text-[#D9D9D9] line-through cursor-not-allowed'
-                    : 'text-[#1f2937] hover:bg-[#C49A6C]/20 cursor-pointer',
+                    ? 'cursor-not-allowed bg-[#EAF0F4] text-[#94A3B8]'
+                    : 'cursor-pointer text-[#0B1F42] hover:bg-[#FDE8D8]',
                   isEndpoint ? 'bg-[#C49A6C] text-white font-bold hover:bg-[#b8895c]' : '',
-                  inRange ? 'bg-[#C49A6C]/15 rounded-none' : '',
+                  inRange ? 'rounded-none bg-[#FDE8D8]' : '',
                 ].join(' ')}
               >
                 {date.getDate()}
@@ -148,7 +148,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
   const canGoBack = viewMonth > new Date(today.getFullYear(), today.getMonth(), 1);
 
   return (
-    <div className="neu-card p-4 md:p-5 bg-white">
+    <div className="rounded-2xl border border-[#E5E7EB] bg-white p-4 shadow-sm md:p-5">
       <div className="flex items-center justify-between mb-2">
         <button
           type="button"
@@ -180,10 +180,10 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
 
       <div className="flex items-center gap-4 mt-4 pt-3 border-t border-[#D9D9D9] text-xs text-[#6b7280]">
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-[#C49A6C] inline-block" /> Selected
+          <span className="inline-block h-3 w-3 rounded bg-[#C49A6C]" /> Selected
         </span>
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-[#D9D9D9] inline-block" /> Unavailable
+          <span className="inline-block h-3 w-3 rounded bg-[#EAF0F4]" /> Unavailable
         </span>
         <span className="ml-auto">
           {checkIn && !checkOut ? 'Select your check-out date' : 'Select your dates'}
