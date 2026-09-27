@@ -77,7 +77,7 @@ function CalendarPropertyPicker({ base }) {
         </div>
       ) : properties.length === 0 ? (
         <div className="bg-white rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.08)] p-10 text-center">
-          <p className="text-[#6b7280]">No properties yet. Add a property to manage its calendar.</p>
+          <p className="text-[#5B6B82]">No properties yet. Add a property to manage its calendar.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -91,7 +91,7 @@ function CalendarPropertyPicker({ base }) {
                 {p.images?.[0] ? (
                   <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
+                  <div className="flex h-full w-full items-center justify-center text-[#5B6B82]">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
