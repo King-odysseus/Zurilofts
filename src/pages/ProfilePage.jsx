@@ -20,6 +20,7 @@ function ProfilePage() {
     const hash = window.location.hash.replace('#', '');
     return ['info', 'bookings', 'favorites', 'verification'].includes(hash) ? hash : 'info';
   });
+  const [showAccountMenu, setShowAccountMenu] = useState(false);
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -399,9 +400,9 @@ function ProfilePage() {
       <Navbar />
       <div className="pt-24 pb-16">
         <div className="max-w-[1344px] mx-auto px-4 md:px-6">
-          <div className="lg:grid lg:grid-cols-[320px_minmax(0,1fr)] lg:items-start lg:gap-8">
+          <div className="space-y-8">
           {/* Header */}
-          <div className="relative z-0 mb-8 min-w-0 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 sm:px-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:sticky lg:top-24 lg:mb-0 lg:border-0 lg:bg-[#F7F4EF] lg:p-6 lg:shadow-none">
+          <div className="relative z-0 min-w-0 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white px-5 py-5 sm:px-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)] lg:bg-[#F7F4EF] lg:p-6 lg:shadow-none">
             <div className="flex items-center mb-4">
               <label className="relative cursor-pointer group">
                 {profile?.avatar ? (
@@ -441,14 +442,9 @@ function ProfilePage() {
                 </h1>
                 <p className="text-[#5B6B82]">{profile?.email}</p>
               </div>
-              <nav aria-label="Account navigation" className="relative z-0 mt-6 hidden w-full space-y-1 lg:block">
-                {[['info', 'Personal details'], ['verification', 'Security & verification'], ['bookings', 'Payments & bookings'], ['favorites', `Saved places${favorites.length ? ` (${favorites.length})` : ''}`]].map(([id, label]) => (
-                  <button key={id} type="button" onClick={() => setActiveTab(id)} className={`flex min-h-[44px] w-full items-center rounded-xl px-3 text-left text-sm font-medium transition-colors ${activeTab === id ? 'bg-white text-[#0B1F42] shadow-sm' : 'text-[#52606F] hover:bg-white/70 hover:text-[#0B1F42]'}`}>
-                    {label}
-                  </button>
-                ))}
-                <button type="button" onClick={logout} className="mt-5 flex min-h-[44px] w-full items-center rounded-xl px-3 text-left text-sm font-medium text-[#C65A24] hover:bg-white/70">Log out</button>
-              </nav>
+              <button type="button" onClick={() => setShowAccountMenu(true)} className="mt-6 inline-flex min-h-[44px] items-center rounded-xl bg-[#C49A6C] px-4 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]">
+                Account menu
+              </button>
             </div>
           </div>
 
@@ -493,12 +489,12 @@ function ProfilePage() {
 
           {/* My Info Tab */}
           {activeTab === 'info' && (
-            <div className="lg:grid lg:grid-cols-[180px_minmax(0,1fr)] lg:gap-8 lg:items-start">
+            <div className="space-y-6">
               {/* Account sidebar (desktop) / compact section selector (mobile) -
                   anchors into the sections below rather than separate tab
                   state, so nothing about the existing info/bookings/
                   favorites/verification tabs had to change. */}
-              <nav aria-label="Account sections" className="mb-6 lg:sticky lg:top-24 lg:mb-0">
+              <nav aria-label="Account sections" className="hidden">
                 <ul className="flex gap-2 overflow-x-auto no-scrollbar lg:block lg:space-y-1 lg:overflow-visible">
                   {[
                     { id: 'section-personal', label: 'Personal details' },
@@ -1148,6 +1144,28 @@ function ProfilePage() {
         </div>
       </div>
       </div>
+      {showAccountMenu && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-[#0B1F42]/35 px-4 pt-24" role="dialog" aria-modal="true" aria-label="Account menu">
+          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-[0_18px_48px_rgba(11,31,66,0.22)]">
+            <div className="flex items-center justify-between border-b border-[#E3E8EF] px-5 py-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9A744A]">Account</p>
+                <h2 className="mt-1 text-lg font-bold text-[#0B1F42]">Where would you like to go?</h2>
+              </div>
+              <button type="button" onClick={() => setShowAccountMenu(false)} className="inline-flex h-10 w-10 items-center justify-center rounded-full text-2xl text-[#5B6B82] hover:bg-[#F7F4EF] hover:text-[#0B1F42]" aria-label="Close account menu">&times;</button>
+            </div>
+            <div className="space-y-2 p-4">
+              {[['info', 'Personal details'], ['verification', 'Security & verification'], ['bookings', 'Payments & bookings'], ['favorites', `Saved places${favorites.length ? ` (${favorites.length})` : ''}`]].map(([id, label]) => (
+                <button key={id} type="button" onClick={() => { setActiveTab(id); setShowAccountMenu(false); }} className={`flex min-h-[48px] w-full items-center justify-between rounded-xl px-4 text-left text-sm font-semibold transition-colors ${activeTab === id ? 'bg-[#C49A6C] text-white' : 'border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF]'}`}>
+                  <span>{label}</span><span aria-hidden="true">&rarr;</span>
+                </button>
+              ))}
+              <div className="my-3 h-px bg-[#E3E8EF]" />
+              <button type="button" onClick={() => { setShowAccountMenu(false); logout(); }} className="flex min-h-[48px] w-full items-center rounded-xl border border-[#F1C9C9] px-4 text-left text-sm font-semibold text-[#B42318] hover:bg-[#FDECEC]">Log out</button>
+            </div>
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );
