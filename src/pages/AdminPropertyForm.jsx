@@ -217,7 +217,7 @@ function AdminPropertyForm() {
           {isEdit && (
             <Link
               to={`${base}/properties/${id}/calendar`}
-              className="inline-flex min-h-[44px] items-center rounded-lg border border-[#E5E7EB] px-4 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
+              className="inline-flex min-h-[44px] items-center rounded-lg border border-[#E3E8EF] px-4 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
             >
               Manage Calendar &rarr;
             </Link>
@@ -244,7 +244,7 @@ function AdminPropertyForm() {
           </a>
         ))}
       </nav>
-      <div className="mb-6 rounded-2xl border border-[#E5E7EB] bg-white px-5 py-4 shadow-sm">
+      <div className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-4 shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div><p className="text-sm font-bold text-[#0B1F42]">Publish readiness</p><p className="mt-1 text-xs text-[#52606F]">Complete the essentials below before sending your listing for review.</p></div>
           <span className="rounded-full bg-[#FDE8D8] px-3 py-1 text-xs font-semibold text-[#9A4A1D]">Draft workspace</span>
@@ -281,7 +281,7 @@ function AdminPropertyForm() {
               onChange={(part) => setForm((f) => ({ ...f, ...part }))}
             />
             {form.lat != null && form.lng != null && (
-              <p className="text-xs text-[#6b7280] mt-2">Coordinates: {Number(form.lat).toFixed(5)}, {Number(form.lng).toFixed(5)}</p>
+              <p className="text-xs text-[#5B6B82] mt-2">Coordinates: {Number(form.lat).toFixed(5)}, {Number(form.lng).toFixed(5)}</p>
             )}
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -319,8 +319,8 @@ function AdminPropertyForm() {
                   }}
                 />
                 <div className="flex-1">
-                  <span className="block text-sm font-semibold text-[#222222]">List as 1-Bed</span>
-                  <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 1-bed card</span>
+                  <span className="block text-sm font-semibold text-[#0B1F42]">List as 1-Bed</span>
+                  <span className="block text-xs text-[#5B6B82] mb-2">Appears as a separate 1-bed card</span>
                   {form.price1Bed !== '' && (
                     <div className="space-y-3">
                       <input
@@ -355,8 +355,8 @@ function AdminPropertyForm() {
                   }}
                 />
                 <div className="flex-1">
-                  <span className="block text-sm font-semibold text-[#222222]">List as 2-Bed</span>
-                  <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 2-bed card</span>
+                  <span className="block text-sm font-semibold text-[#0B1F42]">List as 2-Bed</span>
+                  <span className="block text-xs text-[#5B6B82] mb-2">Appears as a separate 2-bed card</span>
                   {form.price2Bed !== '' && (
                     <div className="space-y-3">
                       <input
@@ -398,11 +398,11 @@ function AdminPropertyForm() {
               />
             </div>
             <div className="flex items-end gap-6 pb-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-[#222222]">
+              <label className="flex items-center gap-2 text-sm font-medium text-[#0B1F42]">
                 <input type="checkbox" checked={form.available} onChange={(e) => update('available', e.target.checked)} className="h-4 w-4 accent-[#C49A6C]" />
                 Available
               </label>
-              <label className="flex items-center gap-2 text-sm font-medium text-[#222222]">
+              <label className="flex items-center gap-2 text-sm font-medium text-[#0B1F42]">
                 <input type="checkbox" checked={form.featured} onChange={(e) => update('featured', e.target.checked)} className="h-4 w-4 accent-[#C49A6C]" />
                 Featured
               </label>
@@ -414,10 +414,10 @@ function AdminPropertyForm() {
           </div>
         </div>
 
-        <div id="listing-photos" className="scroll-mt-24 space-y-5 rounded-2xl border border-[#E5E7EB] bg-white p-6 shadow-sm">
+        <div id="listing-photos" className="scroll-mt-24 space-y-5 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-sm">
           <div>
             <label className={labelCls}>Photos</label>
-            <p className="text-sm text-[#6b7280] mb-3">Upload images from your device. They&apos;re automatically resized and compressed for the website. The first photo is used as the cover.</p>
+            <p className="text-sm text-[#5B6B82] mb-3">Upload images from your device. They&apos;re automatically resized and compressed for the website. The first photo is used as the cover.</p>
 
             {form.images.length > 0 && (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
@@ -442,7 +442,7 @@ function AdminPropertyForm() {
               </div>
             )}
 
-            <label className={`flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#E5E7EB] py-8 transition-colors hover:border-[#C49A6C] hover:bg-[#FDE8D8]/40 ${uploading ? 'pointer-events-none opacity-60' : ''}`}>
+            <label className={`flex w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#E3E8EF] py-8 transition-colors hover:border-[#C49A6C] hover:bg-[#FDE8D8]/40 ${uploading ? 'pointer-events-none opacity-60' : ''}`}>
               {uploading ? (
                 <>
                   <div className="mb-2 h-6 w-6 animate-spin rounded-full border-2 border-[#C49A6C] border-t-transparent"></div>
@@ -454,7 +454,7 @@ function AdminPropertyForm() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                   <span className="text-sm font-semibold text-[#0B1F42]">Click to upload photos</span>
-                  <span className="text-xs text-[#6b7280] mt-1">JPEG, PNG or WebP · up to 10 at a time</span>
+                  <span className="text-xs text-[#5B6B82] mt-1">JPEG, PNG or WebP · up to 10 at a time</span>
                 </>
               )}
               <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handleFiles} disabled={uploading} />
@@ -462,7 +462,7 @@ function AdminPropertyForm() {
           </div>
 
           <div id="listing-amenities" className="scroll-mt-24 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <p className="md:col-span-2 text-sm text-[#6b7280] -mb-1">Enter one item per line.</p>
+            <p className="md:col-span-2 text-sm text-[#5B6B82] -mb-1">Enter one item per line.</p>
             <div>
               <label className={labelCls}>Amenities</label>
               <textarea rows={4} className={inputCls} placeholder="WiFi&#10;Pool" value={form.amenities} onChange={(e) => update('amenities', e.target.value)} />
@@ -481,7 +481,7 @@ function AdminPropertyForm() {
           </div>
         )}
 
-        <div id="listing-review" className="sticky bottom-4 z-20 flex scroll-mt-24 items-center gap-3 rounded-2xl border border-[#E5E7EB] bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
+        <div id="listing-review" className="sticky bottom-4 z-20 flex scroll-mt-24 items-center gap-3 rounded-2xl border border-[#E3E8EF] bg-white/95 px-4 py-3 shadow-lg backdrop-blur">
           <button
             type="submit"
             disabled={saving}
@@ -489,7 +489,7 @@ function AdminPropertyForm() {
           >
             {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Property'}
           </button>
-          <Link to={`${base}/properties`} className="inline-flex min-h-[44px] items-center rounded-lg border border-[#E5E7EB] px-6 font-semibold text-[#0B1F42] hover:bg-[#F7F4EF]">Cancel</Link>
+          <Link to={`${base}/properties`} className="inline-flex min-h-[44px] items-center rounded-lg border border-[#E3E8EF] px-6 font-semibold text-[#0B1F42] hover:bg-[#F7F4EF]">Cancel</Link>
         </div>
       </form>
 
@@ -518,15 +518,15 @@ function AdminPropertyForm() {
       >
         <div className="p-5">
           <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-[#222222]">Live preview</p>
-            <button type="button" onClick={() => setPreviewOpen(false)} className="text-[#6b7280] hover:text-[#222222]" aria-label="Collapse preview">
+            <p className="text-sm font-semibold text-[#0B1F42]">Live preview</p>
+            <button type="button" onClick={() => setPreviewOpen(false)} className="text-[#5B6B82] hover:text-[#0B1F42]" aria-label="Collapse preview">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
           </div>
           <PropertyPreview form={form} />
-          <p className="text-xs text-[#6b7280] mt-3">This is how the property appears as a card on the website. It updates as you edit.</p>
+          <p className="text-xs text-[#5B6B82] mt-3">This is how the property appears as a card on the website. It updates as you edit.</p>
         </div>
       </aside>
     </div>
@@ -574,23 +574,23 @@ function PropertyPreview({ form }) {
 
   return (
     <div className="bg-white rounded-[14px] shadow-md overflow-hidden max-w-sm">
-      <div className="relative aspect-[4/3] overflow-hidden bg-[#f0f0f0]">
+      <div className="relative aspect-[4/3] overflow-hidden bg-[#F7F4EF]">
         {cover ? (
           <img src={cover} alt={form.title || 'Property'} className="w-full h-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#6b7280] text-sm">No photo yet</div>
+          <div className="w-full h-full flex items-center justify-center text-[#5B6B82] text-sm">No photo yet</div>
         )}
         {form.featured && (
           <span className="absolute top-4 left-4 bg-[#0B1F42] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
         )}
         {!form.available && (
-          <span className="absolute top-4 right-4 bg-[#6b7280] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
+          <span className="absolute top-4 right-4 bg-[#5B6B82] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
         )}
       </div>
 
       <div className="p-4">
-        <h3 className="text-base font-semibold text-[#222222] leading-tight">{form.title || 'Property title'}</h3>
-        <div className="flex items-center text-[#6b7280] mt-1 mb-3">
+        <h3 className="text-base font-semibold text-[#0B1F42] leading-tight">{form.title || 'Property title'}</h3>
+        <div className="flex items-center text-[#5B6B82] mt-1 mb-3">
           <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -598,25 +598,25 @@ function PropertyPreview({ form }) {
           <span className="text-sm truncate">{form.location || 'Location'}</span>
         </div>
 
-        <div className="flex items-center justify-between mb-3 py-3 border-y border-[#E5E7EB] text-center">
+        <div className="flex items-center justify-between mb-3 py-3 border-y border-[#E3E8EF] text-center">
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#222222]">{bedrooms}</p>
-            <p className="text-xs text-[#6b7280]">Beds</p>
+            <p className="text-sm font-semibold text-[#0B1F42]">{bedrooms}</p>
+            <p className="text-xs text-[#5B6B82]">Beds</p>
           </div>
-          <div className="flex-1 border-x border-[#E5E7EB]">
-            <p className="text-sm font-semibold text-[#222222]">{bathrooms}</p>
-            <p className="text-xs text-[#6b7280]">Baths</p>
+          <div className="flex-1 border-x border-[#E3E8EF]">
+            <p className="text-sm font-semibold text-[#0B1F42]">{bathrooms}</p>
+            <p className="text-xs text-[#5B6B82]">Baths</p>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#222222]">{area}</p>
-            <p className="text-xs text-[#6b7280]">Sqft</p>
+            <p className="text-sm font-semibold text-[#0B1F42]">{area}</p>
+            <p className="text-xs text-[#5B6B82]">Sqft</p>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs text-[#6b7280]">per night</span>
-            <div className="text-xl font-bold text-[#222222]">KES {price.toLocaleString()}</div>
+            <span className="text-xs text-[#5B6B82]">per night</span>
+            <div className="text-xl font-bold text-[#0B1F42]">KES {price.toLocaleString()}</div>
           </div>
           <span className="bg-[#C49A6C] text-white font-semibold px-4 py-2 rounded-lg text-sm">Book Now</span>
         </div>
