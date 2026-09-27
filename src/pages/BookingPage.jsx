@@ -756,7 +756,7 @@ function BookingPage() {
       {/* Additional guests - one form per extra person in the party */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="block text-sm font-semibold text-[#222222]">
+          <label className="block text-sm font-semibold text-[#0B1F42]">
             Additional Guests {additionalGuests.length > 0 && `(${additionalGuests.length})`}
           </label>
           <button
@@ -768,18 +768,18 @@ function BookingPage() {
             + Add guest
           </button>
         </div>
-        <p className="text-xs text-[#6b7280] mb-3">
+        <p className="text-xs text-[#5B6B82] mb-3">
           You&apos;re booking for {bookingData.guests} {bookingData.guests === 1 ? 'guest' : 'guests'}. Add the names of anyone staying with you.
         </p>
 
         {additionalGuests.length === 0 ? (
-          <p className="text-sm text-[#6b7280] italic">Just you - add a guest if others are staying.</p>
+          <p className="text-sm text-[#5B6B82] italic">Just you - add a guest if others are staying.</p>
         ) : (
           <div className="space-y-3">
             {additionalGuests.map((g, i) => (
               <div key={i} className="flex items-end gap-3">
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-[#6b7280] mb-1">Guest {i + 2} first name</label>
+                  <label className="block text-xs font-medium text-[#5B6B82] mb-1">Guest {i + 2} first name</label>
                   <input
                     type="text"
                     value={g.firstName}
@@ -789,7 +789,7 @@ function BookingPage() {
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-[#6b7280] mb-1">Last name</label>
+                  <label className="block text-xs font-medium text-[#5B6B82] mb-1">Last name</label>
                   <input
                     type="text"
                     value={g.lastName}
@@ -801,7 +801,7 @@ function BookingPage() {
                 <button
                   type="button"
                   onClick={() => removeGuest(i)}
-                  className="mb-1 w-11 h-11 flex items-center justify-center rounded-xl text-[#6b7280] hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0"
+                  className="mb-1 w-11 h-11 flex items-center justify-center rounded-xl text-[#5B6B82] hover:text-[#B42318] hover:bg-[#FDECEC] transition-colors flex-shrink-0"
                   aria-label="Remove guest"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -815,7 +815,7 @@ function BookingPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#222222] mb-2">Special Requests</label>
+        <label className="block text-sm font-semibold text-[#0B1F42] mb-2">Special Requests</label>
         <textarea
           name="specialRequests"
           value={bookingData.specialRequests}
@@ -830,7 +830,7 @@ function BookingPage() {
           screen; they're pushed to the server when the guest continues to
           Payment (or immediately, if a booking already exists - see
           changeAddOnQuantity). */}
-      <div className="rounded-[14px] border border-[#E5E7EB]">
+      <div className="rounded-[14px] border border-[#E3E8EF]">
         <button
           type="button"
           onClick={() => setExtrasExpanded((v) => !v)}
@@ -839,15 +839,15 @@ function BookingPage() {
           className="flex w-full min-h-[44px] items-center justify-between gap-3 p-4 text-left"
         >
           <span>
-            <span className="block font-semibold text-[#222222]">Optional extras</span>
-            <span className="block text-sm text-[#6b7280]">
+            <span className="block font-semibold text-[#0B1F42]">Optional extras</span>
+            <span className="block text-sm text-[#5B6B82]">
               {pricing.addOnsTotal > 0
                 ? `${selectedAddOns.filter((s) => s.quantity > 0).length} selected · KES ${pricing.addOnsTotal.toLocaleString()}`
                 : 'Add services like airport pickup or extra cleaning'}
             </span>
           </span>
           <svg
-            className={`h-5 w-5 flex-shrink-0 text-[#6b7280] transition-transform ${extrasExpanded ? 'rotate-180' : ''}`}
+            className={`h-5 w-5 flex-shrink-0 text-[#5B6B82] transition-transform ${extrasExpanded ? 'rotate-180' : ''}`}
             fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -855,7 +855,7 @@ function BookingPage() {
         </button>
 
         {extrasExpanded && (
-          <div id="booking-extras-panel" className="space-y-3 border-t border-[#E5E7EB] p-4">
+          <div id="booking-extras-panel" className="space-y-3 border-t border-[#E3E8EF] p-4">
             {addOnsError && (
               <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">
                 {addOnsError}
@@ -867,8 +867,8 @@ function BookingPage() {
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent" />
               </div>
             ) : availableAddOns.length === 0 ? (
-              <div className="bg-[#E5E7EB]/40 rounded-xl p-6 text-center">
-                <p className="text-[#6b7280]">No add-ons are available for this property.</p>
+              <div className="bg-[#F7F4EF] rounded-xl p-6 text-center">
+                <p className="text-[#5B6B82]">No add-ons are available for this property.</p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -881,13 +881,13 @@ function BookingPage() {
                     <div key={addOn.id} className="shadow-sm rounded-[14px] p-4 flex flex-col sm:flex-row sm:items-center gap-3">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-[#222222]">{addOn.name}</h3>
+                          <h3 className="font-semibold text-[#0B1F42]">{addOn.name}</h3>
                           <span className="rounded-full bg-[#FDE8D8] px-2.5 py-0.5 text-xs font-semibold capitalize text-[#9A4A1D]">
                             {addOn.category}
                           </span>
                         </div>
-                        <p className="text-sm text-[#6b7280] mt-1">{addOn.description}</p>
-                        <p className="text-sm font-semibold text-[#222222] mt-1">
+                        <p className="text-sm text-[#5B6B82] mt-1">{addOn.description}</p>
+                        <p className="text-sm font-semibold text-[#0B1F42] mt-1">
                           KES {addOn.price != null ? addOn.price.toLocaleString() : '-'} each
                         </p>
                       </div>
@@ -902,7 +902,7 @@ function BookingPage() {
                           >
                             −
                           </button>
-                          <span className="w-8 text-center font-semibold text-[#222222]" aria-live="polite">
+                          <span className="w-8 text-center font-semibold text-[#0B1F42]" aria-live="polite">
                             {busy ? '…' : qty}
                           </span>
                           <button
@@ -915,7 +915,7 @@ function BookingPage() {
                             +
                           </button>
                         </div>
-                        <p className="text-sm font-semibold text-[#222222]">
+                        <p className="text-sm font-semibold text-[#0B1F42]">
                           {qty > 0 ? `KES ${subtotal.toLocaleString()}` : '-'}
                         </p>
                       </div>
@@ -926,9 +926,9 @@ function BookingPage() {
             )}
 
             {pricing.addOnsTotal > 0 && (
-              <div className="bg-[#E5E7EB] rounded-xl p-4 flex justify-between items-center">
-                <span className="font-semibold text-[#222222]">Add-ons total</span>
-                <span className="font-bold text-[#222222]">KES {pricing.addOnsTotal.toLocaleString()}</span>
+              <div className="bg-[#F7F4EF] rounded-xl p-4 flex justify-between items-center">
+                <span className="font-semibold text-[#0B1F42]">Add-ons total</span>
+                <span className="font-bold text-[#0B1F42]">KES {pricing.addOnsTotal.toLocaleString()}</span>
               </div>
             )}
           </div>
@@ -975,12 +975,12 @@ function BookingPage() {
             className="h-5 w-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
-            <svg className="w-8 h-8 text-[#222222] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-8 h-8 text-[#0B1F42] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
             <div>
-              <p className="font-semibold text-[#222222]">Credit/Debit Card</p>
-              <p className="text-sm text-[#6b7280]">Pay securely with your card</p>
+              <p className="font-semibold text-[#0B1F42]">Credit/Debit Card</p>
+              <p className="text-sm text-[#5B6B82]">Pay securely with your card</p>
             </div>
           </div>
         </label>
@@ -1001,8 +1001,8 @@ function BookingPage() {
               <span className="text-white font-bold text-xs">M</span>
             </div>
             <div>
-              <p className="font-semibold text-[#222222]">M-Pesa</p>
-              <p className="text-sm text-[#6b7280]">Pay with M-Pesa mobile money</p>
+              <p className="font-semibold text-[#0B1F42]">M-Pesa</p>
+              <p className="text-sm text-[#5B6B82]">Pay with M-Pesa mobile money</p>
             </div>
           </div>
         </label>
@@ -1019,12 +1019,12 @@ function BookingPage() {
             className="h-5 w-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
-            <svg className="w-8 h-8 text-[#222222] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-8 h-8 text-[#0B1F42] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
             </svg>
             <div>
-              <p className="font-semibold text-[#222222]">Bank Transfer</p>
-              <p className="text-sm text-[#6b7280]">Pay via bank transfer</p>
+              <p className="font-semibold text-[#0B1F42]">Bank Transfer</p>
+              <p className="text-sm text-[#5B6B82]">Pay via bank transfer</p>
             </div>
           </div>
         </label>
@@ -1032,7 +1032,7 @@ function BookingPage() {
 
       {/* Promo Code */}
       <div className="mt-6">
-        <label className="block text-sm font-semibold text-[#222222] mb-2">Promo Code</label>
+        <label className="block text-sm font-semibold text-[#0B1F42] mb-2">Promo Code</label>
         <div className="flex gap-2">
           <input
             type="text"
@@ -1055,7 +1055,7 @@ function BookingPage() {
               type="button"
               onClick={handleApplyPromo}
               disabled={validatingPromo || !promoCode.trim()}
-              className="min-h-[44px] px-4 py-3 rounded-lg text-sm font-semibold bg-white text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-all duration-200 disabled:opacity-50"
+              className="min-h-[44px] px-4 py-3 rounded-lg text-sm font-semibold bg-white text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F4EF] transition-all duration-200 disabled:opacity-50"
             >
               {validatingPromo ? '...' : 'Apply'}
             </button>
@@ -1071,33 +1071,33 @@ function BookingPage() {
         )}
       </div>
 
-      <div className="bg-[#E5E7EB] rounded-xl p-4 space-y-2">
-        <div className="flex justify-between text-[#222222]">
+      <div className="bg-[#F7F4EF] rounded-xl p-4 space-y-2">
+        <div className="flex justify-between text-[#0B1F42]">
           <span>KES {pricing.propertyPrice.toLocaleString()} x {pricing.nights} nights</span>
           <span>KES {pricing.subtotal.toLocaleString()}</span>
         </div>
-        <div className="flex justify-between text-[#222222]">
+        <div className="flex justify-between text-[#0B1F42]">
           <span>Cleaning fee</span>
           <span>KES {pricing.cleaningFee.toLocaleString()}</span>
         </div>
         {pricing.extraGuestFee > 0 && (
-          <div className="flex justify-between text-[#222222]">
+          <div className="flex justify-between text-[#0B1F42]">
             <span>Extra guest fee ({pricing.extraGuests} guest{pricing.extraGuests > 1 ? 's' : ''} x KES {EXTRA_GUEST_FEE.toLocaleString()} x {pricing.nights} nights)</span>
             <span>KES {pricing.extraGuestFee.toLocaleString()}</span>
           </div>
         )}
-        <div className="flex justify-between text-[#222222]">
+        <div className="flex justify-between text-[#0B1F42]">
           <span>Service fee</span>
           <span>KES {pricing.serviceFee.toLocaleString()}</span>
         </div>
         {selectedAddOns.map((item) => (
-          <div key={item.addOn.id} className="flex justify-between text-[#222222]">
+          <div key={item.addOn.id} className="flex justify-between text-[#0B1F42]">
             <span>{item.addOn.name} x {item.quantity}</span>
             <span>KES {(item.quantity * (item.addOn.price || 0)).toLocaleString()}</span>
           </div>
         ))}
         {pricing.lateCheckoutFee > 0 && (
-          <div className="flex justify-between text-[#222222]">
+          <div className="flex justify-between text-[#0B1F42]">
             <span>Late check-out ({formatTime12h(bookingData.checkOutTime)})</span>
             <span>KES {pricing.lateCheckoutFee.toLocaleString()}</span>
           </div>
@@ -1108,7 +1108,7 @@ function BookingPage() {
             <span>-KES {pricing.discountAmount.toLocaleString()}</span>
           </div>
         )}
-        <div className="border-t border-[#222222]/20 pt-2 flex justify-between font-bold text-[#222222]">
+        <div className="border-t border-[#0B1F42]/20 pt-2 flex justify-between font-bold text-[#0B1F42]">
           <span>Total</span>
           <span>KES {pricing.total.toLocaleString()}</span>
         </div>
@@ -1140,7 +1140,7 @@ function BookingPage() {
         </button>
       </form>
 
-      <p className="text-center text-sm text-[#6b7280]">
+      <p className="text-center text-sm text-[#5B6B82]">
         By confirming, you agree to our terms and conditions
       </p>
     </div>
@@ -1159,39 +1159,39 @@ function BookingPage() {
               </svg>
             </div>
             <h1 className="mb-4 text-3xl font-bold text-[#0B1F42]">Booking Confirmed!</h1>
-            <p className="text-[#6b7280] mb-6">
+            <p className="text-[#5B6B82] mb-6">
               Thank you for your booking. We have sent a confirmation email to {bookingData.email} with all the details.
             </p>
-            <div className="bg-[#E5E7EB] rounded-[14px] p-6 mb-6 text-left">
-              <h3 className="font-bold text-[#222222] mb-2">Booking Summary</h3>
-              <p className="text-[#222222]">{property?.title}</p>
-              <p className="text-[#6b7280] text-sm">{property?.location}</p>
-              <div className="mt-3 pt-3 border-t border-[#222222]/10">
+            <div className="bg-[#F7F4EF] rounded-[14px] p-6 mb-6 text-left">
+              <h3 className="font-bold text-[#0B1F42] mb-2">Booking Summary</h3>
+              <p className="text-[#0B1F42]">{property?.title}</p>
+              <p className="text-[#5B6B82] text-sm">{property?.location}</p>
+              <div className="mt-3 pt-3 border-t border-[#0B1F42]/10">
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#6b7280]">Check-in</span>
+                  <span className="text-[#5B6B82]">Check-in</span>
                   <span className="font-medium">{bookingData.checkIn}</span>
                 </div>
                 <div className="flex justify-between text-sm mt-1">
-                  <span className="text-[#6b7280]">Check-out</span>
+                  <span className="text-[#5B6B82]">Check-out</span>
                   <span className="font-medium">{bookingData.checkOut} · {formatTime12h(bookingData.checkOutTime)}</span>
                 </div>
                 {pricing.lateCheckoutFee > 0 && (
                   <div className="flex justify-between text-sm mt-1">
-                    <span className="text-[#6b7280]">Late check-out fee</span>
+                    <span className="text-[#5B6B82]">Late check-out fee</span>
                     <span className="font-medium">KES {pricing.lateCheckoutFee.toLocaleString()}</span>
                   </div>
                 )}
                 {selectedAddOns.map((item) => (
                   <div key={item.addOn.id} className="flex justify-between text-sm mt-1">
-                    <span className="text-[#6b7280]">{item.addOn.name} x {item.quantity}</span>
+                    <span className="text-[#5B6B82]">{item.addOn.name} x {item.quantity}</span>
                     <span className="font-medium">KES {(item.quantity * (item.addOn.price || 0)).toLocaleString()}</span>
                   </div>
                 ))}
                 <div className="flex justify-between text-sm mt-1">
-                  <span className="text-[#6b7280]">Guests</span>
+                  <span className="text-[#5B6B82]">Guests</span>
                   <span className="font-medium">{bookingData.guests}</span>
                 </div>
-                <div className="flex justify-between font-bold text-[#222222] mt-2 pt-2 border-t border-[#222222]/10">
+                <div className="flex justify-between font-bold text-[#0B1F42] mt-2 pt-2 border-t border-[#0B1F42]/10">
                   <span>Total Paid</span>
                   <span>KES {pricing.total.toLocaleString()}</span>
                 </div>
@@ -1206,7 +1206,7 @@ function BookingPage() {
               </button>
               <button
                 onClick={() => window.print()}
-                className="w-full min-h-[44px] bg-white text-[#222222] border border-[#E5E7EB] py-3 rounded-lg font-semibold hover:bg-[#F7F7F5] transition-all duration-200"
+                className="w-full min-h-[44px] bg-white text-[#0B1F42] border border-[#E3E8EF] py-3 rounded-lg font-semibold hover:bg-[#F7F4EF] transition-all duration-200"
               >
                 Print Confirmation
               </button>
@@ -1225,7 +1225,7 @@ function BookingPage() {
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
-            <p className="text-[#6b7280]">Loading property...</p>
+            <p className="text-[#5B6B82]">Loading property...</p>
           </div>
         </div>
       </div>
@@ -1245,8 +1245,8 @@ function BookingPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-[#222222] mb-2">Property unavailable</h2>
-            <p className="text-[#6b7280] mb-6">
+            <h2 className="text-xl font-bold text-[#0B1F42] mb-2">Property unavailable</h2>
+            <p className="text-[#5B6B82] mb-6">
               {propertyError || 'We could not load that property. Please try again.'}
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -1258,7 +1258,7 @@ function BookingPage() {
               </button>
               <button
                 onClick={() => navigate('/properties')}
-                className="min-h-[44px] px-6 py-2.5 rounded-lg font-semibold bg-white text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-all duration-200"
+                className="min-h-[44px] px-6 py-2.5 rounded-lg font-semibold bg-white text-[#0B1F42] border border-[#E3E8EF] hover:bg-[#F7F4EF] transition-all duration-200"
               >
                 Browse properties
               </button>
@@ -1309,7 +1309,7 @@ function BookingPage() {
                   {i > 0 && (
                     <div
                       className={`h-1 w-8 mx-1 transition-colors md:mx-2 md:w-16 ${
-                        currentStageIndex > i - 1 ? 'bg-[#C49A6C]' : 'bg-[#E5E7EB]'
+                        currentStageIndex > i - 1 ? 'bg-[#C49A6C]' : 'bg-[#E3E8EF]'
                       }`}
                     />
                   )}
@@ -1318,12 +1318,12 @@ function BookingPage() {
                       className={`w-11 h-11 rounded-full flex items-center justify-center font-semibold transition-colors ${
                         currentStageIndex >= i
                           ? 'bg-[#0B1F42] text-white'
-                          : 'bg-[#E5E7EB] text-[#6b7280]'
+                          : 'bg-[#E3E8EF] text-[#5B6B82]'
                       }`}
                     >
                       {i + 1}
                     </div>
-                    <span className="text-xs text-[#6b7280] mt-2 whitespace-nowrap">
+                    <span className="text-xs text-[#5B6B82] mt-2 whitespace-nowrap">
                       {stage.label}
                     </span>
                   </div>
@@ -1352,13 +1352,13 @@ function BookingPage() {
                     className="w-full h-48 object-cover rounded-xl mb-4"
                   />
                 </Link>
-                <h3 className="font-bold text-[#222222] text-lg">{property?.title}</h3>
+                <h3 className="font-bold text-[#0B1F42] text-lg">{property?.title}</h3>
                 {bedOption && (
                     <p className="mt-1 text-sm font-medium text-[#0B1F42]">
                     {bedOption === '2bed' ? '2 Bed' : '1 Bed'} &middot; KES {pricing.propertyPrice.toLocaleString()}/night
                   </p>
                 )}
-                <div className="flex items-center text-[#6b7280] text-sm mt-1">
+                <div className="flex items-center text-[#5B6B82] text-sm mt-1">
                   <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -1373,7 +1373,7 @@ function BookingPage() {
                     </svg>
                     <span className="font-medium">{property?.rating}</span>
                   </div>
-                  <div className="flex items-center text-[#6b7280]">
+                  <div className="flex items-center text-[#5B6B82]">
                     <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
@@ -1382,35 +1382,35 @@ function BookingPage() {
                 </div>
 
                 {pricing.nights > 0 && (
-                  <div className="mt-6 pt-6 border-t border-[#E5E7EB]">
-                    <h4 className="font-semibold text-[#222222] mb-3">Price Details</h4>
+                  <div className="mt-6 pt-6 border-t border-[#E3E8EF]">
+                    <h4 className="font-semibold text-[#0B1F42] mb-3">Price Details</h4>
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between text-[#222222]">
+                      <div className="flex justify-between text-[#0B1F42]">
                         <span>KES {pricing.propertyPrice.toLocaleString()} x {pricing.nights} nights</span>
                         <span>KES {pricing.subtotal.toLocaleString()}</span>
                       </div>
-                      <div className="flex justify-between text-[#222222]">
+                      <div className="flex justify-between text-[#0B1F42]">
                         <span>Cleaning fee</span>
                         <span>KES {pricing.cleaningFee.toLocaleString()}</span>
                       </div>
                       {pricing.extraGuestFee > 0 && (
-                        <div className="flex justify-between text-[#222222]">
+                        <div className="flex justify-between text-[#0B1F42]">
                           <span>Extra guest fee ({pricing.extraGuests} x KES {EXTRA_GUEST_FEE.toLocaleString()} x {pricing.nights} nights)</span>
                           <span>KES {pricing.extraGuestFee.toLocaleString()}</span>
                         </div>
                       )}
-                      <div className="flex justify-between text-[#222222]">
+                      <div className="flex justify-between text-[#0B1F42]">
                         <span>Service fee</span>
                         <span>KES {pricing.serviceFee.toLocaleString()}</span>
                       </div>
                       {selectedAddOns.map((item) => (
-                        <div key={item.addOn.id} className="flex justify-between text-[#222222]">
+                        <div key={item.addOn.id} className="flex justify-between text-[#0B1F42]">
                           <span>{item.addOn.name} x {item.quantity}</span>
                           <span>KES {(item.quantity * (item.addOn.price || 0)).toLocaleString()}</span>
                         </div>
                       ))}
                       {pricing.lateCheckoutFee > 0 && (
-                        <div className="flex justify-between text-[#222222]">
+                        <div className="flex justify-between text-[#0B1F42]">
                           <span>Late check-out</span>
                           <span>KES {pricing.lateCheckoutFee.toLocaleString()}</span>
                         </div>
@@ -1421,7 +1421,7 @@ function BookingPage() {
                           <span>-KES {pricing.discountAmount.toLocaleString()}</span>
                         </div>
                       )}
-                      <div className="pt-2 border-t border-[#E5E7EB] flex justify-between font-bold text-[#222222]">
+                      <div className="pt-2 border-t border-[#E3E8EF] flex justify-between font-bold text-[#0B1F42]">
                         <span>Total</span>
                         <span>KES {pricing.total.toLocaleString()}</span>
                       </div>
