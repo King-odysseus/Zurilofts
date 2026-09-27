@@ -507,7 +507,7 @@ function AdminLayout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex">
+    <div className="min-h-screen bg-[#F7F4EF] flex">
       {/* Sidebar */}
       <aside
         className={`bg-[#0B1F42] border-r border-[#17345C] text-white hidden md:flex flex-col fixed inset-y-0 left-0 z-10 transition-all duration-300 ${
