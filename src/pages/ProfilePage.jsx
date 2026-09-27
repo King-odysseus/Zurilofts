@@ -144,6 +144,15 @@ function ProfilePage() {
     loadData();
   }, [reloadKey]);
 
+  useEffect(() => {
+    if (!showAccountMenu) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setShowAccountMenu(false);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [showAccountMenu]);
+
   // Populate bank form when profile loads (HOST only)
   useEffect(() => {
     if (!profile || profile.role !== 'HOST') return;
