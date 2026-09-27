@@ -64,9 +64,9 @@ function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col lg:flex-row bg-white">
       {/* Story panel - photo + pitch, desktop only */}
-      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-[#0B0B45] px-10 py-10 lg:flex lg:w-[70%] lg:px-14 lg:py-12">
+      <div className="relative hidden w-full flex-col justify-between overflow-hidden bg-[#0B1F42] px-10 py-10 lg:flex lg:w-[70%] lg:px-14 lg:py-12">
         <img src={bgImage} alt="" className="absolute inset-0 h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-[#0B0B45]/80" />
+        <div className="absolute inset-0 bg-[#0B1F42]/80" />
 
         <div className="relative z-10">
           <Link to="/" className="inline-flex items-center gap-2.5" aria-label="ZuriLofts home">
@@ -125,12 +125,12 @@ function LoginPage() {
 
         <div className="flex flex-1 items-start justify-center px-4 py-8 md:px-8 lg:items-center">
           <div className="w-full max-w-sm">
-            <h1 className="text-2xl font-bold text-[#0B0B45]">{t('login.welcomeBack')}</h1>
-            <p className="mt-2 text-sm text-[#6b7280]">{t('login.subtitle')}</p>
+            <h1 className="text-2xl font-bold text-[#0B1F42]">{t('login.welcomeBack')}</h1>
+            <p className="mt-2 text-sm text-[#5B6B82]">{t('login.subtitle')}</p>
 
             {/* Error */}
             {(localError || error) && (
-              <div className="mt-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              <div className="mt-6 rounded-2xl border border-[#F1C9C9] bg-[#FDECEC] px-4 py-3 text-sm text-[#B42318]">
                 {localError || error}
               </div>
             )}
@@ -153,7 +153,7 @@ function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full rounded-xl border-0 bg-[#F3F4F6] py-3 pl-12 pr-4 text-base text-[#1f2937] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                    className="w-full rounded-[10px] border-0 bg-[#F7F4EF] py-3 pl-12 pr-4 text-base text-[#0B1F42] placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                     required
                   />
                 </div>
@@ -174,7 +174,7 @@ function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
-                    className="w-full rounded-xl border-0 bg-[#F3F4F6] py-3 pl-12 pr-12 text-base text-[#1f2937] placeholder:text-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]"
+                    className="w-full rounded-[10px] border-0 bg-[#F7F4EF] py-3 pl-12 pr-12 text-base text-[#0B1F42] placeholder:text-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                     required
                   />
                   <PasswordToggle
@@ -193,7 +193,7 @@ function LoginPage() {
                       onChange={(e) => setRememberMe(e.target.checked)}
                       className="peer sr-only"
                     />
-                    <span className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] border border-[#D9D9D9] bg-white peer-checked:bg-[#0B0B45] peer-checked:border-[#0B0B45] peer-focus-visible:ring-2 peer-focus-visible:ring-[#C49A6C] transition-colors">
+                    <span className="flex h-[18px] w-[18px] items-center justify-center rounded-[5px] border border-[#D9D9D9] bg-white peer-checked:border-[#0B1F42] peer-checked:bg-[#0B1F42] peer-focus-visible:ring-2 peer-focus-visible:ring-[#C49A6C] transition-colors">
                       <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ opacity: rememberMe ? 1 : 0 }}>
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                       </svg>
@@ -209,7 +209,7 @@ function LoginPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="flex w-full min-h-[44px] items-center justify-center gap-2 rounded-xl bg-[#C49A6C] py-3 font-semibold text-white transition-all duration-200 hover:bg-[#B8895C] disabled:opacity-50"
+                className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-[10px] bg-[#0B1F42] py-3 font-semibold text-white transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50"
               >
                 {submitting ? t('login.signingIn') : (
                   <>
@@ -246,14 +246,14 @@ function LoginPage() {
 
             <Link
               to="/properties"
-              className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-full py-3 text-sm font-semibold text-[#6b7280] transition-all duration-200 hover:text-[#C49A6C]"
+                className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-[10px] py-3 text-sm font-semibold text-[#5B6B82] transition-all duration-200 hover:bg-[#F7F4EF] hover:text-[#0B1F42]"
             >
               {t('login.continueBrowsing')}
             </Link>
 
             <p className="mt-6 text-center text-sm text-[#6b7280]">
               {t('login.newToZuriLofts')}{' '}
-              <Link to="/register" className="font-semibold text-[#0B0B45] transition-colors hover:text-[#C49A6C]">
+              <Link to="/register" className="font-semibold text-[#0B1F42] transition-colors hover:text-[#C49A6C]">
                 {t('login.createAccount')}
               </Link>
             </p>
@@ -271,7 +271,7 @@ function PasswordToggle({ shown, onClick }) {
       type="button"
       onClick={onClick}
       aria-label={shown ? 'Hide password' : 'Show password'}
-      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#2563EB] transition-colors"
+      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#5B6B82] transition-colors hover:text-[#0B1F42]"
     >
       {shown ? (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
