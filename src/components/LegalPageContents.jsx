@@ -42,24 +42,24 @@ export function LegalPageContentsMobile({ containerRef }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="mb-8 rounded-[14px] border border-[#E5E7EB] bg-white lg:hidden">
+    <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white lg:hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="legal-toc-mobile"
-        className="flex min-h-[44px] w-full items-center justify-between gap-2 px-5 py-3 text-left text-sm font-semibold text-[#222222]"
+        className="flex min-h-[44px] w-full items-center justify-between gap-2 px-5 py-3 text-left text-sm font-semibold text-[#0B1F42]"
       >
         Contents
-        <svg className={`h-4 w-4 text-[#6b7280] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <svg className={`h-4 w-4 text-[#5B6B82] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       {open && (
-        <ul id="legal-toc-mobile" className="space-y-2 border-t border-[#E5E7EB] px-5 py-4">
+        <ul id="legal-toc-mobile" className="space-y-2 border-t border-[#E3E8EF] px-5 py-4">
           {items.map((item) => (
             <li key={item.id}>
-              <a href={`#${item.id}`} onClick={() => setOpen(false)} className="text-sm text-[#2563EB] hover:text-[#1D4ED8]">{item.text}</a>
+              <a href={`#${item.id}`} onClick={() => setOpen(false)} className="text-sm text-[#0B1F42] hover:text-[#C49A6C]">{item.text}</a>
             </li>
           ))}
         </ul>
@@ -76,11 +76,11 @@ export function LegalPageContentsDesktop({ containerRef }) {
 
   return (
     <nav aria-label="Table of contents" className="hidden lg:sticky lg:top-24 lg:block">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#6b7280]">Contents</p>
-      <ul className="max-h-[70vh] space-y-2 overflow-y-auto border-l border-[#E5E7EB] pl-4">
+      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#C49A6C]">Contents</p>
+      <ul className="max-h-[70vh] space-y-2 overflow-y-auto border-l border-[#E3E8EF] pl-4">
         {items.map((item) => (
           <li key={item.id}>
-            <a href={`#${item.id}`} className="text-sm text-[#6b7280] hover:text-[#2563EB] transition-colors">{item.text}</a>
+            <a href={`#${item.id}`} className="text-sm text-[#5B6B82] transition-colors hover:text-[#C49A6C]">{item.text}</a>
           </li>
         ))}
       </ul>

@@ -12,16 +12,17 @@ function PrivacyPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
       <div className="pt-24 pb-16">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 lg:grid lg:grid-cols-[minmax(0,1fr)_200px] lg:gap-10 lg:items-start">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 md:px-8 lg:grid lg:grid-cols-[minmax(0,1fr)_220px] lg:items-start lg:gap-12">
         <div className="max-w-3xl min-w-0">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#222222] mb-2">Privacy Policy</h1>
-          <p className="text-sm text-[#6b7280] mb-8">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#C49A6C]">Legal / Trust</p>
+          <h1 className="mb-2 text-3xl font-bold text-[#0B1F42] md:text-4xl">Privacy Policy</h1>
+          <p className="mb-8 text-sm text-[#5B6B82]">
             Last updated: {lastUpdated} · Policy version: {POLICY_VERSION}
           </p>
 
           <LegalPageContentsMobile containerRef={articleRef} />
 
-          <div ref={articleRef} className="prose prose-slate max-w-none space-y-8 text-[#222222] leading-relaxed">
+          <div ref={articleRef} className="prose prose-slate max-w-none space-y-8 leading-relaxed text-[#0B1F42] prose-headings:text-[#0B1F42] prose-a:text-[#C49A6C]">
 
             {/* 1. Introduction */}
             <section>
