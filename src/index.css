@@ -47,6 +47,34 @@
   .ui-status-danger {
     @apply text-[#B42318];
   }
+
+  .ui-chip {
+    @apply inline-flex min-h-[32px] items-center gap-1.5 rounded-full border border-[#E3E8EF] bg-white px-3 py-1.5 text-xs font-semibold text-[#0B1F42];
+  }
+
+  .ui-icon-button {
+    @apply inline-flex min-h-[40px] min-w-[40px] items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white text-[#0B1F42] transition hover:bg-[#F7F4EF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .ui-tabs {
+    @apply flex min-h-[44px] items-center gap-1 border-b border-[#E3E8EF];
+  }
+
+  .ui-alert {
+    @apply flex min-h-[56px] items-start gap-3 rounded-[10px] border px-4 py-3 text-sm;
+  }
+
+  .ui-alert-success {
+    @apply border-[#BDE2C8] bg-[#E8F4EC] text-[#287A45];
+  }
+
+  .ui-alert-warning {
+    @apply border-[#F2C9A8] bg-[#FDE8D8] text-[#9A4A1D];
+  }
+
+  .ui-alert-danger {
+    @apply border-[#F4C7C3] bg-[#FDECEC] text-[#B42318];
+  }
 }
 
 * {
