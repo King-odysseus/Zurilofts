@@ -83,8 +83,6 @@ function PropertiesResultsScene({
   bedFilterButtons,
   error,
   fetchProperties,
-  viewMode,
-  setViewMode,
   moreFiltersOpen,
   setMoreFiltersOpen,
 }) {

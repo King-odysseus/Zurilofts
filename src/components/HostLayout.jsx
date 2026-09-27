@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import Navbar from './Navbar.jsx';
+import HostMobileBottomNav from './HostMobileBottomNav.jsx';
 
 // Host workspace shell: the normal client Navbar (which in hosting mode shows
 // Today/Calendar/Listings/Messages/Earnings) plus a centred content container.
@@ -11,6 +12,7 @@ function HostLayout({ children }) {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         {children}
       </main>
+      <HostMobileBottomNav />
     </div>
   );
 }

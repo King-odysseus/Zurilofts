@@ -4,6 +4,7 @@ import PropTypes from "prop-types";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 import Navbar from "../components/Navbar.jsx";
+import HostMobileBottomNav from "../components/HostMobileBottomNav.jsx";
 import Spinner from "../components/Spinner.jsx";
 import { firstImage } from "../utils/images.js";
 
@@ -886,6 +887,7 @@ export default function HostTodayPage() {
         {/* Recent guest messages */}
         <RecentMessagesPanel conversations={conversations.slice(0, 3)} loading={conversationsLoading} />
       </main>
+      <HostMobileBottomNav />
     </div>
   );
 }

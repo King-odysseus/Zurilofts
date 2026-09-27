@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useMode } from '../context/ModeContext.jsx';
 
 // Paths where global navigation (including these tabs) is intentionally
 // hidden: the design-led home page, checkout (compact logo/back header only),
@@ -85,7 +86,8 @@ const TABS = [
  */
 function MobileBottomNav() {
   const location = useLocation();
-  const hidden = isHiddenPath(location.pathname);
+  const { mode } = useMode();
+  const hidden = isHiddenPath(location.pathname) || mode === 'hosting';
 
   useEffect(() => {
     document.body.classList.toggle('has-mobile-bottom-nav', !hidden);
@@ -97,7 +99,7 @@ function MobileBottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-40 flex border-t border-[#E5E7EB] bg-white md:hidden"
+      className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-[420px] rounded-2xl bg-[#0B1F42] px-2 py-2 text-white shadow-[0_12px_30px_rgba(11,31,66,0.28)] md:hidden"
     >
       {TABS.map((tab) => {
         const active = tab.match(location.pathname);
@@ -106,8 +108,8 @@ function MobileBottomNav() {
             key={tab.key}
             to={tab.to}
             aria-current={active ? 'page' : undefined}
-            className={`flex min-h-[44px] flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#2563EB] ${
-              active ? 'text-[#2563EB]' : 'text-[#6b7280] hover:text-[#222222]'
+            className={`flex min-h-[48px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white ${
+              active ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
             }`}
           >
             {tab.icon(active)}

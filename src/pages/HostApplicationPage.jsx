@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
+import HostMobileBottomNav from '../components/HostMobileBottomNav.jsx';
 import Footer from '../components/Footer.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
@@ -370,6 +371,7 @@ function HostApplicationPage() {
           )}
         </div>
       </main>
+      <HostMobileBottomNav />
       <Footer />
     </div>
   );

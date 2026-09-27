@@ -2,11 +2,13 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useMode } from '../context/ModeContext.jsx';
 import apiClient from '../api/client.js';
 import Navbar from '../components/Navbar.jsx';
 import Spinner from '../components/Spinner.jsx';
 import MessagesTabBar from '../components/MessagesTabBar.jsx';
 import { firstImage } from '../utils/images.js';
+import HostMobileBottomNav from '../components/HostMobileBottomNav.jsx';
 
 function formatRelativeTime(iso) {
   if (!iso) return '';
@@ -115,6 +117,7 @@ ConversationRow.propTypes = {
 
 function InboxPage() {
   const { user } = useAuth();
+  const { mode } = useMode();
   const [conversations, setConversations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -138,7 +141,7 @@ function InboxPage() {
   return (
     <div className="min-h-screen bg-canvas">
       <Navbar />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         <div className="mb-8 rounded-[14px] border border-[#E5E7EB] bg-white px-5 py-5 sm:px-6 shadow-sm">
           <h1 className="text-3xl font-bold text-[#222222]">Inbox</h1>
           <p className="text-[#6b7280] mt-1">Messages about your bookings and stays.</p>
@@ -146,6 +149,36 @@ function InboxPage() {
 
         <MessagesTabBar active="inbox" />
 
+        {!loading && !error && (
+          <div className="hidden min-h-[560px] overflow-hidden rounded-[14px] border border-[#E5E7EB] bg-white shadow-sm lg:grid lg:grid-cols-[360px_minmax(0,1fr)]">
+            <section className="border-r border-[#E5E7EB]" aria-label="Conversations">
+              <div className="border-b border-[#E5E7EB] px-5 py-4">
+                <h2 className="font-bold text-[#222222]">Conversations</h2>
+                <p className="mt-1 text-sm text-[#6b7280]">Choose a thread to view its messages.</p>
+              </div>
+              {conversations.length > 0 ? conversations.map((conversation) => (
+                <ConversationRow key={conversation.id} conversation={conversation} currentUserId={user?.id} compact />
+              )) : (
+                <p className="px-5 py-8 text-sm text-[#6b7280]">No conversations yet.</p>
+              )}
+            </section>
+            <section className="flex items-center justify-center bg-[#F7F7F5]/60 px-8 text-center" aria-label="Conversation preview">
+              <div className="max-w-sm">
+                <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white text-[#6b7280] shadow-sm">
+                  <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold text-[#222222]">{conversations.length ? 'Select a conversation' : 'No messages yet'}</h2>
+                <p className="mt-2 text-sm text-[#6b7280]">
+                  {conversations.length ? 'Choose a booking conversation from the list to read and reply.' : 'Messages about your bookings will appear here once you make a reservation.'}
+                </p>
+              </div>
+            </section>
+          </div>
+        )}
+
+        <div className="lg:hidden">
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <Spinner />
@@ -179,7 +212,9 @@ function InboxPage() {
             ))}
           </div>
         )}
+        </div>
       </main>
+      {mode === 'hosting' && <HostMobileBottomNav />}
     </div>
   );
 }

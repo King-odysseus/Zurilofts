@@ -74,7 +74,10 @@ body {
 }
 @media (max-width: 767px) {
   body.has-mobile-bottom-nav {
-    padding-bottom: calc(56px + env(safe-area-inset-bottom));
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+  body.has-host-mobile-nav {
+    padding-bottom: calc(92px + env(safe-area-inset-bottom));
   }
 }
 
