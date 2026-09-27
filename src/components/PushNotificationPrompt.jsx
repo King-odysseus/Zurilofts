@@ -23,7 +23,7 @@ function PushNotificationPrompt() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-4 sm:bottom-4 sm:w-96 z-40 bg-white rounded-2xl shadow-2xl p-4">
+    <div className="fixed bottom-4 left-4 right-4 z-40 rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.14)] sm:bottom-4 sm:left-auto sm:right-4 sm:w-96">
       <div className="flex items-start gap-3">
         <div className="w-10 h-10 bg-[#C49A6C]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
           <svg className="w-5 h-5 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,26 +31,26 @@ function PushNotificationPrompt() {
           </svg>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-[#0B0B45]">Stay updated on your bookings</p>
-          <p className="text-xs text-[#6b7280] mt-0.5">
+          <p className="text-sm font-semibold text-[#0B1F42]">Stay updated on your bookings</p>
+          <p className="mt-0.5 text-xs text-[#5B6B82]">
             Get notified when your booking is confirmed and receive check-in reminders.
           </p>
           <div className="flex items-center gap-2 mt-3">
             <button
               onClick={async () => { await subscribe(); setDismissed(true); }}
-              className="bg-[#C49A6C] text-white px-4 py-1.5 rounded-full text-xs font-semibold hover:bg-[#b8895c] transition-all duration-200"
+              className="min-h-[36px] rounded-[10px] bg-[#C49A6C] px-4 py-1.5 text-xs font-semibold text-white transition-all duration-200 hover:bg-[#B8895C]"
             >
               Allow
             </button>
             <button
               onClick={() => setDismissed(true)}
-              className="text-xs text-[#6b7280] hover:text-[#1f2937] transition-colors"
+              className="text-xs text-[#5B6B82] transition-colors hover:text-[#0B1F42]"
             >
               Not now
             </button>
           </div>
         </div>
-        <button onClick={() => setDismissed(true)} className="text-[#D9D9D9] hover:text-[#6b7280] transition-colors flex-shrink-0">
+        <button onClick={() => setDismissed(true)} className="flex-shrink-0 text-[#94A3B8] transition-colors hover:text-[#5B6B82]">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
