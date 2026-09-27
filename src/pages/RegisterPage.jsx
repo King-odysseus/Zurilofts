@@ -140,7 +140,7 @@ function RegisterPage() {
             <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" />
           </Link>
           <div className="ml-auto flex items-center gap-4">
-            <a href="mailto:enquires@zurilofts.com" className="text-sm text-[#6b7280] hover:text-[#C49A6C] transition-colors">
+            <a href="mailto:enquires@zurilofts.com" className="text-sm text-[#5B6B82] transition-colors hover:text-[#C49A6C]">
               {t('register.needHelp')}
             </a>
             <Dropdown
@@ -157,7 +157,7 @@ function RegisterPage() {
         <div className="flex flex-1 items-start justify-center px-4 py-8 md:px-8">
           <div className="w-full max-w-sm">
             <h1 className="text-2xl font-bold text-[#0B1F42]">{t('register.title')}</h1>
-            <p className="mt-2 text-sm text-[#6b7280]">{t('register.subtitle')}</p>
+            <p className="mt-2 text-sm text-[#5B6B82]">{t('register.subtitle')}</p>
 
             {(localError || error) && (
               <div className="mt-2 rounded-2xl border border-[#F1C9C9] bg-[#FDECEC] px-4 py-3 text-sm text-[#B42318]">
@@ -204,7 +204,7 @@ function RegisterPage() {
                   {t('register.email')}
                 </label>
                 <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#5B6B82]">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
@@ -227,7 +227,7 @@ function RegisterPage() {
                   {t('register.password')}
                 </label>
                 <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#5B6B82]">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
@@ -254,7 +254,7 @@ function RegisterPage() {
                   {t('register.confirmPassword')}
                 </label>
                 <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#5B6B82]">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
@@ -291,7 +291,7 @@ function RegisterPage() {
                     </svg>
                   </span>
                 </span>
-                <span className="flex flex-wrap gap-x-1 text-sm text-[#6b7280]">
+                <span className="flex flex-wrap gap-x-1 text-sm text-[#5B6B82]">
                   {t('register.agreeTermsPrefix')}{' '}
                   <a href="/terms" target="_blank" rel="noopener noreferrer" className="font-medium text-[#0B1F42] hover:text-[#C49A6C] transition-colors">
                     {t('register.terms')}
@@ -322,7 +322,7 @@ function RegisterPage() {
             {/* Divider */}
             <div className="my-6 flex items-center">
               <div className="h-px flex-1 bg-[#E5E7EB]"></div>
-              <span className="px-4 text-sm text-[#6b7280]">{t('register.orSignUpWith')}</span>
+              <span className="px-4 text-sm text-[#5B6B82]">{t('register.orSignUpWith')}</span>
               <div className="h-px flex-1 bg-[#E5E7EB]"></div>
             </div>
 
@@ -343,12 +343,12 @@ function RegisterPage() {
 
             <Link
               to="/properties"
-              className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-full py-3 text-sm font-semibold text-[#6b7280] transition-all duration-200 hover:text-[#C49A6C]"
+              className="mt-4 flex min-h-[44px] w-full items-center justify-center rounded-[10px] py-3 text-sm font-semibold text-[#5B6B82] transition-all duration-200 hover:bg-[#F7F4EF] hover:text-[#C49A6C]"
             >
               {t('register.continueBrowsing')}
             </Link>
 
-            <p className="mt-6 text-center text-sm text-[#6b7280]">
+            <p className="mt-6 text-center text-sm text-[#5B6B82]">
               {t('register.alreadyHaveAccount')}{' '}
               <Link to="/login" className="font-semibold text-[#0B1F42] transition-colors hover:text-[#C49A6C]">
                 {t('register.signIn')}
@@ -369,7 +369,7 @@ function PasswordToggle({ shown, onClick }) {
       type="button"
       onClick={onClick}
       aria-label={shown ? 'Hide password' : 'Show password'}
-      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#6b7280] hover:text-[#C49A6C] transition-colors"
+      className="absolute inset-y-0 right-0 flex items-center pr-4 text-[#5B6B82] transition-colors hover:text-[#C49A6C]"
     >
       {shown ? (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

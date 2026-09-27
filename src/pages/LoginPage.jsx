@@ -109,7 +109,7 @@ function LoginPage() {
             <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto" />
           </Link>
           <div className="ml-auto flex items-center gap-4">
-            <a href="mailto:enquires@zurilofts.com" className="text-sm text-[#6b7280] hover:text-[#C49A6C] transition-colors">
+            <a href="mailto:enquires@zurilofts.com" className="text-sm text-[#5B6B82] transition-colors hover:text-[#C49A6C]">
               {t('login.needHelp')}
             </a>
             <Dropdown
@@ -142,7 +142,7 @@ function LoginPage() {
                   {t('login.email')}
                 </label>
                 <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#5B6B82]">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
@@ -163,7 +163,7 @@ function LoginPage() {
                   {t('login.password')}
                 </label>
                 <div className="relative">
-                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#6b7280]">
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-[#5B6B82]">
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
@@ -201,7 +201,7 @@ function LoginPage() {
                   </span>
                   {t('login.rememberMe')}
                 </label>
-                <a href="mailto:enquires@zurilofts.com" className="text-sm font-medium text-[#0B0B45] hover:text-[#C49A6C] transition-colors">
+                <a href="mailto:enquires@zurilofts.com" className="text-sm font-medium text-[#9A744A] transition-colors hover:text-[#C49A6C]">
                   {t('login.forgotPassword')}
                 </a>
               </div>
@@ -225,7 +225,7 @@ function LoginPage() {
             {/* Divider */}
             <div className="my-6 flex items-center">
               <div className="h-px flex-1 bg-[#E5E7EB]"></div>
-              <span className="px-4 text-sm text-[#6b7280]">{t('login.orContinueWith')}</span>
+              <span className="px-4 text-sm text-[#5B6B82]">{t('login.orContinueWith')}</span>
               <div className="h-px flex-1 bg-[#E5E7EB]"></div>
             </div>
 
@@ -251,7 +251,7 @@ function LoginPage() {
               {t('login.continueBrowsing')}
             </Link>
 
-            <p className="mt-6 text-center text-sm text-[#6b7280]">
+            <p className="mt-6 text-center text-sm text-[#5B6B82]">
               {t('login.newToZuriLofts')}{' '}
               <Link to="/register" className="font-semibold text-[#0B1F42] transition-colors hover:text-[#C49A6C]">
                 {t('login.createAccount')}
