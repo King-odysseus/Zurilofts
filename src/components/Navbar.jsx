@@ -631,8 +631,36 @@ function Navbar({ solid = false }) {
         )}
         <div
           id="navbar-main"
-          className={`fixed right-0 top-16 z-30 h-[calc(100dvh-4rem)] w-full max-w-sm overflow-y-auto border-l border-[#E5E7EB] bg-white shadow-2xl transition-transform duration-200 ${menuOpen ? 'translate-x-0' : 'translate-x-full pointer-events-none'}`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Account and navigation menu"
+          className={`fixed left-1/2 top-20 z-30 w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-6rem)] -translate-x-1/2 overflow-y-auto rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_20px_60px_rgba(11,31,66,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
         >
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E3E8EF] bg-white px-4 py-3">
+            <div className="flex items-center gap-3 min-w-0">
+              {isAuthenticated ? (
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#C49A6C] text-sm font-bold text-white">
+                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+                </div>
+              ) : (
+                <div className="h-9 w-9 shrink-0 rounded-full bg-[#F7F4EF]" aria-hidden="true" />
+              )}
+              <div className="min-w-0">
+                <p className="truncate text-sm font-semibold text-[#0B1F42]">{isAuthenticated ? user?.firstName : 'Explore ZuriLofts'}</p>
+                <p className="truncate text-xs text-[#5B6B82]">{isAuthenticated ? user?.email : 'Find your next stay'}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Close menu"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#0B1F42] transition hover:bg-[#F7F4EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
           <ul className="px-2 py-3 space-y-1 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain">
             {navItems.map((item) => {
               const hasChildren = Array.isArray(item.children) && item.children.length > 0;
