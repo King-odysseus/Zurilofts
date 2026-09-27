@@ -81,7 +81,7 @@ function RestaurantsPage() {
     setQuery("");
   };
   return (
-    <div className="min-h-screen overflow-x-hidden bg-[#F8FAFC] text-[#0B1F42]">
+    <div className="min-h-screen overflow-x-hidden bg-[#F7F4EF] text-[#0B1F42]">
       <HomeHeader
         propertiesPage
         searchLabel="Search restaurants"

@@ -343,7 +343,7 @@ export default function HomePage() {
           </div>
         </section>
 
-        <section className="bg-[#F8FAFC]"><div className="mx-auto max-w-[1240px] px-5 py-16 md:px-8 md:py-20"><div className="flex items-end justify-between"><div><h2 className="text-2xl font-semibold md:text-[30px]">{t('home.exploreTitle')}</h2><p className="mt-2 text-xs text-[#5B6B82]">{t('home.exploreDescription')}</p></div><Link to="/guides" className="hidden items-center gap-2 text-xs font-medium sm:flex">{t('home.browseGuides')} <Icon name="arrow" className="h-4 w-4" /></Link></div><div className="mt-8 grid gap-5 md:grid-cols-3">{EXPLORE_CARDS.map((card) => <ExploreCard key={card.title} card={card} />)}</div></div></section>
+        <section className="bg-[#F7F4EF]"><div className="mx-auto max-w-[1240px] px-5 py-16 md:px-8 md:py-20"><div className="flex items-end justify-between"><div><h2 className="text-2xl font-semibold md:text-[30px]">{t('home.exploreTitle')}</h2><p className="mt-2 text-xs text-[#5B6B82]">{t('home.exploreDescription')}</p></div><Link to="/guides" className="hidden items-center gap-2 text-xs font-medium sm:flex">{t('home.browseGuides')} <Icon name="arrow" className="h-4 w-4" /></Link></div><div className="mt-8 grid gap-5 md:grid-cols-3">{EXPLORE_CARDS.map((card) => <ExploreCard key={card.title} card={card} />)}</div></div></section>
       </main>
       <HomeFooter />
     </div>
