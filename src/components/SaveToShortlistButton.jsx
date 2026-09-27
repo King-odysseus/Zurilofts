@@ -77,7 +77,7 @@ export default function SaveToShortlistButton({ propertyId }) {
         className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
           isSaved
             ? "bg-[#C49A6C] text-white"
-            : "text-[#0B0B45] shadow-sm hover:shadow-md hover:bg-[#0B0B45] hover:text-white"
+            : "border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-sm hover:bg-[#F7F4EF] hover:shadow-md"
         }`}
       >
         <svg className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
@@ -89,25 +89,25 @@ export default function SaveToShortlistButton({ propertyId }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-2 z-50 w-64 bg-white rounded-xl shadow-xl p-3">
-            <h4 className="text-sm font-semibold text-[#0B0B45] mb-2">Save to shortlist</h4>
+          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-white p-3 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+            <h4 className="mb-2 text-sm font-semibold text-[#0B1F42]">Save to shortlist</h4>
 
             {loading ? (
-              <p className="text-xs text-[#6b7280] py-2">Loading...</p>
+              <p className="py-2 text-xs text-[#5B6B82]">Loading...</p>
             ) : shortlists.length === 0 ? (
-              <p className="text-xs text-[#6b7280] py-2">No shortlists yet.</p>
+              <p className="py-2 text-xs text-[#5B6B82]">No shortlists yet.</p>
             ) : (
               <div className="space-y-1 max-h-48 overflow-y-auto mb-2">
                 {shortlists.map((sl) => (
                   <label
                     key={sl.id}
-                    className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-[#D9D9D9]/20 cursor-pointer text-sm text-[#1f2937]"
+                    className="flex cursor-pointer items-center gap-2 rounded-[10px] px-2 py-1.5 text-sm text-[#0B1F42] hover:bg-[#F7F4EF]"
                   >
                     <input
                       type="checkbox"
                       checked={savedIds.has(sl.id)}
                       onChange={() => toggleShortlist(sl.id)}
-                      className="rounded border-[#D9D9D9] text-[#C49A6C] focus:ring-[#C49A6C]"
+                      className="rounded border-[#C9D3DF] text-[#C49A6C] focus:ring-[#C49A6C]"
                     />
                     {sl.name}
                   </label>
@@ -122,17 +122,17 @@ export default function SaveToShortlistButton({ propertyId }) {
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Shortlist name"
-                  className="flex-1 rounded-lg shadow-sm px-2 py-1 text-xs text-[#1f2937] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#C49A6C]"
+                  className="min-h-[36px] flex-1 rounded-[10px] border border-[#E3E8EF] px-2 py-1 text-xs text-[#0B1F42] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
                   autoFocus
                   onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); if (e.key === "Escape") setShowCreate(false); }}
                 />
-                <button onClick={handleCreate} className="px-2 py-1 rounded-lg text-xs font-semibold bg-[#C49A6C] text-white">Add</button>
+                <button onClick={handleCreate} className="rounded-[10px] bg-[#C49A6C] px-2 py-1 text-xs font-semibold text-white">Add</button>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => setShowCreate(true)}
-                className="w-full text-left px-2 py-1.5 rounded-lg text-xs font-medium text-[#C49A6C] hover:bg-[#C49A6C]/10 transition-colors"
+                className="w-full rounded-[10px] px-2 py-1.5 text-left text-xs font-medium text-[#9A744A] transition-colors hover:bg-[#FDE8D8]"
               >
                 + Create new shortlist
               </button>

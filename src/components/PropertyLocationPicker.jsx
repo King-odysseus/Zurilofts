@@ -278,7 +278,7 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
 
   return (
     <div>
-      <div className="relative rounded-xl overflow-hidden shadow-sm" onMouseDownCapture={() => setResultsOpen(false)}>
+      <div className="relative overflow-hidden rounded-2xl border border-[#E3E8EF] shadow-[0_8px_28px_rgba(11,31,66,0.08)]" onMouseDownCapture={() => setResultsOpen(false)}>
         <div
           ref={mapElRef}
           className="h-64 md:h-72 w-full"
@@ -286,7 +286,7 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
           role="application"
         />
         {busy && (
-          <div className="absolute top-3 right-3 bg-white/95 rounded-full shadow-md px-3 py-1.5 flex items-center gap-2 text-xs font-medium text-[#0B0B45]" role="status" aria-live="polite">
+          <div className="absolute right-3 top-3 flex items-center gap-2 rounded-full border border-[#E3E8EF] bg-white/95 px-3 py-1.5 text-xs font-medium text-[#0B1F42] shadow-md" role="status" aria-live="polite">
             <span className="w-3 h-3 border-2 border-[#C49A6C] border-t-transparent rounded-full animate-spin"></span>
             Finding address…
           </div>
@@ -299,7 +299,7 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
             <svg className="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-sm text-[#1f2937]">
+            <p className="text-sm text-[#0B1F42]">
               Pin dropped. Drag it or click elsewhere to adjust - or clear the pin to search a new place.
             </p>
           </>
@@ -309,7 +309,7 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <p className="text-sm text-[#6b7280]">
+            <p className="text-sm text-[#5B6B82]">
               Type the estate or street below and pick a result, or click the map to drop the pin.
             </p>
           </>
@@ -317,13 +317,13 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
       </div>
 
       <div className="mt-3 relative">
-        <label className="block text-sm font-semibold text-[#1f2937] mb-2" htmlFor="property-address">
+        <label className="mb-2 block text-sm font-semibold text-[#0B1F42]" htmlFor="property-address">
           Street address
         </label>
         <div className="relative">
           <input
             id="property-address"
-            className="w-full px-4 py-2.5 pr-24 rounded-xl bg-white text-[#1f2937] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
+            className="w-full rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2.5 pr-24 text-[#0B1F42] shadow-sm focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/30"
             placeholder="Type the estate or street to locate it on the map, e.g. Kilimani, Ngong Road"
             value={address || ''}
             maxLength={300}
@@ -341,7 +341,7 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
             <button
               type="button"
               onClick={clearPin}
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg text-xs font-semibold text-[#6b7280] hover:text-red-600 hover:bg-red-50 transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 rounded-[10px] px-2.5 py-1 text-xs font-semibold text-[#5B6B82] transition-colors hover:bg-[#FDECEC] hover:text-[#B42318]"
             >
               Clear pin
             </button>
@@ -352,14 +352,14 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
           <ul
             id="location-search-results"
             role="listbox"
-            className="absolute z-20 left-0 right-0 mt-1.5 bg-white rounded-xl shadow-lg overflow-hidden max-h-60 overflow-y-auto"
+            className="absolute left-0 right-0 z-20 mt-1.5 max-h-60 overflow-y-auto overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.14)]"
             onMouseDown={(e) => e.preventDefault()}
           >
             {results.map((r, i) => (
               <li key={`${r.lat},${r.lng},${i}`}>
                 <button
                   type="button"
-                  className="w-full text-left px-3.5 py-2.5 flex items-start gap-2.5 text-sm text-[#1f2937] hover:bg-canvas transition-colors"
+                  className="flex w-full items-start gap-2.5 px-3.5 py-2.5 text-left text-sm text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
                   onMouseDown={() => chooseResult(r)}
                 >
                   <svg className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -373,7 +373,7 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
           </ul>
         )}
         {searchNote && <p className="text-xs text-red-600 mt-1.5">{searchNote}</p>}
-        <p className="text-xs text-[#6b7280] mt-1.5">
+        <p className="mt-1.5 text-xs text-[#5B6B82]">
           {lookupFailed
             ? 'Automatic lookup did not find an address here - keep the text or type it manually.'
             : hasPin

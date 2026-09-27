@@ -9,7 +9,7 @@ function StarRating({ rating, size = 'sm' }) {
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
-          className={`${sz} ${star <= rating ? 'text-[#C49A6C]' : 'text-[#D9D9D9]'}`}
+          className={`${sz} ${star <= rating ? 'text-[#C49A6C]' : 'text-[#C9D3DF]'}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -44,13 +44,13 @@ function ReviewSection({ propertyId }) {
 
   if (loading) {
     return (
-      <section className="mt-12 pt-8 border-t border-[#D9D9D9]">
+      <section className="mt-12 border-t border-[#E3E8EF] pt-8">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 w-48 bg-[#D9D9D9]/50 rounded" />
-          <div className="h-4 w-32 bg-[#D9D9D9]/30 rounded" />
+          <div className="h-6 w-48 rounded bg-[#EAF0F4]" />
+          <div className="h-4 w-32 rounded bg-[#F1F4F7]" />
           <div className="space-y-3 mt-6">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-[#D9D9D9]/20 rounded-2xl" />
+              <div key={i} className="h-24 rounded-2xl bg-[#F7F4EF]" />
             ))}
           </div>
         </div>
@@ -60,9 +60,9 @@ function ReviewSection({ propertyId }) {
 
   if (!summary || summary.totalReviews === 0) {
     return (
-      <section className="mt-12 pt-8 border-t border-[#D9D9D9]">
-        <h2 className="text-2xl font-bold text-[#0B0B45] mb-2">Guest Reviews</h2>
-        <p className="text-[#6b7280] mb-4">No reviews yet. Be the first to share your experience.</p>
+      <section className="mt-12 border-t border-[#E3E8EF] pt-8">
+        <h2 className="mb-2 text-2xl font-bold text-[#0B1F42]">Guest Reviews</h2>
+        <p className="mb-4 text-[#5B6B82]">No reviews yet. Be the first to share your experience.</p>
         <Link
           to="/bookings"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
@@ -79,16 +79,16 @@ function ReviewSection({ propertyId }) {
   const maxCount = Math.max(...summary.distribution.map((d) => d.count), 1);
 
   return (
-    <section className="mt-12 pt-8 border-t border-[#D9D9D9]">
+    <section className="mt-12 border-t border-[#E3E8EF] pt-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-[#0B0B45] mb-1">Guest Reviews</h2>
+      <h2 className="mb-1 text-2xl font-bold text-[#0B1F42]">Guest Reviews</h2>
           <div className="flex items-center gap-3">
             <StarRating rating={Math.round(summary.averageRating)} size="lg" />
-            <span className="text-lg font-bold text-[#0B0B45]">
+            <span className="text-lg font-bold text-[#0B1F42]">
               {summary.averageRating}
             </span>
-            <span className="text-[#6b7280] text-sm">
+            <span className="text-sm text-[#5B6B82]">
               · {summary.totalReviews} review{summary.totalReviews !== 1 ? 's' : ''}
             </span>
           </div>
@@ -113,13 +113,13 @@ function ReviewSection({ propertyId }) {
               <svg className="w-4 h-4 text-[#C49A6C] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              <div className="flex-1 h-3 bg-[#D9D9D9]/30 rounded-full overflow-hidden">
+              <div className="flex-1 h-3 overflow-hidden rounded-full bg-[#EAF0F4]">
                 <div
                   className="h-full bg-[#C49A6C] rounded-full transition-all duration-500"
                   style={{ width: `${maxCount > 0 ? (d.count / maxCount) * 100 : 0}%` }}
                 />
               </div>
-              <span className="text-sm text-[#6b7280] w-8 text-right">{d.count}</span>
+              <span className="w-8 text-right text-sm text-[#5B6B82]">{d.count}</span>
             </div>
           ))}
         </div>
@@ -128,20 +128,20 @@ function ReviewSection({ propertyId }) {
       {/* Review cards */}
       <div className="space-y-4">
         {reviews.map((review) => (
-          <div key={review.id} className="neu-card p-4 md:p-5">
+        <div key={review.id} className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-5">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <span className="font-semibold text-[#0B0B45] text-sm">
+                <span className="text-sm font-semibold text-[#0B1F42]">
                   {review.user?.firstName} {review.user?.lastName?.[0]}.
                 </span>
               </div>
-              <span className="text-xs text-[#6b7280]">
+              <span className="text-xs text-[#5B6B82]">
                 {new Date(review.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
               </span>
             </div>
             <StarRating rating={review.rating} />
             {review.publicComment && (
-              <p className="mt-2 text-sm text-[#1f2937] leading-relaxed">{review.publicComment}</p>
+              <p className="mt-2 text-sm leading-relaxed text-[#0B1F42]">{review.publicComment}</p>
             )}
           </div>
         ))}
