@@ -16,7 +16,7 @@ const STATUS_META = {
 };
 
 function StatusBadge({ status }) {
-  const meta = STATUS_META[status] || { label: status, bg: "bg-[#6b7280]", icon: null };
+  const meta = STATUS_META[status] || { label: status, bg: "bg-[#52606F]", icon: null };
   return (
     <span
       className={`inline-flex flex-shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${meta.bg}`}
@@ -107,7 +107,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
               <StatusBadge status={booking.status} />
             </div>
 
-            <p className="text-sm text-[#6b7280] mb-2">
+            <p className="mb-2 text-sm text-[#5B6B82]">
               <svg className="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -115,7 +115,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
               {p.location || "Nairobi"}
             </p>
 
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[#6b7280] mb-3">
+            <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[#5B6B82]">
               <span>{formatDateRange(booking.checkIn, booking.checkOut)}</span>
               <span className="hidden sm:inline text-[#E5E7EB]">|</span>
               <span>{nights} night{nights !== 1 ? "s" : ""}</span>
@@ -131,14 +131,14 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
 
             {/* Host contact (upcoming only) */}
             {!isPast && host.firstName && (
-              <div className="flex items-center gap-2 text-sm text-[#6b7280] mb-3">
-                <div className="w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center text-xs font-semibold text-[#2563EB]">
+              <div className="mb-3 flex items-center gap-2 text-sm text-[#5B6B82]">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#FDE8D8] text-xs font-semibold text-[#9A4A1D]">
                   {host.firstName[0]}{host.lastName?.[0]}
                 </div>
                 <span>
-                  Hosted by <span className="font-medium text-[#222222]">{host.firstName} {host.lastName}</span>
+                  Hosted by <span className="font-medium text-[#0B1F42]">{host.firstName} {host.lastName}</span>
                   {host.phone && (
-                    <span className="ml-2 text-[#222222]">{host.phone}</span>
+                    <span className="ml-2 text-[#0B1F42]">{host.phone}</span>
                   )}
                 </span>
               </div>
@@ -146,15 +146,15 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
           </div>
 
           {/* Bottom actions */}
-          <div className="flex items-center justify-between gap-3 pt-3 border-t border-[#E5E7EB]">
-            <span className="text-sm font-semibold text-[#222222]">
+          <div className="flex items-center justify-between gap-3 border-t border-[#E3E8EF] pt-3">
+            <span className="text-sm font-semibold text-[#0B1F42]">
               KES {booking.total?.toLocaleString()}
             </span>
             <div className="flex flex-wrap items-center justify-end gap-2">
               {isPast && !reviewSubmitted && (
                 <Link
                   to={`/property/${p.id}?review=true`}
-                  className="inline-flex items-center gap-1.5 min-h-[44px] px-3 rounded-lg text-xs font-semibold text-[#222222] border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors"
+                  className="inline-flex min-h-[44px] items-center gap-1.5 rounded-[10px] border border-[#E3E8EF] px-3 text-xs font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
                 >
                   <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
@@ -164,7 +164,7 @@ function BookingCard({ booking, isPast, onRequestCancel }) {
               )}
               {isPast && reviewSubmitted && (
                 <span className="text-xs text-[#6b7280] flex items-center gap-1">
-                  <svg className="w-3.5 h-3.5 text-[#2563EB]" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-3.5 h-3.5 text-[#C49A6C]" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                   </svg>
                   Reviewed
@@ -356,8 +356,8 @@ NextStayCard.propTypes = {
 function EmptyState({ isPast }) {
   return (
     <div className="text-center py-16 px-4">
-      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-[#F7F7F5] border border-[#E5E7EB] flex items-center justify-center">
-        <svg className="w-8 h-8 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-[#E3E8EF] bg-[#F7F4EF]">
+        <svg className="h-8 w-8 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {isPast ? (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           ) : (
@@ -365,10 +365,10 @@ function EmptyState({ isPast }) {
           )}
         </svg>
       </div>
-      <h3 className="text-lg font-bold text-[#222222] mb-1">
+      <h3 className="mb-1 text-lg font-bold text-[#0B1F42]">
         {isPast ? "No past trips" : "No upcoming trips"}
       </h3>
-      <p className="text-[#6b7280] max-w-sm mx-auto mb-6">
+      <p className="mx-auto mb-6 max-w-sm text-[#5B6B82]">
         {isPast
           ? "When you complete a stay, it will appear here so you can leave reviews and rebook favourites."
           : "You do not have any upcoming stays. Start exploring our properties to book your next trip."}
@@ -391,7 +391,7 @@ EmptyState.propTypes = {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-[14px] border border-[#E5E7EB] overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white">
       <div className="flex flex-col sm:flex-row">
         <div className="sm:w-48 lg:w-56 h-40 sm:h-36 bg-[#E5E7EB]/60 animate-pulse" />
         <div className="flex-1 p-4 sm:p-5 space-y-3">
