@@ -87,7 +87,7 @@ function CalendarPropertyPicker({ base }) {
               to={`${base}/calendar/${p.id}`}
               className="bg-white rounded-2xl border border-[#E3E8EF] overflow-hidden shadow-[0_8px_28px_rgba(11,31,66,0.08)] hover:shadow-[0_12px_32px_rgba(11,31,66,0.12)] transition-all duration-200 group"
             >
-              <div className="aspect-[4/3] overflow-hidden bg-[#F7F7F5]">
+              <div className="aspect-[4/3] overflow-hidden bg-[#F7F4EF]">
                 {p.images?.[0] ? (
                   <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 ) : (
@@ -300,7 +300,7 @@ function AdminCalendar() {
 
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">{error}</div>}
 
-      <div className="flex gap-1 border-b border-[#E5E7EB] mb-6" role="tablist" aria-label="Calendar sections">
+      <div className="flex gap-1 border-b border-[#E3E8EF] mb-6" role="tablist" aria-label="Calendar sections">
         {[['view', 'View'], ['availability', 'Availability'], ['settings', 'Settings']].map(([value, label]) => <button key={value} type="button" role="tab" aria-selected={calendarTab === value} onClick={() => setCalendarTab(value)} className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-colors duration-200 ${calendarTab === value ? 'border-[#C49A6C] text-[#0B1F42]' : 'border-transparent text-[#5B6B82] hover:text-[#0B1F42]'}`}>{label}</button>)}
       </div>
 
@@ -308,9 +308,9 @@ function AdminCalendar() {
         <div className="flex flex-wrap items-center justify-between gap-4 mb-5">
           <div><p className="text-[11px] font-bold uppercase tracking-[0.12em] text-[#C49A6C]">Availability</p><h2 className="mt-1 text-2xl font-bold text-[#0B1F42]">{monthCursor.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}</h2></div>
           <div className="flex gap-2">
-            <button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1))} aria-label="Previous month" className="w-10 h-10 rounded-lg border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors text-[#222222]"><svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
-            <button type="button" onClick={() => setMonthCursor(new Date())} className="px-4 rounded-lg border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors text-sm font-semibold text-[#222222]">Today</button>
-            <button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1))} aria-label="Next month" className="w-10 h-10 rounded-lg border border-[#E5E7EB] hover:bg-[#F7F7F5] transition-colors text-[#222222]"><svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
+            <button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() - 1, 1))} aria-label="Previous month" className="inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-[#E3E8EF] text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"><svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg></button>
+            <button type="button" onClick={() => setMonthCursor(new Date())} className="rounded-[10px] border border-[#E3E8EF] px-4 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]">Today</button>
+            <button type="button" onClick={() => setMonthCursor(new Date(monthCursor.getFullYear(), monthCursor.getMonth() + 1, 1))} aria-label="Next month" className="inline-flex h-10 w-10 items-center justify-center rounded-[10px] border border-[#E3E8EF] text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"><svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg></button>
           </div>
         </div>
         <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} onBlockClick={handleCalendarBlockClick} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
@@ -326,7 +326,7 @@ function AdminCalendar() {
       </section>}
 
       {/* Outbound feed */}
-      {calendarTab === 'settings' && <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 mb-6">
+      {calendarTab === 'settings' && <section className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
         <h2 className="text-lg font-bold text-[#222222] mb-1">Export this calendar</h2>
         <p className="text-sm text-[#6b7280] mb-4">Paste this link into Airbnb / Booking.com so they block the dates booked on ZuriLofts.</p>
         <div className="flex items-center gap-2">
@@ -338,7 +338,7 @@ function AdminCalendar() {
       </section>}
 
       {/* Imported feeds */}
-      {calendarTab === 'settings' && <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6 mb-6">
+      {calendarTab === 'settings' && <section className="mb-6 rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
         <div className="flex items-center justify-between mb-1">
           <h2 className="text-lg font-bold text-[#222222]">Imported calendars</h2>
           <button
@@ -385,7 +385,7 @@ function AdminCalendar() {
       </section>}
 
       {/* Blocked dates */}
-      {calendarTab === 'availability' && <section className="bg-white rounded-[14px] border border-[#E5E7EB] shadow-sm p-6">
+      {calendarTab === 'availability' && <section className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
         <h2 className="text-lg font-bold text-[#222222] mb-1">Blocked dates</h2>
         <p className="text-sm text-[#6b7280] mb-4">Select a start date, then the final night to block it. Existing stays can&apos;t be selected.</p>
         <CalendarMonth month={monthCursor} blocks={data.blocks} bookings={data.bookings || []} onSelectDate={selectBlockDate} onBlockClick={handleCalendarBlockClick} selectedStart={blockDraft.start ? new Date(`${blockDraft.start}T00:00:00`) : null} selectedEnd={selectedBlockEnd} />
