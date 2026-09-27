@@ -211,7 +211,7 @@ function SearchBar({ discovery = false }) {
 
       {/* Dropdown results */}
       {open && results.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-[#E5E7EB] bg-white shadow-xl">
+        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
           <ul>
             {results.map((p) => (
               <li key={p.id}>
@@ -227,19 +227,19 @@ function SearchBar({ discovery = false }) {
                       className="w-12 h-12 object-cover rounded-xl flex-shrink-0"
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-xl flex-shrink-0 bg-[#F7F7F5] flex items-center justify-center">
-                      <svg className="w-5 h-5 text-[#E5E7EB]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[10px] bg-[#F7F4EF]">
+                      <svg className="h-5 w-5 text-[#C9D3DF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
                     <p className="truncate text-sm font-semibold text-[#0B1F42]">{p.title}</p>
-                    <p className="text-xs text-[#6b7280] truncate">{p.location}</p>
+                    <p className="truncate text-xs text-[#5B6B82]">{p.location}</p>
                   </div>
                   <div className="flex-shrink-0 text-right">
                     <p className="text-sm font-bold text-[#0B1F42]">KES {p.price.toLocaleString()}</p>
-                    <p className="text-xs text-[#6b7280]">/ night</p>
+                    <p className="text-xs text-[#5B6B82]">/ night</p>
                   </div>
                 </button>
               </li>
@@ -319,7 +319,7 @@ function Hero({ stats }) {
       </div>
 
       {/* Gradient overlay - dark navy tint, kept only for photo legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0B0B45]/70 via-[#0B0B45]/40 to-[#0B0B45]/70"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0B1F42]/70 via-[#0B1F42]/40 to-[#0B1F42]/70"></div>
 
       {/* Navbar */}
       <Navbar />
@@ -367,7 +367,7 @@ function Hero({ stats }) {
             <div className="mt-14 flex justify-center">
               <Link
                 to="/register?role=HOST"
-                className="inline-flex items-center gap-2 min-h-[44px] bg-[#C49A6C] text-white font-bold px-10 py-3 rounded-lg hover:bg-[#B8895C] transition-all duration-200 shadow-lg hover:shadow-xl text-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0B45]"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] bg-[#C49A6C] px-10 py-3 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:bg-[#B8895C] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1F42]"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
