@@ -18,10 +18,10 @@ function PropertyCardRow({ title, properties, emptyMessage, align = 'left' }) {
 
   return (
     <section className="max-w-7xl mx-auto px-4 md:px-6" aria-label={title}>
-      <h2 className={`text-2xl md:text-3xl font-bold text-[#0B0B45] mb-6 ${centered ? 'text-center' : ''}`}>{title}</h2>
+      <h2 className={`mb-6 text-2xl font-bold text-[#0B1F42] md:text-3xl ${centered ? 'text-center' : ''}`}>{title}</h2>
 
       {cards.length === 0 ? (
-        <p className={`text-[#6b7280] ${centered ? 'text-center' : ''}`}>{emptyMessage}</p>
+        <p className={`text-[#5B6B82] ${centered ? 'text-center' : ''}`}>{emptyMessage}</p>
       ) : (
         <div className={`flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar ${centered ? 'lg:justify-center' : ''}`}>
           {cards.map((property) => (

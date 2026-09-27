@@ -302,7 +302,7 @@ function Navbar({ solid = false }) {
                       <span className={underlineClass(isActive)} />
                     </button>
                     {open && (
-                      <div className="absolute left-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl py-2 z-30 border border-[#E5E7EB]">
+                      <div className="absolute left-0 top-full z-30 mt-2 w-56 rounded-2xl border border-[#E3E8EF] bg-white py-2 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
                         {submenuItems.map((child) => {
                           const childActive = isActiveHref(location.pathname, child.href);
                           return (
@@ -310,10 +310,10 @@ function Navbar({ solid = false }) {
                               key={child.href}
                               to={child.href}
                               onClick={() => setOpenSubmenu(null)}
-                              className={`flex items-center px-4 py-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#2563EB] ${
+                              className={`flex items-center px-4 py-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] ${
                                 childActive
-                                  ? 'text-[#2563EB] bg-[#2563EB]/5 font-semibold'
-                                  : 'text-[#222222] hover:bg-[#2563EB]/10 hover:text-[#2563EB]'
+                                  ? 'text-[#9A744A] bg-[#FDE8D8] font-semibold'
+                                  : 'text-[#0B1F42] hover:bg-[#F7F4EF] hover:text-[#9A744A]'
                               }`}
                             >
                               {child.name}
@@ -339,8 +339,8 @@ function Navbar({ solid = false }) {
                     aria-haspopup="true"
                     aria-expanded={notifOpen}
                     aria-label="Notifications"
-                    className={`p-2 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2563EB] focus-visible:ring-offset-2 ${
-                      needsWhiteNav ? 'text-[#222222] hover:bg-[#2563EB]/10' : 'text-white hover:bg-white/10'
+                    className={`rounded-full p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${
+                      needsWhiteNav ? 'text-[#0B1F42] hover:bg-[#F7F4EF]' : 'text-white hover:bg-white/10'
                     }`}
                     title="Notifications"
                   >
@@ -354,12 +354,12 @@ function Navbar({ solid = false }) {
                     </span>
                   )}
                   {notifOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl py-2 z-30 border border-[#E5E7EB]">
-                      <div className="px-4 py-2 border-b border-[#E5E7EB]">
-                        <p className="text-sm font-semibold text-[#222222]">Notifications</p>
+                    <div className="absolute right-0 z-30 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-white py-2 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+                      <div className="border-b border-[#E3E8EF] px-4 py-2">
+                        <p className="text-sm font-semibold text-[#0B1F42]">Notifications</p>
                       </div>
                       {totalNotif === 0 ? (
-                        <p className="px-4 py-6 text-sm text-[#6b7280] text-center">No new notifications</p>
+                        <p className="px-4 py-6 text-center text-sm text-[#5B6B82]">No new notifications</p>
                       ) : (
                         <>
                           {unreadMessages > 0 && (
