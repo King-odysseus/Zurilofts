@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import apiClient from "../api/client.js";
+import TableActionsMenu from "../components/TableActionsMenu.jsx";
 
 const STATUS_STYLES = {
   UNVERIFIED: "bg-[#EAF0F4] text-[#52606F]",
@@ -247,13 +248,7 @@ function AdminIdentityVerifications() {
                     </span>
                   </td>
                   <td className="p-4">
-                    <button
-                      onClick={() => open(v.id)}
-                      disabled={busy === v.id}
-                  className="rounded-[10px] bg-[#0B1F42] px-4 py-2 text-xs font-semibold text-white hover:bg-[#07072E] disabled:opacity-50"
-                    >
-                      Review
-                    </button>
+                    <TableActionsMenu actions={[{ label: 'Review identity', icon: '⌕', onClick: () => open(v.id), disabled: busy === v.id }]} />
                   </td>
                 </tr>
               ))}

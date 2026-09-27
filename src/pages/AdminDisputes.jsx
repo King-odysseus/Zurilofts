@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import apiClient from '../api/client.js';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const STATUS_STYLES = {
   OPEN: 'bg-[#FDE8D8] text-[#9A4A1D]', UNDER_REVIEW: 'bg-[#EAF0F4] text-[#52606F]',
@@ -123,7 +124,7 @@ function AdminDisputes() {
                   <td className="p-4">{d.raisedByRole}</td>
                   <td className="p-4">{CATEGORY_LABELS[d.category] || d.category}</td>
                   <td className="p-4"><span className={`rounded-full px-3 py-1 text-xs font-semibold ${STATUS_STYLES[d.status]}`}>{d.status.replaceAll('_', ' ')}</span></td>
-                  <td className="p-4"><button onClick={() => open(d.id)} disabled={busy === d.id} className="rounded-lg bg-[#0B1F42] px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-[#07072E] disabled:opacity-50">Review</button></td>
+                  <td className="p-4"><TableActionsMenu actions={[{ label: 'Review dispute', icon: '⌕', onClick: () => open(d.id), disabled: busy === d.id }]} /></td>
                 </tr>
               ))}
             </tbody>
