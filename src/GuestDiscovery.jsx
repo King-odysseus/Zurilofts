@@ -95,6 +95,7 @@ function SearchForm({ compact = false, initial = '' }) {
         className="opg-datepicker"
         value={parseDateValue(checkIn)}
         onChange={(date) => setCheckIn(formatDateValue(date))}
+        placeholder="Add date"
         aria-label="Check in"
         language="en-GB"
         weekStart={1}
@@ -110,6 +111,7 @@ function SearchForm({ compact = false, initial = '' }) {
         className="opg-datepicker"
         value={parseDateValue(checkOut)}
         onChange={(date) => setCheckOut(formatDateValue(date))}
+        placeholder="Add date"
         minDate={parseDateValue(checkIn) || undefined}
         aria-label="Check out"
         language="en-GB"
