@@ -42,3 +42,5 @@ OpenPencil has composite rather than standalone frames for several legacy CRUD s
 - Flowbite controls are styled through Tailwind's current `flowbite-react/dist` content path, with shared input/select/dropdown geometry from `src/flowbite-controls.css`.
 - Bronze action buttons use white text.
 - Mobile `Inbox` navigation matches the OpenPencil mobile tab naming.
+- `GuestShell` owns the shared guest header and footer. Account, verification, payment-result, saved, and public pages must not render another `Navbar` or footer.
+- Every route that can be entered from another in-app page exposes a back control. It returns to actual history when available and otherwise uses the route-family fallback in `RouteBackButton`.
