@@ -1,12 +1,34 @@
-import { useState, useEffect, useMemo } from 'react';
+import { Fragment, useState, useEffect, useMemo } from 'react';
 import { useLocation, useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, Dropdown as FlowbiteDropdown, DropdownItem, Radio, Textarea, TextInput } from 'flowbite-react';
 import Navbar from '../components/Navbar';
 import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
-import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
 import logo from '../assets/zurilofts-logo.png';
 
 import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
+
+function CheckoutDropdown({ value, options, onChange, ariaLabel, className = '' }) {
+  const selected = options.find((option) => String(option.value) === String(value));
+  return (
+    <FlowbiteDropdown
+      inline
+      theme={{ inlineWrapper: `op-checkout-select ${className}`.trim() }}
+      label={<span className="op-checkout-select-value">{selected?.label ?? 'Select'}</span>}
+      placement="bottom-start"
+      aria-label={ariaLabel}
+    >
+      {options.map((option) => (
+        <DropdownItem key={option.value} onClick={() => onChange(option.value)}>
+          <span className="flex w-full items-center justify-between gap-6">
+            <span>{option.label}</span>
+            {String(option.value) === String(value) && <span aria-hidden="true">✓</span>}
+          </span>
+        </DropdownItem>
+      ))}
+    </FlowbiteDropdown>
+  );
+}
 
 function BookingPage() {
   const { id: routeId } = useParams();
@@ -423,14 +445,13 @@ function BookingPage() {
 
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Number of Guests *</label>
-        <Dropdown
+        <CheckoutDropdown
           value={bookingData.guests}
           onChange={(v) => setGuestCount(Number(v))}
           options={Array.from({ length: pricing.maxGuests }, (_, i) => i + 1).map((num) => ({
             value: num,
             label: `${num} ${num === 1 ? 'guest' : 'guests'}`,
           }))}
-          triggerClassName="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
           ariaLabel="Number of guests"
         />
         {bedOption && (
@@ -483,18 +504,19 @@ function BookingPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-semibold text-[#1f2937] mb-2">Estimated Check-in Time</label>
-          <input
+          <TextInput
             type="time"
             name="checkInTime"
             value={bookingData.checkInTime}
             onChange={handleInputChange}
-            className="date-input neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937]"
+            className="op-checkout-input"
+            sizing="lg"
           />
           <p className="text-xs text-[#6b7280] mt-1">From 3:00 PM</p>
         </div>
         <div>
           <label className="block text-sm font-semibold text-[#1f2937] mb-2">Check-out Time</label>
-          <Dropdown
+          <CheckoutDropdown
             value={bookingData.checkOutTime}
             onChange={(v) => setBookingData((prev) => ({ ...prev, checkOutTime: v }))}
             options={CHECK_OUT_OPTIONS.map((time) => {
@@ -504,7 +526,6 @@ function BookingPage() {
                 label: `${formatTime12h(time)}${fee > 0 ? ` (+KES ${fee.toLocaleString()})` : ' (Standard)'}`,
               };
             })}
-            triggerClassName=" w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] rounded-xl"
             ariaLabel="Check-out time"
           />
           {pricing.lateCheckoutFee > 0 && (
@@ -526,13 +547,14 @@ function BookingPage() {
         </div>
       )}
 
-      <button
+      <Button
         onClick={() => setStep(2)}
         disabled={!bookingData.checkIn || !bookingData.checkOut || pricing.nights <= 0 || !bedOption}
-        className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="op-checkout-primary"
+        pill
       >
         Continue
-      </button>
+      </Button>
     </div>
   );
 
@@ -540,15 +562,17 @@ function BookingPage() {
   const renderStep2 = () => (
     <div className="space-y-6">
       <div className="flex items-center mb-4">
-        <button
+        <Button
+          type="button"
           onClick={() => setStep(1)}
-          className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
+          className="op-checkout-back-button"
+          color="light"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back
-        </button>
+        </Button>
       </div>
 
       <div>
@@ -559,25 +583,27 @@ function BookingPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-semibold text-[#1f2937] mb-2">First Name *</label>
-          <input
+          <TextInput
             type="text"
             name="firstName"
             value={bookingData.firstName}
             onChange={handleInputChange}
             placeholder="John"
-            className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+            className="op-checkout-input"
+            sizing="lg"
             required
           />
         </div>
         <div>
           <label className="block text-sm font-semibold text-[#1f2937] mb-2">Last Name *</label>
-          <input
+          <TextInput
             type="text"
             name="lastName"
             value={bookingData.lastName}
             onChange={handleInputChange}
             placeholder="Doe"
-            className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+            className="op-checkout-input"
+            sizing="lg"
             required
           />
         </div>
@@ -585,13 +611,14 @@ function BookingPage() {
 
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email *</label>
-        <input
+        <TextInput
           type="email"
           name="email"
           value={bookingData.email}
           onChange={handleInputChange}
           placeholder="john@example.com"
-          className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+          className="op-checkout-input"
+          sizing="lg"
           required
         />
       </div>
@@ -599,20 +626,21 @@ function BookingPage() {
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone Number *</label>
         <div className="flex gap-2">
-          <Dropdown
+          <CheckoutDropdown
             value={phoneCountryCode}
             onChange={(val) => handlePhoneChange(val, phoneNumber)}
             options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
-            triggerClassName=" px-3 py-3 bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0"
             ariaLabel="Select country code"
+            className="op-checkout-country-code"
           />
-          <input
+          <TextInput
             type="tel"
             value={phoneNumber}
             onChange={(e) => handlePhoneChange(phoneCountryCode, e.target.value.replace(/\D/g, ''))}
             maxLength={15}
             placeholder={COUNTRY_CODES.find((c) => c.code === phoneCountryCode)?.example || ''}
-            className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+            className="op-checkout-input"
+            sizing="lg"
             required
           />
         </div>
@@ -648,22 +676,24 @@ function BookingPage() {
               <div key={i} className="flex items-end gap-3">
                 <div className="flex-1">
                   <label className="block text-xs font-medium text-[#6b7280] mb-1">Guest {i + 2} first name</label>
-                  <input
+                  <TextInput
                     type="text"
                     value={g.firstName}
                     onChange={(e) => updateAdditionalGuest(i, 'firstName', e.target.value)}
                     placeholder="First name"
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+                    className="op-checkout-input"
+                    sizing="lg"
                   />
                 </div>
                 <div className="flex-1">
                   <label className="block text-xs font-medium text-[#6b7280] mb-1">Last name</label>
-                  <input
+                  <TextInput
                     type="text"
                     value={g.lastName}
                     onChange={(e) => updateAdditionalGuest(i, 'lastName', e.target.value)}
                     placeholder="Last name"
-                    className="neu-input w-full px-4 py-2.5 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280]"
+                    className="op-checkout-input"
+                    sizing="lg"
                   />
                 </div>
                 <button
@@ -684,22 +714,24 @@ function BookingPage() {
 
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Special Requests</label>
-        <textarea
+        <Textarea
           name="specialRequests"
           value={bookingData.specialRequests}
           onChange={handleInputChange}
           placeholder="Any special requirements or requests..."
-          className="neu-input w-full px-4 py-3 focus:outline-none transition-all bg-white text-[#1f2937] placeholder-[#6b7280] h-24 resize-none"
+          className="op-checkout-input"
+          rows={4}
         />
       </div>
 
-      <button
+      <Button
         onClick={goToAddOns}
         disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone || creatingBooking}
-        className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="op-checkout-primary"
+        pill
       >
         {creatingBooking ? 'Starting your booking...' : 'Continue to Add-ons'}
-      </button>
+      </Button>
     </div>
   );
 
@@ -707,15 +739,17 @@ function BookingPage() {
   const renderStep3 = () => (
     <div className="space-y-6">
       <div className="flex items-center mb-4">
-        <button
+        <Button
+          type="button"
           onClick={() => setStep(2)}
-          className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
+          className="op-checkout-back-button"
+          color="light"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back
-        </button>
+        </Button>
       </div>
 
       <div>
@@ -736,7 +770,7 @@ function BookingPage() {
           <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : availableAddOns.length === 0 ? (
-        <div className="bg-[#D9D9D9]/40 rounded-xl p-6 text-center">
+        <div className="rounded-xl bg-[#F3E9DC] p-6 text-center">
           <p className="text-[#6b7280]">No add-ons are available for this property.</p>
         </div>
       ) : (
@@ -794,17 +828,18 @@ function BookingPage() {
         </div>
       )}
 
-      <div className="bg-[#D9D9D9] rounded-xl p-4 flex justify-between items-center">
+      <div className="flex items-center justify-between rounded-xl bg-[#F3E9DC] p-4">
         <span className="font-semibold text-[#0B0B45]">Add-ons total</span>
         <span className="font-bold text-[#0B0B45]">KES {pricing.addOnsTotal.toLocaleString()}</span>
       </div>
 
-      <button
+      <Button
         onClick={() => setStep(4)}
-        className="w-full bg-[#0B0B45] text-white py-3 rounded-full font-semibold hover:bg-[#0B0B45]/90 transition-all duration-200"
+        className="op-checkout-primary"
+        pill
       >
         Continue to Payment
-      </button>
+      </Button>
     </div>
   );
 
@@ -812,15 +847,17 @@ function BookingPage() {
   const renderStep4 = () => (
     <div className="space-y-6">
       <div className="flex items-center mb-4">
-        <button
+        <Button
+          type="button"
           onClick={() => setStep(3)}
-          className="text-[#C49A6C] hover:text-[#0B0B45] font-medium flex items-center transition-colors"
+          className="op-checkout-back-button"
+          color="light"
         >
           <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back
-        </button>
+        </Button>
       </div>
 
       <h2 className="text-2xl font-bold text-[#0B0B45]">Payment</h2>
@@ -829,13 +866,12 @@ function BookingPage() {
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
           bookingData.paymentMethod === 'card' ? 'neu-radio-selected' : 'neu-radio-card'
         }`}>
-          <input
+          <Radio
             type="radio"
             name="paymentMethod"
             value="card"
             checked={bookingData.paymentMethod === 'card'}
             onChange={handleInputChange}
-            className="w-5 h-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
             <svg className="w-8 h-8 text-[#0B0B45] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -851,13 +887,12 @@ function BookingPage() {
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
           bookingData.paymentMethod === 'mpesa' ? 'neu-radio-selected' : 'neu-radio-card'
         }`}>
-          <input
+          <Radio
             type="radio"
             name="paymentMethod"
             value="mpesa"
             checked={bookingData.paymentMethod === 'mpesa'}
             onChange={handleInputChange}
-            className="w-5 h-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
             <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
@@ -873,13 +908,12 @@ function BookingPage() {
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
           bookingData.paymentMethod === 'bank' ? 'neu-radio-selected' : 'neu-radio-card'
         }`}>
-          <input
+          <Radio
             type="radio"
             name="paymentMethod"
             value="bank"
             checked={bookingData.paymentMethod === 'bank'}
             onChange={handleInputChange}
-            className="w-5 h-5 text-[#C49A6C] focus:ring-[#C49A6C]"
           />
           <div className="ml-4 flex items-center flex-1">
             <svg className="w-8 h-8 text-[#0B0B45] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -897,31 +931,32 @@ function BookingPage() {
       <div className="mt-6">
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Promo Code</label>
         <div className="flex gap-2">
-          <input
+          <TextInput
             type="text"
             value={promoCode}
             onChange={(e) => { setPromoCode(e.target.value); setPromoError(''); }}
             placeholder="Enter code"
-            className=" flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] uppercase"
+            className="op-checkout-input uppercase"
+            sizing="lg"
             disabled={!!promoResult}
           />
           {promoResult ? (
-            <button
+            <Button
               type="button"
               onClick={() => { setPromoCode(''); setPromoResult(null); setPromoError(''); }}
-              className="px-4 py-3 rounded-xl text-sm font-semibold bg-green-100 text-green-700 hover:bg-green-200 transition-colors"
+              className="op-checkout-success"
             >
               Applied ✓
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button
               type="button"
               onClick={handleApplyPromo}
               disabled={validatingPromo || !promoCode.trim()}
-              className="px-4 py-3 rounded-xl text-sm font-semibold bg-[#0B0B45] text-white hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
+              className="op-checkout-primary op-checkout-promo-apply"
             >
               {validatingPromo ? '...' : 'Apply'}
-            </button>
+            </Button>
           )}
         </div>
         {promoError && (
@@ -934,7 +969,7 @@ function BookingPage() {
         )}
       </div>
 
-      <div className="bg-[#D9D9D9] rounded-xl p-4 space-y-2">
+      <div className="space-y-2 rounded-xl bg-[#F7F4EF] p-4">
         <div className="flex justify-between text-[#1f2937]">
           <span>KES {pricing.propertyPrice.toLocaleString()} x {pricing.nights} nights</span>
           <span>KES {pricing.subtotal.toLocaleString()}</span>
@@ -984,10 +1019,11 @@ function BookingPage() {
       )}
 
       <form onSubmit={handleSubmit}>
-        <button
+        <Button
           type="submit"
           disabled={isProcessing}
-          className="w-full bg-[#C49A6C] text-white py-4 rounded-full font-bold hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="op-checkout-bronze"
+          pill
         >
           {isProcessing ? (
             <>
@@ -1000,7 +1036,7 @@ function BookingPage() {
           ) : (
             `Pay KES ${pricing.total.toLocaleString()}`
           )}
-        </button>
+        </Button>
       </form>
 
       <p className="text-center text-sm text-[#6b7280]">
@@ -1102,34 +1138,20 @@ function BookingPage() {
       <div className="op-checkout-main pb-12 md:pb-16">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
           {/* Progress Steps */}
-          <div className="max-w-md md:max-w-2xl mx-auto mb-8 md:mb-10">
-            <div className="flex items-start justify-center">
-              {[1, 2, 4].map((s, i) => (
-                <div key={s} className="flex items-center">
-                  {i > 0 && (
-                    <div
-                      className={`w-8 md:w-16 h-1 mx-1 md:mx-2 transition-colors ${
-                        step >= s ? 'bg-[#0B1F42]' : 'bg-[#E2DAD0]'
-                      }`}
-                    />
-                  )}
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold transition-colors ${
-                        step >= s
-                          ? 'bg-[#0B1F42] text-white'
-                          : 'bg-white text-[#6E7686]'
-                      }`}
-                    >
-                      {i + 1}
-                    </div>
-                    <span className="text-xs text-[#6b7280] mt-2 whitespace-nowrap">
-                      {s === 1 ? 'Stay' : s === 2 ? 'Details' : 'Payment'}
-                    </span>
+          <div className="op-checkout-progress" aria-label="Checkout progress">
+            {[1, 2, 4].map((s, i, steps) => (
+              <Fragment key={s}>
+                <div className="op-checkout-progress-step">
+                  <div className={`op-checkout-progress-circle${step >= s ? ' is-active' : ''}`}>
+                    {i + 1}
                   </div>
+                  <span>{s === 1 ? 'Stay' : s === 2 ? 'Details' : 'Payment'}</span>
                 </div>
-              ))}
-            </div>
+                {i < steps.length - 1 && (
+                  <div className={`op-checkout-progress-line${step >= steps[i + 1] ? ' is-active' : ''}`} aria-hidden="true" />
+                )}
+              </Fragment>
+            ))}
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">

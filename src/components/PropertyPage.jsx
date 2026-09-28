@@ -1,8 +1,6 @@
 import { useLocation, useParams, useSearchParams, Link } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
-import Navbar from './Navbar';
-import Footer from './Footer';
 import Lightbox from './Lightbox.jsx';
 import ReviewSection from './ReviewSection.jsx';
 import PropertyTrustPanel from './PropertyTrustPanel';
@@ -103,15 +101,13 @@ function PropertyPage() {
   // ── Loading ──────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-canvas">
-        <Navbar />
-        <main className="pt-24 flex items-center justify-center min-h-[60vh]" role="status" aria-label="Loading property">
+      <div className="min-h-screen bg-white">
+        <main className="flex items-center justify-center min-h-[60vh]" role="status" aria-label="Loading property">
           <div className="text-center">
             <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent" />
             <p className="text-[#5B6B82]">Loading property...</p>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -119,9 +115,8 @@ function PropertyPage() {
   // ── Error / Not Found ────────────────────────────────────────────────
   if (error || !property) {
     return (
-      <div className="min-h-screen bg-canvas">
-        <Navbar />
-        <main className="pt-24 flex items-center justify-center min-h-[60vh]" role="alert">
+      <div className="min-h-screen bg-white">
+        <main className="flex items-center justify-center min-h-[60vh]" role="alert">
           <div className="text-center px-4">
             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -135,7 +130,6 @@ function PropertyPage() {
             </Link>
           </div>
         </main>
-        <Footer />
       </div>
     );
   }
@@ -181,11 +175,9 @@ function PropertyPage() {
 
   // ── Render ───────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-canvas">
-      <Navbar />
-
+    <div className="min-h-screen bg-white">
       {/* ── Compact breadcrumb / back row ────────────────────────── */}
-      <nav className="border-b border-[#E3E8EF] bg-white px-4 pb-4 pt-24 sm:px-6" aria-label="Breadcrumb">
+      <nav className="border-b border-[#E3E8EF] bg-white px-4 py-4 sm:px-6" aria-label="Breadcrumb">
         <div className="mx-auto w-full max-w-[1344px]">
           <ol className="flex items-center gap-2 text-sm">
             <li>
@@ -525,10 +517,6 @@ function PropertyPage() {
           <SimilarProperties property={property} />
         </div>
       )}
-
-      <div className="mt-16 md:mt-24">
-        <Footer />
-      </div>
 
       {/* Lightbox */}
       {lightboxOpen && (
