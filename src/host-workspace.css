@@ -1,5 +1,6 @@
 /* OpenPencil host workspace: dense operations on a white canvas. */
-.op-host-today {
+.op-host-today,
+.op-host-listings {
   --host-navy: #0B0B45;
   --host-blue: #2563EB;
   --host-bronze: #C49A6C;
@@ -552,5 +553,337 @@
 
 @media (prefers-reduced-motion: reduce) {
   .op-host-loading span { animation: none; }
+}
+
+/* Host listing management */
+.op-host-listings-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 22px;
+}
+
+.op-host-listings-heading h1 {
+  margin: 0;
+  color: var(--host-navy);
+  font-size: 29px;
+  line-height: 1.14;
+}
+
+.op-host-listings-heading p {
+  margin: 6px 0 0;
+  color: #64748B;
+  font-size: 13px;
+}
+
+.op-host-listings-heading > a,
+.op-host-listings-empty > a {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 17px;
+  border-radius: 10px;
+  background: var(--host-bronze);
+  color: #fff;
+  font-family: Montserrat, Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.op-host-listings-heading > a:hover,
+.op-host-listings-empty > a:hover { background: #B8895B; }
+
+.op-host-listings-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.op-host-listings-tabs::-webkit-scrollbar { display: none; }
+
+.op-host-listings-tabs button {
+  flex: none;
+  min-height: 34px;
+  padding: 0 13px;
+  border: 0;
+  border-radius: 10px;
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.op-host-listings-tabs button.is-active { background: var(--host-navy); color: #fff; }
+
+.op-host-listings-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.op-host-listing-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #EDF0F4;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(15,23,42,.07);
+}
+
+.op-host-listing-cover {
+  position: relative;
+  height: 190px;
+  overflow: hidden;
+  background: #EDF1F5;
+}
+
+.op-host-listing-cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .3s ease;
+}
+
+.op-host-listing-card:hover .op-host-listing-cover img { transform: scale(1.025); }
+
+.op-host-listing-cover-empty {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  color: #94A3B8;
+  font-size: 12px;
+}
+
+.op-host-listing-status {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.op-host-listing-status.is-published { background: #DCFCE7; color: #15803D; }
+.op-host-listing-status.is-draft { background: #E2E8F0; color: #475569; }
+.op-host-listing-status.is-review { background: #DBEAFE; color: #2563EB; }
+.op-host-listing-status.is-attention { background: #FEF3C7; color: #B45309; }
+.op-host-listing-status.is-suspended { background: #FEE2E2; color: #B91C1C; }
+
+.op-host-listing-body { padding: 18px; }
+
+.op-host-listing-body > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.op-host-listing-body h2 {
+  margin: 0;
+  color: var(--host-navy);
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.op-host-listing-body h2 a { color: inherit; text-decoration: none; }
+.op-host-listing-body h2 a:hover { color: var(--host-blue); }
+.op-host-listing-body header p { margin: 5px 0 0; color: #64748B; font-size: 11px; }
+
+.op-host-listing-body header > strong {
+  flex: none;
+  color: var(--host-navy);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.op-host-listing-body header > strong small {
+  color: #94A3B8;
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.op-host-listing-note {
+  min-height: 34px;
+  margin: 14px 0;
+  padding: 10px 11px;
+  border-radius: 10px;
+  background: #F8FAFC;
+  color: #64748B;
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.op-host-listing-note.is-attention { background: #FFF8E8; color: #92400E; }
+.op-host-listing-note.is-suspended { background: #FFF4F4; color: #B91C1C; }
+.op-host-listing-note.is-review { background: #EFF6FF; color: #1D4ED8; }
+
+.op-host-listing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.op-host-listing-actions a,
+.op-host-listing-actions button,
+.op-host-listing-reviewing {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border: 1px solid #E2E8F0;
+  border-radius: 9px;
+  background: #fff;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.op-host-listing-actions .op-host-listing-edit {
+  border-color: transparent;
+  background: #F1F5F9;
+  color: #334155;
+}
+
+.op-host-listing-actions .op-host-listing-submit {
+  border-color: transparent;
+  background: var(--host-bronze);
+  color: #fff;
+}
+
+.op-host-listing-actions .op-host-listing-view,
+.op-host-listing-actions .op-host-listing-calendar { color: var(--host-blue); }
+.op-host-listing-reviewing { border-color: #DBEAFE; background: #EFF6FF; color: #2563EB; }
+.op-host-listing-actions button:disabled { cursor: wait; opacity: .55; }
+
+.op-host-listing-body > footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 16px;
+  padding-top: 13px;
+  border-top: 1px solid #EEF1F5;
+}
+
+.op-host-listing-availability {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.op-host-listing-availability span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.op-host-listing-toggle { flex: none; }
+
+.op-host-listing-delete {
+  flex: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #DC2626;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.op-host-listing-delete:disabled { opacity: .5; }
+
+.op-host-listings-empty,
+.op-host-listings-error {
+  display: grid;
+  min-height: 300px;
+  place-items: center;
+  align-content: center;
+  padding: 32px;
+  border: 1px dashed #DCE3EC;
+  border-radius: 16px;
+  background: #FBFCFE;
+  text-align: center;
+}
+
+.op-host-listings-empty > span {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+  place-items: center;
+  border-radius: 50%;
+  background: #EEF4FF;
+  color: var(--host-blue);
+}
+
+.op-host-listings-empty svg { width: 22px; height: 22px; }
+.op-host-listings-empty strong { color: var(--host-navy); font-size: 15px; }
+.op-host-listings-empty p,
+.op-host-listings-error p { max-width: 360px; margin: 6px 0 16px; color: #64748B; font-size: 12px; }
+
+.op-host-listings-empty button,
+.op-host-listings-error button {
+  min-height: 38px;
+  padding: 0 15px;
+  border: 1px solid #DDE4EE;
+  border-radius: 9px;
+  background: #fff;
+  color: var(--host-navy);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.op-host-listing-skeleton {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.op-host-listing-skeleton span {
+  height: 430px;
+  border-radius: 16px;
+  background: linear-gradient(90deg, #F4F7FA 25%, #E9EEF4 50%, #F4F7FA 75%);
+  background-size: 200% 100%;
+  animation: op-host-skeleton 1.2s linear infinite;
+}
+
+@keyframes op-host-skeleton {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+@media (max-width: 1023px) {
+  .op-host-listings-grid,
+  .op-host-listing-skeleton { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+  .op-host-listings-heading { align-items: center; margin-bottom: 18px; }
+  .op-host-listings-heading h1 { font-size: 25px; }
+  .op-host-listings-heading p { font-size: 12px; }
+  .op-host-listings-heading > a { min-height: 36px; padding: 0 13px; font-size: 11px; }
+  .op-host-listings-tabs { margin-bottom: 16px; }
+  .op-host-listings-grid,
+  .op-host-listing-skeleton { grid-template-columns: 1fr; gap: 14px; }
+  .op-host-listing-cover { height: 180px; }
+  .op-host-listing-body { padding: 16px; }
+  .op-host-listing-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .op-host-listing-actions > * { width: 100%; }
+  .op-host-listing-body > footer { align-items: flex-end; }
 }
 

@@ -4,7 +4,6 @@ import HostRoute from './components/HostRoute.jsx';
 import HostLayout from './components/HostLayout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AdminDashboard, { AdminLayout } from './pages/AdminDashboard.jsx';
-import AdminProperties from './pages/AdminProperties.jsx';
 import AdminListingReview from './pages/AdminListingReview.jsx';
 import AdminPropertyForm from './pages/AdminPropertyForm.jsx';
 import AdminCalendar from './pages/AdminCalendar.jsx';
@@ -19,6 +18,7 @@ import AdminMessages from './pages/AdminMessages.jsx';
 import AdminGuides from './pages/AdminGuides.jsx';
 import AdminPayouts from './pages/AdminPayouts.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
+import HostListingsPage from './pages/HostListingsPage.jsx';
 import HostTodayPage from './pages/HostTodayPage.jsx';
 import HostPayouts from './pages/HostPayouts.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
@@ -31,7 +31,7 @@ export default function WorkspaceRoutes() {
     <Route path="/host/today" element={hostPage(<HostTodayPage />)} />
     <Route path="/host/calendar" element={hostPage(<AdminCalendar />)} />
     <Route path="/host/calendar/:id" element={hostPage(<AdminCalendar />)} />
-    <Route path="/host/listings" element={hostPage(<AdminProperties />)} />
+    <Route path="/host/listings" element={hostPage(<HostListingsPage />)} />
     <Route path="/host/earnings" element={hostPage(<AdminEarnings />)} />
     <Route path="/host/properties/new" element={hostPage(<AdminPropertyForm />)} />
     <Route path="/host/properties/:id/edit" element={hostPage(<AdminPropertyForm />)} />
