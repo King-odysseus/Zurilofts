@@ -9,6 +9,9 @@ import { LanguageProvider } from './context/LanguageContext.jsx'
 import './index.css'
 import './openpencil-theme.css'
 import './guest-discovery.css'
+import './checkout-design.css'
+import './auth-design.css'
+import './public-content-design.css'
 
 // PWA update handling - when a new service worker activates, reload so the
 // user is always on the latest version (registerType: 'autoUpdate').

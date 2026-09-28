@@ -8,17 +8,17 @@ import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 const NearbyMap = lazy(() => import('./NearbyMap.jsx'));
 
 /** Card for a single place or restaurant */
-function NearbyCard({ item, areaLabels }) {
+function NearbyCard({ item, areaLabels, categoryLabels }) {
   const mapsUrl = googleMapsDirectionsUrl({
     ...item,
     label: item.mapsQuery || `${item.name}, Nairobi, Kenya`,
     preferLabel: true,
   });
   return (
-    <div className="group overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)] transition-shadow duration-300">
+    <article className="op-place-card group">
       <div className="h-48 overflow-hidden relative">
         <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-[14px]" src={item.image} alt={item.name} />
-        <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
+        <span className="op-place-area">{areaLabels[item.area] || item.area}</span><a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
            className="absolute bottom-2 right-2 z-10 rounded-full bg-white/90 p-2 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-[#0B1F42] hover:text-white">
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -26,10 +26,8 @@ function NearbyCard({ item, areaLabels }) {
           </svg>
         </a>
       </div>
-      <div className="p-5">
-        <span className="mb-2 inline-block rounded-full bg-[#FDE8D8] px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-[#9A4A1D]">
-          {areaLabels[item.area] || item.area}
-        </span>
+      <div className="op-place-copy p-5">
+        <span className="op-place-category">{categoryLabels?.[item.category] || item.category}</span>
         <h3 className="mb-2 text-lg font-bold text-[#0B1F42]">{item.name}</h3>
         <p className="text-charcoal text-sm leading-relaxed">{item.desc}</p>
         <a
@@ -42,24 +40,26 @@ function NearbyCard({ item, areaLabels }) {
           <span aria-hidden="true">↗</span>
         </a>
       </div>
-    </div>
+    </article>
   );
 }
 
 NearbyCard.propTypes = {
   item: PropTypes.object.isRequired,
   areaLabels: PropTypes.object.isRequired,
+  categoryLabels: PropTypes.object,
 };
 
 function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, categories, viewMoreLink, maxCards }) {
   const [areaFilter, setAreaFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [query, setQuery] = useState('');
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'map'
 
   const filtered = items.filter((item) => {
     const areaMatch = areaFilter === 'all' || item.area === areaFilter;
     const catMatch = categoryFilter === 'all' || item.category === categoryFilter;
-    return areaMatch && catMatch;
+    return areaMatch && catMatch && `${item.name} ${item.desc} ${item.area}`.toLowerCase().includes(query.toLowerCase());
   });
 
   const visible = maxCards ? filtered.slice(0, maxCards) : filtered;
@@ -69,7 +69,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   const catOptions = categories && Object.entries(categoryLabels).map(([k, v]) => ({ value: k, label: v }));
 
   return (
-    <div className="mt-8 md:mt-12 mb-16">
+    <div className="op-places-list mt-8 md:mt-12 mb-16">
       {/* Centered Header */}
       <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-8 text-center shadow-[0_4px_16px_rgba(11,31,66,0.04)] md:px-8 md:py-10">
         <h2 className="text-3xl font-bold text-[#0B1F42] md:text-4xl">{title}</h2>
@@ -78,6 +78,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
 
       {/* Filters + View Toggle */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 px-4 md:px-0">
+        <input className="op-place-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search places, areas or categories" aria-label="Search places" />
         <Dropdown
           value={areaFilter}
           onChange={setAreaFilter}
@@ -94,6 +95,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             ariaLabel="Filter by category"
           />
         )}
+        <button className="op-place-clear" type="button" onClick={() => { setQuery(''); setAreaFilter('all'); setCategoryFilter('all'); }}>Clear all</button><span className="op-place-count">{filtered.length} places</span>
         {/* Map/Grid toggle */}
         <div className="flex items-center gap-1">
           <button
@@ -126,9 +128,9 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
         </Suspense>
       ) : (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="op-place-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {visible.map((item) => (
-              <NearbyCard key={item.name} item={item} areaLabels={areaLabels} />
+              <NearbyCard key={item.name} item={item} areaLabels={areaLabels} categoryLabels={categoryLabels} />
             ))}
           </div>
 

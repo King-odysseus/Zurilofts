@@ -7,6 +7,7 @@ import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
 import Dropdown from './Dropdown.jsx';
+import MobileBottomNav from './MobileBottomNav.jsx';
 import { languageOptions } from '../i18n/translations.js';
 
 const exploreLinks = [
@@ -187,7 +188,12 @@ function Navbar({ solid = false }) {
   // `key` into translations.js so the visible label follows the language switch.
   const navItems = (() => {
     if (!isAuthenticated) {
-      return [{ name: 'Stays', key: 'properties', href: '/properties' }];
+      return [
+        { name: 'Stays', key: 'properties', href: '/properties' },
+        { name: 'Places', key: 'places', href: '/places' },
+        { name: 'Restaurants', key: 'restaurants', href: '/restaurants' },
+        { name: 'Guides', key: 'guides', href: '/guides' },
+      ];
     }
     if (effectiveMode === 'hosting') {
       if (!hasHostIntent) {
@@ -203,9 +209,9 @@ function Navbar({ solid = false }) {
     }
     return [
       { name: 'Stays', key: 'properties', href: '/properties' },
-      { name: 'Saved', key: 'saved', href: '/favourites' },
-      { name: 'Trips', key: 'trips', href: '/trips' },
-      { name: 'Messages', key: 'messages', href: '/inbox' },
+      { name: 'Places', key: 'places', href: '/places' },
+      { name: 'Restaurants', key: 'restaurants', href: '/restaurants' },
+      { name: 'Guides', key: 'guides', href: '/guides' },
     ];
   })();
 
@@ -243,7 +249,7 @@ function Navbar({ solid = false }) {
   const accountItemClass = 'flex items-center rounded-[10px] px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors';
 
   return (
-    <nav className={`fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
+    <><nav className={`fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
       needsWhiteNav
         ? 'border-b border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.06)]'
         : 'bg-transparent'
@@ -812,7 +818,7 @@ function Navbar({ solid = false }) {
           </ul>
         </div>
       </div>
-    </nav>
+    </nav><MobileBottomNav /></>
   );
 }
 

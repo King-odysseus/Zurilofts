@@ -22,4 +22,5 @@ OpenPencil is the visual source of truth. Keep the existing ZuriLofts logo and A
 
 - Audit completed: page hierarchy and design foundations; current generic theme and demo content diverge materially.
 - In progress: guest home and discovery. The stay detail route now loads a real API listing and gallery, but still needs visual alignment with frame `0:1935`. Do not claim other families complete until route-by-route visual and behavior checks pass.
+- In progress: functional checkout, sign-in, and public content pages have been restored from existing project implementations. Checkout header/progress, sign-in split layout, and Places card grid have been aligned to their OpenPencil frames; checkout details/payment, sign-up, Restaurants, Guides, and legal pages still need visual QA.
 - Preserve unrelated dirty worktree changes and never commit generated audit/build directories or credentials.
