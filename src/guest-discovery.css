@@ -80,10 +80,10 @@
 
 /* Flowbite controls, aligned to the OpenPencil geometry. Page surfaces stay white. */
 .opg-page{background:#fff}
-.opg-search{height:78px;padding:0;border:0;grid-template-columns:28.9362% 20% 20% 22.9787% 8.0851%;align-items:stretch}
-.opg-search .opg-search-field{position:relative;min-width:0;height:100%;display:flex!important;flex-direction:column;justify-content:flex-start;gap:6px;padding:18px 20px 0;border-right:0;color:var(--op-navy);overflow:visible!important}
+.opg-search{height:72px;padding:0;border:0;grid-template-columns:28.9362% 20% 20% 22.9787% 8.0851%;align-items:stretch}
+.opg-search .opg-search-field{position:relative;min-width:0;height:100%;display:flex!important;flex-direction:column;justify-content:flex-start;gap:4px;padding:14px 20px 0;border-right:0;color:var(--op-navy);overflow:visible!important}
 .opg-search .opg-search-field:first-child{padding-left:26px}
-.opg-search .opg-search-field::after{content:'';position:absolute;top:22px;right:0;width:1px;height:34px;background:#e3e8ef}
+.opg-search .opg-search-field::after{content:'';position:absolute;top:20px;right:0;width:1px;height:32px;background:#e3e8ef}
 .opg-search .opg-search-field:last-of-type::after{display:none}
 .opg-search .opg-search-field>span{display:block;margin:0;text-transform:uppercase;color:#64748b;font:700 11px Montserrat,Arial,sans-serif;letter-spacing:.02em;line-height:14px}
 .opg-search .opg-search-field>div{width:100%}
@@ -107,7 +107,7 @@
 .opg-datepicker > .absolute > div{border:0!important;border-radius:12px!important;box-shadow:0 18px 48px #0b1f422b!important}
 .opg-datepicker .bg-primary-700{background-color:#0B1F42!important}
 .opg-datepicker .text-primary-700{color:#0B1F42!important}
-.opg-search .opg-search-submit{width:56px;height:56px;min-width:56px;min-height:56px;padding:0;align-self:center;justify-self:start;border:0;border-radius:50%;background:var(--op-bronze);color:#fff;box-shadow:none;font-size:0}
+.opg-search .opg-search-submit{width:52px;height:52px;min-width:52px;min-height:52px;padding:0;align-self:center;justify-self:start;border:0;border-radius:9999px;background:var(--op-bronze);color:#fff;box-shadow:none;font-size:0;aspect-ratio:1/1}
 .opg-search .opg-search-submit svg{width:16px;height:16px}
 .opg-search .opg-search-submit:hover,.opg-search .opg-search-submit:focus{background:#a97b4e;color:#fff}
 .opg-search .opg-search-submit>span{display:grid;place-items:center}
