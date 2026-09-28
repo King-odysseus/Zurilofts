@@ -1,24 +1,22 @@
 .op-admin-layout{font-family:Inter,Arial,sans-serif;color:#0b1f42}
 .op-admin-mobile-header,.op-admin-mobile-nav{display:none}
 .op-admin-sidebar{border-right:1px solid #eeeae5;overflow:visible;color:#414d63}
-.op-admin-sidebar nav{scrollbar-width:thin}
+.op-admin-sidebar nav{display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;padding-bottom:24px}
 .op-admin-sidebar .op-admin-brand{font:700 16px Montserrat,Arial,sans-serif;color:#0b1f42;text-decoration:none;white-space:nowrap}
 .op-admin-sidebar .op-admin-brand img{border-radius:6px}
 .op-admin-sidebar>span{color:#7f8ba0;font-size:10px;letter-spacing:.1em;padding-bottom:8px}
-.op-admin-sidebar nav{padding-bottom:16px}
-.op-admin-sidebar .op-admin-nav-link{font-size:12px;color:#414d63}
+.op-admin-sidebar .op-admin-nav-link{min-height:36px;gap:8px;font-size:12px;color:#414d63}
 .op-admin-sidebar .op-admin-nav-link[aria-current=page]{background:#e8edf7;color:#0b1f42;font-weight:700}
 .op-admin-sidebar .op-admin-nav-link:hover{background:#f3f5f9;color:#0b1f42}
-.op-admin-sidebar-account{border-top:1px solid #eeeae5;color:#414d63;background:#fff}
-.op-admin-sidebar-account>a{background:#f7f4ef;color:#0b1f42;border-radius:8px;font-size:11px}
+.op-admin-sidebar-account{border-top:1px solid #eeeae5;color:#414d63;background:#fff;padding-top:16px}
 .op-admin-sidebar-account>div p{color:#0b1f42}
 .op-admin-sidebar-account>div p:last-child{color:#6e7686}
 .op-admin-sidebar-account>button{color:#6e7686;font-size:12px}
 .op-admin-sidebar-toggle{position:absolute;z-index:60;top:50%;left:100%;display:grid;width:20px;height:56px;place-items:center;border:0;border-radius:0 8px 8px 0;background:#0b1f42;color:#fff;box-shadow:0 1px 2px rgba(0,0,0,.07);transform:translateY(-50%);transition:background-color 150ms ease,color 150ms ease,transform 150ms ease}
 .op-admin-sidebar-toggle:hover{background:#172b55;transform:translate(1px,-50%)}
 .op-admin-sidebar-toggle:focus-visible{outline:2px solid rgba(196,154,108,.7);outline-offset:-2px}
-.op-admin-sidebar-flyout{position:fixed!important;z-index:80!important;border:1px solid #e2dad0!important;border-radius:10px!important;background:#fff!important;color:#0b1f42!important;padding:8px 11px!important;font-size:11px!important;font-weight:700!important;line-height:1.2!important;box-shadow:0 10px 28px #0b1f421f!important}
-.op-admin-sidebar-flyout [data-testid=flowbite-tooltip-arrow]{background:#fff!important}
+.op-admin-sidebar-flyout{position:fixed!important;z-index:80!important;border:1px solid #a97d4c!important;border-radius:10px!important;background:#c49a6c!important;color:#fff!important;padding:8px 11px!important;font-size:11px!important;font-weight:700!important;line-height:1.2!important;box-shadow:0 10px 28px #6b442326!important}
+.op-admin-sidebar-flyout [data-testid=flowbite-tooltip-arrow]{background:#c49a6c!important}
 .op-admin-shell-header{display:none}
 @media(min-width:768px){
   .op-admin-main>header.op-admin-shell-header{position:sticky;top:0;z-index:30;display:flex;width:100%;min-width:0;min-height:64px;align-items:center;justify-content:space-between;gap:24px;border-bottom:1px solid #eef0f4;background:#fff;padding:0 32px}
@@ -115,11 +113,8 @@
   .op-admin-mobile-more-list>a:hover,.op-admin-mobile-more-list>a:focus-visible{background:#ffffff12;color:#fff;outline:0}
   .op-admin-mobile-more-list>a.is-active{background:#1e3a5f;color:#fff}
   .op-admin-mobile-more-list>a.is-active svg{color:#c49a6c}
-  .op-admin-mobile-more-list svg,.op-admin-mobile-more-footer svg{width:20px;height:20px;flex:none}
+  .op-admin-mobile-more-list svg{width:20px;height:20px;flex:none}
   .op-admin-mobile-more-list small{min-width:20px;margin-left:auto;border-radius:999px;background:#c49a6c;padding:3px 6px;color:#fff;font-size:10px;font-weight:700;text-align:center}
-  .op-admin-mobile-more-footer{display:grid;gap:4px;margin-top:18px;padding-top:14px;border-top:1px solid #ffffff1f}
-  .op-admin-mobile-more-footer>a,.op-admin-mobile-more-footer>button{display:flex;min-height:44px;align-items:center;gap:12px;border:0;border-radius:10px;background:transparent;color:#dde7f4;padding:0 12px;font:500 13px Inter,Arial,sans-serif;text-align:left;text-decoration:none}
-  .op-admin-mobile-more-footer>a:hover,.op-admin-mobile-more-footer>a:focus-visible,.op-admin-mobile-more-footer>button:hover,.op-admin-mobile-more-footer>button:focus-visible{background:#ffffff12;color:#fff;outline:0}
 }
 .op-admin-listing-review .op-admin-metrics article:nth-child(2){background:#dcf3e3}.op-admin-listing-review .op-admin-metrics article:nth-child(3){background:#e8edf7}
 .op-admin-listing-review .op-admin-metrics article:nth-child(4){background:#fae1de}

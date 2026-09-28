@@ -21,7 +21,6 @@ import {
   Tooltip,
 } from 'flowbite-react';
 import {
-  ArrowLeft,
   Banknote,
   BarChart3,
   Bell,
@@ -136,7 +135,7 @@ function HeaderUserMenu({ user, isAdmin, onLogout }) {
       <DropdownItem as={Link} to="/profile#info">My Profile</DropdownItem>
       {user?.role !== 'HOST' && <DropdownItem as={Link} to="/host/application">Become a host</DropdownItem>}
       <DropdownItem as={Link} to="/admin/messages">Messages</DropdownItem>
-      <DropdownItem as={Link} to="/">Go back to client view</DropdownItem>
+      <DropdownItem as={Link} to="/">Client view</DropdownItem>
       <DropdownDivider />
       <DropdownItem className="op-admin-dropdown-danger" onClick={onLogout}>Sign Out</DropdownItem>
     </Dropdown>
@@ -268,7 +267,7 @@ function AdminLayout() {
             {isAdmin ? 'Workspace' : 'Host workspace'}
           </span>
         )}
-        <nav className={`min-h-0 flex-1 overflow-y-auto ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
+        <nav className={`min-h-0 flex-1 overflow-y-auto gap-2 ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
           {navItems.map(({ path, label, icon: NavIcon, exact }) => {
             const active = exact ? location.pathname === path : location.pathname.startsWith(path);
             return (
@@ -277,7 +276,7 @@ function AdminLayout() {
                   to={path}
                   aria-label={collapsed ? label : undefined}
                   aria-current={active ? 'page' : undefined}
-                  className={`op-admin-nav-link flex items-center rounded-lg mb-1 text-sm font-medium transition-all duration-200 ${
+                  className={`op-admin-nav-link flex items-center rounded-lg text-sm font-medium transition-all duration-200 ${
                     active
                       ? 'bg-[#E8EDF7] text-[#0B1F42]'
                       : 'text-[#414D63] hover:bg-[#F7F4EF]'
@@ -296,29 +295,14 @@ function AdminLayout() {
                       </span>
                     )}
                   </div>
-                  {!collapsed && <span className="ml-3">{label}</span>}
+                  {!collapsed && <span className="ml-2">{label}</span>}
                 </Link>
               </SidebarFlyout>
             );
           })}
         </nav>
         <div className={`op-admin-sidebar-account border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'p-5'}`}>
-          <SidebarFlyout active={collapsed} label="Go back to client view">
-            <Link
-              to="/"
-              aria-label={collapsed ? 'Go back to client view' : undefined}
-              className={`flex items-center rounded-full text-sm font-semibold bg-white/10 text-white hover:bg-[#C49A6C] hover:text-white transition-all duration-200 ${
-                collapsed ? 'justify-center w-11 h-11 mb-4' : 'justify-center mb-5 px-4 py-2.5'
-              }`}
-            >
-              <ArrowLeft className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
-              {!collapsed && <span className="ml-2.5">Go back to client view</span>}
-            </Link>
-          </SidebarFlyout>
-          <SidebarFlyout active={collapsed} label="Toggle theme">
-            <ThemeToggle className="op-admin-theme-toggle" showLabel={!collapsed} />
-          </SidebarFlyout>
-          <div className={`flex items-center my-5 ${collapsed ? 'justify-center' : 'space-x-3'}`}>
+          <div className={`flex items-center ${collapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-xs font-bold text-white">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
             </div>
@@ -451,16 +435,6 @@ function AdminLayout() {
             );
           })}
         </DrawerItems>
-        <div className="op-admin-mobile-more-footer">
-          <Link to="/" onClick={() => setMobileMoreOpen(false)}>
-            <ArrowLeft strokeWidth={1.5} aria-hidden="true" />
-            Client view
-          </Link>
-          <button type="button" onClick={handleLogout}>
-            <LogOut strokeWidth={1.5} aria-hidden="true" />
-            Sign Out
-          </button>
-        </div>
       </Drawer>
 
       {/* Main content */}
@@ -481,6 +455,7 @@ function AdminLayout() {
             </span>
           </div>
           <div className="op-admin-shell-actions">
+            <ThemeToggle className="op-admin-shell-icon-button" />
             <div className="op-admin-shell-bell-wrap">
               <button
                 type="button"

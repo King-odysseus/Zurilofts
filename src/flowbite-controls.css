@@ -468,20 +468,13 @@ html.dark .op-admin-sidebar .op-admin-nav-link[aria-current="page"] {
   color: #FFFFFF !important;
 }
 
-html.dark .op-admin-sidebar .op-admin-nav-link:hover,
-html.dark .op-admin-sidebar-account > a:hover {
+html.dark .op-admin-sidebar .op-admin-nav-link:hover {
   background-color: #172238 !important;
   color: #FFFFFF !important;
 }
 
-html.dark .op-admin-sidebar-account > a,
 html.dark .op-admin-sidebar-account > div p,
 html.dark .op-admin-sidebar-account > button {
-  color: var(--dm-text) !important;
-}
-
-html.dark .op-admin-sidebar-account > a {
-  background-color: #172238 !important;
   color: var(--dm-text) !important;
 }
 
@@ -603,7 +596,6 @@ html.dark .op-admin-finance-export>button:hover {
   background-color: #172238 !important;
 }
 
-html.dark .op-admin-theme-toggle,
 html.dark .op-admin-mobile-theme {
   border-color: var(--dm-border-strong) !important;
   background-color: var(--dm-surface-soft) !important;
@@ -819,30 +811,6 @@ html.dark .opg-footer {
 .zl-theme-toggle-icon svg {
   width: 20px;
   height: 20px;
-}
-
-.op-admin-theme-toggle {
-  display: flex;
-  width: 100%;
-  min-height: 40px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 16px;
-  border: 1px solid #E2DAD0;
-  border-radius: 9px;
-  background: #F8FAFC;
-  color: #0B1F42;
-  font-size: 11px;
-  font-weight: 700;
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
-}
-
-.op-admin-theme-toggle:hover,
-.op-admin-theme-toggle:focus-visible {
-  border-color: #C49A6C;
-  background: #F3E9DC;
-  color: #0B1F42;
 }
 
 .op-admin-mobile-theme {
