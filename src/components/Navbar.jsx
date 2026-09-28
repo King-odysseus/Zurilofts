@@ -512,6 +512,18 @@ function Navbar({ solid = false }) {
                         </svg>
                         {t('nav.favourites')}
                       </Link>
+                      {user?.role !== 'HOST' && (
+                        <Link
+                          to="/host/application"
+                          onClick={() => setDropdownOpen(false)}
+                          className={accountItemClass}
+                        >
+                          <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01" />
+                          </svg>
+                          {t('nav.becomeHost')}
+                        </Link>
+                      )}
                       <Link
                         to="/terms"
                         onClick={() => setDropdownOpen(false)}

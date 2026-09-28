@@ -104,6 +104,7 @@ function Header({ menu }) {
             <DropdownItem onClick={() => navigate('/profile')}>{t('nav.myProfile')}</DropdownItem>
             <DropdownItem onClick={() => navigate('/trips')}>Trips</DropdownItem>
             <DropdownItem onClick={() => navigate('/favourites')}>{t('nav.saved')}</DropdownItem>
+            {user?.role !== 'HOST' && <DropdownItem onClick={() => navigate('/host/application')}>{t('nav.becomeHost')}</DropdownItem>}
             {(user?.role === 'HOST' || user?.role === 'ADMIN') && <>
               <DropdownDivider />
               <DropdownItem onClick={() => navigate(user.role === 'ADMIN' ? '/admin' : '/host/today')}>
