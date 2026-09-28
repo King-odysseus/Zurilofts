@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
+import { Button, Checkbox, FileInput, Label, Select, Textarea, TextInput } from 'flowbite-react';
 import Navbar from '../components/Navbar.jsx';
-import Footer from '../components/Footer.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -18,12 +18,43 @@ const EMPTY_FORM = {
 };
 
 const STATUS_COPY = {
-  DRAFT: 'Complete the details and documents below, then submit for verification.',
-  CHANGES_REQUESTED: 'Update the requested details or documents and resubmit.',
-  SUBMITTED: 'Your application is under review. You can continue traveling while you wait.',
-  APPROVED: 'Your host application is approved. You can now create your first property.',
-  REJECTED: 'Your application was not approved. Contact support if you need help.',
+  DRAFT: 'Your draft is ready to complete. Save at any time, then submit it for verification.',
+  CHANGES_REQUESTED: 'Update the requested details or documents below, then submit again.',
+  SUBMITTED: 'Your application is with Trust and Safety. We will notify you when the review is complete.',
+  APPROVED: 'Your host application is approved. You can now create and publish your first listing.',
+  REJECTED: 'Your application was not approved. Contact support if you need help with the review outcome.',
 };
+
+const STATUS_LABELS = {
+  DRAFT: 'Draft',
+  CHANGES_REQUESTED: 'Changes requested',
+  SUBMITTED: 'Under review',
+  APPROVED: 'Approved',
+  REJECTED: 'Not approved',
+};
+
+const STEP_DEFINITIONS = [
+  {
+    key: 'identity',
+    label: 'Identity and contact',
+    description: 'Legal name, contact and ID details',
+  },
+  {
+    key: 'business',
+    label: 'Hosting business',
+    description: 'Host type, trading name and payouts',
+  },
+  {
+    key: 'properties',
+    label: 'Property details',
+    description: 'Locations, property mix and experience',
+  },
+  {
+    key: 'review',
+    label: 'Review and submit',
+    description: 'Documents, terms and final checks',
+  },
+];
 
 const PROPERTY_TYPES = [
   ['apartment', 'Apartment'], ['studio', 'Studio'], ['penthouse', 'Penthouse'],
@@ -31,8 +62,8 @@ const PROPERTY_TYPES = [
 ];
 
 const DOCUMENT_LABELS = {
-  IDENTITY_FRONT: 'Identity document — photo/details side',
-  IDENTITY_BACK: 'Identity document — reverse side',
+  IDENTITY_FRONT: 'Identity document - photo/details side',
+  IDENTITY_BACK: 'Identity document - reverse side',
   PROPERTY_AUTHORITY: 'Proof of ownership or authority to host',
   BUSINESS_REGISTRATION: 'Business registration certificate',
 };
@@ -73,6 +104,7 @@ function HostApplicationPage() {
   const [uploadingKind, setUploadingKind] = useState('');
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const [activeStep, setActiveStep] = useState('identity');
 
   useEffect(() => {
     async function loadApplication() {
@@ -106,6 +138,59 @@ function HostApplicationPage() {
     return kinds;
   }, [form.identityType, form.businessType]);
 
+  const completionItems = useMemo(() => {
+    const identityComplete = [
+      form.legalName, form.dateOfBirth, form.nationality, form.identityType,
+      form.contactEmail, form.contactPhone, form.kraPin,
+    ].every((value) => String(value || '').trim());
+    const businessComplete = Boolean(form.businessName && form.businessType && form.preferredPayoutMethod)
+      && (form.businessType !== 'company' || Boolean(form.companyRegistrationNo));
+    const propertiesComplete = Boolean(
+      form.city && form.propertyCount && form.propertyRelationship
+      && form.propertyTypes.length > 0 && form.propertyLocations,
+    );
+    const documentsComplete = requiredDocuments.every((kind) => (
+      application?.documents?.some((document) => document.kind === kind)
+    ));
+    const reviewComplete = documentsComplete && form.agreedTerms;
+
+    return [
+      { ...STEP_DEFINITIONS[0], complete: identityComplete, detail: identityComplete ? 'Complete' : 'In progress' },
+      { ...STEP_DEFINITIONS[1], complete: businessComplete, detail: businessComplete ? 'Complete' : 'Needs details' },
+      { ...STEP_DEFINITIONS[2], complete: propertiesComplete, detail: propertiesComplete ? 'Complete' : 'Needs details' },
+      { ...STEP_DEFINITIONS[3], complete: reviewComplete, detail: reviewComplete ? 'Ready to submit' : 'Documents required' },
+    ];
+  }, [
+    application?.documents,
+    form.agreedTerms,
+    form.businessName,
+    form.businessType,
+    form.city,
+    form.companyRegistrationNo,
+    form.contactEmail,
+    form.contactPhone,
+    form.dateOfBirth,
+    form.identityType,
+    form.kraPin,
+    form.legalName,
+    form.nationality,
+    form.preferredPayoutMethod,
+    form.propertyCount,
+    form.propertyLocations,
+    form.propertyRelationship,
+    form.propertyTypes,
+    requiredDocuments,
+  ]);
+
+  const completedCount = completionItems.filter((item) => item.complete).length;
+  const completionPercent = (completedCount / STEP_DEFINITIONS.length) * 100;
+  const statusLabel = saving
+    ? 'Saving'
+    : application
+      ? STATUS_LABELS[application.status] || application.status.replaceAll('_', ' ')
+      : 'Draft';
+  const statusMeta = application ? STATUS_COPY[application.status] : STATUS_COPY.DRAFT;
+
   function update(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
   }
@@ -119,20 +204,45 @@ function HostApplicationPage() {
     }));
   }
 
+  function goToStep(step) {
+    setActiveStep(step);
+    const target = document.getElementById(`host-application-${step}`);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   function applicationPayload() {
-    return {
-      legalName: form.legalName.trim(), businessName: form.businessName.trim(),
-      businessType: form.businessType, contactPhone: form.contactPhone.trim(),
-      contactEmail: form.contactEmail.trim(), dateOfBirth: form.dateOfBirth,
-      nationality: form.nationality.trim(), identityType: form.identityType,
-      kraPin: form.kraPin.trim().toUpperCase(),
-      companyRegistrationNo: form.businessType === 'company' ? form.companyRegistrationNo.trim() : '',
-      city: form.city.trim(), propertyCount: Number(form.propertyCount),
-      propertyRelationship: form.propertyRelationship, propertyTypes: form.propertyTypes,
-      propertyLocations: form.propertyLocations.trim(), yearsHosting: Number(form.yearsHosting),
-      preferredPayoutMethod: form.preferredPayoutMethod, experience: form.experience.trim(),
+    const payload = {
+      businessType: form.businessType,
+      propertyRelationship: form.propertyRelationship,
+      yearsHosting: Number(form.yearsHosting),
+      preferredPayoutMethod: form.preferredPayoutMethod,
       agreedTerms: form.agreedTerms,
     };
+
+    const optionalText = {
+      legalName: form.legalName,
+      businessName: form.businessName,
+      contactPhone: form.contactPhone,
+      contactEmail: form.contactEmail,
+      dateOfBirth: form.dateOfBirth,
+      nationality: form.nationality,
+      identityType: form.identityType,
+      kraPin: form.kraPin.trim().toUpperCase(),
+      companyRegistrationNo: form.businessType === 'company' ? form.companyRegistrationNo : '',
+      city: form.city,
+      propertyLocations: form.propertyLocations,
+      experience: form.experience,
+    };
+
+    Object.entries(optionalText).forEach(([key, value]) => {
+      const normalized = String(value || '').trim();
+      if (normalized) payload[key] = normalized;
+    });
+
+    if (form.propertyCount !== '') payload.propertyCount = Number(form.propertyCount);
+    if (form.propertyTypes.length > 0) payload.propertyTypes = form.propertyTypes;
+
+    return payload;
   }
 
   async function saveApplication() {
@@ -142,11 +252,22 @@ function HostApplicationPage() {
   }
 
   async function handleSave(event) {
-    event.preventDefault();
+    event?.preventDefault();
     setSaving(true); setError(''); setMessage('');
     try {
       await saveApplication();
       setMessage('Your application draft has been saved.');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Could not save your application.');
+    } finally { setSaving(false); }
+  }
+
+  async function handleSaveAndContinue(nextStep) {
+    setSaving(true); setError(''); setMessage('');
+    try {
+      await saveApplication();
+      setMessage('Your application draft has been saved.');
+      if (nextStep) goToStep(nextStep);
     } catch (err) {
       setError(err.response?.data?.error || 'Could not save your application.');
     } finally { setSaving(false); }
@@ -208,138 +329,433 @@ function HostApplicationPage() {
     } finally { setUploadingKind(''); }
   }
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-white"><Spinner /></div>;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <main className="op-host-application-page">
+          <div className="op-host-application-loading"><Spinner /></div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
-      <main className="max-w-5xl mx-auto px-4 md:px-6 pt-28 pb-20">
-        <div className="bg-white rounded-[2rem] shadow-sm border border-[#D9D9D9]/70 p-6 md:p-10">
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#C49A6C] mb-2">Become a ZuriLofts host</p>
-          <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45]">Host verification</h1>
-          <p className="text-[#6b7280] mt-3 max-w-3xl">Tell us who you are, how you manage your properties, and provide the documents needed to protect guests and legitimate hosts. Save at any time and continue later.</p>
-
-          {application && (
-            <div className="mt-6 rounded-3xl bg-[#0B0B45]/5 p-5">
-              <p className="font-semibold text-[#0B0B45]">Status: {application.status.replaceAll('_', ' ')}</p>
-              <p className="text-sm text-[#6b7280] mt-1">{STATUS_COPY[application.status]}</p>
-              {application.reviewNote && <p className="text-sm text-red-700 mt-3">Reviewer note: {application.reviewNote}</p>}
+      <main className="op-host-application-page">
+        <section className="op-host-application-hero">
+          <div className="op-host-application-hero-copy">
+            <p>Host setup</p>
+            <h1>Get your space ready to host</h1>
+            <span>Complete your identity, property details and review before you publish.</span>
+          </div>
+          <div className="op-host-application-hero-stats">
+            <div>
+              <strong>{completedCount} / {STEP_DEFINITIONS.length}</strong>
+              <span>Steps complete</span>
             </div>
-          )}
-          {message && <Notice tone="success">{message}</Notice>}
-          {error && <Notice tone="error">{error}</Notice>}
+            <div>
+              <strong>~10 min</strong>
+              <span>Estimated time</span>
+            </div>
+            <div>
+              <strong>{statusLabel}</strong>
+              <span>{saving ? 'Saving changes' : 'Current status'}</span>
+            </div>
+          </div>
+        </section>
 
-          {editable ? (
-            <form onSubmit={handleSave} className="mt-8 space-y-10">
-              <Section title="Identity & contact" description="Your legal details must match the identity document you upload.">
-                <div className="grid md:grid-cols-2 gap-5">
-                  <PillField label="Full legal name" value={form.legalName} onChange={(v) => update('legalName', v)} required />
-                  <PillField label="Date of birth" type="date" value={form.dateOfBirth} onChange={(v) => update('dateOfBirth', v)} required />
-                  <PillField label="Nationality" value={form.nationality} onChange={(v) => update('nationality', v)} required />
-                  <PillSelect label="Identity document" value={form.identityType} onChange={(v) => update('identityType', v)} options={[
-                    ['NATIONAL_ID', 'Kenyan national ID'], ['PASSPORT', 'Passport'], ['ALIEN_ID', 'Alien ID'],
-                  ]} />
-                  <PillField label="Contact email" type="email" value={form.contactEmail} onChange={(v) => update('contactEmail', v)} required />
-                  <PillField label="Contact phone" type="tel" value={form.contactPhone} onChange={(v) => update('contactPhone', v)} required />
-                  <PillField label="KRA PIN" value={form.kraPin} onChange={(v) => update('kraPin', v.toUpperCase())} placeholder="A123456789B" required />
-                </div>
-              </Section>
+        <div className="op-host-application-layout">
+          <aside className="op-host-application-rail">
+            <header>
+              <strong>Your progress</strong>
+              <span>{completedCount} of {STEP_DEFINITIONS.length} steps complete</span>
+            </header>
+            <div className="op-host-application-progress" aria-hidden="true">
+              <i style={{ width: `${completionPercent}%` }} />
+            </div>
+            <nav aria-label="Host application steps">
+              {completionItems.map((step, index) => (
+                <button
+                  key={step.key}
+                  type="button"
+                  className={`${activeStep === step.key ? 'is-active' : ''} ${step.complete ? 'is-complete' : ''}`}
+                  onClick={() => goToStep(step.key)}
+                  aria-current={activeStep === step.key ? 'step' : undefined}
+                >
+                  <span>{step.complete ? '\u2713' : index + 1}</span>
+                  <span>
+                    <strong>{step.label}</strong>
+                    <small>{step.detail}</small>
+                  </span>
+                </button>
+              ))}
+            </nav>
+            <Button type="button" color="light" className="op-host-application-exit" onClick={handleSaveAndLeave} disabled={saving || !editable}>
+              Save and exit
+            </Button>
+          </aside>
 
-              <Section title="Hosting business" description="Individuals can use their public host or trading name.">
-                <div className="grid md:grid-cols-2 gap-5">
-                  <PillSelect label="Host type" value={form.businessType} onChange={(v) => update('businessType', v)} options={[
-                    ['individual', 'Individual'], ['company', 'Registered company'],
-                  ]} />
-                  <PillField label="Host or business name" value={form.businessName} onChange={(v) => update('businessName', v)} required />
-                  {form.businessType === 'company' && <PillField label="Company registration number" value={form.companyRegistrationNo} onChange={(v) => update('companyRegistrationNo', v)} required />}
-                  <PillSelect label="Preferred payout" value={form.preferredPayoutMethod} onChange={(v) => update('preferredPayoutMethod', v)} options={[
-                    ['mpesa', 'M-PESA'], ['bank', 'Bank transfer'],
-                  ]} />
-                </div>
-              </Section>
+          <div className="op-host-application-content">
+            {message && <Notice tone="success">{message}</Notice>}
+            {error && <Notice tone="error">{error}</Notice>}
 
-              <Section title="Properties & experience" description="These details help our team verify that you are authorised to list the accommodation.">
-                <div className="grid md:grid-cols-2 gap-5">
-                  <PillField label="Primary city or area" value={form.city} onChange={(v) => update('city', v)} required />
-                  <PillField label="Number of properties" type="number" min="1" max="1000" value={form.propertyCount} onChange={(v) => update('propertyCount', v)} required />
-                  <PillSelect label="Your relationship to the properties" value={form.propertyRelationship} onChange={(v) => update('propertyRelationship', v)} options={[
-                    ['OWNER', 'Owner'], ['MANAGER', 'Property manager'], ['AGENT', 'Authorised agent'], ['TENANT', 'Tenant with permission'],
-                  ]} />
-                  <PillField label="Years of hosting experience" type="number" min="0" max="80" value={form.yearsHosting} onChange={(v) => update('yearsHosting', v)} required />
-                </div>
-                <div className="mt-5">
-                  <p className="text-sm font-semibold text-[#1f2937] mb-2">Property types</p>
-                  <div className="flex flex-wrap gap-2">
-                    {PROPERTY_TYPES.map(([value, label]) => (
-                      <button key={value} type="button" onClick={() => togglePropertyType(value)} className={`rounded-full px-4 py-2 text-sm font-semibold border transition-colors ${form.propertyTypes.includes(value) ? 'bg-[#0B0B45] text-white border-[#0B0B45]' : 'bg-white text-[#6b7280] border-[#D9D9D9] hover:border-[#C49A6C]'}`}>{label}</button>
-                    ))}
+            {editable ? (
+              <form onSubmit={handleSave}>
+                <section id="host-application-identity" className="op-host-application-card">
+                  <ApplicationCardHeader
+                    step="1"
+                    title="Identity and contact"
+                    description="Your legal details must match the identity document you upload."
+                  />
+                  <div className="op-host-application-fields">
+                    <div>
+                      <Label htmlFor="host-legal-name">Full legal name</Label>
+                      <TextInput id="host-legal-name" value={form.legalName} onChange={(e) => update('legalName', e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label htmlFor="host-dob">Date of birth</Label>
+                      <TextInput id="host-dob" type="date" value={form.dateOfBirth} onChange={(e) => update('dateOfBirth', e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label htmlFor="host-nationality">Nationality</Label>
+                      <TextInput id="host-nationality" value={form.nationality} onChange={(e) => update('nationality', e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label htmlFor="host-identity-type">Identity document</Label>
+                      <Select id="host-identity-type" value={form.identityType} onChange={(e) => update('identityType', e.target.value)}>
+                        <option value="NATIONAL_ID">Kenyan national ID</option>
+                        <option value="PASSPORT">Passport</option>
+                        <option value="ALIEN_ID">Alien ID</option>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="host-contact-email">Contact email</Label>
+                      <TextInput id="host-contact-email" type="email" value={form.contactEmail} onChange={(e) => update('contactEmail', e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label htmlFor="host-contact-phone">Contact phone</Label>
+                      <TextInput id="host-contact-phone" type="tel" value={form.contactPhone} onChange={(e) => update('contactPhone', e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label htmlFor="host-kra-pin">KRA PIN</Label>
+                      <TextInput id="host-kra-pin" value={form.kraPin} onChange={(e) => update('kraPin', e.target.value.toUpperCase())} placeholder="A123456789B" required />
+                    </div>
                   </div>
-                </div>
-                <div className="mt-5 grid gap-5">
-                  <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">Property locations</span><textarea value={form.propertyLocations} onChange={(e) => update('propertyLocations', e.target.value)} rows="3" maxLength="500" className="w-full rounded-[2rem] border border-[#D9D9D9] px-5 py-4 focus:outline-none focus:border-[#C49A6C]" placeholder="Neighbourhoods, towns, or addresses you intend to list" required /></label>
-                  <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">Hosting experience</span><textarea value={form.experience} onChange={(e) => update('experience', e.target.value)} rows="4" maxLength="2000" className="w-full rounded-[2rem] border border-[#D9D9D9] px-5 py-4 focus:outline-none focus:border-[#C49A6C]" placeholder="Tell us about your experience, team, and how guests will be supported." /></label>
-                </div>
-              </Section>
+                  <StepActions
+                    saving={saving}
+                    uploading={Boolean(uploadingKind)}
+                    onSave={handleSave}
+                    onContinue={() => handleSaveAndContinue('business')}
+                  />
+                </section>
 
-              <Section title="Verification documents" description="JPEG, PNG, WebP, or PDF up to 8MB. Documents are encrypted and only available to authorised administrators.">
-                <div className="grid md:grid-cols-2 gap-4">
-                  {requiredDocuments.map((kind) => {
-                    const document = application?.documents?.find((item) => item.kind === kind);
-                    return <DocumentUpload key={kind} kind={kind} document={document} busy={uploadingKind === kind} onUpload={uploadDocument} onRemove={removeDocument} />;
-                  })}
-                </div>
-              </Section>
+                <section id="host-application-business" className="op-host-application-card">
+                  <ApplicationCardHeader
+                    step="2"
+                    title="Hosting business"
+                    description="Tell us whether you host as an individual or through a registered company."
+                  />
+                  <div className="op-host-application-fields">
+                    <div>
+                      <Label htmlFor="host-business-type">Host type</Label>
+                      <Select id="host-business-type" value={form.businessType} onChange={(e) => update('businessType', e.target.value)}>
+                        <option value="individual">Individual</option>
+                        <option value="company">Registered company</option>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="host-business-name">Host or business name</Label>
+                      <TextInput id="host-business-name" value={form.businessName} onChange={(e) => update('businessName', e.target.value)} required />
+                    </div>
+                    {form.businessType === 'company' && (
+                      <div>
+                        <Label htmlFor="host-company-number">Company registration number</Label>
+                        <TextInput id="host-company-number" value={form.companyRegistrationNo} onChange={(e) => update('companyRegistrationNo', e.target.value)} required />
+                      </div>
+                    )}
+                    <div>
+                      <Label htmlFor="host-payout-method">Preferred payout</Label>
+                      <Select id="host-payout-method" value={form.preferredPayoutMethod} onChange={(e) => update('preferredPayoutMethod', e.target.value)}>
+                        <option value="mpesa">M-PESA</option>
+                        <option value="bank">Bank transfer</option>
+                      </Select>
+                    </div>
+                  </div>
+                  <StepActions
+                    saving={saving}
+                    uploading={Boolean(uploadingKind)}
+                    onSave={handleSave}
+                    onContinue={() => handleSaveAndContinue('properties')}
+                  />
+                </section>
 
-              <label className="flex items-start gap-3 rounded-3xl bg-[#0B0B45]/5 p-5">
-                <input type="checkbox" checked={form.agreedTerms} onChange={(e) => update('agreedTerms', e.target.checked)} className="mt-1 h-5 w-5 accent-[#C49A6C]" />
-                <span className="text-sm text-[#1f2937]">I confirm the information is accurate, I am authorised to list these properties, and I agree to the <Link to="/terms" className="font-semibold text-[#C49A6C] hover:underline">Terms of Service</Link> and verification checks.</span>
-              </label>
+                <section id="host-application-properties" className="op-host-application-card">
+                  <ApplicationCardHeader
+                    step="3"
+                    title="Property details"
+                    description="These details help Trust and Safety confirm that you can list the accommodation."
+                  />
+                  <div className="op-host-application-fields">
+                    <div>
+                      <Label htmlFor="host-city">Primary city or area</Label>
+                      <TextInput id="host-city" value={form.city} onChange={(e) => update('city', e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label htmlFor="host-property-count">Number of properties</Label>
+                      <TextInput id="host-property-count" type="number" min="1" max="1000" value={form.propertyCount} onChange={(e) => update('propertyCount', e.target.value)} required />
+                    </div>
+                    <div>
+                      <Label htmlFor="host-relationship">Relationship to the properties</Label>
+                      <Select id="host-relationship" value={form.propertyRelationship} onChange={(e) => update('propertyRelationship', e.target.value)}>
+                        <option value="OWNER">Owner</option>
+                        <option value="MANAGER">Property manager</option>
+                        <option value="AGENT">Authorised agent</option>
+                        <option value="TENANT">Tenant with permission</option>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="host-years">Years of hosting experience</Label>
+                      <TextInput id="host-years" type="number" min="0" max="80" value={form.yearsHosting} onChange={(e) => update('yearsHosting', e.target.value)} required />
+                    </div>
+                  </div>
 
-              <div className="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
-                <button type="submit" disabled={saving || Boolean(uploadingKind)} className="rounded-full border-2 border-[#0B0B45] px-6 py-3 font-semibold text-[#0B0B45] disabled:opacity-50">{saving ? 'Saving...' : 'Save draft'}</button>
-                <button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)} className="rounded-full bg-[#C49A6C] px-6 py-3 font-semibold text-white hover:bg-[#b8895c] disabled:opacity-50">{saving ? 'Working...' : 'Submit for review'}</button>
-                <button type="button" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)} className="rounded-full px-6 py-3 font-semibold text-[#6b7280] hover:text-[#0B0B45] disabled:opacity-50">Save &amp; continue traveling</button>
-              </div>
-            </form>
-          ) : application?.status === 'APPROVED' || user?.role === 'HOST' ? (
-            <div className="mt-8 flex flex-col sm:flex-row gap-3">
-              <Link to="/host/properties/new" className="inline-flex justify-center rounded-full bg-[#C49A6C] px-6 py-3 font-semibold text-white">Set up your first property</Link>
-              <Link to="/host/today" className="inline-flex justify-center rounded-full border-2 border-[#0B0B45] px-6 py-3 font-semibold text-[#0B0B45]">Open host dashboard</Link>
-            </div>
-          ) : (
-            <button type="button" onClick={() => { setMode('travelling'); navigate('/'); }} className="mt-8 rounded-full border-2 border-[#0B0B45] px-6 py-3 font-semibold text-[#0B0B45]">Continue traveling</button>
-          )}
+                  <fieldset className="op-host-application-fieldset">
+                    <legend>Property types</legend>
+                    <div className="op-host-application-type-grid">
+                      {PROPERTY_TYPES.map(([value, label]) => (
+                        <label key={value} className={form.propertyTypes.includes(value) ? 'is-selected' : ''}>
+                          <Checkbox
+                            checked={form.propertyTypes.includes(value)}
+                            onChange={() => togglePropertyType(value)}
+                          />
+                          <span>{label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+
+                  <div className="op-host-application-textareas">
+                    <div>
+                      <Label htmlFor="host-property-locations">Property locations</Label>
+                      <Textarea
+                        id="host-property-locations"
+                        value={form.propertyLocations}
+                        onChange={(e) => update('propertyLocations', e.target.value)}
+                        rows={4}
+                        maxLength={500}
+                        placeholder="Neighbourhoods, towns or addresses you intend to list"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="host-experience">Hosting experience</Label>
+                      <Textarea
+                        id="host-experience"
+                        value={form.experience}
+                        onChange={(e) => update('experience', e.target.value)}
+                        rows={4}
+                        maxLength={2000}
+                        placeholder="Tell us about your experience, team and guest support."
+                      />
+                    </div>
+                  </div>
+                  <StepActions
+                    saving={saving}
+                    uploading={Boolean(uploadingKind)}
+                    onSave={handleSave}
+                    onContinue={() => handleSaveAndContinue('review')}
+                  />
+                </section>
+
+                <section id="host-application-review" className="op-host-application-card">
+                  <ApplicationCardHeader
+                    step="4"
+                    title="Review and submit"
+                    description="Upload the required documents and confirm that the information is accurate."
+                  />
+                  <div className="op-host-application-documents">
+                    {requiredDocuments.map((kind) => {
+                      const document = application?.documents?.find((item) => item.kind === kind);
+                      return (
+                        <DocumentUpload
+                          key={kind}
+                          kind={kind}
+                          document={document}
+                          busy={uploadingKind === kind}
+                          onUpload={uploadDocument}
+                          onRemove={removeDocument}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  <label className="op-host-application-terms">
+                    <Checkbox
+                      checked={form.agreedTerms}
+                      onChange={(e) => update('agreedTerms', e.target.checked)}
+                    />
+                    <span>
+                      I confirm the information is accurate, I am authorised to list these properties,
+                      and I agree to the <Link to="/terms">Terms of Service</Link> and verification checks.
+                    </span>
+                  </label>
+
+                  <div className="op-host-application-final-actions">
+                    <Button type="submit" color="light" disabled={saving || Boolean(uploadingKind)}>
+                      {saving ? 'Saving...' : 'Save draft'}
+                    </Button>
+                    <Button type="button" className="op-host-application-primary" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)}>
+                      {saving ? 'Working...' : 'Submit for review'}
+                    </Button>
+                    <Button type="button" color="light" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)}>
+                      Save and travel
+                    </Button>
+                  </div>
+                </section>
+              </form>
+            ) : (
+              <StatusCard
+                application={application}
+                statusLabel={statusLabel}
+                statusMeta={statusMeta}
+                user={user}
+                onContinueTravelling={() => { setMode('travelling'); navigate('/'); }}
+              />
+            )}
+          </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }
 
-function Section({ title, description, children }) {
-  return <section><div className="mb-5"><h2 className="text-xl font-bold text-[#0B0B45]">{title}</h2><p className="text-sm text-[#6b7280] mt-1">{description}</p></div>{children}</section>;
+function ApplicationCardHeader({ step, title, description }) {
+  return (
+    <header className="op-host-application-card-header">
+      <div>
+        <h2>{title}</h2>
+        <p>{description}</p>
+      </div>
+      <span>STEP {step} OF 4</span>
+    </header>
+  );
 }
 
-function PillField({ label, value, onChange, type = 'text', ...props }) {
-  return <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">{label}</span><input type={type} value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-full border border-[#D9D9D9] px-5 py-3.5 focus:outline-none focus:border-[#C49A6C] focus:ring-2 focus:ring-[#C49A6C]/15" {...props} /></label>;
-}
-
-function PillSelect({ label, value, onChange, options }) {
-  return <label className="block"><span className="block text-sm font-semibold text-[#1f2937] mb-2">{label}</span><select value={value} onChange={(e) => onChange(e.target.value)} className="w-full rounded-full border border-[#D9D9D9] bg-white px-5 py-3.5 focus:outline-none focus:border-[#C49A6C]">{options.map(([optionValue, optionLabel]) => <option key={optionValue} value={optionValue}>{optionLabel}</option>)}</select></label>;
+function StepActions({ saving, uploading, onSave, onContinue }) {
+  return (
+    <div className="op-host-application-step-actions">
+      <Button type="button" color="light" disabled={saving || uploading} onClick={onSave}>
+        {saving ? 'Saving...' : 'Save draft'}
+      </Button>
+      <Button type="button" className="op-host-application-primary" disabled={saving || uploading} onClick={onContinue}>
+        Save and continue
+      </Button>
+    </div>
+  );
 }
 
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
-  return <div className="rounded-3xl border border-[#D9D9D9] p-5"><p className="font-semibold text-[#1f2937]">{DOCUMENT_LABELS[kind]}</p>{document ? <><p className="text-xs text-green-700 mt-2 break-all">Uploaded: {document.originalName}</p><button type="button" onClick={() => onRemove(kind)} disabled={busy} className="mt-3 rounded-full border border-red-200 px-4 py-2 text-xs font-semibold text-red-600 disabled:opacity-50">{busy ? 'Working...' : 'Remove & replace'}</button></> : <label className="mt-3 inline-flex cursor-pointer rounded-full bg-[#0B0B45] px-4 py-2 text-xs font-semibold text-white"><input type="file" className="hidden" accept="image/jpeg,image/png,image/webp,application/pdf" disabled={busy} onChange={(e) => onUpload(kind, e.target.files?.[0])} />{busy ? 'Uploading...' : 'Choose document'}</label>}</div>;
+  return (
+    <div className={`op-host-application-document ${document ? 'is-uploaded' : ''}`}>
+      <div className="op-host-application-document-heading">
+        <span aria-hidden="true">{document ? '\u2713' : '+'}</span>
+        <div>
+          <strong>{DOCUMENT_LABELS[kind]}</strong>
+          <small>{document ? 'Uploaded and encrypted' : 'JPEG, PNG, WebP or PDF up to 8MB'}</small>
+        </div>
+      </div>
+      {document && (
+        <div className="op-host-application-document-file">
+          <span>{document.originalName}</span>
+          <Button type="button" size="xs" color="light" disabled={busy} onClick={() => onRemove(kind)}>
+            {busy ? 'Working...' : 'Remove'}
+          </Button>
+        </div>
+      )}
+      <FileInput
+        aria-label={`${document ? 'Replace' : 'Upload'} ${DOCUMENT_LABELS[kind]}`}
+        accept="image/jpeg,image/png,image/webp,application/pdf"
+        disabled={busy}
+        onChange={(e) => onUpload(kind, e.target.files?.[0])}
+        sizing="sm"
+      />
+      {busy && <p>Uploading securely...</p>}
+    </div>
+  );
 }
 
 function Notice({ tone, children }) {
-  return <div className={`mt-6 rounded-3xl border px-5 py-4 ${tone === 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-700'}`}>{children}</div>;
+  return <div className={`op-host-application-notice is-${tone}`}>{children}</div>;
 }
 
-Section.propTypes = { title: PropTypes.string.isRequired, description: PropTypes.string.isRequired, children: PropTypes.node.isRequired };
-PillField.propTypes = { label: PropTypes.string.isRequired, value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired, onChange: PropTypes.func.isRequired, type: PropTypes.string };
-PillSelect.propTypes = { label: PropTypes.string.isRequired, value: PropTypes.string.isRequired, onChange: PropTypes.func.isRequired, options: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.string)).isRequired };
-DocumentUpload.propTypes = { kind: PropTypes.string.isRequired, document: PropTypes.shape({ originalName: PropTypes.string }), busy: PropTypes.bool.isRequired, onUpload: PropTypes.func.isRequired, onRemove: PropTypes.func.isRequired };
-Notice.propTypes = { tone: PropTypes.oneOf(['success', 'error']).isRequired, children: PropTypes.node.isRequired };
+function StatusCard({ application, statusLabel, statusMeta, user, onContinueTravelling }) {
+  const approved = application?.status === 'APPROVED' || user?.role === 'HOST';
+  const statusKey = (application?.status || 'draft').toLowerCase();
+
+  return (
+    <section className="op-host-application-status-card">
+      <span className={`op-host-application-status is-${statusKey}`}>{statusLabel}</span>
+      <h2>{approved ? 'You are ready to host' : 'Application status'}</h2>
+      <p>{statusMeta}</p>
+      {application?.reviewNote && (
+        <div className="op-host-application-review-note">
+          <strong>Reviewer note</strong>
+          <span>{application.reviewNote}</span>
+        </div>
+      )}
+      <div className="op-host-application-status-actions">
+        {approved ? (
+          <>
+            <Link to="/host/properties/new" className="op-host-application-primary-link">Set up your first property</Link>
+            <Link to="/host/today" className="op-host-application-secondary-link">Open host dashboard</Link>
+          </>
+        ) : (
+          <Button type="button" color="light" onClick={onContinueTravelling}>
+            Continue travelling
+          </Button>
+        )}
+      </div>
+    </section>
+  );
+}
+
+ApplicationCardHeader.propTypes = {
+  step: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+};
+
+StepActions.propTypes = {
+  saving: PropTypes.bool.isRequired,
+  uploading: PropTypes.bool.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onContinue: PropTypes.func.isRequired,
+};
+
+DocumentUpload.propTypes = {
+  kind: PropTypes.string.isRequired,
+  document: PropTypes.shape({ originalName: PropTypes.string }),
+  busy: PropTypes.bool.isRequired,
+  onUpload: PropTypes.func.isRequired,
+  onRemove: PropTypes.func.isRequired,
+};
+
+Notice.propTypes = {
+  tone: PropTypes.oneOf(['success', 'error']).isRequired,
+  children: PropTypes.node.isRequired,
+};
+
+StatusCard.propTypes = {
+  application: PropTypes.shape({
+    status: PropTypes.string,
+    reviewNote: PropTypes.string,
+  }),
+  statusLabel: PropTypes.string.isRequired,
+  statusMeta: PropTypes.string.isRequired,
+  user: PropTypes.shape({ role: PropTypes.string }),
+  onContinueTravelling: PropTypes.func.isRequired,
+};
 
 export default HostApplicationPage;

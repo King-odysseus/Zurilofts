@@ -18,10 +18,10 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/inbox`, `/inbox/:id`, `/messages` | Guest Inbox `0:3910`, conversation detail `0:3940` | Implemented with real conversations, polling, read state, sending, support thread, and mobile detail flow; desktop/mobile QA passed |
 | `/profile` | Guest Account `0:3960`, security `0:4626` | Implemented with account shell, Flowbite controls, avatar upload, host payouts, reviews, privacy controls, and account deletion; desktop/mobile QA passed |
 | `/verify-identity` | Product trust `0:9724`, security `0:4626` | Live identity flow redesigned; dispute flow still pending |
-| `/host/application` | Product `0:9744`, application states `0:4123` | Functional legacy, redesign pending |
+| `/host/application` | Product `0:9744`, application states `0:4123` | Implemented with setup hero, progress rail, Flowbite fields/documents, and review states; desktop/mobile QA passed |
 | `/host/today` | Host Today `0:3583`, mobile `0:4070`, navigation `0:3584` | Implemented with live arrivals, in-house, departures, recent conversations, responsive tabs, and the mobile pill workspace navigation; desktop/mobile QA passed |
 | `/host/listings` | Host Listings `0:3642` | Implemented with live listing data, lifecycle filters, draft submission, availability controls, deletion, and repository photography; desktop/mobile QA passed |
-| `/host/properties/new`, `/host/properties/:id/edit` | Host Listing Editor `0:4339`, edit `0:3955`, preview `0:4710` | Functional legacy, redesign pending |
+| `/host/properties/new`, `/host/properties/:id/edit` | Host Listing Editor `0:4339`, edit `0:3955`, preview `0:4710` | Implemented with live listing data, Flowbite editor controls, uploads, preview, variants, and seasonal pricing; desktop/mobile QA passed |
 | `/host/calendar`, `/host/calendar/:id` | Host Calendar `0:3699` | Implemented with owner-scoped weekly availability, reservations, manual blocks, iCal feeds, week navigation, and detail panel; desktop/mobile QA passed |
 | `/host/earnings` | Host Earnings `0:3761` | Implemented with live period metrics, wallet summary, property earnings, income breakdown, and PDF/CSV reports; desktop/mobile QA passed |
 | `/host/payouts` | Host Earnings `0:3761`, payout details `0:4039` | Implemented with live wallet, destination, WHT statement, CSV/PDF export, and payout history; desktop/mobile QA passed |
