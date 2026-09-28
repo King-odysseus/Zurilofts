@@ -13,7 +13,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/places`, `/restaurants` | Product `0:2825`, `0:10436`; `0:2858`, `0:10544` | Implemented with repository photography; desktop/mobile QA passed |
 | `/guides`, `/guides/:id` | Product `0:2891`, `0:10948`; detail `0:2925`, `0:10857` | Implemented with API data and repository photography; desktop/mobile QA passed |
 | `/privacy`, `/terms`, unknown route | Product `0:3059`, `0:3110`, `0:2964` | Implemented in the shared public shell with editorial legal layout; desktop/mobile QA passed |
-| `/s/:token`, `/shortlists`, `/shortlists/:id`, `/favourites` | Product `0:2989`, `0:3871` | Functional legacy, redesign pending |
+| `/favourites`, `/shortlists`, `/shortlists/:id`, `/s/:token` | Saved `0:3864`, tabs `0:3871`, shared shortlist `0:2001` | Implemented with real favourites, collection previews and shared links; desktop/mobile QA passed |
 | `/trips`, `/booking-history` | Product `0:9318`, trip/history `0:4584` | Functional legacy, redesign pending |
 | `/inbox`, `/inbox/:id`, `/messages` | Product `0:9318`, conversation `0:3913` | Functional legacy, redesign pending |
 | `/profile` | Product `0:9318`, security `0:4626` | Functional legacy, redesign pending |
