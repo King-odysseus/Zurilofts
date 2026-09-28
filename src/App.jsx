@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { BrowserRouter, Link, useLocation, useNavigate } from "react-router-dom";
-import { Avatar, Dropdown, DropdownDivider, DropdownItem } from "flowbite-react";
+import { Dropdown, DropdownDivider, DropdownItem } from "flowbite-react";
 import logo from "./assets/zurilofts-logo.png";
 import { GuestFooter, GuestHome, GuestStays } from './GuestDiscovery.jsx';
 import RealPropertyPage from './components/PropertyPage.jsx';
@@ -34,45 +34,85 @@ import { useAuth } from './context/AuthContext.jsx';
 import { useLanguage } from './context/LanguageContext.jsx';
 import { languageOptions } from './i18n/translations.js';
 
+const headerDropdownTheme = {
+  floating: {
+    style: {
+      auto: 'border-0 bg-white text-[#0B1F42] shadow-[0_16px_40px_rgba(11,31,66,0.16)]',
+    },
+  },
+};
+
+function SearchIcon() {
+  return <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>;
+}
+
+function HeartIcon() {
+  return <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>;
+}
+
+function TranslateIcon() {
+  return <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4 5h9M8.5 3v2m2.2 0c-.8 3.3-2.7 5.9-5.7 7.8M6.2 8.7c1.2 2 3 3.4 5.4 4.2M14 21l4-10 4 10m-6.7-3.3h5.4" /></svg>;
+}
+
+function UserIcon() {
+  return <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM5 21a7 7 0 0114 0" /></svg>;
+}
+
 
 function Header({ menu }) {
   const { setLang, t } = useLanguage();
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const initials = `${user?.firstName?.[0] || user?.name?.[0] || 'G'}${user?.lastName?.[0] || ''}`.toUpperCase();
   return <header className="zl-header">
     <Link to="/" className="zl-brand"><img src={logo} alt="ZuriLofts" /><span>ZuriLofts</span></Link>
     <nav className="zl-desktop-nav" aria-label="Main navigation">
       <Link to="/properties">{t('nav.stays')}</Link><Link to="/places">{t('nav.places')}</Link><Link to="/restaurants">{t('nav.restaurants')}</Link><Link to="/guides">{t('nav.guides')}</Link>
     </nav>
     <div className="zl-header-actions">
-      <Link className="zl-header-search" to="/properties">⌕ <span>{t('nav.searchStays')}</span></Link>
-      {isAuthenticated && <Link className="zl-header-auth-link" to="/profile">{t('nav.myProfile')}</Link>}
+      <Link className="zl-header-search" to="/properties"><SearchIcon /><span>{t('nav.searchStays')}</span></Link>
+      <Link className="zl-icon-btn" to="/favourites" aria-label={t('nav.saved')}><HeartIcon /></Link>
       <Dropdown
         inline
-        theme={{ inlineWrapper: 'zl-header-icon-button' }}
-        label={<><span className="sr-only">{t('nav.language')}</span><span className="zl-header-action-icon" aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 21a9 9 0 100-18 9 9 0 000 18z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.45 3.3 5.45 3.3 9S14.2 18.55 12 21c-2.2-2.45-3.3-5.45-3.3-9S9.8 5.45 12 3z" /></svg></span></>}
+        theme={{ inlineWrapper: 'zl-header-icon-button', ...headerDropdownTheme }}
+        label={<><span className="sr-only">{t('nav.language')}</span><span className="zl-header-action-icon" aria-hidden="true"><TranslateIcon /></span></>}
         arrowIcon={false}
         placement="bottom-end"
         aria-label={t('nav.language')}
       >
         {languageOptions.map((option) => <DropdownItem key={option.value} onClick={() => setLang(option.value)}>{option.label}</DropdownItem>)}
       </Dropdown>
-      {!isAuthenticated && (
-        <Dropdown
-          inline
-          theme={{ inlineWrapper: 'zl-header-avatar-button' }}
-          label={<><span className="sr-only">Open account menu</span><Avatar placeholderInitials="?" rounded size="sm" className="zl-header-avatar" /></>}
-          arrowIcon={false}
-          placement="bottom-end"
-          aria-label="Open account menu"
-        >
+      <Dropdown
+        inline
+        theme={{ inlineWrapper: 'zl-header-avatar-button', ...headerDropdownTheme }}
+        label={<><span className="sr-only">Open account menu</span><span className="zl-header-avatar-icon" aria-hidden="true">{isAuthenticated ? initials : <UserIcon />}</span></>}
+        arrowIcon={false}
+        placement="bottom-end"
+        aria-label="Open account menu"
+      >
+        {isAuthenticated ? (
+          <>
+            <DropdownItem onClick={() => navigate('/profile')}>{t('nav.myProfile')}</DropdownItem>
+            <DropdownItem onClick={() => navigate('/trips')}>Trips</DropdownItem>
+            <DropdownItem onClick={() => navigate('/favourites')}>{t('nav.saved')}</DropdownItem>
+            {(user?.role === 'HOST' || user?.role === 'ADMIN') && <>
+              <DropdownDivider />
+              <DropdownItem onClick={() => navigate(user.role === 'ADMIN' ? '/admin' : '/host/today')}>
+                {user.role === 'ADMIN' ? 'Admin workspace' : 'Host workspace'}
+              </DropdownItem>
+            </>}
+            <DropdownDivider />
+            <DropdownItem onClick={async () => { await logout(); navigate('/'); }}>Sign out</DropdownItem>
+          </>
+        ) : (
+          <>
           <DropdownItem onClick={() => navigate('/login')}>{t('nav.signIn')}</DropdownItem>
           <DropdownItem onClick={() => navigate('/register')}>{t('nav.createAccount')}</DropdownItem>
           <DropdownDivider />
           <DropdownItem onClick={() => navigate('/register?role=HOST')}>{t('nav.becomeHost')}</DropdownItem>
-        </Dropdown>
-      )}
-      <Link className="zl-icon-btn" to="/favourites" aria-label={t('nav.saved')}>♡</Link>
+          </>
+        )}
+      </Dropdown>
       <button className="zl-menu-btn" onClick={menu} aria-label="Open menu">☰</button>
     </div>
   </header>;

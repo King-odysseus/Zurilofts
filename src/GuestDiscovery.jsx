@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Dropdown, DropdownItem, Label, TextInput } from 'flowbite-react';
+import { Button, Datepicker, Dropdown, DropdownItem, Label, TextInput } from 'flowbite-react';
 import apiClient from './api/client.js';
 import { heroImage } from './assets/images.js';
 import { useAuth } from './context/AuthContext.jsx';
@@ -11,11 +11,32 @@ import PropertyResultsMap from './components/PropertyResultsMap.jsx';
 import { openConsentManager } from './utils/consent.js';
 
 const categories = ['All stays', 'Apartments', 'Studios', 'Penthouses', 'Villas'];
+const guestDropdownTheme = {
+  floating: {
+    style: {
+      auto: 'border-0 bg-white text-[#0B1F42] shadow-[0_14px_36px_rgba(11,31,66,0.16)]',
+    },
+  },
+};
 const guides = [
   { title: 'Westlands After Dark', label: 'Nightlife', image: '/images/place-sarit-centre.jpg' },
   { title: 'Kilimani Coffee Guide', label: 'Cafés', image: '/images/eat-artcaffe.jpg' },
   { title: 'Karen Green Escapes', label: 'Outdoors', image: '/images/place-karura-forest.jpg' },
 ];
+
+function parseDateValue(value) {
+  if (!value) return null;
+  const [year, month, day] = value.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function formatDateValue(date) {
+  if (!date) return '';
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
 function useStays(params) {
   const { search, type, page, limit, checkIn, checkOut, minPrice, maxPrice, minBedrooms } = params;
@@ -69,17 +90,40 @@ function SearchForm({ compact = false, initial = '' }) {
     </Label>
     <Label htmlFor="guest-search-check-in" className="opg-search-field">
       <span>Check in</span>
-      <TextInput id="guest-search-check-in" type="date" value={checkIn} onChange={(event) => setCheckIn(event.target.value)} aria-label="Check in" sizing="lg" />
+      <Datepicker
+        id="guest-search-check-in"
+        className="opg-datepicker"
+        value={parseDateValue(checkIn)}
+        onChange={(date) => setCheckIn(formatDateValue(date))}
+        aria-label="Check in"
+        language="en-GB"
+        weekStart={1}
+        showClearButton
+        showTodayButton
+        sizing="lg"
+      />
     </Label>
     <Label htmlFor="guest-search-check-out" className="opg-search-field">
       <span>Check out</span>
-      <TextInput id="guest-search-check-out" type="date" min={checkIn || undefined} value={checkOut} onChange={(event) => setCheckOut(event.target.value)} aria-label="Check out" sizing="lg" />
+      <Datepicker
+        id="guest-search-check-out"
+        className="opg-datepicker"
+        value={parseDateValue(checkOut)}
+        onChange={(date) => setCheckOut(formatDateValue(date))}
+        minDate={parseDateValue(checkIn) || undefined}
+        aria-label="Check out"
+        language="en-GB"
+        weekStart={1}
+        showClearButton
+        showTodayButton
+        sizing="lg"
+      />
     </Label>
     <div className="opg-search-field">
       <span>Guests</span>
       <Dropdown
         inline
-        theme={{ inlineWrapper: 'opg-guest-trigger' }}
+        theme={{ inlineWrapper: 'opg-guest-trigger', ...guestDropdownTheme }}
         label={<span className="opg-guest-value">{guests} {guests === 1 ? 'guest' : 'guests'}</span>}
         placement="bottom-end"
       >
