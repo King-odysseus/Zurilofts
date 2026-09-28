@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
+import { CircleUserRound, Compass, Heart, Luggage, MessageCircleMore } from 'lucide-react';
 import { useMode } from '../context/ModeContext.jsx';
 
 // Paths where global navigation (including these tabs) is intentionally
@@ -21,9 +22,7 @@ const TABS = [
     to: '/properties',
     match: (p) => p === '/' || p.startsWith('/properties') || p.startsWith('/property/'),
     icon: (active) => (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2.2 : 1.8} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-      </svg>
+      <Compass className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),
   },
   {
@@ -32,9 +31,7 @@ const TABS = [
     to: '/favourites',
     match: (p) => p.startsWith('/favourites') || p.startsWith('/shortlists'),
     icon: (active) => (
-      <svg className="h-6 w-6" fill={active ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-      </svg>
+      <Heart className="h-6 w-6" fill={active ? 'currentColor' : 'none'} strokeWidth={1.8} aria-hidden="true" />
     ),
   },
   {
@@ -43,9 +40,7 @@ const TABS = [
     to: '/trips',
     match: (p) => p.startsWith('/trips') || p.startsWith('/bookings'),
     icon: (active) => (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2.2 : 1.8} d="M3 7l9-4 9 4-9 4-9-4zm0 0v10l9 4m0-10v10m0-10l9-4v10l-9 4" />
-      </svg>
+      <Luggage className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),
   },
   {
@@ -54,9 +49,7 @@ const TABS = [
     to: '/inbox',
     match: (p) => p.startsWith('/inbox') || p.startsWith('/messages') || p.startsWith('/disputes'),
     icon: (active) => (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2.2 : 1.8} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8-1.135 0-2.22-.19-3.216-.535L3 21l1.5-4.5C3.55 15.17 3 13.635 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-      </svg>
+      <MessageCircleMore className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),
   },
   {
@@ -65,9 +58,7 @@ const TABS = [
     to: '/profile',
     match: (p) => p.startsWith('/profile') || p.startsWith('/verify-identity') || p.startsWith('/login') || p.startsWith('/register'),
     icon: (active) => (
-      <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2.2 : 1.8} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
+      <CircleUserRound className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),
   },
 ];

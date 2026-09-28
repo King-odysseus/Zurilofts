@@ -1,6 +1,26 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Avatar, Button, Dropdown, DropdownDivider, DropdownItem, TextInput } from 'flowbite-react';
+import {
+  ArrowLeftRight,
+  Bell,
+  Building2,
+  CalendarDays,
+  ChevronDown,
+  CircleUserRound,
+  ClipboardList,
+  FileText,
+  Heart,
+  Languages,
+  LockKeyhole,
+  LogOut,
+  Menu,
+  MessageCircle,
+  MessagesSquare,
+  Search,
+  Settings,
+  X,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -251,9 +271,7 @@ function Navbar() {
     }`;
 
   const chevronIcon = (open) => (
-    <svg className={`w-4 h-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-    </svg>
+    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`} strokeWidth={2} aria-hidden="true" />
   );
 
   const badgeClass = 'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 ml-1.5 bg-red-600 text-white text-[10px] font-bold rounded-full align-middle';
@@ -366,9 +384,7 @@ function Navbar() {
                   needsWhiteNav ? 'text-[#0B1F42] hover:bg-[#F6EFE7]' : 'text-white hover:bg-white/10'
                 }`}
               >
-                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+                <Search className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
               </button>
               {searchOpen && (
                 <form
@@ -407,9 +423,7 @@ function Navbar() {
                     }`}
                     title="Notifications"
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                    </svg>
+                    <Bell className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
                   </button>
                   {totalNotif > 0 && (
                     <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-600 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
@@ -432,9 +446,7 @@ function Navbar() {
                               className="flex items-center px-4 py-3 text-sm text-[#0B1F42] hover:bg-[#F6EFE7] transition-colors"
                             >
                               <div className="w-8 h-8 rounded-full bg-[#F6EFE7] flex items-center justify-center mr-3 flex-shrink-0">
-                                <svg className="w-4 h-4 text-[#9A744A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                                </svg>
+                                <MessageCircle className="w-4 h-4 text-[#9A744A]" strokeWidth={2} aria-hidden="true" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-[#0B1F42] text-xs">New support message</p>
@@ -449,9 +461,7 @@ function Navbar() {
                               className="flex items-center px-4 py-3 text-sm text-[#0B1F42] hover:bg-[#F6EFE7] transition-colors"
                             >
                               <div className="w-8 h-8 rounded-full bg-[#F6EFE7] flex items-center justify-center mr-3 flex-shrink-0">
-                                <svg className="w-4 h-4 text-[#9A744A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-                                </svg>
+                                <MessagesSquare className="w-4 h-4 text-[#9A744A]" strokeWidth={2} aria-hidden="true" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-[#0B1F42] text-xs">New message</p>
@@ -466,9 +476,7 @@ function Navbar() {
                               className="flex items-center px-4 py-3 text-sm text-[#0B1F42] hover:bg-[#F6EFE7] transition-colors"
                             >
                               <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3 flex-shrink-0">
-                                <svg className="w-4 h-4 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
+                                <CalendarDays className="w-4 h-4 text-amber-600" strokeWidth={2} aria-hidden="true" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="font-medium text-[#0B1F42] text-xs">Booking Updates</p>
@@ -514,9 +522,7 @@ function Navbar() {
                         onClick={() => setDropdownOpen(false)}
                         className={accountItemClass}
                       >
-                        <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
+                        <CircleUserRound className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                         {t('nav.myProfile')}
                       </Link>
                       <Link
@@ -524,9 +530,7 @@ function Navbar() {
                         onClick={() => setDropdownOpen(false)}
                         className={accountItemClass}
                       >
-                        <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
+                        <MessageCircle className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                         <span className="flex-1">{t('nav.contactSupport')}</span>
                         {unreadMessages > 0 && (
                           <span className="min-w-[18px] h-[18px] px-1 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
@@ -539,9 +543,7 @@ function Navbar() {
                         onClick={() => setDropdownOpen(false)}
                         className={accountItemClass}
                       >
-                        <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
-                        </svg>
+                        <MessagesSquare className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                         <span className="flex-1">{t('nav.messages')}</span>
                         {conversationUnread > 0 && (
                           <span className="min-w-[18px] h-[18px] px-1 bg-red-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
@@ -554,9 +556,7 @@ function Navbar() {
                         onClick={() => setDropdownOpen(false)}
                         className={accountItemClass}
                       >
-                        <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
+                        <ClipboardList className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                         {t('nav.bookingHistory')}
                       </Link>
                       <Link
@@ -564,9 +564,7 @@ function Navbar() {
                         onClick={() => setDropdownOpen(false)}
                         className={accountItemClass}
                       >
-                        <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
+                        <Heart className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                         {t('nav.favourites')}
                       </Link>
                       {user?.role !== 'HOST' && (
@@ -575,9 +573,7 @@ function Navbar() {
                           onClick={() => setDropdownOpen(false)}
                           className={accountItemClass}
                         >
-                          <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01" />
-                          </svg>
+                          <Building2 className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                           {t('nav.becomeHost')}
                         </Link>
                       )}
@@ -586,9 +582,7 @@ function Navbar() {
                         onClick={() => setDropdownOpen(false)}
                         className={accountItemClass}
                       >
-                        <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
+                        <FileText className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                         {t('nav.termsOfService')}
                       </Link>
                       <Link
@@ -596,9 +590,7 @@ function Navbar() {
                         onClick={() => setDropdownOpen(false)}
                         className={accountItemClass}
                       >
-                        <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                        </svg>
+                        <LockKeyhole className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                         {t('nav.privacyPolicy')}
                       </Link>
                       {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
@@ -607,10 +599,7 @@ function Navbar() {
                           onClick={() => setDropdownOpen(false)}
                           className={accountItemClass}
                         >
-                          <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
+                          <Settings className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                           {user?.role === 'ADMIN' ? t('nav.adminPanel') : t('nav.hostDashboard')}
                         </Link>
                       )}
@@ -620,9 +609,7 @@ function Navbar() {
                             onClick={handleSwitchMode}
                             className="flex items-center w-full px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-[#F6EFE7] transition-colors"
                           >
-                            <svg className="w-4 h-4 mr-3 text-[#5B6B82]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                            </svg>
+                            <ArrowLeftRight className="w-4 h-4 mr-3 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
                             {effectiveMode === 'hosting' ? t('nav.switchToTravelling') : t('nav.switchToHosting')}
                           </button>
                         </div>
@@ -632,9 +619,7 @@ function Navbar() {
                           onClick={handleLogout}
                           className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                         >
-                          <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                          </svg>
+                          <LogOut className="w-4 h-4 mr-3" strokeWidth={2} aria-hidden="true" />
                           {t('nav.signOut')}
                         </button>
                       </div>
@@ -665,7 +650,7 @@ function Navbar() {
             <Dropdown
               inline
               theme={{ inlineWrapper: `zl-nav-icon-button ${needsWhiteNav ? '' : 'is-inverse'}` }}
-              label={<><span className="sr-only">{t('nav.language')}</span><span className="zl-header-action-icon" aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 21a9 9 0 100-18 9 9 0 000 18z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.45 3.3 5.45 3.3 9S14.2 18.55 12 21c-2.2-2.45-3.3-5.45-3.3-9S9.8 5.45 12 3z" /></svg></span></>}
+              label={<><span className="sr-only">{t('nav.language')}</span><span className="zl-header-action-icon" aria-hidden="true"><Languages className="h-5 w-5" strokeWidth={1.8} /></span></>}
               arrowIcon={false}
               placement="bottom-end"
               aria-label={t('nav.language')}
@@ -688,13 +673,9 @@ function Navbar() {
             >
               <span className="sr-only">Open main menu</span>
               {menuOpen ? (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-6 h-6" strokeWidth={2} aria-hidden="true" />
               ) : (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
+                <Menu className="w-6 h-6" strokeWidth={2} aria-hidden="true" />
               )}
             </button>
           </div>
@@ -736,9 +717,7 @@ function Navbar() {
               aria-label="Close menu"
               className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#0B1F42] transition hover:bg-[#F7F4EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
             >
-              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
             </button>
           </div>
           <ul className="px-2 py-3 space-y-1 max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain">
