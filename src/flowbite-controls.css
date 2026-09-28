@@ -148,7 +148,8 @@ html.dark .op-admin-main {
 html.dark .zl-header,
 html.dark .op-admin-sidebar,
 html.dark .op-admin-sidebar-account,
-html.dark .op-admin-mobile-header {
+html.dark .op-admin-mobile-header,
+html.dark .op-admin-main>header.op-admin-shell-header {
   border-color: var(--dm-border) !important;
   background-color: rgba(8, 16, 31, 0.94) !important;
   color: var(--dm-text) !important;
@@ -167,6 +168,26 @@ html.dark .op-admin-sidebar .op-admin-brand,
 html.dark .op-admin-mobile-brand,
 html.dark .op-admin-mobile-brand strong {
   color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-shell-icon {
+  background-color: #1D2B43 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .op-admin-shell-copy small {
+  color: var(--dm-subtle) !important;
+}
+
+html.dark .op-admin-shell-copy strong,
+html.dark .op-admin-shell-icon-button {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-shell-icon-button:hover,
+html.dark .op-admin-shell-icon-button:focus-visible {
+  background-color: #172238 !important;
+  color: #FFFFFF !important;
 }
 
 html.dark .zl-navbar .zl-nav-icon-button:hover,

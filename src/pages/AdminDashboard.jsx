@@ -171,6 +171,11 @@ function AdminLayout() {
     'Host Applications': 'Hosts',
     'Promo Codes': 'Promos',
   };
+  const currentNavItem = [...navItems]
+    .filter(({ path, exact }) => (exact
+      ? location.pathname === path
+      : location.pathname === path || location.pathname.startsWith(`${path}/`)))
+    .sort((a, b) => b.path.length - a.path.length)[0];
 
   function matchesMobilePrimary(item) {
     const paths = item.matchPaths || [item.path];
@@ -460,20 +465,30 @@ function AdminLayout() {
           collapsed ? 'md:ml-[72px]' : 'md:ml-[224px]'
         }`}
       >
-        {/* Desktop header with notification bell and avatar dropdown */}
-        <header className="hidden md:flex items-center justify-between gap-3 h-16 px-8 bg-white border-b border-[#D9D9D9] sticky top-0 z-[5]">
-          <div className="flex items-center gap-3">
-            {/* Bell - unread messages + pending bookings */}
-            <div className="relative">
+        {/* Desktop workspace header */}
+        <header className="op-admin-shell-header hidden md:flex">
+          <div className="op-admin-shell-context">
+            <span className="op-admin-shell-icon" aria-hidden="true">
+              <LayoutGrid strokeWidth={2} />
+            </span>
+            <span className="op-admin-shell-copy">
+              <small>{isAdmin ? 'Admin workspace' : 'Host workspace'}</small>
+              <strong>{currentNavItem?.label || 'Dashboard'}</strong>
+            </span>
+          </div>
+          <div className="op-admin-shell-actions">
+            <div className="op-admin-shell-bell-wrap">
               <button
-                onClick={() => { /* just a visual indicator for now */ }}
-                className="p-2 rounded-full hover:bg-[#D9D9D9]/40 transition-colors text-[#0B0B45]"
+                type="button"
+                className="op-admin-shell-icon-button"
+                onClick={() => navigate(notif.pendingBookings > 0 ? '/admin/bookings' : '/admin/messages')}
                 title={`${notif.unreadMessages} unread messages, ${notif.pendingBookings} pending bookings`}
+                aria-label={`${notif.unreadMessages} unread messages and ${notif.pendingBookings} pending bookings`}
               >
-                <Bell className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
+                <Bell strokeWidth={2} aria-hidden="true" />
               </button>
               {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
-                <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                <span className="op-admin-shell-count">
                   {(() => {
                     const t = notif.unreadMessages + notif.pendingBookings;
                     return t > 99 ? '99+' : t;
