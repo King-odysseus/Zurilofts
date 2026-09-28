@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import { Button, Checkbox, Label, Select, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
 import PropTypes from 'prop-types';
-import Dropdown from '../components/Dropdown.jsx';
 import apiClient from '../api/client.js';
 
 const EMPTY = {
@@ -24,9 +24,12 @@ const EMPTY = {
   nearby: '',
 };
 
-const labelCls = 'block text-sm font-semibold text-[#1f2937] mb-2';
-const inputCls =
-  'w-full px-4 py-2.5 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] bg-white text-[#1f2937]';
+const EDITOR_STEPS = [
+  { key: 'basics', label: 'Basics' },
+  { key: 'photos', label: 'Photos' },
+  { key: 'amenities', label: 'Amenities' },
+  { key: 'pricing', label: 'Pricing' },
+];
 
 // textarea where each non-empty line is one array item
 function linesToArray(text) {
@@ -51,8 +54,8 @@ function AdminPropertyForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
+  const [activeStep, setActiveStep] = useState('basics');
 
   useEffect(() => {
     if (!isEdit) return;
@@ -166,6 +169,23 @@ function AdminPropertyForm() {
     }
   }
 
+  const basicsComplete = [form.title, form.location, form.area, form.description, form.price].filter(Boolean).length;
+  const amenitiesCount = linesToArray(form.amenities).length;
+  const nearbyCount = linesToArray(form.nearby).length;
+  const completionItems = [
+    { key: 'basics', label: 'Basics', complete: basicsComplete === 5, detail: `${basicsComplete} of 5 complete` },
+    { key: 'photos', label: 'Photos', complete: form.images.length > 0, detail: `${form.images.length} photo${form.images.length === 1 ? '' : 's'} added` },
+    { key: 'amenities', label: 'Amenities', complete: amenitiesCount > 0, detail: `${amenitiesCount} amenit${amenitiesCount === 1 ? 'y' : 'ies'} · ${nearbyCount} nearby` },
+    { key: 'pricing', label: 'Pricing', complete: Boolean(form.price && form.bedrooms && form.bathrooms), detail: form.price ? `KES ${Number(form.price).toLocaleString()} / night` : 'Rate not set' },
+  ];
+  const completedCount = completionItems.filter((item) => item.complete).length;
+
+  function goToStep(step) {
+    setActiveStep(step);
+    const target = document.getElementById(`host-editor-${step}`);
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   if (loading) {
     return (
       <div className="text-center py-12">
@@ -175,293 +195,262 @@ function AdminPropertyForm() {
   }
 
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between mb-6">
+    <div className="op-host-listing-editor">
+      <header className="op-host-editor-heading">
         <div>
-          <Link to={`${base}/properties`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to properties</Link>
-          <h1 className="text-2xl font-bold text-[#0B0B45] mt-1">{isEdit ? 'Edit Property' : 'Add Property'}</h1>
+          <Link to={`${base}/properties`} className="op-host-editor-back">&larr; Listings</Link>
+          <p className="op-host-editor-eyebrow">HOST SETUP</p>
+          <h1>{isEdit ? 'Edit listing' : 'Create a listing'}</h1>
+          <span>Prepare the basics, photos, amenities and pricing guests will see.</span>
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setShowFullPreview(true)}
-            className="flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-[#0B0B45] text-white hover:bg-[#06062a] transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        <div className="op-host-editor-heading-actions">
+          <Button type="button" color="light" className="op-host-editor-outline" onClick={() => setShowFullPreview(true)}>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
             </svg>
-            Preview page
-          </button>
-          {isEdit && (
-            <Link
-              to={`${base}/properties/${id}/calendar`}
-              className="px-4 py-2 rounded-full text-sm font-semibold border border-[#D9D9D9] text-[#0B0B45] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors"
-            >
-              Manage Calendar &rarr;
-            </Link>
-          )}
+            Preview listing
+          </Button>
+          {isEdit && <Link to={`${base}/properties/${id}/calendar`} className="op-host-editor-outline">Manage calendar</Link>}
         </div>
-      </div>
+      </header>
 
       {showFullPreview && (
         <FullPagePreview form={form} onClose={() => setShowFullPreview(false)} />
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">{error}</div>
+        <div className="op-host-editor-error" role="alert">{error}</div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6 space-y-5">
-          <div>
-            <label className={labelCls}>Title</label>
-            <input className={inputCls} value={form.title} onChange={(e) => update('title', e.target.value)} required />
-          </div>
-          <div>
-            <label className={labelCls}>Location</label>
-            <input className={inputCls} value={form.location} onChange={(e) => update('location', e.target.value)} required />
-          </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <label className={labelCls}>Base Price/Night (KES)</label>
-              <input type="number" min="1" className={inputCls} value={form.price} onChange={(e) => update('price', e.target.value)} required />
-            </div>
-            <div>
-              <label className={labelCls}>Area (sqft)</label>
-              <input type="number" min="1" className={inputCls} value={form.area} onChange={(e) => update('area', e.target.value)} required />
-            </div>
-            <div>
-              <label className={labelCls}>Bedrooms</label>
-              <input type="number" min="0" className={inputCls} value={form.bedrooms} onChange={(e) => update('bedrooms', e.target.value)} required />
-            </div>
-            <div>
-              <label className={labelCls}>Bathrooms</label>
-              <input type="number" min="0" className={inputCls} value={form.bathrooms} onChange={(e) => update('bathrooms', e.target.value)} required />
-            </div>
-          </div>
-
-          {/* Bed variant pricing */}
-          <div className="bg-[#f8f9fa] rounded-xl p-4 space-y-4">
-            <p className="text-sm font-semibold text-[#0B0B45]">Bed Variant Pricing &amp; Bathrooms</p>
-            <p className="text-xs text-[#6b7280] -mt-3">Each variant can have its own price and bathroom count. Leave unchecked to not list.</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <label className="flex items-start gap-3 bg-white rounded-xl border border-[#D9D9D9] p-4 cursor-pointer hover:border-[#C49A6C] transition-colors">
-                <input
-                  type="checkbox"
-                  className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
-                  checked={form.price1Bed !== ''}
-                  onChange={(e) => {
-                    update('price1Bed', e.target.checked ? (form.price || '') : '');
-                    if (!e.target.checked) update('bathrooms1Bed', '');
-                  }}
-                />
-                <div className="flex-1">
-                  <span className="block text-sm font-semibold text-[#1f2937]">List as 1-Bed</span>
-                  <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 1-bed card</span>
-                  {form.price1Bed !== '' && (
-                    <div className="space-y-3">
-                      <input
-                        type="number"
-                        min="1"
-                        placeholder="1-Bed price per night"
-                        className={inputCls}
-                        value={form.price1Bed}
-                        onChange={(e) => update('price1Bed', e.target.value)}
-                        required
-                      />
-                      <input
-                        type="number"
-                        min="0"
-                        placeholder="Bathrooms (e.g. 1)"
-                        className={inputCls}
-                        value={form.bathrooms1Bed}
-                        onChange={(e) => update('bathrooms1Bed', e.target.value)}
-                      />
-                    </div>
-                  )}
-                </div>
-              </label>
-              <label className="flex items-start gap-3 bg-white rounded-xl border border-[#D9D9D9] p-4 cursor-pointer hover:border-[#C49A6C] transition-colors">
-                <input
-                  type="checkbox"
-                  className="accent-[#C49A6C] w-5 h-5 mt-0.5 flex-shrink-0"
-                  checked={form.price2Bed !== ''}
-                  onChange={(e) => {
-                    update('price2Bed', e.target.checked ? (form.price || '') : '');
-                    if (!e.target.checked) update('bathrooms2Bed', '');
-                  }}
-                />
-                <div className="flex-1">
-                  <span className="block text-sm font-semibold text-[#1f2937]">List as 2-Bed</span>
-                  <span className="block text-xs text-[#6b7280] mb-2">Appears as a separate 2-bed card</span>
-                  {form.price2Bed !== '' && (
-                    <div className="space-y-3">
-                      <input
-                        type="number"
-                        min="1"
-                        placeholder="2-Bed price per night"
-                        className={inputCls}
-                        value={form.price2Bed}
-                        onChange={(e) => update('price2Bed', e.target.value)}
-                        required
-                      />
-                      <input
-                        type="number"
-                        min="0"
-                        placeholder="Bathrooms (e.g. 2)"
-                        className={inputCls}
-                        value={form.bathrooms2Bed}
-                        onChange={(e) => update('bathrooms2Bed', e.target.value)}
-                      />
-                    </div>
-                  )}
-                </div>
-              </label>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className={labelCls}>Type</label>
-              <Dropdown
-                value={form.type}
-                onChange={(v) => update('type', v)}
-                options={[
-                  { value: 'apartment', label: 'Apartment' },
-                  { value: 'studio', label: 'Studio' },
-                  { value: 'penthouse', label: 'Penthouse' },
-                ]}
-                triggerClassName={inputCls}
-                ariaLabel="Property type"
-              />
-            </div>
-            <div className="flex items-end gap-6 pb-2">
-              <label className="flex items-center gap-2 text-sm font-medium text-[#1f2937]">
-                <input type="checkbox" checked={form.available} onChange={(e) => update('available', e.target.checked)} className="accent-[#C49A6C] w-4 h-4" />
-                Available
-              </label>
-              <label className="flex items-center gap-2 text-sm font-medium text-[#1f2937]">
-                <input type="checkbox" checked={form.featured} onChange={(e) => update('featured', e.target.checked)} className="accent-[#C49A6C] w-4 h-4" />
-                Featured
-              </label>
-            </div>
-          </div>
-          <div>
-            <label className={labelCls}>Description</label>
-            <textarea rows={4} className={inputCls} value={form.description} onChange={(e) => update('description', e.target.value)} required />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6 space-y-5">
-          <div>
-            <label className={labelCls}>Photos</label>
-            <p className="text-sm text-[#6b7280] mb-3">Upload images from your device. They&apos;re automatically resized and compressed for the website. The first photo is used as the cover.</p>
-
-            {form.images.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-4">
-                {form.images.map((src, i) => (
-                  <div key={src + i} className="relative group aspect-[4/3] rounded-xl overflow-hidden border border-[#D9D9D9]">
-                    <img src={src} alt={`Property photo ${i + 1}`} className="w-full h-full object-cover" />
-                    {i === 0 && (
-                      <span className="absolute top-1.5 left-1.5 bg-[#C49A6C] text-white text-[10px] font-bold px-2 py-0.5 rounded-full">Cover</span>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => removeImage(i)}
-                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-600"
-                      aria-label="Remove image"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    </button>
-                  </div>
-                ))}
+      <form onSubmit={handleSubmit} className="op-host-editor-form">
+        <div className="op-host-editor-layout">
+          <aside className="op-host-editor-progress-panel">
+            <div className="op-host-editor-progress-heading">
+              <span>Your progress</span>
+              <strong>{completedCount} of 4 steps complete</strong>
+              <div className="op-host-editor-progress-track" aria-hidden="true">
+                <i style={{ width: `${(completedCount / EDITOR_STEPS.length) * 100}%` }} />
               </div>
-            )}
+            </div>
+            <nav className="op-host-editor-steps" aria-label="Listing setup steps">
+              {EDITOR_STEPS.map((step, index) => {
+                const item = completionItems.find((entry) => entry.key === step.key);
+                return (
+                  <button
+                    key={step.key}
+                    type="button"
+                    className={`${activeStep === step.key ? 'is-active' : ''} ${item?.complete ? 'is-complete' : ''}`}
+                    onClick={() => goToStep(step.key)}
+                    aria-current={activeStep === step.key ? 'step' : undefined}
+                  >
+                    <span>{item?.complete ? '✓' : index + 1}</span>
+                    <span>
+                      <strong>{step.label}</strong>
+                      <small>{item?.complete ? 'Complete' : item?.detail || 'Needs attention'}</small>
+                    </span>
+                  </button>
+                );
+              })}
+            </nav>
+            <p className="op-host-editor-autosave">Your progress is saved when you submit this listing.</p>
+          </aside>
 
-            <label className={`flex flex-col items-center justify-center w-full border-2 border-dashed border-[#D9D9D9] rounded-xl py-8 cursor-pointer hover:border-[#C49A6C] hover:bg-[#C49A6C]/5 transition-colors ${uploading ? 'opacity-60 pointer-events-none' : ''}`}>
-              {uploading ? (
-                <>
-                  <div className="w-6 h-6 border-2 border-[#C49A6C] border-t-transparent rounded-full animate-spin mb-2"></div>
-                  <span className="text-sm text-[#6b7280]">Uploading & optimizing...</span>
-                </>
-              ) : (
-                <>
-                  <svg className="w-8 h-8 text-[#C49A6C] mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  <span className="text-sm font-semibold text-[#0B0B45]">Click to upload photos</span>
-                  <span className="text-xs text-[#6b7280] mt-1">JPEG, PNG or WebP · up to 10 at a time</span>
-                </>
+          <div className="op-host-editor-main">
+            <section id="host-editor-basics" className="op-host-editor-card">
+              <header>
+                <span>Step 1</span>
+                <div><h2>Listing basics</h2><p>Tell guests what makes your stay special.</p></div>
+              </header>
+              <div className="op-host-editor-field-grid">
+                <div>
+                  <Label htmlFor="listing-title" className="op-host-editor-label">Listing title</Label>
+                  <TextInput id="listing-title" value={form.title} onChange={(e) => update('title', e.target.value)} placeholder="Bright two-bedroom loft" required />
+                </div>
+                <div>
+                  <Label htmlFor="listing-location" className="op-host-editor-label">Location</Label>
+                  <TextInput id="listing-location" value={form.location} onChange={(e) => update('location', e.target.value)} placeholder="Westlands, Nairobi" required />
+                </div>
+                <div className="op-host-editor-field-full">
+                  <Label htmlFor="listing-description" className="op-host-editor-label">Description</Label>
+                  <Textarea id="listing-description" rows={5} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="Share the layout, views and details guests should know before booking." required />
+                </div>
+              </div>
+            </section>
+
+            <section id="host-editor-photos" className="op-host-editor-card">
+              <header>
+                <span>Step 2</span>
+                <div><h2>Photos</h2><p>Add clear, well-lit images. The first photo becomes the cover.</p></div>
+              </header>
+              {form.images.length > 0 && (
+                <div className="op-host-editor-photo-grid">
+                  {form.images.map((src, i) => (
+                    <div key={src + i} className="op-host-editor-photo">
+                      <img src={src} alt={`Property photo ${i + 1}`} />
+                      {i === 0 && <span>Cover</span>}
+                      <button type="button" onClick={() => removeImage(i)} aria-label="Remove image">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
               )}
-              <input type="file" accept="image/jpeg,image/png,image/webp" multiple className="hidden" onChange={handleFiles} disabled={uploading} />
-            </label>
+              <label className={`op-host-editor-upload ${uploading ? 'is-uploading' : ''}`}>
+                {uploading ? (
+                  <>
+                    <span className="op-host-editor-spinner" aria-hidden="true" />
+                    <strong>Uploading and optimizing...</strong>
+                  </>
+                ) : (
+                  <>
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <strong>Add photos</strong>
+                    <span>JPEG, PNG or WebP. Up to 10 at a time.</span>
+                  </>
+                )}
+                <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleFiles} disabled={uploading} />
+              </label>
+            </section>
+
+            <section id="host-editor-amenities" className="op-host-editor-card">
+              <header>
+                <span>Step 3</span>
+                <div><h2>Amenities and rules</h2><p>List the essentials and useful places around the stay.</p></div>
+              </header>
+              <div className="op-host-editor-field-grid">
+                <div>
+                  <Label htmlFor="listing-amenities" className="op-host-editor-label">Amenities</Label>
+                  <Textarea id="listing-amenities" rows={5} placeholder={'WiFi\nPool\nParking'} value={form.amenities} onChange={(e) => update('amenities', e.target.value)} />
+                  <small className="op-host-editor-help">Enter one item per line.</small>
+                </div>
+                <div>
+                  <Label htmlFor="listing-nearby" className="op-host-editor-label">What&apos;s nearby</Label>
+                  <Textarea id="listing-nearby" rows={5} placeholder={'Airport - 20 min\nVillage Market - 8 min'} value={form.nearby} onChange={(e) => update('nearby', e.target.value)} />
+                  <small className="op-host-editor-help">Enter one item per line.</small>
+                </div>
+              </div>
+            </section>
+
+            <section id="host-editor-pricing" className="op-host-editor-card">
+          <header>
+            <span>Step 4</span>
+            <div><h2>Pricing and availability</h2><p>Set the nightly rate, capacity and booking state.</p></div>
+          </header>
+              <div className="op-host-editor-field-grid op-host-editor-field-grid-four">
+                <div>
+                  <Label htmlFor="listing-price" className="op-host-editor-label">Base price / night (KES)</Label>
+                  <TextInput id="listing-price" type="number" min="1" value={form.price} onChange={(e) => update('price', e.target.value)} required />
+                </div>
+                <div>
+                  <Label htmlFor="listing-area" className="op-host-editor-label">Area (sq ft)</Label>
+                  <TextInput id="listing-area" type="number" min="1" value={form.area} onChange={(e) => update('area', e.target.value)} required />
+                </div>
+                <div>
+                  <Label htmlFor="listing-bedrooms" className="op-host-editor-label">Bedrooms</Label>
+                  <TextInput id="listing-bedrooms" type="number" min="0" value={form.bedrooms} onChange={(e) => update('bedrooms', e.target.value)} required />
+                </div>
+                <div>
+                  <Label htmlFor="listing-bathrooms" className="op-host-editor-label">Bathrooms</Label>
+                  <TextInput id="listing-bathrooms" type="number" min="0" value={form.bathrooms} onChange={(e) => update('bathrooms', e.target.value)} required />
+                </div>
+              </div>
+
+              <div className="op-host-editor-subpanel">
+                <div className="op-host-editor-subpanel-heading">
+                  <h3>Bed size options</h3>
+                  <p>Add a one-bed or two-bed rate when the same stay can be booked at different capacities.</p>
+                </div>
+                <div className="op-host-editor-variant-grid">
+                  <div className={`op-host-editor-variant ${form.price1Bed !== '' ? 'is-selected' : ''}`}>
+                    <Checkbox
+                      id="listing-variant-1"
+                      checked={form.price1Bed !== ''}
+                      onChange={(e) => {
+                        update('price1Bed', e.target.checked ? (form.price || '') : '');
+                        if (!e.target.checked) update('bathrooms1Bed', '');
+                      }}
+                    />
+                    <div>
+                      <Label htmlFor="listing-variant-1">List as 1-bed</Label>
+                      <span>Appears as a separate one-bedroom option.</span>
+                      {form.price1Bed !== '' && (
+                        <div className="op-host-editor-variant-fields">
+                          <TextInput type="number" min="1" placeholder="Price per night" value={form.price1Bed} onChange={(e) => update('price1Bed', e.target.value)} required />
+                          <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms1Bed} onChange={(e) => update('bathrooms1Bed', e.target.value)} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className={`op-host-editor-variant ${form.price2Bed !== '' ? 'is-selected' : ''}`}>
+                    <Checkbox
+                      id="listing-variant-2"
+                      checked={form.price2Bed !== ''}
+                      onChange={(e) => {
+                        update('price2Bed', e.target.checked ? (form.price || '') : '');
+                        if (!e.target.checked) update('bathrooms2Bed', '');
+                      }}
+                    />
+                    <div>
+                      <Label htmlFor="listing-variant-2">List as 2-bed</Label>
+                      <span>Appears as a separate two-bedroom option.</span>
+                      {form.price2Bed !== '' && (
+                        <div className="op-host-editor-variant-fields">
+                          <TextInput type="number" min="1" placeholder="Price per night" value={form.price2Bed} onChange={(e) => update('price2Bed', e.target.value)} required />
+                          <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms2Bed} onChange={(e) => update('bathrooms2Bed', e.target.value)} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="op-host-editor-field-grid">
+                <div>
+                  <Label htmlFor="listing-type" className="op-host-editor-label">Property type</Label>
+                  <Select id="listing-type" value={form.type} onChange={(e) => update('type', e.target.value)}>
+                    <option value="apartment">Apartment</option>
+                    <option value="studio">Studio</option>
+                    <option value="penthouse">Penthouse</option>
+                  </Select>
+                </div>
+                <div className="op-host-editor-toggle-stack">
+                  <div className="op-host-editor-toggle">
+                    <div><strong>Available for bookings</strong><span>Guests can reserve open dates.</span></div>
+                    <ToggleSwitch checked={form.available} onChange={(checked) => update('available', checked)} aria-label="Available for bookings" />
+                  </div>
+                  <div className="op-host-editor-toggle">
+                    <div><strong>Featured listing</strong><span>Highlight this stay in discovery.</span></div>
+                    <ToggleSwitch checked={form.featured} onChange={(checked) => update('featured', checked)} aria-label="Featured listing" />
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {isEdit && <SeasonalPricing propertyId={id} />}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <p className="md:col-span-2 text-sm text-[#6b7280] -mb-1">Enter one item per line.</p>
-            <div>
-              <label className={labelCls}>Amenities</label>
-              <textarea rows={4} className={inputCls} placeholder="WiFi&#10;Pool" value={form.amenities} onChange={(e) => update('amenities', e.target.value)} />
-            </div>
-            <div>
-              <label className={labelCls}>Nearby</label>
-              <textarea rows={4} className={inputCls} placeholder="Airport - 20min" value={form.nearby} onChange={(e) => update('nearby', e.target.value)} />
-            </div>
-          </div>
+          <aside className="op-host-editor-preview-panel">
+            <header>
+              <div><span>GUEST PREVIEW</span><h2>Listing card</h2></div>
+              <Button type="button" color="light" onClick={() => setShowFullPreview(true)}>Open</Button>
+            </header>
+            <PropertyPreview form={form} />
+            <p>This card updates as you edit the listing.</p>
+          </aside>
         </div>
 
-        {isEdit && <SeasonalPricing propertyId={id} />}
-
-        <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={saving}
-            className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : isEdit ? 'Save Changes' : 'Create Property'}
-          </button>
-          <Link to={`${base}/properties`} className="px-6 py-2.5 rounded-full font-semibold text-[#6b7280] hover:text-[#0B0B45]">Cancel</Link>
+        <div className="op-host-editor-actions">
+          <Button type="submit" disabled={saving} className="op-host-editor-save">
+            {saving ? 'Saving...' : isEdit ? 'Save changes' : 'Create listing'}
+          </Button>
+          <Link to={`${base}/properties`}>Cancel</Link>
         </div>
       </form>
-
-      {/* Live preview - collapsible drawer docked to the right edge */}
-      <button
-        type="button"
-        onClick={() => setPreviewOpen((o) => !o)}
-        aria-label={previewOpen ? 'Hide preview' : 'Show preview'}
-        className={`fixed top-1/2 -translate-y-1/2 z-40 bg-[#0B0B45] text-white px-2 py-4 rounded-l-xl shadow-lg hover:bg-[#06062a] transition-all duration-300 ${
-          previewOpen ? 'right-[372px]' : 'right-0'
-        }`}
-        style={{ writingMode: 'vertical-rl' }}
-      >
-        <span className="flex items-center gap-2 text-sm font-semibold tracking-wide">
-          <svg className={`w-4 h-4 transition-transform ${previewOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ writingMode: 'horizontal-tb' }}>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-          {previewOpen ? 'Hide preview' : 'Live preview'}
-        </span>
-      </button>
-
-      <aside
-        className={`fixed top-0 right-0 z-30 h-full w-[372px] max-w-[90vw] bg-[#f8f9fa] border-l border-[#D9D9D9] shadow-2xl transition-transform duration-300 overflow-y-auto ${
-          previewOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
-        <div className="p-5">
-          <div className="flex items-center justify-between mb-4">
-            <p className="text-sm font-semibold text-[#0B0B45]">Live preview</p>
-            <button type="button" onClick={() => setPreviewOpen(false)} className="text-[#6b7280] hover:text-[#0B0B45]" aria-label="Collapse preview">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
-          <PropertyPreview form={form} />
-          <p className="text-xs text-[#6b7280] mt-3">This is how the property appears as a card on the website. It updates as you edit.</p>
-        </div>
-      </aside>
     </div>
   );
 }
@@ -783,22 +772,22 @@ function SeasonalPricing({ propertyId }) {
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
         <div className="col-span-2 md:col-span-1">
-          <label className={labelCls}>Name</label>
-          <input className={inputCls} placeholder="Peak" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <Label htmlFor="seasonal-name" className="op-host-editor-label">Name</Label>
+          <TextInput id="seasonal-name" placeholder="Peak" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
         </div>
         <div>
-          <label className={labelCls}>From</label>
-          <input type="date" className={inputCls} value={draft.start} onChange={(e) => setDraft({ ...draft, start: e.target.value })} />
+          <Label htmlFor="seasonal-start" className="op-host-editor-label">From</Label>
+          <TextInput id="seasonal-start" type="date" value={draft.start} onChange={(e) => setDraft({ ...draft, start: e.target.value })} />
         </div>
         <div>
-          <label className={labelCls}>To</label>
-          <input type="date" className={inputCls} value={draft.end} onChange={(e) => setDraft({ ...draft, end: e.target.value })} />
+          <Label htmlFor="seasonal-end" className="op-host-editor-label">To</Label>
+          <TextInput id="seasonal-end" type="date" value={draft.end} onChange={(e) => setDraft({ ...draft, end: e.target.value })} />
         </div>
         <div>
-          <label className={labelCls}>Price/Night</label>
-          <input type="number" min="1" className={inputCls} value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
+          <Label htmlFor="seasonal-price" className="op-host-editor-label">Price / night</Label>
+          <TextInput id="seasonal-price" type="number" min="1" value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
         </div>
-        <button type="button" onClick={addRule} className="bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors">Add</button>
+        <Button type="button" color="dark" onClick={addRule} className="op-host-editor-rule-add">Add rate</Button>
       </div>
     </div>
   );
