@@ -146,6 +146,79 @@
   .op-admin-people-columns,.op-admin-people-row{grid-template-columns:250px 125px 85px 125px 105px 210px}
 }
 
+.op-admin-catalog-heading{align-items:center;margin-bottom:28px}
+.op-admin-catalog-heading>button{white-space:nowrap}
+.op-admin-catalog-metrics article:nth-child(1){background:#dcf3e3}
+.op-admin-catalog-metrics article:nth-child(2){background:#e8edf7}
+.op-admin-catalog-metrics article:nth-child(3){background:#fff0cd}
+.op-admin-catalog-metrics article:nth-child(4){background:#fae1de}
+.op-admin-catalog-board{min-width:0;border:1px solid #e5e7eb;border-radius:14px;background:#fff;overflow:hidden}
+.op-admin-catalog-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid #e5e7eb;background:#fff}
+.op-admin-catalog-toolbar>span{border-radius:999px;background:#f1f5f9;padding:5px 9px;color:#64748b;font-size:10px;font-weight:700;white-space:nowrap}
+.op-admin-catalog-search{position:relative;width:min(390px,100%)}
+.op-admin-catalog-search>svg{position:absolute;z-index:2;top:50%;left:13px;width:16px;height:16px;color:#64748b;transform:translateY(-50%);pointer-events:none}
+.op-admin-catalog-search input{min-height:40px;border-color:#e5e7eb;border-radius:10px;background:#fff;padding-left:38px;font-size:13px;color:#0b1f42}
+.op-admin-catalog-list{min-width:0}
+.op-admin-catalog-columns,.op-admin-catalog-row{display:grid;align-items:center}
+.op-admin-promo-columns{grid-template-columns:minmax(125px,.8fr) minmax(130px,.82fr) minmax(130px,.82fr) minmax(180px,1.1fr) minmax(170px,1fr) minmax(92px,.58fr) 126px}
+.op-admin-catalog-columns{min-height:42px;background:#f8fafc;color:#64748b;font-size:10px;font-weight:700;letter-spacing:.02em}
+.op-admin-catalog-columns span,.op-admin-catalog-row>div{padding:0 14px}
+.op-admin-catalog-row{min-height:82px;border-top:1px solid #e5e7eb;background:#fff;color:#0b1f42;font-size:12px;transition:background-color 120ms ease}
+.op-admin-catalog-row:hover{background:#fbfcfd}
+.op-admin-catalog-row.is-muted{background:#fcfcfd;opacity:.72}
+.op-admin-catalog-row>div{min-width:0}
+.op-admin-promo-code{display:grid;gap:4px}
+.op-admin-promo-code strong{font:700 13px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.025em}
+.op-admin-promo-code small{color:#9f7142;font-size:10px}
+.op-admin-catalog-cell{display:grid;gap:4px}
+.op-admin-catalog-cell small{color:#94a3b8;font-size:9px;font-weight:700}
+.op-admin-catalog-cell strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.op-admin-catalog-cell span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:10px}
+.op-admin-catalog-status{border:0;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:700;white-space:nowrap;cursor:pointer}
+.op-admin-catalog-status.is-success{background:#ecfdf3;color:#15803d}
+.op-admin-catalog-status.is-danger{background:#fef2f2;color:#b91c1c}
+.op-admin-catalog-status.is-neutral{background:#f1f5f9;color:#475569}
+.op-admin-catalog-actions{display:flex!important;align-items:center;gap:6px;flex-wrap:wrap}
+.op-admin-catalog-actions button{min-height:30px;border:1px solid #e2dad0;border-radius:8px;background:#fff;color:#0b1f42;padding:0 10px;font:600 10px Inter,Arial,sans-serif;white-space:nowrap;cursor:pointer}
+.op-admin-catalog-actions button:hover{border-color:#c49a6c;background:#f7f4ef}
+.op-admin-catalog-actions button.is-danger{color:#b91c1c}
+.op-admin-catalog-empty{display:grid;min-height:230px;place-items:center;align-content:center;gap:8px;padding:32px;text-align:center;color:#64748b}
+.op-admin-catalog-empty>span:not(.op-admin-booking-spinner){display:grid;width:46px;height:46px;place-items:center;border-radius:50%;background:#e8edf7;color:#0b1f42}
+.op-admin-catalog-empty>span svg{width:20px;height:20px}
+.op-admin-catalog-empty strong{color:#0b1f42;font:700 16px Montserrat,Arial,sans-serif}
+.op-admin-catalog-empty p{max-width:430px;font-size:12px;line-height:1.5}
+.op-admin-catalog-dialog{max-width:720px!important}
+.op-admin-assignment-section{display:grid;gap:10px}
+.op-admin-assignment-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px}
+.op-admin-assignment-heading label{margin:0!important}
+.op-admin-assignment-heading p{margin:4px 0 0;color:#6e7686;font-size:10px;line-height:1.45}
+.op-admin-assignment-list{max-height:180px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:10px;background:#fbfcfd;padding:6px}
+.op-admin-assignment-list>p{margin:0;padding:10px;color:#64748b;font-size:11px}
+.op-admin-assignment-item{display:flex!important;align-items:center!important;gap:10px;margin:0!important;border-radius:8px;padding:8px!important;cursor:pointer}
+.op-admin-assignment-item:hover{background:#fff}
+.op-admin-assignment-item input[type=checkbox]{width:16px!important;height:16px!important;min-height:16px!important;flex:none;margin:0}
+.op-admin-assignment-item>span{display:grid;min-width:0;gap:2px}
+.op-admin-assignment-item strong,.op-admin-assignment-item small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.op-admin-assignment-item strong{color:#0b1f42;font-size:11px}
+.op-admin-assignment-item small{color:#64748b;font-size:9px}
+@media(max-width:1000px){.op-admin-promo-columns{grid-template-columns:120px 120px 110px minmax(160px,1fr) minmax(150px,1fr) 88px 118px}.op-admin-catalog-columns span,.op-admin-catalog-row>div{padding:0 10px}}
+@media(max-width:767px){
+  .op-admin-catalog-heading{align-items:stretch;flex-direction:column}
+  .op-admin-catalog-heading>button{width:100%}
+  .op-admin-catalog-toolbar{align-items:stretch;flex-direction:column}
+  .op-admin-catalog-search{width:100%}
+  .op-admin-catalog-toolbar>span{align-self:flex-start}
+  .op-admin-catalog-columns{display:none}
+  .op-admin-catalog-list{display:grid;gap:0;padding:0 14px 14px;background:#f8fafc}
+  .op-admin-catalog-row{grid-template-columns:1fr 1fr;gap:15px 12px;margin-top:12px;border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+  .op-admin-catalog-row>div{padding:0}
+  .op-admin-promo-code{grid-column:1/-1;padding-bottom:12px!important;border-bottom:1px solid #eef2f7}
+  .op-admin-catalog-row>div:nth-child(5){grid-column:1/-1}
+  .op-admin-catalog-row>div:nth-child(6){align-self:center}
+  .op-admin-catalog-actions{justify-content:flex-end}
+  .op-admin-catalog-actions button{flex:1;min-height:34px}
+}
+
 .op-admin-host-apps-heading{margin-bottom:28px}
 .op-admin-host-app-metrics article:nth-child(1){background:#e8edf7}
 .op-admin-host-app-metrics article:nth-child(2){background:#fff0cd}
