@@ -146,6 +146,115 @@
   .op-admin-people-columns,.op-admin-people-row{grid-template-columns:250px 125px 85px 125px 105px 210px}
 }
 
+.op-admin-host-apps-heading{margin-bottom:28px}
+.op-admin-host-app-metrics article:nth-child(1){background:#e8edf7}
+.op-admin-host-app-metrics article:nth-child(2){background:#fff0cd}
+.op-admin-host-app-metrics article:nth-child(3){background:#dcf3e3}
+.op-admin-host-app-metrics article:nth-child(4){background:#fae1de}
+.op-admin-host-app-date{font-size:19px!important;line-height:1.35!important}
+.op-admin-host-app-queue{min-width:0;border:1px solid #e5e7eb;border-radius:14px;background:#fff;overflow:hidden}
+.op-admin-host-app-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid #e5e7eb;background:#fff}
+.op-admin-host-app-search{position:relative;width:min(430px,100%)}
+.op-admin-host-app-search>svg{position:absolute;z-index:2;top:50%;left:13px;width:16px;height:16px;color:#64748b;transform:translateY(-50%);pointer-events:none}
+.op-admin-host-app-search input{padding-left:38px}
+.op-admin-host-app-search input,.op-admin-host-app-filter{min-height:40px;border-color:#e5e7eb;border-radius:10px;background:#fff;font-size:13px;color:#0b1f42}
+.op-admin-host-app-filter{width:190px}
+.op-admin-host-app-list{min-width:0}
+.op-admin-host-app-columns,.op-admin-host-app-row{display:grid;grid-template-columns:minmax(230px,1.45fr) minmax(145px,.95fr) minmax(115px,.72fr) minmax(120px,.75fr) minmax(120px,.75fr) minmax(120px,.75fr) 86px;align-items:center}
+.op-admin-host-app-columns{min-height:42px;background:#f8fafc;color:#64748b;font-size:10px;font-weight:700;letter-spacing:.02em}
+.op-admin-host-app-columns span,.op-admin-host-app-row>div{padding:0 14px}
+.op-admin-host-app-row{min-height:82px;border-top:1px solid #e5e7eb;background:#fff;color:#0b1f42;font-size:12px;transition:background-color 120ms ease}
+.op-admin-host-app-row:hover{background:#fbfcfd}
+.op-admin-host-app-row>div{min-width:0}
+.op-admin-host-app-applicant{display:flex;align-items:center;gap:11px}
+.op-admin-host-app-avatar{display:grid;width:38px;height:38px;flex:none;place-items:center;border-radius:50%;background:#0b1f42;color:#fff;font:700 11px Montserrat,Arial,sans-serif;letter-spacing:.02em}
+.op-admin-host-app-applicant>div{display:grid;min-width:0;gap:3px}
+.op-admin-host-app-applicant strong,.op-admin-host-app-applicant span,.op-admin-host-app-applicant small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.op-admin-host-app-applicant strong{font-size:13px}
+.op-admin-host-app-applicant span{color:#475569;font-size:11px}
+.op-admin-host-app-applicant small{color:#94a3b8;font-size:10px}
+.op-admin-host-app-cell{display:grid;gap:4px}
+.op-admin-host-app-cell small{color:#94a3b8;font-size:9px;font-weight:700}
+.op-admin-host-app-cell strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}
+.op-admin-host-app-cell span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:10px}
+.op-admin-host-app-status{display:inline-flex;min-height:24px;align-items:center;border-radius:999px;padding:3px 9px;font-size:10px;font-weight:700;white-space:nowrap}
+.op-admin-host-app-status.is-success{background:#ecfdf3;color:#15803d}
+.op-admin-host-app-status.is-danger{background:#fef2f2;color:#b91c1c}
+.op-admin-host-app-status.is-warning{background:#fffbeb;color:#a16207}
+.op-admin-host-app-status.is-pending{background:#e8edf7;color:#0b1f42}
+.op-admin-host-app-status.is-neutral{background:#f1f5f9;color:#475569}
+.op-admin-host-app-action button{min-height:32px;border:0!important;border-radius:8px!important;background:#9f7142!important;color:#fff!important;padding:0 12px!important;font-size:10px!important;font-weight:700!important}
+.op-admin-host-app-action button:hover:not(:disabled){background:#8c6138!important}
+.op-admin-host-app-action button:disabled{opacity:.55}
+.op-admin-host-app-empty{display:grid;min-height:230px;place-items:center;align-content:center;gap:8px;padding:32px;text-align:center;color:#64748b}
+.op-admin-host-app-empty>span:not(.op-admin-booking-spinner){display:grid;width:46px;height:46px;place-items:center;border-radius:50%;background:#e8edf7;color:#0b1f42}
+.op-admin-host-app-empty>span svg{width:20px;height:20px}
+.op-admin-host-app-empty strong{color:#0b1f42;font:700 16px Montserrat,Arial,sans-serif}
+.op-admin-host-app-empty p{max-width:430px;font-size:12px;line-height:1.5}
+.op-admin-host-app-dialog{display:flex;width:min(1120px,100%);max-height:92vh;flex-direction:column;overflow:hidden;border-radius:18px;background:#fff;box-shadow:0 24px 70px #0b1f4238}
+.op-admin-host-app-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;border-bottom:1px solid #e5e7eb;padding:22px 24px}
+.op-admin-host-app-dialog-head h2{margin:7px 0 4px;color:#0b1f42;font:700 23px/1.2 Montserrat,Arial,sans-serif}
+.op-admin-host-app-dialog-head span{color:#64748b;font-size:12px}
+.op-admin-host-app-dialog-head>button{display:grid;width:36px;height:36px;place-items:center;border:0;border-radius:9px;background:#f8fafc;color:#64748b;font-size:22px;line-height:1}
+.op-admin-host-app-dialog-head>button:hover{background:#eef2f7;color:#0b1f42}
+.op-admin-host-app-dialog-body{display:grid;gap:22px;overflow-y:auto;padding:22px 24px 28px}
+.op-admin-host-app-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.op-admin-host-app-detail-section{min-width:0;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:16px}
+.op-admin-host-app-detail-section h3{margin:0 0 14px;color:#0b1f42;font:700 14px Montserrat,Arial,sans-serif}
+.op-admin-host-app-detail-section>div{display:grid;gap:11px}
+.op-admin-host-app-detail{display:grid;gap:3px}
+.op-admin-host-app-detail span{color:#94a3b8;font-size:9px;font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+.op-admin-host-app-detail strong{color:#0b1f42;font-size:11px;font-weight:600;overflow-wrap:anywhere}
+.op-admin-host-app-section{border-top:1px solid #e5e7eb;padding-top:20px}
+.op-admin-host-app-section-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:13px}
+.op-admin-host-app-section-heading h3,.op-admin-host-app-review h3{margin:0;color:#0b1f42;font:700 15px Montserrat,Arial,sans-serif}
+.op-admin-host-app-section-heading p,.op-admin-host-app-review p{margin:4px 0 0;color:#64748b;font-size:11px;line-height:1.5}
+.op-admin-host-app-section-heading>span{border-radius:999px;background:#e8edf7;padding:4px 8px;color:#0b1f42;font-size:10px;font-weight:700;white-space:nowrap}
+.op-admin-host-app-experience{margin:0;border-radius:10px;background:#f8fafc;padding:14px 16px;color:#334155;font-size:12px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
+.op-admin-host-app-documents{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.op-admin-host-app-documents button{width:100%;justify-content:flex-start!important;border-color:#e2dad0!important;background:#fff!important;color:#0b1f42!important;padding:12px!important;text-align:left}
+.op-admin-host-app-documents button:hover:not(:disabled){border-color:#c49a6c!important;background:#faf8f5!important}
+.op-admin-host-app-documents button>svg{width:22px;height:22px;flex:none;color:#9f7142}
+.op-admin-host-app-documents button>span{display:grid;min-width:0;gap:3px}
+.op-admin-host-app-documents strong,.op-admin-host-app-documents small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.op-admin-host-app-documents strong{font-size:11px}
+.op-admin-host-app-documents small{color:#64748b;font-size:9px;font-weight:400}
+.op-admin-host-app-no-documents{border:1px dashed #d6dce5;border-radius:10px;padding:18px;color:#64748b;font-size:12px;text-align:center}
+.op-admin-host-app-review{display:grid;gap:12px;border:1px solid #e2dad0;border-radius:12px;background:#f8fafc;padding:18px}
+.op-admin-host-app-review-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.op-admin-host-app-review-actions button{white-space:nowrap}
+.op-admin-host-app-review-actions .op-admin-host-app-reject{border-color:#fecaca!important;color:#b91c1c!important}
+.op-admin-host-app-audit{display:grid;gap:0}
+.op-admin-host-app-audit>div{position:relative;display:grid;gap:7px;border-left:2px solid #e2dad0;padding:0 0 16px 18px}
+.op-admin-host-app-audit>div:last-child{padding-bottom:0}
+.op-admin-host-app-audit>div>span{position:absolute;top:1px;left:-6px;width:10px;height:10px;border:2px solid #fff;border-radius:50%;background:#c49a6c;box-shadow:0 0 0 1px #c49a6c}
+.op-admin-host-app-audit p{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0}
+.op-admin-host-app-audit p strong{color:#0b1f42;font-size:11px;text-transform:capitalize}
+.op-admin-host-app-audit p small{color:#94a3b8;font-size:9px}
+.op-admin-host-app-audit blockquote{margin:0;color:#64748b;font-size:11px;line-height:1.5}
+@media(max-width:1100px){.op-admin-host-app-detail-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:900px){
+  .op-admin-host-app-columns,.op-admin-host-app-row{grid-template-columns:minmax(220px,1.35fr) minmax(135px,.9fr) minmax(110px,.7fr) minmax(105px,.7fr) 110px 105px 82px}
+  .op-admin-host-app-columns span,.op-admin-host-app-row>div{padding:0 10px}
+}
+@media(max-width:767px){
+  .op-admin-host-app-toolbar{align-items:stretch;flex-direction:column}
+  .op-admin-host-app-search,.op-admin-host-app-filter{width:100%}
+  .op-admin-host-app-columns{display:none}
+  .op-admin-host-app-list{display:grid;gap:0;padding:0 14px 14px;background:#f8fafc}
+  .op-admin-host-app-row{grid-template-columns:1fr 1fr;gap:16px 12px;margin-top:12px;border:1px solid #e5e7eb;border-radius:12px;padding:16px}
+  .op-admin-host-app-row>div{padding:0}
+  .op-admin-host-app-applicant{grid-column:1/-1;padding-bottom:14px!important;border-bottom:1px solid #eef2f7}
+  .op-admin-host-app-action{grid-column:1/-1;display:flex;justify-content:flex-end;padding-top:12px!important;border-top:1px solid #eef2f7}
+  .op-admin-host-app-action button{width:100%}
+  .op-admin-host-app-dialog{width:100%;max-height:94vh;border-radius:16px}
+  .op-admin-host-app-dialog-head,.op-admin-host-app-dialog-body{padding-right:16px;padding-left:16px}
+  .op-admin-host-app-detail-grid{grid-template-columns:1fr}
+  .op-admin-host-app-documents{grid-template-columns:1fr}
+  .op-admin-host-app-review-actions{display:grid;grid-template-columns:1fr}
+  .op-admin-host-app-review-actions button{width:100%}
+}
+
 .op-admin-bookings-heading{align-items:center;margin-bottom:26px}
 .op-admin-bookings-heading h1{margin-top:0}
 .op-admin-bookings-tools{display:flex;align-items:center;gap:10px}

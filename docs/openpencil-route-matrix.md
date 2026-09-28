@@ -30,7 +30,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/admin/properties/new`, `/admin/properties/:id/edit`, `/admin/properties/:id/calendar` | Admin `0:7015`, Product listing editor `0:3955` | Functional legacy, redesign pending |
 | `/admin/bookings`, `/admin/earnings`, `/admin/payouts` | Admin `0:7116`, insights `0:7570` | Functional legacy, redesign pending |
 | `/admin/users` | Admin `0:7228` | Implemented with live account metrics, responsive people board, Flowbite role/search controls, payout editing, suspension, and account erasure; desktop/mobile QA passed |
-| `/admin/host-applications` | Admin `0:7228`, Product `0:4123` | Functional legacy, redesign pending |
+| `/admin/host-applications` | Admin `0:7228`, Product `0:4123` | Implemented with live review metrics, responsive application queue, encrypted document access, full verification detail, audit history, and approve/changes/reject controls; desktop/mobile QA passed |
 | `/admin/promos`, `/admin/addons`, `/admin/guides` | Admin `0:7343`, content/support `0:6855` | Functional legacy, redesign pending |
 | `/admin/feedback`, `/admin/messages` | Admin `0:7343`, governance `0:7458` | Functional legacy, redesign pending |
 
