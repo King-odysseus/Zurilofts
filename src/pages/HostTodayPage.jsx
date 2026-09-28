@@ -339,7 +339,7 @@ export default function HostTodayPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f8f9fa]">
+      <div className="min-h-screen bg-white">
         <Navbar />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
           <div className="mb-8">
@@ -367,7 +367,7 @@ export default function HostTodayPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#f8f9fa]">
+      <div className="min-h-screen bg-white">
         <Navbar />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
           <div className="text-center py-16">
@@ -387,7 +387,7 @@ export default function HostTodayPage() {
   const { arrivals = [], departures = [], inHouse = [], summary = {} } = data || {};
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
+    <div className="min-h-screen bg-white">
       <Navbar />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         {/* Hero panel */}

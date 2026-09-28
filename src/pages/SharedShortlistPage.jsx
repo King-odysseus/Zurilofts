@@ -32,7 +32,7 @@ export default function SharedShortlistPage() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa]">
+    <div className="min-h-screen bg-white">
       <Navbar />
       <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
         {loading ? (
