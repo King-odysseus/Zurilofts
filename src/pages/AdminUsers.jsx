@@ -1,19 +1,24 @@
 import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { Button, Label, Select, Textarea, TextInput } from 'flowbite-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import Dropdown from '../components/Dropdown';
 
-const roleColors = {
-  USER: 'bg-gray-100 text-gray-700',
-  HOST: 'bg-[#C49A6C]/20 text-[#8a6a3f]',
-  ADMIN: 'bg-[#0B0B45]/10 text-[#0B0B45]',
+const ROLE_LABELS = {
+  USER: 'Guest',
+  HOST: 'Host',
+  ADMIN: 'Admin',
 };
 
 const EMPTY_FORM = {
   firstName: '', lastName: '', email: '', phone: '',
   bankName: '', bankAccountNo: '', bankCode: '', payoutFrequency: '',
 };
+
+function userInitials(user) {
+  const initials = `${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}`.trim();
+  return initials ? initials.toUpperCase() : 'ZL';
+}
 
 function AdminUsers() {
   const { user: currentUser } = useAuth();
@@ -168,188 +173,179 @@ function AdminUsers() {
     }
   }
 
+  const viewTotals = {
+    total: users.length,
+    guests: users.filter((entry) => entry.role === 'USER').length,
+    hosts: users.filter((entry) => entry.role === 'HOST').length,
+    suspended: users.filter((entry) => entry.suspended).length,
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between flex-wrap gap-4">
-        <h1 className="text-2xl font-bold text-[#0B0B45]">Users &amp; Hosts</h1>
-        <div className="flex items-center gap-3 flex-wrap">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search name or email"
-            className="px-4 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C] w-56"
-          />
-          <Dropdown
-            value={roleFilter}
-            onChange={setRoleFilter}
-            options={[
-              { value: '', label: 'All Roles' },
-              { value: 'USER', label: 'Users' },
-              { value: 'HOST', label: 'Hosts' },
-              { value: 'ADMIN', label: 'Admins' },
-            ]}
-            triggerClassName=" px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm"
-            ariaLabel="Filter by role"
-          />
+    <div className="op-admin-overview op-admin-people" data-openpencil-frame="0:7228">
+      <div className="op-admin-heading op-admin-people-heading">
+        <div>
+          <p className="op-admin-eyebrow">ZURILOFTS · ADMIN · PEOPLE</p>
+          <h1>Users &amp; hosts</h1>
+          <p>Manage guest accounts, host access, payout details, and account safety.</p>
         </div>
       </div>
 
-      {message && (
-        <div className={`p-3 rounded-xl text-sm font-medium ${message.toLowerCase().includes('fail') ? 'bg-red-50 text-red-600' : 'bg-green-50 text-green-600'}`}>
-          {message}
-        </div>
-      )}
+      <div className="op-admin-metrics op-admin-people-metrics">
+        <article><span>PEOPLE IN VIEW</span><strong>{viewTotals.total}</strong><small>Matching the current filters</small></article>
+        <article><span>GUESTS</span><strong>{viewTotals.guests}</strong><small>Travelling accounts</small></article>
+        <article><span>HOSTS</span><strong>{viewTotals.hosts}</strong><small>Workspace access</small></article>
+        <article><span>SUSPENDED</span><strong>{viewTotals.suspended}</strong><small>Accounts currently restricted</small></article>
+      </div>
 
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#6b7280]">Loading users...</p>
+      <section className="op-admin-people-board">
+        <div className="op-admin-people-toolbar">
+          <div className="op-admin-people-search">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <TextInput
+              type="search"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search name or email"
+              aria-label="Search users by name or email"
+            />
+          </div>
+          <Select
+            aria-label="Filter by role"
+            value={roleFilter}
+            onChange={(event) => setRoleFilter(event.target.value)}
+            className="op-admin-people-filter"
+          >
+            <option value="">All roles</option>
+            <option value="USER">Guests</option>
+            <option value="HOST">Hosts</option>
+            <option value="ADMIN">Admins</option>
+          </Select>
         </div>
-      ) : users.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-[#6b7280]">No users found</p>
-        </div>
-      ) : (
-        <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-[#D9D9D9] text-left">
-                <th className="p-4 font-semibold text-[#0B0B45]">Name</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Contact</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Role</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Properties</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Wallet (KES)</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Status</th>
-                <th className="p-4 font-semibold text-[#0B0B45]">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
+
+        {message && (
+          <div className={`op-admin-people-message ${message.toLowerCase().includes('fail') ? 'is-error' : 'is-success'}`} role="status">
+            {message}
+          </div>
+        )}
+
+        {loading ? (
+          <div className="op-admin-people-empty">
+            <span className="op-admin-booking-spinner" aria-hidden="true" />
+            <strong>Loading people</strong>
+            <p>Fetching guest, host, and administrator accounts.</p>
+          </div>
+        ) : users.length === 0 ? (
+          <div className="op-admin-people-empty">
+            <strong>No accounts found</strong>
+            <p>Try a different search or role filter.</p>
+          </div>
+        ) : (
+          <div className="op-admin-people-scroll">
+            <div className="op-admin-people-table" role="table" aria-label="Users and hosts">
+              <div className="op-admin-people-columns" role="row">
+                <span role="columnheader">PERSON</span>
+                <span role="columnheader">ROLE</span>
+                <span role="columnheader">LISTINGS</span>
+                <span role="columnheader">WALLET</span>
+                <span role="columnheader">STATUS</span>
+                <span role="columnheader">ACTIONS</span>
+              </div>
               {users.map((u) => {
                 const isSelf = u.id === currentUser?.id;
                 const busy = busyId === u.id;
                 return (
-                  <tr key={u.id} className={`border-b border-[#D9D9D9]/50 hover:bg-[#0B0B45]/5 ${u.suspended ? 'opacity-60' : ''}`}>
-                    <td className="p-4">
-                      <div className="font-medium text-[#1f2937]">
-                        {u.firstName} {u.lastName}
-                        {isSelf && <span className="ml-2 text-xs text-[#C49A6C]">(you)</span>}
+                  <div key={u.id} className={`op-admin-people-row ${u.suspended ? 'is-suspended' : ''}`} role="row">
+                    <div className="op-admin-people-person" role="cell">
+                      <span className="op-admin-people-avatar" aria-hidden="true">{userInitials(u)}</span>
+                      <div>
+                        <strong>{u.firstName} {u.lastName}{isSelf && <small> · you</small>}</strong>
+                        <span>{u.email}</span>
+                        <small>{u.phone || 'Phone not added'}</small>
                       </div>
-                    </td>
-                    <td className="p-4">
-                      <div className="text-[#1f2937]">{u.email}</div>
-                      <div className="text-xs text-[#6b7280]">{u.phone || '-'}</div>
-                    </td>
-                    <td className="p-4">
+                    </div>
+                    <div className="op-admin-people-role" role="cell">
                       {isSelf ? (
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${roleColors[u.role]}`}>{u.role}</span>
+                        <span className="op-admin-people-pill is-admin">Admin</span>
                       ) : (
-                        <Dropdown
+                        <Select
+                          sizing="sm"
                           value={u.role}
-                          onChange={(role) => changeRole(u, role)}
-                          options={[
-                            { value: 'USER', label: 'User' },
-                            { value: 'HOST', label: 'Host' },
-                            { value: 'ADMIN', label: 'Admin' },
-                          ]}
-                          triggerClassName="px-3 py-1.5 bg-white border border-[#D9D9D9] text-[#1f2937] rounded-lg text-xs"
-                          ariaLabel="Change role"
-                        />
-                      )}
-                    </td>
-                    <td className="p-4">{u._count?.properties ?? 0}</td>
-                    <td className="p-4">{u.wallet?.balance != null ? u.wallet.balance.toLocaleString() : '-'}</td>
-                    <td className="p-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${u.suspended ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                        {u.suspended ? 'Suspended' : 'Active'}
-                      </span>
-                    </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => openEdit(u)}
-                          className="text-xs font-semibold text-[#C49A6C] hover:text-[#0B0B45] transition-colors"
+                          onChange={(event) => changeRole(u, event.target.value)}
+                          disabled={busy}
+                          aria-label={`Change role for ${u.firstName} ${u.lastName}`}
+                          className="op-admin-people-role-select"
                         >
-                          Edit
-                        </button>
-                        {!isSelf && (
-                          <>
-                            <button
-                              onClick={() => toggleSuspend(u)}
-                              disabled={busy}
-                              className={`text-xs font-semibold transition-colors disabled:opacity-50 ${u.suspended ? 'text-green-600 hover:text-green-700' : 'text-red-500 hover:text-red-600'}`}
-                            >
-                              {busy ? '...' : u.suspended ? 'Reactivate' : 'Suspend'}
-                            </button>
-                            <button
-                              onClick={() => openDelete(u)}
-                              disabled={busy}
-                              className="text-xs font-semibold text-red-700 hover:text-red-900 transition-colors disabled:opacity-50"
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
+                          <option value="USER">Guest</option>
+                          <option value="HOST">Host</option>
+                          <option value="ADMIN">Admin</option>
+                        </Select>
+                      )}
+                    </div>
+                    <div role="cell"><strong>{u._count?.properties ?? 0}</strong><small>properties</small></div>
+                    <div role="cell"><strong>{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '—'}</strong><small>host balance</small></div>
+                    <div role="cell"><span className={`op-admin-people-pill ${u.suspended ? 'is-danger' : 'is-success'}`}>{u.suspended ? 'Suspended' : 'Active'}</span></div>
+                    <div className="op-admin-people-actions" role="cell">
+                      <button type="button" onClick={() => openEdit(u)}>Edit</button>
+                      {!isSelf && <button type="button" onClick={() => toggleSuspend(u)} disabled={busy} className={u.suspended ? 'is-positive' : 'is-warning'}>{busy ? 'Working…' : u.suspended ? 'Reactivate' : 'Suspend'}</button>}
+                      {!isSelf && <button type="button" onClick={() => openDelete(u)} disabled={busy} className="is-danger">Delete</button>}
+                    </div>
+                  </div>
                 );
               })}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </div>
+          </div>
+        )}
+      </section>
 
       {/* Edit modal */}
       {editing && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closeEdit}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between p-6 border-b border-[#D9D9D9]">
-              <h2 className="text-lg font-bold text-[#0B0B45]">Edit {editing.firstName} {editing.lastName}</h2>
-              <button onClick={closeEdit} className="text-[#6b7280] hover:text-[#0B0B45] text-xl leading-none">&times;</button>
+        <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={closeEdit}>
+          <div className="op-admin-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="edit-user-title" onMouseDown={(event) => event.stopPropagation()}>
+            <div className="op-admin-dialog-heading">
+              <div>
+                <p className="op-admin-eyebrow">ACCOUNT · {ROLE_LABELS[editing.role] || editing.role}</p>
+                <h2 id="edit-user-title">Edit {editing.firstName} {editing.lastName}</h2>
+              </div>
+              <button type="button" onClick={closeEdit} aria-label="Close account editor">&times;</button>
             </div>
-            <form onSubmit={handleSave} className="p-6 space-y-4">
-              {formError && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{formError}</div>}
+            <form onSubmit={handleSave} className="op-admin-booking-form">
+              {formError && <div className="op-admin-error" role="alert">{formError}</div>}
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="op-admin-form-grid">
                 <Field label="First Name" value={formData.firstName} onChange={(v) => setFormData({ ...formData, firstName: v })} />
                 <Field label="Last Name" value={formData.lastName} onChange={(v) => setFormData({ ...formData, lastName: v })} />
               </div>
               <Field label="Email" type="email" value={formData.email} onChange={(v) => setFormData({ ...formData, email: v })} />
               <Field label="Phone" value={formData.phone} onChange={(v) => setFormData({ ...formData, phone: v })} />
 
-              <div className="pt-2 border-t border-[#D9D9D9]">
-                <p className="text-sm font-semibold text-[#0B0B45] mt-3 mb-1">Host Payout Details</p>
-                <p className="text-xs text-[#6b7280] mb-3">Used for bank transfers to hosts. Leave blank for non-hosts.</p>
-                <div className="grid grid-cols-2 gap-4">
+              <div className="op-admin-people-form-section">
+                <p>Host payout details</p>
+                <span>Used for bank transfers to hosts. Leave blank for non-hosts.</span>
+                <div className="op-admin-form-grid">
                   <Field label="Bank Name" value={formData.bankName} onChange={(v) => setFormData({ ...formData, bankName: v })} />
                   <Field label="Account No." value={formData.bankAccountNo} onChange={(v) => setFormData({ ...formData, bankAccountNo: v })} />
                   <Field label="Bank Code" value={formData.bankCode} onChange={(v) => setFormData({ ...formData, bankCode: v })} />
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-1">Payout Frequency</label>
-                    <Dropdown
+                    <Label htmlFor="user-payout-frequency">Payout frequency</Label>
+                    <Select
+                      id="user-payout-frequency"
                       value={formData.payoutFrequency}
-                      onChange={(v) => setFormData({ ...formData, payoutFrequency: v })}
-                      options={[
-                        { value: '', label: 'Not set' },
-                        { value: 'weekly', label: 'Weekly' },
-                        { value: 'biweekly', label: 'Biweekly' },
-                        { value: 'monthly', label: 'Monthly' },
-                      ]}
-                      triggerClassName="w-full px-3 py-2 bg-white border border-[#D9D9D9] text-[#1f2937] rounded-xl text-sm"
-                      ariaLabel="Payout frequency"
-                    />
+                      onChange={(event) => setFormData({ ...formData, payoutFrequency: event.target.value })}
+                    >
+                      <option value="">Not set</option>
+                      <option value="weekly">Weekly</option>
+                      <option value="biweekly">Biweekly</option>
+                      <option value="monthly">Monthly</option>
+                    </Select>
                   </div>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={closeEdit} className="px-5 py-2 rounded-full text-sm font-semibold text-[#6b7280] hover:text-[#0B0B45] transition-colors">
-                  Cancel
-                </button>
-                <button type="submit" disabled={saving} className="bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50">
-                  {saving ? 'Saving...' : 'Save Changes'}
-                </button>
+              <div className="op-admin-dialog-actions">
+                <Button color="light" type="button" onClick={closeEdit} disabled={saving}>Cancel</Button>
+                <Button className="op-admin-bronze-button" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save changes'}</Button>
               </div>
             </form>
           </div>
@@ -358,52 +354,52 @@ function AdminUsers() {
 
       {/* Account erasure modal */}
       {deleteTarget && (
-        <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={closeDelete}>
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg" onClick={(e) => e.stopPropagation()}>
-            <div className="p-6 border-b border-red-100">
-              <h2 className="text-lg font-bold text-red-700">Delete user account</h2>
-              <p className="text-sm text-[#6b7280] mt-2">
+        <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={closeDelete}>
+          <div className="op-admin-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-user-title" onMouseDown={(event) => event.stopPropagation()}>
+            <div className="op-admin-dialog-heading">
+              <div>
+                <p className="op-admin-eyebrow">ACCOUNT ERASURE</p>
+                <h2 id="delete-user-title">Delete user account</h2>
+              </div>
+              <button type="button" onClick={closeDelete} aria-label="Close account deletion dialog">&times;</button>
+            </div>
+            <p className="op-admin-people-delete-copy">
                 You are deleting {deleteTarget.firstName} {deleteTarget.lastName} ({deleteTarget.email}).
                 Personal data will be erased. Records required for bookings, payouts, and legal compliance
                 will be retained only in anonymised form. This cannot be undone.
-              </p>
-            </div>
-            <div className="p-6 space-y-4">
-              {deleteError && <div className="p-3 rounded-xl bg-red-50 text-red-600 text-sm">{deleteError}</div>}
+            </p>
+            <div className="op-admin-booking-form">
+              {deleteError && <div className="op-admin-error" role="alert">{deleteError}</div>}
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Reason for deletion</label>
-                <textarea
+                <Label htmlFor="delete-user-reason">Reason for deletion</Label>
+                <Textarea
+                  id="delete-user-reason"
                   value={deleteReason}
                   onChange={(e) => { setDeleteReason(e.target.value); setDeleteError(''); }}
                   rows={3}
                   maxLength={500}
                   placeholder="For example: Customer requested account erasure"
-                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-red-400"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">
-                  Type <span className="font-mono text-red-700">DELETE</span> to confirm
-                </label>
-                <input
+                <Label htmlFor="delete-user-confirm">Type DELETE to confirm</Label>
+                <TextInput
+                  id="delete-user-confirm"
                   type="text"
                   value={deleteConfirm}
                   onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
-                  className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-red-400"
                 />
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={closeDelete} disabled={Boolean(busyId)} className="px-5 py-2 rounded-full text-sm font-semibold text-[#6b7280] hover:text-[#0B0B45] disabled:opacity-50">
-                  Cancel
-                </button>
-                <button
+              <div className="op-admin-dialog-actions">
+                <Button color="light" type="button" onClick={closeDelete} disabled={Boolean(busyId)}>Cancel</Button>
+                <Button
                   type="button"
                   onClick={handleDeleteUser}
                   disabled={Boolean(busyId) || deleteConfirm !== 'DELETE' || deleteReason.trim().length < 3}
-                  className="bg-red-600 text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-red-700 disabled:opacity-50"
+                  className="op-admin-danger-button"
                 >
                   {busyId ? 'Deleting...' : 'Delete account'}
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -414,14 +410,15 @@ function AdminUsers() {
 }
 
 function Field({ label, value, onChange, type = 'text' }) {
+  const id = `admin-user-${label.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
   return (
     <div>
-      <label className="block text-sm font-semibold text-[#1f2937] mb-1">{label}</label>
-      <input
+      <Label htmlFor={id}>{label}</Label>
+      <TextInput
+        id={id}
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-[#1f2937] text-sm focus:outline-none focus:border-[#C49A6C]"
       />
     </div>
   );
