@@ -62,9 +62,9 @@ const adminNavGroups = [
   {
     label: 'Operations',
     items: [
+      { path: '/admin/properties', label: 'Listings', icon: House },
       { path: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
       { path: '/admin/messages', label: 'Messages', icon: MessageCircle },
-      { path: '/admin/properties', label: 'Listings', icon: House },
     ],
   },
   {
