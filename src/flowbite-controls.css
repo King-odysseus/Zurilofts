@@ -586,13 +586,60 @@ html.dark .op-admin-mobile-theme {
   color: var(--dm-text) !important;
 }
 
-html.dark .op-admin-mobile-more-drawer,
+html.dark .op-admin-flowbite-drawer,
 html.dark .op-admin-mobile-nav {
   background-color: #0B1F42 !important;
 }
 
+html.dark .op-admin-sidebar-flyout {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-raised) !important;
+  color: var(--dm-text) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark .op-admin-sidebar-flyout [data-testid=flowbite-tooltip-arrow] {
+  background-color: var(--dm-surface-raised) !important;
+}
+
 html.dark .op-admin-mobile-nav {
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.38) !important;
+}
+
+html.dark :where(.op-admin-quick-menu, .op-admin-avatar-menu, .op-admin-accordion, .op-admin-accordion button[type=button], .op-admin-accordion [data-testid=flowbite-accordion-content]) {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(.op-admin-quick>button, .op-admin-avatar-trigger) {
+  border-color: var(--dm-border-strong) !important;
+  background-color: transparent !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(.op-admin-quick>button:hover, .op-admin-avatar-trigger:hover, .op-admin-quick-menu button:hover, .op-admin-avatar-menu [role=menuitem]:hover, .op-admin-accordion button[type=button]:hover, .op-admin-accordion button[type=button][aria-expanded=true]) {
+  background-color: #172238 !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(.op-admin-quick-menu button, .op-admin-avatar-menu [role=menuitem], .op-admin-avatar-header, .op-admin-avatar-header strong, .op-admin-avatar-name) {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-avatar-header span,
+html.dark .op-admin-accordion [data-testid=flowbite-accordion-content] {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-admin-review-filter {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-admin-review-select select {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
 }
 
 /* Auth, checkout, and shared mobile navigation */

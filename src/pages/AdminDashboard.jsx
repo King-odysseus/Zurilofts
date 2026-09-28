@@ -5,7 +5,21 @@ import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
-import { TextInput } from 'flowbite-react';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionPanel,
+  AccordionTitle,
+  Drawer,
+  DrawerHeader,
+  DrawerItems,
+  Dropdown,
+  DropdownDivider,
+  DropdownHeader,
+  DropdownItem,
+  TextInput,
+  Tooltip,
+} from 'flowbite-react';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import '../admin-design.css';
 
@@ -46,102 +60,63 @@ const hostMobilePrimaryItems = [
 const mobileMoreIcon = 'M5 12h.01M12 12h.01M19 12h.01';
 
 
-// Avatar dropdown shown in the dashboard header - mirrors the client Navbar's
-// account menu so admins/hosts get the same affordance inside the panel.
-function HeaderUserMenu({ user, isAdmin, onLogout }) {
-  const [open, setOpen] = useState(false);
-  const menuRef = useRef(null);
-
-  useEffect(() => {
-    function handleClick(e) {
-      if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false);
-    }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
+function SidebarFlyout({ active, label, target = 'control', children }) {
+  if (!active) return children;
 
   return (
-    <div className="relative" ref={menuRef}>
-      <button
-        onClick={() => setOpen((o) => !o)}
-        className="flex items-center space-x-2 px-2 py-1.5 rounded-full hover:bg-[#D9D9D9]/40 transition-all duration-200"
-      >
-        <div className="w-9 h-9 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
+    <Tooltip
+      arrow
+      className="op-admin-sidebar-flyout"
+      content={label}
+      placement="right"
+      style="light"
+      theme={{ target: target === 'nav' ? 'mx-auto block w-11' : 'block w-full' }}
+    >
+      {children}
+    </Tooltip>
+  );
+}
+
+SidebarFlyout.propTypes = {
+  active: PropTypes.bool,
+  label: PropTypes.string.isRequired,
+  target: PropTypes.oneOf(['control', 'nav']),
+  children: PropTypes.node.isRequired,
+};
+
+
+function HeaderUserMenu({ user, isAdmin, onLogout }) {
+  return (
+    <Dropdown
+      inline
+      placement="bottom-end"
+      className="op-admin-avatar-menu"
+      theme={{ inlineWrapper: 'op-admin-avatar-trigger' }}
+      label={(
+        <>
+          <span className="op-admin-avatar-trigger-avatar">
           {user?.avatar ? (
-            <img src={user.avatar} alt="" className="w-full h-full object-cover" />
+              <img src={user.avatar} alt="" />
           ) : (
             <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
           )}
-        </div>
-        <span className="hidden sm:block text-sm font-semibold text-[#0B0B45]">{user?.firstName}</span>
-        <svg className={`w-4 h-4 text-[#0B0B45] transition-transform duration-200 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
-      </button>
-
-      {open && (
-        <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-lg border border-[#D9D9D9] py-2 z-30">
-          <div className="px-4 py-3 border-b border-[#D9D9D9]">
-            <p className="text-sm font-semibold text-[#0B0B45]">{user?.firstName} {user?.lastName}</p>
-            <p className="text-xs text-[#6b7280]">{user?.email}</p>
-            <span className="inline-block mt-1.5 text-[10px] font-bold uppercase tracking-wider text-[#C49A6C]">{isAdmin ? 'Admin' : 'Host'}</span>
-          </div>
-          <Link
-            to="/profile#info"
-            onClick={() => setOpen(false)}
-            className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            My Profile
-          </Link>
-          {user?.role !== 'HOST' && (
-            <Link
-              to="/host/application"
-              onClick={() => setOpen(false)}
-              className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
-            >
-              <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01" />
-              </svg>
-              Become a host
-            </Link>
-          )}
-          <Link
-            to="/admin/messages"
-            onClick={() => setOpen(false)}
-            className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            Messages
-          </Link>
-          <Link
-            to="/"
-            onClick={() => setOpen(false)}
-            className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Go back to client view
-          </Link>
-          <div className="border-t border-[#D9D9D9] mt-1 pt-1">
-            <button
-              onClick={() => { setOpen(false); onLogout(); }}
-              className="flex items-center w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-            >
-              <svg className="w-4 h-4 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Sign Out
-            </button>
-          </div>
-        </div>
+          </span>
+          <span className="op-admin-avatar-name">{user?.firstName}</span>
+        </>
       )}
-    </div>
+    >
+      <DropdownHeader className="op-admin-avatar-header">
+        <strong>{user?.firstName} {user?.lastName}</strong>
+        <span>{user?.email}</span>
+        <small>{isAdmin ? 'Admin' : 'Host'}</small>
+      </DropdownHeader>
+      <DropdownItem as={Link} to="/profile#info">My Profile</DropdownItem>
+      {user?.role !== 'HOST' && <DropdownItem as={Link} to="/host/application">Become a host</DropdownItem>}
+      <DropdownItem as={Link} to="/admin/messages">Messages</DropdownItem>
+      <DropdownItem as={Link} to="/">Go back to client view</DropdownItem>
+      <DropdownDivider />
+      <DropdownItem className="op-admin-dropdown-danger" onClick={onLogout}>Sign Out</DropdownItem>
+    </Dropdown>
   );
 }
 
@@ -269,51 +244,56 @@ function AdminLayout() {
           {navItems.map(({ path, label, icon, exact }) => {
             const active = exact ? location.pathname === path : location.pathname.startsWith(path);
             return (
-              <Link
-                key={path}
-                to={path}
-                title={collapsed ? label : ''}
-                aria-current={active ? 'page' : undefined}
-                className={`op-admin-nav-link flex items-center rounded-lg mb-1 text-sm font-medium transition-all duration-200 ${
-                  active
-                    ? 'bg-[#E8EDF7] text-[#0B1F42]'
-                    : 'text-[#414D63] hover:bg-[#F7F4EF]'
-                } ${collapsed ? 'justify-center w-11 h-11' : 'px-3 py-2'}`}
-              >
-                <div className="relative">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-                  </svg>
-                  {path === '/admin/messages' && notif.unreadMessages > 0 && (
-                    <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
-                    </span>
-                  )}
-                  {path === '/admin/bookings' && notif.pendingBookings > 0 && (
-                    <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                      {notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}
-                    </span>
-                  )}
-                </div>
-                {!collapsed && <span className="ml-3">{label}</span>}
-              </Link>
+              <SidebarFlyout key={path} active={collapsed} label={label} target="nav">
+                <Link
+                  to={path}
+                  aria-label={collapsed ? label : undefined}
+                  aria-current={active ? 'page' : undefined}
+                  className={`op-admin-nav-link flex items-center rounded-lg mb-1 text-sm font-medium transition-all duration-200 ${
+                    active
+                      ? 'bg-[#E8EDF7] text-[#0B1F42]'
+                      : 'text-[#414D63] hover:bg-[#F7F4EF]'
+                  } ${collapsed ? 'justify-center w-11 h-11' : 'px-3 py-2'}`}
+                >
+                  <div className="relative">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                    </svg>
+                    {path === '/admin/messages' && notif.unreadMessages > 0 && (
+                      <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
+                      </span>
+                    )}
+                    {path === '/admin/bookings' && notif.pendingBookings > 0 && (
+                      <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                        {notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}
+                      </span>
+                    )}
+                  </div>
+                  {!collapsed && <span className="ml-3">{label}</span>}
+                </Link>
+              </SidebarFlyout>
             );
           })}
         </nav>
         <div className={`op-admin-sidebar-account border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'p-5'}`}>
-          <Link
-            to="/"
-            title={collapsed ? 'Go back to client view' : ''}
-            className={`flex items-center rounded-full text-sm font-semibold bg-white/10 text-white hover:bg-[#C49A6C] hover:text-white transition-all duration-200 ${
-              collapsed ? 'justify-center w-11 h-11 mb-4' : 'justify-center mb-5 px-4 py-2.5'
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            {!collapsed && <span className="ml-2.5">Go back to client view</span>}
-          </Link>
-          <ThemeToggle className="op-admin-theme-toggle" showLabel={!collapsed} />
+          <SidebarFlyout active={collapsed} label="Go back to client view">
+            <Link
+              to="/"
+              aria-label={collapsed ? 'Go back to client view' : undefined}
+              className={`flex items-center rounded-full text-sm font-semibold bg-white/10 text-white hover:bg-[#C49A6C] hover:text-white transition-all duration-200 ${
+                collapsed ? 'justify-center w-11 h-11 mb-4' : 'justify-center mb-5 px-4 py-2.5'
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              {!collapsed && <span className="ml-2.5">Go back to client view</span>}
+            </Link>
+          </SidebarFlyout>
+          <SidebarFlyout active={collapsed} label="Toggle theme">
+            <ThemeToggle className="op-admin-theme-toggle" showLabel={!collapsed} />
+          </SidebarFlyout>
           <div className={`flex items-center my-5 ${collapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-xs font-bold text-white">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
@@ -325,18 +305,21 @@ function AdminLayout() {
               </div>
             )}
           </div>
-          <button
-            onClick={handleLogout}
-            title={collapsed ? 'Sign Out' : ''}
-            className={`flex items-center text-white/60 hover:text-white transition-colors mt-3 ${
-              collapsed ? 'justify-center w-full text-base' : 'text-[15px]'
-            }`}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            {!collapsed && <span className="ml-2.5">Sign Out</span>}
-          </button>
+          <SidebarFlyout active={collapsed} label="Sign Out">
+            <button
+              type="button"
+              onClick={handleLogout}
+              aria-label={collapsed ? 'Sign Out' : undefined}
+              className={`flex items-center text-white/60 hover:text-white transition-colors mt-3 ${
+                collapsed ? 'justify-center w-full text-base' : 'text-[15px]'
+              }`}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              {!collapsed && <span className="ml-2.5">Sign Out</span>}
+            </button>
+          </SidebarFlyout>
         </div>
         <button
           type="button"
@@ -414,67 +397,60 @@ function AdminLayout() {
           </button>
         </div>
       </nav>
-      {mobileMoreOpen && (
-        <div className="op-admin-mobile-more-backdrop md:hidden" onClick={() => setMobileMoreOpen(false)}>
-          <section
-            id="admin-mobile-more-drawer"
-            className="op-admin-mobile-more-drawer"
-            role="dialog"
-            aria-modal="true"
-            aria-label={`${isAdmin ? 'Admin' : 'Host'} workspace navigation`}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <header className="op-admin-mobile-more-head">
-              <div>
-                <strong>zuri.admin</strong>
-                <span>{isAdmin ? 'Workspace navigation' : 'Host workspace'}</span>
-              </div>
-              <button type="button" onClick={() => setMobileMoreOpen(false)} aria-label="Close navigation">
+      <Drawer
+        id="admin-mobile-more-drawer"
+        open={mobileMoreOpen}
+        onClose={() => setMobileMoreOpen(false)}
+        position="bottom"
+        edge
+        backdrop
+        className="op-admin-flowbite-drawer md:hidden"
+        theme={{ root: { backdrop: 'op-admin-flowbite-drawer-backdrop' } }}
+        aria-label={`${isAdmin ? 'Admin' : 'Host'} workspace navigation`}
+      >
+        <DrawerHeader
+          className="op-admin-mobile-more-head"
+          title="zuri.admin"
+          titleIcon={() => <img src={logoImg} alt="" />}
+        />
+        <p className="op-admin-mobile-more-label">{isAdmin ? 'Workspace navigation' : 'Host workspace'}</p>
+        <DrawerItems className="op-admin-mobile-more-list">
+          {mobileMoreItems.map(({ path, label, icon }) => {
+            const active = location.pathname === path || location.pathname.startsWith(`${path}/`);
+            const displayLabel = mobileNavLabels[label] || label;
+            return (
+              <Link
+                key={path}
+                to={path}
+                className={active ? 'is-active' : ''}
+                aria-current={active ? 'page' : undefined}
+                onClick={() => setMobileMoreOpen(false)}
+              >
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
                 </svg>
-              </button>
-            </header>
-            <p className="op-admin-mobile-more-label">Workspace</p>
-            <div className="op-admin-mobile-more-list">
-              {mobileMoreItems.map(({ path, label, icon }) => {
-                const active = location.pathname === path || location.pathname.startsWith(`${path}/`);
-                const displayLabel = mobileNavLabels[label] || label;
-                return (
-                  <Link
-                    key={path}
-                    to={path}
-                    className={active ? 'is-active' : ''}
-                    aria-current={active ? 'page' : undefined}
-                    onClick={() => setMobileMoreOpen(false)}
-                  >
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
-                    </svg>
-                    <span>{displayLabel}</span>
-                    {path === '/admin/messages' && notif.unreadMessages > 0 && <small>{notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}</small>}
-                    {path === '/admin/bookings' && notif.pendingBookings > 0 && <small>{notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}</small>}
-                  </Link>
-                );
-              })}
-            </div>
-            <div className="op-admin-mobile-more-footer">
-              <Link to="/" onClick={() => setMobileMoreOpen(false)}>
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Client view
+                <span>{displayLabel}</span>
+                {path === '/admin/messages' && notif.unreadMessages > 0 && <small>{notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}</small>}
+                {path === '/admin/bookings' && notif.pendingBookings > 0 && <small>{notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}</small>}
               </Link>
-              <button type="button" onClick={handleLogout}>
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                Sign Out
-              </button>
-            </div>
-          </section>
+            );
+          })}
+        </DrawerItems>
+        <div className="op-admin-mobile-more-footer">
+          <Link to="/" onClick={() => setMobileMoreOpen(false)}>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Client view
+          </Link>
+          <button type="button" onClick={handleLogout}>
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            Sign Out
+          </button>
         </div>
-      )}
+      </Drawer>
 
       {/* Main content */}
       <main
@@ -526,15 +502,6 @@ function DashboardOverview() {
   const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0', satisfaction: '0' });
   const [savingLanding, setSavingLanding] = useState(false);
   const [landingMsg, setLandingMsg] = useState('');
-  const [quickActionsOpen, setQuickActionsOpen] = useState(false);
-  const quickRef = useRef(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    function handleClick(e) { if (quickRef.current && !quickRef.current.contains(e.target)) setQuickActionsOpen(false); }
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
 
   useEffect(() => {
     async function load() {
@@ -602,8 +569,10 @@ function DashboardOverview() {
   const pending = recentBookings.filter((booking) => booking.status === 'PENDING');
   return <div className="op-admin-overview" data-openpencil-frame="0:6909">
     <div className="op-admin-heading"><div><p className="op-admin-eyebrow">ZURILOFTS · ADMIN · OPERATIONS</p><h1>Operations overview</h1><p>Arrivals, departures and priority work across every stay on the platform.</p></div>
-      <div className="op-admin-quick" ref={quickRef}><button type="button" onClick={() => setQuickActionsOpen((open) => !open)} aria-expanded={quickActionsOpen}>Quick actions ⌄</button>
-        {quickActionsOpen && <div className="op-admin-quick-menu" role="menu">{quickLinks.map((link) => <button key={link.to} role="menuitem" onClick={() => { setQuickActionsOpen(false); navigate(link.to); }}>{link.label}</button>)}</div>}
+      <div className="op-admin-quick">
+        <Dropdown inline label="Quick actions" placement="bottom-end" className="op-admin-quick-menu">
+          {quickLinks.map((link) => <DropdownItem as={Link} key={link.to} to={link.to}>{link.label}</DropdownItem>)}
+        </Dropdown>
       </div>
     </div>
     <div className="op-admin-metrics">
@@ -618,13 +587,29 @@ function DashboardOverview() {
       </section>
       <section className="op-admin-glance"><h2>Today at a glance</h2><p><span>Check-ins</span><strong>{arrivals.length}</strong></p><p><span>Check-outs</span><strong>{departures.length}</strong></p><p><span>Listings</span><strong>{stats.properties}</strong></p><Link to="/admin/properties">Open listings board</Link></section>
     </div>
-    <div className="op-admin-secondary"><details><summary>Platform metrics</summary><div className="op-admin-secondary-metrics"><span>Revenue (KES) <strong>{stats.revenue.toLocaleString()}</strong></span><span>Active promos <strong>{stats.promos}</strong></span></div></details>
-      {isAdmin && <details><summary>Landing page statistics</summary><p>Set a value to 0 to use live review and booking data.</p><form onSubmit={saveLandingStats} className="op-admin-stats-form">
-        <label>Happy stays<TextInput type="number" min="0" value={landingStats.happyStays} onChange={(event) => setLandingStats({ ...landingStats, happyStays: event.target.value })} /></label>
-        <label>Star rating<TextInput type="number" min="0" max="5" step="0.1" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
-        <label>Satisfaction %<TextInput type="number" min="0" max="100" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
-        <button type="submit" disabled={savingLanding}>{savingLanding ? 'Saving…' : 'Update'}</button>{landingMsg && <span role="status">{landingMsg}</span>}
-      </form></details>}
+    <div className="op-admin-secondary">
+      <Accordion alwaysOpen className="op-admin-accordion">
+        <AccordionPanel>
+          <AccordionTitle>Platform metrics</AccordionTitle>
+          <AccordionContent>
+            <div className="op-admin-secondary-metrics"><span>Revenue (KES) <strong>{stats.revenue.toLocaleString()}</strong></span><span>Active promos <strong>{stats.promos}</strong></span></div>
+          </AccordionContent>
+        </AccordionPanel>
+        {isAdmin && (
+          <AccordionPanel>
+            <AccordionTitle>Landing page statistics</AccordionTitle>
+            <AccordionContent>
+              <p>Set a value to 0 to use live review and booking data.</p>
+              <form onSubmit={saveLandingStats} className="op-admin-stats-form">
+                <label>Happy stays<TextInput type="number" min="0" value={landingStats.happyStays} onChange={(event) => setLandingStats({ ...landingStats, happyStays: event.target.value })} /></label>
+                <label>Star rating<TextInput type="number" min="0" max="5" step="0.1" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
+                <label>Satisfaction %<TextInput type="number" min="0" max="100" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
+                <button type="submit" disabled={savingLanding}>{savingLanding ? 'Saving…' : 'Update'}</button>{landingMsg && <span role="status">{landingMsg}</span>}
+              </form>
+            </AccordionContent>
+          </AccordionPanel>
+        )}
+      </Accordion>
     </div>
   </div>;
 }

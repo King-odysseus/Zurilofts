@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Select } from 'flowbite-react';
 import apiClient from '../api/client.js';
 
 const statuses = ['ALL', 'PENDING_REVIEW', 'PUBLISHED', 'DRAFT', 'REJECTED', 'SUSPENDED'];
@@ -40,7 +41,7 @@ export default function AdminListingReview() {
     <div className="op-admin-heading"><div><p className="op-admin-eyebrow">ZURILOFTS · ADMIN · LISTINGS</p><h1>Listing review</h1><p>Approve, reject and edit host listings before they reach guests.</p></div><Link className="op-admin-add-link" to="/admin/properties/new">+ Add stay</Link></div>
     <div className="op-admin-metrics"><article><span>PENDING</span><strong>{count('PENDING_REVIEW')}</strong><small>Awaiting review</small></article><article><span>APPROVED</span><strong>{count('PUBLISHED')}</strong><small>Published stays</small></article><article><span>DRAFTS</span><strong>{count('DRAFT')}</strong><small>In progress</small></article><article><span>REJECTED</span><strong>{count('REJECTED')}</strong><small>Need changes</small></article></div>
     <section className="op-admin-priority"><div className="op-admin-panel-heading"><h2>Review queue</h2><span>{count('PENDING_REVIEW')} pending</span></div>
-      <div className="op-admin-review-filter"><label htmlFor="listing-review-filter">Show</label><select id="listing-review-filter" value={filter} onChange={(event) => setFilter(event.target.value)}>{statuses.map((status) => <option key={status} value={status}>{status === 'ALL' ? 'All listings' : status.replaceAll('_', ' ').toLowerCase()}</option>)}</select></div>
+      <div className="op-admin-review-filter"><label htmlFor="listing-review-filter">Show</label><Select id="listing-review-filter" className="op-admin-review-select" value={filter} onChange={(event) => setFilter(event.target.value)}>{statuses.map((status) => <option key={status} value={status}>{status === 'ALL' ? 'All listings' : status.replaceAll('_', ' ').toLowerCase()}</option>)}</Select></div>
       {error && <p role="alert" className="op-admin-error">{error}</p>}
       {loading ? <p className="op-admin-empty">Loading listings…</p> : visible.length ? visible.map((listing) => <div className="op-admin-priority-row op-admin-listing-row" key={listing.id}>
         {listing.images?.[0] ? <img src={listing.images[0]} alt="" /> : <span className="op-admin-image-empty">⌂</span>}
