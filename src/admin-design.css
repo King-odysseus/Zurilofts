@@ -64,3 +64,79 @@
 .op-admin-error{background:#fce8e6;color:#a6332c;border-radius:8px;padding:10px 12px;font-size:12px}
 .op-admin-review-backdrop{position:fixed;inset:0;z-index:80;background:#0b1f4288;display:grid;place-items:center;padding:20px}.op-admin-review-dialog{background:#fff;width:min(490px,100%);border-radius:16px;padding:24px;box-shadow:0 20px 50px #0b1f4230}.op-admin-review-dialog h2{font:700 20px Montserrat,Arial,sans-serif}.op-admin-review-dialog p{font-size:13px;color:#6e7686;margin:10px 0}.op-admin-review-dialog>a{font-size:12px;color:#3b6fd4}.op-admin-review-dialog label{display:block;font-size:12px;font-weight:700;margin:20px 0 7px}.op-admin-review-dialog textarea{width:100%;padding:10px;resize:vertical}.op-admin-review-dialog>div{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.op-admin-review-dialog button{border:1px solid #e2dad0;background:#fff;color:#0b1f42;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:700}.op-admin-review-dialog button:last-child{background:#9f7142;color:#fff;border-color:#9f7142}.op-admin-review-dialog button:disabled{opacity:.55}
 @media(max-width:650px){.op-admin-listing-row{flex-wrap:wrap}.op-admin-listing-row>div{flex:1 1 calc(100% - 70px)}.op-admin-listing-row .op-admin-urgent{margin-left:55px}}
+
+.op-admin-bookings-heading{align-items:center;margin-bottom:26px}
+.op-admin-bookings-heading h1{margin-top:0}
+.op-admin-bookings-tools{display:flex;align-items:center;gap:10px}
+.op-admin-bookings-tools>div:first-child{width:262px}
+.op-admin-booking-search{position:relative}
+.op-admin-booking-search>svg{position:absolute;z-index:1;top:50%;left:13px;width:16px;height:16px;color:#64748b;transform:translateY(-50%);pointer-events:none}
+.op-admin-booking-search input{padding-left:38px}
+.op-admin-bookings-tools input{min-height:40px;border-color:#e5e7eb;border-radius:10px;background:#fff;font-size:13px}
+.op-admin-bookings-tools input::placeholder{color:#94a3b8}
+.op-admin-bookings-tools button{min-height:40px;border-color:#e5e7eb!important;border-radius:10px!important;background:#f1f5f9!important;color:#475569!important;font-size:13px!important;font-weight:500!important;box-shadow:none!important}
+.op-admin-bookings-tools button:hover:not(:disabled){background:#e8edf7!important;color:#0b1f42!important}
+.op-admin-bookings-tabs{display:flex;align-items:center;gap:8px;overflow-x:auto;margin-bottom:16px;padding-bottom:1px;scrollbar-width:none}
+.op-admin-bookings-tabs::-webkit-scrollbar{display:none}
+.op-admin-bookings-tabs button{min-height:32px;flex:none;border:0;border-radius:10px;background:#f1f5f9;color:#64748b;padding:0 14px;font:500 12px Inter,Arial,sans-serif;white-space:nowrap;cursor:pointer;transition:background-color 150ms ease,color 150ms ease}
+.op-admin-bookings-tabs button:hover{background:#e8edf7;color:#0b1f42}
+.op-admin-bookings-tabs button.is-active{background:#0b1f42;color:#fff}
+.op-admin-booking-board{min-width:0;max-width:100%;border:1px solid #e5e7eb;border-radius:14px;background:#fff;overflow:hidden}
+.op-admin-booking-scroll{max-width:100%;overflow-x:auto}
+.op-admin-booking-table{min-width:900px}
+.op-admin-booking-columns,.op-admin-booking-row{display:grid;grid-template-columns:minmax(132px,.95fr) minmax(250px,1.65fr) minmax(190px,1.25fr) minmax(166px,1.05fr) minmax(170px,1.05fr);align-items:center}
+.op-admin-booking-columns{min-height:40px;background:#f8fafc;color:#64748b;font-size:11px;font-weight:700}
+.op-admin-booking-columns span,.op-admin-booking-row>div{padding:0 16px}
+.op-admin-booking-row{min-height:72px;border-top:1px solid #e5e7eb;background:#fff;transition:background-color 120ms ease}
+.op-admin-booking-row:hover{background:#fbfcfd}
+.op-admin-booking-row>div{display:flex;min-width:0;flex-direction:column;align-items:flex-start;gap:4px}
+.op-admin-booking-row strong{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0b1f42;font-size:13px;font-weight:600}
+.op-admin-booking-row small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#6b7280;font-size:11px}
+.op-admin-booking-dates strong,.op-admin-booking-payment strong{font-size:12px;font-weight:500;color:#475569}
+.op-admin-booking-status{position:relative;flex-direction:row!important;align-items:center!important;justify-content:flex-start;gap:8px!important}
+.op-admin-booking-status>small{margin-left:auto;font-size:10px}
+.op-admin-booking-pill{display:inline-flex;min-height:23px;flex:none;align-items:center;border-radius:999px;padding:3px 9px;font-size:11px;font-weight:600;white-space:nowrap}
+.op-admin-booking-pill.is-success{background:#f0fdf4;color:#16a34a}
+.op-admin-booking-pill.is-warning{background:#fff8e7;color:#a16207}
+.op-admin-booking-pill.is-danger{background:#fef2f2;color:#dc2626}
+.op-admin-booking-pill.is-neutral{background:#f1f5f9;color:#475569}
+.op-admin-booking-actions{margin-left:auto}
+.op-admin-row-menu-trigger{display:grid!important;width:28px!important;height:28px!important;place-items:center!important;border:0!important;border-radius:8px!important;background:transparent!important;color:#64748b!important;padding:0!important;box-shadow:none!important}
+.op-admin-row-menu-trigger:hover,.op-admin-row-menu-trigger:focus,.op-admin-row-menu-trigger[aria-expanded=true]{background:#e8edf7!important;color:#0b1f42!important}
+.op-admin-row-menu-trigger svg{width:16px;height:16px}
+.op-admin-bookings [role=menu]{z-index:60;min-width:174px;border:1px solid #e2dad0;border-radius:10px;background:#fff;padding:5px;box-shadow:0 12px 30px #0b1f4220}
+.op-admin-bookings [role=menuitem]{min-height:36px;border-radius:7px;color:#0b1f42;font-size:12px}
+.op-admin-bookings [role=menuitem]:hover{background:#f3e9dc;color:#0b1f42}
+.op-admin-booking-empty{display:grid;min-height:220px;place-items:center;align-content:center;gap:8px;padding:32px;text-align:center;color:#64748b}
+.op-admin-booking-empty strong{color:#0b1f42;font:700 16px Montserrat,Arial,sans-serif}
+.op-admin-booking-empty p{font-size:12px}
+.op-admin-booking-spinner{width:30px;height:30px;border:3px solid #c49a6c;border-top-color:transparent;border-radius:50%;animation:op-admin-spin .8s linear infinite}
+@keyframes op-admin-spin{to{transform:rotate(360deg)}}
+.op-admin-dialog-backdrop{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:20px;background:#0b1f4266;backdrop-filter:blur(2px)}
+.op-admin-confirm-dialog,.op-admin-edit-dialog{width:100%;border-radius:16px;background:#fff;padding:24px;box-shadow:0 24px 60px #0b1f422e}
+.op-admin-confirm-dialog{max-width:430px}
+.op-admin-confirm-dialog h3{color:#0b1f42;font:700 19px Montserrat,Arial,sans-serif}
+.op-admin-confirm-dialog p{margin:10px 0 22px;color:#6e7686;font-size:13px;line-height:1.55}
+.op-admin-edit-dialog{max-width:560px;max-height:min(820px,calc(100vh - 40px));overflow-y:auto}
+.op-admin-dialog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
+.op-admin-dialog-heading h2{margin-top:5px;color:#0b1f42;font:700 20px Montserrat,Arial,sans-serif}
+.op-admin-dialog-heading>button{width:34px;height:34px;flex:none;border:0;border-radius:8px;background:transparent;color:#64748b;font-size:24px;line-height:1}
+.op-admin-dialog-heading>button:hover{background:#f1f5f9;color:#0b1f42}
+.op-admin-booking-form{display:grid;gap:16px}
+.op-admin-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.op-admin-booking-form label{margin-bottom:6px;color:#374151;font-size:12px;font-weight:600}
+.op-admin-booking-form input,.op-admin-booking-form select,.op-admin-booking-form textarea{width:100%;background:#fff;font-size:13px}
+.op-admin-booking-form textarea{resize:vertical}
+.op-admin-dialog-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:4px}
+.op-admin-dialog-actions button{min-height:40px;border-radius:9px!important;padding:0 16px!important;font-size:12px!important;font-weight:700!important;box-shadow:none!important}
+.op-admin-bronze-button,.op-admin-bronze-button:hover{background:#9f7142!important;color:#fff!important}
+.op-admin-danger-button,.op-admin-danger-button:hover{background:#dc2626!important;color:#fff!important}
+@media(max-width:767px){
+  .op-admin-bookings-heading{align-items:stretch;margin-bottom:22px}
+  .op-admin-bookings-tools{width:100%;align-items:stretch}
+  .op-admin-bookings-tools>div:first-child{width:auto;flex:1}
+  .op-admin-bookings-tools button{flex:none}
+  .op-admin-booking-table{min-width:850px}
+  .op-admin-booking-columns,.op-admin-booking-row{grid-template-columns:130px 250px 190px 160px 160px}
+  .op-admin-form-grid{grid-template-columns:1fr}
+}

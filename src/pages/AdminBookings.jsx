@@ -1,42 +1,72 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import Dropdown from '../components/Dropdown.jsx';
+import {
+  Button,
+  Dropdown as FlowbiteDropdown,
+  DropdownItem,
+  Label,
+  Select,
+  Textarea,
+  TextInput,
+} from 'flowbite-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
+const BOOKING_TABS = [
+  { id: 'all', label: 'All bookings', status: '' },
+  { id: 'upcoming', label: 'Upcoming', status: 'CONFIRMED' },
+  { id: 'payment', label: 'Payment review', status: 'PENDING' },
+  { id: 'cancelled', label: 'Cancelled', status: 'CANCELLED' },
+];
+
 const BED_OPTIONS = [
+  { value: '', label: 'Select bedroom option' },
   { value: '1bed', label: '1 Bedroom' },
   { value: '2bed', label: '2 Bedroom' },
 ];
 
 const CHECK_OUT_OPTIONS = [
   { value: '10:00', label: '10:00 AM (Standard)' },
-  { value: '11:00', label: '11:00 AM (+¼ night)' },
-  { value: '12:00', label: '12:00 PM (+½ night)' },
+  { value: '11:00', label: '11:00 AM (+1/4 night)' },
+  { value: '12:00', label: '12:00 PM (+1/2 night)' },
   { value: '13:00', label: '1:00 PM (+1 full night)' },
 ];
 
-function ConfirmDialog({ open, title, message, confirmLabel, confirmClass, onConfirm, onCancel }) {
-  if (!open) return null;
+function SearchIcon() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onCancel}></div>
-      <div className="relative bg-white rounded-2xl shadow-xl p-6 w-full max-w-sm mx-4">
-        <h3 className="text-lg font-bold text-[#0B0B45] mb-2">{title}</h3>
-        <p className="text-[#6b7280] text-sm mb-6">{message}</p>
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={onCancel}
-            className="px-4 py-2 text-sm font-semibold rounded-full border border-[#D9D9D9] text-[#6b7280] hover:bg-gray-50"
-          >
-            Keep
-          </button>
-          <button
-            onClick={onConfirm}
-            className={`px-4 py-2 text-sm font-semibold rounded-full text-white ${confirmClass}`}
-          >
-            {confirmLabel}
-          </button>
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+  );
+}
+
+function DotsIcon() {
+  return (
+    <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+      <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm4 2a2 2 0 100-4 2 2 0 000 4z" />
+    </svg>
+  );
+}
+
+function ConfirmDialog({ open, title, message, confirmLabel, confirmClass, onConfirm, onCancel, busy }) {
+  if (!open) return null;
+
+  return (
+    <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={onCancel}>
+      <div
+        className="op-admin-confirm-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="booking-confirm-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <h3 id="booking-confirm-title">{title}</h3>
+        <p>{message}</p>
+        <div className="op-admin-dialog-actions">
+          <Button color="light" onClick={onCancel} disabled={busy}>Keep</Button>
+          <Button className={confirmClass} onClick={onConfirm} disabled={busy}>
+            {busy ? 'Working...' : confirmLabel}
+          </Button>
         </div>
       </div>
     </div>
@@ -51,6 +81,7 @@ ConfirmDialog.propTypes = {
   confirmClass: PropTypes.string.isRequired,
   onConfirm: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
+  busy: PropTypes.bool,
 };
 
 function EditBookingModal({ booking, onClose, onSaved }) {
@@ -60,7 +91,7 @@ function EditBookingModal({ booking, onClose, onSaved }) {
     guests: 1,
     bedOption: '',
     checkInTime: '',
-    checkOutTime: '',
+    checkOutTime: '10:00',
     specialRequests: '',
   });
   const [saving, setSaving] = useState(false);
@@ -68,35 +99,36 @@ function EditBookingModal({ booking, onClose, onSaved }) {
 
   useEffect(() => {
     if (!booking) return;
-    const toDateStr = (d) => {
-      const date = new Date(d);
-      return date.toISOString().split('T')[0];
-    };
+    const toDateStr = (date) => new Date(date).toISOString().split('T')[0];
     setForm({
       checkIn: toDateStr(booking.checkIn),
       checkOut: toDateStr(booking.checkOut),
-      guests: booking.guests,
+      guests: booking.guests || 1,
       bedOption: booking.bedOption || '',
       checkInTime: booking.checkInTime || '',
-      checkOutTime: booking.checkOutTime || '',
+      checkOutTime: booking.checkOutTime || '10:00',
       specialRequests: booking.specialRequests || '',
     });
+    setError('');
   }, [booking]);
 
-  function set(field) {
-    return (e) => setForm((prev) => ({ ...prev, [field]: e.target.value }));
+  if (!booking) return null;
+
+  function updateField(field) {
+    return (event) => setForm((current) => ({ ...current, [field]: event.target.value }));
   }
 
-  async function handleSubmit(e) {
-    e.preventDefault();
+  async function handleSubmit(event) {
+    event.preventDefault();
     setError('');
     if (new Date(form.checkOut) <= new Date(form.checkIn)) {
-      setError('Check-out date must be after check-in date.');
+      setError('Check-out date must be after the check-in date.');
       return;
     }
+
     setSaving(true);
     try {
-      const res = await apiClient.put(`/admin/bookings/${booking.id}`, {
+      const response = await apiClient.put(`/admin/bookings/${booking.id}`, {
         checkIn: form.checkIn,
         checkOut: form.checkOut,
         guests: Number(form.guests),
@@ -105,7 +137,7 @@ function EditBookingModal({ booking, onClose, onSaved }) {
         checkOutTime: form.checkOutTime || null,
         specialRequests: form.specialRequests || null,
       });
-      onSaved(res.data.data);
+      onSaved(response.data.data);
     } catch (err) {
       setError(err.response?.data?.error || 'Failed to update booking.');
     } finally {
@@ -113,110 +145,74 @@ function EditBookingModal({ booking, onClose, onSaved }) {
     }
   }
 
-  if (!booking) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose}></div>
-      <div className="relative bg-white rounded-2xl shadow-xl p-6 w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-bold text-[#0B0B45]">Edit Booking</h3>
-          <button onClick={onClose} className="text-[#6b7280] hover:text-[#1f2937] text-xl leading-none">&times;</button>
+    <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={onClose}>
+      <div
+        className="op-admin-edit-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="booking-edit-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className="op-admin-dialog-heading">
+          <div>
+            <p className="op-admin-eyebrow">BOOKING {bookingReference(booking.id)}</p>
+            <h2 id="booking-edit-title">Edit booking details</h2>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close edit booking dialog">&times;</button>
         </div>
 
-        {error && (
-          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-sm text-red-700">{error}</div>
-        )}
+        {error && <div className="op-admin-error" role="alert">{error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit} className="op-admin-booking-form">
+          <div className="op-admin-form-grid">
             <div>
-              <label className="block text-xs font-semibold text-[#6b7280] mb-1">Check-in</label>
-              <input
-                type="date"
-                value={form.checkIn}
-                onChange={set('checkIn')}
-                className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
-                required
-              />
+              <Label htmlFor="booking-check-in">Check-in</Label>
+              <TextInput id="booking-check-in" type="date" value={form.checkIn} onChange={updateField('checkIn')} required />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#6b7280] mb-1">Check-out</label>
-              <input
-                type="date"
-                value={form.checkOut}
-                onChange={set('checkOut')}
-                className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
-                required
-              />
+              <Label htmlFor="booking-check-out">Check-out</Label>
+              <TextInput id="booking-check-out" type="date" value={form.checkOut} onChange={updateField('checkOut')} required />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="op-admin-form-grid">
             <div>
-              <label className="block text-xs font-semibold text-[#6b7280] mb-1">Guests</label>
-              <input
-                type="number"
-                min="1"
-                max="6"
-                value={form.guests}
-                onChange={set('guests')}
-                className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
-                required
-              />
+              <Label htmlFor="booking-guests">Guests</Label>
+              <TextInput id="booking-guests" type="number" min="1" max="6" value={form.guests} onChange={updateField('guests')} required />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#6b7280] mb-1">Bed Option</label>
-              <Dropdown
-                value={form.bedOption}
-                onChange={(v) => setForm((prev) => ({ ...prev, bedOption: v }))}
-                options={BED_OPTIONS}
-                triggerClassName="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
-                placeholder="Select..."
-                ariaLabel="Bed option"
-              />
+              <Label htmlFor="booking-bed-option">Bedroom option</Label>
+              <Select id="booking-bed-option" value={form.bedOption} onChange={updateField('bedOption')}>
+                {BED_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </Select>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="op-admin-form-grid">
             <div>
-              <label className="block text-xs font-semibold text-[#6b7280] mb-1">Check-in Time</label>
-              <input
-                type="time"
-                value={form.checkInTime}
-                onChange={set('checkInTime')}
-                className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
-              />
+              <Label htmlFor="booking-check-in-time">Check-in time</Label>
+              <TextInput id="booking-check-in-time" type="time" value={form.checkInTime} onChange={updateField('checkInTime')} />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-[#6b7280] mb-1">Check-out Time</label>
-              <Dropdown
-                value={form.checkOutTime || '10:00'}
-                onChange={(v) => setForm((prev) => ({ ...prev, checkOutTime: v }))}
-                options={CHECK_OUT_OPTIONS}
-                triggerClassName="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
-                ariaLabel="Check-out time"
-              />
+              <Label htmlFor="booking-check-out-time">Check-out time</Label>
+              <Select id="booking-check-out-time" value={form.checkOutTime} onChange={updateField('checkOutTime')}>
+                {CHECK_OUT_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+              </Select>
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-[#6b7280] mb-1">Special Requests</label>
-            <textarea
-              value={form.specialRequests}
-              onChange={set('specialRequests')}
-              rows={2}
-              className="w-full px-3 py-2 rounded-xl border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C] resize-none"
-            />
+            <Label htmlFor="booking-special-requests">Special requests</Label>
+            <Textarea id="booking-special-requests" rows={3} value={form.specialRequests} onChange={updateField('specialRequests')} />
           </div>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="w-full py-2.5 rounded-full bg-[#C49A6C] text-white font-semibold text-sm hover:bg-[#b8895a] disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          <div className="op-admin-dialog-actions">
+            <Button color="light" type="button" onClick={onClose} disabled={saving}>Cancel</Button>
+            <Button className="op-admin-bronze-button" type="submit" disabled={saving}>
+              {saving ? 'Saving...' : 'Save changes'}
+            </Button>
+          </div>
         </form>
       </div>
     </div>
@@ -229,19 +225,79 @@ EditBookingModal.propTypes = {
   onSaved: PropTypes.func.isRequired,
 };
 
-// ── Helpers ────────────────────────────────────────────────────────────────
 function formatTime12h(time) {
-  if (!time) return '-';
-  const [h, m] = time.split(':').map(Number);
-  const period = h >= 12 ? 'PM' : 'AM';
-  const hour12 = h % 12 === 0 ? 12 : h % 12;
-  return `${hour12}:${String(m || 0).padStart(2, '0')} ${period}`;
+  if (!time) return 'Not set';
+  const [hour, minute] = time.split(':').map(Number);
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 === 0 ? 12 : hour % 12;
+  return `${hour12}:${String(minute || 0).padStart(2, '0')} ${period}`;
 }
 
 function isLateCheckout(time) {
   if (!time) return false;
-  const [h, m] = time.split(':').map(Number);
-  return h > 10 || (h === 10 && m > 0);
+  const [hour, minute] = time.split(':').map(Number);
+  return hour > 10 || (hour === 10 && minute > 0);
+}
+
+function bookingReference(id = '') {
+  const compact = String(id).replace(/[^a-z0-9]/gi, '').slice(-4).toUpperCase();
+  return `#ZL-${compact || '----'}`;
+}
+
+function relativeBookingTime(dateValue) {
+  if (!dateValue) return 'Recently created';
+  const date = new Date(dateValue);
+  const diff = Date.now() - date.getTime();
+  if (diff >= 0 && diff < 60_000) return 'Just now';
+  if (diff >= 0 && diff < 3_600_000) return `${Math.max(1, Math.floor(diff / 60_000))} min ago`;
+  if (diff >= 0 && diff < 86_400_000) return `${Math.floor(diff / 3_600_000)} hr ago`;
+  const today = new Date();
+  if (date.toDateString() === today.toDateString()) return 'Booked today';
+  return `Booked ${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`;
+}
+
+function formatDateRange(checkIn, checkOut) {
+  if (!checkIn || !checkOut) return 'Dates not set';
+  const start = new Date(checkIn);
+  const end = new Date(checkOut);
+  const startLabel = start.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
+  const endLabel = end.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  return `${startLabel} - ${endLabel}`;
+}
+
+function paymentMethodLabel(method) {
+  const value = String(method || '').toUpperCase();
+  if (value.includes('MPESA') || value.includes('M-PESA')) return 'M-Pesa';
+  if (value.includes('CARD')) return 'Card';
+  if (value.includes('BANK')) return 'Bank transfer';
+  if (!value) return 'Payment method pending';
+  return value.replaceAll('_', ' ').toLowerCase().replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function paymentSummary(booking) {
+  const method = paymentMethodLabel(booking.paymentMethod);
+  if (booking.paidAt) return `${method} - verified`;
+  if (booking.status === 'CANCELLED') return `${method} - released`;
+  return `${method} - checking`;
+}
+
+function statusMeta(booking) {
+  if (booking.refundStatus === 'REFUND_PENDING') return { label: 'Refund pending', tone: 'danger' };
+  if (booking.status === 'CONFLICT') return { label: 'Needs review', tone: 'warning' };
+  if (booking.status === 'CONFIRMED') return { label: 'Confirmed', tone: 'success' };
+  if (booking.status === 'CANCELLED') return { label: 'Cancelled', tone: 'danger' };
+  if (booking.status === 'PENDING') return { label: 'Payment pending', tone: 'warning' };
+  return { label: String(booking.status || 'Unknown').replaceAll('_', ' ').toLowerCase(), tone: 'neutral' };
+}
+
+function bedSummary(booking) {
+  if (booking.bedOption === '2bed') return '2 bedrooms';
+  if (booking.bedOption === '1bed') return '1 bedroom';
+  return booking.property?.bedrooms ? `${booking.property.bedrooms} bedrooms` : 'Bedrooms not set';
+}
+
+function csvCell(value) {
+  return `"${String(value ?? '').replaceAll('"', '""')}"`;
 }
 
 function AdminBookings() {
@@ -249,251 +305,272 @@ function AdminBookings() {
   const isAdmin = user?.role === 'ADMIN';
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('');
-
-  // Modal / dialog state
+  const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState('all');
+  const [search, setSearch] = useState('');
   const [editingBooking, setEditingBooking] = useState(null);
   const [cancelTarget, setCancelTarget] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
 
+  const selectedTab = BOOKING_TABS.find((tab) => tab.id === activeTab) || BOOKING_TABS[0];
+
   const fetchBookings = useCallback(async () => {
     setLoading(true);
+    setError('');
     try {
       const params = {};
-      if (statusFilter) params.status = statusFilter;
-      // Admins see all bookings; hosts only those on their own listings.
-      const res = await apiClient.get(isAdmin ? '/admin/bookings' : '/bookings/host', { params });
-      setBookings(res.data.data || []);
-    } catch (err) { console.error('AdminBookings error', err); }
-    finally { setLoading(false); }
-  }, [statusFilter, isAdmin]);
+      if (selectedTab.status) params.status = selectedTab.status;
+      const response = await apiClient.get(isAdmin ? '/admin/bookings' : '/bookings/host', { params });
+      setBookings(response.data.data || []);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Bookings could not be loaded. Please refresh the page.');
+    } finally {
+      setLoading(false);
+    }
+  }, [isAdmin, selectedTab.status]);
 
-  useEffect(() => { fetchBookings(); }, [fetchBookings]);
+  useEffect(() => {
+    fetchBookings();
+  }, [fetchBookings]);
+
+  const visibleBookings = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return bookings.filter((booking) => {
+      if (selectedTab.id === 'upcoming' && new Date(booking.checkIn) < today) return false;
+      if (!query) return true;
+
+      const haystack = [
+        booking.id,
+        bookingReference(booking.id),
+        booking.user?.firstName,
+        booking.user?.lastName,
+        booking.user?.email,
+        booking.property?.title,
+        booking.property?.location,
+      ].filter(Boolean).join(' ').toLowerCase();
+
+      return haystack.includes(query);
+    });
+  }, [bookings, search, selectedTab.id]);
 
   async function handleStatusChange(id, status) {
     setActionLoading(true);
+    setError('');
     try {
-      await apiClient.patch(`/admin/bookings/${id}/status`, { status });
-      setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)));
-    } catch {
-      alert('Failed to update booking status');
+      const response = await apiClient.patch(`/admin/bookings/${id}/status`, { status });
+      const updated = response.data.data || {};
+      setBookings((current) => current.map((booking) => (
+        booking.id === id ? { ...booking, ...updated, status } : booking
+      )));
+      setCancelTarget(null);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to update booking status.');
     } finally {
       setActionLoading(false);
-      setCancelTarget(null);
     }
   }
 
   async function handleDelete(id) {
     setActionLoading(true);
+    setError('');
     try {
       await apiClient.delete(`/admin/bookings/${id}`);
-      setBookings((prev) => prev.filter((b) => b.id !== id));
-    } catch {
-      alert('Failed to delete booking');
+      setBookings((current) => current.filter((booking) => booking.id !== id));
+      setDeleteTarget(null);
+    } catch (err) {
+      setError(err.response?.data?.error || 'Failed to delete booking.');
     } finally {
       setActionLoading(false);
-      setDeleteTarget(null);
     }
   }
 
   function handleEditSaved(updated) {
-    setBookings((prev) =>
-      prev.map((b) => (b.id === updated.id ? { ...b, ...updated } : b))
-    );
+    setBookings((current) => current.map((booking) => (
+      booking.id === updated.id ? { ...booking, ...updated } : booking
+    )));
     setEditingBooking(null);
   }
 
+  function exportBookings() {
+    const rows = visibleBookings.map((booking) => [
+      bookingReference(booking.id),
+      booking.user?.firstName || '',
+      booking.user?.lastName || '',
+      booking.user?.email || '',
+      booking.property?.title || '',
+      new Date(booking.checkIn).toLocaleDateString('en-GB'),
+      new Date(booking.checkOut).toLocaleDateString('en-GB'),
+      booking.guests || '',
+      paymentSummary(booking),
+      booking.total || 0,
+      statusMeta(booking).label,
+    ]);
+    const header = ['Booking', 'First name', 'Last name', 'Guest email', 'Stay', 'Check-in', 'Check-out', 'Guests', 'Payment', 'Total KES', 'Status'];
+    const csv = [header, ...rows].map((row) => row.map(csvCell).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `ZuriLofts_bookings_${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function renderActions(booking) {
+    if (!isAdmin) return null;
+
+    const canConfirm = booking.status === 'PENDING';
+    const canEdit = booking.status === 'CONFIRMED' || booking.status === 'CONFLICT';
+    const canCancel = booking.status === 'PENDING' || booking.status === 'CONFIRMED' || booking.status === 'CONFLICT';
+    const canDelete = booking.status === 'CANCELLED' || booking.status === 'CONFIRMED' || booking.status === 'CONFLICT';
+
+    if (!canConfirm && !canEdit && !canCancel && !canDelete) return null;
+
+    return (
+      <FlowbiteDropdown
+        inline
+        arrowIcon={false}
+        placement="bottom-end"
+        label={<><span className="sr-only">Open actions for {bookingReference(booking.id)}</span><DotsIcon /></>}
+        theme={{ inlineWrapper: 'op-admin-row-menu-trigger' }}
+      >
+        {canConfirm && <DropdownItem onClick={() => handleStatusChange(booking.id, 'CONFIRMED')}>Confirm booking</DropdownItem>}
+        {canEdit && <DropdownItem onClick={() => setEditingBooking(booking)}>Edit details</DropdownItem>}
+        {canCancel && <DropdownItem className="text-red-600" onClick={() => setCancelTarget(booking)}>Cancel booking</DropdownItem>}
+        {canDelete && <DropdownItem className="text-red-600" onClick={() => setDeleteTarget(booking)}>Delete booking</DropdownItem>}
+      </FlowbiteDropdown>
+    );
+  }
+
   return (
-    <div>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-[#0B0B45]">Bookings</h1>
-        <Dropdown
-          value={statusFilter}
-          onChange={setStatusFilter}
-          options={[
-            { value: '', label: 'All Statuses' },
-            { value: 'PENDING', label: 'Pending' },
-            { value: 'CONFIRMED', label: 'Confirmed' },
-            { value: 'CANCELLED', label: 'Cancelled' },
-          ]}
-          triggerClassName="w-48 px-4 py-2.5 rounded-xl bg-white border border-[#D9D9D9] text-sm text-[#1f2937] focus:outline-none focus:border-[#C49A6C]"
-          placeholder="All Statuses"
-          ariaLabel="Filter by status"
-        />
+    <div className="op-admin-overview op-admin-bookings" data-openpencil-frame="0:3396">
+      <div className="op-admin-heading op-admin-bookings-heading">
+        <div>
+          <h1>Bookings</h1>
+          <p>Monitor reservations, payment state, and guest support issues.</p>
+        </div>
+        <div className="op-admin-bookings-tools">
+          <div className="op-admin-booking-search">
+            <SearchIcon />
+            <TextInput
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search booking ID"
+              aria-label="Search booking ID, guest, or stay"
+            />
+          </div>
+          <Button color="light" onClick={exportBookings} disabled={!visibleBookings.length}>Export</Button>
+        </div>
       </div>
 
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
-        </div>
-      ) : (
-        <div className="bg-white rounded-2xl shadow-sm border border-[#D9D9D9] overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
-                <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Guest</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Property</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Check-in</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Check-out</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Times</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Guests</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Total</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Status</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Payment</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#0B0B45]">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {bookings.map((b) => (
-                  <tr key={b.id} className="border-b border-[#D9D9D9]/50 hover:bg-[#f8f9fa]">
-                    <td className="py-3 px-4">
-                      <div>
-                        <p className="font-semibold text-[#0B0B45]">{b.user?.firstName} {b.user?.lastName}</p>
-                        <p className="text-xs text-[#6b7280]">{b.user?.email}</p>
-                      </div>
-                    </td>
-                    <td className="py-3 px-4">{b.property?.title}</td>
-                    <td className="py-3 px-4 text-xs">{new Date(b.checkIn).toLocaleDateString()}</td>
-                    <td className="py-3 px-4 text-xs">{new Date(b.checkOut).toLocaleDateString()}</td>
-                    <td className="py-3 px-4 text-xs">
-                      <span className="text-[#6b7280]">In </span>{formatTime12h(b.checkInTime || '15:00')}
-                      <span className="text-[#6b7280]"> · Out </span>
-                      <span className={isLateCheckout(b.checkOutTime) ? 'text-amber-600 font-semibold' : ''}>
-                        {formatTime12h(b.checkOutTime || '10:00')}
-                      </span>
-                      {b.lateCheckoutFee > 0 && (
-                        <span className="ml-1 text-[10px] text-amber-600 font-medium">
-                          +KES {b.lateCheckoutFee.toLocaleString()}
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">{b.guests}</td>
-                    <td className="py-3 px-4 font-semibold">KES {b.total.toLocaleString()}</td>
-                    <td className="py-3 px-4">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        b.status === 'CONFIRMED' ? 'bg-green-100 text-green-700' :
-                        b.status === 'CANCELLED' ? 'bg-red-100 text-red-700' :
-                        'bg-yellow-100 text-yellow-700'
-                      }`}>{b.status}</span>
-                    </td>
-                    <td className="py-3 px-4">
-                      {b.paidAt ? (
-                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                          PAID {b.paymentChannel ? `· ${b.paymentChannel}` : ''}
-                        </span>
-                      ) : (
-                        <span className="px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
-                          UNPAID
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <div className="flex items-center justify-end space-x-1">
-                        {!isAdmin && <span className="text-xs text-[#6b7280]">View only</span>}
-                        {isAdmin && b.status === 'PENDING' && (
-                          <>
-                            <button
-                              onClick={() => handleStatusChange(b.id, 'CONFIRMED')}
-                              disabled={actionLoading}
-                              className="px-3 py-1 text-xs font-semibold rounded-lg bg-green-100 text-green-700 hover:bg-green-200 disabled:opacity-50"
-                            >
-                              Confirm
-                            </button>
-                            <button
-                              onClick={() => setCancelTarget(b)}
-                              disabled={actionLoading}
-                              className="px-3 py-1 text-xs font-semibold rounded-lg bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
-                            >
-                              Cancel
-                            </button>
-                          </>
-                        )}
+      <div className="op-admin-bookings-tabs" role="tablist" aria-label="Booking filters">
+        {BOOKING_TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            className={activeTab === tab.id ? 'is-active' : ''}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
 
-                        {isAdmin && b.status === 'CONFIRMED' && (
-                          <>
-                            <button
-                              onClick={() => setEditingBooking(b)}
-                              disabled={actionLoading}
-                              className="px-3 py-1 text-xs font-semibold rounded-lg bg-[#0B0B45]/10 text-[#0B0B45] hover:bg-[#0B0B45]/20 disabled:opacity-50"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => setCancelTarget(b)}
-                              disabled={actionLoading}
-                              className="px-3 py-1 text-xs font-semibold rounded-lg bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={() => setDeleteTarget(b)}
-                              disabled={actionLoading}
-                              className="px-3 py-1 text-xs font-semibold rounded-lg bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
-                            >
-                              Delete
-                            </button>
-                          </>
-                        )}
+      {error && <div className="op-admin-error" role="alert">{error}</div>}
 
-                        {isAdmin && b.status === 'CANCELLED' && (
-                          <button
-                            onClick={() => setDeleteTarget(b)}
-                            disabled={actionLoading}
-                            className="px-3 py-1 text-xs font-semibold rounded-lg bg-red-100 text-red-700 hover:bg-red-200 disabled:opacity-50"
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      <section className="op-admin-booking-board" aria-label="Bookings">
+        <div className="op-admin-booking-scroll">
+          <div className="op-admin-booking-table" role="table">
+            <div className="op-admin-booking-columns" role="row">
+              <span role="columnheader">BOOKING</span>
+              <span role="columnheader">GUEST &amp; STAY</span>
+              <span role="columnheader">DATES</span>
+              <span role="columnheader">PAYMENT</span>
+              <span role="columnheader">STATUS</span>
+            </div>
+
+            {loading ? (
+              <div className="op-admin-booking-empty" role="row">
+                <span className="op-admin-booking-spinner" aria-hidden="true" />
+                <p>Loading bookings...</p>
+              </div>
+            ) : visibleBookings.length ? visibleBookings.map((booking) => {
+              const status = statusMeta(booking);
+              const actions = renderActions(booking);
+              return (
+                <div className="op-admin-booking-row" role="row" key={booking.id}>
+                  <div role="cell">
+                    <strong>{bookingReference(booking.id)}</strong>
+                    <small>{relativeBookingTime(booking.createdAt)}</small>
+                  </div>
+                  <div role="cell" className="op-admin-booking-stay">
+                    <strong>{booking.user?.firstName || 'Guest'} {booking.user?.lastName || ''} - {booking.property?.title || 'Stay pending'}</strong>
+                    <small>{booking.guests || 0} {booking.guests === 1 ? 'guest' : 'guests'} - {bedSummary(booking)}</small>
+                  </div>
+                  <div role="cell" className="op-admin-booking-dates">
+                    <strong>{formatDateRange(booking.checkIn, booking.checkOut)}</strong>
+                    <small>
+                      In {formatTime12h(booking.checkInTime || '15:00')} / Out {formatTime12h(booking.checkOutTime || '10:00')}
+                      {isLateCheckout(booking.checkOutTime) && booking.lateCheckoutFee > 0 ? ` - +KES ${booking.lateCheckoutFee.toLocaleString()}` : ''}
+                    </small>
+                  </div>
+                  <div role="cell" className="op-admin-booking-payment">
+                    <strong>{paymentSummary(booking)}</strong>
+                    <small>KES {Number(booking.total || 0).toLocaleString()}</small>
+                  </div>
+                  <div role="cell" className="op-admin-booking-status">
+                    <span className={`op-admin-booking-pill is-${status.tone}`}>{status.label}</span>
+                    {actions && <div className="op-admin-booking-actions">{actions}</div>}
+                    {!isAdmin && <small>View only</small>}
+                  </div>
+                </div>
+              );
+            }) : (
+              <div className="op-admin-booking-empty" role="row">
+                <strong>No bookings in this view</strong>
+                <p>{search ? 'Try a different booking, guest, or stay search.' : 'New reservations will appear here when guests book a stay.'}</p>
+              </div>
+            )}
           </div>
-          {bookings.length === 0 && (
-            <div className="text-center py-12 text-[#6b7280]">No bookings found{statusFilter ? ` with status "${statusFilter}"` : ''}.</div>
-          )}
         </div>
-      )}
+      </section>
 
-      {/* Edit Modal */}
       <EditBookingModal
         booking={editingBooking}
         onClose={() => setEditingBooking(null)}
         onSaved={handleEditSaved}
       />
 
-      {/* Cancel Confirmation Dialog */}
       <ConfirmDialog
-        open={!!cancelTarget}
-        title="Cancel Booking"
-        message={
-          cancelTarget
-            ? `Cancel booking for ${cancelTarget.user?.firstName} ${cancelTarget.user?.lastName} at ${cancelTarget.property?.title}? This will free up the dates.`
-            : ''
-        }
-        confirmLabel="Yes, Cancel Booking"
-        confirmClass="bg-red-600 hover:bg-red-700"
+        open={Boolean(cancelTarget)}
+        title="Cancel booking"
+        message={cancelTarget
+          ? `Cancel ${bookingReference(cancelTarget.id)} for ${cancelTarget.user?.firstName || 'this guest'} at ${cancelTarget.property?.title || 'this stay'}? The dates will be released.`
+          : ''}
+        confirmLabel="Cancel booking"
+        confirmClass="op-admin-danger-button"
         onConfirm={() => handleStatusChange(cancelTarget.id, 'CANCELLED')}
         onCancel={() => setCancelTarget(null)}
+        busy={actionLoading}
       />
 
-      {/* Delete Confirmation Dialog */}
       <ConfirmDialog
-        open={!!deleteTarget}
-        title="Delete Booking"
-        message={
-          deleteTarget
-            ? `Permanently delete booking for ${deleteTarget.user?.firstName} ${deleteTarget.user?.lastName} at ${deleteTarget.property?.title}? This cannot be undone.`
-            : ''
-        }
-        confirmLabel="Yes, Delete Forever"
-        confirmClass="bg-red-600 hover:bg-red-700"
+        open={Boolean(deleteTarget)}
+        title="Delete booking"
+        message={deleteTarget
+          ? `Permanently delete ${bookingReference(deleteTarget.id)} for ${deleteTarget.user?.firstName || 'this guest'}? This cannot be undone.`
+          : ''}
+        confirmLabel="Delete forever"
+        confirmClass="op-admin-danger-button"
         onConfirm={() => handleDelete(deleteTarget.id)}
         onCancel={() => setDeleteTarget(null)}
+        busy={actionLoading}
       />
     </div>
   );
