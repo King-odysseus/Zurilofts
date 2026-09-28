@@ -200,32 +200,18 @@ function AdminLayout() {
           collapsed ? 'w-[72px]' : 'w-[224px]'
         }`}
       >
-        <div className={`flex ${collapsed ? 'flex-col items-center gap-2 pt-5 pb-2 px-2' : 'items-center justify-between pt-5 pb-3 px-5'}`}>
+        <div className={`flex items-center ${collapsed ? 'justify-center px-2 pb-2 pt-5' : 'justify-between px-5 pb-3 pt-5'}`}>
           <Link to="/" className="op-admin-brand inline-flex items-center gap-2">
             <img src={logoImg} alt="ZuriLofts" className="h-7 w-7 object-contain" />
             {!collapsed && <strong>zuri.admin</strong>}
           </Link>
-          <button
-            onClick={toggleSidebar}
-            className="p-1 rounded-lg hover:bg-white/10 transition-colors"
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-          >
-            <svg
-              className={`w-5 h-5 transition-transform duration-300 ${collapsed ? 'rotate-180' : ''}`}
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
-            </svg>
-          </button>
         </div>
         {!collapsed && (
           <span className="block px-6 pb-4 text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">
             {isAdmin ? 'Workspace' : 'Host workspace'}
           </span>
         )}
-        <nav className={`flex-1 ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
+        <nav className={`min-h-0 flex-1 overflow-y-auto ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
           {navItems.map(({ path, label, icon, exact }) => {
             const active = exact ? location.pathname === path : location.pathname.startsWith(path);
             return (
@@ -260,7 +246,7 @@ function AdminLayout() {
             );
           })}
         </nav>
-        <div className={`border-t border-white/10 ${collapsed ? 'p-3 flex flex-col items-center' : 'p-5'}`}>
+        <div className={`op-admin-sidebar-account border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'p-5'}`}>
           <Link
             to="/"
             title={collapsed ? 'Go back to client view' : ''}
@@ -297,6 +283,18 @@ function AdminLayout() {
             {!collapsed && <span className="ml-2.5">Sign Out</span>}
           </button>
         </div>
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          className={`op-admin-sidebar-toggle ${collapsed ? 'is-collapsed' : 'is-expanded'}`}
+          aria-expanded={!collapsed}
+          aria-label={collapsed ? 'Expand admin sidebar' : 'Collapse admin sidebar'}
+          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        >
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={collapsed ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7'} />
+          </svg>
+        </button>
       </aside>
 
       {/* Mobile nav */}
