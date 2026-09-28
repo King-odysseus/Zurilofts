@@ -87,8 +87,8 @@
 .opg-history-meta div:last-child dd{color:#9a744a}
 .opg-history-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:18px}
 
-.opg-profile{display:grid;gap:18px}
-.opg-profile-summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 18px;border:1px solid #e8edf3;border-radius:16px;background:#fff}
+.opg-profile{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;min-width:0}
+.opg-profile-summary{display:flex;align-items:center;justify-content:space-between;gap:20px;min-width:0;padding:16px 18px;border:1px solid #e8edf3;border-radius:16px;background:#fff}
 .opg-profile-avatar-wrap{display:flex;align-items:center;gap:14px;min-width:0}
 .opg-profile-avatar-wrap label{display:block;flex:none}
 .opg-profile-avatar-wrap img,.opg-profile-avatar-wrap label>div{width:64px;height:64px;border-radius:50%}
@@ -98,16 +98,18 @@
 .opg-profile-identity span{display:block;margin-top:5px;color:#9a744a;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 .opg-profile-verify{flex:none;color:#2563eb;font-size:12px;font-weight:700;text-decoration:none}
 .opg-profile-verify:hover,.opg-profile-verify:focus-visible{color:#0b1f42;text-decoration:underline}
-.opg-profile-tabs{display:flex;align-items:center;gap:5px;width:fit-content;max-width:100%;padding:4px;border-radius:12px;background:#f1f5f9;overflow-x:auto;scrollbar-width:none}
+.opg-profile-tabs{display:flex;align-items:center;gap:5px;width:fit-content;max-width:100%;min-width:0;padding:4px;border-radius:12px;background:#f1f5f9;overflow-x:auto;scrollbar-width:none}
 .opg-profile-tabs::-webkit-scrollbar{display:none}
 .opg-profile-tabs button{min-height:36px;padding:0 15px;border:0;border-radius:9px;background:transparent;color:#64748b;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer}
 .opg-profile-tabs button.is-active{background:#fff;color:#0b1f42;font-weight:700;box-shadow:0 1px 4px rgba(15,23,42,.08)}
 .opg-profile .neu-card{border:1px solid #e8edf3;border-radius:16px;box-shadow:0 8px 26px rgba(11,31,66,.05)}
 .opg-profile .neu-input{border-color:#e2dad0;border-radius:12px;box-shadow:none}
-.opg-profile-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 16px}
+.opg-profile-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 16px;min-width:0}
+.opg-profile-form>div{min-width:0}
 .opg-profile-form>button{grid-column:1/-1}
 .opg-profile-form label{font-size:12px;font-weight:700;color:#475569}
-.opg-profile-form input,.opg-profile-form select{min-height:44px;border-radius:12px!important;border-color:#e2dad0!important;box-shadow:none!important}
+.opg-profile-form input,.opg-profile-form select{min-width:0;min-height:44px;border-radius:12px!important;border-color:#e2dad0!important;box-shadow:none!important}
+.opg-profile-form>div>div.flex{min-width:0}
 .opg-profile-form input:focus,.opg-profile-form select:focus{border-color:#c49a6c!important;box-shadow:0 0 0 3px rgba(196,154,108,.2)!important}
 .opg-profile-country{width:118px;flex:none}
 .opg-profile-select,.opg-profile-frequency{min-height:44px;border-radius:12px!important;border-color:#e2dad0!important;box-shadow:none!important}
@@ -222,11 +224,17 @@
   .opg-history-title-row .opg-trip-status{margin-top:10px}
   .opg-history-meta{grid-template-columns:1fr 1fr;gap:14px}
   .opg-history-actions{display:grid;grid-template-columns:1fr;margin-top:16px}
+  .opg-profile,
+  .opg-profile>div,
+  .opg-profile-summary,
+  .opg-profile-tabs{width:100%;max-width:100%;min-width:0}
   .opg-profile-summary{display:block;padding:14px}
+  .opg-profile-avatar-wrap{width:100%;min-width:0}
+  .opg-profile-identity{flex:1}
   .opg-profile-verify{display:inline-block;margin-top:14px}
   .opg-profile-tabs{width:100%}
   .opg-profile-tabs button{flex:1;padding:0 10px}
-  .opg-profile-form{grid-template-columns:1fr}
+  .opg-profile-form{grid-template-columns:minmax(0,1fr)}
   .opg-profile-form>button{grid-column:auto}
   .opg-profile-frequency{width:100%}
   .opg-messages-layout{display:block;min-height:0}
