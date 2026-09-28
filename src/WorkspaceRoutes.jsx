@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute.jsx';
 import HostRoute from './components/HostRoute.jsx';
 import HostLayout from './components/HostLayout.jsx';
@@ -17,6 +17,7 @@ import AdminFeedback from './pages/AdminFeedback.jsx';
 import AdminMessages from './pages/AdminMessages.jsx';
 import AdminGuides from './pages/AdminGuides.jsx';
 import AdminPayoutsPage from './pages/AdminPayoutsPage.jsx';
+import AdminTrustSafety from './pages/AdminTrustSafety.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
 import HostCalendarPage from './pages/HostCalendarPage.jsx';
 import HostEarningsPage from './pages/HostEarningsPage.jsx';
@@ -48,6 +49,9 @@ export default function WorkspaceRoutes() {
       <Route path="earnings" element={<AdminEarningsPage />} />
       <Route path="users" element={<AdminUsers />} />
       <Route path="host-applications" element={<AdminHostApplications />} />
+      <Route path="trust-safety" element={<AdminTrustSafety />} />
+      <Route path="identity-verifications" element={<Navigate to="/admin/trust-safety" replace />} />
+      <Route path="disputes" element={<Navigate to="/admin/trust-safety" replace />} />
       <Route path="promos" element={<AdminPromos />} />
       <Route path="addons" element={<AdminAddOns />} />
       <Route path="feedback" element={<AdminFeedback />} />
