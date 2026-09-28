@@ -1,5 +1,18 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Link, useNavigate } from 'react-router-dom';
+import { Alert, Badge, Button, Label, Select, Spinner, TextInput } from 'flowbite-react';
+import {
+  AlertCircle,
+  BadgeCheck,
+  CheckCircle2,
+  Clock3,
+  FileCheck2,
+  FileText,
+  LockKeyhole,
+  ShieldCheck,
+  Upload,
+} from 'lucide-react';
 import apiClient from '../api/client.js';
 
 const DOCUMENT_KINDS = [
@@ -8,47 +21,48 @@ const DOCUMENT_KINDS = [
   { kind: 'SELFIE', label: 'Selfie holding your ID', required: true },
 ];
 
-const STATUS_STYLES = {
-  UNVERIFIED: 'bg-[#EAF0F4] text-[#52606F]',
-  SUBMITTED: 'bg-[#FDE8D8] text-[#9A4A1D]',
-  APPROVED: 'bg-[#E8F4EC] text-[#287A45]',
-  REJECTED: 'bg-[#FDECEC] text-[#B42318]',
+const STATUS_META = {
+  UNVERIFIED: { label: 'Not verified', color: 'gray', icon: Clock3 },
+  SUBMITTED: { label: 'Under review', color: 'warning', icon: Clock3 },
+  APPROVED: { label: 'Verified', color: 'success', icon: BadgeCheck },
+  REJECTED: { label: 'Changes needed', color: 'failure', icon: AlertCircle },
 };
 
-const STATUS_LABELS = {
-  UNVERIFIED: 'Not verified',
-  SUBMITTED: 'Under review',
-  APPROVED: 'Verified',
-  REJECTED: 'Changes needed',
-};
+const VERIFICATION_STEPS = [
+  { number: '1', label: 'Details', detail: 'Personal information', href: '#verification-details' },
+  { number: '2', label: 'Documents', detail: 'Secure upload', href: '#verification-documents' },
+  { number: '3', label: 'Review', detail: 'Submit for review', href: '#verification-review' },
+];
 
 /**
  * Guest identity verification: gates payment on a booking, not account access.
  * Reused on the Profile "Verification" tab and on the standalone /verify-identity
- * page a guest is sent to mid-checkout (see BookingPage's
- * requiresIdentityVerification handling).
+ * page a guest is sent to mid-checkout.
  */
 function IdentityVerificationPanel({ onApproved }) {
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({ fullName: '', dateOfBirth: '', idType: 'NATIONAL_ID', idNumber: '' });
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState('');
+  const [notice, setNotice] = useState('');
+  const [error, setError] = useState('');
   const [uploading, setUploading] = useState(null);
+  const fileInputs = useRef({});
 
   const load = useCallback(async () => {
     try {
-      const res = await apiClient.get('/identity-verification');
-      const v = res.data.data;
-      setData(v);
+      const response = await apiClient.get('/identity-verification');
+      const verification = response.data.data;
+      setData(verification);
       setForm({
-        fullName: v.fullName || '',
-        dateOfBirth: v.dateOfBirth || '',
-        idType: v.idType || 'NATIONAL_ID',
-        idNumber: v.idNumber || '',
+        fullName: verification.fullName || '',
+        dateOfBirth: verification.dateOfBirth || '',
+        idType: verification.idType || 'NATIONAL_ID',
+        idNumber: verification.idNumber || '',
       });
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      setError(error.response?.data?.error || 'Could not load your verification details.');
     } finally {
       setLoading(false);
     }
@@ -62,25 +76,41 @@ function IdentityVerificationPanel({ onApproved }) {
   }, [data?.status]);
 
   const editable = !data || data.status === 'UNVERIFIED' || data.status === 'REJECTED';
+  const status = STATUS_META[data?.status] || STATUS_META.UNVERIFIED;
+  const StatusIcon = status.icon;
+  const uploadedKinds = new Set((data?.documents || []).map((document) => document.kind));
 
-  async function handleSave(e) {
-    e.preventDefault();
+  async function saveDetails() {
     setSaving(true);
-    setMessage('');
+    setNotice('');
+    setError('');
     try {
-      const res = await apiClient.patch('/identity-verification', form);
-      setData(res.data.data);
-      setMessage('Details saved.');
-    } catch (err) {
-      setMessage(err.response?.data?.error || 'Could not save your details');
+      const response = await apiClient.patch('/identity-verification', form);
+      setData(response.data.data);
+      setNotice('Details saved.');
+      return true;
+    } catch (error) {
+      setError(error.response?.data?.error || 'Could not save your details.');
+      return false;
     } finally {
       setSaving(false);
     }
   }
 
+  async function handleSave(event) {
+    event.preventDefault();
+    await saveDetails();
+  }
+
+  async function handleSaveAndExit() {
+    const saved = await saveDetails();
+    if (saved) navigate('/profile#verification');
+  }
+
   async function handleUpload(kind, file) {
     setUploading(kind);
-    setMessage('');
+    setNotice('');
+    setError('');
     try {
       const body = new FormData();
       body.append('document', file);
@@ -88,8 +118,9 @@ function IdentityVerificationPanel({ onApproved }) {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       await load();
-    } catch (err) {
-      setMessage(err.response?.data?.error || 'Could not upload document');
+      setNotice('Document uploaded.');
+    } catch (error) {
+      setError(error.response?.data?.error || 'Could not upload this document.');
     } finally {
       setUploading(null);
     }
@@ -97,175 +128,133 @@ function IdentityVerificationPanel({ onApproved }) {
 
   async function handleSubmit() {
     setSaving(true);
-    setMessage('');
+    setNotice('');
+    setError('');
     try {
-      const res = await apiClient.post('/identity-verification/submit');
-      setData(res.data.data);
-      setMessage('Submitted for review. This usually takes less than a day.');
-    } catch (err) {
-      setMessage(err.response?.data?.error || 'Please complete all required fields and documents first');
+      const response = await apiClient.post('/identity-verification/submit');
+      setData(response.data.data);
+      setNotice('Submitted for review. This usually takes less than a day.');
+    } catch (error) {
+      setError(error.response?.data?.error || 'Complete the required fields and documents before submitting.');
     } finally {
       setSaving(false);
     }
   }
 
   if (loading) {
-    return (
-      <div className="flex justify-center py-12">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent"></div>
-      </div>
-    );
+    return <div className="op-verify-loading" role="status"><Spinner size="lg" /><span>Loading verification...</span></div>;
   }
 
-  const uploadedKinds = new Set((data?.documents || []).map((d) => d.kind));
-
-  return (
-    <div className="max-w-2xl">
-      <div className="mb-4 flex items-center gap-3">
-        <h3 className="text-xl font-bold text-[#0B1F42]">Identity verification</h3>
-        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[data?.status] || STATUS_STYLES.UNVERIFIED}`}>
-          {STATUS_LABELS[data?.status] || STATUS_LABELS.UNVERIFIED}
-        </span>
+  return <div className="op-verify">
+    <header className="op-verify-head">
+      <div>
+        <h2>Verify your identity</h2>
+        <p>Complete the required details securely to continue your booking.</p>
       </div>
-      <p className="mb-6 text-sm text-[#52606F]">
-        We verify every guest&apos;s identity before confirming payment on a booking. Your documents are encrypted and only visible to the ZuriLofts trust &amp; safety team.
-      </p>
+      <Badge color={status.color} icon={StatusIcon}>{status.label}</Badge>
+    </header>
 
-      <nav className="mb-6 grid grid-cols-3 gap-2" aria-label="Identity verification sections">
-        {[
-          ['Details', '#verification-details', '1'],
-          ['Documents', '#verification-documents', '2'],
-          ['Review', '#verification-review', '3'],
-        ].map(([label, href, number]) => (
-          <a key={label} href={href} className="flex min-h-[44px] items-center justify-center gap-2 rounded-[10px] border border-[#E3E8EF] bg-white px-2 text-xs font-semibold text-[#0B1F42] hover:border-[#C49A6C] sm:text-sm">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#FDE8D8] text-xs text-[#9A4A1D]">{number}</span>{label}
-          </a>
-        ))}
-      </nav>
+    <nav className="op-verify-steps" aria-label="Identity verification progress">
+      {VERIFICATION_STEPS.map((step, index) => <a key={step.label} href={step.href} className={`op-verify-step${index === 0 ? ' is-active' : ''}`}>
+        <span>{step.number}</span>
+        <div><strong>{step.label}</strong><small>{step.detail}</small></div>
+      </a>)}
+    </nav>
 
-      {data?.status === 'REJECTED' && data?.reviewNote && (
-        <div className="mb-6 rounded-2xl border border-[#F1C9C9] bg-[#FDECEC] px-4 py-3 text-sm text-[#B42318]">
-          {data.reviewNote}
-        </div>
-      )}
-      {data?.status === 'SUBMITTED' && (
-        <div className="mb-6 rounded-2xl border border-[#F2D5B8] bg-[#FFF4E8] px-4 py-3 text-sm text-[#9A4A1D]">
-          Your verification is being reviewed. We&apos;ll notify you once it&apos;s complete.
-        </div>
-      )}
-      {data?.status === 'APPROVED' && (
-        <div className="mb-6 rounded-2xl border border-[#BFE3C9] bg-[#E8F4EC] px-4 py-3 text-sm text-[#287A45]">
-          You&apos;re verified. You can complete payment on any pending booking.
-        </div>
-      )}
-      {message && <p className="mb-4 text-sm text-[#5B6B82]">{message}</p>}
+    {data?.status === 'REJECTED' && data?.reviewNote && <Alert color="failure" icon={AlertCircle} className="op-verify-alert">{data.reviewNote}</Alert>}
+    {data?.status === 'SUBMITTED' && <Alert color="warning" icon={Clock3} className="op-verify-alert">Your verification is being reviewed. We will notify you when it is complete.</Alert>}
+    {data?.status === 'APPROVED' && <Alert color="success" icon={CheckCircle2} className="op-verify-alert">You are verified. You can complete payment on any pending booking.</Alert>}
+    {error && <Alert color="failure" className="op-verify-alert">{error}</Alert>}
+    {notice && <Alert color="success" className="op-verify-alert">{notice}</Alert>}
 
-      <form id="verification-details" onSubmit={handleSave} className="scroll-mt-24 space-y-4 mb-6">
-        <h4 className="text-sm font-semibold text-[#0B1F42]">Details</h4>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="iv-fullName" className="mb-1 block text-sm font-medium text-[#0B1F42]">Full legal name</label>
-            <input
-              id="iv-fullName"
-              type="text"
-              disabled={!editable}
-              value={form.fullName}
-              onChange={(e) => setForm({ ...form, fullName: e.target.value })}
-              className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:bg-[#EAF0F4] disabled:text-[#52606F]"
-            />
+    <section className="op-verify-section" aria-labelledby="verification-details-title">
+      <div className="op-verify-details-grid">
+        <div className="op-verify-fields">
+          <div className="op-verify-section-head">
+            <h3 id="verification-details-title">Tell us about yourself</h3>
+            <p>Your information is used only for identity verification.</p>
           </div>
-          <div>
-            <label htmlFor="iv-dateOfBirth" className="mb-1 block text-sm font-medium text-[#0B1F42]">Date of birth</label>
-            <input
-              id="iv-dateOfBirth"
-              type="date"
-              disabled={!editable}
-              value={form.dateOfBirth}
-              onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
-              className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:bg-[#EAF0F4] disabled:text-[#52606F]"
-            />
-          </div>
-          <div>
-            <label htmlFor="iv-idType" className="mb-1 block text-sm font-medium text-[#0B1F42]">ID type</label>
-            <select
-              id="iv-idType"
-              disabled={!editable}
-              value={form.idType}
-              onChange={(e) => setForm({ ...form, idType: e.target.value })}
-              className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:bg-[#EAF0F4] disabled:text-[#52606F]"
-            >
-              <option value="NATIONAL_ID">National ID</option>
-              <option value="PASSPORT">Passport</option>
-              <option value="ALIEN_ID">Alien ID</option>
-            </select>
-          </div>
-          <div>
-            <label htmlFor="iv-idNumber" className="mb-1 block text-sm font-medium text-[#0B1F42]">ID number</label>
-            <input
-              id="iv-idNumber"
-              type="text"
-              disabled={!editable}
-              value={form.idNumber}
-              onChange={(e) => setForm({ ...form, idNumber: e.target.value })}
-              className="h-12 w-full rounded-[10px] border-0 bg-[#F7F4EF] px-3 text-sm text-[#0B1F42] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:bg-[#EAF0F4] disabled:text-[#52606F]"
-            />
-          </div>
-        </div>
-        {editable && (
-          <button
-            type="submit"
-            disabled={saving}
-            className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-white px-5 py-2 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF] disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save details'}
-          </button>
-        )}
-      </form>
-
-      {editable && (
-        <div id="verification-documents" className="scroll-mt-24 space-y-3 mb-6">
-          <p className="text-sm font-semibold text-[#0B1F42]">Documents</p>
-          {DOCUMENT_KINDS.map(({ kind, label, required }) => (
-            <div key={kind} className="flex items-center justify-between gap-3 rounded-2xl border border-[#E3E8EF] bg-white p-3 shadow-[0_8px_28px_rgba(11,31,66,0.05)]">
-              <div>
-                <p className="text-sm text-[#0B1F42]">{label}{required && <span className="text-[#B42318]"> *</span>}</p>
-                {uploadedKinds.has(kind) && <p className="text-xs text-[#287A45]">Uploaded</p>}
-              </div>
-              <label className="inline-flex min-h-[44px] cursor-pointer items-center rounded-[10px] border border-[#E3E8EF] px-3 py-1.5 text-xs font-semibold text-[#0B1F42] transition-all hover:bg-[#F7F4EF] hover:text-[#9A744A]">
-                {uploading === kind ? 'Uploading...' : uploadedKinds.has(kind) ? 'Replace' : 'Upload'}
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,application/pdf"
-                  className="hidden"
-                  disabled={uploading === kind}
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleUpload(kind, file);
-                    e.target.value = '';
-                  }}
-                />
-              </label>
+          <form id="verification-details" className="op-verify-form" onSubmit={handleSave}>
+            <div className="op-verify-field">
+              <Label htmlFor="iv-fullName">Legal name</Label>
+              <TextInput id="iv-fullName" type="text" disabled={!editable} value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} placeholder="As shown on your ID" required />
             </div>
-          ))}
+            <div className="op-verify-field">
+              <Label htmlFor="iv-dateOfBirth">Date of birth</Label>
+              <TextInput id="iv-dateOfBirth" type="date" disabled={!editable} value={form.dateOfBirth} onChange={(event) => setForm({ ...form, dateOfBirth: event.target.value })} required />
+            </div>
+            <div className="op-verify-field">
+              <Label htmlFor="iv-idType">Identity document</Label>
+              <Select id="iv-idType" disabled={!editable} value={form.idType} onChange={(event) => setForm({ ...form, idType: event.target.value })} required>
+                <option value="NATIONAL_ID">National ID</option>
+                <option value="PASSPORT">Passport</option>
+                <option value="ALIEN_ID">Alien ID</option>
+              </Select>
+            </div>
+            <div className="op-verify-field">
+              <Label htmlFor="iv-idNumber">Document number</Label>
+              <TextInput id="iv-idNumber" type="text" disabled={!editable} value={form.idNumber} onChange={(event) => setForm({ ...form, idNumber: event.target.value })} required />
+            </div>
+            <p className="op-verify-help"><LockKeyhole size={14} strokeWidth={1.8} aria-hidden="true" />Your documents are encrypted and reviewed securely.</p>
+            {editable && <div className="op-verify-detail-actions">
+              <Button type="submit" disabled={saving} className="op-trust-button-primary">{saving ? <Spinner size="sm" /> : 'Save details'}</Button>
+              <Button as="a" href="#verification-documents" color="light">Continue to documents</Button>
+            </div>}
+          </form>
         </div>
-      )}
-
-      <div id="verification-review" className="scroll-mt-24 border-t border-[#E3E8EF] pt-5">
-        <p className="mb-1 text-sm font-semibold text-[#0B1F42]">Review</p>
-        <p className="mb-4 text-xs text-[#5B6B82]">Check your details and required documents before submitting.</p>
-      {editable && (
-        <button
-          onClick={handleSubmit}
-          disabled={saving}
-          className="min-h-[44px] rounded-[10px] bg-[#C49A6C] px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C] disabled:opacity-50"
-        >
-          Submit for review
-        </button>
-      )}
-      {!editable && <p className="text-sm text-[#5B6B82]">Your submitted information is shown above.</p>}
+        <aside className="op-verify-callout">
+          <span><Clock3 size={18} strokeWidth={1.8} aria-hidden="true" /></span>
+          <strong>Your booking is held</strong>
+          <p>Return to payment after your identity has been approved.</p>
+        </aside>
       </div>
-    </div>
-  );
+    </section>
+
+    {editable && <section id="verification-documents" className="op-verify-section op-verify-documents" aria-labelledby="verification-documents-title">
+      <div className="op-verify-section-head">
+        <h3 id="verification-documents-title">Documents</h3>
+        <p>Upload clear photos or PDF files. Each file can be up to 10MB.</p>
+      </div>
+      <div className="op-verify-document-list">
+        {DOCUMENT_KINDS.map(({ kind, label, required }) => {
+          const uploaded = uploadedKinds.has(kind);
+          return <div key={kind} className="op-verify-document">
+            <span className="op-verify-document-icon"><FileCheck2 size={19} strokeWidth={1.8} aria-hidden="true" /></span>
+            <div>
+              <strong>{label}{required && <em>Required</em>}</strong>
+              <small>{uploaded ? 'Uploaded and encrypted' : 'Not uploaded yet'}</small>
+            </div>
+            <Button size="sm" color="light" disabled={uploading === kind} onClick={() => fileInputs.current[kind]?.click()}>
+              {uploading === kind ? <Spinner size="sm" /> : <><Upload size={14} strokeWidth={1.8} aria-hidden="true" />{uploaded ? 'Replace' : 'Upload'}</>}
+            </Button>
+            <input
+              ref={(element) => { fileInputs.current[kind] = element; }}
+              type="file"
+              className="sr-only"
+              accept="image/jpeg,image/png,image/webp,application/pdf"
+              onChange={(event) => {
+                const file = event.target.files?.[0];
+                if (file) handleUpload(kind, file);
+                event.target.value = '';
+              }}
+            />
+          </div>;
+        })}
+      </div>
+    </section>}
+
+    <section id="verification-review" className="op-verify-section op-verify-review" aria-labelledby="verification-review-title">
+      <div className="op-verify-section-head">
+        <h3 id="verification-review-title">Review</h3>
+        <p>Check your details and required documents before submitting.</p>
+      </div>
+      {editable ? <div className="op-verify-review-actions">
+        <Button onClick={handleSubmit} disabled={saving} className="op-trust-button-primary">{saving ? <Spinner size="sm" /> : <><ShieldCheck size={16} strokeWidth={1.8} aria-hidden="true" />Submit for review</>}</Button>
+        <Button color="light" disabled={saving} onClick={handleSaveAndExit}>Save and exit</Button>
+        <Link to="/trips">Return to trips</Link>
+      </div> : <div className="op-verify-submitted"><FileText size={17} strokeWidth={1.8} aria-hidden="true" /><span>Your submitted information is shown above.</span></div>}
+    </section>
+  </div>;
 }
 
 IdentityVerificationPanel.propTypes = {
