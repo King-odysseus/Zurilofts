@@ -5,6 +5,7 @@ import HostLayout from './components/HostLayout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AdminDashboard, { AdminLayout } from './pages/AdminDashboard.jsx';
 import AdminProperties from './pages/AdminProperties.jsx';
+import AdminListingReview from './pages/AdminListingReview.jsx';
 import AdminPropertyForm from './pages/AdminPropertyForm.jsx';
 import AdminCalendar from './pages/AdminCalendar.jsx';
 import AdminBookings from './pages/AdminBookings.jsx';
@@ -37,7 +38,7 @@ export default function WorkspaceRoutes() {
     <Route path="/host/payouts" element={<HostRoute><HostPayouts /></HostRoute>} />
     <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
       <Route index element={<AdminDashboard />} />
-      <Route path="properties" element={<AdminProperties />} />
+      <Route path="properties" element={<AdminListingReview />} />
       <Route path="properties/new" element={<AdminPropertyForm />} />
       <Route path="properties/:id/edit" element={<AdminPropertyForm />} />
       <Route path="properties/:id/calendar" element={<AdminCalendar />} />

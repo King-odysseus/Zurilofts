@@ -23,7 +23,8 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/host/calendar`, `/host/calendar/:id` | Product `0:757`, calendar `0:3997` | Functional legacy, redesign pending |
 | `/host/earnings`, `/host/payouts` | Product `0:757`, earnings/payouts `0:4039` | Functional legacy, redesign pending |
 | `/admin` | Admin `0:6909`, workspace `0:6598` | Redesigned overview, QA ongoing |
-| `/admin/properties`, `/admin/properties/new`, `/admin/properties/:id/edit`, `/admin/properties/:id/calendar` | Admin `0:7015`, Product listing editor `0:3955` | Functional legacy, redesign pending |
+| `/admin/properties` | Admin `0:7015` | Redesigned live listing review, QA ongoing |
+| `/admin/properties/new`, `/admin/properties/:id/edit`, `/admin/properties/:id/calendar` | Admin `0:7015`, Product listing editor `0:3955` | Functional legacy, redesign pending |
 | `/admin/bookings`, `/admin/earnings`, `/admin/payouts` | Admin `0:7116`, insights `0:7570` | Functional legacy, redesign pending |
 | `/admin/users`, `/admin/host-applications` | Admin `0:7228`, Product `0:4123` | Functional legacy, redesign pending |
 | `/admin/promos`, `/admin/addons`, `/admin/guides` | Admin `0:7343`, content/support `0:6855` | Functional legacy, redesign pending |
