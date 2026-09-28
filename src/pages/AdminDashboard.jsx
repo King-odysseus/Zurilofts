@@ -30,6 +30,20 @@ const adminOnlyItems = [
   { path: '/admin/payouts', label: 'Payouts', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z' },
 ];
 
+const adminMobilePrimaryItems = [
+  { path: '/admin', label: 'Overview', icon: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', exact: true },
+  { path: '/admin/properties', label: 'Listings', icon: 'M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 00-2-2h-2M10 6h1M13 6h1M10 10h1M13 10h1M10 14h1M13 14h1M10 18h1M13 18h1' },
+  { path: '/admin/users', label: 'People', icon: 'M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75', matchPaths: ['/admin/users', '/admin/host-applications'] },
+];
+
+const hostMobilePrimaryItems = [
+  { path: '/admin', label: 'Overview', icon: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', exact: true },
+  { path: '/admin/properties', label: 'Listings', icon: 'M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 00-2-2h-2M10 6h1M13 6h1M10 10h1M13 10h1M10 14h1M13 14h1M10 18h1M13 18h1' },
+  { path: '/admin/earnings', label: 'Earnings', icon: 'M21 12a9 9 0 11-18 0 9 9 0 0118 0zM12 7v10M15 9.5c-.7-.7-1.7-1.1-3-1.1-1.7 0-3 .8-3 2s1.3 2 3 2 3 .8 3 2-1.3 2-3 2c-1.3 0-2.3-.4-3-1.1' },
+];
+
+const mobileMoreIcon = 'M5 12h.01M12 12h.01M19 12h.01';
+
 
 // Avatar dropdown shown in the dashboard header - mirrors the client Navbar's
 // account menu so admins/hosts get the same affordance inside the panel.
@@ -150,13 +164,28 @@ function AdminLayout() {
   const [collapsed, setCollapsed] = useState(() => {
     try { return localStorage.getItem('zurilofts_admin_sidebar') === 'collapsed'; } catch { return false; }
   });
+  const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const isAdmin = user?.role === 'ADMIN';
   const navItems = isAdmin ? [...sharedNavItems, ...adminOnlyItems] : sharedNavItems;
+  const mobilePrimaryItems = isAdmin ? adminMobilePrimaryItems : hostMobilePrimaryItems;
+  const mobilePrimaryPaths = new Set(mobilePrimaryItems.map((item) => item.path));
+  const mobileMoreItems = navItems.filter((item) => !mobilePrimaryPaths.has(item.path));
   const mobileNavLabels = {
     'Users & Hosts': 'Users',
     'Host Applications': 'Hosts',
     'Promo Codes': 'Promos',
   };
+
+  function matchesMobilePrimary(item) {
+    const paths = item.matchPaths || [item.path];
+    return paths.some((path) => {
+      if (item.exact) return location.pathname === path;
+      return location.pathname === path || location.pathname.startsWith(`${path}/`);
+    });
+  }
+
+  const mobilePrimaryActive = mobilePrimaryItems.some(matchesMobilePrimary);
+  const mobileMoreActive = !mobilePrimaryActive && location.pathname.startsWith('/admin');
 
   // ── Notification polling (messages + new bookings) ──
   const [notif, setNotif] = useState({ unreadMessages: 0, pendingBookings: 0 });
@@ -183,6 +212,24 @@ function AdminLayout() {
     const t = setInterval(poll, 25000);
     return () => { active = false; clearInterval(t); };
   }, []);
+
+  useEffect(() => {
+    setMobileMoreOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (!mobileMoreOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    function handleKeyDown(event) {
+      if (event.key === 'Escape') setMobileMoreOpen(false);
+    }
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileMoreOpen]);
 
   function handleLogout() {
     logout();
@@ -336,25 +383,92 @@ function AdminLayout() {
       </div>
       <nav className="op-admin-mobile-nav md:hidden" aria-label={`${isAdmin ? 'Admin' : 'Host'} workspace sections`}>
         <div className="op-admin-mobile-nav-scroll">
-          {navItems.map(({ path, label, icon, exact }) => {
-            const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+          {mobilePrimaryItems.map((item) => {
+            const active = matchesMobilePrimary(item);
             return (
-              <Link key={path} to={path} className={`op-admin-mobile-link ${active ? 'is-active' : ''}`}>
+              <Link key={item.path} to={item.path} className={`op-admin-mobile-link ${active ? 'is-active' : ''}`} aria-current={active ? 'page' : undefined}>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
                 </svg>
-                <span>{mobileNavLabels[label] || label}</span>
+                <span>{item.label}</span>
               </Link>
             );
           })}
-          <Link to="/" className="op-admin-mobile-link">
+          <button
+            type="button"
+            className={`op-admin-mobile-link ${mobileMoreActive || mobileMoreOpen ? 'is-active' : ''}`}
+            onClick={() => setMobileMoreOpen(true)}
+            aria-expanded={mobileMoreOpen}
+            aria-controls="admin-mobile-more-drawer"
+          >
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileMoreIcon} />
             </svg>
-            <span>Client view</span>
-          </Link>
+            <span>More</span>
+          </button>
         </div>
       </nav>
+      {mobileMoreOpen && (
+        <div className="op-admin-mobile-more-backdrop md:hidden" onClick={() => setMobileMoreOpen(false)}>
+          <section
+            id="admin-mobile-more-drawer"
+            className="op-admin-mobile-more-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${isAdmin ? 'Admin' : 'Host'} workspace navigation`}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <header className="op-admin-mobile-more-head">
+              <div>
+                <strong>zuri.admin</strong>
+                <span>{isAdmin ? 'Workspace navigation' : 'Host workspace'}</span>
+              </div>
+              <button type="button" onClick={() => setMobileMoreOpen(false)} aria-label="Close navigation">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </header>
+            <p className="op-admin-mobile-more-label">Workspace</p>
+            <div className="op-admin-mobile-more-list">
+              {mobileMoreItems.map(({ path, label, icon }) => {
+                const active = location.pathname === path || location.pathname.startsWith(`${path}/`);
+                const displayLabel = mobileNavLabels[label] || label;
+                return (
+                  <Link
+                    key={path}
+                    to={path}
+                    className={active ? 'is-active' : ''}
+                    aria-current={active ? 'page' : undefined}
+                    onClick={() => setMobileMoreOpen(false)}
+                  >
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
+                    </svg>
+                    <span>{displayLabel}</span>
+                    {path === '/admin/messages' && notif.unreadMessages > 0 && <small>{notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}</small>}
+                    {path === '/admin/bookings' && notif.pendingBookings > 0 && <small>{notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}</small>}
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="op-admin-mobile-more-footer">
+              <Link to="/" onClick={() => setMobileMoreOpen(false)}>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                </svg>
+                Client view
+              </Link>
+              <button type="button" onClick={handleLogout}>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Sign Out
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
 
       {/* Main content */}
       <main
