@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { CalendarDays } from 'lucide-react';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
@@ -105,7 +106,7 @@ TripRow.propTypes = {
 
 function EmptyTrips({ isPast }) {
   return <div className="opg-trip-empty">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+    <CalendarDays strokeWidth={1.6} aria-hidden="true" />
     <h2>{isPast ? 'No past trips' : 'No upcoming trips'}</h2>
     <p>{isPast ? 'Completed stays will appear here with review and rebooking options.' : 'When you book a stay, your check-in details and host messages will appear here.'}</p>
     {!isPast && <Link className="opg-trip-primary" to="/properties">Browse stays</Link>}

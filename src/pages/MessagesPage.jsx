@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Textarea } from 'flowbite-react';
+import { ChevronLeft, MessageCircleMore, Send } from 'lucide-react';
 import apiClient from '../api/client.js';
 import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMessagesLayout.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -102,10 +103,10 @@ function MessagesPage() {
   >
     <header className="opg-message-pane-head">
       <Link className="opg-message-back" to="/inbox" aria-label="Back to messages">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.9} d="M15 19l-7-7 7-7" /></svg>
+        <ChevronLeft strokeWidth={1.9} aria-hidden="true" />
       </Link>
       <span className="opg-message-context-icon">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+        <MessageCircleMore strokeWidth={1.7} aria-hidden="true" />
       </span>
       <div className="opg-message-context">
         <h2>ZuriLofts Support</h2>
@@ -139,7 +140,7 @@ function MessagesPage() {
         />
         <div className="opg-message-compose-actions">
           <button className="opg-message-send" type="submit" disabled={sending || !body.trim()} aria-label={sending ? 'Sending message' : 'Send message'}>
-            {sending ? <span className="opg-message-send-spinner" /> : <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z" /></svg>}
+            {sending ? <span className="opg-message-send-spinner" /> : <Send strokeWidth={1.8} aria-hidden="true" />}
             <span>Send</span>
           </button>
         </div>

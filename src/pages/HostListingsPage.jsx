@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ToggleSwitch } from 'flowbite-react';
 import PropTypes from 'prop-types';
+import { Building2 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { firstImage } from '../utils/images.js';
@@ -218,7 +219,7 @@ export default function HostListingsPage() {
 
     {error && <div className="op-host-listings-error"><p>{error}</p><button type="button" onClick={() => window.location.reload()}>Try again</button></div>}
     {loading ? <ListingSkeleton /> : !error && visibleProperties.length === 0 ? <div className="op-host-listings-empty">
-      <span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01" /></svg></span>
+      <span><Building2 strokeWidth={1.6} aria-hidden="true" /></span>
       <strong>{properties.length === 0 ? 'No listings yet' : 'Nothing in this view'}</strong>
       <p>{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>
       {properties.length === 0 ? <Link to="/host/properties/new">Add a listing</Link> : <button type="button" onClick={() => setFilter('ALL')}>Show all stays</button>}

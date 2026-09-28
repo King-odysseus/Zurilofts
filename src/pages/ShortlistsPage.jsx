@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { Heart } from 'lucide-react';
 import { Button, Label, TextInput } from 'flowbite-react';
 import SavedStaysHeader from '../components/SavedStaysHeader.jsx';
 import { heroImage } from '../assets/images.js';
@@ -15,7 +16,7 @@ function EmptyState({ onCreateClick }) {
   return (
     <div className="opg-saved-empty">
       <div>
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M4.32 6.32a4.5 4.5 0 000 6.36L12 20.36l7.68-7.68a4.5 4.5 0 00-6.36-6.36L12 7.64l-1.32-1.32a4.5 4.5 0 00-6.36 0z" /></svg>
+        <Heart strokeWidth={1.6} aria-hidden="true" />
         <h2>No shortlists yet</h2>
         <p>Create a collection to keep trip ideas together and share them with the people you travel with.</p>
         <Button className="opg-saved-action" onClick={onCreateClick}>Create your first shortlist</Button>

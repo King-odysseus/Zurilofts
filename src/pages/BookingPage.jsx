@@ -1,6 +1,7 @@
 import { Fragment, useState, useEffect, useMemo } from 'react';
 import { useLocation, useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Dropdown as FlowbiteDropdown, DropdownItem, Radio, Textarea, TextInput } from 'flowbite-react';
+import { Check, ChevronLeft, Clock, CreditCard, House, Landmark, LoaderCircle, MapPin, Star, Trash2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import apiClient from '../api/client.js';
@@ -22,7 +23,7 @@ function CheckoutDropdown({ value, options, onChange, ariaLabel, className = '' 
         <DropdownItem key={option.value} onClick={() => onChange(option.value)}>
           <span className="flex w-full items-center justify-between gap-6">
             <span>{option.label}</span>
-            {String(option.value) === String(value) && <span aria-hidden="true">✓</span>}
+            {String(option.value) === String(value) && <Check className="h-4 w-4" strokeWidth={2} aria-hidden="true" />}
           </span>
         </DropdownItem>
       ))}
@@ -489,9 +490,7 @@ function BookingPage() {
 
       {/* Standard times note */}
       <div className="bg-[#0B0B45]/5 rounded-xl p-4 flex items-start gap-3">
-        <svg className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
+        <Clock className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
         <p className="text-sm text-[#1f2937]">
           Standard <span className="font-semibold">check-in from 3:00 PM</span> and{' '}
           <span className="font-semibold">check-out by 10:00 AM</span>. You may extend up to{' '}
@@ -568,9 +567,7 @@ function BookingPage() {
           className="op-checkout-back-button"
           color="light"
         >
-          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft className="w-5 h-5 mr-1" strokeWidth={2} aria-hidden="true" />
           Back
         </Button>
       </div>
@@ -702,9 +699,7 @@ function BookingPage() {
                   className="mb-1 w-10 h-10 flex items-center justify-center rounded-xl text-[#6b7280] hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0"
                   aria-label="Remove guest"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
+                  <Trash2 className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
                 </button>
               </div>
             ))}
@@ -745,9 +740,7 @@ function BookingPage() {
           className="op-checkout-back-button"
           color="light"
         >
-          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft className="w-5 h-5 mr-1" strokeWidth={2} aria-hidden="true" />
           Back
         </Button>
       </div>
@@ -853,9 +846,7 @@ function BookingPage() {
           className="op-checkout-back-button"
           color="light"
         >
-          <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft className="w-5 h-5 mr-1" strokeWidth={2} aria-hidden="true" />
           Back
         </Button>
       </div>
@@ -874,9 +865,7 @@ function BookingPage() {
             onChange={handleInputChange}
           />
           <div className="ml-4 flex items-center flex-1">
-            <svg className="w-8 h-8 text-[#0B0B45] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-            </svg>
+            <CreditCard className="w-8 h-8 text-[#0B0B45] mr-3" strokeWidth={1.5} aria-hidden="true" />
             <div>
               <p className="font-semibold text-[#1f2937]">Credit/Debit Card</p>
               <p className="text-sm text-[#6b7280]">Pay securely with your card</p>
@@ -916,9 +905,7 @@ function BookingPage() {
             onChange={handleInputChange}
           />
           <div className="ml-4 flex items-center flex-1">
-            <svg className="w-8 h-8 text-[#0B0B45] mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
-            </svg>
+            <Landmark className="w-8 h-8 text-[#0B0B45] mr-3" strokeWidth={1.5} aria-hidden="true" />
             <div>
               <p className="font-semibold text-[#1f2937]">Bank Transfer</p>
               <p className="text-sm text-[#6b7280]">Pay via bank transfer</p>
@@ -1027,10 +1014,7 @@ function BookingPage() {
         >
           {isProcessing ? (
             <>
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#0B0B45]" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
+              <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#0B0B45]" strokeWidth={2} aria-hidden="true" />
               Processing...
             </>
           ) : (
@@ -1053,9 +1037,7 @@ function BookingPage() {
         <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
           <div className="max-w-md mx-auto px-6 text-center">
             <div className="w-24 h-24 bg-[#C49A6C]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <svg className="w-12 h-12 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+              <Check className="w-12 h-12 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
             </div>
             <h1 className="text-3xl font-bold text-[#0B0B45] mb-4">Booking Confirmed!</h1>
             <p className="text-[#6b7280] mb-6">
@@ -1182,24 +1164,17 @@ function BookingPage() {
                   </p>
                 )}
                 <div className="flex items-center text-[#6b7280] text-sm mt-1">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <MapPin className="w-4 h-4 mr-1" strokeWidth={2} aria-hidden="true" />
                   {property?.location}
                 </div>
 
                 <div className="flex items-center mt-2 space-x-4 text-sm">
                   <div className="flex items-center">
-                    <svg className="w-4 h-4 text-[#C49A6C] mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                    </svg>
+                    <Star className="w-4 h-4 text-[#C49A6C] mr-1" fill="currentColor" aria-hidden="true" />
                     <span className="font-medium">{property?.rating}</span>
                   </div>
                   <div className="flex items-center text-[#6b7280]">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
+                    <House className="w-4 h-4 mr-1" strokeWidth={2} aria-hidden="true" />
                     {(bedOption ? (bedOption === '2bed' ? 2 : 1) : property?.bedrooms)} beds
                   </div>
                 </div>

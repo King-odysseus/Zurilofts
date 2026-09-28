@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Textarea } from 'flowbite-react';
+import { ChevronLeft, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMessagesLayout.jsx';
@@ -141,7 +142,7 @@ function ConversationPage() {
   >
     <header className="opg-message-pane-head">
       <Link className="opg-message-back" to="/inbox" aria-label="Back to messages">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.9} d="M15 19l-7-7 7-7" /></svg>
+        <ChevronLeft strokeWidth={1.9} aria-hidden="true" />
       </Link>
       {image && <img className="opg-message-context-image" src={image} alt="" />}
       <div className="opg-message-context">
@@ -178,7 +179,7 @@ function ConversationPage() {
         />
         <div className="opg-message-compose-actions">
           <button className="opg-message-send" type="button" onClick={handleSend} disabled={!canSend} aria-label={sending ? 'Sending message' : 'Send message'}>
-            {sending ? <span className="opg-message-send-spinner" /> : <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z" /></svg>}
+            {sending ? <span className="opg-message-send-spinner" /> : <Send strokeWidth={1.8} aria-hidden="true" />}
             <span>Send</span>
           </button>
         </div>

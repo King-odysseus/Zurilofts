@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { ChevronLeft } from 'lucide-react';
 import { Button, TextInput } from 'flowbite-react';
 import { heroImage } from '../assets/images.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -156,7 +157,7 @@ export default function ShortlistDetailPage() {
     <main className="opg-saved-page">
       <div className="opg-saved-container">
         <Link className="opg-shortlist-back" to="/shortlists">
-          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 19l-7-7 7-7" /></svg>
+          <ChevronLeft strokeWidth={1.8} aria-hidden="true" />
           Back to My lists
         </Link>
 

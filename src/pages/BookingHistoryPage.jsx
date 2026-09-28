@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { ClipboardList } from 'lucide-react';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
@@ -69,7 +70,7 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
 
 function EmptyHistory() {
   return <div className="opg-trip-empty">
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2m-2 0V3H9v2m0 0h6M9 12h6m-6 4h6" /></svg>
+    <ClipboardList strokeWidth={1.6} aria-hidden="true" />
     <h2>No bookings found</h2>
     <p>Try another filter, or browse available stays to plan your next trip.</p>
     <Link className="opg-trip-primary" to="/properties">Browse stays</Link>

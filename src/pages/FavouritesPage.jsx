@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { UserRound } from 'lucide-react';
 import SavedStaysHeader from '../components/SavedStaysHeader.jsx';
 import PropertyCard from '../components/PropertyCard.jsx';
 import Spinner from '../components/Spinner.jsx';
@@ -102,7 +103,7 @@ function FavouritesPage() {
 
         {!isAuthenticated && !sharedIds ? (
           <section className="opg-saved-auth" aria-label="Sign in to save stays">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 0115 0" /></svg>
+            <UserRound strokeWidth={1.7} aria-hidden="true" />
             <p>Sign in to save stays to your account and keep your lists in sync across devices.</p>
             <Link to="/login?returnUrl=/favourites">Sign in</Link>
           </section>

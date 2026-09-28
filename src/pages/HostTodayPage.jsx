@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import { CalendarDays } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 import { firstImage } from "../utils/images.js";
@@ -76,7 +77,7 @@ GuestOperationCard.propTypes = {
 
 function EmptyPanel({ label }) {
   return <div className="op-host-empty">
-    <span><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d="M8 7V3m8 4V3M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></span>
+    <span><CalendarDays strokeWidth={1.6} aria-hidden="true" /></span>
     <strong>No {label.toLowerCase()} today</strong>
     <p>This panel will update when the schedule changes.</p>
   </div>;

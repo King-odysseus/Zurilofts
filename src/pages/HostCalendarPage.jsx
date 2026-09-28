@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button, Label, TextInput } from 'flowbite-react';
 import PropTypes from 'prop-types';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
 
@@ -298,9 +299,9 @@ export default function HostCalendarPage() {
       </div>
       <div className="op-host-calendar-controls">
         <div className="op-host-calendar-week-nav">
-          <button type="button" aria-label="Previous week" onClick={() => moveWeek(-1)}><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m15 18-6-6 6-6" /></svg></button>
+          <button type="button" aria-label="Previous week" onClick={() => moveWeek(-1)}><ChevronLeft strokeWidth={1.8} aria-hidden="true" /></button>
           <span>{formatWeek(weekStart)}</span>
-          <button type="button" aria-label="Next week" onClick={() => moveWeek(1)}><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m9 18 6-6-6-6" /></svg></button>
+          <button type="button" aria-label="Next week" onClick={() => moveWeek(1)}><ChevronRight strokeWidth={1.8} aria-hidden="true" /></button>
         </div>
         {selectedRow && <Link className="op-host-calendar-manage" to={`/host/calendar/${selectedRow.property.id}#block-dates`}>Manage availability</Link>}
       </div>

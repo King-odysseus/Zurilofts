@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { Star, UserRound } from 'lucide-react';
 import apiClient from '../api/client.js';
 import Spinner from '../components/Spinner.jsx';
 import { heroImage } from '../assets/images.js';
@@ -23,7 +24,7 @@ function SharedShortlistRow({ item }) {
         <p>{meta}</p>
         {property.rating > 0 && (
           <span className="opg-shortlist-rating">
-            <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path d="M9.05 2.93c.3-.92 1.6-.92 1.9 0l1.07 3.29c.13.4.5.68.95.69h3.46c.97 0 1.37 1.24.59 1.81l-2.8 2.03a1 1 0 00-.36 1.12l1.07 3.29c.3.92-.76 1.69-1.54 1.12l-2.8-2.03a1 1 0 00-1.18 0l-2.8 2.03c-.78.57-1.84-.2-1.54-1.12l1.07-3.29a1 1 0 00-.36-1.12L2.98 8.72c-.78-.57-.38-1.81.59-1.81h3.46a1 1 0 00.95-.69l1.07-3.29z" /></svg>
+            <Star fill="currentColor" aria-hidden="true" />
             {Number(property.rating).toFixed(2)}
             {property.reviews > 0 && ` (${property.reviews})`}
           </span>
@@ -110,7 +111,7 @@ export default function SharedShortlistPage() {
 
             {!isAuthenticated && (
               <aside className="opg-saved-auth">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.7} d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 20.25a7.5 7.5 0 0115 0" /></svg>
+                <UserRound strokeWidth={1.7} aria-hidden="true" />
                 <p>Sign in to save this shortlist to your account and keep it in sync across devices.</p>
                 <Link to={`/login?returnUrl=${encodeURIComponent(pathname)}`}>Sign in</Link>
               </aside>

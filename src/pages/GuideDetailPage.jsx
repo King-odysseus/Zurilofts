@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
 
@@ -72,9 +73,7 @@ function GuideDetailPage() {
           to="/guides"
           className="op-directory-back"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           Back to Guides
         </Link>
 
