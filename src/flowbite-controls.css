@@ -463,6 +463,10 @@ html.dark .opg-message-loading span {
 }
 
 /* Admin and host workspace */
+html.dark .op-admin-nav-group-label {
+  color: var(--dm-subtle) !important;
+}
+
 html.dark .op-admin-sidebar .op-admin-nav-link[aria-current="page"] {
   background-color: #1D2B43 !important;
   color: #FFFFFF !important;

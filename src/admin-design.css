@@ -1,7 +1,9 @@
 .op-admin-layout{font-family:Inter,Arial,sans-serif;color:#0b1f42}
 .op-admin-mobile-header,.op-admin-mobile-nav{display:none}
 .op-admin-sidebar{border-right:1px solid #eeeae5;overflow:visible;color:#414d63}
-.op-admin-sidebar nav{display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;padding-top:12px;padding-bottom:24px}
+.op-admin-sidebar nav{display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;padding-top:12px;padding-bottom:24px}
+.op-admin-nav-group{display:grid;gap:8px}
+.op-admin-nav-group-label{margin:0 10px 1px;color:#8b95a7;font-size:9px;font-weight:700;letter-spacing:.1em;line-height:1.2;text-transform:uppercase}
 .op-admin-sidebar .op-admin-brand{font:700 16px Montserrat,Arial,sans-serif;color:#0b1f42;text-decoration:none;white-space:nowrap}
 .op-admin-sidebar .op-admin-brand img{border-radius:6px}
 .op-admin-sidebar>span{color:#7f8ba0;font-size:10px;letter-spacing:.1em;padding-bottom:8px}

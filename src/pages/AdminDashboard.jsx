@@ -46,28 +46,55 @@ import ThemeToggle from '../components/ThemeToggle.jsx';
 import '../admin-design.css';
 
 // Shared: both hosts and admins - routes gated by requireHost (or weaker).
-const sharedNavItems = [
+const hostNavItems = [
   { path: '/admin', label: 'Dashboard', icon: LayoutGrid, exact: true },
   { path: '/admin/properties', label: 'Properties', icon: House },
   { path: '/admin/earnings', label: 'Earnings', icon: BarChart3 },
 ];
 
-// Admin-only: backend is requireAdmin. Hosts must not see these - clicking
-// them would 403. Separated from sharedNavItems so the host sidebar stays
-// functional and doesn't invite users to dead-end pages.
-const adminOnlyItems = [
-  { path: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
-  { path: '/admin/users', label: 'Users & Hosts', icon: Users },
-  { path: '/admin/host-applications', label: 'Host Applications', icon: FileText },
-  { path: '/admin/trust-safety', label: 'Trust & Safety', icon: ShieldCheck },
-  { path: '/admin/governance', label: 'Governance', icon: ScrollText },
-  { path: '/admin/promos', label: 'Promo Codes', icon: Tag },
-  { path: '/admin/addons', label: 'Add-ons', icon: SlidersHorizontal },
-  { path: '/admin/guides', label: 'Guides', icon: BookOpen },
-  { path: '/admin/feedback', label: 'Feedback', icon: Star },
-  { path: '/admin/messages', label: 'Messages', icon: MessageCircle },
-  { path: '/admin/payouts', label: 'Payouts', icon: Banknote },
+const adminNavGroups = [
+  {
+    label: 'Overview',
+    items: [
+      { path: '/admin', label: 'Dashboard', icon: LayoutGrid, exact: true },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      { path: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
+      { path: '/admin/messages', label: 'Messages', icon: MessageCircle },
+      { path: '/admin/properties', label: 'Listings', icon: House },
+    ],
+  },
+  {
+    label: 'People & trust',
+    items: [
+      { path: '/admin/users', label: 'Users & Hosts', icon: Users },
+      { path: '/admin/host-applications', label: 'Host Applications', icon: FileText },
+      { path: '/admin/trust-safety', label: 'Trust & Safety', icon: ShieldCheck },
+      { path: '/admin/governance', label: 'Governance', icon: ScrollText },
+    ],
+  },
+  {
+    label: 'Finance',
+    items: [
+      { path: '/admin/earnings', label: 'Earnings', icon: BarChart3 },
+      { path: '/admin/payouts', label: 'Payouts', icon: Banknote },
+    ],
+  },
+  {
+    label: 'Content',
+    items: [
+      { path: '/admin/promos', label: 'Promo Codes', icon: Tag },
+      { path: '/admin/addons', label: 'Add-ons', icon: SlidersHorizontal },
+      { path: '/admin/guides', label: 'Guides', icon: BookOpen },
+      { path: '/admin/feedback', label: 'Feedback', icon: Star },
+    ],
+  },
 ];
+
+const hostNavGroups = [{ label: 'Workspace', items: hostNavItems }];
 
 const adminMobilePrimaryItems = [
   { path: '/admin', label: 'Overview', icon: LayoutGrid, exact: true },
@@ -165,7 +192,8 @@ function AdminLayout() {
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const isAdmin = user?.role === 'ADMIN';
   const isMessageThreadRoute = /^\/admin\/messages\/[^/]+$/.test(location.pathname);
-  const navItems = isAdmin ? [...sharedNavItems, ...adminOnlyItems] : sharedNavItems;
+  const navGroups = isAdmin ? adminNavGroups : hostNavGroups;
+  const navItems = navGroups.flatMap((group) => group.items);
   const mobilePrimaryItems = isAdmin ? adminMobilePrimaryItems : hostMobilePrimaryItems;
   const mobilePrimaryPaths = new Set(mobilePrimaryItems.map((item) => item.path));
   const mobileMoreItems = navItems.filter((item) => !mobilePrimaryPaths.has(item.path));
@@ -268,38 +296,43 @@ function AdminLayout() {
           </span>
         )}
         <nav className={`min-h-0 flex-1 overflow-y-auto gap-2 ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
-          {navItems.map(({ path, label, icon: NavIcon, exact }) => {
-            const active = exact ? location.pathname === path : location.pathname.startsWith(path);
-            return (
-              <SidebarFlyout key={path} active={collapsed} label={label} target="nav">
-                <Link
-                  to={path}
-                  aria-label={collapsed ? label : undefined}
-                  aria-current={active ? 'page' : undefined}
-                  className={`op-admin-nav-link flex items-center rounded-lg text-sm font-medium transition-all duration-200 ${
-                    active
-                      ? 'bg-[#E8EDF7] text-[#0B1F42]'
-                      : 'text-[#414D63] hover:bg-[#F7F4EF]'
-                  } ${collapsed ? 'justify-center w-11 h-11' : 'px-3 py-2'}`}
-                >
-                  <div className="relative">
-                    <NavIcon className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
-                    {path === '/admin/messages' && notif.unreadMessages > 0 && (
-                      <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                        {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
-                      </span>
-                    )}
-                    {path === '/admin/bookings' && notif.pendingBookings > 0 && (
-                      <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                        {notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}
-                      </span>
-                    )}
-                  </div>
-                  {!collapsed && <span className="ml-2">{label}</span>}
-                </Link>
-              </SidebarFlyout>
-            );
-          })}
+          {navGroups.map((group) => (
+            <div className="op-admin-nav-group" key={group.label}>
+              {!collapsed && <p className="op-admin-nav-group-label">{group.label}</p>}
+              {group.items.map(({ path, label, icon: NavIcon, exact }) => {
+                const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+                return (
+                  <SidebarFlyout key={path} active={collapsed} label={label} target="nav">
+                    <Link
+                      to={path}
+                      aria-label={collapsed ? label : undefined}
+                      aria-current={active ? 'page' : undefined}
+                      className={`op-admin-nav-link flex items-center rounded-lg text-sm font-medium transition-all duration-200 ${
+                        active
+                          ? 'bg-[#E8EDF7] text-[#0B1F42]'
+                          : 'text-[#414D63] hover:bg-[#F7F4EF]'
+                      } ${collapsed ? 'justify-center w-11 h-11' : 'px-3 py-2'}`}
+                    >
+                      <div className="relative">
+                        <NavIcon className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
+                        {path === '/admin/messages' && notif.unreadMessages > 0 && (
+                          <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                            {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
+                          </span>
+                        )}
+                        {path === '/admin/bookings' && notif.pendingBookings > 0 && (
+                          <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                            {notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}
+                          </span>
+                        )}
+                      </div>
+                      {!collapsed && <span className="ml-2">{label}</span>}
+                    </Link>
+                  </SidebarFlyout>
+                );
+              })}
+            </div>
+          ))}
         </nav>
         <div className={`op-admin-sidebar-account border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'p-5'}`}>
           <div className={`flex items-center ${collapsed ? 'justify-center' : 'space-x-3'}`}>
