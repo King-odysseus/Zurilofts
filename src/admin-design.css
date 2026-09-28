@@ -321,7 +321,19 @@
 .op-admin-message-empty{display:grid;place-items:center;align-content:center;gap:7px;padding:28px;text-align:center;color:#64748b}
 .op-admin-message-empty strong{color:#0b1f42;font:700 14px Montserrat,Arial,sans-serif}
 .op-admin-message-empty p{font-size:10px;line-height:1.5}
+.op-admin-guide-columns{grid-template-columns:minmax(230px,1.25fr) minmax(100px,.55fr) minmax(250px,1.4fr) minmax(130px,.7fr) 126px}
+.op-admin-guide-title{display:flex;align-items:center;gap:11px}
+.op-admin-guide-title>img,.op-admin-guide-title>span{display:grid;width:40px;height:40px;flex:none;place-items:center;border-radius:9px;background:#e8edf7;color:#0b1f42;object-fit:cover;font:700 14px Montserrat,Arial,sans-serif}
+.op-admin-guide-title>div{display:grid;min-width:0;gap:3px}
+.op-admin-guide-title strong,.op-admin-guide-title small{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.op-admin-guide-title strong{font-size:12px}
+.op-admin-guide-title small{color:#64748b;font-size:9px}
+.op-admin-guide-excerpt{display:grid;min-width:0;gap:4px}
+.op-admin-guide-excerpt p{display:-webkit-box;margin:0;overflow:hidden;color:#334155;font-size:11px;line-height:1.45;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.op-admin-guide-excerpt span{color:#94a3b8;font-size:9px}
+.op-admin-guide-dialog{max-width:780px!important}
 @media(max-width:900px){.op-admin-message-board{grid-template-columns:280px minmax(0,1fr)}}
+@media(max-width:1000px){.op-admin-guide-columns{grid-template-columns:210px 95px minmax(210px,1.2fr) 115px 118px}}
 @media(max-width:767px){
   .op-admin-message-board{display:block;height:auto;min-height:0}
   .op-admin-message-list-panel{border-right:0}
@@ -332,6 +344,9 @@
   .op-admin-message-bubble{max-width:88%}
   .op-admin-message-composer{grid-template-columns:1fr}
   .op-admin-message-composer button{width:100%}
+  .op-admin-guide-columns .op-admin-guide-title{grid-column:1/-1;padding-bottom:12px!important;border-bottom:1px solid #eef2f7}
+  .op-admin-guide-columns .op-admin-guide-excerpt{grid-column:1/-1}
+  .op-admin-guide-columns>div:nth-child(5){grid-column:1/-1}
 }
 
 .op-admin-host-apps-heading{margin-bottom:28px}

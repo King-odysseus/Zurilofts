@@ -1,12 +1,25 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { Button, Label, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
 import apiClient from '../api/client.js';
-import Spinner from '../components/Spinner.jsx';
+
+const EMPTY = { title: '', slug: '', excerpt: '', body: '', coverImage: '', published: false };
 
 function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-const EMPTY = { title: '', slug: '', excerpt: '', body: '', coverImage: '', published: false };
+function formatDate(value) {
+  if (!value) return 'Not published';
+  return new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function SearchIcon() {
+  return (
+    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+  );
+}
 
 function AdminGuides() {
   const [posts, setPosts] = useState([]);
@@ -15,197 +28,174 @@ function AdminGuides() {
   const [form, setForm] = useState(EMPTY);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+  const [search, setSearch] = useState('');
 
-  const fetchPosts = async () => {
+  async function fetchPosts() {
     try {
-      const res = await apiClient.get('/admin/guides');
-      setPosts(res.data.data || []);
-    } catch { /* ignore */ }
-    setLoading(false);
-  };
+      const response = await apiClient.get('/admin/guides');
+      setPosts(response.data.data || []);
+    } catch (requestError) {
+      setMessage(requestError.response?.data?.error || 'Guides could not be loaded.');
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => { fetchPosts(); }, []);
 
-  const handleCreate = () => { setEditing('new'); setForm(EMPTY); setError(''); };
-  const handleEdit = async (id) => {
-    try {
-      const res = await apiClient.get(`/admin/guides/${id}`);
-      const p = res.data.data;
-      setForm({ title: p.title, slug: p.slug, excerpt: p.excerpt || '', body: p.body, coverImage: p.coverImage || '', published: p.published });
-      setEditing(id);
-      setError('');
-    } catch { /* ignore */ }
-  };
-  const handleCancel = () => { setEditing(null); setForm(EMPTY); setError(''); };
+  function handleCreate() {
+    setEditing('new');
+    setForm(EMPTY);
+    setError('');
+    setMessage('');
+  }
 
-  const handleSave = async () => {
-    if (!form.title.trim()) return setError('Title is required');
+  async function handleEdit(id) {
+    setError('');
+    setMessage('');
+    try {
+      const response = await apiClient.get(`/admin/guides/${id}`);
+      const post = response.data.data;
+      setForm({
+        title: post.title,
+        slug: post.slug,
+        excerpt: post.excerpt || '',
+        body: post.body,
+        coverImage: post.coverImage || '',
+        published: post.published,
+      });
+      setEditing(id);
+    } catch (requestError) {
+      setMessage(requestError.response?.data?.error || 'Guide could not be opened.');
+    }
+  }
+
+  function handleCancel() {
+    setEditing(null);
+    setForm(EMPTY);
+    setError('');
+  }
+
+  async function handleSave(event) {
+    event.preventDefault();
+    if (!form.title.trim()) {
+      setError('Title is required.');
+      return;
+    }
     setSaving(true);
     setError('');
     try {
-      if (editing === 'new') {
-        await apiClient.post('/admin/guides', form);
-      } else {
-        await apiClient.put(`/admin/guides/${editing}`, form);
-      }
+      if (editing === 'new') await apiClient.post('/admin/guides', form);
+      else await apiClient.put(`/admin/guides/${editing}`, form);
       setEditing(null);
       setForm(EMPTY);
-      fetchPosts();
-    } catch (err) {
-      setError(err.response?.data?.error || 'Save failed');
+      setMessage(editing === 'new' ? 'Guide created.' : 'Guide updated.');
+      await fetchPosts();
+    } catch (requestError) {
+      setError(requestError.response?.data?.error || 'Save failed.');
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-  };
+  }
 
-  const handleDelete = async (id) => {
+  async function handleDelete(id) {
     if (!window.confirm('Delete this guide?')) return;
-    try { await apiClient.delete(`/admin/guides/${id}`); fetchPosts(); } catch { /* ignore */ }
-  };
+    try {
+      await apiClient.delete(`/admin/guides/${id}`);
+      setMessage('Guide deleted.');
+      await fetchPosts();
+    } catch (requestError) {
+      setMessage(requestError.response?.data?.error || 'Guide could not be deleted.');
+    }
+  }
 
-  const handleTitleChange = (t) => {
-    setForm((prev) => {
-      const slug = editing === 'new' ? slugify(t) : prev.slug;
-      return { ...prev, title: t, slug };
-    });
-  };
+  function handleTitleChange(title) {
+    setForm((current) => ({ ...current, title, slug: editing === 'new' ? slugify(title) : current.slug }));
+  }
 
-  if (loading) return <div className="p-8 flex justify-center"><Spinner /></div>;
+  const visiblePosts = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return posts;
+    return posts.filter((post) => [post.title, post.slug, post.excerpt, post.body].filter(Boolean).join(' ').toLowerCase().includes(query));
+  }, [posts, search]);
 
-  // No width cap or padding on the wrapper - the admin layout already supplies
-  // p-4 md:p-8, and admin pages are full-bleed (see CLAUDE.md).
+  const totals = useMemo(() => ({
+    published: visiblePosts.filter((post) => post.published).length,
+    drafts: visiblePosts.filter((post) => !post.published).length,
+    withCover: visiblePosts.filter((post) => post.coverImage).length,
+  }), [visiblePosts]);
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-[#0B0B45]">Travel Guides</h2>
-        {!editing && (
-          <button onClick={handleCreate} className="bg-[#C49A6C] text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-[#b8895c] transition-all duration-200">
-            + New Guide
-          </button>
-        )}
+    <div className="op-admin-overview op-admin-guides" data-openpencil-frame="0:7343">
+      <div className="op-admin-heading op-admin-catalog-heading">
+        <div>
+          <p className="op-admin-eyebrow">ZURILOFTS · ADMIN · CONTENT</p>
+          <h1>Travel guides</h1>
+          <p>Publish area advice, local recommendations, and practical guest guidance.</p>
+        </div>
+        <Button className="op-admin-bronze-button" onClick={handleCreate}>New guide</Button>
       </div>
 
-      {/* Edit form */}
+      <div className="op-admin-metrics op-admin-catalog-metrics">
+        <article><span>PUBLISHED GUIDES</span><strong>{totals.published}</strong><small>Visible on the public guides route</small></article>
+        <article><span>DRAFTS</span><strong>{totals.drafts}</strong><small>Waiting for review or completion</small></article>
+        <article><span>WITH COVER IMAGE</span><strong>{totals.withCover}</strong><small>Ready for editorial presentation</small></article>
+        <article><span>GUIDES IN VIEW</span><strong>{visiblePosts.length}</strong><small>Matching the current search</small></article>
+      </div>
+
+      <section className="op-admin-catalog-board">
+        <div className="op-admin-catalog-toolbar">
+          <div className="op-admin-catalog-search"><SearchIcon /><TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search guide title, slug or content" aria-label="Search guides" /></div>
+          <span>{visiblePosts.length} guide{visiblePosts.length === 1 ? '' : 's'}</span>
+        </div>
+
+        {message && <div className="op-admin-people-message is-error" role="status">{message}</div>}
+
+        {loading ? (
+          <div className="op-admin-catalog-empty"><span className="op-admin-booking-spinner" aria-hidden="true" /><strong>Loading travel guides</strong><p>Checking editorial status and publishing metadata.</p></div>
+        ) : visiblePosts.length === 0 ? (
+          <div className="op-admin-catalog-empty"><span aria-hidden="true"><SearchIcon /></span><strong>No guides found</strong><p>Create the first guide or adjust the current search.</p></div>
+        ) : (
+          <div className="op-admin-catalog-list" role="table" aria-label="Travel guides">
+            <div className="op-admin-catalog-columns op-admin-guide-columns" role="row">
+              <span role="columnheader">GUIDE</span><span role="columnheader">STATUS</span><span role="columnheader">EXCERPT</span><span role="columnheader">PUBLISHED</span><span role="columnheader">ACTIONS</span>
+            </div>
+            {visiblePosts.map((post) => (
+              <article key={post.id} className={`op-admin-catalog-row op-admin-guide-row op-admin-guide-columns ${post.published ? '' : 'is-muted'}`} role="row">
+                <div className="op-admin-guide-title" role="cell">
+                  {post.coverImage ? <img src={post.coverImage} alt="" /> : <span aria-hidden="true">{String(post.title || 'G')[0].toUpperCase()}</span>}
+                  <div><strong>{post.title}</strong><small>/{post.slug}</small></div>
+                </div>
+                <div role="cell"><span className={`op-admin-catalog-status ${post.published ? 'is-success' : 'is-neutral'}`}>{post.published ? 'Published' : 'Draft'}</span></div>
+                <div className="op-admin-guide-excerpt" role="cell"><p>{post.excerpt || 'No editorial excerpt supplied.'}</p><span>{post.body ? `${post.body.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length} words` : 'No body content'}</span></div>
+                <div className="op-admin-catalog-cell" role="cell"><small>UPDATED</small><strong>{formatDate(post.updatedAt || post.createdAt)}</strong><span>{post.published ? 'Publicly available' : 'Not yet visible'}</span></div>
+                <div className="op-admin-catalog-actions" role="cell"><button type="button" onClick={() => handleEdit(post.id)}>Edit</button><button type="button" className="is-danger" onClick={() => handleDelete(post.id)}>Delete</button></div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
       {editing && (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-4 md:p-6 mb-6">
-          <h3 className="text-lg font-bold text-[#0B0B45] mb-4">{editing === 'new' ? 'New Guide' : 'Edit Guide'}</h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-1">Title</label>
-              <input
-                type="text"
-                value={form.title}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                className="w-full rounded-xl border border-[#D9D9D9] px-4 py-2.5 focus:outline-none focus:border-[#C49A6C] transition-colors"
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Slug</label>
-                <input
-                  type="text"
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  className="w-full rounded-xl border border-[#D9D9D9] px-4 py-2.5 focus:outline-none focus:border-[#C49A6C] transition-colors"
-                />
+        <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={handleCancel}>
+          <div className="op-admin-edit-dialog op-admin-guide-dialog" role="dialog" aria-modal="true" aria-labelledby="guide-form-title" onMouseDown={(event) => event.stopPropagation()}>
+            <div className="op-admin-dialog-heading"><div><p className="op-admin-eyebrow">GUIDE · {editing === 'new' ? 'NEW' : 'EDIT'}</p><h2 id="guide-form-title">{editing === 'new' ? 'Create travel guide' : 'Edit travel guide'}</h2></div><button type="button" onClick={handleCancel} aria-label="Close guide form">&times;</button></div>
+            {error && <div className="op-admin-error" role="alert">{error}</div>}
+            <form onSubmit={handleSave} className="op-admin-booking-form">
+              <div><Label htmlFor="guide-title">Title</Label><TextInput id="guide-title" value={form.title} onChange={(event) => handleTitleChange(event.target.value)} placeholder="Best areas to stay in Nairobi" required /></div>
+              <div className="op-admin-form-grid">
+                <div><Label htmlFor="guide-slug">Slug</Label><TextInput id="guide-slug" value={form.slug} onChange={(event) => setForm({ ...form, slug: event.target.value })} /></div>
+                <div><Label htmlFor="guide-cover">Cover image URL</Label><TextInput id="guide-cover" value={form.coverImage} onChange={(event) => setForm({ ...form, coverImage: event.target.value })} placeholder="/images/..." /></div>
               </div>
-              <div>
-                <label className="block text-sm font-semibold text-[#1f2937] mb-1">Cover Image URL</label>
-                <input
-                  type="text"
-                  value={form.coverImage}
-                  onChange={(e) => setForm({ ...form, coverImage: e.target.value })}
-                  placeholder="/images/..."
-                  className="w-full rounded-xl border border-[#D9D9D9] px-4 py-2.5 focus:outline-none focus:border-[#C49A6C] transition-colors"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-1">Excerpt</label>
-              <input
-                type="text"
-                value={form.excerpt}
-                onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
-                className="w-full rounded-xl border border-[#D9D9D9] px-4 py-2.5 focus:outline-none focus:border-[#C49A6C] transition-colors"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-[#1f2937] mb-1">Body (HTML)</label>
-              <textarea
-                value={form.body}
-                onChange={(e) => setForm({ ...form, body: e.target.value })}
-                rows={12}
-                className="w-full rounded-xl border border-[#D9D9D9] px-4 py-3 focus:outline-none focus:border-[#C49A6C] transition-colors font-mono text-sm"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="published"
-                checked={form.published}
-                onChange={(e) => setForm({ ...form, published: e.target.checked })}
-                className="w-4 h-4 text-[#C49A6C] rounded"
-              />
-              <label htmlFor="published" className="text-sm font-semibold text-[#1f2937]">Published</label>
-            </div>
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <div className="flex gap-3">
-              <button
-                onClick={handleSave}
-                disabled={saving}
-                className="bg-[#C49A6C] text-white px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
-              >
-                {saving ? 'Saving...' : 'Save'}
-              </button>
-              <button onClick={handleCancel} className="border-2 border-[#D9D9D9] text-[#6b7280] px-6 py-2.5 rounded-full text-sm font-semibold hover:bg-[#D9D9D9]/20 transition-all duration-200">
-                Cancel
-              </button>
-            </div>
+              <div><Label htmlFor="guide-excerpt">Excerpt</Label><TextInput id="guide-excerpt" value={form.excerpt} onChange={(event) => setForm({ ...form, excerpt: event.target.value })} placeholder="A concise summary for listing cards and search." /></div>
+              <div><Label htmlFor="guide-body">Body (HTML)</Label><Textarea id="guide-body" rows={12} value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} className="font-mono" /></div>
+              <div className="op-admin-addon-toggle"><ToggleSwitch checked={form.published} label="Publish this guide" onChange={(event) => setForm({ ...form, published: event.target.checked })} /></div>
+              <div className="op-admin-dialog-actions"><Button color="light" type="button" onClick={handleCancel} disabled={saving}>Cancel</Button><Button className="op-admin-bronze-button" type="submit" disabled={saving}>{saving ? 'Saving...' : editing === 'new' ? 'Create guide' : 'Save changes'}</Button></div>
+            </form>
           </div>
         </div>
       )}
-
-      {/* Posts list */}
-      <div className="bg-white rounded-2xl border border-[#D9D9D9] overflow-hidden">
-        <table className="w-full text-sm">
-          <thead className="bg-[#0B0B45]/5 text-left">
-            <tr>
-              <th className="px-4 py-3 font-semibold text-[#0B0B45]">Title</th>
-              <th className="px-4 py-3 font-semibold text-[#0B0B45] hidden md:table-cell">Status</th>
-              <th className="px-4 py-3 font-semibold text-[#0B0B45] hidden md:table-cell">Date</th>
-              <th className="px-4 py-3 font-semibold text-[#0B0B45] text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[#D9D9D9]">
-            {posts.length === 0 && (
-              <tr><td colSpan={4} className="px-4 py-8 text-center text-[#6b7280]">No guides yet. Create your first one.</td></tr>
-            )}
-            {posts.map((p) => (
-              <tr key={p.id} className="hover:bg-[#D9D9D9]/10 transition-colors">
-                <td className="px-4 py-3">
-                  <span className="font-semibold text-[#0B0B45]">{p.title}</span>
-                  <span className="block text-xs text-[#6b7280] md:hidden">{p.published ? 'Published' : 'Draft'} · {new Date(p.createdAt).toLocaleDateString()}</span>
-                </td>
-                <td className="px-4 py-3 hidden md:table-cell">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${p.published ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                    {p.published ? 'Published' : 'Draft'}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-[#6b7280] hidden md:table-cell">
-                  {new Date(p.createdAt).toLocaleDateString()}
-                </td>
-                <td className="px-4 py-3 text-right">
-                  <button onClick={() => handleEdit(p.id)} className="text-[#C49A6C] font-semibold hover:text-[#b8895c] transition-colors mr-3">
-                    Edit
-                  </button>
-                  <button onClick={() => handleDelete(p.id)} className="text-red-500 font-semibold hover:text-red-600 transition-colors">
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }
