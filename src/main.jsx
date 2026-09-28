@@ -6,16 +6,17 @@ import { ModeProvider } from './context/ModeContext.jsx'
 import { FavoritesProvider } from './context/FavoritesContext.jsx'
 import { ToastProvider } from './context/ToastContext.jsx'
 import { LanguageProvider } from './context/LanguageContext.jsx'
+import { ThemeProvider } from './context/ThemeContext.jsx'
 import './index.css'
 import './openpencil-theme.css'
 import './guest-discovery.css'
 import './checkout-design.css'
 import './auth-design.css'
 import './public-content-design.css'
-import './flowbite-controls.css'
 import './saved-stays.css'
 import './account-travel.css'
 import './host-workspace.css'
+import './flowbite-controls.css'
 
 // PWA update handling - when a new service worker activates, reload so the
 // user is always on the latest version (registerType: 'autoUpdate').
@@ -27,16 +28,18 @@ if ('serviceWorker' in navigator) {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <LanguageProvider>
-      <ToastProvider>
-        <AuthProvider>
-          <ModeProvider>
-            <FavoritesProvider>
-              <App />
-            </FavoritesProvider>
-          </ModeProvider>
-        </AuthProvider>
-      </ToastProvider>
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <ModeProvider>
+              <FavoritesProvider>
+                <App />
+              </FavoritesProvider>
+            </ModeProvider>
+          </AuthProvider>
+        </ToastProvider>
+      </LanguageProvider>
+    </ThemeProvider>
   </React.StrictMode>,
 )

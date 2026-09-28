@@ -6,7 +6,7 @@ import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
 import { TextInput } from 'flowbite-react';
-import RouteBackButton from '../components/RouteBackButton.jsx';
+import ThemeToggle from '../components/ThemeToggle.jsx';
 import '../admin-design.css';
 
 // Shared: both hosts and admins - routes gated by requireHost (or weaker).
@@ -167,6 +167,7 @@ function AdminLayout() {
   });
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
   const isAdmin = user?.role === 'ADMIN';
+  const isMessageThreadRoute = /^\/admin\/messages\/[^/]+$/.test(location.pathname);
   const navItems = isAdmin ? [...sharedNavItems, ...adminOnlyItems] : sharedNavItems;
   const mobilePrimaryItems = isAdmin ? adminMobilePrimaryItems : hostMobilePrimaryItems;
   const mobilePrimaryPaths = new Set(mobilePrimaryItems.map((item) => item.path));
@@ -312,6 +313,7 @@ function AdminLayout() {
             </svg>
             {!collapsed && <span className="ml-2.5">Go back to client view</span>}
           </Link>
+          <ThemeToggle className="op-admin-theme-toggle" showLabel={!collapsed} />
           <div className={`flex items-center my-5 ${collapsed ? 'justify-center' : 'space-x-3'}`}>
             <div className="w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-xs font-bold text-white">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
@@ -353,7 +355,6 @@ function AdminLayout() {
       {/* Mobile header and floating section nav */}
       <div className="op-admin-mobile-header md:hidden">
         <div className="op-admin-mobile-heading">
-          <RouteBackButton className="op-admin-back" />
           <Link to="/" className="op-admin-mobile-brand">
             <img src={logoImg} alt="" />
             <span>
@@ -363,6 +364,7 @@ function AdminLayout() {
           </Link>
         </div>
         <div className="op-admin-mobile-actions">
+          <ThemeToggle className="op-admin-mobile-theme" />
           <div className="relative">
             <button
               className="op-admin-mobile-bell"
@@ -476,13 +478,12 @@ function AdminLayout() {
 
       {/* Main content */}
       <main
-        className={`op-admin-main flex-1 transition-all duration-300 ${
+        className={`op-admin-main flex-1 transition-all duration-300 ${isMessageThreadRoute ? 'is-message-thread-route' : ''} ${
           collapsed ? 'md:ml-[72px]' : 'md:ml-[224px]'
         }`}
       >
         {/* Desktop header with notification bell and avatar dropdown */}
         <header className="hidden md:flex items-center justify-between gap-3 h-16 px-8 bg-white border-b border-[#D9D9D9] sticky top-0 z-[5]">
-          <RouteBackButton className="op-admin-back" />
           <div className="flex items-center gap-3">
             {/* Bell - unread messages + pending bookings */}
             <div className="relative">

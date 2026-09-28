@@ -70,6 +70,9 @@
 .zl-header .zl-header-avatar-button:hover,
 .zl-header .zl-header-icon-button:focus,
 .zl-header .zl-header-avatar-button:focus{background:#f4f5f7;color:var(--op-navy)}
+.zl-header .zl-header-icon-button.is-inverse{color:#fff}
+.zl-header .zl-header-icon-button.is-inverse:hover,
+.zl-header .zl-header-icon-button.is-inverse:focus{background:rgba(255,255,255,.12);color:#fff}
 .zl-header-action-icon{display:grid;place-items:center;width:20px;height:20px}
 .zl-header-action-icon svg{width:20px;height:20px}
 .zl-header-avatar-icon{display:grid;place-items:center;width:34px;height:34px;overflow:hidden;border-radius:50%;background:#0B1F42;color:#fff;font:700 12px Montserrat,Arial,sans-serif;line-height:1;box-shadow:0 0 0 1px #0b1f4214}

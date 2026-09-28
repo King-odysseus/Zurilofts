@@ -26,6 +26,12 @@
 .zl-desktop-nav a { padding: 10px 12px; border-radius: 8px; color: #43516A; font-size: 14px; font-weight: 600; text-decoration: none; }
 .zl-desktop-nav a:hover, .zl-desktop-nav a[aria-current="page"] { background: #EEF3FF; color: var(--op-blue); }
 .zl-header-actions { color: var(--op-muted); }
+.zl-nav-icon-button { display: grid !important; width: 40px; height: 40px; min-width: 40px; min-height: 40px !important; place-items: center; padding: 0 !important; border: 0 !important; border-radius: 50% !important; background: transparent !important; color: #0B1F42 !important; box-shadow: none !important; }
+.zl-nav-icon-button:hover,
+.zl-nav-icon-button:focus { background: #F4F5F7 !important; color: #0B1F42 !important; }
+.zl-nav-icon-button.is-inverse { color: #FFFFFF !important; }
+.zl-nav-icon-button.is-inverse:hover,
+.zl-nav-icon-button.is-inverse:focus { background: rgba(255,255,255,.12) !important; color: #FFFFFF !important; }
 .zl-avatar { width: 34px; height: 34px; background: var(--op-navy); color: #fff; font-family: Montserrat, sans-serif; font-size: 11px; font-weight: 700; }
 .zl-icon-btn, .zl-menu-btn { border: 1px solid transparent; background: transparent; color: #43516A; border-radius: 9px; }
 .zl-icon-btn:hover, .zl-menu-btn:hover { background: #F0F4FA; color: var(--op-blue); }
@@ -118,6 +124,7 @@
 
 @media (max-width: 767px) {
   .zl-header { height: 64px; padding: 0 16px; }
+  .zl-nav-icon-button { width: 36px; height: 36px; min-width: 36px; min-height: 36px !important; }
   .zl-brand { font-size: 17px; }
   .zl-hero { min-height: 0; padding: 46px 16px 34px; gap: 32px; }
   .zl-hero::after { right: -30%; width: 78%; opacity: .45; }

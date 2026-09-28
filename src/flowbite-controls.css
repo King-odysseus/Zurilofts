@@ -13,3 +13,498 @@
 :where([role=listbox]){border:1px solid #e5e7eb;border-radius:8px;background:#fff;box-shadow:0 8px 18px #1118271a;padding:4px}
 :where([role=option]){min-height:38px;border-radius:6px}
 :where([role=option]):focus-visible{outline:2px solid var(--control-focus);outline-offset:-2px}
+
+/*
+ * Shared dark theme. The light theme remains the product default and keeps a
+ * white canvas; this layer only activates when html.dark is present.
+ */
+html.dark {
+  color-scheme: dark;
+  --op-ink: #E5EDF8;
+  --op-muted: #9FB0C6;
+  --op-line: #26344A;
+  --op-paper: #111B2D;
+  --op-canvas: #0B1424;
+  --op-navy: #E7EEF8;
+  --op-blue: #7EA6FF;
+  --op-aqua: #19323A;
+  --op-gold: #D1A477;
+  --zl-canvas: #08101F;
+  --zl-border: #26344A;
+  --zl-text: #E7EEF8;
+  --zl-muted: #9FB0C6;
+  --zl-subtle: #72839A;
+  --zl-shadow: 0 10px 32px rgba(0, 0, 0, 0.34);
+  --dm-bg: #08101F;
+  --dm-surface: #111B2D;
+  --dm-surface-raised: #162238;
+  --dm-surface-soft: #0D1728;
+  --dm-border: #26344A;
+  --dm-border-strong: #354760;
+  --dm-text: #E7EEF8;
+  --dm-muted: #9FB0C6;
+  --dm-subtle: #72839A;
+}
+
+html.dark body,
+html.dark #root,
+html.dark .zl-app,
+html.dark .opg-page,
+html.dark .opg-account-page,
+html.dark .op-checkout,
+html.dark .op-admin-layout,
+html.dark .op-admin-main {
+  background-color: var(--dm-bg) !important;
+  color: var(--dm-text);
+}
+
+html.dark .zl-header,
+html.dark .op-admin-sidebar,
+html.dark .op-admin-sidebar-account,
+html.dark .op-admin-mobile-header {
+  border-color: var(--dm-border) !important;
+  background-color: rgba(8, 16, 31, 0.94) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .zl-navbar img,
+html.dark .op-admin-brand img,
+html.dark .op-admin-mobile-brand img {
+  filter: brightness(0) invert(1);
+}
+
+html.dark .zl-navbar .zl-nav-icon-button,
+html.dark .zl-navbar .zl-header-avatar-button,
+html.dark .zl-navbar a[aria-label="ZuriLofts"],
+html.dark .op-admin-sidebar .op-admin-brand,
+html.dark .op-admin-mobile-brand,
+html.dark .op-admin-mobile-brand strong {
+  color: var(--dm-text) !important;
+}
+
+html.dark .zl-navbar .zl-nav-icon-button:hover,
+html.dark .zl-navbar .zl-header-avatar-button:hover,
+html.dark .zl-navbar .zl-nav-icon-button:focus,
+html.dark .zl-navbar .zl-header-avatar-button:focus {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .zl-theme-toggle-icon,
+html.dark .zl-header-action-icon {
+  color: inherit;
+}
+
+/* Shared Tailwind and OpenPencil surfaces */
+html.dark :where(.bg-white, [class*="bg-[#FFFFFF]"], [class*="bg-[#fff]"]) {
+  background-color: var(--dm-surface) !important;
+}
+
+html.dark :where([class*="bg-[#F7F4EF]"], [class*="bg-[#F8FAFC]"], [class*="bg-[#F6EFE7]"], [class*="bg-[#F1F5F9]"], [class*="bg-[#EEF2F7]"], [class*="bg-[#f8f9fa]"], [class*="bg-[#f3f4f6]"]) {
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark :where(.ui-surface, .neu-card, .neu-radio-card, .auth-card, .zl-panel, .zl-booking-card, .zl-calendar-panel, .zl-content-card, .zl-stay-card, .zl-result-card, .zl-shortlist-card, .zl-property-hero, .zl-metric) {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+  box-shadow: var(--zl-shadow) !important;
+}
+
+html.dark :where(.zl-trust, .zl-account-hero, .op-verify-callout) {
+  background: linear-gradient(135deg, #10252C, #13233A) !important;
+}
+
+html.dark :where(.zl-list-row, .zl-table-row, .zl-priority-card, .zl-activity-grid > div, .zl-earnings-grid > div, .op-stay-summary) {
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(.ui-input, .zl-field, .neu-input, .auth-input, .filter-input, .opg-filter-dialog input, .opg-filter-dialog select) {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(input, textarea)::placeholder {
+  color: var(--dm-subtle) !important;
+}
+
+html.dark :where(select, option, [role="listbox"], [role="menu"]) {
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark :where([role="menuitem"], [role="option"]):hover {
+  background-color: #1D2B43 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark :where([class*="border-[#E3E8EF]"], [class*="border-[#e5e7eb]"], [class*="border-[#D9D9D9]"], [class*="border-[#E2DAD0]"], [class*="border-[#edf0f3]"], [class*="border-[#e8edf3]"]) {
+  border-color: var(--dm-border) !important;
+}
+
+html.dark :where([class*="text-[#0B1F42]"], [class*="text-[#0B0B45]"], [class*="text-[#414D63]"], [class*="text-[#334155]"], [class*="text-[#1f2937]"], [class*="text-[#111827]"]) {
+  color: var(--dm-text) !important;
+}
+
+html.dark :where([class*="text-[#5B6B82]"], [class*="text-[#64748b]"], [class*="text-[#6b7280]"], [class*="text-[#6E7686]"], [class*="text-[#94a3b8]"], [class*="text-[#53616F]"]) {
+  color: var(--dm-muted) !important;
+}
+
+html.dark :where(.op-overline, .zl-overline, .opg-account-heading p, .opg-profile-identity span) {
+  color: #D1A477;
+}
+
+html.dark :where(.ui-btn-primary, .ui-btn-strong, .opg-account-action, .opg-trip-primary, .opg-message-send, .op-admin-bronze-button, .op-admin-add-link, .zl-header-register) {
+  color: #FFFFFF !important;
+}
+
+/* Guest discovery and content pages */
+html.dark .opg-page h1,
+html.dark .opg-page h2,
+html.dark .opg-page h3,
+html.dark .zl-page-heading h1,
+html.dark .zl-section-head h2 {
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-search,
+html.dark .opg-state,
+html.dark .opg-categories button,
+html.dark .opg-filter-action,
+html.dark .opg-load-more,
+html.dark .opg-benefit-grid article,
+html.dark .opg-guide-grid a {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-search .opg-search-field::after {
+  background-color: var(--dm-border) !important;
+}
+
+html.dark .opg-search .opg-search-field > span,
+html.dark .opg-search .opg-search-field input,
+html.dark .opg-search .opg-search-field select,
+html.dark .opg-guest-trigger {
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-stay-content,
+html.dark .opg-price,
+html.dark .opg-price strong,
+html.dark .opg-price .opg-rating,
+html.dark .opg-recent-grid a,
+html.dark .opg-section-heading > a,
+html.dark .opg-section-heading > button {
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-stay-content p,
+html.dark .opg-price > span,
+html.dark .opg-section-heading p,
+html.dark .opg-centered p,
+html.dark .opg-benefit-grid p,
+html.dark .opg-results-intro > p,
+html.dark .opg-results-intro > span,
+html.dark .opg-results-toolbar span {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .opg-recent {
+  background-color: #0D1728 !important;
+}
+
+html.dark .opg-filter-dialog {
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+/* Account, trips, profile, and messaging */
+html.dark .opg-account-sidebar,
+html.dark .opg-trip-feature,
+html.dark .opg-trip-row,
+html.dark .opg-trip-empty,
+html.dark .opg-history-card,
+html.dark .opg-profile-summary,
+html.dark .opg-conversation-list,
+html.dark .opg-message-pane,
+html.dark .opg-message-pane-head,
+html.dark .opg-message-composer {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-trip-tabs,
+html.dark .opg-history-tabs,
+html.dark .opg-profile-tabs,
+html.dark .opg-message-tabs {
+  background-color: #0D1728 !important;
+}
+
+html.dark .opg-trip-tabs button[aria-selected="true"],
+html.dark .opg-history-tabs button[aria-selected="true"],
+html.dark .opg-profile-tabs button.is-active,
+html.dark .opg-message-tabs a.is-active {
+  background-color: #23324B !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .opg-account-person,
+html.dark .opg-support-row,
+html.dark .opg-trip-row,
+html.dark .opg-history-card,
+html.dark .opg-profile-summary {
+  border-color: var(--dm-border) !important;
+}
+
+html.dark .opg-account-nav a,
+html.dark .opg-trip-row-copy strong,
+html.dark .opg-trip-feature h2,
+html.dark .opg-trip-price,
+html.dark .opg-history-title-row h2,
+html.dark .opg-history-meta dd,
+html.dark .opg-profile-identity h2,
+html.dark .opg-conversation-row,
+html.dark .opg-conversation-line strong,
+html.dark .opg-message-context h2,
+html.dark .opg-message-empty strong,
+html.dark .opg-message-placeholder h2 {
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-account-person small,
+html.dark .opg-account-heading span,
+html.dark .opg-trip-subtitle,
+html.dark .opg-trip-meta time,
+html.dark .opg-trip-row-copy span,
+html.dark .opg-trip-empty p,
+html.dark .opg-history-title-row p,
+html.dark .opg-history-meta dt,
+html.dark .opg-profile-identity p,
+html.dark .opg-conversation-line time,
+html.dark .opg-conversation-preview,
+html.dark .opg-message-context p,
+html.dark .opg-message-meta {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .opg-conversation-row:hover,
+html.dark .opg-conversation-row:focus-visible,
+html.dark .opg-trip-row:hover,
+html.dark .opg-trip-row:focus-visible {
+  background-color: #1A263A !important;
+}
+
+html.dark .opg-conversation-row.is-selected {
+  background-color: #172B47 !important;
+  box-shadow: inset 3px 0 0 #7EA6FF !important;
+}
+
+html.dark .opg-message-bubble {
+  background-color: #172238 !important;
+  color: var(--dm-text) !important;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.24) !important;
+}
+
+html.dark .opg-message-item.is-mine .opg-message-bubble {
+  background-color: #1D3B62 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .opg-message-compose-surface {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark .opg-message-composer .opg-message-textarea {
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-history-image,
+html.dark .opg-trip-feature-image,
+html.dark .opg-trip-loading span,
+html.dark .opg-profile-loading span,
+html.dark .opg-conversation-loading span,
+html.dark .opg-message-loading span {
+  background-color: #18243A !important;
+}
+
+/* Admin and host workspace */
+html.dark .op-admin-sidebar .op-admin-nav-link[aria-current="page"] {
+  background-color: #1D2B43 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .op-admin-sidebar .op-admin-nav-link:hover,
+html.dark .op-admin-sidebar-account > a:hover {
+  background-color: #172238 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .op-admin-sidebar-account > a,
+html.dark .op-admin-sidebar-account > div p,
+html.dark .op-admin-sidebar-account > button {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-sidebar-account > a {
+  background-color: #172238 !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-priority,
+html.dark .op-admin-glance,
+html.dark .op-admin-secondary details,
+html.dark .op-admin-people-board,
+html.dark .op-admin-catalog-board,
+html.dark .op-admin-booking-board,
+html.dark .op-admin-host-app-dialog,
+html.dark .op-admin-review-dialog,
+html.dark .op-admin-confirm-dialog,
+html.dark .op-admin-edit-dialog,
+html.dark .op-admin-host-app-detail-section,
+html.dark .op-admin-host-app-review {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(.op-admin-priority-row, .op-admin-empty, .op-admin-glance p, .op-admin-people-toolbar, .op-admin-catalog-toolbar, .op-admin-people-row, .op-admin-catalog-row, .op-admin-booking-row) {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(.op-admin-people-columns, .op-admin-catalog-columns, .op-admin-booking-columns, .op-admin-host-app-experience) {
+  border-color: var(--dm-border) !important;
+  background-color: #0D1728 !important;
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-admin-metrics article:nth-child(1) { background: #3A2E18 !important; }
+html.dark .op-admin-metrics article:nth-child(2) { background: #182945 !important; }
+html.dark .op-admin-metrics article:nth-child(3) { background: #3A2228 !important; }
+html.dark .op-admin-metrics article:nth-child(4) { background: #173125 !important; }
+
+html.dark .op-admin-heading h1,
+html.dark .op-admin-overview h2,
+html.dark .op-admin-priority-row strong,
+html.dark .op-admin-people-row,
+html.dark .op-admin-catalog-row,
+html.dark .op-admin-booking-row strong,
+html.dark .op-admin-host-app-dialog-head h2,
+html.dark .op-admin-review-dialog h2 {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-heading p:last-child,
+html.dark .op-admin-metrics small,
+html.dark .op-admin-priority-row small,
+html.dark .op-admin-empty p,
+html.dark .op-admin-glance p,
+html.dark .op-admin-people-row>div>small,
+html.dark .op-admin-catalog-row small,
+html.dark .op-admin-booking-row small {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-admin-main>div:last-child {
+  background-color: var(--dm-bg);
+}
+
+html.dark .op-admin-theme-toggle,
+html.dark .op-admin-mobile-theme {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-mobile-more-drawer,
+html.dark .op-admin-mobile-nav {
+  background-color: #0B1F42 !important;
+}
+
+html.dark .op-admin-mobile-nav {
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.38) !important;
+}
+
+/* Auth, checkout, and shared mobile navigation */
+html.dark .zl-auth-page,
+html.dark .zl-auth-form,
+html.dark .op-checkout-header,
+html.dark .op-checkout-body,
+html.dark .op-account-nav {
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .zl-auth-page,
+html.dark .op-checkout {
+  background-color: var(--dm-bg) !important;
+}
+
+html.dark .opg-footer {
+  background-color: #060D19 !important;
+}
+
+.zl-theme-toggle-icon {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+}
+
+.zl-theme-toggle-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.op-admin-theme-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #E2DAD0;
+  border-radius: 9px;
+  background: #F8FAFC;
+  color: #0B1F42;
+  font-size: 11px;
+  font-weight: 700;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+.op-admin-theme-toggle:hover,
+.op-admin-theme-toggle:focus-visible {
+  border-color: #C49A6C;
+  background: #F3E9DC;
+  color: #0B1F42;
+}
+
+.op-admin-mobile-theme {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid #E2DAD0;
+  border-radius: 50%;
+  background: #F8FAFC;
+  color: #0B1F42;
+}
+
+.op-admin-mobile-theme:hover,
+.op-admin-mobile-theme:focus-visible {
+  background: #F3E9DC;
+}

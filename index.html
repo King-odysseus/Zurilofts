@@ -1,6 +1,17 @@
 <!doctype html>
 <html lang="en" data-theme="zuriloft">
   <head>
+    <script>
+      (() => {
+        try {
+          const stored = localStorage.getItem('zurilofts_theme');
+          const preferred = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.classList.toggle('dark', preferred === 'dark');
+          document.documentElement.dataset.colorMode = preferred;
+          document.documentElement.style.colorScheme = preferred;
+        } catch { /* use the default light theme */ }
+      })();
+    </script>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />

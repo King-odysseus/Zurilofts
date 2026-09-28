@@ -8,7 +8,7 @@ import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
 import MobileBottomNav from './MobileBottomNav.jsx';
-import RouteBackButton from './RouteBackButton.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 import { languageOptions } from '../i18n/translations.js';
 
 const exploreLinks = [
@@ -30,9 +30,8 @@ function isActiveHref(pathname, href) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function Navbar({ solid = false }) {
+function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -64,12 +63,6 @@ function Navbar({ solid = false }) {
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
 
   // Poll unread message count + booking updates for badge + sound alerts
   const [bookingUpdates, setBookingUpdates] = useState(0);
@@ -177,8 +170,10 @@ function Navbar({ solid = false }) {
     return () => document.removeEventListener('keydown', handleKey);
   }, []);
 
-  const isHomePage = location.pathname === '/';
-  const needsWhiteNav = solid || !isHomePage || scrolled;
+  // The app canvas has a reserved strip above the page content, so the global
+  // navbar always needs its white surface. This keeps every icon legible and
+  // makes the header consistent across discovery, account, and host routes.
+  const needsWhiteNav = true;
 
   function handleLogout() {
     setDropdownOpen(false);
@@ -266,23 +261,22 @@ function Navbar({ solid = false }) {
   const accountItemClass = 'flex items-center rounded-[10px] px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors';
 
   return (
-    <><nav className={`fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
+    <><nav className={`zl-navbar fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
       needsWhiteNav
         ? 'border-b border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.06)]'
         : 'bg-transparent'
     }`}>
       <div className="mx-auto w-full max-w-[1344px] px-4 md:px-6">
         <div className="flex h-16 items-center justify-between md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-          {/* Back action and logo */}
-          <div className="flex min-w-0 items-center gap-2 justify-self-start">
-            <RouteBackButton className={needsWhiteNav ? '' : 'bg-white/10 text-white hover:bg-white/20'} />
+          {/* Brand */}
+          <div className="flex min-w-0 items-center justify-self-start">
             <Link to="/" className="flex flex-shrink-0 items-center">
               <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto md:h-10" />
             </Link>
           </div>
 
           {/* Desktop nav links */}
-          <div ref={navMenuRef} className="hidden md:flex md:flex-1 md:justify-center md:items-center md:px-4">
+          <div ref={navMenuRef} className="hidden md:flex md:items-center md:justify-center md:px-4">
             <ul className="flex items-center md:space-x-1 lg:space-x-6">
               {navItems.map((item) => {
                 const hasChildren = Array.isArray(item.children) && item.children.length > 0;
@@ -664,11 +658,14 @@ function Navbar({ solid = false }) {
               </Dropdown>
             )}
 
+            {/* Theme switcher */}
+            <ThemeToggle className={`zl-nav-icon-button zl-theme-toggle ${needsWhiteNav ? '' : 'is-inverse'}`} />
+
             {/* Language switcher */}
             <Dropdown
               inline
-              theme={{ inlineWrapper: `zl-header-icon-button ${needsWhiteNav ? '' : 'text-white'}` }}
-              label={<><span className="sr-only">{t('nav.language')}</span><span className={`zl-header-action-icon ${needsWhiteNav ? '' : 'text-white'}`} aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 21a9 9 0 100-18 9 9 0 000 18z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.45 3.3 5.45 3.3 9S14.2 18.55 12 21c-2.2-2.45-3.3-5.45-3.3-9S9.8 5.45 12 3z" /></svg></span></>}
+              theme={{ inlineWrapper: `zl-nav-icon-button ${needsWhiteNav ? '' : 'is-inverse'}` }}
+              label={<><span className="sr-only">{t('nav.language')}</span><span className="zl-header-action-icon" aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 21a9 9 0 100-18 9 9 0 000 18z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.45 3.3 5.45 3.3 9S14.2 18.55 12 21c-2.2-2.45-3.3-5.45-3.3-9S9.8 5.45 12 3z" /></svg></span></>}
               arrowIcon={false}
               placement="bottom-end"
               aria-label={t('nav.language')}
