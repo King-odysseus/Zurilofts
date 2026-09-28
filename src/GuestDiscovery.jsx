@@ -85,7 +85,7 @@ function SearchForm({ compact = false, initial = '' }) {
   }
   return <form className={`opg-search ${compact ? 'opg-search-compact' : ''}`} onSubmit={submit}>
     <Label htmlFor="guest-search-where" className="opg-search-field opg-search-where">
-      <span>Where</span>
+      <span>{compact ? 'Destination' : 'Where'}</span>
       <TextInput id="guest-search-where" value={where} onChange={(event) => setWhere(event.target.value)} placeholder="Anywhere in Nairobi" aria-label="Search location or stay" sizing="lg" />
     </Label>
     <Label htmlFor="guest-search-check-in" className="opg-search-field">
@@ -139,6 +139,7 @@ function SearchForm({ compact = false, initial = '' }) {
     <Button type="submit" aria-label="Search stays" className="opg-search-submit" pill>
       <span className="opg-search-desktop-label" aria-hidden="true">
         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        {compact && <span className="opg-search-desktop-text">Search</span>}
       </span>
       <span className="opg-search-mobile-label">Search stays</span>
     </Button>

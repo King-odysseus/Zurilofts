@@ -51,7 +51,7 @@
 .opg-guides{padding-bottom:72px}.opg-guide-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}.opg-guide-grid a{height:284px;background-size:cover;background-position:center;border-radius:14px;display:flex;flex-direction:column;justify-content:space-between;padding:22px;color:white;text-decoration:none}.opg-guide-grid a>span{align-self:flex-start;padding:7px 14px;background:#fff;color:var(--op-navy);border-radius:20px;font-size:11px;font-weight:700}.opg-guide-grid h3{color:white;font-size:20px;margin-bottom:5px}.opg-guide-grid small{font-size:11px}
 .opg-results{min-height:100vh;padding:42px 0 80px}.opg-results-intro{margin-bottom:26px}.opg-results-intro>p{font-size:12px;color:var(--op-muted);margin-bottom:20px}.opg-results-intro a{color:var(--op-muted)}.opg-results-intro h1{font-size:34px;margin-bottom:8px}.opg-results-intro>span{font-size:14px;color:var(--op-muted)}.opg-results .opg-search{max-width:none;border:1px solid var(--op-line);margin:0 0 24px}.opg-results-toolbar{display:flex;justify-content:space-between;margin:26px 0 20px;font-size:13px}.opg-results-toolbar span{color:var(--op-muted)}.opg-load-more{display:block;margin:36px auto;border:1px solid var(--op-line);background:#fff;border-radius:8px;padding:12px 20px;color:var(--op-navy);cursor:pointer}
 @media(max-width:850px){.opg-stay-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.opg-recent-grid{grid-template-columns:repeat(3,1fr)}.opg-guide-grid{gap:12px}}
-@media(max-width:900px) and (min-width:601px){.opg-search label{padding:0 10px}.opg-search input,.opg-search select{font-size:11px}}
+@media(max-width:900px) and (min-width:601px){.opg-search{grid-template-columns:minmax(0,2.72fr) minmax(0,1.88fr) minmax(0,1.88fr) minmax(0,2.16fr) 56px}.opg-search .opg-search-field{padding-left:12px;padding-right:12px}.opg-search .opg-search-field:first-child{padding-left:16px}.opg-search .opg-search-submit{width:48px;height:48px;min-width:48px;min-height:48px}.opg-search input,.opg-search select{font-size:11px}}
 @media(max-width:600px){.opg-container{width:calc(100% - 40px)}.opg-hero{height:auto;background:none!important;color:var(--op-navy);text-align:left}.opg-hero .opg-container{padding-top:20px}.opg-hero-badge,.opg-hero>p,.opg-popular{display:none}.opg-hero h1{font-size:24px;color:var(--op-navy);margin:0 0 5px}.opg-hero h1:after{content:'300+ homes across Nairobi and the coast.';display:block;font:400 12px Inter,Arial,sans-serif;color:var(--op-muted);letter-spacing:0;margin-top:5px}.opg-hero p{display:none}.opg-search{display:grid;grid-template-columns:1fr 1fr;gap:8px;height:auto;margin:18px 0 0;padding:12px;border-radius:16px;box-shadow:none}.opg-search label{background:#f6f7f9;border:0;border-radius:9px;padding:9px 12px;min-height:45px}.opg-search .opg-search-where{grid-column:1/-1}.opg-search label:nth-of-type(4){grid-column:1/-1}.opg-search label span{font-size:9px}.opg-search > .opg-search-submit{grid-column:1/-1;border-radius:8px;height:48px;background:var(--op-bronze);font:700 13px Inter,Arial,sans-serif}.opg-search-desktop-label{display:none}.opg-search-mobile-label{display:inline}.opg-stays-section{padding-top:20px}.opg-section{padding-bottom:30px}.opg-section-heading h2,.opg-centered h2{font-size:19px}.opg-section-heading p,.opg-filter-bar,.opg-recent{display:none}.opg-stay-grid{display:block}.opg-stay-card{margin-bottom:24px}.opg-stay-image{aspect-ratio:350/209}.opg-stay-content h3{font-size:17px}.opg-stay-content p{font-size:12px}.opg-price{font-size:14px}.opg-benefits{padding-top:0}.opg-centered{text-align:left;margin-bottom:14px}.opg-centered p{display:none}.opg-benefit-grid{display:block}.opg-benefit-grid article{display:flex;align-items:center;gap:12px;border:0;padding:8px 0;background:transparent}.opg-benefit-grid article>span{flex:none;width:38px;height:38px;background:#f6f0e8;color:var(--op-bronze);margin:0}.opg-benefit-grid h3{font-size:13px;margin:0}.opg-benefit-grid p{font-size:11px}.opg-guides{padding-top:0}.opg-guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.opg-guide-grid a{height:80px;background-image:none!important;background:#fff;border-radius:10px;padding:12px}.opg-guide-grid a>span{display:none}.opg-guide-grid h3{color:var(--op-navy);font-size:12px}.opg-guide-grid small{display:none}.opg-results{padding:18px 0 100px}.opg-results-intro{display:none}.opg-results .opg-search{margin-bottom:12px}.opg-results-toolbar{margin:18px 0}.opg-results-toolbar span{display:none}}
 .zl-header{height:72px;background:#fff;border-bottom:1px solid #edf0f3;padding:0 max(24px,calc((100vw - 1200px)/2));font-family:Inter,Arial,sans-serif;display:grid;grid-template-columns:minmax(220px,1fr) auto minmax(220px,1fr);align-items:center}
 .zl-header .zl-brand{font:800 16px Montserrat,Arial,sans-serif}.zl-header .zl-brand img{width:29px;height:29px}
@@ -80,8 +80,9 @@
 
 /* Flowbite controls, aligned to the OpenPencil geometry. Page surfaces stay white. */
 .opg-page{background:#fff}
-.opg-search{height:78px;padding:0 11px 0 0;border:0;grid-template-columns:1.4fr 1fr 1fr 1fr 58px;align-items:stretch}
+.opg-search{height:78px;padding:0;border:0;grid-template-columns:28.9362% 20% 20% 22.9787% 8.0851%;align-items:stretch}
 .opg-search .opg-search-field{position:relative;min-width:0;height:100%;display:flex!important;flex-direction:column;justify-content:flex-start;gap:6px;padding:18px 20px 0;border-right:0;color:var(--op-navy);overflow:visible!important}
+.opg-search .opg-search-field:first-child{padding-left:26px}
 .opg-search .opg-search-field::after{content:'';position:absolute;top:22px;right:0;width:1px;height:34px;background:#e3e8ef}
 .opg-search .opg-search-field:last-of-type::after{display:none}
 .opg-search .opg-search-field>span{display:block;margin:0;text-transform:uppercase;color:#64748b;font:700 11px Montserrat,Arial,sans-serif;letter-spacing:.02em;line-height:14px}
@@ -90,7 +91,8 @@
 .opg-search .opg-search-field input:focus-visible,.opg-search .opg-search-field select:focus-visible{border:0;box-shadow:none;outline:2px solid var(--op-bronze);outline-offset:2px}
 .opg-search .opg-search-field input:focus-visible{outline:0;box-shadow:0 0 0 2px #c49a6c40}
 .opg-guest-trigger{width:100%;height:18px;min-height:18px;justify-content:space-between;gap:8px;padding:0;border:0;background:transparent;color:var(--op-navy);font:500 15px Inter,Arial,sans-serif;box-shadow:none}
-.opg-guest-trigger:hover,.opg-guest-trigger:focus{background:transparent;color:var(--op-ink);box-shadow:0 0 0 2px #c49a6c40;outline:0}
+.opg-guest-trigger:hover{background:transparent;color:var(--op-ink);box-shadow:none;outline:0}
+.opg-guest-trigger:focus-visible{background:transparent;color:var(--op-navy);box-shadow:none;outline:2px solid var(--op-bronze);outline-offset:2px}
 .opg-guest-trigger svg{width:16px;height:16px;color:var(--op-muted)}
 .opg-guest-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
 .opg-search .opg-search-field [data-testid="flowbite-dropdown"]{width:160px!important;min-width:160px!important;max-width:calc(100vw - 32px);border:0!important;border-radius:10px;background:#fff;box-shadow:0 14px 34px #0b1f4226;overflow:hidden}
@@ -105,9 +107,21 @@
 .opg-datepicker > .absolute > div{border:0!important;border-radius:12px!important;box-shadow:0 18px 48px #0b1f422b!important}
 .opg-datepicker .bg-primary-700{background-color:#0B1F42!important}
 .opg-datepicker .text-primary-700{color:#0B1F42!important}
+.opg-search .opg-search-submit{width:56px;height:56px;min-width:56px;min-height:56px;padding:0;align-self:center;justify-self:start;border:0;border-radius:50%;background:var(--op-bronze);color:#fff;box-shadow:none;font-size:0}
+.opg-search .opg-search-submit svg{width:16px;height:16px}
 .opg-search .opg-search-submit:hover,.opg-search .opg-search-submit:focus{background:#a97b4e;color:#fff}
 .opg-search .opg-search-submit>span{display:grid;place-items:center}
 @media(max-width:600px){.opg-search{padding:12px;grid-template-columns:1fr 1fr;align-items:stretch}.opg-search-field{height:auto;min-height:56px;padding:9px 12px;border:0;border-radius:9px;background:#fff}.opg-search-field>span{font-size:9px}.opg-search-field input,.opg-search-field select{height:25px;min-height:25px}.opg-search .opg-search-submit{grid-column:1/-1;width:100%;height:48px;border-radius:8px}.opg-search .opg-search-submit>span{display:inline}}
+
+/* Results search: compact OpenPencil frame 0:1887. */
+.opg-results .opg-search-compact{height:96px;max-width:1200px;margin:0 0 24px;border:0;border-radius:48px;grid-template-columns:29.1667% 16.3333% 16.3333% 24.8333% 13.3333%;box-shadow:0 14px 40px #0b1f4230}
+.opg-search.opg-search-compact .opg-search-field{padding:28px 24px 0;gap:4px}
+.opg-search.opg-search-compact .opg-search-field:first-child{padding-left:24px}
+.opg-search.opg-search-compact .opg-search-field::after{top:24px;height:48px}
+.opg-search.opg-search-compact .opg-search-submit{width:140px;height:68px;max-width:100%;min-width:0;min-height:0;padding:0;border-radius:34px;justify-self:start;align-self:center;font:700 15px Inter,Arial,sans-serif}
+.opg-results .opg-search.opg-search-compact .opg-search-desktop-label{display:flex;align-items:center;justify-content:center;gap:8px}
+.opg-search.opg-search-compact .opg-search-submit svg{width:18px;height:18px}
+@media(max-width:900px) and (min-width:768px){.opg-search.opg-search-compact .opg-search-submit{font-size:13px}.opg-search.opg-search-compact .opg-search-desktop-label{gap:6px}.opg-search.opg-search-compact .opg-search-submit svg{width:16px;height:16px}}
 
 /* Final responsive overrides keep the OpenPencil mobile geometry intact. */
 .opg-search .opg-search-submit>.opg-search-desktop-label{display:grid}
@@ -118,7 +132,7 @@
   .opg-search .opg-search-field{height:auto;min-height:54px;padding:9px 12px;border:0;border-radius:9px;background:#f6f7f9}
   .opg-search-where,.opg-search-field:nth-of-type(4){grid-column:1/-1}
   .opg-search .opg-search-field input,.opg-search .opg-search-field select{height:25px;min-height:25px}
-  .opg-search .opg-search-submit{grid-column:1/-1;width:100%;height:48px;min-width:0;border-radius:8px;background:var(--op-bronze)}
+  .opg-search .opg-search-submit{grid-column:1/-1;width:100%;height:48px;min-width:0;min-height:48px;border-radius:8px;background:var(--op-bronze);align-self:auto;justify-self:auto;font:700 13px Inter,Arial,sans-serif}
   .opg-search .opg-search-submit>.opg-search-desktop-label{display:none}
   .opg-search .opg-search-submit>.opg-search-mobile-label{display:inline}
   .opg-mobile-feature{margin-top:12px}
@@ -128,4 +142,22 @@
   .zl-header .zl-brand{gap:8px;font-size:16px}
   .zl-header .zl-brand img{display:block;width:28px;height:28px}
   .zl-header .zl-header-icon-button,.zl-header .zl-header-avatar-button{width:36px;height:36px;min-width:36px;border:0;background:transparent}
+}
+@media(max-width:767px){
+  .opg-search{height:auto!important;width:100%;max-width:none;margin:18px 0 0;padding:12px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;border-radius:16px;background:#fff;box-shadow:none}
+  .opg-search .opg-search-field{height:auto;min-height:54px;padding:9px 12px;border:0;border-radius:9px;background:#f6f7f9}
+  .opg-search .opg-search-where{grid-column:1/-1}
+  .opg-search .opg-search-field input,.opg-search .opg-search-field select{height:25px;min-height:25px}
+  .opg-search .opg-search-submit{grid-column:1/-1;width:100%;height:48px;min-width:0;min-height:48px;border-radius:8px;background:var(--op-bronze);align-self:auto;justify-self:auto;font:700 13px Inter,Arial,sans-serif}
+  .opg-search .opg-search-submit>.opg-search-desktop-label{display:none}
+  .opg-search .opg-search-submit>.opg-search-mobile-label{display:inline}
+}
+@media(max-width:767px){
+  .opg-search.opg-search-compact{height:auto!important;margin:0 0 12px;padding:12px;border:0;border-radius:16px;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;box-shadow:none}
+  .opg-search.opg-search-compact .opg-search-field{height:auto;min-height:54px;padding:9px 12px;border:0;border-radius:9px;background:#f6f7f9}
+  .opg-search.opg-search-compact .opg-search-field:first-child{padding-left:12px}
+  .opg-search.opg-search-compact .opg-search-field::after{display:none}
+  .opg-search.opg-search-compact .opg-search-submit{grid-column:1/-1;width:100%;height:48px;min-width:0;min-height:48px;border-radius:8px;align-self:auto;justify-self:auto;font:700 13px Inter,Arial,sans-serif}
+  .opg-search.opg-search-compact .opg-search-submit>.opg-search-desktop-label{display:none}
+  .opg-search.opg-search-compact .opg-search-submit>.opg-search-mobile-label{display:inline}
 }
