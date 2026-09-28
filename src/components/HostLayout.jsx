@@ -9,7 +9,7 @@ function HostLayout({ children }) {
   return (
     <div className="min-h-screen bg-canvas">
       <Navbar />
-      <main className="mx-auto w-full max-w-[1344px] px-4 pt-24 pb-16 sm:px-6">
+      <main className="mx-auto w-full max-w-[1344px] px-4 pb-24 pt-28 sm:px-6">
         {children}
       </main>
       <HostMobileBottomNav />

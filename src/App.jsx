@@ -63,14 +63,23 @@ function Header({ menu }) {
   const { setLang, t } = useLanguage();
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [headerSearch, setHeaderSearch] = useState('');
   const initials = `${user?.firstName?.[0] || user?.name?.[0] || 'G'}${user?.lastName?.[0] || ''}`.toUpperCase();
+  function submitHeaderSearch(event) {
+    event.preventDefault();
+    const query = headerSearch.trim();
+    navigate(query ? `/properties?search=${encodeURIComponent(query)}` : '/properties');
+  }
   return <header className="zl-header">
     <Link to="/" className="zl-brand"><img src={logo} alt="ZuriLofts" /><span>ZuriLofts</span></Link>
     <nav className="zl-desktop-nav" aria-label="Main navigation">
       <Link to="/properties">{t('nav.stays')}</Link><Link to="/places">{t('nav.places')}</Link><Link to="/restaurants">{t('nav.restaurants')}</Link><Link to="/guides">{t('nav.guides')}</Link>
     </nav>
     <div className="zl-header-actions">
-      <Link className="zl-header-search" to="/properties"><SearchIcon /><span>{t('nav.searchStays')}</span></Link>
+      <form className="zl-header-search" role="search" onSubmit={submitHeaderSearch}>
+        <button type="submit" aria-label={t('nav.searchStays')}><SearchIcon /></button>
+        <input value={headerSearch} onChange={(event) => setHeaderSearch(event.target.value)} placeholder={t('nav.searchStays')} aria-label={t('nav.searchStays')} />
+      </form>
       <Link className="zl-icon-btn" to="/favourites" aria-label={t('nav.saved')}><HeartIcon /></Link>
       <Dropdown
         inline
