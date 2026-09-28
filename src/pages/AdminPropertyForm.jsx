@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button, Checkbox, Label, Select, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
-import { Check, Eye, MapPin, Upload, X } from 'lucide-react';
+import { Check, ChevronLeft, Eye, MapPin, Upload, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 import { findSearchLocation, isNairobiSearchLocation, SEARCH_LOCATION_GROUPS } from '../data/searchLocations.js';
@@ -213,10 +213,13 @@ function AdminPropertyForm() {
     <div className="op-host-listing-editor">
       <header className="op-host-editor-heading">
         <div>
-          <Link to={`${base}/properties`} className="op-host-editor-back">&larr; Listings</Link>
-          <p className="op-host-editor-eyebrow">HOST SETUP</p>
+          <Link to={`${base}/properties`} className="op-host-editor-back">
+            <ChevronLeft strokeWidth={2} aria-hidden="true" />
+            Listings
+          </Link>
+          <p className="op-host-editor-eyebrow">{base === '/admin' ? 'ZURILOFTS · ADMIN · LISTINGS' : 'HOST SETUP'}</p>
           <h1>{isEdit ? 'Edit listing' : 'Create a listing'}</h1>
-          <span>Prepare the basics, photos, amenities and pricing guests will see.</span>
+          <span>{base === '/admin' ? 'Review the listing content, photos, amenities and pricing guests will see.' : 'Prepare the basics, photos, amenities and pricing guests will see.'}</span>
         </div>
         <div className="op-host-editor-heading-actions">
           <Button type="button" color="light" className="op-host-editor-outline" onClick={() => setShowFullPreview(true)}>
@@ -239,7 +242,7 @@ function AdminPropertyForm() {
         <div className="op-host-editor-layout">
           <aside className="op-host-editor-progress-panel">
             <div className="op-host-editor-progress-heading">
-              <span>Your progress</span>
+              <span>Listing progress</span>
               <strong>{completedCount} of 4 steps complete</strong>
               <div className="op-host-editor-progress-track" aria-hidden="true">
                 <i style={{ width: `${(completedCount / EDITOR_STEPS.length) * 100}%` }} />
@@ -256,7 +259,7 @@ function AdminPropertyForm() {
                     onClick={() => goToStep(step.key)}
                     aria-current={activeStep === step.key ? 'step' : undefined}
                   >
-                    <span>{item?.complete ? '✓' : index + 1}</span>
+                    <span>{item?.complete ? <Check strokeWidth={2.5} aria-hidden="true" /> : index + 1}</span>
                     <span>
                       <strong>{step.label}</strong>
                       <small>{item?.complete ? 'Complete' : item?.detail || 'Needs attention'}</small>

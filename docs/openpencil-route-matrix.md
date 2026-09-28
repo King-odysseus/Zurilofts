@@ -4,7 +4,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 
 | Application route(s) | OpenPencil reference | Visual status |
 | --- | --- | --- |
-| `/` | Product `0:4`, mobile `0:10192` | Implemented; desktop/mobile QA passed for layout, navigation, controls |
+| `/` | Product `0:4`, mobile `0:10192` | Implemented; desktop/mobile QA passed for layout, navigation, controls, and the grouped Kenya location picker |
 | `/properties` | Product `0:1629`, mobile `0:10333`; filters `0:3591`, `0:3745` | Implemented; desktop/mobile QA passed for search/filter layout and controls |
 | `/property/:id` | Product `0:1935`, gallery `0:4441`, availability `0:4542` | Implemented with real listing data and repository photography; desktop/mobile QA passed |
 | `/booking/:id` | Product `0:2081`, `0:2153`, `0:2386`, `0:2559`, states `0:2708`, `0:2757` | Implemented; desktop/mobile QA passed for details, add-ons, and payment |
@@ -27,7 +27,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/host/payouts` | Host Earnings `0:3761`, payout details `0:4039` | Implemented with live wallet, destination, WHT statement, CSV/PDF export, and payout history; desktop/mobile QA passed |
 | `/admin` | Admin `0:6909`, workspace `0:6598` | Redesigned overview, QA ongoing |
 | `/admin/properties` | Admin `0:7015` | Redesigned live listing review, QA ongoing |
-| `/admin/properties/new`, `/admin/properties/:id/edit`, `/admin/properties/:id/calendar` | Admin `0:7015`, Product listing editor `0:3955` | Functional legacy, redesign pending |
+| `/admin/properties/new`, `/admin/properties/:id/edit`, `/admin/properties/:id/calendar` | Admin `0:7015`, Product listing editor `0:3955` | Implemented with the shared Flowbite listing editor, progress rail, guest preview, responsive admin calendar, Lucide icons, and light/dark QA |
 | `/admin/bookings` | Admin `0:7116` | Implemented with live reservation metrics, status filters, responsive mobile card rows, and Flowbite actions; desktop/mobile QA passed |
 | `/admin/earnings`, `/admin/payouts` | Admin insights `0:7570`, payments `0:7116` | Implemented with live finance metrics, Flowbite-styled line and radial gauge charts, responsive ledgers, exports, and payout actions; desktop/mobile/dark-mode QA passed |
 | `/admin/users` | Admin `0:7228` | Implemented with live account metrics, responsive people board, Flowbite role/search controls, payout editing, suspension, and account erasure; desktop/mobile QA passed |

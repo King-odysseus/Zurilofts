@@ -714,3 +714,95 @@
   .op-admin-finance-actions button{width:100%;min-height:38px}
   .op-admin-finance-board-head{align-items:flex-start;flex-direction:column;padding:16px}
 }
+
+/* Admin listing calendar */
+.op-admin-calendar{display:grid;max-width:1160px;margin:0 auto;gap:18px;padding-bottom:24px}
+.op-admin-calendar-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:8px}
+.op-admin-calendar-heading h1{margin:8px 0 6px;color:#0b1f42;font:700 30px/1.15 Montserrat,Arial,sans-serif;letter-spacing:-.035em}
+.op-admin-calendar-heading>div>span{display:block;color:#6e7686;font-size:13px;line-height:1.5}
+.op-admin-calendar-back{display:inline-flex;align-items:center;gap:5px;margin-bottom:10px;color:#6e7686;font-size:12px;font-weight:700;text-decoration:none}
+.op-admin-calendar-back svg{width:16px;height:16px}
+.op-admin-calendar-back:hover,.op-admin-calendar-back:focus-visible{color:#9f7142}
+.op-admin-calendar-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px!important;background:#e8edf7!important;color:#0b1f42!important;font-size:11px!important;font-weight:700!important}
+.op-admin-calendar-badge svg{width:14px;height:14px}
+.op-admin-calendar-alert{border-radius:12px!important;font-size:12px!important}
+.op-admin-calendar-card{padding:20px;border-radius:16px;background:#f7f4ef}
+.op-admin-calendar-card-head{display:grid;grid-template-columns:40px minmax(0,1fr) auto;align-items:center;gap:12px}
+.op-admin-calendar-card-icon{display:grid;width:40px;height:40px;place-items:center;border-radius:12px;background:#fff;color:#9f7142}
+.op-admin-calendar-card-icon svg{width:18px;height:18px}
+.op-admin-calendar-card-head h2{margin:0;color:#0b1f42;font:700 18px/1.25 Montserrat,Arial,sans-serif}
+.op-admin-calendar-card-head p{margin:4px 0 0;color:#6e7686;font-size:12px;line-height:1.5}
+.op-admin-calendar-copy-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;margin-top:18px}
+.op-admin-calendar-copy-row input{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+.op-admin-calendar-list{display:grid;gap:8px;margin-top:18px}
+.op-admin-calendar-row{display:flex;align-items:center;justify-content:space-between;gap:16px;min-width:0;padding:14px;border-radius:12px;background:#fff}
+.op-admin-calendar-row>div{display:grid;min-width:0;gap:4px}
+.op-admin-calendar-row strong{color:#0b1f42;font-size:12px;line-height:1.4}
+.op-admin-calendar-row span{overflow:hidden;color:#6e7686;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+.op-admin-calendar-row small{color:#1b6b3a;font-size:10px}
+.op-admin-calendar-row small.is-error{color:#b42318}
+.op-admin-calendar-source-badge{width:max-content;margin-top:3px;border-radius:999px!important;font-size:9px!important}
+.op-admin-calendar-empty{display:grid;justify-items:center;gap:5px;margin-top:18px;padding:24px;border-radius:12px;background:#fff;color:#6e7686;text-align:center}
+.op-admin-calendar-empty svg{width:24px;height:24px;color:#c49a6c}
+.op-admin-calendar-empty strong{color:#0b1f42;font-size:12px}
+.op-admin-calendar-empty span{font-size:11px}
+.op-admin-calendar-form{display:grid;align-items:end;gap:12px;margin-top:18px;padding-top:18px;border-top:1px solid #e2dad0}
+.op-admin-calendar-form.is-source-form{grid-template-columns:minmax(150px,.7fr) minmax(260px,1.8fr) auto}
+.op-admin-calendar-form.is-block-form{grid-template-columns:repeat(3,minmax(0,1fr)) auto}
+.op-admin-calendar-form>div{min-width:0}
+.op-admin-calendar-form label{margin-bottom:6px;color:#414d63;font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.op-admin-calendar-form button{align-self:end}
+.op-admin-calendar button{display:inline-flex;min-height:42px;align-items:center;justify-content:center;gap:8px!important;border-radius:10px;padding:0 15px;font:700 11px Montserrat,Arial,sans-serif;box-shadow:none;white-space:nowrap}
+.op-admin-calendar button svg{width:15px;height:15px;flex:none}
+.op-admin-calendar .op-admin-calendar-primary{border:0!important;background:#0b1f42!important;color:#fff!important}
+.op-admin-calendar .op-admin-calendar-primary:hover,.op-admin-calendar .op-admin-calendar-primary:focus{background:#07152d!important;color:#fff!important}
+.op-admin-calendar .op-admin-calendar-bronze{border:0!important;background:#9f7142!important;color:#fff!important}
+.op-admin-calendar .op-admin-calendar-bronze:hover,.op-admin-calendar .op-admin-calendar-bronze:focus{background:#b8895c!important;color:#fff!important}
+.op-admin-calendar .op-admin-calendar-outline{border:1px solid #e2dad0!important;background:#fff!important;color:#0b1f42!important}
+.op-admin-calendar .op-admin-calendar-outline:hover,.op-admin-calendar .op-admin-calendar-outline:focus{border-color:#c49a6c!important;background:#fff!important;color:#0b1f42!important}
+.op-admin-calendar .op-admin-calendar-danger{border:1px solid #f4c7c3!important;background:#fff!important;color:#b42318!important;font-size:10px!important}
+.op-admin-calendar .op-admin-calendar-danger:hover,.op-admin-calendar .op-admin-calendar-danger:focus{background:#fdecec!important;color:#b42318!important}
+.op-admin-calendar-state{display:grid;min-height:360px;place-items:center;align-content:center;gap:7px;color:#6e7686;text-align:center}
+.op-admin-calendar-state>span{display:grid;width:48px;height:48px;place-items:center;border-radius:50%;background:#f7f4ef;color:#9f7142}
+.op-admin-calendar-state>span svg{width:22px;height:22px}
+.op-admin-calendar-state strong{color:#0b1f42;font:700 17px Montserrat,Arial,sans-serif}
+.op-admin-calendar-state p{font-size:12px}
+.op-admin-calendar .is-spinning{animation:op-admin-calendar-spin 1s linear infinite}
+@keyframes op-admin-calendar-spin{to{transform:rotate(360deg)}}
+@media(max-width:900px){
+  .op-admin-calendar-form.is-source-form,.op-admin-calendar-form.is-block-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .op-admin-calendar-form button{width:100%}
+}
+@media(max-width:767px){
+  .op-admin-calendar{gap:14px}
+  .op-admin-calendar-heading{align-items:flex-start;flex-direction:column;gap:14px}
+  .op-admin-calendar-heading h1{font-size:25px}
+  .op-admin-calendar-card{padding:16px}
+  .op-admin-calendar-card-head{grid-template-columns:36px minmax(0,1fr)}
+  .op-admin-calendar-card-icon{width:36px;height:36px}
+  .op-admin-calendar-card-head button{grid-column:1/-1;width:100%}
+  .op-admin-calendar-copy-row{grid-template-columns:1fr}
+  .op-admin-calendar-copy-row button{width:100%}
+  .op-admin-calendar-row{align-items:flex-start;flex-direction:column}
+  .op-admin-calendar-row button{width:100%}
+  .op-admin-calendar-form.is-source-form,.op-admin-calendar-form.is-block-form{grid-template-columns:1fr}
+}
+html.dark .op-admin-calendar-heading h1,
+html.dark .op-admin-calendar-card-head h2,
+html.dark .op-admin-calendar-row strong,
+html.dark .op-admin-calendar-empty strong,
+html.dark .op-admin-calendar-state strong{color:#e7eef8!important}
+html.dark .op-admin-calendar-heading>div>span,
+html.dark .op-admin-calendar-card-head p,
+html.dark .op-admin-calendar-row span,
+html.dark .op-admin-calendar-empty,
+html.dark .op-admin-calendar-state{color:#9fb0c6!important}
+html.dark .op-admin-calendar-card{background:#0d1728!important}
+html.dark .op-admin-calendar-card-icon,
+html.dark .op-admin-calendar-row,
+html.dark .op-admin-calendar-empty{background:#111b2d!important}
+html.dark .op-admin-calendar-form{border-color:#26344a!important}
+html.dark .op-admin-calendar .op-admin-calendar-outline{border-color:#354760!important;background:#111b2d!important;color:#e7eef8!important}
+html.dark .op-admin-calendar .op-admin-calendar-outline:hover,
+html.dark .op-admin-calendar .op-admin-calendar-outline:focus{background:#172238!important;color:#fff!important}
+html.dark .op-admin-calendar .op-admin-calendar-primary{background:#9f7142!important;color:#fff!important}

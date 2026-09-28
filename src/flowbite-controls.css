@@ -645,6 +645,130 @@ html.dark .op-admin-review-select select {
   color: var(--dm-text) !important;
 }
 
+/* Shared host and admin listing editor */
+html.dark .op-host-listing-editor {
+  color: var(--dm-muted);
+}
+
+html.dark .op-host-editor-progress-panel,
+html.dark .op-host-editor-preview-panel,
+html.dark .op-host-editor-subpanel,
+html.dark .op-host-editor-toggle,
+html.dark .op-host-editor-actions {
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark .op-host-editor-card {
+  background-color: var(--dm-surface) !important;
+  box-shadow: var(--zl-shadow) !important;
+}
+
+html.dark .op-host-editor-card > header,
+html.dark .op-host-editor-autosave {
+  border-color: var(--dm-border) !important;
+}
+
+html.dark .op-host-editor-progress-heading > strong,
+html.dark .op-host-editor-steps strong,
+html.dark .op-host-editor-card h2,
+html.dark .op-host-editor-preview-panel h2,
+html.dark .op-host-editor-subpanel-heading h3,
+html.dark .op-host-editor-variant > div > label,
+html.dark .op-host-editor-toggle strong,
+html.dark .op-host-editor-upload strong {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-host-editor-card > header p,
+html.dark .op-host-editor-subpanel-heading p,
+html.dark .op-host-editor-variant > div > span,
+html.dark .op-host-editor-toggle span,
+html.dark .op-host-editor-preview-panel > p,
+html.dark .op-host-editor-actions > a,
+html.dark .op-host-editor-help,
+html.dark .op-host-editor-autosave {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-host-editor-label {
+  color: #C8D4E5 !important;
+}
+
+html.dark .op-host-editor-progress-track {
+  background-color: var(--dm-border) !important;
+}
+
+html.dark .op-host-editor-steps button {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-host-editor-steps button:hover,
+html.dark .op-host-editor-steps button.is-active {
+  background-color: var(--dm-surface-raised) !important;
+}
+
+html.dark .op-host-editor-steps button.is-active {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .22) !important;
+}
+
+html.dark .op-host-editor-steps button > span:first-child {
+  background-color: var(--dm-border) !important;
+  color: #C8D4E5 !important;
+}
+
+html.dark .op-host-editor-steps button.is-active > span:first-child,
+html.dark .op-host-editor-card > header > span {
+  background-color: #3A2E18 !important;
+  color: #D1A477 !important;
+}
+
+html.dark .op-host-editor-steps button.is-complete > span:first-child {
+  background-color: #9F7142 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .op-host-editor-variant {
+  background-color: var(--dm-surface) !important;
+}
+
+html.dark .op-host-editor-variant.is-selected {
+  border-color: #7A5B39 !important;
+}
+
+html.dark .op-host-editor-upload {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark .op-host-editor-upload:hover {
+  border-color: #9F7142 !important;
+  background-color: #172238 !important;
+}
+
+html.dark .op-host-editor-spinner {
+  border-color: var(--dm-border-strong) !important;
+  border-top-color: #D1A477 !important;
+}
+
+html.dark .op-host-editor-outline,
+html.dark .op-host-editor-preview-panel > header button {
+  background-color: #FFFFFF !important;
+  color: #0B1F42 !important;
+}
+
+html.dark .op-host-editor-outline:hover,
+html.dark .op-host-editor-outline:focus,
+html.dark .op-host-editor-preview-panel > header button:hover,
+html.dark .op-host-editor-preview-panel > header button:focus {
+  background-color: #F1F5F9 !important;
+  color: #0B1F42 !important;
+}
+
+html.dark .op-host-editor-error {
+  background-color: #3A2228 !important;
+  color: #FFB4AB !important;
+}
+
 /* Auth, checkout, and shared mobile navigation */
 html.dark .zl-auth-page,
 html.dark .zl-auth-form,

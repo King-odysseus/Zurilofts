@@ -1,140 +1,89 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useParams, useLocation, Link } from 'react-router-dom';
+import { useCallback, useEffect, useState } from 'react';
+import { Link, useParams } from 'react-router-dom';
+import { Alert, Badge, Button, Label, TextInput } from 'flowbite-react';
 import PropTypes from 'prop-types';
-import { CalendarDays, ChevronRight } from 'lucide-react';
+import {
+  CalendarDays,
+  ChevronLeft,
+  CircleAlert,
+  Copy,
+  Link2,
+  Plus,
+  RefreshCw,
+  Trash2,
+} from 'lucide-react';
 import apiClient from '../api/client.js';
 
-const labelCls = 'block text-sm font-semibold text-[#1f2937] mb-2';
-const inputCls =
-  'w-full px-4 py-2.5 rounded-xl border border-[#D9D9D9] focus:outline-none focus:border-[#C49A6C] bg-white text-[#1f2937]';
+const formatDate = (value) => new Date(value).toLocaleDateString('en-GB', {
+  day: '2-digit',
+  month: 'short',
+  year: 'numeric',
+});
 
-const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-
-// The calendar is per-property, so /host/calendar (no id) shows a picker of the
-// host's own listings. Reuses the existing /properties/mine endpoint.
-function CalendarPropertyPicker({ base }) {
-  const [properties, setProperties] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await apiClient.get('/properties/mine');
-        if (!cancelled) setProperties(res.data.data || []);
-      } catch {
-        if (!cancelled) setProperties([]);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
+function CalendarState({ icon, title, copy, children }) {
   return (
-    <div className="w-full">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold text-[#0B0B45]">Calendar</h1>
-        <p className="text-sm text-[#6b7280]">Pick a property to manage its iCal feeds and blocked dates.</p>
-      </div>
-
-      {loading ? (
-        <div className="text-center py-12">
-          <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
-        </div>
-      ) : properties.length === 0 ? (
-        <div className="bg-white rounded-2xl border border-[#D9D9D9] p-10 text-center">
-          <p className="text-[#6b7280]">No properties yet. Add a property to manage its calendar.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {properties.map((p) => (
-            <Link
-              key={p.id}
-              to={`${base}/calendar/${p.id}`}
-              className="bg-white rounded-2xl border border-[#D9D9D9] overflow-hidden shadow-sm hover:shadow-md transition-all duration-200 group"
-            >
-              <div className="aspect-[4/3] overflow-hidden bg-[#D9D9D9]/30">
-                {p.images?.[0] ? (
-                  <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
-                    <CalendarDays className="w-8 h-8" strokeWidth={1.5} aria-hidden="true" />
-                  </div>
-                )}
-              </div>
-              <div className="p-4">
-                <p className="font-semibold text-[#0B0B45] group-hover:text-[#C49A6C] transition-colors line-clamp-1">{p.title}</p>
-                <p className="text-sm text-[#6b7280] mt-0.5">{p.location}</p>
-                <span className="inline-flex items-center mt-3 text-xs font-semibold text-[#C49A6C]">
-                  View calendar
-                  <ChevronRight className="w-3.5 h-3.5 ml-1" strokeWidth={2} aria-hidden="true" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
+    <div className="op-admin-calendar-state">
+      <span aria-hidden="true">{icon}</span>
+      <strong>{title}</strong>
+      <p>{copy}</p>
+      {children}
     </div>
   );
 }
 
-CalendarPropertyPicker.propTypes = {
-  base: PropTypes.string.isRequired,
+CalendarState.propTypes = {
+  icon: PropTypes.node.isRequired,
+  title: PropTypes.string.isRequired,
+  copy: PropTypes.string.isRequired,
+  children: PropTypes.node,
 };
 
 function AdminCalendar() {
   const { id } = useParams();
-  const location = useLocation();
-  // Shared between the admin control centre (/admin/*) and the host workspace
-  // (/host/*). Build frontend links against the active base so a host never
-  // lands on an /admin/* URL. The backend /admin/properties/:id/calendar
-  // endpoints are unchanged - they already scope by hostId.
-  const base = location.pathname.startsWith('/host') ? '/host' : '/admin';
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [syncing, setSyncing] = useState(false);
   const [copied, setCopied] = useState(false);
-
   const [sourceDraft, setSourceDraft] = useState({ name: '', url: '' });
   const [blockDraft, setBlockDraft] = useState({ start: '', end: '', summary: '' });
 
   const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
     try {
       const res = await apiClient.get(`/admin/properties/${id}/calendar`);
       setData(res.data.data);
     } catch {
-      setError('Failed to load calendar');
+      setError('Failed to load the availability calendar.');
     } finally {
       setLoading(false);
     }
   }, [id]);
 
   useEffect(() => {
-    if (!id) return;
     load();
-  }, [load, id]);
+  }, [load]);
 
-  async function addSource(e) {
-    e.preventDefault();
+  async function addSource(event) {
+    event.preventDefault();
     setError('');
     try {
       await apiClient.post(`/admin/properties/${id}/calendar/sources`, sourceDraft);
       setSourceDraft({ name: '', url: '' });
-      load();
+      await load();
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to add source');
+      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to add the calendar feed.');
     }
   }
 
   async function removeSource(sourceId) {
-    if (!confirm('Remove this calendar feed and its imported blocks?')) return;
+    if (!window.confirm('Remove this calendar feed and its imported blocks?')) return;
     try {
       await apiClient.delete(`/admin/properties/${id}/calendar/sources/${sourceId}`);
-      load();
+      await load();
     } catch {
-      alert('Failed to remove source');
+      setError('Failed to remove the calendar feed.');
     }
   }
 
@@ -145,14 +94,14 @@ function AdminCalendar() {
       await apiClient.post(`/admin/properties/${id}/calendar/sync`);
       await load();
     } catch (err) {
-      setError(err.response?.data?.message || 'Sync failed');
+      setError(err.response?.data?.message || 'Calendar sync failed.');
     } finally {
       setSyncing(false);
     }
   }
 
-  async function addBlock(e) {
-    e.preventDefault();
+  async function addBlock(event) {
+    event.preventDefault();
     setError('');
     try {
       await apiClient.post(`/admin/properties/${id}/calendar/blocks`, {
@@ -161,154 +110,249 @@ function AdminCalendar() {
         summary: blockDraft.summary || undefined,
       });
       setBlockDraft({ start: '', end: '', summary: '' });
-      load();
+      await load();
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to add block');
+      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to block the selected dates.');
     }
   }
 
   async function removeBlock(blockId) {
     try {
       await apiClient.delete(`/admin/properties/${id}/calendar/blocks/${blockId}`);
-      setData((d) => ({ ...d, blocks: d.blocks.filter((b) => b.id !== blockId) }));
+      setData((current) => ({
+        ...current,
+        blocks: current.blocks.filter((block) => block.id !== blockId),
+      }));
     } catch {
-      alert('Failed to remove block');
+      setError('Failed to remove the blocked dates.');
     }
   }
 
-  function copyFeed() {
-    navigator.clipboard?.writeText(data.feedUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  async function copyFeed() {
+    try {
+      await navigator.clipboard?.writeText(data.feedUrl);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1600);
+    } catch {
+      setError('Unable to copy the calendar link. Select the link and copy it manually.');
+    }
   }
 
-  // No property selected (e.g. /host/calendar) - show a picker of the host's
-  // own listings instead of trying to load a calendar without an id.
-  if (!id) {
-    return <CalendarPropertyPicker base={base} />;
-  }
-
-  if (loading) {
+  if (loading && !data) {
     return (
-      <div className="text-center py-12">
-        <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
-      </div>
+      <CalendarState
+        icon={<RefreshCw className="is-spinning" />}
+        title="Loading calendar"
+        copy="Checking imported feeds and blocked dates for this listing."
+      />
     );
   }
 
   if (!data) {
-    return <div className="text-red-600">{error || 'Calendar unavailable'}</div>;
+    return (
+      <CalendarState
+        icon={<CircleAlert />}
+        title="Calendar unavailable"
+        copy={error || 'The listing calendar could not be loaded.'}
+      >
+        <Button color="dark" className="op-admin-calendar-primary" onClick={load}>Try again</Button>
+      </CalendarState>
+    );
   }
 
   return (
-    <div className="w-full">
-      <div className="mb-6">
-        <Link to={`${base}/properties/${id}/edit`} className="text-sm text-[#6b7280] hover:text-[#C49A6C]">&larr; Back to property</Link>
-        <h1 className="text-2xl font-bold text-[#0B0B45] mt-1">Calendar: {data.property.title}</h1>
-        <p className="text-sm text-[#6b7280]">Two-way sync with Airbnb, Booking.com, VRBO and other platforms using iCal feeds.</p>
-      </div>
+    <div className="op-admin-calendar">
+      <header className="op-admin-calendar-heading">
+        <div>
+          <Link to={`/admin/properties/${id}/edit`} className="op-admin-calendar-back">
+            <ChevronLeft aria-hidden="true" />
+            Back to listing
+          </Link>
+          <p className="op-admin-eyebrow">ZURILOFTS · ADMIN · CALENDAR</p>
+          <h1>Availability calendar</h1>
+          <span>{data.property.title} · Manage external feeds and manual closures.</span>
+        </div>
+        <Badge color="info" className="op-admin-calendar-badge">
+          <CalendarDays aria-hidden="true" />
+          iCal sync
+        </Badge>
+      </header>
 
-      {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-3 mb-6 text-sm">{error}</div>}
+      {error && (
+        <Alert color="failure" icon={CircleAlert} className="op-admin-calendar-alert">
+          {error}
+        </Alert>
+      )}
 
-      {/* Outbound feed */}
-      <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Export this calendar</h2>
-        <p className="text-sm text-[#6b7280] mb-4">Paste this link into Airbnb / Booking.com so they block the dates booked on ZuriLofts.</p>
-        <div className="flex items-center gap-2">
-          <input readOnly value={data.feedUrl} className={`${inputCls} font-mono text-xs`} onFocus={(e) => e.target.select()} />
-          <button onClick={copyFeed} className="shrink-0 bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors text-sm">
-            {copied ? 'Copied!' : 'Copy'}
-          </button>
+      <section className="op-admin-calendar-card">
+        <header className="op-admin-calendar-card-head">
+          <span className="op-admin-calendar-card-icon" aria-hidden="true"><Link2 /></span>
+          <div>
+            <h2>Export this calendar</h2>
+            <p>Use this feed in Airbnb, Booking.com or another channel to keep their dates in sync.</p>
+          </div>
+        </header>
+        <div className="op-admin-calendar-copy-row">
+          <TextInput
+            readOnly
+            value={data.feedUrl}
+            className="op-admin-calendar-feed"
+            aria-label="Calendar export URL"
+            onFocus={(event) => event.target.select()}
+          />
+          <Button color="dark" className="op-admin-calendar-primary" onClick={copyFeed}>
+            <Copy aria-hidden="true" />
+            {copied ? 'Copied' : 'Copy link'}
+          </Button>
         </div>
       </section>
 
-      {/* Imported feeds */}
-      <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6 mb-6">
-        <div className="flex items-center justify-between mb-1">
-          <h2 className="text-lg font-bold text-[#0B0B45]">Imported calendars</h2>
-          <button
+      <section className="op-admin-calendar-card">
+        <header className="op-admin-calendar-card-head">
+          <span className="op-admin-calendar-card-icon" aria-hidden="true"><RefreshCw /></span>
+          <div>
+            <h2>Imported calendars</h2>
+            <p>Connect external iCal feeds so their reservations block the same dates here.</p>
+          </div>
+          <Button
+            color="light"
+            className="op-admin-calendar-outline"
             onClick={syncNow}
             disabled={syncing || data.sources.length === 0}
-            className="text-sm font-semibold px-4 py-2 rounded-full border border-[#D9D9D9] text-[#0B0B45] hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-50"
           >
-            {syncing ? 'Syncing...' : 'Sync now'}
-          </button>
-        </div>
-        <p className="text-sm text-[#6b7280] mb-4">Add the iCal export URL from each platform to pull in their bookings.</p>
-        <p className="text-sm text-[#6b7280] mb-4">Sync with Airbnb, Booking.com or Google Calendar - import their calendars to block your dates automatically, and share your ZuriLofts calendar with them.</p>
+            <RefreshCw aria-hidden="true" className={syncing ? 'is-spinning' : ''} />
+            {syncing ? 'Syncing' : 'Sync now'}
+          </Button>
+        </header>
 
         {data.sources.length > 0 ? (
-          <div className="space-y-2 mb-5">
-            {data.sources.map((s) => (
-              <div key={s.id} className="flex items-center justify-between bg-[#f8f9fa] rounded-xl px-4 py-3 text-sm">
-                <div className="min-w-0">
-                  <p className="font-semibold text-[#0B0B45]">{s.name}</p>
-                  <p className="text-[#6b7280] text-xs truncate max-w-md">{s.url}</p>
-                  <p className={`text-xs mt-0.5 ${s.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-green-700'}`}>
-                    {s.lastSyncedAt ? `${s.lastStatus} · ${new Date(s.lastSyncedAt).toLocaleString()}` : 'Not synced yet'}
-                  </p>
+          <div className="op-admin-calendar-list">
+            {data.sources.map((source) => (
+              <article key={source.id} className="op-admin-calendar-row">
+                <div>
+                  <strong>{source.name}</strong>
+                  <span>{source.url}</span>
+                  <small className={source.lastStatus?.startsWith('ERROR') ? 'is-error' : ''}>
+                    {source.lastSyncedAt
+                      ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}`
+                      : 'Not synced yet'}
+                  </small>
                 </div>
-                <button onClick={() => removeSource(s.id)} className="shrink-0 text-red-600 hover:text-red-800 text-xs font-semibold ml-3">Remove</button>
-              </div>
+                <Button color="light" size="xs" className="op-admin-calendar-danger" onClick={() => removeSource(source.id)}>
+                  <Trash2 aria-hidden="true" />
+                  Remove
+                </Button>
+              </article>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-[#6b7280] mb-5">No external calendars connected.</p>
+          <div className="op-admin-calendar-empty">
+            <Link2 aria-hidden="true" />
+            <strong>No external calendars connected</strong>
+            <span>Add the export URL from the platform you use.</span>
+          </div>
         )}
 
-        <form onSubmit={addSource} className="grid grid-cols-1 md:grid-cols-12 gap-3 items-end">
-          <div className="md:col-span-3">
-            <label className={labelCls}>Platform</label>
-            <input className={inputCls} placeholder="Airbnb" value={sourceDraft.name} onChange={(e) => setSourceDraft({ ...sourceDraft, name: e.target.value })} required />
+        <form onSubmit={addSource} className="op-admin-calendar-form is-source-form">
+          <div>
+            <Label htmlFor="calendar-platform">Platform</Label>
+            <TextInput
+              id="calendar-platform"
+              placeholder="Airbnb"
+              value={sourceDraft.name}
+              onChange={(event) => setSourceDraft({ ...sourceDraft, name: event.target.value })}
+              required
+            />
           </div>
-          <div className="md:col-span-7">
-            <label className={labelCls}>iCal URL</label>
-            <input className={inputCls} placeholder="https://www.airbnb.com/calendar/ical/....ics" value={sourceDraft.url} onChange={(e) => setSourceDraft({ ...sourceDraft, url: e.target.value })} required />
+          <div>
+            <Label htmlFor="calendar-feed-url">iCal URL</Label>
+            <TextInput
+              id="calendar-feed-url"
+              type="url"
+              placeholder="https://www.airbnb.com/calendar/ical/....ics"
+              value={sourceDraft.url}
+              onChange={(event) => setSourceDraft({ ...sourceDraft, url: event.target.value })}
+              required
+            />
           </div>
-          <button type="submit" className="md:col-span-2 bg-[#C49A6C] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#b8895c] transition-colors">Add feed</button>
+          <Button type="submit" className="op-admin-calendar-bronze">
+            <Plus aria-hidden="true" />
+            Add feed
+          </Button>
         </form>
       </section>
 
-      {/* Blocked dates */}
-      <section className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Blocked dates</h2>
-        <p className="text-sm text-[#6b7280] mb-4">Imported bookings (read-only) and manual blocks. Blocked ranges can&apos;t be booked on ZuriLofts.</p>
+      <section className="op-admin-calendar-card">
+        <header className="op-admin-calendar-card-head">
+          <span className="op-admin-calendar-card-icon" aria-hidden="true"><CalendarDays /></span>
+          <div>
+            <h2>Blocked dates</h2>
+            <p>Imported reservations are read-only. Manual blocks stop guests booking those dates.</p>
+          </div>
+        </header>
 
         {data.blocks.length > 0 ? (
-          <div className="space-y-2 mb-5">
-            {data.blocks.map((b) => (
-              <div key={b.id} className="flex items-center justify-between bg-[#f8f9fa] rounded-xl px-4 py-2.5 text-sm">
+          <div className="op-admin-calendar-list">
+            {data.blocks.map((block) => (
+              <article key={block.id} className="op-admin-calendar-row">
                 <div>
-                  <span className="font-semibold text-[#0B0B45]">{fmt(b.start)} &rarr; {fmt(b.end)}</span>
-                  <span className="text-[#6b7280] ml-2">{b.summary || 'Blocked'}</span>
-                  <span className={`ml-2 px-2 py-0.5 rounded-full text-xs font-medium ${b.manual ? 'bg-[#C49A6C]/15 text-[#8a6a3e]' : 'bg-blue-100 text-blue-700'}`}>
-                    {b.manual ? 'Manual' : b.sourceName || 'Imported'}
-                  </span>
+                  <strong>{formatDate(block.start)} → {formatDate(block.end)}</strong>
+                  <span>{block.summary || 'Blocked dates'}</span>
+                  <Badge color={block.manual ? 'warning' : 'info'} className="op-admin-calendar-source-badge">
+                    {block.manual ? 'Manual block' : block.sourceName || 'Imported'}
+                  </Badge>
                 </div>
-                {b.manual && (
-                  <button onClick={() => removeBlock(b.id)} className="text-red-600 hover:text-red-800 text-xs font-semibold">Remove</button>
+                {block.manual && (
+                  <Button color="light" size="xs" className="op-admin-calendar-danger" onClick={() => removeBlock(block.id)}>
+                    <Trash2 aria-hidden="true" />
+                    Remove
+                  </Button>
                 )}
-              </div>
+              </article>
             ))}
           </div>
         ) : (
-          <p className="text-sm text-[#6b7280] mb-5">No blocked dates.</p>
+          <div className="op-admin-calendar-empty">
+            <CalendarDays aria-hidden="true" />
+            <strong>No blocked dates</strong>
+            <span>Imported bookings and manual closures will appear here.</span>
+          </div>
         )}
 
-        <form onSubmit={addBlock} className="grid grid-cols-2 md:grid-cols-12 gap-3 items-end">
-          <div className="md:col-span-3">
-            <label className={labelCls}>From</label>
-            <input type="date" className={inputCls} value={blockDraft.start} onChange={(e) => setBlockDraft({ ...blockDraft, start: e.target.value })} required />
+        <form onSubmit={addBlock} className="op-admin-calendar-form is-block-form">
+          <div>
+            <Label htmlFor="calendar-block-start">From</Label>
+            <TextInput
+              id="calendar-block-start"
+              type="date"
+              value={blockDraft.start}
+              onChange={(event) => setBlockDraft({ ...blockDraft, start: event.target.value })}
+              required
+            />
           </div>
-          <div className="md:col-span-3">
-            <label className={labelCls}>To</label>
-            <input type="date" className={inputCls} value={blockDraft.end} onChange={(e) => setBlockDraft({ ...blockDraft, end: e.target.value })} required />
+          <div>
+            <Label htmlFor="calendar-block-end">To</Label>
+            <TextInput
+              id="calendar-block-end"
+              type="date"
+              value={blockDraft.end}
+              onChange={(event) => setBlockDraft({ ...blockDraft, end: event.target.value })}
+              required
+            />
           </div>
-          <div className="md:col-span-4">
-            <label className={labelCls}>Reason</label>
-            <input className={inputCls} placeholder="Maintenance" value={blockDraft.summary} onChange={(e) => setBlockDraft({ ...blockDraft, summary: e.target.value })} />
+          <div>
+            <Label htmlFor="calendar-block-reason">Reason</Label>
+            <TextInput
+              id="calendar-block-reason"
+              placeholder="Maintenance"
+              value={blockDraft.summary}
+              onChange={(event) => setBlockDraft({ ...blockDraft, summary: event.target.value })}
+            />
           </div>
-          <button type="submit" className="md:col-span-2 bg-[#0B0B45] text-white font-semibold px-4 py-2.5 rounded-xl hover:bg-[#06062a] transition-colors">Block</button>
+          <Button type="submit" color="dark" className="op-admin-calendar-primary">
+            <CalendarDays aria-hidden="true" />
+            Block dates
+          </Button>
         </form>
       </section>
     </div>
