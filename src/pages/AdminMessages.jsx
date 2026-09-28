@@ -1,22 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, Textarea, TextInput } from 'flowbite-react';
+import { ChevronLeft, MessageSquareText, Search } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import apiClient from '../api/client.js';
 
 function SearchIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  );
+  return <Search strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function BackIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 19l-7-7 7-7" />
-    </svg>
-  );
+  return <ChevronLeft strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function initials(conversation) {
@@ -181,7 +174,7 @@ function AdminMessages() {
         <div className="op-admin-message-thread-panel">
           {!activeUserId ? (
             <div className="op-admin-message-thread-empty">
-              <span aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h8m-8 4h5m8-2a8 8 0 01-11.6 7.1L4 20l.9-3.4A8 8 0 1121 12z" /></svg></span>
+              <span aria-hidden="true"><MessageSquareText strokeWidth={1.5} /></span>
               <strong>Select a conversation</strong>
               <p>Choose a guest from the queue to read the full thread and reply.</p>
             </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button, Checkbox, Label, Select, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
+import { Check, Eye, MapPin, Upload, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 import { findSearchLocation, isNairobiSearchLocation, SEARCH_LOCATION_GROUPS } from '../data/searchLocations.js';
@@ -219,10 +220,7 @@ function AdminPropertyForm() {
         </div>
         <div className="op-host-editor-heading-actions">
           <Button type="button" color="light" className="op-host-editor-outline" onClick={() => setShowFullPreview(true)}>
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+            <Eye strokeWidth={1.5} aria-hidden="true" />
             Preview listing
           </Button>
           {isEdit && <Link to={`${base}/properties/${id}/calendar`} className="op-host-editor-outline">Manage calendar</Link>}
@@ -314,9 +312,7 @@ function AdminPropertyForm() {
                       <img src={src} alt={`Property photo ${i + 1}`} />
                       {i === 0 && <span>Cover</span>}
                       <button type="button" onClick={() => removeImage(i)} aria-label="Remove image">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <X strokeWidth={2} aria-hidden="true" />
                       </button>
                     </div>
                   ))}
@@ -330,9 +326,7 @@ function AdminPropertyForm() {
                   </>
                 ) : (
                   <>
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
+                    <Upload strokeWidth={1.5} aria-hidden="true" />
                     <strong>Add photos</strong>
                     <span>JPEG, PNG or WebP. Up to 10 at a time.</span>
                   </>
@@ -537,10 +531,7 @@ function PropertyPreview({ form }) {
       <div className="p-4">
         <h3 className="text-base font-semibold text-[#1f2937] leading-tight">{form.title || 'Property title'}</h3>
         <div className="flex items-center text-[#6b7280] mt-1 mb-3">
-          <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <MapPin className="w-4 h-4 mr-2 flex-shrink-0" strokeWidth={2} aria-hidden="true" />
           <span className="text-sm truncate">{buildLocationLabel(form.location, form.neighborhood) || 'Location'}</span>
         </div>
 
@@ -591,9 +582,7 @@ function FullPagePreview({ form, onClose }) {
         <div className="sticky top-0 z-10 flex items-center justify-between bg-[#0B0B45] text-white px-5 py-3">
           <span className="text-sm font-semibold">Page preview - not yet saved</span>
           <button onClick={onClose} className="text-white/70 hover:text-white" aria-label="Close preview">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
 
@@ -601,10 +590,7 @@ function FullPagePreview({ form, onClose }) {
           {/* Title */}
           <h1 className="text-2xl md:text-3xl font-bold text-[#0B0B45] mb-1">{form.title || 'Property title'}</h1>
           <div className="flex items-center text-[#6b7280] mb-6">
-            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <MapPin className="w-5 h-5 mr-1" strokeWidth={2} aria-hidden="true" />
             {buildLocationLabel(form.location, form.neighborhood) || 'Location'}
           </div>
 
@@ -664,9 +650,7 @@ function FullPagePreview({ form, onClose }) {
                   <div className="grid grid-cols-2 gap-3">
                     {amenities.map((a, i) => (
                       <div key={i} className="flex items-center text-[#1f2937]">
-                        <svg className="w-5 h-5 text-[#C49A6C] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check className="w-5 h-5 text-[#C49A6C] mr-2" strokeWidth={2} aria-hidden="true" />
                         {a}
                       </div>
                     ))}
@@ -681,10 +665,7 @@ function FullPagePreview({ form, onClose }) {
                   <ul className="space-y-2">
                     {nearby.map((n, i) => (
                       <li key={i} className="flex items-center text-[#1f2937]">
-                        <svg className="w-5 h-5 text-[#C49A6C] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
+                        <MapPin className="w-5 h-5 text-[#C49A6C] mr-2" strokeWidth={2} aria-hidden="true" />
                         {n}
                       </li>
                     ))}

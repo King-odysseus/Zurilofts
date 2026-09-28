@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Label, Select, Textarea, TextInput } from 'flowbite-react';
+import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -200,9 +201,7 @@ function AdminUsers() {
       <section className="op-admin-people-board">
         <div className="op-admin-people-toolbar">
           <div className="op-admin-people-search">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <Search strokeWidth={1.8} aria-hidden="true" />
             <TextInput
               type="search"
               value={search}

@@ -20,44 +20,63 @@ import {
   TextInput,
   Tooltip,
 } from 'flowbite-react';
+import {
+  ArrowLeft,
+  Banknote,
+  BarChart3,
+  Bell,
+  BookOpen,
+  Building2,
+  CalendarDays,
+  ChevronLeft,
+  ChevronRight,
+  Ellipsis,
+  FileText,
+  House,
+  LayoutGrid,
+  LogOut,
+  MessageCircle,
+  SlidersHorizontal,
+  Star,
+  Tag,
+  Users,
+} from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 import '../admin-design.css';
 
 // Shared: both hosts and admins - routes gated by requireHost (or weaker).
 const sharedNavItems = [
-  { path: '/admin', label: 'Dashboard', icon: 'M4 6h16M4 10h16M4 14h16M4 18h16', exact: true },
-  { path: '/admin/properties', label: 'Properties', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-  { path: '/admin/earnings', label: 'Earnings', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
+  { path: '/admin', label: 'Dashboard', icon: LayoutGrid, exact: true },
+  { path: '/admin/properties', label: 'Properties', icon: House },
+  { path: '/admin/earnings', label: 'Earnings', icon: BarChart3 },
 ];
 
 // Admin-only: backend is requireAdmin. Hosts must not see these - clicking
 // them would 403. Separated from sharedNavItems so the host sidebar stays
 // functional and doesn't invite users to dead-end pages.
 const adminOnlyItems = [
-  { path: '/admin/bookings', label: 'Bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-  { path: '/admin/users', label: 'Users & Hosts', icon: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65' },
-  { path: '/admin/host-applications', label: 'Host Applications', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l4.414 4.414A1 1 0 0118 8.414V19a2 2 0 01-2 2z' },
-  { path: '/admin/promos', label: 'Promo Codes', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
-  { path: '/admin/addons', label: 'Add-ons', icon: 'M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4' },
-  { path: '/admin/guides', label: 'Guides', icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253' },
-  { path: '/admin/feedback', label: 'Feedback', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.196-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z' },
-  { path: '/admin/messages', label: 'Messages', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z' },
-  { path: '/admin/payouts', label: 'Payouts', icon: 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z' },
+  { path: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
+  { path: '/admin/users', label: 'Users & Hosts', icon: Users },
+  { path: '/admin/host-applications', label: 'Host Applications', icon: FileText },
+  { path: '/admin/promos', label: 'Promo Codes', icon: Tag },
+  { path: '/admin/addons', label: 'Add-ons', icon: SlidersHorizontal },
+  { path: '/admin/guides', label: 'Guides', icon: BookOpen },
+  { path: '/admin/feedback', label: 'Feedback', icon: Star },
+  { path: '/admin/messages', label: 'Messages', icon: MessageCircle },
+  { path: '/admin/payouts', label: 'Payouts', icon: Banknote },
 ];
 
 const adminMobilePrimaryItems = [
-  { path: '/admin', label: 'Overview', icon: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', exact: true },
-  { path: '/admin/properties', label: 'Listings', icon: 'M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 00-2-2h-2M10 6h1M13 6h1M10 10h1M13 10h1M10 14h1M13 14h1M10 18h1M13 18h1' },
-  { path: '/admin/users', label: 'People', icon: 'M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8zM22 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75', matchPaths: ['/admin/users', '/admin/host-applications'] },
+  { path: '/admin', label: 'Overview', icon: LayoutGrid, exact: true },
+  { path: '/admin/properties', label: 'Listings', icon: Building2 },
+  { path: '/admin/users', label: 'People', icon: Users, matchPaths: ['/admin/users', '/admin/host-applications'] },
 ];
 
 const hostMobilePrimaryItems = [
-  { path: '/admin', label: 'Overview', icon: 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z', exact: true },
-  { path: '/admin/properties', label: 'Listings', icon: 'M6 22V4a2 2 0 012-2h8a2 2 0 012 2v18M6 12H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2v-4a2 2 0 00-2-2h-2M10 6h1M13 6h1M10 10h1M13 10h1M10 14h1M13 14h1M10 18h1M13 18h1' },
-  { path: '/admin/earnings', label: 'Earnings', icon: 'M21 12a9 9 0 11-18 0 9 9 0 0118 0zM12 7v10M15 9.5c-.7-.7-1.7-1.1-3-1.1-1.7 0-3 .8-3 2s1.3 2 3 2 3 .8 3 2-1.3 2-3 2c-1.3 0-2.3-.4-3-1.1' },
+  { path: '/admin', label: 'Overview', icon: LayoutGrid, exact: true },
+  { path: '/admin/properties', label: 'Listings', icon: Building2 },
+  { path: '/admin/earnings', label: 'Earnings', icon: BarChart3 },
 ];
-
-const mobileMoreIcon = 'M5 12h.01M12 12h.01M19 12h.01';
 
 
 function SidebarFlyout({ active, label, target = 'control', children }) {
@@ -241,7 +260,7 @@ function AdminLayout() {
           </span>
         )}
         <nav className={`min-h-0 flex-1 overflow-y-auto ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
-          {navItems.map(({ path, label, icon, exact }) => {
+          {navItems.map(({ path, label, icon: NavIcon, exact }) => {
             const active = exact ? location.pathname === path : location.pathname.startsWith(path);
             return (
               <SidebarFlyout key={path} active={collapsed} label={label} target="nav">
@@ -256,9 +275,7 @@ function AdminLayout() {
                   } ${collapsed ? 'justify-center w-11 h-11' : 'px-3 py-2'}`}
                 >
                   <div className="relative">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-                    </svg>
+                    <NavIcon className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
                     {path === '/admin/messages' && notif.unreadMessages > 0 && (
                       <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                         {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
@@ -285,9 +302,7 @@ function AdminLayout() {
                 collapsed ? 'justify-center w-11 h-11 mb-4' : 'justify-center mb-5 px-4 py-2.5'
               }`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-              </svg>
+              <ArrowLeft className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
               {!collapsed && <span className="ml-2.5">Go back to client view</span>}
             </Link>
           </SidebarFlyout>
@@ -314,9 +329,7 @@ function AdminLayout() {
                 collapsed ? 'justify-center w-full text-base' : 'text-[15px]'
               }`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              <LogOut className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
               {!collapsed && <span className="ml-2.5">Sign Out</span>}
             </button>
           </SidebarFlyout>
@@ -329,9 +342,9 @@ function AdminLayout() {
           aria-label={collapsed ? 'Expand admin sidebar' : 'Collapse admin sidebar'}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={collapsed ? 'M9 5l7 7-7 7' : 'M15 19l-7-7 7-7'} />
-          </svg>
+          {collapsed
+            ? <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+            : <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />}
         </button>
       </aside>
 
@@ -354,9 +367,7 @@ function AdminLayout() {
               title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
               aria-label={`${notif.unreadMessages} unread messages and ${notif.pendingBookings} pending bookings`}
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-              </svg>
+              <Bell className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
             </button>
             {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
               <span className="op-admin-mobile-count">
@@ -374,11 +385,10 @@ function AdminLayout() {
         <div className="op-admin-mobile-nav-scroll">
           {mobilePrimaryItems.map((item) => {
             const active = matchesMobilePrimary(item);
+            const Icon = item.icon;
             return (
               <Link key={item.path} to={item.path} className={`op-admin-mobile-link ${active ? 'is-active' : ''}`} aria-current={active ? 'page' : undefined}>
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.icon} />
-                </svg>
+                <Icon strokeWidth={1.5} aria-hidden="true" />
                 <span>{item.label}</span>
               </Link>
             );
@@ -390,9 +400,7 @@ function AdminLayout() {
             aria-expanded={mobileMoreOpen}
             aria-controls="admin-mobile-more-drawer"
           >
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={mobileMoreIcon} />
-            </svg>
+            <Ellipsis strokeWidth={2} aria-hidden="true" />
             <span>More</span>
           </button>
         </div>
@@ -415,7 +423,7 @@ function AdminLayout() {
         />
         <p className="op-admin-mobile-more-label">{isAdmin ? 'Workspace navigation' : 'Host workspace'}</p>
         <DrawerItems className="op-admin-mobile-more-list">
-          {mobileMoreItems.map(({ path, label, icon }) => {
+          {mobileMoreItems.map(({ path, label, icon: NavIcon }) => {
             const active = location.pathname === path || location.pathname.startsWith(`${path}/`);
             const displayLabel = mobileNavLabels[label] || label;
             return (
@@ -426,9 +434,7 @@ function AdminLayout() {
                 aria-current={active ? 'page' : undefined}
                 onClick={() => setMobileMoreOpen(false)}
               >
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
-                </svg>
+                <NavIcon strokeWidth={1.5} aria-hidden="true" />
                 <span>{displayLabel}</span>
                 {path === '/admin/messages' && notif.unreadMessages > 0 && <small>{notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}</small>}
                 {path === '/admin/bookings' && notif.pendingBookings > 0 && <small>{notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}</small>}
@@ -438,15 +444,11 @@ function AdminLayout() {
         </DrawerItems>
         <div className="op-admin-mobile-more-footer">
           <Link to="/" onClick={() => setMobileMoreOpen(false)}>
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
+            <ArrowLeft strokeWidth={1.5} aria-hidden="true" />
             Client view
           </Link>
           <button type="button" onClick={handleLogout}>
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
+            <LogOut strokeWidth={1.5} aria-hidden="true" />
             Sign Out
           </button>
         </div>
@@ -468,9 +470,7 @@ function AdminLayout() {
                 className="p-2 rounded-full hover:bg-[#D9D9D9]/40 transition-colors text-[#0B0B45]"
                 title={`${notif.unreadMessages} unread messages, ${notif.pendingBookings} pending bookings`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
+                <Bell className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
               </button>
               {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
                 <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">

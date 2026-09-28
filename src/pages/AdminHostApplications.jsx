@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Label, Select, Textarea, TextInput } from 'flowbite-react';
+import { FileBadge, FileText, Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 
 const STATUS_OPTIONS = [
@@ -53,22 +54,14 @@ function statusMeta(status) {
 }
 
 function SearchIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  );
+  return <Search strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function DocumentIcon({ kind }) {
   const business = kind === 'BUSINESS_REGISTRATION';
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.6} d={business
-        ? 'M4 21V5a2 2 0 012-2h8l4 4v14H4zm10-14V3m-6 8h6m-6 4h6M8 3v6H4'
-        : 'M7 3h7l4 4v14H7V3zm7 0v5h5M10 13h4m-4 4h4'} />
-    </svg>
-  );
+  return business
+    ? <FileBadge strokeWidth={1.6} aria-hidden="true" />
+    : <FileText strokeWidth={1.6} aria-hidden="true" />;
 }
 
 function AdminHostApplications() {

@@ -9,6 +9,7 @@ import {
   Textarea,
   TextInput,
 } from 'flowbite-react';
+import { Ellipsis, Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -33,19 +34,11 @@ const CHECK_OUT_OPTIONS = [
 ];
 
 function SearchIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  );
+  return <Search strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function DotsIcon() {
-  return (
-    <svg fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-      <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zm6 0a2 2 0 11-4 0 2 2 0 014 0zm4 2a2 2 0 100-4 2 2 0 000 4z" />
-    </svg>
-  );
+  return <Ellipsis aria-hidden="true" />;
 }
 
 function ConfirmDialog({ open, title, message, confirmLabel, confirmClass, onConfirm, onCancel, busy }) {

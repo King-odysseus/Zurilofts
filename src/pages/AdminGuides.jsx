@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Label, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
+import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 
 const EMPTY = { title: '', slug: '', excerpt: '', body: '', coverImage: '', published: false };
@@ -14,11 +15,7 @@ function formatDate(value) {
 }
 
 function SearchIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  );
+  return <Search strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function AdminGuides() {

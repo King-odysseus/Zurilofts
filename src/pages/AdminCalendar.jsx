@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useLocation, Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { CalendarDays, ChevronRight } from 'lucide-react';
 import apiClient from '../api/client.js';
 
 const labelCls = 'block text-sm font-semibold text-[#1f2937] mb-2';
@@ -58,9 +59,7 @@ function CalendarPropertyPicker({ base }) {
                   <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center text-[#6b7280]">
-                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
+                    <CalendarDays className="w-8 h-8" strokeWidth={1.5} aria-hidden="true" />
                   </div>
                 )}
               </div>
@@ -69,9 +68,7 @@ function CalendarPropertyPicker({ base }) {
                 <p className="text-sm text-[#6b7280] mt-0.5">{p.location}</p>
                 <span className="inline-flex items-center mt-3 text-xs font-semibold text-[#C49A6C]">
                   View calendar
-                  <svg className="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
+                  <ChevronRight className="w-3.5 h-3.5 ml-1" strokeWidth={2} aria-hidden="true" />
                 </span>
               </div>
             </Link>

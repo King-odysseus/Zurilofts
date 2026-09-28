@@ -1,25 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Button, Select, TextInput } from 'flowbite-react';
+import { Search, Star } from 'lucide-react';
 import apiClient from '../api/client.js';
 
 function StarRow({ rating, size = 'sm' }) {
   return (
     <span className={`op-admin-feedback-stars is-${size}`} aria-label={`${rating} out of 5 stars`}>
       {[1, 2, 3, 4, 5].map((star) => (
-        <svg key={star} className={star <= rating ? 'is-filled' : ''} fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-        </svg>
+        <Star key={star} className={star <= rating ? 'is-filled' : ''} fill="currentColor" aria-hidden="true" />
       ))}
     </span>
   );
 }
 
 function SearchIcon() {
-  return (
-    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
-    </svg>
-  );
+  return <Search strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function formatDate(value, includeTime = false) {
