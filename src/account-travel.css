@@ -87,6 +87,80 @@
 .opg-history-meta div:last-child dd{color:#9a744a}
 .opg-history-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:18px}
 
+.opg-messages-layout{display:grid;grid-template-columns:318px minmax(0,1fr);gap:16px;min-height:600px}
+.opg-conversation-list,.opg-message-pane{height:600px;min-width:0;overflow:hidden;border:1px solid #e8edf3;border-radius:16px}
+.opg-conversation-list{display:flex;flex-direction:column;background:#f8fafc}
+.opg-conversation-list-head{flex:none;padding:16px 16px 12px}
+.opg-conversation-list-head h2{margin:0 0 12px;color:#0b1f42;font:700 20px/1.2 Montserrat,Arial,sans-serif;letter-spacing:0}
+.opg-message-tabs{display:inline-flex;align-items:center;gap:3px;padding:3px;border-radius:10px;background:#eef2f7}
+.opg-message-tabs a{display:inline-flex;align-items:center;justify-content:center;min-width:66px;height:29px;padding:0 12px;border-radius:8px;color:#64748b;font-size:12px;font-weight:600;text-decoration:none}
+.opg-message-tabs a.is-active{background:#0b0b45;color:#fff;box-shadow:0 1px 4px rgba(11,31,66,.16)}
+.opg-conversation-scroll{flex:1;min-height:0;overflow-y:auto;padding:0 10px 10px;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+.opg-conversation-row{display:grid;grid-template-columns:42px minmax(0,1fr) 8px;align-items:center;gap:10px;min-height:62px;padding:10px;border-radius:12px;color:#0b1f42;text-decoration:none;transition:background .18s,box-shadow .18s}
+.opg-conversation-row:hover,.opg-conversation-row:focus-visible{background:#f1f5f9;outline:0}
+.opg-conversation-row.is-selected{background:#eff6ff;box-shadow:inset 3px 0 0 #0b0b45}
+.opg-conversation-avatar{display:grid;place-items:center;width:42px;height:42px;flex:none;overflow:hidden;border-radius:50%;background:#dbeafe;color:#0b1f42;font:700 12px Inter,Arial,sans-serif}
+.opg-conversation-avatar img{width:100%;height:100%;object-fit:cover}
+.opg-conversation-avatar.is-support{border-radius:11px;background:#0b0b45;color:#fff}
+.opg-conversation-avatar.is-support svg{width:19px;height:19px}
+.opg-conversation-summary{min-width:0}
+.opg-conversation-line{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.opg-conversation-line strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0b1f42;font-size:12px;font-weight:700}
+.opg-conversation-line strong i{font-style:normal;color:#94a3b8;font-weight:500}
+.opg-conversation-line time,.opg-conversation-line>span{flex:none;color:#64748b;font-size:10px}
+.opg-conversation-preview{display:block;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:11px}
+.opg-conversation-unread{width:7px;height:7px;border-radius:50%;background:#c49a6c}
+.opg-support-row{margin-top:8px;border-top:1px solid #e8edf3;border-radius:0 0 12px 12px}
+.opg-conversation-loading{display:grid;gap:8px;padding:4px}
+.opg-conversation-loading span{display:block;height:62px;border-radius:12px;background:#eef2f7;animation:opg-trip-pulse 1.5s ease-in-out infinite}
+.opg-conversation-error,.opg-conversation-empty{padding:20px 14px;border-radius:12px;background:#fff;text-align:center}
+.opg-conversation-error p{margin:0 0 10px!important;color:#9a3412;font-size:12px;line-height:1.45}
+.opg-conversation-error button{border:0;background:transparent;color:#9a744a;font-size:12px;font-weight:700;cursor:pointer}
+.opg-conversation-empty strong{display:block;color:#0b1f42;font-size:13px}
+.opg-conversation-empty span{display:block;margin-top:5px;color:#64748b;font-size:11px;line-height:1.5}
+.opg-message-pane{display:flex;flex-direction:column;background:#f8fafc}
+.opg-message-pane-head{flex:none;display:flex;align-items:center;gap:12px;min-height:78px;padding:14px 18px;border-bottom:1px solid #e5e7eb;background:#fff}
+.opg-message-back{display:none;place-items:center;width:34px;height:34px;flex:none;border-radius:10px;color:#0b1f42;text-decoration:none}
+.opg-message-back:hover{background:#f1f5f9}
+.opg-message-back svg{width:19px;height:19px}
+.opg-message-context-image,.opg-message-context-icon{display:grid;place-items:center;width:46px;height:46px;flex:none;overflow:hidden;border-radius:12px;background:#0b0b45;color:#fff;object-fit:cover}
+.opg-message-context-icon svg{width:21px;height:21px}
+.opg-message-context{min-width:0;flex:1}
+.opg-message-context h2{margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0b1f42;font:700 17px/1.25 Montserrat,Arial,sans-serif;letter-spacing:0}
+.opg-message-context p{margin-top:5px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:12px}
+.opg-message-context p span{color:#94a3b8}
+.opg-message-booking-link{flex:none;color:#2563eb;font-size:12px;font-weight:700;text-decoration:none}
+.opg-message-booking-link:hover,.opg-message-booking-link:focus-visible{color:#0b1f42;text-decoration:underline}
+.opg-message-thread{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:12px;padding:20px;scrollbar-width:thin;scrollbar-color:#cbd5e1 transparent}
+.opg-message-item{display:flex;flex-direction:column;align-items:flex-start;width:min(78%,560px)}
+.opg-message-item.is-mine{align-self:flex-end;align-items:flex-end}
+.opg-message-bubble{max-width:100%;padding:11px 13px;border-radius:14px;border-bottom-left-radius:5px;background:#fff;color:#0b1f42;font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 4px 14px rgba(11,31,66,.04)}
+.opg-message-item.is-mine .opg-message-bubble{border-radius:14px;border-bottom-right-radius:5px;background:#dbeafe;color:#0b1f42}
+.opg-message-meta{margin-top:5px;color:#94a3b8;font-size:10px}
+.opg-message-composer{flex:none;display:flex;align-items:flex-end;gap:9px;padding:12px;border-top:1px solid #e5e7eb;background:#fff}
+.opg-message-composer .opg-message-textarea{flex:1;min-height:42px!important;max-height:96px;margin:0!important;padding:10px 12px!important;resize:none;border-color:#e2dad0!important;border-radius:12px!important;background:#fff!important;color:#0b1f42!important;font-size:12px!important;line-height:1.45!important;box-shadow:none!important}
+.opg-message-composer .opg-message-textarea:focus{border-color:#c49a6c!important;box-shadow:0 0 0 3px rgba(196,154,108,.2)!important}
+.opg-message-send{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;min-width:88px;padding:0 15px;border:0;border-radius:12px;background:#c49a6c;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
+.opg-message-send:hover:not(:disabled),.opg-message-send:focus-visible:not(:disabled){background:#ad8053}
+.opg-message-send:disabled{background:#d7dde5;color:#fff;cursor:not-allowed}
+.opg-message-send svg{width:15px;height:15px}
+.opg-message-send-spinner{width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite}
+.opg-message-placeholder{display:grid;place-items:center;align-content:center;height:100%;padding:40px;text-align:center}
+.opg-message-placeholder>span{display:grid;place-items:center;width:54px;height:54px;margin-bottom:14px;border-radius:15px;background:#e8eef7;color:#64748b}
+.opg-message-placeholder svg{width:25px;height:25px}
+.opg-message-placeholder h2{margin:0;color:#0b1f42;font:700 19px Montserrat,Arial,sans-serif}
+.opg-message-placeholder p{max-width:370px;margin:7px auto 0!important;color:#64748b;font-size:12px;line-height:1.55}
+.opg-message-loading{display:flex;flex-direction:column;gap:10px;margin:auto 0}
+.opg-message-loading span{display:block;width:58%;height:52px;border-radius:14px;background:#e8eef7;animation:opg-trip-pulse 1.5s ease-in-out infinite}
+.opg-message-loading span:nth-child(2){width:44%;margin-left:auto;background:#dbeafe}
+.opg-message-loading span:nth-child(3){width:64%}
+.opg-message-error,.opg-message-empty{align-self:center;margin:auto;text-align:center}
+.opg-message-error p{margin:0 0 12px!important;color:#9a3412;font-size:12px}
+.opg-message-error button{border:0;background:transparent;color:#9a744a;font-size:12px;font-weight:700;cursor:pointer}
+.opg-message-empty strong{display:block;color:#0b1f42;font:700 17px Montserrat,Arial,sans-serif}
+.opg-message-empty p{max-width:340px;margin:7px auto 0!important;color:#64748b;font-size:12px;line-height:1.55}
+.opg-message-inline-error{align-self:center;margin:0!important;color:#b42318;font-size:10px;text-align:center}
+
 @media(max-width:980px){
   .opg-account-container{grid-template-columns:220px minmax(0,1fr)}
   .opg-trip-feature{grid-template-columns:240px minmax(0,1fr)}
@@ -118,4 +192,19 @@
   .opg-history-title-row .opg-trip-status{margin-top:10px}
   .opg-history-meta{grid-template-columns:1fr 1fr;gap:14px}
   .opg-history-actions{display:grid;grid-template-columns:1fr;margin-top:16px}
+  .opg-messages-layout{display:block;min-height:0}
+  .opg-conversation-list{height:calc(100dvh - 310px);min-height:340px;max-height:650px;border-radius:14px}
+  .opg-messages-layout.is-detail-open .opg-conversation-list{display:none}
+  .opg-message-pane{display:none;height:calc(100dvh - 310px);min-height:340px;border-radius:14px}
+  .opg-messages-layout.is-detail-open .opg-message-pane{display:flex}
+  .opg-message-back{display:inline-grid}
+  .opg-message-pane-head{min-height:72px;padding:12px}
+  .opg-message-context-image,.opg-message-context-icon{width:42px;height:42px}
+  .opg-message-context h2{font-size:15px}
+  .opg-message-booking-link{display:none}
+  .opg-message-thread{padding:14px}
+  .opg-message-item{width:88%}
+  .opg-message-composer{padding:10px}
+  .opg-message-send{min-width:46px;width:46px;padding:0;font-size:0}
+  .opg-message-send svg{width:17px;height:17px}
 }

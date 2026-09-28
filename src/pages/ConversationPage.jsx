@@ -1,16 +1,16 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { useLocation, useParams, Link } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { Textarea } from 'flowbite-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
-import Navbar from '../components/Navbar.jsx';
-import Spinner from '../components/Spinner.jsx';
+import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMessagesLayout.jsx';
+import { getConversationParticipant } from '../utils/conversations.js';
 import { firstImage } from '../utils/images.js';
 
 function formatMessageTime(iso) {
   if (!iso) return '';
   const date = new Date(iso);
-  return date.toLocaleString('en-GB', {
+  return Number.isNaN(date.getTime()) ? '' : date.toLocaleString('en-GB', {
     day: 'numeric',
     month: 'short',
     hour: '2-digit',
@@ -18,52 +18,11 @@ function formatMessageTime(iso) {
   });
 }
 
-function getOtherParticipant(conversation, currentUserId) {
-  const booking = conversation?.booking || {};
-  const guest = booking.user || {};
-  const isGuest = guest.id === currentUserId;
-  if (isGuest) {
-    return { name: 'Host', isHost: true };
-  }
-  return { name: `${guest.firstName || ''} ${guest.lastName || ''}`.trim() || 'Guest', isHost: false };
+function formatStayContext(booking) {
+  if (!booking?.checkIn) return 'Booking conversation';
+  const format = (value) => new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return `${format(booking.checkIn)} - ${format(booking.checkOut)}`;
 }
-
-function MessageBubble({ message, isMine }) {
-  const sender = message.sender || {};
-  const senderName = `${sender.firstName || ''} ${sender.lastName || ''}`.trim() || 'User';
-
-  return (
-    <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-      <div className={`max-w-[80%] sm:max-w-[70%] ${isMine ? 'text-right' : 'text-left'}`}>
-        <div
-          className={`px-4 py-2.5 rounded-2xl text-sm whitespace-pre-wrap break-words ${
-            isMine
-              ? 'bg-[#0B0B45] text-white rounded-br-md'
-              : 'bg-white border border-[#D9D9D9] text-[#1f2937] rounded-bl-md'
-          }`}
-        >
-          {message.content}
-        </div>
-        <p className={`text-[11px] text-[#6b7280] mt-1 ${isMine ? 'text-right' : 'text-left'}`}>
-          {isMine ? 'You' : senderName} · {formatMessageTime(message.createdAt)}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-MessageBubble.propTypes = {
-  message: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    content: PropTypes.string.isRequired,
-    createdAt: PropTypes.string,
-    sender: PropTypes.shape({
-      firstName: PropTypes.string,
-      lastName: PropTypes.string,
-    }),
-  }).isRequired,
-  isMine: PropTypes.bool.isRequired,
-};
 
 function ConversationPage() {
   const { conversationId: routeId } = useParams();
@@ -71,67 +30,73 @@ function ConversationPage() {
   const conversationId = routeId || pathname.split('/')[2];
   const { user } = useAuth();
   const [conversation, setConversation] = useState(null);
+  const [conversations, setConversations] = useState([]);
+  const [conversationsLoading, setConversationsLoading] = useState(true);
+  const [conversationsError, setConversationsError] = useState(null);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [draft, setDraft] = useState('');
   const [sending, setSending] = useState(false);
-  const bottomRef = useRef(null);
+  const threadRef = useRef(null);
 
-  const scrollToBottom = useCallback(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
-    }
+  useEffect(() => {
+    document.title = 'Conversation | ZuriLofts';
   }, []);
 
-  // Load conversation metadata (property title + other participant) from the list
-  useEffect(() => {
-    let cancelled = false;
-    async function loadConversation() {
-      try {
-        const res = await apiClient.get('/conversations');
-        if (cancelled) return;
-        const found = (res.data.data || []).find((c) => c.id === conversationId);
-        setConversation(found || null);
-      } catch {
-        // Non-fatal: thread still renders with messages
-      }
+  const fetchConversations = useCallback(async () => {
+    setConversationsLoading(true);
+    try {
+      const response = await apiClient.get('/conversations');
+      const items = response.data.data || [];
+      setConversations(items);
+      setConversation(items.find((item) => item.id === conversationId) || null);
+      setConversationsError(null);
+    } catch {
+      setConversationsError('Could not load your conversations.');
+    } finally {
+      setConversationsLoading(false);
     }
-    loadConversation();
-    return () => { cancelled = true; };
   }, [conversationId]);
 
-  // Load messages + mark read + poll every 30s
   useEffect(() => {
-    if (!conversationId) return;
-    let active = true;
+    fetchConversations();
+  }, [fetchConversations]);
 
-    async function loadMessages() {
-      try {
-        const res = await apiClient.get(`/conversations/${conversationId}/messages`);
-        if (!active) return;
-        setMessages(res.data.data || []);
-        setError(null);
-        scrollToBottom();
-      } catch (err) {
-        if (!active) return;
-        setError('Could not load messages. Please try again.');
-      } finally {
-        if (active) setLoading(false);
-      }
+  const scrollToBottom = useCallback(() => {
+    const thread = threadRef.current;
+    if (thread) thread.scrollTop = thread.scrollHeight;
+  }, []);
+
+  const loadMessages = useCallback(async () => {
+    try {
+      const response = await apiClient.get(`/conversations/${conversationId}/messages`);
+      setMessages(response.data.data || []);
+      setError(null);
+      requestAnimationFrame(scrollToBottom);
+    } catch {
+      setError('Could not load messages. Please try again.');
+    } finally {
+      setLoading(false);
     }
+  }, [conversationId, scrollToBottom]);
+
+  useEffect(() => {
+    if (!conversationId) return undefined;
+    let active = true;
 
     async function markRead() {
       try {
         await apiClient.patch(`/conversations/${conversationId}/read`);
       } catch {
-        // Ignore read-marking failures
+        // Read state is best effort and should not block the thread.
       }
     }
 
     loadMessages();
     markRead();
     const interval = setInterval(() => {
+      if (!active) return;
       loadMessages();
       markRead();
     }, 30000);
@@ -140,7 +105,7 @@ function ConversationPage() {
       active = false;
       clearInterval(interval);
     };
-  }, [conversationId, scrollToBottom]);
+  }, [conversationId, loadMessages]);
 
   const canSend = draft.trim().length > 0 && !sending;
 
@@ -149,116 +114,72 @@ function ConversationPage() {
     if (!content || sending) return;
     setSending(true);
     try {
-      const res = await apiClient.post(`/conversations/${conversationId}/messages`, { content });
-      const newMessage = res.data.data;
-      setMessages((prev) => [...prev, newMessage]);
+      const response = await apiClient.post(`/conversations/${conversationId}/messages`, { content });
+      setMessages((current) => [...current, response.data.data]);
       setDraft('');
-      scrollToBottom();
-    } catch (err) {
+      requestAnimationFrame(scrollToBottom);
+    } catch {
       setError('Could not send your message. Please try again.');
     } finally {
       setSending(false);
     }
   }
 
-  const other = getOtherParticipant(conversation, user?.id);
+  const participant = getConversationParticipant(conversation, user?.id);
   const property = conversation?.booking?.property || {};
   const image = firstImage(property);
 
-  return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <Navbar />
-      <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-4 flex flex-col">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <Link
-            to="/inbox"
-            className="p-2 rounded-full hover:bg-[#D9D9D9]/40 transition-colors text-[#0B0B45]"
-            aria-label="Back to inbox"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-          </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-bold text-[#0B0B45] truncate">{other.name}</h1>
-            <p className="text-sm text-[#6b7280] truncate">{property.title || 'Property'}</p>
-          </div>
-          {image && (
-            <img src={image} alt={property.title} className="w-10 h-10 rounded-xl object-cover flex-shrink-0" />
-          )}
-        </div>
+  return <GuestMessagesLayout
+    activeTab="inbox"
+    conversations={conversations}
+    currentUserId={user?.id}
+    selectedId={conversationId}
+    loading={conversationsLoading}
+    error={conversationsError}
+    onRetry={fetchConversations}
+    detailOpen
+  >
+    <header className="opg-message-pane-head">
+      <Link className="opg-message-back" to="/inbox" aria-label="Back to messages">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.9} d="M15 19l-7-7 7-7" /></svg>
+      </Link>
+      {image && <img className="opg-message-context-image" src={image} alt="" />}
+      <div className="opg-message-context">
+        <h2>{participant.name}</h2>
+        <p>{property.title || 'Stay conversation'} <span>·</span> {formatStayContext(conversation?.booking)}</p>
+      </div>
+      {property.id && <Link className="opg-message-booking-link" to={`/property/${property.id}`}>View stay</Link>}
+    </header>
 
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto bg-white rounded-2xl border border-[#D9D9D9] p-4 space-y-3 min-h-[50vh]">
-          {loading ? (
-            <div className="flex items-center justify-center py-16">
-              <Spinner />
-            </div>
-          ) : error && messages.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-[#6b7280] mb-4">{error}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-[#C49A6C] text-white hover:bg-[#b8895c] transition-all duration-200"
-              >
-                Try again
-              </button>
-            </div>
-          ) : messages.length === 0 ? (
-            <div className="text-center py-16">
-              <p className="text-[#6b7280]">No messages yet. Say hello to {other.name}.</p>
-            </div>
-          ) : (
-            messages.map((m) => (
-              <MessageBubble key={m.id} message={m} isMine={m.senderId === user?.id} />
-            ))
-          )}
-          {error && messages.length > 0 && (
-            <p className="text-xs text-red-500 text-center">{error}</p>
-          )}
-          <div ref={bottomRef} />
-        </div>
-
-        {/* Composer */}
-        <div className="mt-4 pb-4">
-          <div className="flex items-end gap-2 bg-white rounded-2xl border border-[#D9D9D9] p-2">
-            <textarea
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              rows={1}
-              placeholder="Write a message..."
-              className="flex-1 resize-none bg-transparent outline-none px-3 py-2 text-sm text-[#1f2937] placeholder-[#6b7280] max-h-32"
-            />
-            <button
-              onClick={handleSend}
-              disabled={!canSend}
-              className={`flex-shrink-0 inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
-                canSend
-                  ? 'bg-[#C49A6C] text-white hover:bg-[#b8895c]'
-                  : 'bg-[#D9D9D9] text-[#6b7280] cursor-not-allowed'
-              }`}
-            >
-              {sending ? (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                </svg>
-              )}
-              Send
-            </button>
-          </div>
-        </div>
-      </main>
+    <div className="opg-message-thread" ref={threadRef} aria-live="polite">
+      {loading ? <div className="opg-message-loading" aria-label="Loading messages"><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadMessages}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>No messages yet</strong><p>Say hello to {participant.name} and start planning the stay.</p></div> : messages.map((message) => {
+        const isMine = message.senderId === user?.id;
+        const senderName = [message.sender?.firstName, message.sender?.lastName].filter(Boolean).join(' ') || 'User';
+        return <GuestMessageBubble key={message.id} mine={isMine} meta={`${isMine ? 'You' : senderName} · ${formatMessageTime(message.createdAt)}`}>{message.content}</GuestMessageBubble>;
+      })}
+      {error && messages.length > 0 && <p className="opg-message-inline-error">{error}</p>}
     </div>
-  );
+
+    <div className="opg-message-composer">
+      <Textarea
+        value={draft}
+        onChange={(event) => setDraft(event.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            handleSend();
+          }
+        }}
+        rows={1}
+        placeholder="Write a message..."
+        className="opg-message-textarea"
+      />
+      <button className="opg-message-send" type="button" onClick={handleSend} disabled={!canSend}>
+        {sending ? <span className="opg-message-send-spinner" /> : <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z" /></svg>}
+        Send
+      </button>
+    </div>
+  </GuestMessagesLayout>;
 }
 
 export default ConversationPage;
