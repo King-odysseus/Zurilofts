@@ -1,177 +1,217 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Check, Heart, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, Card } from 'flowbite-react';
+import {
+  Check,
+  CircleX,
+  Clock3,
+  Heart,
+  House,
+  RefreshCw,
+  TriangleAlert,
+} from 'lucide-react';
 import apiClient from '../api/client';
+import RouteBackButton from '../components/RouteBackButton.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
+
+const PENDING_PROVIDER_STATES = new Set(['pending', 'ongoing', 'processing', 'abandoned']);
+
+function formatDate(value) {
+  if (!value) return '-';
+  return new Date(value).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function formatMoney(value) {
+  if (value === null || value === undefined || value === '') return '-';
+  const amount = Number(value);
+  return Number.isFinite(amount) ? `KES ${amount.toLocaleString()}` : '-';
+}
 
 function PaymentCallback() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const reference = searchParams.get('reference');
-  const [status, setStatus] = useState('loading'); // loading | success | failed
+  const [status, setStatus] = useState('loading');
   const [booking, setBooking] = useState(null);
+  const [bookingId, setBookingId] = useState(null);
   const [error, setError] = useState('');
+  const [errorLabel, setErrorLabel] = useState('');
   const { toggleFavorite, isFavorite } = useFavorites();
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
     if (!reference) {
       setStatus('failed');
-      setError('No payment reference found. Please try booking again.');
-      return;
+      setError('No payment reference was found. Please return to your trip and try again.');
+      setErrorLabel('Missing payment reference');
+      return () => { cancelled = true; };
     }
 
     async function verify() {
       try {
         const res = await apiClient.get(`/payments/verify/${reference}`);
+        if (cancelled) return;
         const data = res.data;
+        const paymentData = data.data || {};
+        setBookingId(paymentData.bookingId || null);
 
-        if (data.data?.confirmed) {
+        if (paymentData.confirmed) {
           setStatus('success');
-          // Fetch booking details
-          if (data.data.bookingId) {
+          if (paymentData.bookingId) {
             try {
-              const bookingRes = await apiClient.get(`/bookings/${data.data.bookingId}`);
-              setBooking(bookingRes.data.data);
+              const bookingRes = await apiClient.get(`/bookings/${paymentData.bookingId}`);
+              if (!cancelled) setBooking(bookingRes.data.data);
             } catch {
-              // booking details fetch is optional for success display
+              // Confirmation stays valid when optional booking details cannot load.
             }
           }
-        } else {
-          setStatus('failed');
-          setError(data.message || 'Payment verification failed. Please try again.');
+          return;
         }
+
+        const providerStatus = String(paymentData.providerStatus || '').toLowerCase();
+        setStatus(PENDING_PROVIDER_STATES.has(providerStatus) ? 'pending' : 'failed');
+        setError(data.message || 'Payment verification did not complete. Please review your trip before trying again.');
+        setErrorLabel(providerStatus ? `Provider status: ${providerStatus}` : 'Verification not completed');
       } catch (err) {
-        setStatus('failed');
-        setError(err.response?.data?.message || 'Unable to verify payment. If you completed payment, it will be confirmed shortly.');
+        if (cancelled) return;
+        const responseStatus = err.response?.status;
+        const providerPending = !err.response || responseStatus >= 500;
+        setStatus(providerPending ? 'pending' : 'failed');
+        setError(
+          err.response?.data?.message
+            || err.response?.data?.error
+            || 'Unable to verify the payment right now. If you completed payment, it will be confirmed shortly.',
+        );
+        setErrorLabel(providerPending ? 'Verification is still in progress' : 'Payment could not be verified');
       }
     }
 
     verify();
+    return () => { cancelled = true; };
   }, [reference]);
 
+  const isSaved = saved || (booking?.propertyId ? isFavorite(booking.propertyId) : false);
+
+  async function saveBookingProperty() {
+    if (!booking?.propertyId || isSaved) return;
+    const ok = await toggleFavorite(booking.propertyId);
+    if (ok) setSaved(true);
+  }
+
   return (
-    <div className="min-h-screen bg-white">
-      <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
-        <div className="max-w-md mx-auto px-6 text-center">
+    <main className="op-payment-result" aria-live="polite">
+      <div className="op-payment-result-inner">
+        <RouteBackButton className="op-payment-back" label="Back" />
+        <header className="op-payment-result-heading">
+          <p>PAYMENT STATUS</p>
+          <h1>Your stay confirmation</h1>
+          <span>We verify every payment securely before confirming a reservation.</span>
+        </header>
 
-          {/* Loading */}
+        <Card className={`op-payment-card is-${status}`} aria-busy={status === 'loading'}>
           {status === 'loading' && (
-            <>
-              <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
-              <h1 className="text-2xl font-bold text-[#0B0B45] mb-4">Verifying Payment</h1>
-              <p className="text-[#6b7280]">Please wait while we confirm your payment...</p>
-            </>
+            <div className="op-payment-state">
+              <div className="op-payment-icon is-loading" aria-hidden="true"><RefreshCw /></div>
+              <h2>Confirming payment</h2>
+              <p>This usually takes a few seconds. Keep this page open while we finish.</p>
+              <ol className="op-payment-progress" aria-label="Payment verification progress">
+                <li className="op-payment-step is-complete">
+                  <span className="op-payment-step-dot"><Check aria-hidden="true" /></span>
+                  <span>Request received</span>
+                </li>
+                <li className="op-payment-step is-active">
+                  <span className="op-payment-step-dot" />
+                  <span>Checking with the payment provider</span>
+                </li>
+                <li className="op-payment-step">
+                  <span className="op-payment-step-dot" />
+                  <span>Confirming your stay</span>
+                </li>
+              </ol>
+              <p className="op-payment-note">Don&apos;t close this window while we finish.</p>
+              <Button color="light" className="op-payment-secondary op-payment-cancel" onClick={() => navigate('/')}>
+                Cancel
+              </Button>
+            </div>
           )}
 
-          {/* Success */}
           {status === 'success' && (
-            <>
-              <div className="w-24 h-24 bg-[#C49A6C]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Check className="w-12 h-12 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
-              </div>
-              <h1 className="text-3xl font-bold text-[#0B0B45] mb-4">Booking Confirmed!</h1>
-              <p className="text-[#6b7280] mb-6">
-                Your payment was successful. We&apos;ve sent a confirmation to your email.
-              </p>
-
-              {booking && (
-                <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6 mb-6 text-left">
-                  <h3 className="font-bold text-[#0B0B45] mb-2">Booking Summary</h3>
-                  <p className="text-[#1f2937] font-medium">{booking.property?.title}</p>
-                  <p className="text-[#6b7280] text-sm">{booking.property?.location}</p>
-                  <div className="mt-3 pt-3 border-t border-[#D9D9D9]">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-[#6b7280]">Check-in</span>
-                      <span className="font-medium">{booking.checkIn ? new Date(booking.checkIn).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</span>
-                    </div>
-                    <div className="flex justify-between text-sm mt-1">
-                      <span className="text-[#6b7280]">Check-out</span>
-                      <span className="font-medium">{booking.checkOut ? new Date(booking.checkOut).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</span>
-                    </div>
-                    <div className="flex justify-between text-sm mt-1">
-                      <span className="text-[#6b7280]">Guests</span>
-                      <span className="font-medium">{booking.guests}</span>
-                    </div>
-                    <div className="flex justify-between font-bold text-[#0B0B45] mt-2 pt-2 border-t border-[#D9D9D9]">
-                      <span>Total Paid</span>
-                      <span>KES {booking.total?.toLocaleString()}</span>
-                    </div>
-                    <div className="flex justify-between text-xs text-[#6b7280] mt-1">
-                      <span>Payment Ref</span>
-                      <span className="font-mono">{booking.paymentReference?.slice(0, 16)}...</span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Post-booking save prompt */}
-              {booking && !saved && !isFavorite(booking.propertyId) && (
-                <div className="bg-white rounded-2xl border-2 border-[#C49A6C]/30 p-4 mb-6 text-left">
-                  <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-[#C49A6C]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Heart className="w-5 h-5 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-[#0B0B45]">Save this property for later?</p>
-                      <p className="text-xs text-[#6b7280] mt-0.5">
-                        Add it to your favourites so you can find it again easily.
-                      </p>
-                      <button
-                        onClick={async () => {
-                          const ok = await toggleFavorite(booking.propertyId);
-                          if (ok) setSaved(true);
-                        }}
-                        className="mt-2 text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
-                      >
-                        Yes, save to favourites →
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="space-y-3">
-                <button
-                  onClick={() => navigate('/')}
-                  className="w-full bg-[#C49A6C] text-white py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+            <div className="op-payment-state">
+              <div className="op-payment-icon is-success" aria-hidden="true"><Check /></div>
+              <h2>Payment successful</h2>
+              <p>Your stay is confirmed. We&apos;ve also sent the confirmation to your email.</p>
+              <dl className="op-payment-details">
+                <div><dt>Reference</dt><dd>{booking?.paymentReference || reference || '-'}</dd></div>
+                <div><dt>Check-in</dt><dd>{formatDate(booking?.checkIn)}</dd></div>
+                <div><dt>Check-out</dt><dd>{formatDate(booking?.checkOut)}</dd></div>
+                <div><dt>Total paid</dt><dd>{formatMoney(booking?.total)}</dd></div>
+              </dl>
+              <div className="op-payment-action-row">
+                <Button
+                  color="light"
+                  className="op-payment-secondary"
+                  onClick={saveBookingProperty}
+                  disabled={!booking?.propertyId || isSaved}
                 >
-                  Return to Home
-                </button>
-                {booking && (
-                  <button
-                    onClick={() => navigate(`/property/${booking.propertyId}`)}
-                    className="w-full border-2 border-[#0B0B45] text-[#0B0B45] py-3 rounded-full font-semibold hover:bg-[#0B0B45] hover:text-white transition-all duration-200"
-                  >
-                    View Property
-                  </button>
-                )}
+                  <Heart aria-hidden="true" />
+                  {isSaved ? 'Saved' : 'Save'}
+                </Button>
+                <Button color="dark" className="op-payment-primary" onClick={() => navigate('/')}>
+                  <House aria-hidden="true" />
+                  Home
+                </Button>
               </div>
-            </>
+              {booking?.propertyId && (
+                <button type="button" className="op-payment-link" onClick={() => navigate(`/property/${booking.propertyId}`)}>
+                  View property
+                </button>
+              )}
+            </div>
           )}
 
-          {/* Failed */}
+          {status === 'pending' && (
+            <div className="op-payment-state">
+              <div className="op-payment-icon is-pending" aria-hidden="true"><Clock3 /></div>
+              <h2>Payment pending</h2>
+              <p>{error || 'The payment provider is still confirming this transaction. We are holding your booking while it clears.'}</p>
+              <span className="op-payment-badge">Verification in progress</span>
+              <p className="op-payment-note">We&apos;ll update your trip as soon as the payment clears.</p>
+              <Button color="dark" className="op-payment-primary op-payment-wide" onClick={() => navigate('/trips')}>
+                Check trip status
+              </Button>
+              <button type="button" className="op-payment-link" onClick={() => navigate('/')}>Back to home</button>
+            </div>
+          )}
+
           {status === 'failed' && (
-            <>
-              <div className="w-24 h-24 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <X className="w-12 h-12 text-red-500" strokeWidth={2} aria-hidden="true" />
+            <div className="op-payment-state">
+              <div className="op-payment-icon is-failed" aria-hidden="true"><CircleX /></div>
+              <h2>Payment failed</h2>
+              <p>No confirmed booking or charge was recorded for this payment attempt.</p>
+              <div className="op-payment-alert" role="alert">
+                <TriangleAlert aria-hidden="true" />
+                <div>
+                  <strong>{errorLabel || 'Payment not completed'}</strong>
+                  <span>{error || 'Please review your payment method and try again.'}</span>
+                </div>
               </div>
-              <h1 className="text-2xl font-bold text-[#0B0B45] mb-4">Payment {status === 'failed' ? 'Failed' : 'Pending'}</h1>
-              <p className="text-[#6b7280] mb-6">{error}</p>
-              <div className="space-y-3">
-                <button
-                  onClick={() => navigate('/')}
-                  className="w-full bg-[#C49A6C] text-white py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
-                >
-                  Return to Home
-                </button>
-              </div>
-            </>
+              <Button
+                color="dark"
+                className="op-payment-primary op-payment-wide"
+                onClick={() => navigate(bookingId ? '/trips' : '/')}
+              >
+                Try again
+              </Button>
+              <button type="button" className="op-payment-link" onClick={() => navigate('/inbox')}>
+                Need help? Contact support
+              </button>
+            </div>
           )}
-
-        </div>
+        </Card>
       </div>
-    </div>
+    </main>
   );
 }
 

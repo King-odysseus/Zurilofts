@@ -8,7 +8,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/properties` | Product `0:1629`, mobile `0:10333`; filters `0:3591`, `0:3745` | Implemented; desktop/mobile QA passed for search/filter layout and controls |
 | `/property/:id` | Product `0:1935`, gallery `0:4441`, availability `0:4542` | Implemented with real listing data and repository photography; desktop/mobile QA passed |
 | `/booking/:id` | Product `0:2081`, `0:2153`, `0:2386`, `0:2559`, states `0:2708`, `0:2757` | Implemented; desktop/mobile QA passed for details, add-ons, and payment |
-| `/payment/callback` | Product `0:2757` | Functional legacy, redesign pending |
+| `/payment/callback` | Product `0:2757` | Implemented from the payment-state handoff with responsive loading, success, pending, and failed cards, Flowbite actions, Lucide icons, inline back control, and light/dark QA |
 | `/login`, `/register`, `/auth/callback` | Product `0:1365`, `0:1538`, connection `0:3497` | Login and register aligned with shared Flowbite controls; desktop/mobile QA passed |
 | `/places`, `/restaurants` | Product `0:2825`, `0:10436`; `0:2858`, `0:10544` | Implemented with repository photography; desktop/mobile QA passed |
 | `/guides`, `/guides/:id` | Product `0:2891`, `0:10948`; detail `0:2925`, `0:10857` | Implemented with API data and repository photography; desktop/mobile QA passed |

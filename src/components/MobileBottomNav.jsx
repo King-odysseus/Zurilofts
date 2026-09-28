@@ -4,12 +4,13 @@ import { CircleUserRound, Compass, Heart, Luggage, MessageCircleMore } from 'luc
 import { useMode } from '../context/ModeContext.jsx';
 
 // Paths where global navigation (including these tabs) is intentionally
-// hidden: checkout (compact logo/back header only), and the host/admin
+// hidden: checkout and payment results (compact logo/back header only), and the host/admin
 // workspaces, which have their own navigation. The home page keeps Explore
 // active so mobile guests always have a primary navigation surface.
 function isHiddenPath(pathname) {
   return (
     pathname.startsWith('/booking/') ||
+    pathname.startsWith('/payment/callback') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/host')
   );
