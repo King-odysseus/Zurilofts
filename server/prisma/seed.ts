@@ -51,6 +51,7 @@ async function main() {
     {
       title: 'ZuriLofts - Serenity Residency 1305',
       location: 'Kilimani, Ngong Road, Nairobi',
+      neighborhood: 'Kilimani',
       price: 6800, rating: 4.8, reviews: 7, bedrooms: 2, bathrooms: 2, area: 980,
       description: 'A stylish, contemporary apartment in the heart of Kilimani along Ngong Road. Featuring modern finishes, abundant natural light, and a prime location close to Nairobis best dining and shopping.',
       images: [img(11), img(12), img(1), img(2), img(3)],
@@ -61,6 +62,7 @@ async function main() {
     {
       title: 'ZuriLofts - Serenity Residency 1003',
       location: 'Kilimani, Ngong Road, Nairobi',
+      neighborhood: 'Kilimani',
       price: 6300, rating: 5.0, reviews: 12, bedrooms: 2, bathrooms: 2, area: 950,
       description: 'Experience luxury living in the heart of Kilimani along Ngong Road. This beautifully furnished apartment offers modern amenities, stunning views, and easy access to shopping centers, restaurants, and business districts.',
       images: [img(13), img(14), img(6), img(7), img(8)],
@@ -78,6 +80,7 @@ async function main() {
           hostId: admin.id,
           title: prop.title,
           location: prop.location,
+          neighborhood: prop.neighborhood,
           price: prop.price,
           rating: prop.rating,
           reviews: prop.reviews,

@@ -145,6 +145,7 @@ function buildCreateData(data: any) {
     const base: any = {
       title: data.title,
       location: data.location,
+      neighborhood: data.neighborhood,
       price: data.price,
       bedrooms: data.bedrooms,
       bathrooms: data.bathrooms,

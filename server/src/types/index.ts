@@ -66,6 +66,7 @@ export const refreshSchema = z.object({
 export const propertyCreateSchema = z.object({
   title: z.string().min(1).max(200),
   location: z.string().min(1).max(200),
+  neighborhood: z.string().trim().min(1).max(100).optional(),
   price: z.number().int().positive(),
   price1Bed: z.number().int().positive().optional(),
   price2Bed: z.number().int().positive().optional(),

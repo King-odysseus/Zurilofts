@@ -3,10 +3,12 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button, Checkbox, Label, Select, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
+import { findSearchLocation, SEARCH_LOCATION_GROUPS } from '../data/searchLocations.js';
 
 const EMPTY = {
   title: '',
   location: '',
+  neighborhood: 'Nairobi',
   price: '',
   price1Bed: '',
   price2Bed: '',
@@ -39,6 +41,13 @@ function linesToArray(text) {
     .filter(Boolean);
 }
 
+function buildLocationLabel(location, neighborhood) {
+  const details = String(location || '').trim();
+  const area = String(neighborhood || '').trim();
+  if (!area || details.toLowerCase().includes(area.toLowerCase())) return details;
+  return details ? `${details}, ${area}` : area;
+}
+
 function AdminPropertyForm() {
   const { id } = useParams();
   const isEdit = Boolean(id);
@@ -66,6 +75,7 @@ function AdminPropertyForm() {
         setForm({
           title: p.title || '',
           location: p.location || '',
+          neighborhood: p.neighborhood || findSearchLocation(p.location) || 'Nairobi',
           price: p.price ?? '',
           price1Bed: p.price1Bed ?? '',
           price2Bed: p.price2Bed ?? '',
@@ -128,7 +138,8 @@ function AdminPropertyForm() {
 
     const payload = {
       title: form.title,
-      location: form.location,
+      location: buildLocationLabel(form.location, form.neighborhood),
+      neighborhood: form.neighborhood,
       price: Number(form.price),
       bedrooms: Number(form.bedrooms),
       bathrooms: Number(form.bathrooms),
@@ -268,8 +279,18 @@ function AdminPropertyForm() {
                   <TextInput id="listing-title" value={form.title} onChange={(e) => update('title', e.target.value)} placeholder="Bright two-bedroom loft" required />
                 </div>
                 <div>
-                  <Label htmlFor="listing-location" className="op-host-editor-label">Location</Label>
-                  <TextInput id="listing-location" value={form.location} onChange={(e) => update('location', e.target.value)} placeholder="Westlands, Nairobi" required />
+                  <Label htmlFor="listing-neighborhood" className="op-host-editor-label">Area</Label>
+                  <Select id="listing-neighborhood" value={form.neighborhood} onChange={(e) => update('neighborhood', e.target.value)} required>
+                    {SEARCH_LOCATION_GROUPS.map((group) => (
+                      <optgroup key={group.label} label={group.label}>
+                        {group.options.map((area) => <option key={`${group.label}-${area}`} value={area}>{area}</option>)}
+                      </optgroup>
+                    ))}
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="listing-location" className="op-host-editor-label">Location details</Label>
+                  <TextInput id="listing-location" value={form.location} onChange={(e) => update('location', e.target.value)} placeholder="Street, building or landmark" required />
                 </div>
                 <div className="op-host-editor-field-full">
                   <Label htmlFor="listing-description" className="op-host-editor-label">Description</Label>
@@ -517,7 +538,7 @@ function PropertyPreview({ form }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
-          <span className="text-sm truncate">{form.location || 'Location'}</span>
+          <span className="text-sm truncate">{buildLocationLabel(form.location, form.neighborhood) || 'Location'}</span>
         </div>
 
         <div className="flex items-center justify-between mb-3 py-3 border-y border-[#D9D9D9] text-center">
@@ -581,7 +602,7 @@ function FullPagePreview({ form, onClose }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            {form.location || 'Location'}
+            {buildLocationLabel(form.location, form.neighborhood) || 'Location'}
           </div>
 
           {/* Gallery */}

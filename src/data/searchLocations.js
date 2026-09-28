@@ -105,3 +105,13 @@ export const SEARCH_LOCATION_GROUPS = [
 ];
 
 export const SEARCH_LOCATIONS = SEARCH_LOCATION_GROUPS.flatMap((group) => group.options);
+
+// Prefer the most specific matching area when deriving an area from legacy
+// free-text locations such as "Kilimani, Ngong Road, Nairobi".
+export function findSearchLocation(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  if (!normalized) return '';
+  return [...SEARCH_LOCATIONS]
+    .sort((a, b) => b.length - a.length)
+    .find((location) => normalized.includes(location.toLowerCase())) || '';
+}
