@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Datepicker, Dropdown, DropdownItem, Label, TextInput } from 'flowbite-react';
+import { Button, Datepicker, Dropdown, DropdownItem, Label, Select } from 'flowbite-react';
 import apiClient from './api/client.js';
 import { heroImage } from './assets/images.js';
 import { useAuth } from './context/AuthContext.jsx';
@@ -9,6 +9,7 @@ import { firstImage } from './utils/images.js';
 import { clearRecentlyViewed, getRecentlyViewed } from './utils/recentlyViewed.js';
 import PropertyResultsMap from './components/PropertyResultsMap.jsx';
 import { openConsentManager } from './utils/consent.js';
+import { ALL_KENYA_SEARCH, DEFAULT_SEARCH_LOCATION, SEARCH_LOCATION_GROUPS } from './data/searchLocations.js';
 
 const categories = ['All stays', 'Apartments', 'Studios', 'Penthouses', 'Villas'];
 const guestDropdownTheme = {
@@ -69,16 +70,17 @@ function StayCard({ stay }) {
   </article>;
 }
 
-function SearchForm({ initial = '' }) {
+function SearchForm({ initial = DEFAULT_SEARCH_LOCATION, allKenya = false }) {
   const navigate = useNavigate();
-  const [where, setWhere] = useState(initial);
+  const [where, setWhere] = useState(allKenya ? ALL_KENYA_SEARCH : initial || DEFAULT_SEARCH_LOCATION);
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
   const [guests, setGuests] = useState(2);
   function submit(event) {
     event.preventDefault();
     const query = new URLSearchParams();
-    if (where.trim()) query.set('search', where.trim());
+    if (where === ALL_KENYA_SEARCH) query.set('scope', 'kenya');
+    else query.set('search', where);
     if (checkIn && checkOut && checkOut > checkIn) { query.set('checkIn', checkIn); query.set('checkOut', checkOut); }
     if (guests !== 2) query.set('guests', String(guests));
     navigate(`/properties${query.size ? `?${query}` : ''}`);
@@ -86,7 +88,14 @@ function SearchForm({ initial = '' }) {
   return <form className="opg-search" onSubmit={submit}>
     <Label htmlFor="guest-search-where" className="opg-search-field opg-search-where">
       <span>Where</span>
-      <TextInput id="guest-search-where" value={where} onChange={(event) => setWhere(event.target.value)} placeholder="Anywhere in Nairobi" aria-label="Search location or stay" sizing="lg" />
+      <Select id="guest-search-where" value={where} onChange={(event) => setWhere(event.target.value)} aria-label="Search area in Kenya" sizing="lg">
+        <option value={ALL_KENYA_SEARCH}>All Kenya</option>
+        {SEARCH_LOCATION_GROUPS.map((group) => (
+          <optgroup key={group.label} label={group.label}>
+            {group.options.map((location) => <option key={`${group.label}-${location}`} value={location}>{location}</option>)}
+          </optgroup>
+        ))}
+      </Select>
     </Label>
     <Label htmlFor="guest-search-check-in" className="opg-search-field">
       <span>Check in</span>
@@ -159,7 +168,7 @@ function StayGrid({ items, loading, error, limit }) {
 export function GuestHome() {
   const [category, setCategory] = useState('All stays');
   const [recent, setRecent] = useState(() => getRecentlyViewed());
-  const stays = useStays({ limit: 8, type: category === 'All stays' ? undefined : category.slice(0, -1).toLowerCase() });
+  const stays = useStays({ search: DEFAULT_SEARCH_LOCATION, limit: 8, type: category === 'All stays' ? undefined : category.slice(0, -1).toLowerCase() });
   return <main className="opg-page opg-home">
     <section className="opg-hero" style={{ backgroundImage: 'linear-gradient(90deg, rgba(11,31,66,.79), rgba(11,31,66,.48)), url("/images/place-un-hq.jpg")' }}><div className="opg-container"><span className="opg-hero-badge">VERIFIED HOMES · NAIROBI</span><h1><span className="opg-desktop-title">Find your place in Nairobi</span><span className="opg-mobile-title">Find your next stay</span></h1><p>Handpicked apartments across the city&apos;s best neighbourhoods — verified, furnished, and ready to move in.</p><span className="opg-mobile-subtitle">{stays.loading ? 'Find a home across Nairobi.' : `${stays.total} homes across Nairobi.`}</span><SearchForm /><div className="opg-popular">Popular {['Westlands','Kilimani','Lavington','Karen'].map((place) => <Link key={place} to={`/properties?search=${encodeURIComponent(place)}`}>{place}</Link>)}</div><Link to="/properties?search=Westlands" className="opg-mobile-feature" style={{ backgroundImage: 'url("/images/place-un-hq.jpg")' }}><span>Popular in Westlands</span></Link></div></section>
     <section className="opg-section opg-stays-section"><div className="opg-container"><div className="opg-section-heading"><div><h2>Stays in Nairobi</h2><p>Handpicked homes, verified by our team</p></div><Link to="/properties">See all →</Link></div><CategoryBar selected={category} onSelect={setCategory} /><StayGrid {...stays} /></div></section>
@@ -174,12 +183,14 @@ export function GuestStays() {
   const [category, setCategory] = useState('All stays');
   const [filtersOpen, setFiltersOpen] = useState(searchParams.get('filters') === '1');
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
-  const search = searchParams.get('search') || '';
+  const allKenya = searchParams.get('scope') === 'kenya';
+  const search = allKenya ? '' : searchParams.get('search') || DEFAULT_SEARCH_LOCATION;
   const stays = useStays({ limit: 12, page, search: search || undefined, type: category === 'All stays' ? undefined : category.slice(0, -1).toLowerCase(), checkIn: searchParams.get('checkIn') || undefined, checkOut: searchParams.get('checkOut') || undefined, minPrice: searchParams.get('minPrice') || undefined, maxPrice: searchParams.get('maxPrice') || undefined, minBedrooms: searchParams.get('minBedrooms') || undefined });
   const mapActive = searchParams.get('view') === 'map';
   function toggleMap() { const next = new URLSearchParams(searchParams); if (mapActive) next.delete('view'); else next.set('view', 'map'); setSearchParams(next); }
   function applyFilters(event) { event.preventDefault(); const form = new FormData(event.currentTarget); const next = new URLSearchParams(searchParams); for (const name of ['minPrice','maxPrice','minBedrooms']) { const value = String(form.get(name) || '').trim(); if (value) next.set(name, value); else next.delete(name); } next.delete('filters'); next.delete('page'); setSearchParams(next); setFiltersOpen(false); }
-  return <main className="opg-page opg-results"><div className="opg-container"><div className="opg-results-intro"><p><Link to="/">Home</Link> / Stays</p><h1>Stays in Nairobi</h1><span>Find a verified, furnished home that fits your plans.</span></div><SearchForm initial={search} /><CategoryBar selected={category} onSelect={setCategory} onFilters={() => setFiltersOpen(true)} onMap={toggleMap} mapActive={mapActive} /><div className="opg-results-toolbar"><strong>{stays.loading ? 'Finding stays…' : `${stays.total} stays available`}</strong><span>Nairobi, Kenya</span></div>{mapActive ? <PropertyResultsMap listings={stays.items} /> : <StayGrid {...stays} />}{!mapActive && stays.total > page * 12 && <button className="opg-load-more" onClick={() => { const next = new URLSearchParams(searchParams); next.set('page', String(page + 1)); setSearchParams(next); }}>Next page →</button>}</div>{filtersOpen && <div className="opg-filter-backdrop" onClick={() => setFiltersOpen(false)}><form className="opg-filter-dialog" onClick={(event) => event.stopPropagation()} onSubmit={applyFilters}><div><h2>Filter stays</h2><button type="button" onClick={() => setFiltersOpen(false)} aria-label="Close filters">×</button></div><label>Minimum nightly price<input name="minPrice" type="number" min="0" defaultValue={searchParams.get('minPrice') || ''} placeholder="KSh" /></label><label>Maximum nightly price<input name="maxPrice" type="number" min="0" defaultValue={searchParams.get('maxPrice') || ''} placeholder="KSh" /></label><label>Minimum bedrooms<select name="minBedrooms" defaultValue={searchParams.get('minBedrooms') || ''}><option value="">Any</option>{[1,2,3,4].map((n) => <option key={n} value={n}>{n}+</option>)}</select></label><button className="opg-apply-filters" type="submit">Show stays</button></form></div>}</main>;
+  const areaLabel = allKenya ? 'Kenya' : search;
+  return <main className="opg-page opg-results"><div className="opg-container"><div className="opg-results-intro"><p><Link to="/">Home</Link> / Stays</p><h1>{allKenya ? 'Stays across Kenya' : `Stays in ${areaLabel}`}</h1><span>Find a verified, furnished home that fits your plans.</span></div><SearchForm initial={search} allKenya={allKenya} /><CategoryBar selected={category} onSelect={setCategory} onFilters={() => setFiltersOpen(true)} onMap={toggleMap} mapActive={mapActive} /><div className="opg-results-toolbar"><strong>{stays.loading ? 'Finding stays…' : `${stays.total} stays available`}</strong><span>{allKenya ? 'Kenya' : `${areaLabel}, Kenya`}</span></div>{mapActive ? <PropertyResultsMap listings={stays.items} /> : <StayGrid {...stays} />}{!mapActive && stays.total > page * 12 && <button className="opg-load-more" onClick={() => { const next = new URLSearchParams(searchParams); next.set('page', String(page + 1)); setSearchParams(next); }}>Next page →</button>}</div>{filtersOpen && <div className="opg-filter-backdrop" onClick={() => setFiltersOpen(false)}><form className="opg-filter-dialog" onClick={(event) => event.stopPropagation()} onSubmit={applyFilters}><div><h2>Filter stays</h2><button type="button" onClick={() => setFiltersOpen(false)} aria-label="Close filters">×</button></div><label>Minimum nightly price<input name="minPrice" type="number" min="0" defaultValue={searchParams.get('minPrice') || ''} placeholder="KSh" /></label><label>Maximum nightly price<input name="maxPrice" type="number" min="0" defaultValue={searchParams.get('maxPrice') || ''} placeholder="KSh" /></label><label>Minimum bedrooms<select name="minBedrooms" defaultValue={searchParams.get('minBedrooms') || ''}><option value="">Any</option>{[1,2,3,4].map((n) => <option key={n} value={n}>{n}+</option>)}</select></label><button className="opg-apply-filters" type="submit">Show stays</button></form></div>}</main>;
 }
 
 export function GuestFooter() {

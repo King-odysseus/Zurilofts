@@ -225,6 +225,32 @@ interface PropertyFilters {
   checkOut?: Date;
 }
 
+/**
+ * Builds a location-aware property search. Comma-separated selections such as
+ * "Westlands, Nairobi" are treated as separate required tokens so a listing
+ * must satisfy each part of the chosen area while still matching across title,
+ * location, neighbourhood, and confirmed address.
+ */
+export function buildPropertySearchWhere(search?: string) {
+  const tokens = String(search || '')
+    .split(',')
+    .map((token) => token.trim())
+    .filter(Boolean);
+
+  if (!tokens.length) return null;
+
+  return {
+    AND: tokens.map((token) => ({
+      OR: [
+        { title: { contains: token } },
+        { location: { contains: token } },
+        { neighborhood: { contains: token } },
+        { address: { contains: token } },
+      ],
+    })),
+  };
+}
+
 export async function listProperties(filters: PropertyFilters) {
   const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minRating, available, featured, hostId, status, includeAllStatuses, page = 1, limit = 12, checkIn, checkOut } = filters;
   const skip = (page - 1) * limit;
@@ -258,12 +284,8 @@ export async function listProperties(filters: PropertyFilters) {
   if (neighborhood) where.neighborhood = neighborhood;
   if (minBedrooms) where.bedrooms = { gte: minBedrooms };
   if (minRating) where.rating = { gte: minRating };
-  if (search) {
-    where.OR = [
-      { title: { contains: search } },
-      { location: { contains: search } },
-    ];
-  }
+  const searchWhere = buildPropertySearchWhere(search);
+  if (searchWhere) Object.assign(where, searchWhere);
 
   // Real stay-date availability filtering: reuses the same isRangeAvailable
   // check the booking flow validates against (calendar blocks + non-cancelled
