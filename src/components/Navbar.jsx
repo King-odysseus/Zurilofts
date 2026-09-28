@@ -10,7 +10,7 @@ import Dropdown from './Dropdown.jsx';
 import { languageOptions } from '../i18n/translations.js';
 
 const exploreLinks = [
-  { name: 'Properties', href: '/properties' },
+  { name: 'Stays', href: '/properties' },
   { name: 'Places to Visit', href: '/places' },
   { name: 'Restaurants', href: '/restaurants' },
   { name: 'Travel Guides', href: '/guides' },
@@ -187,7 +187,7 @@ function Navbar({ solid = false }) {
   // `key` into translations.js so the visible label follows the language switch.
   const navItems = (() => {
     if (!isAuthenticated) {
-      return [{ name: 'Properties', key: 'properties', href: '/properties' }];
+      return [{ name: 'Stays', key: 'properties', href: '/properties' }];
     }
     if (effectiveMode === 'hosting') {
       if (!hasHostIntent) {
@@ -202,7 +202,7 @@ function Navbar({ solid = false }) {
       ];
     }
     return [
-      { name: 'Properties', key: 'properties', href: '/properties' },
+      { name: 'Stays', key: 'properties', href: '/properties' },
       { name: 'Saved', key: 'saved', href: '/favourites' },
       { name: 'Trips', key: 'trips', href: '/trips' },
       { name: 'Messages', key: 'messages', href: '/inbox' },

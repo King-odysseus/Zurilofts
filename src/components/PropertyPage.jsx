@@ -1,4 +1,4 @@
-import { useParams, useSearchParams, Link } from 'react-router-dom';
+import { useLocation, useParams, useSearchParams, Link } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Navbar from './Navbar';
@@ -33,7 +33,9 @@ function safeArray(value) {
 }
 
 function PropertyPage() {
-  const { id } = useParams();
+  const { id: routeId } = useParams();
+  const { pathname } = useLocation();
+  const id = routeId || pathname.split('/')[2];
   const [searchParams] = useSearchParams();
   const variant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [featuredImage, setFeaturedImage] = useState(0);
@@ -129,7 +131,7 @@ function PropertyPage() {
             <h2 className="mb-2 text-xl font-bold text-[#0B1F42]">Property Not Found</h2>
             <p className="mb-4 text-[#5B6B82]">{error || 'This property could not be loaded.'}</p>
             <Link to="/properties" className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#0B1F42] px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-[#07072E]">
-              View All Properties
+              View All Stays
             </Link>
           </div>
         </main>
@@ -194,7 +196,7 @@ function PropertyPage() {
                 <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back to Properties
+                Back to Stays
               </Link>
             </li>
             <li aria-hidden="true" className="text-[#94A3B8]">/</li>
