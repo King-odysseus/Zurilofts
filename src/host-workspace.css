@@ -1753,3 +1753,327 @@
   .op-host-earnings-report-grid { grid-template-columns: 1fr; }
 }
 
+/* Host payouts */
+.op-host-payouts-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.op-host-payouts-heading > div > a {
+  display: inline-block;
+  margin-bottom: 7px;
+  color: var(--host-blue);
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.op-host-payouts-heading h1 {
+  margin: 0;
+  color: var(--host-navy);
+  font-size: 30px;
+  line-height: 1.12;
+}
+
+.op-host-payouts-heading p {
+  margin: 7px 0 0;
+  color: #64748B;
+  font-size: 13px;
+}
+
+.op-host-payouts-heading > a {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: #F1F5F9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.op-host-payouts-heading > a:hover { background: #E8EEF5; color: var(--host-navy); }
+
+.op-host-payouts-wallet {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.op-host-payouts-wallet article {
+  display: flex;
+  min-height: 136px;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  padding: 20px 22px;
+  border-radius: 14px;
+}
+
+.op-host-payouts-wallet article > span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .5px;
+}
+
+.op-host-payouts-wallet article > strong {
+  margin-top: 9px;
+  color: var(--host-navy);
+  font-size: 29px;
+  line-height: 1.1;
+}
+
+.op-host-payouts-wallet article > small {
+  margin-top: 10px;
+  color: #64748B;
+  font-size: 11px;
+}
+
+.op-host-payouts-wallet .is-balance { background: #EFF6FF; }
+.op-host-payouts-wallet .is-balance > span { color: var(--host-blue); }
+.op-host-payouts-wallet .is-earned { background: #FDF5EC; }
+.op-host-payouts-wallet .is-earned > span { color: #9A6A3A; }
+.op-host-payouts-wallet .is-paid { background: #ECFDF5; }
+.op-host-payouts-wallet .is-paid > span { color: #15803D; }
+
+.op-host-payouts-grid {
+  display: grid;
+  grid-template-columns: minmax(300px, .8fr) minmax(0, 1.5fr);
+  gap: 20px;
+  align-items: start;
+  margin-bottom: 22px;
+}
+
+.op-host-payouts-panel {
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid #EEF1F5;
+  border-radius: 16px;
+  background: #F8FAFC;
+}
+
+.op-host-payouts-panel > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.op-host-payouts-panel h2 {
+  margin: 0;
+  color: var(--host-navy);
+  font-size: 17px;
+  line-height: 1.25;
+}
+
+.op-host-payouts-panel header p {
+  margin: 5px 0 0;
+  color: #64748B;
+  font-size: 11px;
+}
+
+.op-host-payouts-panel header > span {
+  flex: none;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #fff;
+  color: #64748B;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.op-host-payouts-destination {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.op-host-payouts-destination > span {
+  color: #9A6A3A;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: .55px;
+}
+
+.op-host-payouts-destination > strong { color: var(--host-navy); font-size: 14px; }
+.op-host-payouts-destination > small { color: #64748B; font-size: 10px; }
+
+.op-host-payouts-schedule {
+  display: grid;
+  gap: 0;
+  margin: 14px 0 18px;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.op-host-payouts-schedule > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 12px 15px;
+}
+
+.op-host-payouts-schedule > div + div { border-top: 1px solid #EEF1F5; }
+.op-host-payouts-schedule dt { color: #64748B; font-size: 10px; }
+.op-host-payouts-schedule dd { margin: 0; color: var(--host-navy); font-size: 10px; font-weight: 800; text-align: right; }
+
+.op-host-payouts-panel > a {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 14px;
+  border-radius: 10px;
+  background: var(--host-bronze);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.op-host-payouts-panel > a:hover { background: #B8895B; }
+
+.op-host-payouts-wht-controls {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 14px;
+}
+
+.op-host-payouts-wht-controls label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.op-host-payouts-wht-result,
+.op-host-payouts-wht-empty {
+  padding: 16px;
+  border-radius: 13px;
+  background: #fff;
+}
+
+.op-host-payouts-wht-total {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.op-host-payouts-wht-total > span { color: #9A6A3A; font-size: 9px; font-weight: 800; letter-spacing: .5px; }
+.op-host-payouts-wht-total > strong { color: var(--host-navy); font-size: 20px; }
+.op-host-payouts-wht-total > small { color: #64748B; font-size: 10px; }
+
+.op-host-payouts-table-wrap { width: 100%; overflow-x: auto; }
+.op-host-payouts-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.op-host-payouts-table th,
+.op-host-payouts-table td { padding: 11px 10px; border-bottom: 1px solid #EEF1F5; text-align: left; white-space: nowrap; }
+.op-host-payouts-table th { color: #64748B; font-size: 9px; font-weight: 800; letter-spacing: .45px; text-transform: uppercase; }
+.op-host-payouts-table td { color: #334155; }
+.op-host-payouts-table th:nth-child(n+3),
+.op-host-payouts-table td:nth-child(n+3) { text-align: right; }
+.op-host-payouts-table tbody tr:last-child td { border-bottom: 0; }
+
+.op-host-payouts-wht-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.op-host-payouts-wht-empty {
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.op-host-payouts-wht-empty strong,
+.op-host-payouts-history-empty strong { color: var(--host-navy); font-size: 12px; }
+.op-host-payouts-wht-empty p,
+.op-host-payouts-history-empty p { max-width: 320px; margin: 6px auto 0; color: #94A3B8; font-size: 10px; line-height: 1.5; }
+
+.op-host-payouts-history { margin-bottom: 0; }
+.op-host-payouts-history-empty { min-height: 180px; display: grid; place-items: center; align-content: center; padding: 24px; border-radius: 13px; background: #fff; text-align: center; }
+
+.op-host-payout-status {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.op-host-payouts-table td > small { display: block; margin-top: 5px; color: #DC2626; font-size: 9px; white-space: normal; }
+
+.op-host-payouts-loading {
+  display: grid;
+  min-height: 360px;
+  place-items: center;
+  grid-template-columns: repeat(3, 12px);
+  gap: 8px;
+}
+
+.op-host-payouts-loading span { width: 12px; height: 12px; border-radius: 50%; background: var(--host-bronze); animation: op-host-pulse .8s ease-in-out infinite alternate; }
+.op-host-payouts-loading span:nth-child(2) { animation-delay: .16s; }
+.op-host-payouts-loading span:nth-child(3) { animation-delay: .32s; }
+
+.op-host-payouts-error {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border: 1px solid #F3D1D1;
+  border-radius: 12px;
+  background: #FFF7F7;
+}
+
+.op-host-payouts-error p { margin: 0 0 10px; color: #9F3A3A; font-size: 11px; }
+.op-host-payouts-error button { min-height: 34px; padding: 0 13px; border: 0; border-radius: 8px; background: var(--host-navy); color: #fff; font-size: 10px; font-weight: 800; }
+
+.op-host-payouts-denied {
+  max-width: 420px;
+  margin: 60px auto;
+  padding: 30px;
+  border-radius: 16px;
+  background: #F8FAFC;
+  text-align: center;
+}
+
+.op-host-payouts-denied-icon { display: grid; width: 54px; height: 54px; margin: 0 auto 14px; place-items: center; border-radius: 50%; background: #FEE2E2; color: #DC2626; }
+.op-host-payouts-denied-icon svg { width: 26px; height: 26px; }
+.op-host-payouts-denied h1 { margin: 0; color: var(--host-navy); font-size: 20px; }
+.op-host-payouts-denied p { margin: 7px 0 0; color: #64748B; font-size: 12px; }
+
+@media (max-width: 1023px) {
+  .op-host-payouts-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 767px) {
+  .op-host-payouts-heading { align-items: flex-start; flex-direction: column; gap: 15px; margin-bottom: 18px; }
+  .op-host-payouts-heading h1 { font-size: 25px; }
+  .op-host-payouts-heading p { font-size: 12px; }
+  .op-host-payouts-wallet { grid-template-columns: 1fr; gap: 10px; margin-bottom: 16px; }
+  .op-host-payouts-wallet article { min-height: 112px; padding: 18px; }
+  .op-host-payouts-wallet article > strong { font-size: 25px; }
+  .op-host-payouts-grid { gap: 14px; margin-bottom: 16px; }
+  .op-host-payouts-panel { padding: 16px; }
+  .op-host-payouts-wht-controls { grid-template-columns: 1fr; }
+  .op-host-payouts-wht-controls .op-host-bronze-button { width: 100%; }
+  .op-host-payouts-table th,
+  .op-host-payouts-table td { padding: 10px 8px; }
+}
+

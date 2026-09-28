@@ -37,7 +37,7 @@ export default function WorkspaceRoutes() {
     <Route path="/host/earnings" element={hostPage(<HostEarningsPage />)} />
     <Route path="/host/properties/new" element={hostPage(<AdminPropertyForm />)} />
     <Route path="/host/properties/:id/edit" element={hostPage(<AdminPropertyForm />)} />
-    <Route path="/host/payouts" element={<HostRoute><HostPayouts /></HostRoute>} />
+    <Route path="/host/payouts" element={hostPage(<HostPayouts />)} />
     <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
       <Route index element={<AdminDashboard />} />
       <Route path="properties" element={<AdminListingReview />} />

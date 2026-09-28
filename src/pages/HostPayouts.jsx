@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { Button, Label, TextInput } from 'flowbite-react';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -17,20 +18,20 @@ function HostPayouts() {
   const [destination, setDestination] = useState(null);
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [whtData, setWhtData] = useState(null);
   const [whtMonth, setWhtMonth] = useState('');
 
-  const whtRef = useRef(null);
-
   async function loadData() {
     setLoading(true);
+    setError('');
     try {
       const res = await apiClient.get('/host/payouts');
       setWallet(res.data.data.wallet);
       setDestination(res.data.data.destination || null);
       setPayouts(res.data.data.payouts || []);
     } catch {
-      // silent
+      setError('Could not load your payout information. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -41,48 +42,41 @@ function HostPayouts() {
   }, []);
 
   // Guests have no business here; show a clear denial instead of a spinner.
-  // Declared after every hook so hook order stays identical across renders
-  // (an early return above the hooks violates the Rules of Hooks).
+  // Declared after every hook so hook order stays identical across renders.
   if (user?.role === 'USER') {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-center max-w-sm px-6">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold text-[#0B0B45] mb-2">Access Denied</h1>
-          <p className="text-[#6b7280]">This page is for hosts and administrators only.</p>
-        </div>
+    return <div className="op-host-payouts-denied">
+      <div className="op-host-payouts-denied-icon">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
       </div>
-    );
+      <h1>Access denied</h1>
+      <p>This page is for hosts and administrators only.</p>
+    </div>;
   }
 
   async function downloadWht() {
     const params = {};
     if (whtMonth) {
-      const [y, m] = whtMonth.split('-');
-      params.year = y;
-      params.month = m;
+      const [year, month] = whtMonth.split('-');
+      params.year = year;
+      params.month = month;
     }
     try {
       const res = await apiClient.get('/host/wht', { params });
       setWhtData(res.data.data);
     } catch {
-      // silent
+      setError('Could not load the withholding tax statement.');
     }
   }
 
-  // Build a safe print view from whtData (not innerHTML) - no injection risk.
-  const escapeHtml = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  // Build a safe print view from whtData - no innerHTML injection.
+  const escapeHtml = (value) => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   function printWht() {
     if (!whtData?.bookings) return;
     const period = whtMonth || 'All time';
-    const rowsHtml = whtData.bookings.map(b => {
-      const date = b.paidAt ? new Date(b.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
-      return `<tr><td>${escapeHtml(b.property?.title)}</td><td>${date}</td><td class="num">${(b.hostNetAmount ?? 0).toLocaleString()}</td><td class="num">${(b.withholdingTax ?? 0).toLocaleString()}</td></tr>`;
+    const rowsHtml = whtData.bookings.map((booking) => {
+      const date = booking.paidAt ? new Date(booking.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-';
+      return `<tr><td>${escapeHtml(booking.property?.title)}</td><td>${date}</td><td class="num">${(booking.hostNetAmount ?? 0).toLocaleString()}</td><td class="num">${(booking.withholdingTax ?? 0).toLocaleString()}</td></tr>`;
     }).join('');
     const totalHtml = `<tr class="total"><td colspan="2">Total</td><td class="num">${(whtData.totalEarnings ?? 0).toLocaleString()}</td><td class="num">${(whtData.totalWht ?? 0).toLocaleString()}</td></tr>`;
 
@@ -114,199 +108,126 @@ function HostPayouts() {
   function csvWht() {
     if (!whtData?.bookings) return;
     const rows = [['Host', 'Property', 'Earnings (KES)', 'WHT Deducted (KES)']];
-    for (const b of whtData.bookings) {
-      rows.push(['Host', b.property?.title, b.hostNetAmount, b.withholdingTax]);
+    for (const booking of whtData.bookings) {
+      rows.push(['Host', booking.property?.title, booking.hostNetAmount, booking.withholdingTax]);
     }
     rows.push(['', '', '']);
     rows.push(['', 'TOTAL', whtData.totalEarnings, whtData.totalWht]);
 
-    const bom = '﻿';
-    const csv = bom + rows.map((r) => r.join(',')).join('\n');
+    const csv = `\uFEFF${rows.map((row) => row.join(',')).join('\n')}`;
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `WHT-Statement-${whtMonth || 'all'}.csv`;
-    a.click();
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `WHT-Statement-${whtMonth || 'all'}.csv`;
+    link.click();
     URL.revokeObjectURL(url);
   }
 
-  if (loading) {
-    return (
-      <div className="text-center py-12">
-        <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p className="text-[#6b7280]">Loading payout info...</p>
-      </div>
-    );
-  }
+  if (loading) return <div className="op-host-payouts-loading" aria-label="Loading payout information"><span /><span /><span /></div>;
 
-  return (
-    <div className="space-y-8">
-      {/* Wallet card */}
-      <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-4">My Earnings Wallet</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-[#0B0B45]/5 rounded-xl p-4">
-            <p className="text-xs text-[#6b7280] uppercase tracking-wide">Current Balance</p>
-            <p className="text-2xl font-bold text-[#0B0B45]">
-              KES {wallet?.balance?.toLocaleString() || '0'}
-            </p>
-          </div>
-          <div className="bg-[#C49A6C]/10 rounded-xl p-4">
-            <p className="text-xs text-[#6b7280] uppercase tracking-wide">Total Earned</p>
-            <p className="text-2xl font-bold text-[#0B0B45]">
-              KES {wallet?.totalEarned?.toLocaleString() || '0'}
-            </p>
-          </div>
-          <div className="bg-green-50 rounded-xl p-4">
-            <p className="text-xs text-[#6b7280] uppercase tracking-wide">Total Paid Out</p>
-            <p className="text-2xl font-bold text-green-700">
-              KES {wallet?.totalPaidOut?.toLocaleString() || '0'}
-            </p>
-          </div>
+  return <div className="op-host-payouts">
+    <header className="op-host-payouts-heading">
+      <div>
+        <Link to="/host/earnings">Back to earnings</Link>
+        <h1>Payouts</h1>
+        <p>Manage how you get paid and review your payout history.</p>
+      </div>
+      <Link to="/profile#payouts">{destination?.method ? 'Change destination' : 'Set up payouts'}</Link>
+    </header>
+
+    {error && <div className="op-host-payouts-error"><p>{error}</p><button type="button" onClick={loadData}>Try again</button></div>}
+
+    <section className="op-host-payouts-wallet" aria-label="Payout balance summary">
+      <article className="is-balance">
+        <span>AVAILABLE BALANCE</span>
+        <strong>KES {(wallet?.balance || 0).toLocaleString()}</strong>
+        <small>Ready for the next payout</small>
+      </article>
+      <article className="is-earned">
+        <span>TOTAL EARNED</span>
+        <strong>KES {(wallet?.totalEarned || 0).toLocaleString()}</strong>
+        <small>Recorded host earnings</small>
+      </article>
+      <article className="is-paid">
+        <span>TOTAL PAID OUT</span>
+        <strong>KES {(wallet?.totalPaidOut || 0).toLocaleString()}</strong>
+        <small>Completed host payouts</small>
+      </article>
+    </section>
+
+    <div className="op-host-payouts-grid">
+      <section className="op-host-payouts-panel">
+        <header><div><h2>Payout destination</h2><p>Where your available balance is sent.</p></div><span>Schedule</span></header>
+        <div className="op-host-payouts-destination">
+          <span>{destination?.method || 'NOT CONFIGURED'}</span>
+          <strong>{destination?.label || 'Add a payout destination'}</strong>
+          <small>{destination?.maskedAccount || 'Bank or mobile money details are required before payout.'}</small>
         </div>
-        {wallet?.nextPayoutAt && (
-          <p className="text-sm text-[#6b7280] mt-4">
-            Next scheduled payout:{' '}
-            <span className="font-semibold text-[#1f2937]">
-              {new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-            </span>
-          </p>
-        )}
-        <div className="mt-4 pt-4 border-t border-[#D9D9D9]/60 flex flex-wrap items-center justify-between gap-3">
+        <dl className="op-host-payouts-schedule">
+          <div><dt>Next payout</dt><dd>{wallet?.nextPayoutAt ? new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not scheduled'}</dd></div>
+          <div><dt>Destination status</dt><dd>{destination?.method ? 'Ready' : 'Needs setup'}</dd></div>
+        </dl>
+        <Link to="/profile#payouts">{destination?.method ? 'Update payout details' : 'Add payout details'}</Link>
+      </section>
+
+      <section className="op-host-payouts-panel op-host-payouts-wht">
+        <header><div><h2>WHT statement</h2><p>Withholding tax certificates for KRA returns.</p></div><span>5% rate</span></header>
+        <div className="op-host-payouts-wht-controls">
           <div>
-            <p className="text-xs text-[#6b7280] uppercase tracking-wide">Payout destination</p>
-            <p className="text-sm font-semibold text-[#1f2937] mt-1">
-              {destination?.label
-                ? `${destination.label} · ${destination.maskedAccount || 'details saved'}`
-                : 'Not configured'}
-            </p>
+            <Label htmlFor="wht-month">Statement month</Label>
+            <TextInput id="wht-month" type="month" value={whtMonth} onChange={(event) => setWhtMonth(event.target.value)} />
           </div>
-          <Link to="/profile" className="text-sm font-semibold text-[#C49A6C] hover:text-[#0B0B45]">
-            {destination?.method ? 'Change destination' : 'Set up payouts'}
-          </Link>
+          <Button className="op-host-bronze-button" onClick={downloadWht}>View statement</Button>
         </div>
-      </div>
-
-      {/* WHT Statement */}
-      <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-4">WHT Statement (Tax Certificate)</h2>
-        <p className="text-sm text-[#6b7280] mb-4">
-          Download your withholding tax statement to claim KRA tax credits. WHT at 5% is automatically deducted and remitted on your behalf.
-        </p>
-        <div className="flex flex-wrap items-center gap-3">
-          <input
-            type="month"
-            value={whtMonth}
-            onChange={(e) => setWhtMonth(e.target.value)}
-            className=" px-4 py-2 bg-white text-[#1f2937] rounded-xl text-sm"
-          />
-          <button
-            onClick={downloadWht}
-            className="bg-[#C49A6C] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#b8895c] transition-colors"
-          >
-            View Statement
-          </button>
-        </div>
-
-        {whtData && (
-          <div className="mt-4">
-            <div ref={whtRef}>
-              <h2 className="text-lg font-bold text-[#0B0B45] mb-2">ZuriLofts - WHT Statement</h2>
-              <p className="text-sm text-[#6b7280] mb-4">
-                Period: {whtMonth || 'All time'} | WHT Rate: 5% | Remitted to KRA
-              </p>
-              <table className="w-full text-sm border-collapse">
-                <thead>
-                  <tr className="border-b border-[#D9D9D9] text-left">
-                    <th className="p-2 font-semibold text-[#0B0B45]">Property</th>
-                    <th className="p-2 font-semibold text-[#0B0B45]">Paid Date</th>
-                    <th className="p-2 font-semibold text-[#0B0B45] text-right">Earnings (KES)</th>
-                    <th className="p-2 font-semibold text-[#0B0B45] text-right">WHT (KES)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {whtData.bookings.map((b, i) => (
-                    <tr key={i} className="border-b border-[#D9D9D9]/50">
-                      <td className="p-2 text-[#1f2937]">{b.property?.title}</td>
-                      <td className="p-2 text-[#6b7280]">
-                        {b.paidAt ? new Date(b.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
-                      </td>
-                      <td className="p-2 text-right">{b.hostNetAmount?.toLocaleString()}</td>
-                      <td className="p-2 text-right">{b.withholdingTax?.toLocaleString()}</td>
-                    </tr>
-                  ))}
-                  <tr className="font-bold border-t-2 border-[#0B0B45]/20">
-                    <td className="p-2 text-[#0B0B45]" colSpan="2">Total</td>
-                    <td className="p-2 text-right text-[#0B0B45]">{whtData.totalEarnings?.toLocaleString()}</td>
-                    <td className="p-2 text-right text-[#0B0B45]">{whtData.totalWht?.toLocaleString()}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <p className="text-xs text-[#6b7280] mt-3">
-                This statement confirms that ZuriLofts has deducted and remitted the above withholding tax amounts to KRA on your behalf.
-                Use this document to claim tax credits when filing your annual returns.
-              </p>
-            </div>
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={printWht}
-                className="bg-[#0B0B45] text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#06062a] transition-colors"
-              >
-                Print PDF
-              </button>
-              <button
-                onClick={csvWht}
-                className="border-2 border-[#0B0B45] text-[#0B0B45] text-sm font-semibold px-4 py-2 rounded-full hover:bg-[#0B0B45] hover:text-white transition-colors"
-              >
-                Download CSV
-              </button>
-            </div>
+        {whtData ? <div className="op-host-payouts-wht-result">
+          <div className="op-host-payouts-wht-total">
+            <span>{whtMonth || 'ALL TIME'}</span>
+            <strong>KES {(whtData.totalWht || 0).toLocaleString()} WHT</strong>
+            <small>From KES {(whtData.totalEarnings || 0).toLocaleString()} host earnings</small>
           </div>
-        )}
-      </div>
-
-      {/* Payout History */}
-      <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6">
-        <h2 className="text-lg font-bold text-[#0B0B45] mb-4">Payout History</h2>
-        {payouts.length === 0 ? (
-          <p className="text-[#6b7280] text-sm">No payouts yet. Your first payout will appear here.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-[#D9D9D9] text-left">
-                  <th className="p-3 font-semibold text-[#0B0B45]">Amount (KES)</th>
-                  <th className="p-3 font-semibold text-[#0B0B45]">Bookings</th>
-                  <th className="p-3 font-semibold text-[#0B0B45]">Status</th>
-                  <th className="p-3 font-semibold text-[#0B0B45]">Date</th>
-                </tr>
-              </thead>
+          <div className="op-host-payouts-table-wrap">
+            <table className="op-host-payouts-table">
+              <thead><tr><th>Property</th><th>Paid date</th><th>Earnings</th><th>WHT</th></tr></thead>
               <tbody>
-                {payouts.map((p) => (
-                  <tr key={p.id} className="border-b border-[#D9D9D9]/50">
-                    <td className="p-3 font-medium">KES {p.amount?.toLocaleString()}</td>
-                    <td className="p-3">{p.bookingsCount}</td>
-                    <td className="p-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${statusColors[p.status] || 'bg-gray-100 text-gray-700'}`}>
-                        {p.status}
-                      </span>
-                      {p.failureReason && (
-                        <p className="text-xs text-red-500 mt-1">{p.failureReason}</p>
-                      )}
-                    </td>
-                    <td className="p-3 text-[#6b7280]">
-                      {p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
-                    </td>
-                  </tr>
-                ))}
+                {whtData.bookings.map((booking, index) => <tr key={booking.id || index}>
+                  <td>{booking.property?.title || 'Property'}</td>
+                  <td>{booking.paidAt ? new Date(booking.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</td>
+                  <td>KES {(booking.hostNetAmount || 0).toLocaleString()}</td>
+                  <td>KES {(booking.withholdingTax || 0).toLocaleString()}</td>
+                </tr>)}
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+          <div className="op-host-payouts-wht-actions">
+            <Button color="light" onClick={csvWht}>Download CSV</Button>
+            <Button color="dark" onClick={printWht}>Print PDF</Button>
+          </div>
+        </div> : <div className="op-host-payouts-wht-empty">
+          <strong>Select a month to view your statement</strong>
+          <p>Leave the month empty to view all withholding tax recorded on your account.</p>
+        </div>}
+      </section>
     </div>
-  );
+
+    <section className="op-host-payouts-panel op-host-payouts-history">
+      <header><div><h2>Payout history</h2><p>Completed and in-flight transfers to your destination.</p></div><span>{payouts.length} records</span></header>
+      {payouts.length === 0 ? <div className="op-host-payouts-history-empty">
+        <strong>No payouts yet</strong>
+        <p>Your first payout will appear here after a transfer is created.</p>
+      </div> : <div className="op-host-payouts-table-wrap">
+        <table className="op-host-payouts-table is-history">
+          <thead><tr><th>Amount</th><th>Bookings</th><th>Status</th><th>Date</th></tr></thead>
+          <tbody>{payouts.map((payout) => <tr key={payout.id}>
+            <td>KES {(payout.amount || 0).toLocaleString()}</td>
+            <td>{payout.bookingsCount || 0}</td>
+            <td><span className={`op-host-payout-status ${statusColors[payout.status] || ''}`}>{payout.status}</span>{payout.failureReason && <small>{payout.failureReason}</small>}</td>
+            <td>{payout.createdAt ? new Date(payout.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</td>
+          </tr>)}</tbody>
+        </table>
+      </div>}
+    </section>
+  </div>;
 }
 
 export default HostPayouts;
