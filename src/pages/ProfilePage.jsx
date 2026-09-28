@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar.jsx';
-import Footer from '../components/Footer.jsx';
+import { Select } from 'flowbite-react';
 import PropertyCard from '../components/PropertyCard.jsx';
-import Dropdown from '../components/Dropdown.jsx';
+import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 import apiClient from '../api/client.js';
@@ -318,25 +317,20 @@ function ProfilePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="pt-24 flex items-center justify-center">
-          <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin"></div>
-        </div>
-        <Footer />
-      </div>
-    );
+    return <GuestAccountLayout active="profile" eyebrow="Account" title="Personal details" description="Keep your details current for stays and host communication.">
+      <div className="opg-profile-loading" aria-label="Loading profile"><span /><span /><span /></div>
+    </GuestAccountLayout>;
   }
 
-  return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="max-w-5xl mx-auto px-4 md:px-6">
-          {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center mb-4">
+  return <GuestAccountLayout
+    active="profile"
+    eyebrow="Account"
+    title="Personal details"
+    description="Keep your details current for stays and host communication."
+  >
+    <div className="opg-profile">
+          <div className="opg-profile-summary">
+            <div className="opg-profile-avatar-wrap">
               <label className="relative cursor-pointer group">
                 {profile?.avatar ? (
                   <img
@@ -369,26 +363,27 @@ function ProfilePage() {
                   disabled={avatarUploading}
                 />
               </label>
-              <div className="ml-4">
-                <h1 className="text-2xl font-bold text-[#0B0B45]">
+              <div className="opg-profile-identity">
+                <h2>
                   {profile?.firstName} {profile?.lastName}
-                </h1>
+                </h2>
                 <p className="text-[#6b7280]">{profile?.email}</p>
+                <span>Guest account</span>
               </div>
             </div>
+            <Link to="/verify-identity" className="opg-profile-verify">View verification status</Link>
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b border-[#D9D9D9] mb-8">
+          <div className="opg-profile-tabs" role="tablist" aria-label="Profile sections">
             {['info', 'bookings', 'favorites'].map((tab) => (
               <button
                 key={tab}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 font-semibold text-sm transition-colors border-b-2 -mb-px ${
-                  activeTab === tab
-                    ? 'border-[#C49A6C] text-[#0B0B45]'
-                    : 'border-transparent text-[#6b7280] hover:text-[#0B0B45]'
-                }`}
+                className={activeTab === tab ? 'is-active' : ''}
               >
                 {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
               </button>
@@ -420,7 +415,7 @@ function ProfilePage() {
                     {message}
                   </div>
                 )}
-                <form onSubmit={handleProfileUpdate} className="space-y-4">
+                <form onSubmit={handleProfileUpdate} className="opg-profile-form">
                   <div>
                     <label className="block text-sm font-semibold text-[#1f2937] mb-2">First Name</label>
                     <input
@@ -454,13 +449,14 @@ function ProfilePage() {
                   <div>
                     <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label>
                     <div className="flex gap-2">
-                      <Dropdown
+                      <Select
                         value={countryCode}
-                        onChange={(val) => handlePhoneChange(val, phoneNumber)}
-                        options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
-                        triggerClassName=" px-3 py-3 bg-white text-[#1f2937] rounded-xl w-[120px] flex-shrink-0"
-                        ariaLabel="Select country code"
-                      />
+                        onChange={(event) => handlePhoneChange(event.target.value, phoneNumber)}
+                        aria-label="Select country code"
+                        className="opg-profile-country"
+                      >
+                        {COUNTRY_CODES.map((country) => <option key={country.code} value={country.code}>{country.dial}</option>)}
+                      </Select>
                       <input
                         type="tel"
                         value={phoneNumber}
@@ -639,16 +635,18 @@ function ProfilePage() {
                       {banksLoading ? (
                         <p className="text-sm text-[#6b7280]">Loading banks...</p>
                       ) : banks.length > 0 ? (
-                        <Dropdown
+                        <Select
                           value={bankForm.bankCode}
-                          onChange={(code) => {
-                            const bank = banks.find((b) => b.code === code);
+                          onChange={(event) => {
+                            const code = event.target.value;
+                            const bank = banks.find((item) => item.code === code);
                             setBankForm((prev) => ({ ...prev, bankCode: code, bankName: bank?.name || '' }));
                           }}
-                          options={banks.map((b) => ({ value: b.code, label: b.name }))}
-                          triggerClassName=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] rounded-xl"
-                          ariaLabel="Select your bank"
-                        />
+                          aria-label="Select your bank"
+                          className="opg-profile-select"
+                        >
+                          {banks.map((bank) => <option key={bank.code} value={bank.code}>{bank.name}</option>)}
+                        </Select>
                       ) : (
                         <input
                           type="text"
@@ -704,17 +702,16 @@ function ProfilePage() {
                 <h4 className="font-semibold text-[#1f2937]">Payout Frequency</h4>
                 <p className="text-xs text-[#6b7280]">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
                 <div className="flex items-center gap-3">
-                  <Dropdown
+                  <Select
                     value={payoutFrequency}
-                    onChange={setPayoutFrequency}
-                    options={[
-                      { value: 'weekly', label: 'Weekly (every Monday)' },
-                      { value: 'biweekly', label: 'Bi-Weekly (every other Monday)' },
-                      { value: 'monthly', label: 'Monthly (1st of month)' },
-                    ]}
-                    triggerClassName=" px-4 py-3 bg-white text-[#1f2937] rounded-xl w-64"
-                    ariaLabel="Select payout frequency"
-                  />
+                    onChange={(event) => setPayoutFrequency(event.target.value)}
+                    aria-label="Select payout frequency"
+                    className="opg-profile-frequency"
+                  >
+                    <option value="weekly">Weekly (every Monday)</option>
+                    <option value="biweekly">Bi-Weekly (every other Monday)</option>
+                    <option value="monthly">Monthly (1st of month)</option>
+                  </Select>
                   <button
                     type="button"
                     onClick={handleFrequencySave}
@@ -952,11 +949,8 @@ function ProfilePage() {
               )}
             </div>
           )}
-        </div>
-      </div>
-      <Footer />
     </div>
-  );
+  </GuestAccountLayout>;
 }
 
 export default ProfilePage;

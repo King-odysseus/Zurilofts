@@ -16,7 +16,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/favourites`, `/shortlists`, `/shortlists/:id`, `/s/:token` | Saved `0:3864`, tabs `0:3871`, shared shortlist `0:2001` | Implemented with real favourites, collection previews and shared links; desktop/mobile QA passed |
 | `/trips`, `/booking-history`, `/bookings` | Guest Trips `0:3821` / mobile `0:4018`; account/history `0:9318` | Implemented with real booking data, receipts, messaging, and responsive account navigation; desktop/mobile QA passed |
 | `/inbox`, `/inbox/:id`, `/messages` | Guest Inbox `0:3910`, conversation detail `0:3940` | Implemented with real conversations, polling, read state, sending, support thread, and mobile detail flow; desktop/mobile QA passed |
-| `/profile` | Product `0:9318`, security `0:4626` | Functional legacy, redesign pending |
+| `/profile` | Guest Account `0:3960`, security `0:4626` | Implemented with account shell, Flowbite controls, avatar upload, host payouts, reviews, privacy controls, and account deletion; desktop/mobile QA passed |
 | `/verify-identity` | Product trust `0:9724`, security `0:4626` | Live identity flow redesigned; dispute flow still pending |
 | `/host/application` | Product `0:9744`, application states `0:4123` | Functional legacy, redesign pending |
 | `/host/today` | Product `0:757`, mobile `0:1277`, arrivals/tasks `0:4668` | Functional legacy, redesign pending |

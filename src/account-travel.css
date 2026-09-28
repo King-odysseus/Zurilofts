@@ -87,6 +87,36 @@
 .opg-history-meta div:last-child dd{color:#9a744a}
 .opg-history-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:auto;padding-top:18px}
 
+.opg-profile{display:grid;gap:18px}
+.opg-profile-summary{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:16px 18px;border:1px solid #e8edf3;border-radius:16px;background:#fff}
+.opg-profile-avatar-wrap{display:flex;align-items:center;gap:14px;min-width:0}
+.opg-profile-avatar-wrap label{display:block;flex:none}
+.opg-profile-avatar-wrap img,.opg-profile-avatar-wrap label>div{width:64px;height:64px;border-radius:50%}
+.opg-profile-identity{min-width:0}
+.opg-profile-identity h2{margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0b1f42;font:700 18px Montserrat,Arial,sans-serif;letter-spacing:0}
+.opg-profile-identity p{margin-top:5px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#64748b;font-size:12px}
+.opg-profile-identity span{display:block;margin-top:5px;color:#9a744a;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.opg-profile-verify{flex:none;color:#2563eb;font-size:12px;font-weight:700;text-decoration:none}
+.opg-profile-verify:hover,.opg-profile-verify:focus-visible{color:#0b1f42;text-decoration:underline}
+.opg-profile-tabs{display:flex;align-items:center;gap:5px;width:fit-content;max-width:100%;padding:4px;border-radius:12px;background:#f1f5f9;overflow-x:auto;scrollbar-width:none}
+.opg-profile-tabs::-webkit-scrollbar{display:none}
+.opg-profile-tabs button{min-height:36px;padding:0 15px;border:0;border-radius:9px;background:transparent;color:#64748b;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer}
+.opg-profile-tabs button.is-active{background:#fff;color:#0b1f42;font-weight:700;box-shadow:0 1px 4px rgba(15,23,42,.08)}
+.opg-profile .neu-card{border:1px solid #e8edf3;border-radius:16px;box-shadow:0 8px 26px rgba(11,31,66,.05)}
+.opg-profile .neu-input{border-color:#e2dad0;border-radius:12px;box-shadow:none}
+.opg-profile-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 16px}
+.opg-profile-form>button{grid-column:1/-1}
+.opg-profile-form label{font-size:12px;font-weight:700;color:#475569}
+.opg-profile-form input,.opg-profile-form select{min-height:44px;border-radius:12px!important;border-color:#e2dad0!important;box-shadow:none!important}
+.opg-profile-form input:focus,.opg-profile-form select:focus{border-color:#c49a6c!important;box-shadow:0 0 0 3px rgba(196,154,108,.2)!important}
+.opg-profile-country{width:118px;flex:none}
+.opg-profile-select,.opg-profile-frequency{min-height:44px;border-radius:12px!important;border-color:#e2dad0!important;box-shadow:none!important}
+.opg-profile-select{width:100%}.opg-profile-frequency{width:280px;max-width:100%}
+.opg-profile select:focus{border-color:#c49a6c!important;box-shadow:0 0 0 3px rgba(196,154,108,.2)!important}
+.opg-profile-loading{display:grid;gap:14px}
+.opg-profile-loading span{display:block;height:88px;border-radius:14px;background:#f1f5f9;animation:opg-trip-pulse 1.5s ease-in-out infinite}
+.opg-profile-loading span:first-child{height:96px}.opg-profile-loading span:last-child{height:300px}
+
 .opg-messages-layout{display:grid;grid-template-columns:318px minmax(0,1fr);gap:16px;min-height:600px}
 .opg-conversation-list,.opg-message-pane{height:600px;min-width:0;overflow:hidden;border:1px solid #e8edf3;border-radius:16px}
 .opg-conversation-list{display:flex;flex-direction:column;background:#f8fafc}
@@ -192,6 +222,13 @@
   .opg-history-title-row .opg-trip-status{margin-top:10px}
   .opg-history-meta{grid-template-columns:1fr 1fr;gap:14px}
   .opg-history-actions{display:grid;grid-template-columns:1fr;margin-top:16px}
+  .opg-profile-summary{display:block;padding:14px}
+  .opg-profile-verify{display:inline-block;margin-top:14px}
+  .opg-profile-tabs{width:100%}
+  .opg-profile-tabs button{flex:1;padding:0 10px}
+  .opg-profile-form{grid-template-columns:1fr}
+  .opg-profile-form>button{grid-column:auto}
+  .opg-profile-frequency{width:100%}
   .opg-messages-layout{display:block;min-height:0}
   .opg-conversation-list{height:calc(100dvh - 310px);min-height:340px;max-height:650px;border-radius:14px}
   .opg-messages-layout.is-detail-open .opg-conversation-list{display:none}
