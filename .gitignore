@@ -57,3 +57,9 @@ offline-app/
 # Local SQLite dev database - seeded locally, never committed
 server/prisma/*.db
 server/prisma/*.db-journal
+
+# Local Codex/OpenPencil QA artifacts
+.codex-*
+audit-shots*.cjs
+live-login.png
+skills-lock.json
