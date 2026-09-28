@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, TextInput } from 'flowbite-react';
+import { Button, Textarea, TextInput } from 'flowbite-react';
+import { Link, useParams } from 'react-router-dom';
 import apiClient from '../api/client.js';
 
 function SearchIcon() {
@@ -36,8 +37,9 @@ function formatThreadTime(value) {
 }
 
 function AdminMessages() {
+  const { userId } = useParams();
+  const activeUserId = userId || null;
   const [conversations, setConversations] = useState([]);
-  const [activeUser, setActiveUser] = useState(null);
   const [thread, setThread] = useState([]);
   const [body, setBody] = useState('');
   const [search, setSearch] = useState('');
@@ -68,20 +70,37 @@ function AdminMessages() {
     return () => clearInterval(timer);
   }, [loadConversations]);
 
-  const openConversation = useCallback(async (conversation) => {
-    setActiveUser(conversation);
-    setLoadingThread(true);
-    setError('');
-    try {
-      const response = await apiClient.get(`/admin/messages/${conversation.userId}`);
-      setThread(response.data.data || []);
-      setConversations((current) => current.map((entry) => entry.userId === conversation.userId ? { ...entry, unread: 0 } : entry));
-    } catch (requestError) {
-      setError(requestError.response?.data?.error || 'Conversation could not be loaded.');
-    } finally {
+  useEffect(() => {
+    if (!activeUserId) {
+      setThread([]);
       setLoadingThread(false);
+      setError('');
+      return undefined;
     }
-  }, []);
+
+    let active = true;
+    setLoadingThread(true);
+    setThread([]);
+    setError('');
+
+    apiClient.get(`/admin/messages/${activeUserId}`)
+      .then((response) => {
+        if (!active) return;
+        setThread(response.data.data || []);
+        setConversations((current) => current.map((entry) => entry.userId === activeUserId ? { ...entry, unread: 0 } : entry));
+      })
+      .catch((requestError) => {
+        if (!active) return;
+        setError(requestError.response?.data?.error || 'Conversation could not be loaded.');
+      })
+      .finally(() => {
+        if (active) setLoadingThread(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [activeUserId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -90,11 +109,11 @@ function AdminMessages() {
   async function handleReply(event) {
     event.preventDefault();
     const text = body.trim();
-    if (!text || !activeUser) return;
+    if (!text || !activeUserId) return;
     setSending(true);
     setError('');
     try {
-      const response = await apiClient.post(`/admin/messages/${activeUser.userId}`, { body: text });
+      const response = await apiClient.post(`/admin/messages/${activeUserId}`, { body: text });
       setThread((current) => [...current, response.data.data]);
       setBody('');
       await loadConversations({ quiet: true });
@@ -117,10 +136,12 @@ function AdminMessages() {
   }, [conversations, search]);
 
   const unreadTotal = conversations.reduce((sum, conversation) => sum + (Number(conversation.unread) || 0), 0);
-  const activePreview = activeUser ? conversations.find((conversation) => conversation.userId === activeUser.userId) || activeUser : null;
+  const activePreview = activeUserId
+    ? conversations.find((conversation) => conversation.userId === activeUserId) || { userId: activeUserId, firstName: 'Guest', lastName: '', email: '' }
+    : null;
 
   return (
-    <div className="op-admin-overview op-admin-messages" data-openpencil-frame="0:7458">
+    <div className={`op-admin-overview op-admin-messages ${activeUserId ? 'is-thread-view' : 'is-list-view'}`} data-openpencil-frame="0:7458">
       <div className="op-admin-heading op-admin-messages-heading">
         <div>
           <p className="op-admin-eyebrow">ZURILOFTS · ADMIN · GOVERNANCE</p>
@@ -132,11 +153,11 @@ function AdminMessages() {
       <div className="op-admin-metrics op-admin-catalog-metrics op-admin-message-metrics">
         <article><span>CONVERSATIONS</span><strong>{conversations.length}</strong><small>Guests with a support history</small></article>
         <article><span>UNREAD MESSAGES</span><strong>{unreadTotal}</strong><small>Waiting for an operations reply</small></article>
-        <article><span>OPEN THREAD</span><strong className="op-admin-message-active">{activeUser ? `${activeUser.firstName || ''} ${activeUser.lastName || ''}`.trim() : 'None'}</strong><small>{activeUser ? activeUser.email : 'Select a guest to read the thread'}</small></article>
+        <article><span>OPEN THREAD</span><strong className="op-admin-message-active">{activePreview ? `${activePreview.firstName || ''} ${activePreview.lastName || ''}`.trim() || 'Guest' : 'None'}</strong><small>{activePreview ? activePreview.email || 'Guest conversation' : 'Select a guest to read the thread'}</small></article>
         <article><span>LAST SYNC</span><strong className="op-admin-message-sync">{lastSync ? lastSync.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '—'}</strong><small>Automatically refreshed every 30 seconds</small></article>
       </div>
 
-      <section className={`op-admin-message-board ${activeUser ? 'has-active' : ''}`}>
+      <section className={`op-admin-message-board ${activeUserId ? 'has-active' : ''}`}>
         <aside className="op-admin-message-list-panel">
           <div className="op-admin-message-search"><SearchIcon /><TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search conversations" aria-label="Search conversations" /></div>
           <div className="op-admin-message-list">
@@ -145,20 +166,20 @@ function AdminMessages() {
             ) : visibleConversations.length === 0 ? (
               <div className="op-admin-message-empty"><strong>No conversations found</strong><p>Adjust the search or wait for a new guest message.</p></div>
             ) : visibleConversations.map((conversation) => (
-              <button key={conversation.userId} type="button" className={`op-admin-message-conversation ${activeUser?.userId === conversation.userId ? 'is-active' : ''}`} onClick={() => openConversation(conversation)}>
+              <Link key={conversation.userId} to={`/admin/messages/${encodeURIComponent(conversation.userId)}`} className={`op-admin-message-conversation ${activeUserId === conversation.userId ? 'is-active' : ''}`} aria-current={activeUserId === conversation.userId ? 'page' : undefined}>
                 <span className="op-admin-message-avatar" aria-hidden="true">{initials(conversation)}</span>
                 <span className="op-admin-message-preview">
                   <span><strong>{conversation.firstName} {conversation.lastName}</strong><small>{formatMessageTime(conversation.lastMessage?.createdAt)}</small></span>
                   <span>{conversation.lastMessage ? `${conversation.lastMessage.senderRole === 'ADMIN' ? 'You: ' : ''}${conversation.lastMessage.body}` : 'No messages yet'}</span>
                 </span>
                 {conversation.unread > 0 && <span className="op-admin-message-unread">{conversation.unread}</span>}
-              </button>
+              </Link>
             ))}
           </div>
         </aside>
 
         <div className="op-admin-message-thread-panel">
-          {!activeUser ? (
+          {!activeUserId ? (
             <div className="op-admin-message-thread-empty">
               <span aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h8m-8 4h5m8-2a8 8 0 01-11.6 7.1L4 20l.9-3.4A8 8 0 1121 12z" /></svg></span>
               <strong>Select a conversation</strong>
@@ -167,7 +188,7 @@ function AdminMessages() {
           ) : (
             <>
               <header className="op-admin-message-thread-head">
-                <button type="button" className="op-admin-message-back" onClick={() => setActiveUser(null)} aria-label="Back to conversations"><BackIcon /></button>
+                <Link className="op-admin-message-back" to="/admin/messages" aria-label="Back to conversations"><BackIcon /></Link>
                 <span className="op-admin-message-avatar" aria-hidden="true">{initials(activePreview)}</span>
                 <div><strong>{activePreview?.firstName} {activePreview?.lastName}</strong><span>{activePreview?.email}</span></div>
               </header>
@@ -192,8 +213,25 @@ function AdminMessages() {
               </div>
 
               <form className="op-admin-message-composer" onSubmit={handleReply}>
-                <TextInput value={body} onChange={(event) => setBody(event.target.value)} placeholder="Write a reply to the guest" aria-label="Reply to guest" />
-                <Button className="op-admin-bronze-button" type="submit" disabled={sending || !body.trim()}>{sending ? 'Sending...' : 'Send reply'}</Button>
+                <div className="op-admin-message-compose-surface">
+                  <Textarea
+                    value={body}
+                    onChange={(event) => setBody(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' && !event.shiftKey) {
+                        event.preventDefault();
+                        event.currentTarget.form?.requestSubmit();
+                      }
+                    }}
+                    rows={1}
+                    placeholder="Write a reply to the guest"
+                    aria-label="Reply to guest"
+                    className="op-admin-message-textarea"
+                  />
+                  <div className="op-admin-message-compose-actions">
+                    <Button className="op-admin-bronze-button" type="submit" disabled={sending || !body.trim()}>{sending ? 'Sending...' : 'Send reply'}</Button>
+                  </div>
+                </div>
               </form>
             </>
           )}

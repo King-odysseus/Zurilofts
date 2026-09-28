@@ -247,7 +247,7 @@ function AdminLayout() {
   }
 
   return (
-    <div className="op-admin-layout min-h-screen bg-white flex">
+    <div className={`op-admin-layout min-h-screen bg-white flex${isMessageThreadRoute ? ' is-message-thread-open' : ''}`}>
       {/* Sidebar */}
       <aside
         className={`op-admin-sidebar bg-white hidden md:flex flex-col fixed inset-y-0 left-0 z-10 transition-all duration-300 ${
@@ -508,7 +508,7 @@ function AdminLayout() {
             <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
           </div>
         </header>
-        <div className="p-4 md:p-8 pt-20 md:pt-8">
+        <div className="op-admin-content p-4 md:p-8 pt-20 md:pt-8">
           <Outlet />
         </div>
       </main>

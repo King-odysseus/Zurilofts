@@ -15,6 +15,7 @@ const fallbackRules = [
   [/^\/host\/calendar\/[^/]+$/, '/host/calendar'],
   [/^\/host\/properties\/[^/]+$/, '/host/listings'],
   [/^\/host\/properties\/new$/, '/host/listings'],
+  [/^\/admin\/messages\/[^/]+$/, '/admin/messages'],
   [/^\/admin\/.+$/, '/admin'],
 ];
 

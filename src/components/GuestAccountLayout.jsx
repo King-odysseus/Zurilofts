@@ -31,12 +31,12 @@ const travelLinks = [
   { key: 'inbox', label: 'Messages', to: '/inbox' },
 ];
 
-function GuestAccountLayout({ active, title, description, eyebrow, action, children }) {
+function GuestAccountLayout({ active, title, description, eyebrow, action, pageClassName = '', children }) {
   const { user } = useAuth();
   const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.name || 'Guest account';
   const initials = `${user?.firstName?.[0] || user?.name?.[0] || 'G'}${user?.lastName?.[0] || ''}`.toUpperCase();
 
-  return <div className="opg-account-page">
+  return <div className={`opg-account-page${pageClassName ? ` ${pageClassName}` : ''}`}>
     <main className="opg-account-main">
       <div className="opg-account-container">
         <aside className="opg-account-sidebar" aria-label="Account navigation">
@@ -78,6 +78,7 @@ GuestAccountLayout.propTypes = {
   description: PropTypes.string,
   eyebrow: PropTypes.string,
   action: PropTypes.node,
+  pageClassName: PropTypes.string,
   children: PropTypes.node.isRequired,
 };
 

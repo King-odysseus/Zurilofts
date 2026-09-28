@@ -161,23 +161,28 @@ function ConversationPage() {
     </div>
 
     <div className="opg-message-composer">
-      <Textarea
-        value={draft}
-        onChange={(event) => setDraft(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            handleSend();
-          }
-        }}
-        rows={1}
-        placeholder="Write a message..."
-        className="opg-message-textarea"
-      />
-      <button className="opg-message-send" type="button" onClick={handleSend} disabled={!canSend}>
-        {sending ? <span className="opg-message-send-spinner" /> : <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z" /></svg>}
-        Send
-      </button>
+      <div className="opg-message-compose-surface">
+        <Textarea
+          value={draft}
+          onChange={(event) => setDraft(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault();
+              handleSend();
+            }
+          }}
+          rows={1}
+          placeholder="Write a message..."
+          aria-label="Message"
+          className="opg-message-textarea"
+        />
+        <div className="opg-message-compose-actions">
+          <button className="opg-message-send" type="button" onClick={handleSend} disabled={!canSend} aria-label={sending ? 'Sending message' : 'Send message'}>
+            {sending ? <span className="opg-message-send-spinner" /> : <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M22 2 11 13M22 2l-7 20-4-9-9-4 20-7z" /></svg>}
+            <span>Send</span>
+          </button>
+        </div>
+      </div>
     </div>
   </GuestMessagesLayout>;
 }

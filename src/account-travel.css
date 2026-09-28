@@ -121,7 +121,7 @@
 
 .opg-messages-layout{display:grid;grid-template-columns:318px minmax(0,1fr);gap:16px;min-height:600px}
 .opg-conversation-list,.opg-message-pane{height:600px;min-width:0;overflow:hidden;border:1px solid #e8edf3;border-radius:16px}
-.opg-conversation-list{display:flex;flex-direction:column;background:#f8fafc}
+.opg-conversation-list{display:flex;flex-direction:column;background:#fff}
 .opg-conversation-list-head{flex:none;padding:16px 16px 12px}
 .opg-conversation-list-head h2{margin:0 0 12px;color:#0b1f42;font:700 20px/1.2 Montserrat,Arial,sans-serif;letter-spacing:0}
 .opg-message-tabs{display:inline-flex;align-items:center;gap:3px;padding:3px;border-radius:10px;background:#eef2f7}
@@ -150,7 +150,7 @@
 .opg-conversation-error button{border:0;background:transparent;color:#9a744a;font-size:12px;font-weight:700;cursor:pointer}
 .opg-conversation-empty strong{display:block;color:#0b1f42;font-size:13px}
 .opg-conversation-empty span{display:block;margin-top:5px;color:#64748b;font-size:11px;line-height:1.5}
-.opg-message-pane{display:flex;flex-direction:column;background:#f8fafc}
+.opg-message-pane{display:flex;flex-direction:column;background:#fff}
 .opg-message-pane-head{flex:none;display:flex;align-items:center;gap:12px;min-height:78px;padding:14px 18px;border-bottom:1px solid #e5e7eb;background:#fff}
 .opg-message-back{display:none;place-items:center;width:34px;height:34px;flex:none;border-radius:10px;color:#0b1f42;text-decoration:none}
 .opg-message-back:hover{background:#f1f5f9}
@@ -169,13 +169,18 @@
 .opg-message-bubble{max-width:100%;padding:11px 13px;border-radius:14px;border-bottom-left-radius:5px;background:#fff;color:#0b1f42;font-size:12px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere;box-shadow:0 4px 14px rgba(11,31,66,.04)}
 .opg-message-item.is-mine .opg-message-bubble{border-radius:14px;border-bottom-right-radius:5px;background:#dbeafe;color:#0b1f42}
 .opg-message-meta{margin-top:5px;color:#94a3b8;font-size:10px}
-.opg-message-composer{flex:none;display:flex;align-items:flex-end;gap:9px;padding:12px;border-top:1px solid #e5e7eb;background:#fff}
-.opg-message-composer .opg-message-textarea{flex:1;min-height:42px!important;max-height:96px;margin:0!important;padding:10px 12px!important;resize:none;border-color:#e2dad0!important;border-radius:12px!important;background:#fff!important;color:#0b1f42!important;font-size:12px!important;line-height:1.45!important;box-shadow:none!important}
-.opg-message-composer .opg-message-textarea:focus{border-color:#c49a6c!important;box-shadow:0 0 0 3px rgba(196,154,108,.2)!important}
-.opg-message-send{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;min-width:88px;padding:0 15px;border:0;border-radius:12px;background:#c49a6c;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
+.opg-message-composer{flex:none;padding:12px 14px 10px;border-top:1px solid #e5e7eb;background:#fff}
+.opg-message-compose-surface{position:relative;min-width:0;overflow:hidden;border:1px solid #cbd5e1;border-radius:12px;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.04);transition:border-color .15s ease,box-shadow .15s ease}
+.opg-message-compose-surface:focus-within{border-color:#0b0b45;box-shadow:0 0 0 3px rgba(0,22,102,.1)}
+.opg-message-composer .opg-message-textarea{display:block;width:100%;min-height:72px!important;max-height:128px;margin:0!important;padding:13px 92px 13px 13px!important;resize:none;border:0!important;border-radius:0!important;background:transparent!important;color:#0b1f42!important;font-size:13px!important;line-height:20px!important;box-shadow:none!important}
+.opg-message-composer .opg-message-textarea::placeholder{color:#94a3b8}
+.opg-message-composer .opg-message-textarea:focus{border:0!important;box-shadow:none!important}
+.opg-message-compose-actions{position:absolute;right:8px;bottom:8px;display:flex;align-items:center}
+.opg-message-send{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:34px;min-width:72px;padding:0 12px;border:0;border-radius:8px;background:#c49a6c;color:#fff;font-size:12px;font-weight:700;cursor:pointer}
 .opg-message-send:hover:not(:disabled),.opg-message-send:focus-visible:not(:disabled){background:#ad8053}
 .opg-message-send:disabled{background:#d7dde5;color:#fff;cursor:not-allowed}
 .opg-message-send svg{width:15px;height:15px}
+.opg-message-send>span:not(.opg-message-send-spinner){line-height:1}
 .opg-message-send-spinner{width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite}
 .opg-message-placeholder{display:grid;place-items:center;align-content:center;height:100%;padding:40px;text-align:center}
 .opg-message-placeholder>span{display:grid;place-items:center;width:54px;height:54px;margin-bottom:14px;border-radius:15px;background:#e8eef7;color:#64748b}
@@ -238,18 +243,40 @@
   .opg-profile-form>button{grid-column:auto}
   .opg-profile-frequency{width:100%}
   .opg-messages-layout{display:block;min-height:0}
-  .opg-conversation-list{height:calc(100dvh - 310px);min-height:340px;max-height:650px;border-radius:14px}
+  .opg-account-page.is-messages-index .opg-account-main{padding:80px 0 calc(104px + env(safe-area-inset-bottom))}
+  .opg-account-page.is-messages-index .opg-account-container{width:100%}
+  .opg-account-page.is-messages-index .opg-account-heading{padding:0 16px}
+  .opg-account-page.is-messages-index .opg-conversation-list{height:calc(100dvh - 204px - env(safe-area-inset-bottom));min-height:420px;border:0;border-radius:0}
+  .opg-conversation-list-head{padding:8px 16px 12px}
+  .opg-conversation-list-head h2{display:none}
+  .opg-conversation-scroll{display:grid;align-content:start;gap:8px;padding:8px 16px 16px}
+  .opg-conversation-row{min-height:64px;border:1px solid #e5e7eb;border-radius:10px;background:#fff;padding:8px 12px}
+  .opg-conversation-row:hover,.opg-conversation-row:focus-visible{background:#fff}
+  .opg-conversation-row.is-selected{border-color:#0b0b45;background:#f8fafc;box-shadow:none}
+  .opg-conversation-avatar{width:34px;height:34px}
+  .opg-support-row{margin-top:0;border-top:1px solid #e5e7eb}
+  .opg-conversation-loading{display:grid;gap:8px;padding:0}
+  .opg-conversation-loading span{height:64px}
   .opg-messages-layout.is-detail-open .opg-conversation-list{display:none}
   .opg-message-pane{display:none;height:calc(100dvh - 310px);min-height:340px;border-radius:14px}
   .opg-messages-layout.is-detail-open .opg-message-pane{display:flex}
+  .opg-account-page.is-message-thread .opg-account-main{padding:8px 0 calc(104px + env(safe-area-inset-bottom))}
+  .opg-account-page.is-message-thread .opg-account-container{width:100%}
+  .opg-account-page.is-message-thread .opg-account-heading{display:none}
+  .opg-account-page.is-message-thread .opg-messages-layout{height:calc(100dvh - 176px - env(safe-area-inset-bottom));min-height:420px}
+  .opg-account-page.is-message-thread .opg-message-pane{height:100%;min-height:0;border-right:0;border-left:0;border-radius:0}
   .opg-message-back{display:inline-grid}
-  .opg-message-pane-head{min-height:72px;padding:12px}
+  .opg-message-pane-head{min-height:64px;padding:10px 12px}
   .opg-message-context-image,.opg-message-context-icon{width:42px;height:42px}
   .opg-message-context h2{font-size:15px}
   .opg-message-booking-link{display:none}
-  .opg-message-thread{padding:14px}
+  .opg-message-thread{gap:10px;padding:14px 12px 16px}
   .opg-message-item{width:88%}
-  .opg-message-composer{padding:10px}
-  .opg-message-send{min-width:46px;width:46px;padding:0;font-size:0}
+  .opg-message-composer{padding:10px 12px 8px}
+  .opg-message-compose-surface{border-radius:10px}
+  .opg-message-composer .opg-message-textarea{min-height:60px!important;padding:11px 56px 11px 12px!important;font-size:16px!important;line-height:20px!important}
+  .opg-message-compose-actions{right:6px;bottom:6px}
+  .opg-message-send{min-width:40px;width:40px;height:40px;padding:0}
+  .opg-message-send>span:not(.opg-message-send-spinner){display:none}
   .opg-message-send svg{width:17px;height:17px}
 }

@@ -52,6 +52,7 @@ export default function WorkspaceRoutes() {
       <Route path="addons" element={<AdminAddOns />} />
       <Route path="feedback" element={<AdminFeedback />} />
       <Route path="messages" element={<AdminMessages />} />
+      <Route path="messages/:userId" element={<AdminMessages />} />
       <Route path="guides" element={<AdminGuides />} />
       <Route path="payouts" element={<AdminPayouts />} />
     </Route>

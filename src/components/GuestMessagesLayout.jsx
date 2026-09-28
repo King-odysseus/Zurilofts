@@ -27,7 +27,7 @@ function ConversationRow({ conversation, currentUserId, selected }) {
   const timestamp = conversation.lastMessage?.createdAt || conversation.updatedAt;
   const unread = Number(conversation.unreadCount) > 0;
 
-  return <Link to={`/inbox/${conversation.id}`} className={`opg-conversation-row${selected ? ' is-selected' : ''}`}>
+  return <Link to={`/inbox/${conversation.id}`} className={`opg-conversation-row${selected ? ' is-selected' : ''}`} aria-current={selected ? 'page' : undefined}>
     <span className="opg-conversation-avatar">
       {image ? <img src={image} alt="" /> : participant.avatar ? <img src={participant.avatar} alt="" /> : <span>{initials(participant.name)}</span>}
     </span>
@@ -138,6 +138,7 @@ function GuestMessagesLayout({ activeTab, conversations = [], currentUserId, sel
     eyebrow="Travel"
     title="Messages"
     description="Stay conversations and ZuriLofts support in one place."
+    pageClassName={detailOpen ? 'is-message-thread' : 'is-messages-index'}
   >
     <div className={`opg-messages-layout${detailOpen ? ' is-detail-open' : ''}`}>
       <ConversationList
