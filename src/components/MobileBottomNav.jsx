@@ -108,8 +108,8 @@ function MobileBottomNav() {
             key={tab.key}
             to={tab.to}
             aria-current={active ? 'page' : undefined}
-            className={`flex min-h-[54px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full px-1 py-1.5 text-[10px] font-semibold leading-none transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white ${
-              active ? 'bg-white/16 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'
+            className={`relative flex min-h-[54px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full px-1 py-1.5 text-[10px] font-semibold leading-none transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white ${
+              active ? 'text-white' : 'text-white/80 hover:text-white'
             }`}
           >
             {tab.icon(active)}

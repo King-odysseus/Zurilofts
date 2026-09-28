@@ -18,9 +18,6 @@
 .op-checkout-select:hover,.op-checkout-select:focus{background:#fff;color:#0B1F42;border-color:#C49A6C;box-shadow:0 0 0 3px #c49a6c24;outline:0}
 .op-checkout-select-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .op-checkout-country-code{width:112px;min-width:112px;flex:none}
-.op-checkout-screen [data-testid="flowbite-dropdown"]{min-width:160px;width:max-content;max-width:min(320px,calc(100vw - 32px));border:1px solid #E2DAD0;border-radius:10px;background:#fff;box-shadow:0 12px 30px #0b1f4226;overflow:hidden}
-.op-checkout-screen [data-testid="flowbite-dropdown"] button{width:100%;min-height:36px;padding:9px 12px;border:0;border-radius:6px;background:transparent;color:#0B1F42;font:12px Inter,Arial,sans-serif;text-align:left}
-.op-checkout-screen [data-testid="flowbite-dropdown"] button:hover,.op-checkout-screen [data-testid="flowbite-dropdown"] button:focus{background:#F3E9DC;color:#0B1F42;outline:0}
 .op-checkout-screen .op-checkout-primary{width:100%;min-height:48px;border:0!important;border-radius:9999px!important;background:#0B1F42!important;color:#fff!important;font-weight:700!important;box-shadow:none!important}
 .op-checkout-screen .op-checkout-primary:hover,.op-checkout-screen .op-checkout-primary:focus{background:#07152d!important;color:#fff!important;box-shadow:0 0 0 3px #0b1f4220!important}
 .op-checkout-screen .op-checkout-back-button{min-height:38px;padding:0 4px!important;border:0!important;background:transparent!important;color:#C49A6C!important;font-weight:600!important;box-shadow:none!important}.op-checkout-screen .op-checkout-back-button:hover,.op-checkout-screen .op-checkout-back-button:focus{background:#F3E9DC!important;color:#0B1F42!important;outline:0!important}

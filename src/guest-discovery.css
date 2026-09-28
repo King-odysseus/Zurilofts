@@ -98,9 +98,6 @@
 .opg-guest-trigger:focus-visible{background:transparent;color:var(--op-navy);box-shadow:none;outline:2px solid var(--op-bronze);outline-offset:2px}
 .opg-guest-trigger svg{width:16px;height:16px;color:var(--op-muted)}
 .opg-guest-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
-.opg-search .opg-search-field [data-testid="flowbite-dropdown"]{width:160px!important;min-width:160px!important;max-width:calc(100vw - 32px);border:0!important;border-radius:10px;background:#fff;box-shadow:0 14px 34px #0b1f4226;overflow:hidden}
-.opg-search .opg-search-field [data-testid="flowbite-dropdown"] button{width:100%;height:auto;min-height:36px;padding:9px 12px;border:0;border-radius:6px;background:transparent;color:var(--op-navy);font:12px Inter,Arial,sans-serif;box-shadow:none}
-.opg-search .opg-search-field [data-testid="flowbite-dropdown"] button:hover,.opg-search .opg-search-field [data-testid="flowbite-dropdown"] button:focus{background:#f7f4ef;color:var(--op-navy);outline:0}
 .opg-datepicker{width:100%;min-width:0}
 .opg-datepicker > div:first-child{width:100%}
 .opg-datepicker input{width:100%;height:18px!important;min-height:18px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--op-navy)!important;font:500 15px Inter,Arial,sans-serif!important}

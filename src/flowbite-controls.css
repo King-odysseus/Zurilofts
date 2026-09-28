@@ -1,6 +1,6 @@
 /* Shared Flowbite-style form anatomy using the OpenPencil colour tokens. */
-:root{--control-line:#E2DAD0;--control-focus:#C49A6C;--control-text:#111827;--control-placeholder:#6b7280}
-:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]):not([type=submit]):not([type=button]),select,textarea){border:1px solid var(--control-line);border-radius:8px;background-color:#fff;color:var(--control-text);font-size:14px;line-height:1.4;min-height:42px;transition:border-color .15s ease,box-shadow .15s ease}
+:root{--control-line:#E2DAD0;--control-focus:#C49A6C;--control-text:#111827;--control-placeholder:#6b7280;--control-bg:#fff;--control-surface:#F3E9DC}
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]):not([type=submit]):not([type=button]),select,textarea){border:1px solid var(--control-line);border-radius:8px;background-color:#fff;color:var(--control-text);font-size:14px;line-height:1.4;min-height:44px;transition:border-color .15s ease,box-shadow .15s ease}
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea)::placeholder{color:var(--control-placeholder);opacity:1}
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea)::selection{background:#F3E9DC;color:#0B1F42}
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea):focus,
@@ -13,6 +13,26 @@
 :where([role=listbox]){border:1px solid #e5e7eb;border-radius:8px;background:#fff;box-shadow:0 8px 18px #1118271a;padding:4px}
 :where([role=option]){min-height:38px;border-radius:6px}
 :where([role=option]):focus-visible{outline:2px solid var(--control-focus);outline-offset:-2px}
+
+/* Flowbite dropdowns keep one surface treatment everywhere. */
+[data-testid="flowbite-dropdown"]{min-width:160px;border:1px solid var(--control-line);border-radius:10px;background:var(--control-bg);box-shadow:0 12px 30px #0b1f4226;overflow:hidden}
+[data-testid="flowbite-dropdown"] button{width:100%;min-height:36px;padding:9px 12px;border:0;border-radius:6px;background:transparent;color:var(--control-text);font:12px Inter,Arial,sans-serif;text-align:left;box-shadow:none}
+[data-testid="flowbite-dropdown"] button:hover,
+[data-testid="flowbite-dropdown"] button:focus{background:var(--control-surface);color:var(--control-text);outline:0}
+
+/* Search and checkout contexts only adjust geometry; visual states stay shared. */
+.opg-search .opg-search-field [data-testid="flowbite-dropdown"]{width:160px!important;min-width:160px!important;max-width:calc(100vw - 32px);border:0!important;box-shadow:0 14px 34px #0b1f4226}
+.op-checkout-screen [data-testid="flowbite-dropdown"]{width:max-content;max-width:min(320px,calc(100vw - 32px))}
+
+.opg-saved-create-form [data-testid="flowbite-text-input"]{border-radius:10px}
+.opg-shortlist-card-actions [data-testid="flowbite-button"],
+.opg-saved-empty [data-testid="flowbite-button"],
+.opg-saved-error [data-testid="flowbite-button"]{border:0;border-radius:10px;font:600 12px Inter,Arial,sans-serif}
+.opg-shortlist-rename [data-testid="flowbite-text-input"]{min-width:280px}
+
+@media (max-width: 767px) {
+  .opg-shortlist-rename [data-testid="flowbite-text-input"]{min-width:100%}
+}
 
 /* Navigation geometry is owned here so every route keeps the same header. */
 .zl-navbar .zl-desktop-nav,
@@ -48,6 +68,31 @@
   }
 }
 
+/* Mobile destinations use one bronze state rail instead of competing pill fills. */
+.mobile-bottom-nav > a::after,
+.host-mobile-bottom-nav > a::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: #C49A6C;
+  transform: translateX(-50%);
+  transition: width 160ms ease;
+}
+
+.mobile-bottom-nav > a:hover::after,
+.host-mobile-bottom-nav > a:hover::after {
+  width: 16px;
+}
+
+.mobile-bottom-nav > a[aria-current="page"]::after,
+.host-mobile-bottom-nav > a[aria-current="page"]::after {
+  width: 24px;
+}
+
 /*
  * Shared dark theme. The light theme remains the product default and keeps a
  * white canvas; this layer only activates when html.dark is present.
@@ -78,6 +123,11 @@ html.dark {
   --dm-text: #E7EEF8;
   --dm-muted: #9FB0C6;
   --dm-subtle: #72839A;
+  --control-line: var(--dm-border-strong);
+  --control-text: var(--dm-text);
+  --control-placeholder: var(--dm-subtle);
+  --control-bg: var(--dm-surface);
+  --control-surface: #1D2B43;
 }
 
 html.dark body,
@@ -177,6 +227,21 @@ html.dark :where(select, option, [role="listbox"], [role="menu"]) {
 
 html.dark :where([role="menuitem"], [role="option"]):hover {
   background-color: #1D2B43 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark :where([data-testid="flowbite-dropdown"]) {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+}
+
+html.dark :where([data-testid="flowbite-dropdown"]) button {
+  color: var(--dm-text) !important;
+}
+
+html.dark :where([data-testid="flowbite-dropdown"]) button:hover,
+html.dark :where([data-testid="flowbite-dropdown"]) button:focus {
+  background-color: var(--control-surface) !important;
   color: #FFFFFF !important;
 }
 
