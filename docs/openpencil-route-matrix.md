@@ -23,7 +23,8 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/host/listings` | Host Listings `0:3642` | Implemented with live listing data, lifecycle filters, draft submission, availability controls, deletion, and repository photography; desktop/mobile QA passed |
 | `/host/properties/new`, `/host/properties/:id/edit` | Host Listing Editor `0:4339`, edit `0:3955`, preview `0:4710` | Functional legacy, redesign pending |
 | `/host/calendar`, `/host/calendar/:id` | Host Calendar `0:3699` | Implemented with owner-scoped weekly availability, reservations, manual blocks, iCal feeds, week navigation, and detail panel; desktop/mobile QA passed |
-| `/host/earnings`, `/host/payouts` | Product `0:757`, earnings/payouts `0:4039` | Functional legacy, redesign pending |
+| `/host/earnings` | Host Earnings `0:3761` | Implemented with live period metrics, wallet summary, property earnings, income breakdown, and PDF/CSV reports; desktop/mobile QA passed |
+| `/host/payouts` | Host Earnings `0:3761`, payout details `0:4039` | Functional legacy, redesign pending |
 | `/admin` | Admin `0:6909`, workspace `0:6598` | Redesigned overview, QA ongoing |
 | `/admin/properties` | Admin `0:7015` | Redesigned live listing review, QA ongoing |
 | `/admin/properties/new`, `/admin/properties/:id/edit`, `/admin/properties/:id/calendar` | Admin `0:7015`, Product listing editor `0:3955` | Functional legacy, redesign pending |
