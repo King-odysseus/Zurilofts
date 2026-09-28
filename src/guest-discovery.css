@@ -98,6 +98,11 @@
 .opg-guest-trigger:focus-visible{background:transparent;color:var(--op-navy);box-shadow:none;outline:2px solid var(--op-bronze);outline-offset:2px}
 .opg-guest-trigger svg{width:16px;height:16px;color:var(--op-muted)}
 .opg-guest-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
+.opg-location-trigger{width:100%;height:18px;min-height:18px;justify-content:space-between;gap:8px;padding:0;border:0;background:transparent;color:var(--op-navy);font:500 15px Inter,Arial,sans-serif;box-shadow:none}
+.opg-location-trigger:hover{background:transparent;color:var(--op-ink);box-shadow:none;outline:0}
+.opg-location-trigger:focus-visible{background:transparent;color:var(--op-navy);box-shadow:none;outline:2px solid var(--op-bronze);outline-offset:2px}
+.opg-location-trigger svg{width:16px;height:16px;color:var(--op-muted)}
+.opg-location-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left}
 .opg-datepicker{width:100%;min-width:0}
 .opg-datepicker > div:first-child{width:100%}
 .opg-datepicker input{width:100%;height:18px!important;min-height:18px!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;color:var(--op-navy)!important;font:500 15px Inter,Arial,sans-serif!important}

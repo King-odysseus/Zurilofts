@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Datepicker, Dropdown, DropdownItem, Label, Select } from 'flowbite-react';
+import { Button, Datepicker, Dropdown, DropdownHeader, DropdownItem, Label } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from './api/client.js';
 import { heroImage } from './assets/images.js';
@@ -87,17 +87,28 @@ function SearchForm({ initial = DEFAULT_SEARCH_LOCATION, allKenya = false }) {
     navigate(`/properties${query.size ? `?${query}` : ''}`);
   }
   return <form className="opg-search" onSubmit={submit}>
-    <Label htmlFor="guest-search-where" className="opg-search-field opg-search-where">
+    <div className="opg-search-field opg-search-where">
       <span>Where</span>
-      <Select id="guest-search-where" value={where} onChange={(event) => setWhere(event.target.value)} aria-label="Search area in Kenya" sizing="lg">
-        <option value={ALL_KENYA_SEARCH}>All Kenya</option>
+      <Dropdown
+        inline
+        theme={{ inlineWrapper: 'opg-location-trigger', ...guestDropdownTheme }}
+        label={<span className="opg-location-value">{where}</span>}
+        placement="bottom-start"
+        aria-label="Search area in Kenya"
+      >
+        <DropdownItem onClick={() => setWhere(ALL_KENYA_SEARCH)}>All Kenya</DropdownItem>
         {SEARCH_LOCATION_GROUPS.map((group) => (
-          <optgroup key={group.label} label={group.label}>
-            {group.options.map((location) => <option key={`${group.label}-${location}`} value={location}>{location}</option>)}
-          </optgroup>
+          <Fragment key={group.label}>
+            <DropdownHeader className="opg-location-group">{group.label}</DropdownHeader>
+            {group.options.map((location) => (
+              <DropdownItem key={`${group.label}-${location}`} onClick={() => setWhere(location)}>
+                {location}
+              </DropdownItem>
+            ))}
+          </Fragment>
         ))}
-      </Select>
-    </Label>
+      </Dropdown>
+    </div>
     <Label htmlFor="guest-search-check-in" className="opg-search-field">
       <span>Check in</span>
       <Datepicker
