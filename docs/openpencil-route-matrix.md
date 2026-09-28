@@ -33,7 +33,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/admin/host-applications` | Admin `0:7228`, Product `0:4123` | Implemented with live review metrics, responsive application queue, encrypted document access, full verification detail, audit history, and approve/changes/reject controls; desktop/mobile QA passed |
 | `/admin/promos` | Admin `0:7343`, content/support `0:6855` | Implemented with live offer metrics, searchable responsive board, status controls, property targeting, and Flowbite create/edit form; desktop/mobile QA passed |
 | `/admin/addons` | Admin `0:7343`, content/support `0:6855` | Implemented with live service metrics, searchable responsive board, status controls, pricing/category editing, and per-property assignment toggles; desktop/mobile QA passed |
-| `/admin/guides` | Admin `0:7343`, content/support `0:6855` | Functional legacy, redesign pending |
+| `/admin/guides` | Admin `0:7343`, content/support `0:6855` | Implemented with live guide metrics, a searchable responsive editorial board, Flowbite create/edit controls, publishing state, and delete confirmation; desktop/mobile QA passed |
 | `/admin/feedback` | Admin `0:7343`, governance `0:7458` | Implemented with live rating metrics, searchable rating board, public/private review separation, and responsive review detail; desktop/mobile QA passed |
 | `/admin/messages` | Admin `0:7343`, governance `0:7458` | Implemented with live unread and thread metrics, searchable conversation queue, responsive list-to-thread flow, polling, and a Flowbite reply composer; desktop/mobile QA passed |
 
