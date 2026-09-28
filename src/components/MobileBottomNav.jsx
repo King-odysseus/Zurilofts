@@ -50,7 +50,7 @@ const TABS = [
   },
   {
     key: 'messages',
-    label: 'Messages',
+    label: 'Inbox',
     to: '/inbox',
     match: (p) => p.startsWith('/inbox') || p.startsWith('/messages') || p.startsWith('/disputes'),
     icon: (active) => (
@@ -74,7 +74,7 @@ const TABS = [
 
 /**
  * Role-aware guest mobile bottom navigation (below 768px): Explore, Saved,
- * Trips, Messages, Profile. Hidden during checkout (compact header instead)
+ * Trips, Inbox, Profile. Hidden during checkout (compact header instead)
  * and inside the host/admin workspaces, which have their own navigation.
  * Destinations that require auth (Trips, Messages, Profile's booking
  * history) rely on the existing ProtectedRoute redirect-to-login - no
@@ -99,7 +99,7 @@ function MobileBottomNav() {
   return (
     <nav
       aria-label="Primary"
-      className="mobile-bottom-nav fixed inset-x-4 bottom-3 z-40 mx-auto flex max-w-[358px] rounded-2xl bg-[#0B1F42] px-2 py-2 text-white shadow-[0_12px_30px_rgba(11,31,66,0.28)] md:hidden"
+      className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-[390px] items-center gap-1 rounded-full border border-white/10 bg-[#0B1F42] p-1.5 text-white shadow-[0_16px_36px_rgba(11,31,66,0.34)] backdrop-blur md:hidden"
     >
       {TABS.map((tab) => {
         const active = tab.match(location.pathname);
@@ -108,8 +108,8 @@ function MobileBottomNav() {
             key={tab.key}
             to={tab.to}
             aria-current={active ? 'page' : undefined}
-            className={`flex min-h-[48px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1 text-[10px] font-semibold transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white ${
-              active ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'
+            className={`flex min-h-[54px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full px-1 py-1.5 text-[10px] font-semibold leading-none transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white ${
+              active ? 'bg-white/16 text-white' : 'text-white/80 hover:bg-white/10 hover:text-white'
             }`}
           >
             {tab.icon(active)}

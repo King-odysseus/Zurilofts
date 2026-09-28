@@ -1,7 +1,7 @@
 import { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Dropdown from './Dropdown.jsx';
+import { Select, TextInput } from 'flowbite-react';
 import Spinner from './Spinner.jsx';
 import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 
@@ -78,22 +78,14 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
 
       {/* Filters + View Toggle */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 px-4 md:px-0">
-        <input className="op-place-search" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search places, areas or categories" aria-label="Search places" />
-        <Dropdown
-          value={areaFilter}
-          onChange={setAreaFilter}
-          options={areaOptions}
-          triggerClassName="w-full min-w-[160px] rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2 text-sm text-[#0B1F42] shadow-sm sm:w-auto"
-          ariaLabel="Filter by area"
-        />
+        <TextInput className="op-place-search-wrap" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search places, areas or categories" aria-label="Search places" />
+        <Select className="op-place-select-wrap" value={areaFilter} onChange={(event) => setAreaFilter(event.target.value)} aria-label="Filter by area">
+          {areaOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+        </Select>
         {catOptions && (
-          <Dropdown
-            value={categoryFilter}
-            onChange={setCategoryFilter}
-            options={catOptions}
-            triggerClassName="w-full min-w-[160px] rounded-[10px] border border-[#E3E8EF] bg-white px-4 py-2 text-sm text-[#0B1F42] shadow-sm sm:w-auto"
-            ariaLabel="Filter by category"
-          />
+          <Select className="op-place-select-wrap" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)} aria-label="Filter by category">
+            {catOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+          </Select>
         )}
         <button className="op-place-clear" type="button" onClick={() => { setQuery(''); setAreaFilter('all'); setCategoryFilter('all'); }}>Clear all</button><span className="op-place-count">{filtered.length} places</span>
         {/* Map/Grid toggle */}

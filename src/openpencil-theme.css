@@ -13,7 +13,7 @@
   --op-shadow: 0 14px 42px rgba(11, 31, 66, .08);
 }
 
-.zl-app { min-height: 100vh; background: var(--op-canvas); color: var(--op-ink); }
+.zl-app { min-height: 100vh; background: #fff; color: var(--op-ink); }
 .zl-app, .zl-app input, .zl-app button, .zl-app select, .zl-app textarea { font-family: Inter, Arial, sans-serif; }
 .zl-app h1, .zl-app h2, .zl-app h3, .zl-app b, .zl-app strong { font-family: Montserrat, Inter, Arial, sans-serif; }
 .zl-app h1, .zl-app h2, .zl-app h3, .zl-app p { margin-top: 0; }
@@ -142,7 +142,7 @@
 }
 
 /* Checkout is an independent journey in the design: it deliberately omits global navigation. */
-.op-checkout { min-height: 100vh; background: var(--op-canvas); color: var(--op-ink); }
+.op-checkout { min-height: 100vh; background: #fff; color: var(--op-ink); }
 .op-checkout-header { height: 72px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 max(24px, calc((100vw - 1200px) / 2)); background: #fff; border-bottom: 1px solid var(--op-line); }
 .op-checkout-header > a:first-child, .op-checkout-header > span { color: var(--op-muted); font-size: 13px; font-weight: 700; text-decoration: none; }
 .op-checkout-header > span { text-align: right; }

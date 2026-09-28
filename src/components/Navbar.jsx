@@ -1,12 +1,12 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Avatar, Dropdown, DropdownDivider, DropdownItem } from 'flowbite-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
-import Dropdown from './Dropdown.jsx';
 import MobileBottomNav from './MobileBottomNav.jsx';
 import { languageOptions } from '../i18n/translations.js';
 
@@ -41,7 +41,7 @@ function Navbar({ solid = false }) {
 
   const { user, isAuthenticated, logout } = useAuth();
   const { mode, setMode, canSelectHosting } = useMode();
-  const { lang, setLang, t } = useLanguage();
+  const { setLang, t } = useLanguage();
   // Only an approved HOST account has verified host access. ADMINS are excluded
   // here (they administer the platform through /admin), so they get no Payouts
   // or other verified-host affordances.
@@ -574,23 +574,32 @@ function Navbar({ solid = false }) {
                 </div>
               </>
             ) : (
-              <div className="hidden md:flex items-center gap-2">
-                <Link to="/login" className={`px-3 py-2 rounded-lg text-sm font-semibold ${needsWhiteNav ? 'text-[#0B1F42]' : 'text-white'}`}>{t('nav.signIn')}</Link>
-                <Link to="/register" className={`px-4 py-2 rounded-lg text-sm font-semibold ${needsWhiteNav ? 'bg-[#C49A6C] text-white' : 'bg-white text-[#0B1F42]'}`}>{t('nav.createAccount')}</Link>
-              </div>
+              <Dropdown
+                inline
+                theme={{ inlineWrapper: 'zl-header-avatar-button' }}
+                label={<><span className="sr-only">Open account menu</span><Avatar placeholderInitials="?" rounded size="sm" className="zl-header-avatar" /></>}
+                arrowIcon={false}
+                placement="bottom-end"
+                aria-label="Open account menu"
+              >
+                <DropdownItem onClick={() => navigate('/login')}>{t('nav.signIn')}</DropdownItem>
+                <DropdownItem onClick={() => navigate('/register')}>{t('nav.createAccount')}</DropdownItem>
+                <DropdownDivider />
+                <DropdownItem onClick={() => navigate('/register?role=HOST')}>{t('nav.becomeHost')}</DropdownItem>
+              </Dropdown>
             )}
 
             {/* Language switcher */}
             <Dropdown
-              value={lang}
-              onChange={setLang}
-              options={languageOptions}
-              ariaLabel={t('nav.language')}
-              triggerClassName={`rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
-                needsWhiteNav ? 'text-[#0B1F42] hover:bg-[#F6EFE7]' : 'text-white hover:bg-white/10'
-              }`}
-              menuClassName="right-0"
-            />
+              inline
+              theme={{ inlineWrapper: `zl-header-icon-button ${needsWhiteNav ? '' : 'text-white'}` }}
+              label={<><span className="sr-only">{t('nav.language')}</span><span className={`zl-header-action-icon ${needsWhiteNav ? '' : 'text-white'}`} aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 21a9 9 0 100-18 9 9 0 000 18z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.45 3.3 5.45 3.3 9S14.2 18.55 12 21c-2.2-2.45-3.3-5.45-3.3-9S9.8 5.45 12 3z" /></svg></span></>}
+              arrowIcon={false}
+              placement="bottom-end"
+              aria-label={t('nav.language')}
+            >
+              {languageOptions.map((option) => <DropdownItem key={option.value} onClick={() => setLang(option.value)}>{option.label}</DropdownItem>)}
+            </Dropdown>
 
             {/* Hamburger */}
             <button

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BrowserRouter, Link, useLocation } from "react-router-dom";
+import { BrowserRouter, Link, useLocation, useNavigate } from "react-router-dom";
+import { Avatar, Dropdown, DropdownDivider, DropdownItem } from "flowbite-react";
 import logo from "./assets/zurilofts-logo.png";
 import { GuestFooter, GuestHome, GuestStays } from './GuestDiscovery.jsx';
 import RealPropertyPage from './components/PropertyPage.jsx';
@@ -27,16 +28,17 @@ import TripHubPage from './pages/TripHubPage.jsx';
 import OAuthCallback from './pages/OAuthCallback.jsx';
 import TrustPage from './pages/TrustPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import MobileBottomNav from './components/MobileBottomNav.jsx';
 import WorkspaceRoutes from './WorkspaceRoutes.jsx';
-import Dropdown from './components/Dropdown.jsx';
 import { useAuth } from './context/AuthContext.jsx';
 import { useLanguage } from './context/LanguageContext.jsx';
 import { languageOptions } from './i18n/translations.js';
 
 
 function Header({ menu }) {
-  const { lang, setLang, t } = useLanguage();
+  const { setLang, t } = useLanguage();
   const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   return <header className="zl-header">
     <Link to="/" className="zl-brand"><img src={logo} alt="ZuriLofts" /><span>ZuriLofts</span></Link>
     <nav className="zl-desktop-nav" aria-label="Main navigation">
@@ -44,15 +46,37 @@ function Header({ menu }) {
     </nav>
     <div className="zl-header-actions">
       <Link className="zl-header-search" to="/properties">⌕ <span>{t('nav.searchStays')}</span></Link>
-      <Link className="zl-host-link" to="/host/today">{t('nav.becomeHost')}</Link>
-      {isAuthenticated ? <Link className="zl-header-auth-link" to="/profile">{t('nav.myProfile')}</Link> : <><Link className="zl-header-auth-link" to="/login">{t('nav.signIn')}</Link><Link className="zl-header-register" to="/register">{t('nav.createAccount')}</Link></>}
-      <Dropdown value={lang} onChange={setLang} options={languageOptions} ariaLabel={t('nav.language')} triggerClassName="zl-header-language" menuClassName="zl-header-language-menu" />
+      {isAuthenticated && <Link className="zl-header-auth-link" to="/profile">{t('nav.myProfile')}</Link>}
+      <Dropdown
+        inline
+        theme={{ inlineWrapper: 'zl-header-icon-button' }}
+        label={<><span className="sr-only">{t('nav.language')}</span><span className="zl-header-action-icon" aria-hidden="true"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 21a9 9 0 100-18 9 9 0 000 18z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.45 3.3 5.45 3.3 9S14.2 18.55 12 21c-2.2-2.45-3.3-5.45-3.3-9S9.8 5.45 12 3z" /></svg></span></>}
+        arrowIcon={false}
+        placement="bottom-end"
+        aria-label={t('nav.language')}
+      >
+        {languageOptions.map((option) => <DropdownItem key={option.value} onClick={() => setLang(option.value)}>{option.label}</DropdownItem>)}
+      </Dropdown>
+      {!isAuthenticated && (
+        <Dropdown
+          inline
+          theme={{ inlineWrapper: 'zl-header-avatar-button' }}
+          label={<><span className="sr-only">Open account menu</span><Avatar placeholderInitials="?" rounded size="sm" className="zl-header-avatar" /></>}
+          arrowIcon={false}
+          placement="bottom-end"
+          aria-label="Open account menu"
+        >
+          <DropdownItem onClick={() => navigate('/login')}>{t('nav.signIn')}</DropdownItem>
+          <DropdownItem onClick={() => navigate('/register')}>{t('nav.createAccount')}</DropdownItem>
+          <DropdownDivider />
+          <DropdownItem onClick={() => navigate('/register?role=HOST')}>{t('nav.becomeHost')}</DropdownItem>
+        </Dropdown>
+      )}
       <Link className="zl-icon-btn" to="/favourites" aria-label={t('nav.saved')}>♡</Link>
       <button className="zl-menu-btn" onClick={menu} aria-label="Open menu">☰</button>
     </div>
   </header>;
 }
-function MobileNav() { return <nav className="zl-mobile-nav" aria-label="Mobile navigation"><Link to="/properties"><span>⌕</span><small>Explore</small></Link><Link to="/favourites"><span>♡</span><small>Saved</small></Link><Link to="/trips"><span>♧</span><small>Trips</small></Link><Link to="/inbox"><span>◌</span><small>Inbox</small></Link><Link to="/profile"><span>♙</span><small>Profile</small></Link></nav>; }
 function Home() { return <GuestHome />; }
 function Explore() { return <GuestStays />; }
 function Shell() {
@@ -61,17 +85,10 @@ function Shell() {
   const { user, isAuthenticated } = useAuth();
   const { lang, setLang, t } = useLanguage();
   if (pathname.startsWith('/host') || pathname.startsWith('/admin')) return <WorkspaceRoutes />;
-  if (pathname.startsWith('/property/')) return <RealPropertyPage />;
   if (pathname.startsWith('/booking/')) return <BookingPage />;
   if (pathname === '/login') return <LoginPage />;
   if (pathname === '/register') return <RegisterPage />;
   if (pathname === '/payment/callback') return <PaymentCallback />;
-  if (pathname === '/places') return <PlacesPage />;
-  if (pathname === '/restaurants') return <RestaurantsPage />;
-  if (pathname === '/guides') return <GuidesPage />;
-  if (pathname.startsWith('/guides/')) return <GuideDetailPage />;
-  if (pathname === '/privacy') return <PrivacyPage />;
-  if (pathname === '/terms') return <TermsPage />;
   if (pathname.startsWith('/s/')) return <SharedShortlistPage />;
   if (pathname === '/trips') return <ProtectedRoute><TripHubPage /></ProtectedRoute>;
   if (pathname === '/booking-history') return <ProtectedRoute><BookingHistoryPage /></ProtectedRoute>;
@@ -87,13 +104,20 @@ function Shell() {
   let content;
   if (pathname === '/') content = <Home />;
   else if (pathname === '/properties') content = <Explore />;
-  else return <NotFoundPage />;
+  else if (pathname.startsWith('/property/')) content = <RealPropertyPage />;
+  else if (pathname === '/places') content = <PlacesPage />;
+  else if (pathname === '/restaurants') content = <RestaurantsPage />;
+  else if (pathname === '/guides') content = <GuidesPage />;
+  else if (pathname.startsWith('/guides/')) content = <GuideDetailPage />;
+  else if (pathname === '/privacy') content = <PrivacyPage />;
+  else if (pathname === '/terms') content = <TermsPage />;
+  else content = <NotFoundPage />;
   const closeMenu = () => setMenu(false);
   return <div className="zl-app">
     <Header menu={() => setMenu(true)} />
     {content}
-    {(pathname === '/' || pathname === '/properties') && <GuestFooter />}
-    <MobileNav />
+    <GuestFooter />
+    <MobileBottomNav />
     {menu && <div className="zl-modal-backdrop" onClick={closeMenu}>
       <aside className="zl-menu-modal" onClick={(event) => event.stopPropagation()} aria-label="Site menu">
         <div className="zl-modal-top">
@@ -113,7 +137,19 @@ function Shell() {
           </>}
         </div>
         <label className="zl-menu-language-label">{t('nav.language')}</label>
-        <Dropdown value={lang} onChange={setLang} options={languageOptions} ariaLabel={t('nav.language')} triggerClassName="zl-menu-language" />
+        <Dropdown
+          inline
+          theme={{ inlineWrapper: 'zl-menu-language' }}
+          label={languageOptions.find((option) => option.value === lang)?.label || t('nav.language')}
+          placement="top-start"
+          aria-label={t('nav.language')}
+        >
+          {languageOptions.map((option) => (
+            <DropdownItem key={option.value} onClick={() => setLang(option.value)}>
+              {option.label}
+            </DropdownItem>
+          ))}
+        </Dropdown>
       </aside>
     </div>}
   </div>;

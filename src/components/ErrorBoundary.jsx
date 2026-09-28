@@ -41,7 +41,7 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#F7F4EF] flex flex-col">
+        <div className="min-h-screen bg-white flex flex-col">
           <Navbar />
           <div className="flex-1 flex items-center justify-center px-6">
             <div className="text-center max-w-md">

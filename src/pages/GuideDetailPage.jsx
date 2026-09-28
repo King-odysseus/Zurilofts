@@ -1,9 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
-import Navbar from '../components/Navbar.jsx';
-import Footer from '../components/Footer.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
+
+const detailImages = [
+  '/images/place-sarit-centre.jpg',
+  '/images/place-karura-forest.jpg',
+  '/images/eat-hero.jpg',
+  '/images/place-nairobi-national-museum.jpg',
+];
 
 function GuideDetailPage() {
   const { slug: routeSlug } = useParams();
@@ -35,76 +40,64 @@ function GuideDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
+      <main className="op-public-page op-guide-detail-page">
+        <div className="op-content-container op-public-loader">
           <Spinner />
         </div>
-        <Footer />
-      </div>
+      </main>
     );
   }
 
   if (notFound || !post) {
     return (
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
-          <div className="text-center max-w-md px-6">
-            <h1 className="text-3xl font-bold text-[#0B0B45] mb-4">Guide Not Found</h1>
-            <p className="text-[#6b7280] mb-6">This guide may have been removed or moved.</p>
-            <Link to="/guides" className="inline-block bg-[#C49A6C] text-white px-6 py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+      <main className="op-public-page op-guide-detail-page">
+        <div className="op-content-container op-public-loader">
+          <div className="op-guide-not-found">
+            <span>Guide not found</span>
+            <h1>This story has moved</h1>
+            <p>The guide may have been removed or its address changed.</p>
+            <Link to="/guides" className="op-primary-action">
               Browse Guides
             </Link>
           </div>
         </div>
-        <Footer />
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-
-      {/* Back link */}
-      <div className="pt-24 max-w-3xl mx-auto px-4 sm:px-6">
+    <main className="op-public-page op-guide-detail-page">
+      <article className="op-content-container op-guide-detail">
         <Link
           to="/guides"
-          className="inline-flex items-center gap-1.5 text-sm text-[#6b7280] hover:text-[#C49A6C] transition-colors"
+          className="op-directory-back"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back to Guides
         </Link>
-      </div>
 
-      <article className="max-w-3xl mx-auto px-4 sm:px-6 pb-16">
-        {/* Cover image */}
-        {post.coverImage && (
-          <img
-            src={post.coverImage}
-            alt={post.title}
-            className="w-full aspect-[2/1] object-cover rounded-2xl mt-4 mb-8"
-          />
-        )}
+        <img
+          src={post.coverImage || detailImages[0]}
+          alt={post.title}
+          className="op-guide-detail-cover"
+        />
 
-        {/* Title + meta */}
-        <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-3">{post.title}</h1>
-        <p className="text-[#6b7280] text-sm mb-8">
+        <header className="op-guide-detail-header">
+          <span className="op-eyebrow">City guide</span>
+          <h1>{post.title}</h1>
+          <p>
           {new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-        </p>
+          </p>
+        </header>
 
-        {/* Body */}
         <div
-          className="prose prose-lg max-w-none prose-headings:text-[#0B0B45] prose-a:text-[#C49A6C] prose-img:rounded-2xl prose-p:text-[#1f2937] prose-li:text-[#1f2937]"
+          className="op-guide-detail-content"
           dangerouslySetInnerHTML={{ __html: post.body }}
         />
       </article>
-
-      <Footer />
-    </div>
+    </main>
   );
 }
 

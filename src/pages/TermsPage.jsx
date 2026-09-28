@@ -1,19 +1,29 @@
-import Navbar from '../components/Navbar.jsx';
-import Footer from '../components/Footer.jsx';
+import { useRef } from 'react';
+import { LegalPageContentsDesktop, LegalPageContentsMobile } from '../components/LegalPageContents.jsx';
 
 function TermsPage() {
   const lastUpdated = '17 June 2026';
   const companyName = 'ZuriLofts';
+  const articleRef = useRef(null);
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <div className="pt-24 pb-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 md:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-[#0B0B45] mb-2">Terms of Service</h1>
-          <p className="text-sm text-[#6b7280] mb-8">Last updated: {lastUpdated}</p>
+    <main className="op-public-page op-legal-page">
+      <header className="op-public-hero op-legal-hero">
+        <div className="op-content-container">
+          <nav className="op-breadcrumbs" aria-label="Breadcrumb">
+            <a href="/">Home</a><span>/</span><span>Terms</span>
+          </nav>
+          <span className="op-eyebrow">Legal</span>
+          <h1>Terms of Service</h1>
+          <p>Last updated: {lastUpdated}</p>
+        </div>
+      </header>
 
-          <div className="prose prose-slate max-w-none space-y-8 text-[#1f2937] leading-relaxed">
+      <div className="op-content-container op-legal-layout">
+        <div className="op-legal-aside"><LegalPageContentsDesktop containerRef={articleRef} /></div>
+        <article className="op-legal-article" ref={articleRef}>
+          <LegalPageContentsMobile containerRef={articleRef} />
+          <div className="op-legal-content prose prose-slate max-w-none text-[#1f2937] leading-relaxed">
 
             {/* 1. Acceptance */}
             <section>
@@ -520,10 +530,9 @@ function TermsPage() {
             </section>
 
           </div>
-        </div>
+        </article>
       </div>
-      <Footer />
-    </div>
+    </main>
   );
 }
 

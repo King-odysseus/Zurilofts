@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Button, Dropdown, DropdownItem, Label, TextInput } from 'flowbite-react';
 import apiClient from './api/client.js';
 import { heroImage } from './assets/images.js';
 import { useAuth } from './context/AuthContext.jsx';
@@ -62,11 +63,39 @@ function SearchForm({ compact = false, initial = '' }) {
     navigate(`/properties${query.size ? `?${query}` : ''}`);
   }
   return <form className={`opg-search ${compact ? 'opg-search-compact' : ''}`} onSubmit={submit}>
-    <label className="opg-search-where"><span>Where</span><input value={where} onChange={(event) => setWhere(event.target.value)} placeholder="Anywhere in Nairobi" aria-label="Search location or stay" /></label>
-    <label><span>Check in</span><input type="date" value={checkIn} onChange={(event) => setCheckIn(event.target.value)} aria-label="Check in" /></label>
-    <label><span>Check out</span><input type="date" min={checkIn || undefined} value={checkOut} onChange={(event) => setCheckOut(event.target.value)} aria-label="Check out" /></label>
-    <label><span>Guests</span><select value={guests} onChange={(event) => setGuests(Number(event.target.value))} aria-label="Guests">{[1,2,3,4,5,6,7,8].map((count) => <option key={count} value={count}>{count} {count === 1 ? 'guest' : 'guests'}</option>)}</select></label>
-    <button type="submit" aria-label="Search stays"><span className="opg-search-desktop-label">⌕</span><span className="opg-search-mobile-label">Search stays</span></button>
+    <Label htmlFor="guest-search-where" className="opg-search-field opg-search-where">
+      <span>Where</span>
+      <TextInput id="guest-search-where" value={where} onChange={(event) => setWhere(event.target.value)} placeholder="Anywhere in Nairobi" aria-label="Search location or stay" sizing="lg" />
+    </Label>
+    <Label htmlFor="guest-search-check-in" className="opg-search-field">
+      <span>Check in</span>
+      <TextInput id="guest-search-check-in" type="date" value={checkIn} onChange={(event) => setCheckIn(event.target.value)} aria-label="Check in" sizing="lg" />
+    </Label>
+    <Label htmlFor="guest-search-check-out" className="opg-search-field">
+      <span>Check out</span>
+      <TextInput id="guest-search-check-out" type="date" min={checkIn || undefined} value={checkOut} onChange={(event) => setCheckOut(event.target.value)} aria-label="Check out" sizing="lg" />
+    </Label>
+    <div className="opg-search-field">
+      <span>Guests</span>
+      <Dropdown
+        inline
+        theme={{ inlineWrapper: 'opg-guest-trigger' }}
+        label={<span className="opg-guest-value">{guests} {guests === 1 ? 'guest' : 'guests'}</span>}
+        placement="bottom-end"
+      >
+        {[1, 2, 3, 4, 5, 6, 7, 8].map((count) => (
+          <DropdownItem key={count} onClick={() => setGuests(count)}>
+            {count} {count === 1 ? 'guest' : 'guests'}
+          </DropdownItem>
+        ))}
+      </Dropdown>
+    </div>
+    <Button type="submit" aria-label="Search stays" className="opg-search-submit" pill>
+      <span className="opg-search-desktop-label" aria-hidden="true">
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+      </span>
+      <span className="opg-search-mobile-label">Search stays</span>
+    </Button>
   </form>;
 }
 
