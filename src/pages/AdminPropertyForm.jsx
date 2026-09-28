@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Button, Checkbox, Label, Select, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
-import { findSearchLocation, SEARCH_LOCATION_GROUPS } from '../data/searchLocations.js';
+import { findSearchLocation, isNairobiSearchLocation, SEARCH_LOCATION_GROUPS } from '../data/searchLocations.js';
 
 const EMPTY = {
   title: '',
@@ -44,8 +44,11 @@ function linesToArray(text) {
 function buildLocationLabel(location, neighborhood) {
   const details = String(location || '').trim();
   const area = String(neighborhood || '').trim();
-  if (!area || details.toLowerCase().includes(area.toLowerCase())) return details;
-  return details ? `${details}, ${area}` : area;
+  const label = !area || details.toLowerCase().includes(area.toLowerCase()) ? details : details ? `${details}, ${area}` : area;
+  if (isNairobiSearchLocation(area) && !label.toLowerCase().includes('nairobi')) {
+    return `${label}, Nairobi`;
+  }
+  return label;
 }
 
 function AdminPropertyForm() {

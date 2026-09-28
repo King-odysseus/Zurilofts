@@ -105,6 +105,12 @@ export const SEARCH_LOCATION_GROUPS = [
 ];
 
 export const SEARCH_LOCATIONS = SEARCH_LOCATION_GROUPS.flatMap((group) => group.options);
+export const NAIROBI_SEARCH_LOCATIONS = SEARCH_LOCATION_GROUPS[0].options;
+
+export function isNairobiSearchLocation(value) {
+  const normalized = String(value || '').trim().toLowerCase();
+  return NAIROBI_SEARCH_LOCATIONS.some((location) => location.toLowerCase() === normalized);
+}
 
 // Prefer the most specific matching area when deriving an area from legacy
 // free-text locations such as "Kilimani, Ngong Road, Nairobi".
