@@ -25,13 +25,15 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/host/calendar`, `/host/calendar/:id` | Host Calendar `0:3699` | Implemented with owner-scoped weekly availability, reservations, manual blocks, iCal feeds, week navigation, and detail panel; desktop/mobile QA passed |
 | `/host/earnings` | Host Earnings `0:3761` | Implemented with live period metrics, wallet summary, property earnings, income breakdown, and PDF/CSV reports; desktop/mobile QA passed |
 | `/host/payouts` | Host Earnings `0:3761`, payout details `0:4039` | Implemented with live wallet, destination, WHT statement, CSV/PDF export, and payout history; desktop/mobile QA passed |
-| `/admin` | Admin `0:6909`, workspace `0:6598` | Redesigned overview, QA ongoing |
-| `/admin/properties` | Admin `0:7015` | Redesigned live listing review, QA ongoing |
+| `/admin` | Admin `0:6909`, workspace `0:6598` | Implemented with grouped admin navigation, priority queue, responsive metrics, and Flowbite disclosures; desktop/mobile/dark QA passed |
+| `/admin/properties` | Admin `0:7015` | Implemented with live listing review, status filters, responsive rows, missing-image treatment, and review decisions; desktop/mobile QA passed |
 | `/admin/properties/new`, `/admin/properties/:id/edit`, `/admin/properties/:id/calendar` | Admin `0:7015`, Product listing editor `0:3955` | Implemented with the shared Flowbite listing editor, progress rail, guest preview, responsive admin calendar, Lucide icons, and light/dark QA |
 | `/admin/bookings` | Admin `0:7116` | Implemented with live reservation metrics, status filters, responsive mobile card rows, and Flowbite actions; desktop/mobile QA passed |
 | `/admin/earnings`, `/admin/payouts` | Admin insights `0:7570`, payments `0:7116` | Implemented with live finance metrics, Flowbite-styled line and radial gauge charts, responsive ledgers, exports, and payout actions; desktop/mobile/dark-mode QA passed |
 | `/admin/users` | Admin `0:7228` | Implemented with live account metrics, responsive people board, Flowbite role/search controls, payout editing, suspension, and account erasure; desktop/mobile QA passed |
 | `/admin/host-applications` | Admin `0:7228`, Product `0:4123` | Implemented with live review metrics, responsive application queue, encrypted document access, full verification detail, audit history, and approve/changes/reject controls; desktop/mobile QA passed |
+| `/admin/trust-safety`, `/admin/identity-verifications`, `/admin/disputes` | Admin `0:7228` | Implemented with live verification and dispute queues, Flowbite filters, secure document access, resolution timelines, private notes, and account-linked actions; desktop/mobile/dark QA passed |
+| `/admin/governance`, `/admin/audit` | Admin `0:7458` | Implemented with live audit metrics, searchable activity records, role distribution, responsive detail dialogs, and governance history; desktop/mobile/dark QA passed |
 | `/admin/promos` | Admin `0:7343`, content/support `0:6855` | Implemented with live offer metrics, searchable responsive board, status controls, property targeting, and Flowbite create/edit form; desktop/mobile QA passed |
 | `/admin/addons` | Admin `0:7343`, content/support `0:6855` | Implemented with live service metrics, searchable responsive board, status controls, pricing/category editing, and per-property assignment toggles; desktop/mobile QA passed |
 | `/admin/guides` | Admin `0:7343`, content/support `0:6855` | Implemented with live guide metrics, a searchable responsive editorial board, Flowbite create/edit controls, publishing state, and delete confirmation; desktop/mobile QA passed |
@@ -46,6 +48,7 @@ OpenPencil has composite rather than standalone frames for several legacy CRUD s
 - Header guest actions are grouped under the avatar menu; language is a circular translate control.
 - Flowbite controls are styled through Tailwind's current `flowbite-react/dist` content path, with shared input/select/dropdown geometry from `src/flowbite-controls.css`.
 - Bronze action buttons use white text.
+- Admin desktop navigation is grouped by Overview, Operations, People & trust, Finance, and Content so daily work stays nearest the top.
 - Mobile `Inbox` navigation matches the OpenPencil mobile tab naming.
 - `GuestShell` owns the shared guest header and footer. Account, verification, payment-result, saved, and public pages must not render another `Navbar` or footer.
 - Every route that can be entered from another in-app page exposes a back control. It returns to actual history when available and otherwise uses the route-family fallback in `RouteBackButton`.
