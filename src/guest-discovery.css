@@ -88,8 +88,7 @@
 .opg-search .opg-search-field>span{display:block;margin:0;text-transform:uppercase;color:#64748b;font:700 11px Montserrat,Arial,sans-serif;letter-spacing:.02em;line-height:14px}
 .opg-search .opg-search-field>div{width:100%}
 .opg-search .opg-search-field input,.opg-search .opg-search-field select{width:100%;min-width:0;min-height:18px;height:18px;border:0;border-radius:0;background:transparent;box-shadow:none;outline:0;color:var(--op-navy);font:500 15px Inter,Arial,sans-serif;padding:0}
-.opg-search .opg-search-field input:focus-visible,.opg-search .opg-search-field select:focus-visible{border:0;box-shadow:none;outline:2px solid var(--op-bronze);outline-offset:2px}
-.opg-search .opg-search-field input:focus-visible{outline:0;box-shadow:0 0 0 2px #c49a6c40}
+.opg-search .opg-search-field input:focus,.opg-search .opg-search-field input:focus-visible,.opg-search .opg-search-field select:focus,.opg-search .opg-search-field select:focus-visible{border:0!important;box-shadow:none!important;outline:0!important}
 .opg-guest-trigger{width:100%;height:18px;min-height:18px;justify-content:space-between;gap:8px;padding:0;border:0;background:transparent;color:var(--op-navy);font:500 15px Inter,Arial,sans-serif;box-shadow:none}
 .opg-guest-trigger:hover{background:transparent;color:var(--op-ink);box-shadow:none;outline:0}
 .opg-guest-trigger:focus-visible{background:transparent;color:var(--op-navy);box-shadow:none;outline:2px solid var(--op-bronze);outline-offset:2px}
