@@ -120,7 +120,7 @@
 }
 .op-admin-listing-review .op-admin-metrics article:nth-child(2){background:#dcf3e3}.op-admin-listing-review .op-admin-metrics article:nth-child(3){background:#e8edf7}
 .op-admin-listing-review .op-admin-metrics article:nth-child(4){background:#fae1de}
-.op-admin-add-link{background:#9f7142;color:#fff;text-decoration:none;border-radius:8px;padding:11px 16px;font-size:12px;font-weight:700;white-space:nowrap}
+.op-admin-add-link{display:inline-flex;align-items:center;gap:6px;background:#9f7142;color:#fff;text-decoration:none;border-radius:8px;padding:11px 16px;font-size:12px;font-weight:700;white-space:nowrap}
 .op-admin-review-filter{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:0 0 12px;font-size:12px}
 .op-admin-review-select{width:210px!important}
 .op-admin-review-filter select{padding:7px 10px;min-height:36px;border:1px solid #d1d5db;border-radius:8px;background:#fff;color:#0b1f42}
@@ -128,7 +128,7 @@
 .op-admin-listing-row>button{border:0;border-radius:8px;background:#e8edf7;color:#0b1f42;padding:8px 12px;font-size:11px;font-weight:700}
 .op-admin-listing-row .op-admin-urgent{text-transform:capitalize;white-space:nowrap}
 .op-admin-error{background:#fce8e6;color:#a6332c;border-radius:8px;padding:10px 12px;font-size:12px}
-.op-admin-review-backdrop{position:fixed;inset:0;z-index:80;background:#0b1f4288;display:grid;place-items:center;padding:20px}.op-admin-review-dialog{background:#fff;width:min(490px,100%);border-radius:16px;padding:24px;box-shadow:0 20px 50px #0b1f4230}.op-admin-review-dialog h2{font:700 20px Montserrat,Arial,sans-serif}.op-admin-review-dialog p{font-size:13px;color:#6e7686;margin:10px 0}.op-admin-review-dialog>a{font-size:12px;color:#3b6fd4}.op-admin-review-dialog label{display:block;font-size:12px;font-weight:700;margin:20px 0 7px}.op-admin-review-dialog textarea{width:100%;padding:10px;resize:vertical}.op-admin-review-dialog>div{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.op-admin-review-dialog button{border:1px solid #e2dad0;background:#fff;color:#0b1f42;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:700}.op-admin-review-dialog button:last-child{background:#9f7142;color:#fff;border-color:#9f7142}.op-admin-review-dialog button:disabled{opacity:.55}
+.op-admin-review-backdrop{position:fixed;inset:0;z-index:80;background:#0b1f4288;display:grid;place-items:center;padding:20px}.op-admin-review-dialog{background:#fff;width:min(490px,100%);border-radius:16px;padding:24px;box-shadow:0 20px 50px #0b1f4230}.op-admin-review-dialog h2{font:700 20px Montserrat,Arial,sans-serif}.op-admin-review-dialog p{font-size:13px;color:#6e7686;margin:10px 0}.op-admin-review-dialog>a{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#3b6fd4}.op-admin-review-dialog label{display:block;font-size:12px;font-weight:700;margin:20px 0 7px}.op-admin-review-dialog textarea{width:100%;padding:10px;resize:vertical}.op-admin-review-dialog>div{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.op-admin-review-dialog button{border:1px solid #e2dad0;background:#fff;color:#0b1f42;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:700}.op-admin-review-dialog button:last-child{background:#9f7142;color:#fff;border-color:#9f7142}.op-admin-review-dialog button:disabled{opacity:.55}
 @media(max-width:650px){.op-admin-listing-row{flex-wrap:wrap}.op-admin-listing-row>div{flex:1 1 calc(100% - 70px)}.op-admin-listing-row .op-admin-urgent{margin-left:55px}}
 
 .op-admin-people-heading{margin-bottom:28px}
