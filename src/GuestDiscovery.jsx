@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Datepicker, Dropdown, DropdownHeader, DropdownItem, Label } from 'flowbite-react';
+import { Button, Datepicker, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Label } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from './api/client.js';
 import { heroImage } from './assets/images.js';
@@ -13,13 +13,6 @@ import { openConsentManager } from './utils/consent.js';
 import { ALL_KENYA_SEARCH, DEFAULT_SEARCH_LOCATION, SEARCH_LOCATION_GROUPS } from './data/searchLocations.js';
 
 const categories = ['All stays', 'Apartments', 'Studios', 'Penthouses', 'Villas'];
-const guestDropdownTheme = {
-  floating: {
-    style: {
-      auto: 'border-0 bg-white text-[#0B1F42] shadow-[0_14px_36px_rgba(11,31,66,0.16)]',
-    },
-  },
-};
 const guides = [
   { title: 'Westlands After Dark', label: 'Nightlife', image: '/images/place-sarit-centre.jpg' },
   { title: 'Kilimani Coffee Guide', label: 'Cafés', image: '/images/eat-artcaffe.jpg' },
@@ -91,14 +84,15 @@ function SearchForm({ initial = DEFAULT_SEARCH_LOCATION, allKenya = false }) {
       <span>Where</span>
       <Dropdown
         inline
-        theme={{ inlineWrapper: 'opg-location-trigger', ...guestDropdownTheme }}
+        theme={{ inlineWrapper: 'opg-location-trigger' }}
         label={<span className="opg-location-value">{where}</span>}
         placement="bottom-start"
         aria-label="Search area in Kenya"
       >
         <DropdownItem onClick={() => setWhere(ALL_KENYA_SEARCH)}>All Kenya</DropdownItem>
-        {SEARCH_LOCATION_GROUPS.map((group) => (
+        {SEARCH_LOCATION_GROUPS.map((group, index) => (
           <Fragment key={group.label}>
+            {index > 0 && <DropdownDivider />}
             <DropdownHeader className="opg-location-group">{group.label}</DropdownHeader>
             {group.options.map((location) => (
               <DropdownItem key={`${group.label}-${location}`} onClick={() => setWhere(location)}>
@@ -146,7 +140,7 @@ function SearchForm({ initial = DEFAULT_SEARCH_LOCATION, allKenya = false }) {
       <span>Guests</span>
       <Dropdown
         inline
-        theme={{ inlineWrapper: 'opg-guest-trigger', ...guestDropdownTheme }}
+        theme={{ inlineWrapper: 'opg-guest-trigger' }}
         label={<span className="opg-guest-value">{guests} {guests === 1 ? 'guest' : 'guests'}</span>}
         placement="bottom-end"
       >
