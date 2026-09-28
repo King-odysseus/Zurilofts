@@ -25,6 +25,7 @@ import ShortlistDetailPage from './pages/ShortlistDetailPage.jsx';
 import ShortlistsPage from './pages/ShortlistsPage.jsx';
 import TripHubPage from './pages/TripHubPage.jsx';
 import OAuthCallback from './pages/OAuthCallback.jsx';
+import TrustPage from './pages/TrustPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import WorkspaceRoutes from './WorkspaceRoutes.jsx';
 import Dropdown from './components/Dropdown.jsx';
@@ -54,7 +55,6 @@ function Header({ menu }) {
 function MobileNav() { return <nav className="zl-mobile-nav" aria-label="Mobile navigation"><Link to="/properties"><span>⌕</span><small>Explore</small></Link><Link to="/favourites"><span>♡</span><small>Saved</small></Link><Link to="/trips"><span>♧</span><small>Trips</small></Link><Link to="/inbox"><span>◌</span><small>Inbox</small></Link><Link to="/profile"><span>♙</span><small>Profile</small></Link></nav>; }
 function Home() { return <GuestHome />; }
 function Explore() { return <GuestStays />; }
-function Trust() { return <main className="zl-page"><div className="zl-page-heading"><div><p className="zl-overline">TRUST & RECOVERY</p><h1>Keep your account secure.</h1><p>Review the information that helps protect every booking.</p></div></div><div className="op-trust-grid">{[["Identity verification", "Verified", "Your government ID and selfie have been reviewed."], ["Travel documents", "Add document", "Keep booking documents available in your account."], ["Password & security", "Secure", "Use a strong password and protect your sign-in."], ["Account recovery", "Ready", "Keep a recovery method up to date."]].map(([title, action, text]) => <section className="zl-panel" key={title}><p className="zl-overline">ACCOUNT SAFETY</p><h2>{title}</h2><p>{text}</p><button className="ui-btn-secondary">{action}</button></section>)}</div></main>; }
 function Shell() {
   const { pathname } = useLocation();
   const [menu, setMenu] = useState(false);
@@ -83,10 +83,10 @@ function Shell() {
   if (pathname === '/shortlists') return <ProtectedRoute><ShortlistsPage /></ProtectedRoute>;
   if (pathname.startsWith('/shortlists/')) return <ProtectedRoute><ShortlistDetailPage /></ProtectedRoute>;
   if (pathname === '/auth/callback') return <OAuthCallback />;
+  if (pathname === '/verify-identity') return <ProtectedRoute><TrustPage /></ProtectedRoute>;
   let content;
   if (pathname === '/') content = <Home />;
   else if (pathname === '/properties') content = <Explore />;
-  else if (pathname === '/verify-identity') content = <Trust />;
   else return <NotFoundPage />;
   const closeMenu = () => setMenu(false);
   return <div className="zl-app">

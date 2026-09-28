@@ -16,7 +16,8 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/s/:token`, `/shortlists`, `/shortlists/:id`, `/favourites` | Product `0:2989`, `0:3871` | Functional legacy, redesign pending |
 | `/trips`, `/booking-history` | Product `0:9318`, trip/history `0:4584` | Functional legacy, redesign pending |
 | `/inbox`, `/inbox/:id`, `/messages` | Product `0:9318`, conversation `0:3913` | Functional legacy, redesign pending |
-| `/profile`, `/verify-identity` | Product `0:9318`, trust `0:9724`, security `0:4626` | Profile functional legacy; trust redesign pending |
+| `/profile` | Product `0:9318`, security `0:4626` | Functional legacy, redesign pending |
+| `/verify-identity` | Product trust `0:9724`, security `0:4626` | Live identity flow redesigned; dispute flow still pending |
 | `/host/application` | Product `0:9744`, application states `0:4123` | Functional legacy, redesign pending |
 | `/host/today` | Product `0:757`, mobile `0:1277`, arrivals/tasks `0:4668` | Functional legacy, redesign pending |
 | `/host/listings`, `/host/properties/new`, `/host/properties/:id/edit` | Product `0:757`, edit `0:3955`, preview `0:4710` | Functional legacy, redesign pending |
