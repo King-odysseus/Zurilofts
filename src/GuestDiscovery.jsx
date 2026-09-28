@@ -69,7 +69,7 @@ function StayCard({ stay }) {
   </article>;
 }
 
-function SearchForm({ compact = false, initial = '' }) {
+function SearchForm({ initial = '' }) {
   const navigate = useNavigate();
   const [where, setWhere] = useState(initial);
   const [checkIn, setCheckIn] = useState('');
@@ -83,9 +83,9 @@ function SearchForm({ compact = false, initial = '' }) {
     if (guests !== 2) query.set('guests', String(guests));
     navigate(`/properties${query.size ? `?${query}` : ''}`);
   }
-  return <form className={`opg-search ${compact ? 'opg-search-compact' : ''}`} onSubmit={submit}>
+  return <form className="opg-search" onSubmit={submit}>
     <Label htmlFor="guest-search-where" className="opg-search-field opg-search-where">
-      <span>{compact ? 'Destination' : 'Where'}</span>
+      <span>Where</span>
       <TextInput id="guest-search-where" value={where} onChange={(event) => setWhere(event.target.value)} placeholder="Anywhere in Nairobi" aria-label="Search location or stay" sizing="lg" />
     </Label>
     <Label htmlFor="guest-search-check-in" className="opg-search-field">
@@ -139,7 +139,6 @@ function SearchForm({ compact = false, initial = '' }) {
     <Button type="submit" aria-label="Search stays" className="opg-search-submit" pill>
       <span className="opg-search-desktop-label" aria-hidden="true">
         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-        {compact && <span className="opg-search-desktop-text">Search</span>}
       </span>
       <span className="opg-search-mobile-label">Search stays</span>
     </Button>
@@ -180,7 +179,7 @@ export function GuestStays() {
   const mapActive = searchParams.get('view') === 'map';
   function toggleMap() { const next = new URLSearchParams(searchParams); if (mapActive) next.delete('view'); else next.set('view', 'map'); setSearchParams(next); }
   function applyFilters(event) { event.preventDefault(); const form = new FormData(event.currentTarget); const next = new URLSearchParams(searchParams); for (const name of ['minPrice','maxPrice','minBedrooms']) { const value = String(form.get(name) || '').trim(); if (value) next.set(name, value); else next.delete(name); } next.delete('filters'); next.delete('page'); setSearchParams(next); setFiltersOpen(false); }
-  return <main className="opg-page opg-results"><div className="opg-container"><div className="opg-results-intro"><p><Link to="/">Home</Link> / Stays</p><h1>Stays in Nairobi</h1><span>Find a verified, furnished home that fits your plans.</span></div><SearchForm compact initial={search} /><CategoryBar selected={category} onSelect={setCategory} onFilters={() => setFiltersOpen(true)} onMap={toggleMap} mapActive={mapActive} /><div className="opg-results-toolbar"><strong>{stays.loading ? 'Finding stays…' : `${stays.total} stays available`}</strong><span>Nairobi, Kenya</span></div>{mapActive ? <PropertyResultsMap listings={stays.items} /> : <StayGrid {...stays} />}{!mapActive && stays.total > page * 12 && <button className="opg-load-more" onClick={() => { const next = new URLSearchParams(searchParams); next.set('page', String(page + 1)); setSearchParams(next); }}>Next page →</button>}</div>{filtersOpen && <div className="opg-filter-backdrop" onClick={() => setFiltersOpen(false)}><form className="opg-filter-dialog" onClick={(event) => event.stopPropagation()} onSubmit={applyFilters}><div><h2>Filter stays</h2><button type="button" onClick={() => setFiltersOpen(false)} aria-label="Close filters">×</button></div><label>Minimum nightly price<input name="minPrice" type="number" min="0" defaultValue={searchParams.get('minPrice') || ''} placeholder="KSh" /></label><label>Maximum nightly price<input name="maxPrice" type="number" min="0" defaultValue={searchParams.get('maxPrice') || ''} placeholder="KSh" /></label><label>Minimum bedrooms<select name="minBedrooms" defaultValue={searchParams.get('minBedrooms') || ''}><option value="">Any</option>{[1,2,3,4].map((n) => <option key={n} value={n}>{n}+</option>)}</select></label><button className="opg-apply-filters" type="submit">Show stays</button></form></div>}</main>;
+  return <main className="opg-page opg-results"><div className="opg-container"><div className="opg-results-intro"><p><Link to="/">Home</Link> / Stays</p><h1>Stays in Nairobi</h1><span>Find a verified, furnished home that fits your plans.</span></div><SearchForm initial={search} /><CategoryBar selected={category} onSelect={setCategory} onFilters={() => setFiltersOpen(true)} onMap={toggleMap} mapActive={mapActive} /><div className="opg-results-toolbar"><strong>{stays.loading ? 'Finding stays…' : `${stays.total} stays available`}</strong><span>Nairobi, Kenya</span></div>{mapActive ? <PropertyResultsMap listings={stays.items} /> : <StayGrid {...stays} />}{!mapActive && stays.total > page * 12 && <button className="opg-load-more" onClick={() => { const next = new URLSearchParams(searchParams); next.set('page', String(page + 1)); setSearchParams(next); }}>Next page →</button>}</div>{filtersOpen && <div className="opg-filter-backdrop" onClick={() => setFiltersOpen(false)}><form className="opg-filter-dialog" onClick={(event) => event.stopPropagation()} onSubmit={applyFilters}><div><h2>Filter stays</h2><button type="button" onClick={() => setFiltersOpen(false)} aria-label="Close filters">×</button></div><label>Minimum nightly price<input name="minPrice" type="number" min="0" defaultValue={searchParams.get('minPrice') || ''} placeholder="KSh" /></label><label>Maximum nightly price<input name="maxPrice" type="number" min="0" defaultValue={searchParams.get('maxPrice') || ''} placeholder="KSh" /></label><label>Minimum bedrooms<select name="minBedrooms" defaultValue={searchParams.get('minBedrooms') || ''}><option value="">Any</option>{[1,2,3,4].map((n) => <option key={n} value={n}>{n}+</option>)}</select></label><button className="opg-apply-filters" type="submit">Show stays</button></form></div>}</main>;
 }
 
 export function GuestFooter() {
