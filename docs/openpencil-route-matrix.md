@@ -9,7 +9,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/property/:id` | Product `0:1935`, gallery `0:4441`, availability `0:4542` | Implemented with real listing data and repository photography; desktop/mobile QA passed |
 | `/booking/:id` | Product `0:2081`, `0:2153`, `0:2386`, `0:2559`, states `0:2708`, `0:2757` | Implemented; desktop/mobile QA passed for details, add-ons, and payment |
 | `/payment/callback` | Product `0:2757` | Implemented from the payment-state handoff with responsive loading, success, pending, and failed cards, Flowbite actions, Lucide icons, inline back control, and light/dark QA |
-| `/login`, `/register`, `/auth/callback` | Product `0:1365`, `0:1538`, connection `0:3497` | Login and register aligned with shared Flowbite controls; desktop/mobile QA passed |
+| `/login`, `/register`, `/auth/callback` | Product `0:1365`, `0:1538`, connection `0:3497` | Implemented; login and register aligned with shared Flowbite controls; desktop/mobile QA passed |
 | `/places`, `/restaurants` | Product `0:2825`, `0:10436`; `0:2858`, `0:10544` | Implemented with repository photography; desktop/mobile QA passed |
 | `/guides`, `/guides/:id` | Product `0:2891`, `0:10948`; detail `0:2925`, `0:10857` | Implemented with API data and repository photography; desktop/mobile QA passed |
 | `/privacy`, `/terms`, unknown route | Product `0:3059`, `0:3110`, `0:2964` | Implemented in the shared public shell with editorial legal layout; desktop/mobile QA passed |
@@ -38,7 +38,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/admin/addons` | Admin `0:7343`, content/support `0:6855` | Implemented with live service metrics, searchable responsive board, status controls, pricing/category editing, and per-property assignment toggles; desktop/mobile QA passed |
 | `/admin/guides` | Admin `0:7343`, content/support `0:6855` | Implemented with live guide metrics, a searchable responsive editorial board, Flowbite create/edit controls, publishing state, and delete confirmation; desktop/mobile QA passed |
 | `/admin/feedback` | Admin `0:7343`, governance `0:7458` | Implemented with live rating metrics, searchable rating board, public/private review separation, and responsive review detail; desktop/mobile QA passed |
-| `/admin/messages` | Admin `0:7343`, governance `0:7458` | Implemented with live unread and thread metrics, searchable conversation queue, responsive list-to-thread flow, polling, and a Flowbite reply composer; desktop/mobile QA passed |
+| `/admin/messages`, `/admin/messages/:userId` | Admin `0:7343`, governance `0:7458` | Implemented with live unread and thread metrics, searchable conversation queue, responsive list-to-thread flow, polling, and a Flowbite reply composer; desktop/mobile QA passed |
 
 OpenPencil has composite rather than standalone frames for several legacy CRUD screens. Their listed composite frame is the design-system anchor; a dedicated design frame should be added in OpenPencil if the implemented layout needs a distinct handoff. The repository photo assets, not design placeholders, supply product imagery.
 
