@@ -10,7 +10,7 @@ const TABS = [
 ];
 
 function Icon({ name, active }) {
-  const common = { className: 'h-5 w-5', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24', 'aria-hidden': true };
+  const common = { className: 'h-[18px] w-[18px]', fill: 'none', stroke: 'currentColor', viewBox: '0 0 24 24', 'aria-hidden': true };
   const paths = {
     today: <><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2.2 : 1.8} d="M8 7V3m8 4V3m-9 4h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={active ? 2.2 : 1.8} d="M8 12h.01M12 12h.01M16 12h.01" /></>,
     calendar: <><rect x="3" y="4" width="18" height="17" rx="2" strokeWidth={active ? 2.2 : 1.8} /><path strokeLinecap="round" strokeWidth={active ? 2.2 : 1.8} d="M16 2v4M8 2v4M3 10h18" /></>,
@@ -29,10 +29,10 @@ export default function HostMobileBottomNav() {
   }, []);
 
   return (
-    <nav aria-label="Host workspace" className="host-mobile-bottom-nav fixed inset-x-4 bottom-3 z-40 mx-auto flex max-w-[358px] items-center justify-between rounded-2xl bg-[#0B1F42] px-2 py-2 text-white shadow-[0_12px_30px_rgba(11,31,66,0.28)] md:hidden">
+    <nav aria-label="Host workspace" className="host-mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-[358px] items-center justify-between border border-[#E3E8EF] bg-white/95 text-[#64748B] shadow-[0_10px_30px_rgba(15,23,42,0.14)] backdrop-blur md:hidden">
       {TABS.map((tab) => {
         const active = tab.match(location.pathname);
-        return <Link key={tab.key} to={tab.to} aria-current={active ? 'page' : undefined} className={`flex min-h-[48px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[10px] font-semibold transition-colors ${active ? 'bg-white/15 text-white' : 'text-white/70 hover:bg-white/10 hover:text-white'}`}><Icon name={tab.key} active={active} /><span className="truncate">{tab.label}</span></Link>;
+        return <Link key={tab.key} to={tab.to} aria-current={active ? 'page' : undefined} className={`flex min-h-[48px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[9px] font-semibold transition-colors ${active ? 'bg-[#EEF4FF] text-[#2563EB]' : 'text-[#64748B] hover:bg-[#F8FAFC] hover:text-[#0B1F42]'}`}><Icon name={tab.key} active={active} /><span className="truncate">{tab.label}</span></Link>;
       })}
     </nav>
   );

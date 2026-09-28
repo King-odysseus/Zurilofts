@@ -28,7 +28,7 @@ const hostPage = (page) => <HostRoute><HostLayout>{page}</HostLayout></HostRoute
 export default function WorkspaceRoutes() {
   return <Routes>
     <Route path="/host/application" element={<ProtectedRoute><HostApplicationPage /></ProtectedRoute>} />
-    <Route path="/host/today" element={<HostRoute><HostTodayPage /></HostRoute>} />
+    <Route path="/host/today" element={hostPage(<HostTodayPage />)} />
     <Route path="/host/calendar" element={hostPage(<AdminCalendar />)} />
     <Route path="/host/calendar/:id" element={hostPage(<AdminCalendar />)} />
     <Route path="/host/listings" element={hostPage(<AdminProperties />)} />

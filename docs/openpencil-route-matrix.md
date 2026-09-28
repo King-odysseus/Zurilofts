@@ -19,7 +19,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/profile` | Guest Account `0:3960`, security `0:4626` | Implemented with account shell, Flowbite controls, avatar upload, host payouts, reviews, privacy controls, and account deletion; desktop/mobile QA passed |
 | `/verify-identity` | Product trust `0:9724`, security `0:4626` | Live identity flow redesigned; dispute flow still pending |
 | `/host/application` | Product `0:9744`, application states `0:4123` | Functional legacy, redesign pending |
-| `/host/today` | Product `0:757`, mobile `0:1277`, arrivals/tasks `0:4668` | Functional legacy, redesign pending |
+| `/host/today` | Host Today `0:3583`, mobile `0:4070`, navigation `0:3584` | Implemented with live arrivals, in-house, departures, recent conversations, responsive tabs, and the mobile pill workspace navigation; desktop/mobile QA passed |
 | `/host/listings`, `/host/properties/new`, `/host/properties/:id/edit` | Product `0:757`, edit `0:3955`, preview `0:4710` | Functional legacy, redesign pending |
 | `/host/calendar`, `/host/calendar/:id` | Product `0:757`, calendar `0:3997` | Functional legacy, redesign pending |
 | `/host/earnings`, `/host/payouts` | Product `0:757`, earnings/payouts `0:4039` | Functional legacy, redesign pending |
