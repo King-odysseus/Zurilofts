@@ -1,4 +1,5 @@
 .op-admin-layout{font-family:Inter,Arial,sans-serif;color:#0b1f42}
+.op-admin-mobile-header,.op-admin-mobile-nav{display:none}
 .op-admin-sidebar{border-right:1px solid #eeeae5;overflow:visible;color:#414d63}
 .op-admin-sidebar nav{scrollbar-width:thin}
 .op-admin-sidebar .op-admin-brand{font:700 16px Montserrat,Arial,sans-serif;color:#0b1f42;text-decoration:none;white-space:nowrap}
@@ -17,6 +18,7 @@
 .op-admin-sidebar-toggle:hover{background:#172b55;transform:translate(1px,-50%)}
 .op-admin-sidebar-toggle:focus-visible{outline:2px solid rgba(196,154,108,.7);outline-offset:-2px}
 .op-admin-main>header{display:none}
+.op-admin-main{min-width:0;width:100%}
 .op-admin-main>div:last-child{padding:44px 36px}
 .op-admin-overview{max-width:1160px;margin:0 auto;min-height:calc(100vh - 88px)}
 .op-admin-heading{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:44px}
@@ -31,6 +33,27 @@
 @media(max-width:900px){.op-admin-metrics{grid-template-columns:repeat(2,1fr)}.op-admin-overview-grid{grid-template-columns:1fr}.op-admin-main>div:last-child{padding:24px}}
 @media(max-width:767px){.op-admin-main>div:last-child{padding-top:88px}.op-admin-heading{align-items:start;flex-direction:column}.op-admin-heading h1{font-size:25px}.op-admin-metrics article{min-height:115px;padding:15px}.op-admin-metrics strong{font-size:24px}}
 @media(max-width:767px){.op-admin-sidebar-toggle{display:none}}
+@media(max-width:767px){
+  .op-admin-mobile-header{position:fixed;inset:0 0 auto;z-index:40;display:flex;height:64px;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #eef0f4;background:#fff;padding:0 16px}
+  .op-admin-mobile-brand{display:flex;min-width:0;align-items:center;gap:9px;color:#0b1f42;text-decoration:none}
+  .op-admin-mobile-brand img{width:30px;height:30px;flex:none;object-fit:contain}
+  .op-admin-mobile-brand>span{display:grid;min-width:0;line-height:1.15}
+  .op-admin-mobile-brand strong{font:700 13px Montserrat,Arial,sans-serif;color:#0b1f42}
+  .op-admin-mobile-brand small{font-size:9px;color:#6e7686}
+  .op-admin-mobile-actions{display:flex;align-items:center;gap:4px}
+  .op-admin-mobile-bell{display:grid;width:38px;height:38px;place-items:center;border:0;border-radius:50%;background:transparent;color:#334155}
+  .op-admin-mobile-bell:hover{background:#f1f5f9;color:#0b1f42}
+  .op-admin-mobile-count{position:absolute;top:-2px;right:-2px;display:grid;min-width:16px;height:16px;place-items:center;border-radius:999px;background:#ef4444;padding:0 4px;color:#fff;font-size:9px;font-weight:700}
+  .op-admin-mobile-nav{position:fixed;right:12px;bottom:calc(10px + env(safe-area-inset-bottom));left:12px;z-index:40;display:block;border:1px solid #e2dad0;border-radius:999px;background:#fff;padding:7px 8px;box-shadow:0 14px 34px #0b1f4220}
+  .op-admin-mobile-nav-scroll{display:flex;gap:4px;overflow-x:auto;padding:0 1px;scrollbar-width:none;overscroll-behavior-x:contain}
+  .op-admin-mobile-nav-scroll::-webkit-scrollbar{display:none}
+  .op-admin-mobile-link{display:flex;min-width:68px;height:56px;flex:0 0 auto;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:999px;color:#64748b;padding:6px 8px;font-size:9px;font-weight:600;line-height:1;text-decoration:none;white-space:nowrap}
+  .op-admin-mobile-link svg{width:20px;height:20px;flex:none}
+  .op-admin-mobile-link span{max-width:62px;overflow:hidden;text-overflow:ellipsis}
+  .op-admin-mobile-link:hover{background:#f1f5f9;color:#0b1f42}
+  .op-admin-mobile-link.is-active{background:#e8edf7;color:#0b1f42;font-weight:700}
+  .op-admin-main>div:last-child{padding-bottom:104px}
+}
 .op-admin-listing-review .op-admin-metrics article:nth-child(2){background:#dcf3e3}.op-admin-listing-review .op-admin-metrics article:nth-child(3){background:#e8edf7}
 .op-admin-listing-review .op-admin-metrics article:nth-child(4){background:#fae1de}
 .op-admin-add-link{background:#9f7142;color:#fff;text-decoration:none;border-radius:8px;padding:11px 16px;font-size:12px;font-weight:700;white-space:nowrap}

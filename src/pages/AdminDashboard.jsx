@@ -152,6 +152,11 @@ function AdminLayout() {
   });
   const isAdmin = user?.role === 'ADMIN';
   const navItems = isAdmin ? [...sharedNavItems, ...adminOnlyItems] : sharedNavItems;
+  const mobileNavLabels = {
+    'Users & Hosts': 'Users',
+    'Host Applications': 'Hosts',
+    'Promo Codes': 'Promos',
+  };
 
   // ── Notification polling (messages + new bookings) ──
   const [notif, setNotif] = useState({ unreadMessages: 0, pendingBookings: 0 });
@@ -297,65 +302,59 @@ function AdminLayout() {
         </button>
       </aside>
 
-      {/* Mobile nav */}
-      <div className="md:hidden fixed top-0 w-full bg-[#0B0B45] z-10 p-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="bg-white rounded-lg px-2 py-1">
-            <img src={logoImg} alt="ZuriLofts" className="h-6 w-auto" />
-          </div>
-          <span className="text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">{isAdmin ? 'Admin' : 'Host'}</span>
+      {/* Mobile header and floating section nav */}
+      <div className="op-admin-mobile-header md:hidden">
+        <Link to="/" className="op-admin-mobile-brand">
+          <img src={logoImg} alt="" />
+          <span>
+            <strong>zuri.admin</strong>
+            <small>{isAdmin ? 'Workspace' : 'Host workspace'}</small>
+          </span>
         </Link>
-        <div className="flex items-center space-x-2">
-          {navItems.map(({ path, label, icon }) => (
-            <Link
-              key={path}
-              to={path}
-              className={`p-2 rounded-lg text-xs font-medium transition-colors ${
-                location.pathname === path
-                  ? 'bg-[#C49A6C] text-white'
-                  : 'text-white/70'
-              }`}
-            >
-              <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
-              </svg>
-              <span className="sr-only">{label}</span>
-            </Link>
-          ))}
-          <Link
-            to="/"
-            className="p-2 rounded-lg text-xs font-medium text-white/70 hover:text-white transition-colors"
-            title="Go back to client view"
-          >
-            <svg className="w-5 h-5 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            <span className="sr-only">Go back to client view</span>
-          </Link>
-          {/* Mobile bell */}
+        <div className="op-admin-mobile-actions">
           <div className="relative">
             <button
-              className="p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+              className="op-admin-mobile-bell"
               title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
+              aria-label={`${notif.unreadMessages} unread messages and ${notif.pendingBookings} pending bookings`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
             </button>
             {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
+              <span className="op-admin-mobile-count">
                 {(() => {
-                  const t = notif.unreadMessages + notif.pendingBookings;
-                  return t > 99 ? '99+' : t;
+                  const total = notif.unreadMessages + notif.pendingBookings;
+                  return total > 99 ? '99+' : total;
                 })()}
               </span>
             )}
           </div>
-          <div className="bg-white/95 rounded-full">
-            <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
-          </div>
+          <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
         </div>
       </div>
+      <nav className="op-admin-mobile-nav md:hidden" aria-label={`${isAdmin ? 'Admin' : 'Host'} workspace sections`}>
+        <div className="op-admin-mobile-nav-scroll">
+          {navItems.map(({ path, label, icon, exact }) => {
+            const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+            return (
+              <Link key={path} to={path} className={`op-admin-mobile-link ${active ? 'is-active' : ''}`}>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icon} />
+                </svg>
+                <span>{mobileNavLabels[label] || label}</span>
+              </Link>
+            );
+          })}
+          <Link to="/" className="op-admin-mobile-link">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span>Client view</span>
+          </Link>
+        </div>
+      </nav>
 
       {/* Main content */}
       <main
