@@ -18,6 +18,7 @@ import AdminMessages from './pages/AdminMessages.jsx';
 import AdminGuides from './pages/AdminGuides.jsx';
 import AdminPayouts from './pages/AdminPayouts.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
+import HostCalendarPage from './pages/HostCalendarPage.jsx';
 import HostListingsPage from './pages/HostListingsPage.jsx';
 import HostTodayPage from './pages/HostTodayPage.jsx';
 import HostPayouts from './pages/HostPayouts.jsx';
@@ -29,8 +30,8 @@ export default function WorkspaceRoutes() {
   return <Routes>
     <Route path="/host/application" element={<ProtectedRoute><HostApplicationPage /></ProtectedRoute>} />
     <Route path="/host/today" element={hostPage(<HostTodayPage />)} />
-    <Route path="/host/calendar" element={hostPage(<AdminCalendar />)} />
-    <Route path="/host/calendar/:id" element={hostPage(<AdminCalendar />)} />
+    <Route path="/host/calendar" element={hostPage(<HostCalendarPage />)} />
+    <Route path="/host/calendar/:id" element={hostPage(<HostCalendarPage />)} />
     <Route path="/host/listings" element={hostPage(<HostListingsPage />)} />
     <Route path="/host/earnings" element={hostPage(<AdminEarnings />)} />
     <Route path="/host/properties/new" element={hostPage(<AdminPropertyForm />)} />

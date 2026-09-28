@@ -1,9 +1,16 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError } from '../types/index.js';
 
-export async function listPriceRules(propertyId: string) {
-  const property = await prisma.property.findUnique({ where: { id: propertyId } });
+async function requireProperty(propertyId: string, ownerId?: string) {
+  const property = await prisma.property.findFirst({
+    where: { id: propertyId, ...(ownerId ? { hostId: ownerId } : {}) },
+  });
   if (!property) throw new NotFoundError('Property');
+  return property;
+}
+
+export async function listPriceRules(propertyId: string, ownerId?: string) {
+  await requireProperty(propertyId, ownerId);
   return prisma.priceRule.findMany({
     where: { propertyId },
     orderBy: { start: 'asc' },
@@ -12,10 +19,10 @@ export async function listPriceRules(propertyId: string) {
 
 export async function addPriceRule(
   propertyId: string,
-  data: { name?: string; start: Date; end: Date; price: number }
+  data: { name?: string; start: Date; end: Date; price: number },
+  ownerId?: string
 ) {
-  const property = await prisma.property.findUnique({ where: { id: propertyId } });
-  if (!property) throw new NotFoundError('Property');
+  await requireProperty(propertyId, ownerId);
   if (data.end <= data.start) throw new ValidationError('End date must be after the start date');
   if (data.price <= 0) throw new ValidationError('Price must be greater than zero');
   return prisma.priceRule.create({
@@ -29,8 +36,10 @@ export async function addPriceRule(
   });
 }
 
-export async function deletePriceRule(id: string) {
-  const rule = await prisma.priceRule.findUnique({ where: { id } });
+export async function deletePriceRule(id: string, ownerId?: string) {
+  const rule = await prisma.priceRule.findFirst({
+    where: { id, ...(ownerId ? { property: { hostId: ownerId } } : {}) },
+  });
   if (!rule) throw new NotFoundError('Price rule');
   return prisma.priceRule.delete({ where: { id } });
 }

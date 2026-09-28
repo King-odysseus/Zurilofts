@@ -64,7 +64,12 @@ export async function syncSource(sourceId: string): Promise<{ events: number }> 
 }
 
 /** Sync every external source attached to a property. */
-export async function syncProperty(propertyId: string) {
+export async function syncProperty(propertyId: string, ownerId?: string) {
+  const property = await prisma.property.findFirst({
+    where: { id: propertyId, ...(ownerId ? { hostId: ownerId } : {}) },
+    select: { id: true },
+  });
+  if (!property) throw new NotFoundError('Property');
   const sources = await prisma.calendarSource.findMany({ where: { propertyId } });
   const results = await Promise.allSettled(sources.map((s) => syncSource(s.id)));
   return sources.map((s, i) => ({

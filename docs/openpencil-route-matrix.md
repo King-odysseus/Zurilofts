@@ -22,7 +22,7 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/host/today` | Host Today `0:3583`, mobile `0:4070`, navigation `0:3584` | Implemented with live arrivals, in-house, departures, recent conversations, responsive tabs, and the mobile pill workspace navigation; desktop/mobile QA passed |
 | `/host/listings` | Host Listings `0:3642` | Implemented with live listing data, lifecycle filters, draft submission, availability controls, deletion, and repository photography; desktop/mobile QA passed |
 | `/host/properties/new`, `/host/properties/:id/edit` | Host Listing Editor `0:4339`, edit `0:3955`, preview `0:4710` | Functional legacy, redesign pending |
-| `/host/calendar`, `/host/calendar/:id` | Product `0:757`, calendar `0:3997` | Functional legacy, redesign pending |
+| `/host/calendar`, `/host/calendar/:id` | Host Calendar `0:3699` | Implemented with owner-scoped weekly availability, reservations, manual blocks, iCal feeds, week navigation, and detail panel; desktop/mobile QA passed |
 | `/host/earnings`, `/host/payouts` | Product `0:757`, earnings/payouts `0:4039` | Functional legacy, redesign pending |
 | `/admin` | Admin `0:6909`, workspace `0:6598` | Redesigned overview, QA ongoing |
 | `/admin/properties` | Admin `0:7015` | Redesigned live listing review, QA ongoing |

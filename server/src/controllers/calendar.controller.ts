@@ -5,6 +5,10 @@ import * as priceRuleService from '../services/priceRule.service.js';
 import { NotFoundError } from '../types/index.js';
 import prisma from '../config/prisma.js';
 
+function ownerScope(req: Request) {
+  return req.user?.role === 'ADMIN' ? undefined : req.user?.sub;
+}
+
 // ---- Public: availability (taken date ranges) for the booking calendar ----
 
 export async function availability(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -20,7 +24,7 @@ export async function availability(req: Request, res: Response, next: NextFuncti
 
 export async function getCalendar(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const data = await calendarService.getPropertyCalendar(req.params.id);
+    const data = await calendarService.getPropertyCalendar(req.params.id, ownerScope(req));
     const base = `${req.protocol}://${req.get('host')}`;
     res.json({
       success: true,
@@ -33,7 +37,7 @@ export async function getCalendar(req: Request, res: Response, next: NextFunctio
 
 export async function addSource(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const source = await calendarService.addSource(req.params.id, req.body.name, req.body.url);
+    const source = await calendarService.addSource(req.params.id, req.body.name, req.body.url, ownerScope(req));
     res.status(201).json({ success: true, data: source });
   } catch (error) {
     next(error);
@@ -42,7 +46,7 @@ export async function addSource(req: Request, res: Response, next: NextFunction)
 
 export async function deleteSource(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    await calendarService.deleteSource(req.params.sourceId);
+    await calendarService.deleteSource(req.params.sourceId, ownerScope(req));
     res.json({ success: true, message: 'Calendar source removed' });
   } catch (error) {
     next(error);
@@ -51,7 +55,7 @@ export async function deleteSource(req: Request, res: Response, next: NextFuncti
 
 export async function syncNow(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const results = await icalService.syncProperty(req.params.id);
+    const results = await icalService.syncProperty(req.params.id, ownerScope(req));
     res.json({ success: true, data: results });
   } catch (error) {
     next(error);
@@ -64,7 +68,8 @@ export async function addBlock(req: Request, res: Response, next: NextFunction):
       req.params.id,
       new Date(req.body.start),
       new Date(req.body.end),
-      req.body.summary
+      req.body.summary,
+      ownerScope(req)
     );
     res.status(201).json({ success: true, data: block });
   } catch (error) {
@@ -74,7 +79,7 @@ export async function addBlock(req: Request, res: Response, next: NextFunction):
 
 export async function deleteBlock(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    await calendarService.deleteBlock(req.params.blockId);
+    await calendarService.deleteBlock(req.params.blockId, ownerScope(req));
     res.json({ success: true, message: 'Block removed' });
   } catch (error) {
     next(error);
@@ -83,7 +88,7 @@ export async function deleteBlock(req: Request, res: Response, next: NextFunctio
 
 export async function unblockDate(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    await calendarService.unblockCalendarDate(req.params.blockId, new Date(req.body.date));
+    await calendarService.unblockCalendarDate(req.params.blockId, new Date(req.body.date), ownerScope(req));
     res.json({ success: true, message: 'Date unblocked' });
   } catch (error) {
     next(error);
@@ -94,7 +99,7 @@ export async function unblockDate(req: Request, res: Response, next: NextFunctio
 
 export async function listPriceRules(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const rules = await priceRuleService.listPriceRules(req.params.id);
+    const rules = await priceRuleService.listPriceRules(req.params.id, ownerScope(req));
     res.json({ success: true, data: rules });
   } catch (error) {
     next(error);
@@ -108,7 +113,7 @@ export async function addPriceRule(req: Request, res: Response, next: NextFuncti
       start: new Date(req.body.start),
       end: new Date(req.body.end),
       price: req.body.price,
-    });
+    }, ownerScope(req));
     res.status(201).json({ success: true, data: rule });
   } catch (error) {
     next(error);
@@ -117,7 +122,7 @@ export async function addPriceRule(req: Request, res: Response, next: NextFuncti
 
 export async function deletePriceRule(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    await priceRuleService.deletePriceRule(req.params.ruleId);
+    await priceRuleService.deletePriceRule(req.params.ruleId, ownerScope(req));
     res.json({ success: true, message: 'Price rule removed' });
   } catch (error) {
     next(error);

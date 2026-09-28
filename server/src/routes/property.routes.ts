@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate, requireHost, requireHostWorkspace } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { propertyCreateSchema, propertyUpdateSchema, autoMessageTemplatesSchema } from '../types/index.js';
+import { propertyCreateSchema, propertyUpdateSchema, autoMessageTemplatesSchema, calendarSourceSchema, calendarBlockSchema, priceRuleSchema } from '../types/index.js';
 import * as ctrl from '../controllers/property.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
 import * as autoMsgCtrl from '../controllers/auto-message.controller.js';
@@ -29,6 +29,19 @@ router.get('/:id/similar', ctrl.getSimilar);
 // the service). Placed before '/:id' so the longer path matches first.
 router.get('/:id/auto-messages', authenticate, requireHostWorkspace, autoMsgCtrl.getTemplates);
 router.put('/:id/auto-messages', authenticate, requireHostWorkspace, validate(autoMessageTemplatesSchema), autoMsgCtrl.saveTemplates);
+
+// Owner-scoped calendar management for the host workspace. These mirror the
+// admin calendar endpoints but reject any property the caller does not own.
+router.get('/:id/calendar', authenticate, requireHostWorkspace, calendarCtrl.getCalendar);
+router.post('/:id/calendar/sources', authenticate, requireHostWorkspace, validate(calendarSourceSchema), calendarCtrl.addSource);
+router.delete('/:id/calendar/sources/:sourceId', authenticate, requireHostWorkspace, calendarCtrl.deleteSource);
+router.post('/:id/calendar/sync', authenticate, requireHostWorkspace, calendarCtrl.syncNow);
+router.post('/:id/calendar/blocks', authenticate, requireHostWorkspace, validate(calendarBlockSchema), calendarCtrl.addBlock);
+router.post('/:id/calendar/blocks/:blockId/unblock-date', authenticate, requireHostWorkspace, calendarCtrl.unblockDate);
+router.delete('/:id/calendar/blocks/:blockId', authenticate, requireHostWorkspace, calendarCtrl.deleteBlock);
+router.get('/:id/price-rules', authenticate, requireHostWorkspace, calendarCtrl.listPriceRules);
+router.post('/:id/price-rules', authenticate, requireHostWorkspace, validate(priceRuleSchema), calendarCtrl.addPriceRule);
+router.delete('/:id/price-rules/:ruleId', authenticate, requireHostWorkspace, calendarCtrl.deletePriceRule);
 
 
 // Public reviews for a property

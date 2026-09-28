@@ -5,6 +5,18 @@ import { NotFoundError, ValidationError } from '../types/index.js';
 /** Duration (minutes) a PENDING booking holds inventory before it lapses. */
 export const PENDING_HOLD_MINUTES = 30;
 
+async function requireProperty(propertyId: string, ownerId?: string) {
+  const property = await prisma.property.findFirst({
+    where: { id: propertyId, ...(ownerId ? { hostId: ownerId } : {}) },
+  });
+  if (!property) throw new NotFoundError('Property');
+  return property;
+}
+
+function ownedRelation(ownerId?: string) {
+  return ownerId ? { property: { hostId: ownerId } } : {};
+}
+
 /** Ensure a property has an outbound iCal feed token; create one if missing. */
 export async function ensureIcalToken(propertyId: string): Promise<string> {
   const property = await prisma.property.findUnique({ where: { id: propertyId } });
@@ -17,9 +29,8 @@ export async function ensureIcalToken(propertyId: string): Promise<string> {
 }
 
 /** Full calendar view for the admin: sources, blocks, and the feed token. */
-export async function getPropertyCalendar(propertyId: string) {
-  const property = await prisma.property.findUnique({ where: { id: propertyId } });
-  if (!property) throw new NotFoundError('Property');
+export async function getPropertyCalendar(propertyId: string, ownerId?: string) {
+  const property = await requireProperty(propertyId, ownerId);
 
   const token = await ensureIcalToken(propertyId);
 
@@ -64,14 +75,13 @@ export async function getPropertyCalendar(propertyId: string) {
   };
 }
 
-export async function addSource(propertyId: string, name: string, url: string) {
-  const property = await prisma.property.findUnique({ where: { id: propertyId } });
-  if (!property) throw new NotFoundError('Property');
+export async function addSource(propertyId: string, name: string, url: string, ownerId?: string) {
+  await requireProperty(propertyId, ownerId);
   return prisma.calendarSource.create({ data: { propertyId, name, url } });
 }
 
-export async function deleteSource(id: string) {
-  const source = await prisma.calendarSource.findUnique({ where: { id } });
+export async function deleteSource(id: string, ownerId?: string) {
+  const source = await prisma.calendarSource.findFirst({ where: { id, ...ownedRelation(ownerId) } });
   if (!source) throw new NotFoundError('Calendar source');
   // Cascade removes that source's imported blocks
   return prisma.calendarSource.delete({ where: { id } });
@@ -81,18 +91,18 @@ export async function addManualBlock(
   propertyId: string,
   start: Date,
   end: Date,
-  summary?: string
+  summary?: string,
+  ownerId?: string
 ) {
-  const property = await prisma.property.findUnique({ where: { id: propertyId } });
-  if (!property) throw new NotFoundError('Property');
+  await requireProperty(propertyId, ownerId);
   if (end <= start) throw new ValidationError('Block end date must be after the start date');
   return prisma.calendarBlock.create({
     data: { propertyId, sourceId: null, start, end, summary: summary || 'Blocked' },
   });
 }
 
-export async function deleteBlock(id: string) {
-  const block = await prisma.calendarBlock.findUnique({ where: { id } });
+export async function deleteBlock(id: string, ownerId?: string) {
+  const block = await prisma.calendarBlock.findFirst({ where: { id, ...ownedRelation(ownerId) } });
   if (!block) throw new NotFoundError('Calendar block');
   if (block.sourceId !== null) {
     throw new ValidationError('Imported blocks cannot be deleted manually; remove the source instead');
@@ -101,8 +111,8 @@ export async function deleteBlock(id: string) {
 }
 
 /** Remove one calendar day from a manual block, preserving the other days. */
-export async function unblockCalendarDate(id: string, date: Date) {
-  const block = await prisma.calendarBlock.findUnique({ where: { id } });
+export async function unblockCalendarDate(id: string, date: Date, ownerId?: string) {
+  const block = await prisma.calendarBlock.findFirst({ where: { id, ...ownedRelation(ownerId) } });
   if (!block) throw new NotFoundError('Calendar block');
   if (block.sourceId !== null) throw new ValidationError('Imported blocks can only be changed in their source calendar');
 
