@@ -3,8 +3,6 @@ import { useLocation, useParams, Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
-import Navbar from "../components/Navbar.jsx";
-import Footer from "../components/Footer.jsx";
 
 function SkeletonCard() {
   return (
@@ -196,9 +194,8 @@ export default function ShortlistDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <main className="min-h-screen bg-white">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-12 pb-16">
         {loading ? (
           <div className="space-y-4">
             <div className="h-8 w-48 bg-[#D9D9D9]/40 rounded animate-pulse mb-4" />
@@ -312,8 +309,7 @@ export default function ShortlistDetailPage() {
             )}
           </>
         ) : null}
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </main>
   );
 }

@@ -3,8 +3,6 @@ import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
-import Navbar from "../components/Navbar.jsx";
-import Footer from "../components/Footer.jsx";
 
 function SkeletonCard() {
   return (
@@ -254,9 +252,8 @@ export default function ShortlistsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <main className="min-h-screen bg-white">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-12 pb-16">
         <div className="flex items-center justify-between mb-2">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#0B0B45]">My Shortlists</h1>
           {shortlists.length > 0 && !showCreate && (
@@ -305,8 +302,7 @@ export default function ShortlistsPage() {
             ))}
           </div>
         )}
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </main>
   );
 }

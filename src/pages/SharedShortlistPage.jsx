@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams, Link } from "react-router-dom";
 import apiClient from "../api/client.js";
-import Navbar from "../components/Navbar.jsx";
-import Footer from "../components/Footer.jsx";
 import Spinner from "../components/Spinner.jsx";
 
 export default function SharedShortlistPage() {
@@ -32,9 +30,8 @@ export default function SharedShortlistPage() {
   }, [token]);
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 pt-24 pb-16">
+    <main className="min-h-screen bg-white">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-12 pb-16">
         {loading ? (
           <div className="flex items-center justify-center py-16">
             <Spinner />
@@ -125,8 +122,7 @@ export default function SharedShortlistPage() {
             </div>
           </>
         ) : null}
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </main>
   );
 }

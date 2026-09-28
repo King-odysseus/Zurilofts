@@ -89,16 +89,12 @@ function Shell() {
   if (pathname === '/login') return <LoginPage />;
   if (pathname === '/register') return <RegisterPage />;
   if (pathname === '/payment/callback') return <PaymentCallback />;
-  if (pathname.startsWith('/s/')) return <SharedShortlistPage />;
   if (pathname === '/trips') return <ProtectedRoute><TripHubPage /></ProtectedRoute>;
   if (pathname === '/booking-history') return <ProtectedRoute><BookingHistoryPage /></ProtectedRoute>;
   if (pathname === '/inbox') return <ProtectedRoute><InboxPage /></ProtectedRoute>;
   if (pathname.startsWith('/inbox/')) return <ProtectedRoute><ConversationPage /></ProtectedRoute>;
   if (pathname === '/messages') return <ProtectedRoute><MessagesPage /></ProtectedRoute>;
   if (pathname === '/profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
-  if (pathname === '/favourites') return <ProtectedRoute><FavouritesPage /></ProtectedRoute>;
-  if (pathname === '/shortlists') return <ProtectedRoute><ShortlistsPage /></ProtectedRoute>;
-  if (pathname.startsWith('/shortlists/')) return <ProtectedRoute><ShortlistDetailPage /></ProtectedRoute>;
   if (pathname === '/auth/callback') return <OAuthCallback />;
   if (pathname === '/verify-identity') return <ProtectedRoute><TrustPage /></ProtectedRoute>;
   let content;
@@ -111,6 +107,10 @@ function Shell() {
   else if (pathname.startsWith('/guides/')) content = <GuideDetailPage />;
   else if (pathname === '/privacy') content = <PrivacyPage />;
   else if (pathname === '/terms') content = <TermsPage />;
+  else if (pathname.startsWith('/s/')) content = <SharedShortlistPage />;
+  else if (pathname === '/favourites') content = <ProtectedRoute><FavouritesPage /></ProtectedRoute>;
+  else if (pathname === '/shortlists') content = <ProtectedRoute><ShortlistsPage /></ProtectedRoute>;
+  else if (pathname.startsWith('/shortlists/')) content = <ProtectedRoute><ShortlistDetailPage /></ProtectedRoute>;
   else content = <NotFoundPage />;
   const closeMenu = () => setMenu(false);
   return <div className="zl-app">

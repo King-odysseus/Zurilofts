@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import Navbar from '../components/Navbar.jsx';
-import Footer from '../components/Footer.jsx';
 import PropertyCard from '../components/PropertyCard.jsx';
 import Spinner from '../components/Spinner.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -48,9 +46,8 @@ function FavouritesPage() {
   // Unauthenticated state
   if (!isAuthenticated && !sharedIds) {
     return (
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
+      <main className="min-h-screen bg-white">
+        <div className="pt-12 pb-16 flex items-center justify-center min-h-[60vh]">
           <div className="max-w-md mx-auto px-6 text-center">
             <div className="w-20 h-20 bg-[#C49A6C]/10 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg className="w-10 h-10 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,8 +74,7 @@ function FavouritesPage() {
             </div>
           </div>
         </div>
-        <Footer />
-      </div>
+      </main>
     );
   }
 
@@ -97,22 +93,19 @@ function FavouritesPage() {
   // Loading shared
   if (loadingShared) {
     return (
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="pt-24 pb-16 flex items-center justify-center min-h-[60vh]">
+      <main className="min-h-screen bg-white">
+        <div className="pt-12 pb-16 flex items-center justify-center min-h-[60vh]">
           <Spinner />
         </div>
-        <Footer />
-      </div>
+      </main>
     );
   }
 
   // Empty state (own favourites)
   if (isAuthenticated && !sharedIds && favorites.length === 0) {
     return (
-      <div className="min-h-screen bg-white">
-        <Navbar />
-        <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+      <main className="min-h-screen bg-white">
+        <div className="pt-12 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
           <h1 className="text-3xl font-bold text-[#0B0B45] mb-2">My Favourites</h1>
           <p className="text-[#6b7280] mb-8">Properties you&apos;ve saved for later.</p>
           <div className="flex items-center justify-center min-h-[40vh]">
@@ -135,15 +128,13 @@ function FavouritesPage() {
             </div>
           </div>
         </div>
-        <Footer />
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <Navbar />
-      <div className="pt-24 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+    <main className="min-h-screen bg-white">
+      <div className="pt-12 pb-16 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold text-[#0B0B45] mb-2">
@@ -196,8 +187,7 @@ function FavouritesPage() {
           </div>
         )}
       </div>
-      <Footer />
-    </div>
+    </main>
   );
 }
 
