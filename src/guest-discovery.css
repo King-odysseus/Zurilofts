@@ -79,6 +79,7 @@
 .opg-filter-backdrop{position:fixed;inset:0;z-index:80;display:grid;place-items:center;background:#0b1f4299;padding:20px}.opg-filter-dialog{width:min(440px,100%);background:#fff;border-radius:16px;padding:24px;box-shadow:0 20px 60px #0b1f4230}.opg-filter-dialog>div{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}.opg-filter-dialog h2{font:700 20px Montserrat,Arial,sans-serif;margin:0}.opg-filter-dialog>div button{border:0;background:none;font-size:26px;cursor:pointer}.opg-filter-dialog label{display:block;font-size:12px;font-weight:700;color:var(--op-navy);margin:14px 0}.opg-filter-dialog input,.opg-filter-dialog select{display:block;width:100%;border:1px solid var(--op-line);border-radius:8px;padding:12px;margin-top:7px;background:white}.opg-apply-filters{width:100%;padding:14px;background:var(--op-navy);color:white;border:0;border-radius:8px;font-weight:700;cursor:pointer}
 
 /* Flowbite controls, aligned to the OpenPencil geometry. Page surfaces stay white. */
+.zl-app{padding-top:64px}
 .opg-page{background:#fff}
 .opg-search{height:72px;padding:0;border:0;grid-template-columns:28.9362% 20% 20% 22.9787% 8.0851%;align-items:stretch}
 .opg-search .opg-search-field{position:relative;min-width:0;height:100%;display:flex!important;flex-direction:column;justify-content:flex-start;gap:4px;padding:14px 20px 0;border-right:0;color:var(--op-navy);overflow:visible!important}
