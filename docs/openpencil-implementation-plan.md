@@ -21,7 +21,8 @@ OpenPencil is the visual source of truth. Keep the existing ZuriLofts logo and A
 ## Work state
 
 - Audit completed: page hierarchy and design foundations; current generic theme and demo content diverge materially.
-- In progress: guest home and discovery. The stay detail route now loads a real API listing and gallery, but still needs visual alignment with frame `0:1935`. Do not claim other families complete until route-by-route visual and behavior checks pass.
-- In progress: functional checkout, sign-in, and public content pages have been restored from existing project implementations. Checkout header/progress, sign-in split layout, and Places card grid have been aligned to their OpenPencil frames; checkout details/payment, sign-up, Restaurants, Guides, and legal pages still need visual QA.
+- Guest home and discovery are visually QA'd at 1440px and 390px, including the mobile search stack, avatar auth menu, circular language menu, and mobile tab naming.
+- Sign-in and registration are aligned through the shared split auth shell and Flowbite controls, including the mobile layout. Public Places, Restaurants, Guides, legal pages, and the unknown-route state use the shared guest shell, white canvas, and repository photography.
+- The stay detail route loads a real API listing and gallery and is visually aligned with frame `0:1935`. Checkout details, add-ons, and payment passed desktop/mobile QA with the shared Flowbite controls and a 1080px checkout rhythm.
 - In progress: account/travel routes now use real profile, trips, booking history, favourites, shortlists and conversation pages behind the existing auth gate. The composite guest account scene `0:9318` still needs a dedicated dashboard/layout pass.
 - Preserve unrelated dirty worktree changes and never commit generated audit/build directories or credentials.

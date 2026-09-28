@@ -4,15 +4,15 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 
 | Application route(s) | OpenPencil reference | Visual status |
 | --- | --- | --- |
-| `/` | Product `0:4`, mobile `0:10192` | Implemented, QA ongoing |
-| `/properties` | Product `0:1629`, mobile `0:10333`; filters `0:3591`, `0:3745` | Implemented, QA ongoing |
-| `/property/:id` | Product `0:1935`, gallery `0:4441`, availability `0:4542` | Functional legacy, redesign pending |
-| `/booking/:id` | Product `0:2081`, `0:2153`, `0:2386`, `0:2559`, states `0:2708`, `0:2757` | Functional legacy, partial redesign |
+| `/` | Product `0:4`, mobile `0:10192` | Implemented; desktop/mobile QA passed for layout, navigation, controls |
+| `/properties` | Product `0:1629`, mobile `0:10333`; filters `0:3591`, `0:3745` | Implemented; desktop/mobile QA passed for search/filter layout and controls |
+| `/property/:id` | Product `0:1935`, gallery `0:4441`, availability `0:4542` | Implemented with real listing data and repository photography; desktop/mobile QA passed |
+| `/booking/:id` | Product `0:2081`, `0:2153`, `0:2386`, `0:2559`, states `0:2708`, `0:2757` | Implemented; desktop/mobile QA passed for details, add-ons, and payment |
 | `/payment/callback` | Product `0:2757` | Functional legacy, redesign pending |
-| `/login`, `/register`, `/auth/callback` | Product `0:1365`, `0:1538`, connection `0:3497` | Login partially aligned; remaining QA pending |
-| `/places`, `/restaurants` | Product `0:2825`, `0:10436`; `0:2858`, `0:10544` | Places partially aligned; restaurants pending |
-| `/guides`, `/guides/:id` | Product `0:2891`, `0:10948`; detail `0:2925`, `0:10857` | Functional legacy, redesign pending |
-| `/privacy`, `/terms`, unknown route | Product `0:3059`, `0:3110`, `0:2964` | Functional legacy, redesign pending |
+| `/login`, `/register`, `/auth/callback` | Product `0:1365`, `0:1538`, connection `0:3497` | Login and register aligned with shared Flowbite controls; desktop/mobile QA passed |
+| `/places`, `/restaurants` | Product `0:2825`, `0:10436`; `0:2858`, `0:10544` | Implemented with repository photography; desktop/mobile QA passed |
+| `/guides`, `/guides/:id` | Product `0:2891`, `0:10948`; detail `0:2925`, `0:10857` | Implemented with API data and repository photography; desktop/mobile QA passed |
+| `/privacy`, `/terms`, unknown route | Product `0:3059`, `0:3110`, `0:2964` | Implemented in the shared public shell with editorial legal layout; desktop/mobile QA passed |
 | `/s/:token`, `/shortlists`, `/shortlists/:id`, `/favourites` | Product `0:2989`, `0:3871` | Functional legacy, redesign pending |
 | `/trips`, `/booking-history` | Product `0:9318`, trip/history `0:4584` | Functional legacy, redesign pending |
 | `/inbox`, `/inbox/:id`, `/messages` | Product `0:9318`, conversation `0:3913` | Functional legacy, redesign pending |
@@ -32,3 +32,11 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/admin/feedback`, `/admin/messages` | Admin `0:7343`, governance `0:7458` | Functional legacy, redesign pending |
 
 OpenPencil has composite rather than standalone frames for several legacy CRUD screens. Their listed composite frame is the design-system anchor; a dedicated design frame should be added in OpenPencil if the implemented layout needs a distinct handoff. The repository photo assets, not design placeholders, supply product imagery.
+
+## Shared implementation rules verified
+
+- Page canvases are white. Beige/sand is reserved for accents, tinted panels, and interaction states.
+- Header guest actions are grouped under the avatar menu; language is a circular translate control.
+- Flowbite controls are styled through Tailwind's current `flowbite-react/dist` content path, with shared input/select/dropdown geometry from `src/flowbite-controls.css`.
+- Bronze action buttons use white text.
+- Mobile `Inbox` navigation matches the OpenPencil mobile tab naming.
