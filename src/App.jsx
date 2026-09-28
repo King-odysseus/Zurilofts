@@ -130,7 +130,7 @@ function Shell() {
   if (pathname === '/register') return <RegisterPage />;
   if (pathname === '/payment/callback') return <PaymentCallback />;
   if (pathname === '/trips') return <ProtectedRoute><TripHubPage /></ProtectedRoute>;
-  if (pathname === '/booking-history') return <ProtectedRoute><BookingHistoryPage /></ProtectedRoute>;
+  if (pathname === '/booking-history' || pathname === '/bookings') return <ProtectedRoute><BookingHistoryPage /></ProtectedRoute>;
   if (pathname === '/inbox') return <ProtectedRoute><InboxPage /></ProtectedRoute>;
   if (pathname.startsWith('/inbox/')) return <ProtectedRoute><ConversationPage /></ProtectedRoute>;
   if (pathname === '/messages') return <ProtectedRoute><MessagesPage /></ProtectedRoute>;
