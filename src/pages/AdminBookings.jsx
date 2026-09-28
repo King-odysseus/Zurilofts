@@ -505,26 +505,26 @@ function AdminBookings() {
               const actions = renderActions(booking);
               return (
                 <div className="op-admin-booking-row" role="row" key={booking.id}>
-                  <div role="cell">
+                  <div role="cell" data-label="Booking">
                     <strong>{bookingReference(booking.id)}</strong>
                     <small>{relativeBookingTime(booking.createdAt)}</small>
                   </div>
-                  <div role="cell" className="op-admin-booking-stay">
+                  <div role="cell" className="op-admin-booking-stay" data-label="Guest and stay">
                     <strong>{booking.user?.firstName || 'Guest'} {booking.user?.lastName || ''} - {booking.property?.title || 'Stay pending'}</strong>
                     <small>{booking.guests || 0} {booking.guests === 1 ? 'guest' : 'guests'} - {bedSummary(booking)}</small>
                   </div>
-                  <div role="cell" className="op-admin-booking-dates">
+                  <div role="cell" className="op-admin-booking-dates" data-label="Dates">
                     <strong>{formatDateRange(booking.checkIn, booking.checkOut)}</strong>
                     <small>
                       In {formatTime12h(booking.checkInTime || '15:00')} / Out {formatTime12h(booking.checkOutTime || '10:00')}
                       {isLateCheckout(booking.checkOutTime) && booking.lateCheckoutFee > 0 ? ` - +KES ${booking.lateCheckoutFee.toLocaleString()}` : ''}
                     </small>
                   </div>
-                  <div role="cell" className="op-admin-booking-payment">
+                  <div role="cell" className="op-admin-booking-payment" data-label="Payment">
                     <strong>{paymentSummary(booking)}</strong>
                     <small>KES {Number(booking.total || 0).toLocaleString()}</small>
                   </div>
-                  <div role="cell" className="op-admin-booking-status">
+                  <div role="cell" className="op-admin-booking-status" data-label="Status">
                     <span className={`op-admin-booking-pill is-${status.tone}`}>{status.label}</span>
                     {actions && <div className="op-admin-booking-actions">{actions}</div>}
                     {!isAdmin && <small>View only</small>}

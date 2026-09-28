@@ -8,7 +8,7 @@ import AdminListingReview from './pages/AdminListingReview.jsx';
 import AdminPropertyForm from './pages/AdminPropertyForm.jsx';
 import AdminCalendar from './pages/AdminCalendar.jsx';
 import AdminBookings from './pages/AdminBookings.jsx';
-import AdminEarnings from './pages/AdminEarnings.jsx';
+import AdminEarningsPage from './pages/AdminEarningsPage.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
 import AdminHostApplications from './pages/AdminHostApplications.jsx';
 import AdminPromos from './pages/AdminPromos.jsx';
@@ -16,7 +16,7 @@ import AdminAddOns from './pages/AdminAddOns.jsx';
 import AdminFeedback from './pages/AdminFeedback.jsx';
 import AdminMessages from './pages/AdminMessages.jsx';
 import AdminGuides from './pages/AdminGuides.jsx';
-import AdminPayouts from './pages/AdminPayouts.jsx';
+import AdminPayoutsPage from './pages/AdminPayoutsPage.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
 import HostCalendarPage from './pages/HostCalendarPage.jsx';
 import HostEarningsPage from './pages/HostEarningsPage.jsx';
@@ -45,7 +45,7 @@ export default function WorkspaceRoutes() {
       <Route path="properties/:id/edit" element={<AdminPropertyForm />} />
       <Route path="properties/:id/calendar" element={<AdminCalendar />} />
       <Route path="bookings" element={<AdminBookings />} />
-      <Route path="earnings" element={<AdminEarnings />} />
+      <Route path="earnings" element={<AdminEarningsPage />} />
       <Route path="users" element={<AdminUsers />} />
       <Route path="host-applications" element={<AdminHostApplications />} />
       <Route path="promos" element={<AdminPromos />} />
@@ -54,7 +54,7 @@ export default function WorkspaceRoutes() {
       <Route path="messages" element={<AdminMessages />} />
       <Route path="messages/:userId" element={<AdminMessages />} />
       <Route path="guides" element={<AdminGuides />} />
-      <Route path="payouts" element={<AdminPayouts />} />
+      <Route path="payouts" element={<AdminPayoutsPage />} />
     </Route>
     <Route path="*" element={<NotFoundPage />} />
   </Routes>;

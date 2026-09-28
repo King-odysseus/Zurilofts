@@ -521,6 +521,64 @@ html.dark .op-admin-main>div:last-child {
   background-color: var(--dm-bg);
 }
 
+html.dark :where(.op-admin-finance-toolbar, .op-admin-finance-panel, .op-admin-finance-board, .op-admin-finance-bar-row, .op-admin-finance-summary>p) {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-finance-summary>p.is-strong {
+  background-color: #24324A !important;
+}
+
+html.dark :where(.op-admin-finance-panel h2, .op-admin-finance-board h2, .op-admin-finance-bar-row strong, .op-admin-finance-bar-row>p, .op-admin-finance-summary>p>strong, .op-admin-finance-summary>p>span strong, .op-admin-finance-loading strong, .op-admin-finance-cell strong, .op-admin-finance-cell a) {
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(.op-admin-finance-panel-head p, .op-admin-finance-board-head p, .op-admin-finance-field>span, .op-admin-finance-bar-row span, .op-admin-finance-bar-row>p small, .op-admin-finance-summary>p, .op-admin-finance-summary>p>span small, .op-admin-finance-cell>span, .op-admin-finance-loading, .op-admin-finance-empty) {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-admin-finance-columns {
+  background-color: #0D1728 !important;
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-admin-finance-row {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+}
+
+html.dark .op-admin-finance-row:hover {
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark :where(.op-admin-finance-field input, .op-admin-finance-field select) {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-finance-bar-track {
+  background-color: #26364F !important;
+}
+
+html.dark .op-admin-finance-actions button {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-finance-export>button {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-finance-export>button:hover {
+  background-color: #172238 !important;
+}
+
 html.dark .op-admin-theme-toggle,
 html.dark .op-admin-mobile-theme {
   border-color: var(--dm-border-strong) !important;
