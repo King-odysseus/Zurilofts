@@ -428,9 +428,9 @@ function Navbar({ solid = false }) {
                 {/* Account / Profile menu */}
                 <div className="relative" ref={dropdownRef}>
                   <button
-                    onClick={() => { setDropdownOpen(false); setMenuOpen(true); }}
+                    onClick={() => { setMenuOpen(false); setDropdownOpen((open) => !open); }}
                     aria-haspopup="true"
-                    aria-expanded={menuOpen}
+                    aria-expanded={dropdownOpen}
                     aria-label="Open menu"
                     className="flex items-center space-x-2 px-2 py-2 rounded-full hover:bg-[#F6EFE7] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2"
                   >
@@ -765,6 +765,15 @@ function Navbar({ solid = false }) {
                   >
                     {t('nav.bookingHistory')}
                   </Link>
+                  {user?.role !== 'HOST' && (
+                    <Link
+                      to="/host/application"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {t('nav.becomeHost')}
+                    </Link>
+                  )}
                   <Link
                     to="/terms"
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"

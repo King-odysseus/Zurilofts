@@ -81,6 +81,18 @@ function HeaderUserMenu({ user, isAdmin, onLogout }) {
             </svg>
             My Profile
           </Link>
+          {user?.role !== 'HOST' && (
+            <Link
+              to="/host/application"
+              onClick={() => setOpen(false)}
+              className="flex items-center px-4 py-2.5 text-sm text-[#1f2937] hover:bg-[#D9D9D9]/30 transition-colors"
+            >
+              <svg className="w-4 h-4 mr-3 text-[#6b7280]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 10h.01M15 10h.01" />
+              </svg>
+              Become a host
+            </Link>
+          )}
           <Link
             to="/admin/messages"
             onClick={() => setOpen(false)}
@@ -124,6 +136,7 @@ HeaderUserMenu.propTypes = {
     lastName: PropTypes.string,
     email: PropTypes.string,
     avatar: PropTypes.string,
+    role: PropTypes.string,
   }),
   isAdmin: PropTypes.bool,
   onLogout: PropTypes.func.isRequired,
