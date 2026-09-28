@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 function Lightbox({ images, initialIndex = 0, onClose }) {
   const [index, setIndex] = useState(initialIndex);
@@ -56,9 +57,7 @@ function Lightbox({ images, initialIndex = 0, onClose }) {
           className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
           aria-label="Close gallery"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-6 h-6" strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
 
@@ -74,9 +73,7 @@ function Lightbox({ images, initialIndex = 0, onClose }) {
           className="absolute left-2 sm:left-6 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
           aria-label="Previous image"
         >
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft className="w-6 h-6 text-white" strokeWidth={2} aria-hidden="true" />
         </button>
 
         <img
@@ -91,9 +88,7 @@ function Lightbox({ images, initialIndex = 0, onClose }) {
           className="absolute right-2 sm:right-6 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
           aria-label="Next image"
         >
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+          <ChevronRight className="w-6 h-6 text-white" strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
 

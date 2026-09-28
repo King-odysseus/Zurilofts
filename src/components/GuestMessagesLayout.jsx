@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { MessageCircleMore } from 'lucide-react';
 import GuestAccountLayout from './GuestAccountLayout.jsx';
 import { firstImage } from '../utils/images.js';
 import { getConversationParticipant } from '../utils/conversations.js';
@@ -78,7 +79,7 @@ ConversationRow.propTypes = {
 function SupportRow({ selected }) {
   return <Link to="/messages" className={`opg-conversation-row opg-support-row${selected ? ' is-selected' : ''}`}>
     <span className="opg-conversation-avatar is-support">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.96 7.96 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+      <MessageCircleMore strokeWidth={1.8} aria-hidden="true" />
     </span>
     <span className="opg-conversation-summary">
       <span className="opg-conversation-line"><strong>ZuriLofts Support</strong><span>Help</span></span>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { CircleCheckBig, MapPin } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -296,19 +297,14 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
       <div className="flex items-start gap-2 mt-3" aria-live="polite">
         {hasPin ? (
           <>
-            <svg className="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            <CircleCheckBig className="w-5 h-5 text-green-600 shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
             <p className="text-sm text-[#0B1F42]">
               Pin dropped. Drag it or click elsewhere to adjust - or clear the pin to search a new place.
             </p>
           </>
         ) : (
           <>
-            <svg className="w-5 h-5 text-[#C49A6C] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
+            <MapPin className="w-5 h-5 text-[#C49A6C] shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
             <p className="text-sm text-[#5B6B82]">
               Type the estate or street below and pick a result, or click the map to drop the pin.
             </p>
@@ -362,10 +358,7 @@ function PropertyLocationPicker({ lat, lng, address, onChange }) {
                   className="flex w-full items-start gap-2.5 px-3.5 py-2.5 text-left text-sm text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
                   onMouseDown={() => chooseResult(r)}
                 >
-                  <svg className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
+                  <MapPin className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" strokeWidth={2} aria-hidden="true" />
                   <span className="min-w-0">{r.label || `${r.lat.toFixed(5)}, ${r.lng.toFixed(5)}`}</span>
                 </button>
               </li>

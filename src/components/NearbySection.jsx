@@ -2,6 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Select, TextInput } from 'flowbite-react';
+import { ArrowRight, LayoutGrid, Map, MapPin } from 'lucide-react';
 import Spinner from './Spinner.jsx';
 import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 
@@ -20,10 +21,7 @@ function NearbyCard({ item, areaLabels, categoryLabels }) {
         <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-[14px]" src={item.image} alt={item.name} />
         <span className="op-place-area">{areaLabels[item.area] || item.area}</span><a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
            className="absolute bottom-2 right-2 z-10 rounded-full bg-white/90 p-2 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-[#0B1F42] hover:text-white">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <MapPin className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
         </a>
       </div>
       <div className="op-place-copy p-5">
@@ -95,18 +93,14 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             className={`rounded-[10px] p-2 transition-colors ${viewMode === 'grid' ? 'bg-[#0B1F42] text-white' : 'bg-[#F7F4EF] text-[#52606F]'}`}
             aria-label="Grid view"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-            </svg>
+            <LayoutGrid className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           </button>
           <button
             onClick={() => setViewMode('map')}
             className={`rounded-[10px] p-2 transition-colors ${viewMode === 'map' ? 'bg-[#0B1F42] text-white' : 'bg-[#F7F4EF] text-[#52606F]'}`}
             aria-label="Map view"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l5.447 2.724A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-            </svg>
+            <Map className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -133,9 +127,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] px-8 py-3 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
               >
                 View All {filtered.length} Places
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
+                <ArrowRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
               </Link>
             </div>
           )}

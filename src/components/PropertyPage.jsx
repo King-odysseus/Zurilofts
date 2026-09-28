@@ -1,6 +1,7 @@
 import { useLocation, useParams, useSearchParams, Link } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { ArrowLeft, Bath, Building2, Check, ChevronLeft, ChevronRight, CircleAlert, House, Map, MapPin, Ruler, ShieldCheck, Star } from 'lucide-react';
 import Lightbox from './Lightbox.jsx';
 import ReviewSection from './ReviewSection.jsx';
 import PropertyTrustPanel from './PropertyTrustPanel';
@@ -119,9 +120,7 @@ function PropertyPage() {
         <main className="flex items-center justify-center min-h-[60vh]" role="alert">
           <div className="text-center px-4">
             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
-              </svg>
+              <CircleAlert className="w-10 h-10 text-red-500" strokeWidth={2} aria-hidden="true" />
             </div>
             <h2 className="mb-2 text-xl font-bold text-[#0B1F42]">Property Not Found</h2>
             <p className="mb-4 text-[#5B6B82]">{error || 'This property could not be loaded.'}</p>
@@ -185,9 +184,7 @@ function PropertyPage() {
                 to="/properties"
                 className="inline-flex min-h-[44px] items-center rounded text-[#0B1F42] transition-colors duration-200 hover:text-[#9A744A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
               >
-                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
+                <ArrowLeft className="w-4 h-4 mr-1.5" strokeWidth={2} aria-hidden="true" />
                 Back to Stays
               </Link>
             </li>
@@ -224,18 +221,14 @@ function PropertyPage() {
                     className="absolute top-1/2 -translate-y-1/2 left-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] transition-colors shadow-md"
                     aria-label="Previous photo"
                   >
-                    <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
+                    <ChevronLeft className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
                   </button>
                   <button
                     onClick={goNext}
                     className="absolute top-1/2 -translate-y-1/2 right-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] transition-colors shadow-md"
                     aria-label="Next photo"
                   >
-                    <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
+                    <ChevronRight className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
                   </button>
                 </div>
 
@@ -272,18 +265,13 @@ function PropertyPage() {
               className="inline-flex items-center gap-1.5 min-h-[44px] rounded-full transition-colors hover:text-[#9A744A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
               title="Get directions in Google Maps"
             >
-              <svg className="w-5 h-5 text-[#5B6B82] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
+              <MapPin className="w-5 h-5 text-[#5B6B82] shrink-0" strokeWidth={2} aria-hidden="true" />
               {property.location}
               <span className="text-xs font-semibold">Google Maps ↗</span>
             </a>
             {typeof property.rating === 'number' && property.rating > 0 && (
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#0B1F42]" aria-label={`Rated ${property.rating} out of 5 from ${property.reviews || 0} reviews`}>
-                <svg className="w-4 h-4 text-amber-500" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
+                <Star className="w-4 h-4 text-amber-500" fill="currentColor" aria-hidden="true" />
                 {property.rating}
                 <span className="font-normal text-[#5B6B82]">
                   &middot; {property.reviews === 1 ? '1 review' : `${property.reviews || 0} reviews`}
@@ -308,36 +296,28 @@ function PropertyPage() {
             {/* Quick facts */}
             <section className="flex flex-wrap gap-5 sm:gap-8 mb-8 py-8 md:py-10 border-b border-[#E3E8EF]" aria-label="Key facts">
               <div className="flex items-center gap-2">
-                <svg className="h-6 w-6 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
-                </svg>
+                <House className="h-6 w-6 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
                 <div>
                   <p className="font-bold text-[#0B1F42]">{displayBedrooms}</p>
                   <p className="text-sm text-[#5B6B82]">{displayBedrooms === 1 ? 'Bedroom' : 'Bedrooms'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-6 w-6 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                </svg>
+                <Bath className="h-6 w-6 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
                 <div>
                   <p className="font-bold text-[#0B1F42]">{displayBathrooms}</p>
                   <p className="text-sm text-[#5B6B82]">{displayBathrooms === 1 ? 'Bathroom' : 'Bathrooms'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-6 w-6 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-                </svg>
+                <Ruler className="h-6 w-6 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
                 <div>
                   <p className="font-bold text-[#0B1F42]">{property.area} sq ft</p>
                   <p className="text-sm text-[#5B6B82]">Area</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="h-6 w-6 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+                <Building2 className="h-6 w-6 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
                 <div>
                   <p className="font-bold text-[#0B1F42]">{typeLabel}</p>
                   <p className="text-sm text-[#5B6B82]">Type</p>
@@ -362,9 +342,7 @@ function PropertyPage() {
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="list">
                   {amenities.map((amenity, index) => (
                     <li key={index} className="flex items-center gap-3">
-                      <svg className="h-5 w-5 shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+                      <Check className="h-5 w-5 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
                       <span className="text-[#1f2937]">{amenity}</span>
                     </li>
                   ))}
@@ -379,10 +357,7 @@ function PropertyPage() {
                 <ul className="space-y-3" role="list">
                   {nearby.map((item, index) => (
                     <li key={index} className="flex items-start gap-3 text-[#1f2937]">
-                      <svg className="w-5 h-5 text-[#5B6B82] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
+                      <MapPin className="w-5 h-5 text-[#5B6B82] shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -425,9 +400,7 @@ function PropertyPage() {
               {/* Bed variant chip - only when arriving from a variant card */}
               {variantLabel && (
                 <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#0B1F42]">
-                  <svg className="w-4 h-4 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1" />
-                  </svg>
+                  <House className="w-4 h-4 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
                   {variantLabel}
                 </div>
               )}
@@ -483,18 +456,14 @@ function PropertyPage() {
                 <ul className="space-y-2 text-sm text-[#5B6B82]">
                   {hasReviews && (
                     <li className="flex items-start gap-2">
-                      <svg className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                      </svg>
+                      <Star className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" fill="currentColor" aria-hidden="true" />
                       <span>
                         <span className="font-semibold text-[#0B1F42]">{property.rating}</span> rating &middot; {reviewLabel}
                       </span>
                     </li>
                   )}
                   <li className="flex items-start gap-2">
-                    <svg className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
+                    <ShieldCheck className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" strokeWidth={2} aria-hidden="true" />
                     <span>Secure booking via Paystack</span>
                   </li>
                 </ul>
@@ -571,9 +540,7 @@ function PropertyPinMap({ lat, lng, address, location, title }) {
           rel="noopener noreferrer"
           className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] bg-[#0B1F42] px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#07072E]"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-          </svg>
+          <Map className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           Get directions
         </a>
       </div>

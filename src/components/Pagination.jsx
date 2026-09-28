@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 function pageList(page, totalPages) {
   const pages = [];
@@ -44,9 +45,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
             aria-label="Previous page"
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-sm transition-all hover:bg-[#F7F4EF] hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
+            <ChevronLeft className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           </button>
           {pageList(page, totalPages).map((p, i) =>
             p === '...' ? (
@@ -72,9 +71,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
             aria-label="Next page"
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-sm transition-all hover:bg-[#F7F4EF] hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+            <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           </button>
         </nav>
       )}

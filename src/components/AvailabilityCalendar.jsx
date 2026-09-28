@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 // Local YYYY-MM-DD (avoids UTC off-by-one from toISOString)
 function toISO(date) {
@@ -157,9 +158,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
           className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F7F4EF] disabled:cursor-not-allowed disabled:opacity-30"
           aria-label="Previous month"
         >
-          <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
+          <ChevronLeft className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
         </button>
         <button
           type="button"
@@ -167,9 +166,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
           className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F7F4EF]"
           aria-label="Next month"
         >
-          <svg className="h-5 w-5 text-[#0B1F42]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+          <ChevronRight className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
 

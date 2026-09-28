@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { Check, ChevronDown } from 'lucide-react';
 
 /**
  * Custom select that renders an app-styled fly-out menu (matching the navbar
@@ -47,14 +48,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
         <span className={selected ? 'truncate text-[#0B1F42]' : 'truncate text-[#94A3B8]'}>
           {selected ? selected.label : placeholder}
         </span>
-        <svg
-          className={`h-4 w-4 flex-shrink-0 text-[#5B6B82] transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <ChevronDown className={`h-4 w-4 flex-shrink-0 text-[#5B6B82] transition-transform duration-200 ${open ? 'rotate-180' : ''}`} strokeWidth={2} aria-hidden="true" />
       </button>
 
       {open && (
@@ -80,9 +74,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
               >
                 <span className="flex-1">{o.label}</span>
                 {isSel && (
-                  <svg className="ml-2 h-4 w-4 flex-shrink-0 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="ml-2 h-4 w-4 flex-shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
                 )}
               </button>
             );

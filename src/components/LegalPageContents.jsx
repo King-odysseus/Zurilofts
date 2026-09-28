@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import { ChevronDown } from 'lucide-react';
 
 // Scans the rendered article for h2 headings and assigns each a stable id
 // (derived from its own text) so a contents nav can link to them - no
@@ -51,9 +52,7 @@ export function LegalPageContentsMobile({ containerRef }) {
         className="flex min-h-[44px] w-full items-center justify-between gap-2 px-5 py-3 text-left text-sm font-semibold text-[#0B1F42]"
       >
         Contents
-        <svg className={`h-4 w-4 text-[#5B6B82] transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <ChevronDown className={`h-4 w-4 text-[#5B6B82] transition-transform ${open ? 'rotate-180' : ''}`} strokeWidth={2} aria-hidden="true" />
       </button>
       {open && (
         <ul id="legal-toc-mobile" className="space-y-2 border-t border-[#E3E8EF] px-5 py-4">

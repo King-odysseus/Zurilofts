@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { X } from 'lucide-react';
 import AvailabilityCalendar from './AvailabilityCalendar.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
@@ -85,9 +86,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
                 aria-label="Close"
                 className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-[#F7F4EF]"
               >
-                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
+                <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
               </button>
             </div>
             <AvailabilityCalendar value={dates} onChange={onDatesChange} />
@@ -138,9 +137,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
                 aria-label="Close"
                 className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-[#F7F4EF]"
               >
-                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                </svg>
+                <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
               </button>
             </div>
             <div className="flex items-center justify-between py-2">

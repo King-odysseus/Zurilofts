@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { ChevronLeft } from 'lucide-react';
 
 // Fallbacks cover direct visits where there is no in-app history entry.
 const fallbackRules = [
@@ -44,9 +45,7 @@ function RouteBackButton({ className = '', label = 'Back' }) {
       aria-label="Go back to the previous page"
       title="Go back"
     >
-      <svg className="h-5 w-5 flex-none" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M15 19l-7-7 7-7" />
-      </svg>
+      <ChevronLeft className="h-5 w-5 flex-none" strokeWidth={1.8} aria-hidden="true" />
       <span className="hidden lg:inline">{label}</span>
     </button>
   );

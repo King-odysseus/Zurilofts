@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Dropdown, DropdownItem } from 'flowbite-react';
+import { Languages } from 'lucide-react';
 import logoImg from '../assets/zurilofts-logo.png';
 import { zuriImages } from '../assets/images';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -10,12 +11,7 @@ import RouteBackButton from './RouteBackButton.jsx';
 const bgImage = zuriImages[14];
 
 function GlobeIcon() {
-  return (
-    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M3.6 9h16.8M3.6 15h16.8M12 3c2.2 2.45 3.3 5.45 3.3 9S14.2 18.55 12 21c-2.2-2.45-3.3-5.45-3.3-9S9.8 5.45 12 3z" />
-    </svg>
-  );
+  return <Languages className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function AuthShell({ children }) {

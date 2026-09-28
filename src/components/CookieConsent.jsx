@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Cookie } from 'lucide-react';
 import apiClient from '../api/client.js';
 import {
   getConsent,
@@ -110,10 +111,7 @@ function CookieConsent() {
       <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
         <div className="flex items-start gap-3 mb-3">
           <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[#C49A6C]/15 flex items-center justify-center">
-            <svg className="w-5 h-5 text-[#C49A6C]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 2a10 10 0 100 20 10 10 0 000-20z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 9h.01M15 13h.01M10 15h.01M14 9h.01" />
-            </svg>
+            <Cookie className="w-5 h-5 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
           </div>
           <div>
             <h2 className="text-base font-semibold text-[#0B1F42]">

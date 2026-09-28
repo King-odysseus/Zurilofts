@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
+import { Heart } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 
@@ -80,9 +81,7 @@ export default function SaveToShortlistButton({ propertyId }) {
             : "border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-sm hover:bg-[#F7F4EF] hover:shadow-md"
         }`}
       >
-        <svg className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-        </svg>
+        <Heart className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} strokeWidth={2} aria-hidden="true" />
         {isSaved ? `Saved (${savedIds.size})` : "Save"}
       </button>
 

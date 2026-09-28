@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
+import { Check, Info, X } from 'lucide-react';
 
 const ToastContext = createContext(null);
 
@@ -9,29 +10,17 @@ const KIND_META = {
   success: {
     iconBg: 'bg-emerald-100',
     iconColor: 'text-emerald-600',
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-      </svg>
-    ),
+    icon: <Check className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />,
   },
   error: {
     iconBg: 'bg-red-100',
     iconColor: 'text-red-600',
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    ),
+    icon: <X className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />,
   },
   info: {
     iconBg: 'bg-[#C49A6C]/15',
     iconColor: 'text-[#C49A6C]',
-    icon: (
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
+    icon: <Info className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />,
   },
 };
 
@@ -54,9 +43,7 @@ function ToastCard({ toast, onDismiss }) {
         aria-label="Dismiss notification"
         className="flex-shrink-0 -mr-1 text-[#6b7280]/60 hover:text-[#1f2937] transition-colors"
       >
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <X className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
       </button>
     </div>
   );

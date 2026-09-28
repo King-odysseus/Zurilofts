@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { Heart, Image as ImageIcon, MapPin, Star } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 
@@ -66,7 +67,7 @@ function PropertyCard({ property, cardVariant }) {
           <div className="relative aspect-[3/2] overflow-hidden rounded-2xl bg-[#E7EDF4]">
             {image ? <img src={image} alt={title || 'Property image'} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy" /> : <div className="h-full w-full bg-[#E7EDF4]" />}
             <button type="button" onClick={handleToggleFavorite} className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-[#0B1F42] transition hover:scale-105 hover:bg-white" aria-label={isLiked ? 'Remove from favourites' : 'Add to favourites'}>
-              <svg className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.6" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" /></svg>
+              <Heart className={`h-4 w-4 ${isLiked ? 'fill-red-500 text-red-500' : ''}`} fill={isLiked ? 'currentColor' : 'none'} strokeWidth={1.6} aria-hidden="true" />
             </button>
           </div>
           <div className="pt-3">
@@ -103,9 +104,7 @@ function PropertyCard({ property, cardVariant }) {
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
-            <svg className="w-12 h-12 text-[#E3E8EF]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
+            <ImageIcon className="w-12 h-12 text-[#E3E8EF]" strokeWidth={1.5} aria-hidden="true" />
           </div>
         )}
 
@@ -133,15 +132,7 @@ function PropertyCard({ property, cardVariant }) {
           className="absolute right-1.5 top-1.5 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm transition-all duration-200 hover:scale-110 hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-[#C49A6C]"
           aria-label={isLiked ? 'Remove from favourites' : 'Add to favourites'}
         >
-          <svg
-            className={`w-5 h-5 transition-colors duration-200 ${isLiked ? 'text-red-500 fill-current' : 'text-[#5B6B82] hover:text-red-400'}`}
-            fill={isLiked ? 'currentColor' : 'none'}
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-          </svg>
+          <Heart className={`w-5 h-5 transition-colors duration-200 ${isLiked ? 'text-red-500 fill-current' : 'text-[#5B6B82] hover:text-red-400'}`} fill={isLiked ? 'currentColor' : 'none'} strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
 
@@ -154,9 +145,7 @@ function PropertyCard({ property, cardVariant }) {
           </h3>
           {rating != null && (
             <div className="flex items-center gap-1 flex-shrink-0" aria-label={`Rated ${rating} out of 5`}>
-              <svg className="w-3.5 h-3.5 text-amber-500 fill-current" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
+              <Star className="w-3.5 h-3.5 text-amber-500 fill-current" aria-hidden="true" />
               <span className="text-xs font-bold text-[#0B1F42]">
                 {typeof rating === 'number' ? rating.toFixed(1) : rating}
               </span>
@@ -169,10 +158,7 @@ function PropertyCard({ property, cardVariant }) {
 
         {/* Location */}
         <div className="mb-1 flex items-center text-[#5B6B82]">
-          <svg className="w-3.5 h-3.5 mr-1 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <MapPin className="w-3.5 h-3.5 mr-1 flex-shrink-0" strokeWidth={2} aria-hidden="true" />
           <span className="text-xs truncate">{location || 'TBA'}</span>
         </div>
 

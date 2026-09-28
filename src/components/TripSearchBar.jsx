@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { Search, X } from 'lucide-react';
 import SearchDateGuestFields from './SearchDateGuestFields.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
@@ -11,9 +12,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
           {loading ? (
             <div className="mr-2 h-5 w-5 flex-shrink-0 animate-spin rounded-full border-2 border-[#C49A6C] border-t-transparent sm:mr-3" />
           ) : (
-            <svg className="h-5 w-5 flex-shrink-0 text-[#0B1F42] mr-2 sm:mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+            <Search className="h-5 w-5 flex-shrink-0 text-[#0B1F42] mr-2 sm:mr-3" strokeWidth={2} aria-hidden="true" />
           )}
           <label htmlFor="trip-search-destination" className="sr-only">
             Search destinations or neighbourhoods
@@ -35,13 +34,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
               aria-label="Clear search"
               className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-[#5B6B82] transition-colors duration-150 hover:bg-[#F7F4EF] hover:text-[#0B1F42] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
             >
-              <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
             </button>
           )}
         </div>
@@ -59,9 +52,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveS
           className={`min-h-[44px] w-full whitespace-nowrap rounded-full bg-[#0B1F42] px-6 py-3 text-base font-semibold text-white transition-all duration-200 hover:bg-[#07072E] active:translate-y-px focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${discovery ? 'sm:h-12 sm:w-12 sm:px-0 sm:text-transparent' : 'sm:w-auto sm:px-8'}`}
         >
           {discovery ? (
-            <svg className="mx-auto h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z" />
-            </svg>
+            <Search className="mx-auto h-5 w-5 text-white" strokeWidth={2.5} aria-hidden="true" />
           ) : (loading ? 'Searching…' : 'Search')}
           {discovery && <span className="sr-only">Search</span>}
         </button>

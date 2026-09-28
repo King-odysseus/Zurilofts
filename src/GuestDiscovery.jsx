@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Datepicker, Dropdown, DropdownItem, Label, Select } from 'flowbite-react';
+import { Search } from 'lucide-react';
 import apiClient from './api/client.js';
 import { heroImage } from './assets/images.js';
 import { useAuth } from './context/AuthContext.jsx';
@@ -147,7 +148,7 @@ function SearchForm({ initial = DEFAULT_SEARCH_LOCATION, allKenya = false }) {
     </div>
     <Button type="submit" aria-label="Search stays" className="opg-search-submit" pill>
       <span className="opg-search-desktop-label" aria-hidden="true">
-        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        <Search className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
       </span>
       <span className="opg-search-mobile-label">Search stays</span>
     </Button>

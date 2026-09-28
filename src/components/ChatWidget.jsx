@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { MessagesSquare, Send, X } from 'lucide-react';
 import apiClient from '../api/client.js';
 
 const STORAGE_KEY = 'zuri_chat_session';
@@ -143,9 +144,7 @@ function ChatWidget() {
           className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#0B1F42] shadow-lg transition-all duration-200 group hover:scale-110 hover:shadow-xl"
           aria-label="Open chat"
         >
-          <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
+          <MessagesSquare className="w-7 h-7 text-white" strokeWidth={2} aria-hidden="true" />
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></span>
         </button>
       )}
@@ -157,9 +156,7 @@ function ChatWidget() {
           <div className="flex items-center justify-between bg-[#0B1F42] px-5 py-4">
             <div className="flex items-center space-x-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#C49A6C]">
-                <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
+                <MessagesSquare className="w-5 h-5 text-white" strokeWidth={2} aria-hidden="true" />
               </div>
               <div>
                 <p className="text-white font-semibold text-sm">ZuriLofts Chat</p>
@@ -167,9 +164,7 @@ function ChatWidget() {
               </div>
             </div>
             <button onClick={() => setOpen(false)} className="text-white/60 hover:text-white transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
             </button>
           </div>
 
@@ -245,9 +240,7 @@ function ChatWidget() {
                     {sending ? (
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>
                     ) : (
-                      <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                      </svg>
+                      <Send className="h-5 w-5 text-white" strokeWidth={2} aria-hidden="true" />
                     )}
                   </button>
                 </div>
