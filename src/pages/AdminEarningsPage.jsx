@@ -9,6 +9,8 @@ import {
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import apiClient from '../api/client.js';
+import FlowbiteChart, { FlowbiteGauge } from '../components/FlowbiteChart.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 
 const PERIOD_OPTIONS = [
   { value: 'all', label: 'All time' },
@@ -37,6 +39,18 @@ function safeNumber(value) {
 
 function formatKes(value) {
   return `KES ${safeNumber(value).toLocaleString('en-KE')}`;
+}
+
+function compactKes(value) {
+  const amount = safeNumber(value);
+  if (amount >= 1000000) return `KES ${(amount / 1000000).toFixed(amount % 1000000 ? 1 : 0)}M`;
+  if (amount >= 1000) return `KES ${Math.round(amount / 1000)}K`;
+  return formatKes(amount);
+}
+
+function shortChartLabel(value, maxLength = 18) {
+  const label = String(value || 'Untitled property');
+  return label.length > maxLength ? `${label.slice(0, maxLength - 1)}...` : label;
 }
 
 function formatDate(value) {
@@ -140,6 +154,7 @@ function csvCell(value) {
 }
 
 function AdminEarningsPage() {
+  const { isDark } = useTheme();
   const [rows, setRows] = useState([]);
   const [hosts, setHosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -208,7 +223,6 @@ function AdminEarningsPage() {
     [visibleRows],
   );
   const totals = useMemo(() => sumTotals(earningRows), [earningRows]);
-  const maxEarnings = Math.max(...earningRows.map((row) => safeNumber(row.earnings)), 1);
   const topEarner = [...earningRows].sort((left, right) => safeNumber(right.earnings) - safeNumber(left.earnings))[0] || null;
   const activeProperties = earningRows.length;
   const averageBooking = totals.bookings > 0 ? Math.round(totals.earnings / totals.bookings) : 0;
@@ -218,6 +232,75 @@ function AdminEarningsPage() {
   const bedTotal = totals.bed1Earnings + totals.bed2Earnings;
   const bed1Share = bedTotal > 0 ? Math.round((totals.bed1Earnings / bedTotal) * 100) : 0;
   const bed2Share = bedTotal > 0 ? 100 - bed1Share : 0;
+  const whtRate = totals.grossRent > 0 ? (totals.wht / totals.grossRent) * 100 : 0;
+  const takeHome = Math.max(0, totals.hostNet - totals.wht);
+
+  const propertyChartRows = useMemo(
+    () => [...earningRows]
+      .sort((left, right) => safeNumber(right.grossRent || right.earnings) - safeNumber(left.grossRent || left.earnings))
+      .slice(0, 8),
+    [earningRows],
+  );
+
+  const revenueChartSeries = useMemo(() => [
+    {
+      name: 'Gross booking value',
+      data: propertyChartRows.map((row) => safeNumber(row.grossRent || row.earnings)),
+    },
+    {
+      name: 'Host net',
+      data: propertyChartRows.map((row) => safeNumber(row.hostNet)),
+    },
+  ], [propertyChartRows]);
+
+  const revenueChartOptions = useMemo(() => ({
+    chart: {
+      type: 'line',
+      toolbar: { show: false },
+      fontFamily: 'Inter, Arial, sans-serif',
+      animations: { enabled: true, speed: 450 },
+    },
+    colors: [isDark ? '#8FB4FF' : '#0B1F42', isDark ? '#E3B987' : '#C49A6C'],
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth', width: 3 },
+    markers: { size: 4, strokeWidth: 2, hover: { size: 6 } },
+    grid: {
+      borderColor: isDark ? '#31415B' : '#E5E7EB',
+      strokeDashArray: 4,
+      padding: { left: 20, right: 20 },
+    },
+    legend: {
+      position: 'top',
+      horizontalAlign: 'right',
+      fontSize: '12px',
+      fontWeight: 600,
+      labels: { colors: isDark ? '#CBD5E1' : '#475569' },
+      markers: { width: 9, height: 9, radius: 9 },
+    },
+    xaxis: {
+      categories: propertyChartRows.map((row) => shortChartLabel(row.title)),
+      labels: {
+        rotate: -32,
+        rotateAlways: propertyChartRows.length > 4,
+        hideOverlappingLabels: true,
+        trim: true,
+        style: { colors: isDark ? '#94A3B8' : '#64748B', fontSize: '10px' },
+      },
+      axisBorder: { color: isDark ? '#31415B' : '#E5E7EB' },
+      axisTicks: { color: isDark ? '#31415B' : '#E5E7EB' },
+      tooltip: { enabled: false },
+    },
+    yaxis: {
+      labels: {
+        formatter: compactKes,
+        style: { colors: [isDark ? '#94A3B8' : '#64748B'], fontSize: '10px' },
+      },
+    },
+    tooltip: {
+      theme: isDark ? 'dark' : 'light',
+      y: { formatter: formatKes },
+    },
+  }), [isDark, propertyChartRows]);
 
   const rangeLabel = useMemo(() => {
     if (period === 'all') return 'All time';
@@ -230,15 +313,6 @@ function AdminEarningsPage() {
     { label: 'HOST NET REVENUE', value: formatKes(totals.hostNet), note: `${hostNetPct}% of gross rent` },
     { label: 'SERVICE FEES', value: formatKes(totals.serviceFees), note: `${serviceFeePct}% of gross rent` },
     { label: 'WHT 5%', value: formatKes(totals.wht), note: 'Remitted to KRA' },
-  ];
-
-  const feeRows = [
-    { label: 'Gross rent', value: formatKes(totals.grossRent) },
-    { label: 'Service fees', value: `-${formatKes(totals.serviceFees)}` },
-    { label: 'Discounts', value: `-${formatKes(totals.discounts)}` },
-    { label: 'Host net', value: formatKes(totals.hostNet), strong: true },
-    { label: 'WHT 5%', value: `-${formatKes(totals.wht)}` },
-    { label: 'Take-home', value: formatKes(Math.max(0, totals.hostNet - totals.wht)), strong: true },
   ];
 
   function handleExportCsv() {
@@ -368,34 +442,25 @@ function AdminEarningsPage() {
         </div>
       ) : (
         <>
-          <div className="op-admin-finance-grid">
-            <section className="op-admin-finance-panel">
+          <div className="op-admin-finance-chart-stack">
+            <section className="op-admin-finance-panel op-admin-finance-chart-panel">
               <div className="op-admin-finance-panel-head">
                 <div>
-                  <h2>Revenue by property</h2>
-                  <p>{rangeLabel} against the strongest performing stay.</p>
+                  <h2>Revenue performance</h2>
+                  <p>Gross booking value and host net across the strongest properties.</p>
                 </div>
-                <span>{earningRows.length} active</span>
+                <span>{rangeLabel}</span>
               </div>
               {earningRows.length === 0 ? (
                 <div className="op-admin-finance-empty">No property earnings match the current view.</div>
               ) : (
-                <div className="op-admin-finance-bars">
-                  {earningRows.slice(0, 7).map((row) => {
-                    const share = totals.earnings > 0 ? Math.round((safeNumber(row.earnings) / totals.earnings) * 100) : 0;
-                    return (
-                      <div className="op-admin-finance-bar-row" key={row.id || row.title}>
-                        <div>
-                          <strong>{row.title || 'Untitled property'}</strong>
-                          <span>{row.location || 'Location not set'}</span>
-                        </div>
-                        <div className="op-admin-finance-bar-track" aria-hidden="true">
-                          <span style={{ width: `${Math.max(3, Math.round((safeNumber(row.earnings) / maxEarnings) * 100))}%` }} />
-                        </div>
-                        <p>{formatKes(row.earnings)} <small>{share}%</small></p>
-                      </div>
-                    );
-                  })}
+                <div className="op-admin-finance-chart-frame">
+                  <FlowbiteChart
+                    options={revenueChartOptions}
+                    series={revenueChartSeries}
+                    height={310}
+                    ariaLabel={`Revenue performance for ${earningRows.length} properties`}
+                  />
                 </div>
               )}
               <div className="op-admin-finance-insights">
@@ -404,27 +469,43 @@ function AdminEarningsPage() {
               </div>
             </section>
 
-            <aside className="op-admin-finance-panel">
+            <section className="op-admin-finance-panel op-admin-finance-gauge-panel">
               <div className="op-admin-finance-panel-head">
                 <div>
-                  <h2>Fee breakdown</h2>
-                  <p>Revenue and deductions for the current view.</p>
+                  <h2>Performance status</h2>
+                  <p>Margin, confirmation, and tax health for the current view.</p>
                 </div>
               </div>
-              <div className="op-admin-finance-summary">
-                {feeRows.map((item) => (
-                  <p key={item.label} className={item.strong ? 'is-strong' : ''}>
-                    <span>{item.label}</span>
-                    <strong>{item.value}</strong>
-                  </p>
-                ))}
+              <div className="op-flowbite-gauge-grid op-admin-finance-gauge-columns">
+                <FlowbiteGauge
+                  label="Host net margin"
+                  value={hostNetPct}
+                  note={`${formatKes(totals.hostNet)} retained from gross rent`}
+                  color="#0B1F42"
+                  height={122}
+                />
+                <FlowbiteGauge
+                  label="Confirmation rate"
+                  value={confirmationRate}
+                  note={`${totals.confirmedBookings} of ${totals.bookings} bookings confirmed`}
+                  color="#3F8F62"
+                  height={122}
+                />
+                <FlowbiteGauge
+                  label="WHT share"
+                  value={whtRate}
+                  note={`${formatKes(totals.wht)} remitted to KRA`}
+                  color="#C49A6C"
+                  height={122}
+                />
               </div>
-              <div className="op-admin-finance-note">
-                <span>AVERAGE BOOKING</span>
-                <strong>{formatKes(averageBooking)}</strong>
-                <small>{confirmationRate}% confirmed | {bed1Share}% 1-bed | {bed2Share}% 2-bed</small>
+              <div className="op-admin-finance-gauge-foot">
+                <p><span>Average booking</span><strong>{formatKes(averageBooking)}</strong></p>
+                <p><span>Discounts</span><strong>-{formatKes(totals.discounts)}</strong></p>
+                <p><span>Take-home after WHT</span><strong>{formatKes(takeHome)}</strong></p>
+                <small>{bed1Share}% 1-bed | {bed2Share}% 2-bed</small>
               </div>
-            </aside>
+            </section>
           </div>
 
           <section className="op-admin-finance-board">

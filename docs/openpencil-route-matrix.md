@@ -28,7 +28,8 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/admin` | Admin `0:6909`, workspace `0:6598` | Redesigned overview, QA ongoing |
 | `/admin/properties` | Admin `0:7015` | Redesigned live listing review, QA ongoing |
 | `/admin/properties/new`, `/admin/properties/:id/edit`, `/admin/properties/:id/calendar` | Admin `0:7015`, Product listing editor `0:3955` | Functional legacy, redesign pending |
-| `/admin/bookings`, `/admin/earnings`, `/admin/payouts` | Admin `0:7116`, insights `0:7570` | Functional legacy, redesign pending |
+| `/admin/bookings` | Admin `0:7116` | Implemented with live reservation metrics, status filters, responsive mobile card rows, and Flowbite actions; desktop/mobile QA passed |
+| `/admin/earnings`, `/admin/payouts` | Admin insights `0:7570`, payments `0:7116` | Implemented with live finance metrics, Flowbite-styled line and radial gauge charts, responsive ledgers, exports, and payout actions; desktop/mobile/dark-mode QA passed |
 | `/admin/users` | Admin `0:7228` | Implemented with live account metrics, responsive people board, Flowbite role/search controls, payout editing, suspension, and account erasure; desktop/mobile QA passed |
 | `/admin/host-applications` | Admin `0:7228`, Product `0:4123` | Implemented with live review metrics, responsive application queue, encrypted document access, full verification detail, audit history, and approve/changes/reject controls; desktop/mobile QA passed |
 | `/admin/promos` | Admin `0:7343`, content/support `0:6855` | Implemented with live offer metrics, searchable responsive board, status controls, property targeting, and Flowbite create/edit form; desktop/mobile QA passed |

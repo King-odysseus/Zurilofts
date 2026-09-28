@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Button, Select, TextInput } from 'flowbite-react';
 import apiClient from '../api/client.js';
+import { FlowbiteGauge } from '../components/FlowbiteChart.jsx';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All statuses' },
@@ -84,10 +85,36 @@ function AdminPayoutsPage() {
     const amount = Number(payout.amount) || 0;
     if (payout.status === 'PENDING') result.pending += 1;
     if (payout.status === 'PROCESSING') result.processing += 1;
-    if (payout.status === 'SUCCESS') result.paid += amount;
+    if (payout.status === 'SUCCESS') {
+      result.success += 1;
+      result.paid += amount;
+    }
     if (payout.status === 'FAILED') result.failed += 1;
+    if (payout.status === 'REVERSED') result.reversed += 1;
     return result;
-  }, { pending: 0, processing: 0, paid: 0, failed: 0 }), [payouts]);
+  }, { pending: 0, processing: 0, paid: 0, success: 0, failed: 0, reversed: 0 }), [payouts]);
+
+  const payoutStatusTotal = totals.pending + totals.processing + totals.success + totals.failed + totals.reversed;
+  const payoutGaugeItems = [
+    {
+      label: 'Settlement success',
+      value: payoutStatusTotal > 0 ? (totals.success / payoutStatusTotal) * 100 : 0,
+      note: `${totals.success} successful payouts`,
+      color: '#3F8F62',
+    },
+    {
+      label: 'In flight',
+      value: payoutStatusTotal > 0 ? ((totals.pending + totals.processing) / payoutStatusTotal) * 100 : 0,
+      note: `${totals.pending} pending and ${totals.processing} processing`,
+      color: '#C49A6C',
+    },
+    {
+      label: 'Needs attention',
+      value: payoutStatusTotal > 0 ? ((totals.failed + totals.reversed) / payoutStatusTotal) * 100 : 0,
+      note: `${totals.failed} failed and ${totals.reversed} reversed`,
+      color: '#C85C52',
+    },
+  ];
 
   const kpis = [
     { label: 'PENDING PAYOUTS', value: totals.pending.toLocaleString(), note: 'Waiting for processing' },
@@ -193,6 +220,28 @@ function AdminPayoutsPage() {
           {message}
         </div>
       )}
+
+      <section className="op-admin-finance-panel op-admin-finance-gauge-panel">
+        <div className="op-admin-finance-panel-head">
+          <div>
+            <h2>Settlement health</h2>
+            <p>Current payout status mix across the visible ledger.</p>
+          </div>
+          <span>{payoutStatusTotal} payouts</span>
+        </div>
+        <div className="op-flowbite-gauge-grid op-admin-payout-gauge-grid">
+          {payoutGaugeItems.map((item) => (
+            <FlowbiteGauge
+              key={item.label}
+              label={item.label}
+              value={item.value}
+              note={item.note}
+              color={item.color}
+              height={122}
+            />
+          ))}
+        </div>
+      </section>
 
       <section className="op-admin-finance-board">
         <div className="op-admin-finance-board-head">
