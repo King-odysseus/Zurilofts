@@ -34,7 +34,8 @@ Every frontend route must be compared with its named OpenPencil frame before it 
 | `/admin/promos` | Admin `0:7343`, content/support `0:6855` | Implemented with live offer metrics, searchable responsive board, status controls, property targeting, and Flowbite create/edit form; desktop/mobile QA passed |
 | `/admin/addons` | Admin `0:7343`, content/support `0:6855` | Implemented with live service metrics, searchable responsive board, status controls, pricing/category editing, and per-property assignment toggles; desktop/mobile QA passed |
 | `/admin/guides` | Admin `0:7343`, content/support `0:6855` | Functional legacy, redesign pending |
-| `/admin/feedback`, `/admin/messages` | Admin `0:7343`, governance `0:7458` | Functional legacy, redesign pending |
+| `/admin/feedback` | Admin `0:7343`, governance `0:7458` | Implemented with live rating metrics, searchable rating board, public/private review separation, and responsive review detail; desktop/mobile QA passed |
+| `/admin/messages` | Admin `0:7343`, governance `0:7458` | Functional legacy, redesign pending |
 
 OpenPencil has composite rather than standalone frames for several legacy CRUD screens. Their listed composite frame is the design-system anchor; a dedicated design frame should be added in OpenPencil if the implemented layout needs a distinct handoff. The repository photo assets, not design placeholders, supply product imagery.
 
