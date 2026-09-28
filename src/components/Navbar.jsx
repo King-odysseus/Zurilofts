@@ -276,7 +276,7 @@ function Navbar() {
           </div>
 
           {/* Desktop nav links */}
-          <div ref={navMenuRef} className="hidden md:flex md:items-center md:justify-center md:px-4">
+          <div ref={navMenuRef} className="zl-desktop-nav hidden md:flex md:items-center md:justify-center md:px-4">
             <ul className="flex items-center md:space-x-1 lg:space-x-6">
               {navItems.map((item) => {
                 const hasChildren = Array.isArray(item.children) && item.children.length > 0;
@@ -349,7 +349,7 @@ function Navbar() {
           </div>
 
           {/* Right side: search, account menu and mobile menu */}
-          <div className="flex items-center gap-1 justify-self-end md:gap-2">
+          <div className="zl-header-actions flex items-center gap-1 justify-self-end md:gap-2">
             <div className="relative" ref={searchRef}>
               <button
                 type="button"

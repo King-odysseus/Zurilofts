@@ -7,16 +7,7 @@ import { FavoritesProvider } from './context/FavoritesContext.jsx'
 import { ToastProvider } from './context/ToastContext.jsx'
 import { LanguageProvider } from './context/LanguageContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
-import './index.css'
-import './openpencil-theme.css'
-import './guest-discovery.css'
-import './checkout-design.css'
-import './auth-design.css'
-import './public-content-design.css'
-import './saved-stays.css'
-import './account-travel.css'
-import './host-workspace.css'
-import './flowbite-controls.css'
+import './tailwind.css'
 
 // PWA update handling - when a new service worker activates, reload so the
 // user is always on the latest version (registerType: 'autoUpdate').

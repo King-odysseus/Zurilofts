@@ -14,6 +14,40 @@
 :where([role=option]){min-height:38px;border-radius:6px}
 :where([role=option]):focus-visible{outline:2px solid var(--control-focus);outline-offset:-2px}
 
+/* Navigation geometry is owned here so every route keeps the same header. */
+.zl-navbar .zl-desktop-nav,
+.zl-navbar .zl-header-actions {
+  min-width: 0;
+}
+
+.zl-navbar .zl-desktop-nav {
+  justify-self: center;
+  margin-right: 0;
+  margin-left: 0;
+}
+
+.zl-navbar .zl-desktop-nav a {
+  color: #0B1F42;
+}
+
+.zl-navbar .zl-header-actions {
+  justify-content: flex-end;
+}
+
+@media (min-width: 768px) {
+  .zl-navbar .zl-desktop-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 767px) {
+  .zl-navbar .zl-desktop-nav {
+    display: none;
+  }
+}
+
 /*
  * Shared dark theme. The light theme remains the product default and keeps a
  * white canvas; this layer only activates when html.dark is present.
