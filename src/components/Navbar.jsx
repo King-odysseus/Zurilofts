@@ -574,17 +574,10 @@ function Navbar({ solid = false }) {
                 </div>
               </>
             ) : (
-              /* Logged out - Sign In / Sign Up */
-              <Link
-                to="/login"
-                className={`hidden md:inline-flex items-center justify-center px-5 py-2 rounded-[10px] text-sm font-semibold transition-all duration-200 whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${
-                  needsWhiteNav
-                    ? 'bg-[#C49A6C] text-white hover:bg-[#B8895C]'
-                    : 'bg-white text-[#0B1F42] hover:bg-[#F7F4EF]'
-                }`}
-              >
-                {t('nav.signInSignUp')}
-              </Link>
+              <div className="hidden md:flex items-center gap-2">
+                <Link to="/login" className={`px-3 py-2 rounded-lg text-sm font-semibold ${needsWhiteNav ? 'text-[#0B1F42]' : 'text-white'}`}>{t('nav.signIn')}</Link>
+                <Link to="/register" className={`px-4 py-2 rounded-lg text-sm font-semibold ${needsWhiteNav ? 'bg-[#C49A6C] text-white' : 'bg-white text-[#0B1F42]'}`}>{t('nav.createAccount')}</Link>
+              </div>
             )}
 
             {/* Language switcher */}
@@ -796,7 +789,14 @@ function Navbar({ solid = false }) {
                     className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
-                    {t('nav.signInSignUp')}
+                    {t('nav.signIn')}
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#C49A6C] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {t('nav.createAccount')}
                   </Link>
                   <Link
                     to="/terms"

@@ -1,0 +1,13 @@
+/* Shared Flowbite-style form anatomy using the OpenPencil colour tokens. */
+:root{--control-line:#d1d5db;--control-focus:#3b6fd4;--control-text:#111827;--control-placeholder:#6b7280}
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]):not([type=submit]):not([type=button]),select,textarea){border:1px solid var(--control-line);border-radius:8px;background-color:#fff;color:var(--control-text);font-size:14px;line-height:1.4;min-height:42px;transition:border-color .15s ease,box-shadow .15s ease}
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea)::placeholder{color:var(--control-placeholder);opacity:1}
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea):focus-visible{outline:0;border-color:var(--control-focus);box-shadow:0 0 0 3px #3b6fd433}
+:where(input,select,textarea):disabled{background-color:#f3f4f6;color:#9ca3af;cursor:not-allowed}
+:where(input,select,textarea)[aria-invalid=true]{border-color:#f05252}
+:where(input,select,textarea)[aria-invalid=true]:focus-visible{box-shadow:0 0 0 3px #f0525233}
+:where(input[type=checkbox],input[type=radio]){accent-color:#3b6fd4}
+:where(label){color:#374151}
+:where([role=listbox]){border:1px solid #e5e7eb;border-radius:8px;background:#fff;box-shadow:0 8px 18px #1118271a;padding:4px}
+:where([role=option]){min-height:38px;border-radius:6px}
+:where([role=option]):focus-visible{outline:2px solid var(--control-focus);outline-offset:-2px}

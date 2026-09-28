@@ -26,15 +26,96 @@ import ShortlistsPage from './pages/ShortlistsPage.jsx';
 import TripHubPage from './pages/TripHubPage.jsx';
 import OAuthCallback from './pages/OAuthCallback.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import WorkspaceRoutes from './WorkspaceRoutes.jsx';
+import Dropdown from './components/Dropdown.jsx';
+import { useAuth } from './context/AuthContext.jsx';
+import { useLanguage } from './context/LanguageContext.jsx';
+import { languageOptions } from './i18n/translations.js';
 
-const homes = [["Skyline Residence", "Westlands", "2 beds", "18,500", "photo-0"], ["Garden Studio", "Kilimani", "1 bed", "12,800", "photo-1"], ["Muthaiga Courtyard", "Muthaiga", "3 beds", "26,000", "photo-2"], ["Riverside Loft", "Riverside", "1 bed", "16,200", "photo-3"]];
 
-function Header({ menu }) { return <header className="zl-header"><Link to="/" className="zl-brand"><img src={logo} alt="ZuriLofts" /><span>ZuriLofts</span></Link><nav className="zl-desktop-nav" aria-label="Main navigation"><Link to="/properties">Stays</Link><Link to="/places">Places</Link><Link to="/restaurants">Restaurants</Link><Link to="/guides">Guides</Link></nav><div className="zl-header-actions"><Link className="zl-header-search" to="/properties">⌕ <span>Search stays</span></Link><Link className="zl-host-link" to="/host/today">Become a host</Link><Link className="zl-icon-btn" to="/favourites" aria-label="Saved stays">♡</Link><button className="zl-menu-btn" onClick={menu} aria-label="Open menu">☰</button></div></header>; }
+function Header({ menu }) {
+  const { lang, setLang, t } = useLanguage();
+  const { isAuthenticated } = useAuth();
+  return <header className="zl-header">
+    <Link to="/" className="zl-brand"><img src={logo} alt="ZuriLofts" /><span>ZuriLofts</span></Link>
+    <nav className="zl-desktop-nav" aria-label="Main navigation">
+      <Link to="/properties">{t('nav.stays')}</Link><Link to="/places">{t('nav.places')}</Link><Link to="/restaurants">{t('nav.restaurants')}</Link><Link to="/guides">{t('nav.guides')}</Link>
+    </nav>
+    <div className="zl-header-actions">
+      <Link className="zl-header-search" to="/properties">⌕ <span>{t('nav.searchStays')}</span></Link>
+      <Link className="zl-host-link" to="/host/today">{t('nav.becomeHost')}</Link>
+      {isAuthenticated ? <Link className="zl-header-auth-link" to="/profile">{t('nav.myProfile')}</Link> : <><Link className="zl-header-auth-link" to="/login">{t('nav.signIn')}</Link><Link className="zl-header-register" to="/register">{t('nav.createAccount')}</Link></>}
+      <Dropdown value={lang} onChange={setLang} options={languageOptions} ariaLabel={t('nav.language')} triggerClassName="zl-header-language" menuClassName="zl-header-language-menu" />
+      <Link className="zl-icon-btn" to="/favourites" aria-label={t('nav.saved')}>♡</Link>
+      <button className="zl-menu-btn" onClick={menu} aria-label="Open menu">☰</button>
+    </div>
+  </header>;
+}
 function MobileNav() { return <nav className="zl-mobile-nav" aria-label="Mobile navigation"><Link to="/properties"><span>⌕</span><small>Explore</small></Link><Link to="/favourites"><span>♡</span><small>Saved</small></Link><Link to="/trips"><span>♧</span><small>Trips</small></Link><Link to="/inbox"><span>◌</span><small>Inbox</small></Link><Link to="/profile"><span>♙</span><small>Profile</small></Link></nav>; }
 function Home() { return <GuestHome />; }
 function Explore() { return <GuestStays />; }
-function Calendar({ host = false }) { const days = Array.from({ length: 35 }, (_, i) => i - 2); return <main className="zl-page"><div className="zl-page-heading"><div><p className="zl-overline">{host ? "HOST OPERATIONS" : "YOUR TRIP"}</p><h1>{host ? "Availability calendar" : "Plan your stay"}</h1><p>Keep every important date clear at a glance.</p></div><button className="ui-btn-primary">{host ? "Edit availability" : "Explore stays"}</button></div><section className="zl-calendar-panel"><div className="zl-calendar-toolbar"><button className="zl-icon-btn">‹</button><h2>May 2026</h2><button className="zl-icon-btn">›</button></div><div className="zl-calendar-week">{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => <b key={day}>{day}</b>)}</div><div className="zl-calendar-grid">{days.map((day, i) => <div key={i} className={day === 14 || day === 15 ? "zl-day zl-day-active" : day < 1 ? "zl-day zl-day-muted" : "zl-day"}>{day > 0 && day}</div>)}</div></section></main>; }
-function Workspace({ admin, path }) { const metrics = admin ? [["Arrivals today", "5"], ["Listings live", "12"], ["Needs review", "3"], ["Net earnings", "KES 184k"]] : [["Arrivals today", "2"], ["Open nights", "18"], ["Guest messages", "4"], ["This month", "KES 184k"]]; return <main className={`zl-page ${admin ? "zl-ops-page" : "zl-host-page"}`}><div className="zl-page-heading"><div><p className="zl-overline">{admin ? "ZURILOFTS ADMIN" : "HOST WORKSPACE"}</p><h1>{path.includes("calendar") ? "Availability calendar" : admin ? "Operations, made clear." : "Good morning, Muthoni."}</h1><p>See the decisions and exceptions that need attention first.</p></div><button className="ui-btn-primary">Create listing</button></div><div className="zl-metric-grid">{metrics.map(([name, value]) => <div className="zl-metric" key={name}><span>{name}</span><strong>{value}</strong><small>Updated now</small></div>)}</div><div className={admin ? "zl-admin-grid" : "zl-host-columns"}><section className="zl-panel"><div className="zl-panel-head"><h2>Today&apos;s arrivals</h2><span className="ui-status-badge-success">On track</span></div>{homes.slice(0, 3).map((home) => <div className="zl-host-row" key={home[0]}><span className="zl-list-thumb" /><div><b>{home[0]}</b><span>Today · 16:00 · 2 guests</span></div><button className="zl-text-link">View</button></div>)}</section><section className="zl-panel zl-host-priority"><p className="zl-overline">PRIORITY NEXT STEP</p><h2>{admin ? "3 identity checks need review" : "Share arrival details"}</h2><p>Open the queue and resolve the next action before it becomes urgent.</p><button className="ui-btn-primary">Open queue</button></section></div></main>; }
 function Trust() { return <main className="zl-page"><div className="zl-page-heading"><div><p className="zl-overline">TRUST & RECOVERY</p><h1>Keep your account secure.</h1><p>Review the information that helps protect every booking.</p></div></div><div className="op-trust-grid">{[["Identity verification", "Verified", "Your government ID and selfie have been reviewed."], ["Travel documents", "Add document", "Keep booking documents available in your account."], ["Password & security", "Secure", "Use a strong password and protect your sign-in."], ["Account recovery", "Ready", "Keep a recovery method up to date."]].map(([title, action, text]) => <section className="zl-panel" key={title}><p className="zl-overline">ACCOUNT SAFETY</p><h2>{title}</h2><p>{text}</p><button className="ui-btn-secondary">{action}</button></section>)}</div></main>; }
-function Shell() { const { pathname } = useLocation(); const [menu, setMenu] = useState(false); if (pathname.startsWith('/property/')) return <RealPropertyPage />; if (pathname.startsWith('/booking/')) return <BookingPage />; if (pathname === '/login') return <LoginPage />; if (pathname === '/register') return <RegisterPage />; if (pathname === '/payment/callback') return <PaymentCallback />; if (pathname === '/places') return <PlacesPage />; if (pathname === '/restaurants') return <RestaurantsPage />; if (pathname === '/guides') return <GuidesPage />; if (pathname.startsWith('/guides/')) return <GuideDetailPage />; if (pathname === '/privacy') return <PrivacyPage />; if (pathname === '/terms') return <TermsPage />; if (pathname.startsWith('/s/')) return <SharedShortlistPage />; if (pathname === '/trips') return <ProtectedRoute><TripHubPage /></ProtectedRoute>; if (pathname === '/booking-history') return <ProtectedRoute><BookingHistoryPage /></ProtectedRoute>; if (pathname === '/inbox') return <ProtectedRoute><InboxPage /></ProtectedRoute>; if (pathname.startsWith('/inbox/')) return <ProtectedRoute><ConversationPage /></ProtectedRoute>; if (pathname === '/messages') return <ProtectedRoute><MessagesPage /></ProtectedRoute>; if (pathname === '/profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>; if (pathname === '/favourites') return <ProtectedRoute><FavouritesPage /></ProtectedRoute>; if (pathname === '/shortlists') return <ProtectedRoute><ShortlistsPage /></ProtectedRoute>; if (pathname.startsWith('/shortlists/')) return <ProtectedRoute><ShortlistDetailPage /></ProtectedRoute>; if (pathname === '/auth/callback') return <OAuthCallback />; let content; if (pathname === "/") content = <Home />; else if (pathname === "/properties") content = <Explore />; else if (pathname.startsWith("/host") || pathname.startsWith("/admin")) content = pathname.includes("calendar") ? <Calendar host /> : <Workspace admin={pathname.startsWith("/admin")} path={pathname} />; else if (pathname === '/verify-identity') content = <Trust />; else return <NotFoundPage />; return <div className="zl-app"><Header menu={() => setMenu(true)} />{content}{(pathname === '/' || pathname === '/properties') && <GuestFooter />}<MobileNav />{menu && <div className="zl-modal-backdrop" onClick={() => setMenu(false)}><aside className="zl-menu-modal" onClick={(e) => e.stopPropagation()}><div className="zl-modal-top"><span className="zl-avatar">NB</span><strong>Nate Boyo</strong><button className="zl-icon-btn" onClick={() => setMenu(false)}>×</button></div><div className="zl-modal-links"><Link to="/places" onClick={() => setMenu(false)}>Places to visit</Link><Link to="/restaurants" onClick={() => setMenu(false)}>Restaurants</Link><Link to="/guides" onClick={() => setMenu(false)}>Travel guides</Link><Link to="/host/today" onClick={() => setMenu(false)}>Host workspace</Link></div></aside></div>}</div>; }
+function Shell() {
+  const { pathname } = useLocation();
+  const [menu, setMenu] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+  const { lang, setLang, t } = useLanguage();
+  if (pathname.startsWith('/host') || pathname.startsWith('/admin')) return <WorkspaceRoutes />;
+  if (pathname.startsWith('/property/')) return <RealPropertyPage />;
+  if (pathname.startsWith('/booking/')) return <BookingPage />;
+  if (pathname === '/login') return <LoginPage />;
+  if (pathname === '/register') return <RegisterPage />;
+  if (pathname === '/payment/callback') return <PaymentCallback />;
+  if (pathname === '/places') return <PlacesPage />;
+  if (pathname === '/restaurants') return <RestaurantsPage />;
+  if (pathname === '/guides') return <GuidesPage />;
+  if (pathname.startsWith('/guides/')) return <GuideDetailPage />;
+  if (pathname === '/privacy') return <PrivacyPage />;
+  if (pathname === '/terms') return <TermsPage />;
+  if (pathname.startsWith('/s/')) return <SharedShortlistPage />;
+  if (pathname === '/trips') return <ProtectedRoute><TripHubPage /></ProtectedRoute>;
+  if (pathname === '/booking-history') return <ProtectedRoute><BookingHistoryPage /></ProtectedRoute>;
+  if (pathname === '/inbox') return <ProtectedRoute><InboxPage /></ProtectedRoute>;
+  if (pathname.startsWith('/inbox/')) return <ProtectedRoute><ConversationPage /></ProtectedRoute>;
+  if (pathname === '/messages') return <ProtectedRoute><MessagesPage /></ProtectedRoute>;
+  if (pathname === '/profile') return <ProtectedRoute><ProfilePage /></ProtectedRoute>;
+  if (pathname === '/favourites') return <ProtectedRoute><FavouritesPage /></ProtectedRoute>;
+  if (pathname === '/shortlists') return <ProtectedRoute><ShortlistsPage /></ProtectedRoute>;
+  if (pathname.startsWith('/shortlists/')) return <ProtectedRoute><ShortlistDetailPage /></ProtectedRoute>;
+  if (pathname === '/auth/callback') return <OAuthCallback />;
+  let content;
+  if (pathname === '/') content = <Home />;
+  else if (pathname === '/properties') content = <Explore />;
+  else if (pathname === '/verify-identity') content = <Trust />;
+  else return <NotFoundPage />;
+  const closeMenu = () => setMenu(false);
+  return <div className="zl-app">
+    <Header menu={() => setMenu(true)} />
+    {content}
+    {(pathname === '/' || pathname === '/properties') && <GuestFooter />}
+    <MobileNav />
+    {menu && <div className="zl-modal-backdrop" onClick={closeMenu}>
+      <aside className="zl-menu-modal" onClick={(event) => event.stopPropagation()} aria-label="Site menu">
+        <div className="zl-modal-top">
+          {isAuthenticated && <span className="zl-avatar">{(user?.firstName || user?.name || 'G').slice(0, 1).toUpperCase()}</span>}
+          <strong>{isAuthenticated ? (user?.firstName || user?.name || t('nav.myProfile')) : 'ZuriLofts'}</strong>
+          <button className="zl-icon-btn" onClick={closeMenu} aria-label="Close menu">×</button>
+        </div>
+        <div className="zl-modal-links">
+          <Link to="/properties" onClick={closeMenu}>{t('nav.stays')}</Link>
+          <Link to="/places" onClick={closeMenu}>{t('nav.places')}</Link>
+          <Link to="/restaurants" onClick={closeMenu}>{t('nav.restaurants')}</Link>
+          <Link to="/guides" onClick={closeMenu}>{t('nav.guides')}</Link>
+          <Link to="/host/today" onClick={closeMenu}>{t('nav.becomeHost')}</Link>
+          {isAuthenticated ? <Link to="/profile" onClick={closeMenu}>{t('nav.myProfile')}</Link> : <>
+            <Link to="/login" onClick={closeMenu}>{t('nav.signIn')}</Link>
+            <Link to="/register" onClick={closeMenu}>{t('nav.createAccount')}</Link>
+          </>}
+        </div>
+        <label className="zl-menu-language-label">{t('nav.language')}</label>
+        <Dropdown value={lang} onChange={setLang} options={languageOptions} ariaLabel={t('nav.language')} triggerClassName="zl-menu-language" />
+      </aside>
+    </div>}
+  </div>;
+}
 export default function App() { return <BrowserRouter><Shell /></BrowserRouter>; }

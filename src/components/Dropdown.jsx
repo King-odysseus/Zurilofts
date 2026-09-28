@@ -42,7 +42,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={ariaLabel}
-        className={`flex items-center justify-between gap-2 ${triggerClassName}`}
+        className={`flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B6FD4] focus-visible:ring-offset-2 ${triggerClassName}`}
       >
         <span className={selected ? 'truncate text-[#0B1F42]' : 'truncate text-[#94A3B8]'}>
           {selected ? selected.label : placeholder}
@@ -60,7 +60,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
       {open && (
         <div
           role="listbox"
-          className={`absolute left-0 z-30 mt-2 max-h-72 min-w-full w-max max-w-[18rem] overflow-y-auto rounded-2xl border border-[#E3E8EF] bg-white py-2 shadow-xl ${menuClassName}`}
+          className={`absolute left-0 z-30 mt-2 max-h-72 min-w-full w-max max-w-[18rem] overflow-y-auto rounded-lg border border-[#E5E7EB] bg-white p-1 shadow-lg ${menuClassName}`}
         >
           {options.map((o) => {
             const isSel = String(o.value) === String(value);
@@ -74,8 +74,8 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
                   onChange(o.value);
                   setOpen(false);
                 }}
-                className={`flex items-center w-full text-left px-4 py-2.5 text-sm transition-colors ${
-                  isSel ? 'bg-[#FDE8D8] font-semibold text-[#0B1F42]' : 'text-[#0B1F42] hover:bg-[#F7F4EF]'
+                className={`flex items-center w-full text-left px-3 py-2.5 text-sm rounded-md transition-colors ${
+                  isSel ? 'bg-[#E8EDF7] font-semibold text-[#0B1F42]' : 'text-[#0B1F42] hover:bg-[#F3F4F6]'
                 }`}
               >
                 <span className="flex-1">{o.label}</span>
