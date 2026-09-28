@@ -41,6 +41,8 @@
   .op-admin-mobile-brand strong{font:700 13px Montserrat,Arial,sans-serif;color:#0b1f42}
   .op-admin-mobile-brand small{font-size:9px;color:#6e7686}
   .op-admin-mobile-actions{display:flex;align-items:center;gap:4px}
+  .op-admin-mobile-heading{display:flex;min-width:0;align-items:center;gap:8px}
+  .op-admin-back{background:#f8fafc!important;color:#0b1f42!important}
   .op-admin-mobile-bell{display:grid;width:38px;height:38px;place-items:center;border:0;border-radius:50%;background:transparent;color:#334155}
   .op-admin-mobile-bell:hover{background:#f1f5f9;color:#0b1f42}
   .op-admin-mobile-count{position:absolute;top:-2px;right:-2px;display:grid;min-width:16px;height:16px;place-items:center;border-radius:999px;background:#ef4444;padding:0 4px;color:#fff;font-size:9px;font-weight:700}

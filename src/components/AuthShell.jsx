@@ -5,6 +5,7 @@ import logoImg from '../assets/zurilofts-logo.png';
 import { zuriImages } from '../assets/images';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { languageOptions } from '../i18n/translations.js';
+import RouteBackButton from './RouteBackButton.jsx';
 
 const bgImage = zuriImages[14];
 
@@ -39,24 +40,27 @@ function AuthShell({ children }) {
 
       <section className="op-auth-side">
         <div className="op-auth-top">
-          <Link to="/contact">Need help?</Link>
-          <Dropdown
-            inline
-            theme={{ inlineWrapper: 'op-auth-language' }}
-            label={<span className="op-auth-language-trigger"><GlobeIcon /><span className="sr-only">{t('nav.language')}</span></span>}
-            arrowIcon={false}
-            placement="bottom-end"
-            dismissOnClick
-          >
-            {languageOptions.map((option) => (
-              <DropdownItem key={option.value} onClick={() => setLang(option.value)}>
-                <span className="flex w-full items-center justify-between gap-6">
-                  <span>{option.label}</span>
-                  {String(lang) === String(option.value) && <span aria-hidden="true">✓</span>}
-                </span>
-              </DropdownItem>
-            ))}
-          </Dropdown>
+          <RouteBackButton className="op-auth-back" />
+          <div className="op-auth-top-actions">
+            <Link to="/contact">Need help?</Link>
+            <Dropdown
+              inline
+              theme={{ inlineWrapper: 'op-auth-language' }}
+              label={<span className="op-auth-language-trigger"><GlobeIcon /><span className="sr-only">{t('nav.language')}</span></span>}
+              arrowIcon={false}
+              placement="bottom-end"
+              dismissOnClick
+            >
+              {languageOptions.map((option) => (
+                <DropdownItem key={option.value} onClick={() => setLang(option.value)}>
+                  <span className="flex w-full items-center justify-between gap-6">
+                    <span>{option.label}</span>
+                    {String(lang) === String(option.value) && <span aria-hidden="true">✓</span>}
+                  </span>
+                </DropdownItem>
+              ))}
+            </Dropdown>
+          </div>
         </div>
         <div className="op-auth-card">{children}</div>
       </section>

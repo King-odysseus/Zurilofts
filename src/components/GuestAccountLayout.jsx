@@ -1,7 +1,5 @@
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import Navbar from './Navbar.jsx';
-import Footer from './Footer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 function AccountIcon({ type }) {
@@ -24,7 +22,7 @@ AccountIcon.propTypes = {
 const accountLinks = [
   { key: 'profile', label: 'Personal details', to: '/profile#info' },
   { key: 'verification', label: 'Verification', to: '/verify-identity' },
-  { key: 'privacy', label: 'Privacy', to: '/privacy' },
+  { key: 'privacy', label: 'Privacy', to: '/profile#privacy' },
 ];
 
 const travelLinks = [
@@ -39,7 +37,6 @@ function GuestAccountLayout({ active, title, description, eyebrow, action, child
   const initials = `${user?.firstName?.[0] || user?.name?.[0] || 'G'}${user?.lastName?.[0] || ''}`.toUpperCase();
 
   return <div className="opg-account-page">
-    <Navbar />
     <main className="opg-account-main">
       <div className="opg-account-container">
         <aside className="opg-account-sidebar" aria-label="Account navigation">
@@ -72,7 +69,6 @@ function GuestAccountLayout({ active, title, description, eyebrow, action, child
         </section>
       </div>
     </main>
-    <Footer />
   </div>;
 }
 

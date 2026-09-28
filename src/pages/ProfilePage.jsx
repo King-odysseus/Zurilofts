@@ -481,7 +481,7 @@ function ProfilePage() {
               </div>
 
               {/* Privacy and data */}
-              <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
+              <div id="privacy" className="scroll-mt-28 mt-10 pt-8 border-t-2 border-[#D9D9D9]">
                 <h3 className="text-xl font-bold text-[#0B0B45] mb-1">Privacy and data</h3>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Manage your personal data and consent choices. See our{' '}

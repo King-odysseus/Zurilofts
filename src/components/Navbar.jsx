@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Avatar, Dropdown, DropdownDivider, DropdownItem } from 'flowbite-react';
+import { Avatar, Button, Dropdown, DropdownDivider, DropdownItem, TextInput } from 'flowbite-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -8,6 +8,7 @@ import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
 import MobileBottomNav from './MobileBottomNav.jsx';
+import RouteBackButton from './RouteBackButton.jsx';
 import { languageOptions } from '../i18n/translations.js';
 
 const exploreLinks = [
@@ -34,10 +35,13 @@ function Navbar({ solid = false }) {
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [openSubmenu, setOpenSubmenu] = useState(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
   const dropdownRef = useRef(null);
   const navMenuRef = useRef(null);
+  const searchRef = useRef(null);
 
   const { user, isAuthenticated, logout } = useAuth();
   const { mode, setMode, canSelectHosting } = useMode();
@@ -150,6 +154,9 @@ function Navbar({ solid = false }) {
       if (navMenuRef.current && !navMenuRef.current.contains(e.target)) {
         setOpenSubmenu(null);
       }
+      if (searchRef.current && !searchRef.current.contains(e.target)) {
+        setSearchOpen(false);
+      }
     }
     document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
@@ -162,6 +169,7 @@ function Navbar({ solid = false }) {
         setDropdownOpen(false);
         setNotifOpen(false);
         setOpenSubmenu(null);
+        setSearchOpen(false);
         setMenuOpen(false);
       }
     }
@@ -177,6 +185,15 @@ function Navbar({ solid = false }) {
     setMenuOpen(false);
     logout();
     navigate('/');
+  }
+
+  function handleSearchSubmit(event) {
+    event.preventDefault();
+    const query = searchQuery.trim();
+    navigate(query ? `/properties?search=${encodeURIComponent(query)}` : '/properties');
+    setSearchOpen(false);
+    setSearchQuery('');
+    setMenuOpen(false);
   }
 
   // Desktop guest navigation: Explore, Saved, Trips, Messages. Profile is the
@@ -255,11 +272,14 @@ function Navbar({ solid = false }) {
         : 'bg-transparent'
     }`}>
       <div className="mx-auto w-full max-w-[1344px] px-4 md:px-6">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center flex-shrink-0">
-            <img src={logoImg} alt="ZuriLofts" className="h-10 w-auto" />
-          </Link>
+        <div className="flex h-16 items-center justify-between md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+          {/* Back action and logo */}
+          <div className="flex min-w-0 items-center gap-2 justify-self-start">
+            <RouteBackButton className={needsWhiteNav ? '' : 'bg-white/10 text-white hover:bg-white/20'} />
+            <Link to="/" className="flex flex-shrink-0 items-center">
+              <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto md:h-10" />
+            </Link>
+          </div>
 
           {/* Desktop nav links */}
           <div ref={navMenuRef} className="hidden md:flex md:flex-1 md:justify-center md:items-center md:px-4">
@@ -334,8 +354,51 @@ function Navbar({ solid = false }) {
             </ul>
           </div>
 
-          {/* Right side: CTA buttons / user menu + hamburger */}
-          <div className="flex items-center gap-1 md:gap-2">
+          {/* Right side: search, account menu and mobile menu */}
+          <div className="flex items-center gap-1 justify-self-end md:gap-2">
+            <div className="relative" ref={searchRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchOpen((open) => !open);
+                  setDropdownOpen(false);
+                  setNotifOpen(false);
+                }}
+                aria-expanded={searchOpen}
+                aria-controls="navbar-search"
+                aria-label="Search stays"
+                title="Search stays"
+                className={`grid h-10 w-10 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${
+                  needsWhiteNav ? 'text-[#0B1F42] hover:bg-[#F6EFE7]' : 'text-white hover:bg-white/10'
+                }`}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="m21 21-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+              {searchOpen && (
+                <form
+                  id="navbar-search"
+                  role="search"
+                  onSubmit={handleSearchSubmit}
+                  className="absolute right-0 top-full z-30 mt-2 flex w-[min(340px,calc(100vw-2rem))] items-center gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-2 shadow-[0_16px_40px_rgba(11,31,66,0.16)]"
+                >
+                  <TextInput
+                    value={searchQuery}
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                    placeholder="Where do you want to stay?"
+                    aria-label="Search destination"
+                    sizing="sm"
+                    className="min-w-0 flex-1"
+                    autoFocus
+                  />
+                  <Button type="submit" size="sm" className="shrink-0 bg-[#C49A6C] text-white enabled:hover:bg-[#B8895C]">
+                    Search
+                  </Button>
+                </form>
+              )}
+            </div>
+
             {isAuthenticated ? (
               <>
                 {/* Notification bell with dropdown */}
@@ -617,7 +680,7 @@ function Navbar({ solid = false }) {
             <button
               type="button"
               onClick={() => setMenuOpen(!menuOpen)}
-              className={`inline-flex items-center p-2 w-11 h-11 justify-center rounded-[10px] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${
+              className={`inline-flex h-11 w-11 items-center justify-center rounded-[10px] p-2 transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 md:hidden ${
                 needsWhiteNav
                   ? 'text-[#0B1F42] hover:bg-[#F6EFE7]'
                   : 'text-white hover:bg-white/10'

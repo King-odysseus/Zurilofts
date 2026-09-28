@@ -1,7 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import apiClient from '../api/client';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 
@@ -53,7 +51,6 @@ function PaymentCallback() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
       <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
         <div className="max-w-md mx-auto px-6 text-center">
 
@@ -179,7 +176,6 @@ function PaymentCallback() {
 
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

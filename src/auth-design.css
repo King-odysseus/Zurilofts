@@ -10,6 +10,9 @@
 .op-auth-language{border:1px solid #e2e5eb;border-radius:999px;background:#fff;color:#0B1F42;min-width:38px;min-height:38px;padding:0}
 .op-auth-language:hover{background:#f8fafc}
 .op-auth-language-trigger{display:grid;place-items:center;width:36px;height:36px}
+.op-auth-top-actions{display:flex;align-items:center;gap:10px}
+.op-auth-back{height:38px!important;min-width:38px!important;background:#fff!important;color:#0B1F42!important}
+.op-auth-back:hover{background:#f8fafc!important}
 .op-auth-card form>label,.op-auth-label{display:block;font-size:12px;font-weight:700;margin-bottom:18px;color:#374151}
 .op-auth-label>span{display:block;margin-bottom:7px}
 .op-auth-label input{display:block;width:100%;height:44px;margin-top:0;border:1px solid #e3e7ec;border-radius:8px;background:#fff;padding:0 14px;color:#0B1F42;font:13px Inter,Arial,sans-serif}

@@ -1,6 +1,4 @@
 import { Link } from 'react-router-dom';
-import Navbar from '../components/Navbar.jsx';
-import Footer from '../components/Footer.jsx';
 import IdentityVerificationPanel from '../components/IdentityVerificationPanel.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import '../trust-design.css';
@@ -8,7 +6,6 @@ import '../trust-design.css';
 export default function TrustPage() {
   const { user } = useAuth();
   return <div className="op-trust-page" data-openpencil-frame="0:9724">
-    <Navbar />
     <main className="op-trust-wrap">
       <header className="op-trust-hero"><div><p>TRUST &amp; RECOVERY</p><h1>Keep your account safe</h1><span>Identity verification, dispute resolution and payment recovery in one place.</span></div></header>
       <div className="op-trust-layout">
@@ -22,6 +19,5 @@ export default function TrustPage() {
         </div>
       </div>
     </main>
-    <Footer />
   </div>;
 }
