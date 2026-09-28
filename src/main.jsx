@@ -13,6 +13,7 @@ import './checkout-design.css'
 import './auth-design.css'
 import './public-content-design.css'
 import './flowbite-controls.css'
+import './saved-stays.css'
 
 // PWA update handling - when a new service worker activates, reload so the
 // user is always on the latest version (registerType: 'autoUpdate').
