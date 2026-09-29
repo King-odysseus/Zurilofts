@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Datepicker, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Label } from 'flowbite-react';
-import { Search } from 'lucide-react';
+import { Headphones, Receipt, Search, ShieldCheck } from 'lucide-react';
 import apiClient from './api/client.js';
 import { heroImage } from './assets/images.js';
 import { useAuth } from './context/AuthContext.jsx';
@@ -17,6 +17,12 @@ const guides = [
   { title: 'Westlands After Dark', label: 'Nightlife', image: '/images/place-sarit-centre.jpg' },
   { title: 'Kilimani Coffee Guide', label: 'Cafés', image: '/images/eat-artcaffe.jpg' },
   { title: 'Karen Green Escapes', label: 'Outdoors', image: '/images/place-karura-forest.jpg' },
+];
+
+const benefits = [
+  { Icon: ShieldCheck, title: 'Verified homes', copy: 'Every listing is inspected and professionally photographed before it goes live.' },
+  { Icon: Receipt, title: 'Transparent pricing', copy: 'One clear nightly rate, utilities, fast Wi-Fi and cleaning all included.' },
+  { Icon: Headphones, title: '24/7 local support', copy: 'A Nairobi-based team on call for check-in, repairs and anything else.' },
 ];
 
 function parseDateValue(value) {
@@ -179,7 +185,7 @@ export function GuestHome() {
     <section className="opg-hero" style={{ backgroundImage: 'linear-gradient(90deg, rgba(11,31,66,.79), rgba(11,31,66,.48)), url("/images/place-un-hq.jpg")' }}><div className="opg-container"><span className="opg-hero-badge">VERIFIED HOMES · NAIROBI</span><h1><span className="opg-desktop-title">Find your place in Nairobi</span><span className="opg-mobile-title">Find your next stay</span></h1><p>Handpicked apartments across the city&apos;s best neighbourhoods — verified, furnished, and ready to move in.</p><span className="opg-mobile-subtitle">{stays.loading ? 'Find a home across Nairobi.' : `${stays.total} homes across Nairobi.`}</span><SearchForm /><div className="opg-popular">Popular {['Westlands','Kilimani','Lavington','Karen'].map((place) => <Link key={place} to={`/properties?search=${encodeURIComponent(place)}`}>{place}</Link>)}</div><Link to="/properties?search=Westlands" className="opg-mobile-feature" style={{ backgroundImage: 'url("/images/place-un-hq.jpg")' }}><span>Popular in Westlands</span></Link></div></section>
     <section className="opg-section opg-stays-section"><div className="opg-container"><div className="opg-section-heading"><div><h2>Stays in Nairobi</h2><p>Handpicked homes, verified by our team</p></div><Link to="/properties">See all →</Link></div><CategoryBar selected={category} onSelect={setCategory} /><StayGrid {...stays} /></div></section>
     {recent.length > 0 && <section className="opg-section opg-recent"><div className="opg-container"><div className="opg-section-heading"><h2>Recently viewed</h2><button type="button" onClick={() => { clearRecentlyViewed(); setRecent([]); }}>Clear history</button></div><div className="opg-recent-grid">{recent.slice(0, 5).map((stay) => <Link to={`/property/${stay.id}`} key={stay.id}><img src={stay.image || heroImage} alt="" /><strong>{stay.title}</strong></Link>)}</div></div></section>}
-    <section className="opg-section opg-benefits"><div className="opg-container"><div className="opg-centered"><h2>Why stay with ZuriLofts</h2><p>A calmer, clearer way to book a home in Nairobi</p></div><div className="opg-benefit-grid">{[['◇','Verified homes','Every listing is inspected and professionally photographed before it goes live.'],['▣','Transparent pricing','One clear nightly rate — utilities, fast Wi-Fi and cleaning all included.'],['♧','24/7 local support','A Nairobi-based team on call for check-in, repairs and anything else.']].map(([icon,title,copy]) => <article key={title}><span>{icon}</span><h3>{title}</h3><p>{copy}</p></article>)}</div></div></section>
+    <section className="opg-section opg-benefits"><div className="opg-container"><div className="opg-centered"><h2>Why stay with ZuriLofts</h2><p>A calmer, clearer way to book a home in Nairobi</p></div><div className="opg-benefit-grid">{benefits.map(({ Icon, title, copy }) => <article key={title}><span aria-hidden="true"><Icon size={22} strokeWidth={1.8} /></span><h3>{title}</h3><p>{copy}</p></article>)}</div></div></section>
     <section className="opg-section opg-guides"><div className="opg-container"><div className="opg-section-heading"><div><h2>Explore Nairobi</h2><p>Neighbourhood guides, written by people who live there</p></div><Link to="/guides">Browse all guides →</Link></div><div className="opg-guide-grid">{guides.map((guide) => <Link to="/guides" key={guide.title} style={{ backgroundImage: `linear-gradient(0deg, rgba(0,0,0,.8), transparent 58%), url("${guide.image}")` }}><span>{guide.label}</span><div><h3>{guide.title}</h3><small>Explore the area</small></div></Link>)}</div></div></section>
   </main>;
 }
