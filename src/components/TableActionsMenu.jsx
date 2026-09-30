@@ -10,7 +10,7 @@ function ActionIcon({ icon, danger }) {
     '⌕': Search,
     '↻': RefreshCw,
     '✓': Check,
-    '–': Minus,
+    '-': Minus,
     '⌁': AlignLeft,
   }[icon] || Circle;
   return <Icon className={className} strokeWidth={1.8} aria-hidden="true" />;

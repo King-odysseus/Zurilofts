@@ -283,7 +283,7 @@ function AdminUsers() {
                       )}
                     </div>
                     <div role="cell"><strong>{u._count?.properties ?? 0}</strong><small>properties</small></div>
-                    <div role="cell"><strong>{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '—'}</strong><small>host balance</small></div>
+                    <div role="cell"><strong>{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '-'}</strong><small>host balance</small></div>
                     <div role="cell"><span className={`op-admin-people-pill ${u.suspended ? 'is-danger' : 'is-success'}`}>{u.suspended ? 'Suspended' : 'Active'}</span></div>
                     <div className="op-admin-people-actions" role="cell">
                       <button type="button" onClick={() => openEdit(u)}>Edit</button>

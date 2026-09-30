@@ -99,7 +99,7 @@ function RegisterPage() {
   return (
     <AuthShell>
       <h2>{isHost ? 'Create your host account' : 'Create your account'}</h2>
-      <p>{isHost ? 'List verified, furnished homes with ZuriLofts.' : 'Book verified furnished apartments across Nairobi — it’s free to join.'}</p>
+      <p>{isHost ? 'List verified, furnished homes with ZuriLofts.' : 'Book verified furnished apartments across Nairobi. It’s free to join.'}</p>
       {(localError || error) && <div className="op-auth-error" role="alert">{localError || error}</div>}
 
       <div className="op-auth-mode" aria-label="Account type">

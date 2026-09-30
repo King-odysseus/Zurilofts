@@ -13,7 +13,7 @@ function PlacesPage() {
         </Link>
         <NearbySection
           title="Places to see in Nairobi"
-          subtitle="Markets, galleries, trails and viewpoints — the spots locals actually send visitors to."
+          subtitle="Markets, galleries, trails and viewpoints, the spots locals actually send visitors to."
           items={PLACES_TO_VISIT}
           areaLabels={AREAS}
           categoryLabels={PLACE_CATEGORIES}

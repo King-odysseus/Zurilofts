@@ -24,7 +24,7 @@ function AuthShell({ children }) {
         <div className="op-auth-story-copy">
           <span className="op-auth-proof">✦ &nbsp;Verified stays in Nairobi</span>
           <h1>Find your place in Nairobi.</h1>
-          <p>Premium furnished apartments in the city’s best neighbourhoods — verified, ready to live in, and supported by people who know Nairobi.</p>
+          <p>Premium furnished apartments in the city’s best neighbourhoods, verified, ready to live in, and supported by people who know Nairobi.</p>
           <ul>
             <li>Identity-checked hosts and secure payments</li>
             <li>High-speed internet, smart lock, hotel-grade linen</li>

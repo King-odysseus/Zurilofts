@@ -1116,7 +1116,7 @@ function BookingPage() {
   return (
     <div className="op-checkout-screen min-h-screen bg-white">
       <header className="op-checkout-chrome"><Link to={`/property/${property.id}`} className="op-checkout-back">← &nbsp;Back</Link><Link to="/" className="op-checkout-brand"><img src={logo} alt="" />ZuriLofts</Link><span className="op-checkout-secure">♟ &nbsp;Secure checkout</span></header>
-      <div className="op-checkout-summary"><div><strong>{property.title}</strong><span>{bookingData.checkIn && bookingData.checkOut ? `${bookingData.checkIn} – ${bookingData.checkOut}` : 'Choose your dates'} · {bookingData.guests} guests</span></div><strong>{pricing.nights > 0 ? `KSh ${pricing.total.toLocaleString()}` : 'Total at checkout'}</strong></div>
+      <div className="op-checkout-summary"><div><strong>{property.title}</strong><span>{bookingData.checkIn && bookingData.checkOut ? `${bookingData.checkIn} - ${bookingData.checkOut}` : 'Choose your dates'} · {bookingData.guests} guests</span></div><strong>{pricing.nights > 0 ? `KSh ${pricing.total.toLocaleString()}` : 'Total at checkout'}</strong></div>
       <div className="op-checkout-main pb-12 md:pb-16">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
           {/* Progress Steps */}

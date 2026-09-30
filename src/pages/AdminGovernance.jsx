@@ -249,7 +249,7 @@ function AdminGovernance() {
           )}
 
           <div className="op-admin-governance-footer">
-            <span>Showing {filteredEvents.length === 0 ? 0 : (page - 1) * 8 + 1}–{Math.min(page * 8, filteredEvents.length)} of {filteredEvents.length}</span>
+            <span>Showing {filteredEvents.length === 0 ? 0 : (page - 1) * 8 + 1}-{Math.min(page * 8, filteredEvents.length)} of {filteredEvents.length}</span>
             <div>
               <Button color="light" disabled={page <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>
                 <ChevronLeft strokeWidth={1.8} aria-hidden="true" />Previous

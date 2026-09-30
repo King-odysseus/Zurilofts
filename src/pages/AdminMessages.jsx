@@ -147,7 +147,7 @@ function AdminMessages() {
         <article><span>CONVERSATIONS</span><strong>{conversations.length}</strong><small>Guests with a support history</small></article>
         <article><span>UNREAD MESSAGES</span><strong>{unreadTotal}</strong><small>Waiting for an operations reply</small></article>
         <article><span>OPEN THREAD</span><strong className="op-admin-message-active">{activePreview ? `${activePreview.firstName || ''} ${activePreview.lastName || ''}`.trim() || 'Guest' : 'None'}</strong><small>{activePreview ? activePreview.email || 'Guest conversation' : 'Select a guest to read the thread'}</small></article>
-        <article><span>LAST SYNC</span><strong className="op-admin-message-sync">{lastSync ? lastSync.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '—'}</strong><small>Automatically refreshed every 30 seconds</small></article>
+        <article><span>LAST SYNC</span><strong className="op-admin-message-sync">{lastSync ? lastSync.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '-'}</strong><small>Automatically refreshed every 30 seconds</small></article>
       </div>
 
       <section className={`op-admin-message-board ${activeUserId ? 'has-active' : ''}`}>

@@ -11,7 +11,7 @@
 .zl-brand { gap: 10px; color: var(--op-navy); font-family: Montserrat, sans-serif; font-size: 19px; font-weight: 800; letter-spacing: -.5px; }
 .zl-brand img { width: 32px; height: 32px; object-fit: contain; }
 .zl-desktop-nav { gap: 4px; }
-.zl-desktop-nav a { padding: 10px 12px; color: #43516A; font-size: 14px; font-weight: 600; text-decoration: none; }
+.zl-desktop-nav a { padding: 10px 12px; font-size: 14px; font-weight: 600; text-decoration: none; }
 .zl-desktop-nav a:hover, .zl-desktop-nav a[aria-current="page"] { background: transparent; }
 .zl-header-actions { color: var(--op-muted); }
 .zl-nav-icon-button { display: grid !important; width: 40px; height: 40px; min-width: 40px; min-height: 40px !important; place-items: center; padding: 0 !important; border: 0 !important; border-radius: 50% !important; background: transparent !important; color: #0B1F42 !important; box-shadow: none !important; }

@@ -51,7 +51,7 @@
 }
 
 .zl-navbar .zl-desktop-nav a {
-  color: #0B1F42;
+  /* Text colour is set per-state by navItemClass in Navbar.jsx. */
 }
 
 .zl-navbar .zl-header-actions {

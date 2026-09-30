@@ -417,7 +417,7 @@ function DetailSection({ title, children }) {
 }
 
 function Detail({ label, value }) {
-  return <div className="op-admin-host-app-detail"><span>{label}</span><strong>{value === null || value === undefined || value === '' ? '—' : String(value)}</strong></div>;
+  return <div className="op-admin-host-app-detail"><span>{label}</span><strong>{value === null || value === undefined || value === '' ? '-' : String(value)}</strong></div>;
 }
 
 DetailSection.propTypes = { title: PropTypes.string.isRequired, children: PropTypes.node.isRequired };
