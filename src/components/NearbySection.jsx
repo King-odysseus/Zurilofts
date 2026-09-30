@@ -2,7 +2,7 @@ import { useState, lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Select, TextInput } from 'flowbite-react';
-import { ArrowRight, LayoutGrid, Map, MapPin } from 'lucide-react';
+import { ChevronRight, LayoutGrid, Map, MapPin } from 'lucide-react';
 import Spinner from './Spinner.jsx';
 import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 
@@ -127,7 +127,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] px-8 py-3 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
               >
                 View All {filtered.length} Places
-                <ArrowRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
+                <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
               </Link>
             </div>
           )}

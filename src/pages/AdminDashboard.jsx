@@ -43,7 +43,6 @@ import {
   Users,
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle.jsx';
-import '../admin-design.css';
 
 // Shared: both hosts and admins - routes gated by requireHost (or weaker).
 const hostNavItems = [

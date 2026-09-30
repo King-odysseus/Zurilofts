@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
-import { Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
+import { ChevronRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { googleOAuthUrl } from '../utils/authUrls.js';
 import AuthShell from '../components/AuthShell.jsx';
@@ -101,7 +101,7 @@ function LoginPage() {
           <Link to="/forgot-password">Forgot password?</Link>
         </div>
         <Button type="submit" className="op-auth-submit" disabled={submitting} pill>
-          {submitting ? 'Signing in…' : 'Sign in →'}
+          {submitting ? 'Signing in…' : <>Sign in <ChevronRight className="w-4 h-4" aria-hidden="true" /></>}
         </Button>
       </form>
 

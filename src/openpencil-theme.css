@@ -1,17 +1,5 @@
-/* OpenPencil implementation layer: shared product, host, and admin visual system. */
-:root {
-  --op-ink: #414D63;
-  --op-muted: #6E7686;
-  --op-line: #E2DAD0;
-  --op-paper: #FFFFFF;
-  --op-canvas: #F7F4EF;
-  --op-navy: #0B1F42;
-  --op-blue: #3B6FD4;
-  --op-aqua: #F3E9DC;
-  --op-gold: #C49A6C;
-  --op-radius: 12px;
-  --op-shadow: 0 14px 42px rgba(11, 31, 66, .08);
-}
+/* OpenPencil implementation layer: shared product, host, and admin visual system.
+   Design tokens now live in index.css (single source of truth). */
 
 .zl-app { min-height: 100vh; background: #fff; color: var(--op-ink); }
 .zl-app, .zl-app input, .zl-app button, .zl-app select, .zl-app textarea { font-family: Inter, Arial, sans-serif; }

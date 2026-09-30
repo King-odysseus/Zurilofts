@@ -7,7 +7,6 @@ import IdentityVerificationPanel from '../components/IdentityVerificationPanel.j
 import RouteBackButton from '../components/RouteBackButton.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
-import '../trust-design.css';
 
 const RECOVERY_CARDS = [
   {

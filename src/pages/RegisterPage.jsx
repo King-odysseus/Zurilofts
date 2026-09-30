@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button, Checkbox, FileInput, Label, TextInput } from 'flowbite-react';
-import { Eye, EyeOff, LockKeyhole, Mail, UserRound } from 'lucide-react';
+import { ChevronRight, Eye, EyeOff, LockKeyhole, Mail, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import { googleOAuthUrl } from '../utils/authUrls.js';
@@ -172,7 +172,7 @@ function RegisterPage() {
         </div>
 
         <Button type="submit" className="op-auth-submit" disabled={submitting} pill>
-          {submitting ? 'Creating account…' : isHost ? 'Create host account →' : 'Create account →'}
+          {submitting ? 'Creating account…' : <>{isHost ? 'Create host account' : 'Create account'} <ChevronRight className="w-4 h-4" aria-hidden="true" /></>}
         </Button>
       </form>
 

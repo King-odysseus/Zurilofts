@@ -2,7 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Single source of truth for the design system tokens.
+   Every other CSS file reads these values; no other file defines its own
+   :root token block anymore. Keeping the three namespaces (zl / op / control)
+   in one place lets each surface keep its own vocabulary while the palette
+   stays consistent and editable from one file. */
 :root {
+  /* Core brand (zl-*) */
   --zl-navy: #0B1F42;
   --zl-navy-hover: #07072E;
   --zl-bronze: #C49A6C;
@@ -13,6 +19,29 @@
   --zl-muted: #5B6B82;
   --zl-subtle: #94A3B8;
   --zl-shadow: 0 8px 28px rgba(11, 31, 66, 0.08);
+
+  /* OpenPencil surfaces (op-*) */
+  --op-ink: #414D63;
+  --op-muted: #6E7686;
+  --op-line: #E2DAD0;
+  --op-paper: #FFFFFF;
+  --op-canvas: #F7F4EF;
+  --op-navy: #0B1F42;
+  --op-blue: #3B6FD4;
+  --op-aqua: #F3E9DC;
+  --op-gold: #C49A6C;
+  --op-bronze: #C49A6C;
+  --op-sand: #F3E9DC;
+  --op-radius: 12px;
+  --op-shadow: 0 14px 42px rgba(11, 31, 66, 0.08);
+
+  /* Flowbite control surfaces (control-*) */
+  --control-line: #E2DAD0;
+  --control-focus: #C49A6C;
+  --control-text: #111827;
+  --control-placeholder: #6b7280;
+  --control-bg: #fff;
+  --control-surface: #F3E9DC;
 }
 
 @layer components {

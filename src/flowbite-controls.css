@@ -1,5 +1,5 @@
-/* Shared Flowbite-style form anatomy using the OpenPencil colour tokens. */
-:root{--control-line:#E2DAD0;--control-focus:#C49A6C;--control-text:#111827;--control-placeholder:#6b7280;--control-bg:#fff;--control-surface:#F3E9DC}
+/* Shared Flowbite-style form anatomy using the OpenPencil colour tokens.
+   Design tokens live in index.css (single source of truth). */
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]):not([type=submit]):not([type=button]),select,textarea){border:1px solid var(--control-line);border-radius:8px;background-color:#fff;color:var(--control-text);font-size:14px;line-height:1.4;min-height:44px;transition:border-color .15s ease,box-shadow .15s ease}
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea)::placeholder{color:var(--control-placeholder);opacity:1}
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea)::selection{background:#F3E9DC;color:#0B1F42}
