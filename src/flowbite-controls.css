@@ -138,7 +138,14 @@ html.dark #root,
 html.dark .zl-app,
 html.dark .opg-page,
 html.dark .opg-account-page,
-html.dark .op-checkout,
+html.dark .op-checkout-screen,
+html.dark .op-auth-page,
+html.dark .op-trust-page,
+html.dark .op-host-today,
+html.dark .op-host-listings,
+html.dark .op-host-earnings,
+html.dark .op-host-payouts,
+html.dark .op-host-application-page,
 html.dark .op-admin-layout,
 html.dark .op-admin-main {
   background-color: var(--dm-bg) !important;
@@ -787,22 +794,324 @@ html.dark .op-host-editor-error {
 }
 
 /* Auth, checkout, and shared mobile navigation */
-html.dark .zl-auth-page,
-html.dark .zl-auth-form,
-html.dark .op-checkout-header,
-html.dark .op-checkout-body,
+html.dark .op-auth-page,
+html.dark .op-auth-side,
+html.dark .op-auth-card,
+html.dark .op-checkout-chrome,
+html.dark .op-checkout-main,
 html.dark .op-account-nav {
   background-color: var(--dm-surface) !important;
   color: var(--dm-text) !important;
 }
 
-html.dark .zl-auth-page,
-html.dark .op-checkout {
+html.dark .op-auth-page,
+html.dark .op-checkout-screen {
   background-color: var(--dm-bg) !important;
+}
+
+/* Checkout form surfaces (BookingPage) */
+html.dark .op-checkout-chrome {
+  border-color: var(--dm-border) !important;
+}
+
+html.dark .op-checkout-chrome a {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-checkout-brand img {
+  filter: brightness(0) invert(1);
+}
+
+html.dark .op-checkout-back,
+html.dark .op-checkout-secure {
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-checkout-select {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-checkout-select:hover,
+html.dark .op-checkout-select:focus {
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-checkout-progress-step > span {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-checkout-progress-circle {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-checkout-progress-circle.is-active {
+  border-color: #D1A477 !important;
+  background-color: #D1A477 !important;
+  color: #0B1F42 !important;
+}
+
+html.dark .op-checkout-progress-line {
+  background-color: var(--dm-border-strong) !important;
+}
+
+html.dark .op-checkout-progress-line.is-active {
+  background-color: #D1A477 !important;
+}
+
+html.dark .op-auth-top,
+html.dark .op-auth-top a {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-auth-top span,
+html.dark .op-auth-language {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-auth-card h2,
+html.dark .op-auth-form-row a,
+html.dark .op-auth-switch a,
+html.dark .op-auth-terms a {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-auth-card > p,
+html.dark .op-auth-label > span:first-child,
+html.dark .op-auth-hint,
+html.dark .op-auth-switch,
+html.dark .op-auth-terms {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-auth-label input {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-auth-label input::placeholder {
+  color: var(--dm-subtle) !important;
+}
+
+html.dark .op-auth-control-icon,
+html.dark .op-auth-password-toggle {
+  color: var(--dm-subtle) !important;
+}
+
+html.dark .op-auth-mode {
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark .op-auth-mode a {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-auth-mode a.active {
+  background-color: var(--dm-surface-raised) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-auth-divider {
+  color: var(--dm-subtle) !important;
+}
+
+html.dark .op-auth-divider:before,
+html.dark .op-auth-divider:after {
+  background: var(--dm-border) !important;
+}
+
+html.dark .op-auth-google {
+  border-color: var(--dm-border-strong) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-auth-google:hover {
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark .op-auth-file-row input[type=file] {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-auth-file-row input[type=file]::file-selector-button {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-auth-file-row input[type=file]::file-selector-button:hover {
+  background-color: var(--dm-surface-raised) !important;
+}
+
+html.dark .op-auth-avatar-placeholder {
+  background-color: #3A2E18 !important;
+  color: #D1A477 !important;
+}
+
+/* Trust & recovery */
+html.dark .op-trust-hero,
+html.dark .op-trust-stats > div,
+html.dark .op-trust-sidebar,
+html.dark .op-trust-person,
+html.dark .op-trust-panel,
+html.dark .op-trust-recovery-card {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-trust-wrap {
+  background-color: var(--dm-bg) !important;
+}
+
+html.dark .op-trust-hero-copy > p,
+html.dark .op-trust-hero-copy > span,
+html.dark .op-trust-panel-head p,
+html.dark .op-trust-recovery-card p,
+html.dark .op-trust-stats span,
+html.dark .op-trust-person small,
+html.dark .op-trust-sidebar nav a {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-trust-hero h1,
+html.dark .op-trust-panel-head h2,
+html.dark .op-trust-recovery-card h3,
+html.dark .op-trust-stats strong,
+html.dark .op-trust-person strong {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-trust-sidebar nav a:hover,
+html.dark .op-trust-logout {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-trust-sidebar nav a em {
+  background-color: #3A2E18 !important;
+  color: #D1A477 !important;
 }
 
 html.dark .opg-footer {
   background-color: #060D19 !important;
+}
+
+/* Public content pages: Places, Restaurants, Guides, legal, 404 */
+html.dark .op-public-page,
+html.dark .op-guides-page,
+html.dark .op-guides-hero,
+html.dark .op-public-hero {
+  background-color: var(--dm-bg) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-public-hero,
+html.dark .op-guides-hero,
+html.dark .op-legal-content section {
+  border-color: var(--dm-border) !important;
+}
+
+html.dark .op-public-hero h1,
+html.dark .op-guides-hero h1,
+html.dark .op-guide-detail-header h1,
+html.dark .op-guide-card h2,
+html.dark .op-guides-empty h2,
+html.dark .op-legal-content h2,
+html.dark .op-legal-content h3,
+html.dark .op-guide-detail-content h2,
+html.dark .op-guide-detail-content h3,
+html.dark .op-not-found h1,
+html.dark .op-guide-not-found h1 {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-public-hero p,
+html.dark .op-guides-hero p,
+html.dark .op-guide-detail-header > p,
+html.dark .op-guide-card-copy > p:not(.op-guide-date),
+html.dark .op-guides-empty p,
+html.dark .op-legal-content p,
+html.dark .op-legal-content li,
+html.dark .op-guide-detail-content,
+html.dark .op-not-found p,
+html.dark .op-guide-not-found p,
+html.dark .op-breadcrumbs,
+html.dark .op-breadcrumbs a,
+html.dark .op-place-card p,
+html.dark .op-place-count,
+html.dark .op-places-list > div:first-child p {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-guide-card,
+html.dark .op-guides-empty {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+}
+
+html.dark .op-guide-card h2,
+html.dark .op-guide-card .op-guide-link,
+html.dark .op-place-card h3,
+html.dark .op-place-card .op-place-copy > a,
+html.dark .op-place-clear,
+html.dark .op-legal-content thead,
+html.dark .op-legal-content table,
+html.dark .op-guide-detail-content a {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-guide-card-media,
+html.dark .op-guide-detail-cover,
+html.dark .op-guides-empty-icon {
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark .op-place-search-wrap input,
+html.dark .op-place-select-wrap select {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-place-area,
+html.dark .op-guide-card-media span {
+  background-color: var(--dm-surface-raised) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-guide-card:hover {
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+}
+
+/* Host workspace: swap the light --host-* tokens for dark values. */
+html.dark .op-host-today,
+html.dark .op-host-listings,
+html.dark .op-host-earnings,
+html.dark .op-host-payouts,
+html.dark .op-host-calendar {
+  --host-navy: var(--dm-text);
+  --host-blue: #7EA6FF;
+  --host-bronze: #D1A477;
+  --host-line: var(--dm-border-strong);
+  --host-soft: var(--dm-surface-soft);
+  color: var(--dm-text);
+}
+
+/* Tailwind colour utilities not caught by the arbitrary-value selectors. */
+html.dark :where(.text-charcoal, .text-navy, .text-indigo) {
+  color: var(--dm-text) !important;
+}
+
+html.dark :where(.text-muted, .text-cool-grey) {
+  color: var(--dm-muted) !important;
 }
 
 .zl-theme-toggle-icon {
