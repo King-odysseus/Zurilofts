@@ -221,6 +221,7 @@ function Navbar() {
   const navItems = (() => {
     if (!isAuthenticated) {
       return [
+        { name: 'Home', key: 'home', href: '/' },
         { name: 'Stays', key: 'properties', href: '/properties' },
         { name: 'Places', key: 'places', href: '/places' },
         { name: 'Restaurants', key: 'restaurants', href: '/restaurants' },
