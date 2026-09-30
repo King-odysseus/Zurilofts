@@ -17,7 +17,7 @@
 .op-auth-label>span:first-child{display:block;margin-bottom:7px}
 .op-auth-control{position:relative;display:block;width:100%}
 .op-auth-control-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#6E7686;pointer-events:none}
-.op-auth-label input{display:block;width:100%;height:44px;margin-top:0;border:1px solid #e3e7ec;border-radius:8px;background:#fff;padding:0 14px;color:#0B1F42;font:13px Inter,Arial,sans-serif;box-shadow:none;transition:border-color .15s ease,box-shadow .15s ease}
+.op-auth-label input{display:block;width:100%;height:44px;margin-top:0;border:1px solid #e3e7ec;border-radius:999px;background:#fff;padding:0 14px;color:#0B1F42;font:13px Inter,Arial,sans-serif;box-shadow:none;transition:border-color .15s ease,box-shadow .15s ease}
 .op-auth-label input.has-icon{padding-left:42px}
 .op-auth-label input.has-toggle{padding-right:48px}
 .op-auth-label input::placeholder{color:#9ca3af}
