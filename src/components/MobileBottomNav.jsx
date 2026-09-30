@@ -1,11 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
-import { CircleUserRound, Compass, Heart, Luggage, MessageCircleMore } from 'lucide-react';
+import { CircleUserRound, Home, Heart, Luggage, MessageCircleMore } from 'lucide-react';
 import { useMode } from '../context/ModeContext.jsx';
 
 // Paths where global navigation (including these tabs) is intentionally
 // hidden: checkout and payment results (compact logo/back header only), and the host/admin
-// workspaces, which have their own navigation. The home page keeps Explore
+// workspaces, which have their own navigation. The home page keeps Home
 // active so mobile guests always have a primary navigation surface.
 function isHiddenPath(pathname) {
   return (
@@ -18,12 +18,12 @@ function isHiddenPath(pathname) {
 
 const TABS = [
   {
-    key: 'explore',
-    label: 'Explore',
-    to: '/properties',
+    key: 'home',
+    label: 'Home',
+    to: '/',
     match: (p) => p === '/' || p.startsWith('/properties') || p.startsWith('/property/'),
     icon: (active) => (
-      <Compass className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
+      <Home className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),
   },
   {
@@ -65,7 +65,7 @@ const TABS = [
 ];
 
 /**
- * Role-aware guest mobile bottom navigation (below 768px): Explore, Saved,
+ * Role-aware guest mobile bottom navigation (below 768px): Home, Saved,
  * Trips, Inbox, Profile. Hidden during checkout (compact header instead)
  * and inside the host/admin workspaces, which have their own navigation.
  * Destinations that require auth (Trips, Messages, Profile's booking
