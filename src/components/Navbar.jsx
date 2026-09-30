@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Avatar, Button, Dropdown, DropdownDivider, DropdownItem, TextInput } from 'flowbite-react';
+import { Button, Dropdown, DropdownDivider, DropdownItem, TextInput } from 'flowbite-react';
 import {
   ArrowLeftRight,
   Bell,
@@ -631,7 +631,7 @@ function Navbar() {
               <Dropdown
                 inline
                 theme={{ inlineWrapper: 'zl-header-avatar-button' }}
-                label={<><span className="sr-only">Open account menu</span><Avatar placeholderInitials="?" rounded size="sm" className="zl-header-avatar" /></>}
+                label={<><span className="sr-only">Open account menu</span><span className="zl-header-avatar-icon" aria-hidden="true"><CircleUserRound strokeWidth={1.8} /></span></>}
                 arrowIcon={false}
                 placement="bottom-end"
                 aria-label="Open account menu"
