@@ -1,29 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Checkbox, FileInput, Label, TextInput } from 'flowbite-react';
-import { ChevronRight, Eye, EyeOff, LockKeyhole, Mail, UserRound } from 'lucide-react';
+import { ChevronRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import { googleOAuthUrl } from '../utils/authUrls.js';
 import { rememberNavMode, rememberPostAuthMode } from '../utils/authIntent.js';
 import AuthShell from '../components/AuthShell.jsx';
+import GoogleIcon from '../components/GoogleIcon.jsx';
 
 function getDashboardPath(user) {
   if (user?.role === 'ADMIN') return '/admin';
   if (user?.role === 'HOST') return '/host/today';
   return '/';
-}
-
-function UserIcon() {
-  return <UserRound strokeWidth={1.8} aria-hidden="true" />;
-}
-
-function MailIcon() {
-  return <Mail strokeWidth={1.8} aria-hidden="true" />;
-}
-
-function LockIcon() {
-  return <LockKeyhole strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function RegisterPage() {
@@ -121,63 +109,72 @@ function RegisterPage() {
 
       <form onSubmit={handleSubmit} className="op-auth-register-form">
         <div className="op-auth-name-grid">
-          <Label htmlFor="register-first-name" className="op-auth-label">
+          <label className="op-auth-label">
             <span>First name</span>
-            <TextInput id="register-first-name" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Grace" required autoComplete="given-name" icon={UserIcon} sizing="lg" />
-          </Label>
-          <Label htmlFor="register-last-name" className="op-auth-label">
+            <span className="op-auth-control">
+              <input id="register-first-name" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Grace" required autoComplete="given-name" />
+            </span>
+          </label>
+          <label className="op-auth-label">
             <span>Last name</span>
-            <TextInput id="register-last-name" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Wanjiru" required autoComplete="family-name" sizing="lg" />
-          </Label>
+            <span className="op-auth-control">
+              <input id="register-last-name" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Wanjiru" required autoComplete="family-name" />
+            </span>
+          </label>
         </div>
 
-        <Label htmlFor="register-email" className="op-auth-label">
+        <label className="op-auth-label">
           <span>Email address</span>
-          <TextInput id="register-email" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" required autoComplete="email" icon={MailIcon} sizing="lg" />
-        </Label>
+          <span className="op-auth-control">
+            <Mail className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input className="has-icon" id="register-email" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" required autoComplete="email" />
+          </span>
+        </label>
 
-        <Label htmlFor="register-password" className="op-auth-label">
+        <label className="op-auth-label">
           <span>Password</span>
-          <div className="op-auth-password">
-            <TextInput id="register-password" type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="8+ characters" required autoComplete="new-password" icon={LockIcon} sizing="lg" />
+          <span className="op-auth-control op-auth-password">
+            <LockKeyhole className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input className="has-icon has-toggle" id="register-password" type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="8+ characters" required autoComplete="new-password" />
             <PasswordToggle shown={showPassword} onClick={() => setShowPassword((value) => !value)} />
-          </div>
+          </span>
           <small className="op-auth-hint">Use at least 8 characters with a number and an uppercase letter.</small>
-        </Label>
+        </label>
 
-        <Label htmlFor="register-confirm-password" className="op-auth-label">
+        <label className="op-auth-label">
           <span>Confirm password</span>
-          <div className="op-auth-password">
-            <TextInput id="register-confirm-password" type={showConfirm ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Re-enter your password" required autoComplete="new-password" icon={LockIcon} sizing="lg" />
+          <span className="op-auth-control op-auth-password">
+            <LockKeyhole className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input className="has-icon has-toggle" id="register-confirm-password" type={showConfirm ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Re-enter your password" required autoComplete="new-password" />
             <PasswordToggle shown={showConfirm} onClick={() => setShowConfirm((value) => !value)} />
-          </div>
-        </Label>
+          </span>
+        </label>
 
-        <Label htmlFor="register-avatar" className="op-auth-label op-auth-file-label">
+        <label className="op-auth-label op-auth-file-label">
           <span>Profile photo <small>(optional)</small></span>
           <div className="op-auth-file-row">
             {avatarPreview ? <img src={avatarPreview} alt="Selected profile" className="op-auth-avatar-preview" /> : <span className="op-auth-avatar-placeholder" aria-hidden="true">{formData.firstName?.[0] || 'Z'}</span>}
-            <FileInput id="register-avatar" accept="image/jpeg,image/png,image/webp" sizing="sm" onChange={(event) => {
+            <input id="register-avatar" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => {
               const file = event.target.files?.[0];
               if (!file) return;
               setAvatarFile(file);
               setAvatarPreview(URL.createObjectURL(file));
             }} />
           </div>
-        </Label>
+        </label>
 
         <div className="op-auth-check op-auth-terms">
-          <Checkbox id="register-terms" required />
-          <Label htmlFor="register-terms">I agree to the <Link to="/terms">Terms of Service</Link> and <Link to="/privacy">Privacy Policy</Link>.</Label>
+          <input type="checkbox" id="register-terms" required />
+          <label htmlFor="register-terms">I agree to the <Link to="/terms">Terms of Service</Link> and <Link to="/privacy">Privacy Policy</Link>.</label>
         </div>
 
-        <Button type="submit" className="op-auth-submit" disabled={submitting} pill>
+        <button type="submit" className="op-auth-submit" disabled={submitting}>
           {submitting ? 'Creating account…' : <>{isHost ? 'Create host account' : 'Create account'} <ChevronRight className="w-4 h-4" aria-hidden="true" /></>}
-        </Button>
+        </button>
       </form>
 
       <div className="op-auth-divider">or sign up with</div>
-      <a className="op-auth-google" href={googleHref} onClick={() => rememberPostAuthMode(isHost ? 'hosting' : 'travelling')}><span>G</span> Sign up with Google</a>
+      <a className="op-auth-google" href={googleHref} onClick={() => rememberPostAuthMode(isHost ? 'hosting' : 'travelling')}><GoogleIcon className="h-[18px] w-[18px]" /> Sign up with Google</a>
       <div className="op-auth-switch">Already have an account? <Link to="/login">Sign in</Link></div>
     </AuthShell>
   );

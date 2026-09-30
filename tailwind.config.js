@@ -11,8 +11,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary:        '#2563EB',
-        'primary-hover': '#1D4ED8',
+        primary: {
+          DEFAULT: '#C49A6C',
+          50:  '#FBF7F1',
+          100: '#F6EDE0',
+          200: '#EAD8BE',
+          300: '#DDBE97',
+          400: '#D0A981',
+          500: '#C49A6C',
+          600: '#B8895C',
+          700: '#9A744A',
+          800: '#7C5D3B',
+          900: '#5E472C',
+          950: '#3D2E1B',
+        },
+        'primary-hover': '#B8895C',
         navy:           '#0B1F42',
         indigo:         '#0B1F42', // Backward-compatible alias to navy
         bronze:         '#C49A6C', // Branding
@@ -49,7 +62,7 @@ export default {
     themes: [
       {
         zuriloft: {
-          primary:            '#2563EB',  // Blue
+          primary:            '#C49A6C',  // Bronze
           secondary:          '#0B0B45',  // Dark Navy
           accent:             '#C49A6C',  // Warm Bronze
           neutral:            '#E5E7EB',  // Border Grey

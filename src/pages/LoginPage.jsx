@@ -1,23 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
 import { ChevronRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { googleOAuthUrl } from '../utils/authUrls.js';
 import AuthShell from '../components/AuthShell.jsx';
+import GoogleIcon from '../components/GoogleIcon.jsx';
 
 function getDashboardPath(user) {
   if (user?.role === 'ADMIN') return '/admin';
   if (user?.role === 'HOST') return '/host/today';
   return '/';
-}
-
-function MailIcon() {
-  return <Mail strokeWidth={1.8} aria-hidden="true" />;
-}
-
-function LockIcon() {
-  return <LockKeyhole strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function LoginPage() {
@@ -62,24 +54,29 @@ function LoginPage() {
       {(localError || error) && <div className="op-auth-error" role="alert">{localError || error}</div>}
 
       <form onSubmit={handleSubmit}>
-        <Label htmlFor="login-email" className="op-auth-label">
+        <label className="op-auth-label">
           <span>Email address</span>
-          <TextInput
-            id="login-email"
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
-            required
-            autoComplete="email"
-            icon={MailIcon}
-            sizing="lg"
-          />
-        </Label>
-        <Label htmlFor="login-password" className="op-auth-label">
+          <span className="op-auth-control">
+            <Mail className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input
+              className="has-icon"
+              id="login-email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="you@example.com"
+              required
+              autoComplete="email"
+            />
+          </span>
+        </label>
+
+        <label className="op-auth-label">
           <span>Password</span>
-          <div className="op-auth-password">
-            <TextInput
+          <span className="op-auth-control op-auth-password">
+            <LockKeyhole className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input
+              className="has-icon has-toggle"
               id="login-password"
               type={showPassword ? 'text' : 'password'}
               value={password}
@@ -87,26 +84,26 @@ function LoginPage() {
               placeholder="Enter your password"
               required
               autoComplete="current-password"
-              icon={LockIcon}
-              sizing="lg"
             />
             <PasswordToggle shown={showPassword} onClick={() => setShowPassword((value) => !value)} />
-          </div>
-        </Label>
+          </span>
+        </label>
+
         <div className="op-auth-form-row">
           <span className="op-auth-check">
-            <Checkbox id="remember-me" defaultChecked />
-            <Label htmlFor="remember-me">Remember me</Label>
+            <input type="checkbox" id="remember-me" defaultChecked />
+            <label htmlFor="remember-me">Remember me</label>
           </span>
           <Link to="/forgot-password">Forgot password?</Link>
         </div>
-        <Button type="submit" className="op-auth-submit" disabled={submitting} pill>
+
+        <button type="submit" className="op-auth-submit" disabled={submitting}>
           {submitting ? 'Signing in…' : <>Sign in <ChevronRight className="w-4 h-4" aria-hidden="true" /></>}
-        </Button>
+        </button>
       </form>
 
       <div className="op-auth-divider">or continue with</div>
-      <a className="op-auth-google" href={googleHref}><span>G</span> Continue with Google</a>
+      <a className="op-auth-google" href={googleHref}><GoogleIcon className="h-[18px] w-[18px]" /> Continue with Google</a>
       <div className="op-auth-switch">New to ZuriLofts? <Link to="/register">Create account</Link></div>
     </AuthShell>
   );
