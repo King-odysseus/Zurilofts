@@ -8,7 +8,7 @@
 .opg-container{width:min(1200px,calc(100% - 48px));margin:auto}
 .opg-hero{height:440px;background-size:cover;background-position:center;display:flex;align-items:flex-start;text-align:center;color:white}
 .opg-hero .opg-container{padding-top:54px}
-.opg-hero-badge{display:inline-block;padding:8px 18px;background:var(--op-bronze);color:white;border-radius:50px;font:800 10px Montserrat,Arial,sans-serif;letter-spacing:.07em}
+.opg-hero-badge{display:inline-block;padding:8px 18px;background:#16A34A;color:white;border-radius:50px;font:800 10px Montserrat,Arial,sans-serif;letter-spacing:.07em}
 .opg-hero h1{font-size:40px;line-height:1.16;color:white;margin:22px 0 14px}
 .opg-hero p{max-width:680px;margin:auto;font-size:15px;line-height:1.5;color:#fff}
 .opg-mobile-title,.opg-mobile-subtitle,.opg-mobile-feature{display:none}
