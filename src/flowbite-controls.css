@@ -109,6 +109,7 @@ html.dark {
   --op-paper: #111B2D;
   --op-canvas: #0B1424;
   --op-navy: #E7EEF8;
+  --op-navy-bg: #0B1F42;
   --op-blue: #7EA6FF;
   --op-aqua: #19323A;
   --op-gold: #D1A477;
@@ -546,6 +547,49 @@ html.dark .op-admin-booking-row small {
   color: var(--dm-muted) !important;
 }
 
+/* People board: Flowbite Select wrappers and inline row actions keep their
+   light-mode white fill because the admin CSS targets the wrapper/buttons
+   directly. Pin them to the dark surface palette here. */
+html.dark .op-admin-people-filter,
+html.dark .op-admin-people-search input,
+html.dark .op-admin-people-actions button {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-people-filter select,
+html.dark .op-admin-people-filter option {
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-people-actions button:hover:not(:disabled) {
+  border-color: #9F7142 !important;
+  background-color: #172238 !important;
+  color: var(--dm-text) !important;
+}
+
+/* Lift the semantic action-button text so it stays legible on dark surfaces. */
+html.dark .op-admin-people-actions button.is-warning { color: #FBBF24 !important; }
+html.dark .op-admin-people-actions button.is-positive { color: #4ADE80 !important; }
+html.dark .op-admin-people-actions button.is-danger { color: #F87171 !important; }
+
+/* Catalog tables (promos, add-ons, guides) share the same action-button anatomy. */
+html.dark .op-admin-catalog-actions button {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+html.dark .op-admin-catalog-actions button:hover {
+  border-color: #9F7142 !important;
+  background-color: #172238 !important;
+}
+html.dark .op-admin-catalog-actions button.is-danger { color: #F87171 !important; }
+html.dark .op-admin-catalog-status.is-success { background: #173125 !important; color: #4ADE80 !important; }
+html.dark .op-admin-catalog-status.is-danger { background: #3A2228 !important; color: #F87171 !important; }
+html.dark .op-admin-catalog-status.is-neutral { background: #1D2B43 !important; color: #C8D4E5 !important; }
+
 html.dark .op-admin-main>div:last-child {
   background-color: var(--dm-bg);
 }
@@ -634,24 +678,38 @@ html.dark .op-admin-mobile-nav {
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.38) !important;
 }
 
-html.dark :where(.op-admin-quick-menu, .op-admin-avatar-menu, .op-admin-accordion, .op-admin-accordion button[type=button], .op-admin-accordion [data-testid=flowbite-accordion-content]) {
+html.dark .op-admin-quick-menu,
+html.dark .op-admin-avatar-menu,
+html.dark .op-admin-accordion,
+html.dark .op-admin-accordion button[type=button],
+html.dark .op-admin-accordion [data-testid=flowbite-accordion-content] {
   border-color: var(--dm-border) !important;
   background-color: var(--dm-surface-soft) !important;
   color: var(--dm-text) !important;
 }
 
-html.dark :where(.op-admin-quick>button, .op-admin-avatar-trigger) {
+html.dark .op-admin-quick>button,
+html.dark .op-admin-avatar-trigger {
   border-color: var(--dm-border-strong) !important;
   background-color: transparent !important;
   color: var(--dm-text) !important;
 }
 
-html.dark :where(.op-admin-quick>button:hover, .op-admin-avatar-trigger:hover, .op-admin-quick-menu button:hover, .op-admin-avatar-menu [role=menuitem]:hover, .op-admin-accordion button[type=button]:hover, .op-admin-accordion button[type=button][aria-expanded=true]) {
+html.dark .op-admin-quick>button:hover,
+html.dark .op-admin-avatar-trigger:hover,
+html.dark .op-admin-quick-menu button:hover,
+html.dark .op-admin-avatar-menu [role=menuitem]:hover,
+html.dark .op-admin-accordion button[type=button]:hover,
+html.dark .op-admin-accordion button[type=button][aria-expanded=true] {
   background-color: #172238 !important;
   color: var(--dm-text) !important;
 }
 
-html.dark :where(.op-admin-quick-menu button, .op-admin-avatar-menu [role=menuitem], .op-admin-avatar-header, .op-admin-avatar-header strong, .op-admin-avatar-name) {
+html.dark .op-admin-quick-menu button,
+html.dark .op-admin-avatar-menu [role=menuitem],
+html.dark .op-admin-avatar-header,
+html.dark .op-admin-avatar-header strong,
+html.dark .op-admin-avatar-name {
   color: var(--dm-text) !important;
 }
 
@@ -1141,4 +1199,157 @@ html.dark :where(.text-muted, .text-cool-grey) {
 .op-admin-mobile-theme:hover,
 .op-admin-mobile-theme:focus-visible {
   background: #F3E9DC;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Brand-navy surfaces in dark mode.
+   --op-navy is dual-use: it colours text (must flip to light for legibility)
+   AND backgrounds (must stay dark). The elements below use it as a background,
+   so pin them back to a dark navy surface instead of inheriting the light text
+   value. White badges that draw their *content* from --op-navy are pinned back
+   to navy so they stay visible on their white fill.
+   ──────────────────────────────────────────────────────────────────────────── */
+html.dark .opg-footer {
+  background: #0B1424 !important;
+  color: #E7EEF8 !important;
+}
+
+html.dark .zl-mobile-nav {
+  background: #13233A !important;
+  border-color: #26344A !important;
+}
+
+html.dark .opg-card-badge,
+html.dark .opg-mobile-feature span {
+  background: #13233A !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .opg-categories button.active {
+  background: #23324B !important;
+  border-color: #23324B !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .opg-apply-filters {
+  background: #23324B !important;
+  color: #FFFFFF !important;
+}
+
+/* White floating badges keep their white fill but need navy content pinned
+   back (--op-navy has flipped to light). */
+html.dark .opg-heart {
+  background: #FFFFFF !important;
+  color: #0B1F42 !important;
+}
+
+html.dark .opg-guide-grid a > span {
+  background: #FFFFFF !important;
+  color: #0B1F42 !important;
+}
+
+/* Image placeholder surfaces (before a photo loads). */
+html.dark .opg-stay-image {
+  background: #1A263A !important;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Admin messages workspace.
+   ──────────────────────────────────────────────────────────────────────────── */
+html.dark .op-admin-message-board,
+html.dark .op-admin-message-list-panel,
+html.dark .op-admin-message-thread-panel,
+html.dark .op-admin-message-thread-head,
+html.dark .op-admin-message-thread,
+html.dark .op-admin-message-composer {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-message-search,
+html.dark .op-admin-message-thread-head {
+  border-color: var(--dm-border) !important;
+}
+
+html.dark .op-admin-message-search input {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-message-conversation:hover,
+html.dark .op-admin-message-conversation.is-active {
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark .op-admin-message-conversation.is-active {
+  box-shadow: inset 3px 0 #C49A6C !important;
+}
+
+html.dark .op-admin-message-preview strong,
+html.dark .op-admin-message-thread-empty strong,
+html.dark .op-admin-message-empty strong,
+html.dark .op-admin-message-thread-head strong {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-message-preview small,
+html.dark .op-admin-message-preview > span:last-child,
+html.dark .op-admin-message-thread-empty,
+html.dark .op-admin-message-empty,
+html.dark .op-admin-message-thread-head span {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-admin-message-thread-empty > span {
+  background-color: var(--dm-surface-soft) !important;
+  color: #D1A477 !important;
+}
+
+html.dark .op-admin-message-back {
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-message-bubble {
+  background-color: var(--dm-surface-soft) !important;
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.24) !important;
+}
+
+html.dark .op-admin-message-bubble.is-guest {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-message-bubble.is-admin {
+  background-color: #9F7142 !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .op-admin-message-compose-surface {
+  border-color: var(--dm-border-strong) !important;
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark .op-admin-message-composer .op-admin-message-textarea {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-admin-message-composer .op-admin-message-textarea::placeholder {
+  color: var(--dm-subtle) !important;
+}
+
+@media (max-width: 767px) {
+  html.dark .op-admin-message-board,
+  html.dark .op-admin-message-conversation,
+  html.dark .op-admin-message-conversation:hover,
+  html.dark .op-admin-message-conversation.is-active {
+    background-color: var(--dm-surface) !important;
+  }
+  html.dark .op-admin-message-conversation {
+    border-color: var(--dm-border) !important;
+  }
+  html.dark .op-admin-message-conversation.is-active {
+    border-color: #C49A6C !important;
+  }
 }

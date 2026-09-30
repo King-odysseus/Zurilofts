@@ -27,6 +27,12 @@
   --op-paper: #FFFFFF;
   --op-canvas: #F7F4EF;
   --op-navy: #0B1F42;
+  /* Inverse surfaces (footer, primary/strong buttons, avatar, role pill,
+     card badges, active category pills) must stay navy in both light and
+     dark mode, because they always carry white text on top. Unlike
+     --op-navy (a text ink that flips to light in dark mode), this token is
+     never flipped, so "navy background + white text" never inverts. */
+  --op-navy-bg: #0B1F42;
   --op-blue: #3B6FD4;
   --op-aqua: #F3E9DC;
   --op-gold: #C49A6C;
