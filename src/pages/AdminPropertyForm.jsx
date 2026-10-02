@@ -720,7 +720,9 @@ function SeasonalPricing({ propertyId, base }) {
     } finally {
       setLoading(false);
     }
-  }, [propertyId, rulesPath]);
+    // rulesPath is derived from propertyId, so it already invalidates the
+    // callback whenever the property changes; listing propertyId too is redundant.
+  }, [rulesPath]);
 
   useEffect(() => {
     load();
