@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
-import apiClient, { setAccessToken, clearAccessToken } from '../api/client.js';
+import apiClient, { setAccessToken, clearAccessToken, refreshSession } from '../api/client.js';
 import { clearRecentlyViewed } from '../utils/recentlyViewed.js';
 
 const AuthContext = createContext(null);
@@ -59,7 +59,10 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     async function restoreSession() {
       try {
-        const res = await apiClient.post('/auth/refresh');
+        // Shared with the axios 401 retry path: one request even when StrictMode
+        // (or a second tab) mounts this effect twice, which would otherwise race
+        // on the rotating refresh token and log the user out.
+        const res = await refreshSession();
         if (res.data.success && res.data.data) {
           const { user, accessToken } = res.data.data;
           setAccessToken(accessToken);

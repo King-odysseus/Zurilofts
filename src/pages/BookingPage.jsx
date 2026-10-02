@@ -5,6 +5,7 @@ import { Check, ChevronLeft, Clock, CreditCard, House, Landmark, LoaderCircle, M
 import Navbar from '../components/Navbar';
 import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import apiClient from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import logo from '../assets/zurilofts-logo.png';
 
 import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
@@ -37,6 +38,7 @@ function BookingPage() {
   const id = routeId || pathname.split('/')[2];
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { isAuthenticated } = useAuth();
   const urlVariant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -176,7 +178,12 @@ function BookingPage() {
         // not fatal - user can fill the fields manually
       }
     }
-    fetchProfile();
+    // Only prefill once the session is restored. Firing this before /auth/refresh
+    // resolves guarantees a 401 on a cold load, and the retry costs an extra
+    // refresh-token rotation. Guests skip it entirely - they have no profile yet.
+    if (isAuthenticated) {
+      fetchProfile();
+    }
 
     async function fetchProperty() {
       try {
@@ -205,7 +212,7 @@ function BookingPage() {
       .get(`/properties/${id}/availability`)
       .then((r) => setUnavailableRanges(r.data.data || []))
       .catch(() => { /* calendar still works, just nothing disabled */ });
-  }, [id, urlVariant]);
+  }, [id, urlVariant, isAuthenticated]);
 
   // ── Cost calculations (memoised - expensive enough to matter on every date pick / guest toggle) ──
   const pricing = useMemo(() => {

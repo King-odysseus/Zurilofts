@@ -22,6 +22,39 @@ export function clearAccessToken() {
   accessToken = null;
 }
 
+/**
+ * Exchange the refresh cookie for a new access token, deduplicated.
+ *
+ * The server rotates the refresh token on every exchange, so two exchanges that
+ * race on the same cookie desynchronise: the loser is rejected, and that 401
+ * clears the cookie, signing the user out mid-session. React StrictMode
+ * double-mounts the restore effect on every page load, and a second tab also
+ * refreshes on open, so concurrent callers must share one request. Resolves
+ * with the raw response so callers can read the user payload.
+ */
+export function refreshSession() {
+  if (!refreshPromise) {
+    refreshPromise = axios
+      .post(
+        `${apiClient.defaults.baseURL}/auth/refresh`,
+        {},
+        { withCredentials: true }
+      )
+      .then((res) => {
+        const newToken = res.data.data?.accessToken;
+        if (!newToken) {
+          throw new Error('No token in refresh response');
+        }
+        setAccessToken(newToken);
+        return res;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+}
+
 // Request interceptor: attach access token
 apiClient.interceptors.request.use((config) => {
   if (accessToken) {
@@ -47,28 +80,8 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // Deduplicate concurrent refresh attempts
-        if (!refreshPromise) {
-          refreshPromise = axios
-            .post(
-              `${apiClient.defaults.baseURL}/auth/refresh`,
-              {},
-              { withCredentials: true }
-            )
-            .then((res) => {
-              const newToken = res.data.data?.accessToken;
-              if (newToken) {
-                setAccessToken(newToken);
-                return newToken;
-              }
-              throw new Error('No token in refresh response');
-            })
-            .finally(() => {
-              refreshPromise = null;
-            });
-        }
-
-        const newToken = await refreshPromise;
+        const res = await refreshSession();
+        const newToken = res.data.data.accessToken;
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return apiClient(originalRequest);
       } catch {
