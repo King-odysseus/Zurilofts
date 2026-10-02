@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
-import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee } from '../utils/pricing.js';
+import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee, lateCheckoutOptions, EXTRA_GUEST_FEE_PER_NIGHT } from '../utils/pricing.js';
 import { isRangeAvailable, isRangeAvailableWithDb, PENDING_HOLD_MINUTES } from './calendar.service.js';
 import { isBookable } from './property.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
@@ -315,6 +315,103 @@ export async function createBooking(input: CreateBookingInput) {
   }
 
   return normalizeBooking(booking);
+}
+
+interface QuoteBookingInput {
+  propertyId: string;
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  bedOption?: string;
+  checkOutTime?: string;
+  promoCode?: string;
+}
+
+/**
+ * Price a prospective stay without creating anything.
+ *
+ * This is the authority for the total the checkout page shows. The client
+ * cannot derive it: seasonal PriceRules and promo discounts are server-side
+ * data. Returning the same line items createBooking stores is what keeps the
+ * quoted total and the charged total identical.
+ *
+ * Add-ons are deliberately excluded - they attach to a booking after it exists.
+ * The client adds its selected add-ons subtotal (server-priced when attached)
+ * on top of `total`.
+ */
+export async function quoteBooking(input: QuoteBookingInput) {
+  const property = await prisma.property.findUnique({ where: { id: input.propertyId } });
+
+  // Mirror createBooking's gates so the checkout can never quote a listing that
+  // creation would then refuse.
+  if (!property) throw new NotFoundError('Property');
+  if (!isBookable(property.status)) throw new NotFoundError('Property');
+  if (!property.available) throw new ValidationError('This property is not currently available');
+
+  const checkIn = new Date(input.checkIn);
+  const checkOut = new Date(input.checkOut);
+  if (checkIn >= checkOut) {
+    throw new ValidationError('Check-out date must be after check-in date');
+  }
+
+  const priceRules = await prisma.priceRule.findMany({
+    where: { propertyId: input.propertyId },
+    select: { start: true, end: true, price: true },
+  });
+
+  // The promo is judged against the true seasonal-aware subtotal, so a minimum
+  // spend is measured on what the guest actually pays for the nights.
+  let discountPercent = 0;
+  let maxDiscount: number | null = null;
+  let promo: { code: string; discountPercent: number } | null = null;
+
+  if (input.promoCode) {
+    const nights = calculateNights(checkIn, checkOut);
+    const subtotalForPromo = computeSubtotal(
+      checkIn,
+      nights,
+      getBedPrice(property, input.bedOption),
+      priceRules
+    );
+    const found = await validateAndGetPromo(input.promoCode, subtotalForPromo);
+    discountPercent = found.discountPercent;
+    maxDiscount = found.maxDiscount ?? null;
+    promo = { code: found.code, discountPercent: found.discountPercent };
+  }
+
+  const bp = computeBookingPricing({
+    property,
+    bedOption: input.bedOption,
+    checkIn,
+    checkOut,
+    guests: input.guests,
+    checkOutTime: input.checkOutTime,
+    priceRules,
+    discountPercent,
+    maxDiscount,
+  });
+
+  // Occupancy the bed option allows; extra guests beyond it pay the surcharge.
+  const maxForBed = input.bedOption === '2bed' ? 4 : 2;
+
+  return {
+    nights: bp.nights,
+    nightlyPrice: bp.effectivePrice,
+    capacity: { included: maxForBed, max: input.bedOption === '2bed' ? 6 : 4 },
+    extraGuests: Math.max(0, input.guests - maxForBed),
+    // Lets the checkout label the guest-count note and the late check-out
+    // options without hardcoding the rates a second time on the client.
+    extraGuestFeePerNight: EXTRA_GUEST_FEE_PER_NIGHT,
+    lateCheckoutOptions: lateCheckoutOptions(bp.effectivePrice),
+    subtotal: bp.subtotal,
+    cleaningFee: bp.cleaningFee,
+    serviceFee: bp.serviceFee,
+    extraGuestFee: bp.extraGuestFee,
+    lateCheckoutFee: bp.lateCheckoutFee,
+    discountAmount: bp.discountAmount,
+    promo,
+    total: bp.total,
+  };
 }
 
 export async function listUserBookings(userId: string, status?: string, page = 1, limit = 10) {

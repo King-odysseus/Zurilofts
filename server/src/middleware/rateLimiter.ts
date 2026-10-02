@@ -36,6 +36,22 @@ export const refreshLimiter = rateLimit({
  * Rate limiter for chat endpoints - 20 requests per minute per IP.
  * Chat is conversational, so we allow more throughput than auth.
  */
+/**
+ * Rate limiter for the public checkout quote endpoint - 60 requests per minute
+ * per IP. Checkout re-prices on every date and guest change, so this is generous
+ * for a real booking flow while still bounding unauthenticated database reads.
+ */
+export const quoteLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many price requests. Please slow down.',
+  },
+});
+
 export const chatLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 20,

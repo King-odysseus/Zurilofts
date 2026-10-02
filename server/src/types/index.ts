@@ -192,6 +192,19 @@ export const promoUpdateSchema = promoCreateSchema.partial().extend({
   active: z.boolean().optional(),
 });
 
+/** Checkout price preview. The same stay inputs as bookingCreateSchema, minus
+ *  the guest details, plus an optional promo code so the discount is priced
+ *  server-side against the seasonal subtotal rather than a client guess. */
+export const bookingQuoteSchema = z.object({
+  propertyId: z.string().min(1, 'Property is required'),
+  checkIn: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-in date'),
+  checkOut: z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid check-out date'),
+  guests: z.number().int().min(1).max(6, 'Maximum 6 guests per property'),
+  bedOption: z.enum(['1bed', '2bed']).optional(),
+  checkOutTime: z.string().optional(),
+  promoCode: z.string().max(64).optional(),
+});
+
 export const promoValidateSchema = z.object({
   code: z.string().min(1),
   subtotal: z.number().int().positive(),

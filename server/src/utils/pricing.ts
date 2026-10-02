@@ -19,6 +19,21 @@ export const CLEANING_FEE = 1500;
 /** Service fee as a fraction of the subtotal. */
 export const SERVICE_FEE_RATE = 0.12;
 
+/**
+ * Discount amount in KES: discountPercent off the subtotal, capped at maxDiscount
+ * when the code defines one. Every pricing path and promo validation share this,
+ * so a previewed discount can never disagree with the discount actually charged.
+ */
+export function computeDiscountAmount(
+  subtotal: number,
+  discountPercent: number = 0,
+  maxDiscount?: number | null,
+): number {
+  const raw = Math.round(subtotal * (discountPercent / 100));
+  if (maxDiscount !== null && maxDiscount !== undefined && raw > maxDiscount) return maxDiscount;
+  return raw;
+}
+
 export function calculatePricing(
   pricePerNight: number,
   nights: number,
@@ -35,10 +50,7 @@ export function calculatePricing(
   const cleaningFee = CLEANING_FEE;
   const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE);
 
-  let discountAmount = Math.round(subtotal * (discountPercent / 100));
-  if (maxDiscount !== null && maxDiscount !== undefined && discountAmount > maxDiscount) {
-    discountAmount = maxDiscount;
-  }
+  const discountAmount = computeDiscountAmount(subtotal, discountPercent, maxDiscount);
 
   const total = subtotal + cleaningFee + serviceFee - discountAmount;
 
@@ -63,10 +75,7 @@ export function calculateFees(
   const cleaningFee = CLEANING_FEE;
   const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE);
 
-  let discountAmount = Math.round(subtotal * (discountPercent / 100));
-  if (maxDiscount !== null && maxDiscount !== undefined && discountAmount > maxDiscount) {
-    discountAmount = maxDiscount;
-  }
+  const discountAmount = computeDiscountAmount(subtotal, discountPercent, maxDiscount);
 
   const total = subtotal + cleaningFee + serviceFee - discountAmount;
   return { subtotal, cleaningFee, serviceFee, discountAmount, total };
@@ -100,7 +109,8 @@ export function lateCheckoutFee(checkOutTime: string | null | undefined, nightly
   if (minutes <= standardMinutes) return 0;
   const hoursLate = Math.ceil((minutes - standardMinutes) / 60);
   const capped = Math.min(hoursLate, LATE_CHECKOUT_FULL_NIGHT_HOURS);
-  // night * 2^(capped - 5): capped=5 -&gt; full night; each earlier hour halves it.
+  // night * 2^(capped - LATE_CHECKOUT_FULL_NIGHT_HOURS): at the 3h cap this is a full
+  // night; each hour earlier halves it (2h = half night, 1h = quarter).
   return Math.round(nightlyPrice * Math.pow(2, capped - LATE_CHECKOUT_FULL_NIGHT_HOURS));
 }
 
@@ -109,6 +119,22 @@ export function lateCheckoutFee(checkOutTime: string | null | undefined, nightly
  * exceeding the bed-option capacity (2 guests for 1-bed, 4 for 2-bed),
  * per night of the stay. Returns 0 when guests do not exceed capacity.
  */
+/**
+ * The check-out times a guest may choose, each with the fee it costs at the
+ * given nightly rate. Served by the quote endpoint so the checkout dropdown
+ * labels come from the same rule that charges the guest.
+ */
+export function lateCheckoutOptions(nightlyPrice: number): { time: string; fee: number }[] {
+  const [standardHour, standardMinute] = STANDARD_CHECK_OUT_TIME.split(':').map(Number);
+  const standard = standardHour * 60 + (standardMinute || 0);
+  return Array.from({ length: LATE_CHECKOUT_FULL_NIGHT_HOURS + 1 }, (_, hoursLater) => {
+    const minutes = standard + hoursLater * 60;
+    const h = String(Math.floor(minutes / 60)).padStart(2, '0');
+    const m = String(minutes % 60).padStart(2, '0');
+    const time = h + ':' + m;
+    return { time, fee: lateCheckoutFee(time, nightlyPrice) };
+  });
+}
 export function computeExtraGuestFee(
   guests: number,
   bedOption: string | null | undefined,

@@ -40,6 +40,20 @@ export async function create(req: Request, res: Response, next: NextFunction): P
   }
 }
 
+/**
+ * POST /bookings/quote - price a stay for the checkout summary without creating
+ * a booking. Unauthenticated by design: checkout prices the stay before the
+ * guest signs in, and the response contains prices for a public listing only.
+ */
+export async function quote(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const priced = await bookingService.quoteBooking(req.body);
+    res.json({ success: true, data: priced });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function listMine(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { status, page, limit } = req.query;

@@ -1,6 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
-import { calculatePricing } from '../utils/pricing.js';
+import { computeDiscountAmount } from '../utils/pricing.js';
 
 export async function validatePromoCode(code: string, subtotal: number) {
   const promo = await prisma.promoCode.findUnique({ where: { code: code.toUpperCase() } });
@@ -22,14 +22,7 @@ export async function validatePromoCode(code: string, subtotal: number) {
     );
   }
 
-  const pricing = calculatePricing(1, subtotal, promo.discountPercent, promo.maxDiscount);
-  // calculatePricing expects pricePerNight and nights, so discount calc needs adjustment
-  // We passed sub as nights and 1 as price so: subtotal = 1 * subtotal
-  // Actually let's just redo: discount is on subtotal
-  let discountAmount = Math.round(subtotal * (promo.discountPercent / 100));
-  if (promo.maxDiscount !== null && discountAmount > promo.maxDiscount) {
-    discountAmount = promo.maxDiscount;
-  }
+  const discountAmount = computeDiscountAmount(subtotal, promo.discountPercent, promo.maxDiscount);
 
   return {
     valid: true,

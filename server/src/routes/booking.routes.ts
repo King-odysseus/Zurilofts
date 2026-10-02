@@ -1,7 +1,8 @@
 import { Router } from 'express';
 import { authenticate, requireHostWorkspace } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { bookingCreateSchema, bookingPaymentInitSchema } from '../types/index.js';
+import { bookingCreateSchema, bookingPaymentInitSchema, bookingQuoteSchema } from '../types/index.js';
+import { quoteLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controllers/booking.controller.js';
 
 const router = Router();
@@ -9,6 +10,11 @@ const router = Router();
 // Authenticated user bookings (as a guest/traveller)
 router.post('/', authenticate, validate(bookingCreateSchema), ctrl.create);
 router.get('/', authenticate, ctrl.listMine);
+
+// Price preview for the checkout summary. Public (a guest prices a stay before
+// signing in) and declared before '/:id' so the literal path matches first.
+// Exposes prices for an already-public listing only.
+router.post('/quote', quoteLimiter, validate(bookingQuoteSchema), ctrl.quote);
 
 // Host views - bookings on, and earnings from, the caller's own listings.
 // Declared before '/:id' so these literal paths match first. The controllers
