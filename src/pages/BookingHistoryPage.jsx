@@ -62,7 +62,7 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
         <button className="opg-trip-primary" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</button>
         <button className="opg-trip-secondary" type="button" onClick={() => generateInvoice(booking)}>Invoice</button>
         <Link className="opg-trip-link" to={`/property/${property.id || booking.propertyId}`}>View stay</Link>
-        <Link className="opg-trip-link" to={`/booking/${booking.id}`}>Booking details</Link>
+        <Link className="opg-trip-link" to={`/bookings/${booking.id}`}>Booking details</Link>
       </div>
     </div>
   </article>;

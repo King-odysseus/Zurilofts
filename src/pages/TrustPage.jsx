@@ -72,7 +72,7 @@ export default function TrustPage() {
   }, [bookings, disputes, loading]);
 
   const nextPaymentBooking = bookings.find((booking) => booking.status === 'PENDING');
-  const paymentLink = nextPaymentBooking ? `/booking/${nextPaymentBooking.id}` : '/trips';
+  const paymentLink = nextPaymentBooking ? `/bookings/${nextPaymentBooking.id}` : '/trips';
   const initials = `${user?.firstName?.[0] || user?.name?.[0] || 'G'}${user?.lastName?.[0] || ''}`.toUpperCase();
 
   return <div className="op-trust-page" data-openpencil-frame="0:9724">

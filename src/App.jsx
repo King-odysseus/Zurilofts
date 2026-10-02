@@ -15,6 +15,7 @@ import TermsPage from './pages/TermsPage.jsx';
 import SharedShortlistPage from './pages/SharedShortlistPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import BookingHistoryPage from './pages/BookingHistoryPage.jsx';
+import BookingDetailPage from './pages/BookingDetailPage.jsx';
 import ConversationPage from './pages/ConversationPage.jsx';
 import FavouritesPage from './pages/FavouritesPage.jsx';
 import InboxPage from './pages/InboxPage.jsx';
@@ -48,6 +49,8 @@ function Shell() {
   if (pathname === '/payment/callback') return <GuestShell><PaymentCallback /></GuestShell>;
   if (pathname === '/trips') return <GuestShell><ProtectedRoute><TripHubPage /></ProtectedRoute></GuestShell>;
   if (pathname === '/booking-history' || pathname === '/bookings') return <GuestShell><ProtectedRoute><BookingHistoryPage /></ProtectedRoute></GuestShell>;
+  // Keyed by BOOKING id (checkout at /booking/:propertyId is keyed by property).
+  if (pathname.startsWith('/bookings/')) return <GuestShell><ProtectedRoute><BookingDetailPage /></ProtectedRoute></GuestShell>;
   if (pathname === '/inbox') return <GuestShell><ProtectedRoute><InboxPage /></ProtectedRoute></GuestShell>;
   if (pathname.startsWith('/inbox/')) return <GuestShell><ProtectedRoute><ConversationPage /></ProtectedRoute></GuestShell>;
   if (pathname === '/messages') return <GuestShell><ProtectedRoute><MessagesPage /></ProtectedRoute></GuestShell>;

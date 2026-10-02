@@ -114,7 +114,7 @@ function CalendarDetail({ selected, row, onOpenProperty }) {
       <span>RESERVED STAY</span>
       <strong>{state.item.guestName || 'Guest'}</strong>
       <p>{sameDay(selected.date, new Date(state.item.start)) ? 'Check-in today' : sameDay(selected.date, addDays(new Date(state.item.end), -1)) ? 'Check-out today' : 'Stay in progress'} · {state.item.guests || 1} guest{state.item.guests === 1 ? '' : 's'}</p>
-      <Link to={`/booking/${state.item.id}`}>View booking</Link>
+      <Link to={`/bookings/${state.item.id}`}>View booking</Link>
     </div> : state.type === 'blocked' ? <div className="op-host-calendar-event is-blocked">
       <span>BLOCKED DATE</span>
       <strong>{state.item.summary || 'Unavailable'}</strong>

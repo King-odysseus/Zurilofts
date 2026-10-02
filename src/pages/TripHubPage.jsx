@@ -65,10 +65,10 @@ function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
       <p className="opg-trip-subtitle">{[property.location || 'Nairobi', `${booking.guests || 1} guest${booking.guests === 1 ? '' : 's'}`, `${nights} night${nights === 1 ? '' : 's'}`].join(' / ')}</p>
       {booking.total != null && <p className="opg-trip-price"><strong>KES {Number(booking.total).toLocaleString()}</strong> total</p>}
       <div className="opg-trip-actions">
-        <Link className="opg-trip-primary" to={`/booking/${booking.id}`}>View check-in details</Link>
+        <Link className="opg-trip-primary" to={`/bookings/${booking.id}`}>View check-in details</Link>
         <button className="opg-trip-secondary" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</button>
         <a className="opg-trip-link" href={getMapUrl(property)} target="_blank" rel="noreferrer">Directions</a>
-        <Link className="opg-trip-link" to={`/booking/${booking.id}`}>Receipt</Link>
+        <Link className="opg-trip-link" to={`/bookings/${booking.id}`}>Receipt</Link>
       </div>
     </div>
   </article>;
@@ -94,7 +94,7 @@ function TripRow({ booking, index, isPast }) {
     </div>
     {isPast && !reviewed
       ? <Link className="opg-trip-row-action" to={`/property/${property.id || booking.propertyId}?review=true`}>Leave a review</Link>
-      : <Link className="opg-trip-row-action" to={isPast ? `/property/${property.id || booking.propertyId}` : `/booking/${booking.id}`}>{isPast ? 'View stay' : 'View trip'}</Link>}
+      : <Link className="opg-trip-row-action" to={isPast ? `/property/${property.id || booking.propertyId}` : `/bookings/${booking.id}`}>{isPast ? 'View stay' : 'View trip'}</Link>}
   </article>;
 }
 

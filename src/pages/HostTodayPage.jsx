@@ -53,7 +53,7 @@ function GuestOperationCard({ booking, type, compact = false }) {
       <span>{propertyTitle} · {time}</span>
       <Link to={`/messages?booking=${booking.id}`}>Message guest</Link>
     </div>
-    <Link className="op-host-guest-view" to={`/booking/${booking.id}`}>View</Link>
+    <Link className="op-host-guest-view" to={`/bookings/${booking.id}`}>View</Link>
   </article>;
 }
 
@@ -200,7 +200,7 @@ export default function HostTodayPage() {
         <p>PRIORITY NEXT STEP</p>
         <h2>{priority ? (priorityType === "arrival" ? "Confirm arrival details" : priorityType === "departure" ? "Review today's checkout" : "Check your in-house guest") : "Your day is clear"}</h2>
         <span>{priority ? `${guestName(priority)} at ${priority.property?.title || "your property"} · ${bookingTime(priority, priorityType)}` : "There are no urgent guest actions scheduled right now."}</span>
-        <Link to={priority ? `/booking/${priority.id}` : "/host/calendar"}>{priority ? "Review booking" : "Open calendar"}</Link>
+        <Link to={priority ? `/bookings/${priority.id}` : "/host/calendar"}>{priority ? "Review booking" : "Open calendar"}</Link>
       </section>
     </div>
 
