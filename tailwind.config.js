@@ -63,7 +63,7 @@ export default {
       {
         zuriloft: {
           primary:            '#C49A6C',  // Bronze
-          secondary:          '#0B0B45',  // Dark Navy
+          secondary:          '#0B1F42',  // Dark Navy
           accent:             '#C49A6C',  // Warm Bronze
           neutral:            '#E5E7EB',  // Border Grey
           'base-100':         '#ffffff',  // White

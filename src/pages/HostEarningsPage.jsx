@@ -29,7 +29,7 @@ const DROPDOWN_THEME = {
   inlineWrapper: 'op-host-earnings-period',
   floating: {
     style: {
-      auto: 'border-0 bg-white text-[#0B0B45] shadow-[0_14px_34px_rgba(15,23,42,0.16)]',
+      auto: 'border-0 bg-white text-[#0B1F42] shadow-[0_14px_34px_rgba(15,23,42,0.16)]',
     },
   },
 };

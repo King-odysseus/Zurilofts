@@ -35,7 +35,7 @@ function ToastCard({ toast, onDismiss }) {
         {meta.icon}
       </span>
       <div className="flex-1 min-w-0">
-        {toast.title && <p className="text-sm font-semibold text-[#0B0B45] leading-snug">{toast.title}</p>}
+        {toast.title && <p className="text-sm font-semibold text-[#0B1F42] leading-snug">{toast.title}</p>}
         <p className="text-sm text-[#6b7280] leading-snug break-words">{toast.message}</p>
       </div>
       <button

@@ -282,7 +282,7 @@ html.dark :where([class*="border-[#E3E8EF]"], [class*="border-[#e5e7eb]"], [clas
   border-color: var(--dm-border) !important;
 }
 
-html.dark :where([class*="text-[#0B1F42]"], [class*="text-[#0B0B45]"], [class*="text-[#414D63]"], [class*="text-[#334155]"], [class*="text-[#1f2937]"], [class*="text-[#111827]"]) {
+html.dark :where([class*="text-[#0B1F42]"], [class*="text-[#414D63]"], [class*="text-[#334155]"], [class*="text-[#1f2937]"], [class*="text-[#111827]"]) {
   color: var(--dm-text) !important;
 }
 

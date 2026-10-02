@@ -9,7 +9,7 @@
 .opg-saved-secondary:hover,.opg-saved-secondary:focus-visible{border-color:#0b1f42;background:#f8fafc;color:#0b1f42}
 .opg-saved-tabs{display:flex;align-items:center;gap:8px;margin-top:20px}
 .opg-saved-tabs a{display:inline-flex;align-items:center;justify-content:center;height:31px;padding:0 12px;border-radius:10px;background:#f1f5f9;color:#475569;font:500 12px Inter,Arial,sans-serif;text-decoration:none}
-.opg-saved-tabs a.is-active{background:#0b0b45;color:#fff;font-weight:600}
+.opg-saved-tabs a.is-active{background:#0B1F42;color:#fff;font-weight:600}
 .opg-saved-section{margin-top:24px}
 .opg-saved-section-title{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:14px}
 .opg-saved-section-title h2{font:700 18px Inter,Arial,sans-serif;color:#0b1f42;margin:0}

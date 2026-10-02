@@ -86,10 +86,10 @@ function HostPayouts() {
       <html><head><title>WHT Statement</title>
       <style>
         body { font-family: Inter, sans-serif; padding: 30px; color: #1f2937; }
-        h2 { color: #0B0B45; }
+        h2 { color: #0B1F42; }
         table { width: 100%; border-collapse: collapse; margin-top: 16px; }
         th, td { padding: 10px; border-bottom: 1px solid #D9D9D9; text-align: left; }
-        th { background: #0B0B45; color: white; }
+        th { background: #0B1F42; color: white; }
         .total { font-weight: bold; }
         .num { text-align: right; }
       </style></head><body>

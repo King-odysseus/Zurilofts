@@ -12,7 +12,7 @@ This document is the single source of truth for visual design. All AI agents and
 |-------------------|-----------------|-----------|---------------------------------------------------------------|
 | Primary CTA       | Warm Bronze     | `#C49A6C` | Primary buttons - white text                                  |
 | Primary CTA Hover | Bronze Hover    | `#B8895C` | Hover/active state for primary buttons                        |
-| Strong Secondary  | Dark Navy       | `#0B0B45` | Strong secondary buttons (white text), logo wordmark, footer background, brand headers/dividers |
+| Strong Secondary  | Dark Navy       | `#0B1F42` | Strong secondary buttons (white text), logo wordmark, footer background, brand headers/dividers |
 | Navy Hover        | Navy Hover      | `#07072e` | Hover/active state for navy strong secondary buttons          |
 | Interactive Blue  | Interactive Blue| `#2563EB` | Links, active nav/tab state, selected filters/radios/toggles, focus rings, informational UI |
 | Blue Hover        | Blue Hover      | `#1D4ED8` | Hover/active state for anything using Interactive Blue        |
@@ -25,7 +25,7 @@ This document is the single source of truth for visual design. All AI agents and
 
 ### Color Rules
 - **Warm Bronze `#C49A6C`** is the primary CTA color - every filled primary button uses bronze with white text. Hover/active state darkens to `#B8895C`.
-- **Dark Navy `#0B0B45`** is the strong secondary button color (white text, hover/active darkens to `#07072e`) and the brand color for the logo wordmark, footer background, brand headers/dividers, and decorative accents.
+- **Dark Navy `#0B1F42`** is the strong secondary button color (white text, hover/active darkens to `#07072e`) and the brand color for the logo wordmark, footer background, brand headers/dividers, and decorative accents.
 - **Interactive Blue `#2563EB`** is reserved for links, active navigation/tab indicators, selected filters/radios/toggles, focus rings, and informational UI - it is never a filled CTA or primary button. Hover/active state darkens to `#1D4ED8`.
 - **Canvas `#F7F7F5`** is the page background. **White `#ffffff`** is reserved for cards, inputs, modals, and other flat surfaces sitting on the canvas.
 - **Neutral Grey `#E5E7EB`** is the shared border color for cards, inputs, dividers, and outlined secondary buttons.
@@ -216,7 +216,7 @@ Auth cards over dark photo backgrounds use a single soft drop shadow - no neumor
 | Variant        | Background | Text       | Border         | Hover              |
 |----------------|------------|------------|----------------|--------------------|
 | Primary (CTA) | `#C49A6C` | `#ffffff` | None | `#B8895C` darken |
-| Strong secondary | `#0B0B45` | `#ffffff` | None | `#07072e` darken |
+| Strong secondary | `#0B1F42` | `#ffffff` | None | `#07072e` darken |
 | Secondary (outlined, neutral) | White | `#222222` | 1px `#E5E7EB` | `#F7F7F5` bg |
 | Ghost | Transparent | `#2563EB` | None | Blue underline |
 | Danger | `#dc2626` | `#ffffff` | None | `#b91c1c` darken |
@@ -351,7 +351,7 @@ useEffect(() => {
 - Search bar width: max `680px`, centered
 
 **Design Techniques:**
-- **Multi-layer gradient overlay**: `bg-gradient-to-b from-[#0B0B45]/70 via-[#0B0B45]/40 to-[#0B0B45]/70` for depth
+- **Multi-layer gradient overlay**: `bg-gradient-to-b from-[#0B1F42]/70 via-[#0B1F42]/40 to-[#0B1F42]/70` for depth
 - **Animated number counters**: Custom `AnimatedNumber` component using `IntersectionObserver` and `requestAnimationFrame` with easing
 - **Easing function**: `easeOutQuart = 1 - Math.pow(1 - progress, 4)` for smooth number animation
 - **Status badge with pulse**: Green pulse dot using `animate-pulse` to indicate availability
@@ -421,11 +421,11 @@ Used on the guest Trip Hub, host Today page, and admin Overview. Defaults to a l
 </div>
 ```
 
-A navy gradient variant (`from-[#0B0B45] to-[#07072e]`, white text) is available as an optional brand/promotional moment - not the default header, and used sparingly rather than as a template for buttons or interactive surfaces elsewhere.
+A navy gradient variant (`from-[#0B1F42] to-[#07072e]`, white text) is available as an optional brand/promotional moment - not the default header, and used sparingly rather than as a template for buttons or interactive surfaces elsewhere.
 
 Key properties:
 - Default: light surface (`bg-white`), `rounded-[14px]`, `border-[#E5E7EB]`, charcoal/cool-grey text
-- Optional navy brand variant: `bg-gradient-to-br from-[#0B0B45] to-[#07072e]`, white text
+- Optional navy brand variant: `bg-gradient-to-br from-[#0B1F42] to-[#07072e]`, white text
 - Never use decorative orbs/blobs behind text
 - Quick actions button: bronze `bg-[#C49A6C]` with `Plus` icon
 - Quick actions menu: white card with `shadow-elevated`, `rounded-xl`, `animate-fade-in`
@@ -436,7 +436,7 @@ Key properties:
 - Form card with white background and restrained shadow
 
 ### Footer
-- Dark Navy `#0B0B45` background for the footer and occasional brand moments
+- Dark Navy `#0B1F42` background for the footer and occasional brand moments
 - White text for links and headings
 - Blue `#2563EB` for link hover states; bronze for the logo accent
 - Minimal: copyright left, social icons right
@@ -550,7 +550,7 @@ Used with gradient mask edges (`mask-image: linear-gradient(...)`) for smooth fa
 colors: {
   primary:        '#C49A6C', // Warm Bronze - primary CTA
   'primary-hover':'#B8895C', // Bronze Hover
-  navy:     '#0B0B45',    // Dark Navy - strong secondary + brand
+  navy:     '#0B1F42',    // Dark Navy - strong secondary + brand
   'navy-hover': '#07072e', // Navy Hover
   bronze:   '#C49A6C',    // Warm Bronze (alias of primary)
   blue:     '#2563EB',    // Interactive Blue - links/active/focus/informational
@@ -636,7 +636,7 @@ Three steps: **Stay -> Details -> Payment.**
 
 When implementing new components:
 
-- [ ] Use bronze `#C49A6C` for primary CTAs, navy `#0B0B45` for strong secondary buttons, neutral outlined for lighter secondary actions, and blue `#2563EB` only for links, active/selected states, focus rings, and informational UI
+- [ ] Use bronze `#C49A6C` for primary CTAs, navy `#0B1F42` for strong secondary buttons, neutral outlined for lighter secondary actions, and blue `#2563EB` only for links, active/selected states, focus rings, and informational UI
 - [ ] Pair every status color (success/warning/danger) with a text label or icon
 - [ ] Apply appropriate border-radius (`rounded-[14px]` for cards/modals/stat cards, `rounded-lg` for buttons, `rounded-xl` for inputs, `rounded-full` for filter chips/status badges)
 - [ ] Add `transition-all duration-200` for interactive elements

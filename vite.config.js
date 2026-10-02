@@ -41,7 +41,7 @@ export default defineConfig({
         name: 'ZuriLofts',
         short_name: 'ZuriLofts',
         description: 'Premium Short-Let Apartments in Nairobi',
-        theme_color: '#0B0B45',
+        theme_color: '#0B1F42',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',
@@ -120,7 +120,6 @@ export default defineConfig({
         // actually mounts (via React.lazy).
         manualChunks: {
           'pdf-export': ['jspdf', 'jspdf-autotable'],
-          'html2canvas': ['html2canvas'],
         },
       },
     },

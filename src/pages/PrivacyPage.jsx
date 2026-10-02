@@ -29,7 +29,7 @@ function PrivacyPage() {
 
             {/* 1. Introduction */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">1. Introduction</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">1. Introduction</h2>
               <p>
                 ZuriLofts (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) operates the website{' '}
                 <strong>thezurilofts.com</strong> and the ZuriLofts progressive web application
@@ -47,7 +47,7 @@ function PrivacyPage() {
 
             {/* 2. Data Controller */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">2. Data Controller</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">2. Data Controller</h2>
               <p>
                 ZuriLofts is the data controller for personal data collected through the
                 Platform. For any privacy-related enquiries, contact us at:
@@ -60,9 +60,9 @@ function PrivacyPage() {
 
             {/* 3. Information We Collect */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">3. Information We Collect</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">3. Information We Collect</h2>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">3.1 Information You Provide Directly</h3>
+              <h3 className="text-lg font-semibold text-[#0B1F42] mt-4 mb-2">3.1 Information You Provide Directly</h3>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Account data:</strong> When you register, we collect your first name, last name, email address, phone number, and a hashed password. If you sign in via Google OAuth, we receive your name, email address, and Google profile identifier from Google.</li>
                 <li><strong>Booking data:</strong> When you make a reservation, we collect check-in and check-out dates, number of guests, bed configuration preference, check-in/check-out time preferences, names of additional guests, special requests, payment method selection, and any promo code used.</li>
@@ -73,7 +73,7 @@ function PrivacyPage() {
                 <li><strong>Contact form data:</strong> Any information you submit through our contact form.</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">3.2 Information Collected Automatically</h3>
+              <h3 className="text-lg font-semibold text-[#0B1F42] mt-4 mb-2">3.2 Information Collected Automatically</h3>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Usage data:</strong> Pages visited, time spent on pages, links clicked, and interaction patterns on the Platform.</li>
                 <li><strong>Device data:</strong> IP address, browser type and version, operating system, device type, screen resolution, and referring URLs.</li>
@@ -81,7 +81,7 @@ function PrivacyPage() {
                 <li><strong>Local storage:</strong> We may store preferences (such as your display settings) in your browser&apos;s local storage.</li>
               </ul>
 
-              <h3 className="text-lg font-semibold text-[#0B0B45] mt-4 mb-2">3.3 Information We Never Collect</h3>
+              <h3 className="text-lg font-semibold text-[#0B1F42] mt-4 mb-2">3.3 Information We Never Collect</h3>
               <ul className="list-disc pl-6 space-y-2">
                 <li>Government-issued identification numbers (national ID, passport number, KRA PIN) unless you voluntarily provide them.</li>
                 <li>Biometric data or facial recognition data.</li>
@@ -92,7 +92,7 @@ function PrivacyPage() {
 
             {/* 4. Legal Basis for Processing */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">4. Legal Basis for Processing</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">4. Legal Basis for Processing</h2>
               <p>We process your personal data only when we have a lawful basis to do so under the Kenya Data Protection Act, 2019 (the &ldquo;DPA&rdquo;) and, where applicable, the EU General Data Protection Regulation (GDPR):</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Contractual necessity:</strong> Processing required to fulfil a booking, create your account, or provide a service you have requested.</li>
@@ -104,7 +104,7 @@ function PrivacyPage() {
 
             {/* 5. How We Use Your Information */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">5. How We Use Your Information</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">5. How We Use Your Information</h2>
               <p>We use the information we collect for the following purposes:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li>To create and maintain your account.</li>
@@ -130,7 +130,7 @@ function PrivacyPage() {
 
             {/* 6. Data Sharing and Disclosure */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">6. Data Sharing and Disclosure</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">6. Data Sharing and Disclosure</h2>
               <p>We may share your data only in the following limited circumstances:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Service providers:</strong> Trusted third-party vendors who perform services on our behalf - payment processors, hosting providers (our servers are hosted in a secure data centre), email delivery services, and analytics providers. These providers are contractually bound to process data only on our instructions and with equivalent data protection standards.</li>
@@ -143,7 +143,7 @@ function PrivacyPage() {
 
             {/* 7. Data Retention */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">7. Data Retention</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">7. Data Retention</h2>
               <p>We retain your personal data only for as long as necessary to fulfil the purposes for which it was collected:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Account data:</strong> Retained for the life of your account. If you delete your account, your personal data is anonymised or deleted within 30 days, except as required by law.</li>
@@ -157,7 +157,7 @@ function PrivacyPage() {
 
             {/* 8. Data Security */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">8. Data Security</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">8. Data Security</h2>
               <p>
                 We implement and maintain appropriate technical and organisational measures
                 to protect your personal data against accidental or unlawful destruction,
@@ -182,7 +182,7 @@ function PrivacyPage() {
 
             {/* 9. International Data Transfers */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">9. International Data Transfers</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">9. International Data Transfers</h2>
               <p>
                 Your data is primarily stored and processed in Kenya. Some of our service
                 providers may process data in other jurisdictions (e.g., the United States
@@ -198,7 +198,7 @@ function PrivacyPage() {
 
             {/* 10. Cookies and Tracking */}
             <section id="cookies" className="scroll-mt-24">
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">10. Cookies and Similar Technologies</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">10. Cookies and Similar Technologies</h2>
               <p>We use the following categories of cookies on the Platform:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Essential cookies:</strong> Required for core functionality - authentication sessions, booking flow state, and security. The Platform cannot function without these.</li>
@@ -215,7 +215,7 @@ function PrivacyPage() {
 
             {/* 11. Third-Party Processors */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">11. Third-Party Processors</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">11. Third-Party Processors</h2>
               <p>
                 We use the following third-party processors to operate the Platform. Each
                 receives only the data needed to provide its service, and each has its own
@@ -225,7 +225,7 @@ function PrivacyPage() {
               <div className="overflow-x-auto mt-4">
                 <table className="w-full text-sm border-collapse">
                   <thead>
-                    <tr className="text-left text-[#0B0B45] border-b-2 border-[#D9D9D9]">
+                    <tr className="text-left text-[#0B1F42] border-b-2 border-[#D9D9D9]">
                       <th className="py-2 pr-4 font-semibold">Processor</th>
                       <th className="py-2 pr-4 font-semibold">Receives</th>
                       <th className="py-2 font-semibold">Purpose</th>
@@ -274,7 +274,7 @@ function PrivacyPage() {
 
             {/* 12. Your Rights */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">12. Your Data Protection Rights</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">12. Your Data Protection Rights</h2>
               <p>Under the Kenya Data Protection Act, 2019 and, where applicable, the GDPR, you have the following rights:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Right of access:</strong> Request a copy of the personal data we hold about you, free of charge.</li>
@@ -305,7 +305,7 @@ function PrivacyPage() {
 
             {/* 13. Data Protection for Children */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">13. Children&apos;s Privacy</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">13. Children&apos;s Privacy</h2>
               <p>
                 Our Platform is not directed to individuals under the age of 18. We do not
                 knowingly collect personal data from children. If you are a parent or
@@ -318,7 +318,7 @@ function PrivacyPage() {
 
             {/* 14. Changes to This Policy */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">14. Changes to This Privacy Policy</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">14. Changes to This Privacy Policy</h2>
               <p>
                 We may update this Privacy Policy from time to time to reflect changes in
                 our practices, legal requirements, or operational needs. When we make
@@ -339,7 +339,7 @@ function PrivacyPage() {
 
             {/* 15. Governing Law */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">15. Governing Law</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">15. Governing Law</h2>
               <p>
                 This Privacy Policy is governed by the laws of the Republic of Kenya. Any
                 disputes arising from this policy shall be subject to the exclusive
@@ -349,7 +349,7 @@ function PrivacyPage() {
 
             {/* 16. Contact */}
             <section>
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">16. Contact Us</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">16. Contact Us</h2>
               <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
               <p className="mt-2">
                 <strong>Email:</strong> privacy@zurilofts.com<br />

@@ -527,7 +527,7 @@ function PropertyPreview({ form }) {
           <span className="absolute top-4 left-4 bg-[#C49A6C] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
         )}
         {!form.available && (
-          <span className="absolute top-4 right-4 bg-[#0B0B45] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
+          <span className="absolute top-4 right-4 bg-[#0B1F42] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
         )}
       </div>
 
@@ -540,15 +540,15 @@ function PropertyPreview({ form }) {
 
         <div className="flex items-center justify-between mb-3 py-3 border-y border-[#D9D9D9] text-center">
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#0B0B45]">{bedrooms}</p>
+            <p className="text-sm font-semibold text-[#0B1F42]">{bedrooms}</p>
             <p className="text-xs text-[#6b7280]">Beds</p>
           </div>
           <div className="flex-1 border-x border-[#D9D9D9]">
-            <p className="text-sm font-semibold text-[#0B0B45]">{bathrooms}</p>
+            <p className="text-sm font-semibold text-[#0B1F42]">{bathrooms}</p>
             <p className="text-xs text-[#6b7280]">Baths</p>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#0B0B45]">{area}</p>
+            <p className="text-sm font-semibold text-[#0B1F42]">{area}</p>
             <p className="text-xs text-[#6b7280]">Sqft</p>
           </div>
         </div>
@@ -582,7 +582,7 @@ function FullPagePreview({ form, onClose }) {
     <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center p-4 overflow-y-auto">
       <div className="bg-white rounded-2xl w-full max-w-5xl my-8 shadow-2xl overflow-hidden">
         {/* Bar */}
-        <div className="sticky top-0 z-10 flex items-center justify-between bg-[#0B0B45] text-white px-5 py-3">
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-[#0B1F42] text-white px-5 py-3">
           <span className="text-sm font-semibold">Page preview - not yet saved</span>
           <button onClick={onClose} className="text-white/70 hover:text-white" aria-label="Close preview">
             <X className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
@@ -591,7 +591,7 @@ function FullPagePreview({ form, onClose }) {
 
         <div className="p-5 md:p-8">
           {/* Title */}
-          <h1 className="text-2xl md:text-3xl font-bold text-[#0B0B45] mb-1">{form.title || 'Property title'}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#0B1F42] mb-1">{form.title || 'Property title'}</h1>
           <div className="flex items-center text-[#6b7280] mb-6">
             <MapPin className="w-5 h-5 mr-1" strokeWidth={2} aria-hidden="true" />
             {buildLocationLabel(form.location, form.neighborhood) || 'Location'}
@@ -625,31 +625,31 @@ function FullPagePreview({ form, onClose }) {
               {/* Stats */}
               <div className="flex flex-wrap gap-8 pb-6 mb-6 border-b border-[#D9D9D9]">
                 <div>
-                  <p className="font-bold text-[#0B0B45]">{bedLabel(form)}</p>
+                  <p className="font-bold text-[#0B1F42]">{bedLabel(form)}</p>
                   <p className="text-sm text-[#6b7280]">Bedrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B0B45]">{bedBathLabel(form)}</p>
+                  <p className="font-bold text-[#0B1F42]">{bedBathLabel(form)}</p>
                   <p className="text-sm text-[#6b7280]">Bathrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B0B45]">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
+                  <p className="font-bold text-[#0B1F42]">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
                   <p className="text-sm text-[#6b7280]">Area</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B0B45] capitalize">{form.type}</p>
+                  <p className="font-bold text-[#0B1F42] capitalize">{form.type}</p>
                   <p className="text-sm text-[#6b7280]">Type</p>
                 </div>
               </div>
 
               {/* Description */}
-              <h2 className="text-xl font-bold text-[#0B0B45] mb-3">About this property</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">About this property</h2>
               <p className="text-[#1f2937] leading-relaxed whitespace-pre-line mb-8">{form.description || 'No description yet.'}</p>
 
               {/* Amenities */}
               {amenities.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="text-xl font-bold text-[#0B0B45] mb-3">Amenities</h2>
+                  <h2 className="text-xl font-bold text-[#0B1F42] mb-3">Amenities</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {amenities.map((a, i) => (
                       <div key={i} className="flex items-center text-[#1f2937]">
@@ -664,7 +664,7 @@ function FullPagePreview({ form, onClose }) {
               {/* Nearby */}
               {nearby.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-bold text-[#0B0B45] mb-3">What&apos;s nearby</h2>
+                  <h2 className="text-xl font-bold text-[#0B1F42] mb-3">What&apos;s nearby</h2>
                   <ul className="space-y-2">
                     {nearby.map((n, i) => (
                       <li key={i} className="flex items-center text-[#1f2937]">
@@ -680,7 +680,7 @@ function FullPagePreview({ form, onClose }) {
             {/* Booking card */}
             <div className="lg:col-span-1">
               <div className="border border-[#D9D9D9] rounded-2xl p-6 sticky top-20">
-                <span className="text-3xl font-bold text-[#0B0B45]">KES {price.toLocaleString()}</span>
+                <span className="text-3xl font-bold text-[#0B1F42]">KES {price.toLocaleString()}</span>
                 <span className="text-[#6b7280]"> / night</span>
                 <div className="block w-full bg-[#C49A6C] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
                 {!form.available && (
@@ -758,7 +758,7 @@ function SeasonalPricing({ propertyId, base }) {
 
   return (
     <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
-      <h2 className="text-lg font-bold text-[#0B0B45] mb-1">Seasonal Pricing</h2>
+      <h2 className="text-lg font-bold text-[#0B1F42] mb-1">Seasonal Pricing</h2>
       <p className="text-sm text-[#6b7280] mb-4">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
 
       {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{error}</div>}
@@ -770,11 +770,11 @@ function SeasonalPricing({ propertyId, base }) {
           {rules.map((r) => (
             <div key={r.id} className="flex items-center justify-between bg-[#f8f9fa] rounded-xl px-4 py-2.5 text-sm">
               <div>
-                <span className="font-semibold text-[#0B0B45]">{r.name || 'Rate'}</span>
+                <span className="font-semibold text-[#0B1F42]">{r.name || 'Rate'}</span>
                 <span className="text-[#6b7280] ml-2">{fmt(r.start)} &rarr; {fmt(r.end)}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="font-semibold text-[#0B0B45]">KES {r.price.toLocaleString()}/night</span>
+                <span className="font-semibold text-[#0B1F42]">KES {r.price.toLocaleString()}/night</span>
                 <button type="button" onClick={() => removeRule(r.id)} className="text-red-600 hover:text-red-800 text-xs font-semibold">Remove</button>
               </div>
             </div>

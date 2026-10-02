@@ -55,7 +55,7 @@ function AdminProperties() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#0B0B45]">Properties</h1>
+        <h1 className="text-2xl font-bold text-[#0B1F42]">Properties</h1>
         <Link
           to={`${base}/properties/new`}
           className="bg-[#C49A6C] text-white px-5 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200 text-sm"
@@ -74,12 +74,12 @@ function AdminProperties() {
             <table className="w-full text-sm">
               <thead className="bg-[#f8f9fa] border-b border-[#D9D9D9]">
                 <tr>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Property</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Location</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Type</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Price/Night</th>
-                  <th className="text-left py-3 px-4 font-semibold text-[#0B0B45]">Status</th>
-                  <th className="text-right py-3 px-4 font-semibold text-[#0B0B45]">Actions</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B1F42]">Property</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B1F42]">Location</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B1F42]">Type</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B1F42]">Price/Night</th>
+                  <th className="text-left py-3 px-4 font-semibold text-[#0B1F42]">Status</th>
+                  <th className="text-right py-3 px-4 font-semibold text-[#0B1F42]">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -94,7 +94,7 @@ function AdminProperties() {
                             <Image className="w-5 h-5 text-[#D9D9D9]" strokeWidth={1.5} aria-hidden="true" />
                           </div>
                         )}
-                        <Link to={`/property/${p.id}`} className="font-semibold text-[#0B0B45] hover:text-[#C49A6C]">{p.title}</Link>
+                        <Link to={`/property/${p.id}`} className="font-semibold text-[#0B1F42] hover:text-[#C49A6C]">{p.title}</Link>
                       </div>
                     </td>
                     <td className="py-3 px-4 text-[#6b7280]">{p.location}</td>
