@@ -72,10 +72,6 @@ AnimatedNumber.propTypes = {
   duration: PropTypes.number,
 };
 
-AnimatedNumber.defaultProps = {
-  suffix: '',
-  duration: 2000,
-};
 
 /**
  * Hero search: same debounced live-results/navigation behaviour as before,
@@ -410,9 +406,6 @@ Hero.propTypes = {
   }),
 };
 
-Hero.defaultProps = {
-  stats: null,
-};
 
 export { SearchBar };
 export default Hero;

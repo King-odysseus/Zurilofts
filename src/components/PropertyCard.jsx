@@ -14,7 +14,7 @@ import { useFavorites } from '../context/FavoritesContext.jsx';
  *
  * All optional fields guard against null/undefined.
  */
-function PropertyCard({ property, cardVariant }) {
+function PropertyCard({ property, cardVariant = 'default' }) {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const { isFavorite, toggleFavorite } = useFavorites();
@@ -200,8 +200,5 @@ PropertyCard.propTypes = {
   cardVariant: PropTypes.string,
 };
 
-PropertyCard.defaultProps = {
-  cardVariant: 'default',
-};
 
 export default PropertyCard;

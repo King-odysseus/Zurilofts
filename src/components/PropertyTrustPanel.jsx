@@ -38,7 +38,7 @@ TrustBadge.propTypes = {
   value: PropTypes.string.isRequired,
 };
 
-function PropertyTrustPanel({ rating, reviewCount, type, location }) {
+function PropertyTrustPanel({ rating = 0, reviewCount = 0, type = '', location = '' }) {
   const hasReviews = typeof rating === 'number' && rating > 0;
   const typeLabel = TYPE_LABELS[type] || type || 'Property';
   const ratingDisplay = hasReviews ? `${rating} ★` : 'New';
@@ -92,11 +92,5 @@ PropertyTrustPanel.propTypes = {
   location: PropTypes.string,
 };
 
-PropertyTrustPanel.defaultProps = {
-  rating: 0,
-  reviewCount: 0,
-  type: '',
-  location: '',
-};
 
 export default PropertyTrustPanel;

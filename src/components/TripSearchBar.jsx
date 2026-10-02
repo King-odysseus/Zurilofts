@@ -3,7 +3,7 @@ import { Search, X } from 'lucide-react';
 import SearchDateGuestFields from './SearchDateGuestFields.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
-function TripSearchBar({ value, onChange, onSubmit, onClear, loading, hasActiveSearch, discovery, dates, onDatesChange, guests, onGuestsChange }) {
+function TripSearchBar({ value, onChange, onSubmit, onClear, loading = false, hasActiveSearch = false, discovery = false, dates = { checkIn: '', checkOut: '' }, onDatesChange = () => {}, guests = 1, onGuestsChange = () => {} }) {
   const { t } = useLanguage();
   return (
     <form onSubmit={onSubmit} role="search" className="w-full max-w-full">
@@ -73,16 +73,6 @@ TripSearchBar.propTypes = {
   onDatesChange: PropTypes.func,
   guests: PropTypes.number,
   onGuestsChange: PropTypes.func,
-};
-
-TripSearchBar.defaultProps = {
-  loading: false,
-  hasActiveSearch: false,
-  discovery: false,
-  dates: { checkIn: '', checkOut: '' },
-  onDatesChange: () => {},
-  guests: 1,
-  onGuestsChange: () => {},
 };
 
 export default TripSearchBar;

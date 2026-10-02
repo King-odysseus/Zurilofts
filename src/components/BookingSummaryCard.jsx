@@ -15,7 +15,7 @@ import { House, ShieldCheck, Star } from 'lucide-react';
  *  - addOns       : optional array of selected add-ons to show as line items,
  *                   each { id, name, quantity, price } (price in KES)
  */
-function BookingSummaryCard({ price, bookingHref, rating, reviewCount, variantLabel, addOns }) {
+function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, variantLabel = null, addOns = [] }) {
   const hasReviews = typeof rating === 'number' && rating > 0;
   const reviewLabel =
     reviewCount === 1 ? '1 review' : `${reviewCount || 0} reviews`;
@@ -109,13 +109,6 @@ BookingSummaryCard.propTypes = {
       price: PropTypes.number.isRequired,
     })
   ),
-};
-
-BookingSummaryCard.defaultProps = {
-  rating: 0,
-  reviewCount: 0,
-  variantLabel: null,
-  addOns: [],
 };
 
 export default BookingSummaryCard;
