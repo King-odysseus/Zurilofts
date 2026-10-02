@@ -452,7 +452,7 @@ function AdminPropertyForm() {
               </div>
             </section>
 
-            {isEdit && <SeasonalPricing propertyId={id} />}
+            {isEdit && <SeasonalPricing propertyId={id} base={base} />}
           </div>
 
           <aside className="op-host-editor-preview-panel">
@@ -701,7 +701,11 @@ FullPagePreview.propTypes = {
 };
 
 // ---- Seasonal pricing (price rules) - only available once a property exists ----
-function SeasonalPricing({ propertyId }) {
+function SeasonalPricing({ propertyId, base }) {
+  // Price rules live under a different namespace per area: admin routes are
+  // admin-only, hosts use the host-scoped /properties ones. A host hitting the
+  // admin path gets 403 and the section silently stays empty.
+  const rulesPath = `${base === '/admin' ? '/admin/properties' : '/properties'}/${propertyId}/price-rules`;
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState({ name: '', start: '', end: '', price: '' });
@@ -709,14 +713,14 @@ function SeasonalPricing({ propertyId }) {
 
   const load = useCallback(async () => {
     try {
-      const res = await apiClient.get(`/admin/properties/${propertyId}/price-rules`);
+      const res = await apiClient.get(rulesPath);
       setRules(res.data.data || []);
     } catch {
       // silent
     } finally {
       setLoading(false);
     }
-  }, [propertyId]);
+  }, [propertyId, rulesPath]);
 
   useEffect(() => {
     load();
@@ -726,7 +730,7 @@ function SeasonalPricing({ propertyId }) {
     e.preventDefault();
     setError('');
     try {
-      await apiClient.post(`/admin/properties/${propertyId}/price-rules`, {
+      await apiClient.post(rulesPath, {
         name: draft.name || undefined,
         start: draft.start,
         end: draft.end,
@@ -741,7 +745,7 @@ function SeasonalPricing({ propertyId }) {
 
   async function removeRule(ruleId) {
     try {
-      await apiClient.delete(`/admin/properties/${propertyId}/price-rules/${ruleId}`);
+      await apiClient.delete(`${rulesPath}/${ruleId}`);
       setRules((r) => r.filter((x) => x.id !== ruleId));
     } catch {
       alert('Failed to delete rule');

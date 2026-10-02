@@ -534,8 +534,11 @@ function DashboardOverview() {
       try {
         const bookingsUrl = isAdmin ? '/admin/bookings' : '/bookings/host';
         const earningsUrl = isAdmin ? '/admin/analytics/properties' : '/bookings/host/earnings';
+        // `/properties/mine` is the host workspace scope (an ADMIN is deliberately
+        // excluded from it), so admins must read the admin-namespaced list instead.
+        const propertiesUrl = isAdmin ? '/admin/properties' : '/properties/mine';
         const fetches = [
-          apiClient.get('/properties/mine'),
+          apiClient.get(propertiesUrl),
           apiClient.get(bookingsUrl, { params: { limit: 5 } }),
           apiClient.get(earningsUrl),
         ];

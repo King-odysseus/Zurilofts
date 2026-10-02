@@ -87,7 +87,8 @@ function AdminAddOns() {
 
   async function fetchProperties() {
     try {
-      const response = await apiClient.get('/properties/mine');
+      // Admin-namespaced list: `/properties/mine` is host-scoped and 403s for admins.
+      const response = await apiClient.get('/admin/properties');
       const rows = response.data.data || [];
       setProperties(rows);
       const assignmentMap = {};
