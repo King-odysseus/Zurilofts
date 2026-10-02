@@ -4,11 +4,9 @@ import { Button, Datepicker, Dropdown, DropdownDivider, DropdownHeader, Dropdown
 import { ChevronRight, Headphones, Receipt, Search, ShieldCheck } from 'lucide-react';
 import apiClient from './api/client.js';
 import { heroImage } from './assets/images.js';
-import { useAuth } from './context/AuthContext.jsx';
-import { useFavorites } from './context/FavoritesContext.jsx';
-import { firstImage } from './utils/images.js';
 import { clearRecentlyViewed, getRecentlyViewed } from './utils/recentlyViewed.js';
 import PropertyResultsMap from './components/PropertyResultsMap.jsx';
+import StayCard from './components/StayCard.jsx';
 import { openConsentManager } from './utils/consent.js';
 import { ALL_KENYA_SEARCH, DEFAULT_SEARCH_LOCATION, SEARCH_LOCATION_GROUPS } from './data/searchLocations.js';
 
@@ -51,23 +49,6 @@ function useStays(params) {
     return () => controller.abort();
   }, [search, type, page, limit, checkIn, checkOut, minPrice, maxPrice, minBedrooms]);
   return state;
-}
-
-function StayCard({ stay }) {
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
-  const { isFavorite, toggleFavorite } = useFavorites();
-  const image = firstImage(stay);
-  const location = stay.neighborhood || stay.location || 'Nairobi';
-  const details = [location, stay.guests && `${stay.guests} guests`, stay.bedrooms != null && `${stay.bedrooms} bed${stay.bedrooms === 1 ? '' : 's'}`].filter(Boolean);
-  return <article className="opg-stay-card">
-    <Link to={`/property/${stay.id}`} className="opg-stay-image" aria-label={`View ${stay.title}`}>
-      {image ? <img src={image} alt={stay.title} loading="lazy" /> : <span className="opg-image-fallback">Photo coming soon</span>}
-      {stay.featured && <span className="opg-card-badge">Featured</span>}
-    </Link>
-    <button type="button" className="opg-heart" aria-label={isFavorite(stay.id) ? 'Remove from saved stays' : 'Save stay'} aria-pressed={isFavorite(stay.id)} onClick={() => isAuthenticated ? toggleFavorite(stay.id) : navigate('/login')}>{isFavorite(stay.id) ? '♥' : '♡'}</button>
-    <Link to={`/property/${stay.id}`} className="opg-stay-content"><h3>{stay.title}</h3><p>{details.join(' · ')}</p><div className="opg-price"><strong>{stay.price != null ? `KSh ${Number(stay.price).toLocaleString()}` : 'Price on request'}</strong>{stay.price != null && <span>per night</span>}{stay.rating != null && <span className="opg-rating">★ {Number(stay.rating).toFixed(2)}</span>}</div></Link>
-  </article>;
 }
 
 function SearchForm({ initial = DEFAULT_SEARCH_LOCATION, allKenya = false }) {

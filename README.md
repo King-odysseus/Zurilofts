@@ -62,7 +62,7 @@ zurilofts/
 │   │   ├── Footer.jsx      # Site footer
 │   │   ├── Hero.jsx        # Hero section with search
 │   │   ├── Navbar.jsx      # Navigation bar
-│   │   ├── PropertyCard.jsx# Property listing card
+│   │   ├── StayCard.jsx    # Property listing card (Stays, Similar properties, Saved stays)
 │   │   └── PropertyPage.jsx# Property detail page
 │   ├── assets/             # Images and media
 │   ├── App.jsx             # Main app component
@@ -82,48 +82,47 @@ zurilofts/
 
 ## Component Documentation
 
-### PropertyCard
+### StayCard
 
-A feature-rich card component displaying property listings with interactive elements.
+The one guest property card, shared by the Stays grid (`/properties` and "Stays in Nairobi"), the Similar properties strip and Saved stays. Its presentation lives in `guest-discovery.css` (`.opg-stay-*`). Keep it as the single implementation; do not fork the markup per page.
 
 **Props:**
 | Prop | Type | Required | Description |
 |------|------|----------|-------------|
-| `property.image` | string | Yes | Property image URL |
-| `property.title` | string | Yes | Property name |
-| `property.location` | string | Yes | Location address |
-| `property.price` | number | Yes | Price per night (KES) |
-| `property.rating` | number | Yes | Star rating (e.g., 5.0) |
-| `property.reviews` | number | Yes | Number of reviews |
-| `property.bedrooms` | number | Yes | Bedroom count |
-| `property.bathrooms` | number | Yes | Bathroom count |
-| `property.area` | number | Yes | Area in sq ft |
-| `property.badge` | string | | Optional badge text (e.g., "Featured") |
+| `stay.id` | string | Yes | Property id, used by the card links |
+| `stay.title` | string | Yes | Property name |
+| `stay.neighborhood` | string | | Area; falls back to `location`, then "Nairobi" |
+| `stay.guests` | number | | Guest count, shown in the meta line |
+| `stay.bedrooms` | number | | Bedroom count, shown in the meta line |
+| `stay.price` | number | | Price per night (KES); renders "Price on request" when absent |
+| `stay.rating` | number | | Average rating, rendered as "★ 4.80" |
+| `stay.featured` | boolean | | Shows the "Featured" badge |
+| `stay.images` | string[] | | Image URLs; `imagesJson` and `coverImage` are also accepted |
 
 **Design Techniques:**
-- **Group hover coordination**: Parent `group` class enables synchronized hover effects
-- **Image zoom**: `group-hover:scale-110` creates elegant zoom effect
-- **Gradient overlay**: Fades in on hover for text legibility
-- **Like button**: State-driven heart icon with color transitions
-- **Floating badge**: Absolute positioned with shadow depth
+- **One card everywhere**: the same component renders every guest listing surface, so a property cannot look like two different cards
+- **Transparent surface**: no border or shadow on the card itself, only the photo is rounded (`border-radius: 12px`)
+- **Fixed ratio**: `.opg-stay-image` uses `aspect-ratio: 282/182` to keep rows and grids aligned
+- **Image zoom**: `group hover` / `.opg-stay-card:hover img` scales the photo by 1.04
+- **Heart overlay**: absolute-positioned save control on the image, hidden state driven by `FavoritesContext`
+- **Price row**: price first, then "per night", with the rating pushed right via `margin-left: auto`
 
 ```jsx
-import PropertyCard from './components/PropertyCard';
+import StayCard from './components/StayCard.jsx';
 
-const property = {
-  image: 'https://example.com/image.jpg',
+const stay = {
+  id: 'clx123',
   title: 'Luxury Apartment',
-  location: 'Westlands, Nairobi',
+  neighborhood: 'Westlands, Nairobi',
   price: 8000,
   rating: 5.0,
-  reviews: 12,
+  guests: 4,
   bedrooms: 2,
-  bathrooms: 2,
-  area: 950,
-  badge: 'Featured'
+  featured: true,
+  images: ['https://example.com/image.jpg']
 };
 
-<PropertyCard property={property} />
+<StayCard stay={stay} />
 ```
 
 ### Navbar

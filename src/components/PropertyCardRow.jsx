@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
-import PropertyCard from './PropertyCard';
-import { firstImage } from '../utils/images.js';
+import StayCard from './StayCard.jsx';
 
 /**
  * Reusable horizontally scrollable card strip.
  *
- * Renders at most 6 `PropertyCard`s in a snap-scrolling row. The scrollbar is
- * hidden but keyboard and touch scrolling still work. Renders nothing at all
+ * Renders at most 6 StayCards in a snap-scrolling row, using the same card as
+ * the Stays grid so a property looks identical here and on /properties. Card
+ * width tracks that grid's column (310px inside the shared max-w-[1344px] px-6
+ * container) so both surfaces read as one design. The scrollbar is hidden but
+ * keyboard and touch scrolling still work. Renders nothing at all
  * when `properties` is empty and no `emptyMessage` is provided, so callers can
  * mount it unconditionally without introducing stray headings or layout gaps.
  */
@@ -25,8 +27,8 @@ function PropertyCardRow({ title, properties, emptyMessage, align = 'left' }) {
       ) : (
         <div className={`flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar ${centered ? 'lg:justify-center' : ''}`}>
           {cards.map((property) => (
-            <div key={property.id} className="snap-start flex-shrink-0 w-64 sm:w-72">
-              <PropertyCard property={{ ...property, image: firstImage(property) }} />
+            <div key={property.id} className="snap-start flex-shrink-0 w-64 sm:w-72 lg:w-[310px]">
+              <StayCard stay={property} />
             </div>
           ))}
         </div>
@@ -48,6 +50,9 @@ PropertyCardRow.propTypes = {
       reviewCount: PropTypes.number,
       bedrooms: PropTypes.number,
       bathrooms: PropTypes.number,
+      guests: PropTypes.number,
+      neighborhood: PropTypes.string,
+      featured: PropTypes.bool,
       area: PropTypes.number,
       badge: PropTypes.string,
       variantLabel: PropTypes.string,

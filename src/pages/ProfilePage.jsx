@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Select } from 'flowbite-react';
 import { CalendarDays, Camera, ChevronRight, Heart, Info, Star } from 'lucide-react';
-import PropertyCard from '../components/PropertyCard.jsx';
+import StayCard from '../components/StayCard.jsx';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
@@ -907,20 +907,7 @@ function ProfilePage() {
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {favorites.map((property) => (
-                    <Link key={property.id} to={`/property/${property.id}`} className="block">
-                      <PropertyCard property={{
-                        id: property.id,
-                        image: property.images?.[0] || null,
-                        title: property.title,
-                        location: property.location,
-                        price: property.price,
-                        rating: property.rating,
-                        bedrooms: property.bedrooms,
-                        bathrooms: property.bathrooms,
-                        area: property.area,
-                        badge: property.featured ? 'Featured' : undefined,
-                      }} />
-                    </Link>
+                    <StayCard key={property.id} stay={property} />
                   ))}
                 </div>
               )}

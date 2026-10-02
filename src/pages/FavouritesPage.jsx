@@ -3,7 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { UserRound } from 'lucide-react';
 import SavedStaysHeader from '../components/SavedStaysHeader.jsx';
-import PropertyCard from '../components/PropertyCard.jsx';
+import StayCard from '../components/StayCard.jsx';
 import Spinner from '../components/Spinner.jsx';
 import { heroImage } from '../assets/images.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -165,7 +165,7 @@ function FavouritesPage() {
                 </div>
                 <div className="opg-saved-grid">
                   {displayProperties.map((property) => (
-                    <PropertyCard key={property.id} property={property} />
+                    <StayCard key={property.id} stay={property} />
                   ))}
                 </div>
               </section>

@@ -43,7 +43,7 @@ mcp__cognitive1__brain_learn { type, project: "zurilofts", title, ... }
 
 ```
 src/
-├── components/       # Shared: Navbar, Footer, PropertyCard, Dropdown, Spinner, etc.
+├── components/       # Shared: Navbar, Footer, StayCard, Dropdown, Spinner, etc.
 ├── pages/            # Route pages: HomePage, PropertiesPage, PropertyDetailPage, ContactPage,
 │                     #   BookingPage, LoginPage, RegisterPage, ProfilePage, FavouritesPage,
 │                     #   BookingHistoryPage, MessagesPage
