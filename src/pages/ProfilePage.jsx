@@ -649,7 +649,7 @@ function ProfilePage() {
                           value={bankForm.bankName}
                           onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
                           placeholder="e.g. KCB Bank"
-                          className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                          className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                           required
                         />
                       )}
@@ -663,7 +663,7 @@ function ProfilePage() {
                         onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 20) }))}
                         maxLength={20}
                         placeholder="Bank account number"
-                        className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                        className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                         required
                       />
                     </div>
@@ -677,7 +677,7 @@ function ProfilePage() {
                       onChange={(e) => setMpesaPhone(e.target.value)}
                       placeholder="0712 345 678"
                       autoComplete="tel"
-                      className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
                       required
                     />
                     <p className="text-xs text-[#6b7280] mt-2">Use the Safaricom number registered to receive your host payouts.</p>
@@ -846,7 +846,7 @@ function ProfilePage() {
                               onChange={(e) => setReviewField(booking.id, 'publicComment', e.target.value)}
                               placeholder="Share what other guests should know about this stay. This appears publicly with your first name."
                               maxLength={1000}
-                              className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm mb-4"
+                              className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm mb-4"
                             />
                             <label className="block text-xs font-semibold text-[#6b7280] mb-1">
                               Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
@@ -856,7 +856,7 @@ function ProfilePage() {
                               onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
                               placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
                               maxLength={2000}
-                              className=" w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
+                              className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
                             />
                             {reviewForms[booking.id]?.error && (
                               <p className="text-red-500 text-xs mt-1">{reviewForms[booking.id].error}</p>
