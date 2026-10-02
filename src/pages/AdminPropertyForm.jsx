@@ -504,7 +504,7 @@ function bedBathLabel(form) {
   return form.bathrooms === '' ? '-' : form.bathrooms;
 }
 
-// Live preview of the public PropertyCard, driven by the current form values
+// Live preview of the public listing card, driven by the current form values
 function PropertyPreview({ form }) {
   const cover = form.images?.[0];
   const price = Number(form.price) || 0;

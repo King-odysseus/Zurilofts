@@ -1,12 +1,9 @@
-import { useState, lazy, Suspense } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Select, TextInput } from 'flowbite-react';
-import { ChevronRight, LayoutGrid, Map, MapPin } from 'lucide-react';
-import Spinner from './Spinner.jsx';
+import { ChevronRight, MapPin } from 'lucide-react';
 import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
-
-const NearbyMap = lazy(() => import('./NearbyMap.jsx'));
 
 /** Card for a single place or restaurant */
 function NearbyCard({ item, areaLabels, categoryLabels }) {
@@ -52,7 +49,6 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   const [areaFilter, setAreaFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [query, setQuery] = useState('');
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'map'
 
   const filtered = items.filter((item) => {
     const areaMatch = areaFilter === 'all' || item.area === areaFilter;
@@ -74,7 +70,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
         <p className="text-cool-grey max-w-2xl mx-auto text-base md:text-lg mt-3 px-2 md:px-0">{subtitle}</p>
       </div>
 
-      {/* Filters + View Toggle */}
+      {/* Filters: free-text search plus area/category selects */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 px-4 md:px-0">
         <TextInput className="op-place-search-wrap" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search places, areas or categories" aria-label="Search places" />
         <Select className="op-place-select-wrap" value={areaFilter} onChange={(event) => setAreaFilter(event.target.value)} aria-label="Filter by area">
@@ -86,32 +82,11 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
           </Select>
         )}
         <button className="op-place-clear" type="button" onClick={() => { setQuery(''); setAreaFilter('all'); setCategoryFilter('all'); }}>Clear all</button><span className="op-place-count">{filtered.length} places</span>
-        {/* Map/Grid toggle */}
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => setViewMode('grid')}
-            className={`rounded-[10px] p-2 transition-colors ${viewMode === 'grid' ? 'bg-[#0B1F42] text-white' : 'bg-[#F7F4EF] text-[#52606F]'}`}
-            aria-label="Grid view"
-          >
-            <LayoutGrid className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
-          </button>
-          <button
-            onClick={() => setViewMode('map')}
-            className={`rounded-[10px] p-2 transition-colors ${viewMode === 'map' ? 'bg-[#0B1F42] text-white' : 'bg-[#F7F4EF] text-[#52606F]'}`}
-            aria-label="Map view"
-          >
-            <Map className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
-          </button>
-        </div>
       </div>
 
-      {/* Grid or Map */}
+      {/* List only by design: the grid/map toggle and its NearbyMap view were removed. */}
       {filtered.length === 0 ? (
         <p className="py-12 text-center text-[#5B6B82]">Nothing matches those filters - try a different area or category.</p>
-      ) : viewMode === 'map' ? (
-        <Suspense fallback={<div className="flex items-center justify-center py-24"><Spinner /></div>}>
-          <NearbyMap items={filtered} title={title} />
-        </Suspense>
       ) : (
         <>
           <div className="op-place-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">

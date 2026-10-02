@@ -4,8 +4,8 @@ import { CircleCheckBig, MapPin } from 'lucide-react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Fix Leaflet default marker icon paths broken by bundlers (Vite/webpack) -
-// same fix as NearbyMap.jsx so the shared icon is correct module-wide.
+// Leaflet guesses its default icon URLs at runtime, and bundlers break that guess
+// by renaming the imported assets - so point it at the bundled URLs explicitly.
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
