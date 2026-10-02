@@ -48,6 +48,8 @@ function BookingPage() {
   // Property from API
   const [property, setProperty] = useState(null);
   const [loadingProperty, setLoadingProperty] = useState(true);
+  const [propertyError, setPropertyError] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
   const [unavailableRanges, setUnavailableRanges] = useState([]);
 
   // Promo code
@@ -200,8 +202,15 @@ function BookingPage() {
             setBedOption('1bed');
           }
         }
-      } catch {
-        // fallback
+      } catch (error) {
+        // Keep the reason: without it a failed fetch looks identical to "still
+        // loading", which is how a bad or unpublished listing id used to leave the
+        // guest on "Loading property..." forever with no way out.
+        setPropertyError(
+          error?.response?.status === 404
+            ? 'This listing is no longer available.'
+            : 'We could not load this listing right now. Please try again.'
+        );
       } finally {
         setLoadingProperty(false);
       }
@@ -212,7 +221,7 @@ function BookingPage() {
       .get(`/properties/${id}/availability`)
       .then((r) => setUnavailableRanges(r.data.data || []))
       .catch(() => { /* calendar still works, just nothing disabled */ });
-  }, [id, urlVariant, isAuthenticated]);
+  }, [id, urlVariant, isAuthenticated, reloadKey]);
 
   // ── Cost calculations (memoised - expensive enough to matter on every date pick / guest toggle) ──
   const pricing = useMemo(() => {
@@ -1106,7 +1115,7 @@ function BookingPage() {
   }
 
   // Loading state
-  if (loadingProperty || !property) {
+  if (loadingProperty) {
     return (
       <div className="min-h-screen bg-white">
         <Navbar />
@@ -1114,6 +1123,33 @@ function BookingPage() {
           <div className="text-center">
             <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-[#6b7280]">Loading property...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Separate from the loading branch on purpose: a fetch failure must render an exit,
+  // not an endless spinner.
+  if (!property) {
+    return (
+      <div className="min-h-screen bg-white">
+        <Navbar />
+        <div className="pt-24 flex items-center justify-center min-h-[60vh]">
+          <div className="text-center max-w-md px-4">
+            <h1 className="text-lg font-semibold text-[#0B0B45] mb-2">Property unavailable</h1>
+            <p className="text-[#6b7280] mb-6">{propertyError || 'This listing could not be loaded.'}</p>
+            <div className="flex items-center justify-center gap-3">
+              <Button color="light" onClick={() => setReloadKey((key) => key + 1)}>
+                Try again
+              </Button>
+              <Link
+                to="/properties"
+                className="rounded-full bg-[#0B0B45] px-5 py-2.5 text-sm font-medium text-white"
+              >
+                Browse properties
+              </Link>
+            </div>
           </div>
         </div>
       </div>
