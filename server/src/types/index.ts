@@ -398,6 +398,31 @@ export const priceRuleSchema = z.object({
   price: z.number().int().positive(),
 });
 
+// ---- Guides (blog) ----
+
+// Guide bodies are HTML rendered with dangerouslySetInnerHTML on the public
+// guide page. Shape and size are bounded here; the markup itself is sanitized on
+// write and again on the public read (see utils/sanitizeHtml.ts).
+// AdminGuides.jsx derives slugs with exactly this pattern, so requiring it
+// cannot reject a legitimate save.
+const guideSlugSchema = z
+  .string()
+  .trim()
+  .min(1, 'Slug is required')
+  .max(200)
+  .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, 'Use lowercase letters, numbers and single hyphens');
+
+export const blogPostCreateSchema = z.object({
+  title: z.string().trim().min(1, 'Title is required').max(200),
+  slug: guideSlugSchema,
+  excerpt: z.string().max(500).optional(),
+  body: z.string().min(1, 'Body is required').max(100_000),
+  coverImage: z.string().max(500).optional(),
+  published: z.boolean().optional(),
+});
+
+export const blogPostUpdateSchema = blogPostCreateSchema.partial();
+
 // ============================================================
 // Custom error classes
 // ============================================================

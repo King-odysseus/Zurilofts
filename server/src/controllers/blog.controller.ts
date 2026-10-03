@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as blogService from '../services/blog.service.js';
+import { sanitizeHtml } from '../utils/sanitizeHtml.js';
 
 // Public: list published posts
 export async function list(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -10,7 +11,10 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
       page: page ? Number(page) : 1,
       limit: limit ? Number(limit) : 12,
     });
-    res.json({ success: true, data: result.posts, pagination: result.pagination });
+    // Sanitize here rather than in the service: adminList shares listPosts and
+    // the editor must round-trip the stored markup faithfully.
+    const posts = result.posts.map((post) => ({ ...post, body: sanitizeHtml(post.body) }));
+    res.json({ success: true, data: posts, pagination: result.pagination });
   } catch (error) {
     next(error);
   }
@@ -20,7 +24,7 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
 export async function getBySlug(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const post = await blogService.getPostBySlug(req.params.slug);
-    res.json({ success: true, data: post });
+    res.json({ success: true, data: { ...post, body: sanitizeHtml(post.body) } });
   } catch (error) {
     next(error);
   }

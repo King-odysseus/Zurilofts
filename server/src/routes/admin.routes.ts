@@ -13,6 +13,8 @@ import {
   userSuspendSchema,
   hostApplicationReviewSchema,
   adminAccountDeletionSchema,
+  blogPostCreateSchema,
+  blogPostUpdateSchema,
 } from '../types/index.js';
 import { getLandingStats, setLandingStats } from '../services/settings.service.js';
 import * as bookingCtrl from '../controllers/booking.controller.js';
@@ -125,8 +127,8 @@ router.use('/properties', adminPropertyRoutes);
 // Blog management
 router.get('/guides', blogCtrl.adminList);
 router.get('/guides/:id', blogCtrl.adminGet);
-router.post('/guides', blogCtrl.adminCreate);
-router.put('/guides/:id', blogCtrl.adminUpdate);
+router.post('/guides', validate(blogPostCreateSchema), blogCtrl.adminCreate);
+router.put('/guides/:id', validate(blogPostUpdateSchema), blogCtrl.adminUpdate);
 router.delete('/guides/:id', blogCtrl.adminDelete);
 
 // Push notifications

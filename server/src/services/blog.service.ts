@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError } from '../types/index.js';
+import { sanitizeHtml } from '../utils/sanitizeHtml.js';
 
 export async function listPosts(filters: { published?: boolean; page?: number; limit?: number }) {
   const { published, page = 1, limit = 12 } = filters;
@@ -27,13 +28,16 @@ export async function getPostById(id: string) {
 }
 
 export async function createPost(data: { title: string; slug: string; excerpt?: string; body: string; coverImage?: string; published?: boolean }) {
-  return prisma.blogPost.create({ data });
+  // Sanitize at the write boundary so unsafe markup never reaches the database.
+  return prisma.blogPost.create({ data: { ...data, body: sanitizeHtml(data.body) } });
 }
 
 export async function updatePost(id: string, data: Partial<{ title: string; slug: string; excerpt: string; body: string; coverImage: string; published: boolean }>) {
   const post = await prisma.blogPost.findUnique({ where: { id } });
   if (!post) throw new NotFoundError('Blog post');
-  return prisma.blogPost.update({ where: { id }, data });
+  // Only sanitize when a body is supplied, so a partial update cannot blank it.
+  const patch = data.body === undefined ? data : { ...data, body: sanitizeHtml(data.body) };
+  return prisma.blogPost.update({ where: { id }, data: patch });
 }
 
 export async function deletePost(id: string) {
