@@ -1,29 +1,15 @@
 import { useLocation, useParams, useSearchParams, Link } from 'react-router-dom';
 import { useState, useEffect, useCallback, useRef } from 'react';
-import PropTypes from 'prop-types';
-import { ArrowLeft, Bath, Building2, Check, ChevronLeft, ChevronRight, CircleAlert, House, Map, MapPin, Ruler, ShieldCheck, Star } from 'lucide-react';
+import { ArrowLeft, Bath, Building2, Check, ChevronLeft, ChevronRight, CircleAlert, House, MapPin, Ruler, ShieldCheck, Star } from 'lucide-react';
 import Lightbox from './Lightbox.jsx';
 import ReviewSection from './ReviewSection.jsx';
 import PropertyTrustPanel from './PropertyTrustPanel';
 import SimilarProperties from './SimilarProperties';
 import AddOnsSection from './AddOnsSection';
 
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
-
 import apiClient from '../api/client.js';
 import { recordView } from '../utils/recentlyViewed.js';
-import { googleMapsDirectionsUrl, hasMapCoordinates } from '../utils/googleMaps.js';
+import { googleMapsSearchUrl } from '../utils/googleMaps.js';
 
 /** Safely coerce a value to an array, no matter what the API sends. */
 function safeArray(value) {
@@ -259,15 +245,15 @@ function PropertyPage() {
           </h1>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[#5B6B82]">
             <a
-              href={googleMapsDirectionsUrl({ lat: property.lat, lng: property.lng, label: property.location })}
+              href={googleMapsSearchUrl({ lat: property.lat, lng: property.lng, label: property.location })}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 min-h-[44px] rounded-full transition-colors hover:text-[#9A744A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
-              title="Get directions in Google Maps"
+              title="Open in Google Maps"
             >
               <MapPin className="w-5 h-5 text-[#5B6B82] shrink-0" strokeWidth={2} aria-hidden="true" />
               {property.location}
-              <span className="text-xs font-semibold">Google Maps ↗</span>
+              <span className="text-xs font-semibold">Google Maps</span>
             </a>
             {typeof property.rating === 'number' && property.rating > 0 && (
               <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#0B1F42]" aria-label={`Rated ${property.rating} out of 5 from ${property.reviews || 0} reviews`}>
@@ -365,14 +351,27 @@ function PropertyPage() {
               </section>
             )}
 
-            {/* Where you'll be - only when the host confirmed coordinates */}
-            {hasMapCoordinates(property.lat, property.lng) && (
+            {/* Where you'll be - shown whenever the listing has a place name or
+                street address. No map is embedded; the link opens Google Maps. */}
+            {(property.location || property.address) && (
               <section className="mb-8 md:mb-10" aria-labelledby="location-heading">
                 <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">Where you&apos;ll be</h2>
                 <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(11,31,66,0.06)]">
-                  <p className="font-semibold text-[#0B1F42]">{property.location}</p>
-                  {property.address && <p className="mt-1 text-sm text-[#5B6B82]">{property.address}</p>}
-                  <a href={googleMapsDirectionsUrl({ lat: property.lat, lng: property.lng, label: property.address || property.location })} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex min-h-10 items-center rounded-full bg-[#C49A6C] px-4 text-xs font-semibold text-white hover:bg-[#B8895C]">Get directions ↗</a>
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="min-w-0 flex-1">
+                      {property.location && <p className="font-semibold text-[#0B1F42]">{property.location}</p>}
+                      {property.address && <p className="mt-1 break-words text-sm text-[#5B6B82]">{property.address}</p>}
+                    </div>
+                    <a
+                      href={googleMapsSearchUrl({ lat: property.lat, lng: property.lng, label: property.address || property.location })}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] bg-[#0B1F42] px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#07072E]"
+                    >
+                      <MapPin className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
+                      Open in Google Maps
+                    </a>
+                  </div>
                 </div>
               </section>
             )}
@@ -498,62 +497,5 @@ function PropertyPage() {
     </div>
   );
 }
-
-// Static pin map for a pinned property. Rendered only when the host dropped
-// coordinates during listing, so it never needs an empty-state.
-function PropertyPinMap({ lat, lng, address, location, title }) {
-  const mapElRef = useRef(null);
-  const directionsUrl = googleMapsDirectionsUrl({ lat, lng, label: address || location });
-
-  useEffect(() => {
-    const el = mapElRef.current;
-    if (!el) return;
-    const map = L.map(el, {
-      scrollWheelZoom: false,
-      center: [Number(lat), Number(lng)],
-      zoom: 15,
-    });
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      subdomains: 'abcd',
-      maxZoom: 19,
-    }).addTo(map);
-    L.marker([Number(lat), Number(lng)], { title, alt: `Map pin for ${title}` })
-      .addTo(map)
-      .bindPopup(location || title || 'Property');
-    return () => map.remove();
-  }, [lat, lng, title, location]);
-
-  return (
-    <div className="overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.08)]">
-      <div ref={mapElRef} className="h-64 md:h-80 w-full" aria-label={`Map showing the location of ${title}`} />
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 sm:p-5">
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-[#0B1F42]">{location}</p>
-          {address && (
-            <p className="mt-0.5 break-words text-sm text-[#5B6B82]">{address}</p>
-          )}
-        </div>
-        <a
-          href={directionsUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] bg-[#0B1F42] px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#07072E]"
-        >
-          <Map className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
-          Get directions
-        </a>
-      </div>
-    </div>
-  );
-}
-
-PropertyPinMap.propTypes = {
-  lat: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  lng: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-  address: PropTypes.string,
-  location: PropTypes.string,
-  title: PropTypes.string,
-};
 
 export default PropertyPage;

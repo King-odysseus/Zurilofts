@@ -25,6 +25,13 @@ const EMPTY = {
   images: [], // array of image paths/URLs
   amenities: '',
   nearby: '',
+  // Legacy pin coordinates. The map picker was removed, so lat/lng are no
+  // longer editable - they are only loaded and re-sent so editing a listing
+  // cannot silently drop a pin that is already stored. address IS editable and
+  // is what the Google Maps link uses.
+  lat: '',
+  lng: '',
+  address: '',
 };
 
 const EDITOR_STEPS = [
@@ -95,6 +102,9 @@ function AdminPropertyForm() {
           images: p.images || [],
           amenities: (p.amenities || []).join('\n'),
           nearby: (p.nearby || []).join('\n'),
+          lat: p.lat ?? '',
+          lng: p.lng ?? '',
+          address: p.address || '',
         });
       } catch {
         setError('Failed to load property');
@@ -161,6 +171,16 @@ function AdminPropertyForm() {
     if (form.price2Bed !== '') payload.price2Bed = Number(form.price2Bed);
     if (form.bathrooms1Bed !== '') payload.bathrooms1Bed = Number(form.bathrooms1Bed);
     if (form.bathrooms2Bed !== '') payload.bathrooms2Bed = Number(form.bathrooms2Bed);
+
+    // Coordinates are no longer collected in the editor, but a pin already on
+    // the listing is carried through so saving cannot drop it.
+    if (form.lat !== '' && form.lat !== null && form.lat !== undefined) {
+      payload.lat = Number(form.lat);
+      payload.lng = Number(form.lng);
+    }
+    // Always sent, including when blank, so clearing the field clears the stored
+    // address instead of leaving a stale street name behind.
+    payload.address = form.address ? form.address : null;
 
     if (payload.images.length === 0) {
       setError('Add at least one image');
@@ -295,6 +315,18 @@ function AdminPropertyForm() {
                 <div>
                   <Label htmlFor="listing-location" className="op-host-editor-label">Location details</Label>
                   <TextInput id="listing-location" value={form.location} onChange={(e) => update('location', e.target.value)} placeholder="Street, building or landmark" required />
+                </div>
+                <div className="op-host-editor-field-full">
+                  <Label htmlFor="listing-address" className="op-host-editor-label">Street address (optional)</Label>
+                  <TextInput
+                    id="listing-address"
+                    value={form.address}
+                    onChange={(e) => update('address', e.target.value)}
+                    placeholder="Building name, street or nearest landmark"
+                  />
+                  <p className="mt-2 text-sm text-[#6b7280]">
+                    Shown to guests and used for the Google Maps link. Leave empty to use the location above.
+                  </p>
                 </div>
                 <div className="op-host-editor-field-full">
                   <Label htmlFor="listing-description" className="op-host-editor-label">Description</Label>

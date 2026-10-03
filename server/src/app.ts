@@ -51,13 +51,12 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        frameSrc: ["'self'", 'https://www.google.com'],
+        frameSrc: ["'self'"],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
-        // Leaflet's base map tiles are images fetched directly from the
-        // OpenStreetMap subdomains. Without this source production creates the
-        // marker DOM but CSP blocks every tile, leaving an apparently blank map.
-        imgSrc: ["'self'", 'data:', 'https://*.tile.openstreetmap.org'],
+        // No map tiles are loaded: the app embeds no map, it only links out to
+        // Google Maps, so third-party images are never fetched.
+        imgSrc: ["'self'", 'data:'],
         fontSrc: ["'self'", 'https:', 'data:'],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],

@@ -83,11 +83,14 @@ export const propertyCreateSchema = z.object({
   type: z.enum(['apartment', 'studio', 'penthouse']),
   available: z.boolean().default(true),
   featured: z.boolean().default(false),
-  // Pin-confirmed location (see the drop-a-pin picker in AdminPropertyForm).
-  // lat/lng are the map coordinates; address is the host-confirmed street label.
+  // Location shown to guests and used for the Google Maps link. The app embeds
+  // no map, so a readable address is what matters here.
+  // lat/lng are legacy columns from the removed drop-a-pin picker: still
+  // persisted so saving cannot drop an existing pin, but nothing collects them.
   lat: z.number().min(-90).max(90).optional(),
   lng: z.number().min(-180).max(180).optional(),
-  address: z.string().max(300).optional(),
+  // Editable, and nullable because the form submits null to clear a stale one.
+  address: z.string().max(300).nullable().optional(),
 });
 
 export const propertyUpdateSchema = propertyCreateSchema.partial();
