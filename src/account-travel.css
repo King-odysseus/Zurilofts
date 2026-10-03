@@ -108,11 +108,11 @@
 .opg-profile-form>div{min-width:0}
 .opg-profile-form>button{grid-column:1/-1}
 .opg-profile-form label{font-size:12px;font-weight:700;color:#475569}
-.opg-profile-form input,.opg-profile-form select{min-width:0;min-height:44px;border-radius:12px!important;border-color:#e2dad0!important;box-shadow:none!important}
+.opg-profile-form input,.opg-profile-form select{min-width:0;min-height:44px;border-color:#e2dad0!important;box-shadow:none!important}
 .opg-profile-form>div>div.flex{min-width:0}
 .opg-profile-form input:focus,.opg-profile-form select:focus{border-color:#c49a6c!important;box-shadow:0 0 0 3px rgba(196,154,108,.2)!important}
 .opg-profile-country{width:118px;flex:none}
-.opg-profile-select,.opg-profile-frequency{min-height:44px;border-radius:12px!important;border-color:#e2dad0!important;box-shadow:none!important}
+.opg-profile-select,.opg-profile-frequency{min-height:44px;border-color:#e2dad0!important;box-shadow:none!important}
 .opg-profile-select{width:100%}.opg-profile-frequency{width:280px;max-width:100%}
 .opg-profile select:focus{border-color:#c49a6c!important;box-shadow:0 0 0 3px rgba(196,154,108,.2)!important}
 .opg-profile-loading{display:grid;gap:14px}

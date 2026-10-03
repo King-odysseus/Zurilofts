@@ -1,7 +1,8 @@
 /* Shared Flowbite-style form anatomy using the OpenPencil colour tokens.
    Design tokens live in index.css (single source of truth). */
-:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]):not([type=submit]):not([type=button]),select){border:1px solid var(--control-line);border-radius:999px!important;background-color:#fff;color:var(--control-text);font-size:14px;line-height:1.4;min-height:44px;transition:border-color .15s ease,box-shadow .15s ease}
+:where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]):not([type=submit]):not([type=button]),select){border:1px solid var(--control-line);background-color:#fff;color:var(--control-text);font-size:14px;line-height:1.4;min-height:44px;transition:border-color .15s ease,box-shadow .15s ease}
 :where(textarea){border:1px solid var(--control-line);border-radius:12px;background-color:#fff;color:var(--control-text);font-size:14px;line-height:1.4;min-height:44px;transition:border-color .15s ease,box-shadow .15s ease}
+
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea)::placeholder{color:var(--control-placeholder);opacity:1}
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea)::selection{background:#F3E9DC;color:#0B1F42}
 :where(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),select,textarea):focus,
@@ -15,23 +16,16 @@
 :where([role=option]){min-height:38px;border-radius:6px}
 :where([role=option]):focus-visible{outline:2px solid var(--control-focus);outline-offset:-2px}
 
-/* Flowbite dropdowns keep one surface treatment everywhere. */
-[data-testid="flowbite-dropdown"]{min-width:160px;border:1px solid var(--control-line);border-radius:10px;background:var(--control-bg);box-shadow:0 12px 30px #0b1f4226;overflow:hidden}
-[data-testid="flowbite-dropdown"] button{width:100%;min-height:36px;padding:9px 12px;border:0;border-radius:6px;background:transparent;color:var(--control-text);font:12px Inter,Arial,sans-serif;text-align:left;box-shadow:none}
-[data-testid="flowbite-dropdown"] button:hover,
-[data-testid="flowbite-dropdown"] button:focus{background:var(--control-surface);color:var(--control-text);outline:0}
-
 /* Search and checkout contexts only adjust geometry; visual states stay shared. */
-.opg-search .opg-search-field [data-testid="flowbite-dropdown"]{width:160px!important;min-width:160px!important;max-width:calc(100vw - 32px);border:1px solid var(--control-line)!important;border-radius:8px!important;box-shadow:0 4px 6px -1px #0b1f421a,0 2px 4px -2px #0b1f421a}
+.opg-search .opg-search-field [data-testid="flowbite-dropdown"]{width:160px!important;min-width:160px!important;max-width:calc(100vw - 32px)}
 .opg-search .opg-search-where [data-testid="flowbite-dropdown"]{width:260px!important;min-width:260px!important;max-height:min(420px,calc(100vh - 140px));overflow-y:auto;padding:4px!important}
-.opg-search .opg-search-where [data-testid="flowbite-dropdown"] button{min-height:40px;border-radius:0;padding:8px 14px;font-size:14px}
+.opg-search .opg-search-where [data-testid="flowbite-dropdown"] button{min-height:40px;padding:8px 14px;font-size:14px}
 .opg-search .opg-location-group{margin:0;padding:8px 14px 4px;color:#6b7280;font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
 .op-checkout-screen [data-testid="flowbite-dropdown"]{width:max-content;max-width:min(320px,calc(100vw - 32px))}
 
-.opg-saved-create-form [data-testid="flowbite-text-input"]{border-radius:10px}
 .opg-shortlist-card-actions [data-testid="flowbite-button"],
 .opg-saved-empty [data-testid="flowbite-button"],
-.opg-saved-error [data-testid="flowbite-button"]{border:0;border-radius:10px;font:600 12px Inter,Arial,sans-serif}
+.opg-saved-error [data-testid="flowbite-button"]{font:600 12px Inter,Arial,sans-serif}
 .opg-shortlist-rename [data-testid="flowbite-text-input"]{min-width:280px}
 
 @media (max-width: 767px) {
