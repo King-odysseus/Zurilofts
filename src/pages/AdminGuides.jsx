@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Label, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const EMPTY = { title: '', slug: '', excerpt: '', body: '', coverImage: '', published: false };
 
@@ -167,7 +168,15 @@ function AdminGuides() {
                 <div role="cell"><span className={`op-admin-catalog-status ${post.published ? 'is-success' : 'is-neutral'}`}>{post.published ? 'Published' : 'Draft'}</span></div>
                 <div className="op-admin-guide-excerpt" role="cell"><p>{post.excerpt || 'No editorial excerpt supplied.'}</p><span>{post.body ? `${post.body.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length} words` : 'No body content'}</span></div>
                 <div className="op-admin-catalog-cell" role="cell"><small>UPDATED</small><strong>{formatDate(post.updatedAt || post.createdAt)}</strong><span>{post.published ? 'Publicly available' : 'Not yet visible'}</span></div>
-                <div className="op-admin-catalog-actions" role="cell"><button type="button" onClick={() => handleEdit(post.id)}>Edit</button><button type="button" className="is-danger" onClick={() => handleDelete(post.id)}>Delete</button></div>
+                <div className="op-admin-catalog-actions" role="cell">
+                  <TableActionsMenu
+                    label={`Actions for ${post.title}`}
+                    actions={[
+                      { label: 'Edit', icon: 'edit', onClick: () => handleEdit(post.id) },
+                      { label: 'Delete', icon: 'delete', danger: true, onClick: () => handleDelete(post.id) },
+                    ]}
+                  />
+                </div>
               </article>
             ))}
           </div>

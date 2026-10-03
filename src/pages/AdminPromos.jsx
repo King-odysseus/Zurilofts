@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Checkbox, Label, TextInput } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const EMPTY_FORM = {
   code: '',
@@ -217,7 +218,15 @@ function AdminPromos() {
                   <div className="op-admin-catalog-cell" role="cell"><small>VALIDITY</small><strong>{formatDate(promo.validFrom)}</strong><span>to {formatDate(promo.validUntil)}{!expired && remainingDays <= 30 ? ` · ${remainingDays}d left` : ''}</span></div>
                   <div className="op-admin-catalog-cell" role="cell"><small>LISTINGS</small><strong>{promo.properties?.length ? `${promo.properties.length} targeted` : 'Whole portfolio'}</strong><span>{promo.properties?.map((property) => property.title).join(', ') || 'Applies to every stay'}</span></div>
                   <div role="cell"><button type="button" className={`op-admin-catalog-status ${promo.active && !expired ? 'is-success' : expired ? 'is-danger' : 'is-neutral'}`} onClick={() => handleToggle(promo)}>{expired ? 'Expired' : promo.active ? 'Active' : 'Paused'}</button></div>
-                  <div className="op-admin-catalog-actions" role="cell"><button type="button" onClick={() => openEdit(promo)}>Edit</button><button type="button" className="is-danger" onClick={() => handleDelete(promo.id)}>Delete</button></div>
+                  <div className="op-admin-catalog-actions" role="cell">
+                    <TableActionsMenu
+                      label={`Actions for ${promo.code}`}
+                      actions={[
+                        { label: 'Edit', icon: 'edit', onClick: () => openEdit(promo) },
+                        { label: 'Delete', icon: 'delete', danger: true, onClick: () => handleDelete(promo.id) },
+                      ]}
+                    />
+                  </div>
                 </article>
               );
             })}

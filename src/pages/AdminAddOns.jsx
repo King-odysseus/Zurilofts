@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Checkbox, Label, Select, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const CATEGORIES = ['transport', 'catering', 'housekeeping', 'concierge'];
 
@@ -240,7 +241,15 @@ function AdminAddOns() {
                   <div className="op-admin-catalog-cell" role="cell"><small>RATE</small><strong>KES {Number(addOn.price).toLocaleString()}</strong><span>Per booking or service</span></div>
                   <div className="op-admin-catalog-cell" role="cell"><small>ASSIGNED</small><strong>{assigned.size ? `${assigned.size} propert${assigned.size === 1 ? 'y' : 'ies'}` : 'Not assigned'}</strong><span>{assigned.size ? 'Visible on selected stays' : 'No property coverage'}</span></div>
                   <div role="cell"><button type="button" className={`op-admin-catalog-status ${addOn.active ? 'is-success' : 'is-neutral'}`} onClick={() => handleToggle(addOn)}>{addOn.active ? 'Active' : 'Paused'}</button></div>
-                  <div className="op-admin-catalog-actions" role="cell"><button type="button" onClick={() => openEdit(addOn)}>Edit</button><button type="button" className="is-danger" onClick={() => handleDelete(addOn.id)}>Delete</button></div>
+                  <div className="op-admin-catalog-actions" role="cell">
+                    <TableActionsMenu
+                      label={`Actions for ${addOn.name}`}
+                      actions={[
+                        { label: 'Edit', icon: 'edit', onClick: () => openEdit(addOn) },
+                        { label: 'Delete', icon: 'delete', danger: true, onClick: () => handleDelete(addOn.id) },
+                      ]}
+                    />
+                  </div>
                 </article>
               );
             })}

@@ -4,6 +4,7 @@ import { Button, Label, Select, Textarea, TextInput } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const ROLE_LABELS = {
   USER: 'Guest',
@@ -286,9 +287,18 @@ function AdminUsers() {
                     <div role="cell"><strong>{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '-'}</strong><small>host balance</small></div>
                     <div role="cell"><span className={`op-admin-people-pill ${u.suspended ? 'is-danger' : 'is-success'}`}>{u.suspended ? 'Suspended' : 'Active'}</span></div>
                     <div className="op-admin-people-actions" role="cell">
-                      <button type="button" onClick={() => openEdit(u)}>Edit</button>
-                      {!isSelf && <button type="button" onClick={() => toggleSuspend(u)} disabled={busy} className={u.suspended ? 'is-positive' : 'is-warning'}>{busy ? 'Working…' : u.suspended ? 'Reactivate' : 'Suspend'}</button>}
-                      {!isSelf && <button type="button" onClick={() => openDelete(u)} disabled={busy} className="is-danger">Delete</button>}
+                      <TableActionsMenu
+                        label={`Actions for ${u.firstName} ${u.lastName}`}
+                        actions={[
+                          { label: 'Edit', icon: 'edit', onClick: () => openEdit(u) },
+                          // Suspend and Delete are withheld on your own account: an admin
+                          // removing themselves here would lock the console.
+                          ...(!isSelf ? [
+                            { label: u.suspended ? 'Reactivate' : 'Suspend', icon: u.suspended ? 'refresh' : 'pause', disabled: busy, onClick: () => toggleSuspend(u) },
+                            { label: 'Delete', icon: 'delete', danger: true, disabled: busy, onClick: () => openDelete(u) },
+                          ] : []),
+                        ]}
+                      />
                     </div>
                   </div>
                 );
