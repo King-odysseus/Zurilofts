@@ -7,7 +7,6 @@ import { calculateNights, computeExtraGuestFee } from '../utils/pricing.js';
 import { sendTelegramAlert } from './chat.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
 
-const SERVICE_FEE_PERCENT = Number(env.SERVICE_FEE_PERCENT) / 100;
 const WITHHOLDING_TAX_RATE = Number(env.WITHHOLDING_TAX_RATE) / 100;
 
 /** Map the checkout choice to Paystack's channel names. */

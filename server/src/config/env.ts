@@ -35,7 +35,6 @@ const envSchema = z.object({
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
   // Platform fees
-  SERVICE_FEE_PERCENT: z.string().default('7.5'),
   WITHHOLDING_TAX_RATE: z.string().default('5'),
   TRANSFER_FEE_PASS_TO_HOST: z.string().default('false'),
 })

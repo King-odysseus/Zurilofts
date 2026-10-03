@@ -43,7 +43,6 @@ jobs:
       JWT_REFRESH_SECRET: "ci-refresh-secret-0123456789abcdefghijklmnopqr"
       CLIENT_URL: "http://localhost:5173"
       CORS_ORIGIN: "http://localhost:5173"
-      SERVICE_FEE_PERCENT: "7.5"
       WITHHOLDING_TAX_RATE: "5"
       CLOUDINARY_URL: "cloudinary://999999999999999:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef@ci-cloud"
       PAYSTACK_SECRET_KEY: "sk_test_ci_dummy_dummy_dummy_dummy"
