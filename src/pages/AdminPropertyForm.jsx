@@ -189,11 +189,15 @@ function AdminPropertyForm() {
     }
 
     try {
+      // /properties is host-scoped (requireHostWorkspace, which excludes ADMIN),
+      // so an admin saving from the control centre must use /admin/properties or
+      // the request is rejected with a 403 and nothing persists.
+      const endpoint = base === '/admin' ? '/admin/properties' : '/properties';
       if (isEdit) {
-        await apiClient.put(`/properties/${id}`, payload);
+        await apiClient.put(`${endpoint}/${id}`, payload);
         navigate(`${base}/properties`);
       } else {
-        const res = await apiClient.post('/properties', payload);
+        const res = await apiClient.post(endpoint, payload);
         // Go to edit so seasonal pricing & calendar (which need an id) are available
         navigate(`${base}/properties/${res.data.data.id}/edit`);
       }
