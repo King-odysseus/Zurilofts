@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "items": [
     { "text": "Review relevant diff and exclude unrelated files", "state": "done" },
-    { "text": "Commit host discounts and role-separation changes", "state": "in_progress" },
-    { "text": "Push and verify the remote commit", "state": "pending" }
+    { "text": "Commit host discounts and role-separation changes", "state": "done" },
+    { "text": "Push and verify the remote commit", "state": "done" }
   ],
   "updatedAt": "2026-10-15T14:10:00.000Z"
 }
