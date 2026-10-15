@@ -107,6 +107,14 @@ function HostApplicationPage() {
   const [activeStep, setActiveStep] = useState('identity');
 
   useEffect(() => {
+    // AuthContext resolves the logged-in user asynchronously (it refreshes the
+    // session on mount), so this effect first runs with user still null and
+    // reruns once the real user lands. Without this guard, whichever request
+    // happens to resolve last wins - a slow first run (user=null, so it never
+    // creates the draft) can overwrite the second run's freshly created DRAFT
+    // application with null, leaving the page stuck on the read-only status
+    // card with no way to reach the editable form.
+    let ignore = false;
     async function loadApplication() {
       try {
         let response = await apiClient.get('/host-application');
@@ -117,17 +125,20 @@ function HostApplicationPage() {
         }
         if (current?.status === 'APPROVED' && user?.role !== 'HOST') {
           const meResponse = await apiClient.get('/auth/me');
-          setUser(meResponse.data.data);
+          if (!ignore) setUser(meResponse.data.data);
         }
+        if (ignore) return;
         setApplication(current);
         setForm(formFromApplication(current, user));
       } catch (err) {
+        if (ignore) return;
         setError(err.response?.data?.error || 'Could not load your host application.');
       } finally {
-        setLoading(false);
+        if (!ignore) setLoading(false);
       }
     }
     loadApplication();
+    return () => { ignore = true; };
   }, [setUser, user]);
 
   const editable = ['DRAFT', 'CHANGES_REQUESTED'].includes(application?.status);
