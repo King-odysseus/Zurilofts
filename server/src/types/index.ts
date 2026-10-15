@@ -332,8 +332,9 @@ export const disputeStatusSchema = z.object({
 
 export const userRoleSchema = z.object({
   // HOST elevation is deliberately excluded: it may only happen through an
-  // approved HostApplication, never through the generic user editor.
-  role: z.enum(['USER', 'ADMIN']),
+  // approved HostApplication. ADMIN is excluded too: the single admin comes
+  // from the ADMIN_EMAIL/ADMIN_PASSWORD server variables.
+  role: z.enum(['USER']),
 });
 
 export const userSuspendSchema = z.object({

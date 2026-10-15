@@ -6,6 +6,7 @@ import { env } from './config/env.js';
 import { startTelegramPoller } from './services/chat.service.js';
 import { syncAll } from './services/ical.service.js';
 import { runDueAutoMessages } from './services/automated-message.service.js';
+import { syncConfiguredAdmin } from './services/admin-bootstrap.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,6 +25,7 @@ app.listen(Number(env.PORT), () => {
   console.log(` ZuriLofts running on port ${env.PORT}`);
   console.log(`   Environment: ${env.NODE_ENV}`);
   console.log(`   Health: http://localhost:${env.PORT}/api/health`);
+  syncConfiguredAdmin().catch((err) => console.error('Admin account sync failed:', err?.message || err));
   startTelegramPoller();
   startCalendarSync();
   startAutomatedMessageScheduler();

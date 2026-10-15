@@ -34,6 +34,10 @@ const envSchema = z.object({
   // it never blocks boot - notifications are a nice-to-have, not a hard dependency.
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
+  // The one platform admin. Set both on Railway; the account is created/synced
+  // at boot and every other ADMIN is demoted. Unset = no admin sync happens.
+  ADMIN_EMAIL: z.string().email().optional(),
+  ADMIN_PASSWORD: z.string().optional(),
   // Platform fees
   WITHHOLDING_TAX_RATE: z.string().default('5'),
   TRANSFER_FEE_PASS_TO_HOST: z.string().default('false'),
@@ -44,6 +48,20 @@ const envSchema = z.object({
         code: z.ZodIssueCode.custom,
         path: ['JWT_REFRESH_SECRET'],
         message: 'JWT_REFRESH_SECRET must differ from JWT_ACCESS_SECRET',
+      });
+    }
+    if (Boolean(data.ADMIN_EMAIL) !== Boolean(data.ADMIN_PASSWORD)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['ADMIN_PASSWORD'],
+        message: 'ADMIN_EMAIL and ADMIN_PASSWORD must be set together',
+      });
+    }
+    if (data.NODE_ENV === 'production' && data.ADMIN_PASSWORD && data.ADMIN_PASSWORD.length < 12) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['ADMIN_PASSWORD'],
+        message: 'ADMIN_PASSWORD must be at least 12 characters in production',
       });
     }
     // Never allow the shipped dev placeholder secrets in production.

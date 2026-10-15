@@ -221,8 +221,16 @@ export async function setUserRole(userId: string, role: string) {
   if (role === 'HOST') {
     throw new ValidationError('Approve the user\'s host application to grant HOST access.');
   }
+  // The only admin is the ADMIN_EMAIL account (see admin-bootstrap.service),
+  // so nobody can be promoted here - hosts in particular must never be admins.
+  if (role === 'ADMIN') {
+    throw new ValidationError('Admin access is set through server configuration (ADMIN_EMAIL), not the user editor.');
+  }
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError('User');
+  if (user.role === 'ADMIN') {
+    throw new ValidationError('The platform admin account cannot be changed from the user editor.');
+  }
 
   return prisma.user.update({
     where: { id: userId },

@@ -192,8 +192,8 @@ test('the lifecycle enumerates exactly the five expected statuses', () => {
   ]);
 });
 
-test('the generic admin role editor cannot bypass host application approval', () => {
+test('the generic admin role editor cannot grant HOST or ADMIN', () => {
   assert.equal(userRoleSchema.safeParse({ role: 'USER' }).success, true);
-  assert.equal(userRoleSchema.safeParse({ role: 'ADMIN' }).success, true);
+  assert.equal(userRoleSchema.safeParse({ role: 'ADMIN' }).success, false);
   assert.equal(userRoleSchema.safeParse({ role: 'HOST' }).success, false);
 });

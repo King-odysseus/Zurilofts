@@ -266,7 +266,7 @@ function AdminUsers() {
                       </div>
                     </div>
                     <div className="op-admin-people-role" role="cell">
-                      {isSelf ? (
+                      {isSelf || u.role === 'ADMIN' ? (
                         <span className="op-admin-people-pill is-admin">Admin</span>
                       ) : (
                         <Select
@@ -279,7 +279,6 @@ function AdminUsers() {
                         >
                           <option value="USER">Guest</option>
                           <option value="HOST">Host</option>
-                          <option value="ADMIN">Admin</option>
                         </Select>
                       )}
                     </div>
