@@ -63,3 +63,7 @@ server/prisma/*.db-journal
 audit-shots*.cjs
 live-login.png
 skills-lock.json
+
+# Local KAI QA output and runtime logs
+.kai/audit-shots/
+.kai/*.log
