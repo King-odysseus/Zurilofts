@@ -195,6 +195,17 @@ export const promoUpdateSchema = promoCreateSchema.partial().extend({
   active: z.boolean().optional(),
 });
 
+// A host's own discount, funded from their payout. hostId is never accepted
+// from the body - it is taken from the token - so only propertyId (optional,
+// to limit the code to one of their listings) is added here.
+export const hostPromoCreateSchema = promoCreateSchema.extend({
+  propertyId: z.string().min(1).optional(),
+});
+
+export const hostPromoUpdateSchema = hostPromoCreateSchema.partial().extend({
+  active: z.boolean().optional(),
+});
+
 /** Checkout price preview. The same stay inputs as bookingCreateSchema, minus
  *  the guest details, plus an optional promo code so the discount is priced
  *  server-side against the seasonal subtotal rather than a client guess. */

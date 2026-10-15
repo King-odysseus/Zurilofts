@@ -4,6 +4,7 @@ import { NotFoundError, ValidationError, ConflictError } from '../types/index.js
 import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee, lateCheckoutOptions, EXTRA_GUEST_FEE_PER_NIGHT } from '../utils/pricing.js';
 import { isRangeAvailable, isRangeAvailableWithDb, PENDING_HOLD_MINUTES } from './calendar.service.js';
 import { isBookable } from './property.service.js';
+import { isPromoUsableForProperty, type BookingTarget } from './promo.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
@@ -208,7 +209,10 @@ export async function createBooking(input: CreateBookingInput) {
     const effectivePrice = getBedPrice(property, input.bedOption);
     const nights = calculateNights(checkInDate, checkOutDate);
     const subtotalForPromo = computeSubtotal(checkInDate, nights, effectivePrice, priceRules);
-    const promo = await validateAndGetPromo(input.promoCode, subtotalForPromo);
+    const promo = await validateAndGetPromo(input.promoCode, subtotalForPromo, {
+      propertyId: property.id,
+      hostId: property.hostId,
+    });
     promoCodeId = promo.id;
     discountPercent = promo.discountPercent;
     maxDiscount = promo.maxDiscount ?? null;
@@ -373,7 +377,10 @@ export async function quoteBooking(input: QuoteBookingInput) {
       getBedPrice(property, input.bedOption),
       priceRules
     );
-    const found = await validateAndGetPromo(input.promoCode, subtotalForPromo);
+    const found = await validateAndGetPromo(input.promoCode, subtotalForPromo, {
+      propertyId: property.id,
+      hostId: property.hostId,
+    });
     discountPercent = found.discountPercent;
     maxDiscount = found.maxDiscount ?? null;
     promo = { code: found.code, discountPercent: found.discountPercent };
@@ -1274,11 +1281,17 @@ export async function getHostToday(hostId: string) {
 }
 
 // Internal: validate a promo code and return it
-async function validateAndGetPromo(code: string, subtotal: number) {
+async function validateAndGetPromo(code: string, subtotal: number, target: BookingTarget) {
   const promo = await prisma.promoCode.findUnique({ where: { code: code.toUpperCase() } });
 
   if (!promo) throw new ValidationError('Invalid promo code');
   if (!promo.active) throw new ValidationError('This promo code is no longer active');
+  // A host's own code must not be spendable against another host's payout.
+  // Same message as an unknown code: whether a rival host runs a promotion is
+  // not something a guess at the checkout should be able to reveal.
+  if (!isPromoUsableForProperty(promo, target)) {
+    throw new ValidationError('This promo code does not apply to this property');
+  }
 
   const now = new Date();
   if (now < promo.validFrom) throw new ValidationError('This promo code is not yet valid');

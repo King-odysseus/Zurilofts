@@ -29,6 +29,7 @@ function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState('');
   const [search, setSearch] = useState('');
   const [message, setMessage] = useState('');
+  const [loadError, setLoadError] = useState('');
   const [busyId, setBusyId] = useState('');
 
   // Edit modal
@@ -51,8 +52,12 @@ function AdminUsers() {
       if (search.trim()) params.search = search.trim();
       const res = await apiClient.get('/admin/users', { params });
       setUsers(res.data.data || []);
-    } catch {
-      // silent
+      setLoadError('');
+    } catch (err) {
+      // Must not be silent: an empty list and a failed request look identical
+      // on screen, so a server outage would read as "you have no users".
+      setUsers([]);
+      setLoadError(err.response?.data?.error || 'Could not load accounts. Check your connection and try again.');
     } finally {
       setLoading(false);
     }
@@ -235,6 +240,12 @@ function AdminUsers() {
             <span className="op-admin-booking-spinner" aria-hidden="true" />
             <strong>Loading people</strong>
             <p>Fetching guest, host, and administrator accounts.</p>
+          </div>
+        ) : loadError ? (
+          <div className="op-admin-people-empty" role="alert">
+            <strong>Could not load accounts</strong>
+            <p>{loadError}</p>
+            <Button color="light" type="button" onClick={loadUsers}>Try again</Button>
           </div>
         ) : users.length === 0 ? (
           <div className="op-admin-people-empty">

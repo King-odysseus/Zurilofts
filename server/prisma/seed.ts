@@ -9,22 +9,31 @@ function json(arr: string[]) {
 }
 
 async function main() {
+  // This creates accounts with known passwords, so it must never touch a live
+  // database. The real admin comes from ADMIN_EMAIL/ADMIN_PASSWORD at boot
+  // (see services/admin-bootstrap.service.ts), not from here.
+  if (process.env.NODE_ENV === 'production') {
+    console.error(' Refusing to seed: this script creates demo accounts and must not run in production.');
+    process.exit(1);
+  }
+
   console.log(' Seeding database...');
 
-  // Create admin user
-  const adminPassword = await bcrypt.hash('Admin@123', 12);
+  // Demo host that owns the sample listings. Deliberately NOT an admin:
+  // admin and host are mutually exclusive, and admin access is configured.
+  const hostPassword = await bcrypt.hash('Host@1234', 12);
   const admin = await prisma.user.upsert({
-    where: { email: 'admin@zurilofts.co.ke' },
+    where: { email: 'host@zurilofts.co.ke' },
     update: {},
     create: {
-      email: 'admin@zurilofts.co.ke',
-      passwordHash: adminPassword,
-      firstName: 'Admin',
-      lastName: 'User',
-      role: 'ADMIN',
+      email: 'host@zurilofts.co.ke',
+      passwordHash: hostPassword,
+      firstName: 'Demo',
+      lastName: 'Host',
+      role: 'HOST',
     },
   });
-  console.log('   Admin: admin@zurilofts.co.ke / Admin@123');
+  console.log('   Host: host@zurilofts.co.ke / Host@1234');
 
   // Create test user
   const userPassword = await bcrypt.hash('User@1234', 12);

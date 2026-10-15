@@ -23,7 +23,13 @@ export function paymentChannelsForMethod(method?: string): paystack.PaystackPaym
   }
 }
 
-/** Calculate what the host actually earns after platform fee + WHT */
+/**
+ * What the host earns from a booking. Platform revenue is the guest service
+ * fee and cleaning fee, neither of which is part of hostGross, so withholding
+ * tax is the only deduction here. A promo discount comes out of the host's
+ * share by design: it reduces the nightly rate the host set, not the
+ * platform's fee. Host-created discounts make that explicit.
+ */
 export function calculateHostNet(subtotal: number, discountAmount: number, extraGuestFee: number) {
   const hostGross = subtotal - discountAmount + extraGuestFee;
   const withholdingTax = Math.round(hostGross * WITHHOLDING_TAX_RATE);

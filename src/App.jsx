@@ -1,34 +1,40 @@
+import { Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import { BrowserRouter, useLocation } from "react-router-dom";
 import { GuestFooter, GuestHome, GuestStays } from './GuestDiscovery.jsx';
 import RealPropertyPage from './components/PropertyPage.jsx';
-import BookingPage from './pages/BookingPage.jsx';
-import LoginPage from './pages/LoginPage.jsx';
-import RegisterPage from './pages/RegisterPage.jsx';
-import PaymentCallback from './pages/PaymentCallback.jsx';
-import PlacesPage from './pages/PlacesPage.jsx';
-import RestaurantsPage from './pages/RestaurantsPage.jsx';
-import GuidesPage from './pages/GuidesPage.jsx';
-import GuideDetailPage from './pages/GuideDetailPage.jsx';
-import PrivacyPage from './pages/PrivacyPage.jsx';
-import TermsPage from './pages/TermsPage.jsx';
-import SharedShortlistPage from './pages/SharedShortlistPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
-import BookingHistoryPage from './pages/BookingHistoryPage.jsx';
-import BookingDetailPage from './pages/BookingDetailPage.jsx';
-import ConversationPage from './pages/ConversationPage.jsx';
-import FavouritesPage from './pages/FavouritesPage.jsx';
-import InboxPage from './pages/InboxPage.jsx';
-import MessagesPage from './pages/MessagesPage.jsx';
-import ProfilePage from './pages/ProfilePage.jsx';
-import ShortlistDetailPage from './pages/ShortlistDetailPage.jsx';
-import ShortlistsPage from './pages/ShortlistsPage.jsx';
-import TripHubPage from './pages/TripHubPage.jsx';
-import OAuthCallback from './pages/OAuthCallback.jsx';
-import TrustPage from './pages/TrustPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
-import WorkspaceRoutes from './WorkspaceRoutes.jsx';
 import Navbar from './components/Navbar.jsx';
+import Spinner from './components/Spinner.jsx';
+
+// Only browsing (home, stays, a property) is in the first download. Everything
+// else is fetched when its route is first opened, so a guest never pays to
+// download the host and admin workspaces they cannot open.
+const BookingPage = lazy(() => import('./pages/BookingPage.jsx'));
+const LoginPage = lazy(() => import('./pages/LoginPage.jsx'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage.jsx'));
+const PaymentCallback = lazy(() => import('./pages/PaymentCallback.jsx'));
+const PlacesPage = lazy(() => import('./pages/PlacesPage.jsx'));
+const RestaurantsPage = lazy(() => import('./pages/RestaurantsPage.jsx'));
+const GuidesPage = lazy(() => import('./pages/GuidesPage.jsx'));
+const GuideDetailPage = lazy(() => import('./pages/GuideDetailPage.jsx'));
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage.jsx'));
+const TermsPage = lazy(() => import('./pages/TermsPage.jsx'));
+const SharedShortlistPage = lazy(() => import('./pages/SharedShortlistPage.jsx'));
+const BookingHistoryPage = lazy(() => import('./pages/BookingHistoryPage.jsx'));
+const BookingDetailPage = lazy(() => import('./pages/BookingDetailPage.jsx'));
+const ConversationPage = lazy(() => import('./pages/ConversationPage.jsx'));
+const FavouritesPage = lazy(() => import('./pages/FavouritesPage.jsx'));
+const InboxPage = lazy(() => import('./pages/InboxPage.jsx'));
+const MessagesPage = lazy(() => import('./pages/MessagesPage.jsx'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage.jsx'));
+const ShortlistDetailPage = lazy(() => import('./pages/ShortlistDetailPage.jsx'));
+const ShortlistsPage = lazy(() => import('./pages/ShortlistsPage.jsx'));
+const TripHubPage = lazy(() => import('./pages/TripHubPage.jsx'));
+const OAuthCallback = lazy(() => import('./pages/OAuthCallback.jsx'));
+const TrustPage = lazy(() => import('./pages/TrustPage.jsx'));
+const WorkspaceRoutes = lazy(() => import('./WorkspaceRoutes.jsx'));
 function Home() { return <GuestHome />; }
 function Explore() { return <GuestStays />; }
 function GuestShell({ children }) {
@@ -74,4 +80,13 @@ function Shell() {
   else content = <NotFoundPage />;
   return <GuestShell>{content}</GuestShell>;
 }
-export default function App() { return <BrowserRouter><Shell /></BrowserRouter>; }
+// A lazy route's chunk is fetched on first visit; this is what shows meanwhile.
+function RouteFallback() {
+  return <div className="flex min-h-[60vh] items-center justify-center"><Spinner /></div>;
+}
+
+export default function App() {
+  return <BrowserRouter>
+    <Suspense fallback={<RouteFallback />}><Shell /></Suspense>
+  </BrowserRouter>;
+}

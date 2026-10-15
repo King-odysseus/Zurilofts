@@ -505,9 +505,17 @@ model PromoCode {
   currentUses      Int       @default(0)
   active           Boolean   @default(true)
   createdBy        String
+  // Null = platform-wide code created by the admin. Set = the host who owns it,
+  // and it then only applies to that host's listings. The discount always comes
+  // out of the host's payout, which is why a host may create their own.
+  hostId           String?
+  // Optional further narrowing to a single listing belonging to that host.
+  propertyId       String?
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
   bookings         Booking[]
+
+  @@index([hostId])
 }
 
 // Travel guides / blog posts

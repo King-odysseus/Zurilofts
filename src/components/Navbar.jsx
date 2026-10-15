@@ -238,6 +238,7 @@ function Navbar() {
         { name: 'Listings', key: 'listings', href: '/host/listings' },
         { name: 'Messages', key: 'messages', href: '/inbox' },
         { name: 'Earnings', key: 'earnings', href: '/host/earnings' },
+        { name: 'Discounts', key: 'discounts', href: '/host/discounts' },
       ];
     }
     return [

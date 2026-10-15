@@ -25,6 +25,7 @@ import HostEarningsPage from './pages/HostEarningsPage.jsx';
 import HostListingsPage from './pages/HostListingsPage.jsx';
 import HostTodayPage from './pages/HostTodayPage.jsx';
 import HostPayouts from './pages/HostPayouts.jsx';
+import HostPromosPage from './pages/HostPromosPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
 const hostPage = (page) => <HostRoute><HostLayout>{page}</HostLayout></HostRoute>;
@@ -40,6 +41,7 @@ export default function WorkspaceRoutes() {
     <Route path="/host/properties/new" element={hostPage(<AdminPropertyForm />)} />
     <Route path="/host/properties/:id/edit" element={hostPage(<AdminPropertyForm />)} />
     <Route path="/host/payouts" element={hostPage(<HostPayouts />)} />
+    <Route path="/host/discounts" element={hostPage(<HostPromosPage />)} />
     <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
       <Route index element={<AdminDashboard />} />
       <Route path="properties" element={<AdminListingReview />} />
