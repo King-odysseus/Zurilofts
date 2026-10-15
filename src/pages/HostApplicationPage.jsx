@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Button, Checkbox, FileInput, Label, Select, Textarea, TextInput } from 'flowbite-react';
 import Navbar from '../components/Navbar.jsx';
 import Spinner from '../components/Spinner.jsx';
@@ -105,8 +105,10 @@ function HostApplicationPage() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [activeStep, setActiveStep] = useState('identity');
+  const [loadAttempt, setLoadAttempt] = useState(0);
 
   useEffect(() => {
+    if (!user || user.role === 'ADMIN') return;
     // AuthContext resolves the logged-in user asynchronously (it refreshes the
     // session on mount), so this effect first runs with user still null and
     // reruns once the real user lands. Without this guard, whichever request
@@ -116,6 +118,8 @@ function HostApplicationPage() {
     // card with no way to reach the editable form.
     let ignore = false;
     async function loadApplication() {
+      setLoading(true);
+      setError('');
       try {
         let response = await apiClient.get('/host-application');
         let current = response.data.data;
@@ -139,7 +143,7 @@ function HostApplicationPage() {
     }
     loadApplication();
     return () => { ignore = true; };
-  }, [setUser, user]);
+  }, [setUser, user, loadAttempt]);
 
   const editable = ['DRAFT', 'CHANGES_REQUESTED'].includes(application?.status);
   const requiredDocuments = useMemo(() => {
@@ -199,7 +203,7 @@ function HostApplicationPage() {
     ? 'Saving'
     : application
       ? STATUS_LABELS[application.status] || application.status.replaceAll('_', ' ')
-      : 'Draft';
+      : user?.role === 'HOST' ? 'Approved' : 'Not started';
   const statusMeta = application ? STATUS_COPY[application.status] : STATUS_COPY.DRAFT;
 
   function update(name, value) {
@@ -340,7 +344,10 @@ function HostApplicationPage() {
     } finally { setUploadingKind(''); }
   }
 
-  if (loading) {
+  // Administrators manage applications; they cannot create a host application.
+  if (user?.role === 'ADMIN') return <Navigate to="/admin" replace />;
+
+  if (loading || !user) {
     return (
       <div className="min-h-screen bg-white">
         <Navbar />
@@ -626,6 +633,16 @@ function HostApplicationPage() {
                   </div>
                 </section>
               </form>
+            ) : !application && user.role !== 'HOST' ? (
+              <section className="op-host-application-status-card">
+                <h2>Start your host application</h2>
+                <p>Open your application to add your identity, business and property details.</p>
+                <div className="op-host-application-status-actions">
+                  <Button type="button" className="op-host-application-primary" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
+                    {error ? 'Retry application' : 'Start application'}
+                  </Button>
+                </div>
+              </section>
             ) : (
               <StatusCard
                 application={application}
