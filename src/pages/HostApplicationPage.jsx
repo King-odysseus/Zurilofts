@@ -632,7 +632,7 @@ function HostApplicationPage() {
                 statusLabel={statusLabel}
                 statusMeta={statusMeta}
                 user={user}
-                onContinueTravelling={() => { setMode('travelling'); navigate('/'); }}
+                onBackToTravelling={() => { setMode('travelling'); navigate('/'); }}
               />
             )}
           </div>
@@ -701,7 +701,7 @@ function Notice({ tone, children }) {
   return <div className={`op-host-application-notice is-${tone}`}>{children}</div>;
 }
 
-function StatusCard({ application, statusLabel, statusMeta, user, onContinueTravelling }) {
+function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravelling }) {
   const approved = application?.status === 'APPROVED' || user?.role === 'HOST';
   const statusKey = (application?.status || 'draft').toLowerCase();
 
@@ -723,8 +723,8 @@ function StatusCard({ application, statusLabel, statusMeta, user, onContinueTrav
             <Link to="/host/today" className="op-host-application-secondary-link">Open host dashboard</Link>
           </>
         ) : (
-          <Button type="button" color="light" onClick={onContinueTravelling}>
-            Continue travelling
+          <Button type="button" color="light" onClick={onBackToTravelling}>
+            Back to travelling
           </Button>
         )}
       </div>
@@ -766,7 +766,7 @@ StatusCard.propTypes = {
   statusLabel: PropTypes.string.isRequired,
   statusMeta: PropTypes.string.isRequired,
   user: PropTypes.shape({ role: PropTypes.string }),
-  onContinueTravelling: PropTypes.func.isRequired,
+  onBackToTravelling: PropTypes.func.isRequired,
 };
 
 export default HostApplicationPage;

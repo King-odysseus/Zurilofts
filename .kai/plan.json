@@ -1,9 +1,9 @@
 {
   "schemaVersion": 1,
   "items": [
-    { "text": "Review relevant diff and exclude unrelated files", "state": "done" },
-    { "text": "Commit host discounts and role-separation changes", "state": "done" },
-    { "text": "Push and verify the remote commit", "state": "done" }
+    { "text": "Trace the host setup status action and its destination", "state": "done" },
+    { "text": "Rename the exit action so it matches the travelling destination", "state": "done" },
+    { "text": "Run lint and build, then record the result", "state": "done" }
   ],
-  "updatedAt": "2026-10-15T14:10:00.000Z"
+  "updatedAt": "2026-10-15T14:28:00.000Z"
 }
