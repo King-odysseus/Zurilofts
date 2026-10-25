@@ -2,37 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Audit calendar integration: iCal import/export, Google Calendar, guest add-to-calendar",
+      "text": "Find every page that reads a route parameter and decide which actually receive one",
       "state": "done"
     },
     {
-      "text": "Answer the calendar sync question with evidence from the code",
+      "text": "Fix the duplicated Open calendar link on the host Today page",
       "state": "done"
     },
     {
-      "text": "Take property management out of the admin account (nav, routes, server writes)",
+      "text": "Confirm the stray admin password-hash file is gone and the uncommitted edits are sound",
       "state": "done"
     },
     {
-      "text": "Give hosts their own simple app shell with its own header and tabs",
+      "text": "Verify with lint, production build and by opening the affected screens",
       "state": "done"
     },
     {
-      "text": "Remove dead admin branches left in the listing form and dashboard",
-      "state": "done"
-    },
-    {
-      "text": "Fix listing editor links to the host listings index",
-      "state": "done"
-    },
-    {
-      "text": "Bring host setup into the same host shell and fix its stray label",
-      "state": "done"
-    },
-    {
-      "text": "Verify with lint, build and server typecheck, then check the screens",
-      "state": "done"
+      "text": "Commit and push",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-10-25T16:23:49.878Z"
+  "updatedAt": "2026-10-25T16:27:46.600Z"
 }

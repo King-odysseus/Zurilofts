@@ -200,7 +200,10 @@ export default function HostTodayPage() {
         <p>PRIORITY NEXT STEP</p>
         <h2>{priority ? (priorityType === "arrival" ? "Confirm arrival details" : priorityType === "departure" ? "Review today's checkout" : "Check your in-house guest") : "Your day is clear"}</h2>
         <span>{priority ? `${guestName(priority)} at ${priority.property?.title || "your property"} · ${bookingTime(priority, priorityType)}` : "There are no urgent guest actions scheduled right now."}</span>
-        <Link to={priority ? `/bookings/${priority.id}` : "/host/calendar"}>{priority ? "Review booking" : "Open calendar"}</Link>
+        {/* The card only needs its own action when there is a booking to open.
+            With nothing scheduled the call to action repeated the calendar
+            button already shown above, so the card stays informational. */}
+        {priority && <Link to={`/bookings/${priority.id}`}>Review booking</Link>}
       </section>
     </div>
 
