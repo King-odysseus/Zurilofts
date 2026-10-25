@@ -66,7 +66,7 @@ function CancelBookingDialog({ booking, onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose}></div>
-      <div className="relative w-full max-w-sm rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+      <div className="relative w-full max-w-sm rounded-2xl border border-[#E3E8EF] bg-elevated p-6 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
         <h3 className="mb-1 text-lg font-bold text-[#0B1F42]">Cancel this booking?</h3>
         <p className="text-sm font-semibold text-[#0B1F42]">{booking.property?.title || 'Property'}</p>
         {formatDates(booking.checkIn, booking.checkOut) && (
@@ -87,7 +87,7 @@ function CancelBookingDialog({ booking, onClose, onSuccess }) {
           <button
             onClick={onClose}
             disabled={performing}
-            className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] px-4 py-2 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF] disabled:opacity-50"
+            className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] px-4 py-2 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-surface disabled:opacity-50"
           >
             Keep booking
           </button>

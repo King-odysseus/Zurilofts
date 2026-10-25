@@ -22,7 +22,7 @@ import { Check, ChevronDown } from 'lucide-react';
 // select and a text field on the same row line up. It lives here, not in a page
 // stylesheet, because this is the single place selects are defined.
 const TRIGGER_BASE =
-  'flex w-full items-center justify-between gap-2 rounded-[10px] border border-[#E2DAD0] bg-white text-left text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#C49A6C] dark:border-gray-600 dark:bg-gray-700 dark:text-white';
+  'flex w-full items-center justify-between gap-2 rounded-[10px] border border-[#E2DAD0] bg-elevated text-left text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#C49A6C] dark:border-gray-600 dark:bg-gray-700 dark:text-white';
 
 const TRIGGER_SIZES = {
   sm: 'min-h-[38px] px-3 text-xs',
@@ -34,7 +34,7 @@ const TRIGGER_SIZES = {
 // rather than inline per call site so every select menu looks identical.
 const MENU_THEME = {
   floating: {
-    base: 'z-50 w-full overflow-hidden rounded-[10px] border border-[#E2DAD0] bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700',
+    base: 'z-50 w-full overflow-hidden rounded-[10px] border border-[#E2DAD0] bg-elevated shadow-lg dark:border-gray-600 dark:bg-gray-700',
     content: 'max-h-72 overflow-y-auto py-1 text-sm text-[#111827] dark:text-gray-200',
   },
 };

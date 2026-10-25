@@ -530,11 +530,11 @@ function BookingPage() {
         />
         {(bookingData.checkIn || bookingData.checkOut) && (
           <div className="flex gap-4 mt-3">
-            <div className="flex-1 neu-input px-4 py-2 bg-white">
+            <div className="flex-1 neu-input px-4 py-2 bg-elevated">
               <span className="text-xs text-[#6b7280] block">Check-in</span>
               <span className="font-semibold text-[#0B1F42]">{bookingData.checkIn || '-'}</span>
             </div>
-            <div className="flex-1 neu-input px-4 py-2 bg-white">
+            <div className="flex-1 neu-input px-4 py-2 bg-elevated">
               <span className="text-xs text-[#6b7280] block">Check-out</span>
               <span className="font-semibold text-[#0B1F42]">{bookingData.checkOut || '-'}</span>
             </div>
@@ -1057,7 +1057,7 @@ function BookingPage() {
         )}
       </div>
 
-      <div className="space-y-2 rounded-xl bg-[#F7F4EF] p-4">
+      <div className="space-y-2 rounded-xl bg-surface p-4">
         <div className="flex justify-between text-[#1f2937]">
           <span>
             {quote && quote.subtotal !== quote.nightlyPrice * quote.nights
@@ -1157,7 +1157,7 @@ function BookingPage() {
   // Booking Complete
   if (bookingComplete) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-elevated">
         <Navbar />
         <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
           <div className="max-w-md mx-auto px-6 text-center">
@@ -1226,7 +1226,7 @@ function BookingPage() {
   // Loading state
   if (loadingProperty) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-elevated">
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
@@ -1242,7 +1242,7 @@ function BookingPage() {
   // not an endless spinner.
   if (!property) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-elevated">
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center max-w-md px-4">
@@ -1266,7 +1266,7 @@ function BookingPage() {
   }
 
   return (
-    <div className="op-checkout-screen min-h-screen bg-white">
+    <div className="op-checkout-screen min-h-screen bg-elevated">
       <header className="op-checkout-chrome"><Link to={`/property/${property.id}`} className="op-checkout-back">← &nbsp;Back</Link><Link to="/" className="op-checkout-brand"><BrandLogo imgClassName="h-6 w-auto" alt="" />ZuriLofts</Link><span className="op-checkout-secure">♟ &nbsp;Secure checkout</span></header>
       <div className="op-checkout-summary"><div><strong>{property.title}</strong><span>{bookingData.checkIn && bookingData.checkOut ? `${bookingData.checkIn} - ${bookingData.checkOut}` : 'Choose your dates'} · {bookingData.guests} guests</span></div><strong>{pricing.nights > 0 ? `KSh ${pricing.total.toLocaleString()}` : 'Total at checkout'}</strong></div>
       <div className="op-checkout-main pb-12 md:pb-16">
@@ -1291,7 +1291,7 @@ function BookingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Left Column - Form */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-5 md:p-8">
+              <div className="bg-elevated rounded-2xl shadow-lg border border-[#D9D9D9] p-5 md:p-8">
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 3 && renderStep3()}
@@ -1301,7 +1301,7 @@ function BookingPage() {
 
             {/* Right Column - Property Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6 sticky top-24">
+              <div className="bg-elevated rounded-2xl shadow-lg border border-[#D9D9D9] p-6 sticky top-24">
                 <Link to={`/property/${property?.id}`} className="block">
                   <img
                     src={(property?.images?.[0] || '')}

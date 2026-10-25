@@ -88,7 +88,7 @@ function PropertyPage() {
   // ── Loading ──────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-elevated">
         <main className="flex items-center justify-center min-h-[60vh]" role="status" aria-label="Loading property">
           <div className="text-center">
             <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent" />
@@ -102,7 +102,7 @@ function PropertyPage() {
   // ── Error / Not Found ────────────────────────────────────────────────
   if (error || !property) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-elevated">
         <main className="flex items-center justify-center min-h-[60vh]" role="alert">
           <div className="text-center px-4">
             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -163,9 +163,9 @@ function PropertyPage() {
     // Bottom padding matches the ~88px the other public pages already leave
     // (.op-public-directory, .op-guides-content) so the final block - the Similar
     // properties strip - never butts straight up against the footer.
-    <div className="min-h-screen bg-white pb-20 md:pb-24">
+    <div className="min-h-screen bg-elevated pb-20 md:pb-24">
       {/* ── Compact breadcrumb / back row ────────────────────────── */}
-      <nav className="border-b border-[#E3E8EF] bg-white px-4 py-4 sm:px-6" aria-label="Breadcrumb">
+      <nav className="border-b border-[#E3E8EF] bg-elevated px-4 py-4 sm:px-6" aria-label="Breadcrumb">
         <div className="mx-auto w-full max-w-[1344px]">
           <ol className="flex items-center gap-2 text-sm">
             <li>
@@ -197,7 +197,7 @@ function PropertyPage() {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-2 md:gap-3">
                 {/* Primary image - spans two columns and rows on desktop */}
-                <div className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-sm md:col-span-2">
+                <div className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-sm md:col-span-2">
                   <img
                     className="w-full h-56 sm:h-72 md:h-full md:min-h-[440px] object-cover cursor-pointer"
                     src={images[featuredImage]}
@@ -359,7 +359,7 @@ function PropertyPage() {
             {(property.location || property.address) && (
               <section className="mb-8 md:mb-10" aria-labelledby="location-heading">
                 <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">Where you&apos;ll be</h2>
-                <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_24px_rgba(11,31,66,0.06)]">
+                <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_24px_rgba(11,31,66,0.06)]">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div className="min-w-0 flex-1">
                       {property.location && <p className="font-semibold text-[#0B1F42]">{property.location}</p>}
@@ -390,7 +390,7 @@ function PropertyPage() {
 
           {/* ── Right column - sticky booking summary ─────────────── */}
           <aside className="lg:col-span-1" aria-label="Booking">
-            <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
+            <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
               {/* Price per night */}
               <div className="mb-5">
                 <span className="text-3xl font-bold text-[#0B1F42]">

@@ -18,7 +18,7 @@ function HostRoute({ children }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-elevated">
         <div className="text-center">
           <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-[#5B6B82] text-sm">Loading...</p>
@@ -37,7 +37,7 @@ function HostRoute({ children }) {
 
   if (user?.role !== 'HOST' && !hasHostIntent) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-elevated">
         <div className="text-center">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <CircleAlert className="w-10 h-10 text-red-500" strokeWidth={2} aria-hidden="true" />

@@ -108,7 +108,7 @@ function CookieConsent() {
         visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
       }`}
     >
-      <div className="rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+      <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
         <div className="flex items-start gap-3 mb-3">
           <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[#C49A6C]/15 flex items-center justify-center">
             <Cookie className="w-5 h-5 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
@@ -192,7 +192,7 @@ function CookieConsent() {
               <button
                 type="button"
                 onClick={() => setMode('manage')}
-                className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-white px-5 py-2 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F7F4EF]"
+                className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-elevated px-5 py-2 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-surface"
               >
                 Manage preferences
               </button>

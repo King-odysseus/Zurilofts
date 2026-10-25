@@ -2,33 +2,49 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the collapsed admin sidebar and confirm why labels spill over the content",
+      "text": "Audit admin, host and guest dashboards in the browser to find real design inconsistencies",
       "state": "done"
     },
     {
-      "text": "Fix collapsed sidebar flyout so it is a proper tooltip and never covers the page title",
+      "text": "Fix shared primitives so buttons, cards, headers and status pills match across all three surfaces",
       "state": "done"
     },
     {
-      "text": "Fix the admin sticky header staying white in dark mode",
+      "text": "Align the guest account shell, tabs and trips pages to the shared system",
       "state": "done"
     },
     {
-      "text": "Replace fixed white and beige surfaces with flipping tokens across admin, host, guest pages and components",
+      "text": "Align guest saved stays (favourites and shortlists) to the shared system",
       "state": "done"
     },
     {
-      "text": "Fix dropdown and menu clipping in shared components",
-      "state": "active"
+      "text": "Align the admin dashboard buttons and card headers to the shared system",
+      "state": "done"
     },
     {
-      "text": "Verify the Add-ons page and other surfaces in light and dark at desktop and phone width",
-      "state": "pending"
+      "text": "Align the host shell, today and calendar pages to the shared system",
+      "state": "done"
     },
     {
-      "text": "Run lint and build",
-      "state": "pending"
+      "text": "Align the host listings, earnings, payouts and promos pages to the shared system",
+      "state": "done"
+    },
+    {
+      "text": "Sweep the remaining public and trust stylesheets for non-pill buttons",
+      "state": "done"
+    },
+    {
+      "text": "Verify all three surfaces at desktop and phone width in the browser",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and production build",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-25T22:11:26.527Z"
+  "updatedAt": "2026-10-25T22:15:12.963Z"
 }

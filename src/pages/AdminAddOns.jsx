@@ -226,29 +226,29 @@ function AdminAddOns() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">ACTIVE SERVICES</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.active}</strong>
           <small className="mt-1 block text-xs text-muted">Available during eligible stays</small>
         </article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">AVERAGE PRICE</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">KES {totals.averagePrice.toLocaleString()}</strong>
           <small className="mt-1 block text-xs text-muted">Across services in view</small>
         </article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">CATEGORIES</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.categories}</strong>
           <small className="mt-1 block text-xs text-muted">Service categories represented</small>
         </article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PROPERTY ASSIGNMENTS</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.assigned}</strong>
           <small className="mt-1 block text-xs text-muted">Active property-service links</small>
         </article>
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+      <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
         <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-sm">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
@@ -268,7 +268,7 @@ function AdminAddOns() {
         ) : visibleAddOns.length === 0 ? (
           <Alert color="info">
             <div className="flex w-full flex-col items-center gap-2 px-5 py-12 text-center">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-navy" aria-hidden="true"><SearchIcon /></span>
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><SearchIcon /></span>
               <strong className="text-base font-semibold text-navy">No add-ons found</strong>
               <p className="text-xs leading-relaxed text-muted">Create a guest service or adjust the current search.</p>
             </div>
@@ -292,13 +292,13 @@ function AdminAddOns() {
                   return (
                     <TableRow key={addOn.id}>
                       <TableCell><div className="flex items-center gap-3">
-                        {addOn.image ? <img src={addOn.image} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" /> : <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-sm font-bold text-navy" aria-hidden="true">{String(addOn.name || 'A')[0].toUpperCase()}</span>}
+                        {addOn.image ? <img src={addOn.image} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" /> : <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary/15 text-sm font-bold text-navy" aria-hidden="true">{String(addOn.name || 'A')[0].toUpperCase()}</span>}
                         <div className="min-w-0">
                           <strong className="block truncate text-sm font-semibold text-navy">{addOn.name}</strong>
                           <small className="block truncate text-xs text-muted">{addOn.description}</small>
                         </div>
                       </div></TableCell>
-                      <TableCell><span className="inline-flex whitespace-nowrap rounded-full bg-primary-50 px-2.5 py-1 text-[11px] font-semibold text-navy">{CATEGORY_LABELS[addOn.category] || addOn.category}</span></TableCell>
+                      <TableCell><span className="inline-flex whitespace-nowrap rounded-full bg-primary-50 dark:bg-primary/15 px-2.5 py-1 text-[11px] font-semibold text-navy">{CATEGORY_LABELS[addOn.category] || addOn.category}</span></TableCell>
                       <TableCell><div className="grid gap-1">
                         <small className="text-[11px] font-semibold uppercase tracking-wide text-muted">RATE</small>
                         <strong className="truncate text-sm font-semibold text-navy">KES {Number(addOn.price).toLocaleString()}</strong>
@@ -350,7 +350,7 @@ function AdminAddOns() {
                 {editingId && (
                   <div className="space-y-2">
                     <div className="flex items-start justify-between gap-3"><div><Label>Assigned properties</Label><p className="mt-1 text-xs text-muted">Choose which stays may offer this service.</p></div></div>
-                    <div className="max-h-44 overflow-y-auto rounded-lg border border-border bg-white p-2">
+                    <div className="max-h-44 overflow-y-auto rounded-lg border border-border bg-elevated p-2">
                       {properties.length === 0 ? <p className="p-2 text-xs text-muted">No properties are available.</p> : properties.map((property) => {
                         const assigned = (assignments[editingId] || new Set()).has(property.id);
                         return <Label key={property.id} className="flex items-center gap-3 rounded-md px-2 py-2"><Checkbox checked={assigned} disabled={assigning} onChange={() => toggleAssignment(property.id, editingId, assigned)} /><span className="min-w-0"><strong className="block truncate text-sm font-semibold text-navy">{property.title}</strong><small className="block truncate text-xs text-muted">{property.location}</small></span></Label>;

@@ -71,7 +71,7 @@ const DOCUMENT_LABELS = {
 };
 
 // Shared with the listing editor so both multi-step host forms read identically.
-const CARD_CLASS = 'rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6';
+const CARD_CLASS = 'rounded-xl border border-border bg-elevated p-5 shadow-sm sm:p-6';
 const STEP_BUTTON_BASE = 'flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-surface';
 const STEP_CIRCLE_BASE = 'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-[11px] font-bold';
 
@@ -420,22 +420,22 @@ function HostApplicationPage() {
       </header>
 
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-3" aria-label="Application summary">
-        <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-border bg-elevated p-4 shadow-sm">
           <strong className="block text-lg font-bold text-navy">{completedCount} / {STEP_DEFINITIONS.length}</strong>
           <span className="text-xs text-muted">Steps complete</span>
         </div>
-        <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-border bg-elevated p-4 shadow-sm">
           <strong className="block text-lg font-bold text-navy">~10 min</strong>
           <span className="text-xs text-muted">Estimated time</span>
         </div>
-        <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
+        <div className="rounded-xl border border-border bg-elevated p-4 shadow-sm">
           <strong className="block text-lg font-bold text-navy">{statusLabel}</strong>
           <span className="text-xs text-muted">{saving ? 'Saving changes' : 'Current status'}</span>
         </div>
       </section>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start">
-        <aside className="space-y-2 rounded-xl border border-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
+        <aside className="space-y-2 rounded-xl border border-border bg-elevated p-5 shadow-sm lg:sticky lg:top-24">
           <div>
             <strong className="block text-sm font-semibold text-navy">Your progress</strong>
             <span className="text-xs text-muted">{completedCount} of {STEP_DEFINITIONS.length} steps complete</span>
@@ -452,7 +452,7 @@ function HostApplicationPage() {
                 onClick={() => goToStep(step.key)}
                 aria-current={activeStep === step.key ? 'step' : undefined}
               >
-                <span className={`${STEP_CIRCLE_BASE} ${step.complete || activeStep === step.key ? 'bg-primary-50 text-navy' : 'text-muted'}`}>
+                <span className={`${STEP_CIRCLE_BASE} ${step.complete || activeStep === step.key ? 'bg-primary-50 dark:bg-primary/15 text-navy' : 'text-muted'}`}>
                   {step.complete ? '\u2713' : index + 1}
                 </span>
                 <span className="flex min-w-0 flex-col gap-0.5">
@@ -634,7 +634,7 @@ function HostApplicationPage() {
                       return (
                         <label
                           key={value}
-                          className={`flex min-h-[46px] cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium text-navy ${selected ? 'border-primary bg-primary-50' : 'border-border bg-surface'}`}
+                          className={`flex min-h-[46px] cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium text-navy ${selected ? 'border-primary bg-primary-50 dark:bg-primary/15' : 'border-border bg-surface'}`}
                         >
                           <Checkbox
                             checked={selected}
@@ -727,7 +727,7 @@ function HostApplicationPage() {
               </section>
             </form>
           ) : !application && user.role !== 'HOST' ? (
-            <section className="rounded-xl border border-border bg-white p-6 shadow-sm sm:p-8">
+            <section className="rounded-xl border border-border bg-elevated p-6 shadow-sm sm:p-8">
               <h2 className="text-xl font-bold tracking-tight text-navy sm:text-2xl">Start your host application</h2>
               <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Open your application to add your identity, business and property details.</p>
               <div className="mt-5">
@@ -754,7 +754,7 @@ function HostApplicationPage() {
 function ApplicationCardHeader({ step, title, description }) {
   return (
     <header className="flex items-start gap-3 border-b border-border pb-4">
-      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-bold text-navy">{step}</span>
+      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-bold text-navy">{step}</span>
       <div className="min-w-0 flex-1">
         <h2 className="text-base font-semibold text-navy">{title}</h2>
         <p className="text-xs text-muted">{description}</p>
@@ -779,11 +779,11 @@ function StepActions({ saving, uploading, onSave, onContinue }) {
 
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
   return (
-    <div className={`flex flex-col gap-3 rounded-xl border p-4 ${document ? 'border-primary bg-primary-50' : 'border-border bg-surface'}`}>
+    <div className={`flex flex-col gap-3 rounded-xl border p-4 ${document ? 'border-primary bg-primary-50 dark:bg-primary/15' : 'border-border bg-surface'}`}>
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
-          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${document ? 'bg-navy-bg text-white' : 'bg-white text-primary-600'}`}
+          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${document ? 'bg-navy-bg text-white' : 'bg-elevated text-primary-600'}`}
         >
           {document ? '\u2713' : '+'}
         </span>
@@ -793,7 +793,7 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
         </div>
       </div>
       {document && (
-        <div className="flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-2">
+        <div className="flex items-center justify-between gap-3 rounded-lg bg-elevated px-3 py-2">
           <span className="min-w-0 truncate text-xs text-muted">{document.originalName}</span>
           <Button type="button" size="xs" color="light" disabled={busy} onClick={() => onRemove(kind)}>
             {busy ? 'Working...' : 'Remove'}
@@ -827,7 +827,7 @@ function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravel
         : 'gray';
 
   return (
-    <section className="rounded-xl border border-border bg-white p-6 shadow-sm sm:p-8">
+    <section className="rounded-xl border border-border bg-elevated p-6 shadow-sm sm:p-8">
       <Badge color={statusColor}>{statusLabel}</Badge>
       <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{approved ? 'You are ready to host' : 'Application status'}</h2>
       <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{statusMeta}</p>

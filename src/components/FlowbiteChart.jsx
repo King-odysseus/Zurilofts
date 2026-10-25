@@ -100,7 +100,7 @@ function FlowbiteGauge({ label, value, note, color = '#C49A6C', height = 150 }) 
   }), [displayValue, isDark, label, resolvedColor, trackColor]);
 
   return (
-    <article className="grid min-h-[122px] grid-cols-[112px_minmax(0,1fr)] grid-rows-[auto_auto] items-center gap-x-1.5 rounded-xl border border-border bg-white py-2 pl-1.5 pr-3">
+    <article className="grid min-h-[122px] grid-cols-[112px_minmax(0,1fr)] grid-rows-[auto_auto] items-center gap-x-1.5 rounded-xl border border-border bg-elevated py-2 pl-1.5 pr-3">
       <FlowbiteChart
         options={options}
         series={[safeValue]}

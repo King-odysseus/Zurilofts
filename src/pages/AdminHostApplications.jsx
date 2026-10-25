@@ -208,29 +208,29 @@ function AdminHostApplications() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">APPLICATIONS IN VIEW</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{visibleApplications.length}</strong>
           <small className="mt-1 block text-xs text-muted">Matching the current review filter</small>
         </article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">ENCRYPTED FILES</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.documents}</strong>
           <small className="mt-1 block text-xs text-muted">Documents available to review</small>
         </article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">LOCATIONS</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.locations}</strong>
           <small className="mt-1 block text-xs text-muted">Distinct primary areas</small>
         </article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">LAST UPDATE</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{formatDate(viewTotals.latest)}</strong>
           <small className="mt-1 block text-xs text-muted">Most recent application activity</small>
         </article>
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+      <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
         <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-sm">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
@@ -287,7 +287,7 @@ function AdminHostApplications() {
                     <TableRow key={application.id}>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-bold text-navy" aria-hidden="true">{initials(application)}</span>
+                          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-bold text-navy" aria-hidden="true">{initials(application)}</span>
                           <div className="min-w-0">
                             <strong className="block truncate text-sm font-semibold text-navy">{application.legalName || `${application.user?.firstName || ''} ${application.user?.lastName || ''}`.trim() || 'Unnamed applicant'}</strong>
                             <span className="block truncate text-xs text-muted">{application.contactEmail || application.user?.email || 'Email not provided'}</span>
@@ -407,7 +407,7 @@ function AdminHostApplications() {
                       </Button>
                     ))}
                   </div>
-                ) : <div className="mt-3 rounded-xl border border-border bg-white px-4 py-6 text-center text-sm text-muted">No documents have been uploaded for this application.</div>}
+                ) : <div className="mt-3 rounded-xl border border-border bg-elevated px-4 py-6 text-center text-sm text-muted">No documents have been uploaded for this application.</div>}
               </section>
 
               {selected.status === 'SUBMITTED' && (

@@ -76,7 +76,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label="Choose dates"
-            className="fixed inset-0 z-[100] overflow-y-auto bg-white p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[min(640px,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(11,31,66,0.14)]"
+            className="fixed inset-0 z-[100] overflow-y-auto bg-elevated p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[min(640px,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(11,31,66,0.14)]"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
               <span className="text-base font-semibold text-[#0B1F42]">Choose dates</span>
@@ -84,7 +84,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
                 type="button"
                 onClick={() => setOpenField(null)}
                 aria-label="Close"
-                className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-[#F7F4EF]"
+                className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface"
               >
                 <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
               </button>
@@ -127,7 +127,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label="Choose guests"
-            className="fixed inset-0 z-[100] bg-white p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-[min(18rem,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(11,31,66,0.14)]"
+            className="fixed inset-0 z-[100] bg-elevated p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-[min(18rem,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(11,31,66,0.14)]"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
               <span className="text-base font-semibold text-[#0B1F42]">Guests</span>
@@ -135,7 +135,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
                 type="button"
                 onClick={() => setOpenField(null)}
                 aria-label="Close"
-                className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-[#F7F4EF]"
+                className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface"
               >
                 <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
               </button>
@@ -151,7 +151,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
                   onClick={() => onGuestsChange(clampGuests(guests - 1))}
                   disabled={guests <= 1}
                   aria-label="Decrease guests"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
                 >
                   &minus;
                 </button>
@@ -161,7 +161,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
                   onClick={() => onGuestsChange(clampGuests(guests + 1))}
                   disabled={guests >= 16}
                   aria-label="Increase guests"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
                 >
                   +
                 </button>

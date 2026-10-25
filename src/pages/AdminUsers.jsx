@@ -244,13 +244,13 @@ function AdminUsers() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PEOPLE IN VIEW</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.total}</strong><small className="mt-1 block text-xs text-muted">Matching the current filters</small></article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">GUESTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.guests}</strong><small className="mt-1 block text-xs text-muted">Travelling accounts</small></article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">HOSTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.hosts}</strong><small className="mt-1 block text-xs text-muted">Workspace access</small></article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">SUSPENDED</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.suspended}</strong><small className="mt-1 block text-xs text-muted">Accounts currently restricted</small></article>
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PEOPLE IN VIEW</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.total}</strong><small className="mt-1 block text-xs text-muted">Matching the current filters</small></article>
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">GUESTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.guests}</strong><small className="mt-1 block text-xs text-muted">Travelling accounts</small></article>
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">HOSTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.hosts}</strong><small className="mt-1 block text-xs text-muted">Workspace access</small></article>
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">SUSPENDED</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.suspended}</strong><small className="mt-1 block text-xs text-muted">Accounts currently restricted</small></article>
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+      <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
         <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:max-w-xs">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
@@ -337,7 +337,7 @@ function AdminUsers() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-semibold text-primary-600" aria-hidden="true">{userInitials(u)}</span>
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-semibold text-primary-600 dark:text-primary-300" aria-hidden="true">{userInitials(u)}</span>
                           <div className="min-w-0">
                             <strong className="block truncate text-sm font-semibold text-navy">{u.firstName} {u.lastName}{isSelf && <small> · you</small>}</strong>
                             <span className="block truncate text-xs text-charcoal">{u.email}</span>

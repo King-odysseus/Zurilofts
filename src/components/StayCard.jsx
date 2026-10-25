@@ -28,7 +28,7 @@ function StayCard({ stay }) {
   const isGuestFavourite = Number(stay.rating) >= 4.8;
   const saved = isFavorite(stay.id);
 
-  return <article className="group relative overflow-hidden rounded-xl border border-border bg-white shadow-sm transition-shadow hover:shadow-md">
+  return <article className="group relative overflow-hidden rounded-xl border border-border bg-elevated shadow-sm transition-shadow hover:shadow-md">
     <Link to={`/property/${stay.id}`} className="relative block overflow-hidden" aria-label={`View ${stay.title}`}>
       {image
         ? <img src={image} alt={stay.title} loading="lazy" className="aspect-[4/3] w-full object-cover transition-transform duration-500 group-hover:scale-105" />

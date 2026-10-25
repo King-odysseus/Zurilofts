@@ -5,7 +5,7 @@ import { Link, useParams } from 'react-router-dom';
 import apiClient from '../api/client.js';
 
 // Shared surface styles for both panes so the inbox reads as one component.
-const METRIC_CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
+const METRIC_CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
 const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
 const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
 const METRIC_NOTE = 'mt-1 block text-xs text-muted';
@@ -170,7 +170,7 @@ function AdminMessages() {
         </article>
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+      <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
         {/* Two panes on desktop; one pane at a time on phones, driven by the route. */}
         <div className={`grid grid-cols-1 lg:h-[calc(100vh_-_18rem)] lg:max-h-[680px] lg:min-h-[520px] lg:grid-cols-3 lg:overflow-hidden ${activeUserId ? 'h-[calc(100dvh_-_172px)] min-h-[420px]' : ''}`}>
           <aside className={`${activeUserId ? 'hidden lg:flex' : 'flex'} min-h-0 min-w-0 flex-col border-border lg:col-span-1 lg:border-r`}>
@@ -192,7 +192,7 @@ function AdminMessages() {
                   <p className="text-xs text-muted">Adjust the search or wait for a new guest message.</p>
                 </div>
               ) : visibleConversations.map((conversation) => (
-                <Link key={conversation.userId} to={`/admin/messages/${encodeURIComponent(conversation.userId)}`} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${activeUserId === conversation.userId ? 'bg-primary-50' : 'hover:bg-surface'}`} aria-current={activeUserId === conversation.userId ? 'page' : undefined}>
+                <Link key={conversation.userId} to={`/admin/messages/${encodeURIComponent(conversation.userId)}`} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${activeUserId === conversation.userId ? 'bg-primary-50 dark:bg-primary/15' : 'hover:bg-surface'}`} aria-current={activeUserId === conversation.userId ? 'page' : undefined}>
                   <span className={AVATAR} aria-hidden="true">{initials(conversation)}</span>
                   <span className="block min-w-0 flex-1 space-y-1">
                     <span className="flex items-center justify-between gap-2">
@@ -210,7 +210,7 @@ function AdminMessages() {
           <div className={`${activeUserId ? 'flex' : 'hidden lg:flex'} min-h-0 min-w-0 flex-col lg:col-span-2`}>
             {!activeUserId ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 py-12 text-center">
-                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-navy" aria-hidden="true"><MessageSquareText className="h-6 w-6" strokeWidth={1.5} /></span>
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><MessageSquareText className="h-6 w-6" strokeWidth={1.5} /></span>
                 <strong className="text-sm font-semibold text-navy">Select a conversation</strong>
                 <p className="max-w-sm text-xs leading-relaxed text-muted">Choose a guest from the queue to read the full thread and reply.</p>
               </div>

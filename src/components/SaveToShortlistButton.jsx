@@ -78,7 +78,7 @@ export default function SaveToShortlistButton({ propertyId }) {
         className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
           isSaved
             ? "bg-[#C49A6C] text-white"
-            : "border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-sm hover:bg-[#F7F4EF] hover:shadow-md"
+            : "border border-[#E3E8EF] bg-elevated text-[#0B1F42] shadow-sm hover:bg-surface hover:shadow-md"
         }`}
       >
         <Heart className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} strokeWidth={2} aria-hidden="true" />
@@ -88,7 +88,7 @@ export default function SaveToShortlistButton({ propertyId }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-white p-3 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-elevated p-3 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
             <h4 className="mb-2 text-sm font-semibold text-[#0B1F42]">Save to shortlist</h4>
 
             {loading ? (
@@ -100,7 +100,7 @@ export default function SaveToShortlistButton({ propertyId }) {
                 {shortlists.map((sl) => (
                   <label
                     key={sl.id}
-                    className="flex cursor-pointer items-center gap-2 rounded-[10px] px-2 py-1.5 text-sm text-[#0B1F42] hover:bg-[#F7F4EF]"
+                    className="flex cursor-pointer items-center gap-2 rounded-[10px] px-2 py-1.5 text-sm text-[#0B1F42] hover:bg-surface"
                   >
                     <input
                       type="checkbox"

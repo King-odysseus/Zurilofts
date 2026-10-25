@@ -49,29 +49,29 @@ export default function AdminListingReview() {
     </div>
 
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PENDING</span>
         <strong className="mt-2 block text-2xl font-bold text-navy">{count('PENDING_REVIEW')}</strong>
         <small className="mt-1 block text-xs text-muted">Awaiting review</small>
       </article>
-      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">APPROVED</span>
         <strong className="mt-2 block text-2xl font-bold text-navy">{count('PUBLISHED')}</strong>
         <small className="mt-1 block text-xs text-muted">Published stays</small>
       </article>
-      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">SUSPENDED</span>
         <strong className="mt-2 block text-2xl font-bold text-navy">{count('SUSPENDED')}</strong>
         <small className="mt-1 block text-xs text-muted">Hidden from guests</small>
       </article>
-      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">REJECTED</span>
         <strong className="mt-2 block text-2xl font-bold text-navy">{count('REJECTED')}</strong>
         <small className="mt-1 block text-xs text-muted">Need changes</small>
       </article>
     </div>
 
-    <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+    <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
       <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-base font-semibold text-navy">Review queue</h2>
         <span className="text-xs text-muted">{count('PENDING_REVIEW')} pending</span>
@@ -89,7 +89,7 @@ export default function AdminListingReview() {
       </div>
       {error && <p role="alert" className="mx-5 my-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {loading ? <p className="px-5 py-12 text-center text-sm text-muted">Loading listings…</p> : visible.length ? visible.map((listing) => <div className="flex flex-col gap-3 border-b border-border px-5 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between" key={listing.id}>
-        {listing.images?.[0] ? <img src={listing.images[0]} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" /> : <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-navy"><House className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" /></span>}
+        {listing.images?.[0] ? <img src={listing.images[0]} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" /> : <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary/15 text-navy"><House className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" /></span>}
         <div className="min-w-0 flex-1">
           <strong className="block truncate text-sm font-semibold text-navy">{listing.title}</strong>
           <small className="mt-1 block text-xs text-muted">{listing.location || listing.neighborhood || 'Location pending'} · {listing.images?.length || 0} photos · {listing.type || 'Stay'}</small>

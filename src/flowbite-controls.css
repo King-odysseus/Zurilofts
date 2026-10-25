@@ -160,6 +160,13 @@ html.dark .op-admin-mobile-brand img {
   filter: brightness(0) invert(1);
 }
 
+/* The brand mark always sits on its own white tile, so the inverted (white)
+   artwork above would disappear into that tile. Brand images keep their own
+   colours and stay legible on the tile in both themes. */
+html.dark .op-brand-tile img {
+  filter: none;
+}
+
 html.dark .zl-navbar .zl-nav-icon-button,
 html.dark .zl-navbar .zl-header-avatar-button,
 html.dark .zl-navbar a[aria-label="ZuriLofts"],
@@ -280,10 +287,10 @@ html.dark :where([class*="text-[#0B1F42]"], [class*="text-[#414D63]"], [class*="
    roughly 2.2:1. Anything that paints its own bronze background restores the
    intended pairing; declared after the generic rule so it wins the tie. */
 html.dark :where(
-  [class*="bg-[#C49A6C]"][class*="text-[#0B1F42]"],
-  [class*="bg-[#B8895C]"][class*="text-[#0B1F42]"],
-  .bg-primary[class*="text-[#0B1F42]"],
-  .bg-bronze[class*="text-[#0B1F42]"]
+  [class*="bg-[#C49A6C]"][class*="text-[#0B1F42]"]:not([class*="!bg-"]),
+  [class*="bg-[#B8895C]"][class*="text-[#0B1F42]"]:not([class*="!bg-"]),
+  .bg-primary[class*="text-[#0B1F42]"]:not([class*="!bg-"]),
+  .bg-bronze[class*="text-[#0B1F42]"]:not([class*="!bg-"])
 ) {
   color: #0B1F42 !important;
 }

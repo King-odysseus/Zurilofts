@@ -149,13 +149,13 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
   const canGoBack = viewMonth > new Date(today.getFullYear(), today.getMonth(), 1);
 
   return (
-    <div className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-5">
+    <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-5">
       <div className="flex items-center justify-between mb-2">
         <button
           type="button"
           onClick={() => canGoBack && setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))}
           disabled={!canGoBack}
-          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F7F4EF] disabled:cursor-not-allowed disabled:opacity-30"
+          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-surface disabled:cursor-not-allowed disabled:opacity-30"
           aria-label="Previous month"
         >
           <ChevronLeft className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
@@ -163,7 +163,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
         <button
           type="button"
           onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))}
-          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F7F4EF]"
+          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-surface"
           aria-label="Next month"
         >
           <ChevronRight className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />

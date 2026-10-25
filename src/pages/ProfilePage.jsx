@@ -440,7 +440,7 @@ function ProfilePage() {
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937]"
                     />
                   </div>
                   <div>
@@ -449,7 +449,7 @@ function ProfilePage() {
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937]"
                     />
                   </div>
                   <div>
@@ -458,7 +458,7 @@ function ProfilePage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937]"
                     />
                     {emailError && (
                       <p className="text-red-500 text-xs mt-1">{emailError}</p>
@@ -480,7 +480,7 @@ function ProfilePage() {
                         onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
                         maxLength={15}
                         placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
-                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280] rounded-xl"
                       />
                     </div>
                     {phoneError && (
@@ -584,7 +584,7 @@ function ProfilePage() {
                           value={deleteConfirm}
                           onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
                           placeholder="Type DELETE to confirm"
-                          className="neu-input w-full sm:w-72 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                          className="neu-input w-full sm:w-72 px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280] rounded-xl"
                         />
                         {deleteError && <p className="text-red-500 text-xs mt-2">{deleteError}</p>}
                         <div className="flex gap-3 mt-4">
@@ -668,7 +668,7 @@ function ProfilePage() {
                           value={bankForm.bankName}
                           onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
                           placeholder="e.g. KCB Bank"
-                          className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                          className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280]"
                           required
                         />
                       )}
@@ -682,7 +682,7 @@ function ProfilePage() {
                         onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 20) }))}
                         maxLength={20}
                         placeholder="Bank account number"
-                        className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                        className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280]"
                         required
                       />
                     </div>
@@ -696,7 +696,7 @@ function ProfilePage() {
                       onChange={(e) => setMpesaPhone(e.target.value)}
                       placeholder="0712 345 678"
                       autoComplete="tel"
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280]"
                       required
                     />
                     <p className="text-xs text-[#6b7280] mt-2">Use the Safaricom number registered to receive your host payouts.</p>
@@ -875,7 +875,7 @@ function ProfilePage() {
                               onChange={(e) => setReviewField(booking.id, 'publicComment', e.target.value)}
                               placeholder="Share what other guests should know about this stay. This appears publicly with your first name."
                               maxLength={1000}
-                              className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm mb-4"
+                              className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm mb-4"
                             />
                             <label className="block text-xs font-semibold text-[#6b7280] mb-1">
                               Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
@@ -885,7 +885,7 @@ function ProfilePage() {
                               onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
                               placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
                               maxLength={2000}
-                              className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
+                              className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
                             />
                             {reviewForms[booking.id]?.error && (
                               <p className="text-red-500 text-xs mt-1">{reviewForms[booking.id].error}</p>

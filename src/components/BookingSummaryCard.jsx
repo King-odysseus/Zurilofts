@@ -24,7 +24,7 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
   const addOnsTotal = addOnItems.reduce((sum, a) => sum + (a.quantity * (a.price || 0)), 0);
 
   return (
-    <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-white p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
+    <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
       {/* Price */}
       <div className="mb-5">
         <span className="text-3xl font-bold text-[#0B1F42]">

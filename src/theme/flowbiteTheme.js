@@ -255,7 +255,11 @@ export const brandTheme = {
           },
           pills: {
             active: {
-              on: `rounded-full bg-[${NAVY}] text-white dark:bg-[${BRONZE}] dark:text-[${NAVY}]`,
+              // Token classes, not interpolated arbitrary values: `dark:bg-[${BRONZE}]`
+              // never reaches Tailwind's scanner as a real class, so the dark
+              // branch silently did nothing and the active pill stayed navy with
+              // navy text. Plain utilities are always generated.
+              on: 'rounded-full bg-navy-bg text-white dark:bg-primary dark:text-navy-bg',
               off: `rounded-full text-[${MUTED}] hover:bg-[#F1F5F9] hover:text-[${NAVY}] dark:text-gray-400 dark:hover:bg-gray-800`,
             },
           },

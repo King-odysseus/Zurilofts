@@ -43,7 +43,7 @@ export function LegalPageContentsMobile({ containerRef }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white lg:hidden">
+    <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-elevated lg:hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}

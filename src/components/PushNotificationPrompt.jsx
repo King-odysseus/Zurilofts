@@ -24,7 +24,7 @@ function PushNotificationPrompt() {
   }
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-40 rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.14)] sm:bottom-4 sm:left-auto sm:right-4 sm:w-96">
+    <div className="fixed bottom-4 left-4 right-4 z-40 rounded-2xl border border-[#E3E8EF] bg-elevated p-4 shadow-[0_8px_28px_rgba(11,31,66,0.14)] sm:bottom-4 sm:left-auto sm:right-4 sm:w-96">
       <div className="flex items-start gap-3">
         <div className="w-10 h-10 bg-[#C49A6C]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
           <Bell className="w-5 h-5 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />

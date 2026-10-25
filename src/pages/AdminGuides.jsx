@@ -154,29 +154,29 @@ function AdminGuides() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PUBLISHED GUIDES</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.published}</strong>
           <small className="mt-1 block text-xs text-muted">Visible on the public guides route</small>
         </article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">DRAFTS</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.drafts}</strong>
           <small className="mt-1 block text-xs text-muted">Waiting for review or completion</small>
         </article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">WITH COVER IMAGE</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.withCover}</strong>
           <small className="mt-1 block text-xs text-muted">Ready for editorial presentation</small>
         </article>
-        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">GUIDES IN VIEW</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{visiblePosts.length}</strong>
           <small className="mt-1 block text-xs text-muted">Matching the current search</small>
         </article>
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+      <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
         <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-sm">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
@@ -196,7 +196,7 @@ function AdminGuides() {
         ) : visiblePosts.length === 0 ? (
           <Alert color="info">
             <div className="flex w-full flex-col items-center gap-2 px-5 py-12 text-center">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 text-navy" aria-hidden="true"><SearchIcon /></span>
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><SearchIcon /></span>
               <strong className="text-base font-semibold text-navy">No guides found</strong>
               <p className="text-xs leading-relaxed text-muted">Create the first guide or adjust the current search.</p>
             </div>
@@ -217,7 +217,7 @@ function AdminGuides() {
                 {visiblePosts.map((post) => (
                   <TableRow key={post.id}>
                     <TableCell><div className="flex items-center gap-3">
-                      {post.coverImage ? <img src={post.coverImage} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" /> : <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-sm font-bold text-navy" aria-hidden="true">{String(post.title || 'G')[0].toUpperCase()}</span>}
+                      {post.coverImage ? <img src={post.coverImage} alt="" className="h-10 w-10 shrink-0 rounded-lg object-cover" /> : <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary/15 text-sm font-bold text-navy" aria-hidden="true">{String(post.title || 'G')[0].toUpperCase()}</span>}
                       <div className="min-w-0">
                         <strong className="block truncate text-sm font-semibold text-navy">{post.title}</strong>
                         <small className="block truncate text-xs text-muted">/{post.slug}</small>

@@ -208,14 +208,14 @@ function SearchBar({ discovery = false }) {
 
       {/* Dropdown results */}
       {open && results.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
           <ul>
             {results.map((p) => (
               <li key={p.id}>
                 <button
                   type="button"
                   onClick={() => handleSelect(p.id)}
-                  className="w-full border-b border-[#E3E8EF] px-5 py-3 text-left transition-colors last:border-b-0 hover:bg-[#F7F4EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] flex items-center gap-4"
+                  className="w-full border-b border-[#E3E8EF] px-5 py-3 text-left transition-colors last:border-b-0 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] flex items-center gap-4"
                 >
                   {p.images?.[0] ? (
                     <img
@@ -224,7 +224,7 @@ function SearchBar({ discovery = false }) {
                       className="w-12 h-12 object-cover rounded-xl flex-shrink-0"
                     />
                   ) : (
-                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[10px] bg-[#F7F4EF]">
+                    <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[10px] bg-surface">
                       <ImageIcon className="h-5 w-5 text-[#C9D3DF]" strokeWidth={1.5} aria-hidden="true" />
                     </div>
                   )}
@@ -244,7 +244,7 @@ function SearchBar({ discovery = false }) {
             <button
               type="button"
               onClick={handleSearch}
-              className="w-full border-t border-[#E3E8EF] py-3 text-center text-sm font-semibold text-[#0B1F42] hover:bg-[#F7F4EF]"
+              className="w-full border-t border-[#E3E8EF] py-3 text-center text-sm font-semibold text-[#0B1F42] hover:bg-surface"
             >
               View all results &rarr;
             </button>

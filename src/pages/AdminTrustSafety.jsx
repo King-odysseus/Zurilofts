@@ -256,7 +256,7 @@ function AdminTrustSafety() {
       {error && <Alert color="failure" role="alert">{error}</Alert>}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm" aria-labelledby="verification-queue-title">
+        <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm" aria-labelledby="verification-queue-title">
           <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 id="verification-queue-title" className="text-base font-semibold text-navy">Verification queue</h2>
@@ -281,7 +281,7 @@ function AdminTrustSafety() {
             <div>
               {summary.pendingVerifications.map((verification) => (
                 <article className="flex flex-col gap-3 border-b border-border px-5 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between" key={verification.id}>
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-bold text-navy" aria-hidden="true">{initials(verification.user)}</span>
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-bold text-navy" aria-hidden="true">{initials(verification.user)}</span>
                   <div className="min-w-0 flex-1">
                     <strong className="block truncate text-sm font-semibold text-navy">{displayName(verification.user, verification.fullName)} <small className="text-xs font-normal text-muted">· {verification.user?.role === 'HOST' ? 'Host' : 'Guest'}</small></strong>
                     <span className="block truncate text-xs text-muted">{verification.idType?.replaceAll('_', ' ') || 'Identity document'} · {verification.documents?.length || 0} files · {formatDate(verification.submittedAt || verification.updatedAt)}</span>
@@ -296,7 +296,7 @@ function AdminTrustSafety() {
           )}
         </section>
 
-        <aside className="overflow-hidden rounded-xl border border-border bg-white shadow-sm" aria-labelledby="dispute-queue-title">
+        <aside className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm" aria-labelledby="dispute-queue-title">
           <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 id="dispute-queue-title" className="text-base font-semibold text-navy">Disputes</h2>
@@ -337,7 +337,7 @@ function AdminTrustSafety() {
             <ModalBody>
               <div className="space-y-5">
                 <section className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 sm:flex-row sm:items-center">
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600" aria-hidden="true"><ShieldCheck strokeWidth={1.8} /></span>
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-primary-600 dark:text-primary-300" aria-hidden="true"><ShieldCheck strokeWidth={1.8} /></span>
                   <div className="min-w-0 flex-1">
                     <small className="block text-[11px] font-semibold uppercase tracking-wide text-primary-600">Applicant</small>
                     <strong className="block truncate text-sm font-semibold text-navy">{displayName(selectedVerification.user, selectedVerification.fullName)}</strong>
@@ -349,27 +349,27 @@ function AdminTrustSafety() {
                 </section>
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  <p className="rounded-xl border border-border bg-white p-3">
+                  <p className="rounded-xl border border-border bg-elevated p-3">
                     <span className="block text-xs text-muted">Legal name</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.fullName || 'Not supplied'}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-white p-3">
+                  <p className="rounded-xl border border-border bg-elevated p-3">
                     <span className="block text-xs text-muted">Date of birth</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.dateOfBirth || 'Not supplied'}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-white p-3">
+                  <p className="rounded-xl border border-border bg-elevated p-3">
                     <span className="block text-xs text-muted">ID type</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.idType?.replaceAll('_', ' ') || 'Not supplied'}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-white p-3">
+                  <p className="rounded-xl border border-border bg-elevated p-3">
                     <span className="block text-xs text-muted">ID number</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.idNumber || 'Not supplied'}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-white p-3">
+                  <p className="rounded-xl border border-border bg-elevated p-3">
                     <span className="block text-xs text-muted">Submitted</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{formatDate(selectedVerification.submittedAt, true)}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-white p-3">
+                  <p className="rounded-xl border border-border bg-elevated p-3">
                     <span className="block text-xs text-muted">Account role</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.user?.role || 'USER'}</strong>
                   </p>
@@ -444,7 +444,7 @@ function AdminTrustSafety() {
             <ModalBody>
               <div className="space-y-5">
                 <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 sm:flex-row sm:items-center">
-                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600" aria-hidden="true"><AlertTriangle strokeWidth={1.8} /></span>
+                  <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-primary-600 dark:text-primary-300" aria-hidden="true"><AlertTriangle strokeWidth={1.8} /></span>
                   <div className="min-w-0 flex-1">
                     <small className="block text-[11px] font-semibold uppercase tracking-wide text-primary-600">{selectedDispute.category?.replaceAll('_', ' ') || 'Booking issue'}</small>
                     <strong className="block truncate text-sm font-semibold text-navy">{disputeTitle(selectedDispute)}</strong>
@@ -489,7 +489,7 @@ function AdminTrustSafety() {
                                 <strong className="font-semibold">{entry.action?.replaceAll('_', ' ') || 'Status updated'}</strong>
                                 <small className="text-xs text-muted">{formatDate(entry.createdAt, true)}</small>
                               </p>
-                              {entry.note && <blockquote className="mt-1 rounded-xl border border-border bg-white px-3 py-2 text-xs text-muted">{entry.note}</blockquote>}
+                              {entry.note && <blockquote className="mt-1 rounded-xl border border-border bg-elevated px-3 py-2 text-xs text-muted">{entry.note}</blockquote>}
                             </div>
                           </div>
                         ))}
@@ -504,7 +504,7 @@ function AdminTrustSafety() {
                     </div>
                     <div className="mt-3 space-y-2">
                       {selectedDispute.messages?.length ? selectedDispute.messages.map((message) => (
-                        <article key={message.id} className={`rounded-xl border border-border p-3 ${message.senderRole === 'ADMIN' ? 'bg-primary-50' : 'bg-white'}`}>
+                        <article key={message.id} className={`rounded-xl border border-border p-3 ${message.senderRole === 'ADMIN' ? 'bg-primary-50 dark:bg-primary/15' : 'bg-elevated'}`}>
                           <span className="block text-[11px] font-semibold uppercase tracking-wide text-primary-600">{message.senderRole}</span>
                           <p className="mt-1 whitespace-pre-wrap text-sm text-charcoal">{message.body}</p>
                           <small className="mt-1 block text-xs text-muted">{formatDate(message.createdAt, true)}</small>
@@ -546,7 +546,7 @@ function AdminTrustSafety() {
                   {selectedDispute.notes?.length > 0 && (
                     <div className="mt-3 space-y-2">
                       {selectedDispute.notes.map((note) => (
-                        <p key={note.id} className="rounded-xl border border-border bg-white p-3">
+                        <p key={note.id} className="rounded-xl border border-border bg-elevated p-3">
                           <strong className="block text-sm font-medium text-navy">{note.body}</strong>
                           <small className="mt-1 block text-xs text-muted">{formatDate(note.createdAt, true)}</small>
                         </p>

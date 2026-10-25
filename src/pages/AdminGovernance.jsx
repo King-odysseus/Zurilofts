@@ -41,15 +41,15 @@ const EVENT_META = {
 };
 
 // Shared surface styles so the audit panel and the roles aside stay identical.
-const PANEL = 'overflow-hidden rounded-xl border border-border bg-white shadow-sm';
+const PANEL = 'overflow-hidden rounded-xl border border-border bg-elevated shadow-sm';
 const PANEL_HEAD = 'flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between';
 const PANEL_TITLE = 'text-base font-semibold text-navy';
 const PANEL_SUBTITLE = 'text-xs text-muted';
-const METRIC_CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
+const METRIC_CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
 const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
 const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
 const METRIC_NOTE = 'mt-1 block text-xs text-muted';
-const ICON_TILE = 'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-navy';
+const ICON_TILE = 'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary/15 text-navy';
 const LIST_ROW = 'flex flex-col gap-3 border-b border-border px-5 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between';
 const EMPTY_STATE = 'flex flex-col items-center gap-2 px-5 py-12 text-center';
 

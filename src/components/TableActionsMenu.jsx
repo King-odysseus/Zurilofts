@@ -1,5 +1,6 @@
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import { Dropdown, DropdownItem } from 'flowbite-react';
 import { AlignLeft, Check, Circle, Ellipsis, Minus, Pencil, RefreshCw, Search, X } from 'lucide-react';
 
 function ActionIcon({ icon, danger }) {
@@ -14,48 +15,136 @@ function ActionIcon({ icon, danger }) {
     approve: Check,
     pause: Minus,
     notes: AlignLeft,
-    '✎': Pencil,
-    '×': X,
-    '⌕': Search,
-    '↻': RefreshCw,
-    '✓': Check,
-    '-': Minus,
-    '⌁': AlignLeft,
   }[icon] || Circle;
   return <Icon className={className} strokeWidth={1.8} aria-hidden="true" />;
 }
 
 ActionIcon.propTypes = { icon: PropTypes.string, danger: PropTypes.bool };
 
+const MENU_WIDTH = 200;
+const GAP = 6;
+
+/**
+ * Row action menu for admin tables.
+ *
+ * The menu is rendered into document.body with fixed positioning rather than
+ * inline. Every admin table sits inside a card that needs `overflow-hidden` to
+ * clip its own rounded corners, and inside an `overflow-x-auto` scroll box for
+ * narrow screens. An inline absolutely-positioned menu is clipped by both, so
+ * the last rows' menus were cut off mid-row. A portal escapes those boxes
+ * entirely, which is why the position has to be measured from the trigger.
+ */
 function TableActionsMenu({ label = 'More actions', actions }) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState(null);
+  const triggerRef = useRef(null);
+  const menuRef = useRef(null);
+
+  const place = useCallback(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+    const rect = trigger.getBoundingClientRect();
+    const menuHeight = menuRef.current?.offsetHeight ?? actions.length * 40 + 8;
+
+    // Open upward when there is not enough room below but there is above.
+    const spaceBelow = window.innerHeight - rect.bottom;
+    const openUp = spaceBelow < menuHeight + GAP && rect.top > menuHeight + GAP;
+
+    setPos({
+      top: openUp ? Math.max(GAP, rect.top - menuHeight - GAP) : rect.bottom + GAP,
+      // Right-align to the trigger so the menu never runs past the viewport.
+      left: Math.max(GAP, Math.min(rect.right - MENU_WIDTH, window.innerWidth - MENU_WIDTH - GAP)),
+    });
+  }, [actions.length]);
+
+  useLayoutEffect(() => {
+    if (open) place();
+  }, [open, place]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    function onPointerDown(e) {
+      if (menuRef.current?.contains(e.target) || triggerRef.current?.contains(e.target)) return;
+      setOpen(false);
+    }
+    function onKey(e) {
+      if (e.key === 'Escape') setOpen(false);
+    }
+    // Any scroll or resize invalidates the measured position, so close instead
+    // of letting the menu drift away from its trigger.
+    const onReflow = () => setOpen(false);
+
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('keydown', onKey);
+    window.addEventListener('scroll', onReflow, true);
+    window.addEventListener('resize', onReflow);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', onReflow, true);
+      window.removeEventListener('resize', onReflow);
+    };
+  }, [open]);
+
   return (
-    <Dropdown
-      arrowIcon={false}
-      inline
-      aria-label={label}
-      placement="bottom-end"
-      className="op-table-actions-menu"
-      // Icon-only trigger, so the accessible name has to come from the caller's
-      // label text - Flowbite puts its aria-label on the wrapper, not the button.
-      label={<><span className="sr-only">{label}</span><Ellipsis className="h-5 w-5" strokeWidth={2} aria-hidden="true" /></>}
-      // An `inline` Dropdown renders a bare <button> whose entire className is
-      // this string: Flowbite's own inlineWrapper default contributes only
-      // "flex items-center", so the visual styling has to live here. Do not
-      // move it to a stylesheet or trim it without checking the trigger still
-      // looks like a control - there is nothing underneath to fall back to.
-      // (theme is deep-merged with twMerge, not replaced, so conflict resolution
-      // keeps these utilities while non-conflicting defaults survive.)
-      theme={{ inlineWrapper: 'inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-[10px] border border-[#E3E8EF] bg-white text-[#0B1F42] transition-colors hover:bg-[#F7F4EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]/40' }}
-    >
-      {actions.map((action) => (
-        <DropdownItem key={action.label} disabled={action.disabled} onClick={action.onClick} className={action.danger ? 'text-[#B42318]' : ''}>
-          <ActionIcon icon={action.icon} danger={action.danger} />{action.label}
-        </DropdownItem>
-      ))}
-    </Dropdown>
+    <>
+      <button
+        type="button"
+        ref={triggerRef}
+        aria-label={label}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+        className="inline-flex min-h-[36px] min-w-[36px] items-center justify-center rounded-[10px] border border-border bg-elevated text-navy transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+      >
+        <Ellipsis className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+      </button>
+
+      {open && pos && createPortal(
+        <div
+          ref={menuRef}
+          role="menu"
+          aria-label={label}
+          style={{ top: pos.top, left: pos.left, width: MENU_WIDTH }}
+          className="fixed z-[80] overflow-hidden rounded-xl border border-border bg-elevated p-1 shadow-lg"
+        >
+          {actions.map((action) => (
+            <button
+              key={action.label}
+              type="button"
+              role="menuitem"
+              disabled={action.disabled}
+              onClick={() => {
+                setOpen(false);
+                action.onClick();
+              }}
+              className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                action.danger ? 'text-[#B42318] hover:bg-[#B42318]/10' : 'text-navy hover:bg-surface'
+              }`}
+            >
+              <ActionIcon icon={action.icon} danger={action.danger} />
+              {action.label}
+            </button>
+          ))}
+        </div>,
+        document.body,
+      )}
+    </>
   );
 }
 
-TableActionsMenu.propTypes = { label: PropTypes.string, actions: PropTypes.arrayOf(PropTypes.shape({ label: PropTypes.string.isRequired, onClick: PropTypes.func.isRequired, icon: PropTypes.string, danger: PropTypes.bool, disabled: PropTypes.bool })).isRequired };
+TableActionsMenu.propTypes = {
+  label: PropTypes.string,
+  actions: PropTypes.arrayOf(
+    PropTypes.shape({
+      label: PropTypes.string.isRequired,
+      onClick: PropTypes.func.isRequired,
+      icon: PropTypes.string,
+      danger: PropTypes.bool,
+      disabled: PropTypes.bool,
+    }),
+  ).isRequired,
+};
 
 export default TableActionsMenu;

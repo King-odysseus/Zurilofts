@@ -55,7 +55,7 @@ const EDITOR_STEPS = [
 ];
 
 // Shared with the host application form so both multi-step host forms read identically.
-const CARD_CLASS = 'rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6';
+const CARD_CLASS = 'rounded-xl border border-border bg-elevated p-5 shadow-sm sm:p-6';
 const STEP_BUTTON_BASE = 'flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-surface';
 const STEP_CIRCLE_BASE = 'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-[11px] font-bold';
 
@@ -80,7 +80,7 @@ function buildLocationLabel(location, neighborhood) {
 function SectionHeader({ step, title, description }) {
   return (
     <header className="flex items-start gap-3 border-b border-border pb-4">
-      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-bold text-navy">{step}</span>
+      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-bold text-navy">{step}</span>
       <div className="min-w-0 flex-1">
         <h2 className="text-base font-semibold text-navy">{title}</h2>
         <p className="text-xs text-muted">{description}</p>
@@ -291,7 +291,7 @@ function AdminPropertyForm() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[230px_minmax(0,1fr)_300px] lg:items-start">
-          <aside className="space-y-2 rounded-xl border border-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
+          <aside className="space-y-2 rounded-xl border border-border bg-elevated p-5 shadow-sm lg:sticky lg:top-24">
             <div>
               <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Listing progress</span>
               <strong className="mt-1 block text-sm font-semibold text-navy">{completedCount} of 4 steps complete</strong>
@@ -311,7 +311,7 @@ function AdminPropertyForm() {
                     onClick={() => goToStep(step.key)}
                     aria-current={active ? 'step' : undefined}
                   >
-                    <span className={`${STEP_CIRCLE_BASE} ${item?.complete || active ? 'bg-primary-50 text-navy' : 'text-muted'}`}>
+                    <span className={`${STEP_CIRCLE_BASE} ${item?.complete || active ? 'bg-primary-50 dark:bg-primary/15 text-navy' : 'text-muted'}`}>
                       {item?.complete ? <Check className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" /> : index + 1}
                     </span>
                     <span className="flex min-w-0 flex-col gap-0.5">
@@ -440,7 +440,7 @@ function AdminPropertyForm() {
                   <p className="mt-1 text-xs text-muted">Add a one-bed or two-bed rate when the same stay can be booked at different capacities.</p>
                 </div>
                 <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div className={`flex items-start gap-3 rounded-lg border p-3 ${form.price1Bed !== '' ? 'border-primary bg-primary-50' : 'border-border bg-white'}`}>
+                  <div className={`flex items-start gap-3 rounded-lg border p-3 ${form.price1Bed !== '' ? 'border-primary bg-primary-50 dark:bg-primary/15' : 'border-border bg-elevated'}`}>
                     <Checkbox
                       id="listing-variant-1"
                       checked={form.price1Bed !== ''}
@@ -460,7 +460,7 @@ function AdminPropertyForm() {
                       )}
                     </div>
                   </div>
-                  <div className={`flex items-start gap-3 rounded-lg border p-3 ${form.price2Bed !== '' ? 'border-primary bg-primary-50' : 'border-border bg-white'}`}>
+                  <div className={`flex items-start gap-3 rounded-lg border p-3 ${form.price2Bed !== '' ? 'border-primary bg-primary-50 dark:bg-primary/15' : 'border-border bg-elevated'}`}>
                     <Checkbox
                       id="listing-variant-2"
                       checked={form.price2Bed !== ''}
@@ -510,7 +510,7 @@ function AdminPropertyForm() {
             {isEdit && <SeasonalPricing propertyId={id} />}
           </div>
 
-          <aside className="space-y-3 rounded-xl border border-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
+          <aside className="space-y-3 rounded-xl border border-border bg-elevated p-5 shadow-sm lg:sticky lg:top-24">
             <header className="flex items-start justify-between gap-3">
               <div>
                 <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">GUEST PREVIEW</span>
@@ -580,7 +580,7 @@ function PropertyPreview({ form }) {
   const area = form.area === '' ? '-' : form.area;
 
   return (
-    <div className="max-w-sm overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+    <div className="max-w-sm overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
       <div className="relative">
         {cover ? (
           <img src={cover} alt={form.title || 'Property'} className="aspect-[4/3] w-full object-cover" />
@@ -644,7 +644,7 @@ function FullPagePreview({ form, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4">
-      <div className="my-8 w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-white shadow-lg">
+      <div className="my-8 w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-elevated shadow-lg">
         {/* Bar */}
         <div className="sticky top-0 z-10 flex items-center justify-between bg-navy-bg px-5 py-3 text-white">
           <span className="text-sm font-semibold">Page preview - not yet saved</span>
@@ -743,7 +743,7 @@ function FullPagePreview({ form, onClose }) {
 
             {/* Booking card */}
             <div className="lg:col-span-1">
-              <div className="sticky top-20 rounded-xl border border-border bg-white p-6 shadow-sm">
+              <div className="sticky top-20 rounded-xl border border-border bg-elevated p-6 shadow-sm">
                 <span className="text-3xl font-bold text-navy">KES {price.toLocaleString()}</span>
                 <span className="text-muted"> / night</span>
                 <div className="mt-4 block w-full rounded-full bg-primary py-3 text-center font-bold text-navy-bg">Book Now</div>

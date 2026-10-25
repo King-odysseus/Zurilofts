@@ -20,7 +20,7 @@ const TYPE_LABELS = {
 
 function TrustBadge({ icon, label, value }) {
   return (
-    <div className="flex items-center gap-2 rounded-2xl bg-[#F7F4EF] px-4 py-3">
+    <div className="flex items-center gap-2 rounded-2xl bg-surface px-4 py-3">
       <span className="text-[#C49A6C] shrink-0" aria-hidden="true">
         {icon}
       </span>

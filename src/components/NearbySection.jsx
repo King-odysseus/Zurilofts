@@ -68,7 +68,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   return (
     <div className="op-places-list mt-8 md:mt-12 mb-16">
       {/* Centered Header */}
-      <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-8 text-center shadow-[0_4px_16px_rgba(11,31,66,0.04)] md:px-8 md:py-10">
+      <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-elevated px-5 py-8 text-center shadow-[0_4px_16px_rgba(11,31,66,0.04)] md:px-8 md:py-10">
         <h2 className="text-3xl font-bold text-[#0B1F42] md:text-4xl">{title}</h2>
         <p className="text-cool-grey max-w-2xl mx-auto text-base md:text-lg mt-3 px-2 md:px-0">{subtitle}</p>
       </div>
@@ -110,7 +110,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             <div className="text-center mt-10">
               <Link
                 to={viewMoreLink}
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] px-8 py-3 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] px-8 py-3 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-surface"
               >
                 View All {filtered.length} Places
                 <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />

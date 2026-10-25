@@ -33,7 +33,11 @@ function hostInitials(user) {
 }
 
 // Shared nav-link styling so the desktop tabs cannot drift apart.
-const NAV_LINK = 'inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-navy';
+const NAV_LINK_BASE = 'inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-colors';
+const NAV_LINK_IDLE = 'text-muted hover:bg-surface hover:text-navy';
+// The active pill paints bronze, so its label must be the fixed navy ink.
+// Keeping the colour out of the structural class stops an active item from
+// inheriting the idle `text-muted`, which rendered pale-on-bronze.
 const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-navy-bg hover:bg-primary hover:text-navy-bg';
 
 // Host workspace shell. Hosts get their own frame instead of the guest site
@@ -82,7 +86,7 @@ function HostLayout({ children }) {
                   key={tab.key}
                   to={tab.to}
                   aria-current={active ? 'page' : undefined}
-                  className={`${NAV_LINK}${active ? ` ${NAV_LINK_ACTIVE}` : ''}`}
+                  className={`${NAV_LINK_BASE} ${active ? NAV_LINK_ACTIVE : NAV_LINK_IDLE}`}
                 >
                   {tab.label}
                 </Link>

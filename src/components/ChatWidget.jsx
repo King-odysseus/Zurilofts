@@ -151,7 +151,7 @@ function ChatWidget() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_8px_28px_rgba(11,31,66,0.14)] transition-all duration-300" style={{ maxHeight: '520px' }}>
+        <div className="fixed bottom-6 right-6 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_8px_28px_rgba(11,31,66,0.14)] transition-all duration-300" style={{ maxHeight: '520px' }}>
           {/* Header */}
           <div className="flex items-center justify-between bg-[#0B1F42] px-5 py-4">
             <div className="flex items-center space-x-3">
@@ -175,7 +175,7 @@ function ChatWidget() {
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   m.from === 'user'
                     ? 'bg-[#C49A6C] text-white rounded-br-md font-medium'
-                    : 'bg-white text-[#1f2937] rounded-bl-md shadow-sm'
+                    : 'bg-elevated text-[#1f2937] rounded-bl-md shadow-sm'
                 }`}>
                   {m.text}
                 </div>
@@ -185,7 +185,7 @@ function ChatWidget() {
           </div>
 
           {/* Input */}
-          <form onSubmit={handleSend} className="border-t border-[#E3E8EF] bg-white p-4">
+          <form onSubmit={handleSend} className="border-t border-[#E3E8EF] bg-elevated p-4">
             {!started ? (
               <div className="space-y-2">
                 <input
@@ -193,14 +193,14 @@ function ChatWidget() {
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError(''); }}
                   placeholder="Your name"
-                  className="w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
+                  className="w-full rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email (optional)"
-                  className="w-full rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
+                  className="w-full rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
                 />
                 {error && <p className="text-red-500 text-xs">{error}</p>}
                 <button
@@ -230,7 +230,7 @@ function ChatWidget() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Type your message..."
-                    className="min-w-0 flex-1 rounded-[10px] border-0 bg-[#F7F4EF] px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:opacity-50"
+                    className="min-w-0 flex-1 rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:opacity-50"
                   />
                   <button
                     type="submit"

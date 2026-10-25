@@ -41,7 +41,7 @@ function RouteBackButton({ className = '', label = 'Back' }) {
     <button
       type="button"
       onClick={handleBack}
-      className={`inline-flex h-10 min-w-10 items-center justify-center gap-2 rounded-full bg-[#F7F4EF] px-2.5 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F3E9DC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${className}`}
+      className={`inline-flex h-10 min-w-10 items-center justify-center gap-2 rounded-full bg-surface px-2.5 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-[#F3E9DC] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${className}`}
       aria-label="Go back to the previous page"
       title="Go back"
     >
