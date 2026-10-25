@@ -97,7 +97,7 @@ function SearchForm({ initial = DEFAULT_SEARCH_LOCATION, allKenya = false, fluid
   }
   return <form
     onSubmit={submit}
-    className={`mt-8 grid w-full gap-2 rounded-2xl bg-white p-3 text-left shadow-lg sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_auto] lg:items-center lg:gap-0 lg:rounded-full lg:p-2 ${fluid ? 'max-w-none' : 'mx-auto max-w-[940px]'}`}
+    className={`mt-8 grid w-full gap-2 rounded-2xl bg-elevated p-3 text-left shadow-lg sm:grid-cols-2 lg:grid-cols-[1.6fr_1fr_1fr_1fr_auto] lg:items-center lg:gap-0 lg:rounded-full lg:p-2 ${fluid ? 'max-w-none' : 'mx-auto max-w-[940px]'}`}
   >
     <div className={`${SEARCH_FIELD} sm:col-span-2 lg:col-span-1 lg:border-r lg:border-border`}>
       <span className={SEARCH_FIELD_LABEL}>Where</span>
@@ -256,7 +256,8 @@ export function GuestHome() {
       {/* The navbar is fixed at h-16, so the hero needs more than 56px of top
           padding or the "Verified homes" badge and headline sit under it. */}
       <div className={`relative ${CONTAINER} pb-8 pt-20 sm:pb-14 sm:pt-24 sm:text-center sm:text-white`}>
-        <Badge color="light" className="mb-5 hidden sm:inline-flex">Verified homes · Nairobi</Badge>
+        {/* Fixed light pill on the photo: white surface, navy ink, in both themes. */}
+        <Badge className="mb-5 hidden border-0 bg-white text-navy-bg sm:inline-flex">Verified homes · Nairobi</Badge>
         <h1 className="text-2xl font-bold tracking-tight sm:text-4xl">
           <span className="hidden sm:inline">Find your place in Nairobi</span>
           <span className="sm:hidden">Find your next stay</span>

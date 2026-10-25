@@ -2,41 +2,45 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Fix buttons that wrap text inside mockup boards and the app",
+      "text": "Screenshot all app pages at desktop and phone",
       "state": "done"
     },
     {
-      "text": "Check all six boards render correctly at desktop and phone width",
+      "text": "Fix dark mode so tokens flip app-wide",
       "state": "done"
     },
     {
-      "text": "Convert checkout and saved stays, delete checkout-design.css + saved-stays.css",
+      "text": "Fix dropdown clipping and disabled/bronze button contrast",
       "state": "done"
     },
     {
-      "text": "Convert account/travel, trust and public content; delete their three stylesheets",
+      "text": "Fix page headings hidden under the fixed navbar",
       "state": "done"
     },
     {
-      "text": "Convert discovery and shell; delete guest-discovery.css + openpencil-theme.css",
+      "text": "Fix search bar, price box and toolbar alignment",
       "state": "done"
     },
     {
-      "text": "Slim the Places/Restaurants search and filter bar",
+      "text": "Unify travel and hosting sign-up form",
       "state": "done"
     },
     {
-      "text": "Verify guest, host and admin pages at desktop and phone width",
+      "text": "Verify converted page groups reachable and styled",
       "state": "done"
     },
     {
-      "text": "Run lint and build",
-      "state": "done"
+      "text": "Verify admin sidebar and checkout in dark mode",
+      "state": "active"
+    },
+    {
+      "text": "Clean temp capture files",
+      "state": "pending"
     },
     {
       "text": "Commit and push",
-      "state": "done"
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-25T21:27:15.828Z"
+  "updatedAt": "2026-10-25T21:31:32.988Z"
 }
