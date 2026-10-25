@@ -118,7 +118,14 @@ export const brandTheme = {
     // Pill by default: a fully rounded button reads as an action, while an
     // 8-10px box reads as a field. This is the Airbnb shape the design system
     // settled on, so every Flowbite Button gets it without a per-page class.
-    base: 'relative flex items-center justify-center gap-2 rounded-full text-center font-semibold focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+    // whitespace-nowrap: a pill is sized to its label, so the label must never
+    // break across two lines and turn the pill into a tall blob. Where a row of
+    // buttons is too wide for the screen, the row wraps as a whole (flex-wrap on
+    // the parent) instead of each label breaking up.
+    // A disabled pill used to render as 50%-opacity bronze, so its label looked
+    // washed out and unreadable rather than clearly unavailable. Swap it for the
+    // inset surface with muted ink, which also follows the dark theme.
+    base: 'relative flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full text-center font-semibold focus:outline-none disabled:pointer-events-none disabled:bg-inset disabled:text-muted disabled:opacity-100',
     pill: 'rounded-full',
     size: {
       xs: 'h-8 px-3 text-xs',
@@ -128,7 +135,9 @@ export const brandTheme = {
       xl: 'min-h-[52px] px-7 text-base',
     },
     color: {
-      default: `bg-[${BRONZE}] text-white hover:bg-[${BRONZE_HOVER}] ${FOCUS_RING} dark:bg-[${BRONZE}] dark:hover:bg-[${BRONZE_HOVER}]`,
+      // Bronze is a light surface: navy ink on it reaches ~7:1, while white on it
+      // only reaches ~2.3:1 and read as washed out. Dark surfaces keep white text.
+      default: `bg-[${BRONZE}] text-[${NAVY}] hover:bg-[${BRONZE_HOVER}] ${FOCUS_RING} dark:bg-[${BRONZE}] dark:text-[${NAVY}] dark:hover:bg-[${BRONZE_HOVER}]`,
       alternative: `border border-[${CONTROL_BORDER}] bg-white text-[${NAVY}] hover:bg-[${BRONZE_TINT}] ${FOCUS_RING} dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700`,
       light: `border border-[${CONTROL_BORDER}] bg-white text-[${NAVY}] hover:bg-[${SURFACE}] ${FOCUS_RING} dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700`,
       dark: `bg-[${NAVY}] text-white hover:bg-[${NAVY_HOVER}] ${FOCUS_RING} dark:bg-[${NAVY}] dark:hover:bg-[${NAVY_HOVER}]`,
@@ -288,14 +297,16 @@ export const brandTheme = {
   },
   dropdown: {
     floating: {
-      base: `z-10 w-fit divide-y divide-[#F1F5F9] rounded-[10px] shadow-md focus:outline-none`,
-      content: `py-1 text-sm text-[${INK}] dark:text-gray-200`,
+      base: `z-[70] w-fit max-w-[min(24rem,calc(100vw-2rem))] divide-y divide-[${HAIRLINE}] rounded-[10px] shadow-md focus:outline-none`,
+      // Cap the panel to the viewport and let it scroll: an open menu used to run
+      // past the bottom of the screen with no way to reach the last options.
+      content: `max-h-[min(70vh,20rem)] overflow-y-auto py-1 text-sm text-[${INK}] dark:text-gray-200`,
       header: `block px-4 py-2 text-sm font-semibold text-[${NAVY}] dark:text-gray-200`,
       item: {
         base: `flex w-full cursor-pointer items-center justify-start px-4 py-2 text-sm text-[${INK}] hover:bg-[${SURFACE}] focus:bg-[${SURFACE}] focus:outline-none dark:text-gray-200 dark:hover:bg-gray-600`,
       },
       style: {
-        auto: `border border-[${HAIRLINE}] bg-white text-[${NAVY}] dark:border-none dark:bg-gray-700 dark:text-white`,
+        auto: `border border-[${HAIRLINE}] bg-white text-[${NAVY}] dark:border-gray-600 dark:bg-gray-700 dark:text-white`,
         light: `border border-[${HAIRLINE}] bg-white text-[${NAVY}]`,
       },
     },
