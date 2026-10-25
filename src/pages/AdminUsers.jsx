@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Badge, Button, Label, Modal, ModalBody, ModalFooter, ModalHeader,
-  Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, TextInput,
+  Alert, Badge, Button, Checkbox, Label, Modal, ModalBody, ModalFooter, ModalHeader,
+  Spinner, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, TextInput,
 } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
@@ -234,52 +234,53 @@ function AdminUsers() {
   };
 
   return (
-    <div className="op-admin-overview op-admin-people" data-openpencil-frame="0:7228">
-      <div className="op-admin-heading op-admin-people-heading">
+    <div className="space-y-6" data-openpencil-frame="0:7228">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="op-admin-eyebrow">ZURILOFTS · ADMIN · PEOPLE</p>
-          <h1>Users &amp; hosts</h1>
-          <p>Manage guest accounts, host access, payout details, and account safety.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · PEOPLE</p>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Users &amp; hosts</h1>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Manage guest accounts, host access, payout details, and account safety.</p>
         </div>
       </div>
 
-      <div className="op-admin-metrics op-admin-people-metrics">
-        <article><span>PEOPLE IN VIEW</span><strong>{viewTotals.total}</strong><small>Matching the current filters</small></article>
-        <article><span>GUESTS</span><strong>{viewTotals.guests}</strong><small>Travelling accounts</small></article>
-        <article><span>HOSTS</span><strong>{viewTotals.hosts}</strong><small>Workspace access</small></article>
-        <article><span>SUSPENDED</span><strong>{viewTotals.suspended}</strong><small>Accounts currently restricted</small></article>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <article className="rounded-xl border border-border bg-white p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PEOPLE IN VIEW</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.total}</strong><small className="mt-1 block text-xs text-muted">Matching the current filters</small></article>
+        <article className="rounded-xl border border-border bg-white p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">GUESTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.guests}</strong><small className="mt-1 block text-xs text-muted">Travelling accounts</small></article>
+        <article className="rounded-xl border border-border bg-white p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">HOSTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.hosts}</strong><small className="mt-1 block text-xs text-muted">Workspace access</small></article>
+        <article className="rounded-xl border border-border bg-white p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">SUSPENDED</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.suspended}</strong><small className="mt-1 block text-xs text-muted">Accounts currently restricted</small></article>
       </div>
 
-      <section className="op-admin-people-board">
-        <div className="op-admin-people-toolbar">
-          <div className="op-admin-people-search">
-            <Search strokeWidth={1.8} aria-hidden="true" />
+      <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+        <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative flex-1 sm:max-w-xs">
+            <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
             <TextInput
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search name or email"
               aria-label="Search users by name or email"
+              className="pl-9"
             />
           </div>
           <SelectMenu
             ariaLabel="Filter by role"
             value={roleFilter}
             onChange={(next) => setRoleFilter(next)}
-            className="op-admin-people-filter"
+            wrapperClassName="sm:w-44"
             options={ROLE_FILTER_OPTIONS}
           />
         </div>
 
         {message && (
-          <div className={`op-admin-people-message ${message.toLowerCase().includes('fail') ? 'is-error' : 'is-success'}`} role="status">
+          <Alert color={message.toLowerCase().includes('fail') ? 'failure' : 'success'} className="mx-5 mt-4" role="status">
             {message}
-          </div>
+          </Alert>
         )}
 
         {selectedIds.length > 0 && (
-          <div className="op-admin-people-bulk" role="toolbar" aria-label="Bulk actions">
-            <strong>{selectedIds.length} selected</strong>
+          <div className="mx-5 mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface px-4 py-3" role="toolbar" aria-label="Bulk actions">
+            <strong className="mr-auto text-sm font-semibold text-navy">{selectedIds.length} selected</strong>
             <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => bulkSetSuspended(true)}>Suspend</Button>
             <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => bulkSetSuspended(false)}>Reactivate</Button>
             <Button size="xs" color="light" type="button" onClick={() => setSelectedIds([])}>Clear</Button>
@@ -287,30 +288,29 @@ function AdminUsers() {
         )}
 
         {loading ? (
-          <div className="op-admin-people-empty">
-            <span className="op-admin-booking-spinner" aria-hidden="true" />
-            <strong>Loading people</strong>
-            <p>Fetching guest, host, and administrator accounts.</p>
+          <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
+            <Spinner size="lg" />
+            <strong className="text-sm font-semibold text-navy">Loading people</strong>
+            <p className="text-xs text-muted">Fetching guest, host, and administrator accounts.</p>
           </div>
         ) : loadError ? (
-          <div className="op-admin-people-empty" role="alert">
-            <strong>Could not load accounts</strong>
-            <p>{loadError}</p>
+          <div className="flex flex-col items-center gap-2 px-5 py-12 text-center" role="alert">
+            <strong className="text-sm font-semibold text-navy">Could not load accounts</strong>
+            <p className="text-xs text-muted">{loadError}</p>
             <Button color="light" type="button" onClick={loadUsers}>Try again</Button>
           </div>
         ) : users.length === 0 ? (
-          <Alert color="info" className="op-admin-people-empty">
-            <strong>No accounts found</strong>
+          <Alert color="info" className="m-5">
+            <strong className="block">No accounts found</strong>
             <p>Try a different search or role filter.</p>
           </Alert>
         ) : (
-          <div className="op-admin-people-scroll">
+          <div className="overflow-x-auto">
             <Table hoverable aria-label="Users and hosts">
               <TableHead>
                 <TableRow>
                   <TableHeadCell>
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       aria-label="Select all accounts"
                       checked={selectableUsers.length > 0 && selectedIds.length === selectableUsers.length}
                       onChange={(event) => setSelectedIds(event.target.checked ? selectableUsers.map((u) => u.id) : [])}
@@ -332,16 +332,16 @@ function AdminUsers() {
                     <TableRow key={u.id} className={u.suspended ? 'opacity-70' : undefined}>
                       <TableCell>
                         {!isSelf && u.role !== 'ADMIN' && (
-                          <input type="checkbox" aria-label={`Select ${u.firstName} ${u.lastName}`} checked={selectedIds.includes(u.id)} onChange={() => toggleSelected(u.id)} />
+                          <Checkbox aria-label={`Select ${u.firstName} ${u.lastName}`} checked={selectedIds.includes(u.id)} onChange={() => toggleSelected(u.id)} />
                         )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <span className="op-admin-people-avatar" aria-hidden="true">{userInitials(u)}</span>
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-semibold text-primary-600" aria-hidden="true">{userInitials(u)}</span>
                           <div className="min-w-0">
-                            <strong className="block truncate">{u.firstName} {u.lastName}{isSelf && <small> · you</small>}</strong>
-                            <span className="block truncate text-xs">{u.email}</span>
-                            <small className="block truncate">{u.phone || 'Phone not added'}</small>
+                            <strong className="block truncate text-sm font-semibold text-navy">{u.firstName} {u.lastName}{isSelf && <small> · you</small>}</strong>
+                            <span className="block truncate text-xs text-charcoal">{u.email}</span>
+                            <small className="block truncate text-xs text-muted">{u.phone || 'Phone not added'}</small>
                           </div>
                         </div>
                       </TableCell>
@@ -355,21 +355,21 @@ function AdminUsers() {
                             onChange={(next) => changeRole(u, next)}
                             disabled={busy}
                             ariaLabel={`Change role for ${u.firstName} ${u.lastName}`}
-                            className="op-admin-people-role-select"
+                            wrapperClassName="min-w-[120px]"
                             options={ASSIGNABLE_ROLE_OPTIONS}
                           />
                         )}
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col gap-1">
-                          <strong>{u._count?.properties ?? 0}</strong>
-                          <small>properties</small>
+                          <strong className="text-sm font-semibold text-navy">{u._count?.properties ?? 0}</strong>
+                          <small className="text-xs text-muted">properties</small>
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col gap-1">
-                          <strong>{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '-'}</strong>
-                          <small>host balance</small>
+                          <strong className="text-sm font-semibold text-navy">{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '-'}</strong>
+                          <small className="text-xs text-muted">host balance</small>
                         </div>
                       </TableCell>
                       <TableCell>
@@ -404,24 +404,24 @@ function AdminUsers() {
       {editing && (
         <Modal show onClose={closeEdit} size="lg" dismissible>
           <ModalHeader>
-            <span className="block op-admin-eyebrow">ACCOUNT · {ROLE_LABELS[editing.role] || editing.role}</span>
-            <span className="block">Edit {editing.firstName} {editing.lastName}</span>
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ACCOUNT · {ROLE_LABELS[editing.role] || editing.role}</span>
+            <span className="block text-base font-semibold text-navy">Edit {editing.firstName} {editing.lastName}</span>
           </ModalHeader>
           <form onSubmit={handleSave}>
             <ModalBody>
-              {formError && <Alert color="failure" className="op-admin-error">{formError}</Alert>}
+              {formError && <Alert color="failure">{formError}</Alert>}
 
-              <div className="op-admin-form-grid">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <Field label="First Name" value={formData.firstName} onChange={(v) => setFormData({ ...formData, firstName: v })} />
                 <Field label="Last Name" value={formData.lastName} onChange={(v) => setFormData({ ...formData, lastName: v })} />
               </div>
               <Field label="Email" type="email" value={formData.email} onChange={(v) => setFormData({ ...formData, email: v })} />
               <Field label="Phone" value={formData.phone} onChange={(v) => setFormData({ ...formData, phone: v })} />
 
-              <div className="op-admin-people-form-section">
-                <p>Host payout details</p>
-                <span>Used for bank transfers to hosts. Leave blank for non-hosts.</span>
-                <div className="op-admin-form-grid">
+              <div className="rounded-lg border border-border bg-surface p-4">
+                <p className="text-sm font-semibold text-navy">Host payout details</p>
+                <span className="mt-0.5 block text-xs text-muted">Used for bank transfers to hosts. Leave blank for non-hosts.</span>
+                <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <Field label="Bank Name" value={formData.bankName} onChange={(v) => setFormData({ ...formData, bankName: v })} />
                   <Field label="Account No." value={formData.bankAccountNo} onChange={(v) => setFormData({ ...formData, bankAccountNo: v })} />
                   <Field label="Bank Code" value={formData.bankCode} onChange={(v) => setFormData({ ...formData, bankCode: v })} />
@@ -440,7 +440,7 @@ function AdminUsers() {
             </ModalBody>
             <ModalFooter>
               <Button color="light" type="button" onClick={closeEdit} disabled={saving}>Cancel</Button>
-              <Button className="op-admin-bronze-button" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save changes'}</Button>
+              <Button type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save changes'}</Button>
             </ModalFooter>
           </form>
         </Modal>
@@ -450,16 +450,16 @@ function AdminUsers() {
       {deleteTarget && (
         <Modal show onClose={closeDelete} size="lg" dismissible>
           <ModalHeader>
-            <span className="block op-admin-eyebrow">ACCOUNT ERASURE</span>
-            <span className="block">Delete user account</span>
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ACCOUNT ERASURE</span>
+            <span className="block text-base font-semibold text-navy">Delete user account</span>
           </ModalHeader>
           <ModalBody>
-            <p className="op-admin-people-delete-copy">
+            <p className="text-sm leading-relaxed text-charcoal">
               You are deleting {deleteTarget.firstName} {deleteTarget.lastName} ({deleteTarget.email}).
               Personal data will be erased. Records required for bookings, payouts, and legal compliance
               will be retained only in anonymised form. This cannot be undone.
             </p>
-            {deleteError && <Alert color="failure" className="op-admin-error">{deleteError}</Alert>}
+            {deleteError && <Alert color="failure">{deleteError}</Alert>}
             <div>
               <Label htmlFor="delete-user-reason">Reason for deletion</Label>
               <Textarea
@@ -485,9 +485,9 @@ function AdminUsers() {
             <Button color="light" type="button" onClick={closeDelete} disabled={Boolean(busyId)}>Cancel</Button>
             <Button
               type="button"
+              color="failure"
               onClick={handleDeleteUser}
               disabled={Boolean(busyId) || deleteConfirm !== 'DELETE' || deleteReason.trim().length < 3}
-              className="op-admin-danger-button"
             >
               {busyId ? 'Deleting...' : 'Delete account'}
             </Button>

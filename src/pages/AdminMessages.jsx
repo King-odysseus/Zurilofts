@@ -1,15 +1,19 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Button, Textarea, TextInput } from 'flowbite-react';
+import { Alert, Button, Spinner, Textarea, TextInput } from 'flowbite-react';
 import { ChevronLeft, MessageSquareText, Search } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import apiClient from '../api/client.js';
 
-function SearchIcon() {
-  return <Search strokeWidth={1.8} aria-hidden="true" />;
-}
+// Shared surface styles for both panes so the inbox reads as one component.
+const METRIC_CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
+const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
+const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
+const METRIC_NOTE = 'mt-1 block text-xs text-muted';
+const AVATAR = 'grid h-9 w-9 shrink-0 place-items-center rounded-full bg-navy text-[11px] font-semibold text-white';
+const EMPTY_STATE = 'flex flex-col items-center gap-2 px-4 py-10 text-center';
 
 function BackIcon() {
-  return <ChevronLeft strokeWidth={1.8} aria-hidden="true" />;
+  return <ChevronLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />;
 }
 
 function initials(conversation) {
@@ -134,79 +138,119 @@ function AdminMessages() {
     : null;
 
   return (
-    <div className={`op-admin-overview op-admin-messages ${activeUserId ? 'is-thread-view' : 'is-list-view'}`} data-openpencil-frame="0:7458">
-      <div className="op-admin-heading op-admin-messages-heading">
+    <div className="space-y-6" data-openpencil-frame="0:7458">
+      <div className={`flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between ${activeUserId ? 'hidden lg:flex' : ''}`}>
         <div>
-          <p className="op-admin-eyebrow">ZURILOFTS · ADMIN · GOVERNANCE</p>
-          <h1>Messages</h1>
-          <p>Review guest conversations, keep support replies moving, and track unread demand.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · OPERATIONS</p>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Messages</h1>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Review guest conversations, keep support replies moving, and track unread demand.</p>
         </div>
       </div>
 
-      <div className="op-admin-metrics op-admin-catalog-metrics op-admin-message-metrics">
-        <article><span>CONVERSATIONS</span><strong>{conversations.length}</strong><small>Guests with a support history</small></article>
-        <article><span>UNREAD MESSAGES</span><strong>{unreadTotal}</strong><small>Waiting for an operations reply</small></article>
-        <article><span>OPEN THREAD</span><strong className="op-admin-message-active">{activePreview ? `${activePreview.firstName || ''} ${activePreview.lastName || ''}`.trim() || 'Guest' : 'None'}</strong><small>{activePreview ? activePreview.email || 'Guest conversation' : 'Select a guest to read the thread'}</small></article>
-        <article><span>LAST SYNC</span><strong className="op-admin-message-sync">{lastSync ? lastSync.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '-'}</strong><small>Automatically refreshed every 30 seconds</small></article>
+      <div className={`grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 ${activeUserId ? 'hidden lg:grid' : ''}`}>
+        <article className={METRIC_CARD}>
+          <span className={METRIC_LABEL}>CONVERSATIONS</span>
+          <strong className={METRIC_VALUE}>{conversations.length}</strong>
+          <small className={METRIC_NOTE}>Guests with a support history</small>
+        </article>
+        <article className={METRIC_CARD}>
+          <span className={METRIC_LABEL}>UNREAD MESSAGES</span>
+          <strong className={METRIC_VALUE}>{unreadTotal}</strong>
+          <small className={METRIC_NOTE}>Waiting for an operations reply</small>
+        </article>
+        <article className={METRIC_CARD}>
+          <span className={METRIC_LABEL}>OPEN THREAD</span>
+          <strong className={`${METRIC_VALUE} truncate`}>{activePreview ? `${activePreview.firstName || ''} ${activePreview.lastName || ''}`.trim() || 'Guest' : 'None'}</strong>
+          <small className={METRIC_NOTE}>{activePreview ? activePreview.email || 'Guest conversation' : 'Select a guest to read the thread'}</small>
+        </article>
+        <article className={METRIC_CARD}>
+          <span className={METRIC_LABEL}>LAST SYNC</span>
+          <strong className={METRIC_VALUE}>{lastSync ? lastSync.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '-'}</strong>
+          <small className={METRIC_NOTE}>Automatically refreshed every 30 seconds</small>
+        </article>
       </div>
 
-      <section className={`op-admin-message-board ${activeUserId ? 'has-active' : ''}`}>
-        <aside className="op-admin-message-list-panel">
-          <div className="op-admin-message-search"><SearchIcon /><TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search conversations" aria-label="Search conversations" /></div>
-          <div className="op-admin-message-list">
-            {loadingList ? (
-              <div className="op-admin-message-empty"><span className="op-admin-booking-spinner" aria-hidden="true" /><strong>Loading conversations</strong></div>
-            ) : visibleConversations.length === 0 ? (
-              <div className="op-admin-message-empty"><strong>No conversations found</strong><p>Adjust the search or wait for a new guest message.</p></div>
-            ) : visibleConversations.map((conversation) => (
-              <Link key={conversation.userId} to={`/admin/messages/${encodeURIComponent(conversation.userId)}`} className={`op-admin-message-conversation ${activeUserId === conversation.userId ? 'is-active' : ''}`} aria-current={activeUserId === conversation.userId ? 'page' : undefined}>
-                <span className="op-admin-message-avatar" aria-hidden="true">{initials(conversation)}</span>
-                <span className="op-admin-message-preview">
-                  <span><strong>{conversation.firstName} {conversation.lastName}</strong><small>{formatMessageTime(conversation.lastMessage?.createdAt)}</small></span>
-                  <span>{conversation.lastMessage ? `${conversation.lastMessage.senderRole === 'ADMIN' ? 'You: ' : ''}${conversation.lastMessage.body}` : 'No messages yet'}</span>
-                </span>
-                {conversation.unread > 0 && <span className="op-admin-message-unread">{conversation.unread}</span>}
-              </Link>
-            ))}
-          </div>
-        </aside>
-
-        <div className="op-admin-message-thread-panel">
-          {!activeUserId ? (
-            <div className="op-admin-message-thread-empty">
-              <span aria-hidden="true"><MessageSquareText strokeWidth={1.5} /></span>
-              <strong>Select a conversation</strong>
-              <p>Choose a guest from the queue to read the full thread and reply.</p>
-            </div>
-          ) : (
-            <>
-              <header className="op-admin-message-thread-head">
-                <Link className="op-admin-message-back" to="/admin/messages" aria-label="Back to conversations"><BackIcon /></Link>
-                <span className="op-admin-message-avatar" aria-hidden="true">{initials(activePreview)}</span>
-                <div><strong>{activePreview?.firstName} {activePreview?.lastName}</strong><span>{activePreview?.email}</span></div>
-              </header>
-
-              {error && <div className="op-admin-message-error" role="alert">{error}</div>}
-
-              <div className="op-admin-message-thread">
-                {loadingThread ? (
-                  <div className="op-admin-message-empty"><span className="op-admin-booking-spinner" aria-hidden="true" /><strong>Loading thread</strong></div>
-                ) : thread.length === 0 ? (
-                  <div className="op-admin-message-empty"><strong>No messages in this thread</strong><p>Send the first reply below.</p></div>
-                ) : thread.map((message) => {
-                  const fromAdmin = message.senderRole === 'ADMIN';
-                  return (
-                    <article key={message.id} className={`op-admin-message-bubble ${fromAdmin ? 'is-admin' : 'is-guest'}`}>
-                      <p>{message.body}</p>
-                      <span>{fromAdmin ? 'ZuriLofts support' : `${activePreview?.firstName || 'Guest'}`} · {formatThreadTime(message.createdAt)}</span>
-                    </article>
-                  );
-                })}
-                <div ref={bottomRef} />
+      <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+        {/* Two panes on desktop; one pane at a time on phones, driven by the route. */}
+        <div className={`grid grid-cols-1 lg:h-[calc(100vh_-_18rem)] lg:max-h-[680px] lg:min-h-[520px] lg:grid-cols-3 lg:overflow-hidden ${activeUserId ? 'h-[calc(100dvh_-_172px)] min-h-[420px]' : ''}`}>
+          <aside className={`${activeUserId ? 'hidden lg:flex' : 'flex'} min-h-0 min-w-0 flex-col border-border lg:col-span-1 lg:border-r`}>
+            <div className="flex-none border-b border-border p-3">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
+                <TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search conversations" aria-label="Search conversations" className="pl-9" />
               </div>
+            </div>
+            <div className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
+              {loadingList ? (
+                <div className={EMPTY_STATE}>
+                  <Spinner size="md" aria-hidden="true" />
+                  <strong className="text-sm font-semibold text-navy">Loading conversations</strong>
+                </div>
+              ) : visibleConversations.length === 0 ? (
+                <div className={EMPTY_STATE}>
+                  <strong className="text-sm font-semibold text-navy">No conversations found</strong>
+                  <p className="text-xs text-muted">Adjust the search or wait for a new guest message.</p>
+                </div>
+              ) : visibleConversations.map((conversation) => (
+                <Link key={conversation.userId} to={`/admin/messages/${encodeURIComponent(conversation.userId)}`} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${activeUserId === conversation.userId ? 'bg-primary-50' : 'hover:bg-surface'}`} aria-current={activeUserId === conversation.userId ? 'page' : undefined}>
+                  <span className={AVATAR} aria-hidden="true">{initials(conversation)}</span>
+                  <span className="block min-w-0 flex-1 space-y-1">
+                    <span className="flex items-center justify-between gap-2">
+                      <strong className="min-w-0 truncate text-xs font-semibold text-navy">{conversation.firstName} {conversation.lastName}</strong>
+                      <small className="shrink-0 text-[10px] text-muted">{formatMessageTime(conversation.lastMessage?.createdAt)}</small>
+                    </span>
+                    <span className="block truncate text-xs text-muted">{conversation.lastMessage ? `${conversation.lastMessage.senderRole === 'ADMIN' ? 'You: ' : ''}${conversation.lastMessage.body}` : 'No messages yet'}</span>
+                  </span>
+                  {conversation.unread > 0 && <span className="grid h-[18px] min-w-[18px] shrink-0 place-items-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">{conversation.unread}</span>}
+                </Link>
+              ))}
+            </div>
+          </aside>
 
-              <form className="op-admin-message-composer" onSubmit={handleReply}>
-                <div className="op-admin-message-compose-surface">
+          <div className={`${activeUserId ? 'flex' : 'hidden lg:flex'} min-h-0 min-w-0 flex-col lg:col-span-2`}>
+            {!activeUserId ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 py-12 text-center">
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 text-navy" aria-hidden="true"><MessageSquareText className="h-6 w-6" strokeWidth={1.5} /></span>
+                <strong className="text-sm font-semibold text-navy">Select a conversation</strong>
+                <p className="max-w-sm text-xs leading-relaxed text-muted">Choose a guest from the queue to read the full thread and reply.</p>
+              </div>
+            ) : (
+              <>
+                <header className="flex min-h-[64px] flex-none items-center gap-3 border-b border-border px-4 py-3">
+                  <Link className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface text-navy lg:hidden" to="/admin/messages" aria-label="Back to conversations"><BackIcon /></Link>
+                  <span className={AVATAR} aria-hidden="true">{initials(activePreview)}</span>
+                  <div className="min-w-0">
+                    <strong className="block truncate text-sm font-semibold text-navy">{activePreview?.firstName} {activePreview?.lastName}</strong>
+                    <span className="block truncate text-xs text-muted">{activePreview?.email}</span>
+                  </div>
+                </header>
+
+                {error && <Alert color="failure" role="alert" className="mx-4 mt-3">{error}</Alert>}
+
+                <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto p-4">
+                  {loadingThread ? (
+                    <div className={EMPTY_STATE}>
+                      <Spinner size="md" aria-hidden="true" />
+                      <strong className="text-sm font-semibold text-navy">Loading thread</strong>
+                    </div>
+                  ) : thread.length === 0 ? (
+                    <div className={EMPTY_STATE}>
+                      <strong className="text-sm font-semibold text-navy">No messages in this thread</strong>
+                      <p className="text-xs text-muted">Send the first reply below.</p>
+                    </div>
+                  ) : thread.map((message) => {
+                    const fromAdmin = message.senderRole === 'ADMIN';
+                    return (
+                      <article key={message.id} className={`max-w-[85%] rounded-2xl px-3 py-2 shadow-sm ${fromAdmin ? 'self-end rounded-br-md bg-primary-700 text-white' : 'self-start rounded-bl-md bg-surface text-navy'}`}>
+                        <p className="whitespace-pre-wrap break-words text-sm leading-relaxed">{message.body}</p>
+                        <span className={`mt-1.5 block text-[10px] ${fromAdmin ? 'text-white/80' : 'text-muted'}`}>{fromAdmin ? 'ZuriLofts support' : `${activePreview?.firstName || 'Guest'}`} · {formatThreadTime(message.createdAt)}</span>
+                      </article>
+                    );
+                  })}
+                  <div ref={bottomRef} />
+                </div>
+
+                <form className="flex flex-none items-end gap-2 border-t border-border p-3" onSubmit={handleReply}>
                   <Textarea
                     value={body}
                     onChange={(event) => setBody(event.target.value)}
@@ -219,15 +263,13 @@ function AdminMessages() {
                     rows={1}
                     placeholder="Write a reply to the guest"
                     aria-label="Reply to guest"
-                    className="op-admin-message-textarea"
+                    className="min-h-0 flex-1 resize-none"
                   />
-                  <div className="op-admin-message-compose-actions">
-                    <Button className="op-admin-bronze-button" type="submit" disabled={sending || !body.trim()}>{sending ? 'Sending...' : 'Send reply'}</Button>
-                  </div>
-                </div>
-              </form>
-            </>
-          )}
+                  <Button type="submit" disabled={sending || !body.trim()}>{sending ? 'Sending...' : 'Send reply'}</Button>
+                </form>
+              </>
+            )}
+          </div>
         </div>
       </section>
     </div>

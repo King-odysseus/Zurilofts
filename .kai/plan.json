@@ -2,29 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Audit native selects and custom CSS usage",
+      "text": "Survey current styling: CSS files, custom op-* classes, Flowbite setup and Tailwind config",
       "state": "done"
     },
     {
-      "text": "Swap native selects for Flowbite Dropdown",
+      "text": "Convert the admin panel (shell + 10 pages) to Flowbite components with Tailwind only",
       "state": "done"
     },
     {
-      "text": "Confirm lucide-react icons everywhere",
+      "text": "Delete admin-design.css and move the shared chart classes into FlowbiteChart",
       "state": "done"
     },
     {
-      "text": "Run lint and build",
+      "text": "Verify admin panel: lint, production build, and screenshots of 8 admin pages at desktop and phone width",
       "state": "done"
     },
     {
-      "text": "Check dropdowns in the browser",
-      "state": "done"
-    },
-    {
-      "text": "Commit and push",
+      "text": "Commit and push the admin panel conversion",
       "state": "active"
+    },
+    {
+      "text": "Convert host workspace pages (host-workspace.css) to Flowbite components with Tailwind only",
+      "state": "pending"
+    },
+    {
+      "text": "Convert guest account, checkout, auth and discovery pages, then retire the remaining custom CSS files",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-25T20:03:07.212Z"
+  "updatedAt": "2026-10-25T20:29:13.205Z"
 }

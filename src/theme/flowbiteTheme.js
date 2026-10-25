@@ -115,7 +115,10 @@ export const brandTheme = {
 
   // -- Actions --------------------------------------------------------------
   button: {
-    base: 'relative flex items-center justify-center gap-2 rounded-[10px] text-center font-semibold focus:outline-none disabled:pointer-events-none disabled:opacity-50',
+    // Pill by default: a fully rounded button reads as an action, while an
+    // 8-10px box reads as a field. This is the Airbnb shape the design system
+    // settled on, so every Flowbite Button gets it without a per-page class.
+    base: 'relative flex items-center justify-center gap-2 rounded-full text-center font-semibold focus:outline-none disabled:pointer-events-none disabled:opacity-50',
     pill: 'rounded-full',
     size: {
       xs: 'h-8 px-3 text-xs',

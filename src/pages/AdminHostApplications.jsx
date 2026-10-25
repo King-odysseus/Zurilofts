@@ -8,6 +8,7 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
+  Spinner,
   Table,
   TableBody,
   TableCell,
@@ -197,59 +198,76 @@ function AdminHostApplications() {
   }
 
   return (
-    <div className="op-admin-overview op-admin-host-apps" data-openpencil-frame="0:7228">
-      <div className="op-admin-heading op-admin-host-apps-heading">
+    <div className="space-y-6" data-openpencil-frame="0:7228">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="op-admin-eyebrow">ZURILOFTS · ADMIN · VERIFICATION</p>
-          <h1>Host applications</h1>
-          <p>Verify identity, authority, and hosting details before granting workspace access.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · VERIFICATION</p>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Host applications</h1>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Verify identity, authority, and hosting details before granting workspace access.</p>
         </div>
       </div>
 
-      <div className="op-admin-metrics op-admin-host-app-metrics">
-        <article><span>APPLICATIONS IN VIEW</span><strong>{visibleApplications.length}</strong><small>Matching the current review filter</small></article>
-        <article><span>ENCRYPTED FILES</span><strong>{viewTotals.documents}</strong><small>Documents available to review</small></article>
-        <article><span>LOCATIONS</span><strong>{viewTotals.locations}</strong><small>Distinct primary areas</small></article>
-        <article><span>LAST UPDATE</span><strong className="op-admin-host-app-date">{formatDate(viewTotals.latest)}</strong><small>Most recent application activity</small></article>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">APPLICATIONS IN VIEW</span>
+          <strong className="mt-2 block text-2xl font-bold text-navy">{visibleApplications.length}</strong>
+          <small className="mt-1 block text-xs text-muted">Matching the current review filter</small>
+        </article>
+        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">ENCRYPTED FILES</span>
+          <strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.documents}</strong>
+          <small className="mt-1 block text-xs text-muted">Documents available to review</small>
+        </article>
+        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">LOCATIONS</span>
+          <strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.locations}</strong>
+          <small className="mt-1 block text-xs text-muted">Distinct primary areas</small>
+        </article>
+        <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">LAST UPDATE</span>
+          <strong className="mt-2 block text-2xl font-bold text-navy">{formatDate(viewTotals.latest)}</strong>
+          <small className="mt-1 block text-xs text-muted">Most recent application activity</small>
+        </article>
       </div>
 
-      <section className="op-admin-host-app-queue">
-        <div className="op-admin-host-app-toolbar">
-          <div className="op-admin-host-app-search">
-            <SearchIcon />
+      <section className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+        <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative w-full sm:max-w-sm">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
             <TextInput
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search applicant, business, email or area"
               aria-label="Search host applications"
+              className="pl-9"
             />
           </div>
           <SelectMenu
             ariaLabel="Filter host applications by status"
             value={status}
             onChange={(next) => setStatus(next)}
-            className="op-admin-host-app-filter"
+            wrapperClassName="sm:w-56"
             options={STATUS_OPTIONS}
           />
         </div>
 
-        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="op-admin-people-message" role="status">{message}</Alert>}
+        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="mx-5 mt-4" role="status">{message}</Alert>}
 
         {loading ? (
-          <div className="op-admin-host-app-empty">
-            <span className="op-admin-booking-spinner" aria-hidden="true" />
-            <strong>Loading applications</strong>
-            <p>Fetching the verification queue and encrypted document records.</p>
+          <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
+            <Spinner size="lg" aria-hidden="true" />
+            <strong className="text-sm font-semibold text-navy">Loading applications</strong>
+            <p className="text-xs text-muted">Fetching the verification queue and encrypted document records.</p>
           </div>
         ) : visibleApplications.length === 0 ? (
-          <Alert color="info" className="op-admin-host-app-empty">
+          <Alert color="info" className="m-5">
             <span aria-hidden="true"><SearchIcon /></span>
             <strong>No applications in this view</strong>
             <p>Nothing is waiting under the selected status and search. Try another filter.</p>
           </Alert>
         ) : (
-          <div className="op-admin-host-app-list">
+          <div className="overflow-x-auto">
             <Table hoverable aria-label="Host applications">
               <TableHead>
                 <TableRow>
@@ -267,36 +285,38 @@ function AdminHostApplications() {
                   const meta = statusMeta(application.status);
                   return (
                     <TableRow key={application.id}>
-                      <TableCell className="op-admin-host-app-applicant">
-                        <span className="op-admin-host-app-avatar" aria-hidden="true">{initials(application)}</span>
-                        <div>
-                          <strong>{application.legalName || `${application.user?.firstName || ''} ${application.user?.lastName || ''}`.trim() || 'Unnamed applicant'}</strong>
-                          <span>{application.contactEmail || application.user?.email || 'Email not provided'}</span>
-                          <small>{application.contactPhone || 'Phone not provided'}</small>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-bold text-navy" aria-hidden="true">{initials(application)}</span>
+                          <div className="min-w-0">
+                            <strong className="block truncate text-sm font-semibold text-navy">{application.legalName || `${application.user?.firstName || ''} ${application.user?.lastName || ''}`.trim() || 'Unnamed applicant'}</strong>
+                            <span className="block truncate text-xs text-muted">{application.contactEmail || application.user?.email || 'Email not provided'}</span>
+                            <small className="block text-xs text-muted">{application.contactPhone || 'Phone not provided'}</small>
+                          </div>
                         </div>
                       </TableCell>
-                      <TableCell className="op-admin-host-app-cell">
-                        <small>BUSINESS</small>
-                        <strong>{application.businessName || 'Individual host'}</strong>
-                        <span>{application.businessType ? String(application.businessType).replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Type not set'}</span>
+                      <TableCell>
+                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">BUSINESS</small>
+                        <strong className="mt-0.5 block text-sm font-medium text-navy">{application.businessName || 'Individual host'}</strong>
+                        <span className="mt-0.5 block text-xs text-muted">{application.businessType ? String(application.businessType).replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Type not set'}</span>
                       </TableCell>
-                      <TableCell className="op-admin-host-app-cell">
-                        <small>HOSTING</small>
-                        <strong>{application.city || 'Area not set'}</strong>
-                        <span>{application.propertyCount ? `${application.propertyCount} propert${application.propertyCount === 1 ? 'y' : 'ies'}` : 'Count not set'}</span>
+                      <TableCell>
+                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">HOSTING</small>
+                        <strong className="mt-0.5 block text-sm font-medium text-navy">{application.city || 'Area not set'}</strong>
+                        <span className="mt-0.5 block text-xs text-muted">{application.propertyCount ? `${application.propertyCount} propert${application.propertyCount === 1 ? 'y' : 'ies'}` : 'Count not set'}</span>
                       </TableCell>
-                      <TableCell className="op-admin-host-app-cell">
-                        <small>DOCUMENTS</small>
-                        <strong>{application.documents?.length || 0} encrypted</strong>
-                        <span>{application.documents?.length ? 'Ready to inspect' : 'No files uploaded'}</span>
+                      <TableCell>
+                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">DOCUMENTS</small>
+                        <strong className="mt-0.5 block text-sm font-medium text-navy">{application.documents?.length || 0} encrypted</strong>
+                        <span className="mt-0.5 block text-xs text-muted">{application.documents?.length ? 'Ready to inspect' : 'No files uploaded'}</span>
                       </TableCell>
-                      <TableCell className="op-admin-host-app-cell">
-                        <small>UPDATED</small>
-                        <strong>{formatDate(application.updatedAt || application.submittedAt)}</strong>
-                        <span>{application.reviewedAt ? `Reviewed ${formatDate(application.reviewedAt)}` : 'Not reviewed yet'}</span>
+                      <TableCell>
+                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">UPDATED</small>
+                        <strong className="mt-0.5 block text-sm font-medium text-navy">{formatDate(application.updatedAt || application.submittedAt)}</strong>
+                        <span className="mt-0.5 block text-xs text-muted">{application.reviewedAt ? `Reviewed ${formatDate(application.reviewedAt)}` : 'Not reviewed yet'}</span>
                       </TableCell>
                       <TableCell><Badge color={BADGE_COLORS[meta.tone] || 'gray'}>{meta.label}</Badge></TableCell>
-                      <TableCell className="op-admin-host-app-action">
+                      <TableCell>
                         <Button size="xs" onClick={() => openApplication(application.id)} disabled={busy === application.id}>
                           {busy === application.id ? 'Loading...' : 'Review'}
                         </Button>
@@ -314,14 +334,14 @@ function AdminHostApplications() {
         {selected && (
           <>
             <ModalHeader>
-              <span className="block op-admin-eyebrow">HOST APPLICATION · {String(selected.status || '').replace(/_/g, ' ')}</span>
-              <span className="block">{selected.legalName || 'Host application'}</span>
-              <span className="block">{selected.contactEmail || selected.user?.email}</span>
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">HOST APPLICATION · {String(selected.status || '').replace(/_/g, ' ')}</span>
+              <span className="mt-1 block text-lg font-semibold text-navy">{selected.legalName || 'Host application'}</span>
+              <span className="mt-0.5 block text-xs font-normal text-muted">{selected.contactEmail || selected.user?.email}</span>
             </ModalHeader>
-            <ModalBody>
-              {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="op-admin-people-message" role="status">{message}</Alert>}
+            <ModalBody className="space-y-5">
+              {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} role="status">{message}</Alert>}
 
-              <div className="op-admin-host-app-detail-grid">
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <DetailSection title="Identity & contact">
                   <Detail label="Legal name" value={selected.legalName} />
                   <Detail label="Date of birth" value={selected.dateOfBirth} />
@@ -359,35 +379,42 @@ function AdminHostApplications() {
                 </DetailSection>
               </div>
 
-              <section className="op-admin-host-app-section">
-                <div className="op-admin-host-app-section-heading">
-                  <div><h3>Experience</h3><p>Applicant notes supplied for verification.</p></div>
+              <section className="rounded-xl border border-border bg-surface p-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-navy">Experience</h3>
+                  <p className="mt-1 text-xs text-muted">Applicant notes supplied for verification.</p>
                 </div>
-                <p className="op-admin-host-app-experience">{selected.experience || 'No additional hosting notes were supplied.'}</p>
+                <p className="mt-2 text-sm leading-relaxed text-charcoal">{selected.experience || 'No additional hosting notes were supplied.'}</p>
               </section>
 
-              <section className="op-admin-host-app-section">
-                <div className="op-admin-host-app-section-heading">
-                  <div><h3>Encrypted documents</h3><p>Files are decrypted only for this authorised review download.</p></div>
-                  <span>{selected.documents?.length || 0} files</span>
+              <section className="rounded-xl border border-border bg-surface p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-semibold text-navy">Encrypted documents</h3>
+                    <p className="mt-1 text-xs text-muted">Files are decrypted only for this authorised review download.</p>
+                  </div>
+                  <span className="text-xs text-muted">{selected.documents?.length || 0} files</span>
                 </div>
                 {selected.documents?.length ? (
-                  <div className="op-admin-host-app-documents">
+                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
                     {selected.documents.map((document) => (
                       <Button key={document.id} color="light" onClick={() => downloadDocument(document)} disabled={busy === document.id}>
                         <FileText strokeWidth={1.6} aria-hidden="true" />
-                        <span><strong>{DOCUMENT_LABELS[document.kind] || document.kind}</strong><small>{document.originalName} · {formatFileSize(document.size)}</small></span>
+                        <span className="flex min-w-0 flex-col items-start leading-tight">
+                          <strong className="w-full truncate text-xs font-semibold text-navy">{DOCUMENT_LABELS[document.kind] || document.kind}</strong>
+                          <small className="w-full truncate text-[11px] font-normal text-muted">{document.originalName} · {formatFileSize(document.size)}</small>
+                        </span>
                       </Button>
                     ))}
                   </div>
-                ) : <div className="op-admin-host-app-no-documents">No documents have been uploaded for this application.</div>}
+                ) : <div className="mt-3 rounded-xl border border-border bg-white px-4 py-6 text-center text-sm text-muted">No documents have been uploaded for this application.</div>}
               </section>
 
               {selected.status === 'SUBMITTED' && (
-                <section className="op-admin-host-app-review">
+                <section className="space-y-3 rounded-xl border border-border bg-surface p-4">
                   <div>
-                    <h3>Review decision</h3>
-                    <p>Approve to grant host access, or return the application with a clear, applicant-visible note.</p>
+                    <h3 className="text-sm font-semibold text-navy">Review decision</h3>
+                    <p className="mt-1 text-xs text-muted">Approve to grant host access, or return the application with a clear, applicant-visible note.</p>
                   </div>
                   <Label htmlFor="host-application-note">Reviewer note</Label>
                   <Textarea
@@ -398,30 +425,41 @@ function AdminHostApplications() {
                     maxLength={2000}
                     placeholder="Required for changes or rejection"
                   />
-                  <div className="op-admin-host-app-review-actions">
+                  <div className="flex flex-wrap items-center gap-2">
                     <Button color="failure" onClick={() => review('reject')} disabled={Boolean(busy)}>Reject</Button>
                     <Button color="light" onClick={() => review('request-changes')} disabled={Boolean(busy)}>Request changes</Button>
-                    <Button onClick={() => review('approve')} disabled={Boolean(busy)} className="op-admin-bronze-button">{busy === 'approve' ? 'Approving...' : 'Approve host'}</Button>
+                    <Button onClick={() => review('approve')} disabled={Boolean(busy)}>{busy === 'approve' ? 'Approving...' : 'Approve host'}</Button>
                   </div>
                 </section>
               )}
 
               {selected.reviewNote && selected.status !== 'SUBMITTED' && (
-                <section className="op-admin-host-app-section">
-                  <div className="op-admin-host-app-section-heading"><div><h3>Reviewer note</h3><p>Shared with the applicant.</p></div></div>
-                  <p className="op-admin-host-app-experience">{selected.reviewNote}</p>
+                <section className="rounded-xl border border-border bg-surface p-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-navy">Reviewer note</h3>
+                    <p className="mt-1 text-xs text-muted">Shared with the applicant.</p>
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed text-charcoal">{selected.reviewNote}</p>
                 </section>
               )}
 
               {selected.auditLogs?.length > 0 && (
-                <section className="op-admin-host-app-section">
-                  <div className="op-admin-host-app-section-heading"><div><h3>Review history</h3><p>Immutable actions recorded for this application.</p></div></div>
-                  <div className="op-admin-host-app-audit">
+                <section className="rounded-xl border border-border bg-surface p-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-navy">Review history</h3>
+                    <p className="mt-1 text-xs text-muted">Immutable actions recorded for this application.</p>
+                  </div>
+                  <div className="mt-3 space-y-3">
                     {selected.auditLogs.map((entry) => (
-                      <div key={entry.id}>
-                        <span aria-hidden="true" />
-                        <p><strong>{String(entry.action).replace(/_/g, ' ')}</strong><small>{formatDate(entry.createdAt, true)}</small></p>
-                        {entry.note && <blockquote>{entry.note}</blockquote>}
+                      <div key={entry.id} className="flex items-start gap-3">
+                        <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary-600" aria-hidden="true" />
+                        <div className="min-w-0">
+                          <p className="text-sm text-navy">
+                            <strong className="font-semibold">{String(entry.action).replace(/_/g, ' ')}</strong>
+                            <small className="ml-1 text-xs text-muted">{formatDate(entry.createdAt, true)}</small>
+                          </p>
+                          {entry.note && <blockquote className="mt-1 border-l-2 border-border pl-3 text-xs text-muted">{entry.note}</blockquote>}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -436,11 +474,21 @@ function AdminHostApplications() {
 }
 
 function DetailSection({ title, children }) {
-  return <section className="op-admin-host-app-detail-section"><h3>{title}</h3><div>{children}</div></section>;
+  return (
+    <section className="rounded-xl border border-border bg-surface p-4">
+      <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted">{title}</h3>
+      <div className="mt-2">{children}</div>
+    </section>
+  );
 }
 
 function Detail({ label, value }) {
-  return <div className="op-admin-host-app-detail"><span>{label}</span><strong>{value === null || value === undefined || value === '' ? '-' : String(value)}</strong></div>;
+  return (
+    <div className="flex items-start justify-between gap-4 border-b border-border py-2 last:border-0">
+      <span className="text-xs text-muted">{label}</span>
+      <strong className="text-right text-sm font-medium text-navy">{value === null || value === undefined || value === '' ? '-' : String(value)}</strong>
+    </div>
+  );
 }
 
 DetailSection.propTypes = { title: PropTypes.string.isRequired, children: PropTypes.node.isRequired };

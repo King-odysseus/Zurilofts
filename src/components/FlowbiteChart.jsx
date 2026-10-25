@@ -42,7 +42,7 @@ function FlowbiteChart({ options, series, height = 280, className = '', ariaLabe
   return (
     <div
       ref={chartElementRef}
-      className={`op-flowbite-chart ${className}`.trim()}
+      className={`w-full min-w-0 [&_.apexcharts-canvas]:mx-auto ${className}`.trim()}
       role={ariaLabel ? 'img' : undefined}
       aria-label={ariaLabel}
     />
@@ -100,15 +100,16 @@ function FlowbiteGauge({ label, value, note, color = '#C49A6C', height = 150 }) 
   }), [displayValue, isDark, label, resolvedColor, trackColor]);
 
   return (
-    <article className="op-flowbite-gauge">
+    <article className="grid min-h-[122px] grid-cols-[112px_minmax(0,1fr)] grid-rows-[auto_auto] items-center gap-x-1.5 rounded-xl border border-border bg-white py-2 pl-1.5 pr-3">
       <FlowbiteChart
         options={options}
         series={[safeValue]}
         height={height}
+        className="row-span-2"
         ariaLabel={`${label}: ${displayValue}%`}
       />
-      <strong>{label}</strong>
-      <span>{note}</span>
+      <strong className="text-[11px] font-semibold leading-[1.35] text-navy">{label}</strong>
+      <span className="text-[9px] leading-[1.45] text-muted">{note}</span>
     </article>
   );
 }

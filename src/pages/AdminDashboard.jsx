@@ -11,9 +11,7 @@ import {
   AccordionContent,
   AccordionPanel,
   AccordionTitle,
-  Drawer,
-  DrawerHeader,
-  DrawerItems,
+  Button,
   Dropdown,
   DropdownDivider,
   DropdownHeader,
@@ -32,13 +30,39 @@ import {
   LayoutGrid,
   LogOut,
   MessageCircle,
-  SlidersHorizontal,
   ScrollText,
+  Search,
   ShieldCheck,
+  SlidersHorizontal,
   Star,
   Users,
+  X,
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle.jsx';
+
+// ---------------------------------------------------------------------------
+// Shared Tailwind recipes
+// The shell (sidebar, mobile drawer, dashboard cards) repeats the same surfaces
+// many times over, so the recipes live here: retyping them per element is how
+// the old stylesheet drifted apart in the first place.
+// ---------------------------------------------------------------------------
+const NAV_LINK_BASE = 'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors';
+const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-navy';
+const NAV_LINK_IDLE = 'text-white/80 hover:bg-white/10 hover:text-white';
+
+const METRIC_CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
+const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
+const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
+const METRIC_NOTE = 'mt-1 block text-xs text-muted';
+
+const PANEL = 'overflow-hidden rounded-xl border border-border bg-white shadow-sm';
+const PANEL_HEAD = 'flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between';
+const PANEL_TITLE = 'text-base font-semibold text-navy';
+const PANEL_SUBTITLE = 'text-xs text-muted';
+const LIST_ROW = 'flex flex-col gap-3 border-b border-border px-5 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between';
+const EMPTY_STATE = 'flex flex-col items-center gap-2 px-5 py-12 text-center';
+
+const ICON_BUTTON = 'grid h-9 w-9 place-items-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-navy';
 
 // Admin scope is people and the platform. Listings appear only as the approval
 // queue: hosts own create, edit, calendar, pricing, money and discounts, so
@@ -77,17 +101,21 @@ const adminMobilePrimaryItems = [
   { path: '/admin/users', label: 'People', icon: Users, matchPaths: ['/admin/users', '/admin/trust-safety'] },
 ];
 
-function SidebarFlyout({ active, label, target = 'control', children }) {
+/**
+ * Collapsed rail only: the nav label has no room in a 64px column, so it is
+ * revealed as a tooltip. Flowbite's Tooltip positions itself with a fixed
+ * strategy, which is what lets the flyout escape the sidebar's scroll container.
+ */
+function SidebarFlyout({ active, label, children }) {
   if (!active) return children;
 
   return (
     <Tooltip
       arrow
-      className="op-admin-sidebar-flyout"
+      className="rounded-xl border border-border bg-white px-3 py-2 text-sm font-medium text-navy shadow-lg"
       content={label}
       placement="right"
       style="light"
-      theme={{ target: target === 'nav' ? 'mx-auto block w-11' : 'block w-full' }}
     >
       {children}
     </Tooltip>
@@ -97,7 +125,6 @@ function SidebarFlyout({ active, label, target = 'control', children }) {
 SidebarFlyout.propTypes = {
   active: PropTypes.bool,
   label: PropTypes.string.isRequired,
-  target: PropTypes.oneOf(['control', 'nav']),
   children: PropTypes.node.isRequired,
 };
 
@@ -105,33 +132,33 @@ SidebarFlyout.propTypes = {
 function HeaderUserMenu({ user, onLogout }) {
   return (
     <Dropdown
-      inline
       placement="bottom-end"
-      className="op-admin-avatar-menu"
-      theme={{ inlineWrapper: 'op-admin-avatar-trigger' }}
-      label={(
-        <>
-          <span className="op-admin-avatar-trigger-avatar">
-          {user?.avatar ? (
-              <img src={user.avatar} alt="" />
-          ) : (
-            <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
-          )}
+      className="w-60 border border-border shadow-lg"
+      // The trigger is our own button: Flowbite's default inline wrapper has no
+      // Tailwind hook on the element, so styling it through className is impossible.
+      renderTrigger={() => (
+        <button type="button" className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-surface">
+          <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-primary text-xs font-bold text-white">
+            {user?.avatar ? (
+              <img src={user.avatar} alt="" className="h-8 w-8 rounded-full object-cover" />
+            ) : (
+              <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
+            )}
           </span>
-          <span className="op-admin-avatar-name">{user?.firstName}</span>
-        </>
+          <span className="text-sm font-semibold text-navy">{user?.firstName}</span>
+        </button>
       )}
     >
-      <DropdownHeader className="op-admin-avatar-header">
-        <strong>{user?.firstName} {user?.lastName}</strong>
-        <span>{user?.email}</span>
-        <small>Admin</small>
+      <DropdownHeader className="flex flex-col gap-0.5 px-3 py-2">
+        <strong className="block w-full text-xs font-semibold text-navy">{user?.firstName} {user?.lastName}</strong>
+        <span className="block w-full truncate text-[11px] text-muted">{user?.email}</span>
+        <small className="block w-full text-[10px] font-bold uppercase tracking-wider text-primary-600">Admin</small>
       </DropdownHeader>
       <DropdownItem as={Link} to="/profile#info">My Profile</DropdownItem>
       <DropdownItem as={Link} to="/admin/messages">Messages</DropdownItem>
       <DropdownItem as={Link} to="/">Client view</DropdownItem>
       <DropdownDivider />
-      <DropdownItem className="op-admin-dropdown-danger" onClick={onLogout}>Sign Out</DropdownItem>
+      <DropdownItem className="text-red-600" onClick={onLogout}>Sign Out</DropdownItem>
     </Dropdown>
   );
 }
@@ -165,13 +192,14 @@ function AdminSearch() {
   const hasResults = results.users.length > 0 || results.properties.length > 0;
   function go(path) { setQuery(''); navigate(path); }
   return (
-    <div className="op-admin-search">
-      <TextInput type="search" sizing="sm" placeholder="Search people and listings" aria-label="Search people and listings" value={query} onChange={(event) => setQuery(event.target.value)} />
+    <div className="relative w-full max-w-md">
+      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
+      <TextInput type="search" sizing="sm" className="[&_input]:pl-9" placeholder="Search people and listings" aria-label="Search people and listings" value={query} onChange={(event) => setQuery(event.target.value)} />
       {query.trim().length >= 2 && (
-        <div className="op-admin-search-results" role="listbox">
-          {!hasResults && <p>No matches</p>}
-          {results.users.map((u) => <button type="button" key={u.id} onClick={() => go(`/admin/users?search=${encodeURIComponent(u.email)}`)}><strong>{u.firstName} {u.lastName}</strong><span>{u.email} · {u.role}</span></button>)}
-          {results.properties.map((p) => <button type="button" key={p.id} onClick={() => go('/admin/properties')}><strong>{p.title}</strong><span>{p.location} · {p.status}</span></button>)}
+        <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg" role="listbox">
+          {!hasResults && <p className="px-3 py-2 text-xs text-muted">No matches</p>}
+          {results.users.map((u) => <button type="button" key={u.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go(`/admin/users?search=${encodeURIComponent(u.email)}`)}><strong className="text-xs font-semibold text-navy">{u.firstName} {u.lastName}</strong><span className="text-[11px] text-muted">{u.email} · {u.role}</span></button>)}
+          {results.properties.map((p) => <button type="button" key={p.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go('/admin/properties')}><strong className="text-xs font-semibold text-navy">{p.title}</strong><span className="text-[11px] text-muted">{p.location} · {p.status}</span></button>)}
         </div>
       )}
     </div>
@@ -214,7 +242,7 @@ function AdminLayout() {
   const mobilePrimaryActive = mobilePrimaryItems.some(matchesMobilePrimary);
   const mobileMoreActive = !mobilePrimaryActive && location.pathname.startsWith('/admin');
 
-  // ── Notification polling (unread messages; bookings are a host concern) ──
+  // Notification polling (unread messages; bookings are a host concern)
   const [notif, setNotif] = useState({ unreadMessages: 0 });
   const lastNotifRef = useRef({ unreadMessages: 0 });
 
@@ -270,52 +298,57 @@ function AdminLayout() {
     });
   }
 
+  // A message thread owns the phone viewport: the panel is sized to the screen,
+  // so the outlet gutter drops its own padding and only clears the two fixed
+  // bars (56px sticky header + 92px bottom nav) that frame it.
+  const contentSpacing = isMessageThreadRoute
+    ? 'pt-20 pb-[calc(92px_+_env(safe-area-inset-bottom))] lg:pt-6 lg:pb-6'
+    : 'pt-6 pb-24 lg:pb-6';
+
   return (
-    <div className={`op-admin-layout min-h-screen bg-white flex${isMessageThreadRoute ? ' is-message-thread-open' : ''}`}>
+    <div className="min-h-screen bg-surface text-charcoal">
       {/* Sidebar */}
       <aside
-        className={`op-admin-sidebar bg-white hidden md:flex flex-col fixed inset-y-0 left-0 z-10 transition-all duration-300 ${
-          collapsed ? 'w-[72px]' : 'w-[224px]'
+        className={`fixed inset-y-0 left-0 z-10 hidden flex-col border-r border-white/10 bg-navy text-white transition-all duration-300 lg:flex ${
+          collapsed ? 'w-16' : 'w-64'
         }`}
       >
         <div className={`flex items-center ${collapsed ? 'justify-center px-2 pb-2 pt-5' : 'justify-between px-5 pb-3 pt-5'}`}>
-          <Link to="/" className="op-admin-brand inline-flex items-center gap-2">
-            <BrandLogo imgClassName="h-7 w-7 object-contain" />
-            {!collapsed && <strong>zuri.admin</strong>}
+          <Link to="/" className="inline-flex items-center gap-2 text-white">
+            <BrandLogo imgClassName="h-7 w-auto" />
+            {!collapsed && <strong className="font-montserrat text-base font-bold tracking-tight">zuri.admin</strong>}
           </Link>
         </div>
         {!collapsed && (
-          <span className="block px-6 pb-4 text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">
+          <span className="block px-6 pb-4 text-xs font-semibold uppercase tracking-wider text-primary">
             Workspace
           </span>
         )}
-        <nav className={`min-h-0 flex-1 overflow-y-auto gap-2 ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
+        <nav className={`flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto ${collapsed ? 'items-center' : 'px-3'}`}>
           {navGroups.map((group) => (
-            <div className="op-admin-nav-group" key={group.label}>
-              {!collapsed && <p className="op-admin-nav-group-label">{group.label}</p>}
+            <div className="space-y-1 py-1" key={group.label}>
+              {!collapsed && <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">{group.label}</p>}
               {group.items.map(({ path, label, icon: NavIcon, exact }) => {
                 const active = exact ? location.pathname === path : location.pathname.startsWith(path);
                 return (
-                  <SidebarFlyout key={path} active={collapsed} label={label} target="nav">
+                  <SidebarFlyout key={path} active={collapsed} label={label}>
                     <Link
                       to={path}
                       aria-label={collapsed ? label : undefined}
                       aria-current={active ? 'page' : undefined}
-                      className={`op-admin-nav-link flex items-center rounded-lg text-sm font-medium transition-all duration-200 ${
-                        active
-                          ? 'bg-[#E8EDF7] text-[#0B1F42]'
-                          : 'text-[#414D63] hover:bg-[#F7F4EF]'
-                      } ${collapsed ? 'justify-center w-11 h-11' : 'px-3 py-2'}`}
+                      className={`${NAV_LINK_BASE} ${active ? NAV_LINK_ACTIVE : NAV_LINK_IDLE} ${
+                        collapsed ? 'h-11 w-11 justify-center' : 'px-3 py-2'
+                      }`}
                     >
                       <div className="relative">
-                        <NavIcon className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
+                        <NavIcon className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
                         {path === '/admin/messages' && notif.unreadMessages > 0 && (
-                          <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                          <span className="absolute -right-2 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                             {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
                           </span>
                         )}
                       </div>
-                      {!collapsed && <span className="ml-2">{label}</span>}
+                      {!collapsed && <span>{label}</span>}
                     </Link>
                   </SidebarFlyout>
                 );
@@ -323,15 +356,15 @@ function AdminLayout() {
             </div>
           ))}
         </nav>
-        <div className={`op-admin-sidebar-account border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'p-5'}`}>
-          <div className={`flex items-center ${collapsed ? 'justify-center' : 'space-x-3'}`}>
-            <div className="w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-xs font-bold text-white">
+        <div className={`mt-auto border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'p-5'}`}>
+          <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
             </div>
             {!collapsed && (
               <div className="text-sm">
-                <p className="font-medium">{user?.firstName}</p>
-                <p className="text-white/50 text-xs">Admin</p>
+                <p className="font-medium text-white">{user?.firstName}</p>
+                <p className="text-xs text-white/50">Admin</p>
               </div>
             )}
           </div>
@@ -340,11 +373,11 @@ function AdminLayout() {
               type="button"
               onClick={handleLogout}
               aria-label={collapsed ? 'Sign Out' : undefined}
-              className={`flex items-center text-white/60 hover:text-white transition-colors mt-3 ${
-                collapsed ? 'justify-center w-full text-base' : 'text-[15px]'
+              className={`flex items-center text-white/60 transition-colors hover:text-white ${
+                collapsed ? 'mt-3 h-10 w-10 justify-center text-base' : 'mt-3 text-[15px]'
               }`}
             >
-              <LogOut className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
+              <LogOut className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
               {!collapsed && <span className="ml-2.5">Sign Out</span>}
             </button>
           </SidebarFlyout>
@@ -352,7 +385,7 @@ function AdminLayout() {
         <button
           type="button"
           onClick={toggleSidebar}
-          className={`op-admin-sidebar-toggle ${collapsed ? 'is-collapsed' : 'is-expanded'}`}
+          className="absolute left-full top-1/2 z-50 grid h-14 w-5 -translate-y-1/2 place-items-center rounded-r-lg bg-navy text-white shadow-sm transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           aria-expanded={!collapsed}
           aria-label={collapsed ? 'Expand admin sidebar' : 'Collapse admin sidebar'}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -364,28 +397,30 @@ function AdminLayout() {
       </aside>
 
       {/* Mobile header and floating section nav */}
-      <div className="op-admin-mobile-header md:hidden">
-        <div className="op-admin-mobile-heading">
-          <Link to="/" className="op-admin-mobile-brand">
-            <BrandLogo imgClassName="h-6 w-6 object-contain" alt="" />
-            <span>
-              <strong>zuri.admin</strong>
-              <small>Workspace</small>
+      <div className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-white px-4 lg:hidden">
+        <div className="flex items-center">
+          <Link to="/" className="inline-flex items-center gap-2">
+            <BrandLogo imgClassName="h-6 w-auto" alt="" />
+            <span className="flex flex-col leading-tight">
+              <strong className="font-montserrat text-sm font-bold text-navy">zuri.admin</strong>
+              <small className="text-[10px] uppercase tracking-wide text-muted">Workspace</small>
             </span>
           </Link>
         </div>
-        <div className="op-admin-mobile-actions">
-          <ThemeToggle className="op-admin-mobile-theme" />
+        <div className="flex items-center gap-2">
+          <ThemeToggle className={ICON_BUTTON} />
           <div className="relative">
             <button
-              className="op-admin-mobile-bell"
+              type="button"
+              className={ICON_BUTTON}
+              onClick={() => navigate('/admin/messages')}
               title={`${notif.unreadMessages} unread`}
               aria-label={`${notif.unreadMessages} unread messages`}
             >
-              <Bell className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
+              <Bell className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
             </button>
             {notif.unreadMessages > 0 && (
-              <span className="op-admin-mobile-count">
+              <span className="absolute right-0 top-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                 {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
               </span>
             )}
@@ -393,100 +428,111 @@ function AdminLayout() {
           <HeaderUserMenu user={user} onLogout={handleLogout} />
         </div>
       </div>
-      <nav className="op-admin-mobile-nav md:hidden" aria-label="Admin workspace sections">
-        <div className="op-admin-mobile-nav-scroll">
-          {mobilePrimaryItems.map((item) => {
-            const active = matchesMobilePrimary(item);
-            const Icon = item.icon;
-            return (
-              <Link key={item.path} to={item.path} className={`op-admin-mobile-link ${active ? 'is-active' : ''}`} aria-current={active ? 'page' : undefined}>
-                <Icon strokeWidth={1.5} aria-hidden="true" />
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-          <button
-            type="button"
-            className={`op-admin-mobile-link ${mobileMoreActive || mobileMoreOpen ? 'is-active' : ''}`}
-            onClick={() => setMobileMoreOpen(true)}
-            aria-expanded={mobileMoreOpen}
-            aria-controls="admin-mobile-more-drawer"
-          >
-            <Ellipsis strokeWidth={2} aria-hidden="true" />
-            <span>More</span>
-          </button>
-        </div>
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-border bg-white pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Admin workspace sections">
+        {mobilePrimaryItems.map((item) => {
+          const active = matchesMobilePrimary(item);
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium transition-colors ${active ? 'text-primary-600' : 'text-muted hover:text-navy'}`}
+              aria-current={active ? 'page' : undefined}
+            >
+              <Icon className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+        <button
+          type="button"
+          className={`flex flex-1 flex-col items-center gap-1 py-2 text-[11px] font-medium transition-colors ${mobileMoreActive || mobileMoreOpen ? 'text-primary-600' : 'text-muted hover:text-navy'}`}
+          onClick={() => setMobileMoreOpen(true)}
+          aria-expanded={mobileMoreOpen}
+          aria-controls="admin-mobile-more-drawer"
+        >
+          <Ellipsis className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+          <span>More</span>
+        </button>
       </nav>
-      <Drawer
-        id="admin-mobile-more-drawer"
-        open={mobileMoreOpen}
-        onClose={() => setMobileMoreOpen(false)}
-        position="bottom"
-        edge
-        backdrop
-        className="op-admin-flowbite-drawer md:hidden"
-        theme={{ root: { backdrop: 'op-admin-flowbite-drawer-backdrop' } }}
-        aria-label="Admin workspace navigation"
-      >
-        <DrawerHeader
-          className="op-admin-mobile-more-head"
-          title="zuri.admin"
-          titleIcon={() => <BrandLogo imgClassName="h-6 w-6 object-contain" alt="" />}
-        />
-        <p className="op-admin-mobile-more-label">Workspace navigation</p>
-        <DrawerItems className="op-admin-mobile-more-list">
-          {mobileMoreItems.map(({ path, label, icon: NavIcon }) => {
-            const active = location.pathname === path || location.pathname.startsWith(`${path}/`);
-            const displayLabel = mobileNavLabels[label] || label;
-            return (
-              <Link
-                key={path}
-                to={path}
-                className={active ? 'is-active' : ''}
-                aria-current={active ? 'page' : undefined}
+
+      {/* Mobile "more" sheet: every section the bottom bar cannot fit */}
+      {mobileMoreOpen && (
+        <div
+          id="admin-mobile-more-drawer"
+          className="fixed inset-0 z-50 lg:hidden"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Admin workspace navigation"
+        >
+          <button type="button" className="absolute inset-0 bg-navy/40" aria-label="Close navigation" onClick={() => setMobileMoreOpen(false)} />
+          <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-navy p-4 text-white">
+            <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
+              <div className="inline-flex items-center gap-2">
+                <BrandLogo imgClassName="h-6 w-auto" alt="" />
+                <strong className="font-montserrat text-base font-bold tracking-tight">zuri.admin</strong>
+              </div>
+              <button
+                type="button"
+                className="grid h-9 w-9 place-items-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                 onClick={() => setMobileMoreOpen(false)}
+                aria-label="Close navigation"
               >
-                <NavIcon strokeWidth={1.5} aria-hidden="true" />
-                <span>{displayLabel}</span>
-                {path === '/admin/messages' && notif.unreadMessages > 0 && <small>{notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}</small>}
-              </Link>
-            );
-          })}
-        </DrawerItems>
-      </Drawer>
+                <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+              </button>
+            </div>
+            <p className="px-1 pb-2 pt-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/50">Workspace navigation</p>
+            <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
+              {mobileMoreItems.map(({ path, label, icon: NavIcon }) => {
+                const active = location.pathname === path || location.pathname.startsWith(`${path}/`);
+                const displayLabel = mobileNavLabels[label] || label;
+                return (
+                  <Link
+                    key={path}
+                    to={path}
+                    className={`${NAV_LINK_BASE} px-3 py-2 ${active ? NAV_LINK_ACTIVE : NAV_LINK_IDLE}`}
+                    aria-current={active ? 'page' : undefined}
+                    onClick={() => setMobileMoreOpen(false)}
+                  >
+                    <NavIcon className="h-4 w-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
+                    <span className="flex-1">{displayLabel}</span>
+                    {path === '/admin/messages' && notif.unreadMessages > 0 && <small className="rounded-full bg-red-500 px-1.5 text-[10px] font-bold text-white">{notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}</small>}
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main content */}
-      <main
-        className={`op-admin-main flex-1 transition-all duration-300 ${isMessageThreadRoute ? 'is-message-thread-route' : ''} ${
-          collapsed ? 'md:ml-[72px]' : 'md:ml-[224px]'
-        }`}
-      >
+      <main className={`flex min-h-screen flex-1 flex-col transition-all duration-300 ${collapsed ? 'lg:pl-16' : 'lg:pl-64'}`}>
         {/* Desktop workspace header */}
-        <header className="op-admin-shell-header hidden md:flex">
-          <div className="op-admin-shell-context">
-            <span className="op-admin-shell-icon" aria-hidden="true">
-              <LayoutGrid strokeWidth={2} />
+        <header className="sticky top-0 z-30 hidden items-center justify-between gap-3 border-b border-border bg-white/95 px-4 py-3 backdrop-blur lg:flex lg:px-6">
+          <div className="flex items-center gap-3">
+            <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary-50 text-navy" aria-hidden="true">
+              <LayoutGrid className="h-4 w-4" strokeWidth={2} />
             </span>
-            <span className="op-admin-shell-copy">
-              <small>Admin workspace</small>
-              <strong>{currentNavItem?.label || 'Dashboard'}</strong>
+            <span className="flex flex-col leading-tight">
+              <small className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Admin workspace</small>
+              <strong className="text-sm font-semibold text-navy">{currentNavItem?.label || 'Dashboard'}</strong>
             </span>
           </div>
           <AdminSearch />
-          <div className="op-admin-shell-actions">
-            <ThemeToggle className="op-admin-shell-icon-button" />
-            <div className="op-admin-shell-bell-wrap">
+          <div className="flex items-center gap-2">
+            <ThemeToggle className={ICON_BUTTON} />
+            <div className="relative">
               <button
                 type="button"
-                className="op-admin-shell-icon-button"
+                className={ICON_BUTTON}
                 onClick={() => navigate('/admin/messages')}
                 title={`${notif.unreadMessages} unread messages`}
                 aria-label={`${notif.unreadMessages} unread messages`}
               >
-                <Bell strokeWidth={2} aria-hidden="true" />
+                <Bell className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
               </button>
               {notif.unreadMessages > 0 && (
-                <span className="op-admin-shell-count">
+                <span className="absolute right-0 top-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
                   {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
                 </span>
               )}
@@ -494,7 +540,7 @@ function AdminLayout() {
             <HeaderUserMenu user={user} onLogout={handleLogout} />
           </div>
         </header>
-        <div className="op-admin-content p-4 md:p-8 pt-20 md:pt-8">
+        <div className={`flex-1 px-4 lg:px-6 ${contentSpacing}`}>
           <Outlet />
         </div>
       </main>
@@ -584,64 +630,102 @@ function DashboardOverview() {
     { to: '/admin/trust-safety', label: 'Open trust and safety' },
   ];
 
-  return <div className="op-admin-overview" data-openpencil-frame="0:6909">
-    <div className="op-admin-heading"><div><p className="op-admin-eyebrow">ZURILOFTS · ADMIN · PEOPLE & PLATFORM</p><h1>Platform overview</h1><p>Host applications, accounts and listing approvals that need a decision. Listings, bookings and money are managed by hosts.</p></div>
-      <div className="op-admin-quick">
-        <Dropdown inline label="Quick actions" placement="bottom-end" className="op-admin-quick-menu">
+  // Bars are scaled against the busiest day in the window, so a quiet week still
+  // reads as a shape instead of a flat line at the bottom.
+  const peakSignups = trend ? Math.max(1, ...trend.series.map((p) => p.signups)) : 1;
+
+  return <div className="space-y-6" data-openpencil-frame="0:6909">
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · PEOPLE & PLATFORM</p>
+        <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Platform overview</h1>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Host applications, accounts and listing approvals that need a decision. Listings, bookings and money are managed by hosts.</p>
+      </div>
+      <div className="shrink-0">
+        <Dropdown label="Quick actions" placement="bottom-end">
           {quickLinks.map((link) => <DropdownItem as={Link} key={link.to} to={link.to}>{link.label}</DropdownItem>)}
         </Dropdown>
       </div>
     </div>
-    <div className="op-admin-metrics">
-      <article><span>HOST APPLICATIONS</span><strong>{summary.applicationsPending}</strong><small>Awaiting your review</small></article>
-      <article><span>ACCOUNTS</span><strong>{summary.accounts}</strong><small>Guests and hosts</small></article>
-      <article><span>LISTING APPROVALS</span><strong>{summary.listingsPending}</strong><small>Submitted by hosts</small></article>
-      <article><span>IDENTITY CHECKS</span><strong>{summary.verificationsPending}</strong><small>Awaiting review</small></article>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <article className={METRIC_CARD}><span className={METRIC_LABEL}>HOST APPLICATIONS</span><strong className={METRIC_VALUE}>{summary.applicationsPending}</strong><small className={METRIC_NOTE}>Awaiting your review</small></article>
+      <article className={METRIC_CARD}><span className={METRIC_LABEL}>ACCOUNTS</span><strong className={METRIC_VALUE}>{summary.accounts}</strong><small className={METRIC_NOTE}>Guests and hosts</small></article>
+      <article className={METRIC_CARD}><span className={METRIC_LABEL}>LISTING APPROVALS</span><strong className={METRIC_VALUE}>{summary.listingsPending}</strong><small className={METRIC_NOTE}>Submitted by hosts</small></article>
+      <article className={METRIC_CARD}><span className={METRIC_LABEL}>IDENTITY CHECKS</span><strong className={METRIC_VALUE}>{summary.verificationsPending}</strong><small className={METRIC_NOTE}>Awaiting review</small></article>
     </div>
-    <div className="op-admin-overview-grid">
-      <section className="op-admin-priority"><div className="op-admin-panel-heading"><h2>Applications to review</h2><span>{summary.applicationsPending} open</span></div>
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2.7fr)_minmax(245px,1fr)]">
+      <section className={PANEL}>
+        <div className={PANEL_HEAD}>
+          <div>
+            <h2 className={PANEL_TITLE}>Applications to review</h2>
+          </div>
+          <span className="inline-flex items-center self-start rounded-full bg-primary-50 px-2.5 py-1 text-[11px] font-semibold text-primary-700">{summary.applicationsPending} open</span>
+        </div>
         {summary.applications.length ? summary.applications.map((application) => (
-          <div className="op-admin-priority-row" key={application.id}>
-            <div>
-              <strong>{application.businessName || application.legalName || 'Host application'}</strong>
-              <small>{application.user?.email || application.contactEmail || 'No email yet'}
+          <div className={LIST_ROW} key={application.id}>
+            <div className="min-w-0 flex-1">
+              <strong className="block truncate text-sm font-semibold text-navy">{application.businessName || application.legalName || 'Host application'}</strong>
+              <small className="mt-1 block truncate text-xs text-muted">{application.user?.email || application.contactEmail || 'No email yet'}
                 {application.submittedAt ? ` · ${new Date(application.submittedAt).toLocaleDateString()}` : ''}</small>
             </div>
-            <span className="op-admin-urgent">Submitted</span>
-            <Link to="/admin/host-applications">Open</Link>
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700">Submitted</span>
+              <Button as={Link} to="/admin/host-applications" size="xs" color="light">Open</Button>
+            </div>
           </div>
-        )) : <div className="op-admin-empty"><strong>No applications waiting</strong><p>New host applications land here for review.</p><Link to="/admin/host-applications">Open host applications</Link></div>}
+        )) : <div className={EMPTY_STATE}>
+          <strong className="text-sm font-semibold text-navy">No applications waiting</strong>
+          <p className={PANEL_SUBTITLE}>New host applications land here for review.</p>
+          <Button as={Link} to="/admin/host-applications" size="sm" className="mt-2">Open host applications</Button>
+        </div>}
       </section>
-      <section className="op-admin-trend">
-        <div className="op-admin-panel-heading"><h2>New sign-ups</h2>
+      <section className={PANEL}>
+        <div className={PANEL_HEAD}>
+          <h2 className={PANEL_TITLE}>New sign-ups</h2>
           <SelectMenu
             sizing="sm"
             ariaLabel="Sign-up date range"
             value={String(trendDays)}
             onChange={(next) => setTrendDays(Number(next))}
             options={[{ value: '7', label: 'Last 7 days' }, { value: '30', label: 'Last 30 days' }, { value: '90', label: 'Last 90 days' }]}
+            wrapperClassName="w-36 shrink-0"
           />
         </div>
-        {trend ? <>
-          <p><strong>{trend.total}</strong> new accounts in the last {trend.days} days</p>
-          <div className="op-admin-trend-bars" role="img" aria-label={`Daily sign-ups over the last ${trend.days} days`}>
-            {trend.series.map((point) => <span key={point.date} title={`${point.date}: ${point.signups}`} style={{ height: `${Math.max(4, (point.signups / Math.max(1, ...trend.series.map((p) => p.signups))) * 100)}%` }} />)}
-          </div>
-        </> : <p>Trend data is unavailable right now.</p>}
+        <div className="px-5 py-4">
+          {trend ? <>
+            <p className={PANEL_SUBTITLE}><strong className="mr-1 text-base font-bold text-navy">{trend.total}</strong>new accounts in the last {trend.days} days</p>
+            <div className="mt-4 flex h-24 items-end gap-1" role="img" aria-label={`Daily sign-ups over the last ${trend.days} days`}>
+              {trend.series.map((point) => <span key={point.date} title={`${point.date}: ${point.signups}`} className="flex-1 rounded-t bg-primary" style={{ height: `${Math.max(4, (point.signups / peakSignups) * 100)}%` }} />)}
+            </div>
+          </> : <p className={PANEL_SUBTITLE}>Trend data is unavailable right now.</p>}
+        </div>
       </section>
-      <section className="op-admin-glance"><h2>Platform at a glance</h2><p><span>Live listings</span><strong>{summary.listingsLive}</strong></p><p><span>Awaiting approval</span><strong>{summary.listingsPending}</strong></p><p><span>Identity checks</span><strong>{summary.verificationsPending}</strong></p><Link to="/admin/properties">Open listing approvals</Link></section>
+      <section className={PANEL}>
+        <div className="border-b border-border px-5 py-4">
+          <h2 className={PANEL_TITLE}>Platform at a glance</h2>
+        </div>
+        <div className="space-y-2 px-5 py-4">
+          <p className="flex items-center justify-between text-xs text-muted"><span>Live listings</span><strong className="text-sm font-semibold text-navy">{summary.listingsLive}</strong></p>
+          <p className="flex items-center justify-between text-xs text-muted"><span>Awaiting approval</span><strong className="text-sm font-semibold text-navy">{summary.listingsPending}</strong></p>
+          <p className="flex items-center justify-between text-xs text-muted"><span>Identity checks</span><strong className="text-sm font-semibold text-navy">{summary.verificationsPending}</strong></p>
+        </div>
+        <div className="px-5 pb-5">
+          <Button as={Link} to="/admin/properties" fullSized>Open listing approvals</Button>
+        </div>
+      </section>
     </div>
-    <div className="op-admin-secondary">
-      <Accordion alwaysOpen className="op-admin-accordion">
+    <div>
+      <Accordion alwaysOpen className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
         <AccordionPanel>
-          <AccordionTitle>Landing page statistics</AccordionTitle>
+          <AccordionTitle className="text-navy">Landing page statistics</AccordionTitle>
           <AccordionContent>
-            <p>Set a value to 0 to use live review and booking data.</p>
-            <form onSubmit={saveLandingStats} className="op-admin-stats-form">
-              <label>Happy stays<TextInput type="number" min="0" value={landingStats.happyStays} onChange={(event) => setLandingStats({ ...landingStats, happyStays: event.target.value })} /></label>
-              <label>Star rating<TextInput type="number" min="0" max="5" step="0.1" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
-              <label>Satisfaction %<TextInput type="number" min="0" max="100" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
-              <button type="submit" disabled={savingLanding}>{savingLanding ? 'Saving…' : 'Update'}</button>{landingMsg && <span role="status">{landingMsg}</span>}
+            <p className={PANEL_SUBTITLE}>Set a value to 0 to use live review and booking data.</p>
+            <form onSubmit={saveLandingStats} className="mt-3 flex flex-wrap items-end gap-3">
+              <label className="grid gap-1 text-xs font-semibold text-navy">Happy stays<TextInput type="number" min="0" className="w-32" value={landingStats.happyStays} onChange={(event) => setLandingStats({ ...landingStats, happyStays: event.target.value })} /></label>
+              <label className="grid gap-1 text-xs font-semibold text-navy">Star rating<TextInput type="number" min="0" max="5" step="0.1" className="w-32" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
+              <label className="grid gap-1 text-xs font-semibold text-navy">Satisfaction %<TextInput type="number" min="0" max="100" className="w-32" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
+              <Button type="submit" size="sm" disabled={savingLanding}>{savingLanding ? 'Saving...' : 'Update'}</Button>
+              {landingMsg && <span role="status" className="text-xs font-semibold text-primary-700">{landingMsg}</span>}
             </form>
           </AccordionContent>
         </AccordionPanel>

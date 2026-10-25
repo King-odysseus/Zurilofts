@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
+  Alert,
   Badge,
   Button,
   Modal,
   ModalBody,
   ModalHeader,
+  Spinner,
   TextInput,
 } from 'flowbite-react';
 import {
@@ -37,6 +39,19 @@ const EVENT_META = {
   DISPUTE: { label: 'Dispute', tone: 'failure', icon: Flag },
   ACCOUNT: { label: 'Account', tone: 'gray', icon: Users },
 };
+
+// Shared surface styles so the audit panel and the roles aside stay identical.
+const PANEL = 'overflow-hidden rounded-xl border border-border bg-white shadow-sm';
+const PANEL_HEAD = 'flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between';
+const PANEL_TITLE = 'text-base font-semibold text-navy';
+const PANEL_SUBTITLE = 'text-xs text-muted';
+const METRIC_CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
+const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
+const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
+const METRIC_NOTE = 'mt-1 block text-xs text-muted';
+const ICON_TILE = 'inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-navy';
+const LIST_ROW = 'flex flex-col gap-3 border-b border-border px-5 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between';
+const EMPTY_STATE = 'flex flex-col items-center gap-2 px-5 py-12 text-center';
 
 function formatDate(value, withTime = false) {
   if (!value) return 'Not recorded';
@@ -166,79 +181,96 @@ function AdminGovernance() {
   };
 
   return (
-    <div className="op-admin-overview op-admin-governance" data-openpencil-frame="0:7458">
-      <div className="op-admin-trust-hero">
+    <div className="space-y-6" data-openpencil-frame="0:7458">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="op-admin-eyebrow">ZURILOFTS · ADMIN · GOVERNANCE</p>
-          <h1>Governance and audit</h1>
-          <p>Admin access, recorded reviews and operational history across the platform.</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · GOVERNANCE</p>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Governance and audit</h1>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Admin access, recorded reviews and operational history across the platform.</p>
         </div>
-        <Button color="light" disabled={refreshing} onClick={() => load(true)} className="op-admin-trust-refresh">
-          <RefreshCw className={refreshing ? 'is-spinning' : ''} strokeWidth={1.8} aria-hidden="true" />
+        <Button color="light" disabled={refreshing} onClick={() => load(true)}>
+          <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} strokeWidth={1.8} aria-hidden="true" />
           {refreshing ? 'Refreshing' : 'Refresh records'}
         </Button>
       </div>
 
-      {error && <div className="op-admin-error" role="alert">{error}</div>}
+      {error && <Alert color="failure" role="alert">{error}</Alert>}
 
-      <div className="op-admin-metrics op-admin-governance-metrics">
-        <article><span>ADMIN USERS</span><strong>{adminUsers.length}</strong><small>Accounts with admin access</small></article>
-        <article><span>RECORDED ACTIVITY</span><strong>{events.length}</strong><small>Available audit records</small></article>
-        <article><span>OPEN CASES</span><strong>{openCases}</strong><small>Disputes needing attention</small></article>
-        <article><span>REVIEWS TODAY</span><strong>{reviewsToday}</strong><small>Applications and identities</small></article>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <article className={METRIC_CARD}>
+          <span className={METRIC_LABEL}>ADMIN USERS</span>
+          <strong className={METRIC_VALUE}>{adminUsers.length}</strong>
+          <small className={METRIC_NOTE}>Accounts with admin access</small>
+        </article>
+        <article className={METRIC_CARD}>
+          <span className={METRIC_LABEL}>RECORDED ACTIVITY</span>
+          <strong className={METRIC_VALUE}>{events.length}</strong>
+          <small className={METRIC_NOTE}>Available audit records</small>
+        </article>
+        <article className={METRIC_CARD}>
+          <span className={METRIC_LABEL}>OPEN CASES</span>
+          <strong className={METRIC_VALUE}>{openCases}</strong>
+          <small className={METRIC_NOTE}>Disputes needing attention</small>
+        </article>
+        <article className={METRIC_CARD}>
+          <span className={METRIC_LABEL}>REVIEWS TODAY</span>
+          <strong className={METRIC_VALUE}>{reviewsToday}</strong>
+          <small className={METRIC_NOTE}>Applications and identities</small>
+        </article>
       </div>
 
-      <div className="op-admin-governance-grid">
-        <section className="op-admin-trust-panel op-admin-governance-audit" aria-labelledby="audit-log-title">
-          <div className="op-admin-trust-panel-head">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <section className={`${PANEL} lg:col-span-2`} aria-labelledby="audit-log-title">
+          <div className={PANEL_HEAD}>
             <div>
-              <h2 id="audit-log-title">Audit activity</h2>
-              <p>Recorded application, identity and dispute actions, newest first.</p>
+              <h2 id="audit-log-title" className={PANEL_TITLE}>Audit activity</h2>
+              <p className={PANEL_SUBTITLE}>Recorded application, identity and dispute actions, newest first.</p>
             </div>
             <Badge color="info">{filteredEvents.length} records</Badge>
           </div>
 
-          <div className="op-admin-governance-toolbar">
-            <div className="op-admin-governance-search">
-              <Search strokeWidth={1.8} aria-hidden="true" />
+          <div className="flex flex-col gap-3 border-b border-border px-5 py-3 sm:flex-row sm:items-center">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
               <TextInput
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search action, record or actor"
                 aria-label="Search governance activity"
+                className="pl-9"
               />
             </div>
-            <SelectMenu value={typeFilter} onChange={(next) => setTypeFilter(next)} ariaLabel="Filter audit activity by type" options={EVENT_TYPES} />
+            <SelectMenu value={typeFilter} onChange={(next) => setTypeFilter(next)} ariaLabel="Filter audit activity by type" options={EVENT_TYPES} wrapperClassName="w-full sm:w-56" />
           </div>
 
           {loading ? (
-            <div className="op-admin-trust-empty">
-              <span className="op-admin-booking-spinner" aria-hidden="true" />
-              <strong>Loading governance records</strong>
-              <p>Fetching account, application, verification and dispute history.</p>
+            <div className={EMPTY_STATE}>
+              <Spinner size="lg" aria-hidden="true" />
+              <strong className="text-sm font-semibold text-navy">Loading governance records</strong>
+              <p className="text-xs text-muted">Fetching account, application, verification and dispute history.</p>
             </div>
           ) : visibleEvents.length === 0 ? (
-            <div className="op-admin-trust-empty">
-              <ScrollText strokeWidth={1.6} aria-hidden="true" />
-              <strong>No activity matches this view</strong>
-              <p>Try another record type or clear the search.</p>
+            <div className={EMPTY_STATE}>
+              <ScrollText className="h-6 w-6 text-muted" strokeWidth={1.6} aria-hidden="true" />
+              <strong className="text-sm font-semibold text-navy">No activity matches this view</strong>
+              <p className="text-xs text-muted">Try another record type or clear the search.</p>
             </div>
           ) : (
-            <div className="op-admin-governance-list">
+            <div>
               {visibleEvents.map((event) => {
                 const meta = EVENT_META[event.type];
                 const EventIcon = meta.icon;
                 return (
-                  <article className="op-admin-governance-row" key={event.id}>
-                    <span className={`op-admin-governance-icon is-${meta.tone}`} aria-hidden="true"><EventIcon strokeWidth={1.8} /></span>
-                    <div className="op-admin-governance-copy">
-                      <strong>{event.title}</strong>
-                      <span>{event.meta} · {formatDate(event.createdAt, true)}</span>
+                  <article className={LIST_ROW} key={event.id}>
+                    <span className={ICON_TILE} aria-hidden="true"><EventIcon strokeWidth={1.8} /></span>
+                    <div className="min-w-0 flex-1">
+                      <strong className="block truncate text-sm font-semibold text-navy">{event.title}</strong>
+                      <span className="block text-xs text-muted">{event.meta} · {formatDate(event.createdAt, true)}</span>
                     </div>
                     <Badge color={meta.tone}>{meta.label}</Badge>
                     <Button size="xs" color="light" onClick={() => setSelectedEvent(event)}>
-                      <Eye strokeWidth={1.8} aria-hidden="true" />Detail
+                      <Eye className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />Detail
                     </Button>
                   </article>
                 );
@@ -246,68 +278,77 @@ function AdminGovernance() {
             </div>
           )}
 
-          <div className="op-admin-governance-footer">
-            <span>Showing {filteredEvents.length === 0 ? 0 : (page - 1) * 8 + 1}-{Math.min(page * 8, filteredEvents.length)} of {filteredEvents.length}</span>
-            <div>
-              <Button color="light" disabled={page <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>
-                <ChevronLeft strokeWidth={1.8} aria-hidden="true" />Previous
+          <div className="flex flex-col gap-3 border-t border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <span className="text-xs text-muted">Showing {filteredEvents.length === 0 ? 0 : (page - 1) * 8 + 1}-{Math.min(page * 8, filteredEvents.length)} of {filteredEvents.length}</span>
+            <div className="flex items-center gap-2">
+              <Button color="light" size="sm" disabled={page <= 1} onClick={() => setPage((current) => Math.max(1, current - 1))}>
+                <ChevronLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />Previous
               </Button>
-              <Button color="light" disabled={page >= pageCount} onClick={() => setPage((current) => Math.min(pageCount, current + 1))}>
-                Next<ChevronRight strokeWidth={1.8} aria-hidden="true" />
+              <Button color="light" size="sm" disabled={page >= pageCount} onClick={() => setPage((current) => Math.min(pageCount, current + 1))}>
+                Next<ChevronRight className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </Button>
             </div>
           </div>
         </section>
 
-        <aside className="op-admin-trust-panel op-admin-governance-roles" aria-labelledby="roles-title">
-          <div className="op-admin-trust-panel-head">
+        <aside className={PANEL} aria-labelledby="roles-title">
+          <div className={PANEL_HEAD}>
             <div>
-              <h2 id="roles-title">Roles and permissions</h2>
-              <p>Actual account distribution in the loaded workspace data.</p>
+              <h2 id="roles-title" className={PANEL_TITLE}>Roles and permissions</h2>
+              <p className={PANEL_SUBTITLE}>Actual account distribution in the loaded workspace data.</p>
             </div>
           </div>
-          <div className="op-admin-governance-role-list">
+          <div>
             {Object.entries(roleCounts).map(([role, count]) => (
-              <div key={role}>
-                <span>{role === 'GUEST' ? 'Guests' : role === 'HOST' ? 'Hosts' : role === 'ADMIN' ? 'Administrators' : 'Suspended accounts'}</span>
-                <strong>{count}</strong>
+              <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-4 last:border-0" key={role}>
+                <span className="text-sm text-charcoal">{role === 'GUEST' ? 'Guests' : role === 'HOST' ? 'Hosts' : role === 'ADMIN' ? 'Administrators' : 'Suspended accounts'}</span>
+                <strong className="text-sm font-semibold text-navy">{count}</strong>
               </div>
             ))}
           </div>
-          <div className="op-admin-governance-role-note">
-            <ShieldCheck strokeWidth={1.8} aria-hidden="true" />
+          <div className="flex items-start gap-3 border-t border-border bg-surface px-5 py-4">
+            <span className={ICON_TILE} aria-hidden="true"><ShieldCheck strokeWidth={1.8} /></span>
             <div>
-              <strong>Admin access is privilege-gated</strong>
-              <p>Every admin endpoint is protected by the server-side role check. Host privileges remain application-controlled.</p>
+              <strong className="block text-sm font-semibold text-navy">Admin access is privilege-gated</strong>
+              <p className="mt-1 text-xs leading-relaxed text-muted">Every admin endpoint is protected by the server-side role check. Host privileges remain application-controlled.</p>
             </div>
           </div>
         </aside>
       </div>
 
-      <Modal show={Boolean(selectedEvent)} onClose={() => setSelectedEvent(null)} size="lg" dismissible className="op-admin-trust-modal">
+      <Modal show={Boolean(selectedEvent)} onClose={() => setSelectedEvent(null)} size="lg" dismissible>
         {selectedEvent && (
           <>
             <ModalHeader>{EVENT_META[selectedEvent.type].label} record</ModalHeader>
             <ModalBody>
-              <div className="op-admin-governance-detail">
-                <div className={`op-admin-governance-icon is-${EVENT_META[selectedEvent.type].tone}`} aria-hidden="true">
+              <div className="flex items-start gap-3">
+                <span className={ICON_TILE} aria-hidden="true">
                   {(() => { const Icon = EVENT_META[selectedEvent.type].icon; return <Icon strokeWidth={1.8} />; })()}
-                </div>
-                <div>
+                </span>
+                <div className="min-w-0">
                   <Badge color={EVENT_META[selectedEvent.type].tone}>{EVENT_META[selectedEvent.type].label}</Badge>
-                  <h3>{selectedEvent.title}</h3>
-                  <p>{selectedEvent.meta}</p>
+                  <h3 className="mt-2 text-base font-semibold text-navy">{selectedEvent.title}</h3>
+                  <p className="mt-1 text-sm leading-relaxed text-charcoal">{selectedEvent.meta}</p>
                 </div>
               </div>
-              <div className="op-admin-governance-detail-grid">
-                <p><span>Recorded</span><strong>{formatDate(selectedEvent.createdAt, true)}</strong></p>
-                <p><span>Actor ID</span><strong>{selectedEvent.actorId || 'Not recorded'}</strong></p>
-                <p><span>Record ID</span><strong>{selectedEvent.record}</strong></p>
+              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <p>
+                  <span className={METRIC_LABEL}>Recorded</span>
+                  <strong className="mt-1 block text-sm font-semibold text-navy">{formatDate(selectedEvent.createdAt, true)}</strong>
+                </p>
+                <p>
+                  <span className={METRIC_LABEL}>Actor ID</span>
+                  <strong className="mt-1 block break-all text-sm font-semibold text-navy">{selectedEvent.actorId || 'Not recorded'}</strong>
+                </p>
+                <p>
+                  <span className={METRIC_LABEL}>Record ID</span>
+                  <strong className="mt-1 block break-all text-sm font-semibold text-navy">{selectedEvent.record}</strong>
+                </p>
               </div>
             </ModalBody>
-            <div className="op-admin-governance-modal-actions">
+            <div className="flex flex-col gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">
               <Button color="light" onClick={() => setSelectedEvent(null)}>Close</Button>
-              <Button as={Link} to={selectedEvent.to} className="op-admin-bronze-button">Open related workspace</Button>
+              <Button as={Link} to={selectedEvent.to}>Open related workspace</Button>
             </div>
           </>
         )}
