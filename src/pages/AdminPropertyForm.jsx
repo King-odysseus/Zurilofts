@@ -64,10 +64,8 @@ function AdminPropertyForm() {
   const isEdit = Boolean(id);
   const navigate = useNavigate();
 
-  // Host-only screen: /admin/properties/* redirects to the approval queue, so
-  // every link here points at the host workspace.
-  // Writes go to /properties, which is host-scoped (requireHostWorkspace).
-  const base = '/host';
+  // Host-only screen. Listing writes go to /properties (host-scoped) and the
+  // listing index lives at /host/listings; /admin/properties is review-only.
 
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(isEdit);
@@ -194,11 +192,11 @@ function AdminPropertyForm() {
       const endpoint = '/properties';
       if (isEdit) {
         await apiClient.put(`${endpoint}/${id}`, payload);
-        navigate(`${base}/properties`);
+        navigate('/host/listings');
       } else {
         const res = await apiClient.post(endpoint, payload);
         // Go to edit so seasonal pricing & calendar (which need an id) are available
-        navigate(`${base}/properties/${res.data.data.id}/edit`);
+        navigate(`/host/properties/${res.data.data.id}/edit`);
       }
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.error || 'Failed to save property');
@@ -236,7 +234,7 @@ function AdminPropertyForm() {
     <div className="op-host-listing-editor">
       <header className="op-host-editor-heading">
         <div>
-          <Link to={`${base}/properties`} className="op-host-editor-back">
+          <Link to="/host/listings" className="op-host-editor-back">
             <ChevronLeft strokeWidth={2} aria-hidden="true" />
             Listings
           </Link>
@@ -504,7 +502,7 @@ function AdminPropertyForm() {
           <Button type="submit" disabled={saving} className="op-host-editor-save">
             {saving ? 'Saving...' : isEdit ? 'Save changes' : 'Create listing'}
           </Button>
-          <Link to={`${base}/properties`}>Cancel</Link>
+          <Link to="/host/listings">Cancel</Link>
         </div>
       </form>
     </div>
