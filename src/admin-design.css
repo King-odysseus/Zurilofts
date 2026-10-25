@@ -730,7 +730,7 @@
 }
 
 /* Admin listing calendar */
-.op-admin-calendar{display:grid;width:100%;max-width:none;margin:0;gap:18px;padding-bottom:24px}
+.op-admin-calendar{display:grid;align-content:start;width:100%;max-width:none;margin:0;gap:18px;padding-bottom:24px}
 .op-admin-calendar-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:8px}
 .op-admin-calendar-heading h1{margin:8px 0 6px;color:#0b1f42;font:700 30px/1.15 Montserrat,Arial,sans-serif;letter-spacing:-.035em}
 .op-admin-calendar-heading>div>span{display:block;color:#6e7686;font-size:13px;line-height:1.5}
@@ -822,7 +822,7 @@ html.dark .op-admin-calendar .op-admin-calendar-outline:focus{background:#172238
 html.dark .op-admin-calendar .op-admin-calendar-primary{background:#9f7142!important;color:#fff!important}
 
 /* Admin trust and safety workspace */
-.op-admin-trust{display:grid;gap:18px}
+.op-admin-trust{display:grid;align-content:start;gap:18px}
 .op-admin-trust-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;border:1px solid #eef0f4;border-radius:18px;background:#fff;padding:26px 28px}
 .op-admin-trust-hero h1{margin:9px 0 10px;color:#0b1f42;font:700 30px/1.15 Montserrat,Arial,sans-serif;letter-spacing:-.03em}
 .op-admin-trust-hero p:last-child{max-width:650px;color:#6e7686;font-size:13px;line-height:1.55}
@@ -949,7 +949,7 @@ html.dark .op-admin-trust-detail-icon.is-alert{background:#3a2228!important;colo
 html.dark .op-admin-trust-modal [data-testid="flowbite-modal-header"],html.dark .op-admin-trust-modal-footer{border-color:#26344a!important;color:#e7eef8!important}
 
 /* Admin governance and audit workspace */
-.op-admin-governance{display:grid;gap:18px}
+.op-admin-governance{display:grid;align-content:start;gap:18px}
 .op-admin-governance-grid{display:grid;grid-template-columns:minmax(0,820fr) minmax(280px,300fr);gap:24px;align-items:start}
 .op-admin-governance-metrics article:nth-child(1){background:#e8edf7}
 .op-admin-governance-metrics article:nth-child(2){background:#f1eee8}
