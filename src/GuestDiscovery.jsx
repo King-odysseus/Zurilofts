@@ -250,9 +250,9 @@ export function GuestHome() {
   const [recent, setRecent] = useState(() => getRecentlyViewed());
   const stays = useStays({ search: DEFAULT_SEARCH_LOCATION, limit: 8, type: category === 'All stays' ? undefined : category.slice(0, -1).toLowerCase() });
   return <main className="bg-white text-navy">
-    <section className="relative overflow-hidden bg-white sm:bg-navy">
+    <section className="relative overflow-hidden bg-white sm:bg-navy-bg">
       <img src="/images/place-un-hq.jpg" alt="" aria-hidden="true" className="absolute inset-0 hidden h-full w-full object-cover sm:block" />
-      <span aria-hidden="true" className="absolute inset-0 hidden bg-gradient-to-r from-navy/80 to-navy/50 sm:block" />
+      <span aria-hidden="true" className="absolute inset-0 hidden bg-gradient-to-r from-navy-bg/80 to-navy-bg/50 sm:block" />
       {/* The navbar is fixed at h-16, so the hero needs more than 56px of top
           padding or the "Verified homes" badge and headline sit under it. */}
       <div className={`relative ${CONTAINER} pb-8 pt-20 sm:pb-14 sm:pt-24 sm:text-center sm:text-white`}>
@@ -268,10 +268,10 @@ export function GuestHome() {
           <span>Popular</span>
           {['Westlands', 'Kilimani', 'Lavington', 'Karen'].map((place) => <Link key={place} to={`/properties?search=${encodeURIComponent(place)}`} className="font-semibold text-white underline-offset-2 hover:underline">{place}</Link>)}
         </div>
-        <Link to="/properties?search=Westlands" className="relative mt-3 block h-24 overflow-hidden rounded-xl bg-navy sm:hidden">
+        <Link to="/properties?search=Westlands" className="relative mt-3 block h-24 overflow-hidden rounded-xl bg-navy-bg sm:hidden">
           <span className="relative block h-full w-full">
             <img src="/images/place-un-hq.jpg" alt="" aria-hidden="true" className="h-full w-full object-cover" />
-            <span className="absolute left-3 top-3 rounded-full bg-navy px-3 py-1.5 text-[10px] font-bold text-white">Popular in Westlands</span>
+            <span className="absolute left-3 top-3 rounded-full bg-navy-bg px-3 py-1.5 text-[10px] font-bold text-white">Popular in Westlands</span>
           </span>
         </Link>
       </div>
@@ -334,7 +334,7 @@ export function GuestHome() {
           <Link to="/guides" className="inline-flex items-center gap-1 text-sm font-semibold text-navy hover:underline">Browse all guides <ChevronRight className="h-4 w-4" aria-hidden="true" /></Link>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-6">
-          {guides.map((guide) => <Link key={guide.title} to="/guides" className="group relative flex h-40 flex-col justify-between overflow-hidden rounded-[14px] bg-navy p-4 text-white sm:h-[284px] sm:p-5">
+          {guides.map((guide) => <Link key={guide.title} to="/guides" className="group relative flex h-40 flex-col justify-between overflow-hidden rounded-[14px] bg-navy-bg p-4 text-white sm:h-[284px] sm:p-5">
             <img src={guide.image} alt="" aria-hidden="true" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
             <span aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
             <span className="relative w-fit rounded-full bg-white px-3 py-1 text-[11px] font-bold text-navy">{guide.label}</span>
@@ -457,7 +457,7 @@ export function GuestStays() {
 }
 
 export function GuestFooter() {
-  return <footer className="border-t-4 border-primary bg-navy py-12 text-white">
+  return <footer className="border-t-4 border-primary bg-navy-bg py-12 text-white">
     <div className={CONTAINER}>
       <div className="grid gap-8 pb-12 sm:grid-cols-2 lg:grid-cols-[2fr_repeat(4,minmax(0,1fr))] lg:gap-10">
         <div className="flex flex-col gap-3">

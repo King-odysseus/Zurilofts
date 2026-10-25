@@ -43,7 +43,7 @@ const SECTION_TITLE = 'text-xl font-bold text-navy';
 const SECTION_SUBTITLE = 'mt-1 mb-6 text-sm text-muted';
 const CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
 const TAB_BASE = 'whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors';
-const TAB_ACTIVE = 'bg-navy text-white';
+const TAB_ACTIVE = 'bg-navy-bg text-white';
 const TAB_IDLE = 'text-muted hover:text-navy';
 
 function tabClass(isActive) {
@@ -630,7 +630,7 @@ function ProfilePage() {
                   key={option.value}
                   type="button"
                   onClick={() => setPayoutMethod(option.value)}
-                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${payoutMethod === option.value ? 'bg-navy text-white' : 'text-muted hover:text-navy'}`}
+                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${payoutMethod === option.value ? 'bg-navy-bg text-white' : 'text-muted hover:text-navy'}`}
                 >
                   {option.label}
                 </button>

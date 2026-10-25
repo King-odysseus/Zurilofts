@@ -16,7 +16,7 @@ const STATUS_META = {
 };
 
 const TAB_BASE = 'inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors';
-const TAB_ACTIVE = 'bg-navy text-white';
+const TAB_ACTIVE = 'bg-navy-bg text-white';
 const TAB_IDLE = 'text-muted hover:text-navy';
 const ROW_ACTION = 'text-xs font-semibold text-primary-600 hover:text-primary-700';
 const SUBTLE_LINK = 'inline-flex min-h-[36px] items-center text-xs font-semibold text-muted hover:text-navy';

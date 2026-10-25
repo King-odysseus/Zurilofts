@@ -88,7 +88,7 @@ ConversationRow.propTypes = {
 
 function SupportRow({ selected }) {
   return <Link to="/messages" className={rowClass(selected)}>
-    <span className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-xl bg-navy text-white">
+    <span className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-xl bg-navy-bg text-white">
       <MessageCircleMore className="h-[19px] w-[19px]" strokeWidth={1.8} aria-hidden="true" />
     </span>
     <span className="min-w-0">
@@ -106,7 +106,7 @@ function paneDisplayClass(isOpen) {
 }
 
 function listTabClass(isActive) {
-  return `inline-flex min-w-[66px] items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold no-underline transition-colors ${isActive ? 'bg-navy text-white' : 'text-muted hover:text-navy'}`;
+  return `inline-flex min-w-[66px] items-center justify-center whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-semibold no-underline transition-colors ${isActive ? 'bg-navy-bg text-white' : 'text-muted hover:text-navy'}`;
 }
 
 function ConversationList({ activeTab, conversations, currentUserId, selectedId, loading, error, onRetry, open = true }) {

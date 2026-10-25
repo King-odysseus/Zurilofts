@@ -23,7 +23,7 @@ const FILTERS = [
 ];
 
 const TAB_BASE = 'whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors';
-const TAB_ACTIVE = 'bg-navy text-white';
+const TAB_ACTIVE = 'bg-navy-bg text-white';
 const TAB_IDLE = 'text-muted hover:text-navy';
 const ROW_LINK = 'inline-flex min-h-[36px] items-center text-xs font-semibold text-muted hover:text-navy';
 

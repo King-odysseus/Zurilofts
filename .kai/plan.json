@@ -1,16 +1,42 @@
 {
   "schemaVersion": 1,
   "items": [
-    { "text": "Fix buttons that wrap text inside mockup boards and the app", "state": "done" },
-    { "text": "Check all six boards render correctly at desktop and phone width", "state": "done" },
-    { "text": "Convert checkout and saved stays, delete checkout-design.css + saved-stays.css", "state": "done" },
-    { "text": "Convert account/travel, trust and public content; delete their three stylesheets", "state": "done" },
-    { "text": "Convert discovery and shell; delete guest-discovery.css + openpencil-theme.css", "state": "done" },
-    { "text": "Slim the Places/Restaurants search and filter bar", "state": "done" },
-    { "text": "Verify guest and host pages at desktop and phone width", "state": "done" },
-    { "text": "Verify admin pages at desktop and phone width", "state": "in progress" },
-    { "text": "Run lint and build", "state": "pending" },
-    { "text": "Commit and push", "state": "pending" }
+    {
+      "text": "Fix buttons that wrap text inside mockup boards and the app",
+      "state": "done"
+    },
+    {
+      "text": "Check all six boards render correctly at desktop and phone width",
+      "state": "done"
+    },
+    {
+      "text": "Convert checkout and saved stays, delete checkout-design.css + saved-stays.css",
+      "state": "done"
+    },
+    {
+      "text": "Convert account/travel, trust and public content; delete their three stylesheets",
+      "state": "done"
+    },
+    {
+      "text": "Convert discovery and shell; delete guest-discovery.css + openpencil-theme.css",
+      "state": "done"
+    },
+    {
+      "text": "Slim the Places/Restaurants search and filter bar",
+      "state": "done"
+    },
+    {
+      "text": "Verify guest, host and admin pages at desktop and phone width",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and build",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push",
+      "state": "done"
+    }
   ],
-  "updatedAt": "2026-10-25T21:40:00.000Z"
+  "updatedAt": "2026-10-25T21:27:15.828Z"
 }

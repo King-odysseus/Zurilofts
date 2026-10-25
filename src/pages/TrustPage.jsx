@@ -105,7 +105,7 @@ export default function TrustPage() {
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[240px_minmax(0,1fr)]">
         <aside className="self-start rounded-xl border border-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
           <div className="flex items-center gap-3 border-b border-border pb-4">
-            {user?.avatar ? <img src={user.avatar} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" /> : <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy text-xs font-bold text-white">{initials}</span>}
+            {user?.avatar ? <img src={user.avatar} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" /> : <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy-bg text-xs font-bold text-white">{initials}</span>}
             <div className="min-w-0"><strong className="block truncate text-sm font-semibold text-navy">{[user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Guest'}</strong><small className="mt-0.5 block truncate text-xs text-muted">{user?.email}</small></div>
           </div>
           <nav className="mt-4 grid gap-1" aria-label="Trust sections">

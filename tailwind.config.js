@@ -26,18 +26,34 @@ export default {
           950: '#3D2E1B',
         },
         'primary-hover': '#B8895C',
-        navy:           '#0B1F42',
-        indigo:         '#0B1F42', // Backward-compatible alias to navy
+        // 'navy' is the heading/body ink and therefore flips in dark mode;
+        // 'navy-bg' is the fixed brand surface that always carries white text
+        // (footer, primary buttons, avatars). Keeping them apart is what lets
+        // a dark theme invert text without inverting buttons behind white text.
+        navy:           'rgb(var(--ds-navy) / <alpha-value>)',
+        'navy-bg':      '#0B1F42',
+        'navy-hover':   '#07072E',
+        indigo:         'rgb(var(--ds-navy) / <alpha-value>)', // Alias to navy, flips with it
         bronze:         '#C49A6C', // Branding
         silver:         '#D9D9D9',
-        charcoal:       '#0B1F42',
-        muted:          '#5B6B82',
-        'cool-grey':    '#5B6B82',
-        border:         '#E3E8EF',
-        surface:        '#F7F4EF',
+        charcoal:       'rgb(var(--ds-ink) / <alpha-value>)',
+        muted:          'rgb(var(--ds-muted) / <alpha-value>)',
+        'cool-grey':    'rgb(var(--ds-muted) / <alpha-value>)',
+        border:         'rgb(var(--ds-line) / <alpha-value>)',
+        // Design system 2026 (docs/design-system-2026/airbnb-language.md).
+        // Guest pages are being moved onto these names; `ink` is the heading
+        // colour and `line` the only divider grey, so a page that uses them
+        // cannot drift back to navy headings or a second border tint.
+        ink:            'rgb(var(--ds-ink) / <alpha-value>)',
+        line:           'rgb(var(--ds-line) / <alpha-value>)',
+        inset:          'rgb(var(--ds-inset) / <alpha-value>)',
+        link:           'rgb(var(--ds-link) / <alpha-value>)',
+        surface:        'rgb(var(--ds-surface) / <alpha-value>)',
         // App canvas stays white; warm brand accents are applied intentionally
         // to sections, controls, and status surfaces rather than the whole app.
-        canvas:         '#FFFFFF',
+        canvas:         'rgb(var(--ds-canvas) / <alpha-value>)',
+        // Raised card that sits on the canvas; lifts slightly in dark mode.
+        elevated:       'rgb(var(--ds-elevated) / <alpha-value>)',
       },
       // Whole-app elevation scale. Default Tailwind shadows are too faint for
       // borderless cards, so each level is a tight contact edge + a soft base.
