@@ -6,7 +6,7 @@
       "state": "done"
     },
     {
-      "text": "Fix the row action dropdown so it renders as one panel instead of split (page CSS double-styling menu items)",
+      "text": "Fix the row action dropdown so it renders as one panel instead of split",
       "state": "done"
     },
     {
@@ -14,21 +14,21 @@
       "state": "done"
     },
     {
-      "text": "Finish uncommitted admin conversions (Flowbite Table/Modal/Alert) and clear stale lint directives",
+      "text": "Finish uncommitted admin conversions (Flowbite Table/Modal/Alert)",
       "state": "done"
     },
     {
-      "text": "Run lint and build",
+      "text": "Put the ZuriLofts logo on a rounded navy tile across all pages",
       "state": "done"
     },
     {
-      "text": "Commit and push the Flowbite work so the deployed app matches the code",
+      "text": "Convert host tab bars to Flowbite Tabs (listings, today, earnings)",
       "state": "done"
     },
     {
-      "text": "Convert remaining hand-rolled tab groups to Flowbite Tabs on host and admin surfaces",
-      "state": "pending"
+      "text": "Run lint and build, commit and push all of the above",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-25T17:30:11.494Z"
+  "updatedAt": "2026-10-25T17:38:32.979Z"
 }
