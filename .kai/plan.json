@@ -2,45 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Screenshot all app pages at desktop and phone",
+      "text": "Give the admin sidebar brand block proper top padding and separate it from the Workspace label",
       "state": "done"
     },
     {
-      "text": "Fix dark mode so tokens flip app-wide",
+      "text": "Space the nav items and groups so the column uses its height instead of dumping all slack at the bottom",
       "state": "done"
     },
     {
-      "text": "Fix dropdown clipping and disabled/bronze button contrast",
+      "text": "Check expanded and collapsed sidebar at tall, normal and short viewport heights in the browser",
       "state": "done"
     },
     {
-      "text": "Fix page headings hidden under the fixed navbar",
+      "text": "Run lint and build",
       "state": "done"
-    },
-    {
-      "text": "Fix search bar, price box and toolbar alignment",
-      "state": "done"
-    },
-    {
-      "text": "Unify travel and hosting sign-up form",
-      "state": "done"
-    },
-    {
-      "text": "Verify converted page groups reachable and styled",
-      "state": "done"
-    },
-    {
-      "text": "Verify admin sidebar and checkout in dark mode",
-      "state": "active"
-    },
-    {
-      "text": "Clean temp capture files",
-      "state": "pending"
-    },
-    {
-      "text": "Commit and push",
-      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-25T21:31:32.988Z"
+  "updatedAt": "2026-10-25T21:41:00.000Z"
 }

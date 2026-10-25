@@ -313,21 +313,21 @@ function AdminLayout() {
           collapsed ? 'w-16' : 'w-64'
         }`}
       >
-        <div className={`flex items-center ${collapsed ? 'justify-center px-2 pb-2 pt-5' : 'justify-between px-5 pb-3 pt-5'}`}>
+        <div className={`flex shrink-0 items-center ${collapsed ? 'justify-center px-2 pb-4 pt-6' : 'justify-between px-5 pb-6 pt-6'}`}>
           <Link to="/" className="inline-flex items-center gap-2 text-white">
             <BrandLogo imgClassName="h-7 w-auto" />
             {!collapsed && <strong className="font-montserrat text-base font-bold tracking-tight">zuri.admin</strong>}
           </Link>
         </div>
         {!collapsed && (
-          <span className="block px-6 pb-4 text-xs font-semibold uppercase tracking-wider text-primary">
+          <span className="block shrink-0 px-6 pb-2 text-xs font-semibold uppercase tracking-wider text-primary">
             Workspace
           </span>
         )}
-        <nav className={`flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto ${collapsed ? 'items-center' : 'px-3'}`}>
+        <nav className={`flex min-h-0 flex-1 flex-col justify-between gap-3 overflow-y-auto pb-3 pt-3 [scrollbar-color:rgba(255,255,255,0.22)_transparent] [scrollbar-width:thin] ${collapsed ? 'items-center px-2' : 'px-3'}`}>
           {navGroups.map((group) => (
-            <div className="space-y-1 py-1" key={group.label}>
-              {!collapsed && <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">{group.label}</p>}
+            <div className="space-y-1.5" key={group.label}>
+              {!collapsed && <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">{group.label}</p>}
               {group.items.map(({ path, label, icon: NavIcon, exact }) => {
                 const active = exact ? location.pathname === path : location.pathname.startsWith(path);
                 return (
@@ -337,7 +337,7 @@ function AdminLayout() {
                       aria-label={collapsed ? label : undefined}
                       aria-current={active ? 'page' : undefined}
                       className={`${NAV_LINK_BASE} ${active ? NAV_LINK_ACTIVE : NAV_LINK_IDLE} ${
-                        collapsed ? 'h-11 w-11 justify-center' : 'px-3 py-2'
+                        collapsed ? 'h-11 w-11 justify-center' : 'px-3 py-2.5'
                       }`}
                     >
                       <div className="relative">
@@ -356,7 +356,7 @@ function AdminLayout() {
             </div>
           ))}
         </nav>
-        <div className={`mt-auto border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'p-5'}`}>
+        <div className={`shrink-0 border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'px-5 py-5'}`}>
           <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-navy-bg">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
@@ -490,7 +490,7 @@ function AdminLayout() {
                   <Link
                     key={path}
                     to={path}
-                    className={`${NAV_LINK_BASE} px-3 py-2 ${active ? NAV_LINK_ACTIVE : NAV_LINK_IDLE}`}
+                    className={`${NAV_LINK_BASE} px-3 py-2.5 ${active ? NAV_LINK_ACTIVE : NAV_LINK_IDLE}`}
                     aria-current={active ? 'page' : undefined}
                     onClick={() => setMobileMoreOpen(false)}
                   >
