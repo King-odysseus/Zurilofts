@@ -30,7 +30,7 @@
 .opg-filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:20px}
 .opg-categories{display:flex;gap:8px;flex:1;overflow:auto;scrollbar-width:none}
 .opg-categories button,.opg-filter-action{border:1px solid #e1e5ea;border-radius:30px;background:#fff;color:var(--op-navy);font:600 12px Inter,Arial,sans-serif;padding:9px 16px;white-space:nowrap;text-decoration:none;cursor:pointer}
-.opg-categories button.active{background:var(--op-navy-bg);border-color:var(--op-navy-bg);color:white}
+.opg-categories button.active{background:#C49A6C;border-color:#C49A6C;color:#0B1F42}
 .opg-filter-action{border-radius:8px}
 .opg-stay-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:34px 18px}
 .opg-stay-card{position:relative;min-width:0}

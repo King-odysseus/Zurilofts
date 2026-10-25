@@ -85,7 +85,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
   const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
   const quality = listingQuality(property);
 
-  return <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+  return <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
     <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface">
       {image ? <img src={image} alt="" className="aspect-[4/3] w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-muted">No photo yet</div>}
       <Badge color={STATUS_BADGE_COLOR[status.tone] || 'gray'} className="absolute left-3 top-3">{status.label}</Badge>
@@ -98,8 +98,8 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
         </div>
         <strong className="whitespace-nowrap text-lg font-bold text-navy">KES {(property.price || 0).toLocaleString()}<small className="text-xs font-medium text-muted">/night</small></strong>
       </header>
-      <p className="rounded-lg bg-surface px-3 py-2 text-xs leading-relaxed text-muted">{statusCopy(property)}</p>
-      <div className="rounded-lg border border-border p-3">
+      <p className="rounded-xl bg-surface px-3 py-2 text-xs leading-relaxed text-muted">{statusCopy(property)}</p>
+      <div className="rounded-xl border border-border p-3">
         <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-muted"><span>Listing quality</span><strong className="text-navy">{quality.score}%</strong></div>
         <div
           className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border"
@@ -135,7 +135,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
           />
           <span className="text-xs text-muted">{property.available ? 'Accepting bookings' : 'Not accepting bookings'}</span>
         </div>
-        <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onDelete(property)}>
+        <Button type="button" color="light" size="sm" disabled={busy} onClick={() => onDelete(property)}>
           {busy ? 'Working...' : 'Delete'}
         </Button>
       </footer>
@@ -240,19 +240,20 @@ export default function HostListingsPage() {
   return <div className="space-y-6">
     <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">HOST WORKSPACE</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Your listings</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare, publish, and manage your stays.</p>
       </div>
-      <Button as={Link} to="/host/properties/new">+ Add a listing</Button>
+      <Button as={Link} to="/host/properties/new" size="sm">+ Add a listing</Button>
     </header>
 
-    <div className="inline-flex flex-wrap gap-1 rounded-full border border-border bg-white p-1" role="group" aria-label="Listing status">
+    <div className="inline-flex flex-wrap gap-1 rounded-full border border-border bg-elevated p-1" role="group" aria-label="Listing status">
       {FILTERS.map((item) => <button
         key={item.key}
         type="button"
         aria-pressed={filter === item.key}
         onClick={() => setFilter(item.key)}
-        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${filter === item.key ? 'bg-navy-bg text-white' : 'text-muted hover:text-navy'}`}
+        className={`h-8 rounded-full px-4 text-sm font-semibold transition-colors ${filter === item.key ? 'bg-navy-bg text-white' : 'text-muted hover:text-navy'}`}
       >{item.label} · {counts[item.key] || 0}</button>)}
     </div>
 
@@ -260,7 +261,7 @@ export default function HostListingsPage() {
       <p>{error}</p>
       <div><Button type="button" color="light" size="sm" onClick={() => window.location.reload()}>Try again</Button></div>
     </Alert>}
-    {loading ? <ListingSkeleton /> : !error && visibleProperties.length === 0 ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center">
+    {loading ? <ListingSkeleton /> : !error && visibleProperties.length === 0 ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center">
       <span className="text-primary-600"><Building2 strokeWidth={1.6} aria-hidden="true" /></span>
       <strong className="text-base font-semibold text-navy">{properties.length === 0 ? 'No listings yet' : 'Nothing in this view'}</strong>
       <p className="max-w-md text-sm leading-relaxed text-muted">{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>

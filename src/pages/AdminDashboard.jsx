@@ -50,12 +50,12 @@ const NAV_LINK_BASE = 'flex items-center gap-3 rounded-lg text-sm font-medium tr
 const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-navy-bg';
 const NAV_LINK_IDLE = 'text-white/80 hover:bg-white/10 hover:text-white';
 
-const METRIC_CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
+const METRIC_CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
 const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
 const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
 const METRIC_NOTE = 'mt-1 block text-xs text-muted';
 
-const PANEL = 'overflow-hidden rounded-xl border border-border bg-white shadow-sm';
+const PANEL = 'overflow-hidden rounded-xl border border-border bg-elevated shadow-sm';
 const PANEL_HEAD = 'flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between';
 const PANEL_TITLE = 'text-base font-semibold text-navy';
 const PANEL_SUBTITLE = 'text-xs text-muted';
@@ -63,6 +63,19 @@ const LIST_ROW = 'flex flex-col gap-3 border-b border-border px-5 py-4 last:bord
 const EMPTY_STATE = 'flex flex-col items-center gap-2 px-5 py-12 text-center';
 
 const ICON_BUTTON = 'grid h-9 w-9 place-items-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-navy';
+
+// Dashboard content actions share one geometry: a 36px pill with 16px side
+// padding and 13px/600 label. Flowbite's own size classes are merged out, and
+// the hover is written as `enabled:hover:` so it replaces Flowbite's variant
+// instead of stacking next to it. Primary is bronze with fixed navy ink (it
+// must not flip in dark mode), secondary is white on the shared border token.
+const BTN_BASE = 'h-9 w-fit rounded-full px-4 text-[13px] font-semibold';
+const BTN_PRIMARY = `${BTN_BASE} bg-primary text-navy-bg enabled:hover:bg-[#B8895C]`;
+const BTN_SECONDARY = `${BTN_BASE} border border-border bg-white text-navy enabled:hover:bg-surface`;
+
+// Status and count pills share one geometry so a badge never drifts from the
+// pill beside it; only the tone (bronze for counts, red for attention) differs.
+const PILL = 'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold';
 
 // Admin scope is people and the platform. Listings appear only as the approval
 // queue: hosts own create, edit, calendar, pricing, money and discounts, so
@@ -112,10 +125,10 @@ function SidebarFlyout({ active, label, children }) {
   return (
     <Tooltip
       arrow
-      className="rounded-xl border border-border bg-white px-3 py-2 text-sm font-medium text-navy shadow-lg"
+      className="z-[70] whitespace-nowrap rounded-lg border-0 bg-navy-bg px-2.5 py-1.5 text-xs font-semibold text-white shadow-lg"
       content={label}
       placement="right"
-      style="light"
+      style="dark"
     >
       {children}
     </Tooltip>
@@ -196,7 +209,7 @@ function AdminSearch() {
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
       <TextInput type="search" sizing="sm" className="[&_input]:pl-9" placeholder="Search people and listings" aria-label="Search people and listings" value={query} onChange={(event) => setQuery(event.target.value)} />
       {query.trim().length >= 2 && (
-        <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-xl border border-border bg-white py-1 shadow-lg" role="listbox">
+        <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-xl border border-border bg-elevated py-1 shadow-lg" role="listbox">
           {!hasResults && <p className="px-3 py-2 text-xs text-muted">No matches</p>}
           {results.users.map((u) => <button type="button" key={u.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go(`/admin/users?search=${encodeURIComponent(u.email)}`)}><strong className="text-xs font-semibold text-navy">{u.firstName} {u.lastName}</strong><span className="text-[11px] text-muted">{u.email} · {u.role}</span></button>)}
           {results.properties.map((p) => <button type="button" key={p.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go('/admin/properties')}><strong className="text-xs font-semibold text-navy">{p.title}</strong><span className="text-[11px] text-muted">{p.location} · {p.status}</span></button>)}
@@ -403,7 +416,7 @@ function AdminLayout() {
       </aside>
 
       {/* Mobile header and floating section nav */}
-      <div className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-white px-4 lg:hidden">
+      <div className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-elevated px-4 lg:hidden">
         <div className="flex items-center">
           <Link to="/" className="inline-flex items-center gap-2">
             <BrandLogo imgClassName="h-6 w-auto" alt="" />
@@ -434,7 +447,7 @@ function AdminLayout() {
           <HeaderUserMenu user={user} onLogout={handleLogout} />
         </div>
       </div>
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-border bg-white pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Admin workspace sections">
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-border bg-elevated pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Admin workspace sections">
         {mobilePrimaryItems.map((item) => {
           const active = matchesMobilePrimary(item);
           const Icon = item.icon;
@@ -514,9 +527,9 @@ function AdminLayout() {
       {/* Main content */}
       <main className={`flex min-h-screen flex-1 flex-col transition-all duration-300 ${collapsed ? 'lg:pl-16' : 'lg:pl-64'}`}>
         {/* Desktop workspace header */}
-        <header className="sticky top-0 z-30 hidden items-center justify-between gap-3 border-b border-border bg-white/95 px-4 py-3 backdrop-blur lg:flex lg:px-6">
+        <header className="sticky top-0 z-30 hidden items-center justify-between gap-3 border-b border-border bg-elevated/95 px-4 py-3 backdrop-blur lg:flex lg:px-6">
           <div className="flex items-center gap-3">
-            <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary-50 text-navy" aria-hidden="true">
+            <span className="grid h-9 w-9 place-items-center rounded-lg bg-primary/15 text-navy" aria-hidden="true">
               <LayoutGrid className="h-4 w-4" strokeWidth={2} />
             </span>
             <span className="flex flex-col leading-tight">
@@ -648,7 +661,15 @@ function DashboardOverview() {
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Host applications, accounts and listing approvals that need a decision. Listings, bookings and money are managed by hosts.</p>
       </div>
       <div className="shrink-0">
-        <Dropdown label="Quick actions" placement="bottom-end">
+        <Dropdown
+          label="Quick actions"
+          placement="bottom-end"
+          // Flowbite's default trigger has no Tailwind hook on the element, so the
+          // pill is rendered by us: same pattern as the header user menu above.
+          renderTrigger={() => (
+            <button type="button" className={BTN_SECONDARY}>Quick actions</button>
+          )}
+        >
           {quickLinks.map((link) => <DropdownItem as={Link} key={link.to} to={link.to}>{link.label}</DropdownItem>)}
         </Dropdown>
       </div>
@@ -665,7 +686,7 @@ function DashboardOverview() {
           <div>
             <h2 className={PANEL_TITLE}>Applications to review</h2>
           </div>
-          <span className="inline-flex items-center self-start rounded-full bg-primary-50 px-2.5 py-1 text-[11px] font-semibold text-primary-700">{summary.applicationsPending} open</span>
+          <span className={`self-start ${PILL} bg-primary-50 text-primary-700`}>{summary.applicationsPending} open</span>
         </div>
         {summary.applications.length ? summary.applications.map((application) => (
           <div className={LIST_ROW} key={application.id}>
@@ -675,14 +696,14 @@ function DashboardOverview() {
                 {application.submittedAt ? ` · ${new Date(application.submittedAt).toLocaleDateString()}` : ''}</small>
             </div>
             <div className="flex items-center gap-3">
-              <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700">Submitted</span>
-              <Button as={Link} to="/admin/host-applications" size="xs" color="light">Open</Button>
+              <span className={`${PILL} bg-red-50 text-red-700`}>Submitted</span>
+              <Button as={Link} to="/admin/host-applications" size="sm" color="light" className={BTN_SECONDARY}>Open</Button>
             </div>
           </div>
         )) : <div className={EMPTY_STATE}>
           <strong className="text-sm font-semibold text-navy">No applications waiting</strong>
           <p className={PANEL_SUBTITLE}>New host applications land here for review.</p>
-          <Button as={Link} to="/admin/host-applications" size="sm" className="mt-2">Open host applications</Button>
+          <Button as={Link} to="/admin/host-applications" size="sm" className={`mt-2 ${BTN_PRIMARY}`}>Open host applications</Button>
         </div>}
       </section>
       <section className={PANEL}>
@@ -715,7 +736,7 @@ function DashboardOverview() {
         </div>
       </section>
       <section className={PANEL}>
-        <div className="border-b border-border px-5 py-4">
+        <div className={PANEL_HEAD}>
           <h2 className={PANEL_TITLE}>Platform at a glance</h2>
         </div>
         <div className="space-y-2 px-5 py-4">
@@ -724,21 +745,21 @@ function DashboardOverview() {
           <p className="flex items-center justify-between text-xs text-muted"><span>Identity checks</span><strong className="text-sm font-semibold text-navy">{summary.verificationsPending}</strong></p>
         </div>
         <div className="px-5 pb-5">
-          <Button as={Link} to="/admin/properties" fullSized>Open listing approvals</Button>
+          <Button as={Link} to="/admin/properties" size="sm" className={BTN_PRIMARY}>Open listing approvals</Button>
         </div>
       </section>
     </div>
     <div>
-      <Accordion alwaysOpen className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+      <Accordion alwaysOpen className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
         <AccordionPanel>
-          <AccordionTitle className="text-navy">Landing page statistics</AccordionTitle>
+          <AccordionTitle className="bg-white text-navy [&>button]:bg-white">Landing page statistics</AccordionTitle>
           <AccordionContent>
             <p className={PANEL_SUBTITLE}>Set a value to 0 to use live review and booking data.</p>
             <form onSubmit={saveLandingStats} className="mt-3 flex flex-wrap items-end gap-3">
               <label className="grid gap-1 text-xs font-semibold text-navy">Happy stays<TextInput type="number" min="0" className="w-32" value={landingStats.happyStays} onChange={(event) => setLandingStats({ ...landingStats, happyStays: event.target.value })} /></label>
               <label className="grid gap-1 text-xs font-semibold text-navy">Star rating<TextInput type="number" min="0" max="5" step="0.1" className="w-32" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
               <label className="grid gap-1 text-xs font-semibold text-navy">Satisfaction %<TextInput type="number" min="0" max="100" className="w-32" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
-              <Button type="submit" size="sm" disabled={savingLanding}>{savingLanding ? 'Saving...' : 'Update'}</Button>
+              <Button type="submit" size="sm" className={BTN_PRIMARY} disabled={savingLanding}>{savingLanding ? 'Saving...' : 'Update'}</Button>
               {landingMsg && <span role="status" className="text-xs font-semibold text-primary-700">{landingMsg}</span>}
             </form>
           </AccordionContent>

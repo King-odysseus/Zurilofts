@@ -34,7 +34,7 @@ function hostInitials(user) {
 
 // Shared nav-link styling so the desktop tabs cannot drift apart.
 const NAV_LINK = 'inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-navy';
-const NAV_LINK_ACTIVE = 'bg-primary/15 text-navy';
+const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-navy-bg hover:bg-primary hover:text-navy-bg';
 
 // Host workspace shell. Hosts get their own frame instead of the guest site
 // header: the marketing nav (search, destinations, saved trips) is no use while
@@ -67,11 +67,11 @@ function HostLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-surface">
-      <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b border-border bg-elevated/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 lg:px-6">
           <Link to="/host/today" className="inline-flex shrink-0 items-center gap-2.5" aria-label="Host workspace home">
             <BrandLogo imgClassName="h-8 w-auto" />
-            <span className="hidden items-center rounded-full bg-primary-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.09em] text-primary-700 md:inline-flex">Host</span>
+            <span className="hidden items-center rounded-full bg-primary-50 dark:bg-primary/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300 md:inline-flex">Host</span>
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Host workspace">
@@ -103,7 +103,7 @@ function HostLayout({ children }) {
               label={
                 <>
                   <span className="sr-only">Open host account menu</span>
-                  <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white p-1 transition-colors hover:border-primary-200">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border bg-elevated p-1 transition-colors hover:border-primary-200">
                     <span aria-hidden="true" className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-bg text-[11px] font-bold tracking-wide text-white">{hostInitials(user)}</span>
                     <ChevronDown className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
                   </span>

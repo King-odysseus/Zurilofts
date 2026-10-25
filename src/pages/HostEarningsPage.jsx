@@ -28,8 +28,8 @@ const EMPTY_TOTALS = {
 // Tone -> classes for the income-breakdown cards. Kept as a lookup so the
 // neutral/positive/deduction variants stay readable in the JSX below.
 const BREAKDOWN_TONE = {
-  neutral: { card: 'border-border bg-white', value: 'text-navy' },
-  positive: { card: 'border-primary-200 bg-primary-50', value: 'text-navy' },
+  neutral: { card: 'border-border bg-elevated', value: 'text-navy' },
+  positive: { card: 'border-primary-200 bg-primary-50 dark:bg-primary/15', value: 'text-navy' },
   deduction: { card: 'border-red-200 bg-red-50', value: 'text-red-700' },
 };
 
@@ -261,6 +261,7 @@ export default function HostEarningsPage() {
   return <div className="space-y-6">
     <header className="flex flex-wrap items-start justify-between gap-4">
       <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">HOST WORKSPACE</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Earnings</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">A clear view of stay income, pending amounts, and payouts.</p>
       </div>
@@ -268,7 +269,7 @@ export default function HostEarningsPage() {
         <Dropdown
           placement="bottom-end"
           dismissOnClick
-          label={<span className="inline-flex min-h-[40px] items-center rounded-full border border-border bg-white px-4 py-2 text-sm font-medium text-navy transition-colors hover:bg-surface">{periodLabel}</span>}
+          label={<span className="inline-flex min-h-[40px] items-center rounded-full border border-border bg-elevated px-4 py-2 text-sm font-medium text-navy transition-colors hover:bg-surface">{periodLabel}</span>}
         >
           {PERIOD_OPTIONS.map((option) => <DropdownItem key={option.value} onClick={() => setPeriod(option.value)}>{option.label}</DropdownItem>)}
         </Dropdown>
@@ -297,17 +298,17 @@ export default function HostEarningsPage() {
       <TabItem title="Overview" active={activeTab === 'overview'}>
       {activeTab === 'overview' && <>
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+          <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">NET EARNINGS</span>
             <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">{formatMoney(totals.hostNet)}</strong>
             <small className="mt-1 block text-xs text-muted">After withholding tax</small>
           </article>
-          <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+          <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PROCESSING</span>
             <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">{formatMoney(processing)}</strong>
             <small className="mt-1 block text-xs text-muted">From upcoming stays</small>
           </article>
-          <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+          <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">AVAILABLE PAYOUT</span>
             <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">{formatMoney(availablePayout)}</strong>
             <small className="mt-1 block text-xs text-muted">Eligible for payout</small>
@@ -315,7 +316,7 @@ export default function HostEarningsPage() {
         </section>
 
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <section className="rounded-xl border border-border bg-white p-5 shadow-sm lg:col-span-2">
+          <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm lg:col-span-2">
             <header className="flex flex-wrap items-start justify-between gap-3">
               <h2 className="text-base font-semibold text-navy">Stay income trend</h2>
               {trendChange != null && <span className={`text-xs font-semibold ${trendChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{trendChange >= 0 ? '+' : ''}{trendChange}% vs previous month</span>}
@@ -330,7 +331,7 @@ export default function HostEarningsPage() {
             </div> : <p className="mt-5 text-sm text-muted">No income trend for this period.</p>}
           </section>
 
-          <aside className="rounded-xl border border-border bg-white p-5 shadow-sm">
+          <aside className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
             <h2 className="text-base font-semibold text-navy">Payouts</h2>
             <div className="mt-4 rounded-lg bg-surface px-4 py-3">
               <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">Destination</span>
@@ -346,7 +347,7 @@ export default function HostEarningsPage() {
 
       </TabItem>
       <TabItem title="Properties" active={activeTab === 'properties'}>
-      {activeTab === 'properties' && <section className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      {activeTab === 'properties' && <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Property earnings</h2><p className="mt-1 text-xs text-muted">{earningRows.length} properties with bookings in this period.</p></div><span className="text-xs font-medium text-muted">{periodLabel}</span></header>
         {earningRows.length > 0 ? <div className="mt-4 divide-y divide-border">
           {earningRows.map((row) => <article key={row.id} className="flex flex-wrap items-center gap-4 py-4">
@@ -361,12 +362,12 @@ export default function HostEarningsPage() {
             <div className="text-right"><small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Gross rent</small><strong className="mt-1 block text-sm font-semibold text-navy tabular-nums">{formatMoney(row.grossRent)}</strong></div>
             <div className="text-right"><small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Host net</small><strong className="mt-1 block text-sm font-bold text-navy tabular-nums">{formatMoney(row.hostNet)}</strong></div>
           </article>)}
-        </div> : <div className="mt-4 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center"><strong className="text-sm font-semibold text-navy">No property earnings</strong><p className="text-xs text-muted">There are no bookings with income in this period.</p></div>}
+        </div> : <div className="mt-4 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center"><strong className="text-sm font-semibold text-navy">No property earnings</strong><p className="text-xs text-muted">There are no bookings with income in this period.</p></div>}
       </section>}
 
       </TabItem>
       <TabItem title="Breakdown" active={activeTab === 'breakdown'}>
-      {activeTab === 'breakdown' && <section className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      {activeTab === 'breakdown' && <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Income breakdown</h2><p className="mt-1 text-xs text-muted">How booking value and deductions contribute to your earnings.</p></div><span className="text-xs font-medium text-muted">{periodLabel}</span></header>
         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {breakdown.map((item) => {
@@ -382,7 +383,7 @@ export default function HostEarningsPage() {
 
       </TabItem>
       <TabItem title="Reports" active={activeTab === 'reports'}>
-      {activeTab === 'reports' && <section className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      {activeTab === 'reports' && <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Reports</h2><p className="mt-1 text-xs text-muted">Export a property-level earnings summary for {rangeLabel}.</p></div><span className="text-xs font-medium text-muted">{earningRows.length} properties</span></header>
         <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <article className="rounded-lg border border-border bg-surface p-5">

@@ -162,23 +162,23 @@ export default function HostPromosPage() {
             <h2 className="m-0 text-[17px] leading-[1.25] text-[#0B1F42]">Your discounts</h2>
             <p className="m-0 mt-[5px] text-[11px] text-[#64748B]">Deactivated codes stop working immediately; existing bookings keep their discount.</p>
           </div>
-          {!loading && <span className="flex-none rounded-full bg-white px-[9px] py-[5px] text-[10px] font-extrabold text-[#64748B]">{promos.length} code{promos.length === 1 ? '' : 's'}</span>}
+          {!loading && <span className="flex-none rounded-full bg-elevated px-[9px] py-[5px] text-[10px] font-extrabold text-[#64748B]">{promos.length} code{promos.length === 1 ? '' : 's'}</span>}
         </div>
 
         {loading ? (
           <div className="flex flex-col gap-2" aria-label="Loading discounts" role="status">
-            <span className="h-16 animate-pulse rounded-[13px] bg-white" />
-            <span className="h-16 animate-pulse rounded-[13px] bg-white [animation-delay:150ms]" />
+            <span className="h-16 animate-pulse rounded-[13px] bg-elevated" />
+            <span className="h-16 animate-pulse rounded-[13px] bg-elevated [animation-delay:150ms]" />
           </div>
         ) : promos.length === 0 ? (
-          <div className="grid min-h-[160px] place-items-center content-center rounded-[13px] bg-white p-6 text-center">
+          <div className="grid min-h-[160px] place-items-center content-center rounded-[13px] bg-elevated p-6 text-center">
             <strong className="text-xs text-[#0B1F42]">No discounts yet</strong>
             <p className="mx-auto mt-1.5 max-w-[320px] text-[10px] leading-normal text-[#94A3B8]">Create your first code above and it will appear here.</p>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
             {promos.map((promo) => (
-              <article key={promo.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-[13px] bg-white p-3.5">
+              <article key={promo.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-[13px] bg-elevated p-3.5">
                 <div className="min-w-0">
                   <strong className="block font-mono text-[13px] text-[#0B1F42]">{promo.code}</strong>
                   <p className="m-0 mt-1 text-[11px] text-[#64748B]">

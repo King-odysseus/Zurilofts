@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ClipboardList } from 'lucide-react';
+import { Button } from 'flowbite-react';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
@@ -8,10 +9,15 @@ import { zuriImages } from '../assets/images.js';
 import { generateInvoice } from '../utils/invoice.js';
 import { canAddToCalendar, downloadStayCalendar, isUpcomingStay } from '../utils/stayCalendar.js';
 
+// Booking state reads as a tinted pill: one shape, one tone per status, so the
+// guest pages match the admin and host surfaces.
+const STATUS_PILL = 'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold';
+const STATUS_TONE_IDLE = 'bg-[#F1F5F9] text-[#475569]';
+
 const STATUS_META = {
-  PENDING: { label: 'Pending', className: 'is-pending' },
-  CONFIRMED: { label: 'Confirmed', className: '' },
-  CANCELLED: { label: 'Cancelled', className: 'is-cancelled' },
+  PENDING: { label: 'Pending', className: 'bg-[#FDF3D8] text-[#8A5A00]' },
+  CONFIRMED: { label: 'Confirmed', className: 'bg-[#E7F6EE] text-[#157347]' },
+  CANCELLED: { label: 'Cancelled', className: 'bg-[#FDECEC] text-[#B42318]' },
 };
 
 const FILTERS = [
@@ -37,9 +43,9 @@ function getBookingImage(booking, index = 0) {
 
 function HistoryCard({ booking, index, onMessage, messagePending }) {
   const property = booking.property || {};
-  const status = STATUS_META[booking.status] || { label: booking.status || 'Unknown', className: '' };
+  const status = STATUS_META[booking.status] || { label: booking.status || 'Unknown', className: STATUS_TONE_IDLE };
 
-  return <article className="opg-history-card">
+  return <article className="opg-history-card rounded-xl border border-border">
     <Link to={`/property/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={`View ${property.title || 'stay'}`}>
       <img src={getBookingImage(booking, index)} alt="" />
     </Link>
@@ -49,7 +55,7 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
           <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || 'Property'}</Link></h2>
           <p>{property.location || 'Nairobi'}</p>
         </div>
-        <span className={`opg-trip-status ${status.className}`}>{status.label}</span>
+        <span className={`${STATUS_PILL} ${status.className}`}>{status.label}</span>
       </div>
 
       <dl className="opg-history-meta">
@@ -60,13 +66,13 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
       </dl>
 
       <div className="opg-history-actions">
-        <button className="opg-trip-primary" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</button>
-        <button className="opg-trip-secondary" type="button" onClick={() => generateInvoice(booking)}>Invoice</button>
+        <Button size="sm" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</Button>
+        <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>Invoice</Button>
         {canAddToCalendar(booking) && isUpcomingStay(booking) && (
-          <button className="opg-trip-secondary" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</button>
+          <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</Button>
         )}
-        <Link className="opg-trip-link" to={`/property/${property.id || booking.propertyId}`}>View stay</Link>
-        <Link className="opg-trip-link" to={`/bookings/${booking.id}`}>Booking details</Link>
+        <Button as={Link} to={`/property/${property.id || booking.propertyId}`} color="light" size="sm">View stay</Button>
+        <Button as={Link} to={`/bookings/${booking.id}`} color="light" size="sm">Booking details</Button>
       </div>
     </div>
   </article>;
@@ -77,7 +83,7 @@ function EmptyHistory() {
     <ClipboardList strokeWidth={1.6} aria-hidden="true" />
     <h2>No bookings found</h2>
     <p>Try another filter, or browse available stays to plan your next trip.</p>
-    <Link className="opg-trip-primary" to="/properties">Browse stays</Link>
+    <Button as={Link} to="/properties" size="sm">Browse stays</Button>
   </div>;
 }
 
@@ -131,7 +137,7 @@ function BookingHistoryPage() {
     eyebrow="Travel"
     title="Booking history"
     description="Every reservation, receipt, and conversation in one place."
-    action={<Link className="opg-account-action" to="/trips">Upcoming trips</Link>}
+    action={<Button as={Link} to="/trips" className="w-fit max-md:mt-3.5" size="sm">Upcoming trips</Button>}
   >
     <div className="opg-history-tabs" role="tablist" aria-label="Booking status">
       {FILTERS.map((filter) => <button key={filter.value} type="button" role="tab" aria-selected={statusFilter === filter.value} onClick={() => setStatusFilter(filter.value)}>{filter.label}</button>)}
@@ -139,7 +145,7 @@ function BookingHistoryPage() {
 
     <p className="opg-history-count">{loading ? 'Loading bookings...' : `${filtered.length} booking${filtered.length === 1 ? '' : 's'}`}</p>
 
-    {loading ? <div className="opg-trip-loading" aria-label="Loading booking history"><span /><span /><span /></div> : error ? <div className="opg-trip-error"><p>{error}</p><button className="opg-trip-primary" type="button" onClick={() => window.location.reload()}>Try again</button></div> : filtered.length === 0 ? <EmptyHistory /> : <div className="opg-history-list">
+    {loading ? <div className="opg-trip-loading" aria-label="Loading booking history"><span /><span /><span /></div> : error ? <div className="opg-trip-error"><p>{error}</p><Button className="mx-auto w-fit" size="sm" type="button" onClick={() => window.location.reload()}>Try again</Button></div> : filtered.length === 0 ? <EmptyHistory /> : <div className="opg-history-list">
       {filtered.map((booking, index) => <HistoryCard key={booking.id} booking={booking} index={index} onMessage={openConversation} messagePending={messageBookingId === booking.id} />)}
     </div>}
   </GuestAccountLayout>;

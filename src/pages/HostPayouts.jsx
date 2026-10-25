@@ -47,7 +47,7 @@ function HostPayouts() {
   // Guests have no business here; show a clear denial instead of a spinner.
   // Declared after every hook so hook order stays identical across renders.
   if (user?.role === 'USER') {
-    return <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-white px-5 py-16 text-center">
+    return <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-elevated px-5 py-16 text-center">
       <span className="grid h-12 w-12 place-items-center rounded-full bg-surface text-primary-600">
         <CircleAlert strokeWidth={2} aria-hidden="true" />
       </span>
@@ -136,32 +136,33 @@ function HostPayouts() {
   return <div className="space-y-6">
     <header className="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <Link to="/host/earnings" className="text-xs font-semibold text-primary-600 hover:underline">Back to earnings</Link>
+        <Link to="/host/earnings" className="text-xs font-semibold text-muted transition-colors hover:text-navy">Back to earnings</Link>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">HOST WORKSPACE</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Payouts</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Manage how you get paid and review your payout history.</p>
       </div>
-      <Link to="/profile#payouts" className="text-sm font-medium text-primary-600 hover:underline">{destination?.method ? 'Change destination' : 'Set up payouts'}</Link>
+      <Button as={Link} to="/profile#payouts" size="sm">{destination?.method ? 'Change destination' : 'Set up payouts'}</Button>
     </header>
 
     {error && <Alert color="failure">
       <div className="flex w-full flex-wrap items-center justify-between gap-3">
         <p className="min-w-0 flex-1">{error}</p>
-        <Button size="xs" color="light" onClick={loadData}>Try again</Button>
+        <Button size="sm" color="light" onClick={loadData}>Try again</Button>
       </div>
     </Alert>}
 
     <section className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Payout balance summary">
-      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">AVAILABLE BALANCE</span>
         <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.balance || 0).toLocaleString()}</strong>
         <small className="mt-1 block text-xs text-muted">Ready for the next payout</small>
       </article>
-      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">TOTAL EARNED</span>
         <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.totalEarned || 0).toLocaleString()}</strong>
         <small className="mt-1 block text-xs text-muted">Recorded host earnings</small>
       </article>
-      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">TOTAL PAID OUT</span>
         <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.totalPaidOut || 0).toLocaleString()}</strong>
         <small className="mt-1 block text-xs text-muted">Completed host payouts</small>
@@ -169,9 +170,9 @@ function HostPayouts() {
     </section>
 
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-      <section className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Payout destination</h2><p className="mt-1 text-xs text-muted">Where your available balance is sent.</p></div><span className="text-xs font-medium text-muted">Schedule</span></header>
-        <div className="mt-4 rounded-lg bg-surface px-4 py-3">
+        <div className="mt-4 rounded-xl bg-surface px-4 py-3">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{destination?.method || 'NOT CONFIGURED'}</span>
           <strong className="mt-1 block text-sm font-semibold text-navy">{destination?.label || 'Add a payout destination'}</strong>
           <small className="mt-1 block text-xs text-muted">{destination?.maskedAccount || 'Bank or mobile money details are required before payout.'}</small>
@@ -180,20 +181,20 @@ function HostPayouts() {
           <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Next payout</dt><dd className="font-semibold text-navy">{wallet?.nextPayoutAt ? new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not scheduled'}</dd></div>
           <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Destination status</dt><dd className="font-semibold text-navy">{destination?.method ? 'Ready' : 'Needs setup'}</dd></div>
         </dl>
-        <Link to="/profile#payouts" className="mt-4 inline-flex text-sm font-medium text-primary-600 hover:underline">{destination?.method ? 'Update payout details' : 'Add payout details'}</Link>
+        <Button as={Link} to="/profile#payouts" color="light" size="sm" className="mt-4 w-fit">{destination?.method ? 'Update payout details' : 'Add payout details'}</Button>
       </section>
 
-      <section className="rounded-xl border border-border bg-white p-5 shadow-sm lg:col-span-2">
+      <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm lg:col-span-2">
         <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">WHT statement</h2><p className="mt-1 text-xs text-muted">Withholding tax certificates for KRA returns.</p></div><span className="text-xs font-medium text-muted">5% rate</span></header>
         <div className="mt-4 flex flex-wrap items-end gap-3">
           <div>
             <Label htmlFor="wht-month">Statement month</Label>
             <TextInput id="wht-month" type="month" value={whtMonth} onChange={(event) => setWhtMonth(event.target.value)} />
           </div>
-          <Button onClick={downloadWht}>View statement</Button>
+          <Button size="sm" onClick={downloadWht}>View statement</Button>
         </div>
         {whtData ? <div className="mt-4 space-y-4">
-          <div className="rounded-lg bg-surface px-4 py-3">
+          <div className="rounded-xl bg-surface px-4 py-3">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{whtMonth || 'ALL TIME'}</span>
             <strong className="mt-1 block text-xl font-bold text-navy tabular-nums">KES {(whtData.totalWht || 0).toLocaleString()} WHT</strong>
             <small className="mt-1 block text-xs text-muted">From KES {(whtData.totalEarnings || 0).toLocaleString()} host earnings</small>
@@ -219,19 +220,19 @@ function HostPayouts() {
             </Table>
           </div>
           <div className="flex flex-wrap gap-2">
-            <Button color="light" onClick={csvWht}>Download CSV</Button>
-            <Button color="dark" onClick={printWht}>Print PDF</Button>
+            <Button color="light" size="sm" onClick={csvWht}>Download CSV</Button>
+            <Button color="light" size="sm" onClick={printWht}>Print PDF</Button>
           </div>
-        </div> : <div className="mt-4 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center">
+        </div> : <div className="mt-4 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center">
           <strong className="text-sm font-semibold text-navy">Select a month to view your statement</strong>
           <p className="text-xs text-muted">Leave the month empty to view all withholding tax recorded on your account.</p>
         </div>}
       </section>
     </div>
 
-    <section className="rounded-xl border border-border bg-white p-5 shadow-sm">
+    <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
       <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Payout history</h2><p className="mt-1 text-xs text-muted">Completed and in-flight transfers to your destination.</p></div><span className="text-xs font-medium text-muted">{payouts.length} records</span></header>
-      {payouts.length === 0 ? <div className="mt-4 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center">
+      {payouts.length === 0 ? <div className="mt-4 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center">
         <strong className="text-sm font-semibold text-navy">No payouts yet</strong>
         <p className="text-xs text-muted">Your first payout will appear here after a transfer is created.</p>
       </div> : <div className="mt-4 overflow-x-auto">

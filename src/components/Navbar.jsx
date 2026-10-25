@@ -279,12 +279,12 @@ function Navbar() {
 
   const badgeClass = 'inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 ml-1.5 bg-red-600 text-white text-[10px] font-bold rounded-full align-middle';
 
-  const accountItemClass = 'flex items-center rounded-[10px] px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors';
+  const accountItemClass = 'flex items-center rounded-[10px] px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-surface transition-colors';
 
   return (
     <><nav className={`zl-navbar fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
       needsWhiteNav
-        ? 'border-b border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.06)]'
+        ? 'border-b border-[#E3E8EF] bg-elevated shadow-[0_4px_16px_rgba(11,31,66,0.06)]'
         : 'bg-transparent'
     }`}>
       <div className="mx-auto w-full max-w-[1344px] px-4 md:px-6">
@@ -343,7 +343,7 @@ function Navbar() {
                       <span className={underlineClass(isActive)} />
                     </button>
                     {open && (
-                      <div className="absolute left-0 top-full z-30 mt-2 w-56 rounded-2xl border border-[#E3E8EF] bg-white py-2 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+                      <div className="absolute left-0 top-full z-30 mt-2 w-56 rounded-2xl border border-[#E3E8EF] bg-elevated py-2 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
                         {submenuItems.map((child) => {
                           const childActive = isActiveHref(location.pathname, child.href);
                           return (
@@ -354,7 +354,7 @@ function Navbar() {
                               className={`flex items-center px-4 py-2.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] ${
                                 childActive
                                   ? 'text-[#9A744A] bg-[#FDE8D8] font-semibold'
-                                  : 'text-[#0B1F42] hover:bg-[#F7F4EF] hover:text-[#9A744A]'
+                                  : 'text-[#0B1F42] hover:bg-surface hover:text-[#9A744A]'
                               }`}
                             >
                               {child.name}
@@ -394,7 +394,7 @@ function Navbar() {
                   id="navbar-search"
                   role="search"
                   onSubmit={handleSearchSubmit}
-                  className="absolute right-0 top-full z-30 mt-2 flex w-[min(340px,calc(100vw-2rem))] items-center gap-2 rounded-2xl border border-[#E3E8EF] bg-white p-2 shadow-[0_16px_40px_rgba(11,31,66,0.16)]"
+                  className="absolute right-0 top-full z-30 mt-2 flex w-[min(340px,calc(100vw-2rem))] items-center gap-2 rounded-2xl border border-[#E3E8EF] bg-elevated p-2 shadow-[0_16px_40px_rgba(11,31,66,0.16)]"
                 >
                   <TextInput
                     value={searchQuery}
@@ -422,7 +422,7 @@ function Navbar() {
                     aria-expanded={notifOpen}
                     aria-label="Notifications"
                     className={`rounded-full p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2 ${
-                      needsWhiteNav ? 'text-[#0B1F42] hover:bg-[#F7F4EF]' : 'text-white hover:bg-white/10'
+                      needsWhiteNav ? 'text-[#0B1F42] hover:bg-surface' : 'text-white hover:bg-white/10'
                     }`}
                     title="Notifications"
                   >
@@ -434,7 +434,7 @@ function Navbar() {
                     </span>
                   )}
                   {notifOpen && (
-                    <div className="absolute right-0 z-30 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-white py-2 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+                    <div className="absolute right-0 z-30 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-elevated py-2 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
                       <div className="border-b border-[#E3E8EF] px-4 py-2">
                         <p className="text-sm font-semibold text-[#0B1F42]">Notifications</p>
                       </div>
@@ -515,7 +515,7 @@ function Navbar() {
                   </button>
 
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl py-2 z-30 border border-[#E3E8EF]">
+                    <div className="absolute right-0 mt-2 w-56 bg-elevated rounded-2xl shadow-xl py-2 z-30 border border-[#E3E8EF]">
                       <div className="px-4 py-3 border-b border-[#E3E8EF]">
                         <p className="text-sm font-semibold text-[#0B1F42]">{user?.firstName} {user?.lastName}</p>
                         <p className="text-xs text-[#5B6B82]">{user?.email}</p>
@@ -698,16 +698,16 @@ function Navbar() {
           role="dialog"
           aria-modal="true"
           aria-label="Account and navigation menu"
-          className={`fixed left-1/2 top-20 z-30 w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-6rem)] -translate-x-1/2 overflow-y-auto rounded-2xl border border-[#E3E8EF] bg-white shadow-[0_20px_60px_rgba(11,31,66,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
+          className={`fixed left-1/2 top-20 z-30 w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-6rem)] -translate-x-1/2 overflow-y-auto rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_20px_60px_rgba(11,31,66,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
         >
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E3E8EF] bg-white px-4 py-3">
+          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E3E8EF] bg-elevated px-4 py-3">
             <div className="flex items-center gap-3 min-w-0">
               {isAuthenticated ? (
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#C49A6C] text-sm font-bold text-white">
                   {user?.firstName?.[0]}{user?.lastName?.[0]}
                 </div>
               ) : (
-                <div className="h-9 w-9 shrink-0 rounded-full bg-[#F7F4EF]" aria-hidden="true" />
+                <div className="h-9 w-9 shrink-0 rounded-full bg-surface" aria-hidden="true" />
               )}
               <div className="min-w-0">
                 <p className="truncate text-sm font-semibold text-[#0B1F42]">{isAuthenticated ? user?.firstName : 'Explore ZuriLofts'}</p>
@@ -718,7 +718,7 @@ function Navbar() {
               type="button"
               onClick={() => setMenuOpen(false)}
               aria-label="Close menu"
-              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#0B1F42] transition hover:bg-[#F7F4EF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+              className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#0B1F42] transition hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
             >
               <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
             </button>
@@ -737,7 +737,7 @@ function Navbar() {
                           <Link
                             to={child.href}
                             onClick={() => setMenuOpen(false)}
-                            className={`flex items-center min-h-[44px] px-3 py-2.5 rounded-[10px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] ${
+                            className={`flex items-center min-h-[44px] px-3 py-2.5 rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] ${
                               isActiveHref(location.pathname, child.href)
                                 ? 'text-[#9A744A] bg-[#F6EFE7]'
                                 : 'text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]'
@@ -756,7 +756,7 @@ function Navbar() {
                   <Link
                     to={item.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`flex items-center justify-between min-h-[44px] px-3 py-2.5 rounded-[10px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] ${
+                    className={`flex items-center justify-between min-h-[44px] px-3 py-2.5 rounded-full text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] ${
                       isActiveHref(location.pathname, item.href)
                         ? 'text-[#9A744A] bg-[#F6EFE7]'
                         : 'text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]'
@@ -777,12 +777,12 @@ function Navbar() {
               <p className="px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em] text-[#5B6B82]">{t('nav.moreToExplore')}</p>
               <div className="space-y-1">
                 {exploreLinks.filter((link) => link.href !== '/properties').map((link) => (
-                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-[10px] px-3 py-2.5 text-sm font-medium text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]">
+                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-full px-3 py-2.5 text-sm font-medium text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]">
                     {link.name}
                   </Link>
                 ))}
                 {savedLinks.map((link) => (
-                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-[10px] px-3 py-2.5 text-sm font-medium text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]">
+                  <Link key={link.href} to={link.href} onClick={() => setMenuOpen(false)} className="flex min-h-[44px] items-center rounded-full px-3 py-2.5 text-sm font-medium text-[#0B1F42] hover:bg-[#F6EFE7] hover:text-[#9A744A]">
                     {link.name}
                   </Link>
                 ))}
@@ -795,14 +795,14 @@ function Navbar() {
                 <>
                   <Link
                     to="/profile#info"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold bg-[#C49A6C] text-[#0B1F42] hover:bg-[#B8895C] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.myProfile')}
                   </Link>
                   <Link
                     to="/bookings"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.bookingHistory')}
@@ -810,7 +810,7 @@ function Navbar() {
                   {user?.role !== 'HOST' && (
                     <Link
                       to="/host/application"
-                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface transition-colors duration-200 text-center"
                       onClick={() => setMenuOpen(false)}
                     >
                       {t('nav.becomeHost')}
@@ -818,14 +818,14 @@ function Navbar() {
                   )}
                   <Link
                     to="/terms"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.termsOfService')}
                   </Link>
                   <Link
                     to="/privacy"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.privacyPolicy')}
@@ -833,7 +833,7 @@ function Navbar() {
                   {(user?.role === 'ADMIN' || user?.role === 'HOST') && (
                     <Link
                       to={user?.role === 'ADMIN' ? '/admin' : '/host/today'}
-                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold bg-[#C49A6C] text-[#0B1F42] hover:bg-[#B8895C] transition-colors duration-200 text-center"
                       onClick={() => setMenuOpen(false)}
                     >
                       {user?.role === 'ADMIN' ? t('nav.adminPanel') : t('nav.hostDashboard')}
@@ -842,14 +842,14 @@ function Navbar() {
                   {canSelectHosting && (
                     <button
                       onClick={handleSwitchMode}
-                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold text-[#9A744A] hover:bg-[#F6EFE7] transition-colors duration-200 text-center"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold text-[#9A744A] hover:bg-[#F6EFE7] transition-colors duration-200 text-center"
                     >
                       {effectiveMode === 'hosting' ? t('nav.switchToTravelling') : t('nav.switchToHosting')}
                     </button>
                   )}
                   <button
                     onClick={handleLogout}
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold text-red-600 hover:bg-red-50 transition-colors duration-200 text-center border border-red-200"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold text-red-600 hover:bg-red-50 transition-colors duration-200 text-center border border-red-200"
                   >
                     {t('nav.signOut')}
                   </button>
@@ -858,28 +858,28 @@ function Navbar() {
                 <>
                   <Link
                     to="/login"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold bg-[#C49A6C] text-white hover:bg-[#B8895C] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold bg-[#C49A6C] text-[#0B1F42] hover:bg-[#B8895C] transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.signIn')}
                   </Link>
                   <Link
                     to="/register"
-                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-lg font-semibold border border-[#C49A6C] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
+                    className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold border border-[#C49A6C] text-[#0B1F42] hover:bg-surface transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.createAccount')}
                   </Link>
                   <Link
                     to="/terms"
-                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.termsOfService')}
                   </Link>
                   <Link
                     to="/privacy"
-                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-[10px] font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors duration-200 text-center"
+                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface transition-colors duration-200 text-center"
                     onClick={() => setMenuOpen(false)}
                   >
                     {t('nav.privacyPolicy')}

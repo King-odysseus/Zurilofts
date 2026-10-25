@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { ClipboardList, MapPin } from 'lucide-react';
+import { Button } from 'flowbite-react';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -21,11 +22,16 @@ import { canAddToCalendar, downloadStayCalendar, googleCalendarUrl } from '../ut
  * owns the listing, so this page serves both sides of the same reservation; a
  * booking the caller has no claim to comes back as a 404.
  */
+// Booking state reads as a tinted pill: one shape, one tone per status, so the
+// guest pages match the admin and host surfaces.
+const STATUS_PILL = 'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold';
+const STATUS_TONE_IDLE = 'bg-[#F1F5F9] text-[#475569]';
+
 const STATUS_META = {
-  PENDING: { label: 'Pending payment', className: 'is-pending' },
-  CONFIRMED: { label: 'Confirmed', className: '' },
-  CANCELLED: { label: 'Cancelled', className: 'is-cancelled' },
-  CONFLICT: { label: 'Needs review', className: 'is-cancelled' },
+  PENDING: { label: 'Pending payment', className: 'bg-[#FDF3D8] text-[#8A5A00]' },
+  CONFIRMED: { label: 'Confirmed', className: 'bg-[#E7F6EE] text-[#157347]' },
+  CANCELLED: { label: 'Cancelled', className: 'bg-[#FDECEC] text-[#B42318]' },
+  CONFLICT: { label: 'Needs review', className: 'bg-[#FDECEC] text-[#B42318]' },
 };
 
 function formatDate(iso) {
@@ -147,7 +153,7 @@ function BookingDetailPage() {
   }
 
   const property = booking?.property || {};
-  const status = STATUS_META[booking?.status] || { label: booking?.status || 'Unknown', className: '' };
+  const status = STATUS_META[booking?.status] || { label: booking?.status || 'Unknown', className: STATUS_TONE_IDLE };
   const isGuestOwner = Boolean(user?.id && booking?.userId && user.id === booking.userId);
   const canResumePayment = isGuestOwner && booking?.status === 'PENDING' && !booking?.paidAt;
   // Hosts get the same two controls: a reservation is just as useful in the
@@ -170,7 +176,7 @@ function BookingDetailPage() {
           <ClipboardList strokeWidth={1.6} aria-hidden="true" />
           <h2>Booking not found</h2>
           <p>It may have been removed, or it does not belong to this account.</p>
-          <Link className="opg-trip-primary" to="/bookings">Back to bookings</Link>
+          <Button as={Link} to="/bookings" size="sm">Back to bookings</Button>
         </div>
       </GuestAccountLayout>
     );
@@ -181,7 +187,7 @@ function BookingDetailPage() {
       <GuestAccountLayout active="bookings" eyebrow="Reservation" title="Booking details" description="Something went wrong.">
         <div className="opg-trip-error">
           <p>{error || 'Could not load this booking. Please try again.'}</p>
-          <button className="opg-trip-primary" type="button" onClick={() => window.location.reload()}>Try again</button>
+          <Button className="mx-auto w-fit" size="sm" type="button" onClick={() => window.location.reload()}>Try again</Button>
         </div>
       </GuestAccountLayout>
     );
@@ -196,9 +202,9 @@ function BookingDetailPage() {
       eyebrow="Reservation"
       title={property.title || 'Booking details'}
       description={`Booked ${formatDate(booking.createdAt)}`}
-      action={<Link className="opg-account-action" to="/bookings">All bookings</Link>}
+      action={<Button as={Link} to="/bookings" className="w-fit max-md:mt-3.5" size="sm">All bookings</Button>}
     >
-      <article className="opg-history-card">
+      <article className="opg-history-card rounded-xl border border-border">
         <Link to={`/property/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={`View ${property.title || 'stay'}`}>
           <img src={image} alt="" />
         </Link>
@@ -208,7 +214,7 @@ function BookingDetailPage() {
               <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || 'Property'}</Link></h2>
               <p><MapPin size={13} aria-hidden="true" /> {property.location || 'Nairobi'}</p>
             </div>
-            <span className={`opg-trip-status ${status.className}`}>{status.label}</span>
+            <span className={`${STATUS_PILL} ${status.className}`}>{status.label}</span>
           </div>
 
           <dl className="opg-history-meta">
@@ -227,7 +233,7 @@ function BookingDetailPage() {
         </div>
       </article>
 
-      <section className="opg-detail-panel" aria-labelledby="detail-payment">
+      <section className="opg-detail-panel rounded-xl border border-border" aria-labelledby="detail-payment">
         <h2 id="detail-payment">Payment summary</h2>
         <dl className="opg-detail-money">
           <MoneyRow label={`Accommodation (${booking.bedOption === '2bed' ? '2-bed' : '1-bed'})`} value={formatCurrency(booking.subtotal)} />
@@ -251,26 +257,26 @@ function BookingDetailPage() {
 
         <div className="opg-history-actions">
           {canResumePayment && (
-            <button className="opg-trip-primary" type="button" onClick={resumePayment} disabled={paymentPending}>
+            <Button size="sm" type="button" onClick={resumePayment} disabled={paymentPending}>
               {paymentPending ? 'Opening payment...' : 'Complete payment'}
-            </button>
+            </Button>
           )}
-          {!isGuestOwner && <button className="opg-trip-primary" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message guest'}</button>}
-          {isGuestOwner && <button className="opg-trip-primary" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</button>}
-          <button className="opg-trip-secondary" type="button" onClick={() => generateInvoice(booking)}>Invoice</button>
+          {!isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message guest'}</Button>}
+          {isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</Button>}
+          <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>Invoice</Button>
           {calendarReady && (
-            <button className="opg-trip-secondary" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</button>
+            <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</Button>
           )}
           {calendarLink && (
-            <a className="opg-trip-link" href={calendarLink} target="_blank" rel="noopener noreferrer">Google Calendar</a>
+            <Button as="a" href={calendarLink} target="_blank" rel="noopener noreferrer" color="light" size="sm">Google Calendar</Button>
           )}
-          <Link className="opg-trip-link" to={`/property/${property.id || booking.propertyId}`}>View stay</Link>
-          <Link className="opg-trip-link" to={isGuestOwner ? '/trips' : '/host/today'}>{isGuestOwner ? 'My trips' : 'Today'}</Link>
+          <Button as={Link} to={`/property/${property.id || booking.propertyId}`} color="light" size="sm">View stay</Button>
+          <Button as={Link} to={isGuestOwner ? '/trips' : '/host/today'} color="light" size="sm">{isGuestOwner ? 'My trips' : 'Today'}</Button>
         </div>
       </section>
 
       {(additionalGuests.length > 0 || booking.specialRequests) && (
-        <section className="opg-detail-panel" aria-labelledby="detail-stay">
+        <section className="opg-detail-panel rounded-xl border border-border" aria-labelledby="detail-stay">
           <h2 id="detail-stay">Guest details</h2>
           {additionalGuests.length > 0 && (
             <>

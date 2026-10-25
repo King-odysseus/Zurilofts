@@ -10,7 +10,7 @@ import { firstImage } from "../utils/images.js";
 // Badge tones replace the old per-tone status pills on each panel header.
 const TONE_COLORS = { arrival: "info", inhouse: "warning", departure: "success" };
 
-const CARD = "rounded-xl border border-border bg-white p-5 shadow-sm";
+const CARD = "rounded-xl border border-border bg-elevated p-5 shadow-sm";
 const EYEBROW = "text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600";
 
 function formatToday() {
@@ -51,7 +51,7 @@ function GuestOperationCard({ booking, type, compact = false }) {
   const propertyTitle = property.title || "Your stay";
   const time = bookingTime(booking, type);
 
-  return <article className={`flex items-center gap-3 rounded-xl border border-border bg-white ${compact ? "p-2.5" : "p-3"}`}>
+  return <article className={`flex items-center gap-3 rounded-xl border border-border bg-elevated ${compact ? "p-2.5" : "p-3"}`}>
     <Link to={`/property/${property.id || ""}`} className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-surface text-sm font-bold uppercase text-muted" aria-label={propertyTitle}>
       {image ? <img src={image} alt="" className="h-full w-full object-cover" /> : <span>{guestInitials(booking)}</span>}
     </Link>
@@ -83,7 +83,7 @@ GuestOperationCard.propTypes = {
 };
 
 function EmptyPanel({ label }) {
-  return <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center">
+  return <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center">
     <span className="grid h-9 w-9 place-items-center rounded-full bg-surface text-muted"><CalendarDays className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" /></span>
     <strong className="text-sm font-semibold text-navy">No {label.toLowerCase()} today</strong>
     <p className="text-xs text-muted">This panel will update when the schedule changes.</p>
@@ -129,7 +129,7 @@ function RecentMessages({ conversations, loading }) {
         const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || "Guest";
         const image = firstImage(property);
         return <Link key={conversation.id} to={`/inbox/${conversation.id}`} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-3 transition-colors hover:bg-primary-50">
-          <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-white text-xs font-bold uppercase text-muted">{image ? <img src={image} alt="" className="h-full w-full object-cover" /> : name.slice(0, 1)}</span>
+          <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-elevated text-xs font-bold uppercase text-muted">{image ? <img src={image} alt="" className="h-full w-full object-cover" /> : name.slice(0, 1)}</span>
           <div className="min-w-0 flex-1"><strong className="block truncate text-sm font-semibold text-navy">{name}</strong><small className="block truncate text-xs text-muted">{property.title || "Stay"}</small><p className="mt-1 truncate text-xs text-muted">{conversation.lastMessage?.content || "No messages yet"}</p></div>
           <time className="shrink-0 text-[10px] text-muted">{relativeTime(conversation.lastMessage?.createdAt || conversation.updatedAt)}</time>
         </Link>;
@@ -186,9 +186,9 @@ export default function HostTodayPage() {
     return () => { active = false; };
   }, [isAuthenticated]);
 
-  if (loading) return <div className="space-y-6" aria-label="Loading host dashboard"><span className="block h-24 animate-pulse rounded-xl border border-border bg-white" /><span className="block h-44 animate-pulse rounded-xl border border-border bg-white" /><span className="block h-24 animate-pulse rounded-xl border border-border bg-white" /><span className="block h-64 animate-pulse rounded-xl border border-border bg-white" /></div>;
+  if (loading) return <div className="space-y-6" aria-label="Loading host dashboard"><span className="block h-24 animate-pulse rounded-xl border border-border bg-elevated" /><span className="block h-44 animate-pulse rounded-xl border border-border bg-elevated" /><span className="block h-24 animate-pulse rounded-xl border border-border bg-elevated" /><span className="block h-64 animate-pulse rounded-xl border border-border bg-elevated" /></div>;
 
-  if (error) return <div className="space-y-6"><div className="rounded-xl border border-border bg-white p-5 shadow-sm"><p className="text-sm text-charcoal">{error}</p><Button type="button" size="sm" className="mt-3" onClick={() => window.location.reload()}>Try again</Button></div></div>;
+  if (error) return <div className="space-y-6"><div className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><p className="text-sm text-charcoal">{error}</p><Button type="button" size="sm" className="mt-3" onClick={() => window.location.reload()}>Try again</Button></div></div>;
 
   const { arrivals = [], departures = [], inHouse = [], summary = {} } = data || {};
   const priority = arrivals[0] || inHouse[0] || departures[0];
@@ -205,7 +205,7 @@ export default function HostTodayPage() {
     </header>
 
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-      <section className="flex flex-col justify-between gap-4 rounded-xl border border-border bg-primary-50 p-5 shadow-sm sm:flex-row sm:items-center lg:col-span-2">
+      <section className="flex flex-col justify-between gap-4 rounded-xl border border-border bg-primary-50 dark:bg-primary/15 p-5 shadow-sm sm:flex-row sm:items-center lg:col-span-2">
         <div>
           <p className={EYEBROW}>TODAY AT YOUR STAYS</p>
           <h2 className="mt-1 text-xl font-semibold text-navy">Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}{user?.firstName ? `, ${user.firstName}` : ""}</h2>
@@ -214,7 +214,7 @@ export default function HostTodayPage() {
         <Button as={Link} to="/host/calendar" size="sm" className="self-start md:hidden">Open calendar</Button>
       </section>
       <section className="flex flex-col items-start rounded-xl border border-border bg-navy-bg p-5 shadow-sm">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">PRIORITY NEXT STEP</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">PRIORITY NEXT STEP</p>
         <h2 className="mt-1 text-xl font-semibold text-white">{priority ? (priorityType === "arrival" ? "Confirm arrival details" : priorityType === "departure" ? "Review today's checkout" : "Check your in-house guest") : "Your day is clear"}</h2>
         <span className="mt-2 block text-sm leading-relaxed text-white/70">{priority ? `${guestName(priority)} at ${priority.property?.title || "your property"} · ${bookingTime(priority, priorityType)}` : "There are no urgent guest actions scheduled right now."}</span>
         {/* The card only needs its own action when there is a booking to open.
@@ -225,9 +225,9 @@ export default function HostTodayPage() {
     </div>
 
     <div className="hidden grid-cols-1 gap-4 sm:grid sm:grid-cols-3">
-      <article className="flex items-center justify-between gap-4 rounded-xl border border-border bg-white p-4 shadow-sm"><div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Arrivals</span><small className="mt-1 block text-xs text-muted">Guests checking in</small></div><strong className="text-2xl font-bold text-navy">{summary.arrivals || 0}</strong></article>
-      <article className="flex items-center justify-between gap-4 rounded-xl border border-border bg-white p-4 shadow-sm"><div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Departures</span><small className="mt-1 block text-xs text-muted">Guests checking out</small></div><strong className="text-2xl font-bold text-navy">{summary.departures || 0}</strong></article>
-      <article className="flex items-center justify-between gap-4 rounded-xl border border-border bg-white p-4 shadow-sm"><div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">In house</span><small className="mt-1 block text-xs text-muted">Stays in progress</small></div><strong className="text-2xl font-bold text-navy">{summary.inHouse || 0}</strong></article>
+      <article className="flex items-center justify-between gap-4 rounded-xl border border-border bg-elevated p-4 shadow-sm"><div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Arrivals</span><small className="mt-1 block text-xs text-muted">Guests checking in</small></div><strong className="text-2xl font-bold text-navy">{summary.arrivals || 0}</strong></article>
+      <article className="flex items-center justify-between gap-4 rounded-xl border border-border bg-elevated p-4 shadow-sm"><div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Departures</span><small className="mt-1 block text-xs text-muted">Guests checking out</small></div><strong className="text-2xl font-bold text-navy">{summary.departures || 0}</strong></article>
+      <article className="flex items-center justify-between gap-4 rounded-xl border border-border bg-elevated p-4 shadow-sm"><div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">In house</span><small className="mt-1 block text-xs text-muted">Stays in progress</small></div><strong className="text-2xl font-bold text-navy">{summary.inHouse || 0}</strong></article>
     </div>
 
     <div className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:[&>section:last-child]:col-span-2 lg:[&>section:last-child]:col-span-1">

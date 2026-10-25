@@ -14,10 +14,25 @@ const WEEK_GRID = 'grid grid-cols-[minmax(170px,1.6fr)_repeat(7,minmax(0,1fr))]'
 
 // Day-cell surface per availability state; selected cells add a ring.
 const DAY_STATE_CLASSES = {
-  open: 'bg-white text-muted hover:bg-surface',
+  open: 'bg-elevated text-muted hover:bg-surface',
   reserved: 'bg-navy-bg text-white hover:bg-navy-bg/90',
   blocked: 'bg-silver/50 text-navy hover:bg-silver/70',
 };
+
+// Admin-workspace control shapes: one pill, 36px tall, 14px/600 label. Flowbite
+// ships its own radius, padding, alignment, background and text utilities for
+// the same properties, so the ones that clash are marked important - otherwise
+// the winner is decided by stylesheet order, not by the order in this string.
+const BTN_PRIMARY = 'h-9 !items-center !rounded-full !border-0 !bg-primary !px-4 !text-sm !font-semibold !text-navy-bg hover:!bg-primary-hover hover:!text-navy-bg';
+// Secondary buttons need the admin panels' solid 1px token border; Flowbite's
+// light button border measures under a pixel on some display ratios. The
+// elevated/navy pair flips with the theme, so the label is never white on white.
+const BTN_SECONDARY = 'h-9 !items-center !rounded-full !border !border-border !bg-elevated !px-4 !text-sm !font-semibold !text-navy hover:!bg-surface hover:!text-navy';
+// Icon-only controls keep the 36px pill but square it off, so they must not
+// inherit the shared horizontal padding.
+const BTN_ICON = 'h-9 !w-9 !items-center !justify-center !rounded-full !border !border-border !bg-elevated !px-0 !text-navy hover:!bg-surface hover:!text-navy';
+// Small uppercase label above a value: the same recipe the admin eyebrows use.
+const LABEL = 'text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600';
 
 function startOfWeek(date) {
   const value = new Date(date);
@@ -71,7 +86,7 @@ function calendarDayState(calendar, day) {
 function WeeklyCalendar({ rows, weekStart, selected, onSelect }) {
   const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
 
-  return <section className="rounded-xl border border-border bg-white shadow-sm xl:col-span-2">
+  return <section className="rounded-xl border border-border bg-elevated shadow-sm xl:col-span-2">
     <div className="overflow-x-auto">
       <div className="min-w-[720px]">
         <div className={`${WEEK_GRID} border-b border-border bg-surface`}>
@@ -105,7 +120,7 @@ function WeeklyCalendar({ rows, weekStart, selected, onSelect }) {
       </div>
     </div>
     <div className="flex flex-wrap items-center gap-4 border-t border-border px-5 py-3 text-xs text-muted">
-      <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full border border-border bg-white" aria-hidden="true" />Open</span>
+      <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full border border-border bg-elevated" aria-hidden="true" />Open</span>
       <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-navy-bg" aria-hidden="true" />Reserved</span>
       <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-silver" aria-hidden="true" />Blocked</span>
     </div>
@@ -120,32 +135,32 @@ WeeklyCalendar.propTypes = {
 };
 
 function CalendarDetail({ selected, row, onOpenProperty }) {
-  if (!row || !selected?.date) return <aside className="h-fit rounded-xl border border-dashed border-border bg-white p-5 text-center shadow-sm xl:col-span-1">
+  if (!row || !selected?.date) return <aside className="h-fit rounded-xl border border-dashed border-border bg-elevated p-5 text-center shadow-sm xl:col-span-1">
     <span className="block text-sm font-semibold text-navy">Select a date</span>
     <small className="mt-1 block text-xs leading-relaxed text-muted">Choose a day to see its booking or availability state.</small>
   </aside>;
   const state = calendarDayState(row.calendar, selected.date);
 
-  return <aside className="h-fit space-y-4 rounded-xl border border-border bg-white p-5 shadow-sm xl:col-span-1">
+  return <aside className="h-fit space-y-4 rounded-xl border border-border bg-elevated p-5 shadow-sm xl:col-span-1">
     <header><h2 className="text-base font-semibold text-navy">{formatFullDate(selected.date)}</h2><p className="mt-1 text-xs text-muted">{row.property.title}</p></header>
     {state.type === 'reserved' ? <div className="rounded-lg bg-navy-bg p-3 text-white">
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-white/70">RESERVED STAY</span>
+      <span className={LABEL}>RESERVED STAY</span>
       <strong className="mt-1 block text-sm font-semibold">{state.item.guestName || 'Guest'}</strong>
       <p className="mt-1 text-xs leading-relaxed text-white/80">{sameDay(selected.date, new Date(state.item.start)) ? 'Check-in today' : sameDay(selected.date, addDays(new Date(state.item.end), -1)) ? 'Check-out today' : 'Stay in progress'} · {state.item.guests || 1} guest{state.item.guests === 1 ? '' : 's'}</p>
       <Link to={`/bookings/${state.item.id}`} className="mt-2 inline-block text-xs font-semibold underline">View booking</Link>
     </div> : state.type === 'blocked' ? <div className="rounded-lg bg-surface p-3">
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">BLOCKED DATE</span>
+      <span className={LABEL}>BLOCKED DATE</span>
       <strong className="mt-1 block text-sm font-semibold text-navy">{state.item.summary || 'Unavailable'}</strong>
       <p className="mt-1 text-xs leading-relaxed text-muted">{state.item.manual ? 'Manual block' : state.item.sourceName || 'Imported calendar'}</p>
     </div> : <div className="rounded-lg border border-dashed border-border p-3">
-      <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">OPEN NIGHT</span>
+      <span className={LABEL}>OPEN NIGHT</span>
       <strong className="mt-1 block text-sm font-semibold text-navy">Ready for bookings</strong>
       <p className="mt-1 text-xs leading-relaxed text-muted">Guests can reserve this date on ZuriLofts.</p>
     </div>}
     <div className="rounded-lg border border-border p-3">
       <strong className="block text-sm font-semibold text-navy">Availability rules</strong>
       <p className="mt-1 text-xs leading-relaxed text-muted">Reserved dates are read-only. Manual blocks can be managed below.</p>
-      <Button type="button" color="light" size="xs" onClick={onOpenProperty} className="mt-2">Open property calendar</Button>
+      <Button type="button" onClick={onOpenProperty} className={`mt-2 ${BTN_SECONDARY}`}>Open property calendar</Button>
     </div>
   </aside>;
 }
@@ -157,7 +172,7 @@ CalendarDetail.propTypes = {
 };
 
 function CalendarLoading() {
-  return <div className="space-y-3 rounded-xl border border-border bg-white p-5 shadow-sm" aria-label="Loading calendar">
+  return <div className="space-y-3 rounded-xl border border-border bg-elevated p-5 shadow-sm" aria-label="Loading calendar">
     <span className="block h-16 animate-pulse rounded-lg bg-surface" />
     <span className="block h-16 animate-pulse rounded-lg bg-surface" />
     <span className="block h-16 animate-pulse rounded-lg bg-surface" />
@@ -316,49 +331,50 @@ export default function HostCalendarPage() {
     <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div>
         {id && <Link to="/host/calendar" className="mb-2 inline-block text-sm font-medium text-primary-600 hover:underline">← All calendars</Link>}
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">HOST WORKSPACE</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Availability calendar</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Manage open dates without changing reserved stays.</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <Button type="button" color="light" size="xs" aria-label="Previous week" onClick={() => moveWeek(-1)}><ChevronLeft strokeWidth={1.8} aria-hidden="true" /></Button>
+        <Button type="button" className={BTN_ICON} aria-label="Previous week" onClick={() => moveWeek(-1)}><ChevronLeft strokeWidth={1.8} aria-hidden="true" /></Button>
         <span className="text-sm font-semibold text-navy">{formatWeek(weekStart)}</span>
-        <Button type="button" color="light" size="xs" aria-label="Next week" onClick={() => moveWeek(1)}><ChevronRight strokeWidth={1.8} aria-hidden="true" /></Button>
-        {selectedRow && <Button as={Link} to={`/host/calendar/${selectedRow.property.id}#block-dates`} color="light" size="sm">Manage availability</Button>}
+        <Button type="button" className={BTN_ICON} aria-label="Next week" onClick={() => moveWeek(1)}><ChevronRight strokeWidth={1.8} aria-hidden="true" /></Button>
+        {selectedRow && <Button as={Link} to={`/host/calendar/${selectedRow.property.id}#block-dates`} className={BTN_SECONDARY}>Manage availability</Button>}
       </div>
     </header>
 
     {error && <Alert color="failure">
       <p>{error}</p>
-      <div><Button type="button" color="light" size="sm" onClick={load}>Try again</Button></div>
+      <div><Button type="button" className={BTN_SECONDARY} onClick={load}>Try again</Button></div>
     </Alert>}
-    {loading ? <CalendarLoading /> : rows.length === 0 && !error ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center">
+    {loading ? <CalendarLoading /> : rows.length === 0 && !error ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center">
       <strong className="text-base font-semibold text-navy">No listings to manage</strong>
       <p className="max-w-md text-sm leading-relaxed text-muted">Add a listing before setting availability.</p>
-      <Button as={Link} to="/host/properties/new" size="sm">Add a listing</Button>
+      <Button as={Link} to="/host/properties/new" className={BTN_PRIMARY}>Add a listing</Button>
     </div> : <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
       <WeeklyCalendar rows={rows} weekStart={weekStart} selected={selected} onSelect={selectDate} />
       <CalendarDetail selected={selected} row={selectedRow} onOpenProperty={() => selectedRow && navigate(`/host/calendar/${selectedRow.property.id}`)} />
     </div>}
 
-    {!id && rows.length > 0 && <div className="flex flex-col items-start gap-2 rounded-xl border border-border bg-white p-5 shadow-sm">
+    {!id && rows.length > 0 && <div className="flex flex-col items-start gap-2 rounded-xl border border-border bg-elevated p-5 shadow-sm">
       <strong className="text-base font-semibold text-navy">Need to edit a feed or block dates?</strong>
       <span className="text-sm leading-relaxed text-muted">Open a property calendar to manage imported calendars and manual blocks.</span>
-      <Button type="button" color="light" size="sm" onClick={() => selectedRow && navigate(`/host/calendar/${selectedRow.property.id}`)}>Open selected calendar</Button>
+      <Button type="button" className={BTN_SECONDARY} onClick={() => selectedRow && navigate(`/host/calendar/${selectedRow.property.id}`)}>Open selected calendar</Button>
     </div>}
 
     {id && selectedCalendar && <div className="space-y-4">
-      <section className="space-y-4 rounded-xl border border-border bg-white p-5 shadow-sm">
+      <section className="space-y-4 rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <header><div><h2 className="text-base font-semibold text-navy">Export this calendar</h2><p className="mt-1 text-xs text-muted">Paste this link into Airbnb, Booking.com, or another platform.</p></div></header>
         <div className="flex flex-col gap-2 sm:flex-row">
           <TextInput readOnly value={selectedCalendar.feedUrl || ''} onFocus={(event) => event.target.select()} sizing="md" className="sm:flex-1" />
-          <Button color="dark" onClick={copyFeed}>{copied ? 'Copied' : 'Copy link'}</Button>
+          <Button className={BTN_PRIMARY} onClick={copyFeed}>{copied ? 'Copied' : 'Copy link'}</Button>
         </div>
       </section>
 
-      <section className="space-y-4 rounded-xl border border-border bg-white p-5 shadow-sm">
+      <section className="space-y-4 rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div><h2 className="text-base font-semibold text-navy">Imported calendars</h2><p className="mt-1 text-xs text-muted">Pull reservations from other platforms into this stay.</p></div>
-          <Button color="light" disabled={syncing || (selectedCalendar.sources || []).length === 0} onClick={syncNow}>{syncing ? 'Syncing...' : 'Sync now'}</Button>
+          <Button className={BTN_SECONDARY} disabled={syncing || (selectedCalendar.sources || []).length === 0} onClick={syncNow}>{syncing ? 'Syncing...' : 'Sync now'}</Button>
         </header>
         {(selectedCalendar.sources || []).length > 0 ? <div className="space-y-2">
           {selectedCalendar.sources.map((source) => <article key={source.id} className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border p-3">
@@ -367,17 +383,17 @@ export default function HostCalendarPage() {
               <span className="block truncate text-xs text-muted">{source.url}</span>
               <small className={`text-xs ${source.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-muted'}`}>{source.lastSyncedAt ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}` : 'Not synced yet'}</small>
             </div>
-            <Button type="button" color="light" size="xs" disabled={saving} onClick={() => removeSource(source.id)}>Remove</Button>
+            <Button type="button" className={BTN_SECONDARY} disabled={saving} onClick={() => removeSource(source.id)}>Remove</Button>
           </article>)}
         </div> : <p className="text-xs text-muted">No external calendars connected.</p>}
         <form className="grid grid-cols-1 gap-4 border-t border-border pt-4 sm:grid-cols-2" onSubmit={addSource}>
           <div className="space-y-1.5"><Label htmlFor="calendar-platform">Platform</Label><TextInput id="calendar-platform" value={sourceDraft.name} onChange={(event) => setSourceDraft({ ...sourceDraft, name: event.target.value })} placeholder="Airbnb" required /></div>
           <div className="space-y-1.5"><Label htmlFor="calendar-url">iCal URL</Label><TextInput id="calendar-url" type="url" value={sourceDraft.url} onChange={(event) => setSourceDraft({ ...sourceDraft, url: event.target.value })} placeholder="https://example.com/calendar.ics" required /></div>
-          <div className="sm:col-span-2"><Button type="submit" disabled={saving}>Add feed</Button></div>
+          <div className="sm:col-span-2"><Button type="submit" className={BTN_PRIMARY} disabled={saving}>Add feed</Button></div>
         </form>
       </section>
 
-      <section id="block-dates" className="space-y-4 rounded-xl border border-border bg-white p-5 shadow-sm">
+      <section id="block-dates" className="space-y-4 rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <header><div><h2 className="text-base font-semibold text-navy">Blocked dates</h2><p className="mt-1 text-xs text-muted">Imported bookings are read-only. Manual blocks can be removed at any time.</p></div></header>
         {(selectedCalendar.blocks || []).length > 0 ? <div className="space-y-2">
           {selectedCalendar.blocks.map((block) => <article key={block.id} className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border p-3">
@@ -386,14 +402,14 @@ export default function HostCalendarPage() {
               <span className="block text-xs text-muted">{block.summary || 'Blocked'}</span>
               <small className={`text-xs ${block.manual ? 'font-semibold text-navy' : 'text-muted'}`}>{block.manual ? 'Manual' : block.sourceName || 'Imported'}</small>
             </div>
-            {block.manual && <Button type="button" color="light" size="xs" disabled={saving} onClick={() => removeBlock(block.id)}>Remove</Button>}
+            {block.manual && <Button type="button" className={BTN_SECONDARY} disabled={saving} onClick={() => removeBlock(block.id)}>Remove</Button>}
           </article>)}
         </div> : <p className="text-xs text-muted">No blocked dates.</p>}
         <form className="grid grid-cols-1 gap-4 border-t border-border pt-4 sm:grid-cols-3" onSubmit={addBlock}>
           <div className="space-y-1.5"><Label htmlFor="block-start">From</Label><TextInput id="block-start" type="date" value={blockDraft.start} onChange={(event) => setBlockDraft({ ...blockDraft, start: event.target.value })} required /></div>
           <div className="space-y-1.5"><Label htmlFor="block-end">To</Label><TextInput id="block-end" type="date" value={blockDraft.end} onChange={(event) => setBlockDraft({ ...blockDraft, end: event.target.value })} required /></div>
           <div className="space-y-1.5"><Label htmlFor="block-reason">Reason</Label><TextInput id="block-reason" value={blockDraft.summary} onChange={(event) => setBlockDraft({ ...blockDraft, summary: event.target.value })} placeholder="Maintenance" /></div>
-          <div className="sm:col-span-3"><Button type="submit" color="dark" disabled={saving}>Block dates</Button></div>
+          <div className="sm:col-span-3"><Button type="submit" className={BTN_PRIMARY} disabled={saving}>Block dates</Button></div>
         </form>
       </section>
     </div>}
