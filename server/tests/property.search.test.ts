@@ -37,3 +37,13 @@ test('buildPropertyOrderBy maps public sort values and falls back to featured-fi
   assert.deepEqual(buildPropertyOrderBy('bogus')[0], { featured: 'desc' });
   assert.deepEqual(buildPropertyOrderBy(undefined)[0], { featured: 'desc' });
 });
+
+test('computeReviewAggregate averages only the sub-scores guests filled in', async () => {
+  const { computeReviewAggregate, averageSubScore } = await import('../src/services/review.service.js');
+  assert.equal(averageSubScore([5, null, 4]), 4.5);
+  assert.equal(averageSubScore([null, undefined]), null);
+  const agg = computeReviewAggregate([5, 4], { cleanliness: [5, null], location: [], value: [3, 4] });
+  assert.equal(agg.subScores.cleanliness, 5);
+  assert.equal(agg.subScores.location, null);
+  assert.equal(agg.subScores.value, 3.5);
+});

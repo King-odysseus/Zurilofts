@@ -104,6 +104,9 @@ test('toPublicReview exposes only the allowlisted fields', () => {
   assert.deepEqual(pub, {
     id: 'r-1',
     rating: 5,
+    cleanlinessRating: null,
+    locationRating: null,
+    valueRating: null,
     publicComment: 'Lovely stay',
     createdAt: PAST,
     user: { firstName: 'Ada', lastName: 'Lovelace' },

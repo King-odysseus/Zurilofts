@@ -5,6 +5,9 @@ interface CreateReviewInput {
   userId: string;
   bookingId: string;
   rating: number;
+  cleanlinessRating?: number;
+  locationRating?: number;
+  valueRating?: number;
   satisfaction?: string;
   publicComment?: string;
   privateNote?: string;
@@ -55,6 +58,9 @@ export function assertReviewEligibility(
 export interface PublicReview {
   id: string;
   rating: number;
+  cleanlinessRating: number | null;
+  locationRating: number | null;
+  valueRating: number | null;
   publicComment: string | null;
   createdAt: Date | string;
   user: { firstName: string; lastName: string } | null;
@@ -69,6 +75,9 @@ export function toPublicReview(review: any): PublicReview {
   return {
     id: review.id,
     rating: review.rating,
+    cleanlinessRating: review.cleanlinessRating ?? null,
+    locationRating: review.locationRating ?? null,
+    valueRating: review.valueRating ?? null,
     publicComment: review.publicComment ?? null,
     createdAt: review.createdAt,
     user: review.user
@@ -81,6 +90,14 @@ export interface ReviewAggregate {
   averageRating: number;
   totalReviews: number;
   distribution: { stars: number; count: number }[];
+  subScores: { cleanliness: number | null; location: number | null; value: number | null };
+}
+
+/** Average of the sub-scores that guests actually filled in; null when nobody has rated that aspect. */
+export function averageSubScore(values: Array<number | null | undefined>): number | null {
+  const given = values.filter((v): v is number => typeof v === 'number');
+  if (!given.length) return null;
+  return Math.round((given.reduce((a, b) => a + b, 0) / given.length) * 10) / 10;
 }
 
 /**
@@ -88,7 +105,10 @@ export interface ReviewAggregate {
  * ratings of visible (non-hidden) reviews so hidden reviews never influence the
  * public average, count, or star distribution.
  */
-export function computeReviewAggregate(ratings: number[]): ReviewAggregate {
+export function computeReviewAggregate(
+  ratings: number[],
+  subs: { cleanliness?: Array<number | null>; location?: Array<number | null>; value?: Array<number | null> } = {},
+): ReviewAggregate {
   const totalReviews = ratings.length;
   const averageRating = totalReviews
     ? Math.round((ratings.reduce((sum, r) => sum + r, 0) / totalReviews) * 10) / 10
@@ -97,7 +117,12 @@ export function computeReviewAggregate(ratings: number[]): ReviewAggregate {
     stars,
     count: ratings.filter((r) => r === stars).length,
   }));
-  return { averageRating, totalReviews, distribution };
+  const subScores = {
+    cleanliness: averageSubScore(subs.cleanliness ?? []),
+    location: averageSubScore(subs.location ?? []),
+    value: averageSubScore(subs.value ?? []),
+  };
+  return { averageRating, totalReviews, distribution, subScores };
 }
 
 // ============================================================
@@ -143,6 +168,9 @@ export async function createReview(input: CreateReviewInput) {
       userId: input.userId,
       propertyId: booking!.propertyId,
       rating: input.rating,
+      cleanlinessRating: input.cleanlinessRating ?? null,
+      locationRating: input.locationRating ?? null,
+      valueRating: input.valueRating ?? null,
       publicComment: input.publicComment?.trim() || null,
       satisfaction: input.satisfaction || null,
       privateNote: input.privateNote?.trim() || null,
@@ -235,6 +263,9 @@ export async function getPropertyReviews(propertyId: string) {
       select: {
         id: true,
         rating: true,
+        cleanlinessRating: true,
+        locationRating: true,
+        valueRating: true,
         publicComment: true,
         createdAt: true,
         user: { select: { firstName: true, lastName: true } },
@@ -242,13 +273,17 @@ export async function getPropertyReviews(propertyId: string) {
     }),
     prisma.review.findMany({
       where: { propertyId, hidden: false },
-      select: { rating: true },
+      select: { rating: true, cleanlinessRating: true, locationRating: true, valueRating: true },
     }),
   ]);
 
   return {
     reviews: reviews.map(toPublicReview),
-    summary: computeReviewAggregate(visible.map((r) => r.rating)),
+    summary: computeReviewAggregate(visible.map((r) => r.rating), {
+      cleanliness: visible.map((r) => r.cleanlinessRating),
+      location: visible.map((r) => r.locationRating),
+      value: visible.map((r) => r.valueRating),
+    }),
   };
 }
 

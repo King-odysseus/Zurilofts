@@ -81,6 +81,9 @@ function ProfilePage() {
       const res = await apiClient.post('/reviews', {
         bookingId,
         rating: form.rating,
+        cleanlinessRating: form.cleanlinessRating || undefined,
+        locationRating: form.locationRating || undefined,
+        valueRating: form.valueRating || undefined,
         satisfaction: form.satisfaction || undefined,
         publicComment: form.publicComment?.trim() || undefined,
         privateNote: form.privateNote?.trim() || undefined,
@@ -810,6 +813,17 @@ function ProfilePage() {
                                   </button>
                                 );
                               })}
+                            </div>
+                            <div className="mb-3 grid gap-2 sm:grid-cols-3">
+                              {[['cleanlinessRating', 'Cleanliness'], ['locationRating', 'Location'], ['valueRating', 'Value']].map(([field, label]) => (
+                                <label key={field} className="text-xs font-semibold text-[#6b7280]">
+                                  {label} (optional)
+                                  <Select value={reviewForms[booking.id]?.[field] || ''} onChange={(event) => setReviewField(booking.id, field, Number(event.target.value) || 0)}>
+                                    <option value="">Skip</option>
+                                    {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} star{n > 1 ? 's' : ''}</option>)}
+                                  </Select>
+                                </label>
+                              ))}
                             </div>
                             <label className="block text-xs font-semibold text-[#6b7280] mb-2">
                               How satisfied were you with your stay?

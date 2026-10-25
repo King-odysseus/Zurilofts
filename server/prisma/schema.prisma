@@ -449,6 +449,9 @@ model Review {
   propertyId    String
   property      Property @relation(fields: [propertyId], references: [id])
   rating        Int // 1-5 stars
+  cleanlinessRating Int? // optional 1-5 sub-score
+  locationRating    Int? // optional 1-5 sub-score
+  valueRating       Int? // optional 1-5 sub-score
   publicComment String? // guest-facing review text shown publicly on the property page
   satisfaction  String? // PRIVATE: "happy" | "neutral" | "unhappy" - admin only
   privateNote   String? // PRIVATE: feedback for admin - how to improve - admin only

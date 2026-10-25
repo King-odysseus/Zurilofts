@@ -94,6 +94,17 @@ function ReviewSection({ propertyId }) {
         </Link>
       </div>
 
+      {['cleanliness', 'location', 'value'].some((key) => summary.subScores?.[key] != null) && (
+        <div className="mb-6 grid gap-3 sm:grid-cols-3">
+          {[['cleanliness', 'Cleanliness'], ['location', 'Location'], ['value', 'Value']].map(([key, label]) => summary.subScores?.[key] != null && (
+            <div key={key} className="rounded-2xl bg-white p-4 shadow-[0_1px_3px_rgb(38_34_98_/_0.06)]">
+              <p className="text-xs font-semibold text-[#5B6B82]">{label}</p>
+              <p className="text-lg font-bold text-[#0B1F42]">{summary.subScores[key]}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Star distribution histogram */}
       <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgb(38_34_98_/_0.06),0_6px_20px_-6px_rgb(38_34_98_/_0.10)] p-4 md:p-6 mb-6">
         <div className="space-y-2">

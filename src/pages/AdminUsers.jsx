@@ -34,6 +34,7 @@ function AdminUsers() {
   const [message, setMessage] = useState('');
   const [loadError, setLoadError] = useState('');
   const [busyId, setBusyId] = useState('');
+  const [selectedIds, setSelectedIds] = useState([]);
 
   // Edit modal
   const [editing, setEditing] = useState(null); // the user being edited
@@ -71,6 +72,26 @@ function AdminUsers() {
     const t = setTimeout(loadUsers, search ? 350 : 0);
     return () => clearTimeout(t);
   }, [loadUsers, search]);
+
+  // Admins and your own account are never bulk-selectable, so a bulk suspend cannot lock the console.
+  const selectableUsers = users.filter((u) => u.role !== 'ADMIN' && u.id !== currentUser?.id);
+
+  function toggleSelected(id) {
+    setSelectedIds((current) => (current.includes(id) ? current.filter((x) => x !== id) : [...current, id]));
+  }
+
+  async function bulkSetSuspended(suspended) {
+    if (!selectedIds.length) return;
+    if (!window.confirm(`${suspended ? 'Suspend' : 'Reactivate'} ${selectedIds.length} account(s)?`)) return;
+    setBusyId('bulk');
+    setMessage('');
+    const results = await Promise.allSettled(selectedIds.map((id) => apiClient.patch(`/admin/users/${id}/suspend`, { suspended })));
+    const failed = results.filter((result) => result.status === 'rejected').length;
+    setMessage(failed ? `Failed to update ${failed} of ${results.length} accounts` : `${results.length} accounts ${suspended ? 'suspended' : 'reactivated'}`);
+    setSelectedIds([]);
+    setBusyId('');
+    loadUsers();
+  }
 
   function openEdit(u) {
     setEditing(u);
@@ -238,6 +259,15 @@ function AdminUsers() {
           </div>
         )}
 
+        {selectedIds.length > 0 && (
+          <div className="op-admin-people-bulk" role="toolbar" aria-label="Bulk actions">
+            <strong>{selectedIds.length} selected</strong>
+            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => bulkSetSuspended(true)}>Suspend</Button>
+            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => bulkSetSuspended(false)}>Reactivate</Button>
+            <Button size="xs" color="light" type="button" onClick={() => setSelectedIds([])}>Clear</Button>
+          </div>
+        )}
+
         {loading ? (
           <div className="op-admin-people-empty">
             <span className="op-admin-booking-spinner" aria-hidden="true" />
@@ -260,6 +290,14 @@ function AdminUsers() {
             <Table hoverable aria-label="Users and hosts">
               <TableHead>
                 <TableRow>
+                  <TableHeadCell>
+                    <input
+                      type="checkbox"
+                      aria-label="Select all accounts"
+                      checked={selectableUsers.length > 0 && selectedIds.length === selectableUsers.length}
+                      onChange={(event) => setSelectedIds(event.target.checked ? selectableUsers.map((u) => u.id) : [])}
+                    />
+                  </TableHeadCell>
                   <TableHeadCell>PERSON</TableHeadCell>
                   <TableHeadCell>ROLE</TableHeadCell>
                   <TableHeadCell>LISTINGS</TableHeadCell>
@@ -274,6 +312,11 @@ function AdminUsers() {
                   const busy = busyId === u.id;
                   return (
                     <TableRow key={u.id} className={u.suspended ? 'opacity-70' : undefined}>
+                      <TableCell>
+                        {!isSelf && u.role !== 'ADMIN' && (
+                          <input type="checkbox" aria-label={`Select ${u.firstName} ${u.lastName}`} checked={selectedIds.includes(u.id)} onChange={() => toggleSelected(u.id)} />
+                        )}
+                      </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <span className="op-admin-people-avatar" aria-hidden="true">{userInitials(u)}</span>

@@ -166,6 +166,9 @@ export const bookingPaymentInitSchema = z.object({
 export const reviewCreateSchema = z.object({
   bookingId: z.string().min(1, 'Booking is required'),
   rating: z.number().int().min(1, 'Rating is required').max(5),
+  cleanlinessRating: z.number().int().min(1).max(5).optional(),
+  locationRating: z.number().int().min(1).max(5).optional(),
+  valueRating: z.number().int().min(1).max(5).optional(),
   satisfaction: z.enum(['happy', 'neutral', 'unhappy']).optional(),
   // Guest-facing review text shown publicly on the property page
   publicComment: z.string().max(1000, 'Public review must be 1000 characters or fewer').optional(),
