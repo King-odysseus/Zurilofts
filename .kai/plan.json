@@ -2,37 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check whether Flowbite components are actually used and whether local commits are pushed",
+      "text": "Record plan and inspect recent commits plus Railway build configuration",
       "state": "done"
     },
     {
-      "text": "Fix the row action dropdown so it renders as one panel instead of split",
+      "text": "Reproduce the Railway build locally to capture the real error",
       "state": "done"
     },
     {
-      "text": "Fix admin tables knocked out of table layout by grid/flex set on table cells",
+      "text": "Identify root cause: failed deploy died at image push after a successful compile",
       "state": "done"
     },
     {
-      "text": "Finish uncommitted admin conversions (Flowbite Table/Modal/Alert)",
+      "text": "Redeploy from source at HEAD and confirm the deploy completes",
       "state": "done"
     },
     {
-      "text": "Put the ZuriLofts logo on a rounded navy tile across all pages",
+      "text": "Confirm the live site serves the current build and health endpoint",
       "state": "done"
     },
     {
-      "text": "Convert host tab bars to Flowbite Tabs (listings, today, earnings)",
-      "state": "done"
-    },
-    {
-      "text": "Run lint and build, commit and push all of the above",
-      "state": "done"
-    },
-    {
-      "text": "Verify against GitHub that local main and origin/main point at the same commit",
-      "state": "done"
+      "text": "Commit the plan record and push",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-10-25T17:41:22.173Z"
+  "updatedAt": "2026-10-25T17:53:20.607Z"
 }
