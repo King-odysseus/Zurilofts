@@ -2,21 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Give the admin sidebar brand block proper top padding and separate it from the Workspace label",
+      "text": "Read RegisterPage and map how traveller vs host sign-up differs today",
       "state": "done"
     },
     {
-      "text": "Space the nav items and groups so the column uses its height instead of dumping all slack at the bottom",
+      "text": "Confirm only one sign-up form exists and find every host entry point",
       "state": "done"
     },
     {
-      "text": "Check expanded and collapsed sidebar at tall, normal and short viewport heights in the browser",
-      "state": "done"
+      "text": "Make both modes render one identical form (same heading, subtitle, submit label)",
+      "state": "active"
+    },
+    {
+      "text": "Fix the footer Become a host link so visitors reach the sign-up form",
+      "state": "pending"
+    },
+    {
+      "text": "Verify both modes and every host CTA in the browser",
+      "state": "pending"
     },
     {
       "text": "Run lint and build",
-      "state": "done"
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-25T21:41:00.000Z"
+  "updatedAt": "2026-10-25T21:54:15.614Z"
 }

@@ -282,7 +282,7 @@ function Navbar() {
   const accountItemClass = 'flex items-center rounded-[10px] px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-[#F7F4EF] transition-colors';
 
   return (
-    <><nav className={`fixed start-0 top-0 z-20 w-full transition-all duration-300 ${
+    <><nav className={`zl-navbar fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
       needsWhiteNav
         ? 'border-b border-[#E3E8EF] bg-white shadow-[0_4px_16px_rgba(11,31,66,0.06)]'
         : 'bg-transparent'
@@ -297,7 +297,7 @@ function Navbar() {
           </div>
 
           {/* Desktop nav links */}
-          <div ref={navMenuRef} className="ml-auto mr-6 hidden gap-10 text-[15px] md:flex md:items-center md:justify-center md:px-4">
+          <div ref={navMenuRef} className="zl-desktop-nav hidden md:flex md:items-center md:justify-center md:px-4">
             <ul className="flex items-center md:space-x-1 lg:space-x-6">
               {navItems.map((item) => {
                 const hasChildren = Array.isArray(item.children) && item.children.length > 0;
@@ -370,7 +370,7 @@ function Navbar() {
           </div>
 
           {/* Right side: search, account menu and mobile menu */}
-          <div className="flex items-center gap-1 justify-self-end md:gap-2">
+          <div className="zl-header-actions flex items-center gap-1 justify-self-end md:gap-2">
             <div className="relative" ref={searchRef}>
               <button
                 type="button"
@@ -633,8 +633,8 @@ function Navbar() {
             ) : (
               <Dropdown
                 inline
-                theme={{ inlineWrapper: 'inline-flex items-center justify-center rounded-full p-0.5 transition-colors hover:bg-surface' }}
-                label={<><span className="sr-only">Open account menu</span><span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-navy-bg text-white" aria-hidden="true"><CircleUserRound strokeWidth={1.8} /></span></>}
+                theme={{ inlineWrapper: 'zl-header-avatar-button' }}
+                label={<><span className="sr-only">Open account menu</span><span className="zl-header-avatar-icon" aria-hidden="true"><CircleUserRound strokeWidth={1.8} /></span></>}
                 arrowIcon={false}
                 placement="bottom-end"
                 aria-label="Open account menu"
@@ -647,13 +647,13 @@ function Navbar() {
             )}
 
             {/* Theme switcher */}
-            <ThemeToggle className={`inline-flex h-10 w-10 items-center justify-center rounded-full bg-transparent transition-colors ${needsWhiteNav ? 'text-navy hover:bg-surface' : 'text-white hover:bg-white/10'}`} />
+            <ThemeToggle className={`zl-nav-icon-button zl-theme-toggle ${needsWhiteNav ? '' : 'is-inverse'}`} />
 
             {/* Language switcher */}
             <Dropdown
               inline
-              theme={{ inlineWrapper: `inline-flex h-10 w-10 items-center justify-center rounded-full bg-transparent transition-colors ${needsWhiteNav ? 'text-navy hover:bg-surface' : 'text-white hover:bg-white/10'}` }}
-              label={<><span className="sr-only">{t('nav.language')}</span><span className="inline-flex items-center justify-center" aria-hidden="true"><Languages className="h-5 w-5" strokeWidth={1.8} /></span></>}
+              theme={{ inlineWrapper: `zl-nav-icon-button ${needsWhiteNav ? '' : 'is-inverse'}` }}
+              label={<><span className="sr-only">{t('nav.language')}</span><span className="zl-header-action-icon" aria-hidden="true"><Languages className="h-5 w-5" strokeWidth={1.8} /></span></>}
               arrowIcon={false}
               placement="bottom-end"
               aria-label={t('nav.language')}

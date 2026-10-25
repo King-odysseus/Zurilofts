@@ -1,19 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronRight, Mail } from 'lucide-react';
+import { ChevronRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { googleOAuthUrl } from '../utils/authUrls.js';
 import AuthShell from '../components/AuthShell.jsx';
-import {
-  AuthDivider,
-  AuthError,
-  AuthField,
-  AuthGoogleButton,
-  AuthHeading,
-  AuthPasswordField,
-  AuthSubmit,
-  AuthSwitchLine,
-} from '../components/AuthForm.jsx';
+import GoogleIcon from '../components/GoogleIcon.jsx';
 
 function getDashboardPath(user) {
   if (user?.role === 'ADMIN') return '/admin';
@@ -26,6 +17,7 @@ function LoginPage() {
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const { user, login, isAuthenticated, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -57,69 +49,82 @@ function LoginPage() {
 
   return (
     <AuthShell>
-      <div className="space-y-5">
-        <AuthHeading
-          title="Welcome back"
-          subtitle="Sign in to manage your stays, bookings and saved places."
-        />
-        <AuthError>{localError || error}</AuthError>
+      <h2>Welcome back</h2>
+      <p>Sign in to manage your stays, bookings and saved places.</p>
+      {(localError || error) && <div className="op-auth-error" role="alert">{localError || error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <AuthField
-            id="login-email"
-            label="Email address"
-            icon={Mail}
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
-            required
-            autoComplete="email"
-          />
+      <form onSubmit={handleSubmit}>
+        <label className="op-auth-label">
+          <span>Email address</span>
+          <span className="op-auth-control">
+            <Mail className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input
+              className="has-icon"
+              id="login-email"
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="you@example.com"
+              required
+              autoComplete="email"
+            />
+          </span>
+        </label>
 
-          <AuthPasswordField
-            id="login-password"
-            label="Password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Enter your password"
-            required
-            autoComplete="current-password"
-          />
+        <label className="op-auth-label">
+          <span>Password</span>
+          <span className="op-auth-control op-auth-password">
+            <LockKeyhole className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input
+              className="has-icon has-toggle"
+              id="login-password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Enter your password"
+              required
+              autoComplete="current-password"
+            />
+            <PasswordToggle shown={showPassword} onClick={() => setShowPassword((value) => !value)} />
+          </span>
+        </label>
 
-          <div className="flex items-center justify-between gap-3 text-[13px] text-muted">
-            <label htmlFor="remember-me" className="flex cursor-pointer items-center gap-2">
-              <input
-                type="checkbox"
-                id="remember-me"
-                defaultChecked
-                className="h-4 w-4 rounded border-line text-primary accent-primary focus:ring-primary/30"
-              />
-              Remember me
-            </label>
-            <Link to="/forgot-password" className="font-medium text-ink underline underline-offset-4 hover:text-link">
-              Forgot password?
-            </Link>
-          </div>
+        <div className="op-auth-form-row">
+          <span className="op-auth-check">
+            <input type="checkbox" id="remember-me" defaultChecked />
+            <label htmlFor="remember-me">Remember me</label>
+          </span>
+          <Link to="/forgot-password">Forgot password?</Link>
+        </div>
 
-          <AuthSubmit
-            submitting={submitting}
-            busy="Signing in..."
-            idle={<>Sign in <ChevronRight className="h-4 w-4" aria-hidden="true" /></>}
-          />
-        </form>
+        <button type="submit" className="op-auth-submit" disabled={submitting}>
+          {submitting ? 'Signing in…' : <>Sign in <ChevronRight className="w-4 h-4" aria-hidden="true" /></>}
+        </button>
+      </form>
 
-        <AuthDivider label="or continue with" />
-        <AuthGoogleButton href={googleHref} label="Continue with Google" />
-        {/* Same form either way (one page, one set of fields); this only keeps the
-            host intent when a host arrives from the hosting entry point. */}
-        <AuthSwitchLine
-          prompt="New to ZuriLofts?"
-          to={searchParams.get('role')?.toUpperCase() === 'HOST' ? '/register?role=HOST' : '/register'}
-          action="Create account"
-        />
-      </div>
+      <div className="op-auth-divider">or continue with</div>
+      <a className="op-auth-google" href={googleHref}><GoogleIcon className="h-[18px] w-[18px]" /> Continue with Google</a>
+      {/* Keep the hosting intent: a host who came from the hosting entry point
+          must land on the same sign-up form in hosting mode. */}
+      <div className="op-auth-switch">New to ZuriLofts? <Link to={searchParams.get('role')?.toUpperCase() === 'HOST' ? '/register?role=HOST' : '/register'}>Create account</Link></div>
     </AuthShell>
+  );
+}
+
+function PasswordToggle({ shown, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={shown ? 'Hide password' : 'Show password'}
+      className="op-auth-password-toggle"
+    >
+      {shown ? (
+        <EyeOff className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+      ) : (
+        <Eye className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+      )}
+    </button>
   );
 }
 

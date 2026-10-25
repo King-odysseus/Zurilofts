@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Badge, Button, TextInput } from 'flowbite-react';
-import { ArrowUpRight, ChevronRight, MapPin } from 'lucide-react';
+import { TextInput } from 'flowbite-react';
+import { ChevronRight, MapPin } from 'lucide-react';
 import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 import SelectMenu from './SelectMenu.jsx';
 
@@ -14,23 +14,27 @@ function NearbyCard({ item, areaLabels, categoryLabels }) {
     preferLabel: true,
   });
   return (
-    <article className="group overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-      <div className="relative h-48 overflow-hidden">
-        <img className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" src={item.image} alt={item.name} />
-        <Badge color="info" className="absolute left-3 top-3">{areaLabels[item.area] || item.area}</Badge>
-        <a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
-           className="absolute bottom-3 right-3 z-10 rounded-full bg-white/90 p-2 text-navy shadow-sm backdrop-blur transition-colors hover:bg-white">
-          <MapPin className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+    <article className="op-place-card group">
+      <div className="h-48 overflow-hidden relative">
+        <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-[14px]" src={item.image} alt={item.name} />
+        <span className="op-place-area">{areaLabels[item.area] || item.area}</span><a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
+           className="absolute bottom-2 right-2 z-10 rounded-full bg-white/90 p-2 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-[#0B1F42] hover:text-white">
+          <MapPin className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
         </a>
       </div>
-      <div className="p-5">
-        <span className="text-[11px] font-semibold uppercase tracking-wide text-primary-700">{categoryLabels?.[item.category] || item.category}</span>
-        <h3 className="mb-2 mt-1 text-lg font-bold text-navy">{item.name}</h3>
-        <p className="text-sm leading-relaxed text-charcoal">{item.desc}</p>
-        <Button as="a" href={mapsUrl} target="_blank" rel="noopener noreferrer" color="light" className="mt-4">
+      <div className="op-place-copy p-5">
+        <span className="op-place-category">{categoryLabels?.[item.category] || item.category}</span>
+        <h3 className="mb-2 text-lg font-bold text-[#0B1F42]">{item.name}</h3>
+        <p className="text-charcoal text-sm leading-relaxed">{item.desc}</p>
+        <a
+          href={mapsUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-2 min-h-[44px] rounded-lg bg-[#C49A6C] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]"
+        >
           Get directions
-          <ArrowUpRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-        </Button>
+          <span aria-hidden="true">↗</span>
+        </a>
       </div>
     </article>
   );
@@ -62,20 +66,18 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   const catOptions = categories && Object.entries(categoryLabels).map(([k, v]) => ({ value: k, label: v }));
 
   return (
-    <div className="mb-16 mt-8 md:mt-12">
-      {/* Same header shape as the Guides page: eyebrow, title, muted lead, left aligned. */}
-      <header className="mb-8">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">EXPLORE NAIROBI</p>
-        <h2 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{title}</h2>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{subtitle}</p>
-      </header>
+    <div className="op-places-list mt-8 md:mt-12 mb-16">
+      {/* Centered Header */}
+      <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white px-5 py-8 text-center shadow-[0_4px_16px_rgba(11,31,66,0.04)] md:px-8 md:py-10">
+        <h2 className="text-3xl font-bold text-[#0B1F42] md:text-4xl">{title}</h2>
+        <p className="text-cool-grey max-w-2xl mx-auto text-base md:text-lg mt-3 px-2 md:px-0">{subtitle}</p>
+      </div>
 
-      {/* Filters: a slim single row on desktop, stacked full width on phones. */}
-      <div className="mb-8 flex flex-col items-stretch gap-2 sm:flex-row sm:flex-wrap sm:items-center">
-        <TextInput sizing="sm" className="sm:w-64" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search places" aria-label="Search places" />
+      {/* Filters: free-text search plus area/category selects */}
+      <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 px-4 md:px-0">
+        <TextInput className="op-place-search-wrap" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search places, areas or categories" aria-label="Search places" />
         <SelectMenu
-          sizing="sm"
-          wrapperClassName="sm:w-44"
+          className="op-place-select-wrap"
           value={areaFilter}
           onChange={(next) => setAreaFilter(next)}
           options={areaOptions}
@@ -83,35 +85,36 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
         />
         {catOptions && (
           <SelectMenu
-            sizing="sm"
-            wrapperClassName="sm:w-44"
+            className="op-place-select-wrap"
             value={categoryFilter}
             onChange={(next) => setCategoryFilter(next)}
             options={catOptions}
             ariaLabel="Filter by category"
           />
         )}
-        <Button color="light" size="xs" type="button" onClick={() => { setQuery(''); setAreaFilter('all'); setCategoryFilter('all'); }}>Clear all</Button>
-        <span className="text-xs text-muted sm:ml-1">{filtered.length} places</span>
+        <button className="op-place-clear" type="button" onClick={() => { setQuery(''); setAreaFilter('all'); setCategoryFilter('all'); }}>Clear all</button><span className="op-place-count">{filtered.length} places</span>
       </div>
 
       {/* List only by design: the grid/map toggle and its NearbyMap view were removed. */}
       {filtered.length === 0 ? (
-        <p className="py-12 text-center text-muted">Nothing matches those filters - try a different area or category.</p>
+        <p className="py-12 text-center text-[#5B6B82]">Nothing matches those filters - try a different area or category.</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+          <div className="op-place-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {visible.map((item) => (
               <NearbyCard key={item.name} item={item} areaLabels={areaLabels} categoryLabels={categoryLabels} />
             ))}
           </div>
 
           {hasMore && (
-            <div className="mt-10 text-center">
-              <Button as={Link} to={viewMoreLink} color="light">
+            <div className="text-center mt-10">
+              <Link
+                to={viewMoreLink}
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] px-8 py-3 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#F7F4EF]"
+              >
                 View All {filtered.length} Places
-                <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-              </Button>
+                <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
+              </Link>
             </div>
           )}
         </>

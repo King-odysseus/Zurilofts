@@ -105,10 +105,10 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
 
     return (
       <div className="flex-1">
-        <div className="mb-3 text-center font-semibold text-ink">{MONTHS[month]} {year}</div>
+        <div className="mb-3 text-center font-semibold text-[#0B1F42]">{MONTHS[month]} {year}</div>
         <div className="mb-1 grid grid-cols-7 gap-1">
           {WEEKDAYS.map((w) => (
-            <div key={w} className="py-1 text-center text-xs font-medium text-muted">{w}</div>
+            <div key={w} className="py-1 text-center text-xs font-medium text-[#52606F]">{w}</div>
           ))}
         </div>
         <div className="grid grid-cols-7 gap-1">
@@ -130,10 +130,10 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
                 className={[
                   'h-9 rounded-[10px] text-sm transition-colors',
                   disabled
-                    ? 'cursor-not-allowed bg-inset text-muted/60'
-                    : 'cursor-pointer text-ink hover:bg-primary-50',
-                  isEndpoint ? 'bg-primary font-bold text-navy-bg hover:bg-primary-hover' : '',
-                  inRange ? 'rounded-none bg-primary-50' : '',
+                    ? 'cursor-not-allowed bg-[#EAF0F4] text-[#94A3B8]'
+                    : 'cursor-pointer text-[#0B1F42] hover:bg-[#FDE8D8]',
+                  isEndpoint ? 'bg-[#C49A6C] font-bold text-white hover:bg-[#B8895C]' : '',
+                  inRange ? 'rounded-none bg-[#FDE8D8]' : '',
                 ].join(' ')}
               >
                 {date.getDate()}
@@ -149,24 +149,24 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
   const canGoBack = viewMonth > new Date(today.getFullYear(), today.getMonth(), 1);
 
   return (
-    <div className="rounded-2xl border border-line bg-elevated p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-5">
+    <div className="rounded-2xl border border-[#E3E8EF] bg-white p-4 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-5">
       <div className="flex items-center justify-between mb-2">
         <button
           type="button"
           onClick={() => canGoBack && setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))}
           disabled={!canGoBack}
-          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-inset disabled:cursor-not-allowed disabled:opacity-30"
+          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F7F4EF] disabled:cursor-not-allowed disabled:opacity-30"
           aria-label="Previous month"
         >
-          <ChevronLeft className="h-5 w-5 text-ink" strokeWidth={2} aria-hidden="true" />
+          <ChevronLeft className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
         </button>
         <button
           type="button"
           onClick={() => setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))}
-          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-inset"
+          className="flex h-9 w-9 items-center justify-center rounded-full hover:bg-[#F7F4EF]"
           aria-label="Next month"
         >
-          <ChevronRight className="h-5 w-5 text-ink" strokeWidth={2} aria-hidden="true" />
+          <ChevronRight className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
         </button>
       </div>
 
@@ -175,15 +175,15 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
         <div className="hidden md:block flex-1">{renderMonth(nextMonth)}</div>
       </div>
 
-      <div className="mt-4 flex items-center gap-4 border-t border-line pt-3 text-xs text-muted">
+      <div className="mt-4 flex items-center gap-4 border-t border-[#E3E8EF] pt-3 text-xs text-[#5B6B82]">
         <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-primary" /> Selected
+          <span className="inline-block h-3 w-3 rounded bg-[#C49A6C]" /> Selected
         </span>
         <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-3 rounded bg-inset ring-1 ring-line" /> Unavailable
+          <span className="inline-block h-3 w-3 rounded bg-[#EAF0F4]" /> Unavailable
         </span>
         <span className="ml-auto">
-          {checkIn && !checkOut ? 'Now pick your check-out date' : checkIn && checkOut ? 'Dates selected' : 'Tap a date to begin'}
+          {checkIn && !checkOut ? 'Select your check-out date' : 'Select your dates'}
         </span>
       </div>
     </div>

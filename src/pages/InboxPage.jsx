@@ -5,12 +5,12 @@ import apiClient from '../api/client.js';
 import GuestMessagesLayout from '../components/GuestMessagesLayout.jsx';
 
 function ConversationPlaceholder() {
-  return <div className="m-auto flex max-w-[340px] flex-col items-center gap-3 px-6 py-10 text-center">
-    <span className="grid h-12 w-12 place-items-center rounded-full bg-primary-50 text-primary-700">
-      <MessageCircleMore className="h-[22px] w-[22px]" strokeWidth={1.7} aria-hidden="true" />
+  return <div className="opg-message-placeholder">
+    <span>
+      <MessageCircleMore strokeWidth={1.7} aria-hidden="true" />
     </span>
-    <h2 className="text-base font-bold text-navy">Select a conversation</h2>
-    <p className="text-xs leading-relaxed text-muted">Open a stay conversation to read messages and reply to your host.</p>
+    <h2>Select a conversation</h2>
+    <p>Open a stay conversation to read messages and reply to your host.</p>
   </div>;
 }
 

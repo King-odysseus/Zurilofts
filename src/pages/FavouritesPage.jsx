@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { UserRound } from 'lucide-react';
-import { Button } from 'flowbite-react';
 import SavedStaysHeader from '../components/SavedStaysHeader.jsx';
 import StayCard from '../components/StayCard.jsx';
 import Spinner from '../components/Spinner.jsx';
@@ -17,28 +16,19 @@ function getPropertyImage(property) {
 
 function CollectionCard({ title, meta, images, linkLabel, to }) {
   const previewImages = (images.filter(Boolean).length ? images.filter(Boolean) : [heroImage]).slice(0, 4);
-  const isSingle = previewImages.length === 1;
 
   return (
-    <Link className="overflow-hidden rounded-xl border border-border bg-white shadow-sm transition-shadow hover:shadow-md" to={to}>
-      <span className="grid grid-cols-2 gap-0.5">
+    <Link className="opg-saved-collection" to={to}>
+      <span className={`opg-saved-collage ${previewImages.length === 1 ? 'is-single' : ''}`}>
         {previewImages.map((image, index) => (
-          <img
-            key={`${image}-${index}`}
-            src={image}
-            alt=""
-            aria-hidden="true"
-            className={isSingle ? 'col-span-2 h-56 w-full object-cover' : 'h-28 w-full object-cover'}
-          />
+          <img key={`${image}-${index}`} src={image} alt="" aria-hidden="true" />
         ))}
       </span>
-      <span className="block space-y-1 p-4">
-        <h3 className="block text-base font-semibold text-navy">{title}</h3>
-        <p className="block text-xs text-muted">{meta}</p>
+      <span className="opg-saved-collection-copy">
+        <h3>{title}</h3>
+        <p>{meta}</p>
       </span>
-      <span className="flex items-center justify-between gap-2 border-t border-border px-4 py-3">
-        <span className="text-sm font-medium text-primary-700">{linkLabel}</span>
-      </span>
+      <span className="opg-saved-collection-link">{linkLabel}</span>
     </Link>
   );
 }
@@ -98,8 +88,8 @@ function FavouritesPage() {
   const shortlistCards = shortlists.slice(0, 2);
 
   return (
-    <main className="min-h-screen bg-surface">
-      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+    <main className="opg-saved-page">
+      <div className="opg-saved-container">
         <SavedStaysHeader
           activeTab="saved"
           title={sharedIds ? 'Shared wishlist' : 'Saved stays'}
@@ -112,24 +102,24 @@ function FavouritesPage() {
         />
 
         {!isAuthenticated && !sharedIds ? (
-          <section className="mt-6 flex flex-wrap items-center gap-4 rounded-xl border border-border bg-primary-50 px-5 py-4" aria-label="Sign in to save stays">
-            <UserRound className="h-6 w-6 shrink-0 text-primary" strokeWidth={1.7} aria-hidden="true" />
-            <p className="min-w-0 flex-1 text-sm text-navy">Sign in to save stays to your account and keep your lists in sync across devices.</p>
-            <Button as={Link} to="/login?returnUrl=/favourites" size="sm">Sign in</Button>
+          <section className="opg-saved-auth" aria-label="Sign in to save stays">
+            <UserRound strokeWidth={1.7} aria-hidden="true" />
+            <p>Sign in to save stays to your account and keep your lists in sync across devices.</p>
+            <Link to="/login?returnUrl=/favourites">Sign in</Link>
           </section>
         ) : loadingShared ? (
           <div className="flex min-h-[320px] items-center justify-center"><Spinner /></div>
         ) : (
           <>
             {!sharedIds && (
-              <section className="mt-8" aria-labelledby="saved-collections-heading">
-                <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+              <section className="opg-saved-section" aria-labelledby="saved-collections-heading">
+                <div className="opg-saved-section-title">
                   <div>
-                    <h2 id="saved-collections-heading" className="text-lg font-bold text-navy">Your collections</h2>
-                    <p className="text-xs text-muted">Favourites and lists, ready for your next trip.</p>
+                    <h2 id="saved-collections-heading">Your collections</h2>
+                    <p>Favourites and lists, ready for your next trip.</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="opg-saved-collections">
                   <CollectionCard
                     title="Favourites"
                     meta={`${favorites.length} ${favorites.length === 1 ? 'stay' : 'stays'} saved`}
@@ -152,26 +142,28 @@ function FavouritesPage() {
             )}
 
             {sharedIds && sharedProperties.length === 0 && (
-              <div className="mt-6 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-white px-6 py-14 text-center">
-                <h2 className="text-lg font-bold text-navy">No stays in this wishlist</h2>
-                <p className="max-w-md text-sm text-muted">The shared link is valid, but there are no properties to display.</p>
+              <div className="opg-saved-empty">
+                <div>
+                  <h2>No stays in this wishlist</h2>
+                  <p>The shared link is valid, but there are no properties to display.</p>
+                </div>
               </div>
             )}
 
             {displayProperties.length > 0 && (
-              <section className="mt-8" id="saved-stays" aria-labelledby="saved-stays-heading">
-                <div className="mb-4 flex flex-wrap items-end justify-between gap-4">
+              <section className="opg-saved-section" id="saved-stays" aria-labelledby="saved-stays-heading">
+                <div className="opg-saved-section-title">
                   <div>
-                    <h2 id="saved-stays-heading" className="text-lg font-bold text-navy">{sharedIds ? 'Shared stays' : 'Saved stays'}</h2>
-                    <p className="text-xs text-muted">{displayProperties.length} {displayProperties.length === 1 ? 'property' : 'properties'} saved</p>
+                    <h2 id="saved-stays-heading">{sharedIds ? 'Shared stays' : 'Saved stays'}</h2>
+                    <p>{displayProperties.length} {displayProperties.length === 1 ? 'property' : 'properties'} saved</p>
                   </div>
                   {!sharedIds && favorites.length > 0 && (
-                    <Button type="button" color="light" size="sm" onClick={handleShare}>
+                    <button type="button" className="opg-saved-action opg-saved-secondary" onClick={handleShare}>
                       {copied ? 'Link copied' : 'Share wishlist'}
-                    </Button>
+                    </button>
                   )}
                 </div>
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="opg-saved-grid">
                   {displayProperties.map((property) => (
                     <StayCard key={property.id} stay={property} />
                   ))}

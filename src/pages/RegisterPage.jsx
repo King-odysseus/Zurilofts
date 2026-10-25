@@ -1,34 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronRight, Mail } from 'lucide-react';
+import { ChevronRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import { googleOAuthUrl } from '../utils/authUrls.js';
 import { rememberNavMode, rememberPostAuthMode } from '../utils/authIntent.js';
 import AuthShell from '../components/AuthShell.jsx';
-import {
-  AuthDivider,
-  AuthError,
-  AuthField,
-  AuthGoogleButton,
-  AuthHeading,
-  AuthPasswordField,
-  AuthSubmit,
-  AuthSwitchLine,
-} from '../components/AuthForm.jsx';
+import GoogleIcon from '../components/GoogleIcon.jsx';
 
 function getDashboardPath(user) {
   if (user?.role === 'ADMIN') return '/admin';
   if (user?.role === 'HOST') return '/host/today';
   return '/';
 }
-
-// Travelling / Hosting is a mode switch, not a navigation: it reads as one
-// segmented control so the two account types never look like separate links.
-const MODES = [
-  { to: '/register', label: 'Travelling', hosting: false },
-  { to: '/register?role=HOST', label: 'Hosting', hosting: true },
-];
 
 function RegisterPage() {
   const [searchParams] = useSearchParams();
@@ -44,6 +28,8 @@ function RegisterPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
   const { user, register, isAuthenticated, isLoading, error, clearError, setUser } = useAuth();
@@ -112,158 +98,101 @@ function RegisterPage() {
 
   return (
     <AuthShell>
-      <div className="space-y-5">
-        <AuthHeading
-          title={isHost ? 'Create your host account' : 'Create your account'}
-          subtitle={isHost
-            ? 'List verified, furnished homes with ZuriLofts.'
-            : 'Book verified furnished apartments across Nairobi. It is free to join.'}
-        />
-        <AuthError>{localError || error}</AuthError>
+      {/* One account covers both jobs: the same person books stays and lists
+          their own, so travelling and hosting must not read as two different
+          sign-up forms. The toggle only says which one you are starting with;
+          every field, heading and button is identical in both modes. */}
+      <h2>Create your account</h2>
+      <p>One account to book verified homes in Nairobi and to host your own. It’s free to join.</p>
+      {(localError || error) && <div className="op-auth-error" role="alert">{localError || error}</div>}
 
-        <div className="flex rounded-full bg-inset p-1" role="tablist" aria-label="Account type">
-          {MODES.map((mode) => {
-            const active = mode.hosting === isHost;
-            return (
-              <Link
-                key={mode.label}
-                to={mode.to}
-                role="tab"
-                aria-selected={active}
-                className={`flex-1 rounded-full px-4 py-2 text-center text-[13px] font-semibold transition-colors ${
-                  active ? 'bg-elevated text-ink shadow-sm' : 'text-muted hover:text-ink'
-                }`}
-              >
-                {mode.label}
-              </Link>
-            );
-          })}
+      <div className="op-auth-mode" aria-label="Account type">
+        <Link to="/register" className={!isHost ? 'active' : ''}>Travelling</Link>
+        <Link to="/register?role=HOST" className={isHost ? 'active' : ''}>Hosting</Link>
+      </div>
+
+      <form onSubmit={handleSubmit} className="op-auth-register-form">
+        <div className="op-auth-name-grid">
+          <label className="op-auth-label">
+            <span>First name</span>
+            <span className="op-auth-control">
+              <input id="register-first-name" name="firstName" value={formData.firstName} onChange={handleChange} placeholder="Grace" required autoComplete="given-name" />
+            </span>
+          </label>
+          <label className="op-auth-label">
+            <span>Last name</span>
+            <span className="op-auth-control">
+              <input id="register-last-name" name="lastName" value={formData.lastName} onChange={handleChange} placeholder="Wanjiru" required autoComplete="family-name" />
+            </span>
+          </label>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
-            <AuthField
-              id="register-first-name"
-              label="First name"
-              name="firstName"
-              value={formData.firstName}
-              onChange={handleChange}
-              placeholder="Grace"
-              required
-              autoComplete="given-name"
-            />
-            <AuthField
-              id="register-last-name"
-              label="Last name"
-              name="lastName"
-              value={formData.lastName}
-              onChange={handleChange}
-              placeholder="Wanjiru"
-              required
-              autoComplete="family-name"
-            />
+        <label className="op-auth-label">
+          <span>Email address</span>
+          <span className="op-auth-control">
+            <Mail className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input className="has-icon" id="register-email" type="email" name="email" value={formData.email} onChange={handleChange} placeholder="you@example.com" required autoComplete="email" />
+          </span>
+        </label>
+
+        <label className="op-auth-label">
+          <span>Password</span>
+          <span className="op-auth-control op-auth-password">
+            <LockKeyhole className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input className="has-icon has-toggle" id="register-password" type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="8+ characters" required autoComplete="new-password" />
+            <PasswordToggle shown={showPassword} onClick={() => setShowPassword((value) => !value)} />
+          </span>
+          <small className="op-auth-hint">Use at least 8 characters with a number and an uppercase letter.</small>
+        </label>
+
+        <label className="op-auth-label">
+          <span>Confirm password</span>
+          <span className="op-auth-control op-auth-password">
+            <LockKeyhole className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input className="has-icon has-toggle" id="register-confirm-password" type={showConfirm ? 'text' : 'password'} name="confirmPassword" value={formData.confirmPassword} onChange={handleChange} placeholder="Re-enter your password" required autoComplete="new-password" />
+            <PasswordToggle shown={showConfirm} onClick={() => setShowConfirm((value) => !value)} />
+          </span>
+        </label>
+
+        <label className="op-auth-label op-auth-file-label">
+          <span>Profile photo <small>(optional)</small></span>
+          <div className="op-auth-file-row">
+            {avatarPreview ? <img src={avatarPreview} alt="Selected profile" className="op-auth-avatar-preview" /> : <span className="op-auth-avatar-placeholder" aria-hidden="true">{formData.firstName?.[0] || 'Z'}</span>}
+            <input id="register-avatar" type="file" accept="image/jpeg,image/png,image/webp" onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (!file) return;
+              setAvatarFile(file);
+              setAvatarPreview(URL.createObjectURL(file));
+            }} />
           </div>
+        </label>
 
-          <AuthField
-            id="register-email"
-            label="Email address"
-            icon={Mail}
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="you@example.com"
-            required
-            autoComplete="email"
-          />
+        <div className="op-auth-check op-auth-terms">
+          <input type="checkbox" id="register-terms" required />
+          <label htmlFor="register-terms">I agree to the <Link to="/terms">Terms of Service</Link> and <Link to="/privacy">Privacy Policy</Link>.</label>
+        </div>
 
-          <AuthPasswordField
-            id="register-password"
-            label="Password"
-            hint="Use at least 8 characters with a number and an uppercase letter."
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            placeholder="8+ characters"
-            required
-            autoComplete="new-password"
-          />
+        <button type="submit" className="op-auth-submit" disabled={submitting}>
+          {submitting ? 'Creating account…' : <>Create account <ChevronRight className="w-4 h-4" aria-hidden="true" /></>}
+        </button>
+      </form>
 
-          <AuthPasswordField
-            id="register-confirm-password"
-            label="Confirm password"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            placeholder="Re-enter your password"
-            required
-            autoComplete="new-password"
-          />
-
-          <div>
-            <span className="mb-1.5 block text-[13px] font-medium text-ink">Profile photo <span className="font-normal text-muted">(optional)</span></span>
-            <div className="flex items-center gap-3">
-              {avatarPreview
-                ? <img src={avatarPreview} alt="Selected profile" className="h-11 w-11 rounded-full border border-line object-cover" />
-                : (
-                  <span className="grid h-11 w-11 place-items-center rounded-full bg-inset text-sm font-semibold text-muted" aria-hidden="true">
-                    {formData.firstName?.[0] || 'Z'}
-                  </span>
-                )}
-              <label
-                htmlFor="register-avatar"
-                className="inline-flex min-h-9 cursor-pointer items-center rounded-full border border-line bg-white px-4 text-[13px] font-semibold text-ink transition-colors hover:bg-inset"
-              >
-                Choose photo
-              </label>
-              <input
-                id="register-avatar"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="sr-only"
-                onChange={(event) => {
-                  const file = event.target.files?.[0];
-                  if (!file) return;
-                  setAvatarFile(file);
-                  setAvatarPreview(URL.createObjectURL(file));
-                }}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-start gap-2.5 text-[13px] text-muted">
-            <input
-              type="checkbox"
-              id="register-terms"
-              required
-              className="mt-0.5 h-4 w-4 rounded border-line text-primary accent-primary focus:ring-primary/30"
-            />
-            <label htmlFor="register-terms" className="leading-relaxed">
-              I agree to the{' '}
-              <Link to="/terms" className="font-medium text-ink underline underline-offset-4 hover:text-link">Terms of Service</Link>
-              {' '}and{' '}
-              <Link to="/privacy" className="font-medium text-ink underline underline-offset-4 hover:text-link">Privacy Policy</Link>.
-            </label>
-          </div>
-
-          <AuthSubmit
-            submitting={submitting}
-            busy="Creating account..."
-            idle={<>{isHost ? 'Create host account' : 'Create account'} <ChevronRight className="h-4 w-4" aria-hidden="true" /></>}
-          />
-        </form>
-
-        <AuthDivider label="or sign up with" />
-        <AuthGoogleButton
-          href={googleHref}
-          label="Sign up with Google"
-          onClick={() => rememberPostAuthMode(isHost ? 'hosting' : 'travelling')}
-        />
-        {/* Carry the chosen mode across: a host who clicks "Sign in" should land on
-            the host sign-in, not silently drop back to the traveller flow. */}
-        <AuthSwitchLine prompt="Already have an account?" to={isHost ? '/login?role=HOST' : '/login'} action="Sign in" />
-      </div>
+      <div className="op-auth-divider">or sign up with</div>
+      <a className="op-auth-google" href={googleHref} onClick={() => rememberPostAuthMode(isHost ? 'hosting' : 'travelling')}><GoogleIcon className="h-[18px] w-[18px]" /> Sign up with Google</a>
+      <div className="op-auth-switch">Already have an account? <Link to={isHost ? '/login?role=HOST' : '/login'}>Sign in</Link></div>
     </AuthShell>
+  );
+}
+
+function PasswordToggle({ shown, onClick }) {
+  return (
+    <button type="button" onClick={onClick} aria-label={shown ? 'Hide password' : 'Show password'} className="op-auth-password-toggle">
+      {shown ? (
+        <EyeOff className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+      ) : (
+        <Eye className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+      )}
+    </button>
   );
 }
 

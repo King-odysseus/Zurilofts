@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Alert, Badge, Button } from 'flowbite-react';
 import { ClipboardList, MapPin } from 'lucide-react';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import apiClient from '../api/client.js';
@@ -23,13 +22,11 @@ import { canAddToCalendar, downloadStayCalendar, googleCalendarUrl } from '../ut
  * booking the caller has no claim to comes back as a 404.
  */
 const STATUS_META = {
-  PENDING: { label: 'Pending payment', color: 'warning' },
-  CONFIRMED: { label: 'Confirmed', color: 'success' },
-  CANCELLED: { label: 'Cancelled', color: 'failure' },
-  CONFLICT: { label: 'Needs review', color: 'failure' },
+  PENDING: { label: 'Pending payment', className: 'is-pending' },
+  CONFIRMED: { label: 'Confirmed', className: '' },
+  CANCELLED: { label: 'Cancelled', className: 'is-cancelled' },
+  CONFLICT: { label: 'Needs review', className: 'is-cancelled' },
 };
-
-const SUBTLE_LINK = 'inline-flex min-h-[36px] items-center text-xs font-semibold text-muted hover:text-navy';
 
 function formatDate(iso) {
   if (!iso) return '-';
@@ -54,9 +51,9 @@ function formatCurrency(value) {
 
 function MoneyRow({ label, value }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-border py-2 last:border-0">
-      <dt className="text-sm text-muted">{label}</dt>
-      <dd className="text-sm font-medium tabular-nums text-navy">{value}</dd>
+    <div className="opg-detail-money-row">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
     </div>
   );
 }
@@ -150,7 +147,7 @@ function BookingDetailPage() {
   }
 
   const property = booking?.property || {};
-  const status = STATUS_META[booking?.status] || { label: booking?.status || 'Unknown', color: 'gray' };
+  const status = STATUS_META[booking?.status] || { label: booking?.status || 'Unknown', className: '' };
   const isGuestOwner = Boolean(user?.id && booking?.userId && user.id === booking.userId);
   const canResumePayment = isGuestOwner && booking?.status === 'PENDING' && !booking?.paidAt;
   // Hosts get the same two controls: a reservation is just as useful in the
@@ -161,7 +158,7 @@ function BookingDetailPage() {
   if (loading) {
     return (
       <GuestAccountLayout active="bookings" eyebrow="Reservation" title="Booking details" description="Loading your reservation.">
-        <div className="flex flex-col gap-3" aria-label="Loading booking"><span className="block h-28 animate-pulse rounded-xl bg-white" /><span className="block h-28 animate-pulse rounded-xl bg-white" /><span className="block h-28 animate-pulse rounded-xl bg-white" /></div>
+        <div className="opg-trip-loading" aria-label="Loading booking"><span /><span /><span /></div>
       </GuestAccountLayout>
     );
   }
@@ -169,11 +166,11 @@ function BookingDetailPage() {
   if (notFound) {
     return (
       <GuestAccountLayout active="bookings" eyebrow="Reservation" title="Booking details" description="We could not find that reservation.">
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-white px-6 py-14 text-center">
-          <ClipboardList className="h-8 w-8 text-primary-600" strokeWidth={1.6} aria-hidden="true" />
-          <h2 className="text-lg font-bold text-navy">Booking not found</h2>
-          <p className="max-w-md text-sm leading-relaxed text-muted">It may have been removed, or it does not belong to this account.</p>
-          <Button as={Link} to="/bookings">Back to bookings</Button>
+        <div className="opg-trip-empty">
+          <ClipboardList strokeWidth={1.6} aria-hidden="true" />
+          <h2>Booking not found</h2>
+          <p>It may have been removed, or it does not belong to this account.</p>
+          <Link className="opg-trip-primary" to="/bookings">Back to bookings</Link>
         </div>
       </GuestAccountLayout>
     );
@@ -182,10 +179,10 @@ function BookingDetailPage() {
   if (error || !booking) {
     return (
       <GuestAccountLayout active="bookings" eyebrow="Reservation" title="Booking details" description="Something went wrong.">
-        <Alert color="failure" role="alert">
+        <div className="opg-trip-error">
           <p>{error || 'Could not load this booking. Please try again.'}</p>
-          <Button color="light" size="sm" type="button" onClick={() => window.location.reload()} className="mt-2">Try again</Button>
-        </Alert>
+          <button className="opg-trip-primary" type="button" onClick={() => window.location.reload()}>Try again</button>
+        </div>
       </GuestAccountLayout>
     );
   }
@@ -199,42 +196,40 @@ function BookingDetailPage() {
       eyebrow="Reservation"
       title={property.title || 'Booking details'}
       description={`Booked ${formatDate(booking.createdAt)}`}
-      action={<Button as={Link} to="/bookings" color="light">All bookings</Button>}
+      action={<Link className="opg-account-action" to="/bookings">All bookings</Link>}
     >
-      <article className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-        <div className="grid grid-cols-1 sm:grid-cols-[200px_minmax(0,1fr)]">
-          <Link to={`/property/${property.id || booking.propertyId}`} className="block h-40 w-full overflow-hidden sm:h-full" aria-label={`View ${property.title || 'stay'}`}>
-            <img className="h-full w-full object-cover" src={image} alt="" />
-          </Link>
-          <div className="min-w-0 p-4 sm:p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <h2 className="text-lg font-bold text-navy"><Link to={`/property/${property.id || booking.propertyId}`} className="hover:text-primary-600">{property.title || 'Property'}</Link></h2>
-                <p className="mt-0.5 flex items-center gap-1 text-sm text-muted"><MapPin size={13} aria-hidden="true" /> {property.location || 'Nairobi'}</p>
-              </div>
-              <Badge color={status.color}>{status.label}</Badge>
+      <article className="opg-history-card">
+        <Link to={`/property/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={`View ${property.title || 'stay'}`}>
+          <img src={image} alt="" />
+        </Link>
+        <div className="opg-history-copy">
+          <div className="opg-history-title-row">
+            <div>
+              <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || 'Property'}</Link></h2>
+              <p><MapPin size={13} aria-hidden="true" /> {property.location || 'Nairobi'}</p>
             </div>
-
-            <dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div><dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Check-in</dt><dd className="mt-1 text-sm font-medium text-navy">{formatDate(booking.checkIn)}</dd></div>
-              <div><dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Check-out</dt><dd className="mt-1 text-sm font-medium text-navy">{formatDate(booking.checkOut)}</dd></div>
-              <div><dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Guests</dt><dd className="mt-1 text-sm font-medium text-navy">{booking.guests || 1}</dd></div>
-              <div><dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Total</dt><dd className="mt-1 text-sm font-bold tabular-nums text-navy">{formatCurrency(booking.total)}</dd></div>
-            </dl>
-
-            <dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div><dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Arrival time</dt><dd className="mt-1 text-sm font-medium text-navy">{formatTime(booking.checkInTime)}</dd></div>
-              <div><dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Departure time</dt><dd className="mt-1 text-sm font-medium text-navy">{formatTime(booking.checkOutTime)}</dd></div>
-              <div><dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Payment</dt><dd className="mt-1 text-sm font-medium text-navy">{booking.paidAt ? `Paid ${formatDate(booking.paidAt)}` : (booking.paymentMethod || '-')}</dd></div>
-              <div><dt className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted">Reference</dt><dd className="mt-1 text-sm font-medium text-navy">{booking.id.slice(-8).toUpperCase()}</dd></div>
-            </dl>
+            <span className={`opg-trip-status ${status.className}`}>{status.label}</span>
           </div>
+
+          <dl className="opg-history-meta">
+            <div><dt>Check-in</dt><dd>{formatDate(booking.checkIn)}</dd></div>
+            <div><dt>Check-out</dt><dd>{formatDate(booking.checkOut)}</dd></div>
+            <div><dt>Guests</dt><dd>{booking.guests || 1}</dd></div>
+            <div><dt>Total</dt><dd>{formatCurrency(booking.total)}</dd></div>
+          </dl>
+
+          <dl className="opg-history-meta">
+            <div><dt>Arrival time</dt><dd>{formatTime(booking.checkInTime)}</dd></div>
+            <div><dt>Departure time</dt><dd>{formatTime(booking.checkOutTime)}</dd></div>
+            <div><dt>Payment</dt><dd>{booking.paidAt ? `Paid ${formatDate(booking.paidAt)}` : (booking.paymentMethod || '-')}</dd></div>
+            <div><dt>Reference</dt><dd>{booking.id.slice(-8).toUpperCase()}</dd></div>
+          </dl>
         </div>
       </article>
 
-      <section className="mt-4 rounded-xl border border-border bg-white p-5 shadow-sm" aria-labelledby="detail-payment">
-        <h2 id="detail-payment" className="text-base font-bold text-navy">Payment summary</h2>
-        <dl className="mt-3">
+      <section className="opg-detail-panel" aria-labelledby="detail-payment">
+        <h2 id="detail-payment">Payment summary</h2>
+        <dl className="opg-detail-money">
           <MoneyRow label={`Accommodation (${booking.bedOption === '2bed' ? '2-bed' : '1-bed'})`} value={formatCurrency(booking.subtotal)} />
           {booking.lateCheckoutFee > 0 && <MoneyRow label="Late check-out" value={formatCurrency(booking.lateCheckoutFee)} />}
           <MoneyRow label="Cleaning fee" value={formatCurrency(booking.cleaningFee)} />
@@ -246,41 +241,41 @@ function BookingDetailPage() {
               value={`- ${formatCurrency(booking.discountAmount)}`}
             />
           )}
-          <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
-            <dt className="text-base font-bold text-navy">Total</dt>
-            <dd className="text-base font-bold tabular-nums text-navy">{formatCurrency(booking.total)}</dd>
+          <div className="opg-detail-money-total">
+            <dt>Total</dt>
+            <dd>{formatCurrency(booking.total)}</dd>
           </div>
         </dl>
 
-        {actionError && <Alert color="failure" role="alert" className="mt-3">{actionError}</Alert>}
+        {actionError && <p className="opg-detail-error" role="alert">{actionError}</p>}
 
-        <div className="mt-4 flex flex-wrap items-center gap-2">
+        <div className="opg-history-actions">
           {canResumePayment && (
-            <Button size="sm" type="button" onClick={resumePayment} disabled={paymentPending}>
+            <button className="opg-trip-primary" type="button" onClick={resumePayment} disabled={paymentPending}>
               {paymentPending ? 'Opening payment...' : 'Complete payment'}
-            </Button>
+            </button>
           )}
-          {!isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message guest'}</Button>}
-          {isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</Button>}
-          <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>Invoice</Button>
+          {!isGuestOwner && <button className="opg-trip-primary" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message guest'}</button>}
+          {isGuestOwner && <button className="opg-trip-primary" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</button>}
+          <button className="opg-trip-secondary" type="button" onClick={() => generateInvoice(booking)}>Invoice</button>
           {calendarReady && (
-            <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</Button>
+            <button className="opg-trip-secondary" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</button>
           )}
           {calendarLink && (
-            <a className={SUBTLE_LINK} href={calendarLink} target="_blank" rel="noopener noreferrer">Google Calendar</a>
+            <a className="opg-trip-link" href={calendarLink} target="_blank" rel="noopener noreferrer">Google Calendar</a>
           )}
-          <Link className={SUBTLE_LINK} to={`/property/${property.id || booking.propertyId}`}>View stay</Link>
-          <Link className={SUBTLE_LINK} to={isGuestOwner ? '/trips' : '/host/today'}>{isGuestOwner ? 'My trips' : 'Today'}</Link>
+          <Link className="opg-trip-link" to={`/property/${property.id || booking.propertyId}`}>View stay</Link>
+          <Link className="opg-trip-link" to={isGuestOwner ? '/trips' : '/host/today'}>{isGuestOwner ? 'My trips' : 'Today'}</Link>
         </div>
       </section>
 
       {(additionalGuests.length > 0 || booking.specialRequests) && (
-        <section className="mt-4 rounded-xl border border-border bg-white p-5 shadow-sm" aria-labelledby="detail-stay">
-          <h2 id="detail-stay" className="text-base font-bold text-navy">Guest details</h2>
+        <section className="opg-detail-panel" aria-labelledby="detail-stay">
+          <h2 id="detail-stay">Guest details</h2>
           {additionalGuests.length > 0 && (
             <>
-              <h3 className="mt-3 text-sm font-semibold text-navy">Additional guests</h3>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-navy">
+              <h3>Additional guests</h3>
+              <ul className="opg-detail-list">
                 {additionalGuests.map((guest, index) => (
                   <li key={`guest-${index}-${guest.lastName || ''}`}>{[guest.firstName, guest.lastName].filter(Boolean).join(' ') || 'Guest'}</li>
                 ))}
@@ -289,8 +284,8 @@ function BookingDetailPage() {
           )}
           {booking.specialRequests && (
             <>
-              <h3 className="mt-3 text-sm font-semibold text-navy">Special requests</h3>
-              <p className="mt-2 text-sm leading-relaxed text-navy">{booking.specialRequests}</p>
+              <h3>Special requests</h3>
+              <p className="opg-detail-note">{booking.specialRequests}</p>
             </>
           )}
         </section>

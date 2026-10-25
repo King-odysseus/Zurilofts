@@ -1,44 +1,35 @@
 import { useRef } from 'react';
-import { Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow } from 'flowbite-react';
 import { LegalPageContentsDesktop, LegalPageContentsMobile } from '../components/LegalPageContents.jsx';
 import { POLICY_VERSION } from '../utils/consent.js';
-
-// The legal copy is plain JSX, so its reading rhythm (section dividers and
-// paragraph spacing) is expressed as descendant utilities on one wrapper
-// rather than a stylesheet with nested selectors.
-const LEGAL_PROSE = 'text-sm leading-relaxed text-charcoal '
-  + '[&>section]:border-t [&>section]:border-line [&>section]:py-6 '
-  + '[&>section:first-child]:border-t-0 [&>section:first-child]:pt-0 '
-  + '[&_p]:mb-3.5';
 
 function PrivacyPage() {
   const lastUpdated = '8 August 2026';
   const articleRef = useRef(null);
 
   return (
-    <main className="min-h-[70vh] bg-white">
-      <header className="border-b border-border">
-        <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 md:py-12">
-          <nav className="flex flex-wrap items-center gap-2 text-xs text-muted" aria-label="Breadcrumb">
-            <a href="/" className="font-medium transition-colors hover:text-primary-600">Home</a><span aria-hidden="true">/</span><span>Privacy</span>
+    <main className="op-public-page op-legal-page">
+      <header className="op-public-hero op-legal-hero">
+        <div className="op-content-container">
+          <nav className="op-breadcrumbs" aria-label="Breadcrumb">
+            <a href="/">Home</a><span>/</span><span>Privacy</span>
           </nav>
-          <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Legal</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Privacy Policy</h1>
-          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
+          <span className="op-eyebrow">Legal</span>
+          <h1>Privacy Policy</h1>
+          <p>
             Last updated: {lastUpdated} · Policy version: {POLICY_VERSION}
           </p>
         </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-6xl grid-cols-1 items-start gap-10 px-4 pb-24 pt-10 sm:px-6 lg:grid-cols-[210px_minmax(0,760px)] lg:gap-12">
-        <div className="hidden min-w-0 lg:block"><LegalPageContentsDesktop containerRef={articleRef} /></div>
-        <article className="min-w-0" ref={articleRef}>
+      <div className="op-content-container op-legal-layout">
+        <div className="op-legal-aside"><LegalPageContentsDesktop containerRef={articleRef} /></div>
+        <article className="op-legal-article" ref={articleRef}>
           <LegalPageContentsMobile containerRef={articleRef} />
-          <div className={LEGAL_PROSE}>
+          <div className="op-legal-content prose prose-slate max-w-none text-[#1f2937] leading-relaxed">
 
             {/* 1. Introduction */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">1. Introduction</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">1. Introduction</h2>
               <p>
                 ZuriLofts (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) operates the website{' '}
                 <strong>thezurilofts.com</strong> and the ZuriLofts progressive web application
@@ -56,7 +47,7 @@ function PrivacyPage() {
 
             {/* 2. Data Controller */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">2. Data Controller</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">2. Data Controller</h2>
               <p>
                 ZuriLofts is the data controller for personal data collected through the
                 Platform. For any privacy-related enquiries, contact us at:
@@ -69,9 +60,9 @@ function PrivacyPage() {
 
             {/* 3. Information We Collect */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">3. Information We Collect</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">3. Information We Collect</h2>
 
-              <h3 className="mb-2 mt-4 text-lg font-semibold text-navy">3.1 Information You Provide Directly</h3>
+              <h3 className="text-lg font-semibold text-[#0B1F42] mt-4 mb-2">3.1 Information You Provide Directly</h3>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Account data:</strong> When you register, we collect your first name, last name, email address, phone number, and a hashed password. If you sign in via Google OAuth, we receive your name, email address, and Google profile identifier from Google.</li>
                 <li><strong>Booking data:</strong> When you make a reservation, we collect check-in and check-out dates, number of guests, bed configuration preference, check-in/check-out time preferences, names of additional guests, special requests, payment method selection, and any promo code used.</li>
@@ -82,7 +73,7 @@ function PrivacyPage() {
                 <li><strong>Contact form data:</strong> Any information you submit through our contact form.</li>
               </ul>
 
-              <h3 className="mb-2 mt-4 text-lg font-semibold text-navy">3.2 Information Collected Automatically</h3>
+              <h3 className="text-lg font-semibold text-[#0B1F42] mt-4 mb-2">3.2 Information Collected Automatically</h3>
               <ul className="list-disc pl-6 space-y-2">
                 <li><strong>Usage data:</strong> Pages visited, time spent on pages, links clicked, and interaction patterns on the Platform.</li>
                 <li><strong>Device data:</strong> IP address, browser type and version, operating system, device type, screen resolution, and referring URLs.</li>
@@ -90,7 +81,7 @@ function PrivacyPage() {
                 <li><strong>Local storage:</strong> We may store preferences (such as your display settings) in your browser&apos;s local storage.</li>
               </ul>
 
-              <h3 className="mb-2 mt-4 text-lg font-semibold text-navy">3.3 Information We Never Collect</h3>
+              <h3 className="text-lg font-semibold text-[#0B1F42] mt-4 mb-2">3.3 Information We Never Collect</h3>
               <ul className="list-disc pl-6 space-y-2">
                 <li>Government-issued identification numbers (national ID, passport number, KRA PIN) unless you voluntarily provide them.</li>
                 <li>Biometric data or facial recognition data.</li>
@@ -101,7 +92,7 @@ function PrivacyPage() {
 
             {/* 4. Legal Basis for Processing */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">4. Legal Basis for Processing</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">4. Legal Basis for Processing</h2>
               <p>We process your personal data only when we have a lawful basis to do so under the Kenya Data Protection Act, 2019 (the &ldquo;DPA&rdquo;) and, where applicable, the EU General Data Protection Regulation (GDPR):</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Contractual necessity:</strong> Processing required to fulfil a booking, create your account, or provide a service you have requested.</li>
@@ -113,7 +104,7 @@ function PrivacyPage() {
 
             {/* 5. How We Use Your Information */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">5. How We Use Your Information</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">5. How We Use Your Information</h2>
               <p>We use the information we collect for the following purposes:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li>To create and maintain your account.</li>
@@ -139,7 +130,7 @@ function PrivacyPage() {
 
             {/* 6. Data Sharing and Disclosure */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">6. Data Sharing and Disclosure</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">6. Data Sharing and Disclosure</h2>
               <p>We may share your data only in the following limited circumstances:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Service providers:</strong> Trusted third-party vendors who perform services on our behalf - payment processors, hosting providers (our servers are hosted in a secure data centre), email delivery services, and analytics providers. These providers are contractually bound to process data only on our instructions and with equivalent data protection standards.</li>
@@ -152,7 +143,7 @@ function PrivacyPage() {
 
             {/* 7. Data Retention */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">7. Data Retention</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">7. Data Retention</h2>
               <p>We retain your personal data only for as long as necessary to fulfil the purposes for which it was collected:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Account data:</strong> Retained for the life of your account. If you delete your account, your personal data is anonymised or deleted within 30 days, except as required by law.</li>
@@ -166,7 +157,7 @@ function PrivacyPage() {
 
             {/* 8. Data Security */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">8. Data Security</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">8. Data Security</h2>
               <p>
                 We implement and maintain appropriate technical and organisational measures
                 to protect your personal data against accidental or unlawful destruction,
@@ -191,7 +182,7 @@ function PrivacyPage() {
 
             {/* 9. International Data Transfers */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">9. International Data Transfers</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">9. International Data Transfers</h2>
               <p>
                 Your data is primarily stored and processed in Kenya. Some of our service
                 providers may process data in other jurisdictions (e.g., the United States
@@ -207,7 +198,7 @@ function PrivacyPage() {
 
             {/* 10. Cookies and Tracking */}
             <section id="cookies" className="scroll-mt-24">
-              <h2 className="mb-3 text-xl font-bold text-navy">10. Cookies and Similar Technologies</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">10. Cookies and Similar Technologies</h2>
               <p>We use the following categories of cookies on the Platform:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Essential cookies:</strong> Required for core functionality - authentication sessions, booking flow state, and security. The Platform cannot function without these.</li>
@@ -224,55 +215,55 @@ function PrivacyPage() {
 
             {/* 11. Third-Party Processors */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">11. Third-Party Processors</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">11. Third-Party Processors</h2>
               <p>
                 We use the following third-party processors to operate the Platform. Each
                 receives only the data needed to provide its service, and each has its own
                 privacy policy. We are not responsible for the privacy practices of these
                 third parties; please review their policies independently.
               </p>
-              <div className="mt-4 overflow-x-auto">
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableHeadCell>Processor</TableHeadCell>
-                      <TableHeadCell>Receives</TableHeadCell>
-                      <TableHeadCell>Purpose</TableHeadCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody className="divide-y divide-border">
-                    <TableRow>
-                      <TableCell className="align-top font-medium text-navy">Cloudinary</TableCell>
-                      <TableCell className="align-top">Uploaded images</TableCell>
-                      <TableCell className="align-top">Image hosting and delivery</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="align-top font-medium text-navy">Paystack</TableCell>
-                      <TableCell className="align-top">Name, email, payment details</TableCell>
-                      <TableCell className="align-top">Payment processing</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="align-top font-medium text-navy">Google (OAuth)</TableCell>
-                      <TableCell className="align-top">Email, name, profile picture</TableCell>
-                      <TableCell className="align-top">Optional sign-in</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="align-top font-medium text-navy">Web Push (browser vendors)</TableCell>
-                      <TableCell className="align-top">Push subscription endpoint</TableCell>
-                      <TableCell className="align-top">Booking notifications</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="align-top font-medium text-navy">Telegram</TableCell>
-                      <TableCell className="align-top">Support chat message contents</TableCell>
-                      <TableCell className="align-top">Support conversations</TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="align-top font-medium text-navy">Railway</TableCell>
-                      <TableCell className="align-top">All application data</TableCell>
-                      <TableCell className="align-top">Hosting and database</TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
+              <div className="overflow-x-auto mt-4">
+                <table className="w-full text-sm border-collapse">
+                  <thead>
+                    <tr className="text-left text-[#0B1F42] border-b-2 border-[#D9D9D9]">
+                      <th className="py-2 pr-4 font-semibold">Processor</th>
+                      <th className="py-2 pr-4 font-semibold">Receives</th>
+                      <th className="py-2 font-semibold">Purpose</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#D9D9D9]">
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Cloudinary</td>
+                      <td className="py-3 pr-4 align-top">Uploaded images</td>
+                      <td className="py-3 align-top">Image hosting and delivery</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Paystack</td>
+                      <td className="py-3 pr-4 align-top">Name, email, payment details</td>
+                      <td className="py-3 align-top">Payment processing</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Google (OAuth)</td>
+                      <td className="py-3 pr-4 align-top">Email, name, profile picture</td>
+                      <td className="py-3 align-top">Optional sign-in</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Web Push (browser vendors)</td>
+                      <td className="py-3 pr-4 align-top">Push subscription endpoint</td>
+                      <td className="py-3 align-top">Booking notifications</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Telegram</td>
+                      <td className="py-3 pr-4 align-top">Support chat message contents</td>
+                      <td className="py-3 align-top">Support conversations</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">Railway</td>
+                      <td className="py-3 pr-4 align-top">All application data</td>
+                      <td className="py-3 align-top">Hosting and database</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
               <p className="mt-3">
                 We do not sell your personal data to any third party. Processors are engaged
@@ -283,7 +274,7 @@ function PrivacyPage() {
 
             {/* 12. Your Rights */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">12. Your Data Protection Rights</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">12. Your Data Protection Rights</h2>
               <p>Under the Kenya Data Protection Act, 2019 and, where applicable, the GDPR, you have the following rights:</p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Right of access:</strong> Request a copy of the personal data we hold about you, free of charge.</li>
@@ -314,7 +305,7 @@ function PrivacyPage() {
 
             {/* 13. Data Protection for Children */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">13. Children&apos;s Privacy</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">13. Children&apos;s Privacy</h2>
               <p>
                 Our Platform is not directed to individuals under the age of 18. We do not
                 knowingly collect personal data from children. If you are a parent or
@@ -327,7 +318,7 @@ function PrivacyPage() {
 
             {/* 14. Changes to This Policy */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">14. Changes to This Privacy Policy</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">14. Changes to This Privacy Policy</h2>
               <p>
                 We may update this Privacy Policy from time to time to reflect changes in
                 our practices, legal requirements, or operational needs. When we make
@@ -348,7 +339,7 @@ function PrivacyPage() {
 
             {/* 15. Governing Law */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">15. Governing Law</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">15. Governing Law</h2>
               <p>
                 This Privacy Policy is governed by the laws of the Republic of Kenya. Any
                 disputes arising from this policy shall be subject to the exclusive
@@ -358,7 +349,7 @@ function PrivacyPage() {
 
             {/* 16. Contact */}
             <section>
-              <h2 className="mb-3 text-xl font-bold text-navy">16. Contact Us</h2>
+              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">16. Contact Us</h2>
               <p>If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us:</p>
               <p className="mt-2">
                 <strong>Email:</strong> privacy@zurilofts.com<br />
@@ -368,7 +359,7 @@ function PrivacyPage() {
               <p className="mt-2">
                 You also have the right to lodge a complaint with the{' '}
                 <strong>Office of the Data Protection Commissioner (ODPC)</strong> of Kenya
-                at <a href="https://www.odpc.go.ke" className="text-primary-600 underline hover:text-primary-700" target="_blank" rel="noopener noreferrer">www.odpc.go.ke</a>.
+                at <a href="https://www.odpc.go.ke" className="text-[#C49A6C] hover:underline" target="_blank" rel="noopener noreferrer">www.odpc.go.ke</a>.
               </p>
             </section>
 

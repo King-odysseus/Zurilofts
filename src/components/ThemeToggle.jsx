@@ -15,7 +15,7 @@ function ThemeToggle({ className = '', showLabel = false }) {
       title={label}
       aria-pressed={isDark}
     >
-      <span className="inline-flex items-center justify-center" aria-hidden="true">
+      <span className="zl-theme-toggle-icon" aria-hidden="true">
         {isDark ? (
           <Sun strokeWidth={1.8} />
         ) : (

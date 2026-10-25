@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Badge, Button, Spinner } from 'flowbite-react';
+import { Badge, Button, Spinner } from 'flowbite-react';
 import { AlertTriangle, BadgeCheck, Clock3, LifeBuoy, LogOut, ShieldCheck, WalletCards } from 'lucide-react';
 import DisputePanel from '../components/DisputePanel.jsx';
 import IdentityVerificationPanel from '../components/IdentityVerificationPanel.jsx';
@@ -31,16 +31,6 @@ const RECOVERY_CARDS = [
     tone: 'danger',
   },
 ];
-
-// Shared class recipes so the hero, sidebar and section panels cannot drift apart.
-const PANEL = 'rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6';
-const SECTION_HEAD = 'flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between';
-const EYEBROW = 'text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-600';
-const NAV_LINK = 'flex min-h-[40px] items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold text-muted transition-colors hover:bg-surface hover:text-navy';
-const NAV_LINK_ACTIVE = `${NAV_LINK} bg-surface text-navy`;
-// Each recovery card carries the same tone a themed Alert does, so the tone in
-// the data maps straight onto the Alert palette.
-const RECOVERY_TONE = { info: 'info', warning: 'warning', danger: 'failure' };
 
 export default function TrustPage() {
   const { user, logout } = useAuth();
@@ -85,59 +75,58 @@ export default function TrustPage() {
   const paymentLink = nextPaymentBooking ? `/bookings/${nextPaymentBooking.id}` : '/trips';
   const initials = `${user?.firstName?.[0] || user?.name?.[0] || 'G'}${user?.lastName?.[0] || ''}`.toUpperCase();
 
-  return <div className="min-h-screen bg-surface" data-openpencil-frame="0:9724">
-    <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
-      <div className="mb-3"><RouteBackButton /></div>
+  return <div className="op-trust-page" data-openpencil-frame="0:9724">
+    <main className="op-trust-wrap">
+      <div className="op-trust-back"><RouteBackButton /></div>
 
-      <header className={PANEL}>
-        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className={EYEBROW}>TRUST &amp; RECOVERY</p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy">Keep your account safe</h1>
-            <span className="mt-1 block text-sm leading-relaxed text-muted">Identity verification, dispute resolution and payment recovery in one place.</span>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3" aria-label="Trust and recovery overview">
-            {stats.map((stat) => <div key={stat.label} className="min-w-[96px]"><strong className="block text-xl font-bold text-navy">{stat.value}</strong><span className="mt-1 block text-xs text-muted">{stat.label}</span></div>)}
-          </div>
+      <header className="op-trust-hero">
+        <div className="op-trust-hero-copy">
+          <p>TRUST &amp; RECOVERY</p>
+          <h1>Keep your account safe</h1>
+          <span>Identity verification, dispute resolution and payment recovery in one place.</span>
+        </div>
+        <div className="op-trust-stats" aria-label="Trust and recovery overview">
+          {stats.map((stat) => <div key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}
         </div>
       </header>
 
-      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-[240px_minmax(0,1fr)]">
-        <aside className="self-start rounded-xl border border-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
-          <div className="flex items-center gap-3 border-b border-border pb-4">
-            {user?.avatar ? <img src={user.avatar} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" /> : <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy-bg text-xs font-bold text-white">{initials}</span>}
-            <div className="min-w-0"><strong className="block truncate text-sm font-semibold text-navy">{[user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Guest'}</strong><small className="mt-0.5 block truncate text-xs text-muted">{user?.email}</small></div>
+      <div className="op-trust-layout">
+        <aside className="op-trust-sidebar">
+          <div className="op-trust-person">
+            {user?.avatar ? <img src={user.avatar} alt="" /> : <span>{initials}</span>}
+            <div><strong>{[user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Guest'}</strong><small>{user?.email}</small></div>
           </div>
-          <nav className="mt-4 grid gap-1" aria-label="Trust sections">
-            <a href="#identity" className={NAV_LINK_ACTIVE}><BadgeCheck size={16} strokeWidth={1.8} aria-hidden="true" />Identity verification</a>
-            <a href="#disputes" className={NAV_LINK}><AlertTriangle size={16} strokeWidth={1.8} aria-hidden="true" />Disputes{stats[0].value !== 0 && <em className="ml-auto inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-primary-100 px-1.5 text-[10px] font-semibold not-italic text-primary-700">{stats[0].value}</em>}</a>
-            <a href="#payment-recovery" className={NAV_LINK}><WalletCards size={16} strokeWidth={1.8} aria-hidden="true" />Payment recovery</a>
-            <Link to="/profile#privacy" className={NAV_LINK}><ShieldCheck size={16} strokeWidth={1.8} aria-hidden="true" />Security</Link>
+          <nav aria-label="Trust sections">
+            <a href="#identity"><BadgeCheck size={16} strokeWidth={1.8} aria-hidden="true" />Identity verification</a>
+            <a href="#disputes"><AlertTriangle size={16} strokeWidth={1.8} aria-hidden="true" />Disputes{stats[0].value !== 0 && <em>{stats[0].value}</em>}</a>
+            <a href="#payment-recovery"><WalletCards size={16} strokeWidth={1.8} aria-hidden="true" />Payment recovery</a>
+            <Link to="/profile#privacy"><ShieldCheck size={16} strokeWidth={1.8} aria-hidden="true" />Security</Link>
           </nav>
-          <button type="button" className="mt-4 flex min-h-[40px] w-full items-center gap-2 border-t border-border px-3 pt-4 text-left text-xs font-semibold text-muted transition-colors hover:text-navy" onClick={logout}><LogOut size={16} strokeWidth={1.8} aria-hidden="true" />Log out</button>
+          <button type="button" className="op-trust-logout" onClick={logout}><LogOut size={16} strokeWidth={1.8} aria-hidden="true" />Log out</button>
         </aside>
 
-        <div className="grid min-w-0 gap-5">
-          <section id="identity" className={`${PANEL} scroll-mt-24`}><IdentityVerificationPanel /></section>
+        <div className="op-trust-content">
+          <section id="identity" className="op-trust-panel"><IdentityVerificationPanel /></section>
 
-          <section id="disputes" className={`${PANEL} scroll-mt-24`}>
+          <section id="disputes" className="op-trust-panel">
             <DisputePanel disputes={disputes} bookings={bookings} loading={loading} error={error} onRefresh={() => loadTrustData({ silent: true })} />
           </section>
 
-          <section id="payment-recovery" className={`${PANEL} scroll-mt-24`}>
-            <div className={SECTION_HEAD}>
-              <div><h2 className="text-lg font-semibold text-navy">Payment recovery</h2><p className="mt-1 text-sm leading-relaxed text-muted">What guests see if a payment is interrupted.</p></div>
+          <section id="payment-recovery" className="op-trust-panel op-trust-recovery-panel">
+            <div className="op-trust-panel-head">
+              <div><h2>Payment recovery</h2><p>What guests see if a payment is interrupted.</p></div>
               <Badge color="gray" icon={ShieldCheck}>Secure provider check</Badge>
             </div>
-            <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {RECOVERY_CARDS.map(({ key, title, copy, icon: Icon, tone }) => <Alert key={key} color={RECOVERY_TONE[tone]}>
-                <div className="flex items-center gap-2"><Icon size={18} strokeWidth={1.8} aria-hidden="true" /><h3 className="text-sm font-semibold">{title}</h3></div>
-                <p className="text-xs leading-relaxed">{copy}</p>
-                {key === 'pending' && <Button as={Link} to={paymentLink} color="light" size="sm" className="self-start">Review booking</Button>}
-                {key === 'failed' && <div className="flex flex-wrap items-center gap-3"><Button as={Link} to={paymentLink} size="sm">Try payment again</Button><Link to="/trips" className="text-xs font-semibold underline underline-offset-2">Return to booking</Link></div>}
-              </Alert>)}
+            <div className="op-trust-recovery">
+              {RECOVERY_CARDS.map(({ key, title, copy, icon: Icon, tone }) => <article key={key} className={`op-trust-recovery-card is-${tone}`}>
+                <span><Icon size={18} strokeWidth={1.8} aria-hidden="true" /></span>
+                <h3>{title}</h3>
+                <p>{copy}</p>
+                {key === 'pending' && <Button as={Link} to={paymentLink} color="light" size="sm">Review booking</Button>}
+                {key === 'failed' && <div className="op-trust-recovery-actions"><Button as={Link} to={paymentLink} size="sm" className="op-trust-button-primary">Try payment again</Button><Link to="/trips">Return to booking</Link></div>}
+              </article>)}
             </div>
-            {loading && <div className="mt-4 flex items-center justify-center gap-2 text-xs text-muted"><Spinner size="sm" /><span>Checking your booking state...</span></div>}
+            {loading && <div className="op-trust-inline-loading"><Spinner size="sm" /><span>Checking your booking state...</span></div>}
           </section>
         </div>
       </div>

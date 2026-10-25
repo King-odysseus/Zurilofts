@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Button, Spinner, Textarea } from 'flowbite-react';
+import { Textarea } from 'flowbite-react';
 import { ChevronLeft, MessageCircleMore, Send } from 'lucide-react';
 import apiClient from '../api/client.js';
 import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMessagesLayout.jsx';
@@ -101,32 +101,29 @@ function MessagesPage() {
     onRetry={loadConversations}
     detailOpen
   >
-    <header className="flex items-center gap-3 border-b border-border px-4 py-3">
-      <Link className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-navy hover:bg-surface lg:hidden" to="/inbox" aria-label="Back to messages">
-        <ChevronLeft className="h-[18px] w-[18px]" strokeWidth={1.9} aria-hidden="true" />
+    <header className="opg-message-pane-head">
+      <Link className="opg-message-back" to="/inbox" aria-label="Back to messages">
+        <ChevronLeft strokeWidth={1.9} aria-hidden="true" />
       </Link>
-      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary-700">
-        <MessageCircleMore className="h-[19px] w-[19px]" strokeWidth={1.7} aria-hidden="true" />
+      <span className="opg-message-context-icon">
+        <MessageCircleMore strokeWidth={1.7} aria-hidden="true" />
       </span>
-      <div className="min-w-0">
-        <h2 className="truncate text-sm font-bold text-navy">ZuriLofts Support</h2>
-        <p className="mt-0.5 truncate text-xs text-muted">Booking help and general questions</p>
+      <div className="opg-message-context">
+        <h2>ZuriLofts Support</h2>
+        <p>Booking help and general questions</p>
       </div>
     </header>
 
-    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-4" ref={threadRef} aria-live="polite">
-      {loading ? <div className="flex flex-col gap-2" aria-label="Loading support messages"><span className="block h-10 w-3/5 animate-pulse rounded-2xl bg-surface" /><span className="block h-10 w-2/5 animate-pulse self-end rounded-2xl bg-surface" /><span className="block h-10 w-1/2 animate-pulse rounded-2xl bg-surface" /></div> : error && messages.length === 0 ? <Alert color="failure">
-        <p>{error}</p>
-        <Button color="light" size="xs" type="button" onClick={loadThread} className="mt-2">Try again</Button>
-      </Alert> : messages.length === 0 ? <div className="m-auto max-w-[340px] text-center"><strong className="block text-base font-bold text-navy">How can we help?</strong><p className="mt-1.5 text-xs leading-relaxed text-muted">Send the team a message about your booking or account.</p></div> : messages.map((message) => {
+    <div className="opg-message-thread" ref={threadRef} aria-live="polite">
+      {loading ? <div className="opg-message-loading" aria-label="Loading support messages"><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadThread}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>How can we help?</strong><p>Send the team a message about your booking or account.</p></div> : messages.map((message) => {
         const mine = message.senderRole === 'USER';
         return <GuestMessageBubble key={message.id} mine={mine} meta={`${mine ? 'You' : 'ZuriLofts Support'} · ${formatMessageTime(message.createdAt)}`}>{message.body}</GuestMessageBubble>;
       })}
-      {error && messages.length > 0 && <Alert color="failure" className="self-center text-[11px]">{error}</Alert>}
+      {error && messages.length > 0 && <p className="opg-message-inline-error">{error}</p>}
     </div>
 
-    <form className="sticky bottom-0 border-t border-border bg-white p-3" onSubmit={handleSend}>
-      <div className="flex items-end gap-2">
+    <form className="opg-message-composer" onSubmit={handleSend}>
+      <div className="opg-message-compose-surface">
         <Textarea
           value={body}
           onChange={(event) => setBody(event.target.value)}
@@ -139,12 +136,14 @@ function MessagesPage() {
           rows={1}
           placeholder="Write a message..."
           aria-label="Message"
-          className="min-h-[44px] flex-1"
+          className="opg-message-textarea"
         />
-        <Button type="submit" disabled={sending || !body.trim()} aria-label={sending ? 'Sending message' : 'Send message'} className="shrink-0">
-          {sending ? <Spinner size="sm" /> : <Send className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />}
-          <span>Send</span>
-        </Button>
+        <div className="opg-message-compose-actions">
+          <button className="opg-message-send" type="submit" disabled={sending || !body.trim()} aria-label={sending ? 'Sending message' : 'Send message'}>
+            {sending ? <span className="opg-message-send-spinner" /> : <Send strokeWidth={1.8} aria-hidden="true" />}
+            <span>Send</span>
+          </button>
+        </div>
       </div>
     </form>
   </GuestMessagesLayout>;

@@ -8,7 +8,7 @@ import logoImg from '../assets/zurilofts-logo.png';
  */
 function BrandLogo({ className = '', imgClassName = 'h-8 w-auto', alt = 'ZuriLofts' }) {
   return (
-    <span className={`inline-flex shrink-0 items-center justify-center rounded-xl border border-border bg-white px-1.5 py-1.5 shadow-sm ${className}`.trim()}>
+    <span className={`op-brand-tile ${className}`.trim()}>
       <img src={logoImg} alt={alt} className={imgClassName} />
     </span>
   );

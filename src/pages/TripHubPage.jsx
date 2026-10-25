@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Alert, Badge, Button } from 'flowbite-react';
 import { CalendarDays } from 'lucide-react';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -10,24 +9,10 @@ import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
 
 const STATUS_META = {
-  PENDING: { label: 'Awaiting confirmation', color: 'warning' },
-  CONFIRMED: { label: 'Confirmed', color: 'success' },
-  CANCELLED: { label: 'Cancelled', color: 'failure' },
+  PENDING: { label: 'Awaiting confirmation', className: 'is-pending' },
+  CONFIRMED: { label: 'Confirmed', className: '' },
+  CANCELLED: { label: 'Cancelled', className: 'is-cancelled' },
 };
-
-const TAB_BASE = 'inline-flex items-center gap-2 whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors';
-const TAB_ACTIVE = 'bg-navy-bg text-white';
-const TAB_IDLE = 'text-muted hover:text-navy';
-const ROW_ACTION = 'text-xs font-semibold text-primary-600 hover:text-primary-700';
-const SUBTLE_LINK = 'inline-flex min-h-[36px] items-center text-xs font-semibold text-muted hover:text-navy';
-
-function tabClass(isActive) {
-  return `${TAB_BASE} ${isActive ? TAB_ACTIVE : TAB_IDLE}`;
-}
-
-function countClass(isActive) {
-  return `rounded-full px-1.5 text-[11px] font-semibold ${isActive ? 'bg-white/20 text-white' : 'bg-surface text-navy'}`;
-}
 
 function getNights(checkIn, checkOut) {
   const nights = Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000);
@@ -54,9 +39,23 @@ function getMapUrl(property) {
   return `${mapsBase}${encodeURIComponent(query)}`;
 }
 
+function getCalendarUrl(booking) {
+  const property = booking.property || {};
+  const toDay = (value) => new Date(value).toISOString().slice(0, 10).replace(/-/g, '');
+  if (Number.isNaN(new Date(booking.checkIn).getTime()) || Number.isNaN(new Date(booking.checkOut).getTime())) return null;
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: `Stay at ${property.title || 'ZuriLofts'}`,
+    dates: `${toDay(booking.checkIn)}/${toDay(booking.checkOut)}`,
+    location: property.location || '',
+    details: `ZuriLofts booking ${booking.id}`,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 function StatusPill({ status }) {
-  const meta = STATUS_META[status] || { label: status || 'Status unavailable', color: 'gray' };
-  return <Badge color={meta.color}>{meta.label}</Badge>;
+  const meta = STATUS_META[status] || { label: status || 'Status unavailable', className: '' };
+  return <span className={`opg-trip-status ${meta.className}`}>{meta.label}</span>;
 }
 
 StatusPill.propTypes = {
@@ -66,27 +65,25 @@ StatusPill.propTypes = {
 function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
   const property = booking.property || {};
   const nights = getNights(booking.checkIn, booking.checkOut);
-  const stayLink = `/property/${property.id || booking.propertyId}`;
 
-  return <article className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-    <div className="grid grid-cols-1 sm:grid-cols-[240px_minmax(0,1fr)]">
-      <Link to={stayLink} className="block h-40 w-full overflow-hidden sm:h-full" aria-label={`View ${property.title || 'stay'}`}>
-        <img className="h-full w-full object-cover" src={getBookingImage(booking, index)} alt="" />
-      </Link>
-      <div className="min-w-0 p-4 sm:p-5">
-        <div className="flex flex-wrap items-center gap-3">
-          <StatusPill status={booking.status} />
-          <time dateTime={booking.checkIn} className="text-xs font-medium text-muted">{formatDateRange(booking.checkIn, booking.checkOut)}</time>
-        </div>
-        <h2 className="mt-2 text-lg font-bold text-navy"><Link to={stayLink} className="hover:text-primary-600">{property.title || 'Your upcoming stay'}</Link></h2>
-        <p className="mt-1 text-sm text-muted">{[property.location || 'Nairobi', `${booking.guests || 1} guest${booking.guests === 1 ? '' : 's'}`, `${nights} night${nights === 1 ? '' : 's'}`].join(' / ')}</p>
-        {booking.total != null && <p className="mt-2 text-sm text-muted"><strong className="text-base font-bold tabular-nums text-navy">KES {Number(booking.total).toLocaleString()}</strong> total</p>}
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          <Button as={Link} to={`/bookings/${booking.id}`} size="sm">View check-in details</Button>
-          <Button color="light" size="sm" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</Button>
-          <a className={SUBTLE_LINK} href={getMapUrl(property)} target="_blank" rel="noreferrer">Directions</a>
-          <Link className={SUBTLE_LINK} to={`/bookings/${booking.id}`}>Receipt</Link>
-        </div>
+  return <article className="opg-trip-feature">
+    <Link to={`/property/${property.id || booking.propertyId}`} className="opg-trip-feature-image" aria-label={`View ${property.title || 'stay'}`}>
+      <img src={getBookingImage(booking, index)} alt="" />
+    </Link>
+    <div className="opg-trip-feature-copy">
+      <div className="opg-trip-meta">
+        <StatusPill status={booking.status} />
+        <time dateTime={booking.checkIn}>{formatDateRange(booking.checkIn, booking.checkOut)}</time>
+      </div>
+      <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || 'Your upcoming stay'}</Link></h2>
+      <p className="opg-trip-subtitle">{[property.location || 'Nairobi', `${booking.guests || 1} guest${booking.guests === 1 ? '' : 's'}`, `${nights} night${nights === 1 ? '' : 's'}`].join(' / ')}</p>
+      {booking.total != null && <p className="opg-trip-price"><strong>KES {Number(booking.total).toLocaleString()}</strong> total</p>}
+      <div className="opg-trip-actions">
+        <Link className="opg-trip-primary" to={`/bookings/${booking.id}`}>View check-in details</Link>
+        <button className="opg-trip-secondary" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</button>
+        <a className="opg-trip-link" href={getMapUrl(property)} target="_blank" rel="noreferrer">Directions</a>
+        <Link className="opg-trip-link" to={`/bookings/${booking.id}`}>Receipt</Link>
+        {getCalendarUrl(booking) && <a className="opg-trip-link" href={getCalendarUrl(booking)} target="_blank" rel="noreferrer">Add to calendar</a>}
       </div>
     </div>
   </article>;
@@ -103,22 +100,17 @@ function TripRow({ booking, index, isPast }) {
   const property = booking.property || {};
   const reviewed = Boolean(booking.review?.id);
   const status = STATUS_META[booking.status]?.label || booking.status;
-  const stayLink = `/property/${property.id || booking.propertyId}`;
 
-  return <article className="flex flex-col gap-3 border-b border-border py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between">
-    <div className="flex min-w-0 items-center gap-3">
-      <img className="h-[52px] w-16 shrink-0 rounded-lg object-cover" src={getBookingImage(booking, index + 1)} alt="" />
-      <div className="min-w-0">
-        <strong className="block truncate text-sm font-semibold text-navy">{property.title || 'Your stay'}</strong>
-        <span className="mt-0.5 block truncate text-xs text-muted">{formatDateRange(booking.checkIn, booking.checkOut)} / {status}</span>
-      </div>
+  return <article className="opg-trip-row">
+    <img src={getBookingImage(booking, index + 1)} alt="" />
+    <div className="opg-trip-row-copy">
+      <strong>{property.title || 'Your stay'}</strong>
+      <span>{formatDateRange(booking.checkIn, booking.checkOut)} / {status}</span>
     </div>
-    <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-      {isPast && !reviewed
-        ? <Link className={ROW_ACTION} to={`${stayLink}?review=true`}>Leave a review</Link>
-        : <Link className={ROW_ACTION} to={isPast ? stayLink : `/bookings/${booking.id}`}>{isPast ? 'View stay' : 'View trip'}</Link>}
-      {isPast && booking.status !== 'CANCELLED' && <Link className={ROW_ACTION} to={stayLink}>Book again</Link>}
-    </div>
+    {isPast && !reviewed
+      ? <Link className="opg-trip-row-action" to={`/property/${property.id || booking.propertyId}?review=true`}>Leave a review</Link>
+      : <Link className="opg-trip-row-action" to={isPast ? `/property/${property.id || booking.propertyId}` : `/bookings/${booking.id}`}>{isPast ? 'View stay' : 'View trip'}</Link>}
+    {isPast && booking.status !== 'CANCELLED' && <Link className="opg-trip-row-action" to={`/property/${property.id || booking.propertyId}`}>Book again</Link>}
   </article>;
 }
 
@@ -129,11 +121,11 @@ TripRow.propTypes = {
 };
 
 function EmptyTrips({ isPast }) {
-  return <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-white px-6 py-14 text-center">
-    <CalendarDays className="h-8 w-8 text-primary-600" strokeWidth={1.6} aria-hidden="true" />
-    <h2 className="text-lg font-bold text-navy">{isPast ? 'No past trips' : 'No upcoming trips'}</h2>
-    <p className="max-w-md text-sm leading-relaxed text-muted">{isPast ? 'Completed stays will appear here with review and rebooking options.' : 'When you book a stay, your check-in details and host messages will appear here.'}</p>
-    {!isPast && <Button as={Link} to="/properties">Browse stays</Button>}
+  return <div className="opg-trip-empty">
+    <CalendarDays strokeWidth={1.6} aria-hidden="true" />
+    <h2>{isPast ? 'No past trips' : 'No upcoming trips'}</h2>
+    <p>{isPast ? 'Completed stays will appear here with review and rebooking options.' : 'When you book a stay, your check-in details and host messages will appear here.'}</p>
+    {!isPast && <Link className="opg-trip-primary" to="/properties">Browse stays</Link>}
   </div>;
 }
 
@@ -207,17 +199,14 @@ function TripHubPage() {
     eyebrow="Travel"
     title="Your trips"
     description="The stays you have coming up, plus the places you have already visited."
-    action={<Button as={Link} to="/booking-history" color="light">Booking history</Button>}
+    action={<Link className="opg-account-action" to="/booking-history">Booking history</Link>}
   >
-    <div className="mb-5 inline-flex flex-wrap gap-1 rounded-full border border-border bg-white p-1" role="tablist" aria-label="Trip status">
-      <button className={tabClass(activeTab === 'upcoming')} type="button" role="tab" aria-selected={activeTab === 'upcoming'} onClick={() => setActiveTab('upcoming')}>Upcoming{upcoming.length > 0 && <span className={countClass(activeTab === 'upcoming')}>{upcoming.length}</span>}</button>
-      <button className={tabClass(activeTab === 'past')} type="button" role="tab" aria-selected={activeTab === 'past'} onClick={() => setActiveTab('past')}>Past{past.length > 0 && <span className={countClass(activeTab === 'past')}>{past.length}</span>}</button>
+    <div className="opg-trip-tabs" role="tablist" aria-label="Trip status">
+      <button type="button" role="tab" aria-selected={activeTab === 'upcoming'} onClick={() => setActiveTab('upcoming')}>Upcoming{upcoming.length > 0 && <span>{upcoming.length}</span>}</button>
+      <button type="button" role="tab" aria-selected={activeTab === 'past'} onClick={() => setActiveTab('past')}>Past{past.length > 0 && <span>{past.length}</span>}</button>
     </div>
 
-    {loading ? <div className="flex flex-col gap-3" aria-label="Loading trips"><span className="block h-28 animate-pulse rounded-xl bg-white" /><span className="block h-28 animate-pulse rounded-xl bg-white" /><span className="block h-28 animate-pulse rounded-xl bg-white" /></div> : error ? <Alert color="failure">
-      <p>{error}</p>
-      <Button color="light" size="sm" type="button" onClick={() => window.location.reload()} className="mt-2">Try again</Button>
-    </Alert> : displayed.length === 0 ? <EmptyTrips isPast={activeTab === 'past'} /> : <div className="flex flex-col gap-3">
+    {loading ? <div className="opg-trip-loading" aria-label="Loading trips"><span /><span /><span /></div> : error ? <div className="opg-trip-error"><p>{error}</p><button className="opg-trip-primary" type="button" onClick={() => window.location.reload()}>Try again</button></div> : displayed.length === 0 ? <EmptyTrips isPast={activeTab === 'past'} /> : <div className="opg-trips-list">
       {featured && <UpcomingTripCard booking={featured} index={0} onMessage={openConversation} messagePending={messageBookingId === featured.id} />}
       {rows.map((booking, index) => <TripRow key={booking.id} booking={booking} index={index} isPast={activeTab === 'past'} />)}
     </div>}

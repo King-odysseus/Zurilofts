@@ -20,13 +20,13 @@ const TYPE_LABELS = {
 
 function TrustBadge({ icon, label, value }) {
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-line bg-white px-4 py-3">
-      <span className="shrink-0 text-muted" aria-hidden="true">
+    <div className="flex items-center gap-2 rounded-2xl bg-[#F7F4EF] px-4 py-3">
+      <span className="text-[#C49A6C] shrink-0" aria-hidden="true">
         {icon}
       </span>
-      <div className="min-w-0">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{label}</p>
-        <p className="mt-0.5 truncate text-sm font-semibold text-ink">{value}</p>
+      <div>
+        <p className="text-xs uppercase tracking-wide text-[#5B6B82]">{label}</p>
+        <p className="text-sm font-semibold text-[#0B1F42]">{value}</p>
       </div>
     </div>
   );
@@ -41,9 +41,7 @@ TrustBadge.propTypes = {
 function PropertyTrustPanel({ rating = 0, reviewCount = 0, type = '', location = '' }) {
   const hasReviews = typeof rating === 'number' && rating > 0;
   const typeLabel = TYPE_LABELS[type] || type || 'Property';
-  // The badge already renders the Star icon, so the value stays a plain number:
-  // appending the star glyph put two stars side by side.
-  const ratingDisplay = hasReviews ? `${rating}` : 'New';
+  const ratingDisplay = hasReviews ? `${rating} ★` : 'New';
   const reviewDisplay = hasReviews
     ? reviewCount === 1
       ? '1 review'
@@ -58,7 +56,7 @@ function PropertyTrustPanel({ rating = 0, reviewCount = 0, type = '', location =
       {/* Rating */}
       <TrustBadge
         icon={
-          <Star className="h-5 w-5" fill="currentColor" aria-hidden="true" />
+          <Star className="w-5 h-5" fill="currentColor" aria-hidden="true" />
         }
         label="Guest rating"
         value={`${ratingDisplay} · ${reviewDisplay}`}
@@ -67,7 +65,7 @@ function PropertyTrustPanel({ rating = 0, reviewCount = 0, type = '', location =
       {/* Property type */}
       <TrustBadge
         icon={
-          <Building2 className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+          <Building2 className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
         }
         label="Property type"
         value={typeLabel}
@@ -77,7 +75,7 @@ function PropertyTrustPanel({ rating = 0, reviewCount = 0, type = '', location =
       {location && (
         <TrustBadge
           icon={
-            <MapPin className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+            <MapPin className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
           }
           label="Location"
           value={location}
@@ -93,5 +91,6 @@ PropertyTrustPanel.propTypes = {
   type: PropTypes.string,
   location: PropTypes.string,
 };
+
 
 export default PropertyTrustPanel;

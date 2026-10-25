@@ -2,13 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { ChevronLeft } from 'lucide-react';
-import { Alert, Button, Modal, ModalBody, ModalFooter, ModalHeader, TextInput } from 'flowbite-react';
+import { Button, TextInput } from 'flowbite-react';
 import { heroImage } from '../assets/images.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 
 function SkeletonCard() {
-  return <div className="h-[104px] animate-pulse rounded-xl border border-border bg-white" />;
+  return <span />;
 }
 
 function PropertyItem({ item, onRemove }) {
@@ -21,22 +21,20 @@ function PropertyItem({ item, onRemove }) {
   ].filter(Boolean).join(' · ');
 
   return (
-    <article className="grid grid-cols-[96px_minmax(0,1fr)] items-center gap-3 rounded-xl border border-border bg-white p-4 shadow-sm transition-shadow hover:shadow-md sm:grid-cols-[132px_minmax(0,1fr)_auto_auto] sm:gap-5">
-      <Link className="block" to={`/property/${property.id}`}>
-        <img className="h-[72px] w-24 rounded-lg object-cover sm:h-20 sm:w-[120px]" src={image} alt={property.title || 'Stay'} />
+    <article className="opg-shortlist-row opg-shortlist-row-managed">
+      <Link className="opg-shortlist-row-image" to={`/property/${property.id}`}>
+        <img src={image} alt={property.title || 'Stay'} />
       </Link>
-      <div className="min-w-0">
-        <Link to={`/property/${property.id}`}>
-          <h3 className="truncate text-base font-semibold text-navy">{property.title || 'ZuriLofts stay'}</h3>
-        </Link>
-        <p className="mt-1 truncate text-xs text-muted">{meta}</p>
-        {item.note && <p className="mt-1 text-xs italic text-primary-700">&ldquo;{item.note}&rdquo;</p>}
+      <div className="opg-shortlist-row-copy">
+        <Link to={`/property/${property.id}`}><h3>{property.title || 'ZuriLofts stay'}</h3></Link>
+        <p>{meta}</p>
+        {item.note && <p className="opg-shortlist-note">&ldquo;{item.note}&rdquo;</p>}
       </div>
-      <div className="col-start-2 text-left sm:col-start-auto sm:text-right sm:pr-3">
-        <strong className="block text-base font-bold text-navy">KSh {property.price?.toLocaleString() || '-'}</strong>
-        <span className="mt-1 block text-xs text-muted">per night</span>
+      <div className="opg-shortlist-price">
+        <strong>KSh {property.price?.toLocaleString() || '-'}</strong>
+        <span>per night</span>
       </div>
-      <Button className="col-start-2 justify-self-start sm:col-start-auto" size="sm" color="light" onClick={() => onRemove(item.propertyId)}>Remove</Button>
+      <Button className="opg-saved-remove" onClick={() => onRemove(item.propertyId)}>Remove</Button>
     </article>
   );
 }
@@ -60,16 +58,16 @@ PropertyItem.propTypes = {
 
 function DeleteConfirm({ onConfirm, onCancel }) {
   return (
-    <Modal show onClose={onCancel} size="md" dismissible>
-      <ModalHeader>Delete shortlist?</ModalHeader>
-      <ModalBody>
-        <p className="text-sm leading-relaxed text-muted">This permanently deletes the collection and removes it from every shared link. The stays themselves are not deleted.</p>
-      </ModalBody>
-      <ModalFooter className="justify-end">
-        <Button color="light" onClick={onCancel}>Cancel</Button>
-        <Button color="failure" onClick={onConfirm}>Delete shortlist</Button>
-      </ModalFooter>
-    </Modal>
+    <div className="opg-delete-backdrop">
+      <div className="opg-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-shortlist-title">
+        <h2 id="delete-shortlist-title">Delete shortlist?</h2>
+        <p>This permanently deletes the collection and removes it from every shared link. The stays themselves are not deleted.</p>
+        <div className="opg-shortlist-actions">
+          <Button className="opg-saved-secondary" onClick={onCancel}>Cancel</Button>
+          <Button color="failure" onClick={onConfirm}>Delete shortlist</Button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -156,63 +154,63 @@ export default function ShortlistDetailPage() {
   const itemCount = shortlist?._count?.items ?? shortlist?.items?.length ?? 0;
 
   return (
-    <main className="min-h-screen bg-surface">
-      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <Link className="inline-flex items-center gap-1.5 text-sm text-muted hover:text-navy" to="/shortlists">
-          <ChevronLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+    <main className="opg-saved-page">
+      <div className="opg-saved-container">
+        <Link className="opg-shortlist-back" to="/shortlists">
+          <ChevronLeft strokeWidth={1.8} aria-hidden="true" />
           Back to My lists
         </Link>
 
         {loading ? (
-          <div className="mt-6 grid gap-3"><SkeletonCard /><SkeletonCard /></div>
+          <div className="opg-saved-loading mt-6"><SkeletonCard /><SkeletonCard /></div>
         ) : error && !shortlist ? (
-          <Alert color="failure" className="mt-6">
+          <div className="opg-saved-error">
             <p>{error}</p>
-            <Button className="mt-4" onClick={fetchShortlist}>Try again</Button>
-          </Alert>
+            <Button className="opg-saved-action mt-4" onClick={fetchShortlist}>Try again</Button>
+          </div>
         ) : shortlist ? (
           <>
-            <header className="mt-6 flex flex-wrap items-start justify-between gap-4">
-              <div className="min-w-0">
+            <header className="opg-saved-header opg-shortlist-detail-header">
+              <div className="opg-saved-heading">
                 {renaming ? (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <div className="min-w-[220px] flex-1">
-                      <TextInput
-                        value={newName}
-                        onChange={(event) => setNewName(event.target.value)}
-                        onKeyDown={(event) => { if (event.key === 'Enter') handleRename(); if (event.key === 'Escape') setRenaming(false); }}
-                        autoFocus
-                      />
-                    </div>
-                    <Button size="sm" onClick={handleRename}>Save</Button>
-                    <Button size="sm" color="light" onClick={() => setRenaming(false)}>Cancel</Button>
+                  <div className="opg-shortlist-rename">
+                    <TextInput
+                      value={newName}
+                      onChange={(event) => setNewName(event.target.value)}
+                      onKeyDown={(event) => { if (event.key === 'Enter') handleRename(); if (event.key === 'Escape') setRenaming(false); }}
+                      autoFocus
+                    />
+                    <Button className="opg-saved-action" onClick={handleRename}>Save</Button>
+                    <Button className="opg-saved-secondary" onClick={() => setRenaming(false)}>Cancel</Button>
                   </div>
-                ) : <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{shortlist.name}</h1>}
-                <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{itemCount} {itemCount === 1 ? 'stay' : 'stays'} in this shortlist.</p>
+                ) : <h1>{shortlist.name}</h1>}
+                <p>{itemCount} {itemCount === 1 ? 'stay' : 'stays'} in this shortlist.</p>
               </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <Button size="sm" onClick={handleShare}>{copied ? 'Link copied' : 'Share'}</Button>
-                {!renaming && <Button size="sm" color="light" onClick={() => setRenaming(true)}>Rename</Button>}
+              <div className="opg-shortlist-actions">
+                <Button className="opg-saved-action" onClick={handleShare}>{copied ? 'Link copied' : 'Share'}</Button>
+                {!renaming && <Button className="opg-saved-secondary" onClick={() => setRenaming(true)}>Rename</Button>}
               </div>
             </header>
 
-            {error && <Alert color="failure" className="mt-6"><p>{error}</p></Alert>}
+            {error && <div className="opg-saved-error mt-6"><p>{error}</p></div>}
 
             {(!shortlist.items || shortlist.items.length === 0) ? (
-              <div className="mt-6 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-white px-6 py-14 text-center">
-                <h2 className="text-lg font-bold text-navy">No saved properties</h2>
-                <p className="max-w-md text-sm text-muted">Browse stays and add them to this shortlist from any property page.</p>
-                <Button as={Link} to="/properties">Browse stays</Button>
+              <div className="opg-saved-empty mt-6">
+                <div>
+                  <h2>No saved properties</h2>
+                  <p>Browse stays and add them to this shortlist from any property page.</p>
+                  <Link className="opg-saved-action" to="/properties">Browse stays</Link>
+                </div>
               </div>
             ) : (
-              <section className="mt-6 grid gap-3" aria-label={`${shortlist.name} stays`}>
+              <section className="opg-shortlist-rows" aria-label={`${shortlist.name} stays`}>
                 {shortlist.items.map((item) => (
                   <PropertyItem key={item.id} item={item} onRemove={handleRemoveItem} />
                 ))}
               </section>
             )}
 
-            <div className="mt-10 border-t border-border pt-6">
+            <div className="opg-shortlist-delete-row">
               <Button color="failure" onClick={() => setShowDelete(true)}>Delete this shortlist</Button>
             </div>
 

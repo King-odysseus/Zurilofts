@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import SelectMenu from '../components/SelectMenu.jsx';
 import { CalendarDays, Camera, ChevronRight, Heart, Info, Star } from 'lucide-react';
-import { Alert, Badge, Button, Label, Spinner, Textarea, TextInput } from 'flowbite-react';
 import StayCard from '../components/StayCard.jsx';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -30,25 +29,6 @@ const PAYOUT_FREQUENCY_OPTIONS = [
   { value: 'biweekly', label: 'Bi-Weekly (every other Monday)' },
   { value: 'monthly', label: 'Monthly (1st of month)' },
 ];
-
-// Badge palettes for a booking status, so the same status reads the same colour
-// everywhere on this page.
-const STATUS_BADGES = {
-  PENDING: 'warning',
-  CONFIRMED: 'success',
-  CANCELLED: 'failure',
-};
-
-const SECTION_TITLE = 'text-xl font-bold text-navy';
-const SECTION_SUBTITLE = 'mt-1 mb-6 text-sm text-muted';
-const CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
-const TAB_BASE = 'whitespace-nowrap rounded-full px-4 py-1.5 text-sm font-medium transition-colors';
-const TAB_ACTIVE = 'bg-navy-bg text-white';
-const TAB_IDLE = 'text-muted hover:text-navy';
-
-function tabClass(isActive) {
-  return `${TAB_BASE} ${isActive ? TAB_ACTIVE : TAB_IDLE}`;
-}
 
 function ProfilePage() {
   const { user, setUser, logout } = useAuth();
@@ -353,9 +333,15 @@ function ProfilePage() {
     }
   }
 
+  const statusColors = {
+    PENDING: 'bg-yellow-100 text-yellow-800',
+    CONFIRMED: 'bg-green-100 text-green-800',
+    CANCELLED: 'bg-red-100 text-red-800',
+  };
+
   if (loading) {
     return <GuestAccountLayout active="profile" eyebrow="Account" title="Personal details" description="Keep your details current for stays and host communication.">
-      <div className="flex flex-col gap-3" aria-label="Loading profile"><span className="block h-24 animate-pulse rounded-xl bg-white" /><span className="block h-24 animate-pulse rounded-xl bg-white" /><span className="block h-24 animate-pulse rounded-xl bg-white" /></div>
+      <div className="opg-profile-loading" aria-label="Loading profile"><span /><span /><span /></div>
     </GuestAccountLayout>;
   }
 
@@ -365,565 +351,597 @@ function ProfilePage() {
     title="Personal details"
     description="Keep your details current for stays and host communication."
   >
-    <div>
-      {/* Identity summary */}
-      <div className={`${CARD} flex flex-col justify-between gap-4 sm:flex-row sm:items-center`}>
-        <div className="flex items-center gap-4">
-          <label className="group relative cursor-pointer">
-            {profile?.avatar ? (
-              <img
-                src={profile.avatar}
-                alt="Profile"
-                className="h-16 w-16 rounded-full border border-border object-cover"
-              />
-            ) : (
-              <span className="grid h-16 w-16 place-items-center rounded-full bg-primary text-2xl font-bold text-white">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
-              </span>
-            )}
-            <span className="absolute inset-0 grid place-items-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
-              {avatarUploading ? (
-                <Spinner size="sm" />
-              ) : (
-                <Camera className="h-5 w-5 text-white" strokeWidth={2} aria-hidden="true" />
-              )}
-            </span>
-            <input
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleAvatarUpload}
-              className="hidden"
-              disabled={avatarUploading}
-            />
-          </label>
-          <div className="min-w-0">
-            <h2 className="truncate text-lg font-bold text-navy">
-              {profile?.firstName} {profile?.lastName}
-            </h2>
-            <p className="truncate text-sm text-muted">{profile?.email}</p>
-            <span className="mt-1 inline-block text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-600">Guest account</span>
-          </div>
-        </div>
-        <Button as={Link} to="/verify-identity" color="light" size="sm" className="shrink-0">View verification status</Button>
-      </div>
-
-      {/* Tabs */}
-      <div className="my-5 inline-flex flex-wrap gap-1 rounded-full border border-border bg-white p-1" role="tablist" aria-label="Profile sections">
-        {['info', 'bookings', 'favorites'].map((tab) => (
-          <button
-            key={tab}
-            type="button"
-            role="tab"
-            aria-selected={activeTab === tab}
-            onClick={() => setActiveTab(tab)}
-            className={tabClass(activeTab === tab)}
-          >
-            {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
-          </button>
-        ))}
-      </div>
-
-      {/* My Info Tab */}
-      {activeTab === 'info' && (
-        <div>
-          {showCompletionBanner && (
-            <Alert color="warning" className="mb-6">
-              <div className="flex items-start gap-3">
-                <Info className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
-                <div>
-                  <p className="text-sm font-semibold">Complete your profile</p>
-                  <p className="mt-1 text-sm">Fill in your details below to get the most out of ZuriLofts.</p>
-                </div>
-              </div>
-            </Alert>
-          )}
-          <div className={CARD}>
-            <h2 className="mb-6 text-lg font-bold text-navy">Personal Information</h2>
-            {message && <Alert color={message.includes('success') ? 'success' : 'failure'} className="mb-4">{message}</Alert>}
-            <form onSubmit={handleProfileUpdate} className="grid gap-4">
-              <div>
-                <Label htmlFor="profile-first-name" className="mb-2 block text-sm font-semibold text-navy">First Name</Label>
-                <TextInput
-                  id="profile-first-name"
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="profile-last-name" className="mb-2 block text-sm font-semibold text-navy">Last Name</Label>
-                <TextInput
-                  id="profile-last-name"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="profile-email" className="mb-2 block text-sm font-semibold text-navy">Email</Label>
-                <TextInput
-                  id="profile-email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
-                />
-                {emailError && (
-                  <p className="mt-1 text-xs font-medium text-red-600">{emailError}</p>
-                )}
-              </div>
-              <div>
-                <Label htmlFor="profile-phone" className="mb-2 block text-sm font-semibold text-navy">Phone</Label>
-                <div className="flex gap-2">
-                  <SelectMenu
-                    value={countryCode}
-                    onChange={(next) => handlePhoneChange(next, phoneNumber)}
-                    ariaLabel="Select country code"
-                    wrapperClassName="w-28 shrink-0"
-                    options={COUNTRY_OPTIONS}
+    <div className="opg-profile">
+          <div className="opg-profile-summary">
+            <div className="opg-profile-avatar-wrap">
+              <label className="relative cursor-pointer group">
+                {profile?.avatar ? (
+                  <img
+                    src={profile.avatar}
+                    alt="Profile"
+                    className="w-16 h-16 rounded-full object-cover border-2 border-[#D9D9D9]"
                   />
-                  <TextInput
-                    id="profile-phone"
-                    type="tel"
-                    value={phoneNumber}
-                    onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
-                    maxLength={15}
-                    placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
-                    className="flex-1"
-                  />
-                </div>
-                {phoneError && (
-                  <p className="mt-1 text-xs font-medium text-red-600">{phoneError}</p>
-                )}
-              </div>
-              <div>
-                <Button type="submit" disabled={saving}>
-                  {saving ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </div>
-            </form>
-          </div>
-
-          {/* Privacy and data */}
-          <div id="privacy" className="mt-10 scroll-mt-28 border-t border-border pt-8">
-            <h3 className={SECTION_TITLE}>Privacy and data</h3>
-            <p className={SECTION_SUBTITLE}>
-              Manage your personal data and consent choices. See our{' '}
-              <Link to="/privacy" className="font-medium text-primary-600 hover:underline">Privacy Policy</Link>{' '}
-              for full details.
-            </p>
-
-            <div className="space-y-4">
-              {/* Download my data */}
-              <div className={`${CARD} flex flex-col justify-between gap-4 sm:flex-row sm:items-center`}>
-                <div>
-                  <h4 className="font-semibold text-navy">Download my data</h4>
-                  <p className="mt-1 text-sm text-muted">
-                    Get a copy of the personal data we hold about you in a portable format.
-                  </p>
-                  {exportMessage && (
-                    <p className={`mt-2 text-sm font-medium ${exportMessage.includes('Could') ? 'text-red-600' : 'text-green-700'}`}>
-                      {exportMessage}
-                    </p>
-                  )}
-                </div>
-                <Button type="button" onClick={handleExportData} disabled={exporting} className="shrink-0">
-                  {exporting ? (
-                    <>
-                      <Spinner size="sm" className="me-2" />
-                      Exporting...
-                    </>
-                  ) : (
-                    'Download my data'
-                  )}
-                </Button>
-              </div>
-
-              {/* Cookie preferences */}
-              <div className={`${CARD} flex flex-col justify-between gap-4 sm:flex-row sm:items-center`}>
-                <div>
-                  <h4 className="font-semibold text-navy">Cookie preferences</h4>
-                  <p className="mt-1 text-sm text-muted">
-                    Review or change which optional cookies we may use. You can withdraw consent at any time.
-                  </p>
-                </div>
-                <Button type="button" onClick={openConsentManager} className="shrink-0">Manage preferences</Button>
-              </div>
-
-              {/* Delete my account */}
-              <div className="rounded-xl border border-red-200 bg-white p-5 shadow-sm">
-                <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                  <div>
-                    <h4 className="font-semibold text-red-700">Delete my account</h4>
-                    <p className="mt-1 text-sm text-muted">
-                      Permanently erase your account and personal data. Bookings and payment records are
-                      retained for legal and tax reasons but are anonymised so they no longer identify you.
-                      This action cannot be undone.
-                    </p>
-                  </div>
-                  <Button
-                    type="button"
-                    color="failure"
-                    onClick={() => { setShowDeleteDialog(true); setDeleteConfirm(''); setDeleteError(''); }}
-                    className="shrink-0"
-                  >
-                    Delete my account
-                  </Button>
-                </div>
-
-                {showDeleteDialog && (
-                  <div className="mt-5 border-t border-border pt-5">
-                    <p className="mb-2 text-sm font-semibold text-navy">
-                      To confirm, type <span className="font-mono font-bold text-red-700">DELETE</span> below.
-                    </p>
-                    <TextInput
-                      type="text"
-                      value={deleteConfirm}
-                      onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
-                      placeholder="Type DELETE to confirm"
-                      className="w-full sm:max-w-[18rem]"
-                    />
-                    {deleteError && <p className="mt-2 text-xs font-medium text-red-600">{deleteError}</p>}
-                    <div className="mt-4 flex gap-3">
-                      <Button
-                        type="button"
-                        color="failure"
-                        onClick={handleDeleteAccount}
-                        disabled={deleteConfirm !== 'DELETE' || deleting}
-                      >
-                        {deleting ? 'Deleting...' : 'Permanently delete my account'}
-                      </Button>
-                      <Button
-                        type="button"
-                        color="light"
-                        onClick={() => setShowDeleteDialog(false)}
-                        disabled={deleting}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
+                ) : (
+                  <div className="w-16 h-16 bg-[#C49A6C] rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-2xl">
+                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    </span>
                   </div>
                 )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Payout Settings - HOST only */}
-      {activeTab === 'info' && profile?.role === 'HOST' && (
-        <div className="mt-10 border-t border-border pt-8">
-          <h3 className={SECTION_TITLE}>Payout Settings</h3>
-          <p className={SECTION_SUBTITLE}>
-            Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
-          </p>
-
-          {/* Payout destination */}
-          <form onSubmit={handlePayoutDestinationSave} className="mb-8 space-y-4">
-            <h4 className="font-semibold text-navy">Payout Destination</h4>
-
-            <div className="grid grid-cols-2 gap-1 rounded-full bg-surface p-1">
-              {[
-                { value: 'bank', label: 'Bank account' },
-                { value: 'mpesa', label: 'M-PESA' },
-              ].map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => setPayoutMethod(option.value)}
-                  className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition-colors ${payoutMethod === option.value ? 'bg-navy-bg text-white' : 'text-muted hover:text-navy'}`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
-
-            {payoutMethod === 'bank' ? (
-              <>
-                <div>
-                  <Label htmlFor="payout-bank" className="mb-2 block text-sm font-semibold text-navy">Bank Name *</Label>
-                  {banksLoading ? (
-                    <p className="text-sm text-muted">Loading banks...</p>
-                  ) : banks.length > 0 ? (
-                    <SelectMenu
-                      id="payout-bank"
-                      value={bankForm.bankCode}
-                      ariaLabel="Select your bank"
-                      onChange={(next) => {
-                        const bank = banks.find((item) => item.code === next);
-                        setBankForm((prev) => ({ ...prev, bankCode: next, bankName: bank?.name || '' }));
-                      }}
-                      wrapperClassName="w-full"
-                      options={banks.map((bank) => ({ value: bank.code, label: bank.name }))}
-                    />
+                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  {avatarUploading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   ) : (
-                    <TextInput
-                      type="text"
-                      value={bankForm.bankName}
-                      onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
-                      placeholder="e.g. KCB Bank"
-                      required
-                    />
+                    <Camera className="w-5 h-5 text-white" strokeWidth={2} aria-hidden="true" />
                   )}
                 </div>
-
-                <div>
-                  <Label htmlFor="payout-account" className="mb-2 block text-sm font-semibold text-navy">Account Number *</Label>
-                  <TextInput
-                    id="payout-account"
-                    type="text"
-                    value={bankForm.bankAccountNo}
-                    onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 20) }))}
-                    maxLength={20}
-                    placeholder="Bank account number"
-                    required
-                  />
-                </div>
-              </>
-            ) : (
-              <div>
-                <Label htmlFor="payout-mpesa" className="mb-2 block text-sm font-semibold text-navy">Safaricom M-PESA Number *</Label>
-                <TextInput
-                  id="payout-mpesa"
-                  type="tel"
-                  value={mpesaPhone}
-                  onChange={(e) => setMpesaPhone(e.target.value)}
-                  placeholder="0712 345 678"
-                  autoComplete="tel"
-                  required
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  disabled={avatarUploading}
                 />
-                <p className="mt-2 text-xs text-muted">Use the Safaricom number registered to receive your host payouts.</p>
+              </label>
+              <div className="opg-profile-identity">
+                <h2>
+                  {profile?.firstName} {profile?.lastName}
+                </h2>
+                <p className="text-[#6b7280]">{profile?.email}</p>
+                <span>Guest account</span>
               </div>
-            )}
+            </div>
+            <Link to="/verify-identity" className="opg-profile-verify">View verification status</Link>
+          </div>
 
+          {/* Tabs */}
+          <div className="opg-profile-tabs" role="tablist" aria-label="Profile sections">
+            {['info', 'bookings', 'favorites'].map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab}
+                onClick={() => setActiveTab(tab)}
+                className={activeTab === tab ? 'is-active' : ''}
+              >
+                {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
+              </button>
+            ))}
+          </div>
+
+          {/* My Info Tab */}
+          {activeTab === 'info' && (
             <div>
-              <Button type="submit" size="sm" disabled={bankSaving}>
-                {bankSaving ? 'Saving...' : 'Save Payout Destination'}
-              </Button>
-            </div>
-          </form>
-
-          {/* Payout Frequency */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-navy">Payout Frequency</h4>
-            <p className="text-xs text-muted">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
-            <div className="flex items-center gap-3">
-              <SelectMenu
-                value={payoutFrequency}
-                onChange={(next) => setPayoutFrequency(next)}
-                ariaLabel="Select payout frequency"
-                wrapperClassName="w-full sm:max-w-xs"
-                options={PAYOUT_FREQUENCY_OPTIONS}
-              />
-              <Button type="button" size="sm" onClick={handleFrequencySave} disabled={bankSaving} className="shrink-0">
-                Save
-              </Button>
-            </div>
-          </div>
-
-          {bankMessage && (
-            <Alert color={bankMessage.includes('failed') || bankMessage.includes('Failed') || bankMessage.includes('Please') ? 'failure' : 'success'} className="mt-4">
-              {bankMessage}
-            </Alert>
-          )}
-        </div>
-      )}
-
-      {/* My Bookings Tab */}
-      {activeTab === 'bookings' && (
-        <div className="space-y-4">
-          {bookings.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-white px-6 py-14 text-center">
-              <span className="grid h-16 w-16 place-items-center rounded-full bg-surface">
-                <CalendarDays className="h-8 w-8 text-muted" strokeWidth={2} aria-hidden="true" />
-              </span>
-              <h3 className="text-lg font-bold text-navy">No bookings yet</h3>
-              <p className="text-sm text-muted">Your upcoming stays will appear here.</p>
-            </div>
-          ) : (
-            bookings.map((booking) => (
-              <div key={booking.id} className={CARD}>
-                <div className="flex flex-col gap-4 md:flex-row">
-                  {booking.property?.images?.[0] && (
-                    <img
-                      src={booking.property.images[0]}
-                      alt={booking.property.title}
-                      className="h-32 w-full rounded-xl object-cover md:w-48"
+              {showCompletionBanner && (
+                <div className="mb-6 bg-[#C49A6C]/10 border border-[#C49A6C] rounded-2xl p-5 flex items-start gap-3">
+                  <Info className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-[#0B1F42] text-sm">Complete your profile</p>
+                    <p className="text-sm text-[#6b7280] mt-1">Fill in your details below to get the most out of ZuriLofts.</p>
+                  </div>
+                </div>
+              )}
+              <div className="neu-card p-6">
+                <h2 className="text-lg font-bold text-[#0B1F42] mb-6">Personal Information</h2>
+                {message && (
+                  <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
+                    message.includes('success')
+                      ? 'bg-green-50 border border-green-200 text-green-700'
+                      : 'bg-red-50 border border-red-200 text-red-700'
+                  }`}>
+                    {message}
+                  </div>
+                )}
+                <form onSubmit={handleProfileUpdate} className="opg-profile-form">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">First Name</label>
+                    <input
+                      type="text"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
                     />
-                  )}
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <h3 className="font-bold text-navy">{booking.property?.title}</h3>
-                        <p className="text-sm text-muted">{booking.property?.location}</p>
-                      </div>
-                      <Badge color={STATUS_BADGES[booking.status] || 'gray'}>
-                        {booking.status}
-                      </Badge>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Last Name</label>
+                    <input
+                      type="text"
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                    />
+                    {emailError && (
+                      <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label>
+                    <div className="flex gap-2">
+                      <SelectMenu
+                        value={countryCode}
+                        onChange={(next) => handlePhoneChange(next, phoneNumber)}
+                        ariaLabel="Select country code"
+                        wrapperClassName="opg-profile-country"
+                        options={COUNTRY_OPTIONS}
+                      />
+                      <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
+                        maxLength={15}
+                        placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
+                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                      />
                     </div>
-                    <div className="mt-4 grid grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <span className="text-muted">Check-in</span>
-                        <p className="font-semibold text-navy">{new Date(booking.checkIn).toLocaleDateString()}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted">Check-out</span>
-                        <p className="font-semibold text-navy">{new Date(booking.checkOut).toLocaleDateString()}</p>
-                      </div>
-                      <div>
-                        <span className="text-muted">Total</span>
-                        <p className="font-semibold tabular-nums text-navy">KES {booking.total.toLocaleString()}</p>
-                      </div>
+                    {phoneError && (
+                      <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="bg-[#C49A6C] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                  >
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </form>
+              </div>
+
+              {/* Privacy and data */}
+              <div id="privacy" className="scroll-mt-28 mt-10 pt-8 border-t-2 border-[#D9D9D9]">
+                <h3 className="text-xl font-bold text-[#0B1F42] mb-1">Privacy and data</h3>
+                <p className="text-sm text-[#6b7280] mb-6">
+                  Manage your personal data and consent choices. See our{' '}
+                  <Link to="/privacy" className="text-[#C49A6C] hover:underline font-medium">Privacy Policy</Link>{' '}
+                  for full details.
+                </p>
+
+                <div className="space-y-4">
+                  {/* Download my data */}
+                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1f2937]">Download my data</h4>
+                      <p className="text-sm text-[#6b7280] mt-1">
+                        Get a copy of the personal data we hold about you in a portable format.
+                      </p>
+                      {exportMessage && (
+                        <p className={`text-sm mt-2 font-medium ${exportMessage.includes('Could') ? 'text-red-500' : 'text-green-600'}`}>
+                          {exportMessage}
+                        </p>
+                      )}
                     </div>
-                    {booking.promoCode && (
-                      <div className="mt-3">
-                        <Badge color="success">
-                          Promo: {booking.promoCode.code}
-                        </Badge>
+                    <button
+                      type="button"
+                      onClick={handleExportData}
+                      disabled={exporting}
+                      className="flex-shrink-0 inline-flex items-center gap-2 bg-[#0B1F42] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
+                    >
+                      {exporting ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                          Exporting...
+                        </>
+                      ) : (
+                        'Download my data'
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Cookie preferences */}
+                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1f2937]">Cookie preferences</h4>
+                      <p className="text-sm text-[#6b7280] mt-1">
+                        Review or change which optional cookies we may use. You can withdraw consent at any time.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={openConsentManager}
+                      className="flex-shrink-0 bg-[#0B1F42] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200"
+                    >
+                      Manage preferences
+                    </button>
+                  </div>
+
+                  {/* Delete my account */}
+                  <div className="rounded-2xl border-2 border-red-200 bg-red-50/50 p-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="font-semibold text-red-700">Delete my account</h4>
+                        <p className="text-sm text-[#6b7280] mt-1">
+                          Permanently erase your account and personal data. Bookings and payment records are
+                          retained for legal and tax reasons but are anonymised so they no longer identify you.
+                          This action cannot be undone.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setShowDeleteDialog(true); setDeleteConfirm(''); setDeleteError(''); }}
+                        className="flex-shrink-0 bg-red-600 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-red-700 transition-all duration-200"
+                      >
+                        Delete my account
+                      </button>
+                    </div>
+
+                    {showDeleteDialog && (
+                      <div className="mt-5 pt-5 border-t border-red-200">
+                        <p className="text-sm font-semibold text-[#1f2937] mb-2">
+                          To confirm, type <span className="font-mono font-bold text-red-700">DELETE</span> below.
+                        </p>
+                        <input
+                          type="text"
+                          value={deleteConfirm}
+                          onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
+                          placeholder="Type DELETE to confirm"
+                          className="neu-input w-full sm:w-72 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                        />
+                        {deleteError && <p className="text-red-500 text-xs mt-2">{deleteError}</p>}
+                        <div className="flex gap-3 mt-4">
+                          <button
+                            type="button"
+                            onClick={handleDeleteAccount}
+                            disabled={deleteConfirm !== 'DELETE' || deleting}
+                            className="bg-red-600 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-red-700 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            {deleting ? 'Deleting...' : 'Permanently delete my account'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowDeleteDialog(false)}
+                            disabled={deleting}
+                            className="px-5 py-2.5 rounded-full border border-[#D9D9D9] text-[#1f2937] text-sm font-semibold hover:bg-[#f8f9fa] transition-colors duration-200 disabled:opacity-50"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
                     )}
-
-                    {/* Post-stay review */}
-                    {booking.review ? (
-                      <div className="mt-4 border-t border-border pt-4">
-                        <p className="mb-1 text-sm font-semibold text-navy">Your rating</p>
-                        <div className="flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} className={`h-5 w-5 ${star <= booking.review.rating ? 'text-primary-600' : 'text-border'}`} fill="currentColor" aria-hidden="true" />
-                          ))}
-                          <span className="ml-2 text-xs font-medium text-green-600">Thanks for your feedback!</span>
-                        </div>
-                      </div>
-                    ) : isStayCompleted(booking) ? (
-                      <div className="mt-4 border-t border-border pt-4">
-                        <p className="mb-2 text-sm font-semibold text-navy">Rate your stay</p>
-                        <div className="mb-3 flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => {
-                            const current = reviewForms[booking.id]?.rating || 0;
-                            return (
-                              <button
-                                key={star}
-                                type="button"
-                                onClick={() => setReviewField(booking.id, 'rating', star)}
-                                className="p-0.5 transition-transform hover:scale-110"
-                                aria-label={`${star} star${star > 1 ? 's' : ''}`}
-                              >
-                                <Star className={`h-7 w-7 ${star <= current ? 'text-primary-600' : 'text-border'}`} fill="currentColor" aria-hidden="true" />
-                              </button>
-                            );
-                          })}
-                        </div>
-                        <div className="mb-3 grid gap-2 sm:grid-cols-3">
-                          {[['cleanlinessRating', 'Cleanliness'], ['locationRating', 'Location'], ['valueRating', 'Value']].map(([field, label]) => (
-                            <label key={field} className="text-xs font-semibold text-muted">
-                              {label} (optional)
-                              <SelectMenu
-                                value={String(reviewForms[booking.id]?.[field] || '')}
-                                onChange={(next) => setReviewField(booking.id, field, Number(next) || 0)}
-                                options={SUB_SCORE_OPTIONS}
-                                ariaLabel={`${label} rating (optional)`}
-                              />
-                            </label>
-                          ))}
-                        </div>
-                        <label className="mb-2 block text-xs font-semibold text-muted">
-                          How satisfied were you with your stay?
-                        </label>
-                        <div className="mb-4 flex items-center gap-3">
-                          {[
-                            { key: 'happy', emoji: '😊', label: 'Happy', color: 'border-green-300 bg-green-100 text-green-700' },
-                            { key: 'neutral', emoji: '😐', label: 'Neutral', color: 'border-yellow-300 bg-yellow-100 text-yellow-700' },
-                            { key: 'unhappy', emoji: '😞', label: 'Unhappy', color: 'border-red-300 bg-red-100 text-red-700' },
-                          ].map(({ key, emoji, label, color }) => {
-                            const current = reviewForms[booking.id]?.satisfaction;
-                            return (
-                              <button
-                                key={key}
-                                type="button"
-                                onClick={() => setReviewField(booking.id, 'satisfaction', key)}
-                                className={`flex flex-col items-center gap-1 rounded-xl border-2 px-4 py-2 text-sm font-medium transition-colors ${current === key ? color : 'border-border text-muted hover:border-primary'}`}
-                              >
-                                <span className="text-2xl">{emoji}</span>
-                                <span className="text-xs">{label}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                        <label className="mb-1 block text-xs font-semibold text-muted">
-                          Public review <span className="font-normal">(shown on the property page)</span>
-                        </label>
-                        <Textarea
-                          value={reviewForms[booking.id]?.publicComment || ''}
-                          onChange={(e) => setReviewField(booking.id, 'publicComment', e.target.value)}
-                          placeholder="Share what other guests should know about this stay. This appears publicly with your first name."
-                          maxLength={1000}
-                          rows={3}
-                          className="mb-4"
-                        />
-                        <label className="mb-1 block text-xs font-semibold text-muted">
-                          Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
-                        </label>
-                        <Textarea
-                          value={reviewForms[booking.id]?.privateNote || ''}
-                          onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
-                          placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
-                          maxLength={2000}
-                          rows={3}
-                        />
-                        {reviewForms[booking.id]?.error && (
-                          <p className="mt-1 text-xs font-medium text-red-600">{reviewForms[booking.id].error}</p>
-                        )}
-                        <div className="mt-3">
-                          <Button
-                            type="button"
-                            size="sm"
-                            onClick={() => handleSubmitReview(booking.id)}
-                            disabled={reviewForms[booking.id]?.submitting}
-                          >
-                            {reviewForms[booking.id]?.submitting ? 'Submitting...' : 'Submit Review'}
-                          </Button>
-                        </div>
-                      </div>
-                    ) : null}
                   </div>
                 </div>
               </div>
-            ))
-          )}
-          {bookings.length > 0 && (
-            <div className="mt-6 text-center">
-              <Link
-                to="/bookings"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-primary-600 transition-colors hover:text-primary-700"
-              >
-                View all bookings
-                <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-              </Link>
             </div>
           )}
-        </div>
-      )}
 
-      {/* Favourites Tab */}
-      {activeTab === 'favorites' && (
-        <div>
-          {favorites.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-white px-6 py-14 text-center">
-              <span className="grid h-16 w-16 place-items-center rounded-full bg-surface">
-                <Heart className="h-8 w-8 text-muted" strokeWidth={2} aria-hidden="true" />
-              </span>
-              <h3 className="text-lg font-bold text-navy">No favourites yet</h3>
-              <p className="text-sm text-muted">Tap the heart on any property to save it here.</p>
-              <Button as={Link} to="/properties">Browse properties</Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {favorites.map((property) => (
-                <StayCard key={property.id} stay={property} />
-              ))}
+          {/* Payout Settings - HOST only */}
+          {activeTab === 'info' && profile?.role === 'HOST' && (
+            <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
+              <h3 className="text-xl font-bold text-[#0B1F42] mb-1">Payout Settings</h3>
+              <p className="text-sm text-[#6b7280] mb-6">
+                Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
+              </p>
+
+              {/* Payout destination */}
+              <form onSubmit={handlePayoutDestinationSave} className="space-y-4 mb-8">
+                <h4 className="font-semibold text-[#1f2937]">Payout Destination</h4>
+
+                <div className="grid grid-cols-2 gap-2 rounded-full bg-[#0B1F42]/5 p-1">
+                  {[
+                    { value: 'bank', label: 'Bank account' },
+                    { value: 'mpesa', label: 'M-PESA' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setPayoutMethod(option.value)}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                        payoutMethod === option.value
+                          ? 'bg-[#0B1F42] text-white shadow-sm'
+                          : 'text-[#6b7280] hover:text-[#0B1F42]'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+
+                {payoutMethod === 'bank' ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Bank Name *</label>
+                      {banksLoading ? (
+                        <p className="text-sm text-[#6b7280]">Loading banks...</p>
+                      ) : banks.length > 0 ? (
+                        <SelectMenu
+                          value={bankForm.bankCode}
+                          ariaLabel="Select your bank"
+                          onChange={(next) => {
+                            const bank = banks.find((item) => item.code === next);
+                            setBankForm((prev) => ({ ...prev, bankCode: next, bankName: bank?.name || '' }));
+                          }}
+                          wrapperClassName="opg-profile-select"
+                          options={banks.map((bank) => ({ value: bank.code, label: bank.name }))}
+                        />
+                      ) : (
+                        <input
+                          type="text"
+                          value={bankForm.bankName}
+                          onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
+                          placeholder="e.g. KCB Bank"
+                          className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                          required
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Account Number *</label>
+                      <input
+                        type="text"
+                        value={bankForm.bankAccountNo}
+                        onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 20) }))}
+                        maxLength={20}
+                        placeholder="Bank account number"
+                        className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                        required
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Safaricom M-PESA Number *</label>
+                    <input
+                      type="tel"
+                      value={mpesaPhone}
+                      onChange={(e) => setMpesaPhone(e.target.value)}
+                      placeholder="0712 345 678"
+                      autoComplete="tel"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                      required
+                    />
+                    <p className="text-xs text-[#6b7280] mt-2">Use the Safaricom number registered to receive your host payouts.</p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={bankSaving}
+                  className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 text-sm"
+                >
+                  {bankSaving ? 'Saving...' : 'Save Payout Destination'}
+                </button>
+              </form>
+
+              {/* Payout Frequency */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-[#1f2937]">Payout Frequency</h4>
+                <p className="text-xs text-[#6b7280]">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
+                <div className="flex items-center gap-3">
+                  <SelectMenu
+                    value={payoutFrequency}
+                    onChange={(next) => setPayoutFrequency(next)}
+                    ariaLabel="Select payout frequency"
+                    wrapperClassName="opg-profile-frequency"
+                    options={PAYOUT_FREQUENCY_OPTIONS}
+                  />
+                  <button
+                    type="button"
+                    onClick={handleFrequencySave}
+                    disabled={bankSaving}
+                    className="bg-[#0B1F42] text-white font-semibold px-4 py-2.5 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50 text-sm"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+
+              {bankMessage && (
+                <p className={`text-sm mt-4 font-medium ${bankMessage.includes('failed') || bankMessage.includes('Failed') || bankMessage.includes('Please') ? 'text-red-500' : 'text-green-600'}`}>
+                  {bankMessage}
+                </p>
+              )}
             </div>
           )}
-        </div>
-      )}
+
+          {/* My Bookings Tab */}
+          {activeTab === 'bookings' && (
+            <div className="space-y-4">
+              {bookings.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CalendarDays className="w-8 h-8 text-[#6b7280]" strokeWidth={2} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[#0B1F42] mb-1">No bookings yet</h3>
+                  <p className="text-[#6b7280]">Your upcoming stays will appear here.</p>
+                </div>
+              ) : (
+                bookings.map((booking) => (
+                  <div key={booking.id} className="shadow-sm p-6">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      {booking.property?.images?.[0] && (
+                        <img
+                          src={booking.property.images[0]}
+                          alt={booking.property.title}
+                          className="w-full md:w-48 h-32 object-cover rounded-xl"
+                        />
+                      )}
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-bold text-[#0B1F42]">{booking.property?.title}</h3>
+                            <p className="text-sm text-[#6b7280]">{booking.property?.location}</p>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[booking.status]}`}>
+                            {booking.status}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
+                          <div>
+                            <span className="text-[#6b7280]">Check-in</span>
+                            <p className="font-semibold">{new Date(booking.checkIn).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <span className="text-[#6b7280]">Check-out</span>
+                            <p className="font-semibold">{new Date(booking.checkOut).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <span className="text-[#6b7280]">Total</span>
+                            <p className="font-semibold text-[#C49A6C]">KES {booking.total.toLocaleString()}</p>
+                          </div>
+                        </div>
+                        {booking.promoCode && (
+                          <div className="mt-3">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                              Promo: {booking.promoCode.code}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Post-stay review */}
+                        {booking.review ? (
+                          <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
+                            <p className="text-sm font-semibold text-[#0B1F42] mb-1">Your rating</p>
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star key={star} className={`w-5 h-5 ${star <= booking.review.rating ? 'text-[#C49A6C]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
+                              ))}
+                              <span className="ml-2 text-xs text-green-600 font-medium">Thanks for your feedback!</span>
+                            </div>
+                          </div>
+                        ) : isStayCompleted(booking) ? (
+                          <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
+                            <p className="text-sm font-semibold text-[#0B1F42] mb-2">Rate your stay</p>
+                            <div className="flex items-center gap-1 mb-3">
+                              {[1, 2, 3, 4, 5].map((star) => {
+                                const current = reviewForms[booking.id]?.rating || 0;
+                                return (
+                                  <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => setReviewField(booking.id, 'rating', star)}
+                                    className="p-0.5 transition-transform hover:scale-110"
+                                    aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                                  >
+                                    <Star className={`w-7 h-7 ${star <= current ? 'text-[#C49A6C]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <div className="mb-3 grid gap-2 sm:grid-cols-3">
+                              {[['cleanlinessRating', 'Cleanliness'], ['locationRating', 'Location'], ['valueRating', 'Value']].map(([field, label]) => (
+                                <label key={field} className="text-xs font-semibold text-[#6b7280]">
+                                  {label} (optional)
+                                  <SelectMenu
+                                    value={String(reviewForms[booking.id]?.[field] || '')}
+                                    onChange={(next) => setReviewField(booking.id, field, Number(next) || 0)}
+                                    options={SUB_SCORE_OPTIONS}
+                                    ariaLabel={`${label} rating (optional)`}
+                                  />
+                                </label>
+                              ))}
+                            </div>
+                            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+                              How satisfied were you with your stay?
+                            </label>
+                            <div className="flex items-center gap-3 mb-4">
+                              {[
+                                { key: 'happy', emoji: '😊', label: 'Happy', color: 'bg-green-100 border-green-300 text-green-700' },
+                                { key: 'neutral', emoji: '😐', label: 'Neutral', color: 'bg-yellow-100 border-yellow-300 text-yellow-700' },
+                                { key: 'unhappy', emoji: '😞', label: 'Unhappy', color: 'bg-red-100 border-red-300 text-red-700' },
+                              ].map(({ key, emoji, label, color }) => {
+                                const current = reviewForms[booking.id]?.satisfaction;
+                                return (
+                                  <button
+                                    key={key}
+                                    type="button"
+                                    onClick={() => setReviewField(booking.id, 'satisfaction', key)}
+                                    className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all ${
+                                      current === key
+                                        ? color
+                                        : 'border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C]'
+                                    }`}
+                                  >
+                                    <span className="text-2xl">{emoji}</span>
+                                    <span className="text-xs">{label}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <label className="block text-xs font-semibold text-[#6b7280] mb-1">
+                              Public review <span className="font-normal">(shown on the property page)</span>
+                            </label>
+                            <textarea
+                              value={reviewForms[booking.id]?.publicComment || ''}
+                              onChange={(e) => setReviewField(booking.id, 'publicComment', e.target.value)}
+                              placeholder="Share what other guests should know about this stay. This appears publicly with your first name."
+                              maxLength={1000}
+                              className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm mb-4"
+                            />
+                            <label className="block text-xs font-semibold text-[#6b7280] mb-1">
+                              Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
+                            </label>
+                            <textarea
+                              value={reviewForms[booking.id]?.privateNote || ''}
+                              onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
+                              placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
+                              maxLength={2000}
+                              className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
+                            />
+                            {reviewForms[booking.id]?.error && (
+                              <p className="text-red-500 text-xs mt-1">{reviewForms[booking.id].error}</p>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleSubmitReview(booking.id)}
+                              disabled={reviewForms[booking.id]?.submitting}
+                              className="mt-3 bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                            >
+                              {reviewForms[booking.id]?.submitting ? 'Submitting...' : 'Submit Review'}
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+              {bookings.length > 0 && (
+                <div className="mt-6 text-center">
+                  <Link
+                    to="/bookings"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
+                  >
+                    View all bookings
+                    <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Favourites Tab */}
+          {activeTab === 'favorites' && (
+            <div>
+              {favorites.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Heart className="w-8 h-8 text-[#6b7280]" strokeWidth={2} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[#0B1F42] mb-1">No favourites yet</h3>
+                  <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
+                  <Link to="/properties" className="inline-block bg-[#C49A6C] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+                    Browse properties
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {favorites.map((property) => (
+                    <StayCard key={property.id} stay={property} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
     </div>
   </GuestAccountLayout>;
 }
