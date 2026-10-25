@@ -1,16 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Label, TextInput } from 'flowbite-react';
+import { Alert, Badge, Button, Label, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, TextInput } from 'flowbite-react';
 import { CircleAlert } from 'lucide-react';
 import apiClient from '../api/client';
 import { useAuth } from '../context/AuthContext.jsx';
 
-const statusColors = {
-  PENDING: 'bg-yellow-100 text-yellow-700',
-  PROCESSING: 'bg-blue-100 text-blue-700',
-  SUCCESS: 'bg-green-100 text-green-700',
-  FAILED: 'bg-red-100 text-red-700',
-  REVERSED: 'bg-orange-100 text-orange-700',
+// Payout statuses map onto the themed Badge palette instead of hand-rolled
+// background/text pairs.
+const STATUS_BADGE_COLORS = {
+  PENDING: 'warning',
+  PROCESSING: 'info',
+  SUCCESS: 'success',
+  FAILED: 'failure',
+  REVERSED: 'warning',
 };
 
 function HostPayouts() {
@@ -45,12 +47,12 @@ function HostPayouts() {
   // Guests have no business here; show a clear denial instead of a spinner.
   // Declared after every hook so hook order stays identical across renders.
   if (user?.role === 'USER') {
-    return <div className="op-host-payouts-denied">
-      <div className="op-host-payouts-denied-icon">
+    return <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-white px-5 py-16 text-center">
+      <span className="grid h-12 w-12 place-items-center rounded-full bg-surface text-primary-600">
         <CircleAlert strokeWidth={2} aria-hidden="true" />
-      </div>
-      <h1>Access denied</h1>
-      <p>This page is for hosts and administrators only.</p>
+      </span>
+      <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Access denied</h1>
+      <p className="text-sm leading-relaxed text-muted">This page is for hosts and administrators only.</p>
     </div>;
   }
 
@@ -125,107 +127,133 @@ function HostPayouts() {
     URL.revokeObjectURL(url);
   }
 
-  if (loading) return <div className="op-host-payouts-loading" aria-label="Loading payout information"><span /><span /><span /></div>;
+  if (loading) return <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Loading payout information">
+    <span className="h-24 animate-pulse rounded-xl border border-border bg-surface" />
+    <span className="h-24 animate-pulse rounded-xl border border-border bg-surface" />
+    <span className="h-24 animate-pulse rounded-xl border border-border bg-surface" />
+  </div>;
 
-  return <div className="op-host-payouts">
-    <header className="op-host-payouts-heading">
+  return <div className="space-y-6">
+    <header className="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <Link to="/host/earnings">Back to earnings</Link>
-        <h1>Payouts</h1>
-        <p>Manage how you get paid and review your payout history.</p>
+        <Link to="/host/earnings" className="text-xs font-semibold text-primary-600 hover:underline">Back to earnings</Link>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Payouts</h1>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Manage how you get paid and review your payout history.</p>
       </div>
-      <Link to="/profile#payouts">{destination?.method ? 'Change destination' : 'Set up payouts'}</Link>
+      <Link to="/profile#payouts" className="text-sm font-medium text-primary-600 hover:underline">{destination?.method ? 'Change destination' : 'Set up payouts'}</Link>
     </header>
 
-    {error && <div className="op-host-payouts-error"><p>{error}</p><button type="button" onClick={loadData}>Try again</button></div>}
+    {error && <Alert color="failure">
+      <div className="flex w-full flex-wrap items-center justify-between gap-3">
+        <p className="min-w-0 flex-1">{error}</p>
+        <Button size="xs" color="light" onClick={loadData}>Try again</Button>
+      </div>
+    </Alert>}
 
-    <section className="op-host-payouts-wallet" aria-label="Payout balance summary">
-      <article className="is-balance">
-        <span>AVAILABLE BALANCE</span>
-        <strong>KES {(wallet?.balance || 0).toLocaleString()}</strong>
-        <small>Ready for the next payout</small>
+    <section className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Payout balance summary">
+      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">AVAILABLE BALANCE</span>
+        <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.balance || 0).toLocaleString()}</strong>
+        <small className="mt-1 block text-xs text-muted">Ready for the next payout</small>
       </article>
-      <article className="is-earned">
-        <span>TOTAL EARNED</span>
-        <strong>KES {(wallet?.totalEarned || 0).toLocaleString()}</strong>
-        <small>Recorded host earnings</small>
+      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">TOTAL EARNED</span>
+        <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.totalEarned || 0).toLocaleString()}</strong>
+        <small className="mt-1 block text-xs text-muted">Recorded host earnings</small>
       </article>
-      <article className="is-paid">
-        <span>TOTAL PAID OUT</span>
-        <strong>KES {(wallet?.totalPaidOut || 0).toLocaleString()}</strong>
-        <small>Completed host payouts</small>
+      <article className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">TOTAL PAID OUT</span>
+        <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.totalPaidOut || 0).toLocaleString()}</strong>
+        <small className="mt-1 block text-xs text-muted">Completed host payouts</small>
       </article>
     </section>
 
-    <div className="op-host-payouts-grid">
-      <section className="op-host-payouts-panel">
-        <header><div><h2>Payout destination</h2><p>Where your available balance is sent.</p></div><span>Schedule</span></header>
-        <div className="op-host-payouts-destination">
-          <span>{destination?.method || 'NOT CONFIGURED'}</span>
-          <strong>{destination?.label || 'Add a payout destination'}</strong>
-          <small>{destination?.maskedAccount || 'Bank or mobile money details are required before payout.'}</small>
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <section className="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Payout destination</h2><p className="mt-1 text-xs text-muted">Where your available balance is sent.</p></div><span className="text-xs font-medium text-muted">Schedule</span></header>
+        <div className="mt-4 rounded-lg bg-surface px-4 py-3">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{destination?.method || 'NOT CONFIGURED'}</span>
+          <strong className="mt-1 block text-sm font-semibold text-navy">{destination?.label || 'Add a payout destination'}</strong>
+          <small className="mt-1 block text-xs text-muted">{destination?.maskedAccount || 'Bank or mobile money details are required before payout.'}</small>
         </div>
-        <dl className="op-host-payouts-schedule">
-          <div><dt>Next payout</dt><dd>{wallet?.nextPayoutAt ? new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not scheduled'}</dd></div>
-          <div><dt>Destination status</dt><dd>{destination?.method ? 'Ready' : 'Needs setup'}</dd></div>
+        <dl className="mt-4 space-y-2 text-sm">
+          <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Next payout</dt><dd className="font-semibold text-navy">{wallet?.nextPayoutAt ? new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not scheduled'}</dd></div>
+          <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Destination status</dt><dd className="font-semibold text-navy">{destination?.method ? 'Ready' : 'Needs setup'}</dd></div>
         </dl>
-        <Link to="/profile#payouts">{destination?.method ? 'Update payout details' : 'Add payout details'}</Link>
+        <Link to="/profile#payouts" className="mt-4 inline-flex text-sm font-medium text-primary-600 hover:underline">{destination?.method ? 'Update payout details' : 'Add payout details'}</Link>
       </section>
 
-      <section className="op-host-payouts-panel op-host-payouts-wht">
-        <header><div><h2>WHT statement</h2><p>Withholding tax certificates for KRA returns.</p></div><span>5% rate</span></header>
-        <div className="op-host-payouts-wht-controls">
+      <section className="rounded-xl border border-border bg-white p-5 shadow-sm lg:col-span-2">
+        <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">WHT statement</h2><p className="mt-1 text-xs text-muted">Withholding tax certificates for KRA returns.</p></div><span className="text-xs font-medium text-muted">5% rate</span></header>
+        <div className="mt-4 flex flex-wrap items-end gap-3">
           <div>
             <Label htmlFor="wht-month">Statement month</Label>
             <TextInput id="wht-month" type="month" value={whtMonth} onChange={(event) => setWhtMonth(event.target.value)} />
           </div>
-          <Button className="op-host-bronze-button" onClick={downloadWht}>View statement</Button>
+          <Button onClick={downloadWht}>View statement</Button>
         </div>
-        {whtData ? <div className="op-host-payouts-wht-result">
-          <div className="op-host-payouts-wht-total">
-            <span>{whtMonth || 'ALL TIME'}</span>
-            <strong>KES {(whtData.totalWht || 0).toLocaleString()} WHT</strong>
-            <small>From KES {(whtData.totalEarnings || 0).toLocaleString()} host earnings</small>
+        {whtData ? <div className="mt-4 space-y-4">
+          <div className="rounded-lg bg-surface px-4 py-3">
+            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{whtMonth || 'ALL TIME'}</span>
+            <strong className="mt-1 block text-xl font-bold text-navy tabular-nums">KES {(whtData.totalWht || 0).toLocaleString()} WHT</strong>
+            <small className="mt-1 block text-xs text-muted">From KES {(whtData.totalEarnings || 0).toLocaleString()} host earnings</small>
           </div>
-          <div className="op-host-payouts-table-wrap">
-            <table className="op-host-payouts-table">
-              <thead><tr><th>Property</th><th>Paid date</th><th>Earnings</th><th>WHT</th></tr></thead>
-              <tbody>
-                {whtData.bookings.map((booking, index) => <tr key={booking.id || index}>
-                  <td>{booking.property?.title || 'Property'}</td>
-                  <td>{booking.paidAt ? new Date(booking.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</td>
-                  <td>KES {(booking.hostNetAmount || 0).toLocaleString()}</td>
-                  <td>KES {(booking.withholdingTax || 0).toLocaleString()}</td>
-                </tr>)}
-              </tbody>
-            </table>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableHeadCell>Property</TableHeadCell>
+                  <TableHeadCell>Paid date</TableHeadCell>
+                  <TableHeadCell>Earnings</TableHeadCell>
+                  <TableHeadCell>WHT</TableHeadCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {whtData.bookings.map((booking, index) => <TableRow key={booking.id || index}>
+                  <TableCell>{booking.property?.title || 'Property'}</TableCell>
+                  <TableCell>{booking.paidAt ? new Date(booking.paidAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</TableCell>
+                  <TableCell className="tabular-nums text-right">KES {(booking.hostNetAmount || 0).toLocaleString()}</TableCell>
+                  <TableCell className="tabular-nums text-right">KES {(booking.withholdingTax || 0).toLocaleString()}</TableCell>
+                </TableRow>)}
+              </TableBody>
+            </Table>
           </div>
-          <div className="op-host-payouts-wht-actions">
+          <div className="flex flex-wrap gap-2">
             <Button color="light" onClick={csvWht}>Download CSV</Button>
             <Button color="dark" onClick={printWht}>Print PDF</Button>
           </div>
-        </div> : <div className="op-host-payouts-wht-empty">
-          <strong>Select a month to view your statement</strong>
-          <p>Leave the month empty to view all withholding tax recorded on your account.</p>
+        </div> : <div className="mt-4 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center">
+          <strong className="text-sm font-semibold text-navy">Select a month to view your statement</strong>
+          <p className="text-xs text-muted">Leave the month empty to view all withholding tax recorded on your account.</p>
         </div>}
       </section>
     </div>
 
-    <section className="op-host-payouts-panel op-host-payouts-history">
-      <header><div><h2>Payout history</h2><p>Completed and in-flight transfers to your destination.</p></div><span>{payouts.length} records</span></header>
-      {payouts.length === 0 ? <div className="op-host-payouts-history-empty">
-        <strong>No payouts yet</strong>
-        <p>Your first payout will appear here after a transfer is created.</p>
-      </div> : <div className="op-host-payouts-table-wrap">
-        <table className="op-host-payouts-table is-history">
-          <thead><tr><th>Amount</th><th>Bookings</th><th>Status</th><th>Date</th></tr></thead>
-          <tbody>{payouts.map((payout) => <tr key={payout.id}>
-            <td>KES {(payout.amount || 0).toLocaleString()}</td>
-            <td>{payout.bookingsCount || 0}</td>
-            <td><span className={`op-host-payout-status ${statusColors[payout.status] || ''}`}>{payout.status}</span>{payout.failureReason && <small>{payout.failureReason}</small>}</td>
-            <td>{payout.createdAt ? new Date(payout.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</td>
-          </tr>)}</tbody>
-        </table>
+    <section className="rounded-xl border border-border bg-white p-5 shadow-sm">
+      <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Payout history</h2><p className="mt-1 text-xs text-muted">Completed and in-flight transfers to your destination.</p></div><span className="text-xs font-medium text-muted">{payouts.length} records</span></header>
+      {payouts.length === 0 ? <div className="mt-4 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center">
+        <strong className="text-sm font-semibold text-navy">No payouts yet</strong>
+        <p className="text-xs text-muted">Your first payout will appear here after a transfer is created.</p>
+      </div> : <div className="mt-4 overflow-x-auto">
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableHeadCell>Amount</TableHeadCell>
+              <TableHeadCell>Bookings</TableHeadCell>
+              <TableHeadCell>Status</TableHeadCell>
+              <TableHeadCell>Date</TableHeadCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>{payouts.map((payout) => <TableRow key={payout.id}>
+            <TableCell className="tabular-nums text-right">KES {(payout.amount || 0).toLocaleString()}</TableCell>
+            <TableCell className="tabular-nums text-right">{payout.bookingsCount || 0}</TableCell>
+            <TableCell>
+              <Badge color={STATUS_BADGE_COLORS[payout.status] || 'gray'}>{payout.status}</Badge>
+              {payout.failureReason && <small className="mt-1 block text-xs text-muted">{payout.failureReason}</small>}
+            </TableCell>
+            <TableCell>{payout.createdAt ? new Date(payout.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}</TableCell>
+          </TableRow>)}</TableBody>
+        </Table>
       </div>}
     </section>
   </div>;

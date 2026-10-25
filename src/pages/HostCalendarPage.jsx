@@ -1,12 +1,23 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Button, Label, TextInput } from 'flowbite-react';
+import { Alert, Button, Label, TextInput } from 'flowbite-react';
 import PropTypes from 'prop-types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Property column plus seven equal day columns. Held in one constant so the
+// header row and every property row line up on exactly the same grid.
+const WEEK_GRID = 'grid grid-cols-[minmax(170px,1.6fr)_repeat(7,minmax(0,1fr))]';
+
+// Day-cell surface per availability state; selected cells add a ring.
+const DAY_STATE_CLASSES = {
+  open: 'bg-white text-muted hover:bg-surface',
+  reserved: 'bg-navy text-white hover:bg-navy/90',
+  blocked: 'bg-silver/50 text-navy hover:bg-silver/70',
+};
 
 function startOfWeek(date) {
   const value = new Date(date);
@@ -60,21 +71,21 @@ function calendarDayState(calendar, day) {
 function WeeklyCalendar({ rows, weekStart, selected, onSelect }) {
   const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
 
-  return <section className="op-host-calendar-board">
-    <div className="op-host-calendar-scroll">
-      <div className="op-host-calendar-week">
-        <div className="op-host-calendar-week-head">
-          <span>PROPERTY</span>
-          {days.map((day) => <span key={day.toISOString()} className={sameDay(day, new Date()) ? 'is-today' : ''}>
+  return <section className="rounded-xl border border-border bg-white shadow-sm xl:col-span-2">
+    <div className="overflow-x-auto">
+      <div className="min-w-[720px]">
+        <div className={`${WEEK_GRID} border-b border-border bg-surface`}>
+          <span className="px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-muted">PROPERTY</span>
+          {days.map((day) => <span key={day.toISOString()} className={`px-1 py-2 text-center text-[11px] font-semibold uppercase tracking-wide ${sameDay(day, new Date()) ? 'text-navy' : 'text-muted'}`}>
             {day.toLocaleDateString('en-GB', { weekday: 'short' }).toUpperCase()} {day.getDate()}
           </span>)}
         </div>
         {rows.map(({ property, calendar }) => {
           const weekBookings = (calendar.bookings || []).filter((booking) => days.some((day) => inRange(day, booking.start, booking.end)));
-          return <div className="op-host-calendar-row" key={property.id}>
-            <div className="op-host-calendar-property">
-              <Link to={`/host/calendar/${property.id}`}>{property.title}</Link>
-              <span>{weekBookings.length} {weekBookings.length === 1 ? 'stay' : 'stays'} this week</span>
+          return <div className={`${WEEK_GRID} border-b border-border last:border-0`} key={property.id}>
+            <div className="flex flex-col justify-center gap-1 px-3 py-2">
+              <Link to={`/host/calendar/${property.id}`} className="text-sm font-semibold text-navy hover:text-primary-600">{property.title}</Link>
+              <span className="text-[11px] text-muted">{weekBookings.length} {weekBookings.length === 1 ? 'stay' : 'stays'} this week</span>
             </div>
             {days.map((day) => {
               const state = calendarDayState(calendar, day);
@@ -82,7 +93,7 @@ function WeeklyCalendar({ rows, weekStart, selected, onSelect }) {
               return <button
                 key={day.toISOString()}
                 type="button"
-                className={`op-host-calendar-day is-${state.type}${isSelected ? ' is-selected' : ''}`}
+                className={`flex min-h-[64px] flex-col items-center justify-center border-l border-border px-1 py-2 text-[10px] font-semibold uppercase tracking-wide transition-colors ${DAY_STATE_CLASSES[state.type] || DAY_STATE_CLASSES.open}${isSelected ? ' ring-2 ring-inset ring-primary' : ''}`}
                 onClick={() => onSelect(property.id, day)}
                 aria-label={`${property.title}, ${formatFullDate(day)}: ${state.type}`}
               >
@@ -93,7 +104,11 @@ function WeeklyCalendar({ rows, weekStart, selected, onSelect }) {
         })}
       </div>
     </div>
-    <div className="op-host-calendar-legend"><span><i className="is-open" />Open</span><span><i className="is-reserved" />Reserved</span><span><i className="is-blocked" />Blocked</span></div>
+    <div className="flex flex-wrap items-center gap-4 border-t border-border px-5 py-3 text-xs text-muted">
+      <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full border border-border bg-white" aria-hidden="true" />Open</span>
+      <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-navy" aria-hidden="true" />Reserved</span>
+      <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-silver" aria-hidden="true" />Blocked</span>
+    </div>
   </section>;
 }
 
@@ -105,29 +120,32 @@ WeeklyCalendar.propTypes = {
 };
 
 function CalendarDetail({ selected, row, onOpenProperty }) {
-  if (!row || !selected?.date) return <aside className="op-host-calendar-detail is-empty"><span>Select a date</span><small>Choose a day to see its booking or availability state.</small></aside>;
+  if (!row || !selected?.date) return <aside className="h-fit rounded-xl border border-dashed border-border bg-white p-5 text-center shadow-sm xl:col-span-1">
+    <span className="block text-sm font-semibold text-navy">Select a date</span>
+    <small className="mt-1 block text-xs leading-relaxed text-muted">Choose a day to see its booking or availability state.</small>
+  </aside>;
   const state = calendarDayState(row.calendar, selected.date);
 
-  return <aside className="op-host-calendar-detail">
-    <header><h2>{formatFullDate(selected.date)}</h2><p>{row.property.title}</p></header>
-    {state.type === 'reserved' ? <div className="op-host-calendar-event is-reserved">
-      <span>RESERVED STAY</span>
-      <strong>{state.item.guestName || 'Guest'}</strong>
-      <p>{sameDay(selected.date, new Date(state.item.start)) ? 'Check-in today' : sameDay(selected.date, addDays(new Date(state.item.end), -1)) ? 'Check-out today' : 'Stay in progress'} · {state.item.guests || 1} guest{state.item.guests === 1 ? '' : 's'}</p>
-      <Link to={`/bookings/${state.item.id}`}>View booking</Link>
-    </div> : state.type === 'blocked' ? <div className="op-host-calendar-event is-blocked">
-      <span>BLOCKED DATE</span>
-      <strong>{state.item.summary || 'Unavailable'}</strong>
-      <p>{state.item.manual ? 'Manual block' : state.item.sourceName || 'Imported calendar'}</p>
-    </div> : <div className="op-host-calendar-event is-open">
-      <span>OPEN NIGHT</span>
-      <strong>Ready for bookings</strong>
-      <p>Guests can reserve this date on ZuriLofts.</p>
+  return <aside className="h-fit space-y-4 rounded-xl border border-border bg-white p-5 shadow-sm xl:col-span-1">
+    <header><h2 className="text-base font-semibold text-navy">{formatFullDate(selected.date)}</h2><p className="mt-1 text-xs text-muted">{row.property.title}</p></header>
+    {state.type === 'reserved' ? <div className="rounded-lg bg-navy p-3 text-white">
+      <span className="text-[11px] font-semibold uppercase tracking-wide text-white/70">RESERVED STAY</span>
+      <strong className="mt-1 block text-sm font-semibold">{state.item.guestName || 'Guest'}</strong>
+      <p className="mt-1 text-xs leading-relaxed text-white/80">{sameDay(selected.date, new Date(state.item.start)) ? 'Check-in today' : sameDay(selected.date, addDays(new Date(state.item.end), -1)) ? 'Check-out today' : 'Stay in progress'} · {state.item.guests || 1} guest{state.item.guests === 1 ? '' : 's'}</p>
+      <Link to={`/bookings/${state.item.id}`} className="mt-2 inline-block text-xs font-semibold underline">View booking</Link>
+    </div> : state.type === 'blocked' ? <div className="rounded-lg bg-surface p-3">
+      <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">BLOCKED DATE</span>
+      <strong className="mt-1 block text-sm font-semibold text-navy">{state.item.summary || 'Unavailable'}</strong>
+      <p className="mt-1 text-xs leading-relaxed text-muted">{state.item.manual ? 'Manual block' : state.item.sourceName || 'Imported calendar'}</p>
+    </div> : <div className="rounded-lg border border-dashed border-border p-3">
+      <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">OPEN NIGHT</span>
+      <strong className="mt-1 block text-sm font-semibold text-navy">Ready for bookings</strong>
+      <p className="mt-1 text-xs leading-relaxed text-muted">Guests can reserve this date on ZuriLofts.</p>
     </div>}
-    <div className="op-host-calendar-rule">
-      <strong>Availability rules</strong>
-      <p>Reserved dates are read-only. Manual blocks can be managed below.</p>
-      <button type="button" onClick={onOpenProperty}>Open property calendar</button>
+    <div className="rounded-lg border border-border p-3">
+      <strong className="block text-sm font-semibold text-navy">Availability rules</strong>
+      <p className="mt-1 text-xs leading-relaxed text-muted">Reserved dates are read-only. Manual blocks can be managed below.</p>
+      <Button type="button" color="light" size="xs" onClick={onOpenProperty} className="mt-2">Open property calendar</Button>
     </div>
   </aside>;
 }
@@ -139,7 +157,11 @@ CalendarDetail.propTypes = {
 };
 
 function CalendarLoading() {
-  return <div className="op-host-calendar-loading" aria-label="Loading calendar"><span /><span /><span /></div>;
+  return <div className="space-y-3 rounded-xl border border-border bg-white p-5 shadow-sm" aria-label="Loading calendar">
+    <span className="block h-16 animate-pulse rounded-lg bg-surface" />
+    <span className="block h-16 animate-pulse rounded-lg bg-surface" />
+    <span className="block h-16 animate-pulse rounded-lg bg-surface" />
+  </div>;
 }
 
 export default function HostCalendarPage() {
@@ -290,82 +312,90 @@ export default function HostCalendarPage() {
     window.setTimeout(() => setCopied(false), 1500);
   }
 
-  return <div className="op-host-calendar">
-    <header className="op-host-calendar-heading">
+  return <div className="space-y-6">
+    <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div>
-        {id && <Link to="/host/calendar">← All calendars</Link>}
-        <h1>Availability calendar</h1>
-        <p>Manage open dates without changing reserved stays.</p>
+        {id && <Link to="/host/calendar" className="mb-2 inline-block text-sm font-medium text-primary-600 hover:underline">← All calendars</Link>}
+        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Availability calendar</h1>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Manage open dates without changing reserved stays.</p>
       </div>
-      <div className="op-host-calendar-controls">
-        <div className="op-host-calendar-week-nav">
-          <button type="button" aria-label="Previous week" onClick={() => moveWeek(-1)}><ChevronLeft strokeWidth={1.8} aria-hidden="true" /></button>
-          <span>{formatWeek(weekStart)}</span>
-          <button type="button" aria-label="Next week" onClick={() => moveWeek(1)}><ChevronRight strokeWidth={1.8} aria-hidden="true" /></button>
-        </div>
-        {selectedRow && <Link className="op-host-calendar-manage" to={`/host/calendar/${selectedRow.property.id}#block-dates`}>Manage availability</Link>}
+      <div className="flex flex-wrap items-center gap-2">
+        <Button type="button" color="light" size="xs" aria-label="Previous week" onClick={() => moveWeek(-1)}><ChevronLeft strokeWidth={1.8} aria-hidden="true" /></Button>
+        <span className="text-sm font-semibold text-navy">{formatWeek(weekStart)}</span>
+        <Button type="button" color="light" size="xs" aria-label="Next week" onClick={() => moveWeek(1)}><ChevronRight strokeWidth={1.8} aria-hidden="true" /></Button>
+        {selectedRow && <Button as={Link} to={`/host/calendar/${selectedRow.property.id}#block-dates`} color="light" size="sm">Manage availability</Button>}
       </div>
     </header>
 
-    {error && <div className="op-host-calendar-error"><p>{error}</p><button type="button" onClick={load}>Try again</button></div>}
-    {loading ? <CalendarLoading /> : rows.length === 0 && !error ? <div className="op-host-calendar-empty">
-      <strong>No listings to manage</strong>
-      <p>Add a listing before setting availability.</p>
-      <Link to="/host/properties/new">Add a listing</Link>
-    </div> : <div className="op-host-calendar-layout">
+    {error && <Alert color="failure">
+      <p>{error}</p>
+      <div><Button type="button" color="light" size="sm" onClick={load}>Try again</Button></div>
+    </Alert>}
+    {loading ? <CalendarLoading /> : rows.length === 0 && !error ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center">
+      <strong className="text-base font-semibold text-navy">No listings to manage</strong>
+      <p className="max-w-md text-sm leading-relaxed text-muted">Add a listing before setting availability.</p>
+      <Button as={Link} to="/host/properties/new" size="sm">Add a listing</Button>
+    </div> : <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
       <WeeklyCalendar rows={rows} weekStart={weekStart} selected={selected} onSelect={selectDate} />
       <CalendarDetail selected={selected} row={selectedRow} onOpenProperty={() => selectedRow && navigate(`/host/calendar/${selectedRow.property.id}`)} />
     </div>}
 
-    {!id && rows.length > 0 && <div className="op-host-calendar-hint">
-      <strong>Need to edit a feed or block dates?</strong>
-      <span>Open a property calendar to manage imported calendars and manual blocks.</span>
-      <button type="button" onClick={() => selectedRow && navigate(`/host/calendar/${selectedRow.property.id}`)}>Open selected calendar</button>
+    {!id && rows.length > 0 && <div className="flex flex-col items-start gap-2 rounded-xl border border-border bg-white p-5 shadow-sm">
+      <strong className="text-base font-semibold text-navy">Need to edit a feed or block dates?</strong>
+      <span className="text-sm leading-relaxed text-muted">Open a property calendar to manage imported calendars and manual blocks.</span>
+      <Button type="button" color="light" size="sm" onClick={() => selectedRow && navigate(`/host/calendar/${selectedRow.property.id}`)}>Open selected calendar</Button>
     </div>}
 
-    {id && selectedCalendar && <div className="op-host-calendar-management">
-      <section className="op-host-calendar-panel">
-        <header><div><h2>Export this calendar</h2><p>Paste this link into Airbnb, Booking.com, or another platform.</p></div></header>
-        <div className="op-host-calendar-copy-row">
-          <TextInput readOnly value={selectedCalendar.feedUrl || ''} onFocus={(event) => event.target.select()} sizing="md" />
+    {id && selectedCalendar && <div className="space-y-4">
+      <section className="space-y-4 rounded-xl border border-border bg-white p-5 shadow-sm">
+        <header><div><h2 className="text-base font-semibold text-navy">Export this calendar</h2><p className="mt-1 text-xs text-muted">Paste this link into Airbnb, Booking.com, or another platform.</p></div></header>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          <TextInput readOnly value={selectedCalendar.feedUrl || ''} onFocus={(event) => event.target.select()} sizing="md" className="sm:flex-1" />
           <Button color="dark" onClick={copyFeed}>{copied ? 'Copied' : 'Copy link'}</Button>
         </div>
       </section>
 
-      <section className="op-host-calendar-panel">
-        <header>
-          <div><h2>Imported calendars</h2><p>Pull reservations from other platforms into this stay.</p></div>
+      <section className="space-y-4 rounded-xl border border-border bg-white p-5 shadow-sm">
+        <header className="flex flex-wrap items-start justify-between gap-3">
+          <div><h2 className="text-base font-semibold text-navy">Imported calendars</h2><p className="mt-1 text-xs text-muted">Pull reservations from other platforms into this stay.</p></div>
           <Button color="light" disabled={syncing || (selectedCalendar.sources || []).length === 0} onClick={syncNow}>{syncing ? 'Syncing...' : 'Sync now'}</Button>
         </header>
-        {(selectedCalendar.sources || []).length > 0 ? <div className="op-host-calendar-source-list">
-          {selectedCalendar.sources.map((source) => <article key={source.id}>
-            <div><strong>{source.name}</strong><span>{source.url}</span><small className={source.lastStatus?.startsWith('ERROR') ? 'is-error' : ''}>{source.lastSyncedAt ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}` : 'Not synced yet'}</small></div>
-            <button type="button" disabled={saving} onClick={() => removeSource(source.id)}>Remove</button>
+        {(selectedCalendar.sources || []).length > 0 ? <div className="space-y-2">
+          {selectedCalendar.sources.map((source) => <article key={source.id} className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border p-3">
+            <div className="min-w-0">
+              <strong className="block text-sm font-semibold text-navy">{source.name}</strong>
+              <span className="block truncate text-xs text-muted">{source.url}</span>
+              <small className={`text-xs ${source.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-muted'}`}>{source.lastSyncedAt ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}` : 'Not synced yet'}</small>
+            </div>
+            <Button type="button" color="light" size="xs" disabled={saving} onClick={() => removeSource(source.id)}>Remove</Button>
           </article>)}
-        </div> : <p className="op-host-calendar-none">No external calendars connected.</p>}
-        <form className="op-host-calendar-source-form" onSubmit={addSource}>
-          <div><Label htmlFor="calendar-platform">Platform</Label><TextInput id="calendar-platform" value={sourceDraft.name} onChange={(event) => setSourceDraft({ ...sourceDraft, name: event.target.value })} placeholder="Airbnb" required /></div>
-          <div><Label htmlFor="calendar-url">iCal URL</Label><TextInput id="calendar-url" type="url" value={sourceDraft.url} onChange={(event) => setSourceDraft({ ...sourceDraft, url: event.target.value })} placeholder="https://example.com/calendar.ics" required /></div>
-          <Button type="submit" className="op-host-calendar-bronze" disabled={saving}>Add feed</Button>
+        </div> : <p className="text-xs text-muted">No external calendars connected.</p>}
+        <form className="grid grid-cols-1 gap-4 border-t border-border pt-4 sm:grid-cols-2" onSubmit={addSource}>
+          <div className="space-y-1.5"><Label htmlFor="calendar-platform">Platform</Label><TextInput id="calendar-platform" value={sourceDraft.name} onChange={(event) => setSourceDraft({ ...sourceDraft, name: event.target.value })} placeholder="Airbnb" required /></div>
+          <div className="space-y-1.5"><Label htmlFor="calendar-url">iCal URL</Label><TextInput id="calendar-url" type="url" value={sourceDraft.url} onChange={(event) => setSourceDraft({ ...sourceDraft, url: event.target.value })} placeholder="https://example.com/calendar.ics" required /></div>
+          <div className="sm:col-span-2"><Button type="submit" disabled={saving}>Add feed</Button></div>
         </form>
       </section>
 
-      <section className="op-host-calendar-panel" id="block-dates">
-        <header><div><h2>Blocked dates</h2><p>Imported bookings are read-only. Manual blocks can be removed at any time.</p></div></header>
-        {(selectedCalendar.blocks || []).length > 0 ? <div className="op-host-calendar-block-list">
-          {selectedCalendar.blocks.map((block) => <article key={block.id}>
-            <div><strong>{formatShortDate(new Date(block.start))} → {formatShortDate(new Date(block.end))}</strong><span>{block.summary || 'Blocked'}</span><small className={block.manual ? 'is-manual' : ''}>{block.manual ? 'Manual' : block.sourceName || 'Imported'}</small></div>
-            {block.manual && <button type="button" disabled={saving} onClick={() => removeBlock(block.id)}>Remove</button>}
+      <section id="block-dates" className="space-y-4 rounded-xl border border-border bg-white p-5 shadow-sm">
+        <header><div><h2 className="text-base font-semibold text-navy">Blocked dates</h2><p className="mt-1 text-xs text-muted">Imported bookings are read-only. Manual blocks can be removed at any time.</p></div></header>
+        {(selectedCalendar.blocks || []).length > 0 ? <div className="space-y-2">
+          {selectedCalendar.blocks.map((block) => <article key={block.id} className="flex flex-wrap items-start justify-between gap-3 rounded-lg border border-border p-3">
+            <div className="min-w-0">
+              <strong className="block text-sm font-semibold text-navy">{formatShortDate(new Date(block.start))} → {formatShortDate(new Date(block.end))}</strong>
+              <span className="block text-xs text-muted">{block.summary || 'Blocked'}</span>
+              <small className={`text-xs ${block.manual ? 'font-semibold text-navy' : 'text-muted'}`}>{block.manual ? 'Manual' : block.sourceName || 'Imported'}</small>
+            </div>
+            {block.manual && <Button type="button" color="light" size="xs" disabled={saving} onClick={() => removeBlock(block.id)}>Remove</Button>}
           </article>)}
-        </div> : <p className="op-host-calendar-none">No blocked dates.</p>}
-        <form className="op-host-calendar-block-form" onSubmit={addBlock}>
-          <div><Label htmlFor="block-start">From</Label><TextInput id="block-start" type="date" value={blockDraft.start} onChange={(event) => setBlockDraft({ ...blockDraft, start: event.target.value })} required /></div>
-          <div><Label htmlFor="block-end">To</Label><TextInput id="block-end" type="date" value={blockDraft.end} onChange={(event) => setBlockDraft({ ...blockDraft, end: event.target.value })} required /></div>
-          <div><Label htmlFor="block-reason">Reason</Label><TextInput id="block-reason" value={blockDraft.summary} onChange={(event) => setBlockDraft({ ...blockDraft, summary: event.target.value })} placeholder="Maintenance" /></div>
-          <Button type="submit" color="dark" disabled={saving}>Block dates</Button>
+        </div> : <p className="text-xs text-muted">No blocked dates.</p>}
+        <form className="grid grid-cols-1 gap-4 border-t border-border pt-4 sm:grid-cols-3" onSubmit={addBlock}>
+          <div className="space-y-1.5"><Label htmlFor="block-start">From</Label><TextInput id="block-start" type="date" value={blockDraft.start} onChange={(event) => setBlockDraft({ ...blockDraft, start: event.target.value })} required /></div>
+          <div className="space-y-1.5"><Label htmlFor="block-end">To</Label><TextInput id="block-end" type="date" value={blockDraft.end} onChange={(event) => setBlockDraft({ ...blockDraft, end: event.target.value })} required /></div>
+          <div className="space-y-1.5"><Label htmlFor="block-reason">Reason</Label><TextInput id="block-reason" value={blockDraft.summary} onChange={(event) => setBlockDraft({ ...blockDraft, summary: event.target.value })} placeholder="Maintenance" /></div>
+          <div className="sm:col-span-3"><Button type="submit" color="dark" disabled={saving}>Block dates</Button></div>
         </form>
       </section>
     </div>}
   </div>;
 }
-

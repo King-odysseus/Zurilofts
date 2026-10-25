@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import BrandLogo from './BrandLogo.jsx';
 import PropTypes from 'prop-types';
-import { Dropdown, DropdownDivider, DropdownHeader, DropdownItem } from 'flowbite-react';
+import { Button, Dropdown, DropdownDivider, DropdownHeader, DropdownItem } from 'flowbite-react';
 import {
   Building2,
   CalendarClock,
@@ -31,6 +31,10 @@ function hostInitials(user) {
   const last = user?.lastName?.[0] ?? '';
   return `${first}${last}`.toUpperCase() || 'H';
 }
+
+// Shared nav-link styling so the desktop tabs cannot drift apart.
+const NAV_LINK = 'inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-surface hover:text-navy';
+const NAV_LINK_ACTIVE = 'bg-primary/15 text-navy';
 
 // Host workspace shell. Hosts get their own frame instead of the guest site
 // header: the marketing nav (search, destinations, saved trips) is no use while
@@ -62,15 +66,15 @@ function HostLayout({ children }) {
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Your account';
 
   return (
-    <div className="min-h-screen bg-[#F7F8FA]">
-      <header className="op-host-appbar">
-        <div className="op-host-appbar-inner">
-          <Link to="/host/today" className="op-host-appbar-brand" aria-label="Host workspace home">
+    <div className="min-h-screen bg-surface">
+      <header className="sticky top-0 z-30 border-b border-border bg-white/95 backdrop-blur">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 lg:px-6">
+          <Link to="/host/today" className="inline-flex shrink-0 items-center gap-2.5" aria-label="Host workspace home">
             <BrandLogo imgClassName="h-8 w-auto" />
-            <span className="op-host-appbar-badge">Host</span>
+            <span className="hidden items-center rounded-full bg-primary-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.09em] text-primary-700 md:inline-flex">Host</span>
           </Link>
 
-          <nav className="op-host-appbar-tabs" aria-label="Host workspace">
+          <nav className="hidden items-center gap-1 lg:flex" aria-label="Host workspace">
             {TABS.map((tab) => {
               const active = tab.match(location.pathname);
               return (
@@ -78,7 +82,7 @@ function HostLayout({ children }) {
                   key={tab.key}
                   to={tab.to}
                   aria-current={active ? 'page' : undefined}
-                  className={`op-host-appbar-tab${active ? ' is-active' : ''}`}
+                  className={`${NAV_LINK}${active ? ` ${NAV_LINK_ACTIVE}` : ''}`}
                 >
                   {tab.label}
                 </Link>
@@ -86,28 +90,29 @@ function HostLayout({ children }) {
             })}
           </nav>
 
-          <div className="op-host-appbar-actions">
-            <Link to="/host/properties/new" className="op-host-appbar-primary" aria-label="New listing">
+          <div className="flex items-center gap-2">
+            <Button as={Link} to="/host/properties/new" size="sm" aria-label="New listing">
               <Plus className="h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
-              <span>New listing</span>
-            </Link>
+              <span className="hidden md:inline">New listing</span>
+            </Button>
 
             <Dropdown
               inline
               arrowIcon={false}
               placement="bottom-end"
-              theme={{ inlineWrapper: 'op-host-appbar-menu' }}
               label={
                 <>
                   <span className="sr-only">Open host account menu</span>
-                  <span aria-hidden="true" className="op-host-appbar-avatar">{hostInitials(user)}</span>
-                  <ChevronDown className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white p-1 transition-colors hover:border-primary-200">
+                    <span aria-hidden="true" className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy text-[11px] font-bold tracking-wide text-white">{hostInitials(user)}</span>
+                    <ChevronDown className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
+                  </span>
                 </>
               }
             >
               <DropdownHeader>
-                <span className="block text-sm font-semibold text-[#0B1F42]">{displayName}</span>
-                <span className="block truncate text-xs text-[#64748B]">{user?.email}</span>
+                <span className="block text-sm font-semibold text-navy">{displayName}</span>
+                <span className="block truncate text-xs text-muted">{user?.email}</span>
               </DropdownHeader>
               <DropdownItem as={Link} to="/profile">Profile</DropdownItem>
               <DropdownItem as={Link} to="/host/discounts">Discounts</DropdownItem>
@@ -128,7 +133,7 @@ function HostLayout({ children }) {
         </div>
       </header>
 
-      <main className="op-host-appmain">{children}</main>
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 lg:px-6">{children}</main>
       <HostMobileBottomNav />
     </div>
   );

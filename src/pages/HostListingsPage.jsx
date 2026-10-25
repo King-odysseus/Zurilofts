@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { TabItem, Tabs, ToggleSwitch } from 'flowbite-react';
+import { Alert, Badge, Button, ToggleSwitch } from 'flowbite-react';
 import PropTypes from 'prop-types';
 import { Building2 } from 'lucide-react';
 import apiClient from '../api/client.js';
@@ -13,6 +13,16 @@ const STATUS_META = {
   PUBLISHED: { label: 'Published', tone: 'published' },
   REJECTED: { label: 'Needs changes', tone: 'attention' },
   SUSPENDED: { label: 'Suspended', tone: 'suspended' },
+};
+
+// The tone vocabulary is presentation-only; the Badge palette names its colours
+// differently, so the mapping lives here instead of on each call site.
+const STATUS_BADGE_COLOR = {
+  draft: 'gray',
+  review: 'info',
+  published: 'success',
+  attention: 'warning',
+  suspended: 'failure',
 };
 
 const FILTERS = [
@@ -62,8 +72,10 @@ function listingQuality(property) {
 }
 
 function ListingSkeleton() {
-  return <div className="op-host-listing-skeleton" aria-label="Loading listings">
-    <span /><span /><span />
+  return <div className="space-y-3" aria-label="Loading listings">
+    <span className="block h-24 animate-pulse rounded-xl border border-border bg-surface" />
+    <span className="block h-24 animate-pulse rounded-xl border border-border bg-surface" />
+    <span className="block h-24 animate-pulse rounded-xl border border-border bg-surface" />
   </div>;
 }
 
@@ -73,53 +85,59 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
   const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
   const quality = listingQuality(property);
 
-  return <article className="op-host-listing-card">
-    <div className="op-host-listing-cover">
-      {image ? <img src={image} alt="" /> : <div className="op-host-listing-cover-empty">No photo yet</div>}
-      <span className={`op-host-listing-status is-${status.tone}`}>{status.label}</span>
+  return <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+    <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface">
+      {image ? <img src={image} alt="" className="aspect-[4/3] w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-muted">No photo yet</div>}
+      <Badge color={STATUS_BADGE_COLOR[status.tone] || 'gray'} className="absolute left-3 top-3">{status.label}</Badge>
     </div>
-    <div className="op-host-listing-body">
-      <header>
-        <div>
-          <h2><Link to={`/property/${property.id}`}>{property.title}</Link></h2>
-          <p>{bedSummary(property)} · {property.neighborhood || property.location || 'Nairobi'}</p>
+    <div className="flex flex-1 flex-col gap-4 p-5">
+      <header className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold text-navy"><Link to={`/property/${property.id}`} className="hover:text-primary-600">{property.title}</Link></h2>
+          <p className="mt-1 text-xs text-muted">{bedSummary(property)} · {property.neighborhood || property.location || 'Nairobi'}</p>
         </div>
-        <strong>KES {(property.price || 0).toLocaleString()}<small>/night</small></strong>
+        <strong className="whitespace-nowrap text-lg font-bold text-navy">KES {(property.price || 0).toLocaleString()}<small className="text-xs font-medium text-muted">/night</small></strong>
       </header>
-      <p className={`op-host-listing-note is-${status.tone}`}>{statusCopy(property)}</p>
-      <div className="op-host-listing-quality">
-        <div className="op-host-listing-quality-head"><span>Listing quality</span><strong>{quality.score}%</strong></div>
-        <progress value={quality.score} max="100" aria-label={`Listing quality ${quality.score} percent`} />
-        {quality.tips.length > 0 && <ul>{quality.tips.slice(0, 2).map((tip) => <li key={tip}>{tip}</li>)}</ul>}
+      <p className="rounded-lg bg-surface px-3 py-2 text-xs leading-relaxed text-muted">{statusCopy(property)}</p>
+      <div className="rounded-lg border border-border p-3">
+        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-muted"><span>Listing quality</span><strong className="text-navy">{quality.score}%</strong></div>
+        <div
+          className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border"
+          role="progressbar"
+          aria-valuenow={quality.score}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label={`Listing quality ${quality.score} percent`}
+        >
+          {/* Computed fill width: data-driven, so it stays an inline style. */}
+          <div className="h-full rounded-full bg-primary" style={{ width: `${quality.score}%` }} />
+        </div>
+        {quality.tips.length > 0 && <ul className="mt-2 space-y-1 text-xs text-muted">{quality.tips.slice(0, 2).map((tip) => <li key={tip}>{tip}</li>)}</ul>}
       </div>
-      <div className="op-host-listing-actions">
-        <Link className="op-host-listing-edit" to={`/host/properties/${property.id}/edit`}>
+      <div className="flex flex-wrap items-center gap-2">
+        <Button as={Link} to={`/host/properties/${property.id}/edit`} size="sm">
           {property.status === 'DRAFT' ? 'Continue setup' : 'Edit listing'}
-        </Link>
-        {canSubmit && <button type="button" className="op-host-listing-submit" disabled={busy} onClick={() => onReview(property)}>
+        </Button>
+        {canSubmit && <Button type="button" color="light" size="sm" disabled={busy} onClick={() => onReview(property)}>
           {busy ? 'Submitting...' : 'Submit for review'}
-        </button>}
-        {property.status === 'PENDING_REVIEW' && <span className="op-host-listing-reviewing">Awaiting review</span>}
-        {property.status === 'PUBLISHED' && <Link className="op-host-listing-view" to={`/property/${property.id}`}>View listing</Link>}
-        <Link className="op-host-listing-calendar" to={`/host/calendar/${property.id}`}>Calendar</Link>
+        </Button>}
+        {property.status === 'PENDING_REVIEW' && <span className="text-xs font-medium text-muted">Awaiting review</span>}
+        {property.status === 'PUBLISHED' && <Button as={Link} to={`/property/${property.id}`} color="light" size="sm">View listing</Button>}
+        <Button as={Link} to={`/host/calendar/${property.id}`} color="light" size="sm">Calendar</Button>
       </div>
-      <footer>
-        <div className="op-host-listing-availability">
+      <footer className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-3">
+        <div className="flex items-center gap-2">
           <ToggleSwitch
             checked={Boolean(property.available)}
             onChange={() => onToggleAvailability(property)}
             disabled={busy}
             aria-label={`${property.title} availability`}
-            theme={{
-              root: { base: 'op-host-listing-toggle' },
-              toggle: { checked: { color: { default: 'bg-[#2563EB] group-focus:ring-[#BFDBFE]' } } },
-            }}
           />
-          <span>{property.available ? 'Accepting bookings' : 'Not accepting bookings'}</span>
+          <span className="text-xs text-muted">{property.available ? 'Accepting bookings' : 'Not accepting bookings'}</span>
         </div>
-        <button type="button" className="op-host-listing-delete" disabled={busy} onClick={() => onDelete(property)}>
+        <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onDelete(property)}>
           {busy ? 'Working...' : 'Delete'}
-        </button>
+        </Button>
       </footer>
     </div>
   </article>;
@@ -219,35 +237,36 @@ export default function HostListingsPage() {
     }
   }
 
-  return <div className="op-host-listings">
-    <header className="op-host-listings-heading">
-      <div><h1>Your listings</h1><p>Prepare, publish, and manage your stays.</p></div>
-      <Link to="/host/properties/new">+ Add a listing</Link>
+  return <div className="space-y-6">
+    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Your listings</h1>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare, publish, and manage your stays.</p>
+      </div>
+      <Button as={Link} to="/host/properties/new">+ Add a listing</Button>
     </header>
 
-    <Tabs
-      aria-label="Listing status"
-      variant="pills"
-      onActiveTabChange={(index) => setFilter(FILTERS[index].key)}
-    >
-      {FILTERS.map((item) => <TabItem
+    <div className="inline-flex flex-wrap gap-1 rounded-full border border-border bg-white p-1" role="group" aria-label="Listing status">
+      {FILTERS.map((item) => <button
         key={item.key}
-        title={`${item.label} · ${counts[item.key] || 0}`}
-        active={filter === item.key}
-      >
-        {filter === item.key && <>
+        type="button"
+        aria-pressed={filter === item.key}
+        onClick={() => setFilter(item.key)}
+        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${filter === item.key ? 'bg-navy text-white' : 'text-muted hover:text-navy'}`}
+      >{item.label} · {counts[item.key] || 0}</button>)}
+    </div>
 
-    {error && <div className="op-host-listings-error"><p>{error}</p><button type="button" onClick={() => window.location.reload()}>Try again</button></div>}
-    {loading ? <ListingSkeleton /> : !error && visibleProperties.length === 0 ? <div className="op-host-listings-empty">
-      <span><Building2 strokeWidth={1.6} aria-hidden="true" /></span>
-      <strong>{properties.length === 0 ? 'No listings yet' : 'Nothing in this view'}</strong>
-      <p>{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>
-      {properties.length === 0 ? <Link to="/host/properties/new">Add a listing</Link> : <button type="button" onClick={() => setFilter('ALL')}>Show all stays</button>}
-    </div> : <div className="op-host-listings-grid">
+    {error && <Alert color="failure">
+      <p>{error}</p>
+      <div><Button type="button" color="light" size="sm" onClick={() => window.location.reload()}>Try again</Button></div>
+    </Alert>}
+    {loading ? <ListingSkeleton /> : !error && visibleProperties.length === 0 ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-white px-5 py-12 text-center">
+      <span className="text-primary-600"><Building2 strokeWidth={1.6} aria-hidden="true" /></span>
+      <strong className="text-base font-semibold text-navy">{properties.length === 0 ? 'No listings yet' : 'Nothing in this view'}</strong>
+      <p className="max-w-md text-sm leading-relaxed text-muted">{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>
+      {properties.length === 0 ? <Button as={Link} to="/host/properties/new" size="sm">Add a listing</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>Show all stays</Button>}
+    </div> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {visibleProperties.map((property) => <HostListingCard key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
     </div>}
-        </>}
-      </TabItem>)}
-    </Tabs>
   </div>;
 }

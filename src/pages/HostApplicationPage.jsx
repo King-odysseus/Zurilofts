@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { Button, Checkbox, FileInput, HelperText, Label, Textarea, TextInput } from 'flowbite-react';
+import { Alert, Badge, Button, Checkbox, FileInput, Label, Textarea, TextInput } from 'flowbite-react';
 import SelectMenu from '../components/SelectMenu.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
@@ -69,6 +69,11 @@ const DOCUMENT_LABELS = {
   PROPERTY_AUTHORITY: 'Proof of ownership or authority to host',
   BUSINESS_REGISTRATION: 'Business registration certificate',
 };
+
+// Shared with the listing editor so both multi-step host forms read identically.
+const CARD_CLASS = 'rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6';
+const STEP_BUTTON_BASE = 'flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-surface';
+const STEP_CIRCLE_BASE = 'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-[11px] font-bold';
 
 function formFromApplication(application, user) {
   return {
@@ -400,364 +405,372 @@ function HostApplicationPage() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen bg-white">
-        <main className="op-host-application-page">
-          <div className="op-host-application-loading"><Spinner /></div>
-        </main>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <main className="op-host-application-page">
-        <section className="op-host-application-hero">
-          <div className="op-host-application-hero-copy">
-            <p>Host setup</p>
-            <h1>Get your space ready to host</h1>
-            <span>Complete your identity, property details and review before you publish.</span>
+    <div className="space-y-6">
+      <header>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Host setup</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Get your space ready to host</h1>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Complete your identity, property details and review before you publish.</p>
+      </header>
+
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3" aria-label="Application summary">
+        <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
+          <strong className="block text-lg font-bold text-navy">{completedCount} / {STEP_DEFINITIONS.length}</strong>
+          <span className="text-xs text-muted">Steps complete</span>
+        </div>
+        <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
+          <strong className="block text-lg font-bold text-navy">~10 min</strong>
+          <span className="text-xs text-muted">Estimated time</span>
+        </div>
+        <div className="rounded-xl border border-border bg-white p-4 shadow-sm">
+          <strong className="block text-lg font-bold text-navy">{statusLabel}</strong>
+          <span className="text-xs text-muted">{saving ? 'Saving changes' : 'Current status'}</span>
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start">
+        <aside className="space-y-2 rounded-xl border border-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
+          <div>
+            <strong className="block text-sm font-semibold text-navy">Your progress</strong>
+            <span className="text-xs text-muted">{completedCount} of {STEP_DEFINITIONS.length} steps complete</span>
           </div>
-          <div className="op-host-application-hero-stats">
-            <div>
-              <strong>{completedCount} / {STEP_DEFINITIONS.length}</strong>
-              <span>Steps complete</span>
-            </div>
-            <div>
-              <strong>~10 min</strong>
-              <span>Estimated time</span>
-            </div>
-            <div>
-              <strong>{statusLabel}</strong>
-              <span>{saving ? 'Saving changes' : 'Current status'}</span>
-            </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface" aria-hidden="true">
+            <i className="block h-full rounded-full bg-primary" style={{ width: `${completionPercent}%` }} />
           </div>
-        </section>
+          <nav className="space-y-2 pt-2" aria-label="Host application steps">
+            {completionItems.map((step, index) => (
+              <button
+                key={step.key}
+                type="button"
+                className={`${STEP_BUTTON_BASE} ${activeStep === step.key ? 'bg-primary/10 font-semibold text-navy' : ''} ${step.complete ? 'text-navy' : 'text-muted'}`}
+                onClick={() => goToStep(step.key)}
+                aria-current={activeStep === step.key ? 'step' : undefined}
+              >
+                <span className={`${STEP_CIRCLE_BASE} ${step.complete || activeStep === step.key ? 'bg-primary-50 text-navy' : 'text-muted'}`}>
+                  {step.complete ? '\u2713' : index + 1}
+                </span>
+                <span className="flex min-w-0 flex-col gap-0.5">
+                  <strong className="text-sm font-semibold text-navy">{step.label}</strong>
+                  <small className="truncate text-xs text-muted">{step.detail}</small>
+                </span>
+              </button>
+            ))}
+          </nav>
+          <Button type="button" color="light" className="w-full" onClick={handleSaveAndLeave} disabled={saving || !editable}>
+            Save and exit
+          </Button>
+        </aside>
 
-        <div className="op-host-application-layout">
-          <aside className="op-host-application-rail">
-            <header>
-              <strong>Your progress</strong>
-              <span>{completedCount} of {STEP_DEFINITIONS.length} steps complete</span>
-            </header>
-            <div className="op-host-application-progress" aria-hidden="true">
-              <i style={{ width: `${completionPercent}%` }} />
-            </div>
-            <nav aria-label="Host application steps">
-              {completionItems.map((step, index) => (
-                <button
-                  key={step.key}
-                  type="button"
-                  className={`${activeStep === step.key ? 'is-active' : ''} ${step.complete ? 'is-complete' : ''}`}
-                  onClick={() => goToStep(step.key)}
-                  aria-current={activeStep === step.key ? 'step' : undefined}
-                >
-                  <span>{step.complete ? '\u2713' : index + 1}</span>
-                  <span>
-                    <strong>{step.label}</strong>
-                    <small>{step.detail}</small>
-                  </span>
-                </button>
-              ))}
-            </nav>
-            <Button type="button" color="light" className="op-host-application-exit" onClick={handleSaveAndLeave} disabled={saving || !editable}>
-              Save and exit
-            </Button>
-          </aside>
+        <div className="space-y-5">
+          {message && <Notice tone="success">{message}</Notice>}
+          {error && <Notice tone="error">{error}</Notice>}
 
-          <div className="op-host-application-content">
-            {message && <Notice tone="success">{message}</Notice>}
-            {error && <Notice tone="error">{error}</Notice>}
-
-            {editable ? (
-              <form onSubmit={handleSave}>
-                <section id="host-application-identity" className="op-host-application-card">
-                  <ApplicationCardHeader
-                    step="1"
-                    title="Identity and contact"
-                    description="Your legal details must match the identity document you upload."
-                  />
-                  <div className="op-host-application-fields">
-                    <div>
-                      <Label htmlFor="host-legal-name">Full legal name</Label>
-                      <TextInput id="host-legal-name" value={form.legalName} onChange={(e) => update('legalName', e.target.value)} required />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-dob">Date of birth</Label>
-                      <TextInput id="host-dob" type="date" value={form.dateOfBirth} onChange={(e) => update('dateOfBirth', e.target.value)} required />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-nationality">Nationality</Label>
-                      <TextInput id="host-nationality" value={form.nationality} onChange={(e) => update('nationality', e.target.value)} required />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-identity-type">Identity document</Label>
-                      <SelectMenu id="host-identity-type" value={form.identityType} onChange={(v) => update('identityType', v)} options={[
-          { value: 'NATIONAL_ID', label: 'Kenyan national ID' },
-          { value: 'PASSPORT', label: 'Passport' },
-          { value: 'ALIEN_ID', label: 'Alien ID' },
-        ]} />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-contact-email">Contact email</Label>
-                      <TextInput id="host-contact-email" type="email" value={form.contactEmail} onChange={(e) => update('contactEmail', e.target.value)} required />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-contact-phone">Contact phone</Label>
-                      <TextInput id="host-contact-phone" type="tel" value={form.contactPhone} onChange={(e) => update('contactPhone', e.target.value)} required />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-kra-pin">KRA PIN</Label>
-                      <TextInput id="host-kra-pin" value={form.kraPin} onChange={(e) => update('kraPin', e.target.value.toUpperCase())} placeholder="A123456789B" required />
-                    </div>
+          {editable ? (
+            <form onSubmit={handleSave} className="space-y-5">
+              <section id="host-application-identity" className={`${CARD_CLASS} scroll-mt-24`}>
+                <ApplicationCardHeader
+                  step="1"
+                  title="Identity and contact"
+                  description="Your legal details must match the identity document you upload."
+                />
+                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="host-legal-name">Full legal name</Label>
+                    <TextInput id="host-legal-name" value={form.legalName} onChange={(e) => update('legalName', e.target.value)} required />
                   </div>
-                  <StepActions
-                    saving={saving}
-                    uploading={Boolean(uploadingKind)}
-                    onSave={handleSave}
-                    onContinue={() => handleSaveAndContinue('business')}
-                  />
-                </section>
+                  <div>
+                    <Label htmlFor="host-dob">Date of birth</Label>
+                    <TextInput id="host-dob" type="date" value={form.dateOfBirth} onChange={(e) => update('dateOfBirth', e.target.value)} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="host-nationality">Nationality</Label>
+                    <TextInput id="host-nationality" value={form.nationality} onChange={(e) => update('nationality', e.target.value)} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="host-identity-type">Identity document</Label>
+                    <SelectMenu id="host-identity-type" value={form.identityType} onChange={(v) => update('identityType', v)} options={[
+                      { value: 'NATIONAL_ID', label: 'Kenyan national ID' },
+                      { value: 'PASSPORT', label: 'Passport' },
+                      { value: 'ALIEN_ID', label: 'Alien ID' },
+                    ]} />
+                  </div>
+                  <div>
+                    <Label htmlFor="host-contact-email">Contact email</Label>
+                    <TextInput id="host-contact-email" type="email" value={form.contactEmail} onChange={(e) => update('contactEmail', e.target.value)} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="host-contact-phone">Contact phone</Label>
+                    <TextInput id="host-contact-phone" type="tel" value={form.contactPhone} onChange={(e) => update('contactPhone', e.target.value)} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="host-kra-pin">KRA PIN</Label>
+                    <TextInput id="host-kra-pin" value={form.kraPin} onChange={(e) => update('kraPin', e.target.value.toUpperCase())} placeholder="A123456789B" required />
+                  </div>
+                </div>
+                <StepActions
+                  saving={saving}
+                  uploading={Boolean(uploadingKind)}
+                  onSave={handleSave}
+                  onContinue={() => handleSaveAndContinue('business')}
+                />
+              </section>
 
-                <section id="host-application-business" className="op-host-application-card">
-                  <ApplicationCardHeader
-                    step="2"
-                    title="Hosting business"
-                    description="Tell us whether you host as an individual or through a registered company."
-                  />
-                  <div className="op-host-application-fields">
+              <section id="host-application-business" className={`${CARD_CLASS} scroll-mt-24`}>
+                <ApplicationCardHeader
+                  step="2"
+                  title="Hosting business"
+                  description="Tell us whether you host as an individual or through a registered company."
+                />
+                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="host-business-type">Host type</Label>
+                    <SelectMenu id="host-business-type" value={form.businessType} onChange={(v) => update('businessType', v)} options={[
+                      { value: 'individual', label: 'Individual' },
+                      { value: 'company', label: 'Registered company' },
+                    ]} />
+                  </div>
+                  <div>
+                    <Label htmlFor="host-business-name">Host or business name</Label>
+                    <TextInput id="host-business-name" value={form.businessName} onChange={(e) => update('businessName', e.target.value)} required />
+                  </div>
+                  {form.businessType === 'company' && (
                     <div>
-                      <Label htmlFor="host-business-type">Host type</Label>
-                      <SelectMenu id="host-business-type" value={form.businessType} onChange={(v) => update('businessType', v)} options={[
-          { value: 'individual', label: 'Individual' },
-          { value: 'company', label: 'Registered company' },
-        ]} />
+                      <Label htmlFor="host-company-number">Company registration number</Label>
+                      <TextInput id="host-company-number" value={form.companyRegistrationNo} onChange={(e) => update('companyRegistrationNo', e.target.value)} required />
                     </div>
+                  )}
+                  <div>
+                    <Label htmlFor="host-payout-method">Preferred payout</Label>
+                    <SelectMenu id="host-payout-method" value={form.preferredPayoutMethod} onChange={(v) => update('preferredPayoutMethod', v)} options={[
+                      { value: 'mpesa', label: 'M-PESA' },
+                      { value: 'bank', label: 'Bank transfer' },
+                    ]} />
+                    <p className="mt-1 text-xs text-muted">Earnings are paid out by Paystack to the account below. M-PESA goes straight to your phone number; bank transfer goes to your account number using your bank code.</p>
+                  </div>
+                  {form.preferredPayoutMethod === 'mpesa' ? (
                     <div>
-                      <Label htmlFor="host-business-name">Host or business name</Label>
-                      <TextInput id="host-business-name" value={form.businessName} onChange={(e) => update('businessName', e.target.value)} required />
+                      <Label htmlFor="host-payout-mpesa">M-PESA number for payouts</Label>
+                      <TextInput id="host-payout-mpesa" type="tel" value={form.payoutMpesaPhone} onChange={(e) => update('payoutMpesaPhone', e.target.value)} placeholder="0712345678" required />
+                      <p className="mt-1 text-xs text-muted">Use the Safaricom number registered in your own name, for example 0712345678 or 254712345678.</p>
                     </div>
-                    {form.businessType === 'company' && (
-                      <div>
-                        <Label htmlFor="host-company-number">Company registration number</Label>
-                        <TextInput id="host-company-number" value={form.companyRegistrationNo} onChange={(e) => update('companyRegistrationNo', e.target.value)} required />
-                      </div>
-                    )}
+                  ) : banks.length > 0 ? (
                     <div>
-                      <Label htmlFor="host-payout-method">Preferred payout</Label>
-                      <SelectMenu id="host-payout-method" value={form.preferredPayoutMethod} onChange={(v) => update('preferredPayoutMethod', v)} options={[
-          { value: 'mpesa', label: 'M-PESA' },
-          { value: 'bank', label: 'Bank transfer' },
-        ]} />
-                      <HelperText>Earnings are paid out by Paystack to the account below. M-PESA goes straight to your phone number; bank transfer goes to your account number using your bank code.</HelperText>
+                      <Label htmlFor="host-payout-bank">Bank</Label>
+                      <SelectMenu id="host-payout-bank" value={form.payoutBankCode} onChange={(code) => {
+                        const bank = banks.find((item) => item.code === code);
+                        update('payoutBankName', bank?.name || '');
+                        update('payoutBankCode', code);
+                      }} options={banks.map((bank) => ({ value: bank.code, label: bank.name }))} />
                     </div>
-                    {form.preferredPayoutMethod === 'mpesa' ? (
-                      <div>
-                        <Label htmlFor="host-payout-mpesa">M-PESA number for payouts</Label>
-                        <TextInput id="host-payout-mpesa" type="tel" value={form.payoutMpesaPhone} onChange={(e) => update('payoutMpesaPhone', e.target.value)} placeholder="0712345678" required />
-                        <HelperText>Use the Safaricom number registered in your own name, for example 0712345678 or 254712345678.</HelperText>
-                      </div>
-                    ) : banks.length > 0 ? (
-                      <div>
-                        <Label htmlFor="host-payout-bank">Bank</Label>
-                        <SelectMenu id="host-payout-bank" value={form.payoutBankCode} onChange={(code) => {
-                          const bank = banks.find((item) => item.code === code);
-                          update('payoutBankName', bank?.name || '');
-                          update('payoutBankCode', code);
-                        }} options={banks.map((bank) => ({ value: bank.code, label: bank.name }))} />
-                      </div>
-                    ) : (
+                  ) : (
+                    <div className="space-y-4">
                       <div>
                         <Label htmlFor="host-payout-bank-name">Bank name</Label>
                         <TextInput id="host-payout-bank-name" value={form.payoutBankName} onChange={(e) => update('payoutBankName', e.target.value)} placeholder="Equity Bank" required />
+                      </div>
+                      <div>
                         <Label htmlFor="host-payout-bank-code">Bank code</Label>
                         <TextInput id="host-payout-bank-code" value={form.payoutBankCode} onChange={(e) => update('payoutBankCode', e.target.value)} placeholder="068" required />
-                        <HelperText>Enter the Paystack bank code, for example 068 for Equity Bank. We could not load the bank list automatically.</HelperText>
                       </div>
-                    )}
-                    {form.preferredPayoutMethod === 'bank' && (
-                      <div>
-                        <Label htmlFor="host-payout-account">Bank account number</Label>
-                        <TextInput id="host-payout-account" value={form.payoutBankAccountNo} onChange={(e) => update('payoutBankAccountNo', e.target.value.replace(/\D/g, ''))} placeholder="0123456789" inputMode="numeric" required />
-                      </div>
-                    )}
-                  </div>
-                  <StepActions
-                    saving={saving}
-                    uploading={Boolean(uploadingKind)}
-                    onSave={handleSave}
-                    onContinue={() => handleSaveAndContinue('properties')}
-                  />
-                </section>
+                      <p className="mt-1 text-xs text-muted">Enter the Paystack bank code, for example 068 for Equity Bank. We could not load the bank list automatically.</p>
+                    </div>
+                  )}
+                  {form.preferredPayoutMethod === 'bank' && (
+                    <div>
+                      <Label htmlFor="host-payout-account">Bank account number</Label>
+                      <TextInput id="host-payout-account" value={form.payoutBankAccountNo} onChange={(e) => update('payoutBankAccountNo', e.target.value.replace(/\D/g, ''))} placeholder="0123456789" inputMode="numeric" required />
+                    </div>
+                  )}
+                </div>
+                <StepActions
+                  saving={saving}
+                  uploading={Boolean(uploadingKind)}
+                  onSave={handleSave}
+                  onContinue={() => handleSaveAndContinue('properties')}
+                />
+              </section>
 
-                <section id="host-application-properties" className="op-host-application-card">
-                  <ApplicationCardHeader
-                    step="3"
-                    title="Property details"
-                    description="These details help Trust and Safety confirm that you can list the accommodation."
-                  />
-                  <div className="op-host-application-fields">
-                    <div>
-                      <Label htmlFor="host-city">Primary city or area</Label>
-                      <TextInput id="host-city" value={form.city} onChange={(e) => update('city', e.target.value)} required />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-property-count">Number of properties</Label>
-                      <TextInput id="host-property-count" type="number" min="1" max="1000" value={form.propertyCount} onChange={(e) => update('propertyCount', e.target.value)} required />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-relationship">Relationship to the properties</Label>
-                      <SelectMenu id="host-relationship" value={form.propertyRelationship} onChange={(v) => update('propertyRelationship', v)} options={[
-          { value: 'OWNER', label: 'Owner' },
-          { value: 'MANAGER', label: 'Property manager' },
-          { value: 'AGENT', label: 'Authorised agent' },
-          { value: 'TENANT', label: 'Tenant with permission' },
-        ]} />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-years">Years of hosting experience</Label>
-                      <TextInput id="host-years" type="number" min="0" max="80" value={form.yearsHosting} onChange={(e) => update('yearsHosting', e.target.value)} required />
-                    </div>
+              <section id="host-application-properties" className={`${CARD_CLASS} scroll-mt-24`}>
+                <ApplicationCardHeader
+                  step="3"
+                  title="Property details"
+                  description="These details help Trust and Safety confirm that you can list the accommodation."
+                />
+                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="host-city">Primary city or area</Label>
+                    <TextInput id="host-city" value={form.city} onChange={(e) => update('city', e.target.value)} required />
                   </div>
+                  <div>
+                    <Label htmlFor="host-property-count">Number of properties</Label>
+                    <TextInput id="host-property-count" type="number" min="1" max="1000" value={form.propertyCount} onChange={(e) => update('propertyCount', e.target.value)} required />
+                  </div>
+                  <div>
+                    <Label htmlFor="host-relationship">Relationship to the properties</Label>
+                    <SelectMenu id="host-relationship" value={form.propertyRelationship} onChange={(v) => update('propertyRelationship', v)} options={[
+                      { value: 'OWNER', label: 'Owner' },
+                      { value: 'MANAGER', label: 'Property manager' },
+                      { value: 'AGENT', label: 'Authorised agent' },
+                      { value: 'TENANT', label: 'Tenant with permission' },
+                    ]} />
+                  </div>
+                  <div>
+                    <Label htmlFor="host-years">Years of hosting experience</Label>
+                    <TextInput id="host-years" type="number" min="0" max="80" value={form.yearsHosting} onChange={(e) => update('yearsHosting', e.target.value)} required />
+                  </div>
+                </div>
 
-                  <fieldset className="op-host-application-fieldset">
-                    <legend>Property types</legend>
-                    <div className="op-host-application-type-grid">
-                      {PROPERTY_TYPES.map(([value, label]) => (
-                        <label key={value} className={form.propertyTypes.includes(value) ? 'is-selected' : ''}>
+                <fieldset className="mt-5">
+                  <legend className="mb-2 block text-sm font-medium text-navy">Property types</legend>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                    {PROPERTY_TYPES.map(([value, label]) => {
+                      const selected = form.propertyTypes.includes(value);
+                      return (
+                        <label
+                          key={value}
+                          className={`flex min-h-[46px] cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium text-navy ${selected ? 'border-primary bg-primary-50' : 'border-border bg-surface'}`}
+                        >
                           <Checkbox
-                            checked={form.propertyTypes.includes(value)}
+                            checked={selected}
                             onChange={() => togglePropertyType(value)}
                           />
                           <span>{label}</span>
                         </label>
-                      ))}
-                    </div>
-                  </fieldset>
-
-                  <div className="op-host-application-textareas">
-                    <div>
-                      <Label htmlFor="host-property-locations">Property locations</Label>
-                      <Textarea
-                        id="host-property-locations"
-                        value={form.propertyLocations}
-                        onChange={(e) => update('propertyLocations', e.target.value)}
-                        rows={4}
-                        maxLength={500}
-                        placeholder="Neighbourhoods, towns or addresses you intend to list"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="host-experience">Hosting experience</Label>
-                      <Textarea
-                        id="host-experience"
-                        value={form.experience}
-                        onChange={(e) => update('experience', e.target.value)}
-                        rows={4}
-                        maxLength={2000}
-                        placeholder="Tell us about your experience, team and guest support."
-                      />
-                    </div>
-                  </div>
-                  <StepActions
-                    saving={saving}
-                    uploading={Boolean(uploadingKind)}
-                    onSave={handleSave}
-                    onContinue={() => handleSaveAndContinue('review')}
-                  />
-                </section>
-
-                <section id="host-application-review" className="op-host-application-card">
-                  <ApplicationCardHeader
-                    step="4"
-                    title="Review and submit"
-                    description="Upload the required documents and confirm that the information is accurate."
-                  />
-                  <div className="op-host-application-documents">
-                    {requiredDocuments.map((kind) => {
-                      const document = application?.documents?.find((item) => item.kind === kind);
-                      return (
-                        <DocumentUpload
-                          key={kind}
-                          kind={kind}
-                          document={document}
-                          busy={uploadingKind === kind}
-                          onUpload={uploadDocument}
-                          onRemove={removeDocument}
-                        />
                       );
                     })}
                   </div>
+                </fieldset>
 
-                  <label className="op-host-application-terms">
-                    <Checkbox
-                      checked={form.agreedTerms}
-                      onChange={(e) => update('agreedTerms', e.target.checked)}
+                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label htmlFor="host-property-locations">Property locations</Label>
+                    <Textarea
+                      id="host-property-locations"
+                      value={form.propertyLocations}
+                      onChange={(e) => update('propertyLocations', e.target.value)}
+                      rows={4}
+                      maxLength={500}
+                      placeholder="Neighbourhoods, towns or addresses you intend to list"
+                      required
                     />
-                    <span>
-                      I confirm the information is accurate, I am authorised to list these properties,
-                      and I agree to the <Link to="/terms">Terms of Service</Link> and verification checks.
-                    </span>
-                  </label>
-
-                  <div className="op-host-application-final-actions">
-                    <Button type="submit" color="light" disabled={saving || Boolean(uploadingKind)}>
-                      {saving ? 'Saving...' : 'Save draft'}
-                    </Button>
-                    <Button type="button" className="op-host-application-primary" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)}>
-                      {saving ? 'Working...' : 'Submit for review'}
-                    </Button>
-                    <Button type="button" color="light" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)}>
-                      Save and travel
-                    </Button>
                   </div>
-                </section>
-              </form>
-            ) : !application && user.role !== 'HOST' ? (
-              <section className="op-host-application-status-card">
-                <h2>Start your host application</h2>
-                <p>Open your application to add your identity, business and property details.</p>
-                <div className="op-host-application-status-actions">
-                  <Button type="button" className="op-host-application-primary" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
-                    {error ? 'Retry application' : 'Start application'}
+                  <div>
+                    <Label htmlFor="host-experience">Hosting experience</Label>
+                    <Textarea
+                      id="host-experience"
+                      value={form.experience}
+                      onChange={(e) => update('experience', e.target.value)}
+                      rows={4}
+                      maxLength={2000}
+                      placeholder="Tell us about your experience, team and guest support."
+                    />
+                  </div>
+                </div>
+                <StepActions
+                  saving={saving}
+                  uploading={Boolean(uploadingKind)}
+                  onSave={handleSave}
+                  onContinue={() => handleSaveAndContinue('review')}
+                />
+              </section>
+
+              <section id="host-application-review" className={`${CARD_CLASS} scroll-mt-24`}>
+                <ApplicationCardHeader
+                  step="4"
+                  title="Review and submit"
+                  description="Upload the required documents and confirm that the information is accurate."
+                />
+                <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {requiredDocuments.map((kind) => {
+                    const document = application?.documents?.find((item) => item.kind === kind);
+                    return (
+                      <DocumentUpload
+                        key={kind}
+                        kind={kind}
+                        document={document}
+                        busy={uploadingKind === kind}
+                        onUpload={uploadDocument}
+                        onRemove={removeDocument}
+                      />
+                    );
+                  })}
+                </div>
+
+                <label className="mt-5 flex items-start gap-3 rounded-xl bg-surface p-4 text-sm leading-relaxed text-muted">
+                  <Checkbox
+                    checked={form.agreedTerms}
+                    onChange={(e) => update('agreedTerms', e.target.checked)}
+                  />
+                  <span>
+                    I confirm the information is accurate, I am authorised to list these properties,
+                    and I agree to the <Link to="/terms" className="font-semibold text-primary-600 hover:underline">Terms of Service</Link> and verification checks.
+                  </span>
+                </label>
+
+                <div className="mt-5 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+                  <Button type="submit" color="light" disabled={saving || Boolean(uploadingKind)}>
+                    {saving ? 'Saving...' : 'Save draft'}
+                  </Button>
+                  <Button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)}>
+                    {saving ? 'Working...' : 'Submit for review'}
+                  </Button>
+                  <Button type="button" color="light" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)}>
+                    Save and travel
                   </Button>
                 </div>
               </section>
-            ) : (
-              <StatusCard
-                application={application}
-                statusLabel={statusLabel}
-                statusMeta={statusMeta}
-                user={user}
-                onBackToTravelling={() => { setMode('travelling'); navigate('/'); }}
-              />
-            )}
-          </div>
+            </form>
+          ) : !application && user.role !== 'HOST' ? (
+            <section className="rounded-xl border border-border bg-white p-6 shadow-sm sm:p-8">
+              <h2 className="text-xl font-bold tracking-tight text-navy sm:text-2xl">Start your host application</h2>
+              <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Open your application to add your identity, business and property details.</p>
+              <div className="mt-5">
+                <Button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
+                  {error ? 'Retry application' : 'Start application'}
+                </Button>
+              </div>
+            </section>
+          ) : (
+            <StatusCard
+              application={application}
+              statusLabel={statusLabel}
+              statusMeta={statusMeta}
+              user={user}
+              onBackToTravelling={() => { setMode('travelling'); navigate('/'); }}
+            />
+          )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }
 
 function ApplicationCardHeader({ step, title, description }) {
   return (
-    <header className="op-host-application-card-header">
-      <div>
-        <h2>{title}</h2>
-        <p>{description}</p>
+    <header className="flex items-start gap-3 border-b border-border pb-4">
+      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-bold text-navy">{step}</span>
+      <div className="min-w-0 flex-1">
+        <h2 className="text-base font-semibold text-navy">{title}</h2>
+        <p className="text-xs text-muted">{description}</p>
       </div>
-      <span>STEP {step} OF 4</span>
+      <span className="shrink-0 whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">STEP {step} OF 4</span>
     </header>
   );
 }
 
 function StepActions({ saving, uploading, onSave, onContinue }) {
   return (
-    <div className="op-host-application-step-actions">
+    <div className="mt-5 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
       <Button type="button" color="light" disabled={saving || uploading} onClick={onSave}>
         {saving ? 'Saving...' : 'Save draft'}
       </Button>
-      <Button type="button" className="op-host-application-primary" disabled={saving || uploading} onClick={onContinue}>
+      <Button type="button" disabled={saving || uploading} onClick={onContinue}>
         Save and continue
       </Button>
     </div>
@@ -766,17 +779,22 @@ function StepActions({ saving, uploading, onSave, onContinue }) {
 
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
   return (
-    <div className={`op-host-application-document ${document ? 'is-uploaded' : ''}`}>
-      <div className="op-host-application-document-heading">
-        <span aria-hidden="true">{document ? '\u2713' : '+'}</span>
-        <div>
-          <strong>{DOCUMENT_LABELS[kind]}</strong>
-          <small>{document ? 'Uploaded and encrypted' : 'JPEG, PNG, WebP or PDF up to 8MB'}</small>
+    <div className={`flex flex-col gap-3 rounded-xl border p-4 ${document ? 'border-primary bg-primary-50' : 'border-border bg-surface'}`}>
+      <div className="flex items-start gap-3">
+        <span
+          aria-hidden="true"
+          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${document ? 'bg-navy text-white' : 'bg-white text-primary-600'}`}
+        >
+          {document ? '\u2713' : '+'}
+        </span>
+        <div className="min-w-0">
+          <strong className="block text-sm font-semibold text-navy">{DOCUMENT_LABELS[kind]}</strong>
+          <small className="block text-xs text-muted">{document ? 'Uploaded and encrypted' : 'JPEG, PNG, WebP or PDF up to 8MB'}</small>
         </div>
       </div>
       {document && (
-        <div className="op-host-application-document-file">
-          <span>{document.originalName}</span>
+        <div className="flex items-center justify-between gap-3 rounded-lg bg-white px-3 py-2">
+          <span className="min-w-0 truncate text-xs text-muted">{document.originalName}</span>
           <Button type="button" size="xs" color="light" disabled={busy} onClick={() => onRemove(kind)}>
             {busy ? 'Working...' : 'Remove'}
           </Button>
@@ -789,35 +807,41 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
         onChange={(e) => onUpload(kind, e.target.files?.[0])}
         sizing="sm"
       />
-      {busy && <p>Uploading securely...</p>}
+      {busy && <p className="text-xs text-muted">Uploading securely...</p>}
     </div>
   );
 }
 
 function Notice({ tone, children }) {
-  return <div className={`op-host-application-notice is-${tone}`}>{children}</div>;
+  return <Alert color={tone === 'success' ? 'success' : 'failure'}>{children}</Alert>;
 }
 
 function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravelling }) {
   const approved = application?.status === 'APPROVED' || user?.role === 'HOST';
-  const statusKey = (application?.status || 'draft').toLowerCase();
+  const statusColor = approved
+    ? 'success'
+    : application?.status === 'REJECTED'
+      ? 'failure'
+      : application?.status === 'SUBMITTED' || application?.status === 'CHANGES_REQUESTED'
+        ? 'warning'
+        : 'gray';
 
   return (
-    <section className="op-host-application-status-card">
-      <span className={`op-host-application-status is-${statusKey}`}>{statusLabel}</span>
-      <h2>{approved ? 'You are ready to host' : 'Application status'}</h2>
-      <p>{statusMeta}</p>
+    <section className="rounded-xl border border-border bg-white p-6 shadow-sm sm:p-8">
+      <Badge color={statusColor}>{statusLabel}</Badge>
+      <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{approved ? 'You are ready to host' : 'Application status'}</h2>
+      <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{statusMeta}</p>
       {application?.reviewNote && (
-        <div className="op-host-application-review-note">
-          <strong>Reviewer note</strong>
-          <span>{application.reviewNote}</span>
+        <div className="mt-5 rounded-lg bg-surface p-4">
+          <strong className="block text-sm font-semibold text-navy">Reviewer note</strong>
+          <span className="text-sm text-muted">{application.reviewNote}</span>
         </div>
       )}
-      <div className="op-host-application-status-actions">
+      <div className="mt-6 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center">
         {approved ? (
           <>
-            <Link to="/host/properties/new" className="op-host-application-primary-link">Set up your first property</Link>
-            <Link to="/host/today" className="op-host-application-secondary-link">Open host dashboard</Link>
+            <Button as={Link} to="/host/properties/new">Set up your first property</Button>
+            <Button as={Link} to="/host/today" color="light">Open host dashboard</Button>
           </>
         ) : (
           <Button type="button" color="light" onClick={onBackToTravelling}>

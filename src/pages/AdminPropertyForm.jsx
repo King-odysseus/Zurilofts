@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Button, Checkbox, Label, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
+import { Alert, Button, Checkbox, Label, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
 import { Check, ChevronLeft, Eye, MapPin, Upload, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
@@ -54,6 +54,11 @@ const EDITOR_STEPS = [
   { key: 'pricing', label: 'Pricing' },
 ];
 
+// Shared with the host application form so both multi-step host forms read identically.
+const CARD_CLASS = 'rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6';
+const STEP_BUTTON_BASE = 'flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-surface';
+const STEP_CIRCLE_BASE = 'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-[11px] font-bold';
+
 // textarea where each non-empty line is one array item
 function linesToArray(text) {
   return text
@@ -70,6 +75,18 @@ function buildLocationLabel(location, neighborhood) {
     return `${label}, Nairobi`;
   }
   return label;
+}
+
+function SectionHeader({ step, title, description }) {
+  return (
+    <header className="flex items-start gap-3 border-b border-border pb-4">
+      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-50 text-xs font-bold text-navy">{step}</span>
+      <div className="min-w-0 flex-1">
+        <h2 className="text-base font-semibold text-navy">{title}</h2>
+        <p className="text-xs text-muted">{description}</p>
+      </div>
+    </header>
+  );
 }
 
 function AdminPropertyForm() {
@@ -237,30 +254,30 @@ function AdminPropertyForm() {
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <div className="w-8 h-8 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <div className="flex min-h-[40vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="op-host-listing-editor">
-      <header className="op-host-editor-heading">
+    <div className="space-y-6">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <Link to="/host/listings" className="op-host-editor-back">
-            <ChevronLeft strokeWidth={2} aria-hidden="true" />
+          <Link to="/host/listings" className="inline-flex items-center gap-1 text-xs font-semibold text-muted transition-colors hover:text-navy">
+            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
             Listings
           </Link>
-          <p className="op-host-editor-eyebrow">HOST SETUP</p>
-          <h1>{isEdit ? 'Edit listing' : 'Create a listing'}</h1>
-          <span>Prepare the basics, photos, amenities and pricing guests will see.</span>
+          <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Host setup</p>
+          <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{isEdit ? 'Edit listing' : 'Create a listing'}</h1>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare the basics, photos, amenities and pricing guests will see.</p>
         </div>
-        <div className="op-host-editor-heading-actions">
-          <Button type="button" color="light" className="op-host-editor-outline" onClick={() => setShowFullPreview(true)}>
-            <Eye strokeWidth={1.5} aria-hidden="true" />
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" color="light" onClick={() => setShowFullPreview(true)}>
+            <Eye className="mr-2 h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
             Preview listing
           </Button>
-          {isEdit && <Link to={`/host/calendar/${id}`} className="op-host-editor-outline">Manage calendar</Link>}
+          {isEdit && <Button as={Link} to={`/host/calendar/${id}`} color="light">Manage calendar</Button>}
         </div>
       </header>
 
@@ -269,171 +286,161 @@ function AdminPropertyForm() {
       )}
 
       {error && (
-        <div className="op-host-editor-error" role="alert">{error}</div>
+        <Alert color="failure" role="alert">{error}</Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="op-host-editor-form">
-        <div className="op-host-editor-layout">
-          <aside className="op-host-editor-progress-panel">
-            <div className="op-host-editor-progress-heading">
-              <span>Listing progress</span>
-              <strong>{completedCount} of 4 steps complete</strong>
-              <div className="op-host-editor-progress-track" aria-hidden="true">
-                <i style={{ width: `${(completedCount / EDITOR_STEPS.length) * 100}%` }} />
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 gap-5 lg:grid-cols-[230px_minmax(0,1fr)_300px] lg:items-start">
+          <aside className="space-y-2 rounded-xl border border-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
+            <div>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Listing progress</span>
+              <strong className="mt-1 block text-sm font-semibold text-navy">{completedCount} of 4 steps complete</strong>
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface" aria-hidden="true">
+                <i className="block h-full rounded-full bg-primary" style={{ width: `${(completedCount / EDITOR_STEPS.length) * 100}%` }} />
               </div>
             </div>
-            <nav className="op-host-editor-steps" aria-label="Listing setup steps">
+            <nav className="space-y-2 pt-2" aria-label="Listing setup steps">
               {EDITOR_STEPS.map((step, index) => {
                 const item = completionItems.find((entry) => entry.key === step.key);
+                const active = activeStep === step.key;
                 return (
                   <button
                     key={step.key}
                     type="button"
-                    className={`${activeStep === step.key ? 'is-active' : ''} ${item?.complete ? 'is-complete' : ''}`}
+                    className={`${STEP_BUTTON_BASE} ${active ? 'bg-primary/10 font-semibold text-navy' : ''} ${item?.complete ? 'text-navy' : 'text-muted'}`}
                     onClick={() => goToStep(step.key)}
-                    aria-current={activeStep === step.key ? 'step' : undefined}
+                    aria-current={active ? 'step' : undefined}
                   >
-                    <span>{item?.complete ? <Check strokeWidth={2.5} aria-hidden="true" /> : index + 1}</span>
-                    <span>
-                      <strong>{step.label}</strong>
-                      <small>{item?.complete ? 'Complete' : item?.detail || 'Needs attention'}</small>
+                    <span className={`${STEP_CIRCLE_BASE} ${item?.complete || active ? 'bg-primary-50 text-navy' : 'text-muted'}`}>
+                      {item?.complete ? <Check className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" /> : index + 1}
+                    </span>
+                    <span className="flex min-w-0 flex-col gap-0.5">
+                      <strong className="text-sm font-semibold text-navy">{step.label}</strong>
+                      <small className="truncate text-xs text-muted">{item?.complete ? 'Complete' : item?.detail || 'Needs attention'}</small>
                     </span>
                   </button>
                 );
               })}
             </nav>
-            <p className="op-host-editor-autosave">Your progress is saved when you submit this listing.</p>
+            <p className="border-t border-border pt-3 text-xs text-muted">Your progress is saved when you submit this listing.</p>
           </aside>
 
-          <div className="op-host-editor-main">
-            <section id="host-editor-basics" className="op-host-editor-card">
-              <header>
-                <span>Step 1</span>
-                <div><h2>Listing basics</h2><p>Tell guests what makes your stay special.</p></div>
-              </header>
-              <div className="op-host-editor-field-grid">
+          <div className="space-y-5">
+            <section id="host-editor-basics" className={`${CARD_CLASS} scroll-mt-24`}>
+              <SectionHeader step="1" title="Listing basics" description="Tell guests what makes your stay special." />
+              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="listing-title" className="op-host-editor-label">Listing title</Label>
+                  <Label htmlFor="listing-title">Listing title</Label>
                   <TextInput id="listing-title" value={form.title} onChange={(e) => update('title', e.target.value)} placeholder="Bright two-bedroom loft" required />
                 </div>
                 <div>
-                  <Label htmlFor="listing-neighborhood" className="op-host-editor-label">Area</Label>
+                  <Label htmlFor="listing-neighborhood">Area</Label>
                   <SelectMenu id="listing-neighborhood" ariaLabel="Area" value={form.neighborhood} onChange={(next) => update('neighborhood', next)} options={AREA_OPTIONS} />
-
-
-
-
-
-
                 </div>
                 <div>
-                  <Label htmlFor="listing-location" className="op-host-editor-label">Location details</Label>
+                  <Label htmlFor="listing-location">Location details</Label>
                   <TextInput id="listing-location" value={form.location} onChange={(e) => update('location', e.target.value)} placeholder="Street, building or landmark" required />
                 </div>
-                <div className="op-host-editor-field-full">
-                  <Label htmlFor="listing-address" className="op-host-editor-label">Street address (optional)</Label>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="listing-address">Street address (optional)</Label>
                   <TextInput
                     id="listing-address"
                     value={form.address}
                     onChange={(e) => update('address', e.target.value)}
                     placeholder="Building name, street or nearest landmark"
                   />
-                  <p className="mt-2 text-sm text-[#6b7280]">
+                  <p className="mt-1 text-xs text-muted">
                     Shown to guests and used for the Google Maps link. Leave empty to use the location above.
                   </p>
                 </div>
-                <div className="op-host-editor-field-full">
-                  <Label htmlFor="listing-description" className="op-host-editor-label">Description</Label>
+                <div className="sm:col-span-2">
+                  <Label htmlFor="listing-description">Description</Label>
                   <Textarea id="listing-description" rows={5} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="Share the layout, views and details guests should know before booking." required />
                 </div>
               </div>
             </section>
 
-            <section id="host-editor-photos" className="op-host-editor-card">
-              <header>
-                <span>Step 2</span>
-                <div><h2>Photos</h2><p>Add clear, well-lit images. The first photo becomes the cover.</p></div>
-              </header>
+            <section id="host-editor-photos" className={`${CARD_CLASS} scroll-mt-24`}>
+              <SectionHeader step="2" title="Photos" description="Add clear, well-lit images. The first photo becomes the cover." />
               {form.images.length > 0 && (
-                <div className="op-host-editor-photo-grid">
+                <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                   {form.images.map((src, i) => (
-                    <div key={src + i} className="op-host-editor-photo">
-                      <img src={src} alt={`Property photo ${i + 1}`} />
-                      {i === 0 && <span>Cover</span>}
-                      <button type="button" onClick={() => removeImage(i)} aria-label="Remove image">
-                        <X strokeWidth={2} aria-hidden="true" />
+                    <div key={src + i} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
+                      <img src={src} alt={`Property photo ${i + 1}`} className="h-full w-full object-cover" />
+                      {i === 0 && <span className="absolute left-2 top-2 rounded-full bg-navy/85 px-2 py-0.5 text-[10px] font-semibold text-white">Cover</span>}
+                      <button
+                        type="button"
+                        onClick={() => removeImage(i)}
+                        aria-label="Remove image"
+                        className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-navy shadow-sm hover:bg-white"
+                      >
+                        <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
                       </button>
                     </div>
                   ))}
                 </div>
               )}
-              <label className={`op-host-editor-upload ${uploading ? 'is-uploading' : ''}`}>
+              <label className="mt-5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-muted hover:border-primary">
                 {uploading ? (
                   <>
-                    <span className="op-host-editor-spinner" aria-hidden="true" />
-                    <strong>Uploading and optimizing...</strong>
+                    <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" aria-hidden="true" />
+                    <strong className="text-sm font-semibold text-navy">Uploading and optimizing...</strong>
                   </>
                 ) : (
                   <>
-                    <Upload strokeWidth={1.5} aria-hidden="true" />
-                    <strong>Add photos</strong>
-                    <span>JPEG, PNG or WebP. Up to 10 at a time.</span>
+                    <Upload className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
+                    <strong className="text-sm font-semibold text-navy">Add photos</strong>
+                    <span className="text-xs">JPEG, PNG or WebP. Up to 10 at a time.</span>
                   </>
                 )}
-                <input type="file" accept="image/jpeg,image/png,image/webp" multiple onChange={handleFiles} disabled={uploading} />
+                <input type="file" className="sr-only" accept="image/jpeg,image/png,image/webp" multiple onChange={handleFiles} disabled={uploading} />
               </label>
             </section>
 
-            <section id="host-editor-amenities" className="op-host-editor-card">
-              <header>
-                <span>Step 3</span>
-                <div><h2>Amenities and rules</h2><p>List the essentials and useful places around the stay.</p></div>
-              </header>
-              <div className="op-host-editor-field-grid">
+            <section id="host-editor-amenities" className={`${CARD_CLASS} scroll-mt-24`}>
+              <SectionHeader step="3" title="Amenities and rules" description="List the essentials and useful places around the stay." />
+              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="listing-amenities" className="op-host-editor-label">Amenities</Label>
+                  <Label htmlFor="listing-amenities">Amenities</Label>
                   <Textarea id="listing-amenities" rows={5} placeholder={'WiFi\nPool\nParking'} value={form.amenities} onChange={(e) => update('amenities', e.target.value)} />
-                  <small className="op-host-editor-help">Enter one item per line.</small>
+                  <p className="mt-1 text-xs text-muted">Enter one item per line.</p>
                 </div>
                 <div>
-                  <Label htmlFor="listing-nearby" className="op-host-editor-label">What&apos;s nearby</Label>
+                  <Label htmlFor="listing-nearby">What&apos;s nearby</Label>
                   <Textarea id="listing-nearby" rows={5} placeholder={'Airport - 20 min\nVillage Market - 8 min'} value={form.nearby} onChange={(e) => update('nearby', e.target.value)} />
-                  <small className="op-host-editor-help">Enter one item per line.</small>
+                  <p className="mt-1 text-xs text-muted">Enter one item per line.</p>
                 </div>
               </div>
             </section>
 
-            <section id="host-editor-pricing" className="op-host-editor-card">
-          <header>
-            <span>Step 4</span>
-            <div><h2>Pricing and availability</h2><p>Set the nightly rate, capacity and booking state.</p></div>
-          </header>
-              <div className="op-host-editor-field-grid op-host-editor-field-grid-four">
+            <section id="host-editor-pricing" className={`${CARD_CLASS} scroll-mt-24`}>
+              <SectionHeader step="4" title="Pricing and availability" description="Set the nightly rate, capacity and booking state." />
+              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <Label htmlFor="listing-price" className="op-host-editor-label">Base price / night (KES)</Label>
+                  <Label htmlFor="listing-price">Base price / night (KES)</Label>
                   <TextInput id="listing-price" type="number" min="1" value={form.price} onChange={(e) => update('price', e.target.value)} required />
                 </div>
                 <div>
-                  <Label htmlFor="listing-area" className="op-host-editor-label">Area (sq ft)</Label>
+                  <Label htmlFor="listing-area">Area (sq ft)</Label>
                   <TextInput id="listing-area" type="number" min="1" value={form.area} onChange={(e) => update('area', e.target.value)} required />
                 </div>
                 <div>
-                  <Label htmlFor="listing-bedrooms" className="op-host-editor-label">Bedrooms</Label>
+                  <Label htmlFor="listing-bedrooms">Bedrooms</Label>
                   <TextInput id="listing-bedrooms" type="number" min="0" value={form.bedrooms} onChange={(e) => update('bedrooms', e.target.value)} required />
                 </div>
                 <div>
-                  <Label htmlFor="listing-bathrooms" className="op-host-editor-label">Bathrooms</Label>
+                  <Label htmlFor="listing-bathrooms">Bathrooms</Label>
                   <TextInput id="listing-bathrooms" type="number" min="0" value={form.bathrooms} onChange={(e) => update('bathrooms', e.target.value)} required />
                 </div>
               </div>
 
-              <div className="op-host-editor-subpanel">
-                <div className="op-host-editor-subpanel-heading">
-                  <h3>Bed size options</h3>
-                  <p>Add a one-bed or two-bed rate when the same stay can be booked at different capacities.</p>
+              <div className="mt-5 rounded-lg border border-border bg-surface p-4">
+                <div>
+                  <h3 className="text-sm font-semibold text-navy">Bed size options</h3>
+                  <p className="mt-1 text-xs text-muted">Add a one-bed or two-bed rate when the same stay can be booked at different capacities.</p>
                 </div>
-                <div className="op-host-editor-variant-grid">
-                  <div className={`op-host-editor-variant ${form.price1Bed !== '' ? 'is-selected' : ''}`}>
+                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className={`flex items-start gap-3 rounded-lg border p-3 ${form.price1Bed !== '' ? 'border-primary bg-primary-50' : 'border-border bg-white'}`}>
                     <Checkbox
                       id="listing-variant-1"
                       checked={form.price1Bed !== ''}
@@ -442,19 +449,18 @@ function AdminPropertyForm() {
                         if (!e.target.checked) update('bathrooms1Bed', '');
                       }}
                     />
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <Label htmlFor="listing-variant-1">List as 1-bed</Label>
-                      <span>Appears as a separate one-bedroom option.</span>
+                      <span className="block text-xs text-muted">Appears as a separate one-bedroom option.</span>
                       {form.price1Bed !== '' && (
-                        <div className="op-host-editor-variant-fields">
+                        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                           <TextInput type="number" min="1" placeholder="Price per night" value={form.price1Bed} onChange={(e) => update('price1Bed', e.target.value)} required />
                           <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms1Bed} onChange={(e) => update('bathrooms1Bed', e.target.value)} />
                         </div>
-  
                       )}
                     </div>
                   </div>
-                  <div className={`op-host-editor-variant ${form.price2Bed !== '' ? 'is-selected' : ''}`}>
+                  <div className={`flex items-start gap-3 rounded-lg border p-3 ${form.price2Bed !== '' ? 'border-primary bg-primary-50' : 'border-border bg-white'}`}>
                     <Checkbox
                       id="listing-variant-2"
                       checked={form.price2Bed !== ''}
@@ -463,37 +469,38 @@ function AdminPropertyForm() {
                         if (!e.target.checked) update('bathrooms2Bed', '');
                       }}
                     />
-                    <div>
+                    <div className="min-w-0 flex-1">
                       <Label htmlFor="listing-variant-2">List as 2-bed</Label>
-                      <span>Appears as a separate two-bedroom option.</span>
+                      <span className="block text-xs text-muted">Appears as a separate two-bedroom option.</span>
                       {form.price2Bed !== '' && (
-                        <div className="op-host-editor-variant-fields">
+                        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                           <TextInput type="number" min="1" placeholder="Price per night" value={form.price2Bed} onChange={(e) => update('price2Bed', e.target.value)} required />
                           <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms2Bed} onChange={(e) => update('bathrooms2Bed', e.target.value)} />
                         </div>
-  
                       )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div className="op-host-editor-field-grid">
+              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="listing-type" className="op-host-editor-label">Property type</Label>
+                  <Label htmlFor="listing-type">Property type</Label>
                   <SelectMenu id="listing-type" ariaLabel="Property type" value={form.type} onChange={(next) => update('type', next)} options={PROPERTY_TYPE_OPTIONS} />
-
-
-
-
                 </div>
-                <div className="op-host-editor-toggle-stack">
-                  <div className="op-host-editor-toggle">
-                    <div><strong>Available for bookings</strong><span>Guests can reserve open dates.</span></div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+                    <div>
+                      <strong className="block text-sm font-semibold text-navy">Available for bookings</strong>
+                      <span className="text-xs text-muted">Guests can reserve open dates.</span>
+                    </div>
                     <ToggleSwitch checked={form.available} onChange={(checked) => update('available', checked)} aria-label="Available for bookings" />
                   </div>
-                  <div className="op-host-editor-toggle">
-                    <div><strong>Featured listing</strong><span>Highlight this stay in discovery.</span></div>
+                  <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+                    <div>
+                      <strong className="block text-sm font-semibold text-navy">Featured listing</strong>
+                      <span className="text-xs text-muted">Highlight this stay in discovery.</span>
+                    </div>
                     <ToggleSwitch checked={form.featured} onChange={(checked) => update('featured', checked)} aria-label="Featured listing" />
                   </div>
                 </div>
@@ -503,26 +510,35 @@ function AdminPropertyForm() {
             {isEdit && <SeasonalPricing propertyId={id} />}
           </div>
 
-          <aside className="op-host-editor-preview-panel">
-            <header>
-              <div><span>GUEST PREVIEW</span><h2>Listing card</h2></div>
-              <Button type="button" color="light" onClick={() => setShowFullPreview(true)}>Open</Button>
+          <aside className="space-y-3 rounded-xl border border-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
+            <header className="flex items-start justify-between gap-3">
+              <div>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">GUEST PREVIEW</span>
+                <h2 className="text-base font-semibold text-navy">Listing card</h2>
+              </div>
+              <Button type="button" color="light" size="sm" onClick={() => setShowFullPreview(true)}>Open</Button>
             </header>
             <PropertyPreview form={form} />
-            <p>This card updates as you edit the listing.</p>
+            <p className="text-xs text-muted">This card updates as you edit the listing.</p>
           </aside>
         </div>
 
-        <div className="op-host-editor-actions">
-          <Button type="submit" disabled={saving} className="op-host-editor-save">
+        <div className="flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+          <Button type="submit" disabled={saving}>
             {saving ? 'Saving...' : isEdit ? 'Save changes' : 'Create listing'}
           </Button>
-          <Link to="/host/listings">Cancel</Link>
+          <Link to="/host/listings" className="text-sm font-semibold text-muted transition-colors hover:text-navy">Cancel</Link>
         </div>
       </form>
     </div>
   );
 }
+
+SectionHeader.propTypes = {
+  step: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
+};
 
 // Derive the bed count shown on a card from the bed-variant selection.
 // 1-Bed → 1, 2-Bed → 2, both → "1 & 2", neither → the raw Bedrooms field.
@@ -564,49 +580,49 @@ function PropertyPreview({ form }) {
   const area = form.area === '' ? '-' : form.area;
 
   return (
-    <div className="bg-white rounded-2xl shadow-md border border-[#D9D9D9] overflow-hidden max-w-sm">
-      <div className="relative aspect-[4/3] overflow-hidden bg-[#f0f0f0]">
+    <div className="max-w-sm overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+      <div className="relative">
         {cover ? (
-          <img src={cover} alt={form.title || 'Property'} className="w-full h-full object-cover" />
+          <img src={cover} alt={form.title || 'Property'} className="aspect-[4/3] w-full object-cover" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-[#6b7280] text-sm">No photo yet</div>
+          <div className="flex aspect-[4/3] w-full items-center justify-center bg-surface text-sm text-muted">No photo yet</div>
         )}
         {form.featured && (
-          <span className="absolute top-4 left-4 bg-[#C49A6C] text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-md">Featured</span>
+          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-white">Featured</span>
         )}
         {!form.available && (
-          <span className="absolute top-4 right-4 bg-[#0B1F42] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-md">Unavailable</span>
+          <span className="absolute right-3 top-3 rounded-full bg-navy px-3 py-1 text-[10px] font-semibold text-white">Unavailable</span>
         )}
       </div>
 
-      <div className="p-4">
-        <h3 className="text-base font-semibold text-[#1f2937] leading-tight">{form.title || 'Property title'}</h3>
-        <div className="flex items-center text-[#6b7280] mt-1 mb-3">
-          <MapPin className="w-4 h-4 mr-2 flex-shrink-0" strokeWidth={2} aria-hidden="true" />
-          <span className="text-sm truncate">{buildLocationLabel(form.location, form.neighborhood) || 'Location'}</span>
+      <div className="space-y-3 p-4">
+        <h3 className="text-base font-semibold leading-tight text-navy">{form.title || 'Property title'}</h3>
+        <div className="flex items-center text-muted">
+          <MapPin className="mr-2 h-4 w-4 flex-shrink-0" strokeWidth={2} aria-hidden="true" />
+          <span className="truncate text-sm">{buildLocationLabel(form.location, form.neighborhood) || 'Location'}</span>
         </div>
 
-        <div className="flex items-center justify-between mb-3 py-3 border-y border-[#D9D9D9] text-center">
+        <div className="flex items-center justify-between border-y border-border py-3 text-center">
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#0B1F42]">{bedrooms}</p>
-            <p className="text-xs text-[#6b7280]">Beds</p>
+            <p className="text-sm font-semibold text-navy">{bedrooms}</p>
+            <p className="text-xs text-muted">Beds</p>
           </div>
-          <div className="flex-1 border-x border-[#D9D9D9]">
-            <p className="text-sm font-semibold text-[#0B1F42]">{bathrooms}</p>
-            <p className="text-xs text-[#6b7280]">Baths</p>
+          <div className="flex-1 border-x border-border">
+            <p className="text-sm font-semibold text-navy">{bathrooms}</p>
+            <p className="text-xs text-muted">Baths</p>
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-[#0B1F42]">{area}</p>
-            <p className="text-xs text-[#6b7280]">Sqft</p>
+            <p className="text-sm font-semibold text-navy">{area}</p>
+            <p className="text-xs text-muted">Sqft</p>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs text-[#6b7280]">per night</span>
-            <div className="text-xl font-bold text-[#C49A6C]">KES {price.toLocaleString()}</div>
+            <span className="text-xs text-muted">per night</span>
+            <div className="text-xl font-bold text-primary-600">KES {price.toLocaleString()}</div>
           </div>
-          <span className="bg-[#C49A6C] text-white font-semibold px-4 py-2 rounded-full text-sm">Book Now</span>
+          <span className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white">Book Now</span>
         </div>
       </div>
     </div>
@@ -627,86 +643,84 @@ function FullPagePreview({ form, onClose }) {
   const featured = images[Math.min(active, Math.max(images.length - 1, 0))];
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-start justify-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl w-full max-w-5xl my-8 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4">
+      <div className="my-8 w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-white shadow-lg">
         {/* Bar */}
-        <div className="sticky top-0 z-10 flex items-center justify-between bg-[#0B1F42] text-white px-5 py-3">
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-navy px-5 py-3 text-white">
           <span className="text-sm font-semibold">Page preview - not yet saved</span>
           <button onClick={onClose} className="text-white/70 hover:text-white" aria-label="Close preview">
-            <X className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
+            <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
 
         <div className="p-5 md:p-8">
           {/* Title */}
-          <h1 className="text-2xl md:text-3xl font-bold text-[#0B1F42] mb-1">{form.title || 'Property title'}</h1>
-          <div className="flex items-center text-[#6b7280] mb-6">
-            <MapPin className="w-5 h-5 mr-1" strokeWidth={2} aria-hidden="true" />
+          <h1 className="mb-1 text-2xl font-bold tracking-tight text-navy md:text-3xl">{form.title || 'Property title'}</h1>
+          <div className="mb-6 flex items-center text-muted">
+            <MapPin className="mr-1 h-5 w-5" strokeWidth={2} aria-hidden="true" />
             {buildLocationLabel(form.location, form.neighborhood) || 'Location'}
           </div>
 
           {/* Gallery */}
           {images.length > 0 ? (
             <div className="mb-8">
-              <img src={featured} alt={form.title} className="w-full h-64 md:h-[420px] object-cover rounded-2xl" />
+              <img src={featured} alt={form.title} className="h-64 w-full rounded-xl object-cover md:h-[420px]" />
               {images.length > 1 && (
-                <div className="grid grid-cols-5 gap-2 md:gap-3 mt-3">
+                <div className="mt-3 grid grid-cols-5 gap-2 md:gap-3">
                   {images.slice(0, 5).map((img, i) => (
                     <button
                       type="button"
                       key={img + i}
                       onClick={() => setActive(i)}
-                      className={`overflow-hidden rounded-xl transition-all ${active === i ? 'ring-2 ring-[#C49A6C]' : 'opacity-70 hover:opacity-100'}`}
+                      className={`overflow-hidden rounded-lg transition-all ${active === i ? 'ring-2 ring-primary' : 'opacity-70 hover:opacity-100'}`}
                     >
-                      <img src={img} alt={`${form.title} ${i + 1}`} className="w-full h-16 md:h-20 object-cover" />
+                      <img src={img} alt={`${form.title} ${i + 1}`} className="h-16 w-full object-cover md:h-20" />
                     </button>
                   ))}
                 </div>
               )}
             </div>
           ) : (
-            <div className="mb-8 w-full h-64 md:h-[420px] rounded-2xl bg-[#f0f0f0] flex items-center justify-center text-[#6b7280]">No photos uploaded yet</div>
+            <div className="mb-8 flex h-64 w-full items-center justify-center rounded-xl bg-surface text-muted md:h-[420px]">No photos uploaded yet</div>
           )}
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             <div className="lg:col-span-2">
               {/* Stats */}
-              <div className="flex flex-wrap gap-8 pb-6 mb-6 border-b border-[#D9D9D9]">
+              <div className="mb-6 flex flex-wrap gap-8 border-b border-border pb-6">
                 <div>
-                  <p className="font-bold text-[#0B1F42]">{bedLabel(form)}</p>
-                  <p className="text-sm text-[#6b7280]">Bedrooms</p>
+                  <p className="font-bold text-navy">{bedLabel(form)}</p>
+                  <p className="text-sm text-muted">Bedrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B1F42]">{bedBathLabel(form)}</p>
-                  <p className="text-sm text-[#6b7280]">Bathrooms</p>
+                  <p className="font-bold text-navy">{bedBathLabel(form)}</p>
+                  <p className="text-sm text-muted">Bathrooms</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B1F42]">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
-                  <p className="text-sm text-[#6b7280]">Area</p>
+                  <p className="font-bold text-navy">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
+                  <p className="text-sm text-muted">Area</p>
                 </div>
                 <div>
-                  <p className="font-bold text-[#0B1F42] capitalize">{form.type}</p>
-                  <p className="text-sm text-[#6b7280]">Type</p>
+                  <p className="font-bold capitalize text-navy">{form.type}</p>
+                  <p className="text-sm text-muted">Type</p>
                 </div>
               </div>
 
               {/* Description */}
-              <h2 className="text-xl font-bold text-[#0B1F42] mb-3">About this property</h2>
-              <p className="text-[#1f2937] leading-relaxed whitespace-pre-line mb-8">{form.description || 'No description yet.'}</p>
+              <h2 className="mb-3 text-xl font-bold text-navy">About this property</h2>
+              <p className="mb-8 whitespace-pre-line leading-relaxed text-charcoal">{form.description || 'No description yet.'}</p>
 
               {/* Amenities */}
               {amenities.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="text-xl font-bold text-[#0B1F42] mb-3">Amenities</h2>
+                  <h2 className="mb-3 text-xl font-bold text-navy">Amenities</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {amenities.map((a, i) => (
-                      <div key={i} className="flex items-center text-[#1f2937]">
-                        <Check className="w-5 h-5 text-[#C49A6C] mr-2" strokeWidth={2} aria-hidden="true" />
+                      <div key={i} className="flex items-center text-charcoal">
+                        <Check className="mr-2 h-5 w-5 text-primary-600" strokeWidth={2} aria-hidden="true" />
                         {a}
                       </div>
                     ))}
-
-
                   </div>
                 </div>
               )}
@@ -714,14 +728,13 @@ function FullPagePreview({ form, onClose }) {
               {/* Nearby */}
               {nearby.length > 0 && (
                 <div>
-                  <h2 className="text-xl font-bold text-[#0B1F42] mb-3">What&apos;s nearby</h2>
+                  <h2 className="mb-3 text-xl font-bold text-navy">What&apos;s nearby</h2>
                   <ul className="space-y-2">
                     {nearby.map((n, i) => (
-                      <li key={i} className="flex items-center text-[#1f2937]">
-                        <MapPin className="w-5 h-5 text-[#C49A6C] mr-2" strokeWidth={2} aria-hidden="true" />
+                      <li key={i} className="flex items-center text-charcoal">
+                        <MapPin className="mr-2 h-5 w-5 text-primary-600" strokeWidth={2} aria-hidden="true" />
                         {n}
                       </li>
-
                     ))}
                   </ul>
                 </div>
@@ -730,12 +743,12 @@ function FullPagePreview({ form, onClose }) {
 
             {/* Booking card */}
             <div className="lg:col-span-1">
-              <div className="border border-[#D9D9D9] rounded-2xl p-6 sticky top-20">
-                <span className="text-3xl font-bold text-[#0B1F42]">KES {price.toLocaleString()}</span>
-                <span className="text-[#6b7280]"> / night</span>
-                <div className="block w-full bg-[#C49A6C] text-white font-bold py-3 rounded-xl text-center mt-4">Book Now</div>
+              <div className="sticky top-20 rounded-xl border border-border bg-white p-6 shadow-sm">
+                <span className="text-3xl font-bold text-navy">KES {price.toLocaleString()}</span>
+                <span className="text-muted"> / night</span>
+                <div className="mt-4 block w-full rounded-full bg-primary py-3 text-center font-bold text-white">Book Now</div>
                 {!form.available && (
-                  <p className="text-center text-sm text-red-600 mt-3 font-medium">Currently marked unavailable</p>
+                  <p className="mt-3 text-center text-sm font-medium text-red-600">Currently marked unavailable</p>
                 )}
               </div>
             </div>
@@ -807,53 +820,53 @@ function SeasonalPricing({ propertyId }) {
   const fmt = (d) => new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
   return (
-    <div className="bg-white rounded-2xl border border-[#D9D9D9] p-6">
-      <h2 className="text-lg font-bold text-[#0B1F42] mb-1">Seasonal Pricing</h2>
-      <p className="text-sm text-[#6b7280] mb-4">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
+    <section className={CARD_CLASS}>
+      <h2 className="text-base font-semibold text-navy">Seasonal Pricing</h2>
+      <p className="mt-1 text-xs text-muted">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
 
-      {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl px-4 py-2 mb-4 text-sm">{error}</div>}
+      {error && <Alert color="failure" className="mt-4">{error}</Alert>}
 
       {loading ? (
-        <p className="text-sm text-[#6b7280]">Loading...</p>
+        <p className="mt-4 text-sm text-muted">Loading...</p>
       ) : rules.length > 0 ? (
-        <div className="space-y-2 mb-4">
+        <div className="mt-4 space-y-2">
           {rules.map((r) => (
-            <div key={r.id} className="flex items-center justify-between bg-[#f8f9fa] rounded-xl px-4 py-2.5 text-sm">
+            <div key={r.id} className="flex items-center justify-between rounded-lg bg-surface px-4 py-2.5 text-sm">
               <div>
-                <span className="font-semibold text-[#0B1F42]">{r.name || 'Rate'}</span>
-                <span className="text-[#6b7280] ml-2">{fmt(r.start)} &rarr; {fmt(r.end)}</span>
+                <span className="font-semibold text-navy">{r.name || 'Rate'}</span>
+                <span className="ml-2 text-muted">{fmt(r.start)} &rarr; {fmt(r.end)}</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="font-semibold text-[#0B1F42]">KES {r.price.toLocaleString()}/night</span>
-                <button type="button" onClick={() => removeRule(r.id)} className="text-red-600 hover:text-red-800 text-xs font-semibold">Remove</button>
+                <span className="font-semibold text-navy">KES {r.price.toLocaleString()}/night</span>
+                <button type="button" onClick={() => removeRule(r.id)} className="text-xs font-semibold text-red-600 hover:text-red-800">Remove</button>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-[#6b7280] mb-4">No seasonal rates yet.</p>
+        <p className="mt-4 text-sm text-muted">No seasonal rates yet.</p>
       )}
 
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
-        <div className="col-span-2 md:col-span-1">
-          <Label htmlFor="seasonal-name" className="op-host-editor-label">Name</Label>
+      <div className="mt-4 grid grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="sm:col-span-2 lg:col-span-1">
+          <Label htmlFor="seasonal-name">Name</Label>
           <TextInput id="seasonal-name" placeholder="Peak" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
         </div>
         <div>
-          <Label htmlFor="seasonal-start" className="op-host-editor-label">From</Label>
+          <Label htmlFor="seasonal-start">From</Label>
           <TextInput id="seasonal-start" type="date" value={draft.start} onChange={(e) => setDraft({ ...draft, start: e.target.value })} />
         </div>
         <div>
-          <Label htmlFor="seasonal-end" className="op-host-editor-label">To</Label>
+          <Label htmlFor="seasonal-end">To</Label>
           <TextInput id="seasonal-end" type="date" value={draft.end} onChange={(e) => setDraft({ ...draft, end: e.target.value })} />
         </div>
         <div>
-          <Label htmlFor="seasonal-price" className="op-host-editor-label">Price / night</Label>
+          <Label htmlFor="seasonal-price">Price / night</Label>
           <TextInput id="seasonal-price" type="number" min="1" value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
         </div>
-        <Button type="button" color="dark" onClick={addRule} className="op-host-editor-rule-add">Add rate</Button>
+        <Button type="button" onClick={addRule}>Add rate</Button>
       </div>
-    </div>
+    </section>
   );
 }
 
