@@ -277,7 +277,7 @@ export const brandTheme = {
       },
       selector: {
         base: `w-12 border border-[${CONTROL_BORDER}] bg-white py-2 leading-tight text-[${MUTED}] enabled:hover:bg-[${SURFACE}] enabled:hover:text-[${NAVY}] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400`,
-        active: `border-[${BRONZE}] bg-[${BRONZE}] text-white hover:bg-[${BRONZE_HOVER}] hover:text-white dark:border-[${BRONZE}] dark:bg-[${BRONZE}] dark:text-[${NAVY}]`,
+        active: `border-[${BRONZE}] bg-[${BRONZE}] text-[${NAVY}] hover:bg-[${BRONZE_HOVER}] hover:text-[${NAVY}] dark:border-[${BRONZE}] dark:bg-[${BRONZE}] dark:text-[${NAVY}]`,
       },
     },
   },

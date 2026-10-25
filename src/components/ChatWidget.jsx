@@ -156,7 +156,7 @@ function ChatWidget() {
           <div className="flex items-center justify-between bg-[#0B1F42] px-5 py-4">
             <div className="flex items-center space-x-3">
               <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#C49A6C]">
-                <MessagesSquare className="w-5 h-5 text-white" strokeWidth={2} aria-hidden="true" />
+                <MessagesSquare className="w-5 h-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
               </div>
               <div>
                 <p className="text-white font-semibold text-sm">ZuriLofts Chat</p>
@@ -174,7 +174,7 @@ function ChatWidget() {
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   m.from === 'user'
-                    ? 'bg-[#C49A6C] text-white rounded-br-md font-medium'
+                    ? 'bg-[#C49A6C] text-[#0B1F42] rounded-br-md font-medium'
                     : 'bg-elevated text-[#1f2937] rounded-bl-md shadow-sm'
                 }`}>
                   {m.text}

@@ -7,8 +7,8 @@
 .op-eyebrow{display:inline-block;margin-bottom:10px;color:#C49A6C;font:800 10px Montserrat,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase}
 .op-public-hero h1,.op-guide-detail-header h1,.op-not-found h1,.op-guide-not-found h1{margin:0;color:#0B1F42;font-family:Montserrat,Arial,sans-serif;font-size:clamp(34px,4vw,48px);line-height:1.12;letter-spacing:-.035em}
 .op-public-hero p{max-width:680px;margin:14px 0 0;color:#6E7686;font-size:14px;line-height:1.65}
-.op-primary-action{display:inline-flex;min-height:46px;align-items:center;justify-content:center;border-radius:9999px;background:#C49A6C;padding:0 24px;color:#fff;font:700 13px Montserrat,Arial,sans-serif;text-decoration:none;transition:background-color .15s ease}
-.op-primary-action:hover,.op-primary-action:focus{background:#a97b4e;color:#fff}
+.op-primary-action{display:inline-flex;min-height:46px;align-items:center;justify-content:center;border-radius:9999px;background:#C49A6C;padding:0 24px;color:#0B1F42;font:700 13px Montserrat,Arial,sans-serif;text-decoration:none;transition:background-color .15s ease}
+.op-primary-action:hover,.op-primary-action:focus{background:#a97b4e;color:#0B1F42}
 
 .op-public-directory{padding:34px 0 88px}
 .op-directory-back{display:inline-flex;align-items:center;gap:7px;margin-bottom:22px;color:#6E7686;font-size:12px;font-weight:600;text-decoration:none}

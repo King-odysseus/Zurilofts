@@ -405,7 +405,7 @@ function Navbar() {
                     className="min-w-0 flex-1"
                     autoFocus
                   />
-                  <Button type="submit" size="sm" className="shrink-0 bg-[#C49A6C] text-white enabled:hover:bg-[#B8895C]">
+                  <Button type="submit" size="sm" className="shrink-0 bg-[#C49A6C] text-[#0B1F42] enabled:hover:bg-[#B8895C]">
                     Search
                   </Button>
                 </form>
@@ -502,7 +502,7 @@ function Navbar() {
                     aria-label="Open menu"
                     className="flex items-center space-x-2 px-2 py-2 rounded-full hover:bg-[#F6EFE7] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C] focus-visible:ring-offset-2"
                   >
-                    <div className="relative w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
+                    <div className="relative w-8 h-8 bg-[#C49A6C] rounded-full flex items-center justify-center text-sm font-bold text-[#0B1F42] overflow-hidden">
                       {user?.avatar ? (
                         <img src={user.avatar} alt="" className="w-full h-full object-cover" />
                       ) : (
@@ -703,7 +703,7 @@ function Navbar() {
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E3E8EF] bg-elevated px-4 py-3">
             <div className="flex items-center gap-3 min-w-0">
               {isAuthenticated ? (
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#C49A6C] text-sm font-bold text-white">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#C49A6C] text-sm font-bold text-[#0B1F42]">
                   {user?.firstName?.[0]}{user?.lastName?.[0]}
                 </div>
               ) : (

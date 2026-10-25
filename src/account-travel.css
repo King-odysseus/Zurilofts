@@ -4,7 +4,7 @@
 .opg-account-container{width:min(1296px,calc(100% - 48px));margin:0 auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;align-items:start}
 .opg-account-sidebar{position:sticky;top:96px;padding:16px;border-radius:12px;background:#f8fafc}
 .opg-account-person{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid #e3e8ef}
-.opg-account-person>img,.opg-account-person>span{display:grid;place-items:center;width:46px;height:46px;flex:none;border-radius:50%;background:#c49a6c;color:#fff;object-fit:cover;font:700 14px Montserrat,Arial,sans-serif}
+.opg-account-person>img,.opg-account-person>span{display:grid;place-items:center;width:46px;height:46px;flex:none;border-radius:50%;background:#c49a6c;color:#0B1F42;object-fit:cover;font:700 14px Montserrat,Arial,sans-serif}
 .opg-account-person>div{min-width:0}
 .opg-account-person strong,.opg-account-person small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .opg-account-person strong{color:#0b1f42;font:700 14px Montserrat,Arial,sans-serif}
@@ -179,7 +179,7 @@
 .opg-message-compose-actions{position:absolute;right:8px;bottom:8px;display:flex;align-items:center}
 .opg-message-send{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;min-width:72px;padding:0 14px;border:0;border-radius:999px;background:#C49A6C;color:#0B1F42;font-size:13px;font-weight:600;cursor:pointer}
 .opg-message-send:hover:not(:disabled),.opg-message-send:focus-visible:not(:disabled){background:#ad8053}
-.opg-message-send:disabled{background:#d7dde5;color:#fff;cursor:not-allowed}
+.opg-message-send:disabled{background:#d7dde5;color:#64748B;cursor:not-allowed}
 .opg-message-send svg{width:15px;height:15px}
 .opg-message-send>span:not(.opg-message-send-spinner){line-height:1}
 .opg-message-send-spinner{width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite}

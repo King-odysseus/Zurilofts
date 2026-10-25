@@ -285,12 +285,17 @@ html.dark :where([class*="text-[#0B1F42]"], [class*="text-[#414D63]"], [class*="
 /* Bronze surfaces keep dark brand ink. The rule above turns every dark text
    hex light, which left primary buttons and bronze pills pale-on-bronze at
    roughly 2.2:1. Anything that paints its own bronze background restores the
-   intended pairing; declared after the generic rule so it wins the tie. */
+   intended pairing; declared after the generic rule so it wins the tie.
+   The earlier version excluded `!bg-` utilities, which let buttons such as the
+   host promo submit fall back to near-white ink on bronze, so that guard is gone
+   (a bare `bg-[#C49A6C]` substring also matches `!bg-[#C49A6C]`). */
 html.dark :where(
-  [class*="bg-[#C49A6C]"][class*="text-[#0B1F42]"]:not([class*="!bg-"]),
-  [class*="bg-[#B8895C]"][class*="text-[#0B1F42]"]:not([class*="!bg-"]),
-  .bg-primary[class*="text-[#0B1F42]"]:not([class*="!bg-"]),
-  .bg-bronze[class*="text-[#0B1F42]"]:not([class*="!bg-"])
+  [class*="bg-[#C49A6C]"][class*="text-[#0B1F42]"],
+  [class*="bg-[#B8895C]"][class*="text-[#0B1F42]"],
+  [class*="bg-[#A97B4E]"][class*="text-[#0B1F42]"],
+  [class*="bg-[#9A744A]"][class*="text-[#0B1F42]"],
+  .bg-primary[class*="text-[#0B1F42]"],
+  .bg-bronze[class*="text-[#0B1F42]"]
 ) {
   color: #0B1F42 !important;
 }
@@ -298,6 +303,26 @@ html.dark :where(
 
 html.dark :where([class*="text-[#5B6B82]"], [class*="text-[#64748b]"], [class*="text-[#6b7280]"], [class*="text-[#6E7686]"], [class*="text-[#94a3b8]"], [class*="text-[#53616F]"]) {
   color: var(--dm-muted) !important;
+}
+
+/* The account tab strips and the workspace tab bars set their resting colour in
+   account-travel.css alone, so on a dark page they stayed at #5B6B82 and
+   measured 3.31:1 against the surface. Deliberately without !important: each
+   class keeps its own is-active / aria-current rule, which is more specific. */
+html.dark :where(
+  .opg-account-nav a,
+  .opg-trip-tabs button,
+  .opg-history-tabs button,
+  .opg-profile-tabs button,
+  .opg-message-tabs a
+) {
+  color: var(--dm-muted);
+}
+
+/* A destructive red needs the lighter ramp on a dark surface; red-600 measured
+   3.29:1 there, which made Sign out hard to pick out from the muted items. */
+html.dark :where(.text-red-600) {
+  color: #F87171 !important;
 }
 
 /* Pale tints keep their light value in dark mode, but the text on top of them
@@ -321,8 +346,57 @@ html.dark :where(.op-overline, .zl-overline, .opg-account-heading p, .opg-profil
   color: #D1A477;
 }
 
-html.dark :where(.ui-btn-primary, .ui-btn-strong, .opg-account-action, .opg-trip-primary, .opg-message-send, .op-admin-bronze-button, .op-admin-add-link, .zl-header-register) {
+/* Navy surfaces take light ink: these classes paint #0B1F42, so white is right. */
+html.dark :where(.ui-btn-primary, .ui-btn-strong) {
   color: #FFFFFF !important;
+}
+
+/* Bronze surfaces keep the brand navy ink, which is the documented pairing and
+   measures 6.35:1. Forcing white here was the bug: it left every bronze CTA at
+   2.57:1, so the buttons read as pale and the label was hard to make out. */
+html.dark :where(
+  .opg-account-action,
+  .opg-trip-primary,
+  .opg-message-send,
+  .zl-header-register
+) {
+  color: #0B1F42 !important;
+}
+
+/* Any control that paints a dark surface must carry light ink. Each selector
+   below renders a navy/charcoal background, so an inherited or utility text
+   colour that stayed dark made the label disappear into the button. */
+html.dark :where(
+  .ui-btn-primary,
+  .ui-btn-strong,
+  .op-checkout-primary,
+  .op-payment-primary,
+  .op-auth-back,
+  .zl-mobile-nav a
+) {
+  color: #FFFFFF !important;
+}
+
+/* The back button is a white pill in light mode. On a dark page it has to become
+   a dark pill, otherwise the light ink above lands on white at 1.17:1. */
+html.dark .op-auth-back {
+  background-color: var(--dm-surface-raised) !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .op-auth-back:hover {
+  background-color: var(--dm-surface-soft) !important;
+}
+
+/* Circular overlays on cards and galleries are translucent white. In dark mode
+   the white used to stay put while the icon flipped light, so the heart and the
+   gallery arrows vanished. Darkening the pill keeps the light icon legible. */
+html.dark :where(.bg-white\/90) {
+  background-color: rgba(22, 34, 56, 0.92) !important;
+}
+
+html.dark :where(.bg-white\/90:hover, .hover\:bg-white:hover) {
+  background-color: rgba(32, 47, 72, 0.97) !important;
 }
 
 /* Guest discovery and content pages */
@@ -983,7 +1057,9 @@ html.dark .op-auth-label input::placeholder {
 
 html.dark .op-auth-control-icon,
 html.dark .op-auth-password-toggle {
-  color: var(--dm-subtle) !important;
+  /* This icon sits on the dark input surface, so it takes the body ink. The
+     muted tone it used before measured 4.46:1, which is too faint for a control. */
+  color: var(--dm-text) !important;
 }
 
 html.dark .op-auth-mode {

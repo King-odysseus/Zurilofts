@@ -580,7 +580,7 @@ function BookingPage() {
               Apartment fits up to {pricing.maxGuests} guests &middot; KES {pricing.propertyPrice.toLocaleString()}/night
             </p>
           </div>
-          <span className="bg-[#C49A6C] text-white text-xs font-bold px-3 py-1 rounded-full">
+          <span className="bg-[#C49A6C] text-[#0B1F42] text-xs font-bold px-3 py-1 rounded-full">
             {bedOption === '2bed' ? '2 Bed' : '1 Bed'}
           </span>
         </div>
@@ -1206,7 +1206,7 @@ function BookingPage() {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/')}
-                className="w-full bg-[#C49A6C] text-white py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+                className="w-full bg-[#C49A6C] text-[#0B1F42] py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
               >
                 Return to Home
               </button>

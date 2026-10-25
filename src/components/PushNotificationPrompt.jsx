@@ -37,7 +37,7 @@ function PushNotificationPrompt() {
           <div className="flex items-center gap-2 mt-3">
             <button
               onClick={async () => { await subscribe(); setDismissed(true); }}
-              className="min-h-[36px] rounded-[10px] bg-[#C49A6C] px-4 py-1.5 text-xs font-semibold text-white transition-all duration-200 hover:bg-[#B8895C]"
+              className="min-h-[36px] rounded-[10px] bg-[#C49A6C] px-4 py-1.5 text-xs font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-[#B8895C]"
             >
               Allow
             </button>

@@ -2,49 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Audit admin, host and guest dashboards in the browser to find real design inconsistencies",
+      "text": "Find the shared button rules that set text colour (Flowbite theme plus custom CSS)",
       "state": "done"
     },
     {
-      "text": "Fix shared primitives so buttons, cards, headers and status pills match across all three surfaces",
+      "text": "Audit every button on every page in both themes and list the unreadable pairings",
       "state": "done"
     },
     {
-      "text": "Align the guest account shell, tabs and trips pages to the shared system",
+      "text": "Fix the central dark rules: dark surfaces take white ink, bronze takes navy ink, white pills darken",
       "state": "done"
     },
     {
-      "text": "Align guest saved stays (favourites and shortlists) to the shared system",
+      "text": "Fix the remaining bronze buttons that carry white ink across the stylesheets and components",
       "state": "done"
     },
     {
-      "text": "Align the admin dashboard buttons and card headers to the shared system",
+      "text": "Verify the fixed pages in both themes in the browser",
       "state": "done"
     },
     {
-      "text": "Align the host shell, today and calendar pages to the shared system",
-      "state": "done"
-    },
-    {
-      "text": "Align the host listings, earnings, payouts and promos pages to the shared system",
-      "state": "done"
-    },
-    {
-      "text": "Sweep the remaining public and trust stylesheets for non-pill buttons",
-      "state": "done"
-    },
-    {
-      "text": "Verify all three surfaces at desktop and phone width in the browser",
-      "state": "done"
-    },
-    {
-      "text": "Run lint and production build",
-      "state": "done"
-    },
-    {
-      "text": "Commit and push",
+      "text": "Run lint and build, then report",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-25T22:15:12.963Z"
+  "updatedAt": "2026-10-25T23:25:08.462Z"
 }

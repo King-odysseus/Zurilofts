@@ -132,7 +132,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
                   disabled
                     ? 'cursor-not-allowed bg-[#EAF0F4] text-[#94A3B8]'
                     : 'cursor-pointer text-[#0B1F42] hover:bg-[#FDE8D8]',
-                  isEndpoint ? 'bg-[#C49A6C] font-bold text-white hover:bg-[#B8895C]' : '',
+                  isEndpoint ? 'bg-[#C49A6C] font-bold text-[#0B1F42] hover:bg-[#B8895C]' : '',
                   inRange ? 'rounded-none bg-[#FDE8D8]' : '',
                 ].join(' ')}
               >

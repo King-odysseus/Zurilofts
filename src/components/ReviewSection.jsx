@@ -87,7 +87,7 @@ function ReviewSection({ propertyId }) {
         </div>
         <Link
           to="/bookings"
-          className="inline-flex items-center gap-1.5 self-start px-4 py-2 border-2 border-[#C49A6C] text-[#C49A6C] rounded-full text-sm font-semibold hover:bg-[#C49A6C] hover:text-white transition-all duration-200"
+          className="inline-flex items-center gap-1.5 self-start px-4 py-2 border-2 border-[#C49A6C] text-[#C49A6C] rounded-full text-sm font-semibold hover:bg-[#C49A6C] hover:text-[#0B1F42] transition-all duration-200"
         >
           <NotebookPen className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           Write a Review
