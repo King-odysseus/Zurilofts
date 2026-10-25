@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { TabItem, Tabs } from "flowbite-react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import { CalendarDays } from "lucide-react";
@@ -183,7 +184,6 @@ export default function HostTodayPage() {
   const { arrivals = [], departures = [], inHouse = [], summary = {} } = data || {};
   const priority = arrivals[0] || inHouse[0] || departures[0];
   const priorityType = arrivals[0] ? "arrival" : inHouse[0] ? "inhouse" : "departure";
-  const mobileItems = mobileTab === "arrival" ? arrivals : mobileTab === "departure" ? departures : inHouse;
 
   return <div className="op-host-today">
     <div className="op-host-heading">
@@ -220,14 +220,28 @@ export default function HostTodayPage() {
     </div>
 
     <div className="op-host-mobile-ops">
-      <div className="op-host-mobile-tabs" role="tablist" aria-label="Today's operations">
-        <button type="button" role="tab" aria-selected={mobileTab === "arrival"} className={mobileTab === "arrival" ? "is-active" : ""} onClick={() => setMobileTab("arrival")}>Arrivals <span>{arrivals.length}</span></button>
-        <button type="button" role="tab" aria-selected={mobileTab === "inhouse"} className={mobileTab === "inhouse" ? "is-active" : ""} onClick={() => setMobileTab("inhouse")}>In house <span>{inHouse.length}</span></button>
-        <button type="button" role="tab" aria-selected={mobileTab === "departure"} className={mobileTab === "departure" ? "is-active" : ""} onClick={() => setMobileTab("departure")}>Departures <span>{departures.length}</span></button>
-      </div>
-      <div className="op-host-mobile-list">
-        {mobileItems.length === 0 ? <EmptyPanel label={mobileTab === "arrival" ? "Arrivals" : mobileTab === "departure" ? "Departures" : "In-house guests"} /> : mobileItems.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={mobileTab} compact />)}
-      </div>
+      <Tabs
+        aria-label="Today's operations"
+        variant="pills"
+        className="op-host-mobile-tablist"
+        onActiveTabChange={(index) => setMobileTab(["arrival", "inhouse", "departure"][index])}
+      >
+        {[
+          ["arrival", "Arrivals", arrivals],
+          ["inhouse", "In house", inHouse],
+          ["departure", "Departures", departures],
+        ].map(([key, label, items]) => <TabItem
+          key={key}
+          title={<span className="flex flex-col leading-tight"><span className="whitespace-nowrap">{label}</span><span className="text-[11px] opacity-70">{items.length}</span></span>}
+          active={mobileTab === key}
+        >
+          <div className="op-host-mobile-list">
+            {items.length === 0
+              ? <EmptyPanel label={key === "arrival" ? "Arrivals" : key === "departure" ? "Departures" : "In-house guests"} />
+              : items.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={key} compact />)}
+          </div>
+        </TabItem>)}
+      </Tabs>
     </div>
 
     <RecentMessages conversations={conversations} loading={conversationsLoading} />

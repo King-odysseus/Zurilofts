@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ToggleSwitch } from 'flowbite-react';
+import { TabItem, Tabs, ToggleSwitch } from 'flowbite-react';
 import PropTypes from 'prop-types';
 import { Building2 } from 'lucide-react';
 import apiClient from '../api/client.js';
@@ -206,16 +206,17 @@ export default function HostListingsPage() {
       <Link to="/host/properties/new">+ Add a listing</Link>
     </header>
 
-    <div className="op-host-listings-tabs" role="tablist" aria-label="Listing status">
-      {FILTERS.map((item) => <button
+    <Tabs
+      aria-label="Listing status"
+      variant="pills"
+      onActiveTabChange={(index) => setFilter(FILTERS[index].key)}
+    >
+      {FILTERS.map((item) => <TabItem
         key={item.key}
-        type="button"
-        role="tab"
-        aria-selected={filter === item.key}
-        className={filter === item.key ? 'is-active' : ''}
-        onClick={() => setFilter(item.key)}
-      >{item.label} · {counts[item.key] || 0}</button>)}
-    </div>
+        title={`${item.label} · ${counts[item.key] || 0}`}
+        active={filter === item.key}
+      >
+        {filter === item.key && <>
 
     {error && <div className="op-host-listings-error"><p>{error}</p><button type="button" onClick={() => window.location.reload()}>Try again</button></div>}
     {loading ? <ListingSkeleton /> : !error && visibleProperties.length === 0 ? <div className="op-host-listings-empty">
@@ -226,5 +227,8 @@ export default function HostListingsPage() {
     </div> : <div className="op-host-listings-grid">
       {visibleProperties.map((property) => <HostListingCard key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
     </div>}
+        </>}
+      </TabItem>)}
+    </Tabs>
   </div>;
 }

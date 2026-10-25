@@ -523,6 +523,13 @@
   .op-host-summary { display: none; }
   .op-host-panel-grid { display: none; }
   .op-host-mobile-ops { display: block; }
+  /* Flowbite supplies the tab bar now; keep the three equal columns of the old bar. */
+  .op-host-mobile-tablist > [role="tablist"] {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    margin-bottom: 14px;
+  }
   .op-host-mobile-tabs {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));

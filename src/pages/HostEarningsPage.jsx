@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Button, Dropdown, DropdownItem } from 'flowbite-react';
+import { Button, Dropdown, DropdownItem, TabItem, Tabs } from 'flowbite-react';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import apiClient from '../api/client.js';
@@ -278,24 +278,16 @@ export default function HostEarningsPage() {
       </div>
     </header>
 
-    <nav className="op-host-earnings-tabs" aria-label="Earnings views">
-      {[
-        ['overview', 'Overview'],
-        ['properties', 'Properties'],
-        ['breakdown', 'Breakdown'],
-        ['reports', 'Reports'],
-      ].map(([key, label]) => <button
-        key={key}
-        type="button"
-        className={activeTab === key ? 'is-active' : ''}
-        aria-current={activeTab === key ? 'page' : undefined}
-        onClick={() => setActiveTab(key)}
-      >{label}</button>)}
-    </nav>
 
     {error && <div className="op-host-earnings-error"><p>{error}</p><button type="button" onClick={() => setReloadToken((current) => current + 1)}>Try again</button></div>}
 
     {loading ? <div className="op-host-earnings-loading" aria-label="Loading earnings"><span /><span /><span /></div> : !error && <>
+      <Tabs
+        aria-label="Earnings views"
+        variant="pills"
+        onActiveTabChange={(index) => setActiveTab(['overview', 'properties', 'breakdown', 'reports'][index])}
+      >
+      <TabItem title="Overview" active={activeTab === 'overview'}>
       {activeTab === 'overview' && <>
         <section className="op-host-earnings-metrics">
           <article className="is-net">
@@ -343,6 +335,8 @@ export default function HostEarningsPage() {
         </div>
       </>}
 
+      </TabItem>
+      <TabItem title="Properties" active={activeTab === 'properties'}>
       {activeTab === 'properties' && <section className="op-host-earnings-panel">
         <header><div><h2>Property earnings</h2><p>{earningRows.length} properties with bookings in this period.</p></div><span>{periodLabel}</span></header>
         {earningRows.length > 0 ? <div className="op-host-earnings-property-list">
@@ -361,6 +355,8 @@ export default function HostEarningsPage() {
         </div> : <div className="op-host-earnings-empty"><strong>No property earnings</strong><p>There are no bookings with income in this period.</p></div>}
       </section>}
 
+      </TabItem>
+      <TabItem title="Breakdown" active={activeTab === 'breakdown'}>
       {activeTab === 'breakdown' && <section className="op-host-earnings-panel">
         <header><div><h2>Income breakdown</h2><p>How booking value and deductions contribute to your earnings.</p></div><span>{periodLabel}</span></header>
         <div className="op-host-earnings-breakdown">
@@ -372,6 +368,8 @@ export default function HostEarningsPage() {
         </div>
       </section>}
 
+      </TabItem>
+      <TabItem title="Reports" active={activeTab === 'reports'}>
       {activeTab === 'reports' && <section className="op-host-earnings-panel op-host-earnings-reports">
         <header><div><h2>Reports</h2><p>Export a property-level earnings summary for {rangeLabel}.</p></div><span>{earningRows.length} properties</span></header>
         <div className="op-host-earnings-report-grid">
@@ -392,6 +390,8 @@ export default function HostEarningsPage() {
           </article>
         </div>
       </section>}
+      </TabItem>
+      </Tabs>
     </>}
   </div>;
 }
