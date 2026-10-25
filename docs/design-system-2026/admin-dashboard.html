@@ -284,20 +284,6 @@
             </div>
           </section>
 
-          <!-- one example of the shared empty state -->
-          <section class="section">
-            <div class="section__head">
-              <h3 class="t-section">Identity checks</h3>
-            </div>
-            <div class="card">
-              <div class="empty">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.7-7 9.5-4.1-1.8-7-5.2-7-9.5V6z"/><path d="M9.2 12.2l2 2 3.6-3.8"/></svg>
-                <strong>No identity checks waiting</strong>
-                <p>New submissions appear here within a minute of a guest uploading a document.</p>
-                <button class="btn btn--secondary btn--sm">See past checks</button>
-              </div>
-            </div>
-          </section>
         </div>
 
         <!-- right rail -->
@@ -350,6 +336,20 @@
               </div>
             </div>
             <button class="btn btn--secondary btn--block btn--sm" style="margin-top:16px;">Edit statistics</button>
+          </div>
+
+          <!-- one example of the shared empty state, sized to the rail so it balances
+               the taller review column beside it -->
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-card">Identity checks</h3>
+              <a class="link" href="#" style="font-size:13px;">Past checks</a>
+            </div>
+            <div class="empty">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.7-7 9.5-4.1-1.8-7-5.2-7-9.5V6z"/><path d="M9.2 12.2l2 2 3.6-3.8"/></svg>
+              <strong>No identity checks waiting</strong>
+              <p>New submissions appear within a minute of a guest uploading a document.</p>
+            </div>
           </div>
 
         </aside>

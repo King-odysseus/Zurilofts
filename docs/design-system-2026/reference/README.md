@@ -1,21 +1,24 @@
-# Reference screenshots
+# Reference material
 
-Drop the designs you like in this folder. Any file name works, PNG or JPG.
-Screenshots of whole pages are the most useful; close-ups of buttons, cards
-or colour also help.
+This folder holds what the boards were derived from. Nothing here is built into
+the app or bundled with the site; it exists so the design decisions can be
+checked against their source.
 
-When they are here, tell me and I will read them and rebuild the boards in
-that direction. Nothing in this folder gets built into the app.
+## What is here
 
-## What is already here (first pass, being replaced)
+| File | What it shows |
+|---|---|
+| `airbnb-host-earnings.webp` | Host earnings sheet: cream panel, full-width dark action, centred heading |
+| `airbnb-host-payout.webp` | Host earnings header: statement figure, quiet secondary line, small dark button |
+| `photos/` | ZuriLofts' own property photography, used inside the boards |
+| `contact-sheet.html` | Grid of the photos above, for picking which image goes on which board |
 
-The three boards one level up in `docs/design-system-2026/` are the first
-attempt:
+The two `.webp` files are screenshots of Airbnb's public host pages, kept as
+visual reference only. `airbnb-language.md` records what each one contributed
+and links to the live pages.
 
-- `admin-dashboard.html`
-- `host-dashboard.html`
-- `guest-booking-dashboard.html`
-- `preview.css` (shared styling for all three)
+## Adding your own
 
-Open any of them by double clicking the file. They are static mockups, not
-app pages.
+Any PNG or JPG dropped in here can be read directly. Whole-page screenshots are
+the most useful, close-ups of buttons, cards or colour also help. Say which
+board a reference applies to and the boards will be updated to match.

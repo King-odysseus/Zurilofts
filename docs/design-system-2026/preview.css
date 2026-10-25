@@ -124,7 +124,21 @@ button { font: inherit; color: inherit; }
 
 /* ---------- shell ---------- */
 
-.shell { display: flex; min-height: 100vh; }
+.shell { display: flex; min-height: 100vh; position: relative; }
+
+/* The sidebar sticks at viewport height while the page is taller, which used to
+   leave its divider stopping mid-page. Draw the column edge on the shell so the
+   rail reads as one continuous column in a long page. */
+.shell::before {
+  content: '';
+  position: absolute;
+  left: 247px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
 
 .sidebar {
   width: 248px;
@@ -150,7 +164,9 @@ button { font: inherit; color: inherit; }
 .brand__name { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
 .brand__name span { color: var(--muted); font-weight: 500; }
 
-.nav { display: flex; flex-direction: column; gap: 2px; }
+/* Groups sit on one steady rhythm; leftover height is deliberately left under the
+   last item rather than fanning the links apart on tall screens. */
+.nav { display: flex; flex-direction: column; gap: 4px; }
 .nav__label { padding: 0 10px; margin: 16px 0 6px; }
 .nav__label:first-child { margin-top: 0; }
 
@@ -209,7 +225,7 @@ button { font: inherit; color: inherit; }
 .page__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: none; }
 .page__sub { max-width: 620px; margin-top: 8px; }
 
-.section { margin-top: 48px; }
+.section { margin-top: 40px; }
 .section:first-of-type { margin-top: 0; }
 .section__head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
 .section__head .btn, .section__head .link { margin-left: auto; }
@@ -440,7 +456,7 @@ textarea.input { height: auto; padding: 12px 14px; resize: vertical; }
 .banner--info { background: #eff4ff; }
 .banner--info svg { color: var(--blue); }
 
-.empty { text-align: center; padding: 56px 24px; }
+.empty { text-align: center; padding: 28px 20px; }
 .empty svg { width: 32px; height: 32px; margin: 0 auto 12px; color: var(--muted); }
 .empty strong { display: block; font-size: 16px; font-weight: 600; }
 .empty p { margin: 6px auto 0; max-width: 380px; font-size: 14px; color: var(--muted); }
@@ -451,6 +467,7 @@ textarea.input { height: auto; padding: 12px 14px; resize: vertical; }
 /* ---------- layout helpers ---------- */
 
 .split { display: grid; grid-template-columns: minmax(0, 1fr) 384px; gap: 56px; align-items: start; }
+.split > :last-child { position: sticky; top: 16px; }
 /* narrower right rail (money, host, side facts); named so a page never needs
    an inline column width, which would win over the phone collapse below */
 .split--rail { grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; }

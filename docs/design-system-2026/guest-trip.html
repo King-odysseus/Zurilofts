@@ -177,20 +177,6 @@
 
         <div class="card">
           <div class="card__head">
-            <h3 class="t-section">Your host</h3>
-          </div>
-          <div class="guestrow">
-            <span class="avatar avatar--lg">GW</span>
-            <div class="list__grow">
-              <strong>Grace Wanjiku</strong>
-              <p class="t-meta">Superhost · 3 years hosting · replies within an hour</p>
-            </div>
-            <button class="btn btn--secondary btn--sm">Message Grace</button>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card__head">
             <h3 class="t-section">Before you go</h3>
           </div>
           <div class="feature">
@@ -245,6 +231,47 @@
           <h3 class="t-card" style="margin-top:8px;">Send your arrival time</h3>
           <p class="t-meta" style="margin-top:4px;">Let Grace know when you land so check-in is ready.</p>
           <button class="btn btn--primary btn--block btn--sm" style="margin-top:16px;">Message host</button>
+        </div>
+
+        <!-- the host and the house rules belong in the rail on a trip page: they
+           are references for the stay, not steps through it -->
+        <div class="card">
+          <div class="card__head">
+            <h3 class="t-card">Your host</h3>
+            <a class="link link--quiet" href="#" style="font-size:13px;">Profile</a>
+          </div>
+          <div class="guestrow" style="padding-top:0;">
+            <span class="avatar avatar--lg">GW</span>
+            <div class="list__grow">
+              <strong>Grace Wanjiku</strong>
+              <p class="t-meta">Superhost · 3 years hosting · replies within an hour</p>
+            </div>
+          </div>
+          <button class="btn btn--secondary btn--block btn--sm">Message Grace</button>
+        </div>
+
+        <div class="card card--inset">
+          <h3 class="t-card">House rules</h3>
+          <div class="lines" style="margin-bottom:0;">
+            <div class="lines__row"><span>Check-in</span><strong>from 3:00 PM</strong></div>
+            <div class="lines__row"><span>Check-out</span><strong>11:00 AM</strong></div>
+            <div class="lines__row"><span>Guests</span><strong>2 included</strong></div>
+            <div class="lines__row"><span>Smoking and parties</span><strong>Not allowed</strong></div>
+          </div>
+        </div>
+
+        <!-- same cancellation block as the checkout board, same component -->
+        <div class="card">
+          <div class="card__head">
+            <h3 class="t-card">Cancellation</h3>
+            <a class="link" href="#" style="font-size:13px;">Full policy</a>
+          </div>
+          <p class="t-body">Free cancellation until <strong>8 November</strong>.</p>
+          <div class="lines" style="margin-bottom:0;">
+            <div class="lines__row"><span>Before 8 Nov</span><strong>Full refund</strong></div>
+            <div class="lines__row"><span>8 - 10 Nov</span><strong>50% refund</strong></div>
+            <div class="lines__row"><span>After 10 Nov</span><strong>No refund</strong></div>
+          </div>
         </div>
 
       </aside>

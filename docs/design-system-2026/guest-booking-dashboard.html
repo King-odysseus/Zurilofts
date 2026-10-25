@@ -234,7 +234,8 @@
       </div>
 
       <!-- the card is the grid item itself, so sticky travels the full split -->
-      <aside class="bookcard">
+      <aside class="stack stack--lg">
+      <div class="bookcard">
         <div class="photo photo--wide">
           <img src="reference/photos/living.jpg" alt="">
         </div>
@@ -279,6 +280,28 @@
         <button class="btn btn--primary btn--block">Reserve</button>
         <p class="bookcard__note">You won't be charged yet</p>
         <p class="bookcard__fine">Rare find: this place is usually booked</p>
+      </div>
+
+      <!-- the two blocks that sit under the price on a real checkout page, so the
+           rail keeps carrying content down the page instead of stopping short -->
+      <div class="card">
+        <div class="card__head">
+          <h3 class="t-card">Cancellation</h3>
+          <a class="link" href="#" style="font-size:13px;">Full policy</a>
+        </div>
+        <p class="t-body">Free cancellation until <strong>8 November</strong>.</p>
+        <div class="lines" style="margin-bottom:0;">
+          <div class="lines__row"><span>Before 8 Nov</span><strong>Full refund</strong></div>
+          <div class="lines__row"><span>8 - 10 Nov</span><strong>50% refund</strong></div>
+          <div class="lines__row"><span>After 10 Nov</span><strong>No refund</strong></div>
+        </div>
+      </div>
+
+      <div class="card card--inset">
+        <h3 class="t-card">Need help?</h3>
+        <p class="t-meta" style="margin-top:4px;">We answer within 24 hours, and faster on check-in day.</p>
+        <button class="btn btn--secondary btn--block btn--sm" style="margin-top:16px;">Message ZuriLofts</button>
+      </div>
       </aside>
 
     </div>

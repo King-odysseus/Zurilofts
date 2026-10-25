@@ -186,3 +186,34 @@ All six boards are static HTML in `docs/design-system-2026/` and share
 
 `index.html` in that folder is the landing page that links all six, and is the
 right place to start a review.
+
+## Balance and density
+
+A page reads as unfinished when one column stops early and leaves a bare strip
+beside it, so the layouts follow four rules.
+
+**The rail carries content to the bottom.** A two-column page puts reference
+material in the rail, not just the first card: booking pages keep the price card,
+then cancellation terms and help; a trip page keeps the host card and house
+rules; the host calendar keeps the month read-out; admin keeps the review
+sign-ups, the attention list and the empty identity check. Nothing is invented
+for the sake of filling space - each block is something the reader would look
+for on that screen.
+
+**The rail sticks.** `.split > :last-child` is `position: sticky`, so while the
+long form column scrolls, the price or summary card stays in view instead of
+scrolling away and leaving a gap.
+
+**The sidebar is one continuous column.** The sidebar itself sticks at viewport
+height, so on a long page its divider used to stop mid-page. The edge is drawn on
+the shell (`.shell::before`) instead, which keeps the rail reading as a single
+column from the top of the page to the bottom.
+
+**Empty states are sized to their card.** `.empty` is 28px padding, not a
+screen-centred 56px: an empty list in a rail should look like a quiet card, not a
+placeholder page.
+
+**Vertical rhythm.** Sections are 40px apart, cards pad 24px, and the sidebar
+nav sits on one steady 4px rhythm with the account pinned at the foot. Leftover
+height stays under the last nav item rather than being fanned out between links -
+spreading the links apart is what made tall screens look sparse.

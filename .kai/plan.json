@@ -2,23 +2,27 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read RegisterPage and map how traveller vs host sign-up differs today",
+      "text": "Read the collapsed admin sidebar and confirm why labels spill over the content",
       "state": "done"
     },
     {
-      "text": "Confirm only one sign-up form exists and find every host entry point",
+      "text": "Fix collapsed sidebar flyout so it is a proper tooltip and never covers the page title",
       "state": "done"
     },
     {
-      "text": "Make both modes render one identical form (same heading, subtitle, submit label)",
+      "text": "Fix the admin sticky header staying white in dark mode",
+      "state": "done"
+    },
+    {
+      "text": "Replace fixed white and beige surfaces with flipping tokens across admin, host, guest pages and components",
+      "state": "done"
+    },
+    {
+      "text": "Fix dropdown and menu clipping in shared components",
       "state": "active"
     },
     {
-      "text": "Fix the footer Become a host link so visitors reach the sign-up form",
-      "state": "pending"
-    },
-    {
-      "text": "Verify both modes and every host CTA in the browser",
+      "text": "Verify the Add-ons page and other surfaces in light and dark at desktop and phone width",
       "state": "pending"
     },
     {
@@ -26,5 +30,5 @@
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-25T21:54:15.614Z"
+  "updatedAt": "2026-10-25T22:11:26.527Z"
 }
