@@ -483,6 +483,8 @@ function DashboardOverview() {
     verificationsPending: 0,
   });
   const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0', satisfaction: '0' });
+  const [trendDays, setTrendDays] = useState(30);
+  const [trend, setTrend] = useState(null);
   const [savingLanding, setSavingLanding] = useState(false);
   const [landingMsg, setLandingMsg] = useState('');
 
@@ -524,6 +526,14 @@ function DashboardOverview() {
     load();
     return () => { active = false; };
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    apiClient.get('/admin/stats/signups', { params: { days: trendDays } })
+      .then((res) => { if (active) setTrend(res.data?.data || null); })
+      .catch(() => { if (active) setTrend(null); });
+    return () => { active = false; };
+  }, [trendDays]);
 
   async function saveLandingStats(e) {
     e.preventDefault();
@@ -569,6 +579,19 @@ function DashboardOverview() {
             <Link to="/admin/host-applications">Open</Link>
           </div>
         )) : <div className="op-admin-empty"><strong>No applications waiting</strong><p>New host applications land here for review.</p><Link to="/admin/host-applications">Open host applications</Link></div>}
+      </section>
+      <section className="op-admin-trend">
+        <div className="op-admin-panel-heading"><h2>New sign-ups</h2>
+          <select aria-label="Sign-up date range" value={trendDays} onChange={(event) => setTrendDays(Number(event.target.value))}>
+            <option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option>
+          </select>
+        </div>
+        {trend ? <>
+          <p><strong>{trend.total}</strong> new accounts in the last {trend.days} days</p>
+          <div className="op-admin-trend-bars" role="img" aria-label={`Daily sign-ups over the last ${trend.days} days`}>
+            {trend.series.map((point) => <span key={point.date} title={`${point.date}: ${point.signups}`} style={{ height: `${Math.max(4, (point.signups / Math.max(1, ...trend.series.map((p) => p.signups))) * 100)}%` }} />)}
+          </div>
+        </> : <p>Trend data is unavailable right now.</p>}
       </section>
       <section className="op-admin-glance"><h2>Platform at a glance</h2><p><span>Live listings</span><strong>{summary.listingsLive}</strong></p><p><span>Awaiting approval</span><strong>{summary.listingsPending}</strong></p><p><span>Identity checks</span><strong>{summary.verificationsPending}</strong></p><Link to="/admin/properties">Open listing approvals</Link></section>
     </div>

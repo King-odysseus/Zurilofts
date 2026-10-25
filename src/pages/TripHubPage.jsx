@@ -39,6 +39,20 @@ function getMapUrl(property) {
   return `${mapsBase}${encodeURIComponent(query)}`;
 }
 
+function getCalendarUrl(booking) {
+  const property = booking.property || {};
+  const toDay = (value) => new Date(value).toISOString().slice(0, 10).replace(/-/g, '');
+  if (Number.isNaN(new Date(booking.checkIn).getTime()) || Number.isNaN(new Date(booking.checkOut).getTime())) return null;
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: `Stay at ${property.title || 'ZuriLofts'}`,
+    dates: `${toDay(booking.checkIn)}/${toDay(booking.checkOut)}`,
+    location: property.location || '',
+    details: `ZuriLofts booking ${booking.id}`,
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 function StatusPill({ status }) {
   const meta = STATUS_META[status] || { label: status || 'Status unavailable', className: '' };
   return <span className={`opg-trip-status ${meta.className}`}>{meta.label}</span>;
@@ -69,6 +83,7 @@ function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
         <button className="opg-trip-secondary" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</button>
         <a className="opg-trip-link" href={getMapUrl(property)} target="_blank" rel="noreferrer">Directions</a>
         <Link className="opg-trip-link" to={`/bookings/${booking.id}`}>Receipt</Link>
+        {getCalendarUrl(booking) && <a className="opg-trip-link" href={getCalendarUrl(booking)} target="_blank" rel="noreferrer">Add to calendar</a>}
       </div>
     </div>
   </article>;
@@ -95,6 +110,7 @@ function TripRow({ booking, index, isPast }) {
     {isPast && !reviewed
       ? <Link className="opg-trip-row-action" to={`/property/${property.id || booking.propertyId}?review=true`}>Leave a review</Link>
       : <Link className="opg-trip-row-action" to={isPast ? `/property/${property.id || booking.propertyId}` : `/bookings/${booking.id}`}>{isPast ? 'View stay' : 'View trip'}</Link>}
+    {isPast && booking.status !== 'CANCELLED' && <Link className="opg-trip-row-action" to={`/property/${property.id || booking.propertyId}`}>Book again</Link>}
   </article>;
 }
 

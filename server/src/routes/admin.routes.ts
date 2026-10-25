@@ -33,6 +33,7 @@ router.use(authenticate, requireAdmin);
 
 // User / host account management
 router.get('/users', userCtrl.adminListUsers);
+router.get('/stats/signups', userCtrl.adminSignupTrend);
 router.patch('/users/:id', validate(adminUserUpdateSchema), userCtrl.adminUpdateUser);
 router.patch('/users/:id/role', validate(userRoleSchema), userCtrl.adminSetUserRole);
 router.patch('/users/:id/suspend', validate(userSuspendSchema), userCtrl.adminSetUserSuspended);

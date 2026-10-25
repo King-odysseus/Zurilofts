@@ -28,3 +28,12 @@ test('ignores blank searches', () => {
   assert.equal(buildPropertySearchWhere('   '), null);
   assert.equal(buildPropertySearchWhere(undefined), null);
 });
+
+test('buildPropertyOrderBy maps public sort values and falls back to featured-first ranking', async () => {
+  const { buildPropertyOrderBy } = await import('../src/services/property.service.js');
+  assert.deepEqual(buildPropertyOrderBy('price_asc')[0], { price: 'asc' });
+  assert.deepEqual(buildPropertyOrderBy('price_desc')[0], { price: 'desc' });
+  assert.deepEqual(buildPropertyOrderBy('rating')[0], { rating: 'desc' });
+  assert.deepEqual(buildPropertyOrderBy('bogus')[0], { featured: 'desc' });
+  assert.deepEqual(buildPropertyOrderBy(undefined)[0], { featured: 'desc' });
+});

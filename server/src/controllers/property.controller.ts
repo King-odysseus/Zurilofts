@@ -19,7 +19,7 @@ function getSoftUser(req: Request): { sub: string; role: string } | null {
 
 export async function list(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minRating, available, featured, status, page, limit, checkIn, checkOut } = req.query;
+    const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minBathrooms, amenities, sort, minRating, available, featured, status, page, limit, checkIn, checkOut } = req.query;
     // Only the admin listing queue (mounted behind requireAdmin) may see every
     // lifecycle status and filter by one; the public route always sees PUBLISHED only.
     const isAdmin = req.user?.role === 'ADMIN';
@@ -33,6 +33,9 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
       search: search as string | undefined,
       neighborhood: neighborhood as string | undefined,
       minBedrooms: minBedrooms ? Number(minBedrooms) : undefined,
+      minBathrooms: minBathrooms ? Number(minBathrooms) : undefined,
+      amenities: typeof amenities === 'string' ? amenities.split(',').map((a) => a.trim()).filter(Boolean).slice(0, 10) : undefined,
+      sort: typeof sort === 'string' ? sort : undefined,
       minRating: minRating ? Number(minRating) : undefined,
       available: available !== undefined ? available === 'true' : undefined,
       featured: featured !== undefined ? featured === 'true' : undefined,

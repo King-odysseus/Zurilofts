@@ -294,3 +294,24 @@ export async function changePassword(userId: string, currentPassword: string, ne
 
   return { message: 'Password updated successfully' };
 }
+
+/** Daily new-account counts for the admin dashboard; days is clamped to 7/30/90 so the query window stays bounded. */
+export async function signupTrend(days: number) {
+  const window = [7, 30, 90].includes(days) ? days : 30;
+  const start = new Date();
+  start.setUTCHours(0, 0, 0, 0);
+  start.setUTCDate(start.getUTCDate() - (window - 1));
+  const users = await prisma.user.findMany({ where: { createdAt: { gte: start } }, select: { createdAt: true } });
+  const counts = new Map<string, number>();
+  for (const user of users) {
+    const day = user.createdAt.toISOString().slice(0, 10);
+    counts.set(day, (counts.get(day) || 0) + 1);
+  }
+  const series = Array.from({ length: window }, (_, i) => {
+    const d = new Date(start);
+    d.setUTCDate(start.getUTCDate() + i);
+    const day = d.toISOString().slice(0, 10);
+    return { date: day, signups: counts.get(day) || 0 };
+  });
+  return { days: window, total: users.length, series };
+}

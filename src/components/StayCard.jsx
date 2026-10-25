@@ -30,13 +30,15 @@ function StayCard({ stay }) {
     stay.bedrooms != null && `${stay.bedrooms} bed${stay.bedrooms === 1 ? '' : 's'}`,
   ].filter(Boolean);
 
+  const isGuestFavourite = Number(stay.rating) >= 4.8 && Number(stay.reviews) >= 5;
+
   return <article className="opg-stay-card">
     <Link to={`/property/${stay.id}`} className="opg-stay-image" aria-label={`View ${stay.title}`}>
       {image ? <img src={image} alt={stay.title} loading="lazy" /> : <span className="opg-image-fallback">Photo coming soon</span>}
-      {stay.featured && <span className="opg-card-badge">Featured</span>}
+      {isGuestFavourite ? <span className="opg-card-badge">Guest favourite</span> : stay.featured && <span className="opg-card-badge">Featured</span>}
     </Link>
     <button type="button" className="opg-heart" aria-label={isFavorite(stay.id) ? 'Remove from saved stays' : 'Save stay'} aria-pressed={isFavorite(stay.id)} onClick={() => isAuthenticated ? toggleFavorite(stay.id) : navigate('/login')}>{isFavorite(stay.id) ? '♥' : '♡'}</button>
-    <Link to={`/property/${stay.id}`} className="opg-stay-content"><h3>{stay.title}</h3><p>{details.join(' · ')}</p><div className="opg-price"><strong>{stay.price != null ? `KSh ${Number(stay.price).toLocaleString()}` : 'Price on request'}</strong>{stay.price != null && <span>per night</span>}{stay.rating != null && <span className="opg-rating">★ {Number(stay.rating).toFixed(2)}</span>}</div></Link>
+    <Link to={`/property/${stay.id}`} className="opg-stay-content"><h3>{stay.title}</h3><p>{details.join(' · ')}</p><div className="opg-price"><strong>{stay.price != null ? `KSh ${Number(stay.price).toLocaleString()}` : 'Price on request'}</strong>{stay.price != null && <span>per night</span>}{stay.rating != null && <span className="opg-rating">★ {Number(stay.rating).toFixed(2)}{Number(stay.reviews) > 0 && ` (${stay.reviews})`}</span>}</div></Link>
   </article>;
 }
 
@@ -50,6 +52,7 @@ StayCard.propTypes = {
     bedrooms: PropTypes.number,
     price: PropTypes.number,
     rating: PropTypes.number,
+    reviews: PropTypes.number,
     featured: PropTypes.bool,
     images: PropTypes.arrayOf(PropTypes.string),
     imagesJson: PropTypes.string,

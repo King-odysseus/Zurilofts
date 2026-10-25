@@ -104,6 +104,14 @@ export async function adminListUsers(req: Request, res: Response, next: NextFunc
   }
 }
 
+export async function adminSignupTrend(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    res.json({ success: true, data: await userService.signupTrend(Number(req.query.days) || 30) });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function adminUpdateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const user = await userService.adminUpdateUser(req.params.id, req.body);

@@ -210,6 +210,9 @@ interface PropertyFilters {
   search?: string;
   neighborhood?: string;
   minBedrooms?: number;
+  minBathrooms?: number;
+  amenities?: string[];
+  sort?: string;
   minRating?: number;
   available?: boolean;
   featured?: boolean;
@@ -252,8 +255,21 @@ export function buildPropertySearchWhere(search?: string) {
   };
 }
 
+type PropertySort = 'recommended' | 'price_asc' | 'price_desc' | 'rating' | 'newest';
+
+/** Maps the public ?sort= value to a Prisma orderBy; unknown values fall back to the default ranking. */
+export function buildPropertyOrderBy(sort?: string) {
+  switch (sort as PropertySort) {
+    case 'price_asc': return [{ price: 'asc' as const }, { createdAt: 'desc' as const }];
+    case 'price_desc': return [{ price: 'desc' as const }, { createdAt: 'desc' as const }];
+    case 'rating': return [{ rating: 'desc' as const }, { reviews: 'desc' as const }];
+    case 'newest': return [{ createdAt: 'desc' as const }];
+    default: return [{ featured: 'desc' as const }, { createdAt: 'desc' as const }];
+  }
+}
+
 export async function listProperties(filters: PropertyFilters) {
-  const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minRating, available, featured, hostId, status, includeAllStatuses, page = 1, limit = 12, checkIn, checkOut } = filters;
+  const { type, minPrice, maxPrice, search, neighborhood, minBedrooms, minBathrooms, amenities, sort, minRating, available, featured, hostId, status, includeAllStatuses, page = 1, limit = 12, checkIn, checkOut } = filters;
   const skip = (page - 1) * limit;
 
   const where: any = {};
@@ -284,9 +300,17 @@ export async function listProperties(filters: PropertyFilters) {
   }
   if (neighborhood) where.neighborhood = neighborhood;
   if (minBedrooms) where.bedrooms = { gte: minBedrooms };
+  if (minBathrooms) where.bathrooms = { gte: minBathrooms };
+  // amenitiesJson is a JSON string array, so each required amenity is a substring match; all must be present.
+  if (amenities?.length) {
+    where.AND = [...(where.AND || []), ...amenities.map((a) => ({ amenitiesJson: { contains: a } }))];
+  }
   if (minRating) where.rating = { gte: minRating };
   const searchWhere = buildPropertySearchWhere(search);
-  if (searchWhere) Object.assign(where, searchWhere);
+  if (searchWhere) {
+    where.AND = [...(where.AND || []), ...searchWhere.AND];
+  }
+  const orderBy = buildPropertyOrderBy(sort);
 
   // Real stay-date availability filtering: reuses the same isRangeAvailable
   // check the booking flow validates against (calendar blocks + non-cancelled
@@ -298,7 +322,7 @@ export async function listProperties(filters: PropertyFilters) {
   if (checkIn && checkOut) {
     const candidates = await prisma.property.findMany({
       where,
-      orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
+      orderBy,
     });
     const availabilityFlags = await Promise.all(
       candidates.map((p) => isRangeAvailable(p.id, checkIn, checkOut))
@@ -322,7 +346,7 @@ export async function listProperties(filters: PropertyFilters) {
       where,
       skip,
       take: limit,
-      orderBy: [{ featured: 'desc' }, { createdAt: 'desc' }],
+      orderBy,
     }),
     prisma.property.count({ where }),
   ]);

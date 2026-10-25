@@ -48,6 +48,19 @@ function statusCopy(property) {
   return 'Complete the details, photos, and pricing before submitting.';
 }
 
+// Completeness checks mirror what guests look for on Airbnb/Booking.com listings; each is worth equal points.
+function listingQuality(property) {
+  const checks = [
+    { ok: (property.images?.length || 0) >= 5, tip: `Add ${Math.max(5 - (property.images?.length || 0), 1)} more photo(s) (aim for 5+)` },
+    { ok: (property.description?.length || 0) >= 200, tip: 'Write a longer description (200+ characters)' },
+    { ok: (property.amenities?.length || 0) >= 6, tip: 'List more amenities (6+)' },
+    { ok: property.lat != null && property.lng != null, tip: 'Pin the exact location on the map' },
+    { ok: Boolean(property.address), tip: 'Confirm the street address' },
+  ];
+  const done = checks.filter((check) => check.ok).length;
+  return { score: Math.round((done / checks.length) * 100), tips: checks.filter((check) => !check.ok).map((check) => check.tip) };
+}
+
 function ListingSkeleton() {
   return <div className="op-host-listing-skeleton" aria-label="Loading listings">
     <span /><span /><span />
@@ -58,6 +71,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
   const image = firstImage(property);
   const status = propertyStatus(property);
   const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
+  const quality = listingQuality(property);
 
   return <article className="op-host-listing-card">
     <div className="op-host-listing-cover">
@@ -73,6 +87,11 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
         <strong>KES {(property.price || 0).toLocaleString()}<small>/night</small></strong>
       </header>
       <p className={`op-host-listing-note is-${status.tone}`}>{statusCopy(property)}</p>
+      <div className="op-host-listing-quality">
+        <div className="op-host-listing-quality-head"><span>Listing quality</span><strong>{quality.score}%</strong></div>
+        <progress value={quality.score} max="100" aria-label={`Listing quality ${quality.score} percent`} />
+        {quality.tips.length > 0 && <ul>{quality.tips.slice(0, 2).map((tip) => <li key={tip}>{tip}</li>)}</ul>}
+      </div>
       <div className="op-host-listing-actions">
         <Link className="op-host-listing-edit" to={`/host/properties/${property.id}/edit`}>
           {property.status === 'DRAFT' ? 'Continue setup' : 'Edit listing'}
