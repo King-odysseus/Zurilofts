@@ -2,33 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the booking detail and history pages to find where a guest sees a confirmed stay",
+      "text": "Audit calendar integration: iCal import/export, Google Calendar, guest add-to-calendar",
       "state": "done"
     },
     {
-      "text": "Add a shared helper that builds a calendar file and a Google Calendar link from a booking",
+      "text": "Answer the calendar sync question with evidence from the code",
       "state": "done"
     },
     {
-      "text": "Add the add-to-calendar action to the guest booking screens",
+      "text": "Take property management out of the admin account (nav, routes, server writes)",
       "state": "done"
     },
     {
-      "text": "Fix the booking detail page never receiving its booking id",
+      "text": "Give hosts their own simple app shell with its own header and tabs",
       "state": "done"
     },
     {
-      "text": "Verify with lint and production build",
+      "text": "Remove dead admin branches left in the listing form and dashboard",
       "state": "done"
     },
     {
-      "text": "Check the buttons in the browser as a signed-in guest",
+      "text": "Fix listing editor links to the host listings index",
       "state": "done"
     },
     {
-      "text": "Commit and push",
-      "state": "active"
+      "text": "Bring host setup into the same host shell and fix its stray label",
+      "state": "done"
+    },
+    {
+      "text": "Verify with lint, build and server typecheck, then check the screens",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-25T16:18:12.714Z"
+  "updatedAt": "2026-10-25T16:23:49.878Z"
 }

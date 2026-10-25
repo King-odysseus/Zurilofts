@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Button, Checkbox, FileInput, Label, Select, Textarea, TextInput } from 'flowbite-react';
-import Navbar from '../components/Navbar.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -350,7 +349,6 @@ function HostApplicationPage() {
   if (loading || !user) {
     return (
       <div className="min-h-screen bg-white">
-        <Navbar />
         <main className="op-host-application-page">
           <div className="op-host-application-loading"><Spinner /></div>
         </main>
@@ -360,7 +358,6 @@ function HostApplicationPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar />
       <main className="op-host-application-page">
         <section className="op-host-application-hero">
           <div className="op-host-application-hero-copy">

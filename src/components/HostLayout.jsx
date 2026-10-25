@@ -38,7 +38,9 @@ function hostInitials(user) {
 // too. This bar carries only the host's daily tasks, so the workspace reads as
 // an app rather than a page inside the marketplace.
 // Every /host/* route renders inside this, which is why the page bodies need no
-// header of their own and why HostApplicationPage (pre-approval) stays outside.
+// header of their own, including HostApplicationPage, which is why that page
+// draws no navbar of its own. It used to sit outside this shell and rendered a
+// second navbar above its content.
 function HostLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();

@@ -194,7 +194,7 @@ export default function HostTodayPage() {
     <div className="op-host-hero-grid">
       <section className="op-host-greeting">
         <div><p>TODAY AT YOUR STAYS</p><h2>Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}{user?.firstName ? `, ${user.firstName}` : ""}</h2><span>{summary.arrivals || 0} arrivals, {summary.departures || 0} departures, and {summary.inHouse || 0} in-house guests on today&apos;s schedule.</span></div>
-        <Link to="/host/calendar">Open calendar</Link>
+        <Link to="/host/calendar" className="op-host-greeting-calendar">Open calendar</Link>
       </section>
       <section className="op-host-priority">
         <p>PRIORITY NEXT STEP</p>

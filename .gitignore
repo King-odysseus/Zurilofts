@@ -68,3 +68,6 @@ skills-lock.json
 .kai/audit-shots/
 .kai/screens/
 .kai/*.log
+
+# Local verification screenshots
+.kai/shots/

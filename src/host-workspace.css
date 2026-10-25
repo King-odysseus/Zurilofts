@@ -71,6 +71,13 @@
   background: #FFF9F3;
 }
 
+/* The page heading already offers "Open calendar" on desktop, and the greeting
+   card sits right below it, so both rendered the same link twice in one screen.
+   Below 768px the heading action is hidden, which is where this one takes over. */
+.op-host-greeting > .op-host-greeting-calendar {
+  display: none;
+}
+
 .op-host-hero-grid {
   display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
@@ -503,6 +510,7 @@
   .op-host-priority span { font-size: 12px; }
   .op-host-greeting > a,
   .op-host-priority > a { min-height: 35px; min-width: 112px; padding: 0 14px; font-size: 11px; }
+  .op-host-greeting > .op-host-greeting-calendar { display: inline-flex; }
   .op-host-summary { display: none; }
   .op-host-panel-grid { display: none; }
   .op-host-mobile-ops { display: block; }
@@ -2706,7 +2714,9 @@
   width: 100%;
   max-width: 1392px;
   margin: 0 auto;
-  padding: 112px 24px 96px;
+  /* Sits inside the host workspace shell, whose main element already pads the
+     page; the old fixed-navbar offset would leave a dead band at the top. */
+  padding: 8px 0 0;
   color: #334155;
 }
 
@@ -3450,7 +3460,7 @@
 
 @media (max-width: 767px) {
   .op-host-application-page {
-    padding: 96px 16px 64px;
+    padding: 4px 0 0;
   }
 
   .op-host-application-hero {
