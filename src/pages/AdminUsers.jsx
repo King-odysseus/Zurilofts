@@ -30,7 +30,7 @@ function AdminUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [roleFilter, setRoleFilter] = useState('');
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(() => new URLSearchParams(window.location.search).get('search') || '');
   const [message, setMessage] = useState('');
   const [loadError, setLoadError] = useState('');
   const [busyId, setBusyId] = useState('');

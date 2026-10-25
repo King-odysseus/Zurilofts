@@ -112,6 +112,14 @@ export async function adminSignupTrend(req: Request, res: Response, next: NextFu
   }
 }
 
+export async function adminSearch(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    res.json({ success: true, data: await userService.adminSearch(String(req.query.q || '')) });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function adminUpdateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const user = await userService.adminUpdateUser(req.params.id, req.body);

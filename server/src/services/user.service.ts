@@ -315,3 +315,22 @@ export async function signupTrend(days: number) {
   });
   return { days: window, total: users.length, series };
 }
+
+/** Admin global search: people by name/email, listings by title/location. Capped so one keystroke cannot scan unbounded rows. */
+export async function adminSearch(query: string) {
+  const q = query.trim();
+  if (q.length < 2) return { users: [], properties: [] };
+  const [users, properties] = await Promise.all([
+    prisma.user.findMany({
+      where: { deletedAt: null, OR: [{ email: { contains: q } }, { firstName: { contains: q } }, { lastName: { contains: q } }] },
+      select: { id: true, email: true, firstName: true, lastName: true, role: true },
+      take: 5,
+    }),
+    prisma.property.findMany({
+      where: { OR: [{ title: { contains: q } }, { location: { contains: q } }, { neighborhood: { contains: q } }] },
+      select: { id: true, title: true, location: true, status: true },
+      take: 5,
+    }),
+  ]);
+  return { users, properties };
+}

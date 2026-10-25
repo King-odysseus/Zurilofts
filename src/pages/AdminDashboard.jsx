@@ -147,6 +147,36 @@ HeaderUserMenu.propTypes = {
 };
 
 
+function AdminSearch() {
+  const navigate = useNavigate();
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState({ users: [], properties: [] });
+  useEffect(() => {
+    if (query.trim().length < 2) { setResults({ users: [], properties: [] }); return undefined; }
+    let active = true;
+    const timer = setTimeout(() => {
+      apiClient.get('/admin/search', { params: { q: query } })
+        .then((res) => { if (active) setResults(res.data?.data || { users: [], properties: [] }); })
+        .catch(() => { if (active) setResults({ users: [], properties: [] }); });
+    }, 250);
+    return () => { active = false; clearTimeout(timer); };
+  }, [query]);
+  const hasResults = results.users.length > 0 || results.properties.length > 0;
+  function go(path) { setQuery(''); navigate(path); }
+  return (
+    <div className="op-admin-search">
+      <TextInput type="search" sizing="sm" placeholder="Search people and listings" aria-label="Search people and listings" value={query} onChange={(event) => setQuery(event.target.value)} />
+      {query.trim().length >= 2 && (
+        <div className="op-admin-search-results" role="listbox">
+          {!hasResults && <p>No matches</p>}
+          {results.users.map((u) => <button type="button" key={u.id} onClick={() => go(`/admin/users?search=${encodeURIComponent(u.email)}`)}><strong>{u.firstName} {u.lastName}</strong><span>{u.email} · {u.role}</span></button>)}
+          {results.properties.map((p) => <button type="button" key={p.id} onClick={() => go('/admin/properties')}><strong>{p.title}</strong><span>{p.location} · {p.status}</span></button>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function AdminLayout() {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -441,6 +471,7 @@ function AdminLayout() {
               <strong>{currentNavItem?.label || 'Dashboard'}</strong>
             </span>
           </div>
+          <AdminSearch />
           <div className="op-admin-shell-actions">
             <ThemeToggle className="op-admin-shell-icon-button" />
             <div className="op-admin-shell-bell-wrap">

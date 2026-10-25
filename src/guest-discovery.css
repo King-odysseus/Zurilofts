@@ -148,3 +148,4 @@
   .opg-search .opg-search-submit>.opg-search-mobile-label{display:inline}
 }
 .opg-filter-dialog{max-height:90vh;overflow-y:auto}.opg-amenity-filters{border:0;padding:0;margin:14px 0;display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}.opg-amenity-filters legend{font-size:12px;font-weight:700;color:var(--op-navy);margin-bottom:6px}.opg-filter-dialog .opg-amenity-filters label{display:flex;align-items:center;gap:8px;margin:4px 0;font-weight:500}.opg-filter-dialog .opg-amenity-filters input{display:inline-block;width:auto;margin:0}.opg-sort{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--op-muted)}.opg-sort select{width:auto;padding:6px 32px 6px 10px;font-size:13px}
+.opg-map-link{font-size:13px;font-weight:600;color:var(--op-navy);text-decoration:underline}
