@@ -2,25 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Find every page that reads a route parameter and decide which actually receive one",
+      "text": "Check whether Flowbite components are actually used and whether local commits are pushed",
       "state": "done"
     },
     {
-      "text": "Fix the duplicated Open calendar link on the host Today page",
+      "text": "Fix the row action dropdown so it renders as one panel instead of split (page CSS double-styling menu items)",
       "state": "done"
     },
     {
-      "text": "Confirm the stray admin password-hash file is gone and the uncommitted edits are sound",
+      "text": "Fix admin tables knocked out of table layout by grid/flex set on table cells",
       "state": "done"
     },
     {
-      "text": "Verify with lint, production build and by opening the affected screens",
+      "text": "Finish uncommitted admin conversions (Flowbite Table/Modal/Alert) and clear stale lint directives",
       "state": "done"
     },
     {
-      "text": "Commit and push",
+      "text": "Run lint and build",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push the Flowbite work so the deployed app matches the code",
       "state": "active"
+    },
+    {
+      "text": "Convert remaining hand-rolled tab groups to Flowbite Tabs on host and admin surfaces",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-25T16:27:46.600Z"
+  "updatedAt": "2026-10-25T17:29:09.559Z"
 }

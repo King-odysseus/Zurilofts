@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Label, Select, Textarea, TextInput } from 'flowbite-react';
+import {
+  Alert, Badge, Button, Label, Modal, ModalBody, ModalFooter, ModalHeader, Select,
+  Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, TextInput,
+} from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -248,89 +251,106 @@ function AdminUsers() {
             <Button color="light" type="button" onClick={loadUsers}>Try again</Button>
           </div>
         ) : users.length === 0 ? (
-          <div className="op-admin-people-empty">
+          <Alert color="info" className="op-admin-people-empty">
             <strong>No accounts found</strong>
             <p>Try a different search or role filter.</p>
-          </div>
+          </Alert>
         ) : (
           <div className="op-admin-people-scroll">
-            <div className="op-admin-people-table" role="table" aria-label="Users and hosts">
-              <div className="op-admin-people-columns" role="row">
-                <span role="columnheader">PERSON</span>
-                <span role="columnheader">ROLE</span>
-                <span role="columnheader">LISTINGS</span>
-                <span role="columnheader">WALLET</span>
-                <span role="columnheader">STATUS</span>
-                <span role="columnheader">ACTIONS</span>
-              </div>
-              {users.map((u) => {
-                const isSelf = u.id === currentUser?.id;
-                const busy = busyId === u.id;
-                return (
-                  <div key={u.id} className={`op-admin-people-row ${u.suspended ? 'is-suspended' : ''}`} role="row">
-                    <div className="op-admin-people-person" role="cell">
-                      <span className="op-admin-people-avatar" aria-hidden="true">{userInitials(u)}</span>
-                      <div>
-                        <strong>{u.firstName} {u.lastName}{isSelf && <small> · you</small>}</strong>
-                        <span>{u.email}</span>
-                        <small>{u.phone || 'Phone not added'}</small>
-                      </div>
-                    </div>
-                    <div className="op-admin-people-role" role="cell">
-                      {isSelf || u.role === 'ADMIN' ? (
-                        <span className="op-admin-people-pill is-admin">Admin</span>
-                      ) : (
-                        <Select
-                          sizing="sm"
-                          value={u.role}
-                          onChange={(event) => changeRole(u, event.target.value)}
-                          disabled={busy}
-                          aria-label={`Change role for ${u.firstName} ${u.lastName}`}
-                          className="op-admin-people-role-select"
-                        >
-                          <option value="USER">Guest</option>
-                          <option value="HOST">Host</option>
-                        </Select>
-                      )}
-                    </div>
-                    <div role="cell"><strong>{u._count?.properties ?? 0}</strong><small>properties</small></div>
-                    <div role="cell"><strong>{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '-'}</strong><small>host balance</small></div>
-                    <div role="cell"><span className={`op-admin-people-pill ${u.suspended ? 'is-danger' : 'is-success'}`}>{u.suspended ? 'Suspended' : 'Active'}</span></div>
-                    <div className="op-admin-people-actions" role="cell">
-                      <TableActionsMenu
-                        label={`Actions for ${u.firstName} ${u.lastName}`}
-                        actions={[
-                          { label: 'Edit', icon: 'edit', onClick: () => openEdit(u) },
-                          // Suspend and Delete are withheld on your own account: an admin
-                          // removing themselves here would lock the console.
-                          ...(!isSelf ? [
-                            { label: u.suspended ? 'Reactivate' : 'Suspend', icon: u.suspended ? 'refresh' : 'pause', disabled: busy, onClick: () => toggleSuspend(u) },
-                            { label: 'Delete', icon: 'delete', danger: true, disabled: busy, onClick: () => openDelete(u) },
-                          ] : []),
-                        ]}
-                      />
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <Table hoverable aria-label="Users and hosts">
+              <TableHead>
+                <TableRow>
+                  <TableHeadCell>PERSON</TableHeadCell>
+                  <TableHeadCell>ROLE</TableHeadCell>
+                  <TableHeadCell>LISTINGS</TableHeadCell>
+                  <TableHeadCell>WALLET</TableHeadCell>
+                  <TableHeadCell>STATUS</TableHeadCell>
+                  <TableHeadCell>ACTIONS</TableHeadCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {users.map((u) => {
+                  const isSelf = u.id === currentUser?.id;
+                  const busy = busyId === u.id;
+                  return (
+                    <TableRow key={u.id} className={u.suspended ? 'opacity-70' : undefined}>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <span className="op-admin-people-avatar" aria-hidden="true">{userInitials(u)}</span>
+                          <div className="min-w-0">
+                            <strong className="block truncate">{u.firstName} {u.lastName}{isSelf && <small> · you</small>}</strong>
+                            <span className="block truncate text-xs">{u.email}</span>
+                            <small className="block truncate">{u.phone || 'Phone not added'}</small>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {isSelf || u.role === 'ADMIN' ? (
+                          <Badge color="gray">Admin</Badge>
+                        ) : (
+                          <Select
+                            sizing="sm"
+                            value={u.role}
+                            onChange={(event) => changeRole(u, event.target.value)}
+                            disabled={busy}
+                            aria-label={`Change role for ${u.firstName} ${u.lastName}`}
+                            className="op-admin-people-role-select"
+                          >
+                            <option value="USER">Guest</option>
+                            <option value="HOST">Host</option>
+                          </Select>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          <strong>{u._count?.properties ?? 0}</strong>
+                          <small>properties</small>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-1">
+                          <strong>{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '-'}</strong>
+                          <small>host balance</small>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge color={u.suspended ? 'failure' : 'success'}>{u.suspended ? 'Suspended' : 'Active'}</Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <TableActionsMenu
+                            label={`Actions for ${u.firstName} ${u.lastName}`}
+                            actions={[
+                              { label: 'Edit', icon: 'edit', onClick: () => openEdit(u) },
+                              // Suspend and Delete are withheld on your own account: an admin
+                              // removing themselves here would lock the console.
+                              ...(!isSelf ? [
+                                { label: u.suspended ? 'Reactivate' : 'Suspend', icon: u.suspended ? 'refresh' : 'pause', disabled: busy, onClick: () => toggleSuspend(u) },
+                                { label: 'Delete', icon: 'delete', danger: true, disabled: busy, onClick: () => openDelete(u) },
+                              ] : []),
+                            ]}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
         )}
       </section>
 
       {/* Edit modal */}
       {editing && (
-        <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={closeEdit}>
-          <div className="op-admin-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="edit-user-title" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="op-admin-dialog-heading">
-              <div>
-                <p className="op-admin-eyebrow">ACCOUNT · {ROLE_LABELS[editing.role] || editing.role}</p>
-                <h2 id="edit-user-title">Edit {editing.firstName} {editing.lastName}</h2>
-              </div>
-              <button type="button" onClick={closeEdit} aria-label="Close account editor">&times;</button>
-            </div>
-            <form onSubmit={handleSave} className="op-admin-booking-form">
-              {formError && <div className="op-admin-error" role="alert">{formError}</div>}
+        <Modal show onClose={closeEdit} size="lg" dismissible>
+          <ModalHeader>
+            <span className="block op-admin-eyebrow">ACCOUNT · {ROLE_LABELS[editing.role] || editing.role}</span>
+            <span className="block">Edit {editing.firstName} {editing.lastName}</span>
+          </ModalHeader>
+          <form onSubmit={handleSave}>
+            <ModalBody>
+              {formError && <Alert color="failure" className="op-admin-error">{formError}</Alert>}
 
               <div className="op-admin-form-grid">
                 <Field label="First Name" value={formData.firstName} onChange={(v) => setFormData({ ...formData, firstName: v })} />
@@ -361,68 +381,62 @@ function AdminUsers() {
                   </div>
                 </div>
               </div>
-
-              <div className="op-admin-dialog-actions">
-                <Button color="light" type="button" onClick={closeEdit} disabled={saving}>Cancel</Button>
-                <Button className="op-admin-bronze-button" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save changes'}</Button>
-              </div>
-            </form>
-          </div>
-        </div>
+            </ModalBody>
+            <ModalFooter>
+              <Button color="light" type="button" onClick={closeEdit} disabled={saving}>Cancel</Button>
+              <Button className="op-admin-bronze-button" type="submit" disabled={saving}>{saving ? 'Saving...' : 'Save changes'}</Button>
+            </ModalFooter>
+          </form>
+        </Modal>
       )}
 
       {/* Account erasure modal */}
       {deleteTarget && (
-        <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={closeDelete}>
-          <div className="op-admin-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-user-title" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="op-admin-dialog-heading">
-              <div>
-                <p className="op-admin-eyebrow">ACCOUNT ERASURE</p>
-                <h2 id="delete-user-title">Delete user account</h2>
-              </div>
-              <button type="button" onClick={closeDelete} aria-label="Close account deletion dialog">&times;</button>
-            </div>
+        <Modal show onClose={closeDelete} size="lg" dismissible>
+          <ModalHeader>
+            <span className="block op-admin-eyebrow">ACCOUNT ERASURE</span>
+            <span className="block">Delete user account</span>
+          </ModalHeader>
+          <ModalBody>
             <p className="op-admin-people-delete-copy">
-                You are deleting {deleteTarget.firstName} {deleteTarget.lastName} ({deleteTarget.email}).
-                Personal data will be erased. Records required for bookings, payouts, and legal compliance
-                will be retained only in anonymised form. This cannot be undone.
+              You are deleting {deleteTarget.firstName} {deleteTarget.lastName} ({deleteTarget.email}).
+              Personal data will be erased. Records required for bookings, payouts, and legal compliance
+              will be retained only in anonymised form. This cannot be undone.
             </p>
-            <div className="op-admin-booking-form">
-              {deleteError && <div className="op-admin-error" role="alert">{deleteError}</div>}
-              <div>
-                <Label htmlFor="delete-user-reason">Reason for deletion</Label>
-                <Textarea
-                  id="delete-user-reason"
-                  value={deleteReason}
-                  onChange={(e) => { setDeleteReason(e.target.value); setDeleteError(''); }}
-                  rows={3}
-                  maxLength={500}
-                  placeholder="For example: Customer requested account erasure"
-                />
-              </div>
-              <div>
-                <Label htmlFor="delete-user-confirm">Type DELETE to confirm</Label>
-                <TextInput
-                  id="delete-user-confirm"
-                  type="text"
-                  value={deleteConfirm}
-                  onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
-                />
-              </div>
-              <div className="op-admin-dialog-actions">
-                <Button color="light" type="button" onClick={closeDelete} disabled={Boolean(busyId)}>Cancel</Button>
-                <Button
-                  type="button"
-                  onClick={handleDeleteUser}
-                  disabled={Boolean(busyId) || deleteConfirm !== 'DELETE' || deleteReason.trim().length < 3}
-                  className="op-admin-danger-button"
-                >
-                  {busyId ? 'Deleting...' : 'Delete account'}
-                </Button>
-              </div>
+            {deleteError && <Alert color="failure" className="op-admin-error">{deleteError}</Alert>}
+            <div>
+              <Label htmlFor="delete-user-reason">Reason for deletion</Label>
+              <Textarea
+                id="delete-user-reason"
+                value={deleteReason}
+                onChange={(e) => { setDeleteReason(e.target.value); setDeleteError(''); }}
+                rows={3}
+                maxLength={500}
+                placeholder="For example: Customer requested account erasure"
+              />
             </div>
-          </div>
-        </div>
+            <div>
+              <Label htmlFor="delete-user-confirm">Type DELETE to confirm</Label>
+              <TextInput
+                id="delete-user-confirm"
+                type="text"
+                value={deleteConfirm}
+                onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
+              />
+            </div>
+          </ModalBody>
+          <ModalFooter>
+            <Button color="light" type="button" onClick={closeDelete} disabled={Boolean(busyId)}>Cancel</Button>
+            <Button
+              type="button"
+              onClick={handleDeleteUser}
+              disabled={Boolean(busyId) || deleteConfirm !== 'DELETE' || deleteReason.trim().length < 3}
+              className="op-admin-danger-button"
+            >
+              {busyId ? 'Deleting...' : 'Delete account'}
+            </Button>
+          </ModalFooter>
+        </Modal>
       )}
     </div>
   );

@@ -60,7 +60,6 @@ function BookingPage() {
 
   // Add-ons
   const [bookingId, setBookingId] = useState(null);
-  const [paymentUrl, setPaymentUrl] = useState(null);
   const [availableAddOns, setAvailableAddOns] = useState([]);
   const [selectedAddOns, setSelectedAddOns] = useState([]); // { addOn, quantity }
   const [loadingAddOns, setLoadingAddOns] = useState(false);
@@ -395,7 +394,6 @@ function BookingPage() {
       });
       const createdId = res.data.data.booking?.id || null;
       setBookingId(createdId);
-      setPaymentUrl(res.data.data.paymentUrl || null);
       return createdId;
     } catch (err) {
       setAddOnsError(err.response?.data?.error || 'Could not start your booking. Please try again.');
@@ -483,37 +481,36 @@ function BookingPage() {
     setSubmitError('');
 
     try {
-      if (!paymentUrl) {
-        // No booking created yet (e.g. user jumped straight to payment) - create
-        // it now so we have a booking id and a payment URL to redirect to.
-        const res = await apiClient.post('/bookings', {
-          propertyId: id,
-          bedOption,
-          checkIn: bookingData.checkIn,
-          checkOut: bookingData.checkOut,
-          guests: bookingData.guests,
-          checkInTime: bookingData.checkInTime || undefined,
-          checkOutTime: bookingData.checkOutTime || undefined,
-          specialRequests: bookingData.specialRequests || undefined,
-          paymentMethod: bookingData.paymentMethod,
-          promoCode: promoResult?.code || undefined,
-          additionalGuests: additionalGuests.filter((g) => g.firstName.trim() || g.lastName.trim()),
-        });
-        setBookingId(res.data.data.booking?.id || null);
-        setPaymentUrl(res.data.data.paymentUrl || null);
-        if (res.data.data.paymentUrl) {
-          window.location.href = res.data.data.paymentUrl;
-          return;
-        }
+      // The booking is created when the guest leaves the details step, which is
+      // BEFORE add-ons are attached and BEFORE a payment method is chosen, so any
+      // link minted back then carries the old total and the default channel. Always
+      // mint a fresh link here: the server recalculates the total (add-ons included)
+      // and opens the transaction on the method the guest actually picked.
+      const id = bookingId || (await ensureBooking());
+      if (!id) {
+        setSubmitError('Could not start your booking. Please try again.');
+        setIsProcessing(false);
+        return;
+      }
+
+      const res = await apiClient.post(`/bookings/${id}/payment`, {
+        paymentMethod: bookingData.paymentMethod,
+      });
+      const authorizationUrl = res.data.data.authorizationUrl;
+      if (!authorizationUrl) {
         setSubmitError('Payment gateway unavailable. Please try again.');
         setIsProcessing(false);
         return;
       }
 
-      // Booking already created during the add-ons step - just redirect to the
-      // payment URL that was returned at creation time.
-      window.location.href = paymentUrl;
+      window.location.href = authorizationUrl;
     } catch (err) {
+      // An unverified guest cannot pay yet: send them to the verification step
+      // instead of leaving a checkout button that can never succeed.
+      if (err.response?.data?.error === 'IDENTITY_VERIFICATION_REQUIRED') {
+        navigate('/verify-identity');
+        return;
+      }
       setSubmitError(err.response?.data?.error || 'Booking failed. Please try again.');
       setIsProcessing(false);
     }

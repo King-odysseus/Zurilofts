@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Select } from 'flowbite-react';
+import { Button, Label, Modal, ModalBody, ModalFooter, ModalHeader, Select, Textarea } from 'flowbite-react';
 import { ExternalLink, House } from 'lucide-react';
 import apiClient from '../api/client.js';
 
@@ -52,6 +52,21 @@ export default function AdminListingReview() {
         {listing.status === 'PENDING_REVIEW' && <button type="button" onClick={() => { setReviewing(listing); setNote(''); }}>Decide</button>}
       </div>) : <div className="op-admin-empty"><strong>No listings in this view</strong><p>Try another status.</p></div>}
     </section>
-    {reviewing && <div className="op-admin-review-backdrop" onClick={() => setReviewing(null)}><div className="op-admin-review-dialog" role="dialog" aria-modal="true" aria-labelledby="review-title" onClick={(event) => event.stopPropagation()}><h2 id="review-title">Review {reviewing.title}</h2><p>Check the listing details and photos before making a decision.</p><Link to={`/property/${reviewing.id}`} target="_blank">Preview stay <ExternalLink strokeWidth={1.8} aria-hidden="true" /></Link><label htmlFor="review-note">Reason or note (required for rejection)</label><textarea id="review-note" value={note} onChange={(event) => setNote(event.target.value)} rows="3" /><div><button type="button" onClick={() => setReviewing(null)}>Cancel</button><button type="button" disabled={busy} onClick={() => review(reviewing, 'reject')}>Reject</button><button type="button" disabled={busy} onClick={() => review(reviewing, 'approve')}>Approve</button></div></div></div>}
+    {reviewing && <Modal show onClose={() => setReviewing(null)} size="lg" dismissible>
+      <ModalHeader>Review {reviewing.title}</ModalHeader>
+      <ModalBody>
+        <p>Check the listing details and photos before making a decision.</p>
+        <Link to={`/property/${reviewing.id}`} target="_blank">Preview stay <ExternalLink strokeWidth={1.8} aria-hidden="true" /></Link>
+        <div>
+          <Label htmlFor="review-note" value="Reason or note (required for rejection)" />
+          <Textarea id="review-note" value={note} onChange={(event) => setNote(event.target.value)} rows={3} />
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <Button color="light" type="button" onClick={() => setReviewing(null)}>Cancel</Button>
+        <Button color="failure" type="button" disabled={busy} onClick={() => review(reviewing, 'reject')}>Reject</Button>
+        <Button type="button" disabled={busy} onClick={() => review(reviewing, 'approve')}>Approve</Button>
+      </ModalFooter>
+    </Modal>}
   </div>;
 }

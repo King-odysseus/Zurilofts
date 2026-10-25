@@ -1,5 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Button, Select, TextInput } from 'flowbite-react';
+import {
+  Alert,
+  Button,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+  TextInput,
+} from 'flowbite-react';
 import { Search, Star } from 'lucide-react';
 import apiClient from '../api/client.js';
 
@@ -100,45 +115,61 @@ function AdminFeedback() {
         {loading ? (
           <div className="op-admin-catalog-empty"><span className="op-admin-booking-spinner" aria-hidden="true" /><strong>Loading guest feedback</strong><p>Checking ratings, public reviews, and private stay notes.</p></div>
         ) : error ? (
-          <div className="op-admin-catalog-empty"><strong>Feedback could not be loaded</strong><p>{error}</p></div>
+          <Alert color="failure" className="op-admin-catalog-empty"><strong>Feedback could not be loaded</strong><p>{error}</p></Alert>
         ) : visibleReviews.length === 0 ? (
-          <div className="op-admin-catalog-empty"><span aria-hidden="true"><SearchIcon /></span><strong>No feedback found</strong><p>Adjust the rating filter or search terms.</p></div>
+          <Alert color="info" className="op-admin-catalog-empty"><span aria-hidden="true"><SearchIcon /></span><strong>No feedback found</strong><p>Adjust the rating filter or search terms.</p></Alert>
         ) : (
-          <div className="op-admin-catalog-list" role="table" aria-label="Guest feedback">
-            <div className="op-admin-catalog-columns op-admin-feedback-columns" role="row">
-              <span role="columnheader">PROPERTY</span><span role="columnheader">GUEST</span><span role="columnheader">RATING</span><span role="columnheader">PUBLIC REVIEW</span><span role="columnheader">DATE</span><span role="columnheader">ACTION</span>
-            </div>
-            {visibleReviews.map((review) => (
-              <article key={review.id} className="op-admin-catalog-row op-admin-feedback-row op-admin-feedback-columns" role="row">
-                <div className="op-admin-feedback-property" role="cell"><strong>{review.property?.title || 'Property unavailable'}</strong><span>{review.property?.location || 'Location not recorded'}</span></div>
-                <div className="op-admin-feedback-guest" role="cell"><strong>{review.user?.firstName} {review.user?.lastName}</strong><span>{review.user?.email || 'Email not available'}</span></div>
-                <div role="cell"><StarRow rating={Number(review.rating) || 0} /><small className="op-admin-feedback-score">{review.rating}/5</small></div>
-                <div className="op-admin-feedback-copy" role="cell">
-                  <p>{review.publicComment || 'No public review was submitted.'}</p>
-                  <span>{review.privateNote ? 'Includes a private operational note' : 'No private note supplied'}</span>
-                </div>
-                <div className="op-admin-catalog-cell" role="cell"><small>SUBMITTED</small><strong>{formatDate(review.createdAt)}</strong><span>{review.privateNote ? 'Private note attached' : 'Public only'}</span></div>
-                <div className="op-admin-catalog-actions" role="cell"><Button size="xs" color="light" onClick={() => setSelected(review)}>View</Button></div>
-              </article>
-            ))}
+          <div className="op-admin-catalog-list">
+            <Table hoverable aria-label="Guest feedback">
+              <TableHead>
+                <TableRow>
+                  <TableHeadCell>PROPERTY</TableHeadCell>
+                  <TableHeadCell>GUEST</TableHeadCell>
+                  <TableHeadCell>RATING</TableHeadCell>
+                  <TableHeadCell>PUBLIC REVIEW</TableHeadCell>
+                  <TableHeadCell>DATE</TableHeadCell>
+                  <TableHeadCell>ACTION</TableHeadCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {visibleReviews.map((review) => (
+                  <TableRow key={review.id}>
+                    <TableCell className="op-admin-feedback-property"><strong>{review.property?.title || 'Property unavailable'}</strong><span>{review.property?.location || 'Location not recorded'}</span></TableCell>
+                    <TableCell className="op-admin-feedback-guest"><strong>{review.user?.firstName} {review.user?.lastName}</strong><span>{review.user?.email || 'Email not available'}</span></TableCell>
+                    <TableCell className="op-admin-catalog-cell"><StarRow rating={Number(review.rating) || 0} /><small className="op-admin-feedback-score">{review.rating}/5</small></TableCell>
+                    <TableCell className="op-admin-feedback-copy">
+                      <p>{review.publicComment || 'No public review was submitted.'}</p>
+                      <span>{review.privateNote ? 'Includes a private operational note' : 'No private note supplied'}</span>
+                    </TableCell>
+                    <TableCell className="op-admin-catalog-cell"><small>SUBMITTED</small><strong>{formatDate(review.createdAt)}</strong><span>{review.privateNote ? 'Private note attached' : 'Public only'}</span></TableCell>
+                    <TableCell className="op-admin-catalog-actions"><Button size="xs" color="light" onClick={() => setSelected(review)}>View</Button></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
       </section>
 
-      {selected && (
-        <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={() => setSelected(null)}>
-          <div className="op-admin-edit-dialog op-admin-feedback-dialog" role="dialog" aria-modal="true" aria-labelledby="feedback-detail-title" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="op-admin-dialog-heading"><div><p className="op-admin-eyebrow">GUEST REVIEW · {selected.rating}/5</p><h2 id="feedback-detail-title">{selected.property?.title || 'Guest feedback'}</h2></div><button type="button" onClick={() => setSelected(null)} aria-label="Close feedback detail">&times;</button></div>
-            <div className="op-admin-feedback-dialog-meta">
-              <div><span>Guest</span><strong>{selected.user?.firstName} {selected.user?.lastName}</strong><small>{selected.user?.email}</small></div>
-              <div><span>Stay location</span><strong>{selected.property?.location || 'Not recorded'}</strong><small>{formatDate(selected.createdAt, true)}</small></div>
-              <div><span>Rating</span><StarRow rating={Number(selected.rating) || 0} size="lg" /><small>{selected.rating} out of 5</small></div>
-            </div>
-            <section className="op-admin-feedback-note"><div><span>PUBLIC REVIEW</span><p>{selected.publicComment || 'No public review was submitted.'}</p></div><div className="is-private"><span>PRIVATE OPERATIONAL NOTE</span><p>{selected.privateNote || 'No private note was supplied.'}</p></div></section>
-            <div className="op-admin-dialog-actions"><Button color="light" onClick={() => setSelected(null)}>Close</Button></div>
-          </div>
-        </div>
-      )}
+      <Modal show={Boolean(selected)} onClose={() => setSelected(null)} size="lg" dismissible>
+        {selected && (
+          <>
+            <ModalHeader>
+              <span className="block op-admin-eyebrow">GUEST REVIEW · {selected.rating}/5</span>
+              <span className="block">{selected.property?.title || 'Guest feedback'}</span>
+            </ModalHeader>
+            <ModalBody>
+              <div className="op-admin-feedback-dialog-meta">
+                <div><span>Guest</span><strong>{selected.user?.firstName} {selected.user?.lastName}</strong><small>{selected.user?.email}</small></div>
+                <div><span>Stay location</span><strong>{selected.property?.location || 'Not recorded'}</strong><small>{formatDate(selected.createdAt, true)}</small></div>
+                <div><span>Rating</span><StarRow rating={Number(selected.rating) || 0} size="lg" /><small>{selected.rating} out of 5</small></div>
+              </div>
+              <section className="op-admin-feedback-note"><div><span>PUBLIC REVIEW</span><p>{selected.publicComment || 'No public review was submitted.'}</p></div><div className="is-private"><span>PRIVATE OPERATIONAL NOTE</span><p>{selected.privateNote || 'No private note was supplied.'}</p></div></section>
+            </ModalBody>
+            <ModalFooter className="op-admin-dialog-actions"><Button color="light" onClick={() => setSelected(null)}>Close</Button></ModalFooter>
+          </>
+        )}
+      </Modal>
     </div>
   );
 }

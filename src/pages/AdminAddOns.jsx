@@ -1,5 +1,23 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Button, Checkbox, Label, Select, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Alert,
+  Button,
+  Checkbox,
+  Label,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+  Textarea,
+  TextInput,
+  ToggleSwitch,
+} from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
@@ -69,12 +87,7 @@ function AdminAddOns() {
     setFormError('');
   }
 
-  useEffect(() => {
-    fetchAddOns();
-    fetchProperties();
-  }, []);
-
-  async function fetchAddOns() {
+  const fetchAddOns = useCallback(async () => {
     try {
       const response = await apiClient.get('/admin/addons');
       setAddOns(response.data.data || []);
@@ -84,9 +97,9 @@ function AdminAddOns() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  async function fetchProperties() {
+  const fetchProperties = useCallback(async () => {
     try {
       // Admin-namespaced list: `/properties/mine` is host-scoped and 403s for admins.
       const response = await apiClient.get('/admin/properties');
@@ -101,11 +114,18 @@ function AdminAddOns() {
             if (!assignmentMap[addOn.id]) assignmentMap[addOn.id] = new Set();
             assignmentMap[addOn.id].add(property.id);
           });
-        } catch { /* A property without add-ons should not block the editor. */ }
+        } catch { /* A property without add-ons must not block the rest of the editor. */ }
       }));
       setAssignments(assignmentMap);
-    } catch { /* Property assignment is optional until the editor is opened. */ }
-  }
+    } catch { /* Property coverage is optional until the editor is opened. */ }
+  }, []);
+
+  // Fetchers are stable callbacks, so this runs once on mount and after each mutation
+  // that calls them directly - no dependency-array suppression needed.
+  useEffect(() => {
+    fetchAddOns();
+    fetchProperties();
+  }, [fetchAddOns, fetchProperties]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -218,77 +238,93 @@ function AdminAddOns() {
           <span>{visibleAddOns.length} service{visibleAddOns.length === 1 ? '' : 's'}</span>
         </div>
 
-        {message && <div className={`op-admin-people-message ${messageTone === 'error' ? 'is-error' : 'is-success'}`} role="status">{message}</div>}
+        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="op-admin-people-message" role="status">{message}</Alert>}
 
         {loading ? (
-          <div className="op-admin-catalog-empty"><span className="op-admin-booking-spinner" aria-hidden="true" /><strong>Loading add-ons</strong><p>Checking service inventory and property assignments.</p></div>
+          <div className="op-admin-catalog-empty"><span className="op-admin-booking-spinner" aria-hidden="true" /><strong>Loading add-ons</strong><p>Checking service inventory and property coverage.</p></div>
         ) : visibleAddOns.length === 0 ? (
-          <div className="op-admin-catalog-empty"><span aria-hidden="true"><SearchIcon /></span><strong>No add-ons found</strong><p>Create a guest service or adjust the current search.</p></div>
+          <Alert color="info" className="op-admin-catalog-empty"><span aria-hidden="true"><SearchIcon /></span><strong>No add-ons found</strong><p>Create a guest service or adjust the current search.</p></Alert>
         ) : (
-          <div className="op-admin-catalog-list" role="table" aria-label="Add-ons">
-            <div className="op-admin-catalog-columns op-admin-addon-columns" role="row">
-              <span role="columnheader">SERVICE</span><span role="columnheader">CATEGORY</span><span role="columnheader">PRICE</span><span role="columnheader">PROPERTY COVERAGE</span><span role="columnheader">STATUS</span><span role="columnheader">ACTIONS</span>
-            </div>
-            {visibleAddOns.map((addOn) => {
-              const assigned = assignments[addOn.id] || new Set();
-              return (
-                <article key={addOn.id} className={`op-admin-catalog-row op-admin-addon-columns ${addOn.active ? '' : 'is-muted'}`} role="row">
-                  <div className="op-admin-addon-service" role="cell">
-                    {addOn.image ? <img src={addOn.image} alt="" /> : <span aria-hidden="true">{String(addOn.name || 'A')[0].toUpperCase()}</span>}
-                    <div><strong>{addOn.name}</strong><small>{addOn.description}</small></div>
-                  </div>
-                  <div role="cell"><span className="op-admin-addon-category">{CATEGORY_LABELS[addOn.category] || addOn.category}</span></div>
-                  <div className="op-admin-catalog-cell" role="cell"><small>RATE</small><strong>KES {Number(addOn.price).toLocaleString()}</strong><span>Per booking or service</span></div>
-                  <div className="op-admin-catalog-cell" role="cell"><small>ASSIGNED</small><strong>{assigned.size ? `${assigned.size} propert${assigned.size === 1 ? 'y' : 'ies'}` : 'Not assigned'}</strong><span>{assigned.size ? 'Visible on selected stays' : 'No property coverage'}</span></div>
-                  <div role="cell"><button type="button" className={`op-admin-catalog-status ${addOn.active ? 'is-success' : 'is-neutral'}`} onClick={() => handleToggle(addOn)}>{addOn.active ? 'Active' : 'Paused'}</button></div>
-                  <div className="op-admin-catalog-actions" role="cell">
-                    <TableActionsMenu
-                      label={`Actions for ${addOn.name}`}
-                      actions={[
-                        { label: 'Edit', icon: 'edit', onClick: () => openEdit(addOn) },
-                        { label: 'Delete', icon: 'delete', danger: true, onClick: () => handleDelete(addOn.id) },
-                      ]}
-                    />
-                  </div>
-                </article>
-              );
-            })}
+          <div className="op-admin-catalog-list">
+            <Table hoverable aria-label="Add-ons">
+              <TableHead>
+                <TableRow>
+                  <TableHeadCell>SERVICE</TableHeadCell>
+                  <TableHeadCell>CATEGORY</TableHeadCell>
+                  <TableHeadCell>PRICE</TableHeadCell>
+                  <TableHeadCell>PROPERTY COVERAGE</TableHeadCell>
+                  <TableHeadCell>STATUS</TableHeadCell>
+                  <TableHeadCell>ACTIONS</TableHeadCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {visibleAddOns.map((addOn) => {
+                  const assigned = assignments[addOn.id] || new Set();
+                  return (
+                    <TableRow key={addOn.id}>
+                      <TableCell><div className="op-admin-addon-service">
+                        {addOn.image ? <img src={addOn.image} alt="" /> : <span aria-hidden="true">{String(addOn.name || 'A')[0].toUpperCase()}</span>}
+                        <div><strong>{addOn.name}</strong><small>{addOn.description}</small></div>
+                      </div></TableCell>
+                      <TableCell><span className="op-admin-addon-category">{CATEGORY_LABELS[addOn.category] || addOn.category}</span></TableCell>
+                      <TableCell><div className="op-admin-catalog-cell"><small>RATE</small><strong>KES {Number(addOn.price).toLocaleString()}</strong><span>Per booking or service</span></div></TableCell>
+                      <TableCell><div className="op-admin-catalog-cell"><small>ASSIGNED</small><strong>{assigned.size ? `${assigned.size} propert${assigned.size === 1 ? 'y' : 'ies'}` : 'Not assigned'}</strong><span>{assigned.size ? 'Offered on selected stays' : 'No property coverage'}</span></div></TableCell>
+                      <TableCell><Button size="xs" color={addOn.active ? 'success' : 'warning'} onClick={() => handleToggle(addOn)}>{addOn.active ? 'Active' : 'Paused'}</Button></TableCell>
+                      <TableCell><div className="op-admin-catalog-actions">
+                        <TableActionsMenu
+                          label={`Actions for ${addOn.name}`}
+                          actions={[
+                            { label: 'Edit', icon: 'edit', onClick: () => openEdit(addOn) },
+                            { label: 'Delete', icon: 'delete', danger: true, onClick: () => handleDelete(addOn.id) },
+                          ]}
+                        />
+                      </div></TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
         )}
       </section>
 
-      {showForm && (
-        <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={closeForm}>
-          <div className="op-admin-edit-dialog op-admin-catalog-dialog" role="dialog" aria-modal="true" aria-labelledby="addon-form-title" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="op-admin-dialog-heading"><div><p className="op-admin-eyebrow">ADD-ON · {editingId ? 'EDIT' : 'NEW'}</p><h2 id="addon-form-title">{editingId ? 'Edit add-on' : 'Create add-on'}</h2></div><button type="button" onClick={closeForm} aria-label="Close add-on form">&times;</button></div>
-            {formError && <div className="op-admin-error" role="alert">{formError}</div>}
-            <form onSubmit={handleSubmit} className="op-admin-booking-form">
-              <div><Label htmlFor="addon-name">Service name</Label><TextInput id="addon-name" value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Airport pickup" required /></div>
-              <div><Label htmlFor="addon-description">Description</Label><Textarea id="addon-description" rows={3} value={formData.description} onChange={(event) => setFormData({ ...formData, description: event.target.value })} placeholder="Describe what guests receive and when." required /></div>
-              <div className="op-admin-form-grid">
-                <div><Label htmlFor="addon-price">Price (KES)</Label><TextInput id="addon-price" type="number" min="1" value={formData.price} onChange={(event) => setFormData({ ...formData, price: event.target.value })} required /></div>
-                <div><Label htmlFor="addon-category">Category</Label><Select id="addon-category" value={formData.category} onChange={(event) => setFormData({ ...formData, category: event.target.value })}>{CATEGORIES.map((category) => <option key={category} value={category}>{CATEGORY_LABELS[category]}</option>)}</Select></div>
-              </div>
-              <div><Label htmlFor="addon-image">Image URL (optional)</Label><TextInput id="addon-image" value={formData.image} onChange={(event) => setFormData({ ...formData, image: event.target.value })} placeholder="https://..." /></div>
-              <div className="op-admin-addon-toggle"><ToggleSwitch checked={formData.active} label="Available to guests" onChange={(event) => setFormData({ ...formData, active: event.target.checked })} /></div>
-
-              {editingId && (
-                <div className="op-admin-assignment-section">
-                  <div className="op-admin-assignment-heading"><div><Label>Assigned properties</Label><p>Choose which stays may offer this service.</p></div></div>
-                  <div className="op-admin-assignment-list">
-                    {properties.length === 0 ? <p>No properties are available.</p> : properties.map((property) => {
-                      const assigned = (assignments[editingId] || new Set()).has(property.id);
-                      return <Label key={property.id} className="op-admin-assignment-item"><Checkbox checked={assigned} disabled={assigning} onChange={() => toggleAssignment(property.id, editingId, assigned)} /><span><strong>{property.title}</strong><small>{property.location}</small></span></Label>;
-                    })}
-                  </div>
+      <Modal show={showForm} onClose={closeForm} size="lg" dismissible>
+        {showForm && (
+          <>
+            <ModalHeader>
+              <span className="block op-admin-eyebrow">ADD-ON · {editingId ? 'EDIT' : 'NEW'}</span>
+              <span className="block">{editingId ? 'Edit add-on' : 'Create add-on'}</span>
+            </ModalHeader>
+            <ModalBody>
+              {formError && <Alert color="failure" className="op-admin-error">{formError}</Alert>}
+              <form onSubmit={handleSubmit} className="op-admin-booking-form">
+                <div><Label htmlFor="addon-name">Service name</Label><TextInput id="addon-name" value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Airport pickup" required /></div>
+                <div><Label htmlFor="addon-description">Description</Label><Textarea id="addon-description" rows={3} value={formData.description} onChange={(event) => setFormData({ ...formData, description: event.target.value })} placeholder="Describe what guests receive and when." required /></div>
+                <div className="op-admin-form-grid">
+                  <div><Label htmlFor="addon-price">Price (KES)</Label><TextInput id="addon-price" type="number" min="1" value={formData.price} onChange={(event) => setFormData({ ...formData, price: event.target.value })} required /></div>
+                  <div><Label htmlFor="addon-category">Category</Label><Select id="addon-category" value={formData.category} onChange={(event) => setFormData({ ...formData, category: event.target.value })}>{CATEGORIES.map((category) => <option key={category} value={category}>{CATEGORY_LABELS[category]}</option>)}</Select></div>
                 </div>
-              )}
+                <div><Label htmlFor="addon-image">Image URL (optional)</Label><TextInput id="addon-image" value={formData.image} onChange={(event) => setFormData({ ...formData, image: event.target.value })} placeholder="https://..." /></div>
+                <div className="op-admin-addon-toggle"><ToggleSwitch checked={formData.active} label="Available to guests" onChange={(event) => setFormData({ ...formData, active: event.target.checked })} /></div>
 
-              <div className="op-admin-dialog-actions"><Button color="light" type="button" onClick={closeForm} disabled={saving}>Cancel</Button><Button className="op-admin-bronze-button" type="submit" disabled={saving}>{saving ? 'Saving...' : editingId ? 'Save changes' : 'Create add-on'}</Button></div>
-            </form>
-          </div>
-        </div>
-      )}
+                {editingId && (
+                  <div className="op-admin-assignment-section">
+                    <div className="op-admin-assignment-heading"><div><Label>Assigned properties</Label><p>Choose which stays may offer this service.</p></div></div>
+                    <div className="op-admin-assignment-list">
+                      {properties.length === 0 ? <p>No properties are available.</p> : properties.map((property) => {
+                        const assigned = (assignments[editingId] || new Set()).has(property.id);
+                        return <Label key={property.id} className="op-admin-assignment-item"><Checkbox checked={assigned} disabled={assigning} onChange={() => toggleAssignment(property.id, editingId, assigned)} /><span><strong>{property.title}</strong><small>{property.location}</small></span></Label>;
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <div className="op-admin-dialog-actions"><Button color="light" type="button" onClick={closeForm} disabled={saving}>Cancel</Button><Button className="op-admin-bronze-button" type="submit" disabled={saving}>{saving ? 'Saving...' : editingId ? 'Save changes' : 'Create add-on'}</Button></div>
+              </form>
+            </ModalBody>
+          </>
+        )}
+      </Modal>
     </div>
   );
 }

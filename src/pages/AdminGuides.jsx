@@ -1,5 +1,22 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Button, Label, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Alert,
+  Badge,
+  Button,
+  Label,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+  Textarea,
+  TextInput,
+  ToggleSwitch,
+} from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
@@ -29,7 +46,7 @@ function AdminGuides() {
   const [message, setMessage] = useState('');
   const [search, setSearch] = useState('');
 
-  async function fetchPosts() {
+  const fetchPosts = useCallback(async () => {
     try {
       const response = await apiClient.get('/admin/guides');
       setPosts(response.data.data || []);
@@ -38,9 +55,10 @@ function AdminGuides() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  useEffect(() => { fetchPosts(); }, []);
+  // Stable callback, so this fetches once on mount; mutations call it directly.
+  useEffect(() => { fetchPosts(); }, [fetchPosts]);
 
   function handleCreate() {
     setEditing('new');
@@ -148,60 +166,75 @@ function AdminGuides() {
           <span>{visiblePosts.length} guide{visiblePosts.length === 1 ? '' : 's'}</span>
         </div>
 
-        {message && <div className="op-admin-people-message is-error" role="status">{message}</div>}
+        {message && <Alert color="failure" className="op-admin-people-message" role="status">{message}</Alert>}
 
         {loading ? (
           <div className="op-admin-catalog-empty"><span className="op-admin-booking-spinner" aria-hidden="true" /><strong>Loading travel guides</strong><p>Checking editorial status and publishing metadata.</p></div>
         ) : visiblePosts.length === 0 ? (
-          <div className="op-admin-catalog-empty"><span aria-hidden="true"><SearchIcon /></span><strong>No guides found</strong><p>Create the first guide or adjust the current search.</p></div>
+          <Alert color="info" className="op-admin-catalog-empty"><span aria-hidden="true"><SearchIcon /></span><strong>No guides found</strong><p>Create the first guide or adjust the current search.</p></Alert>
         ) : (
-          <div className="op-admin-catalog-list" role="table" aria-label="Travel guides">
-            <div className="op-admin-catalog-columns op-admin-guide-columns" role="row">
-              <span role="columnheader">GUIDE</span><span role="columnheader">STATUS</span><span role="columnheader">EXCERPT</span><span role="columnheader">PUBLISHED</span><span role="columnheader">ACTIONS</span>
-            </div>
-            {visiblePosts.map((post) => (
-              <article key={post.id} className={`op-admin-catalog-row op-admin-guide-row op-admin-guide-columns ${post.published ? '' : 'is-muted'}`} role="row">
-                <div className="op-admin-guide-title" role="cell">
-                  {post.coverImage ? <img src={post.coverImage} alt="" /> : <span aria-hidden="true">{String(post.title || 'G')[0].toUpperCase()}</span>}
-                  <div><strong>{post.title}</strong><small>/{post.slug}</small></div>
-                </div>
-                <div role="cell"><span className={`op-admin-catalog-status ${post.published ? 'is-success' : 'is-neutral'}`}>{post.published ? 'Published' : 'Draft'}</span></div>
-                <div className="op-admin-guide-excerpt" role="cell"><p>{post.excerpt || 'No editorial excerpt supplied.'}</p><span>{post.body ? `${post.body.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length} words` : 'No body content'}</span></div>
-                <div className="op-admin-catalog-cell" role="cell"><small>UPDATED</small><strong>{formatDate(post.updatedAt || post.createdAt)}</strong><span>{post.published ? 'Publicly available' : 'Not yet visible'}</span></div>
-                <div className="op-admin-catalog-actions" role="cell">
-                  <TableActionsMenu
-                    label={`Actions for ${post.title}`}
-                    actions={[
-                      { label: 'Edit', icon: 'edit', onClick: () => handleEdit(post.id) },
-                      { label: 'Delete', icon: 'delete', danger: true, onClick: () => handleDelete(post.id) },
-                    ]}
-                  />
-                </div>
-              </article>
-            ))}
+          <div className="op-admin-catalog-list">
+            <Table hoverable aria-label="Travel guides">
+              <TableHead>
+                <TableRow>
+                  <TableHeadCell>GUIDE</TableHeadCell>
+                  <TableHeadCell>STATUS</TableHeadCell>
+                  <TableHeadCell>EXCERPT</TableHeadCell>
+                  <TableHeadCell>PUBLISHED</TableHeadCell>
+                  <TableHeadCell>ACTIONS</TableHeadCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {visiblePosts.map((post) => (
+                  <TableRow key={post.id}>
+                    <TableCell><div className="op-admin-guide-title">
+                      {post.coverImage ? <img src={post.coverImage} alt="" /> : <span aria-hidden="true">{String(post.title || 'G')[0].toUpperCase()}</span>}
+                      <div><strong>{post.title}</strong><small>/{post.slug}</small></div>
+                    </div></TableCell>
+                    <TableCell><Badge color={post.published ? 'success' : 'warning'}>{post.published ? 'Published' : 'Draft'}</Badge></TableCell>
+                    <TableCell><div className="op-admin-guide-excerpt"><p>{post.excerpt || 'No editorial excerpt supplied.'}</p><span>{post.body ? `${post.body.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length} words` : 'No body content'}</span></div></TableCell>
+                    <TableCell className="op-admin-catalog-cell"><small>UPDATED</small><strong>{formatDate(post.updatedAt || post.createdAt)}</strong><span>{post.published ? 'Publicly available' : 'Not yet visible'}</span></TableCell>
+                    <TableCell><div className="op-admin-catalog-actions">
+                      <TableActionsMenu
+                        label={`Actions for ${post.title}`}
+                        actions={[
+                          { label: 'Edit', icon: 'edit', onClick: () => handleEdit(post.id) },
+                          { label: 'Delete', icon: 'delete', danger: true, onClick: () => handleDelete(post.id) },
+                        ]}
+                      />
+                    </div></TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         )}
       </section>
 
-      {editing && (
-        <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={handleCancel}>
-          <div className="op-admin-edit-dialog op-admin-guide-dialog" role="dialog" aria-modal="true" aria-labelledby="guide-form-title" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="op-admin-dialog-heading"><div><p className="op-admin-eyebrow">GUIDE · {editing === 'new' ? 'NEW' : 'EDIT'}</p><h2 id="guide-form-title">{editing === 'new' ? 'Create travel guide' : 'Edit travel guide'}</h2></div><button type="button" onClick={handleCancel} aria-label="Close guide form">&times;</button></div>
-            {error && <div className="op-admin-error" role="alert">{error}</div>}
-            <form onSubmit={handleSave} className="op-admin-booking-form">
-              <div><Label htmlFor="guide-title">Title</Label><TextInput id="guide-title" value={form.title} onChange={(event) => handleTitleChange(event.target.value)} placeholder="Best areas to stay in Nairobi" required /></div>
-              <div className="op-admin-form-grid">
-                <div><Label htmlFor="guide-slug">Slug</Label><TextInput id="guide-slug" value={form.slug} onChange={(event) => setForm({ ...form, slug: event.target.value })} /></div>
-                <div><Label htmlFor="guide-cover">Cover image URL</Label><TextInput id="guide-cover" value={form.coverImage} onChange={(event) => setForm({ ...form, coverImage: event.target.value })} placeholder="/images/..." /></div>
-              </div>
-              <div><Label htmlFor="guide-excerpt">Excerpt</Label><TextInput id="guide-excerpt" value={form.excerpt} onChange={(event) => setForm({ ...form, excerpt: event.target.value })} placeholder="A concise summary for listing cards and search." /></div>
-              <div><Label htmlFor="guide-body">Body (HTML)</Label><Textarea id="guide-body" rows={12} value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} className="font-mono" /></div>
-              <div className="op-admin-addon-toggle"><ToggleSwitch checked={form.published} label="Publish this guide" onChange={(event) => setForm({ ...form, published: event.target.checked })} /></div>
-              <div className="op-admin-dialog-actions"><Button color="light" type="button" onClick={handleCancel} disabled={saving}>Cancel</Button><Button className="op-admin-bronze-button" type="submit" disabled={saving}>{saving ? 'Saving...' : editing === 'new' ? 'Create guide' : 'Save changes'}</Button></div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Modal show={Boolean(editing)} onClose={handleCancel} size="lg" dismissible>
+        {editing && (
+          <>
+            <ModalHeader>
+              <span className="block op-admin-eyebrow">GUIDE · {editing === 'new' ? 'NEW' : 'EDIT'}</span>
+              <span className="block">{editing === 'new' ? 'Create travel guide' : 'Edit travel guide'}</span>
+            </ModalHeader>
+            <ModalBody>
+              {error && <Alert color="failure" className="op-admin-error">{error}</Alert>}
+              <form onSubmit={handleSave} className="op-admin-booking-form">
+                <div><Label htmlFor="guide-title">Title</Label><TextInput id="guide-title" value={form.title} onChange={(event) => handleTitleChange(event.target.value)} placeholder="Best areas to stay in Nairobi" required /></div>
+                <div className="op-admin-form-grid">
+                  <div><Label htmlFor="guide-slug">Slug</Label><TextInput id="guide-slug" value={form.slug} onChange={(event) => setForm({ ...form, slug: event.target.value })} /></div>
+                  <div><Label htmlFor="guide-cover">Cover image URL</Label><TextInput id="guide-cover" value={form.coverImage} onChange={(event) => setForm({ ...form, coverImage: event.target.value })} placeholder="/images/..." /></div>
+                </div>
+                <div><Label htmlFor="guide-excerpt">Excerpt</Label><TextInput id="guide-excerpt" value={form.excerpt} onChange={(event) => setForm({ ...form, excerpt: event.target.value })} placeholder="A concise summary for listing cards and search." /></div>
+                <div><Label htmlFor="guide-body">Body (HTML)</Label><Textarea id="guide-body" rows={12} value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} className="font-mono" /></div>
+                <div className="op-admin-addon-toggle"><ToggleSwitch checked={form.published} label="Publish this guide" onChange={(event) => setForm({ ...form, published: event.target.checked })} /></div>
+                <div className="op-admin-dialog-actions"><Button color="light" type="button" onClick={handleCancel} disabled={saving}>Cancel</Button><Button className="op-admin-bronze-button" type="submit" disabled={saving}>{saving ? 'Saving...' : editing === 'new' ? 'Create guide' : 'Save changes'}</Button></div>
+              </form>
+            </ModalBody>
+          </>
+        )}
+      </Modal>
     </div>
   );
 }

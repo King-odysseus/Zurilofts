@@ -160,7 +160,10 @@ function PropertyPage() {
 
   // ── Render ───────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-white">
+    // Bottom padding matches the ~88px the other public pages already leave
+    // (.op-public-directory, .op-guides-content) so the final block - the Similar
+    // properties strip - never butts straight up against the footer.
+    <div className="min-h-screen bg-white pb-20 md:pb-24">
       {/* ── Compact breadcrumb / back row ────────────────────────── */}
       <nav className="border-b border-[#E3E8EF] bg-white px-4 py-4 sm:px-6" aria-label="Breadcrumb">
         <div className="mx-auto w-full max-w-[1344px]">

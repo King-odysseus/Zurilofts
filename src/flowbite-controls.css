@@ -491,10 +491,6 @@ html.dark .op-admin-secondary details,
 html.dark .op-admin-people-board,
 html.dark .op-admin-catalog-board,
 html.dark .op-admin-booking-board,
-html.dark .op-admin-host-app-dialog,
-html.dark .op-admin-review-dialog,
-html.dark .op-admin-confirm-dialog,
-html.dark .op-admin-edit-dialog,
 html.dark .op-admin-host-app-detail-section,
 html.dark .op-admin-host-app-review {
   border-color: var(--dm-border) !important;
@@ -524,9 +520,7 @@ html.dark .op-admin-overview h2,
 html.dark .op-admin-priority-row strong,
 html.dark .op-admin-people-row,
 html.dark .op-admin-catalog-row,
-html.dark .op-admin-booking-row strong,
-html.dark .op-admin-host-app-dialog-head h2,
-html.dark .op-admin-review-dialog h2 {
+html.dark .op-admin-booking-row strong {
   color: var(--dm-text) !important;
 }
 
@@ -546,7 +540,7 @@ html.dark .op-admin-booking-row small {
    directly. Pin them to the dark surface palette here. */
 html.dark .op-admin-people-filter,
 html.dark .op-admin-people-search input,
-html.dark .op-admin-people-actions button {
+html.dark .op-admin-people-actions > button {
   border-color: var(--dm-border-strong) !important;
   background-color: var(--dm-surface-soft) !important;
   color: var(--dm-text) !important;
@@ -558,28 +552,28 @@ html.dark .op-admin-people-filter option {
   color: var(--dm-text) !important;
 }
 
-html.dark .op-admin-people-actions button:hover:not(:disabled) {
+html.dark .op-admin-people-actions > button:hover:not(:disabled) {
   border-color: #9F7142 !important;
   background-color: #172238 !important;
   color: var(--dm-text) !important;
 }
 
 /* Lift the semantic action-button text so it stays legible on dark surfaces. */
-html.dark .op-admin-people-actions button.is-warning { color: #FBBF24 !important; }
-html.dark .op-admin-people-actions button.is-positive { color: #4ADE80 !important; }
-html.dark .op-admin-people-actions button.is-danger { color: #F87171 !important; }
+html.dark .op-admin-people-actions > button.is-warning { color: #FBBF24 !important; }
+html.dark .op-admin-people-actions > button.is-positive { color: #4ADE80 !important; }
+html.dark .op-admin-people-actions > button.is-danger { color: #F87171 !important; }
 
 /* Catalog tables (promos, add-ons, guides) share the same action-button anatomy. */
-html.dark .op-admin-catalog-actions button {
+html.dark .op-admin-catalog-actions > button {
   border-color: var(--dm-border-strong) !important;
   background-color: var(--dm-surface-soft) !important;
   color: var(--dm-text) !important;
 }
-html.dark .op-admin-catalog-actions button:hover {
+html.dark .op-admin-catalog-actions > button:hover {
   border-color: #9F7142 !important;
   background-color: #172238 !important;
 }
-html.dark .op-admin-catalog-actions button.is-danger { color: #F87171 !important; }
+html.dark .op-admin-catalog-actions > button.is-danger { color: #F87171 !important; }
 html.dark .op-admin-catalog-status.is-success { background: #173125 !important; color: #4ADE80 !important; }
 html.dark .op-admin-catalog-status.is-danger { background: #3A2228 !important; color: #F87171 !important; }
 html.dark .op-admin-catalog-status.is-neutral { background: #1D2B43 !important; color: #C8D4E5 !important; }
@@ -630,7 +624,7 @@ html.dark .op-admin-finance-gauge-foot {
   border-color: var(--dm-border) !important;
 }
 
-html.dark .op-admin-finance-actions button {
+html.dark .op-admin-finance-actions > button {
   border-color: var(--dm-border-strong) !important;
   background-color: var(--dm-surface-soft) !important;
   color: var(--dm-text) !important;

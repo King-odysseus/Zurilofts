@@ -757,7 +757,7 @@
 }
 
 .op-host-listing-actions a,
-.op-host-listing-actions button,
+.op-host-listing-actions > button,
 .op-host-listing-reviewing {
   display: inline-flex;
   min-height: 32px;
@@ -788,7 +788,7 @@
 .op-host-listing-actions .op-host-listing-view,
 .op-host-listing-actions .op-host-listing-calendar { color: var(--host-blue); }
 .op-host-listing-reviewing { border-color: #DBEAFE; background: #EFF6FF; color: #2563EB; }
-.op-host-listing-actions button:disabled { cursor: wait; opacity: .55; }
+.op-host-listing-actions > button:disabled { cursor: wait; opacity: .55; }
 
 .op-host-listing-body > footer {
   display: flex;

@@ -133,11 +133,12 @@
 .op-admin-listing-row>button{border:0;border-radius:8px;background:#e8edf7;color:#0b1f42;padding:8px 12px;font-size:11px;font-weight:700}
 .op-admin-listing-row .op-admin-urgent{text-transform:capitalize;white-space:nowrap}
 .op-admin-error{background:#fce8e6;color:#a6332c;border-radius:8px;padding:10px 12px;font-size:12px}
-.op-admin-review-backdrop{position:fixed;inset:0;z-index:80;background:#0b1f4288;display:grid;place-items:center;padding:20px}.op-admin-review-dialog{background:#fff;width:min(490px,100%);border-radius:16px;padding:24px;box-shadow:0 20px 50px #0b1f4230}.op-admin-review-dialog h2{font:700 20px Montserrat,Arial,sans-serif}.op-admin-review-dialog p{font-size:13px;color:#6e7686;margin:10px 0}.op-admin-review-dialog>a{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:#3b6fd4}.op-admin-review-dialog label{display:block;font-size:12px;font-weight:700;margin:20px 0 7px}.op-admin-review-dialog textarea{width:100%;padding:10px;resize:vertical}.op-admin-review-dialog>div{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.op-admin-review-dialog button{border:1px solid #e2dad0;background:#fff;color:#0b1f42;border-radius:8px;padding:9px 12px;font-size:12px;font-weight:700}.op-admin-review-dialog button:last-child{background:#9f7142;color:#fff;border-color:#9f7142}.op-admin-review-dialog button:disabled{opacity:.55}
 @media(max-width:650px){.op-admin-listing-row{flex-wrap:wrap}.op-admin-listing-row>div{flex:1 1 calc(100% - 70px)}.op-admin-listing-row .op-admin-urgent{margin-left:55px}}
 
 .op-admin-people-heading{margin-bottom:28px}
-.op-admin-people-board{min-width:0;border:1px solid #e5e7eb;border-radius:14px;background:#fff;overflow:hidden}
+/* No `overflow: hidden` here: it clipped the row action menus, which hang past
+   the card. The Flowbite table rounds its own corner cells instead. */
+.op-admin-people-board{min-width:0;border:1px solid #e5e7eb;border-radius:14px;background:#fff}
 .op-admin-people-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid #e5e7eb;background:#fff}
 .op-admin-people-search{position:relative;width:min(360px,100%)}
 .op-admin-people-search>svg{position:absolute;z-index:2;top:50%;left:13px;width:16px;height:16px;color:#64748b;transform:translateY(-50%);pointer-events:none}
@@ -147,7 +148,13 @@
 .op-admin-people-message{margin:14px 16px 0;border-radius:9px;padding:10px 12px;font-size:12px;font-weight:600}
 .op-admin-people-message.is-success{background:#ecfdf3;color:#15803d}
 .op-admin-people-message.is-error{background:#fef2f2;color:#b91c1c}
-.op-admin-people-scroll{max-width:100%;overflow-x:auto}
+/* Horizontal scrolling is only needed while the table is wider than the card
+   (small screens). Above that the scroll box stays unclipped: `overflow-x`
+   forces `overflow-y` to auto too, which cut the row action menus in half. */
+.op-admin-people-scroll{max-width:100%}
+@media (max-width: 1023px){
+  .op-admin-people-scroll{overflow-x:auto}
+}
 .op-admin-people-table{min-width:980px}
 .op-admin-people-columns,.op-admin-people-row{display:grid;grid-template-columns:minmax(260px,1.7fr) minmax(130px,.75fr) minmax(90px,.55fr) minmax(130px,.75fr) minmax(110px,.65fr) minmax(210px,1.15fr);align-items:center}
 .op-admin-people-columns{min-height:42px;background:#f8fafc;color:#64748b;font-size:10px;font-weight:700;letter-spacing:.02em}
@@ -173,12 +180,12 @@
 .op-admin-people-pill.is-danger{background:#fef2f2;color:#b91c1c}
 .op-admin-people-pill.is-admin{background:#e8edf7;color:#0b1f42}
 .op-admin-people-actions{display:flex!important;flex-direction:row!important;align-items:center!important;gap:8px!important;flex-wrap:wrap}
-.op-admin-people-actions button{min-height:30px;border:1px solid #e2dad0;border-radius:8px;background:#fff;color:#0b1f42;padding:0 10px;font:600 10px Inter,Arial,sans-serif;white-space:nowrap;cursor:pointer}
-.op-admin-people-actions button:hover:not(:disabled){border-color:#c49a6c;background:#f7f4ef}
-.op-admin-people-actions button.is-warning{color:#a16207}
-.op-admin-people-actions button.is-positive{color:#15803d}
-.op-admin-people-actions button.is-danger{color:#b91c1c}
-.op-admin-people-actions button:disabled{cursor:not-allowed;opacity:.55}
+.op-admin-people-actions > button{min-height:30px;border:1px solid #e2dad0;border-radius:8px;background:#fff;color:#0b1f42;padding:0 10px;font:600 10px Inter,Arial,sans-serif;white-space:nowrap;cursor:pointer}
+.op-admin-people-actions > button:hover:not(:disabled){border-color:#c49a6c;background:#f7f4ef}
+.op-admin-people-actions > button.is-warning{color:#a16207}
+.op-admin-people-actions > button.is-positive{color:#15803d}
+.op-admin-people-actions > button.is-danger{color:#b91c1c}
+.op-admin-people-actions > button:disabled{cursor:not-allowed;opacity:.55}
 .op-admin-people-empty{display:grid;min-height:220px;place-items:center;align-content:center;gap:8px;padding:32px;text-align:center;color:#64748b}
 .op-admin-people-empty strong{color:#0b1f42;font:700 16px Montserrat,Arial,sans-serif}
 .op-admin-people-empty p{font-size:12px}
@@ -199,7 +206,7 @@
 .op-admin-catalog-metrics article:nth-child(2){background:#e8edf7}
 .op-admin-catalog-metrics article:nth-child(3){background:#fff0cd}
 .op-admin-catalog-metrics article:nth-child(4){background:#fae1de}
-.op-admin-catalog-board{min-width:0;border:1px solid #e5e7eb;border-radius:14px;background:#fff;overflow:hidden}
+.op-admin-catalog-board{min-width:0;border:1px solid #e5e7eb;border-radius:14px;background:#fff}
 .op-admin-catalog-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-bottom:1px solid #e5e7eb;background:#fff}
 .op-admin-catalog-toolbar>span{border-radius:999px;background:#f1f5f9;padding:5px 9px;color:#64748b;font-size:10px;font-weight:700;white-space:nowrap}
 .op-admin-catalog-search{position:relative;width:min(390px,100%)}
@@ -235,9 +242,9 @@
 .op-admin-catalog-status.is-danger{background:#fef2f2;color:#b91c1c}
 .op-admin-catalog-status.is-neutral{background:#f1f5f9;color:#475569}
 .op-admin-catalog-actions{display:flex!important;align-items:center;gap:6px;flex-wrap:wrap}
-.op-admin-catalog-actions button{min-height:30px;border:1px solid #e2dad0;border-radius:8px;background:#fff;color:#0b1f42;padding:0 10px;font:600 10px Inter,Arial,sans-serif;white-space:nowrap;cursor:pointer}
-.op-admin-catalog-actions button:hover{border-color:#c49a6c;background:#f7f4ef}
-.op-admin-catalog-actions button.is-danger{color:#b91c1c}
+.op-admin-catalog-actions > button{min-height:30px;border:1px solid #e2dad0;border-radius:8px;background:#fff;color:#0b1f42;padding:0 10px;font:600 10px Inter,Arial,sans-serif;white-space:nowrap;cursor:pointer}
+.op-admin-catalog-actions > button:hover{border-color:#c49a6c;background:#f7f4ef}
+.op-admin-catalog-actions > button.is-danger{color:#b91c1c}
 .op-admin-catalog-empty{display:grid;min-height:230px;place-items:center;align-content:center;gap:8px;padding:32px;text-align:center;color:#64748b}
 .op-admin-catalog-empty>span:not(.op-admin-booking-spinner){display:grid;width:46px;height:46px;place-items:center;border-radius:50%;background:#e8edf7;color:#0b1f42}
 .op-admin-catalog-empty>span svg{width:20px;height:20px}
@@ -307,7 +314,7 @@
   .op-admin-catalog-row>div:nth-child(5){grid-column:1/-1}
   .op-admin-catalog-row>div:nth-child(6){align-self:center}
   .op-admin-catalog-actions{justify-content:flex-end}
-  .op-admin-catalog-actions button{flex:1;min-height:34px}
+  .op-admin-catalog-actions > button{flex:1;min-height:34px}
   .op-admin-addon-columns .op-admin-addon-service{grid-column:1/-1;padding-bottom:12px!important;border-bottom:1px solid #eef2f7}
   .op-admin-addon-columns>div:nth-child(4){grid-column:1/-1}
   .op-admin-addon-columns>div:nth-child(5){grid-column:auto}
@@ -456,21 +463,14 @@
 .op-admin-host-app-status.is-warning{background:#fffbeb;color:#a16207}
 .op-admin-host-app-status.is-pending{background:#e8edf7;color:#0b1f42}
 .op-admin-host-app-status.is-neutral{background:#f1f5f9;color:#475569}
-.op-admin-host-app-action button{min-height:32px;border:0!important;border-radius:8px!important;background:#9f7142!important;color:#fff!important;padding:0 12px!important;font-size:10px!important;font-weight:700!important}
-.op-admin-host-app-action button:hover:not(:disabled){background:#8c6138!important}
-.op-admin-host-app-action button:disabled{opacity:.55}
+.op-admin-host-app-action > button{min-height:32px;border:0!important;border-radius:8px!important;background:#9f7142!important;color:#fff!important;padding:0 12px!important;font-size:10px!important;font-weight:700!important}
+.op-admin-host-app-action > button:hover:not(:disabled){background:#8c6138!important}
+.op-admin-host-app-action > button:disabled{opacity:.55}
 .op-admin-host-app-empty{display:grid;min-height:230px;place-items:center;align-content:center;gap:8px;padding:32px;text-align:center;color:#64748b}
 .op-admin-host-app-empty>span:not(.op-admin-booking-spinner){display:grid;width:46px;height:46px;place-items:center;border-radius:50%;background:#e8edf7;color:#0b1f42}
 .op-admin-host-app-empty>span svg{width:20px;height:20px}
 .op-admin-host-app-empty strong{color:#0b1f42;font:700 16px Montserrat,Arial,sans-serif}
 .op-admin-host-app-empty p{max-width:430px;font-size:12px;line-height:1.5}
-.op-admin-host-app-dialog{display:flex;width:min(1120px,100%);max-height:92vh;flex-direction:column;overflow:hidden;border-radius:18px;background:#fff;box-shadow:0 24px 70px #0b1f4238}
-.op-admin-host-app-dialog-head{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;border-bottom:1px solid #e5e7eb;padding:22px 24px}
-.op-admin-host-app-dialog-head h2{margin:7px 0 4px;color:#0b1f42;font:700 23px/1.2 Montserrat,Arial,sans-serif}
-.op-admin-host-app-dialog-head span{color:#64748b;font-size:12px}
-.op-admin-host-app-dialog-head>button{display:grid;width:36px;height:36px;place-items:center;border:0;border-radius:9px;background:#f8fafc;color:#64748b;font-size:22px;line-height:1}
-.op-admin-host-app-dialog-head>button:hover{background:#eef2f7;color:#0b1f42}
-.op-admin-host-app-dialog-body{display:grid;gap:22px;overflow-y:auto;padding:22px 24px 28px}
 .op-admin-host-app-detail-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .op-admin-host-app-detail-section{min-width:0;border:1px solid #e5e7eb;border-radius:12px;background:#fff;padding:16px}
 .op-admin-host-app-detail-section h3{margin:0 0 14px;color:#0b1f42;font:700 14px Montserrat,Arial,sans-serif}
@@ -495,7 +495,7 @@
 .op-admin-host-app-no-documents{border:1px dashed #d6dce5;border-radius:10px;padding:18px;color:#64748b;font-size:12px;text-align:center}
 .op-admin-host-app-review{display:grid;gap:12px;border:1px solid #e2dad0;border-radius:12px;background:#f8fafc;padding:18px}
 .op-admin-host-app-review-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
-.op-admin-host-app-review-actions button{white-space:nowrap}
+.op-admin-host-app-review-actions > button{white-space:nowrap}
 .op-admin-host-app-review-actions .op-admin-host-app-reject{border-color:#fecaca!important;color:#b91c1c!important}
 .op-admin-host-app-audit{display:grid;gap:0}
 .op-admin-host-app-audit>div{position:relative;display:grid;gap:7px;border-left:2px solid #e2dad0;padding:0 0 16px 18px}
@@ -519,13 +519,11 @@
   .op-admin-host-app-row>div{padding:0}
   .op-admin-host-app-applicant{grid-column:1/-1;padding-bottom:14px!important;border-bottom:1px solid #eef2f7}
   .op-admin-host-app-action{grid-column:1/-1;display:flex;justify-content:flex-end;padding-top:12px!important;border-top:1px solid #eef2f7}
-  .op-admin-host-app-action button{width:100%}
-  .op-admin-host-app-dialog{width:100%;max-height:94vh;border-radius:16px}
-  .op-admin-host-app-dialog-head,.op-admin-host-app-dialog-body{padding-right:16px;padding-left:16px}
+  .op-admin-host-app-action > button{width:100%}
   .op-admin-host-app-detail-grid{grid-template-columns:1fr}
   .op-admin-host-app-documents{grid-template-columns:1fr}
   .op-admin-host-app-review-actions{display:grid;grid-template-columns:1fr}
-  .op-admin-host-app-review-actions button{width:100%}
+  .op-admin-host-app-review-actions > button{width:100%}
 }
 
 .op-admin-bookings-heading{align-items:center;margin-bottom:26px}
@@ -576,11 +574,6 @@
 .op-admin-booking-spinner{width:30px;height:30px;border:3px solid #c49a6c;border-top-color:transparent;border-radius:50%;animation:op-admin-spin .8s linear infinite}
 @keyframes op-admin-spin{to{transform:rotate(360deg)}}
 .op-admin-dialog-backdrop{position:fixed;inset:0;z-index:90;display:grid;place-items:center;padding:20px;background:#0b1f4266;backdrop-filter:blur(2px)}
-.op-admin-confirm-dialog,.op-admin-edit-dialog{width:100%;border-radius:16px;background:#fff;padding:24px;box-shadow:0 24px 60px #0b1f422e}
-.op-admin-confirm-dialog{max-width:430px}
-.op-admin-confirm-dialog h3{color:#0b1f42;font:700 19px Montserrat,Arial,sans-serif}
-.op-admin-confirm-dialog p{margin:10px 0 22px;color:#6e7686;font-size:13px;line-height:1.55}
-.op-admin-edit-dialog{max-width:560px;max-height:min(820px,calc(100vh - 40px));overflow-y:auto}
 .op-admin-dialog-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}
 .op-admin-dialog-heading h2{margin-top:5px;color:#0b1f42;font:700 20px Montserrat,Arial,sans-serif}
 .op-admin-dialog-heading>button{width:34px;height:34px;flex:none;border:0;border-radius:8px;background:transparent;color:#64748b;font-size:24px;line-height:1}
@@ -591,7 +584,7 @@
 .op-admin-booking-form input,.op-admin-booking-form select,.op-admin-booking-form textarea{width:100%;background:#fff;font-size:13px}
 .op-admin-booking-form textarea{resize:vertical}
 .op-admin-dialog-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:4px}
-.op-admin-dialog-actions button{min-height:40px;border-radius:9px!important;padding:0 16px!important;font-size:12px!important;font-weight:700!important;box-shadow:none!important}
+.op-admin-dialog-actions > button{min-height:40px;border-radius:9px!important;padding:0 16px!important;font-size:12px!important;font-weight:700!important;box-shadow:none!important}
 .op-admin-bronze-button,.op-admin-bronze-button:hover{background:#9f7142!important;color:#fff!important}
 .op-admin-danger-button,.op-admin-danger-button:hover{background:#dc2626!important;color:#fff!important}
 @media(max-width:767px){
@@ -696,9 +689,9 @@
 .op-admin-finance-status.is-neutral{background:#f1f5f9;color:#475569}
 .op-admin-finance-failure{display:block;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#b91c1c!important;font-size:9px}
 .op-admin-finance-actions{justify-items:start}
-.op-admin-finance-actions button{min-height:30px;border:1px solid #e2dad0;border-radius:8px;background:#fff;color:#0b1f42;padding:0 11px;font:700 10px Inter,Arial,sans-serif;white-space:nowrap;cursor:pointer}
-.op-admin-finance-actions button:hover:not(:disabled){border-color:#c49a6c;background:#f7f4ef}
-.op-admin-finance-actions button:disabled{cursor:not-allowed;opacity:.55}
+.op-admin-finance-actions > button{min-height:30px;border:1px solid #e2dad0;border-radius:8px;background:#fff;color:#0b1f42;padding:0 11px;font:700 10px Inter,Arial,sans-serif;white-space:nowrap;cursor:pointer}
+.op-admin-finance-actions > button:hover:not(:disabled){border-color:#c49a6c;background:#f7f4ef}
+.op-admin-finance-actions > button:disabled{cursor:not-allowed;opacity:.55}
 .op-admin-finance-loading,.op-admin-finance-empty{display:grid;min-height:220px;place-items:center;align-content:center;gap:8px;padding:32px;text-align:center;color:#64748b}
 .op-admin-finance-loading strong{color:#0b1f42;font:700 16px Montserrat,Arial,sans-serif}
 .op-admin-finance-loading p,.op-admin-finance-empty{font-size:12px}
@@ -728,7 +721,7 @@
   .op-admin-finance-cell>small{display:block;color:#94a3b8;font-size:8px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
   .op-admin-earnings-columns .op-admin-finance-cell:first-child,.op-admin-payout-columns .op-admin-finance-cell:first-child{grid-column:1/-1;padding-bottom:12px!important;border-bottom:1px solid #eef2f7}
   .op-admin-finance-actions{grid-column:1/-1}
-  .op-admin-finance-actions button{width:100%;min-height:38px}
+  .op-admin-finance-actions > button{width:100%;min-height:38px}
   .op-admin-finance-board-head{align-items:flex-start;flex-direction:column;padding:16px}
 }
 
@@ -998,7 +991,7 @@ html.dark .op-admin-trust-modal [data-testid="flowbite-modal-header"],html.dark 
 .op-admin-governance-detail-grid span{color:#64748b;font-size:9px;font-weight:700;text-transform:uppercase}
 .op-admin-governance-detail-grid strong{overflow:hidden;color:#0b1f42;font-size:10px;text-overflow:ellipsis;white-space:nowrap}
 .op-admin-governance-modal-actions{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #eef0f4;padding:14px 20px}
-.op-admin-governance-modal-actions button{min-height:40px;border-radius:9px!important;font-size:10px!important;font-weight:700!important;box-shadow:none!important}
+.op-admin-governance-modal-actions > button{min-height:40px;border-radius:9px!important;font-size:10px!important;font-weight:700!important;box-shadow:none!important}
 @media(max-width:1100px){.op-admin-governance-grid{grid-template-columns:1fr}}
 @media(max-width:767px){
   .op-admin-governance{gap:14px}

@@ -1,7 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Label, Select, Textarea, TextInput } from 'flowbite-react';
-import { FileBadge, FileText, Search } from 'lucide-react';
+import {
+  Alert,
+  Badge,
+  Button,
+  Label,
+  Modal,
+  ModalBody,
+  ModalHeader,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeadCell,
+  TableRow,
+  Textarea,
+  TextInput,
+} from 'flowbite-react';
+import { FileText, Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 
 const STATUS_OPTIONS = [
@@ -20,6 +37,9 @@ const STATUS_META = {
   APPROVED: { label: 'Approved', tone: 'success' },
   REJECTED: { label: 'Rejected', tone: 'danger' },
 };
+
+// Status tones are semantic; the Badge palette names them differently.
+const BADGE_COLORS = { neutral: 'gray', pending: 'warning', warning: 'warning', success: 'success', danger: 'failure' };
 
 const DOCUMENT_LABELS = {
   IDENTITY_FRONT: 'Identity - front/details',
@@ -50,18 +70,11 @@ function formatFileSize(size) {
 }
 
 function statusMeta(status) {
-  return STATUS_META[status] || { label: String(status || 'Unknown').replaceAll('_', ' '), tone: 'neutral' };
+  return STATUS_META[status] || { label: String(status || 'Unknown').replace(/_/g, ' '), tone: 'neutral' };
 }
 
 function SearchIcon() {
   return <Search strokeWidth={1.8} aria-hidden="true" />;
-}
-
-function DocumentIcon({ kind }) {
-  const business = kind === 'BUSINESS_REGISTRATION';
-  return business
-    ? <FileBadge strokeWidth={1.6} aria-hidden="true" />
-    : <FileText strokeWidth={1.6} aria-hidden="true" />;
 }
 
 function AdminHostApplications() {
@@ -222,7 +235,7 @@ function AdminHostApplications() {
           </Select>
         </div>
 
-        {message && <div className={`op-admin-people-message ${messageTone === 'error' ? 'is-error' : 'is-success'}`} role="status">{message}</div>}
+        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="op-admin-people-message" role="status">{message}</Alert>}
 
         {loading ? (
           <div className="op-admin-host-app-empty">
@@ -231,81 +244,83 @@ function AdminHostApplications() {
             <p>Fetching the verification queue and encrypted document records.</p>
           </div>
         ) : visibleApplications.length === 0 ? (
-          <div className="op-admin-host-app-empty">
+          <Alert color="info" className="op-admin-host-app-empty">
             <span aria-hidden="true"><SearchIcon /></span>
             <strong>No applications in this view</strong>
             <p>Nothing is waiting under the selected status and search. Try another filter.</p>
-          </div>
+          </Alert>
         ) : (
-          <div className="op-admin-host-app-list" role="table" aria-label="Host applications">
-            <div className="op-admin-host-app-columns" role="row">
-              <span role="columnheader">APPLICANT</span>
-              <span role="columnheader">BUSINESS</span>
-              <span role="columnheader">HOSTING</span>
-              <span role="columnheader">DOCUMENTS</span>
-              <span role="columnheader">UPDATED</span>
-              <span role="columnheader">STATUS</span>
-              <span role="columnheader">ACTION</span>
-            </div>
-            {visibleApplications.map((application) => {
-              const meta = statusMeta(application.status);
-              return (
-                <article key={application.id} className="op-admin-host-app-row" role="row">
-                  <div className="op-admin-host-app-applicant" role="cell">
-                    <span className="op-admin-host-app-avatar" aria-hidden="true">{initials(application)}</span>
-                    <div>
-                      <strong>{application.legalName || `${application.user?.firstName || ''} ${application.user?.lastName || ''}`.trim() || 'Unnamed applicant'}</strong>
-                      <span>{application.contactEmail || application.user?.email || 'Email not provided'}</span>
-                      <small>{application.contactPhone || 'Phone not provided'}</small>
-                    </div>
-                  </div>
-                  <div className="op-admin-host-app-cell" role="cell">
-                    <small>BUSINESS</small>
-                    <strong>{application.businessName || 'Individual host'}</strong>
-                    <span>{application.businessType ? String(application.businessType).replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Type not set'}</span>
-                  </div>
-                  <div className="op-admin-host-app-cell" role="cell">
-                    <small>HOSTING</small>
-                    <strong>{application.city || 'Area not set'}</strong>
-                    <span>{application.propertyCount ? `${application.propertyCount} propert${application.propertyCount === 1 ? 'y' : 'ies'}` : 'Count not set'}</span>
-                  </div>
-                  <div className="op-admin-host-app-cell" role="cell">
-                    <small>DOCUMENTS</small>
-                    <strong>{application.documents?.length || 0} encrypted</strong>
-                    <span>{application.documents?.length ? 'Ready to inspect' : 'No files uploaded'}</span>
-                  </div>
-                  <div className="op-admin-host-app-cell" role="cell">
-                    <small>UPDATED</small>
-                    <strong>{formatDate(application.updatedAt || application.submittedAt)}</strong>
-                    <span>{application.reviewedAt ? `Reviewed ${formatDate(application.reviewedAt)}` : 'Not reviewed yet'}</span>
-                  </div>
-                  <div role="cell"><span className={`op-admin-host-app-status is-${meta.tone}`}>{meta.label}</span></div>
-                  <div className="op-admin-host-app-action" role="cell">
-                    <Button size="xs" onClick={() => openApplication(application.id)} disabled={busy === application.id}>
-                      {busy === application.id ? 'Loading...' : 'Review'}
-                    </Button>
-                  </div>
-                </article>
-              );
-            })}
+          <div className="op-admin-host-app-list">
+            <Table hoverable aria-label="Host applications">
+              <TableHead>
+                <TableRow>
+                  <TableHeadCell>APPLICANT</TableHeadCell>
+                  <TableHeadCell>BUSINESS</TableHeadCell>
+                  <TableHeadCell>HOSTING</TableHeadCell>
+                  <TableHeadCell>DOCUMENTS</TableHeadCell>
+                  <TableHeadCell>UPDATED</TableHeadCell>
+                  <TableHeadCell>STATUS</TableHeadCell>
+                  <TableHeadCell>ACTION</TableHeadCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {visibleApplications.map((application) => {
+                  const meta = statusMeta(application.status);
+                  return (
+                    <TableRow key={application.id}>
+                      <TableCell className="op-admin-host-app-applicant">
+                        <span className="op-admin-host-app-avatar" aria-hidden="true">{initials(application)}</span>
+                        <div>
+                          <strong>{application.legalName || `${application.user?.firstName || ''} ${application.user?.lastName || ''}`.trim() || 'Unnamed applicant'}</strong>
+                          <span>{application.contactEmail || application.user?.email || 'Email not provided'}</span>
+                          <small>{application.contactPhone || 'Phone not provided'}</small>
+                        </div>
+                      </TableCell>
+                      <TableCell className="op-admin-host-app-cell">
+                        <small>BUSINESS</small>
+                        <strong>{application.businessName || 'Individual host'}</strong>
+                        <span>{application.businessType ? String(application.businessType).replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Type not set'}</span>
+                      </TableCell>
+                      <TableCell className="op-admin-host-app-cell">
+                        <small>HOSTING</small>
+                        <strong>{application.city || 'Area not set'}</strong>
+                        <span>{application.propertyCount ? `${application.propertyCount} propert${application.propertyCount === 1 ? 'y' : 'ies'}` : 'Count not set'}</span>
+                      </TableCell>
+                      <TableCell className="op-admin-host-app-cell">
+                        <small>DOCUMENTS</small>
+                        <strong>{application.documents?.length || 0} encrypted</strong>
+                        <span>{application.documents?.length ? 'Ready to inspect' : 'No files uploaded'}</span>
+                      </TableCell>
+                      <TableCell className="op-admin-host-app-cell">
+                        <small>UPDATED</small>
+                        <strong>{formatDate(application.updatedAt || application.submittedAt)}</strong>
+                        <span>{application.reviewedAt ? `Reviewed ${formatDate(application.reviewedAt)}` : 'Not reviewed yet'}</span>
+                      </TableCell>
+                      <TableCell><Badge color={BADGE_COLORS[meta.tone] || 'gray'}>{meta.label}</Badge></TableCell>
+                      <TableCell className="op-admin-host-app-action">
+                        <Button size="xs" onClick={() => openApplication(application.id)} disabled={busy === application.id}>
+                          {busy === application.id ? 'Loading...' : 'Review'}
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           </div>
         )}
       </section>
 
-      {selected && (
-        <div className="op-admin-dialog-backdrop" role="presentation" onMouseDown={closeApplication}>
-          <div className="op-admin-host-app-dialog" role="dialog" aria-modal="true" aria-labelledby="host-application-title" onMouseDown={(event) => event.stopPropagation()}>
-            <div className="op-admin-host-app-dialog-head">
-              <div>
-                <p className="op-admin-eyebrow">HOST APPLICATION · {selected.status.replaceAll('_', ' ')}</p>
-                <h2 id="host-application-title">{selected.legalName || 'Host application'}</h2>
-                <span>{selected.contactEmail || selected.user?.email}</span>
-              </div>
-              <button type="button" onClick={closeApplication} aria-label="Close host application">&times;</button>
-            </div>
-
-            <div className="op-admin-host-app-dialog-body">
-              {message && <div className={`op-admin-people-message ${messageTone === 'error' ? 'is-error' : 'is-success'}`} role="status">{message}</div>}
+      <Modal show={Boolean(selected)} onClose={closeApplication} size="2xl" dismissible>
+        {selected && (
+          <>
+            <ModalHeader>
+              <span className="block op-admin-eyebrow">HOST APPLICATION · {String(selected.status || '').replace(/_/g, ' ')}</span>
+              <span className="block">{selected.legalName || 'Host application'}</span>
+              <span className="block">{selected.contactEmail || selected.user?.email}</span>
+            </ModalHeader>
+            <ModalBody>
+              {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="op-admin-people-message" role="status">{message}</Alert>}
 
               <div className="op-admin-host-app-detail-grid">
                 <DetailSection title="Identity & contact">
@@ -352,7 +367,7 @@ function AdminHostApplications() {
                   <div className="op-admin-host-app-documents">
                     {selected.documents.map((document) => (
                       <Button key={document.id} color="light" onClick={() => downloadDocument(document)} disabled={busy === document.id}>
-                        <DocumentIcon kind={document.kind} />
+                        <FileText strokeWidth={1.6} aria-hidden="true" />
                         <span><strong>{DOCUMENT_LABELS[document.kind] || document.kind}</strong><small>{document.originalName} · {formatFileSize(document.size)}</small></span>
                       </Button>
                     ))}
@@ -376,7 +391,7 @@ function AdminHostApplications() {
                     placeholder="Required for changes or rejection"
                   />
                   <div className="op-admin-host-app-review-actions">
-                    <Button color="light" onClick={() => review('reject')} disabled={Boolean(busy)} className="op-admin-host-app-reject">Reject</Button>
+                    <Button color="failure" onClick={() => review('reject')} disabled={Boolean(busy)}>Reject</Button>
                     <Button color="light" onClick={() => review('request-changes')} disabled={Boolean(busy)}>Request changes</Button>
                     <Button onClick={() => review('approve')} disabled={Boolean(busy)} className="op-admin-bronze-button">{busy === 'approve' ? 'Approving...' : 'Approve host'}</Button>
                   </div>
@@ -397,17 +412,17 @@ function AdminHostApplications() {
                     {selected.auditLogs.map((entry) => (
                       <div key={entry.id}>
                         <span aria-hidden="true" />
-                        <p><strong>{String(entry.action).replaceAll('_', ' ')}</strong><small>{formatDate(entry.createdAt, true)}</small></p>
+                        <p><strong>{String(entry.action).replace(/_/g, ' ')}</strong><small>{formatDate(entry.createdAt, true)}</small></p>
                         {entry.note && <blockquote>{entry.note}</blockquote>}
                       </div>
                     ))}
                   </div>
                 </section>
               )}
-            </div>
-          </div>
-        </div>
-      )}
+            </ModalBody>
+          </>
+        )}
+      </Modal>
     </div>
   );
 }
