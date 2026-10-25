@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import logoImg from '../assets/zurilofts-logo.png';
 
 /**
- * The mark is thin bronze line work on a transparent background, so it fades away
- * against white headers. Every surface that shows it puts it on this warm rounded
- * tile instead, which lifts the bronze lines and keeps the wordmark readable.
+ * The mark and its wordmark sit on a transparent background, so every surface
+ * shows it inside this white rounded tile. The border and shadow give the logo a
+ * defined edge on white headers without tinting the artwork.
  */
 function BrandLogo({ className = '', imgClassName = 'h-8 w-auto', alt = 'ZuriLofts' }) {
   return (

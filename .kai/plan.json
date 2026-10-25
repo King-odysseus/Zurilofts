@@ -2,29 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Record plan and inspect recent commits plus Railway build configuration",
+      "text": "Read the current logo tile styles and where they are applied",
       "state": "done"
     },
     {
-      "text": "Reproduce the Railway build locally to capture the real error",
+      "text": "Switch the tile to a white rounded box that suits the bronze mark",
       "state": "done"
     },
     {
-      "text": "Identify root cause: failed deploy died at image push after a successful compile",
+      "text": "Check the logo renders on the main headers in the browser",
       "state": "done"
     },
     {
-      "text": "Redeploy from source at HEAD and confirm the deploy completes",
-      "state": "done"
-    },
-    {
-      "text": "Confirm the live site serves the current build and health endpoint",
-      "state": "done"
-    },
-    {
-      "text": "Commit the plan record and push",
+      "text": "Run lint and build, then commit and push",
       "state": "active"
     }
   ],
-  "updatedAt": "2026-10-25T17:53:20.607Z"
+  "updatedAt": "2026-10-25T18:21:16.950Z"
 }
