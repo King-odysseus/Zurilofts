@@ -1,13 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Alert, Badge, Button, Label, Modal, ModalBody, ModalFooter, ModalHeader, Select,
+  Alert, Badge, Button, Label, Modal, ModalBody, ModalFooter, ModalHeader,
   Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, TextInput,
 } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
+import SelectMenu from '../components/SelectMenu.jsx';
 
 const ROLE_LABELS = {
   USER: 'Guest',
@@ -19,6 +20,27 @@ const EMPTY_FORM = {
   firstName: '', lastName: '', email: '', phone: '',
   bankName: '', bankAccountNo: '', bankCode: '', payoutFrequency: '',
 };
+
+const ROLE_FILTER_OPTIONS = [
+  { value: '', label: 'All roles' },
+  { value: 'USER', label: 'Guests' },
+  { value: 'HOST', label: 'Hosts' },
+  { value: 'ADMIN', label: 'Admins' },
+];
+
+// Rebuilt on every render of every row if left inline, so the option lists live
+// at module scope instead.
+const ASSIGNABLE_ROLE_OPTIONS = [
+  { value: 'USER', label: 'Guest' },
+  { value: 'HOST', label: 'Host' },
+];
+
+const PAYOUT_FREQUENCY_OPTIONS = [
+  { value: '', label: 'Not set' },
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'biweekly', label: 'Biweekly' },
+  { value: 'monthly', label: 'Monthly' },
+];
 
 function userInitials(user) {
   const initials = `${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}`.trim();
@@ -240,17 +262,13 @@ function AdminUsers() {
               aria-label="Search users by name or email"
             />
           </div>
-          <Select
-            aria-label="Filter by role"
+          <SelectMenu
+            ariaLabel="Filter by role"
             value={roleFilter}
-            onChange={(event) => setRoleFilter(event.target.value)}
+            onChange={(next) => setRoleFilter(next)}
             className="op-admin-people-filter"
-          >
-            <option value="">All roles</option>
-            <option value="USER">Guests</option>
-            <option value="HOST">Hosts</option>
-            <option value="ADMIN">Admins</option>
-          </Select>
+            options={ROLE_FILTER_OPTIONS}
+          />
         </div>
 
         {message && (
@@ -331,17 +349,15 @@ function AdminUsers() {
                         {isSelf || u.role === 'ADMIN' ? (
                           <Badge color="gray">Admin</Badge>
                         ) : (
-                          <Select
+                          <SelectMenu
                             sizing="sm"
                             value={u.role}
-                            onChange={(event) => changeRole(u, event.target.value)}
+                            onChange={(next) => changeRole(u, next)}
                             disabled={busy}
-                            aria-label={`Change role for ${u.firstName} ${u.lastName}`}
+                            ariaLabel={`Change role for ${u.firstName} ${u.lastName}`}
                             className="op-admin-people-role-select"
-                          >
-                            <option value="USER">Guest</option>
-                            <option value="HOST">Host</option>
-                          </Select>
+                            options={ASSIGNABLE_ROLE_OPTIONS}
+                          />
                         )}
                       </TableCell>
                       <TableCell>
@@ -411,16 +427,13 @@ function AdminUsers() {
                   <Field label="Bank Code" value={formData.bankCode} onChange={(v) => setFormData({ ...formData, bankCode: v })} />
                   <div>
                     <Label htmlFor="user-payout-frequency">Payout frequency</Label>
-                    <Select
+                    <SelectMenu
                       id="user-payout-frequency"
                       value={formData.payoutFrequency}
-                      onChange={(event) => setFormData({ ...formData, payoutFrequency: event.target.value })}
-                    >
-                      <option value="">Not set</option>
-                      <option value="weekly">Weekly</option>
-                      <option value="biweekly">Biweekly</option>
-                      <option value="monthly">Monthly</option>
-                    </Select>
+                      onChange={(next) => setFormData({ ...formData, payoutFrequency: next })}
+                      options={PAYOUT_FREQUENCY_OPTIONS}
+                      ariaLabel="Payout frequency"
+                    />
                   </div>
                 </div>
               </div>

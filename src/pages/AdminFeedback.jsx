@@ -6,7 +6,6 @@ import {
   ModalBody,
   ModalFooter,
   ModalHeader,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -17,6 +16,7 @@ import {
 } from 'flowbite-react';
 import { Search, Star } from 'lucide-react';
 import apiClient from '../api/client.js';
+import SelectMenu from '../components/SelectMenu.jsx';
 
 function StarRow({ rating, size = 'sm' }) {
   return (
@@ -106,10 +106,16 @@ function AdminFeedback() {
       <section className="op-admin-catalog-board">
         <div className="op-admin-catalog-toolbar op-admin-feedback-toolbar">
           <div className="op-admin-catalog-search"><SearchIcon /><TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search property, guest or review" aria-label="Search guest feedback" /></div>
-          <Select aria-label="Filter feedback by rating" value={ratingFilter} onChange={(event) => setRatingFilter(event.target.value)} className="op-admin-feedback-filter">
-            <option value="">All ratings</option>
-            {[5, 4, 3, 2, 1].map((rating) => <option key={rating} value={rating}>{rating} star{rating === 1 ? '' : 's'}</option>)}
-          </Select>
+          <SelectMenu
+            ariaLabel="Filter feedback by rating"
+            value={ratingFilter}
+            onChange={(next) => setRatingFilter(next)}
+            className="op-admin-feedback-filter"
+            options={[
+              { value: '', label: 'All ratings' },
+              ...[5, 4, 3, 2, 1].map((rating) => ({ value: String(rating), label: `${rating} star${rating === 1 ? '' : 's'}` })),
+            ]}
+          />
         </div>
 
         {loading ? (

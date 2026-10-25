@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
+import SelectMenu from '../components/SelectMenu.jsx';
 import { playMessageSound } from '../utils/notificationSound.js';
 import {
   Accordion,
@@ -613,9 +614,13 @@ function DashboardOverview() {
       </section>
       <section className="op-admin-trend">
         <div className="op-admin-panel-heading"><h2>New sign-ups</h2>
-          <select aria-label="Sign-up date range" value={trendDays} onChange={(event) => setTrendDays(Number(event.target.value))}>
-            <option value={7}>Last 7 days</option><option value={30}>Last 30 days</option><option value={90}>Last 90 days</option>
-          </select>
+          <SelectMenu
+            sizing="sm"
+            ariaLabel="Sign-up date range"
+            value={String(trendDays)}
+            onChange={(next) => setTrendDays(Number(next))}
+            options={[{ value: '7', label: 'Last 7 days' }, { value: '30', label: 'Last 30 days' }, { value: '90', label: 'Last 90 days' }]}
+          />
         </div>
         {trend ? <>
           <p><strong>{trend.total}</strong> new accounts in the last {trend.days} days</p>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Select } from 'flowbite-react';
+import SelectMenu from '../components/SelectMenu.jsx';
 import { CalendarDays, Camera, ChevronRight, Heart, Info, Star } from 'lucide-react';
 import StayCard from '../components/StayCard.jsx';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
@@ -10,6 +10,25 @@ import apiClient from '../api/client.js';
 import { openConsentManager } from '../utils/consent.js';
 
 import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
+
+// SelectMenu option lists. Module scope keeps them out of every render of the
+// phone, payout and review forms.
+const COUNTRY_OPTIONS = COUNTRY_CODES.map((country) => ({ value: country.code, label: country.dial }));
+
+// Review sub-scores are optional, so a blank "Skip" leads the list. Scores are
+// stored as numbers but options compare by string, so the trigger passes
+// String(value) - otherwise a saved 5 would not match the "5" option and the
+// menu would fall back to the placeholder.
+const SUB_SCORE_OPTIONS = [
+  { value: '', label: 'Skip' },
+  ...[5, 4, 3, 2, 1].map((n) => ({ value: String(n), label: `${n} star${n > 1 ? 's' : ''}` })),
+];
+
+const PAYOUT_FREQUENCY_OPTIONS = [
+  { value: 'weekly', label: 'Weekly (every Monday)' },
+  { value: 'biweekly', label: 'Bi-Weekly (every other Monday)' },
+  { value: 'monthly', label: 'Monthly (1st of month)' },
+];
 
 function ProfilePage() {
   const { user, setUser, logout } = useAuth();
@@ -448,14 +467,13 @@ function ProfilePage() {
                   <div>
                     <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label>
                     <div className="flex gap-2">
-                      <Select
+                      <SelectMenu
                         value={countryCode}
-                        onChange={(event) => handlePhoneChange(event.target.value, phoneNumber)}
-                        aria-label="Select country code"
-                        className="opg-profile-country"
-                      >
-                        {COUNTRY_CODES.map((country) => <option key={country.code} value={country.code}>{country.dial}</option>)}
-                      </Select>
+                        onChange={(next) => handlePhoneChange(next, phoneNumber)}
+                        ariaLabel="Select country code"
+                        wrapperClassName="opg-profile-country"
+                        options={COUNTRY_OPTIONS}
+                      />
                       <input
                         type="tel"
                         value={phoneNumber}
@@ -634,18 +652,16 @@ function ProfilePage() {
                       {banksLoading ? (
                         <p className="text-sm text-[#6b7280]">Loading banks...</p>
                       ) : banks.length > 0 ? (
-                        <Select
+                        <SelectMenu
                           value={bankForm.bankCode}
-                          onChange={(event) => {
-                            const code = event.target.value;
-                            const bank = banks.find((item) => item.code === code);
-                            setBankForm((prev) => ({ ...prev, bankCode: code, bankName: bank?.name || '' }));
+                          ariaLabel="Select your bank"
+                          onChange={(next) => {
+                            const bank = banks.find((item) => item.code === next);
+                            setBankForm((prev) => ({ ...prev, bankCode: next, bankName: bank?.name || '' }));
                           }}
-                          aria-label="Select your bank"
-                          className="opg-profile-select"
-                        >
-                          {banks.map((bank) => <option key={bank.code} value={bank.code}>{bank.name}</option>)}
-                        </Select>
+                          wrapperClassName="opg-profile-select"
+                          options={banks.map((bank) => ({ value: bank.code, label: bank.name }))}
+                        />
                       ) : (
                         <input
                           type="text"
@@ -701,16 +717,13 @@ function ProfilePage() {
                 <h4 className="font-semibold text-[#1f2937]">Payout Frequency</h4>
                 <p className="text-xs text-[#6b7280]">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
                 <div className="flex items-center gap-3">
-                  <Select
+                  <SelectMenu
                     value={payoutFrequency}
-                    onChange={(event) => setPayoutFrequency(event.target.value)}
-                    aria-label="Select payout frequency"
-                    className="opg-profile-frequency"
-                  >
-                    <option value="weekly">Weekly (every Monday)</option>
-                    <option value="biweekly">Bi-Weekly (every other Monday)</option>
-                    <option value="monthly">Monthly (1st of month)</option>
-                  </Select>
+                    onChange={(next) => setPayoutFrequency(next)}
+                    ariaLabel="Select payout frequency"
+                    wrapperClassName="opg-profile-frequency"
+                    options={PAYOUT_FREQUENCY_OPTIONS}
+                  />
                   <button
                     type="button"
                     onClick={handleFrequencySave}
@@ -818,10 +831,12 @@ function ProfilePage() {
                               {[['cleanlinessRating', 'Cleanliness'], ['locationRating', 'Location'], ['valueRating', 'Value']].map(([field, label]) => (
                                 <label key={field} className="text-xs font-semibold text-[#6b7280]">
                                   {label} (optional)
-                                  <Select value={reviewForms[booking.id]?.[field] || ''} onChange={(event) => setReviewField(booking.id, field, Number(event.target.value) || 0)}>
-                                    <option value="">Skip</option>
-                                    {[5, 4, 3, 2, 1].map((n) => <option key={n} value={n}>{n} star{n > 1 ? 's' : ''}</option>)}
-                                  </Select>
+                                  <SelectMenu
+                                    value={String(reviewForms[booking.id]?.[field] || '')}
+                                    onChange={(next) => setReviewField(booking.id, field, Number(next) || 0)}
+                                    options={SUB_SCORE_OPTIONS}
+                                    ariaLabel={`${label} rating (optional)`}
+                                  />
                                 </label>
                               ))}
                             </div>

@@ -2,29 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read host application payout step and payout code",
+      "text": "Audit native selects and custom CSS usage",
       "state": "done"
     },
     {
-      "text": "Work out what Paystack needs for M-Pesa vs bank transfers",
+      "text": "Swap native selects for Flowbite Dropdown",
       "state": "done"
     },
     {
-      "text": "Add missing payout detail fields to host application form",
+      "text": "Confirm lucide-react icons everywhere",
       "state": "done"
     },
     {
-      "text": "Validate and persist the details server-side",
+      "text": "Run lint and build",
       "state": "done"
     },
     {
-      "text": "Run tests, lint and build",
-      "state": "active"
+      "text": "Check dropdowns in the browser",
+      "state": "done"
     },
     {
       "text": "Commit and push",
-      "state": "pending"
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-10-25T19:42:31.087Z"
+  "updatedAt": "2026-10-25T20:03:07.212Z"
 }

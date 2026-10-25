@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Select, TextInput } from 'flowbite-react';
+import { TextInput } from 'flowbite-react';
 import { ChevronRight, MapPin } from 'lucide-react';
 import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
+import SelectMenu from './SelectMenu.jsx';
 
 /** Card for a single place or restaurant */
 function NearbyCard({ item, areaLabels, categoryLabels }) {
@@ -59,6 +60,8 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   const visible = maxCards ? filtered.slice(0, maxCards) : filtered;
   const hasMore = maxCards && filtered.length > maxCards;
 
+  // "all" is a real entry in areaLabels/categoryLabels, so the label lists it as
+  // the clear-the-filter choice instead of needing a separate empty option.
   const areaOptions = Object.entries(areaLabels).map(([k, v]) => ({ value: k, label: v }));
   const catOptions = categories && Object.entries(categoryLabels).map(([k, v]) => ({ value: k, label: v }));
 
@@ -73,13 +76,21 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
       {/* Filters: free-text search plus area/category selects */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 px-4 md:px-0">
         <TextInput className="op-place-search-wrap" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search places, areas or categories" aria-label="Search places" />
-        <Select className="op-place-select-wrap" value={areaFilter} onChange={(event) => setAreaFilter(event.target.value)} aria-label="Filter by area">
-          {areaOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-        </Select>
+        <SelectMenu
+          className="op-place-select-wrap"
+          value={areaFilter}
+          onChange={(next) => setAreaFilter(next)}
+          options={areaOptions}
+          ariaLabel="Filter by area"
+        />
         {catOptions && (
-          <Select className="op-place-select-wrap" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)} aria-label="Filter by category">
-            {catOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-          </Select>
+          <SelectMenu
+            className="op-place-select-wrap"
+            value={categoryFilter}
+            onChange={(next) => setCategoryFilter(next)}
+            options={catOptions}
+            ariaLabel="Filter by category"
+          />
         )}
         <button className="op-place-clear" type="button" onClick={() => { setQuery(''); setAreaFilter('all'); setCategoryFilter('all'); }}>Clear all</button><span className="op-place-count">{filtered.length} places</span>
       </div>

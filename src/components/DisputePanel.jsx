@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Alert, Badge, Button, Label, Select, Spinner, Textarea } from 'flowbite-react';
+import { Alert, Badge, Button, Label, Spinner, Textarea } from 'flowbite-react';
 import {
   CheckCircle2,
   Clock3,
@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import SelectMenu from './SelectMenu.jsx';
 
 const DISPUTE_CATEGORIES = [
   { value: 'PROPERTY_CONDITION', label: 'Property condition' },
@@ -223,17 +224,26 @@ function CreateDisputeForm({ bookings, onCreated }) {
     <div className="op-dispute-create-grid">
       <div className="op-dispute-field">
         <Label htmlFor="dispute-booking">Booking</Label>
-        <Select id="dispute-booking" value={bookingId} onChange={(event) => setBookingId(event.target.value)} required>
-          {availableBookings.map((booking) => <option key={booking.id} value={booking.id}>
-            {bookingReference(booking.id)} - {booking.property?.title || 'Stay booking'}
-          </option>)}
-        </Select>
+        <SelectMenu
+          id="dispute-booking"
+          ariaLabel="Booking"
+          value={bookingId}
+          onChange={(next) => setBookingId(next)}
+          options={availableBookings.map((booking) => ({
+            value: booking.id,
+            label: `${bookingReference(booking.id)} - ${booking.property?.title || 'Stay booking'}`,
+          }))}
+        />
       </div>
       <div className="op-dispute-field">
         <Label htmlFor="dispute-category">Issue category</Label>
-        <Select id="dispute-category" value={category} onChange={(event) => setCategory(event.target.value)} required>
-          {DISPUTE_CATEGORIES.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-        </Select>
+        <SelectMenu
+          id="dispute-category"
+          ariaLabel="Issue category"
+          value={category}
+          onChange={(next) => setCategory(next)}
+          options={DISPUTE_CATEGORIES}
+        />
       </div>
     </div>
     <div className="op-dispute-field">
@@ -334,9 +344,16 @@ function DisputePanel({ disputes, bookings, loading = false, error = '', onRefre
         <p>Booking {bookingReference(selected.bookingId)} {booking?.property?.title ? `- ${booking.property.title}` : ''}</p>
       </div>
       <div className="op-dispute-head-actions">
-        {disputes.length > 1 && <Select aria-label="Select dispute" value={selected.id} onChange={(event) => setSelectedId(event.target.value)} className="op-dispute-picker">
-          {disputes.map((dispute) => <option key={dispute.id} value={dispute.id}>{bookingReference(dispute.bookingId)} - {CATEGORY_LABELS[dispute.category] || dispute.category}</option>)}
-        </Select>}
+        {disputes.length > 1 && <SelectMenu
+          ariaLabel="Select dispute"
+          value={selected.id}
+          onChange={(next) => setSelectedId(next)}
+          className="op-dispute-picker"
+          options={disputes.map((dispute) => ({
+            value: dispute.id,
+            label: `${bookingReference(dispute.bookingId)} - ${CATEGORY_LABELS[dispute.category] || dispute.category}`,
+          }))}
+        />}
         <Badge color={status.color} icon={StatusIcon}>{status.label}</Badge>
       </div>
     </header>
@@ -347,9 +364,16 @@ function DisputePanel({ disputes, bookings, loading = false, error = '', onRefre
       <div className="op-dispute-left">
         <div className="op-dispute-field">
           <Label htmlFor="dispute-category-current">Issue category</Label>
-          <Select id="dispute-category-current" value={selected.category} disabled>
-            {DISPUTE_CATEGORIES.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
-          </Select>
+          {/* Read-only: a category is fixed once the dispute is opened, so the
+              handler exists only because SelectMenu requires one. */}
+          <SelectMenu
+            id="dispute-category-current"
+            ariaLabel="Issue category"
+            value={selected.category}
+            onChange={() => {}}
+            disabled
+            options={DISPUTE_CATEGORIES}
+          />
         </div>
 
         <div className="op-dispute-description">

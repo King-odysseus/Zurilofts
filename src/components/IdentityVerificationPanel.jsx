@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, useNavigate } from 'react-router-dom';
-import { Alert, Badge, Button, Label, Select, Spinner, TextInput } from 'flowbite-react';
+import { Alert, Badge, Button, Label, Spinner, TextInput } from 'flowbite-react';
 import {
   AlertCircle,
   BadgeCheck,
@@ -14,11 +14,18 @@ import {
   Upload,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
+import SelectMenu from './SelectMenu.jsx';
 
 const DOCUMENT_KINDS = [
   { kind: 'ID_FRONT', label: 'ID / Passport (front)', required: true },
   { kind: 'ID_BACK', label: 'ID (back)', required: false },
   { kind: 'SELFIE', label: 'Selfie holding your ID', required: true },
+];
+
+const ID_TYPE_OPTIONS = [
+  { value: 'NATIONAL_ID', label: 'National ID' },
+  { value: 'PASSPORT', label: 'Passport' },
+  { value: 'ALIEN_ID', label: 'Alien ID' },
 ];
 
 const STATUS_META = {
@@ -185,11 +192,14 @@ function IdentityVerificationPanel({ onApproved }) {
             </div>
             <div className="op-verify-field">
               <Label htmlFor="iv-idType">Identity document</Label>
-              <Select id="iv-idType" disabled={!editable} value={form.idType} onChange={(event) => setForm({ ...form, idType: event.target.value })} required>
-                <option value="NATIONAL_ID">National ID</option>
-                <option value="PASSPORT">Passport</option>
-                <option value="ALIEN_ID">Alien ID</option>
-              </Select>
+              <SelectMenu
+                id="iv-idType"
+                ariaLabel="Identity document"
+                disabled={!editable}
+                value={form.idType}
+                onChange={(next) => setForm({ ...form, idType: next })}
+                options={ID_TYPE_OPTIONS}
+              />
             </div>
             <div className="op-verify-field">
               <Label htmlFor="iv-idNumber">Document number</Label>

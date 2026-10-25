@@ -6,7 +6,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Select,
   TextInput,
 } from 'flowbite-react';
 import {
@@ -22,6 +21,7 @@ import {
   Users,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
+import SelectMenu from '../components/SelectMenu.jsx';
 
 const EVENT_TYPES = [
   { value: '', label: 'All recorded activity' },
@@ -209,9 +209,7 @@ function AdminGovernance() {
                 aria-label="Search governance activity"
               />
             </div>
-            <Select value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)} aria-label="Filter audit activity by type">
-              {EVENT_TYPES.map((option) => <option key={option.value || 'all'} value={option.value}>{option.label}</option>)}
-            </Select>
+            <SelectMenu value={typeFilter} onChange={(next) => setTypeFilter(next)} ariaLabel="Filter audit activity by type" options={EVENT_TYPES} />
           </div>
 
           {loading ? (

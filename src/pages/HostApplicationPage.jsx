@@ -1,40 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { Button, Checkbox, Dropdown, DropdownItem, FileInput, HelperText, Label, Textarea, TextInput } from 'flowbite-react';
+import { Button, Checkbox, FileInput, HelperText, Label, Textarea, TextInput } from 'flowbite-react';
+import SelectMenu from '../components/SelectMenu.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
 
-
-// Flowbite Dropdown used as a select so the option list is styled, not the browser's native list.
-function SelectField({ id, value, onChange, options }) {
-  const selected = options.find((option) => option.value === value);
-  return (
-    <Dropdown
-      color="light"
-      dismissOnClick
-      label={selected?.label || 'Select'}
-      theme={{ floating: { target: 'w-full' } }}
-      className="w-full"
-      id={id}
-    >
-      {options.map((option) => (
-        <DropdownItem key={option.value} onClick={() => onChange(option.value)} className={option.value === value ? 'font-semibold text-[#0B1F42]' : ''}>
-          {option.label}
-        </DropdownItem>
-      ))}
-    </Dropdown>
-  );
-}
-
-SelectField.propTypes = {
-  id: PropTypes.string.isRequired,
-  value: PropTypes.string,
-  onChange: PropTypes.func.isRequired,
-  options: PropTypes.arrayOf(PropTypes.shape({ value: PropTypes.string.isRequired, label: PropTypes.string.isRequired })).isRequired,
-};
 
 const EMPTY_FORM = {
   legalName: '', businessName: '', businessType: 'individual',
@@ -518,7 +491,7 @@ function HostApplicationPage() {
                     </div>
                     <div>
                       <Label htmlFor="host-identity-type">Identity document</Label>
-                      <SelectField id="host-identity-type" value={form.identityType} onChange={(v) => update('identityType', v)} options={[
+                      <SelectMenu id="host-identity-type" value={form.identityType} onChange={(v) => update('identityType', v)} options={[
           { value: 'NATIONAL_ID', label: 'Kenyan national ID' },
           { value: 'PASSPORT', label: 'Passport' },
           { value: 'ALIEN_ID', label: 'Alien ID' },
@@ -554,7 +527,7 @@ function HostApplicationPage() {
                   <div className="op-host-application-fields">
                     <div>
                       <Label htmlFor="host-business-type">Host type</Label>
-                      <SelectField id="host-business-type" value={form.businessType} onChange={(v) => update('businessType', v)} options={[
+                      <SelectMenu id="host-business-type" value={form.businessType} onChange={(v) => update('businessType', v)} options={[
           { value: 'individual', label: 'Individual' },
           { value: 'company', label: 'Registered company' },
         ]} />
@@ -571,7 +544,7 @@ function HostApplicationPage() {
                     )}
                     <div>
                       <Label htmlFor="host-payout-method">Preferred payout</Label>
-                      <SelectField id="host-payout-method" value={form.preferredPayoutMethod} onChange={(v) => update('preferredPayoutMethod', v)} options={[
+                      <SelectMenu id="host-payout-method" value={form.preferredPayoutMethod} onChange={(v) => update('preferredPayoutMethod', v)} options={[
           { value: 'mpesa', label: 'M-PESA' },
           { value: 'bank', label: 'Bank transfer' },
         ]} />
@@ -586,7 +559,7 @@ function HostApplicationPage() {
                     ) : banks.length > 0 ? (
                       <div>
                         <Label htmlFor="host-payout-bank">Bank</Label>
-                        <SelectField id="host-payout-bank" value={form.payoutBankCode} onChange={(code) => {
+                        <SelectMenu id="host-payout-bank" value={form.payoutBankCode} onChange={(code) => {
                           const bank = banks.find((item) => item.code === code);
                           update('payoutBankName', bank?.name || '');
                           update('payoutBankCode', code);
@@ -633,7 +606,7 @@ function HostApplicationPage() {
                     </div>
                     <div>
                       <Label htmlFor="host-relationship">Relationship to the properties</Label>
-                      <SelectField id="host-relationship" value={form.propertyRelationship} onChange={(v) => update('propertyRelationship', v)} options={[
+                      <SelectMenu id="host-relationship" value={form.propertyRelationship} onChange={(v) => update('propertyRelationship', v)} options={[
           { value: 'OWNER', label: 'Owner' },
           { value: 'MANAGER', label: 'Property manager' },
           { value: 'AGENT', label: 'Authorised agent' },

@@ -7,7 +7,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -20,6 +19,7 @@ import {
 } from 'flowbite-react';
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
+import SelectMenu from '../components/SelectMenu.jsx';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
 
 const CATEGORIES = ['transport', 'catering', 'housekeeping', 'concierge'];
@@ -302,7 +302,7 @@ function AdminAddOns() {
                 <div><Label htmlFor="addon-description">Description</Label><Textarea id="addon-description" rows={3} value={formData.description} onChange={(event) => setFormData({ ...formData, description: event.target.value })} placeholder="Describe what guests receive and when." required /></div>
                 <div className="op-admin-form-grid">
                   <div><Label htmlFor="addon-price">Price (KES)</Label><TextInput id="addon-price" type="number" min="1" value={formData.price} onChange={(event) => setFormData({ ...formData, price: event.target.value })} required /></div>
-                  <div><Label htmlFor="addon-category">Category</Label><Select id="addon-category" value={formData.category} onChange={(event) => setFormData({ ...formData, category: event.target.value })}>{CATEGORIES.map((category) => <option key={category} value={category}>{CATEGORY_LABELS[category]}</option>)}</Select></div>
+                  <div><Label htmlFor="addon-category">Category</Label><SelectMenu id="addon-category" ariaLabel="Category" value={formData.category} onChange={(next) => setFormData({ ...formData, category: next })} options={CATEGORIES.map((category) => ({ value: category, label: CATEGORY_LABELS[category] }))} /></div>
                 </div>
                 <div><Label htmlFor="addon-image">Image URL (optional)</Label><TextInput id="addon-image" value={formData.image} onChange={(event) => setFormData({ ...formData, image: event.target.value })} placeholder="https://..." /></div>
                 <div className="op-admin-addon-toggle"><ToggleSwitch checked={formData.active} label="Available to guests" onChange={(event) => setFormData({ ...formData, active: event.target.checked })} /></div>

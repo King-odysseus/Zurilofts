@@ -1,10 +1,23 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Button, Checkbox, Label, Select, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
+import { Button, Checkbox, Label, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
 import { Check, ChevronLeft, Eye, MapPin, Upload, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
+import SelectMenu from '../components/SelectMenu.jsx';
 import { findSearchLocation, isNairobiSearchLocation, SEARCH_LOCATION_GROUPS } from '../data/searchLocations.js';
+
+// SelectMenu renders a flat option list, so the optgroups the native select used
+// are flattened here. Area names are unique across the groups, so no value is lost.
+const AREA_OPTIONS = SEARCH_LOCATION_GROUPS.flatMap((group) => (
+  group.options.map((area) => ({ value: area, label: area }))
+));
+
+const PROPERTY_TYPE_OPTIONS = [
+  { value: 'apartment', label: 'Apartment' },
+  { value: 'studio', label: 'Studio' },
+  { value: 'penthouse', label: 'Penthouse' },
+];
 
 const EMPTY = {
   title: '',
@@ -305,13 +318,13 @@ function AdminPropertyForm() {
                 </div>
                 <div>
                   <Label htmlFor="listing-neighborhood" className="op-host-editor-label">Area</Label>
-                  <Select id="listing-neighborhood" value={form.neighborhood} onChange={(e) => update('neighborhood', e.target.value)} required>
-                    {SEARCH_LOCATION_GROUPS.map((group) => (
-                      <optgroup key={group.label} label={group.label}>
-                        {group.options.map((area) => <option key={`${group.label}-${area}`} value={area}>{area}</option>)}
-                      </optgroup>
-                    ))}
-                  </Select>
+                  <SelectMenu id="listing-neighborhood" ariaLabel="Area" value={form.neighborhood} onChange={(next) => update('neighborhood', next)} options={AREA_OPTIONS} />
+
+
+
+
+
+
                 </div>
                 <div>
                   <Label htmlFor="listing-location" className="op-host-editor-label">Location details</Label>
@@ -437,6 +450,7 @@ function AdminPropertyForm() {
                           <TextInput type="number" min="1" placeholder="Price per night" value={form.price1Bed} onChange={(e) => update('price1Bed', e.target.value)} required />
                           <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms1Bed} onChange={(e) => update('bathrooms1Bed', e.target.value)} />
                         </div>
+  
                       )}
                     </div>
                   </div>
@@ -457,6 +471,7 @@ function AdminPropertyForm() {
                           <TextInput type="number" min="1" placeholder="Price per night" value={form.price2Bed} onChange={(e) => update('price2Bed', e.target.value)} required />
                           <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms2Bed} onChange={(e) => update('bathrooms2Bed', e.target.value)} />
                         </div>
+  
                       )}
                     </div>
                   </div>
@@ -466,11 +481,11 @@ function AdminPropertyForm() {
               <div className="op-host-editor-field-grid">
                 <div>
                   <Label htmlFor="listing-type" className="op-host-editor-label">Property type</Label>
-                  <Select id="listing-type" value={form.type} onChange={(e) => update('type', e.target.value)}>
-                    <option value="apartment">Apartment</option>
-                    <option value="studio">Studio</option>
-                    <option value="penthouse">Penthouse</option>
-                  </Select>
+                  <SelectMenu id="listing-type" ariaLabel="Property type" value={form.type} onChange={(next) => update('type', next)} options={PROPERTY_TYPE_OPTIONS} />
+
+
+
+
                 </div>
                 <div className="op-host-editor-toggle-stack">
                   <div className="op-host-editor-toggle">
@@ -690,6 +705,8 @@ function FullPagePreview({ form, onClose }) {
                         {a}
                       </div>
                     ))}
+
+
                   </div>
                 </div>
               )}
@@ -704,6 +721,7 @@ function FullPagePreview({ form, onClose }) {
                         <MapPin className="w-5 h-5 text-[#C49A6C] mr-2" strokeWidth={2} aria-hidden="true" />
                         {n}
                       </li>
+
                     ))}
                   </ul>
                 </div>

@@ -8,7 +8,6 @@ import {
   Modal,
   ModalBody,
   ModalHeader,
-  Select,
   Table,
   TableBody,
   TableCell,
@@ -20,6 +19,7 @@ import {
 } from 'flowbite-react';
 import { FileText, Search } from 'lucide-react';
 import apiClient from '../api/client.js';
+import SelectMenu from '../components/SelectMenu.jsx';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All applications' },
@@ -225,14 +225,13 @@ function AdminHostApplications() {
               aria-label="Search host applications"
             />
           </div>
-          <Select
-            aria-label="Filter host applications by status"
+          <SelectMenu
+            ariaLabel="Filter host applications by status"
             value={status}
-            onChange={(event) => setStatus(event.target.value)}
+            onChange={(next) => setStatus(next)}
             className="op-admin-host-app-filter"
-          >
-            {STATUS_OPTIONS.map((option) => <option key={option.value || 'all'} value={option.value}>{option.label}</option>)}
-          </Select>
+            options={STATUS_OPTIONS}
+          />
         </div>
 
         {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="op-admin-people-message" role="status">{message}</Alert>}

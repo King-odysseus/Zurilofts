@@ -1,8 +1,9 @@
 import { Fragment, useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Datepicker, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Label, Select, TextInput } from 'flowbite-react';
+import { Button, Datepicker, Dropdown, DropdownDivider, DropdownHeader, DropdownItem, Label, TextInput } from 'flowbite-react';
 import { ChevronRight, Headphones, Receipt, Search, ShieldCheck } from 'lucide-react';
 import apiClient from './api/client.js';
+import SelectMenu from './components/SelectMenu.jsx';
 import { heroImage } from './assets/images.js';
 import { clearRecentlyViewed, getRecentlyViewed } from './utils/recentlyViewed.js';
 import StayCard from './components/StayCard.jsx';
@@ -148,6 +149,23 @@ function SearchForm({ initial = DEFAULT_SEARCH_LOCATION, allKenya = false }) {
 
 const AMENITY_OPTIONS = [{ value: 'WiFi', label: 'Wi-Fi' }, { value: 'Parking', label: 'Parking' }, { value: 'Kitchen', label: 'Kitchen' }, { value: 'Air Conditioning', label: 'Air conditioning' }, { value: 'Washing Machine', label: 'Washing machine' }, { value: 'Balcony', label: 'Balcony' }, { value: 'Power Backup', label: 'Power backup' }];
 
+// SelectMenu takes string values, while the old native <option> elements used
+// numbers; the leading empty option keeps a "clear this filter" choice.
+const SORT_OPTIONS = [
+  { value: '', label: 'Recommended' },
+  { value: 'price_asc', label: 'Price: low to high' },
+  { value: 'price_desc', label: 'Price: high to low' },
+  { value: 'rating', label: 'Top rated' },
+  { value: 'newest', label: 'Newest' },
+];
+
+function countOptions(label, counts) {
+  return [{ value: '', label }, ...counts.map((count) => ({ value: String(count), label: `${count}+` }))];
+}
+
+const BEDROOM_OPTIONS = countOptions('Any', [1, 2, 3, 4]);
+const BATHROOM_OPTIONS = countOptions('Any', [1, 2, 3]);
+
 function CategoryBar({ selected, onSelect, onFilters }) {
   return <div className="opg-filter-bar"><div className="opg-categories">{categories.map((category) => <button key={category} type="button" className={selected === category ? 'active' : ''} onClick={() => onSelect(category)}>{category}</button>)}</div>{onFilters ? <button className="opg-filter-action" type="button" onClick={onFilters}>☷ Filters</button> : <Link to="/properties?filters=1" className="opg-filter-action">☷ Filters</Link>}</div>;
 }
@@ -176,13 +194,23 @@ export function GuestStays() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [category, setCategory] = useState('All stays');
   const [filtersOpen, setFiltersOpen] = useState(searchParams.get('filters') === '1');
+  // The styled selects are controlled, so their values live in state instead of
+  // the old uncontrolled FormData fields. They are reset from the URL each time
+  // the dialog opens, so closing it without applying discards edits as before.
+  const [bedroomFilter, setBedroomFilter] = useState(() => searchParams.get('minBedrooms') || '');
+  const [bathroomFilter, setBathroomFilter] = useState(() => searchParams.get('minBathrooms') || '');
+  function openFilters() {
+    setBedroomFilter(searchParams.get('minBedrooms') || '');
+    setBathroomFilter(searchParams.get('minBathrooms') || '');
+    setFiltersOpen(true);
+  }
   const page = Math.max(1, Number(searchParams.get('page')) || 1);
   const allKenya = searchParams.get('scope') === 'kenya';
   const search = allKenya ? '' : searchParams.get('search') || DEFAULT_SEARCH_LOCATION;
   const stays = useStays({ limit: 12, page, search: search || undefined, type: category === 'All stays' ? undefined : category.slice(0, -1).toLowerCase(), checkIn: searchParams.get('checkIn') || undefined, checkOut: searchParams.get('checkOut') || undefined, minPrice: searchParams.get('minPrice') || undefined, maxPrice: searchParams.get('maxPrice') || undefined, minBedrooms: searchParams.get('minBedrooms') || undefined, minBathrooms: searchParams.get('minBathrooms') || undefined, amenities: searchParams.get('amenities') || undefined, sort: searchParams.get('sort') || undefined });
   function applyFilters(event) { event.preventDefault(); const form = new FormData(event.currentTarget); const next = new URLSearchParams(searchParams); for (const name of ['minPrice','maxPrice','minBedrooms','minBathrooms']) { const value = String(form.get(name) || '').trim(); if (value) next.set(name, value); else next.delete(name); } const chosenAmenities = form.getAll('amenities'); if (chosenAmenities.length) next.set('amenities', chosenAmenities.join(',')); else next.delete('amenities'); next.delete('filters'); next.delete('page'); setSearchParams(next); setFiltersOpen(false); }
   const areaLabel = allKenya ? 'Kenya' : search;
-  return <main className="opg-page opg-results"><div className="opg-container"><div className="opg-results-intro"><p><Link to="/">Home</Link> / Stays</p><h1>{allKenya ? 'Stays across Kenya' : `Stays in ${areaLabel}`}</h1><span>Find a verified, furnished home that fits your plans.</span></div><SearchForm initial={search} allKenya={allKenya} /><CategoryBar selected={category} onSelect={setCategory} onFilters={() => setFiltersOpen(true)} /><div className="opg-results-toolbar"><strong>{stays.loading ? 'Finding stays…' : `${stays.total} stays available`}</strong><a className="opg-map-link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`stays in ${areaLabel}`)}`} target="_blank" rel="noopener noreferrer">View area on map</a><label className="opg-sort">Sort by <Select aria-label="Sort stays" value={searchParams.get('sort') || ''} onChange={(event) => { const next = new URLSearchParams(searchParams); if (event.target.value) next.set('sort', event.target.value); else next.delete('sort'); next.delete('page'); setSearchParams(next); }}><option value="">Recommended</option><option value="price_asc">Price: low to high</option><option value="price_desc">Price: high to low</option><option value="rating">Top rated</option><option value="newest">Newest</option></Select></label></div><StayGrid {...stays} />{stays.total > page * 12 && <button className="opg-load-more" onClick={() => { const next = new URLSearchParams(searchParams); next.set('page', String(page + 1)); setSearchParams(next); }}>Next page <ChevronRight className="w-4 h-4" aria-hidden="true" /></button>}</div>{filtersOpen && <div className="opg-filter-backdrop" onClick={() => setFiltersOpen(false)}><form className="opg-filter-dialog" onClick={(event) => event.stopPropagation()} onSubmit={applyFilters}><div><h2>Filter stays</h2><button type="button" onClick={() => setFiltersOpen(false)} aria-label="Close filters">×</button></div><label>Minimum nightly price<TextInput name="minPrice" type="number" min="0" defaultValue={searchParams.get('minPrice') || ''} placeholder="KSh" /></label><label>Maximum nightly price<TextInput name="maxPrice" type="number" min="0" defaultValue={searchParams.get('maxPrice') || ''} placeholder="KSh" /></label><label>Minimum bedrooms<Select name="minBedrooms" defaultValue={searchParams.get('minBedrooms') || ''}><option value="">Any</option>{[1,2,3,4].map((n) => <option key={n} value={n}>{n}+</option>)}</Select></label><label>Minimum bathrooms<Select name="minBathrooms" defaultValue={searchParams.get('minBathrooms') || ''}><option value="">Any</option>{[1,2,3].map((n) => <option key={n} value={n}>{n}+</option>)}</Select></label><fieldset className="opg-amenity-filters"><legend>Amenities</legend>{AMENITY_OPTIONS.map((amenity) => <label key={amenity.value}><input type="checkbox" name="amenities" value={amenity.value} defaultChecked={(searchParams.get('amenities') || '').split(',').includes(amenity.value)} /> {amenity.label}</label>)}</fieldset><button className="opg-apply-filters" type="submit">Show stays</button></form></div>}</main>;
+  return <main className="opg-page opg-results"><div className="opg-container"><div className="opg-results-intro"><p><Link to="/">Home</Link> / Stays</p><h1>{allKenya ? 'Stays across Kenya' : `Stays in ${areaLabel}`}</h1><span>Find a verified, furnished home that fits your plans.</span></div><SearchForm initial={search} allKenya={allKenya} /><CategoryBar selected={category} onSelect={setCategory} onFilters={openFilters} /><div className="opg-results-toolbar"><strong>{stays.loading ? 'Finding stays…' : `${stays.total} stays available`}</strong><a className="opg-map-link" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`stays in ${areaLabel}`)}`} target="_blank" rel="noopener noreferrer">View area on map</a><label className="opg-sort">Sort by <SelectMenu ariaLabel="Sort stays" value={searchParams.get('sort') || ''} onChange={(next) => { const nextParams = new URLSearchParams(searchParams); if (next) nextParams.set('sort', next); else nextParams.delete('sort'); nextParams.delete('page'); setSearchParams(nextParams); }} options={SORT_OPTIONS} /></label></div><StayGrid {...stays} />{stays.total > page * 12 && <button className="opg-load-more" onClick={() => { const next = new URLSearchParams(searchParams); next.set('page', String(page + 1)); setSearchParams(next); }}>Next page <ChevronRight className="w-4 h-4" aria-hidden="true" /></button>}</div>{filtersOpen && <div className="opg-filter-backdrop" onClick={() => setFiltersOpen(false)}><form className="opg-filter-dialog" onClick={(event) => event.stopPropagation()} onSubmit={applyFilters}><div><h2>Filter stays</h2><button type="button" onClick={() => setFiltersOpen(false)} aria-label="Close filters">×</button></div><label>Minimum nightly price<TextInput name="minPrice" type="number" min="0" defaultValue={searchParams.get('minPrice') || ''} placeholder="KSh" /></label><label>Maximum nightly price<TextInput name="maxPrice" type="number" min="0" defaultValue={searchParams.get('maxPrice') || ''} placeholder="KSh" /></label><label>Minimum bedrooms<SelectMenu name="minBedrooms" value={bedroomFilter} onChange={(next) => setBedroomFilter(next)} options={BEDROOM_OPTIONS} ariaLabel="Minimum bedrooms" /></label><label>Minimum bathrooms<SelectMenu name="minBathrooms" value={bathroomFilter} onChange={(next) => setBathroomFilter(next)} options={BATHROOM_OPTIONS} ariaLabel="Minimum bathrooms" /></label><fieldset className="opg-amenity-filters"><legend>Amenities</legend>{AMENITY_OPTIONS.map((amenity) => <label key={amenity.value}><input type="checkbox" name="amenities" value={amenity.value} defaultChecked={(searchParams.get('amenities') || '').split(',').includes(amenity.value)} /> {amenity.label}</label>)}</fieldset><button className="opg-apply-filters" type="submit">Show stays</button></form></div>}</main>;
 }
 
 export function GuestFooter() {
