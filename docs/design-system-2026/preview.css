@@ -196,7 +196,9 @@ button { font: inherit; color: inherit; }
 .topbar__title { font-size: 15px; font-weight: 600; }
 .topbar__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 
-.page { padding: 32px; max-width: 1280px; width: 100%; }
+/* Centred so a wide monitor does not leave all the slack on the right. The
+   boards and the index share this, so the set stays aligned. */
+.page { padding: 32px; max-width: 1280px; width: 100%; margin: 0 auto; }
 .page--wide { max-width: none; }
 
 .page__head { display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap; margin-bottom: 28px; }
@@ -235,6 +237,23 @@ button { font: inherit; color: inherit; }
   display: flex; align-items: center; justify-content: center; margin-left: 4px; cursor: pointer;
 }
 .searchpill__btn svg { width: 17px; height: 17px; }
+
+/* Compact variant for an app bar. The boards used to fake this with inline
+   styles, which is exactly the drift a design system exists to prevent, so the
+   geometry lives here and the markup stays class-only. */
+.searchpill--compact {
+  height: 44px; padding: 2px;
+  max-width: 440px; box-shadow: none;
+}
+.searchpill--compact .searchpill__seg { padding: 3px 14px; }
+.searchpill--compact .searchpill__label { font-size: 10px; }
+.searchpill--compact .searchpill__value { font-size: 12px; }
+.searchpill--compact .searchpill__btn { width: 38px; height: 38px; margin-left: 2px; }
+
+/* Single field with a leading magnifier, as opposed to stacked label/value
+   segments. Keeps icon and text on one line inside the 44px bar. */
+.searchpill--field .searchpill__seg { display: flex; align-items: center; gap: 8px; }
+.searchpill--field .searchpill__seg svg { width: 15px; height: 15px; flex: none; color: var(--muted); }
 
 /* filter pills row */
 .filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -488,10 +507,13 @@ textarea.input { height: auto; padding: 12px 14px; resize: vertical; }
   .card { padding: 18px; }
   .card__foot { margin: 18px -18px -18px; padding: 14px 18px; }
   .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
-  .list__row { flex-wrap: wrap; gap: 8px; }
+  .list__row { flex-wrap: wrap; gap: 8px; align-items: flex-start; }
   .list__cell { min-width: 0; }
-  .list__actions { width: 100%; margin-left: 0; justify-content: flex-end; }
-  .list__row { align-items: flex-start; }
+  /* A small action pill floating alone under the row reads as a wrapped
+     button. On phones the actions take the full row width instead, so the
+     button is a deliberate card action rather than a leftover. */
+  .list__actions { width: 100%; margin-left: 0; }
+  .list__actions .btn { flex: 1 1 auto; }
   .searchpill { max-width: none; }
   /* Airbnb drops the search field from the top bar on phones; the page
      heading already says where you are, so the bar keeps only the actions. */

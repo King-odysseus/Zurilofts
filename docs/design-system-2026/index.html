@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZuriLofts design system 2026</title>
+<link rel="stylesheet" href="preview.css">
+</head>
+<body>
+
+<main class="page">
+
+  <!-- brand band: the set names itself, then one line says what it is -->
+  <header class="page__head">
+    <div>
+      <p class="t-label">Board index</p>
+      <h1 class="t-page mt-24">ZuriLofts design system 2026</h1>
+      <p class="t-meta page__sub">The Airbnb-derived visual language, with ZuriLofts colours, applied to the admin, host and guest surfaces.</p>
+    </div>
+  </header>
+
+  <hr class="hr">
+
+  <!-- one card per board, each linking to its own file -->
+  <section class="section" aria-label="Boards">
+    <div class="section__head">
+      <h2 class="t-section">Boards</h2>
+      <span class="t-meta">One board per surface</span>
+    </div>
+
+    <div class="cols cols--3">
+
+      <article class="card">
+        <div class="stack">
+          <h3 class="t-section">Admin overview</h3>
+          <p class="t-label">Admin</p>
+          <p class="t-body muted">Statement statistics and a review queue kept as divider rows instead of a data table.</p>
+        </div>
+        <a class="btn btn--secondary btn--sm mt-24" href="admin-dashboard.html" aria-label="Open board: Admin overview">Open board</a>
+      </article>
+
+      <article class="card">
+        <div class="stack">
+          <h3 class="t-section">Users and hosts</h3>
+          <p class="t-label">Admin</p>
+          <p class="t-body muted">A people table with filter tabs and row actions that stay on the row they belong to.</p>
+        </div>
+        <a class="btn btn--secondary btn--sm mt-24" href="admin-users.html" aria-label="Open board: Users and hosts">Open board</a>
+      </article>
+
+      <article class="card">
+        <div class="stack">
+          <h3 class="t-section">Host today</h3>
+          <p class="t-label">Host</p>
+          <p class="t-body muted">Earnings as one statement, today's arrivals and departures, and messages awaiting a reply.</p>
+        </div>
+        <a class="btn btn--secondary btn--sm mt-24" href="host-dashboard.html" aria-label="Open board: Host today">Open board</a>
+      </article>
+
+      <article class="card">
+        <div class="stack">
+          <h3 class="t-section">Host calendar</h3>
+          <p class="t-label">Host</p>
+          <p class="t-body muted">One month at a glance, with bookings drawn as bars inside each day cell.</p>
+        </div>
+        <a class="btn btn--secondary btn--sm mt-24" href="host-calendar.html" aria-label="Open board: Host calendar">Open board</a>
+      </article>
+
+      <article class="card">
+        <div class="stack">
+          <h3 class="t-section">Guest booking</h3>
+          <p class="t-label">Guest</p>
+          <p class="t-body muted">Booking detail with a photo mosaic, dates in a single field, and a price card that stays in view.</p>
+        </div>
+        <a class="btn btn--secondary btn--sm mt-24" href="guest-booking-dashboard.html" aria-label="Open board: Guest booking">Open board</a>
+      </article>
+
+      <article class="card">
+        <div class="stack">
+          <h3 class="t-section">Guest trips</h3>
+          <p class="t-label">Guest</p>
+          <p class="t-body muted">The trips list and a single trip, with the next stay given the photograph and money in the rail.</p>
+        </div>
+        <a class="btn btn--secondary btn--sm mt-24" href="guest-trip.html" aria-label="Open board: Guest trips">Open board</a>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- the rules the boards are built from, one item each -->
+  <section class="section" aria-label="Core rules">
+    <div class="section__head">
+      <h2 class="t-section">Core rules</h2>
+      <span class="t-meta">Six rules, every board</span>
+    </div>
+
+    <div class="card">
+      <div class="cols cols--3">
+
+        <div class="stack">
+          <p class="t-label">Buttons</p>
+          <p class="t-body">Every button is a pill.</p>
+        </div>
+
+        <div class="stack">
+          <p class="t-label">Accent colour</p>
+          <p class="t-body">One accent colour, bronze, for the primary action per screen.</p>
+        </div>
+
+        <div class="stack">
+          <p class="t-label">Headings</p>
+          <p class="t-body">Headings are charcoal, not navy.</p>
+        </div>
+
+        <div class="stack">
+          <p class="t-label">Page title</p>
+          <p class="t-body">One page-title size.</p>
+        </div>
+
+        <div class="stack">
+          <p class="t-label">Borders</p>
+          <p class="t-body">1px light borders, never coloured.</p>
+        </div>
+
+        <div class="stack">
+          <p class="t-label">Radius</p>
+          <p class="t-body">Radius is 12 for images, 16 for cards, 8 for inputs.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="mt-32" aria-label="Design notes">
+    <hr class="hr">
+    <p class="t-meta">The observations behind these rules are written down in full. <a class="link" href="airbnb-language.md">Read the notes</a></p>
+  </footer>
+
+</main>
+
+</body>
+</html>
