@@ -326,7 +326,11 @@ function AdminLayout() {
           </span>
         )}
         {/* Rows sit close together so the menu reads as one block. The breathing room lives in each group label's top padding instead of in stretched gaps, so sections stay distinct without the column going sparse. */}
-        <nav className={`flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto pb-4 pt-1 [scrollbar-color:rgba(255,255,255,0.22)_transparent] [scrollbar-width:thin] ${collapsed ? 'items-center px-2' : 'px-3'}`}>
+        {/* Children are flat (label, items, label, items), so justify-between shares
+            the leftover height across twelve small gaps rather than pooling it into
+            one band above the account block, which reached 111px at 900px tall and
+            411px at 1200px. */}
+        <nav className={`flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto pb-4 pt-1 [scrollbar-color:rgba(255,255,255,0.22)_transparent] [scrollbar-width:thin] ${collapsed ? 'items-center px-2' : 'justify-between px-3'}`}>
           {navGroups.map((group, groupIndex) => (
             <Fragment key={group.label}>
               {collapsed ? (groupIndex > 0 && <span className="my-2.5 h-px w-6 bg-white/15" aria-hidden="true" />) : (<p className="px-3 pb-1.5 pt-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">{group.label}</p>)}
