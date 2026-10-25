@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { ClipboardList, MapPin } from 'lucide-react';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
 import { generateInvoice } from '../utils/invoice.js';
+import { canAddToCalendar, downloadStayCalendar, googleCalendarUrl } from '../utils/stayCalendar.js';
 
 /**
  * Booking details for one reservation, addressed by BOOKING id.
@@ -63,7 +64,12 @@ MoneyRow.propTypes = {
 };
 
 function BookingDetailPage() {
-  const { bookingId } = useParams();
+  const { bookingId: routeId } = useParams();
+  const { pathname } = useLocation();
+  // The app switches on pathname instead of declaring <Route>s, so useParams is
+  // empty on a direct visit and every request went to /bookings/undefined. Same
+  // pathname fallback the other detail pages use.
+  const bookingId = routeId || pathname.split('/')[2];
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -144,6 +150,10 @@ function BookingDetailPage() {
   const status = STATUS_META[booking?.status] || { label: booking?.status || 'Unknown', className: '' };
   const isGuestOwner = Boolean(user?.id && booking?.userId && user.id === booking.userId);
   const canResumePayment = isGuestOwner && booking?.status === 'PENDING' && !booking?.paidAt;
+  // Hosts get the same two controls: a reservation is just as useful in the
+  // calendar of the person preparing the apartment as in the guest's.
+  const calendarReady = canAddToCalendar(booking);
+  const calendarLink = calendarReady ? googleCalendarUrl(booking) : null;
 
   if (loading) {
     return (
@@ -248,6 +258,12 @@ function BookingDetailPage() {
           {!isGuestOwner && <button className="opg-trip-primary" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message guest'}</button>}
           {isGuestOwner && <button className="opg-trip-primary" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</button>}
           <button className="opg-trip-secondary" type="button" onClick={() => generateInvoice(booking)}>Invoice</button>
+          {calendarReady && (
+            <button className="opg-trip-secondary" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</button>
+          )}
+          {calendarLink && (
+            <a className="opg-trip-link" href={calendarLink} target="_blank" rel="noopener noreferrer">Google Calendar</a>
+          )}
           <Link className="opg-trip-link" to={`/property/${property.id || booking.propertyId}`}>View stay</Link>
           <Link className="opg-trip-link" to={isGuestOwner ? '/trips' : '/host/today'}>{isGuestOwner ? 'My trips' : 'Today'}</Link>
         </div>

@@ -6,6 +6,7 @@ import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
 import { generateInvoice } from '../utils/invoice.js';
+import { canAddToCalendar, downloadStayCalendar, isUpcomingStay } from '../utils/stayCalendar.js';
 
 const STATUS_META = {
   PENDING: { label: 'Pending', className: 'is-pending' },
@@ -61,6 +62,9 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
       <div className="opg-history-actions">
         <button className="opg-trip-primary" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</button>
         <button className="opg-trip-secondary" type="button" onClick={() => generateInvoice(booking)}>Invoice</button>
+        {canAddToCalendar(booking) && isUpcomingStay(booking) && (
+          <button className="opg-trip-secondary" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</button>
+        )}
         <Link className="opg-trip-link" to={`/property/${property.id || booking.propertyId}`}>View stay</Link>
         <Link className="opg-trip-link" to={`/bookings/${booking.id}`}>Booking details</Link>
       </div>

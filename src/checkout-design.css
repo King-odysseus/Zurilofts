@@ -83,6 +83,10 @@
 .op-payment-cancel{width:100%;margin-top:22px}
 .op-payment-link{align-self:center;margin-top:18px;padding:4px 8px;border:0;background:transparent;color:#0B1F42;font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:3px}
 .op-payment-link:hover,.op-payment-link:focus-visible{color:#9F7142}
+/* The two calendar links sit side by side on wide screens and stack on phones;
+   they carry their own gap, so the single-link top margin is cancelled here. */
+.op-payment-calendar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:4px 20px;margin-top:16px}
+.op-payment-calendar .op-payment-link{margin-top:0}
 @keyframes op-payment-spin{to{transform:rotate(360deg)}}
 @media(max-width:600px){
   .op-payment-result{min-height:calc(100vh - 64px)}

@@ -13,6 +13,7 @@ import {
 import apiClient from '../api/client';
 import RouteBackButton from '../components/RouteBackButton.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
+import { canAddToCalendar, downloadStayCalendar, googleCalendarUrl } from '../utils/stayCalendar.js';
 
 const PENDING_PROVIDER_STATES = new Set(['pending', 'ongoing', 'processing', 'abandoned']);
 
@@ -93,6 +94,8 @@ function PaymentCallback() {
   }, [reference]);
 
   const isSaved = saved || (booking?.propertyId ? isFavorite(booking.propertyId) : false);
+  const calendarReady = canAddToCalendar(booking);
+  const calendarLink = calendarReady ? googleCalendarUrl(booking) : null;
 
   async function saveBookingProperty() {
     if (!booking?.propertyId || isSaved) return;
@@ -141,7 +144,7 @@ function PaymentCallback() {
             <div className="op-payment-state">
               <div className="op-payment-icon is-success" aria-hidden="true"><Check /></div>
               <h2>Payment successful</h2>
-              <p>Your stay is confirmed. We&apos;ve also sent the confirmation to your email.</p>
+              <p>Your stay is confirmed. Your booking details are below.</p>
               <dl className="op-payment-details">
                 <div><dt>Reference</dt><dd>{booking?.paymentReference || reference || '-'}</dd></div>
                 <div><dt>Check-in</dt><dd>{formatDate(booking?.checkIn)}</dd></div>
@@ -163,6 +166,18 @@ function PaymentCallback() {
                   Home
                 </Button>
               </div>
+              {calendarReady && (
+                <div className="op-payment-calendar">
+                  <button type="button" className="op-payment-link" onClick={() => downloadStayCalendar(booking)}>
+                    Add to calendar
+                  </button>
+                  {calendarLink && (
+                    <a className="op-payment-link" href={calendarLink} target="_blank" rel="noopener noreferrer">
+                      Google Calendar
+                    </a>
+                  )}
+                </div>
+              )}
               {booking?.propertyId && (
                 <button type="button" className="op-payment-link" onClick={() => navigate(`/property/${booking.propertyId}`)}>
                   View property

@@ -2,13 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Review verified host fix and ignore rules",
+      "text": "Read the booking detail and history pages to find where a guest sees a confirmed stay",
       "state": "done"
     },
     {
-      "text": "Commit changes and push to origin",
+      "text": "Add a shared helper that builds a calendar file and a Google Calendar link from a booking",
       "state": "done"
+    },
+    {
+      "text": "Add the add-to-calendar action to the guest booking screens",
+      "state": "done"
+    },
+    {
+      "text": "Fix the booking detail page never receiving its booking id",
+      "state": "done"
+    },
+    {
+      "text": "Verify with lint and production build",
+      "state": "done"
+    },
+    {
+      "text": "Check the buttons in the browser as a signed-in guest",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-10-15T22:12:31.202Z"
+  "updatedAt": "2026-10-25T16:18:12.714Z"
 }
