@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import BrandLogo from './BrandLogo.jsx';
 import PropTypes from 'prop-types';
 import { Dropdown, DropdownDivider, DropdownHeader, DropdownItem } from 'flowbite-react';
 import {
@@ -14,7 +15,6 @@ import {
 import HostMobileBottomNav from './HostMobileBottomNav.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
-import logoImg from '../assets/zurilofts-logo.png';
 
 // The five things a host repeats every day. One list feeds the desktop tabs and
 // the mobile bottom bar so the two navigations cannot drift apart.
@@ -66,7 +66,7 @@ function HostLayout({ children }) {
       <header className="op-host-appbar">
         <div className="op-host-appbar-inner">
           <Link to="/host/today" className="op-host-appbar-brand" aria-label="Host workspace home">
-            <img src={logoImg} alt="" className="h-8 w-auto" />
+            <BrandLogo imgClassName="h-8 w-auto" />
             <span className="op-host-appbar-badge">Host</span>
           </Link>
 

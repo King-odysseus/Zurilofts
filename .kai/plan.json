@@ -23,12 +23,12 @@
     },
     {
       "text": "Commit and push the Flowbite work so the deployed app matches the code",
-      "state": "active"
+      "state": "done"
     },
     {
       "text": "Convert remaining hand-rolled tab groups to Flowbite Tabs on host and admin surfaces",
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-25T17:29:09.559Z"
+  "updatedAt": "2026-10-25T17:30:11.494Z"
 }

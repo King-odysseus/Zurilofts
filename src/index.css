@@ -405,3 +405,23 @@ select:not(.neu-input) option {
 .toast-in {
   animation: toast-in 0.18s ease-out both;
 }
+
+/* Warm tile behind the ZuriLofts mark: the logo is thin bronze line work on a
+   transparent background, so it washes out on white headers without it. Navy
+   behind the bronze lines is what makes the mark read. */
+.op-brand-tile {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 5px;
+  border: 1px solid rgba(196, 154, 108, .6);
+  border-radius: 12px;
+  background: #0B1F42;
+  box-shadow: 0 1px 3px rgba(11, 31, 66, .16);
+}
+
+/* On dark pages the navy would blend into the surface, so lift it slightly. */
+html.dark .op-brand-tile {
+  background: #16294F;
+}

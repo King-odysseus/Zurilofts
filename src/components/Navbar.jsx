@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import BrandLogo from './BrandLogo.jsx';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button, Dropdown, DropdownDivider, DropdownItem, TextInput } from 'flowbite-react';
 import {
@@ -26,7 +27,6 @@ import { useMode } from '../context/ModeContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
-import logoImg from '../assets/zurilofts-logo.png';
 import MobileBottomNav from './MobileBottomNav.jsx';
 import ThemeToggle from './ThemeToggle.jsx';
 import { languageOptions } from '../i18n/translations.js';
@@ -292,7 +292,7 @@ function Navbar() {
           {/* Brand */}
           <div className="flex min-w-0 items-center justify-self-start">
             <Link to="/" className="flex flex-shrink-0 items-center">
-              <img src={logoImg} alt="ZuriLofts" className="h-9 w-auto md:h-10" />
+              <BrandLogo imgClassName="h-9 w-auto md:h-10" />
             </Link>
           </div>
 

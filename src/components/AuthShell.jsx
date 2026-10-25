@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
+import BrandLogo from './BrandLogo.jsx';
 import { Link } from 'react-router-dom';
 import { Dropdown, DropdownItem } from 'flowbite-react';
 import { Languages } from 'lucide-react';
-import logoImg from '../assets/zurilofts-logo.png';
 import { zuriImages } from '../assets/images';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { languageOptions } from '../i18n/translations.js';
@@ -20,7 +20,7 @@ function AuthShell({ children }) {
   return (
     <main className="op-auth-page">
       <section className="op-auth-story" style={{ backgroundImage: `linear-gradient(90deg,rgba(11,31,66,.83),rgba(44,67,112,.72)),url("${bgImage}")` }}>
-        <Link to="/" className="op-auth-brand"><img src={logoImg} alt="" />ZuriLofts</Link>
+        <Link to="/" className="op-auth-brand"><BrandLogo imgClassName="h-8 w-auto" />ZuriLofts</Link>
         <div className="op-auth-story-copy">
           <span className="op-auth-proof">✦ &nbsp;Verified stays in Nairobi</span>
           <h1>Find your place in Nairobi.</h1>

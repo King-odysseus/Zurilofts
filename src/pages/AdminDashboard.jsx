@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
+import BrandLogo from '../components/BrandLogo.jsx';
 import PropTypes from 'prop-types';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import { playMessageSound } from '../utils/notificationSound.js';
-import logoImg from '../assets/zurilofts-logo.png';
 import {
   Accordion,
   AccordionContent,
@@ -249,7 +249,7 @@ function AdminLayout() {
       >
         <div className={`flex items-center ${collapsed ? 'justify-center px-2 pb-2 pt-5' : 'justify-between px-5 pb-3 pt-5'}`}>
           <Link to="/" className="op-admin-brand inline-flex items-center gap-2">
-            <img src={logoImg} alt="ZuriLofts" className="h-7 w-7 object-contain" />
+            <BrandLogo imgClassName="h-7 w-7 object-contain" />
             {!collapsed && <strong>zuri.admin</strong>}
           </Link>
         </div>
@@ -336,7 +336,7 @@ function AdminLayout() {
       <div className="op-admin-mobile-header md:hidden">
         <div className="op-admin-mobile-heading">
           <Link to="/" className="op-admin-mobile-brand">
-            <img src={logoImg} alt="" />
+            <BrandLogo imgClassName="h-6 w-6 object-contain" alt="" />
             <span>
               <strong>zuri.admin</strong>
               <small>Workspace</small>
@@ -400,7 +400,7 @@ function AdminLayout() {
         <DrawerHeader
           className="op-admin-mobile-more-head"
           title="zuri.admin"
-          titleIcon={() => <img src={logoImg} alt="" />}
+          titleIcon={() => <BrandLogo imgClassName="h-6 w-6 object-contain" alt="" />}
         />
         <p className="op-admin-mobile-more-label">Workspace navigation</p>
         <DrawerItems className="op-admin-mobile-more-list">
