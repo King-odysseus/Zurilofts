@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { Fragment, useState, useEffect, useRef } from 'react';
 import BrandLogo from '../components/BrandLogo.jsx';
 import PropTypes from 'prop-types';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
@@ -313,21 +313,23 @@ function AdminLayout() {
           collapsed ? 'w-16' : 'w-64'
         }`}
       >
-        <div className={`flex shrink-0 items-center ${collapsed ? 'justify-center px-2 pb-4 pt-6' : 'justify-between px-5 pb-6 pt-6'}`}>
+        {/* Brand sits in its own band: more room above than below so it reads as the top of the column, and a hairline closes the band so the Workspace label below starts a new section instead of floating under the logo. */}
+        <div className={`flex shrink-0 items-center border-b border-white/10 ${collapsed ? 'justify-center px-2 pb-5 pt-7' : 'justify-between px-6 pb-5 pt-7'}`}>
           <Link to="/" className="inline-flex items-center gap-2 text-white">
             <BrandLogo imgClassName="h-7 w-auto" />
             {!collapsed && <strong className="font-montserrat text-base font-bold tracking-tight">zuri.admin</strong>}
           </Link>
         </div>
         {!collapsed && (
-          <span className="block shrink-0 px-6 pb-2 text-xs font-semibold uppercase tracking-wider text-primary">
+          <span className="block shrink-0 px-6 pb-1 pt-4 text-xs font-semibold uppercase tracking-wider text-primary">
             Workspace
           </span>
         )}
-        <nav className={`flex min-h-0 flex-1 flex-col justify-between gap-3 overflow-y-auto pb-3 pt-3 [scrollbar-color:rgba(255,255,255,0.22)_transparent] [scrollbar-width:thin] ${collapsed ? 'items-center px-2' : 'px-3'}`}>
-          {navGroups.map((group) => (
-            <div className="space-y-1.5" key={group.label}>
-              {!collapsed && <p className="px-3 pb-1.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">{group.label}</p>}
+        {/* Rows sit close together so the menu reads as one block. The breathing room lives in each group label's top padding instead of in stretched gaps, so sections stay distinct without the column going sparse. */}
+        <nav className={`flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto pb-4 pt-1 [scrollbar-color:rgba(255,255,255,0.22)_transparent] [scrollbar-width:thin] ${collapsed ? 'items-center px-2' : 'px-3'}`}>
+          {navGroups.map((group, groupIndex) => (
+            <Fragment key={group.label}>
+              {collapsed ? (groupIndex > 0 && <span className="my-2.5 h-px w-6 bg-white/15" aria-hidden="true" />) : (<p className="px-3 pb-1.5 pt-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">{group.label}</p>)}
               {group.items.map(({ path, label, icon: NavIcon, exact }) => {
                 const active = exact ? location.pathname === path : location.pathname.startsWith(path);
                 return (
@@ -353,7 +355,7 @@ function AdminLayout() {
                   </SidebarFlyout>
                 );
               })}
-            </div>
+            </Fragment>
           ))}
         </nav>
         <div className={`shrink-0 border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'px-5 py-5'}`}>
