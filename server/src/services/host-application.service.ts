@@ -8,6 +8,7 @@ import {
   safeDocumentName,
   type HostDocumentKind,
 } from '../utils/hostDocumentCrypto.js';
+import { normalizeKenyanMpesaPhone } from '../utils/payoutDestination.js';
 
 // ============================================================
 // Host application lifecycle - pure transition logic
@@ -78,6 +79,10 @@ export const EDITABLE_APPLICANT_FIELDS = [
   'propertyLocations',
   'yearsHosting',
   'preferredPayoutMethod',
+  'payoutBankName',
+  'payoutBankCode',
+  'payoutBankAccountNo',
+  'payoutMpesaPhone',
   'experience',
   'agreedTerms',
 ] as const;
@@ -100,8 +105,29 @@ export interface ApplicantFields {
   propertyLocations?: string | null;
   yearsHosting?: number | null;
   preferredPayoutMethod?: string | null;
+  payoutBankName?: string | null;
+  payoutBankCode?: string | null;
+  payoutBankAccountNo?: string | null;
+  payoutMpesaPhone?: string | null;
   experience?: string | null;
   agreedTerms?: boolean | null;
+}
+
+/** True when a field holds no usable value (blank string, null, undefined). */
+function isBlank(value: unknown): boolean {
+  return value === null || value === undefined || (typeof value === 'string' && value.trim() === '');
+}
+
+/**
+ * Destination fields implied by the chosen payout method. Paystack transfers need
+ * a concrete account: an M-PESA number or a bank code plus account number.
+ */
+export function payoutDetailFields(app: ApplicantFields): (keyof ApplicantFields)[] {
+  if (app.preferredPayoutMethod === 'mpesa') return ['payoutMpesaPhone'];
+  if (app.preferredPayoutMethod === 'bank') {
+    return ['payoutBankName', 'payoutBankCode', 'payoutBankAccountNo'];
+  }
+  return [];
 }
 
 export function isEditable(status: string): boolean {
@@ -130,6 +156,9 @@ export function missingRequiredFields(app: ApplicantFields): string[] {
   });
   if (app.businessType === 'company' && !app.companyRegistrationNo?.trim()) {
     missing.push('companyRegistrationNo');
+  }
+  for (const field of payoutDetailFields(app)) {
+    if (isBlank((app as Record<string, unknown>)[field])) missing.push(field as string);
   }
   return missing;
 }
@@ -230,6 +259,10 @@ export function toApplicantView(app: any) {
     propertyLocations: app.propertyLocations ?? null,
     yearsHosting: app.yearsHosting ?? null,
     preferredPayoutMethod: app.preferredPayoutMethod ?? null,
+    payoutBankName: app.payoutBankName ?? null,
+    payoutBankCode: app.payoutBankCode ?? null,
+    payoutBankAccountNo: app.payoutBankAccountNo ?? null,
+    payoutMpesaPhone: app.payoutMpesaPhone ?? null,
     experience: app.experience ?? null,
     agreedTerms: Boolean(app.agreedTerms),
     documents: (app.documents || []).map(toDocumentMetadata),
@@ -571,6 +604,33 @@ export async function adminReject(id: string, reviewerId: string, reason: string
 }
 
 /**
+ * Translate an approved application's payout choice into User payout fields.
+ * Returns null when the application carries no destination details at all, so a
+ * legacy application can still be approved without wiping existing settings.
+ */
+function buildApprovedPayoutPatch(app: any): Record<string, unknown> | null {
+  if (app.preferredPayoutMethod === 'mpesa' && app.payoutMpesaPhone) {
+    return {
+      payoutMethod: 'mpesa',
+      mpesaPhone: normalizeKenyanMpesaPhone(app.payoutMpesaPhone),
+      paystackRecipientCode: null,
+      paystackRecipientKey: null,
+    };
+  }
+  if (app.preferredPayoutMethod === 'bank' && app.payoutBankName && app.payoutBankCode && app.payoutBankAccountNo) {
+    return {
+      payoutMethod: 'bank',
+      bankName: app.payoutBankName,
+      bankCode: app.payoutBankCode,
+      bankAccountNo: app.payoutBankAccountNo,
+      paystackRecipientCode: null,
+      paystackRecipientKey: null,
+    };
+  }
+  return null;
+}
+
+/**
  * Approve an application: atomically flip it to APPROVED and grant the applicant
  * the HOST role. Idempotent - a repeat call on an already-APPROVED application
  * is a no-op that does not change any role. A suspended applicant cannot be
@@ -608,6 +668,15 @@ export async function adminApprove(id: string, reviewerId: string) {
     });
     if (promoted.count !== 1) {
       throw new ForbiddenError('A suspended applicant cannot be approved as a host.');
+    }
+
+    // Hand the payout destination the applicant entered to their host account so
+    // Paystack has a real account to transfer earnings to. Legacy applications may
+    // predate these fields, so only apply what is actually present. The cached
+    // Paystack recipient is cleared so it can never point at an earlier account.
+    const payoutPatch = buildApprovedPayoutPatch(app);
+    if (payoutPatch) {
+      await tx.user.update({ where: { id: app.userId }, data: payoutPatch });
     }
 
     const updated = await tx.hostApplication.update({

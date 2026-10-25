@@ -43,6 +43,7 @@ const COMPLETE = {
   propertyLocations: 'Kilimani, Nairobi',
   yearsHosting: 0,
   preferredPayoutMethod: 'mpesa',
+  payoutMpesaPhone: '0712345678',
   experience: 'Managed 3 units on other platforms',
   agreedTerms: true,
 };
@@ -81,6 +82,26 @@ test('null and undefined required fields are treated as missing', () => {
 
 test('propertyCount must be a positive integer to count as present', () => {
   assert.deepEqual(missingRequiredFields({ ...COMPLETE, propertyCount: -1 }), ['propertyCount']);
+});
+
+test('the chosen payout method decides which destination details are required', () => {
+  const bank = {
+    ...COMPLETE,
+    preferredPayoutMethod: 'bank',
+    payoutBankName: 'Equity Bank',
+    payoutBankCode: '068',
+    payoutBankAccountNo: '0123456789',
+    payoutMpesaPhone: '',
+  };
+  assert.deepEqual(missingRequiredFields(bank), []);
+  assert.deepEqual(
+    missingRequiredFields({ ...bank, payoutBankAccountNo: '' }),
+    ['payoutBankAccountNo'],
+  );
+
+  // An M-PESA host is not asked for bank details, and vice versa.
+  assert.deepEqual(missingRequiredFields({ ...COMPLETE, payoutMpesaPhone: '' }), ['payoutMpesaPhone']);
+  assert.deepEqual(missingRequiredFields(bank).includes('payoutMpesaPhone'), false);
 });
 
 // ---- Submission ----

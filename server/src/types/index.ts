@@ -292,6 +292,11 @@ export const hostApplicationUpdateSchema = z.object({
   propertyLocations: z.string().trim().min(2).max(500).optional(),
   yearsHosting: z.number().int().min(0).max(80).optional(),
   preferredPayoutMethod: z.enum(['bank', 'mpesa']).optional(),
+  // Destination for the chosen method, so the host can actually be paid.
+  payoutBankName: z.string().trim().min(1).max(100).optional(),
+  payoutBankCode: z.string().trim().min(1).max(20).optional(),
+  payoutBankAccountNo: z.string().trim().regex(/^\d{6,20}$/, 'Enter a valid bank account number').optional(),
+  payoutMpesaPhone: z.string().trim().min(10).max(16).optional(),
   experience: z.string().max(2000).optional(),
   agreedTerms: z.boolean().optional(),
 });

@@ -332,6 +332,15 @@ function AdminHostApplications() {
                   <Detail label="Contact phone" value={selected.contactPhone} />
                   <Detail label="Contact email" value={selected.contactEmail} />
                   <Detail label="Preferred payout" value={selected.preferredPayoutMethod} />
+                  {selected.preferredPayoutMethod === 'mpesa' ? (
+                    <Detail label="M-PESA number" value={selected.payoutMpesaPhone} />
+                  ) : (
+                    <>
+                      <Detail label="Bank" value={selected.payoutBankName} />
+                      <Detail label="Bank code" value={selected.payoutBankCode} />
+                      <Detail label="Account number" value={selected.payoutBankAccountNo} />
+                    </>
+                  )}
                 </DetailSection>
 
                 <DetailSection title="Business">

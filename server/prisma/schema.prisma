@@ -113,6 +113,13 @@ model HostApplication {
   propertyLocations     String?
   yearsHosting          Int?
   preferredPayoutMethod String? // bank | mpesa
+  // Destination for the chosen method, collected up front so Paystack has a real
+  // account to transfer to once the application is approved. Copied onto User at
+  // approval time.
+  payoutBankName        String? // bank name exactly as Paystack lists it
+  payoutBankCode        String? // Paystack bank code (required for the transfer recipient)
+  payoutBankAccountNo   String?
+  payoutMpesaPhone      String? // Safaricom number registered for M-PESA
   experience            String? // hosting background / notes for verification
   agreedTerms           Boolean                   @default(false)
   reviewNote            String? // applicant-visible reviewer note (reason for changes/rejection)

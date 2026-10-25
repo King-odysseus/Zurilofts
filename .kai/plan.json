@@ -2,21 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the current logo tile styles and where they are applied",
+      "text": "Read host application payout step and payout code",
       "state": "done"
     },
     {
-      "text": "Switch the tile to a white rounded box that suits the bronze mark",
+      "text": "Work out what Paystack needs for M-Pesa vs bank transfers",
       "state": "done"
     },
     {
-      "text": "Check the logo renders on the main headers in the browser",
+      "text": "Add missing payout detail fields to host application form",
       "state": "done"
     },
     {
-      "text": "Run lint and build, then commit and push",
+      "text": "Validate and persist the details server-side",
       "state": "done"
+    },
+    {
+      "text": "Run tests, lint and build",
+      "state": "active"
+    },
+    {
+      "text": "Commit and push",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-25T18:22:19.454Z"
+  "updatedAt": "2026-10-25T19:42:31.087Z"
 }

@@ -1,11 +1,40 @@
 import { useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { Button, Checkbox, FileInput, Label, Select, Textarea, TextInput } from 'flowbite-react';
+import { Button, Checkbox, Dropdown, DropdownItem, FileInput, HelperText, Label, Textarea, TextInput } from 'flowbite-react';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
+
+
+// Flowbite Dropdown used as a select so the option list is styled, not the browser's native list.
+function SelectField({ id, value, onChange, options }) {
+  const selected = options.find((option) => option.value === value);
+  return (
+    <Dropdown
+      color="light"
+      dismissOnClick
+      label={selected?.label || 'Select'}
+      theme={{ floating: { target: 'w-full' } }}
+      className="w-full"
+      id={id}
+    >
+      {options.map((option) => (
+        <DropdownItem key={option.value} onClick={() => onChange(option.value)} className={option.value === value ? 'font-semibold text-[#0B1F42]' : ''}>
+          {option.label}
+        </DropdownItem>
+      ))}
+    </Dropdown>
+  );
+}
+
+SelectField.propTypes = {
+  id: PropTypes.string.isRequired,
+  value: PropTypes.string,
+  onChange: PropTypes.func.isRequired,
+  options: PropTypes.arrayOf(PropTypes.shape({ value: PropTypes.string.isRequired, label: PropTypes.string.isRequired })).isRequired,
+};
 
 const EMPTY_FORM = {
   legalName: '', businessName: '', businessType: 'individual',
@@ -13,6 +42,7 @@ const EMPTY_FORM = {
   identityType: 'NATIONAL_ID', kraPin: '', companyRegistrationNo: '',
   city: '', propertyCount: '', propertyRelationship: 'OWNER', propertyTypes: [],
   propertyLocations: '', yearsHosting: '0', preferredPayoutMethod: 'mpesa',
+  payoutMpesaPhone: '', payoutBankName: '', payoutBankCode: '', payoutBankAccountNo: '',
   experience: '', agreedTerms: false,
 };
 
@@ -87,6 +117,10 @@ function formFromApplication(application, user) {
     propertyLocations: application?.propertyLocations || '',
     yearsHosting: application?.yearsHosting ?? '0',
     preferredPayoutMethod: application?.preferredPayoutMethod || 'mpesa',
+    payoutMpesaPhone: application?.payoutMpesaPhone || user?.phone || '',
+    payoutBankName: application?.payoutBankName || '',
+    payoutBankCode: application?.payoutBankCode || '',
+    payoutBankAccountNo: application?.payoutBankAccountNo || '',
     experience: application?.experience || '',
     agreedTerms: Boolean(application?.agreedTerms),
   };
@@ -105,6 +139,25 @@ function HostApplicationPage() {
   const [error, setError] = useState('');
   const [activeStep, setActiveStep] = useState('identity');
   const [loadAttempt, setLoadAttempt] = useState(0);
+  const [banks, setBanks] = useState([]);
+
+  // Paystack needs its own bank code to create a transfer recipient, so the
+  // applicant picks from Paystack's list instead of typing a name we cannot map.
+  useEffect(() => {
+    if (!user) return;
+    let ignore = false;
+    apiClient.get('/payments/banks')
+      .then((response) => {
+        if (ignore) return;
+        if (Array.isArray(response.data?.data)) setBanks(response.data.data);
+      })
+      .catch(() => {
+        // A failed bank list must not block the rest of the application: an empty
+        // list switches the bank fields to manual entry below.
+        if (!ignore) setBanks([]);
+      });
+    return () => { ignore = true; };
+  }, [user]);
 
   useEffect(() => {
     if (!user || user.role === 'ADMIN') return;
@@ -157,8 +210,14 @@ function HostApplicationPage() {
       form.legalName, form.dateOfBirth, form.nationality, form.identityType,
       form.contactEmail, form.contactPhone, form.kraPin,
     ].every((value) => String(value || '').trim());
+    const payoutComplete = form.preferredPayoutMethod === 'mpesa'
+      ? Boolean(String(form.payoutMpesaPhone || '').trim())
+      : Boolean(String(form.payoutBankName || '').trim()
+        && String(form.payoutBankCode || '').trim()
+        && String(form.payoutBankAccountNo || '').trim());
     const businessComplete = Boolean(form.businessName && form.businessType && form.preferredPayoutMethod)
-      && (form.businessType !== 'company' || Boolean(form.companyRegistrationNo));
+      && (form.businessType !== 'company' || Boolean(form.companyRegistrationNo))
+      && payoutComplete;
     const propertiesComplete = Boolean(
       form.city && form.propertyCount && form.propertyRelationship
       && form.propertyTypes.length > 0 && form.propertyLocations,
@@ -188,6 +247,10 @@ function HostApplicationPage() {
     form.kraPin,
     form.legalName,
     form.nationality,
+    form.payoutBankAccountNo,
+    form.payoutBankCode,
+    form.payoutBankName,
+    form.payoutMpesaPhone,
     form.preferredPayoutMethod,
     form.propertyCount,
     form.propertyLocations,
@@ -252,6 +315,22 @@ function HostApplicationPage() {
       const normalized = String(value || '').trim();
       if (normalized) payload[key] = normalized;
     });
+
+    // Only send the destination that matches the chosen method, so a stale value
+    // from a previous choice can never be approved as the payout account.
+    if (form.preferredPayoutMethod === 'mpesa') {
+      const mpesaPhone = String(form.payoutMpesaPhone || '').trim();
+      if (mpesaPhone) payload.payoutMpesaPhone = mpesaPhone;
+    } else {
+      const bankPatch = {
+        payoutBankName: String(form.payoutBankName || '').trim(),
+        payoutBankCode: String(form.payoutBankCode || '').trim(),
+        payoutBankAccountNo: String(form.payoutBankAccountNo || '').trim(),
+      };
+      Object.entries(bankPatch).forEach(([key, value]) => {
+        if (value) payload[key] = value;
+      });
+    }
 
     if (form.propertyCount !== '') payload.propertyCount = Number(form.propertyCount);
     if (form.propertyTypes.length > 0) payload.propertyTypes = form.propertyTypes;
@@ -439,11 +518,11 @@ function HostApplicationPage() {
                     </div>
                     <div>
                       <Label htmlFor="host-identity-type">Identity document</Label>
-                      <Select id="host-identity-type" value={form.identityType} onChange={(e) => update('identityType', e.target.value)}>
-                        <option value="NATIONAL_ID">Kenyan national ID</option>
-                        <option value="PASSPORT">Passport</option>
-                        <option value="ALIEN_ID">Alien ID</option>
-                      </Select>
+                      <SelectField id="host-identity-type" value={form.identityType} onChange={(v) => update('identityType', v)} options={[
+          { value: 'NATIONAL_ID', label: 'Kenyan national ID' },
+          { value: 'PASSPORT', label: 'Passport' },
+          { value: 'ALIEN_ID', label: 'Alien ID' },
+        ]} />
                     </div>
                     <div>
                       <Label htmlFor="host-contact-email">Contact email</Label>
@@ -475,10 +554,10 @@ function HostApplicationPage() {
                   <div className="op-host-application-fields">
                     <div>
                       <Label htmlFor="host-business-type">Host type</Label>
-                      <Select id="host-business-type" value={form.businessType} onChange={(e) => update('businessType', e.target.value)}>
-                        <option value="individual">Individual</option>
-                        <option value="company">Registered company</option>
-                      </Select>
+                      <SelectField id="host-business-type" value={form.businessType} onChange={(v) => update('businessType', v)} options={[
+          { value: 'individual', label: 'Individual' },
+          { value: 'company', label: 'Registered company' },
+        ]} />
                     </div>
                     <div>
                       <Label htmlFor="host-business-name">Host or business name</Label>
@@ -492,11 +571,42 @@ function HostApplicationPage() {
                     )}
                     <div>
                       <Label htmlFor="host-payout-method">Preferred payout</Label>
-                      <Select id="host-payout-method" value={form.preferredPayoutMethod} onChange={(e) => update('preferredPayoutMethod', e.target.value)}>
-                        <option value="mpesa">M-PESA</option>
-                        <option value="bank">Bank transfer</option>
-                      </Select>
+                      <SelectField id="host-payout-method" value={form.preferredPayoutMethod} onChange={(v) => update('preferredPayoutMethod', v)} options={[
+          { value: 'mpesa', label: 'M-PESA' },
+          { value: 'bank', label: 'Bank transfer' },
+        ]} />
+                      <HelperText>Earnings are paid out by Paystack to the account below. M-PESA goes straight to your phone number; bank transfer goes to your account number using your bank code.</HelperText>
                     </div>
+                    {form.preferredPayoutMethod === 'mpesa' ? (
+                      <div>
+                        <Label htmlFor="host-payout-mpesa">M-PESA number for payouts</Label>
+                        <TextInput id="host-payout-mpesa" type="tel" value={form.payoutMpesaPhone} onChange={(e) => update('payoutMpesaPhone', e.target.value)} placeholder="0712345678" required />
+                        <HelperText>Use the Safaricom number registered in your own name, for example 0712345678 or 254712345678.</HelperText>
+                      </div>
+                    ) : banks.length > 0 ? (
+                      <div>
+                        <Label htmlFor="host-payout-bank">Bank</Label>
+                        <SelectField id="host-payout-bank" value={form.payoutBankCode} onChange={(code) => {
+                          const bank = banks.find((item) => item.code === code);
+                          update('payoutBankName', bank?.name || '');
+                          update('payoutBankCode', code);
+                        }} options={banks.map((bank) => ({ value: bank.code, label: bank.name }))} />
+                      </div>
+                    ) : (
+                      <div>
+                        <Label htmlFor="host-payout-bank-name">Bank name</Label>
+                        <TextInput id="host-payout-bank-name" value={form.payoutBankName} onChange={(e) => update('payoutBankName', e.target.value)} placeholder="Equity Bank" required />
+                        <Label htmlFor="host-payout-bank-code">Bank code</Label>
+                        <TextInput id="host-payout-bank-code" value={form.payoutBankCode} onChange={(e) => update('payoutBankCode', e.target.value)} placeholder="068" required />
+                        <HelperText>Enter the Paystack bank code, for example 068 for Equity Bank. We could not load the bank list automatically.</HelperText>
+                      </div>
+                    )}
+                    {form.preferredPayoutMethod === 'bank' && (
+                      <div>
+                        <Label htmlFor="host-payout-account">Bank account number</Label>
+                        <TextInput id="host-payout-account" value={form.payoutBankAccountNo} onChange={(e) => update('payoutBankAccountNo', e.target.value.replace(/\D/g, ''))} placeholder="0123456789" inputMode="numeric" required />
+                      </div>
+                    )}
                   </div>
                   <StepActions
                     saving={saving}
@@ -523,12 +633,12 @@ function HostApplicationPage() {
                     </div>
                     <div>
                       <Label htmlFor="host-relationship">Relationship to the properties</Label>
-                      <Select id="host-relationship" value={form.propertyRelationship} onChange={(e) => update('propertyRelationship', e.target.value)}>
-                        <option value="OWNER">Owner</option>
-                        <option value="MANAGER">Property manager</option>
-                        <option value="AGENT">Authorised agent</option>
-                        <option value="TENANT">Tenant with permission</option>
-                      </Select>
+                      <SelectField id="host-relationship" value={form.propertyRelationship} onChange={(v) => update('propertyRelationship', v)} options={[
+          { value: 'OWNER', label: 'Owner' },
+          { value: 'MANAGER', label: 'Property manager' },
+          { value: 'AGENT', label: 'Authorised agent' },
+          { value: 'TENANT', label: 'Tenant with permission' },
+        ]} />
                     </div>
                     <div>
                       <Label htmlFor="host-years">Years of hosting experience</Label>
