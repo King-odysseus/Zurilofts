@@ -275,9 +275,39 @@ html.dark :where([class*="border-[#E3E8EF]"], [class*="border-[#e5e7eb]"], [clas
 html.dark :where([class*="text-[#0B1F42]"], [class*="text-[#414D63]"], [class*="text-[#334155]"], [class*="text-[#1f2937]"], [class*="text-[#111827]"]) {
   color: var(--dm-text) !important;
 }
+/* Bronze surfaces keep dark brand ink. The rule above turns every dark text
+   hex light, which left primary buttons and bronze pills pale-on-bronze at
+   roughly 2.2:1. Anything that paints its own bronze background restores the
+   intended pairing; declared after the generic rule so it wins the tie. */
+html.dark :where(
+  [class*="bg-[#C49A6C]"][class*="text-[#0B1F42]"],
+  [class*="bg-[#B8895C]"][class*="text-[#0B1F42]"],
+  .bg-primary[class*="text-[#0B1F42]"],
+  .bg-bronze[class*="text-[#0B1F42]"]
+) {
+  color: #0B1F42 !important;
+}
+
 
 html.dark :where([class*="text-[#5B6B82]"], [class*="text-[#64748b]"], [class*="text-[#6b7280]"], [class*="text-[#6E7686]"], [class*="text-[#94a3b8]"], [class*="text-[#53616F]"]) {
   color: var(--dm-muted) !important;
+}
+
+/* Pale tints keep their light value in dark mode, but the text on top of them
+   flips to light: a bronze-50 active nav row then reads as pale-on-pale and
+   disappears. Darken the surface and lift the matching bronze accent so each
+   pair stays legible. Surfaces whose text is a fixed dark hex are left alone;
+   those pairs are already readable. */
+html.dark :where(.bg-primary-50, .bg-primary-100, [class*="bg-[#FBF7F1]"]) {
+  background-color: #2B2318 !important;
+}
+
+html.dark :where([class*="bg-[#F7F1EA]"]) {
+  background-color: var(--dm-surface-soft) !important;
+}
+
+html.dark :where(.text-primary-700, .text-primary-800, .text-primary-900) {
+  color: #DDBE97 !important;
 }
 
 html.dark :where(.op-overline, .zl-overline, .opg-account-heading p, .opg-profile-identity span) {
