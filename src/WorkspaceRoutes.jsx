@@ -6,17 +6,12 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AdminDashboard, { AdminLayout } from './pages/AdminDashboard.jsx';
 import AdminListingReview from './pages/AdminListingReview.jsx';
 import AdminPropertyForm from './pages/AdminPropertyForm.jsx';
-import AdminCalendar from './pages/AdminCalendar.jsx';
-import AdminBookings from './pages/AdminBookings.jsx';
-import AdminEarningsPage from './pages/AdminEarningsPage.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
 import AdminHostApplications from './pages/AdminHostApplications.jsx';
-import AdminPromos from './pages/AdminPromos.jsx';
 import AdminAddOns from './pages/AdminAddOns.jsx';
 import AdminFeedback from './pages/AdminFeedback.jsx';
 import AdminMessages from './pages/AdminMessages.jsx';
 import AdminGuides from './pages/AdminGuides.jsx';
-import AdminPayoutsPage from './pages/AdminPayoutsPage.jsx';
 import AdminTrustSafety from './pages/AdminTrustSafety.jsx';
 import AdminGovernance from './pages/AdminGovernance.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
@@ -44,12 +39,17 @@ export default function WorkspaceRoutes() {
     <Route path="/host/discounts" element={hostPage(<HostPromosPage />)} />
     <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
       <Route index element={<AdminDashboard />} />
+      {/* Listings are host-owned. Admin keeps the approval queue only, so the
+          old create/edit/calendar screens redirect instead of resolving. */}
       <Route path="properties" element={<AdminListingReview />} />
-      <Route path="properties/new" element={<AdminPropertyForm />} />
-      <Route path="properties/:id/edit" element={<AdminPropertyForm />} />
-      <Route path="properties/:id/calendar" element={<AdminCalendar />} />
-      <Route path="bookings" element={<AdminBookings />} />
-      <Route path="earnings" element={<AdminEarningsPage />} />
+      <Route path="properties/new" element={<Navigate to="/admin/properties" replace />} />
+      <Route path="properties/:id/edit" element={<Navigate to="/admin/properties" replace />} />
+      <Route path="properties/:id/calendar" element={<Navigate to="/admin/properties" replace />} />
+      {/* Bookings, money and discounts are host workspace concerns now. */}
+      <Route path="bookings" element={<Navigate to="/admin" replace />} />
+      <Route path="earnings" element={<Navigate to="/admin" replace />} />
+      <Route path="payouts" element={<Navigate to="/admin" replace />} />
+      <Route path="promos" element={<Navigate to="/admin" replace />} />
       <Route path="users" element={<AdminUsers />} />
       <Route path="host-applications" element={<AdminHostApplications />} />
       <Route path="trust-safety" element={<AdminTrustSafety />} />
@@ -57,13 +57,11 @@ export default function WorkspaceRoutes() {
       <Route path="disputes" element={<Navigate to="/admin/trust-safety" replace />} />
       <Route path="governance" element={<AdminGovernance />} />
       <Route path="audit" element={<Navigate to="/admin/governance" replace />} />
-      <Route path="promos" element={<AdminPromos />} />
       <Route path="addons" element={<AdminAddOns />} />
       <Route path="feedback" element={<AdminFeedback />} />
       <Route path="messages" element={<AdminMessages />} />
       <Route path="messages/:userId" element={<AdminMessages />} />
       <Route path="guides" element={<AdminGuides />} />
-      <Route path="payouts" element={<AdminPayoutsPage />} />
     </Route>
     <Route path="*" element={<NotFoundPage />} />
   </Routes>;

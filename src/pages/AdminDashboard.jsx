@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
-import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
+import { playMessageSound } from '../utils/notificationSound.js';
 import logoImg from '../assets/zurilofts-logo.png';
 import {
   Accordion,
@@ -21,12 +21,8 @@ import {
   Tooltip,
 } from 'flowbite-react';
 import {
-  Banknote,
-  BarChart3,
   Bell,
   BookOpen,
-  Building2,
-  CalendarDays,
   ChevronLeft,
   ChevronRight,
   Ellipsis,
@@ -39,18 +35,13 @@ import {
   ScrollText,
   ShieldCheck,
   Star,
-  Tag,
   Users,
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle.jsx';
 
-// Shared: both hosts and admins - routes gated by requireHost (or weaker).
-const hostNavItems = [
-  { path: '/admin', label: 'Dashboard', icon: LayoutGrid, exact: true },
-  { path: '/admin/properties', label: 'Properties', icon: House },
-  { path: '/admin/earnings', label: 'Earnings', icon: BarChart3 },
-];
-
+// Admin scope is people and the platform. Listings appear only as the approval
+// queue: hosts own create, edit, calendar, pricing, money and discounts, so
+// those screens (and their nav entries) do not belong here.
 const adminNavGroups = [
   {
     label: 'Overview',
@@ -59,54 +50,31 @@ const adminNavGroups = [
     ],
   },
   {
-    label: 'Operations',
-    items: [
-      { path: '/admin/properties', label: 'Listings', icon: House },
-      { path: '/admin/bookings', label: 'Bookings', icon: CalendarDays },
-      { path: '/admin/messages', label: 'Messages', icon: MessageCircle },
-    ],
-  },
-  {
-    label: 'People & trust',
+    label: 'People',
     items: [
       { path: '/admin/users', label: 'Users & Hosts', icon: Users },
       { path: '/admin/host-applications', label: 'Host Applications', icon: FileText },
       { path: '/admin/trust-safety', label: 'Trust & Safety', icon: ShieldCheck },
-      { path: '/admin/governance', label: 'Governance', icon: ScrollText },
+      { path: '/admin/messages', label: 'Messages', icon: MessageCircle },
     ],
   },
   {
-    label: 'Finance',
+    label: 'Platform',
     items: [
-      { path: '/admin/earnings', label: 'Earnings', icon: BarChart3 },
-      { path: '/admin/payouts', label: 'Payouts', icon: Banknote },
-    ],
-  },
-  {
-    label: 'Content',
-    items: [
-      { path: '/admin/promos', label: 'Promo Codes', icon: Tag },
+      { path: '/admin/properties', label: 'Listing approvals', icon: House },
       { path: '/admin/addons', label: 'Add-ons', icon: SlidersHorizontal },
       { path: '/admin/guides', label: 'Guides', icon: BookOpen },
       { path: '/admin/feedback', label: 'Feedback', icon: Star },
+      { path: '/admin/governance', label: 'Governance', icon: ScrollText },
     ],
   },
 ];
 
-const hostNavGroups = [{ label: 'Workspace', items: hostNavItems }];
-
 const adminMobilePrimaryItems = [
   { path: '/admin', label: 'Overview', icon: LayoutGrid, exact: true },
-  { path: '/admin/properties', label: 'Listings', icon: Building2 },
-  { path: '/admin/users', label: 'People', icon: Users, matchPaths: ['/admin/users', '/admin/host-applications'] },
+  { path: '/admin/host-applications', label: 'Hosts', icon: FileText },
+  { path: '/admin/users', label: 'People', icon: Users, matchPaths: ['/admin/users', '/admin/trust-safety'] },
 ];
-
-const hostMobilePrimaryItems = [
-  { path: '/admin', label: 'Overview', icon: LayoutGrid, exact: true },
-  { path: '/admin/properties', label: 'Listings', icon: Building2 },
-  { path: '/admin/earnings', label: 'Earnings', icon: BarChart3 },
-];
-
 
 function SidebarFlyout({ active, label, target = 'control', children }) {
   if (!active) return children;
@@ -133,7 +101,7 @@ SidebarFlyout.propTypes = {
 };
 
 
-function HeaderUserMenu({ user, isAdmin, onLogout }) {
+function HeaderUserMenu({ user, onLogout }) {
   return (
     <Dropdown
       inline
@@ -156,10 +124,9 @@ function HeaderUserMenu({ user, isAdmin, onLogout }) {
       <DropdownHeader className="op-admin-avatar-header">
         <strong>{user?.firstName} {user?.lastName}</strong>
         <span>{user?.email}</span>
-        <small>{isAdmin ? 'Admin' : 'Host'}</small>
+        <small>Admin</small>
       </DropdownHeader>
       <DropdownItem as={Link} to="/profile#info">My Profile</DropdownItem>
-      {user?.role !== 'HOST' && <DropdownItem as={Link} to="/host/application">Become a host</DropdownItem>}
       <DropdownItem as={Link} to="/admin/messages">Messages</DropdownItem>
       <DropdownItem as={Link} to="/">Client view</DropdownItem>
       <DropdownDivider />
@@ -176,7 +143,6 @@ HeaderUserMenu.propTypes = {
     avatar: PropTypes.string,
     role: PropTypes.string,
   }),
-  isAdmin: PropTypes.bool,
   onLogout: PropTypes.func.isRequired,
 };
 
@@ -189,17 +155,16 @@ function AdminLayout() {
     try { return localStorage.getItem('zurilofts_admin_sidebar') === 'collapsed'; } catch { return false; }
   });
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
-  const isAdmin = user?.role === 'ADMIN';
   const isMessageThreadRoute = /^\/admin\/messages\/[^/]+$/.test(location.pathname);
-  const navGroups = isAdmin ? adminNavGroups : hostNavGroups;
+  const navGroups = adminNavGroups;
   const navItems = navGroups.flatMap((group) => group.items);
-  const mobilePrimaryItems = isAdmin ? adminMobilePrimaryItems : hostMobilePrimaryItems;
+  const mobilePrimaryItems = adminMobilePrimaryItems;
   const mobilePrimaryPaths = new Set(mobilePrimaryItems.map((item) => item.path));
   const mobileMoreItems = navItems.filter((item) => !mobilePrimaryPaths.has(item.path));
   const mobileNavLabels = {
     'Users & Hosts': 'Users',
     'Host Applications': 'Hosts',
-    'Promo Codes': 'Promos',
+    'Listing approvals': 'Approvals',
   };
   const currentNavItem = [...navItems]
     .filter(({ path, exact }) => (exact
@@ -218,9 +183,9 @@ function AdminLayout() {
   const mobilePrimaryActive = mobilePrimaryItems.some(matchesMobilePrimary);
   const mobileMoreActive = !mobilePrimaryActive && location.pathname.startsWith('/admin');
 
-  // ── Notification polling (messages + new bookings) ──
-  const [notif, setNotif] = useState({ unreadMessages: 0, pendingBookings: 0 });
-  const lastNotifRef = useRef({ unreadMessages: 0, pendingBookings: 0 });
+  // ── Notification polling (unread messages; bookings are a host concern) ──
+  const [notif, setNotif] = useState({ unreadMessages: 0 });
+  const lastNotifRef = useRef({ unreadMessages: 0 });
 
   useEffect(() => {
     let active = true;
@@ -231,12 +196,11 @@ function AdminLayout() {
         const d = r.data.data || {};
         const prev = lastNotifRef.current;
 
-        // Play sound only when a count increased
+        // Play sound only when the unread count increased
         if (d.unreadMessages > prev.unreadMessages) playMessageSound();
-        if (d.pendingBookings > prev.pendingBookings) playBookingSound();
 
-        lastNotifRef.current = { unreadMessages: d.unreadMessages ?? 0, pendingBookings: d.pendingBookings ?? 0 };
-        setNotif({ unreadMessages: d.unreadMessages ?? 0, pendingBookings: d.pendingBookings ?? 0 });
+        lastNotifRef.current = { unreadMessages: d.unreadMessages ?? 0 };
+        setNotif({ unreadMessages: d.unreadMessages ?? 0 });
       } catch { /* silently ignore */ }
     };
     poll();
@@ -291,7 +255,7 @@ function AdminLayout() {
         </div>
         {!collapsed && (
           <span className="block px-6 pb-4 text-[#C49A6C] text-xs font-semibold uppercase tracking-wider">
-            {isAdmin ? 'Workspace' : 'Host workspace'}
+            Workspace
           </span>
         )}
         <nav className={`min-h-0 flex-1 overflow-y-auto gap-2 ${collapsed ? 'flex flex-col items-center' : 'px-3'}`}>
@@ -319,11 +283,6 @@ function AdminLayout() {
                             {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
                           </span>
                         )}
-                        {path === '/admin/bookings' && notif.pendingBookings > 0 && (
-                          <span className="absolute -top-1.5 -right-2 min-w-[18px] h-[18px] px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                            {notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}
-                          </span>
-                        )}
                       </div>
                       {!collapsed && <span className="ml-2">{label}</span>}
                     </Link>
@@ -341,7 +300,7 @@ function AdminLayout() {
             {!collapsed && (
               <div className="text-sm">
                 <p className="font-medium">{user?.firstName}</p>
-                <p className="text-white/50 text-xs">{isAdmin ? 'Admin' : 'Host'}</p>
+                <p className="text-white/50 text-xs">Admin</p>
               </div>
             )}
           </div>
@@ -380,7 +339,7 @@ function AdminLayout() {
             <img src={logoImg} alt="" />
             <span>
               <strong>zuri.admin</strong>
-              <small>{isAdmin ? 'Workspace' : 'Host workspace'}</small>
+              <small>Workspace</small>
             </span>
           </Link>
         </div>
@@ -389,24 +348,21 @@ function AdminLayout() {
           <div className="relative">
             <button
               className="op-admin-mobile-bell"
-              title={`${notif.unreadMessages} unread, ${notif.pendingBookings} pending`}
-              aria-label={`${notif.unreadMessages} unread messages and ${notif.pendingBookings} pending bookings`}
+              title={`${notif.unreadMessages} unread`}
+              aria-label={`${notif.unreadMessages} unread messages`}
             >
               <Bell className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
             </button>
-            {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
+            {notif.unreadMessages > 0 && (
               <span className="op-admin-mobile-count">
-                {(() => {
-                  const total = notif.unreadMessages + notif.pendingBookings;
-                  return total > 99 ? '99+' : total;
-                })()}
+                {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
               </span>
             )}
           </div>
-          <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+          <HeaderUserMenu user={user} onLogout={handleLogout} />
         </div>
       </div>
-      <nav className="op-admin-mobile-nav md:hidden" aria-label={`${isAdmin ? 'Admin' : 'Host'} workspace sections`}>
+      <nav className="op-admin-mobile-nav md:hidden" aria-label="Admin workspace sections">
         <div className="op-admin-mobile-nav-scroll">
           {mobilePrimaryItems.map((item) => {
             const active = matchesMobilePrimary(item);
@@ -439,14 +395,14 @@ function AdminLayout() {
         backdrop
         className="op-admin-flowbite-drawer md:hidden"
         theme={{ root: { backdrop: 'op-admin-flowbite-drawer-backdrop' } }}
-        aria-label={`${isAdmin ? 'Admin' : 'Host'} workspace navigation`}
+        aria-label="Admin workspace navigation"
       >
         <DrawerHeader
           className="op-admin-mobile-more-head"
           title="zuri.admin"
           titleIcon={() => <img src={logoImg} alt="" />}
         />
-        <p className="op-admin-mobile-more-label">{isAdmin ? 'Workspace navigation' : 'Host workspace'}</p>
+        <p className="op-admin-mobile-more-label">Workspace navigation</p>
         <DrawerItems className="op-admin-mobile-more-list">
           {mobileMoreItems.map(({ path, label, icon: NavIcon }) => {
             const active = location.pathname === path || location.pathname.startsWith(`${path}/`);
@@ -462,7 +418,6 @@ function AdminLayout() {
                 <NavIcon strokeWidth={1.5} aria-hidden="true" />
                 <span>{displayLabel}</span>
                 {path === '/admin/messages' && notif.unreadMessages > 0 && <small>{notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}</small>}
-                {path === '/admin/bookings' && notif.pendingBookings > 0 && <small>{notif.pendingBookings > 99 ? '99+' : notif.pendingBookings}</small>}
               </Link>
             );
           })}
@@ -482,7 +437,7 @@ function AdminLayout() {
               <LayoutGrid strokeWidth={2} />
             </span>
             <span className="op-admin-shell-copy">
-              <small>{isAdmin ? 'Admin workspace' : 'Host workspace'}</small>
+              <small>Admin workspace</small>
               <strong>{currentNavItem?.label || 'Dashboard'}</strong>
             </span>
           </div>
@@ -492,22 +447,19 @@ function AdminLayout() {
               <button
                 type="button"
                 className="op-admin-shell-icon-button"
-                onClick={() => navigate(notif.pendingBookings > 0 ? '/admin/bookings' : '/admin/messages')}
-                title={`${notif.unreadMessages} unread messages, ${notif.pendingBookings} pending bookings`}
-                aria-label={`${notif.unreadMessages} unread messages and ${notif.pendingBookings} pending bookings`}
+                onClick={() => navigate('/admin/messages')}
+                title={`${notif.unreadMessages} unread messages`}
+                aria-label={`${notif.unreadMessages} unread messages`}
               >
                 <Bell strokeWidth={2} aria-hidden="true" />
               </button>
-              {(notif.unreadMessages > 0 || notif.pendingBookings > 0) && (
+              {notif.unreadMessages > 0 && (
                 <span className="op-admin-shell-count">
-                  {(() => {
-                    const t = notif.unreadMessages + notif.pendingBookings;
-                    return t > 99 ? '99+' : t;
-                  })()}
+                  {notif.unreadMessages > 99 ? '99+' : notif.unreadMessages}
                 </span>
               )}
             </div>
-            <HeaderUserMenu user={user} isAdmin={isAdmin} onLogout={handleLogout} />
+            <HeaderUserMenu user={user} onLogout={handleLogout} />
           </div>
         </header>
         <div className="op-admin-content p-4 md:p-8 pt-20 md:pt-8">
@@ -518,56 +470,60 @@ function AdminLayout() {
   );
 }
 
-// Dashboard Overview
-// Dashboard Overview
+// Admin overview: the numbers are accounts, applications and approvals.
+// Bookings, earnings, payouts and discounts belong to the host workspace, so
+// they are deliberately absent here.
 function DashboardOverview() {
-  const { user } = useAuth();
-  const isAdmin = user?.role === 'ADMIN';
-  const [stats, setStats] = useState({ properties: 0, bookings: 0, promos: 0, revenue: 0 });
-  const [recentBookings, setRecentBookings] = useState([]);
+  const [summary, setSummary] = useState({
+    applications: [],
+    applicationsPending: 0,
+    accounts: 0,
+    listingsLive: 0,
+    listingsPending: 0,
+    verificationsPending: 0,
+  });
   const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0', satisfaction: '0' });
   const [savingLanding, setSavingLanding] = useState(false);
   const [landingMsg, setLandingMsg] = useState('');
 
   useEffect(() => {
+    let active = true;
     async function load() {
-      try {
-        const bookingsUrl = isAdmin ? '/admin/bookings' : '/bookings/host';
-        const earningsUrl = isAdmin ? '/admin/analytics/properties' : '/bookings/host/earnings';
-        // `/properties/mine` is the host workspace scope (an ADMIN is deliberately
-        // excluded from it), so admins must read the admin-namespaced list instead.
-        const propertiesUrl = isAdmin ? '/admin/properties' : '/properties/mine';
-        const fetches = [
-          apiClient.get(propertiesUrl),
-          apiClient.get(bookingsUrl, { params: { limit: 5 } }),
-          apiClient.get(earningsUrl),
-        ];
-        if (isAdmin) {
-          fetches.push(apiClient.get('/promo'));
-          fetches.push(apiClient.get('/admin/settings/landing-stats'));
-        }
-        const results = await Promise.all(fetches);
-        const propsRes = results[0];
-        const bookingsRes = results[1];
-        const earningsRes = results[2];
-        const bookings = bookingsRes.data.data || [];
-        const totalRevenue = bookings.filter((b) => b.status !== 'CANCELLED').reduce((sum, b) => sum + b.total, 0);
-        const totals = earningsRes.data.data?.totals || {};
-        setStats({
-          properties: propsRes.data.pagination?.total || 0,
-          bookings: totals.bookings || bookingsRes.data.pagination?.total || 0,
-          promos: results[3]?.data.data?.length || 0,
-          revenue: totals.earnings || totalRevenue,
+      // Every list endpoint reports its own filtered total in `pagination`, so the
+      // counts stay accurate without downloading whole tables. One failing panel
+      // must not blank the others, hence the per-request fallbacks.
+      const [applicationsRes, accountsRes, pendingListingsRes, liveListingsRes, verificationsRes, landingRes] =
+        await Promise.all([
+          apiClient.get('/admin/host-applications', { params: { status: 'SUBMITTED', limit: 5 } }).catch(() => null),
+          apiClient.get('/admin/users', { params: { limit: 1 } }).catch(() => null),
+          apiClient.get('/admin/properties', { params: { status: 'PENDING_REVIEW', limit: 1 } }).catch(() => null),
+          apiClient.get('/admin/properties', { params: { status: 'PUBLISHED', limit: 1 } }).catch(() => null),
+          apiClient.get('/admin/identity-verifications', { params: { status: 'SUBMITTED', limit: 1 } }).catch(() => null),
+          apiClient.get('/admin/settings/landing-stats').catch(() => null),
+        ]);
+      if (!active) return;
+
+      setSummary({
+        applications: applicationsRes?.data?.data || [],
+        applicationsPending: applicationsRes?.data?.pagination?.total ?? 0,
+        accounts: accountsRes?.data?.pagination?.total ?? 0,
+        listingsLive: liveListingsRes?.data?.pagination?.total ?? 0,
+        listingsPending: pendingListingsRes?.data?.pagination?.total ?? 0,
+        verificationsPending: verificationsRes?.data?.pagination?.total ?? 0,
+      });
+
+      const landing = landingRes?.data?.data;
+      if (landing) {
+        setLandingStats({
+          happyStays: String(landing.happyStays ?? '10'),
+          starRating: String(landing.starRating ?? '5.0'),
+          satisfaction: String(landing.satisfaction ?? '0'),
         });
-        setRecentBookings(bookings);
-        if (isAdmin && results[4]) {
-          const ls = results[4].data.data || {};
-          setLandingStats({ happyStays: String(ls.happyStays || '10'), starRating: String(ls.starRating || '5.0'), satisfaction: String(ls.satisfaction || '0') });
-        }
-      } catch { /* silent */ }
+      }
     }
     load();
-  }, [isAdmin]);
+    return () => { active = false; };
+  }, []);
 
   async function saveLandingStats(e) {
     e.preventDefault();
@@ -580,24 +536,14 @@ function DashboardOverview() {
   }
 
   const quickLinks = [
-    ...(isAdmin ? [
-      { to: '/admin/bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label: 'View bookings' },
-      { to: '/admin/users', icon: 'M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6-1.13a4 4 0 10-4-4 4 4 0 004 4zm6 0a4 4 0 10-3-6.65', label: 'Manage users' },
-      { to: '/admin/properties/new', icon: 'M12 4v16m8-8H4', label: 'Add property' },
-      { to: '/admin/promos', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z', label: 'Manage promos' },
-    ] : [
-      { to: '/admin/properties/new', icon: 'M12 4v16m8-8H4', label: 'Add property' },
-      { to: '/admin/bookings', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label: 'View bookings' },
-      { to: '/admin/earnings', icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z', label: 'View earnings' },
-    ]),
+    { to: '/admin/host-applications', label: 'Review host applications' },
+    { to: '/admin/users', label: 'Manage accounts' },
+    { to: '/admin/properties', label: 'Open listing approvals' },
+    { to: '/admin/trust-safety', label: 'Open trust and safety' },
   ];
 
-  const today = new Date().toDateString();
-  const arrivals = recentBookings.filter((booking) => new Date(booking.checkIn).toDateString() === today);
-  const departures = recentBookings.filter((booking) => new Date(booking.checkOut).toDateString() === today);
-  const pending = recentBookings.filter((booking) => booking.status === 'PENDING');
   return <div className="op-admin-overview" data-openpencil-frame="0:6909">
-    <div className="op-admin-heading"><div><p className="op-admin-eyebrow">ZURILOFTS · ADMIN · OPERATIONS</p><h1>Operations overview</h1><p>Arrivals, departures and priority work across every stay on the platform.</p></div>
+    <div className="op-admin-heading"><div><p className="op-admin-eyebrow">ZURILOFTS · ADMIN · PEOPLE & PLATFORM</p><h1>Platform overview</h1><p>Host applications, accounts and listing approvals that need a decision. Listings, bookings and money are managed by hosts.</p></div>
       <div className="op-admin-quick">
         <Dropdown inline label="Quick actions" placement="bottom-end" className="op-admin-quick-menu">
           {quickLinks.map((link) => <DropdownItem as={Link} key={link.to} to={link.to}>{link.label}</DropdownItem>)}
@@ -605,43 +551,46 @@ function DashboardOverview() {
       </div>
     </div>
     <div className="op-admin-metrics">
-      <article><span>ARRIVALS TODAY</span><strong>{arrivals.length}</strong><small>From recent bookings</small></article>
-      <article><span>DEPARTURES</span><strong>{departures.length}</strong><small>From recent bookings</small></article>
-      <article><span>NEED REVIEW</span><strong>{pending.length}</strong><small>Pending bookings</small></article>
-      <article><span>ACTIVE BOOKINGS</span><strong>{stats.bookings}</strong><small>All bookings</small></article>
+      <article><span>HOST APPLICATIONS</span><strong>{summary.applicationsPending}</strong><small>Awaiting your review</small></article>
+      <article><span>ACCOUNTS</span><strong>{summary.accounts}</strong><small>Guests and hosts</small></article>
+      <article><span>LISTING APPROVALS</span><strong>{summary.listingsPending}</strong><small>Submitted by hosts</small></article>
+      <article><span>IDENTITY CHECKS</span><strong>{summary.verificationsPending}</strong><small>Awaiting review</small></article>
     </div>
     <div className="op-admin-overview-grid">
-      <section className="op-admin-priority"><div className="op-admin-panel-heading"><h2>Priority queue</h2><span>{pending.length} open</span></div>
-        {pending.length ? pending.map((booking) => <div className="op-admin-priority-row" key={booking.id}><div><strong>{booking.property?.title || 'Stay booking'}</strong><small>{booking.user?.firstName} {booking.user?.lastName} · {new Date(booking.checkIn).toLocaleDateString()}</small></div><span className="op-admin-urgent">Pending</span><Link to="/admin/bookings">Open</Link></div>) : <div className="op-admin-empty"><strong>No urgent bookings</strong><p>New bookings requiring review will appear here.</p><Link to="/admin/bookings">View all bookings</Link></div>}
+      <section className="op-admin-priority"><div className="op-admin-panel-heading"><h2>Applications to review</h2><span>{summary.applicationsPending} open</span></div>
+        {summary.applications.length ? summary.applications.map((application) => (
+          <div className="op-admin-priority-row" key={application.id}>
+            <div>
+              <strong>{application.businessName || application.legalName || 'Host application'}</strong>
+              <small>{application.user?.email || application.contactEmail || 'No email yet'}
+                {application.submittedAt ? ` · ${new Date(application.submittedAt).toLocaleDateString()}` : ''}</small>
+            </div>
+            <span className="op-admin-urgent">Submitted</span>
+            <Link to="/admin/host-applications">Open</Link>
+          </div>
+        )) : <div className="op-admin-empty"><strong>No applications waiting</strong><p>New host applications land here for review.</p><Link to="/admin/host-applications">Open host applications</Link></div>}
       </section>
-      <section className="op-admin-glance"><h2>Today at a glance</h2><p><span>Check-ins</span><strong>{arrivals.length}</strong></p><p><span>Check-outs</span><strong>{departures.length}</strong></p><p><span>Listings</span><strong>{stats.properties}</strong></p><Link to="/admin/properties">Open listings board</Link></section>
+      <section className="op-admin-glance"><h2>Platform at a glance</h2><p><span>Live listings</span><strong>{summary.listingsLive}</strong></p><p><span>Awaiting approval</span><strong>{summary.listingsPending}</strong></p><p><span>Identity checks</span><strong>{summary.verificationsPending}</strong></p><Link to="/admin/properties">Open listing approvals</Link></section>
     </div>
     <div className="op-admin-secondary">
       <Accordion alwaysOpen className="op-admin-accordion">
         <AccordionPanel>
-          <AccordionTitle>Platform metrics</AccordionTitle>
+          <AccordionTitle>Landing page statistics</AccordionTitle>
           <AccordionContent>
-            <div className="op-admin-secondary-metrics"><span>Revenue (KES) <strong>{stats.revenue.toLocaleString()}</strong></span><span>Active promos <strong>{stats.promos}</strong></span></div>
+            <p>Set a value to 0 to use live review and booking data.</p>
+            <form onSubmit={saveLandingStats} className="op-admin-stats-form">
+              <label>Happy stays<TextInput type="number" min="0" value={landingStats.happyStays} onChange={(event) => setLandingStats({ ...landingStats, happyStays: event.target.value })} /></label>
+              <label>Star rating<TextInput type="number" min="0" max="5" step="0.1" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
+              <label>Satisfaction %<TextInput type="number" min="0" max="100" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
+              <button type="submit" disabled={savingLanding}>{savingLanding ? 'Saving…' : 'Update'}</button>{landingMsg && <span role="status">{landingMsg}</span>}
+            </form>
           </AccordionContent>
         </AccordionPanel>
-        {isAdmin && (
-          <AccordionPanel>
-            <AccordionTitle>Landing page statistics</AccordionTitle>
-            <AccordionContent>
-              <p>Set a value to 0 to use live review and booking data.</p>
-              <form onSubmit={saveLandingStats} className="op-admin-stats-form">
-                <label>Happy stays<TextInput type="number" min="0" value={landingStats.happyStays} onChange={(event) => setLandingStats({ ...landingStats, happyStays: event.target.value })} /></label>
-                <label>Star rating<TextInput type="number" min="0" max="5" step="0.1" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
-                <label>Satisfaction %<TextInput type="number" min="0" max="100" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
-                <button type="submit" disabled={savingLanding}>{savingLanding ? 'Saving…' : 'Update'}</button>{landingMsg && <span role="status">{landingMsg}</span>}
-              </form>
-            </AccordionContent>
-          </AccordionPanel>
-        )}
       </Accordion>
     </div>
   </div>;
 }
+
 function AdminDashboard() {
   return <DashboardOverview />;
 }

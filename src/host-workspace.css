@@ -2,7 +2,11 @@
 .op-host-today,
 .op-host-listings,
 .op-host-earnings,
-.op-host-payouts {
+.op-host-payouts,
+/* The calendar page root carries its own class, so it must be listed here too:
+   without these variables its bronze buttons resolve to transparent with white
+   text, which hides "Manage availability" entirely. */
+.op-host-calendar {
   --host-navy: #0B1F42;
   --host-blue: #2563EB;
   --host-bronze: #C49A6C;
@@ -12,7 +16,7 @@
 }
 
 .op-host-heading {
-  display: none;
+  display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 24px;
@@ -3553,3 +3557,163 @@
   }
 }
 
+
+/* ---------------------------------------------------------------
+   Host app shell
+   Hosts get their own frame instead of the guest site header. The bar keeps the
+   five daily tasks in reach; the bottom bar carries them on phones.
+   --------------------------------------------------------------- */
+.op-host-appbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border-bottom: 1px solid #E4E8EF;
+  background: #fff;
+}
+
+.op-host-appbar-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 1344px;
+  min-height: 64px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.op-host-appbar-brand {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+
+.op-host-appbar-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: #F6EFE7;
+  color: #9A6A3A;
+  font-family: Montserrat, Inter, sans-serif;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.op-host-appbar-tabs {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-left: 8px;
+}
+
+.op-host-appbar-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 10px;
+  color: #64748B;
+  font-family: Montserrat, Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color .15s ease, background .15s ease;
+}
+
+.op-host-appbar-tab:hover {
+  background: #F6F8FB;
+  color: #0B1F42;
+}
+
+.op-host-appbar-tab.is-active {
+  color: #0B1F42;
+}
+
+.op-host-appbar-tab.is-active::after {
+  content: '';
+  position: absolute;
+  right: 12px;
+  bottom: -13px;
+  left: 12px;
+  height: 2px;
+  border-radius: 2px;
+  background: #C49A6C;
+}
+
+.op-host-appbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.op-host-appbar-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #C49A6C;
+  color: #0B1F42;
+  font-family: Montserrat, Inter, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.op-host-appbar-primary:hover {
+  background: #B98D5D;
+}
+
+.op-host-appbar-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px;
+  border: 1px solid #E4E8EF;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.op-host-appbar-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #0B1F42;
+  color: #fff;
+  font-family: Montserrat, Inter, sans-serif;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.op-host-appmain {
+  width: 100%;
+  max-width: 1344px;
+  margin: 0 auto;
+  padding: 24px 24px 104px;
+}
+
+@media (max-width: 1023px) {
+  .op-host-appbar-tabs { display: none; }
+  .op-host-appbar-inner { min-height: 60px; gap: 12px; padding: 0 16px; }
+}
+
+@media (max-width: 767px) {
+  .op-host-appmain { padding: 16px 16px 96px; }
+  .op-host-appbar-badge { display: none; }
+  .op-host-appbar-primary span { display: none; }
+  .op-host-appbar-primary { width: 36px; min-height: 36px; justify-content: center; padding: 0; }
+}

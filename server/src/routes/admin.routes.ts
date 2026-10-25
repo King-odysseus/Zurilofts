@@ -4,9 +4,6 @@ import { validate } from '../middleware/validate.js';
 import {
   bookingStatusSchema,
   bookingRefundSchema,
-  calendarSourceSchema,
-  calendarBlockSchema,
-  priceRuleSchema,
   adminUserUpdateSchema,
   adminPasswordSetSchema,
   userRoleSchema,
@@ -18,7 +15,6 @@ import {
 } from '../types/index.js';
 import { getLandingStats, setLandingStats } from '../services/settings.service.js';
 import * as bookingCtrl from '../controllers/booking.controller.js';
-import * as calendarCtrl from '../controllers/calendar.controller.js';
 import * as reviewCtrl from '../controllers/review.controller.js';
 import * as blogCtrl from '../controllers/blog.controller.js';
 import * as pushCtrl from '../controllers/push.controller.js';
@@ -106,22 +102,8 @@ router.put('/settings/landing-stats', async (req: Request, res: Response, next: 
   } catch (e) { next(e); }
 });
 
-// Calendar - sources, blocks, sync (per property)
-router.get('/properties/:id/calendar', calendarCtrl.getCalendar);
-router.post('/properties/:id/calendar/sources', validate(calendarSourceSchema), calendarCtrl.addSource);
-router.delete('/properties/:id/calendar/sources/:sourceId', calendarCtrl.deleteSource);
-router.post('/properties/:id/calendar/sync', calendarCtrl.syncNow);
-router.post('/properties/:id/calendar/blocks', validate(calendarBlockSchema), calendarCtrl.addBlock);
-router.post('/properties/:id/calendar/blocks/:blockId/unblock-date', calendarCtrl.unblockDate);
-router.delete('/properties/:id/calendar/blocks/:blockId', calendarCtrl.deleteBlock);
 
-// Seasonal price rules (per property)
-router.get('/properties/:id/price-rules', calendarCtrl.listPriceRules);
-router.post('/properties/:id/price-rules', validate(priceRuleSchema), calendarCtrl.addPriceRule);
-router.delete('/properties/:id/price-rules/:ruleId', calendarCtrl.deletePriceRule);
-
-
-// Admin property CRUD
+// Listing review queue (read + approve/reject/suspend only; hosts own listing writes)
 router.use('/properties', adminPropertyRoutes);
 
 // Blog management

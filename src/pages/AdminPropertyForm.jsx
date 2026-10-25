@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Button, Checkbox, Label, Select, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
 import { Check, ChevronLeft, Eye, MapPin, Upload, X } from 'lucide-react';
 import PropTypes from 'prop-types';
@@ -63,11 +63,11 @@ function AdminPropertyForm() {
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
-  const location = useLocation();
-  // Shared between the admin control centre (/admin/*) and the host workspace
-  // (/host/*). Build frontend links against the active base so a host never
-  // lands on an /admin/* URL. Backend endpoints are unchanged.
-  const base = location.pathname.startsWith('/host') ? '/host' : '/admin';
+
+  // Host-only screen: /admin/properties/* redirects to the approval queue, so
+  // every link here points at the host workspace.
+  // Writes go to /properties, which is host-scoped (requireHostWorkspace).
+  const base = '/host';
 
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(isEdit);
@@ -189,10 +189,9 @@ function AdminPropertyForm() {
     }
 
     try {
-      // /properties is host-scoped (requireHostWorkspace, which excludes ADMIN),
-      // so an admin saving from the control centre must use /admin/properties or
-      // the request is rejected with a 403 and nothing persists.
-      const endpoint = base === '/admin' ? '/admin/properties' : '/properties';
+      // Host-scoped endpoint; requireHostWorkspace rejects ADMIN, so the admin
+      // control centre no longer offers listing writes at all.
+      const endpoint = '/properties';
       if (isEdit) {
         await apiClient.put(`${endpoint}/${id}`, payload);
         navigate(`${base}/properties`);
@@ -241,16 +240,16 @@ function AdminPropertyForm() {
             <ChevronLeft strokeWidth={2} aria-hidden="true" />
             Listings
           </Link>
-          <p className="op-host-editor-eyebrow">{base === '/admin' ? 'ZURILOFTS · ADMIN · LISTINGS' : 'HOST SETUP'}</p>
+          <p className="op-host-editor-eyebrow">HOST SETUP</p>
           <h1>{isEdit ? 'Edit listing' : 'Create a listing'}</h1>
-          <span>{base === '/admin' ? 'Review the listing content, photos, amenities and pricing guests will see.' : 'Prepare the basics, photos, amenities and pricing guests will see.'}</span>
+          <span>Prepare the basics, photos, amenities and pricing guests will see.</span>
         </div>
         <div className="op-host-editor-heading-actions">
           <Button type="button" color="light" className="op-host-editor-outline" onClick={() => setShowFullPreview(true)}>
             <Eye strokeWidth={1.5} aria-hidden="true" />
             Preview listing
           </Button>
-          {isEdit && <Link to={`${base}/properties/${id}/calendar`} className="op-host-editor-outline">Manage calendar</Link>}
+          {isEdit && <Link to={`/host/calendar/${id}`} className="op-host-editor-outline">Manage calendar</Link>}
         </div>
       </header>
 
@@ -488,7 +487,7 @@ function AdminPropertyForm() {
               </div>
             </section>
 
-            {isEdit && <SeasonalPricing propertyId={id} base={base} />}
+            {isEdit && <SeasonalPricing propertyId={id} />}
           </div>
 
           <aside className="op-host-editor-preview-panel">
@@ -737,11 +736,10 @@ FullPagePreview.propTypes = {
 };
 
 // ---- Seasonal pricing (price rules) - only available once a property exists ----
-function SeasonalPricing({ propertyId, base }) {
-  // Price rules live under a different namespace per area: admin routes are
-  // admin-only, hosts use the host-scoped /properties ones. A host hitting the
-  // admin path gets 403 and the section silently stays empty.
-  const rulesPath = `${base === '/admin' ? '/admin/properties' : '/properties'}/${propertyId}/price-rules`;
+function SeasonalPricing({ propertyId }) {
+  // Price rules are host-scoped; the old admin namespace no longer exists, so
+  // there is a single path to read and write here.
+  const rulesPath = `/properties/${propertyId}/price-rules`;
   const [rules, setRules] = useState([]);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState({ name: '', start: '', end: '', price: '' });
