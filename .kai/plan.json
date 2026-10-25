@@ -28,7 +28,11 @@
     {
       "text": "Run lint and build, commit and push all of the above",
       "state": "done"
+    },
+    {
+      "text": "Verify against GitHub that local main and origin/main point at the same commit",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-25T17:38:32.979Z"
+  "updatedAt": "2026-10-25T17:41:22.173Z"
 }
