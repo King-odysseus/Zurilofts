@@ -104,7 +104,7 @@ function HostLayout({ children }) {
                 <>
                   <span className="sr-only">Open host account menu</span>
                   <span className="inline-flex items-center gap-1 rounded-full border border-border bg-white p-1 transition-colors hover:border-primary-200">
-                    <span aria-hidden="true" className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy text-[11px] font-bold tracking-wide text-white">{hostInitials(user)}</span>
+                    <span aria-hidden="true" className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy-bg text-[11px] font-bold tracking-wide text-white">{hostInitials(user)}</span>
                     <ChevronDown className="h-3.5 w-3.5 text-muted" aria-hidden="true" />
                   </span>
                 </>

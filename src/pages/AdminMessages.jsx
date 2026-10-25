@@ -9,7 +9,7 @@ const METRIC_CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
 const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
 const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
 const METRIC_NOTE = 'mt-1 block text-xs text-muted';
-const AVATAR = 'grid h-9 w-9 shrink-0 place-items-center rounded-full bg-navy text-[11px] font-semibold text-white';
+const AVATAR = 'grid h-9 w-9 shrink-0 place-items-center rounded-full bg-navy-bg text-[11px] font-semibold text-white';
 const EMPTY_STATE = 'flex flex-col items-center gap-2 px-4 py-10 text-center';
 
 function BackIcon() {

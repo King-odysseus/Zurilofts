@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { Textarea } from 'flowbite-react';
+import { Alert, Button, Spinner, Textarea } from 'flowbite-react';
 import { ChevronLeft, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
@@ -140,29 +140,32 @@ function ConversationPage() {
     onRetry={fetchConversations}
     detailOpen
   >
-    <header className="opg-message-pane-head">
-      <Link className="opg-message-back" to="/inbox" aria-label="Back to messages">
-        <ChevronLeft strokeWidth={1.9} aria-hidden="true" />
+    <header className="flex items-center gap-3 border-b border-border px-4 py-3">
+      <Link className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-navy hover:bg-surface lg:hidden" to="/inbox" aria-label="Back to messages">
+        <ChevronLeft className="h-[18px] w-[18px]" strokeWidth={1.9} aria-hidden="true" />
       </Link>
-      {image && <img className="opg-message-context-image" src={image} alt="" />}
-      <div className="opg-message-context">
-        <h2>{participant.name}</h2>
-        <p>{property.title || 'Stay conversation'} <span>·</span> {formatStayContext(conversation?.booking)}</p>
+      {image && <img className="h-10 w-10 shrink-0 rounded-lg object-cover" src={image} alt="" />}
+      <div className="min-w-0">
+        <h2 className="truncate text-sm font-bold text-navy">{participant.name}</h2>
+        <p className="mt-0.5 truncate text-xs text-muted">{property.title || 'Stay conversation'} <span>·</span> {formatStayContext(conversation?.booking)}</p>
       </div>
-      {property.id && <Link className="opg-message-booking-link" to={`/property/${property.id}`}>View stay</Link>}
+      {property.id && <Link className="ml-auto shrink-0 text-xs font-semibold text-primary-600 hover:text-primary-700" to={`/property/${property.id}`}>View stay</Link>}
     </header>
 
-    <div className="opg-message-thread" ref={threadRef} aria-live="polite">
-      {loading ? <div className="opg-message-loading" aria-label="Loading messages"><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadMessages}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>No messages yet</strong><p>Say hello to {participant.name} and start planning the stay.</p></div> : messages.map((message) => {
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 py-4" ref={threadRef} aria-live="polite">
+      {loading ? <div className="flex flex-col gap-2" aria-label="Loading messages"><span className="block h-10 w-3/5 animate-pulse rounded-2xl bg-surface" /><span className="block h-10 w-2/5 animate-pulse self-end rounded-2xl bg-surface" /><span className="block h-10 w-1/2 animate-pulse rounded-2xl bg-surface" /></div> : error && messages.length === 0 ? <Alert color="failure">
+        <p>{error}</p>
+        <Button color="light" size="xs" type="button" onClick={loadMessages} className="mt-2">Try again</Button>
+      </Alert> : messages.length === 0 ? <div className="m-auto max-w-[340px] text-center"><strong className="block text-base font-bold text-navy">No messages yet</strong><p className="mt-1.5 text-xs leading-relaxed text-muted">Say hello to {participant.name} and start planning the stay.</p></div> : messages.map((message) => {
         const isMine = message.senderId === user?.id;
         const senderName = [message.sender?.firstName, message.sender?.lastName].filter(Boolean).join(' ') || 'User';
         return <GuestMessageBubble key={message.id} mine={isMine} meta={`${isMine ? 'You' : senderName} · ${formatMessageTime(message.createdAt)}`}>{message.content}</GuestMessageBubble>;
       })}
-      {error && messages.length > 0 && <p className="opg-message-inline-error">{error}</p>}
+      {error && messages.length > 0 && <Alert color="failure" className="self-center text-[11px]">{error}</Alert>}
     </div>
 
-    <div className="opg-message-composer">
-      <div className="opg-message-compose-surface">
+    <div className="sticky bottom-0 border-t border-border bg-white p-3">
+      <div className="flex items-end gap-2">
         <Textarea
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
@@ -175,14 +178,12 @@ function ConversationPage() {
           rows={1}
           placeholder="Write a message..."
           aria-label="Message"
-          className="opg-message-textarea"
+          className="min-h-[44px] flex-1"
         />
-        <div className="opg-message-compose-actions">
-          <button className="opg-message-send" type="button" onClick={handleSend} disabled={!canSend} aria-label={sending ? 'Sending message' : 'Send message'}>
-            {sending ? <span className="opg-message-send-spinner" /> : <Send strokeWidth={1.8} aria-hidden="true" />}
-            <span>Send</span>
-          </button>
-        </div>
+        <Button type="button" onClick={handleSend} disabled={!canSend} aria-label={sending ? 'Sending message' : 'Send message'} className="shrink-0">
+          {sending ? <Spinner size="sm" /> : <Send className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />}
+          <span>Send</span>
+        </Button>
       </div>
     </div>
   </GuestMessagesLayout>;

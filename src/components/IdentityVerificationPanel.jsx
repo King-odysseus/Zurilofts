@@ -149,48 +149,48 @@ function IdentityVerificationPanel({ onApproved }) {
   }
 
   if (loading) {
-    return <div className="op-verify-loading" role="status"><Spinner size="lg" /><span>Loading verification...</span></div>;
+    return <div className="flex min-h-[180px] items-center justify-center gap-3 text-sm text-muted" role="status"><Spinner size="lg" /><span>Loading verification...</span></div>;
   }
 
-  return <div className="op-verify">
-    <header className="op-verify-head">
-      <div>
-        <h2>Verify your identity</h2>
-        <p>Complete the required details securely to continue your booking.</p>
+  return <div className="space-y-4">
+    <header className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <h2 className="text-lg font-semibold text-navy">Verify your identity</h2>
+        <p className="mt-1 text-sm leading-relaxed text-muted">Complete the required details securely to continue your booking.</p>
       </div>
       <Badge color={status.color} icon={StatusIcon}>{status.label}</Badge>
     </header>
 
-    <nav className="op-verify-steps" aria-label="Identity verification progress">
-      {VERIFICATION_STEPS.map((step, index) => <a key={step.label} href={step.href} className={`op-verify-step${index === 0 ? ' is-active' : ''}`}>
-        <span>{step.number}</span>
-        <div><strong>{step.label}</strong><small>{step.detail}</small></div>
+    <nav className="grid grid-cols-1 gap-2 sm:grid-cols-3" aria-label="Identity verification progress">
+      {VERIFICATION_STEPS.map((step, index) => <a key={step.label} href={step.href} className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-sm ${index === 0 ? 'border-primary bg-primary-50 text-navy' : 'border-border text-muted hover:bg-surface hover:text-navy'}`}>
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white text-[11px] font-bold text-navy">{step.number}</span>
+        <div><strong className="block text-sm font-semibold text-navy">{step.label}</strong><small className="mt-0.5 block text-[11px] text-muted">{step.detail}</small></div>
       </a>)}
     </nav>
 
-    {data?.status === 'REJECTED' && data?.reviewNote && <Alert color="failure" icon={AlertCircle} className="op-verify-alert">{data.reviewNote}</Alert>}
-    {data?.status === 'SUBMITTED' && <Alert color="warning" icon={Clock3} className="op-verify-alert">Your verification is being reviewed. We will notify you when it is complete.</Alert>}
-    {data?.status === 'APPROVED' && <Alert color="success" icon={CheckCircle2} className="op-verify-alert">You are verified. You can complete payment on any pending booking.</Alert>}
-    {error && <Alert color="failure" className="op-verify-alert">{error}</Alert>}
-    {notice && <Alert color="success" className="op-verify-alert">{notice}</Alert>}
+    {data?.status === 'REJECTED' && data?.reviewNote && <Alert color="failure" icon={AlertCircle}>{data.reviewNote}</Alert>}
+    {data?.status === 'SUBMITTED' && <Alert color="warning" icon={Clock3}>Your verification is being reviewed. We will notify you when it is complete.</Alert>}
+    {data?.status === 'APPROVED' && <Alert color="success" icon={CheckCircle2}>You are verified. You can complete payment on any pending booking.</Alert>}
+    {error && <Alert color="failure">{error}</Alert>}
+    {notice && <Alert color="success">{notice}</Alert>}
 
-    <section className="op-verify-section" aria-labelledby="verification-details-title">
-      <div className="op-verify-details-grid">
-        <div className="op-verify-fields">
-          <div className="op-verify-section-head">
-            <h3 id="verification-details-title">Tell us about yourself</h3>
-            <p>Your information is used only for identity verification.</p>
+    <section className="border-t border-border pt-5" aria-labelledby="verification-details-title">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_280px]">
+        <div className="min-w-0">
+          <div>
+            <h3 id="verification-details-title" className="text-sm font-semibold text-navy">Tell us about yourself</h3>
+            <p className="mt-1 text-xs leading-relaxed text-muted">Your information is used only for identity verification.</p>
           </div>
-          <form id="verification-details" className="op-verify-form" onSubmit={handleSave}>
-            <div className="op-verify-field">
+          <form id="verification-details" className="mt-4 space-y-4" onSubmit={handleSave}>
+            <div className="space-y-2">
               <Label htmlFor="iv-fullName">Legal name</Label>
               <TextInput id="iv-fullName" type="text" disabled={!editable} value={form.fullName} onChange={(event) => setForm({ ...form, fullName: event.target.value })} placeholder="As shown on your ID" required />
             </div>
-            <div className="op-verify-field">
+            <div className="space-y-2">
               <Label htmlFor="iv-dateOfBirth">Date of birth</Label>
               <TextInput id="iv-dateOfBirth" type="date" disabled={!editable} value={form.dateOfBirth} onChange={(event) => setForm({ ...form, dateOfBirth: event.target.value })} required />
             </div>
-            <div className="op-verify-field">
+            <div className="space-y-2">
               <Label htmlFor="iv-idType">Identity document</Label>
               <SelectMenu
                 id="iv-idType"
@@ -201,38 +201,38 @@ function IdentityVerificationPanel({ onApproved }) {
                 options={ID_TYPE_OPTIONS}
               />
             </div>
-            <div className="op-verify-field">
+            <div className="space-y-2">
               <Label htmlFor="iv-idNumber">Document number</Label>
               <TextInput id="iv-idNumber" type="text" disabled={!editable} value={form.idNumber} onChange={(event) => setForm({ ...form, idNumber: event.target.value })} required />
             </div>
-            <p className="op-verify-help"><LockKeyhole size={14} strokeWidth={1.8} aria-hidden="true" />Your documents are encrypted and reviewed securely.</p>
-            {editable && <div className="op-verify-detail-actions">
-              <Button type="submit" disabled={saving} className="op-trust-button-primary">{saving ? <Spinner size="sm" /> : 'Save details'}</Button>
+            <p className="flex items-center gap-2 text-xs leading-relaxed text-muted"><LockKeyhole size={14} strokeWidth={1.8} aria-hidden="true" className="shrink-0" />Your documents are encrypted and reviewed securely.</p>
+            {editable && <div className="flex flex-wrap items-center gap-3">
+              <Button type="submit" disabled={saving}>{saving ? <Spinner size="sm" /> : 'Save details'}</Button>
               <Button as="a" href="#verification-documents" color="light">Continue to documents</Button>
             </div>}
           </form>
         </div>
-        <aside className="op-verify-callout">
-          <span><Clock3 size={18} strokeWidth={1.8} aria-hidden="true" /></span>
-          <strong>Your booking is held</strong>
-          <p>Return to payment after your identity has been approved.</p>
+        <aside className="rounded-xl bg-surface p-5">
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white text-primary-700"><Clock3 size={18} strokeWidth={1.8} aria-hidden="true" /></span>
+          <strong className="mt-3 block text-sm font-semibold text-navy">Your booking is held</strong>
+          <p className="mt-1.5 text-xs leading-relaxed text-muted">Return to payment after your identity has been approved.</p>
         </aside>
       </div>
     </section>
 
-    {editable && <section id="verification-documents" className="op-verify-section op-verify-documents" aria-labelledby="verification-documents-title">
-      <div className="op-verify-section-head">
-        <h3 id="verification-documents-title">Documents</h3>
-        <p>Upload clear photos or PDF files. Each file can be up to 10MB.</p>
+    {editable && <section id="verification-documents" className="border-t border-border pt-5" aria-labelledby="verification-documents-title">
+      <div>
+        <h3 id="verification-documents-title" className="text-sm font-semibold text-navy">Documents</h3>
+        <p className="mt-1 text-xs leading-relaxed text-muted">Upload clear photos or PDF files. Each file can be up to 10MB.</p>
       </div>
-      <div className="op-verify-document-list">
+      <div className="mt-4 grid grid-cols-1 gap-3">
         {DOCUMENT_KINDS.map(({ kind, label, required }) => {
           const uploaded = uploadedKinds.has(kind);
-          return <div key={kind} className="op-verify-document">
-            <span className="op-verify-document-icon"><FileCheck2 size={19} strokeWidth={1.8} aria-hidden="true" /></span>
-            <div>
-              <strong>{label}{required && <em>Required</em>}</strong>
-              <small>{uploaded ? 'Uploaded and encrypted' : 'Not uploaded yet'}</small>
+          return <div key={kind} className="flex items-center gap-3 rounded-lg border border-border p-3">
+            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface text-navy"><FileCheck2 size={19} strokeWidth={1.8} aria-hidden="true" /></span>
+            <div className="min-w-0 flex-1">
+              <strong className="block text-xs font-semibold text-navy">{label}{required && <em className="ml-2 text-[10px] font-semibold uppercase not-italic text-primary-700">Required</em>}</strong>
+              <small className="mt-1 block text-[11px] text-muted">{uploaded ? 'Uploaded and encrypted' : 'Not uploaded yet'}</small>
             </div>
             <Button size="sm" color="light" disabled={uploading === kind} onClick={() => fileInputs.current[kind]?.click()}>
               {uploading === kind ? <Spinner size="sm" /> : <><Upload size={14} strokeWidth={1.8} aria-hidden="true" />{uploaded ? 'Replace' : 'Upload'}</>}
@@ -253,16 +253,16 @@ function IdentityVerificationPanel({ onApproved }) {
       </div>
     </section>}
 
-    <section id="verification-review" className="op-verify-section op-verify-review" aria-labelledby="verification-review-title">
-      <div className="op-verify-section-head">
-        <h3 id="verification-review-title">Review</h3>
-        <p>Check your details and required documents before submitting.</p>
+    <section id="verification-review" className="border-t border-border pt-5" aria-labelledby="verification-review-title">
+      <div>
+        <h3 id="verification-review-title" className="text-sm font-semibold text-navy">Review</h3>
+        <p className="mt-1 text-xs leading-relaxed text-muted">Check your details and required documents before submitting.</p>
       </div>
-      {editable ? <div className="op-verify-review-actions">
-        <Button onClick={handleSubmit} disabled={saving} className="op-trust-button-primary">{saving ? <Spinner size="sm" /> : <><ShieldCheck size={16} strokeWidth={1.8} aria-hidden="true" />Submit for review</>}</Button>
+      {editable ? <div className="mt-4 flex flex-wrap items-center gap-3">
+        <Button onClick={handleSubmit} disabled={saving}>{saving ? <Spinner size="sm" /> : <><ShieldCheck size={16} strokeWidth={1.8} aria-hidden="true" />Submit for review</>}</Button>
         <Button color="light" disabled={saving} onClick={handleSaveAndExit}>Save and exit</Button>
-        <Link to="/trips">Return to trips</Link>
-      </div> : <div className="op-verify-submitted"><FileText size={17} strokeWidth={1.8} aria-hidden="true" /><span>Your submitted information is shown above.</span></div>}
+        <Link to="/trips" className="text-sm font-semibold text-navy underline-offset-2 hover:underline">Return to trips</Link>
+      </div> : <div className="mt-4 flex items-center gap-2 rounded-lg bg-surface p-3 text-xs text-muted"><FileText size={17} strokeWidth={1.8} aria-hidden="true" className="shrink-0" /><span>Your submitted information is shown above.</span></div>}
     </section>
   </div>;
 }

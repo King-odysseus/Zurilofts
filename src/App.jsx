@@ -38,7 +38,7 @@ const WorkspaceRoutes = lazy(() => import('./WorkspaceRoutes.jsx'));
 function Home() { return <GuestHome />; }
 function Explore() { return <GuestStays />; }
 function GuestShell({ children }) {
-  return <div className="zl-app">
+  return <div className="min-h-screen bg-canvas text-navy">
     <Navbar />
     {children}
     <GuestFooter />

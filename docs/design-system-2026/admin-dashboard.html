@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZuriLofts admin - platform overview</title>
+<link rel="stylesheet" href="preview.css">
+<style>
+  /* board-only: the strip above the mockups */
+  .board-note {
+    max-width: 1280px; margin: 0 auto; padding: 40px 32px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .board-note .t-label { margin-bottom: 8px; }
+  .board-note p { max-width: 680px; margin-top: 8px; }
+  .board-frame { border-bottom: 1px solid var(--line); }
+  .swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .swatch { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .swatch i { width: 20px; height: 20px; border-radius: 6px; display: block; border: 1px solid var(--line); }
+  .minichart { display: flex; align-items: flex-end; gap: 3px; height: 64px; margin-top: 16px; }
+  .minichart span { flex: 1; background: var(--line); border-radius: 2px 2px 0 0; }
+  .minichart span.is-on { background: var(--bronze); }
+</style>
+</head>
+<body>
+
+<!-- ============ board header, not part of the product ============ -->
+<div class="board-note">
+  <p class="t-label">ZuriLofts design system 2026</p>
+  <h1 class="t-page">Admin workspace</h1>
+  <p class="t-meta">Airbnb layout language, ZuriLofts colour. White canvas, one page title size, divider rows instead of tables, one primary action per screen.</p>
+  <div class="swatches">
+    <span class="swatch"><i style="background:#C49A6C"></i>Bronze C49A6C</span>
+    <span class="swatch"><i style="background:#0B1F42"></i>Navy 0B1F42</span>
+    <span class="swatch"><i style="background:#2563EB"></i>Blue 2563EB</span>
+    <span class="swatch"><i style="background:#222222"></i>Ink 222222</span>
+    <span class="swatch"><i style="background:#F7F7F5"></i>Inset F7F7F5</span>
+    <span class="swatch"><i style="background:#E5E7EB"></i>Line E5E7EB</span>
+  </div>
+</div>
+
+<div class="board-frame">
+<div class="shell">
+
+  <!-- ================= sidebar ================= -->
+  <aside class="sidebar">
+    <a class="brand" href="#">
+      <span class="brand__mark">Z</span>
+      <span class="brand__name">zuri<span>.admin</span></span>
+    </a>
+
+    <nav class="nav">
+      <p class="t-label nav__label">Overview</p>
+      <a class="nav__item is-active" href="#" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+        Dashboard
+      </a>
+
+      <p class="t-label nav__label">People</p>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3.2 2.5-5.2 5.5-5.2s5.5 2 5.5 5.2"/><circle cx="17.5" cy="9" r="2.4"/><path d="M16 14.6c2.6.2 4.5 2 4.5 4.6"/></svg>
+        Users &amp; hosts
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>
+        Host applications
+        <span class="nav__count">5</span>
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.7-7 9.5-4.1-1.8-7-5.2-7-9.5V6z"/><path d="M9.2 12.2l2 2 3.6-3.8"/></svg>
+        Trust &amp; safety
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 12a8 8 0 1 1-3.2-6.4"/><path d="M4 5h3v3"/><path d="M8.5 14c1.6 1.3 5.4 1.3 7 0"/><circle cx="9.5" cy="9.5" r=".6" fill="currentColor"/><circle cx="14.5" cy="9.5" r=".6" fill="currentColor"/></svg>
+        Messages
+        <span class="nav__count">3</span>
+      </a>
+
+      <p class="t-label nav__label">Platform</p>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
+        Listing approvals
+        <span class="nav__count">3</span>
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2"/><circle cx="15" cy="17" r="2"/></svg>
+        Add-ons
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 5.5c0-1 .8-1.5 2-1.5h5v16H6c-1.2 0-2-.5-2-1.5z"/><path d="M20 5.5c0-1-.8-1.5-2-1.5h-5v16h5c1.2 0 2-.5 2-1.5z"/></svg>
+        Guides
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 3.5l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-3-5.3 3 1.1-6L3.4 9.9l6-.8z"/></svg>
+        Feedback
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4"/><path d="M9 12h7M9 16h7"/></svg>
+        Governance
+      </a>
+    </nav>
+
+    <div class="sidebar__foot">
+      <a class="sidebar__user" href="#">
+        <span class="avatar avatar--sm">NM</span>
+        <div>
+          <strong>Njeri Mwangi</strong>
+          <small>Administrator</small>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ================= main ================= -->
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Admin workspace</span>
+
+      <div class="searchpill" style="height:44px; max-width:400px; padding:2px; box-shadow:none; margin-left:16px;">
+        <span class="searchpill__seg" style="border:0; display:flex; align-items:center; gap:8px; padding-left:14px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="width:15px;height:15px;color:var(--muted)"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
+          <span class="searchpill__value" style="font-size:13px; padding:0;">Search people and listings</span>
+        </span>
+      </div>
+
+      <div class="topbar__actions">
+        <button class="iconbtn iconbtn--plain" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3.2.6 4.8 1.5 6H5c.9-1.2 1.5-2.8 1.5-6z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+        </button>
+        <span class="avatar avatar--sm" style="background:var(--navy); color:#fff;">NM</span>
+      </div>
+    </header>
+
+    <div class="page">
+
+      <!-- page head: one title, one sub, one action group -->
+      <div class="page__head">
+        <div>
+          <h2 class="t-page">Platform overview</h2>
+          <p class="t-meta page__sub">Host applications, identity checks and listings that need a decision. Listings, bookings and money are run by hosts.</p>
+        </div>
+        <div class="page__actions">
+          <button class="btn btn--secondary">Export</button>
+          <button class="btn btn--primary">Review queue</button>
+        </div>
+      </div>
+
+      <!-- statement instead of four identical tiles -->
+      <div class="card">
+        <p class="t-label">Waiting on you</p>
+        <p class="statement__figure">12 <em>decisions</em></p>
+        <p class="t-meta">Oldest has been open 3 days. Nothing is overdue.</p>
+        <div class="stats">
+          <div class="stat">
+            <p class="stat__value">5</p>
+            <p class="stat__label">Host applications</p>
+          </div>
+          <div class="stat">
+            <p class="stat__value">4</p>
+            <p class="stat__label">Identity checks</p>
+          </div>
+          <div class="stat">
+            <p class="stat__value">3</p>
+            <p class="stat__label">Listing approvals</p>
+          </div>
+          <div class="stat">
+            <p class="stat__value">1,284</p>
+            <p class="stat__label">Accounts on the platform</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="split mt-32">
+
+        <!-- left column -->
+        <div>
+          <section class="section" style="margin-top:0;">
+            <div class="section__head">
+              <h3 class="t-section">Host applications</h3>
+              <a class="link" href="#">View all 5</a>
+            </div>
+
+            <div class="list">
+              <div class="list__row">
+                <span class="avatar">GW</span>
+                <div class="list__grow">
+                  <p class="list__title">Grace Wanjiku</p>
+                  <p class="list__meta">Kilimani, Nairobi · 2 properties · 3 documents</p>
+                </div>
+                <span class="badge badge--warn">Awaiting review</span>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Open</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="avatar">PO</span>
+                <div class="list__grow">
+                  <p class="list__title">Peter Otieno</p>
+                  <p class="list__meta">Westlands, Nairobi · 1 property · 4 documents</p>
+                </div>
+                <span class="badge badge--warn">Awaiting review</span>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Open</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="avatar">AH</span>
+                <div class="list__grow">
+                  <p class="list__title">Amina Hassan</p>
+                  <p class="list__meta">Nyali, Mombasa · 3 properties · 2 documents</p>
+                </div>
+                <span class="badge badge--info">Changes requested</span>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Open</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="avatar">DK</span>
+                <div class="list__grow">
+                  <p class="list__title">David Kimani</p>
+                  <p class="list__meta">Karen, Nairobi · 1 property · 3 documents</p>
+                </div>
+                <span class="badge badge--ok">Approved</span>
+                <div class="list__actions">
+                  <button class="btn btn--quiet btn--sm">Details</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section__head">
+              <h3 class="t-section">Listing approvals</h3>
+              <a class="link" href="#">View all 3</a>
+            </div>
+
+            <div class="list">
+              <div class="list__row">
+                <span class="photo" style="width:56px; height:56px; flex:none;">
+                  <img src="reference/photos/living.jpg" alt="">
+                </span>
+                <div class="list__grow">
+                  <p class="list__title">Ely Homes Studio</p>
+                  <p class="list__meta">Kilimani, Nairobi · 6 photos · submitted 2 days ago</p>
+                </div>
+                <span class="badge badge--warn">Pending</span>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Preview</button>
+                  <button class="btn btn--dark btn--sm">Decide</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="photo" style="width:56px; height:56px; flex:none;">
+                  <img src="reference/photos/kitchen.jpg" alt="">
+                </span>
+                <div class="list__grow">
+                  <p class="list__title">Riverside two-bedroom</p>
+                  <p class="list__meta">Riverside, Nairobi · 9 photos · submitted 1 day ago</p>
+                </div>
+                <span class="badge badge--warn">Pending</span>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Preview</button>
+                  <button class="btn btn--dark btn--sm">Decide</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="photo" style="width:56px; height:56px; flex:none;">
+                  <img src="reference/photos/bed.jpg" alt="">
+                </span>
+                <div class="list__grow">
+                  <p class="list__title">Lavington garden loft</p>
+                  <p class="list__meta">Lavington, Nairobi · 7 photos · live since June</p>
+                </div>
+                <span class="badge badge--ok">Published</span>
+                <div class="list__actions">
+                  <button class="btn btn--quiet btn--sm">Details</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- one example of the shared empty state -->
+          <section class="section">
+            <div class="section__head">
+              <h3 class="t-section">Identity checks</h3>
+            </div>
+            <div class="card">
+              <div class="empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.7-7 9.5-4.1-1.8-7-5.2-7-9.5V6z"/><path d="M9.2 12.2l2 2 3.6-3.8"/></svg>
+                <strong>No identity checks waiting</strong>
+                <p>New submissions appear here within a minute of a guest uploading a document.</p>
+                <button class="btn btn--secondary btn--sm">See past checks</button>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- right rail -->
+        <aside class="stack stack--lg">
+
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-card">New sign-ups</h3>
+              <a class="link" href="#" style="font-size:13px;">30 days</a>
+            </div>
+            <p class="statement__figure" style="font-size:28px;">248</p>
+            <p class="t-meta">accounts created in the last 30 days</p>
+            <div class="minichart" role="img" aria-label="Daily sign-ups, last 30 days">
+              <span style="height:38%"></span><span style="height:52%"></span><span style="height:41%"></span>
+              <span style="height:66%"></span><span style="height:58%"></span><span style="height:74%"></span>
+              <span style="height:61%"></span><span style="height:88%"></span><span style="height:72%"></span>
+              <span style="height:95%"></span><span style="height:64%"></span><span class="is-on" style="height:100%"></span>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-card">Needs attention</h3>
+            </div>
+            <div class="lines">
+              <div class="lines__row"><span>Applications open</span><strong>5</strong></div>
+              <div class="lines__row"><span>Identity checks</span><strong>4</strong></div>
+              <div class="lines__row"><span>Open disputes</span><strong>2</strong></div>
+              <div class="lines__row"><span>Unread messages</span><strong>3</strong></div>
+            </div>
+            <button class="btn btn--secondary btn--block btn--sm">Open trust &amp; safety</button>
+          </div>
+
+          <div class="card card--inset">
+            <p class="t-label" style="color:var(--bronze);">Landing page</p>
+            <h3 class="t-card" style="margin-top:8px;">Public statistics</h3>
+            <p class="t-meta" style="margin-top:4px;">Set a value to 0 to use live review and booking data instead.</p>
+            <div class="stack" style="margin-top:16px;">
+              <div class="row row--between">
+                <span class="t-body">Happy stays</span>
+                <span class="money">1,240</span>
+              </div>
+              <div class="row row--between">
+                <span class="t-body">Star rating</span>
+                <span class="money">4.9</span>
+              </div>
+              <div class="row row--between">
+                <span class="t-body">Satisfaction</span>
+                <span class="money">96%</span>
+              </div>
+            </div>
+            <button class="btn btn--secondary btn--block btn--sm" style="margin-top:16px;">Edit statistics</button>
+          </div>
+
+        </aside>
+      </div>
+
+      <!-- button reference strip, so the rules are visible at a glance -->
+      <section class="section">
+        <div class="section__head"><h3 class="t-section">Controls</h3></div>
+        <div class="card">
+          <div class="row wrap" style="gap:12px;">
+            <button class="btn btn--primary">Primary action</button>
+            <button class="btn btn--dark">Strong action</button>
+            <button class="btn btn--secondary">Secondary</button>
+            <button class="btn btn--quiet">Quiet</button>
+            <button class="btn btn--secondary btn--sm">Small</button>
+            <button class="btn btn--primary btn--pill btn--sm">Pill (mobile)</button>
+          </div>
+          <hr class="hr">
+          <div class="row wrap" style="gap:10px;">
+            <span class="badge badge--ok">Approved</span>
+            <span class="badge badge--warn">Awaiting review</span>
+            <span class="badge badge--danger">Rejected</span>
+            <span class="badge badge--info">Changes requested</span>
+            <span class="badge">Draft</span>
+            <span class="badge badge--dark">Admin</span>
+          </div>
+          <hr class="hr">
+          <div class="formrow">
+            <div class="field">
+              <label for="a1">Reviewer note</label>
+              <input class="input" id="a1" placeholder="Required for rejection">
+            </div>
+            <div class="field">
+              <label for="a2">Status</label>
+              <input class="input" id="a2" value="Awaiting review">
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+</div>
+
+</body>
+</html>

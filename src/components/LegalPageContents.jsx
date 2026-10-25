@@ -35,6 +35,9 @@ function useHeadingIds(containerRef) {
 
 const containerRefProp = PropTypes.shape({ current: PropTypes.any }).isRequired;
 
+/** One contents row: a pill that tints on hover, matching the card inset. */
+const rowClass = 'block rounded-lg px-3 py-2 text-[13px] leading-snug text-muted transition-colors hover:bg-white hover:text-ink';
+
 /** Mobile collapsed accordion - place inside the main column, near the top. */
 export function LegalPageContentsMobile({ containerRef }) {
   const items = useHeadingIds(containerRef);
@@ -43,22 +46,22 @@ export function LegalPageContentsMobile({ containerRef }) {
   if (items.length === 0) return null;
 
   return (
-    <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-white lg:hidden">
+    <div className="mb-8 rounded-2xl border border-line bg-inset lg:hidden">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="legal-toc-mobile"
-        className="flex min-h-[44px] w-full items-center justify-between gap-2 px-5 py-3 text-left text-sm font-semibold text-[#0B1F42]"
+        className="flex min-h-[44px] w-full items-center justify-between gap-2 px-4 py-3 text-left text-[13px] font-semibold text-ink"
       >
         Contents
-        <ChevronDown className={`h-4 w-4 text-[#5B6B82] transition-transform ${open ? 'rotate-180' : ''}`} strokeWidth={2} aria-hidden="true" />
+        <ChevronDown className={`h-4 w-4 text-muted transition-transform ${open ? 'rotate-180' : ''}`} strokeWidth={2} aria-hidden="true" />
       </button>
       {open && (
-        <ul id="legal-toc-mobile" className="space-y-2 border-t border-[#E3E8EF] px-5 py-4">
+        <ul id="legal-toc-mobile" className="space-y-0.5 border-t border-line px-2 py-2">
           {items.map((item) => (
             <li key={item.id}>
-              <a href={`#${item.id}`} onClick={() => setOpen(false)} className="text-sm text-[#0B1F42] hover:text-[#C49A6C]">{item.text}</a>
+              <a href={`#${item.id}`} onClick={() => setOpen(false)} className={rowClass}>{item.text}</a>
             </li>
           ))}
         </ul>
@@ -68,18 +71,21 @@ export function LegalPageContentsMobile({ containerRef }) {
 }
 LegalPageContentsMobile.propTypes = { containerRef: containerRefProp };
 
-/** Desktop sticky sidebar - place as a grid sibling beside the article. */
+/**
+ * Desktop contents card - sits above the article in the same single column.
+ * Long-form pages are one narrow column, so this is no longer a sticky sidebar.
+ */
 export function LegalPageContentsDesktop({ containerRef }) {
   const items = useHeadingIds(containerRef);
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label="Table of contents" className="hidden lg:sticky lg:top-24 lg:block">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#C49A6C]">Contents</p>
-      <ul className="max-h-[70vh] space-y-2 overflow-y-auto border-l border-[#E3E8EF] pl-4">
+    <nav aria-label="Table of contents" className="mb-10 hidden rounded-2xl border border-line bg-inset p-3 lg:block">
+      <p className="px-3 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">Contents</p>
+      <ul className="max-h-[60vh] space-y-0.5 overflow-y-auto">
         {items.map((item) => (
           <li key={item.id}>
-            <a href={`#${item.id}`} className="text-sm text-[#5B6B82] transition-colors hover:text-[#C49A6C]">{item.text}</a>
+            <a href={`#${item.id}`} className={rowClass}>{item.text}</a>
           </li>
         ))}
       </ul>

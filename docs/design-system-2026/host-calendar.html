@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZuriLofts design system 2026 - Host calendar</title>
+<link rel="stylesheet" href="preview.css">
+<style>
+  /* board-only: the strip above the mockups */
+  .board-note {
+    max-width: 1280px; margin: 0 auto; padding: 40px 32px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .board-note .t-label { margin-bottom: 8px; }
+  .board-note p { max-width: 680px; margin-top: 8px; }
+  .board-frame { border-bottom: 1px solid var(--line); }
+  .swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .swatch { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .swatch i { width: 20px; height: 20px; border-radius: 6px; display: block; border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+
+<!-- ============ board header, not part of the product ============ -->
+<div class="board-note">
+  <p class="t-label">ZuriLofts design system 2026</p>
+  <h1 class="t-page">Host calendar</h1>
+  <p class="t-meta">The month as a real grid: reservations, held nights and blocked dates in one view, the month's numbers underneath as key and value, and the stays that need a reply in the rail. Same white canvas, same divider lines, one bronze action.</p>
+  <div class="swatches">
+    <span class="swatch"><i style="background:#C49A6C"></i>Bronze C49A6C</span>
+    <span class="swatch"><i style="background:#0B1F42"></i>Navy 0B1F42</span>
+    <span class="swatch"><i style="background:#2563EB"></i>Blue 2563EB</span>
+    <span class="swatch"><i style="background:#222222"></i>Ink 222222</span>
+    <span class="swatch"><i style="background:#F7F7F5"></i>Inset F7F7F5</span>
+    <span class="swatch"><i style="background:#E5E7EB"></i>Line E5E7EB</span>
+  </div>
+</div>
+
+<div class="board-frame">
+<div class="shell">
+
+  <!-- ================= sidebar ================= -->
+  <aside class="sidebar">
+    <a class="brand" href="#">
+      <span class="brand__mark">Z</span>
+      <span class="brand__name">zuri<span>.host</span></span>
+    </a>
+
+    <nav class="nav">
+      <p class="t-label nav__label">Hosting</p>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/></svg>
+        Today
+      </a>
+      <a class="nav__item is-active" href="#" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>
+        Calendar
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
+        Listings
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 12.3a7.6 7.6 0 0 1-11.2 6.8L4.5 20l1-4.2A7.6 7.6 0 1 1 20 12.3z"/><path d="M9 11h6M9 14h4"/></svg>
+        Messages
+        <span class="nav__count">3</span>
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20.4 13.4l-7 7a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1-.6-1.4V5a1 1 0 0 1 1-1h7a2 2 0 0 1 1.4.6l8 8a2 2 0 0 1 0 2.8z"/><circle cx="8" cy="8" r="1.2"/></svg>
+        Promotions
+      </a>
+
+      <p class="t-label nav__label">Money</p>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 16l5-5 3.5 3.5L20 7"/><path d="M15 7h5v5"/></svg>
+        Earnings
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M16 14h2"/></svg>
+        Payouts
+      </a>
+
+      <p class="t-label nav__label">Insights</p>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 3.5l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-3-5.3 3 1.1-6L3.4 9.9l6-.8z"/></svg>
+        Reviews
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16l4-4 3 2.5 4-6"/></svg>
+        Performance
+      </a>
+    </nav>
+
+    <div class="sidebar__foot">
+      <a class="sidebar__user" href="#">
+        <span class="avatar avatar--sm">GW</span>
+        <div>
+          <strong>Grace Wanjiku</strong>
+          <small>Superhost</small>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ================= main ================= -->
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Host calendar</span>
+
+      <div class="searchpill" style="height:44px; max-width:400px; padding:2px; box-shadow:none; margin-left:16px;">
+        <span class="searchpill__seg" style="border:0; display:flex; align-items:center; gap:8px; padding-left:14px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="width:15px;height:15px;color:var(--muted)"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
+          <span class="searchpill__value">Search bookings and listings</span>
+        </span>
+      </div>
+
+      <div class="topbar__actions">
+        <button class="iconbtn iconbtn--plain" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3.2.6 4.8 1.5 6H5c.9-1.2 1.5-2.8 1.5-6z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+        </button>
+        <span class="avatar avatar--sm" style="background:var(--navy); color:#fff;">GW</span>
+      </div>
+    </header>
+
+    <div class="page">
+
+      <!-- page head: the month in one line, one bronze action -->
+      <div class="page__head">
+        <div>
+          <h2 class="t-page">Calendar</h2>
+          <p class="t-meta page__sub">November 2026. Two rooms turn over on the 14th.</p>
+        </div>
+        <div class="page__actions">
+          <button class="btn btn--secondary">Sync iCal</button>
+          <button class="btn btn--primary">Block dates</button>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="btn btn--secondary btn--sm">Today</button>
+        <button class="filter is-on" aria-pressed="true">Month</button>
+        <button class="filter" aria-pressed="false">Week</button>
+        <span class="spacer"></span>
+        <button class="btn btn--secondary btn--sm">
+          Ely Homes Studio
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M6 9.5l6 6 6-6"/></svg>
+        </button>
+        <button class="btn btn--quiet btn--sm">1 of 3 listings</button>
+      </div>
+
+      <div class="split split--rail mt-24">
+
+        <!-- left column: the month, then its numbers -->
+        <div>
+
+          <section aria-label="November 2026">
+            <div class="cal">
+              <div class="cal__head">
+                <button class="iconbtn iconbtn--plain" aria-label="Previous month">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M14.5 5l-7 7 7 7"/></svg>
+                </button>
+                <button class="iconbtn iconbtn--plain" aria-label="Next month">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M9.5 5l7 7-7 7"/></svg>
+                </button>
+                <h3 class="t-section">November 2026</h3>
+                <span class="spacer"></span>
+                <div class="row">
+                  <span class="badge badge--info">Booked</span>
+                  <span class="badge badge--warn">Pending</span>
+                  <span class="badge">Blocked</span>
+                </div>
+              </div>
+
+              <div class="cal__weekdays">
+                <span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span><span>SUN</span>
+              </div>
+
+              <div class="cal__grid">
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">26</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">27</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">28</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">29</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">30</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">31</span></div>
+                <div class="cal__cell"><span class="cal__day">1</span><span class="cal__bar cal__bar--booked">Chloe Kim</span></div>
+
+                <div class="cal__cell"><span class="cal__day">2</span><span class="cal__bar cal__bar--booked">Chloe Kim</span></div>
+                <div class="cal__cell"><span class="cal__day">3</span><span class="cal__bar cal__bar--booked">Chloe Kim</span></div>
+                <div class="cal__cell"><span class="cal__day">4</span><span class="cal__bar cal__bar--booked">Chloe Kim</span></div>
+                <div class="cal__cell"><span class="cal__day">5</span><span class="cal__bar cal__bar--blocked">Blocked</span></div>
+                <div class="cal__cell"><span class="cal__day">6</span></div>
+                <div class="cal__cell"><span class="cal__day">7</span></div>
+                <div class="cal__cell"><span class="cal__day">8</span><span class="cal__bar cal__bar--booked">Tom Bennett</span></div>
+
+                <div class="cal__cell"><span class="cal__day">9</span><span class="cal__bar cal__bar--booked">Tom Bennett</span></div>
+                <div class="cal__cell"><span class="cal__day">10</span><span class="cal__bar cal__bar--booked">Tom Bennett</span></div>
+                <div class="cal__cell"><span class="cal__day">11</span><span class="cal__bar cal__bar--booked">Tom Bennett</span></div>
+                <div class="cal__cell"><span class="cal__day">12</span><span class="cal__bar cal__bar--pending">Amina M.</span></div>
+                <div class="cal__cell"><span class="cal__day">13</span><span class="cal__bar cal__bar--pending">Amina M.</span></div>
+                <div class="cal__cell cal__cell--today"><span class="cal__day">14</span><span class="cal__bar cal__bar--booked">Brian O.</span></div>
+                <div class="cal__cell"><span class="cal__day">15</span><span class="cal__bar cal__bar--booked">Brian O.</span></div>
+
+                <div class="cal__cell"><span class="cal__day">16</span><span class="cal__bar cal__bar--booked">Brian O.</span><span class="cal__bar cal__bar--booked">Grace K.</span></div>
+                <div class="cal__cell"><span class="cal__day">17</span><span class="cal__bar cal__bar--booked">Brian O.</span><span class="cal__bar cal__bar--booked">Grace K.</span></div>
+                <div class="cal__cell"><span class="cal__day">18</span><span class="cal__bar cal__bar--booked">Brian O.</span><span class="cal__bar cal__bar--booked">Grace K.</span></div>
+                <div class="cal__cell"><span class="cal__day">19</span><span class="cal__bar cal__bar--booked">Grace K.</span></div>
+                <div class="cal__cell"><span class="cal__day">20</span></div>
+                <div class="cal__cell"><span class="cal__day">21</span><span class="cal__bar cal__bar--pending">Pending</span></div>
+                <div class="cal__cell"><span class="cal__day">22</span><span class="cal__bar cal__bar--pending">Pending</span></div>
+
+                <div class="cal__cell"><span class="cal__day">23</span><span class="cal__bar cal__bar--pending">Pending</span></div>
+                <div class="cal__cell"><span class="cal__day">24</span><span class="cal__bar cal__bar--pending">Pending</span></div>
+                <div class="cal__cell"><span class="cal__day">25</span></div>
+                <div class="cal__cell"><span class="cal__day">26</span><span class="cal__bar cal__bar--booked">David K.</span></div>
+                <div class="cal__cell"><span class="cal__day">27</span><span class="cal__bar cal__bar--booked">David K.</span></div>
+                <div class="cal__cell"><span class="cal__day">28</span><span class="cal__bar cal__bar--booked">David K.</span></div>
+                <div class="cal__cell"><span class="cal__day">29</span><span class="cal__bar cal__bar--booked">David K.</span></div>
+
+                <div class="cal__cell"><span class="cal__day">30</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">1</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">2</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">3</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">4</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">5</span></div>
+                <div class="cal__cell cal__cell--muted"><span class="cal__day">6</span></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section" style="margin-top:32px;">
+            <div class="section__head">
+              <h3 class="t-section">This month</h3>
+            </div>
+            <div class="card">
+              <div class="kv">
+                <div class="kv__item"><span>Nights booked</span><strong>22</strong></div>
+                <div class="kv__item"><span>Occupancy</span><strong>92%</strong></div>
+                <div class="kv__item"><span>Nights available</span><strong>8</strong></div>
+                <div class="kv__item"><span>Average nightly rate</span><strong>KES 9,850</strong></div>
+                <div class="kv__item"><span>Booked revenue</span><strong>KES 216,700</strong></div>
+                <div class="kv__item"><span>Blocked nights</span><strong>2</strong></div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- right rail -->
+        <aside class="stack stack--lg">
+
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-card">Upcoming stays</h3>
+              <a class="link link--quiet" href="#">All stays</a>
+            </div>
+            <div class="list">
+              <div class="list__row">
+                <span class="avatar avatar--sm">CK</span>
+                <div class="list__grow">
+                  <p class="list__title">Chloe Kim</p>
+                  <p class="list__meta">Ely Homes Studio · 1-4 Nov</p>
+                  <span class="badge badge--ok" style="margin-top:6px;">Confirmed</span>
+                </div>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Message</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="avatar avatar--sm">AM</span>
+                <div class="list__grow">
+                  <p class="list__title">Amina Mohamed</p>
+                  <p class="list__meta">Lavington garden loft · 12-13 Nov</p>
+                  <span class="badge badge--warn" style="margin-top:6px;">Balance due</span>
+                </div>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Message</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="avatar avatar--sm">BO</span>
+                <div class="list__grow">
+                  <p class="list__title">Brian Otieno</p>
+                  <p class="list__meta">Ely Homes Studio · 14-18 Nov</p>
+                  <span class="badge badge--ok" style="margin-top:6px;">Confirmed</span>
+                </div>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Message</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card card--inset">
+            <p class="t-label" style="color:var(--bronze);">Weekend rate</p>
+            <h3 class="t-card" style="margin-top:8px;">Friday and Saturday</h3>
+            <p class="t-meta" style="margin-top:4px;">A KES 12,500 nightly rate applies automatically on Friday and Saturday nights, replacing the KES 9,850 base rate. No action is needed on individual dates.</p>
+            <button class="btn btn--secondary btn--block btn--sm" style="margin-top:16px;">Edit pricing</button>
+          </div>
+
+        </aside>
+      </div>
+
+      <!-- button reference strip, so the rules are visible at a glance -->
+      <section class="section" style="margin-top:48px;">
+        <div class="section__head"><h3 class="t-section">Controls</h3></div>
+        <div class="card">
+          <div class="row wrap" style="gap:12px;">
+            <button class="btn btn--primary">Primary action</button>
+            <button class="btn btn--dark">Strong action</button>
+            <button class="btn btn--secondary">Secondary</button>
+            <button class="btn btn--quiet">Quiet</button>
+            <button class="btn btn--secondary btn--sm">Small</button>
+            <button class="btn btn--primary btn--pill btn--sm">Pill (mobile)</button>
+          </div>
+          <hr class="hr">
+          <div class="row wrap" style="gap:10px;">
+            <span class="badge badge--info">Booked</span>
+            <span class="badge badge--warn">Pending</span>
+            <span class="badge">Blocked</span>
+            <span class="badge badge--ok">Confirmed</span>
+            <span class="badge badge--danger">Cancelled</span>
+            <span class="badge badge--dark">Superhost</span>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+</div>
+
+</body>
+</html>

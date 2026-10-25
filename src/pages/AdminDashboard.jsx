@@ -47,7 +47,7 @@ import ThemeToggle from '../components/ThemeToggle.jsx';
 // the old stylesheet drifted apart in the first place.
 // ---------------------------------------------------------------------------
 const NAV_LINK_BASE = 'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors';
-const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-navy';
+const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-navy-bg';
 const NAV_LINK_IDLE = 'text-white/80 hover:bg-white/10 hover:text-white';
 
 const METRIC_CARD = 'rounded-xl border border-border bg-white p-5 shadow-sm';
@@ -138,7 +138,7 @@ function HeaderUserMenu({ user, onLogout }) {
       // Tailwind hook on the element, so styling it through className is impossible.
       renderTrigger={() => (
         <button type="button" className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-surface">
-          <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-primary text-xs font-bold text-white">
+          <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-primary text-xs font-bold text-navy-bg">
             {user?.avatar ? (
               <img src={user.avatar} alt="" className="h-8 w-8 rounded-full object-cover" />
             ) : (
@@ -309,7 +309,7 @@ function AdminLayout() {
     <div className="min-h-screen bg-surface text-charcoal">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-10 hidden flex-col border-r border-white/10 bg-navy text-white transition-all duration-300 lg:flex ${
+        className={`fixed inset-y-0 left-0 z-10 hidden flex-col border-r border-white/10 bg-navy-bg text-white transition-all duration-300 lg:flex ${
           collapsed ? 'w-16' : 'w-64'
         }`}
       >
@@ -358,7 +358,7 @@ function AdminLayout() {
         </nav>
         <div className={`mt-auto border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'p-5'}`}>
           <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-navy-bg">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
             </div>
             {!collapsed && (
@@ -385,7 +385,7 @@ function AdminLayout() {
         <button
           type="button"
           onClick={toggleSidebar}
-          className="absolute left-full top-1/2 z-50 grid h-14 w-5 -translate-y-1/2 place-items-center rounded-r-lg bg-navy text-white shadow-sm transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          className="absolute left-full top-1/2 z-50 grid h-14 w-5 -translate-y-1/2 place-items-center rounded-r-lg bg-navy-bg text-white shadow-sm transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           aria-expanded={!collapsed}
           aria-label={collapsed ? 'Expand admin sidebar' : 'Collapse admin sidebar'}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -465,8 +465,8 @@ function AdminLayout() {
           aria-modal="true"
           aria-label="Admin workspace navigation"
         >
-          <button type="button" className="absolute inset-0 bg-navy/40" aria-label="Close navigation" onClick={() => setMobileMoreOpen(false)} />
-          <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-navy p-4 text-white">
+          <button type="button" className="absolute inset-0 bg-navy-bg/40" aria-label="Close navigation" onClick={() => setMobileMoreOpen(false)} />
+          <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-navy-bg p-4 text-white">
             <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
               <div className="inline-flex items-center gap-2">
                 <BrandLogo imgClassName="h-6 w-auto" alt="" />
@@ -681,7 +681,7 @@ function DashboardOverview() {
       </section>
       <section className={PANEL}>
         <div className={PANEL_HEAD}>
-          <h2 className={PANEL_TITLE}>New sign-ups</h2>
+          <h2 className={`${PANEL_TITLE} whitespace-nowrap`}>New sign-ups</h2>
           <SelectMenu
             sizing="sm"
             ariaLabel="Sign-up date range"
@@ -694,9 +694,17 @@ function DashboardOverview() {
         <div className="px-5 py-4">
           {trend ? <>
             <p className={PANEL_SUBTITLE}><strong className="mr-1 text-base font-bold text-navy">{trend.total}</strong>new accounts in the last {trend.days} days</p>
-            <div className="mt-4 flex h-24 items-end gap-1" role="img" aria-label={`Daily sign-ups over the last ${trend.days} days`}>
-              {trend.series.map((point) => <span key={point.date} title={`${point.date}: ${point.signups}`} className="flex-1 rounded-t bg-primary" style={{ height: `${Math.max(4, (point.signups / peakSignups) * 100)}%` }} />)}
-            </div>
+            {/* With no sign-ups every bar collapsed to a 4% stub, which read as a
+                row of stray dots. Say so instead of drawing a chart with no data. */}
+            {trend.total > 0 ? (
+              <div className="mt-4 flex h-24 items-end gap-1" role="img" aria-label={`Daily sign-ups over the last ${trend.days} days`}>
+                {trend.series.map((point) => <span key={point.date} title={`${point.date}: ${point.signups}`} className="flex-1 rounded-t bg-primary" style={{ height: `${Math.max(4, (point.signups / peakSignups) * 100)}%` }} />)}
+              </div>
+            ) : (
+              <p className="mt-4 rounded-lg border border-dashed border-border px-4 py-6 text-center text-xs text-muted">
+                No sign-ups in the last {trend.days} days.
+              </p>
+            )}
           </> : <p className={PANEL_SUBTITLE}>Trend data is unavailable right now.</p>}
         </div>
       </section>

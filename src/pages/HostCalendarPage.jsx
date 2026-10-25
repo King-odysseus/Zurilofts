@@ -15,7 +15,7 @@ const WEEK_GRID = 'grid grid-cols-[minmax(170px,1.6fr)_repeat(7,minmax(0,1fr))]'
 // Day-cell surface per availability state; selected cells add a ring.
 const DAY_STATE_CLASSES = {
   open: 'bg-white text-muted hover:bg-surface',
-  reserved: 'bg-navy text-white hover:bg-navy/90',
+  reserved: 'bg-navy-bg text-white hover:bg-navy-bg/90',
   blocked: 'bg-silver/50 text-navy hover:bg-silver/70',
 };
 
@@ -106,7 +106,7 @@ function WeeklyCalendar({ rows, weekStart, selected, onSelect }) {
     </div>
     <div className="flex flex-wrap items-center gap-4 border-t border-border px-5 py-3 text-xs text-muted">
       <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full border border-border bg-white" aria-hidden="true" />Open</span>
-      <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-navy" aria-hidden="true" />Reserved</span>
+      <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-navy-bg" aria-hidden="true" />Reserved</span>
       <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-full bg-silver" aria-hidden="true" />Blocked</span>
     </div>
   </section>;
@@ -128,7 +128,7 @@ function CalendarDetail({ selected, row, onOpenProperty }) {
 
   return <aside className="h-fit space-y-4 rounded-xl border border-border bg-white p-5 shadow-sm xl:col-span-1">
     <header><h2 className="text-base font-semibold text-navy">{formatFullDate(selected.date)}</h2><p className="mt-1 text-xs text-muted">{row.property.title}</p></header>
-    {state.type === 'reserved' ? <div className="rounded-lg bg-navy p-3 text-white">
+    {state.type === 'reserved' ? <div className="rounded-lg bg-navy-bg p-3 text-white">
       <span className="text-[11px] font-semibold uppercase tracking-wide text-white/70">RESERVED STAY</span>
       <strong className="mt-1 block text-sm font-semibold">{state.item.guestName || 'Guest'}</strong>
       <p className="mt-1 text-xs leading-relaxed text-white/80">{sameDay(selected.date, new Date(state.item.start)) ? 'Check-in today' : sameDay(selected.date, addDays(new Date(state.item.end), -1)) ? 'Check-out today' : 'Stay in progress'} · {state.item.guests || 1} guest{state.item.guests === 1 ? '' : 's'}</p>

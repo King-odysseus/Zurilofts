@@ -213,7 +213,7 @@ export default function HostTodayPage() {
         </div>
         <Button as={Link} to="/host/calendar" size="sm" className="self-start md:hidden">Open calendar</Button>
       </section>
-      <section className="flex flex-col items-start rounded-xl border border-border bg-navy p-5 shadow-sm">
+      <section className="flex flex-col items-start rounded-xl border border-border bg-navy-bg p-5 shadow-sm">
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary">PRIORITY NEXT STEP</p>
         <h2 className="mt-1 text-xl font-semibold text-white">{priority ? (priorityType === "arrival" ? "Confirm arrival details" : priorityType === "departure" ? "Review today's checkout" : "Check your in-house guest") : "Your day is clear"}</h2>
         <span className="mt-2 block text-sm leading-relaxed text-white/70">{priority ? `${guestName(priority)} at ${priority.property?.title || "your property"} · ${bookingTime(priority, priorityType)}` : "There are no urgent guest actions scheduled right now."}</span>

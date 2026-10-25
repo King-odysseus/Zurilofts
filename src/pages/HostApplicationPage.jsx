@@ -783,7 +783,7 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
-          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${document ? 'bg-navy text-white' : 'bg-white text-primary-600'}`}
+          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${document ? 'bg-navy-bg text-white' : 'bg-white text-primary-600'}`}
         >
           {document ? '\u2713' : '+'}
         </span>

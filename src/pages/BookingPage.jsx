@@ -1,11 +1,12 @@
 import { Fragment, useState, useEffect, useMemo, useCallback } from 'react';
 import { useLocation, useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { Button, Dropdown as FlowbiteDropdown, DropdownItem, Radio, Textarea, TextInput } from 'flowbite-react';
-import { Check, ChevronLeft, Clock, CreditCard, House, Landmark, LoaderCircle, MapPin, Star, Trash2 } from 'lucide-react';
+import { Alert, Button, Dropdown as FlowbiteDropdown, DropdownItem, Label, Radio, Spinner, Textarea, TextInput } from 'flowbite-react';
+import { Check, ChevronLeft, Clock, CreditCard, House, Landmark, LoaderCircle, MapPin, ShieldCheck, Star, Trash2 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import apiClient from '../api/client.js';
 import BrandLogo from '../components/BrandLogo.jsx';
+
 import { useAuth } from '../context/AuthContext.jsx';
 
 import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
@@ -15,8 +16,8 @@ function CheckoutDropdown({ value, options, onChange, ariaLabel, className = '' 
   return (
     <FlowbiteDropdown
       inline
-      theme={{ inlineWrapper: `op-checkout-select ${className}`.trim() }}
-      label={<span className="op-checkout-select-value">{selected?.label ?? 'Select'}</span>}
+      theme={{ inlineWrapper: `flex w-full items-center justify-between gap-2 rounded-lg border border-border bg-white px-3 py-2.5 text-sm font-semibold text-navy ${className}`.trim() }}
+      label={<span className="truncate">{selected?.label ?? 'Select'}</span>}
       placement="bottom-start"
       aria-label={ariaLabel}
     >
@@ -519,10 +520,8 @@ function BookingPage() {
   // Step 1: Dates & Guests
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#0B1F42]">Select your dates</h2>
-
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-2">Select your dates *</label>
+        <Label className="mb-2 block">Dates *</Label>
         <AvailabilityCalendar
           value={{ checkIn: bookingData.checkIn, checkOut: bookingData.checkOut }}
           onChange={({ checkIn, checkOut }) => setBookingData((prev) => ({ ...prev, checkIn, checkOut }))}
@@ -530,20 +529,20 @@ function BookingPage() {
         />
         {(bookingData.checkIn || bookingData.checkOut) && (
           <div className="flex gap-4 mt-3">
-            <div className="flex-1 neu-input px-4 py-2 bg-white">
-              <span className="text-xs text-[#6b7280] block">Check-in</span>
-              <span className="font-semibold text-[#0B1F42]">{bookingData.checkIn || '-'}</span>
+            <div className="flex-1 rounded-lg border border-border bg-white px-4 py-2">
+              <span className="text-xs text-muted block">Check-in</span>
+              <span className="font-semibold text-navy">{bookingData.checkIn || '-'}</span>
             </div>
-            <div className="flex-1 neu-input px-4 py-2 bg-white">
-              <span className="text-xs text-[#6b7280] block">Check-out</span>
-              <span className="font-semibold text-[#0B1F42]">{bookingData.checkOut || '-'}</span>
+            <div className="flex-1 rounded-lg border border-border bg-white px-4 py-2">
+              <span className="text-xs text-muted block">Check-out</span>
+              <span className="font-semibold text-navy">{bookingData.checkOut || '-'}</span>
             </div>
           </div>
         )}
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-2">Number of Guests *</label>
+        <Label className="mb-2 block">Number of Guests *</Label>
         <CheckoutDropdown
           value={bookingData.guests}
           onChange={(v) => setGuestCount(Number(v))}
@@ -554,42 +553,42 @@ function BookingPage() {
           ariaLabel="Number of guests"
         />
         {bedOption && (
-          <p className="text-xs text-[#6b7280] mt-1">
+          <p className="text-xs text-muted mt-1">
             This apartment fits up to {pricing.maxGuests} guests ({pricing.baseGuests} included in the {bedOption === '2bed' ? '2-bed' : '1-bed'} rate). Each additional guest is KES {pricing.extraGuestFeePerNight.toLocaleString()}/night.
             {bookingData.guests > pricing.baseGuests && (
-              <span className="text-amber-600 font-medium"> {pricing.extraGuests} extra guest{pricing.extraGuests > 1 ? 's' : ''} &middot; +KES {pricing.extraGuestFee.toLocaleString()}</span>
+              <span className="font-medium text-primary-700"> {pricing.extraGuests} extra guest{pricing.extraGuests > 1 ? 's' : ''} &middot; +KES {pricing.extraGuestFee.toLocaleString()}</span>
             )}
           </p>
         )}
         {bookingData.guests > pricing.maxGuests && (
-          <p className="text-red-500 text-xs mt-1 font-semibold">Maximum {pricing.maxGuests} guests for this room type. Exceeding this is grounds for removal.</p>
+          <Alert color="failure" className="mt-2">Maximum {pricing.maxGuests} guests for this room type. Exceeding this is grounds for removal.</Alert>
         )}
         {!bedOption && (
-          <p className="text-xs text-[#6b7280] mt-1">Select a bed option above to see guest limits.</p>
+          <p className="text-xs text-muted mt-1">Select a bed option above to see guest limits.</p>
         )}
       </div>
 
       {/* Bed Option - shown as read-only since it was selected on the property card */}
       {bedOption && (
-        <div className="bg-[#C49A6C]/10 rounded-xl p-4 flex items-center justify-between">
+        <div className="flex items-center justify-between gap-3 rounded-lg bg-primary-50 p-4 dark:bg-white/5">
           <div>
-            <p className="text-sm font-semibold text-[#0B1F42]">
+            <p className="text-sm font-semibold text-navy">
               {bedOption === '2bed' ? '2-Bed Configuration' : '1-Bed Configuration'}
             </p>
-            <p className="text-xs text-[#6b7280]">
+            <p className="text-xs text-muted">
               Apartment fits up to {pricing.maxGuests} guests &middot; KES {pricing.propertyPrice.toLocaleString()}/night
             </p>
           </div>
-          <span className="bg-[#C49A6C] text-white text-xs font-bold px-3 py-1 rounded-full">
+          <span className="bg-primary text-navy-bg text-xs font-bold px-3 py-1 rounded-full">
             {bedOption === '2bed' ? '2 Bed' : '1 Bed'}
           </span>
         </div>
       )}
 
       {/* Standard times note */}
-      <div className="bg-[#0B1F42]/5 rounded-xl p-4 flex items-start gap-3">
-        <Clock className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
-        <p className="text-sm text-[#1f2937]">
+      <div className="flex items-start gap-3 rounded-lg bg-surface p-4">
+        <Clock className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
+        <p className="text-sm text-charcoal">
           Standard <span className="font-semibold">check-in from 3:00 PM</span> and{' '}
           <span className="font-semibold">check-out by 10:00 AM</span>. You may extend up to{' '}
           <span className="font-semibold">1:00 PM (3 hours max)</span>. The fee{' '}
@@ -598,21 +597,21 @@ function BookingPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-2">Estimated Check-in Time</label>
+          <Label className="mb-2 block">Estimated Check-in Time</Label>
           <TextInput
             type="time"
             name="checkInTime"
             value={bookingData.checkInTime}
             onChange={handleInputChange}
-            className="op-checkout-input"
+            className="w-full"
             sizing="lg"
           />
-          <p className="text-xs text-[#6b7280] mt-1">From 3:00 PM</p>
+          <p className="text-xs text-muted mt-1">From 3:00 PM</p>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-2">Check-out Time</label>
+          <Label className="mb-2 block">Check-out Time</Label>
           <CheckoutDropdown
             value={bookingData.checkOutTime}
             onChange={(v) => setBookingData((prev) => ({ ...prev, checkOutTime: v }))}
@@ -629,7 +628,7 @@ function BookingPage() {
             ariaLabel="Check-out time"
           />
           {pricing.lateCheckoutFee > 0 && (
-            <p className="text-xs text-[#C49A6C] font-medium mt-1">
+            <p className="text-xs text-primary font-medium mt-1">
               Late check-out fee: KES {pricing.lateCheckoutFee.toLocaleString()}
             </p>
           )}
@@ -637,11 +636,11 @@ function BookingPage() {
       </div>
 
       {requestedNights > 0 && (
-        <div className="bg-[#C49A6C]/10 rounded-xl p-4">
-          <p className="text-[#0B1F42] font-medium">
+        <div className="bg-primary-50 rounded-xl p-4">
+          <p className="text-navy font-medium">
             {requestedNights} {requestedNights === 1 ? 'night' : 'nights'} selected
           </p>
-          <p className="text-[#6b7280] text-sm">
+          <p className="text-muted text-sm">
             KES {pricing.propertyPrice.toLocaleString()} per night
           </p>
         </div>
@@ -650,7 +649,7 @@ function BookingPage() {
       <Button
         onClick={() => setStep(2)}
         disabled={!bookingData.checkIn || !bookingData.checkOut || requestedNights <= 0 || !bedOption}
-        className="op-checkout-primary"
+        className="w-full"
         pill
       >
         Continue
@@ -665,7 +664,7 @@ function BookingPage() {
         <Button
           type="button"
           onClick={() => setStep(1)}
-          className="op-checkout-back-button"
+          size="sm"
           color="light"
         >
           <ChevronLeft className="w-5 h-5 mr-1" strokeWidth={2} aria-hidden="true" />
@@ -674,33 +673,33 @@ function BookingPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-[#0B1F42]">Guest Information</h2>
-        <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account. Edit anything that&apos;s changed.</p>
+        <h2 className="text-base font-semibold text-navy">Guest Information</h2>
+        <p className="mt-1 text-xs text-muted">Pre-filled from your account. Edit anything that&apos;s changed.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-2">First Name *</label>
+          <Label className="mb-2 block">First Name *</Label>
           <TextInput
             type="text"
             name="firstName"
             value={bookingData.firstName}
             onChange={handleInputChange}
             placeholder="John"
-            className="op-checkout-input"
+            className="w-full"
             sizing="lg"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-2">Last Name *</label>
+          <Label className="mb-2 block">Last Name *</Label>
           <TextInput
             type="text"
             name="lastName"
             value={bookingData.lastName}
             onChange={handleInputChange}
             placeholder="Doe"
-            className="op-checkout-input"
+            className="w-full"
             sizing="lg"
             required
           />
@@ -708,28 +707,28 @@ function BookingPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email *</label>
+        <Label className="mb-2 block">Email *</Label>
         <TextInput
           type="email"
           name="email"
           value={bookingData.email}
           onChange={handleInputChange}
           placeholder="john@example.com"
-          className="op-checkout-input"
+          className="w-full"
           sizing="lg"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone Number *</label>
+        <Label className="mb-2 block">Phone Number *</Label>
         <div className="flex gap-2">
           <CheckoutDropdown
             value={phoneCountryCode}
             onChange={(val) => handlePhoneChange(val, phoneNumber)}
             options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
             ariaLabel="Select country code"
-            className="op-checkout-country-code"
+            className="w-28 shrink-0"
           />
           <TextInput
             type="tel"
@@ -737,67 +736,67 @@ function BookingPage() {
             onChange={(e) => handlePhoneChange(phoneCountryCode, e.target.value.replace(/\D/g, ''))}
             maxLength={15}
             placeholder={COUNTRY_CODES.find((c) => c.code === phoneCountryCode)?.example || ''}
-            className="op-checkout-input"
+            className="w-full"
             sizing="lg"
             required
           />
         </div>
         {phoneError && (
-          <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+          <Alert color="failure" className="mt-2">{phoneError}</Alert>
         )}
       </div>
 
       {/* Additional guests - one form per extra person in the party */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="block text-sm font-semibold text-[#1f2937]">
+          <Label className="block text-sm font-semibold text-charcoal">
             Additional Guests {additionalGuests.length > 0 && `(${additionalGuests.length})`}
-          </label>
+          </Label>
           <button
             type="button"
             onClick={addGuest}
             disabled={bookingData.guests >= pricing.maxGuests}
-            className="text-sm font-semibold text-[#C49A6C] hover:text-[#0B1F42] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="text-sm font-semibold text-primary hover:text-navy transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add guest
           </button>
         </div>
-        <p className="text-xs text-[#6b7280] mb-3">
+        <p className="text-xs text-muted mb-3">
           You&apos;re booking for {bookingData.guests} {bookingData.guests === 1 ? 'guest' : 'guests'}. Add the names of anyone staying with you.
         </p>
 
         {additionalGuests.length === 0 ? (
-          <p className="text-sm text-[#6b7280] italic">Just you - add a guest if others are staying.</p>
+          <p className="text-sm text-muted italic">Just you - add a guest if others are staying.</p>
         ) : (
           <div className="space-y-3">
             {additionalGuests.map((g, i) => (
               <div key={i} className="flex items-end gap-3">
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-[#6b7280] mb-1">Guest {i + 2} first name</label>
+                  <Label className="mb-1 block text-xs font-medium text-muted">Guest {i + 2} first name</Label>
                   <TextInput
                     type="text"
                     value={g.firstName}
                     onChange={(e) => updateAdditionalGuest(i, 'firstName', e.target.value)}
                     placeholder="First name"
-                    className="op-checkout-input"
+                    className="w-full"
                     sizing="lg"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-[#6b7280] mb-1">Last name</label>
+                  <Label className="mb-1 block text-xs font-medium text-muted">Last name</Label>
                   <TextInput
                     type="text"
                     value={g.lastName}
                     onChange={(e) => updateAdditionalGuest(i, 'lastName', e.target.value)}
                     placeholder="Last name"
-                    className="op-checkout-input"
+                    className="w-full"
                     sizing="lg"
                   />
                 </div>
                 <button
                   type="button"
                   onClick={() => removeGuest(i)}
-                  className="mb-1 w-10 h-10 flex items-center justify-center rounded-xl text-[#6b7280] hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0"
+                  className="mb-1 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-navy"
                   aria-label="Remove guest"
                 >
                   <Trash2 className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
@@ -809,13 +808,13 @@ function BookingPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-2">Special Requests</label>
+        <Label className="mb-2 block">Special Requests</Label>
         <Textarea
           name="specialRequests"
           value={bookingData.specialRequests}
           onChange={handleInputChange}
           placeholder="Any special requirements or requests..."
-          className="op-checkout-input"
+          className="w-full"
           rows={4}
         />
       </div>
@@ -823,7 +822,7 @@ function BookingPage() {
       <Button
         onClick={goToAddOns}
         disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone || creatingBooking}
-        className="op-checkout-primary"
+        className="w-full"
         pill
       >
         {creatingBooking ? 'Starting your booking...' : 'Continue to Add-ons'}
@@ -838,7 +837,7 @@ function BookingPage() {
         <Button
           type="button"
           onClick={() => setStep(2)}
-          className="op-checkout-back-button"
+          size="sm"
           color="light"
         >
           <ChevronLeft className="w-5 h-5 mr-1" strokeWidth={2} aria-hidden="true" />
@@ -847,25 +846,25 @@ function BookingPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-[#0B1F42]">Enhance your stay</h2>
-        <p className="text-sm text-[#6b7280] mt-1">
+        <h2 className="text-base font-semibold text-navy">Enhance your stay</h2>
+        <p className="text-sm text-muted mt-1">
           Add optional services to your booking. You can change quantities any time before payment.
         </p>
       </div>
 
       {addOnsError && (
-        <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">
+        <div className="rounded-lg border border-border bg-surface p-3 text-sm text-charcoal" role="alert">
           {addOnsError}
         </div>
       )}
 
       {loadingAddOns ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin" />
+          <Spinner size="xl" />
         </div>
       ) : availableAddOns.length === 0 ? (
-        <div className="rounded-xl bg-[#F3E9DC] p-6 text-center">
-          <p className="text-[#6b7280]">No add-ons are available for this property.</p>
+        <div className="rounded-xl bg-primary-50 p-6 text-center">
+          <p className="text-muted">No add-ons are available for this property.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -875,16 +874,16 @@ function BookingPage() {
             const subtotal = qty * (addOn.price || 0);
             const busy = pendingAddOnId === addOn.id;
             return (
-              <div key={addOn.id} className="border border-[#D9D9D9] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+              <div key={addOn.id} className={`flex flex-col gap-3 rounded-lg border p-3 text-sm sm:flex-row sm:items-start sm:justify-between ${qty > 0 ? 'border-primary bg-primary-50' : 'border-border'}`}>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-[#0B1F42]">{addOn.name}</h3>
-                    <span className="bg-[#C49A6C]/10 text-[#0B1F42] text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize">
+                    <h3 className="font-semibold text-navy">{addOn.name}</h3>
+                    <span className="bg-primary-50 text-navy text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize">
                       {addOn.category}
                     </span>
                   </div>
-                  <p className="text-sm text-[#6b7280] mt-1">{addOn.description}</p>
-                  <p className="text-sm font-semibold text-[#0B1F42] mt-1">
+                  <p className="text-sm text-muted mt-1">{addOn.description}</p>
+                  <p className="text-sm font-semibold text-navy mt-1">
                     KES {addOn.price != null ? addOn.price.toLocaleString() : '-'} each
                   </p>
                 </div>
@@ -894,25 +893,25 @@ function BookingPage() {
                       type="button"
                       onClick={() => changeAddOnQuantity(addOn, qty - 1)}
                       disabled={busy || qty === 0}
-                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#0B1F42] font-bold hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-9 h-9 rounded-full border border-border text-navy font-bold hover:border-primary hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       aria-label={`Decrease ${addOn.name} quantity`}
                     >
                       −
                     </button>
-                    <span className="w-8 text-center font-semibold text-[#0B1F42]" aria-live="polite">
+                    <span className="w-8 text-center font-semibold text-navy tabular-nums" aria-live="polite">
                       {busy ? '…' : qty}
                     </span>
                     <button
                       type="button"
                       onClick={() => changeAddOnQuantity(addOn, qty + 1)}
                       disabled={busy || qty >= 20}
-                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#0B1F42] font-bold hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-9 h-9 rounded-full border border-border text-navy font-bold hover:border-primary hover:text-primary transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       aria-label={`Increase ${addOn.name} quantity`}
                     >
                       +
                     </button>
                   </div>
-                  <p className="text-sm font-semibold text-[#0B1F42]">
+                  <p className="text-sm font-semibold text-navy">
                     {qty > 0 ? `KES ${subtotal.toLocaleString()}` : '-'}
                   </p>
                 </div>
@@ -922,14 +921,14 @@ function BookingPage() {
         </div>
       )}
 
-      <div className="flex items-center justify-between rounded-xl bg-[#F3E9DC] p-4">
-        <span className="font-semibold text-[#0B1F42]">Add-ons total</span>
-        <span className="font-bold text-[#0B1F42]">KES {pricing.addOnsTotal.toLocaleString()}</span>
+      <div className="flex items-center justify-between rounded-xl bg-primary-50 p-4">
+        <span className="font-semibold text-navy">Add-ons total</span>
+        <span className="font-bold text-navy tabular-nums">KES {pricing.addOnsTotal.toLocaleString()}</span>
       </div>
 
       <Button
         onClick={() => setStep(4)}
-        className="op-checkout-primary"
+        className="w-full"
         pill
       >
         Continue to Payment
@@ -944,7 +943,7 @@ function BookingPage() {
         <Button
           type="button"
           onClick={() => setStep(3)}
-          className="op-checkout-back-button"
+          size="sm"
           color="light"
         >
           <ChevronLeft className="w-5 h-5 mr-1" strokeWidth={2} aria-hidden="true" />
@@ -952,11 +951,11 @@ function BookingPage() {
         </Button>
       </div>
 
-      <h2 className="text-2xl font-bold text-[#0B1F42]">Payment</h2>
+      <h2 className="text-base font-semibold text-navy">Payment</h2>
 
       <div className="space-y-3">
-        <label className={`flex items-center p-4 cursor-pointer transition-all ${
-          bookingData.paymentMethod === 'card' ? 'neu-radio-selected' : 'neu-radio-card'
+        <label className={`flex cursor-pointer items-center gap-1 rounded-lg border p-4 transition-colors ${
+          bookingData.paymentMethod === 'card' ? 'border-primary bg-primary-50' : 'border-border bg-white'
         }`}>
           <Radio
             type="radio"
@@ -966,16 +965,16 @@ function BookingPage() {
             onChange={handleInputChange}
           />
           <div className="ml-4 flex items-center flex-1">
-            <CreditCard className="w-8 h-8 text-[#0B1F42] mr-3" strokeWidth={1.5} aria-hidden="true" />
+            <CreditCard className="w-8 h-8 text-navy mr-3" strokeWidth={1.5} aria-hidden="true" />
             <div>
-              <p className="font-semibold text-[#1f2937]">Credit/Debit Card</p>
-              <p className="text-sm text-[#6b7280]">Pay securely with your card</p>
+              <p className="font-semibold text-charcoal">Credit/Debit Card</p>
+              <p className="text-sm text-muted">Pay securely with your card</p>
             </div>
           </div>
         </label>
 
-        <label className={`flex items-center p-4 cursor-pointer transition-all ${
-          bookingData.paymentMethod === 'mpesa' ? 'neu-radio-selected' : 'neu-radio-card'
+        <label className={`flex cursor-pointer items-center gap-1 rounded-lg border p-4 transition-colors ${
+          bookingData.paymentMethod === 'mpesa' ? 'border-primary bg-primary-50' : 'border-border bg-white'
         }`}>
           <Radio
             type="radio"
@@ -985,18 +984,18 @@ function BookingPage() {
             onChange={handleInputChange}
           />
           <div className="ml-4 flex items-center flex-1">
-            <div className="w-8 h-8 bg-green-600 rounded-lg flex items-center justify-center mr-3">
+            <div className="mr-3 flex h-8 w-8 items-center justify-center rounded-lg bg-navy-bg">
               <span className="text-white font-bold text-xs">M</span>
             </div>
             <div>
-              <p className="font-semibold text-[#1f2937]">M-Pesa</p>
-              <p className="text-sm text-[#6b7280]">Pay with M-Pesa mobile money</p>
+              <p className="font-semibold text-charcoal">M-Pesa</p>
+              <p className="text-sm text-muted">Pay with M-Pesa mobile money</p>
             </div>
           </div>
         </label>
 
-        <label className={`flex items-center p-4 cursor-pointer transition-all ${
-          bookingData.paymentMethod === 'bank' ? 'neu-radio-selected' : 'neu-radio-card'
+        <label className={`flex cursor-pointer items-center gap-1 rounded-lg border p-4 transition-colors ${
+          bookingData.paymentMethod === 'bank' ? 'border-primary bg-primary-50' : 'border-border bg-white'
         }`}>
           <Radio
             type="radio"
@@ -1006,10 +1005,10 @@ function BookingPage() {
             onChange={handleInputChange}
           />
           <div className="ml-4 flex items-center flex-1">
-            <Landmark className="w-8 h-8 text-[#0B1F42] mr-3" strokeWidth={1.5} aria-hidden="true" />
+            <Landmark className="w-8 h-8 text-navy mr-3" strokeWidth={1.5} aria-hidden="true" />
             <div>
-              <p className="font-semibold text-[#1f2937]">Bank Transfer</p>
-              <p className="text-sm text-[#6b7280]">Pay via bank transfer</p>
+              <p className="font-semibold text-charcoal">Bank Transfer</p>
+              <p className="text-sm text-muted">Pay via bank transfer</p>
             </div>
           </div>
         </label>
@@ -1017,14 +1016,14 @@ function BookingPage() {
 
       {/* Promo Code */}
       <div className="mt-6">
-        <label className="block text-sm font-semibold text-[#1f2937] mb-2">Promo Code</label>
+        <Label className="mb-2 block">Promo Code</Label>
         <div className="flex gap-2">
           <TextInput
             type="text"
             value={promoCode}
             onChange={(e) => { setPromoCode(e.target.value); setPromoError(''); }}
             placeholder="Enter code"
-            className="op-checkout-input uppercase"
+            className="uppercase"
             sizing="lg"
             disabled={!!promoResult}
           />
@@ -1032,7 +1031,7 @@ function BookingPage() {
             <Button
               type="button"
               onClick={() => { setPromoCode(''); setPromoResult(null); setPromoError(''); }}
-              className="op-checkout-success"
+              color="success"
             >
               Applied ✓
             </Button>
@@ -1041,24 +1040,24 @@ function BookingPage() {
               type="button"
               onClick={handleApplyPromo}
               disabled={validatingPromo || !promoCode.trim()}
-              className="op-checkout-primary op-checkout-promo-apply"
+              className="shrink-0"
             >
               {validatingPromo ? '...' : 'Apply'}
             </Button>
           )}
         </div>
         {promoError && (
-          <p className="text-red-500 text-xs mt-1">{promoError}</p>
+          <Alert color="failure" className="mt-2">{promoError}</Alert>
         )}
         {promoResult && (
-          <p className="text-green-600 text-xs mt-1">
+          <p className="mt-1 text-xs font-medium text-primary-700">
             {promoResult.discountPercent}% off. KES {promoResult.discountAmount.toLocaleString()} saved!
           </p>
         )}
       </div>
 
-      <div className="space-y-2 rounded-xl bg-[#F7F4EF] p-4">
-        <div className="flex justify-between text-[#1f2937]">
+      <div className="space-y-2 rounded-xl bg-surface p-4">
+        <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
           <span>
             {quote && quote.subtotal !== quote.nightlyPrice * quote.nights
               ? `Seasonal nightly rates x ${pricing.nights} nights`
@@ -1066,76 +1065,76 @@ function BookingPage() {
           </span>
           <span>KES {pricing.subtotal.toLocaleString()}</span>
         </div>
-        <div className="flex justify-between text-[#1f2937]">
+        <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
           <span>Cleaning fee</span>
           <span>KES {pricing.cleaningFee.toLocaleString()}</span>
         </div>
         {pricing.extraGuestFee > 0 && (
-          <div className="flex justify-between text-[#1f2937]">
+          <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
             <span>Extra guest fee ({pricing.extraGuests} guest{pricing.extraGuests > 1 ? 's' : ''} x KES {pricing.extraGuestFeePerNight.toLocaleString()} x {pricing.nights} nights)</span>
             <span>KES {pricing.extraGuestFee.toLocaleString()}</span>
           </div>
         )}
-        <div className="flex justify-between text-[#1f2937]">
+        <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
           <span>Service fee</span>
           <span>KES {pricing.serviceFee.toLocaleString()}</span>
         </div>
         {selectedAddOns.map((item) => (
-          <div key={item.addOn.id} className="flex justify-between text-[#1f2937]">
+          <div key={item.addOn.id} className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
             <span>{item.addOn.name} x {item.quantity}</span>
             <span>KES {(item.quantity * (item.addOn.price || 0)).toLocaleString()}</span>
           </div>
         ))}
         {pricing.lateCheckoutFee > 0 && (
-          <div className="flex justify-between text-[#1f2937]">
+          <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
             <span>Late check-out ({formatTime12h(bookingData.checkOutTime)})</span>
             <span>KES {pricing.lateCheckoutFee.toLocaleString()}</span>
           </div>
         )}
         {pricing.discountAmount > 0 && (
-          <div className="flex justify-between text-green-600">
+          <div className="flex items-baseline justify-between gap-3 text-primary-700 tabular-nums">
             <span>Promo discount</span>
             <span>-KES {pricing.discountAmount.toLocaleString()}</span>
           </div>
         )}
-        <div className="border-t border-[#0B1F42]/20 pt-2 flex justify-between font-bold text-[#0B1F42]">
+        <div className="flex items-baseline justify-between border-t border-border pt-3 font-bold text-navy tabular-nums">
           <span>Total</span>
           <span>KES {pricing.total.toLocaleString()}</span>
         </div>
       </div>
 
       {submitError && (
-        <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm">
+        <div className="rounded-lg border border-border bg-surface p-3 text-sm text-charcoal" role="alert">
           {submitError}
         </div>
       )}
 
       {quoteError && (
-        <div className="mb-3 rounded-xl border border-red-200 bg-red-50 p-3">
-          <p className="text-sm text-red-600">{quoteError}</p>
+        <div className="mb-3 rounded-lg border border-border bg-surface p-3" role="alert">
+          <p className="text-sm text-charcoal">{quoteError}</p>
           <button
             type="button"
             onClick={retryQuote}
-            className="mt-1 text-sm font-semibold text-[#C49A6C] hover:underline"
+            className="mt-1 text-sm font-semibold text-primary hover:underline"
           >
             Try again
           </button>
         </div>
       )}
       {quoteLoading && !quote && (
-        <p className="mb-3 text-sm text-[#6b7280]">Pricing your stay...</p>
+        <p className="mb-3 text-sm text-muted">Pricing your stay...</p>
       )}
 
       <form onSubmit={handleSubmit}>
         <Button
           type="submit"
           disabled={isProcessing || !quote || quoteLoading}
-          className="op-checkout-bronze"
+          className="w-full"
           pill
         >
           {isProcessing ? (
             <>
-              <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
+              <LoaderCircle className="animate-spin -ml-1 mr-3 h-5 w-5 text-navy" strokeWidth={2} aria-hidden="true" />
               Processing...
             </>
           ) : quote ? (
@@ -1148,7 +1147,7 @@ function BookingPage() {
         </Button>
       </form>
 
-      <p className="text-center text-sm text-[#6b7280]">
+      <p className="text-center text-sm text-muted">
         By confirming, you agree to our terms and conditions
       </p>
     </div>
@@ -1157,47 +1156,47 @@ function BookingPage() {
   // Booking Complete
   if (bookingComplete) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-surface">
         <Navbar />
-        <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
+        <div className="flex min-h-[80vh] items-center justify-center px-4 pb-16 pt-24">
           <div className="max-w-md mx-auto px-6 text-center">
-            <div className="w-24 h-24 bg-[#C49A6C]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Check className="w-12 h-12 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+            <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-primary-50">
+              <Check className="w-12 h-12 text-primary" strokeWidth={2} aria-hidden="true" />
             </div>
-            <h1 className="text-3xl font-bold text-[#0B1F42] mb-4">Booking Confirmed!</h1>
-            <p className="text-[#6b7280] mb-6">
+            <h1 className="text-3xl font-bold text-navy mb-4">Booking Confirmed!</h1>
+            <p className="text-muted mb-6">
               Thank you for your booking. We have sent a confirmation email to {bookingData.email} with all the details.
             </p>
-            <div className="bg-[#D9D9D9] rounded-2xl p-6 mb-6 text-left">
-              <h3 className="font-bold text-[#0B1F42] mb-2">Booking Summary</h3>
-              <p className="text-[#1f2937]">{property?.title}</p>
-              <p className="text-[#6b7280] text-sm">{property?.location}</p>
-              <div className="mt-3 pt-3 border-t border-[#0B1F42]/10">
-                <div className="flex justify-between text-sm">
-                  <span className="text-[#6b7280]">Check-in</span>
+            <div className="mb-6 rounded-xl border border-border bg-surface p-6 text-left">
+              <h3 className="font-bold text-navy mb-2">Booking Summary</h3>
+              <p className="text-charcoal">{property?.title}</p>
+              <p className="text-muted text-sm">{property?.location}</p>
+              <div className="mt-3 pt-3 border-t border-border">
+                <div className="flex items-baseline justify-between text-sm tabular-nums">
+                  <span className="text-muted">Check-in</span>
                   <span className="font-medium">{bookingData.checkIn}</span>
                 </div>
-                <div className="flex justify-between text-sm mt-1">
-                  <span className="text-[#6b7280]">Check-out</span>
+                <div className="flex items-baseline justify-between text-sm tabular-nums mt-1">
+                  <span className="text-muted">Check-out</span>
                   <span className="font-medium">{bookingData.checkOut} · {formatTime12h(bookingData.checkOutTime)}</span>
                 </div>
                 {pricing.lateCheckoutFee > 0 && (
-                  <div className="flex justify-between text-sm mt-1">
-                    <span className="text-[#6b7280]">Late check-out fee</span>
+                  <div className="flex items-baseline justify-between text-sm tabular-nums mt-1">
+                    <span className="text-muted">Late check-out fee</span>
                     <span className="font-medium">KES {pricing.lateCheckoutFee.toLocaleString()}</span>
                   </div>
                 )}
                 {selectedAddOns.map((item) => (
-                  <div key={item.addOn.id} className="flex justify-between text-sm mt-1">
-                    <span className="text-[#6b7280]">{item.addOn.name} x {item.quantity}</span>
+                  <div key={item.addOn.id} className="flex items-baseline justify-between text-sm tabular-nums mt-1">
+                    <span className="text-muted">{item.addOn.name} x {item.quantity}</span>
                     <span className="font-medium">KES {(item.quantity * (item.addOn.price || 0)).toLocaleString()}</span>
                   </div>
                 ))}
-                <div className="flex justify-between text-sm mt-1">
-                  <span className="text-[#6b7280]">Guests</span>
+                <div className="flex items-baseline justify-between text-sm tabular-nums mt-1">
+                  <span className="text-muted">Guests</span>
                   <span className="font-medium">{bookingData.guests}</span>
                 </div>
-                <div className="flex justify-between font-bold text-[#0B1F42] mt-2 pt-2 border-t border-[#0B1F42]/10">
+                <div className="mt-2 flex items-baseline justify-between border-t border-border pt-3 font-bold text-navy tabular-nums">
                   <span>Total Paid</span>
                   <span>KES {pricing.total.toLocaleString()}</span>
                 </div>
@@ -1206,13 +1205,13 @@ function BookingPage() {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/')}
-                className="w-full bg-[#C49A6C] text-white py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+                className="w-full rounded-full bg-primary py-3 font-semibold text-navy-bg transition-colors hover:bg-primary-600"
               >
                 Return to Home
               </button>
               <button
                 onClick={() => window.print()}
-                className="w-full border-2 border-[#0B1F42] text-[#0B1F42] py-3 rounded-full font-semibold hover:bg-[#0B1F42] hover:text-white transition-all duration-200"
+                className="w-full rounded-full border-2 border-navy py-3 font-semibold text-navy transition-colors hover:bg-navy-bg hover:text-white"
               >
                 Print Confirmation
               </button>
@@ -1226,12 +1225,12 @@ function BookingPage() {
   // Loading state
   if (loadingProperty) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-surface">
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-[#6b7280]">Loading property...</p>
+            <Spinner size="xl" className="mx-auto mb-4" />
+            <p className="text-muted">Loading property...</p>
           </div>
         </div>
       </div>
@@ -1242,19 +1241,19 @@ function BookingPage() {
   // not an endless spinner.
   if (!property) {
     return (
-      <div className="min-h-screen bg-white">
+      <div className="min-h-screen bg-surface">
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center max-w-md px-4">
-            <h1 className="text-lg font-semibold text-[#0B1F42] mb-2">Property unavailable</h1>
-            <p className="text-[#6b7280] mb-6">{propertyError || 'This listing could not be loaded.'}</p>
+            <h1 className="text-lg font-semibold text-navy mb-2">Property unavailable</h1>
+            <p className="text-muted mb-6">{propertyError || 'This listing could not be loaded.'}</p>
             <div className="flex items-center justify-center gap-3">
               <Button color="light" onClick={() => setReloadKey((key) => key + 1)}>
                 Try again
               </Button>
               <Link
                 to="/properties"
-                className="rounded-full bg-[#0B1F42] px-5 py-2.5 text-sm font-medium text-white"
+                className="rounded-full bg-navy-bg px-5 py-2.5 text-sm font-medium text-white"
               >
                 Browse properties
               </Link>
@@ -1266,32 +1265,32 @@ function BookingPage() {
   }
 
   return (
-    <div className="op-checkout-screen min-h-screen bg-white">
-      <header className="op-checkout-chrome"><Link to={`/property/${property.id}`} className="op-checkout-back">← &nbsp;Back</Link><Link to="/" className="op-checkout-brand"><BrandLogo imgClassName="h-6 w-auto" alt="" />ZuriLofts</Link><span className="op-checkout-secure">♟ &nbsp;Secure checkout</span></header>
-      <div className="op-checkout-summary"><div><strong>{property.title}</strong><span>{bookingData.checkIn && bookingData.checkOut ? `${bookingData.checkIn} - ${bookingData.checkOut}` : 'Choose your dates'} · {bookingData.guests} guests</span></div><strong>{pricing.nights > 0 ? `KSh ${pricing.total.toLocaleString()}` : 'Total at checkout'}</strong></div>
-      <div className="op-checkout-main pb-12 md:pb-16">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+    <div className="min-h-screen bg-surface px-4 py-6 sm:px-6 lg:px-8">
+      <header className="mx-auto mb-6 flex max-w-6xl items-center justify-between gap-4 rounded-xl border border-border bg-white px-4 py-3"><Link to={`/property/${property.id}`} className="inline-flex items-center gap-1 text-sm font-semibold text-navy transition-colors hover:text-primary-700"><ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />Back</Link><Link to="/" className="inline-flex items-center gap-2 text-sm font-bold text-navy"><BrandLogo imgClassName="h-6 w-auto" alt="" />ZuriLofts</Link><span className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted"><ShieldCheck className="h-4 w-4 text-primary" strokeWidth={1.8} aria-hidden="true" />Secure checkout</span></header>
+      <div className="mx-auto mb-6 flex max-w-6xl items-center justify-between gap-4 rounded-xl border border-border bg-white px-4 py-3 text-sm"><div className="flex min-w-0 flex-col"><strong className="truncate text-navy">{property.title}</strong><span className="text-xs text-muted">{bookingData.checkIn && bookingData.checkOut ? `${bookingData.checkIn} - ${bookingData.checkOut}` : 'Choose your dates'} · {bookingData.guests} guests</span></div><strong className="shrink-0 tabular-nums text-navy">{pricing.nights > 0 ? `KSh ${pricing.total.toLocaleString()}` : `KSh ${pricing.propertyPrice.toLocaleString()}/night`}</strong></div>
+      <div className="mx-auto max-w-6xl pb-12 md:pb-16">
+        <div>
           {/* Progress Steps */}
-          <div className="op-checkout-progress" aria-label="Checkout progress">
+          <div className="flex items-center gap-2 text-xs font-semibold text-muted sm:gap-3" aria-label="Checkout progress">
             {[1, 2, 4].map((s, i, steps) => (
               <Fragment key={s}>
-                <div className="op-checkout-progress-step">
-                  <div className={`op-checkout-progress-circle${step >= s ? ' is-active' : ''}`}>
+                <div className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 ${step >= s ? (step > s ? 'bg-primary-50 text-navy' : 'bg-navy-bg text-white') : ''}`}>
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full border border-current text-[11px] font-bold">
                     {i + 1}
                   </div>
                   <span>{s === 1 ? 'Stay' : s === 2 ? 'Details' : 'Payment'}</span>
                 </div>
                 {i < steps.length - 1 && (
-                  <div className={`op-checkout-progress-line${step >= steps[i + 1] ? ' is-active' : ''}`} aria-hidden="true" />
+                  <div className={`h-px flex-1 ${step >= steps[i + 1] ? 'bg-primary' : 'bg-border'}`} aria-hidden="true" />
                 )}
               </Fragment>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
             {/* Left Column - Form */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-5 md:p-8">
+            <div className="min-w-0">
+              <div className="rounded-xl border border-border bg-white p-5 shadow-sm sm:p-6">
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 3 && renderStep3()}
@@ -1300,8 +1299,8 @@ function BookingPage() {
             </div>
 
             {/* Right Column - Property Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-2xl shadow-lg border border-[#D9D9D9] p-6 sticky top-24">
+            <div className="min-w-0">
+              <div className="h-fit rounded-xl border border-border bg-white p-5 shadow-sm lg:sticky lg:top-24">
                 <Link to={`/property/${property?.id}`} className="block">
                   <img
                     src={(property?.images?.[0] || '')}
@@ -1309,69 +1308,69 @@ function BookingPage() {
                     className="w-full h-48 object-cover rounded-xl mb-4"
                   />
                 </Link>
-                <h3 className="font-bold text-[#0B1F42] text-lg">{property?.title}</h3>
+                <h3 className="font-bold text-navy text-lg">{property?.title}</h3>
                 {bedOption && (
-                  <p className="text-sm text-[#C49A6C] font-medium mt-1">
+                  <p className="text-sm text-primary font-medium mt-1">
                     {bedOption === '2bed' ? '2 Bed' : '1 Bed'} &middot; KES {pricing.propertyPrice.toLocaleString()}/night
                   </p>
                 )}
-                <div className="flex items-center text-[#6b7280] text-sm mt-1">
+                <div className="flex items-center text-muted text-sm mt-1">
                   <MapPin className="w-4 h-4 mr-1" strokeWidth={2} aria-hidden="true" />
                   {property?.location}
                 </div>
 
                 <div className="flex items-center mt-2 space-x-4 text-sm">
                   <div className="flex items-center">
-                    <Star className="w-4 h-4 text-[#C49A6C] mr-1" fill="currentColor" aria-hidden="true" />
+                    <Star className="w-4 h-4 text-primary mr-1" fill="currentColor" aria-hidden="true" />
                     <span className="font-medium">{property?.rating}</span>
                   </div>
-                  <div className="flex items-center text-[#6b7280]">
+                  <div className="flex items-center text-muted">
                     <House className="w-4 h-4 mr-1" strokeWidth={2} aria-hidden="true" />
-                    {(bedOption ? (bedOption === '2bed' ? 2 : 1) : property?.bedrooms)} beds
+                    {(() => { const n = bedOption ? (bedOption === '2bed' ? 2 : 1) : property?.bedrooms; return `${n} ${n === 1 ? 'bed' : 'beds'}`; })()}
                   </div>
                 </div>
 
                 {pricing.nights > 0 && (
-                  <div className="mt-6 pt-6 border-t border-[#D9D9D9]">
-                    <h4 className="font-semibold text-[#0B1F42] mb-3">Price Details</h4>
+                  <div className="mt-6 pt-6 border-t border-border">
+                    <h4 className="font-semibold text-navy mb-3">Price Details</h4>
                     <div className="space-y-2 text-sm">
-                      <div className="flex justify-between text-[#1f2937]">
+                      <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
                         <span>KES {pricing.propertyPrice.toLocaleString()} x {pricing.nights} nights</span>
                         <span>KES {pricing.subtotal.toLocaleString()}</span>
                       </div>
-                      <div className="flex justify-between text-[#1f2937]">
+                      <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
                         <span>Cleaning fee</span>
                         <span>KES {pricing.cleaningFee.toLocaleString()}</span>
                       </div>
                       {pricing.extraGuestFee > 0 && (
-                        <div className="flex justify-between text-[#1f2937]">
+                        <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
                           <span>Extra guest fee ({pricing.extraGuests} x KES {pricing.extraGuestFeePerNight.toLocaleString()} x {pricing.nights} nights)</span>
                           <span>KES {pricing.extraGuestFee.toLocaleString()}</span>
                         </div>
                       )}
-                      <div className="flex justify-between text-[#1f2937]">
+                      <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
                         <span>Service fee</span>
                         <span>KES {pricing.serviceFee.toLocaleString()}</span>
                       </div>
                       {selectedAddOns.map((item) => (
-                        <div key={item.addOn.id} className="flex justify-between text-[#1f2937]">
+                        <div key={item.addOn.id} className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
                           <span>{item.addOn.name} x {item.quantity}</span>
                           <span>KES {(item.quantity * (item.addOn.price || 0)).toLocaleString()}</span>
                         </div>
                       ))}
                       {pricing.lateCheckoutFee > 0 && (
-                        <div className="flex justify-between text-[#1f2937]">
+                        <div className="flex items-baseline justify-between gap-3 text-charcoal tabular-nums">
                           <span>Late check-out</span>
                           <span>KES {pricing.lateCheckoutFee.toLocaleString()}</span>
                         </div>
                       )}
                       {pricing.discountAmount > 0 && (
-                        <div className="flex justify-between text-green-600">
+                        <div className="flex items-baseline justify-between gap-3 text-primary-700 tabular-nums">
                           <span>Promo discount</span>
                           <span>-KES {pricing.discountAmount.toLocaleString()}</span>
                         </div>
                       )}
-                      <div className="pt-2 border-t border-[#D9D9D9] flex justify-between font-bold text-[#0B1F42]">
+                      <div className="flex items-baseline justify-between border-t border-border pt-3 text-base font-bold text-navy tabular-nums">
                         <span>Total</span>
                         <span>KES {pricing.total.toLocaleString()}</span>
                       </div>

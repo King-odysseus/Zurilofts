@@ -109,16 +109,16 @@ function EvidenceItem({ disputeId, evidence }) {
   const isImage = evidence.mimeType?.startsWith('image/');
   const Icon = isImage ? FileImage : FileText;
 
-  return <div className="op-dispute-evidence">
-    <span className="op-dispute-evidence-thumb">
-      {previewUrl ? <img src={previewUrl} alt="" /> : <Icon size={18} strokeWidth={1.8} aria-hidden="true" />}
+  return <div className="flex items-center gap-3 rounded-lg border border-border p-2">
+    <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface text-navy">
+      {previewUrl ? <img src={previewUrl} alt="" className="h-12 w-12 object-cover" /> : <Icon size={18} strokeWidth={1.8} aria-hidden="true" />}
     </span>
-    <div className="op-dispute-evidence-copy">
-      <strong>{evidence.originalName}</strong>
-      <small>{formatBytes(evidence.size)} - {formatEventDate(evidence.createdAt)}</small>
-      {error && <span role="alert">{error}</span>}
+    <div className="min-w-0 flex-1">
+      <strong className="block truncate text-xs font-semibold text-navy">{evidence.originalName}</strong>
+      <small className="mt-1 block truncate text-[11px] text-muted">{formatBytes(evidence.size)} - {formatEventDate(evidence.createdAt)}</small>
+      {error && <span className="mt-1 block truncate text-[11px] text-red-600" role="alert">{error}</span>}
     </div>
-    <Button size="xs" color="light" disabled={opening} onClick={openEvidence} className="op-dispute-evidence-open">
+    <Button size="xs" color="light" disabled={opening} onClick={openEvidence}>
       {opening ? 'Opening...' : 'View'}
     </Button>
   </div>;
@@ -138,13 +138,13 @@ EvidenceItem.propTypes = {
 function ThreadMessage({ message, currentUserId }) {
   const isMine = message.senderId === currentUserId;
   const sender = isMine ? 'You' : message.senderRole === 'ADMIN' ? 'ZuriLofts Support' : message.senderRole === 'HOST' ? 'Host' : 'Guest';
-  return <article className={`op-dispute-message${isMine ? ' is-mine' : ''}`}>
-    <div className="op-dispute-message-head">
+  return <article className={isMine ? 'ml-auto max-w-[85%] rounded-xl bg-primary-50 p-3 text-sm text-charcoal' : 'mr-auto max-w-[85%] rounded-xl bg-surface p-3 text-sm text-charcoal'}>
+    <div className="flex items-center gap-2 text-xs text-muted">
       <MessageSquareText size={14} strokeWidth={1.8} aria-hidden="true" />
-      <strong>{sender}</strong>
-      <time dateTime={message.createdAt}>{formatEventDate(message.createdAt)}</time>
+      <strong className="font-semibold text-navy">{sender}</strong>
+      <time className="ml-auto" dateTime={message.createdAt}>{formatEventDate(message.createdAt)}</time>
     </div>
-    <p>{message.body}</p>
+    <p className="mt-2 leading-relaxed">{message.body}</p>
   </article>;
 }
 
@@ -162,9 +162,9 @@ ThreadMessage.propTypes = {
 function ThreadEvent({ event }) {
   const label = EVENT_LABELS[event.action] || 'Dispute updated';
   const note = event.action === 'OPENED' ? CATEGORY_LABELS[event.note] || event.note : event.note;
-  return <div className="op-dispute-event">
-    <span className="op-dispute-event-dot" aria-hidden="true" />
-    <div><strong>{label}</strong><small>{formatEventDate(event.createdAt)}{note ? ` - ${note}` : ''}</small></div>
+  return <div className="flex items-start gap-3 text-xs text-muted">
+    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" aria-hidden="true" />
+    <div><strong className="block text-sm font-semibold text-navy">{label}</strong><small className="mt-1 block">{formatEventDate(event.createdAt)}{note ? ` - ${note}` : ''}</small></div>
   </div>;
 }
 
@@ -208,21 +208,21 @@ function CreateDisputeForm({ bookings, onCreated }) {
   }
 
   if (availableBookings.length === 0) {
-    return <div className="op-dispute-empty">
-      <span><ShieldAlert size={22} strokeWidth={1.8} aria-hidden="true" /></span>
-      <h3>No eligible booking</h3>
-      <p>A dispute can be opened after a booking exists on your account.</p>
+    return <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-white px-6 py-12 text-center">
+      <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 text-primary-700"><ShieldAlert size={22} strokeWidth={1.8} aria-hidden="true" /></span>
+      <h3 className="text-lg font-semibold text-navy">No eligible booking</h3>
+      <p className="text-sm leading-relaxed text-muted">A dispute can be opened after a booking exists on your account.</p>
       <Button color="light" href="/trips">Go to trips</Button>
     </div>;
   }
 
-  return <form className="op-dispute-create" onSubmit={submit}>
-    <div className="op-dispute-create-intro">
-      <span><ShieldAlert size={20} strokeWidth={1.8} aria-hidden="true" /></span>
-      <div><strong>Start with the booking</strong><p>Your report and booking history stay together for the resolution team.</p></div>
+  return <form className="space-y-4" onSubmit={submit}>
+    <div className="flex items-center gap-3 rounded-lg bg-surface p-4">
+      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-primary-700"><ShieldAlert size={20} strokeWidth={1.8} aria-hidden="true" /></span>
+      <div className="min-w-0"><strong className="block text-sm font-semibold text-navy">Start with the booking</strong><p className="mt-1 text-xs leading-relaxed text-muted">Your report and booking history stay together for the resolution team.</p></div>
     </div>
-    <div className="op-dispute-create-grid">
-      <div className="op-dispute-field">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="space-y-2">
         <Label htmlFor="dispute-booking">Booking</Label>
         <SelectMenu
           id="dispute-booking"
@@ -235,7 +235,7 @@ function CreateDisputeForm({ bookings, onCreated }) {
           }))}
         />
       </div>
-      <div className="op-dispute-field">
+      <div className="space-y-2">
         <Label htmlFor="dispute-category">Issue category</Label>
         <SelectMenu
           id="dispute-category"
@@ -246,14 +246,14 @@ function CreateDisputeForm({ bookings, onCreated }) {
         />
       </div>
     </div>
-    <div className="op-dispute-field">
+    <div className="space-y-2">
       <Label htmlFor="dispute-description">What happened?</Label>
       <Textarea id="dispute-description" rows={4} value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Describe the issue and what outcome you need." maxLength={4000} required />
     </div>
     {error && <Alert color="failure">{error}</Alert>}
-    <div className="op-dispute-create-actions">
-      <Button type="submit" disabled={saving} className="op-trust-button-primary">{saving ? <Spinner size="sm" /> : 'Open dispute'}</Button>
-      <span>We share this only with the booking participants and ZuriLofts resolution team.</span>
+    <div className="flex flex-wrap items-center gap-3">
+      <Button type="submit" disabled={saving}>{saving ? <Spinner size="sm" /> : 'Open dispute'}</Button>
+      <span className="text-xs leading-relaxed text-muted">We share this only with the booking participants and ZuriLofts resolution team.</span>
     </div>
   </form>;
 }
@@ -331,24 +331,24 @@ function DisputePanel({ disputes, bookings, loading = false, error = '', onRefre
   }
 
   if (loading) {
-    return <div className="op-dispute-loading" role="status"><Spinner size="lg" /><span>Loading your reports...</span></div>;
+    return <div className="flex min-h-[180px] items-center justify-center gap-3 text-sm text-muted" role="status"><Spinner size="lg" /><span>Loading your reports...</span></div>;
   }
 
   if (error) return <Alert color="failure">{error}</Alert>;
   if (!selected) return <CreateDisputeForm bookings={bookings} onCreated={onRefresh} />;
 
-  return <div className="op-dispute">
-    <header className="op-dispute-head">
-      <div>
-        <h2>Report an issue</h2>
-        <p>Booking {bookingReference(selected.bookingId)} {booking?.property?.title ? `- ${booking.property.title}` : ''}</p>
+  return <div className="space-y-4">
+    <header className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <h2 className="text-lg font-semibold text-navy">Report an issue</h2>
+        <p className="mt-1 text-sm leading-relaxed text-muted">Booking {bookingReference(selected.bookingId)} {booking?.property?.title ? `- ${booking.property.title}` : ''}</p>
       </div>
-      <div className="op-dispute-head-actions">
+      <div className="flex flex-wrap items-center gap-3">
         {disputes.length > 1 && <SelectMenu
           ariaLabel="Select dispute"
           value={selected.id}
           onChange={(next) => setSelectedId(next)}
-          className="op-dispute-picker"
+          className="min-w-[190px]"
           options={disputes.map((dispute) => ({
             value: dispute.id,
             label: `${bookingReference(dispute.bookingId)} - ${CATEGORY_LABELS[dispute.category] || dispute.category}`,
@@ -358,11 +358,9 @@ function DisputePanel({ disputes, bookings, loading = false, error = '', onRefre
       </div>
     </header>
 
-    <div className="op-dispute-divider" />
-
-    <div className="op-dispute-body">
-      <div className="op-dispute-left">
-        <div className="op-dispute-field">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <div className="min-w-0 space-y-4">
+        <div className="space-y-2">
           <Label htmlFor="dispute-category-current">Issue category</Label>
           {/* Read-only: a category is fixed once the dispute is opened, so the
               handler exists only because SelectMenu requires one. */}
@@ -376,31 +374,31 @@ function DisputePanel({ disputes, bookings, loading = false, error = '', onRefre
           />
         </div>
 
-        <div className="op-dispute-description">
-          <span className="op-dispute-label">Issue summary</span>
-          <p>{selected.description}</p>
+        <div className="rounded-r-lg border-l-[3px] border-primary bg-surface p-3">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">Issue summary</span>
+          <p className="mt-1.5 text-sm leading-relaxed text-charcoal">{selected.description}</p>
         </div>
 
-        <div className="op-dispute-field">
-          <span className="op-dispute-label">Evidence</span>
-          {(selected.evidence || []).length > 0 ? <div className="op-dispute-evidence-list">
+        <div className="space-y-2">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">Evidence</span>
+          {(selected.evidence || []).length > 0 ? <div className="space-y-2">
             {selected.evidence.map((item) => <EvidenceItem key={item.id} disputeId={selected.id} evidence={item} />)}
-          </div> : <p className="op-dispute-hint">No evidence has been added yet.</p>}
-          {!closed && <Button color="light" fullSized disabled={uploading} onClick={() => evidenceInputRef.current?.click()} className="op-dispute-add-evidence">
+          </div> : <p className="text-xs leading-relaxed text-muted">No evidence has been added yet.</p>}
+          {!closed && <Button color="light" fullSized disabled={uploading} onClick={() => evidenceInputRef.current?.click()}>
             {uploading ? <Spinner size="sm" /> : <><Plus size={16} strokeWidth={1.8} aria-hidden="true" />Add evidence</>}
           </Button>}
           <input ref={evidenceInputRef} type="file" className="sr-only" accept="image/jpeg,image/png,image/webp,application/pdf" onChange={uploadEvidence} />
         </div>
 
-        <p className="op-dispute-privacy"><Paperclip size={14} strokeWidth={1.8} aria-hidden="true" />Your information is shared only with participants and the ZuriLofts resolution team.</p>
+        <p className="flex items-start gap-2 border-t border-border pt-4 text-xs leading-relaxed text-muted"><Paperclip size={14} strokeWidth={1.8} aria-hidden="true" className="mt-0.5 shrink-0" />Your information is shared only with participants and the ZuriLofts resolution team.</p>
       </div>
 
-      <div className="op-dispute-right">
-        <div className="op-dispute-thread-head">
-          <div><h3>Resolution thread</h3><p>Messages and recorded status events</p></div>
+      <div className="min-w-0 space-y-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div><h3 className="text-sm font-semibold text-navy">Resolution thread</h3><p className="mt-1 text-xs text-muted">Messages and recorded status events</p></div>
           {closed && <Badge color={selected.status === 'RESOLVED' ? 'success' : 'gray'}>{selected.resolution || status.label}</Badge>}
         </div>
-        <div className="op-dispute-thread">
+        <div className="space-y-3">
           {thread.map((item) => item.type === 'message'
             ? <ThreadMessage key={`message-${item.id}`} message={item} currentUserId={user?.id} />
             : <ThreadEvent key={`event-${item.action}-${item.createdAt}`} event={item} />)}
@@ -409,9 +407,9 @@ function DisputePanel({ disputes, bookings, loading = false, error = '', onRefre
         {actionError && <Alert color="failure">{actionError}</Alert>}
         {notice && <Alert color="success">{notice}</Alert>}
 
-        {closed ? <div className="op-dispute-closed"><CheckCircle2 size={18} strokeWidth={1.8} aria-hidden="true" /><span>This dispute is closed. The recorded resolution remains available above.</span></div> : <form className="op-dispute-composer" onSubmit={sendMessage}>
-          <Textarea aria-label="Add a message to this dispute" placeholder="Add a message to this dispute..." value={message} onChange={(event) => setMessage(event.target.value)} rows={1} maxLength={2000} required />
-          <Button type="submit" disabled={sending || !message.trim()} className="op-trust-button-primary">{sending ? <Spinner size="sm" /> : <><Send size={15} strokeWidth={1.8} aria-hidden="true" />Send</>}</Button>
+        {closed ? <div className="flex items-center gap-2 rounded-lg bg-surface p-3 text-xs text-muted"><CheckCircle2 size={18} strokeWidth={1.8} aria-hidden="true" className="shrink-0" /><span>This dispute is closed. The recorded resolution remains available above.</span></div> : <form className="flex flex-col gap-3 sm:flex-row sm:items-end" onSubmit={sendMessage}>
+          <div className="min-w-0 flex-1"><Textarea aria-label="Add a message to this dispute" placeholder="Add a message to this dispute..." className="resize-none" value={message} onChange={(event) => setMessage(event.target.value)} rows={1} maxLength={2000} required /></div>
+          <Button type="submit" disabled={sending || !message.trim()}>{sending ? <Spinner size="sm" /> : <><Send size={15} strokeWidth={1.8} aria-hidden="true" />Send</>}</Button>
         </form>}
       </div>
     </div>

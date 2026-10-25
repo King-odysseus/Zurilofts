@@ -367,7 +367,7 @@ function AdminPropertyForm() {
                   {form.images.map((src, i) => (
                     <div key={src + i} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
                       <img src={src} alt={`Property photo ${i + 1}`} className="h-full w-full object-cover" />
-                      {i === 0 && <span className="absolute left-2 top-2 rounded-full bg-navy/85 px-2 py-0.5 text-[10px] font-semibold text-white">Cover</span>}
+                      {i === 0 && <span className="absolute left-2 top-2 rounded-full bg-navy-bg/85 px-2 py-0.5 text-[10px] font-semibold text-white">Cover</span>}
                       <button
                         type="button"
                         onClick={() => removeImage(i)}
@@ -588,10 +588,10 @@ function PropertyPreview({ form }) {
           <div className="flex aspect-[4/3] w-full items-center justify-center bg-surface text-sm text-muted">No photo yet</div>
         )}
         {form.featured && (
-          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-white">Featured</span>
+          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-navy-bg">Featured</span>
         )}
         {!form.available && (
-          <span className="absolute right-3 top-3 rounded-full bg-navy px-3 py-1 text-[10px] font-semibold text-white">Unavailable</span>
+          <span className="absolute right-3 top-3 rounded-full bg-navy-bg px-3 py-1 text-[10px] font-semibold text-white">Unavailable</span>
         )}
       </div>
 
@@ -622,7 +622,7 @@ function PropertyPreview({ form }) {
             <span className="text-xs text-muted">per night</span>
             <div className="text-xl font-bold text-primary-600">KES {price.toLocaleString()}</div>
           </div>
-          <span className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white">Book Now</span>
+          <span className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-navy-bg">Book Now</span>
         </div>
       </div>
     </div>
@@ -646,7 +646,7 @@ function FullPagePreview({ form, onClose }) {
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4">
       <div className="my-8 w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-white shadow-lg">
         {/* Bar */}
-        <div className="sticky top-0 z-10 flex items-center justify-between bg-navy px-5 py-3 text-white">
+        <div className="sticky top-0 z-10 flex items-center justify-between bg-navy-bg px-5 py-3 text-white">
           <span className="text-sm font-semibold">Page preview - not yet saved</span>
           <button onClick={onClose} className="text-white/70 hover:text-white" aria-label="Close preview">
             <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
@@ -746,7 +746,7 @@ function FullPagePreview({ form, onClose }) {
               <div className="sticky top-20 rounded-xl border border-border bg-white p-6 shadow-sm">
                 <span className="text-3xl font-bold text-navy">KES {price.toLocaleString()}</span>
                 <span className="text-muted"> / night</span>
-                <div className="mt-4 block w-full rounded-full bg-primary py-3 text-center font-bold text-white">Book Now</div>
+                <div className="mt-4 block w-full rounded-full bg-primary py-3 text-center font-bold text-navy-bg">Book Now</div>
                 {!form.available && (
                   <p className="mt-3 text-center text-sm font-medium text-red-600">Currently marked unavailable</p>
                 )}

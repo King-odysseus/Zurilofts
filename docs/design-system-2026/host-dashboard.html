@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZuriLofts design system 2026 - Host workspace</title>
+<link rel="stylesheet" href="preview.css">
+<style>
+  /* board-only: the strip above the mockups */
+  .board-note {
+    max-width: 1280px; margin: 0 auto; padding: 40px 32px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .board-note .t-label { margin-bottom: 8px; }
+  .board-note p { max-width: 680px; margin-top: 8px; }
+  .board-frame { border-bottom: 1px solid var(--line); }
+  .swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .swatch { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .swatch i { width: 20px; height: 20px; border-radius: 6px; display: block; border: 1px solid var(--line); }
+  .minichart { display: flex; align-items: flex-end; gap: 3px; height: 64px; margin-top: 16px; }
+  .minichart span { flex: 1; background: var(--line); border-radius: 2px 2px 0 0; }
+  .minichart span.is-on { background: var(--bronze); }
+  /* occupancy: one bar per night in the next 30 nights, booked nights in bronze */
+  .barrow { display: flex; align-items: flex-end; gap: 3px; height: 56px; margin-top: 16px; }
+  .bar { flex: 1; background: var(--line); border-radius: 2px 2px 0 0; }
+  .bar.is-on { background: var(--bronze); }
+</style>
+</head>
+<body>
+
+<!-- ============ board header, not part of the product ============ -->
+<div class="board-note">
+  <p class="t-label">ZuriLofts design system 2026</p>
+  <h1 class="t-page">Host workspace</h1>
+  <p class="t-meta">The host side of the same system: an arrival-led Today view, money as one statement figure, listings as photo cards. Same white canvas, same 20px section headings, same divider rows, one bronze action per screen.</p>
+  <div class="swatches">
+    <span class="swatch"><i style="background:#C49A6C"></i>Bronze C49A6C</span>
+    <span class="swatch"><i style="background:#0B1F42"></i>Navy 0B1F42</span>
+    <span class="swatch"><i style="background:#2563EB"></i>Blue 2563EB</span>
+    <span class="swatch"><i style="background:#222222"></i>Ink 222222</span>
+    <span class="swatch"><i style="background:#F7F7F5"></i>Inset F7F7F5</span>
+    <span class="swatch"><i style="background:#E5E7EB"></i>Line E5E7EB</span>
+  </div>
+</div>
+
+<div class="board-frame">
+<div class="shell">
+
+  <!-- ================= sidebar ================= -->
+  <aside class="sidebar">
+    <a class="brand" href="#">
+      <span class="brand__mark">Z</span>
+      <span class="brand__name">zuri<span>.host</span></span>
+    </a>
+
+    <nav class="nav">
+      <p class="t-label nav__label">Hosting</p>
+      <a class="nav__item is-active" href="#" aria-current="page">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 1.8"/></svg>
+        Today
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M8 3v4M16 3v4M3.5 10h17"/></svg>
+        Calendar
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 11l8-7 8 7"/><path d="M6 10v9h12v-9"/><path d="M10 19v-5h4v5"/></svg>
+        Listings
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20 12.3a7.6 7.6 0 0 1-11.2 6.8L4.5 20l1-4.2A7.6 7.6 0 1 1 20 12.3z"/><path d="M9 11h6M9 14h4"/></svg>
+        Messages
+        <span class="nav__count">3</span>
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M20.4 13.4l-7 7a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1-.6-1.4V5a1 1 0 0 1 1-1h7a2 2 0 0 1 1.4.6l8 8a2 2 0 0 1 0 2.8z"/><circle cx="8" cy="8" r="1.2"/></svg>
+        Promotions
+      </a>
+
+      <p class="t-label nav__label">Money</p>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 16l5-5 3.5 3.5L20 7"/><path d="M15 7h5v5"/></svg>
+        Earnings
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/><path d="M16 14h2"/></svg>
+        Payouts
+      </a>
+
+      <p class="t-label nav__label">Insights</p>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 3.5l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-3-5.3 3 1.1-6L3.4 9.9l6-.8z"/></svg>
+        Reviews
+      </a>
+      <a class="nav__item" href="#">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 20V4"/><path d="M4 20h16"/><path d="M8 16l4-4 3 2.5 4-6"/></svg>
+        Performance
+      </a>
+    </nav>
+
+    <div class="sidebar__foot">
+      <a class="sidebar__user" href="#">
+        <span class="avatar avatar--sm">GW</span>
+        <div>
+          <strong>Grace Wanjiku</strong>
+          <small>Superhost</small>
+        </div>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ================= main ================= -->
+  <div class="main">
+    <header class="topbar">
+      <span class="topbar__title">Host workspace</span>
+
+      <div class="searchpill" style="height:44px; max-width:400px; padding:2px; box-shadow:none; margin-left:16px;">
+        <span class="searchpill__seg" style="border:0; display:flex; align-items:center; gap:8px; padding-left:14px;">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="width:15px;height:15px;color:var(--muted)"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
+          <span class="searchpill__value">Search bookings and listings</span>
+        </span>
+      </div>
+
+      <div class="topbar__actions">
+        <button class="iconbtn iconbtn--plain" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M6.5 10a5.5 5.5 0 0 1 11 0c0 3.2.6 4.8 1.5 6H5c.9-1.2 1.5-2.8 1.5-6z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>
+        </button>
+        <span class="avatar avatar--sm" style="background:var(--navy); color:#fff;">GW</span>
+      </div>
+    </header>
+
+    <div class="page">
+
+      <!-- page head: greeting, the day's state, one bronze action -->
+      <div class="page__head">
+        <div>
+          <h2 class="t-page">Good afternoon, Grace</h2>
+          <p class="t-meta page__sub">Today is the 14th of 18 nights booked. Two guests arrive this afternoon and one room turns over before 2:00 PM.</p>
+        </div>
+        <div class="page__actions">
+          <button class="btn btn--secondary">Open calendar</button>
+          <button class="btn btn--primary">Add dates to calendar</button>
+        </div>
+      </div>
+
+      <!-- money as one statement, never four identical tiles -->
+      <div class="card">
+        <p class="t-label">Earnings this month</p>
+        <p class="statement__figure">KES 184,500 <em>earned</em></p>
+        <p class="t-meta">Upcoming payout KES 62,300 arrives Friday</p>
+        <div class="stats">
+          <div class="stat">
+            <p class="stat__value">14</p>
+            <p class="stat__label">Nights booked</p>
+          </div>
+          <div class="stat">
+            <p class="stat__value">92%</p>
+            <p class="stat__label">Occupancy</p>
+          </div>
+          <div class="stat">
+            <p class="stat__value">4.87</p>
+            <p class="stat__label">Guest rating</p>
+          </div>
+          <div class="stat">
+            <p class="stat__value">18</p>
+            <p class="stat__label">Upcoming guests</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="split mt-32">
+
+        <!-- left column -->
+        <div>
+          <section class="section" style="margin-top:0;">
+            <div class="section__head">
+              <h3 class="t-section">Arrivals and departures today</h3>
+              <a class="link" href="#">Open today</a>
+            </div>
+
+            <div class="list">
+              <div class="list__row">
+                <span class="avatar">CK</span>
+                <div class="list__grow">
+                  <p class="list__title">Chloe Kim</p>
+                  <p class="list__meta">Riverside two-bedroom · 2 guests · departing 11:00 AM</p>
+                </div>
+                <span class="badge">Departing 11:00 AM</span>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Message</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="avatar">TB</span>
+                <div class="list__grow">
+                  <p class="list__title">Tom Bennett</p>
+                  <p class="list__meta">Lavington garden loft · 3 guests · checked in 11:40 AM</p>
+                </div>
+                <span class="badge badge--ok">Checked in</span>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Message</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="avatar">AM</span>
+                <div class="list__grow">
+                  <p class="list__title">Amina Mohamed</p>
+                  <p class="list__meta">Ely Homes Studio, Kilimani · 2 guests · arriving 3:00 PM</p>
+                </div>
+                <span class="badge badge--warn">Arriving 3:00 PM</span>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Message</button>
+                </div>
+              </div>
+
+              <div class="list__row">
+                <span class="avatar">BO</span>
+                <div class="list__grow">
+                  <p class="list__title">Brian Otieno</p>
+                  <p class="list__meta">Ely Homes Studio, Kilimani · 1 guest · arriving 6:00 PM</p>
+                </div>
+                <span class="badge badge--warn">Arriving 6:00 PM</span>
+                <div class="list__actions">
+                  <button class="btn btn--secondary btn--sm">Message</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section__head">
+              <h3 class="t-section">Your listings</h3>
+              <a class="link" href="#">Manage listings</a>
+            </div>
+
+            <div class="cols cols--3">
+              <article class="stay">
+                <div class="photo photo--square">
+                  <img src="reference/photos/living.jpg" alt="">
+                  <span class="photo__badge">Published</span>
+                  <button class="photo__fav" aria-label="Ely Homes Studio actions">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 19.6c-4.9-3.4-7.4-6.4-7.4-9.2A3.9 3.9 0 0 1 12 8.2a3.9 3.9 0 0 1 7.4 2.2c0 2.8-2.5 5.8-7.4 9.2z"/></svg>
+                  </button>
+                </div>
+                <p class="t-card stay__title">Ely Homes Studio, Kilimani</p>
+                <p class="t-meta stay__meta">1 bedroom · 1 bath · 62 sq m</p>
+                <p class="stay__price"><strong>KES 9,800</strong> <span class="muted">night</span></p>
+              </article>
+
+              <article class="stay">
+                <div class="photo photo--square">
+                  <img src="reference/photos/bed.jpg" alt="">
+                  <span class="photo__badge">Published</span>
+                  <button class="photo__fav" aria-label="Lavington garden loft actions">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 19.6c-4.9-3.4-7.4-6.4-7.4-9.2A3.9 3.9 0 0 1 12 8.2a3.9 3.9 0 0 1 7.4 2.2c0 2.8-2.5 5.8-7.4 9.2z"/></svg>
+                  </button>
+                </div>
+                <p class="t-card stay__title">Lavington garden loft</p>
+                <p class="t-meta stay__meta">2 bedrooms · 2 baths · 96 sq m</p>
+                <p class="stay__price"><strong>KES 14,500</strong> <span class="muted">night</span></p>
+              </article>
+
+              <article class="stay">
+                <div class="photo photo--square">
+                  <img src="reference/photos/bed2.jpg" alt="">
+                  <span class="photo__badge">Draft</span>
+                  <button class="photo__fav" aria-label="Riverside two-bedroom actions">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 19.6c-4.9-3.4-7.4-6.4-7.4-9.2A3.9 3.9 0 0 1 12 8.2a3.9 3.9 0 0 1 7.4 2.2c0 2.8-2.5 5.8-7.4 9.2z"/></svg>
+                  </button>
+                </div>
+                <p class="t-card stay__title">Riverside two-bedroom</p>
+                <p class="t-meta stay__meta">2 bedrooms · 1 bath · 84 sq m</p>
+                <p class="stay__price"><strong>KES 12,000</strong> <span class="muted">night</span></p>
+              </article>
+            </div>
+          </section>
+
+          <section class="section">
+            <div class="section__head">
+              <h3 class="t-section">Next payout</h3>
+              <a class="link" href="#">All payouts</a>
+            </div>
+
+            <div class="card">
+              <div class="card__head">
+                <h3 class="t-card">Friday 17 October</h3>
+                <span class="badge badge--info">Scheduled</span>
+              </div>
+              <div class="lines">
+                <div class="lines__row"><span>Gross booking value</span><strong>KES 71,500</strong></div>
+                <div class="lines__row"><span>Cleaning fees</span><strong>KES 2,400</strong></div>
+                <div class="lines__row"><span>Platform fee</span><strong>- KES 8,000</strong></div>
+                <div class="lines__row"><span>Withholding tax</span><strong>- KES 3,600</strong></div>
+                <div class="lines__row lines__row--total">You receive<strong>KES 62,300</strong></div>
+              </div>
+              <button class="btn btn--secondary btn--block btn--sm">View payout details</button>
+            </div>
+          </section>
+        </div>
+
+        <!-- right rail -->
+        <aside class="stack stack--lg">
+
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-card">Today</h3>
+              <a class="link link--quiet" href="#">This week</a>
+            </div>
+            <div class="lines">
+              <div class="lines__row"><span>Check-ins</span><strong>2</strong></div>
+              <div class="lines__row"><span>Check-outs</span><strong>1</strong></div>
+              <div class="lines__row"><span>Unread messages</span><strong>3</strong></div>
+            </div>
+            <button class="btn btn--primary btn--block">Open today</button>
+          </div>
+
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-card">Occupancy</h3>
+              <span class="badge badge--ok">On track</span>
+            </div>
+            <p class="statement__figure">92%</p>
+            <p class="t-meta">next 30 nights · 28 already booked</p>
+            <div class="barrow" role="img" aria-label="Nights booked over the next 30 days">
+              <span class="bar is-on" style="height:100%"></span><span class="bar is-on" style="height:100%"></span>
+              <span class="bar is-on" style="height:100%"></span><span class="bar is-on" style="height:100%"></span>
+              <span class="bar" style="height:52%"></span><span class="bar is-on" style="height:88%"></span>
+              <span class="bar is-on" style="height:100%"></span><span class="bar is-on" style="height:100%"></span>
+              <span class="bar is-on" style="height:100%"></span><span class="bar is-on" style="height:100%"></span>
+              <span class="bar" style="height:44%"></span><span class="bar is-on" style="height:100%"></span>
+            </div>
+          </div>
+
+          <div class="card card--inset">
+            <p class="t-label" style="color:var(--bronze);">Superhost</p>
+            <h3 class="t-card" style="margin-top:8px;">You are on track</h3>
+            <p class="t-meta" style="margin-top:4px;">A 4.87 rating and 96% response rate keep the badge for next quarter. Two more stays cross the line.</p>
+            <button class="btn btn--secondary btn--block btn--sm" style="margin-top:16px;">See what's left</button>
+          </div>
+
+        </aside>
+      </div>
+
+      <!-- button reference strip, so the rules are visible at a glance -->
+      <section class="section">
+        <div class="section__head"><h3 class="t-section">Controls</h3></div>
+        <div class="card">
+          <div class="row wrap" style="gap:12px;">
+            <button class="btn btn--primary">Primary action</button>
+            <button class="btn btn--dark">Strong action</button>
+            <button class="btn btn--secondary">Secondary</button>
+            <button class="btn btn--quiet">Quiet</button>
+            <button class="btn btn--secondary btn--sm">Small</button>
+            <button class="btn btn--primary btn--pill btn--sm">Pill (mobile)</button>
+          </div>
+          <hr class="hr">
+          <div class="row wrap" style="gap:10px;">
+            <span class="badge badge--ok">Checked in</span>
+            <span class="badge badge--warn">Arriving 3:00 PM</span>
+            <span class="badge badge--danger">Cancelled</span>
+            <span class="badge badge--info">Scheduled</span>
+            <span class="badge">Draft</span>
+            <span class="badge badge--dark">Superhost</span>
+          </div>
+          <hr class="hr">
+          <div class="formrow">
+            <div class="field">
+              <label for="h1">Block dates</label>
+              <input class="input" id="h1" placeholder="14 Oct - 16 Oct">
+            </div>
+            <div class="field">
+              <label for="h2">Nightly rate</label>
+              <input class="input" id="h2" value="KES 9,800">
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+</div>
+
+</body>
+</html>

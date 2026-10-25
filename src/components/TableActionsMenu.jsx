@@ -34,7 +34,7 @@ function TableActionsMenu({ label = 'More actions', actions }) {
       inline
       aria-label={label}
       placement="bottom-end"
-      className="op-table-actions-menu"
+      className="inline-flex items-center justify-center"
       // Icon-only trigger, so the accessible name has to come from the caller's
       // label text - Flowbite puts its aria-label on the wrapper, not the button.
       label={<><span className="sr-only">{label}</span><Ellipsis className="h-5 w-5" strokeWidth={2} aria-hidden="true" /></>}

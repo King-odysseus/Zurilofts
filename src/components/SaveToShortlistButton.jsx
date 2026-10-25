@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import { Heart } from "lucide-react";
+import { Button, Checkbox, Label, TextInput } from "flowbite-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 
@@ -71,67 +72,65 @@ export default function SaveToShortlistButton({ propertyId }) {
 
   return (
     <div className="relative">
-      <button
+      {/* Saved state reads as a filled brand pill; unsaved as a light outline. */}
+      <Button
         type="button"
+        color={isSaved ? undefined : "light"}
+        size="sm"
         onClick={() => setOpen(!open)}
         aria-label={isSaved ? "Saved to shortlist" : "Save to shortlist"}
-        className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
-          isSaved
-            ? "bg-[#C49A6C] text-white"
-            : "border border-[#E3E8EF] bg-white text-[#0B1F42] shadow-sm hover:bg-[#F7F4EF] hover:shadow-md"
-        }`}
       >
         <Heart className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} strokeWidth={2} aria-hidden="true" />
         {isSaved ? `Saved (${savedIds.size})` : "Save"}
-      </button>
+      </Button>
 
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-white p-3 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
-            <h4 className="mb-2 text-sm font-semibold text-[#0B1F42]">Save to shortlist</h4>
+          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-border bg-white p-3 shadow-lg">
+            <h4 className="mb-2 text-sm font-semibold text-navy">Save to shortlist</h4>
 
             {loading ? (
-              <p className="py-2 text-xs text-[#5B6B82]">Loading...</p>
+              <p className="py-2 text-xs text-muted">Loading...</p>
             ) : shortlists.length === 0 ? (
-              <p className="py-2 text-xs text-[#5B6B82]">No shortlists yet.</p>
+              <p className="py-2 text-xs text-muted">No shortlists yet.</p>
             ) : (
-              <div className="space-y-1 max-h-48 overflow-y-auto mb-2">
+              <div className="mb-2 max-h-48 space-y-1 overflow-y-auto">
                 {shortlists.map((sl) => (
-                  <label
+                  <Label
                     key={sl.id}
-                    className="flex cursor-pointer items-center gap-2 rounded-[10px] px-2 py-1.5 text-sm text-[#0B1F42] hover:bg-[#F7F4EF]"
+                    className="flex cursor-pointer items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-surface"
                   >
-                    <input
-                      type="checkbox"
+                    <Checkbox
                       checked={savedIds.has(sl.id)}
                       onChange={() => toggleShortlist(sl.id)}
-                      className="rounded border-[#C9D3DF] text-[#C49A6C] focus:ring-[#C49A6C]"
                     />
                     {sl.name}
-                  </label>
+                  </Label>
                 ))}
               </div>
             )}
 
             {showCreate ? (
-              <div className="flex gap-1.5">
-                <input
-                  type="text"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  placeholder="Shortlist name"
-                  className="min-h-[36px] flex-1 rounded-[10px] border border-[#E3E8EF] px-2 py-1 text-xs text-[#0B1F42] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
-                  autoFocus
-                  onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); if (e.key === "Escape") setShowCreate(false); }}
-                />
-                <button onClick={handleCreate} className="rounded-[10px] bg-[#C49A6C] px-2 py-1 text-xs font-semibold text-white">Add</button>
+              <div className="flex items-center gap-1.5">
+                <div className="min-w-0 flex-1">
+                  <TextInput
+                    type="text"
+                    sizing="sm"
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder="Shortlist name"
+                    autoFocus
+                    onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); if (e.key === "Escape") setShowCreate(false); }}
+                  />
+                </div>
+                <Button size="xs" onClick={handleCreate}>Add</Button>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => setShowCreate(true)}
-                className="w-full rounded-[10px] px-2 py-1.5 text-left text-xs font-medium text-[#9A744A] transition-colors hover:bg-[#FDE8D8]"
+                className="w-full rounded-lg px-2 py-1.5 text-left text-xs font-medium text-primary-700 transition-colors hover:bg-primary-100"
               >
                 + Create new shortlist
               </button>

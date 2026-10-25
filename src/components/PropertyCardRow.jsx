@@ -11,6 +11,10 @@ import StayCard from './StayCard.jsx';
  * keyboard and touch scrolling still work. Renders nothing at all
  * when `properties` is empty and no `emptyMessage` is provided, so callers can
  * mount it unconditionally without introducing stray headings or layout gaps.
+ *
+ * Deliberately still a strip of StayCards rather than its own row markup: a
+ * second card shape here is exactly the drift the single-card rule exists to
+ * prevent.
  */
 function PropertyCardRow({ title, properties, emptyMessage, align = 'left' }) {
   const cards = Array.isArray(properties) ? properties.slice(0, 6) : [];
@@ -20,14 +24,14 @@ function PropertyCardRow({ title, properties, emptyMessage, align = 'left' }) {
 
   return (
     <section className="mx-auto w-full max-w-[1344px] px-4 md:px-6" aria-label={title}>
-      <h2 className={`mb-6 text-2xl font-bold text-[#0B1F42] md:text-3xl ${centered ? 'text-center' : ''}`}>{title}</h2>
+      <h2 className={`mb-6 text-2xl font-bold text-navy md:text-3xl ${centered ? 'text-center' : ''}`}>{title}</h2>
 
       {cards.length === 0 ? (
-        <p className={`text-[#5B6B82] ${centered ? 'text-center' : ''}`}>{emptyMessage}</p>
+        <p className={`text-muted ${centered ? 'text-center' : ''}`}>{emptyMessage}</p>
       ) : (
-        <div className={`flex overflow-x-auto snap-x snap-mandatory gap-4 pb-2 no-scrollbar ${centered ? 'lg:justify-center' : ''}`}>
+        <div className={`no-scrollbar flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 ${centered ? 'lg:justify-center' : ''}`}>
           {cards.map((property) => (
-            <div key={property.id} className="snap-start flex-shrink-0 w-64 sm:w-72 lg:w-[310px]">
+            <div key={property.id} className="w-64 shrink-0 snap-start sm:w-72 lg:w-[310px]">
               <StayCard stay={property} />
             </div>
           ))}

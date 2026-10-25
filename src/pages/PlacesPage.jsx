@@ -5,10 +5,10 @@ import { PLACES_TO_VISIT, AREAS, PLACE_CATEGORIES } from '../data/nearby.js';
 
 function PlacesPage() {
   return (
-    <main className="op-public-page op-public-directory">
-      <div className="op-content-container">
-        <Link to="/" className="op-directory-back">
-          <ChevronLeft className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
+    <main className="min-h-[70vh] bg-white">
+      <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 md:py-10">
+        <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted transition-colors hover:text-primary-600">
+          <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
           Back to Home
         </Link>
         <NearbySection

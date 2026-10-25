@@ -252,7 +252,7 @@ export default function HostListingsPage() {
         type="button"
         aria-pressed={filter === item.key}
         onClick={() => setFilter(item.key)}
-        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${filter === item.key ? 'bg-navy text-white' : 'text-muted hover:text-navy'}`}
+        className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${filter === item.key ? 'bg-navy-bg text-white' : 'text-muted hover:text-navy'}`}
       >{item.label} · {counts[item.key] || 0}</button>)}
     </div>
 

@@ -34,8 +34,8 @@ const TRIGGER_SIZES = {
 // rather than inline per call site so every select menu looks identical.
 const MENU_THEME = {
   floating: {
-    base: 'z-50 w-full overflow-hidden rounded-[10px] border border-[#E2DAD0] bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700',
-    content: 'max-h-72 overflow-y-auto py-1 text-sm text-[#111827] dark:text-gray-200',
+    base: 'z-[70] w-full min-w-[9rem] max-w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[10px] border border-[#E2DAD0] bg-white shadow-lg dark:border-gray-600 dark:bg-gray-700',
+    content: 'max-h-[min(70vh,18rem)] overflow-y-auto py-1 text-sm text-[#111827] dark:text-gray-200',
   },
 };
 

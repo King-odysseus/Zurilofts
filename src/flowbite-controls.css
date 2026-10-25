@@ -137,10 +137,6 @@ html.dark .opg-account-page,
 html.dark .op-checkout-screen,
 html.dark .op-auth-page,
 html.dark .op-trust-page,
-html.dark .op-host-today,
-html.dark .op-host-listings,
-html.dark .op-host-earnings,
-html.dark .op-host-payouts,
 html.dark .op-host-application-page,
 html.dark .op-admin-layout,
 html.dark .op-admin-main {
@@ -1138,20 +1134,6 @@ html.dark .op-guide-card:hover {
   box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
 }
 
-/* Host workspace: swap the light --host-* tokens for dark values. */
-html.dark .op-host-today,
-html.dark .op-host-listings,
-html.dark .op-host-earnings,
-html.dark .op-host-payouts,
-html.dark .op-host-calendar {
-  --host-navy: var(--dm-text);
-  --host-blue: #7EA6FF;
-  --host-bronze: #D1A477;
-  --host-line: var(--dm-border-strong);
-  --host-soft: var(--dm-surface-soft);
-  color: var(--dm-text);
-}
-
 /* Tailwind colour utilities not caught by the arbitrary-value selectors. */
 html.dark :where(.text-charcoal, .text-navy, .text-indigo) {
   color: var(--dm-text) !important;
@@ -1340,4 +1322,16 @@ html.dark .op-admin-message-composer .op-admin-message-textarea::placeholder {
   html.dark .op-admin-message-conversation.is-active {
     border-color: #C49A6C !important;
   }
+}
+/*
+ * Dropdown menus are absolutely positioned inside their trigger, so any
+ * ancestor with overflow-hidden clips them. Card surfaces clip for their
+ * rounded corners, which cut open menus off at the card edge - the menu
+ * appeared to open and then vanish halfway down. :has() only matches while a
+ * panel is actually open, so the card keeps its clipping the rest of the time.
+ * Marked dropdown-clip so the rule is easy to find and remove.
+ */
+.overflow-hidden:has([data-testid="flowbite-dropdown"]),
+.overflow-hidden:has(> .relative > [role="menu"]) {
+  overflow: visible;
 }

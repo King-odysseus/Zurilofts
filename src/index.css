@@ -427,3 +427,34 @@ html.dark .op-brand-tile {
   background: #ffffff;
   border-color: rgba(255, 255, 255, .18);
 }
+
+/* Design-system 2026 tokens as raw RGB channels.
+   Tailwind reads these through rgb(var(--ds-*) / <alpha-value>), so
+   text-ink, border-line, bg-inset and bg-canvas all flip when html.dark
+   swaps the channels below. Before this, Tailwind resolved those names to
+   fixed hex values, so dark mode had to override every utility class by
+   name and anything nobody remembered stayed light. Channels (not hex)
+   keep opacity modifiers such as border-ink/10 working. */
+:root {
+  --ds-ink: 34 34 34;          /* #222222 - headings and body ink */
+  --ds-navy: 11 31 66;         /* #0B1F42 - brand navy used as text */
+  --ds-muted: 91 107 130;      /* #5B6B82 - secondary text */
+  --ds-line: 229 231 235;      /* #E5E7EB - the only divider grey */
+  --ds-inset: 247 247 245;     /* #F7F7F5 - inset panels and hovers */
+  --ds-link: 37 99 235;        /* #2563EB - links and focus */
+  --ds-surface: 247 244 239;   /* #F7F4EF - warm card surface */
+  --ds-canvas: 255 255 255;    /* #FFFFFF - page background */
+  --ds-elevated: 255 255 255;  /* raised card on the canvas */
+}
+
+html.dark {
+  --ds-ink: 231 238 248;       /* #E7EEF8 */
+  --ds-navy: 231 238 248;      /* brand navy becomes light ink in dark mode */
+  --ds-muted: 159 176 198;     /* #9FB0C6 */
+  --ds-line: 38 52 74;         /* #26344A */
+  --ds-inset: 13 23 40;        /* #0D1728 */
+  --ds-link: 126 166 255;      /* #7EA6FF */
+  --ds-surface: 17 27 45;      /* #111B2D */
+  --ds-canvas: 8 16 31;        /* #08101F */
+  --ds-elevated: 22 34 56;     /* #162238 */
+}

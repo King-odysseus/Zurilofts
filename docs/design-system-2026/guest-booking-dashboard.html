@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZuriLofts guest - confirm and pay</title>
+<link rel="stylesheet" href="preview.css">
+<style>
+  /* board-only: the strip above the mockups */
+  .board-note {
+    max-width: 1280px; margin: 0 auto; padding: 40px 32px 8px;
+    border-bottom: 1px solid var(--line);
+  }
+  .board-note .t-label { margin-bottom: 8px; }
+  .board-note p { max-width: 680px; margin-top: 8px; }
+  .board-frame { border-bottom: 1px solid var(--line); }
+  .swatches { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+  .swatch { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+  .swatch i { width: 20px; height: 20px; border-radius: 6px; display: block; border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+
+<!-- ============ board header, not part of the product ============ -->
+<div class="board-note">
+  <p class="t-label">ZuriLofts design system 2026</p>
+  <h1 class="t-page">Guest booking</h1>
+  <p class="t-meta">The same primitives with no rail: one top bar, one page title, one bronze action per screen, and the money carried by the floating booking card.</p>
+  <div class="swatches">
+    <span class="swatch"><i style="background:#C49A6C"></i>Bronze C49A6C</span>
+    <span class="swatch"><i style="background:#0B1F42"></i>Navy 0B1F42</span>
+    <span class="swatch"><i style="background:#2563EB"></i>Blue 2563EB</span>
+    <span class="swatch"><i style="background:#222222"></i>Ink 222222</span>
+    <span class="swatch"><i style="background:#F7F7F5"></i>Inset F7F7F5</span>
+    <span class="swatch"><i style="background:#E5E7EB"></i>Line E5E7EB</span>
+  </div>
+</div>
+
+<div class="board-frame">
+
+  <!-- ================= guest top bar, no sidebar ================= -->
+  <header class="topbar">
+    <a class="brand" href="#">
+      <span class="brand__mark">Z</span>
+      <span class="brand__name">zuri<span>.lofts</span></span>
+    </a>
+
+    <div class="searchpill" style="max-width:520px;">
+      <span class="searchpill__seg">
+        <span class="searchpill__label">Where</span>
+        <span class="searchpill__value">Kilimani</span>
+      </span>
+      <span class="searchpill__seg">
+        <span class="searchpill__label">When</span>
+        <span class="searchpill__value">10-15 Nov</span>
+      </span>
+      <span class="searchpill__seg">
+        <span class="searchpill__label">Who</span>
+        <span class="searchpill__value">2 guests</span>
+      </span>
+      <button class="searchpill__btn" aria-label="Search stays">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg>
+      </button>
+    </div>
+
+    <div class="topbar__actions">
+      <a class="btn btn--quiet btn--sm" href="#">Trips</a>
+      <a class="btn btn--quiet btn--sm" href="#">Messages</a>
+      <span class="avatar avatar--sm">AW</span>
+      <button class="iconbtn" aria-label="Account menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="page">
+
+    <!-- page head: one title, one sub, one action group -->
+    <div class="page__head">
+      <div>
+        <h2 class="t-page">Confirm and pay</h2>
+        <p class="t-meta page__sub">You will not be charged until the host accepts.</p>
+      </div>
+      <div class="page__actions">
+        <button class="btn btn--secondary">Back to listing</button>
+      </div>
+    </div>
+
+    <div class="split">
+
+      <!-- ---------------- left column ---------------- -->
+      <div>
+
+        <section class="section">
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-section">Your trip</h3>
+              <button class="btn btn--secondary btn--sm">Edit</button>
+            </div>
+            <p class="t-card muted">Ely Homes Studio, Kilimani</p>
+            <div class="lines">
+              <div class="lines__row"><span>Trip dates</span><strong>10 - 15 Nov 2026</strong></div>
+              <div class="lines__row"><span>Guests</span><strong>2 guests</strong></div>
+              <div class="lines__row"><span>Nights</span><strong>5 nights</strong></div>
+            </div>
+            <div class="feature">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg>
+              <div>
+                <strong>Flexible check-in from 3:00 PM</strong>
+                <p>Self check-in with a lockbox - the host sends the code the day before.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-section">Guest details</h3>
+            </div>
+            <div class="banner banner--info">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><path d="M12 3l7 3v5.5c0 4.3-2.9 7.7-7 9.5-4.1-1.8-7-5.2-7-9.5V6z"/><path d="M9.2 12.2l2 2 3.6-3.8"/></svg>
+              <div>
+                <strong>Identity verification approved</strong>
+                <p>Your ID was checked on 2 October. No further documents are needed before you pay.</p>
+              </div>
+            </div>
+            <div class="stack mt-24">
+              <div class="formrow">
+                <div class="field">
+                  <label for="guest-first">First name</label>
+                  <input class="input" id="guest-first" value="Amina">
+                </div>
+                <div class="field">
+                  <label for="guest-last">Last name</label>
+                  <input class="input" id="guest-last" value="Wekesa">
+                </div>
+              </div>
+              <div class="field">
+                <label for="guest-email">Email address</label>
+                <input class="input" id="guest-email" type="email" value="amina.wekesa@gmail.com">
+              </div>
+              <div class="field">
+                <label for="guest-phone">Phone number</label>
+                <input class="input" id="guest-phone" type="tel" value="+254 712 345 678">
+              </div>
+              <div class="field">
+                <label for="guest-message">Message to the host</label>
+                <textarea class="input" id="guest-message" rows="3" placeholder="Arrival time, occasion, anything useful"></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-section">Add-ons</h3>
+              <a class="link" href="#">See all 6</a>
+            </div>
+            <div class="list">
+              <div class="list__row">
+                <span class="photo" style="width:56px; height:56px; flex:none;">
+                  <img src="reference/photos/living.jpg" alt="">
+                </span>
+                <div class="list__grow">
+                  <p class="list__title">Airport pickup</p>
+                  <p class="list__meta">Private car from JKIA, met at arrivals · one way</p>
+                </div>
+                <span class="list__cell list__cell--end money">KES 3,500</span>
+                <button class="btn btn--secondary btn--sm">Add</button>
+              </div>
+
+              <div class="list__row">
+                <span class="photo" style="width:56px; height:56px; flex:none;">
+                  <img src="reference/photos/kitchen.jpg" alt="">
+                </span>
+                <div class="list__grow">
+                  <p class="list__title">Breakfast basket</p>
+                  <p class="list__meta">Fruit, bread, eggs and coffee stocked before you arrive</p>
+                </div>
+                <span class="list__cell list__cell--end money">KES 1,800</span>
+                <span class="badge badge--ok">Added</span>
+              </div>
+
+              <div class="list__row">
+                <span class="photo" style="width:56px; height:56px; flex:none;">
+                  <img src="reference/photos/bed2.jpg" alt="">
+                </span>
+                <div class="list__grow">
+                  <p class="list__title">Late checkout</p>
+                  <p class="list__meta">Stay until 6:00 PM on your last day</p>
+                </div>
+                <span class="list__cell list__cell--end money">KES 2,000</span>
+                <button class="btn btn--secondary btn--sm">Add</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="card">
+            <div class="card__head">
+              <h3 class="t-section">Payment</h3>
+            </div>
+            <div class="stack">
+              <div class="lines" style="margin:0;">
+                <div class="lines__row"><span>Pay now</span><strong>KES 41,300</strong></div>
+                <div class="lines__row"><span>Pay on arrival</span><strong class="muted">Not selected</strong></div>
+              </div>
+              <div class="formrow">
+                <div class="field">
+                  <label for="pay-mpesa">M-PESA number</label>
+                  <input class="input" id="pay-mpesa" type="tel" value="+254 712 345 678">
+                </div>
+                <div class="field">
+                  <label for="pay-id">ID number for the receipt</label>
+                  <input class="input" id="pay-id" value="31428765">
+                </div>
+              </div>
+              <div class="banner banner--warm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><path d="M12 14.5v2.5"/></svg>
+                <div>
+                  <strong>ZuriLofts holds your payment</strong>
+                  <p>Nothing reaches the host until 24 hours after check-in, so a cancelled stay is refunded in full.</p>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn--primary btn--block" style="margin-top:20px;">Confirm and pay KES 41,300</button>
+            <p class="bookcard__fine">Free cancellation until 8 November</p>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- the card is the grid item itself, so sticky travels the full split -->
+      <aside class="bookcard">
+        <div class="photo photo--wide">
+          <img src="reference/photos/living.jpg" alt="">
+        </div>
+
+        <div class="row row--between" style="margin-top:16px;">
+          <p class="t-card stay__title" style="margin-top:0;">Ely Homes Studio, Kilimani</p>
+          <p class="t-meta" style="display:flex; align-items:center; gap:4px; white-space:nowrap;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="width:13px;height:13px;"><path d="M12 3.5l2.6 5.6 6 .8-4.4 4.2 1.1 6-5.3-3-5.3 3 1.1-6L3.4 9.9l6-.8z"/></svg>
+            4.87 · 71 reviews
+          </p>
+        </div>
+
+        <div class="bookcard__price" style="margin-top:16px;">
+          <span class="bookcard__strike">KES 48,000</span>
+          <strong>KES 41,300 total</strong>
+        </div>
+
+        <div class="fields">
+          <div class="fields__cell">
+            <span class="fields__label">Check-in</span>
+            <span class="fields__value">10/11/2026</span>
+          </div>
+          <div class="fields__cell">
+            <span class="fields__label">Checkout</span>
+            <span class="fields__value">15/11/2026</span>
+          </div>
+          <div class="fields__cell fields__cell--full">
+            <span class="fields__label">Guests</span>
+            <span class="fields__value" style="display:flex; align-items:center;">2 guests
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" style="width:16px;height:16px;margin-left:auto;"><path d="M6 9l6 6 6-6"/></svg>
+            </span>
+          </div>
+        </div>
+
+        <div class="lines">
+          <div class="lines__row"><span>5 nights x KES 8,000</span><strong>KES 40,000</strong></div>
+          <div class="lines__row"><span>Cleaning fee</span><strong>KES 800</strong></div>
+          <div class="lines__row"><span>Service fee</span><strong>KES 500</strong></div>
+          <div class="lines__row lines__row--total"><span>Total (KES)</span><strong>41,300</strong></div>
+        </div>
+
+        <button class="btn btn--primary btn--block">Reserve</button>
+        <p class="bookcard__note">You won't be charged yet</p>
+        <p class="bookcard__fine">Rare find: this place is usually booked</p>
+      </aside>
+
+    </div>
+
+    <!-- ---------------- trips state ---------------- -->
+    <section class="section">
+      <div class="section__head">
+        <h3 class="t-section">Your trips</h3>
+        <a class="link link--quiet" href="#">View all</a>
+      </div>
+      <div class="cols cols--3">
+
+        <div class="card card--flush">
+          <div class="photo photo--wide">
+            <img src="reference/photos/kitchen.jpg" alt="">
+            <span class="photo__badge">Upcoming</span>
+          </div>
+          <div style="padding:20px">
+            <p class="t-card">Ely Homes Studio, Kilimani</p>
+            <p class="t-meta">10 - 15 Nov 2026 · 2 guests</p>
+            <div class="row wrap" style="gap:8px; margin:12px 0 16px;">
+              <span class="badge badge--ok">Confirmed</span>
+              <span class="badge badge--warn">Balance due</span>
+            </div>
+            <button class="btn btn--secondary btn--sm">View trip</button>
+          </div>
+        </div>
+
+        <div class="card card--flush">
+          <div class="photo photo--wide">
+            <img src="reference/photos/bed.jpg" alt="">
+            <span class="photo__badge">Completed</span>
+          </div>
+          <div style="padding:20px">
+            <p class="t-card">Lavington garden loft</p>
+            <p class="t-meta">2 - 5 Sep 2026 · 2 guests</p>
+            <div class="row wrap" style="gap:8px; margin:12px 0 16px;">
+              <span class="badge badge--ok">Confirmed</span>
+              <span class="badge">Receipt sent</span>
+            </div>
+            <button class="btn btn--secondary btn--sm">View trip</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="empty">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20.5s-7.5-4.6-7.5-9.6A4.4 4.4 0 0 1 12 8.2a4.4 4.4 0 0 1 7.5 2.7c0 5-7.5 9.6-7.5 9.6z"/></svg>
+            <strong>No saved stays yet</strong>
+            <p>Tap the heart on any stay to keep it here for the next trip.</p>
+            <button class="btn btn--secondary btn--sm">Explore stays</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </div>
+
+  <!-- phone only: the sticky CTA bar, hidden above 860px -->
+  <div class="mobilebar">
+    <div class="mobilebar__price">
+      <strong>KES 41,300</strong>
+      <small>total for 5 nights</small>
+    </div>
+    <button class="btn btn--primary btn--pill">Reserve</button>
+  </div>
+
+</div>
+
+</body>
+</html>

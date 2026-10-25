@@ -1,0 +1,630 @@
+/* =========================================================================
+   ZuriLofts design system 2026 - built on Airbnb's layout language
+   Brand colours from DESIGN.md. Structure from airbnb.co.uk (see
+   airbnb-language.md for what was observed and why each rule exists).
+
+   Rules this file enforces:
+   - white canvas, 1px #E5E7EB lines, no tinted panels, no gradients
+   - 4 radii only: 12 image, 16 card, 8 control, 999 pill
+   - bronze is the only filled primary; blue is links and active nav only
+   - headings are charcoal #222222 and weight 600, never 800
+   - one page title size, one section heading size, one row height
+   ========================================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --bronze: #C49A6C;
+  --bronze-hover: #B8895C;
+  --navy: #0B1F42;
+  --navy-hover: #07072e;
+  --blue: #2563EB;
+  --blue-hover: #1D4ED8;
+  --ink: #222222;
+  --muted: #6b7280;
+  --line: #E5E7EB;
+  --inset: #F7F7F5;
+  --ok: #16a34a;
+  --warn: #d97706;
+  --danger: #dc2626;
+
+  --r-img: 12px;
+  --r-card: 16px;
+  --r-control: 8px;
+  --r-pill: 999px;
+
+  --shadow-float: 0 6px 16px rgba(0, 0, 0, .12);
+  --shadow-pop: 0 8px 28px rgba(0, 0, 0, .14);
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: #fff;
+  color: var(--ink);
+  font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; text-decoration: none; }
+img { display: block; max-width: 100%; }
+button { font: inherit; color: inherit; }
+
+/* ---------- type scale: 6 sizes, nothing in between ---------- */
+
+.t-display { font-size: 44px; line-height: 1.08; font-weight: 600; letter-spacing: -.02em; margin: 0; }
+.t-page    { font-size: 28px; line-height: 1.2;  font-weight: 600; letter-spacing: -.01em; margin: 0; }
+.t-section { font-size: 20px; line-height: 1.3;  font-weight: 600; letter-spacing: -.01em; margin: 0; }
+.t-card    { font-size: 15px; line-height: 1.35; font-weight: 600; margin: 0; }
+.t-body    { font-size: 14px; line-height: 1.55; margin: 0; }
+.t-meta    { font-size: 13px; line-height: 1.45; color: var(--muted); margin: 0; }
+.t-label   { font-size: 11px; line-height: 1.2; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin: 0; }
+
+.t-display + .t-meta, .t-page + .t-meta, .t-section + .t-meta { margin-top: 6px; }
+.muted { color: var(--muted); }
+.money { font-weight: 600; letter-spacing: -.01em; }
+
+/* ---------- buttons: three shapes, one size ---------- */
+
+/* Buttons are fully rounded pills, as on Airbnb. This is the one shape that
+   differs from inputs (8px) because a pill reads as an action, not a field.
+   Flowbite's Button reaches the same shape with the `rounded-full` class. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 24px;
+  border: 1px solid transparent;
+  border-radius: var(--r-pill);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.btn svg { width: 16px; height: 16px; flex: none; }
+
+.btn--primary  { background: var(--bronze); color: #fff; }
+.btn--primary:hover { background: var(--bronze-hover); }
+.btn--dark     { background: var(--navy); color: #fff; }
+.btn--dark:hover { background: var(--navy-hover); }
+.btn--secondary { background: #fff; border-color: var(--line); color: var(--ink); }
+.btn--secondary:hover { border-color: var(--ink); }
+.btn--quiet    { background: transparent; color: var(--ink); padding: 0 14px; }
+.btn--quiet:hover { background: var(--inset); }
+
+.btn--sm { height: 38px; padding: 0 16px; font-size: 13px; border-radius: var(--r-pill); }
+.btn--block { width: 100%; }
+/* kept so existing markup keeps working; every .btn is a pill now */
+.btn--pill { border-radius: var(--r-pill); }
+
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+
+/* text link, used inside cards and beside headings */
+.link { color: var(--blue); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+.link:hover { color: var(--blue-hover); }
+.link--quiet { color: var(--ink); text-decoration: underline; }
+
+/* circular icon control, 32-40px, for hearts, chevrons, close */
+.iconbtn {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: var(--r-pill);
+  border: 1px solid var(--line); background: #fff; cursor: pointer;
+}
+.iconbtn svg { width: 16px; height: 16px; }
+.iconbtn--plain { border-color: transparent; }
+.iconbtn--plain:hover { background: var(--inset); }
+
+/* ---------- shell ---------- */
+
+.shell { display: flex; min-height: 100vh; }
+
+.sidebar {
+  width: 248px;
+  flex: none;
+  border-right: 1px solid var(--line);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; padding: 0 8px; }
+.brand__mark {
+  width: 30px; height: 30px; border-radius: 9px;
+  background: var(--navy); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; letter-spacing: -.02em;
+}
+.brand__name { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+.brand__name span { color: var(--muted); font-weight: 500; }
+
+.nav { display: flex; flex-direction: column; gap: 2px; }
+.nav__label { padding: 0 10px; margin: 16px 0 6px; }
+.nav__label:first-child { margin-top: 0; }
+
+.nav__item {
+  display: flex; align-items: center; gap: 12px;
+  height: 40px; padding: 0 10px;
+  border-radius: var(--r-control);
+  font-size: 14px; font-weight: 500; color: var(--ink);
+  position: relative;
+}
+.nav__item svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
+.nav__item:hover { background: var(--inset); }
+.nav__item.is-active { background: var(--inset); font-weight: 600; }
+.nav__item.is-active svg { color: var(--ink); }
+/* the marker is the only colour in the rail */
+.nav__item.is-active::before {
+  content: ""; position: absolute; left: -8px; top: 10px;
+  width: 3px; height: 20px; border-radius: 0 3px 3px 0; background: var(--bronze);
+}
+.nav__count {
+  margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px;
+  border-radius: var(--r-pill); background: var(--danger); color: #fff;
+  font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center;
+}
+
+.sidebar__foot { margin-top: auto; border-top: 1px solid var(--line); padding-top: 16px; }
+.sidebar__user { display: flex; align-items: center; gap: 10px; padding: 8px; border-radius: var(--r-control); }
+.sidebar__user:hover { background: var(--inset); }
+.sidebar__user div { min-width: 0; }
+.sidebar__user strong { display: block; font-size: 13px; font-weight: 600; }
+.sidebar__user small { display: block; font-size: 12px; color: var(--muted); }
+
+/* ---------- main column ---------- */
+
+.main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+
+.topbar {
+  display: flex; align-items: center; gap: 16px;
+  height: 72px; padding: 0 32px;
+  border-bottom: 1px solid var(--line);
+  background: #fff; position: sticky; top: 0; z-index: 20;
+}
+.topbar__title { font-size: 15px; font-weight: 600; }
+.topbar__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.page { padding: 32px; max-width: 1280px; width: 100%; }
+.page--wide { max-width: none; }
+
+.page__head { display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap; margin-bottom: 28px; }
+/* The heading block gives way before the actions do: it shrinks to its share
+   of the row so the action buttons stay on the heading line. Without the
+   basis the wide subtitle forced the buttons onto a second line at 1024px. */
+.page__head > div:first-child { min-width: 0; flex: 1 1 320px; }
+.page__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: none; }
+.page__sub { max-width: 620px; margin-top: 8px; }
+
+.section { margin-top: 48px; }
+.section:first-of-type { margin-top: 0; }
+.section__head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.section__head .btn, .section__head .link { margin-left: auto; }
+
+/* ---------- segmented search field (the Airbnb signature control) ---------- */
+
+.searchpill {
+  display: flex; align-items: center;
+  height: 56px; padding: 4px;
+  border: 1px solid var(--line); border-radius: var(--r-pill);
+  background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+  width: 100%; max-width: 620px;
+}
+.searchpill__seg {
+  flex: 1; min-width: 0; padding: 6px 16px; border-radius: var(--r-pill);
+  border-right: 1px solid var(--line);
+}
+.searchpill__seg:last-of-type { border-right: 0; }
+.searchpill__seg:hover { background: var(--inset); }
+.searchpill__label { display: block; font-size: 11px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.searchpill__value { display: block; font-size: 13px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.searchpill__btn {
+  flex: none; width: 44px; height: 44px; border-radius: var(--r-pill);
+  background: var(--bronze); border: 0; color: #fff;
+  display: flex; align-items: center; justify-content: center; margin-left: 4px; cursor: pointer;
+}
+.searchpill__btn svg { width: 17px; height: 17px; }
+
+/* filter pills row */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.filter {
+  height: 36px; padding: 0 14px; border-radius: var(--r-pill);
+  border: 1px solid var(--line); background: #fff;
+  font-size: 13px; font-weight: 500; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+}
+.filter svg { width: 14px; height: 14px; }
+.filter:hover { border-color: var(--ink); }
+.filter.is-on { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+/* ---------- cards ---------- */
+
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 24px;
+}
+.card--flush { padding: 0; overflow: hidden; }
+.card--float { border-color: transparent; box-shadow: var(--shadow-float); }
+.card--inset { background: var(--inset); border-color: transparent; }
+
+.card__head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.card__head .link, .card__head .btn { margin-left: auto; }
+.card__foot {
+  display: flex; align-items: center; gap: 12px;
+  margin: 20px -24px -24px; padding: 16px 24px;
+  border-top: 1px solid var(--line); background: var(--inset);
+  border-radius: 0 0 var(--r-card) var(--r-card);
+}
+
+/* statement figure: replaces the four identical metric tiles */
+.statement { padding: 4px 0 0; }
+.statement__figure { font-size: 34px; line-height: 1.15; font-weight: 600; letter-spacing: -.02em; margin: 4px 0 2px; }
+.statement__figure em { font-style: normal; color: var(--bronze); }
+
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin-top: 28px; }
+.stat__value { font-size: 22px; font-weight: 600; letter-spacing: -.01em; margin: 0; }
+.stat__label { font-size: 13px; color: var(--muted); margin: 2px 0 0; }
+
+/* ---------- badges ---------- */
+
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 26px; padding: 0 10px; border-radius: var(--r-pill);
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+  background: var(--inset); color: var(--ink);
+}
+.badge--ok { background: #ecfdf3; color: #15803d; }
+.badge--warn { background: #fffaeb; color: #b45309; }
+.badge--danger { background: #fef3f2; color: #b42318; }
+.badge--info { background: #eff4ff; color: #1d4ed8; }
+.badge--dark { background: var(--navy); color: #fff; }
+
+/* ---------- rows instead of a data table ---------- */
+
+.list { border-top: 1px solid var(--line); }
+.list__row {
+  display: flex; align-items: center; gap: 16px;
+  min-height: 72px; padding: 14px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.list__row:hover { background: var(--inset); }
+.list__grow { flex: 1; min-width: 0; }
+.list__title { font-size: 14px; font-weight: 600; }
+.list__meta { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.list__cell { min-width: 108px; }
+.list__actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.list__head {
+  display: flex; gap: 16px; padding: 0 8px 10px;
+  border-bottom: 1px solid var(--line);
+}
+.list__head span { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* ---------- photos ---------- */
+
+.photo { border-radius: var(--r-img); overflow: hidden; background: var(--inset); position: relative; }
+.photo img { width: 100%; height: 100%; object-fit: cover; }
+.photo--square { aspect-ratio: 1 / 1; }
+.photo--wide { aspect-ratio: 4 / 3; }
+
+.photo__badge {
+  position: absolute; top: 12px; left: 12px;
+  height: 28px; padding: 0 12px; border-radius: var(--r-pill);
+  background: #fff; color: var(--ink); font-size: 12px; font-weight: 600;
+  display: inline-flex; align-items: center;
+}
+.photo__fav {
+  position: absolute; top: 12px; right: 12px;
+  width: 32px; height: 32px; border-radius: var(--r-pill);
+  background: rgba(255, 255, 255, .92); border: 0;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.photo__fav svg { width: 15px; height: 15px; }
+.photo__count {
+  position: absolute; right: 10px; bottom: 10px;
+  background: rgba(0, 0, 0, .6); color: #fff;
+  font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--r-pill);
+}
+
+/* stay card: image on top, three lines of text, no border */
+.stay { display: block; }
+.stay__title { margin-top: 12px; }
+.stay__meta { margin-top: 2px; }
+.stay__price { margin-top: 6px; font-size: 14px; }
+
+.mosaic { display: grid; grid-template-columns: 2fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; height: 420px; }
+.mosaic .photo:first-child { grid-row: span 2; border-radius: var(--r-card) 0 0 var(--r-card); }
+.mosaic .photo:nth-child(3) { border-radius: 0 var(--r-card) 0 0; }
+.mosaic .photo:nth-child(5) { border-radius: 0 0 var(--r-card) 0; }
+
+/* ---------- fields (Airbnb date boxes) ---------- */
+
+.fields { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid #b0b0b0; border-radius: var(--r-control); overflow: hidden; }
+.fields__cell { padding: 10px 12px; }
+.fields__cell + .fields__cell { border-left: 1px solid #b0b0b0; }
+.fields__cell--full { grid-column: 1 / -1; border-left: 0; border-top: 1px solid #b0b0b0; }
+.fields__label { display: block; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
+.fields__value { display: block; font-size: 15px; margin-top: 1px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.field > label { font-size: 13px; font-weight: 600; }
+.input {
+  height: 48px; padding: 0 14px; width: 100%;
+  border: 1px solid var(--line); border-radius: var(--r-control);
+  font-size: 14px; font-family: inherit; background: #fff; color: var(--ink);
+}
+.input:focus { outline: 2px solid var(--blue); outline-offset: 1px; border-color: transparent; }
+.input::placeholder { color: var(--muted); }
+textarea.input { height: auto; padding: 12px 14px; resize: vertical; }
+
+.formrow { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+/* ---------- booking card (the floating rail on a listing) ---------- */
+
+.bookcard {
+  border: 1px solid var(--line); border-radius: var(--r-card);
+  background: #fff; box-shadow: var(--shadow-float);
+  padding: 24px; position: sticky; top: 96px;
+}
+.bookcard__price { display: flex; align-items: baseline; gap: 8px; margin-bottom: 16px; }
+.bookcard__price strong { font-size: 22px; font-weight: 600; letter-spacing: -.01em; }
+.bookcard__strike { font-size: 15px; color: var(--muted); text-decoration: line-through; }
+.bookcard__note {
+  margin: 12px 0 0; padding: 12px; border-radius: var(--r-control);
+  background: var(--inset); font-size: 13px; text-align: center;
+}
+.bookcard__fine { font-size: 12px; color: var(--muted); text-align: center; margin-top: 12px; }
+
+.lines { margin: 20px 0; border-top: 1px solid var(--line); }
+.lines__row { display: flex; align-items: center; gap: 12px; padding: 10px 0; font-size: 14px; }
+.lines__row + .lines__row { border-top: 1px solid var(--line); }
+.lines__row span { color: var(--muted); }
+.lines__row strong { margin-left: auto; font-weight: 500; }
+.lines__row--total { font-weight: 600; }
+.lines__row--total strong { font-weight: 600; }
+
+/* ---------- avatar ---------- */
+
+.avatar {
+  width: 40px; height: 40px; border-radius: var(--r-pill);
+  background: var(--inset); color: var(--ink);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 600; flex: none; overflow: hidden;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar--sm { width: 32px; height: 32px; font-size: 12px; }
+.avatar--lg { width: 56px; height: 56px; font-size: 16px; }
+
+/* ---------- banners, empty states, dividers ---------- */
+
+.banner {
+  display: flex; gap: 14px; align-items: flex-start;
+  padding: 16px 20px; border-radius: var(--r-card); background: var(--inset);
+}
+.banner svg { width: 20px; height: 20px; flex: none; margin-top: 1px; }
+.banner strong { display: block; font-size: 14px; font-weight: 600; }
+.banner p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
+.banner--warm { background: #FBF6F0; }
+.banner--warm svg { color: var(--bronze); }
+.banner--info { background: #eff4ff; }
+.banner--info svg { color: var(--blue); }
+
+.empty { text-align: center; padding: 56px 24px; }
+.empty svg { width: 32px; height: 32px; margin: 0 auto 12px; color: var(--muted); }
+.empty strong { display: block; font-size: 16px; font-weight: 600; }
+.empty p { margin: 6px auto 0; max-width: 380px; font-size: 14px; color: var(--muted); }
+.empty .btn { margin-top: 16px; }
+
+.hr { height: 1px; background: var(--line); border: 0; margin: 24px 0; }
+
+/* ---------- layout helpers ---------- */
+
+.split { display: grid; grid-template-columns: minmax(0, 1fr) 384px; gap: 56px; align-items: start; }
+/* narrower right rail (money, host, side facts); named so a page never needs
+   an inline column width, which would win over the phone collapse below */
+.split--rail { grid-template-columns: minmax(0, 1fr) 360px; gap: 40px; }
+.cols { display: grid; gap: 24px; }
+.cols--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.cols--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cols--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stack { display: flex; flex-direction: column; gap: 16px; }
+.stack--lg { gap: 24px; }
+.row { display: flex; align-items: center; gap: 12px; }
+.row--between { justify-content: space-between; }
+.wrap { flex-wrap: wrap; }
+.mt-24 { margin-top: 24px; }
+.mt-32 { margin-top: 32px; }
+
+.feature { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--line); }
+.feature:last-child { border-bottom: 0; }
+.feature svg { width: 22px; height: 22px; flex: none; margin-top: 2px; }
+.feature strong { display: block; font-size: 15px; font-weight: 600; }
+.feature p { margin: 2px 0 0; font-size: 14px; color: var(--muted); }
+
+.guestrow { display: flex; align-items: center; gap: 12px; padding: 16px 0; }
+.guestrow strong { display: block; font-size: 15px; font-weight: 600; }
+
+/* ---------- mobile ---------- */
+
+.mobilebar {
+  display: none; align-items: center; gap: 12px;
+  position: sticky; bottom: 0; padding: 12px 16px;
+  border-top: 1px solid var(--line); background: #fff; z-index: 30;
+}
+.mobilebar__price { font-size: 15px; font-weight: 600; }
+.mobilebar__price small { display: block; font-size: 12px; font-weight: 400; color: var(--muted); }
+.mobilebar .btn { margin-left: auto; }
+
+.tabbar { display: none; }
+
+@media (max-width: 1100px) {
+  .split, .split--rail { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+  .bookcard { position: static; }
+  .cols--4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mosaic { height: 320px; }
+}
+
+@media (max-width: 860px) {
+  .sidebar { display: none; }
+  .page { padding: 20px 16px 96px; }
+  .topbar { height: 60px; padding: 0 16px; }
+  .t-display { font-size: 30px; }
+  .t-page { font-size: 22px; }
+  .t-section { font-size: 18px; }
+  .section { margin-top: 32px; }
+  .cols--2, .cols--3, .cols--4 { grid-template-columns: minmax(0, 1fr); }
+  .card { padding: 18px; }
+  .card__foot { margin: 18px -18px -18px; padding: 14px 18px; }
+  .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+  .list__row { flex-wrap: wrap; gap: 8px; }
+  .list__cell { min-width: 0; }
+  .list__actions { width: 100%; margin-left: 0; justify-content: flex-end; }
+  .list__row { align-items: flex-start; }
+  .searchpill { max-width: none; }
+  /* Airbnb drops the search field from the top bar on phones; the page
+     heading already says where you are, so the bar keeps only the actions. */
+  .topbar .searchpill { display: none; }
+  .topbar { gap: 8px; }
+  .topbar__title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .page__head { gap: 16px; }
+  /* Phone: actions share the row while they fit and drop to a full-width row
+     when they cannot. Forcing equal widths made three nowrap buttons overflow
+     the screen and clipped the last one. */
+  .page__actions { margin-left: 0; width: 100%; flex-wrap: wrap; }
+  .page__actions .btn { flex: 1 1 auto; }
+  .mosaic { grid-template-columns: 1fr 1fr; grid-template-rows: auto; height: auto; }
+  .mosaic .photo { aspect-ratio: 4 / 3; border-radius: var(--r-img) !important; }
+  .mosaic .photo:first-child { grid-row: auto; grid-column: 1 / -1; }
+  .formrow { grid-template-columns: minmax(0, 1fr); }
+
+  /* phone keeps the pill CTA and adds a bottom bar */
+  .mobilebar { display: flex; }
+  .btn { height: 48px; }
+  .btn--pill { border-radius: var(--r-pill); }
+
+  .tabbar {
+    display: flex; position: fixed; bottom: 0; left: 0; right: 0;
+    height: 64px; background: #fff; border-top: 1px solid var(--line);
+    z-index: 40; padding-bottom: env(safe-area-inset-bottom);
+  }
+  .tabbar a {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; font-size: 10px; font-weight: 500; color: var(--muted);
+  }
+  .tabbar a svg { width: 21px; height: 21px; }
+  .tabbar a.is-active { color: var(--ink); font-weight: 600; }
+
+  /* phone top bar keeps the brand and the account controls only */
+  .topbar__actions .btn--quiet { display: none; }
+}
+
+/* numeric column: right aligned so prices line up when the action beside them
+   differs in width (an "Add" button vs an "Added" badge) */
+.list__cell--end { text-align: right; }
+
+/* flush cards square their media, the way Airbnb does on trip cards */
+.card--flush .photo { border-radius: 0; }
+/* grid children size to content so a short card is not stretched to a tall one */
+.cols { align-items: start; }
+
+/* ---------- tabs: text tabs with an underline marker ---------- */
+
+.tabs { display: flex; gap: 24px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+.tab {
+  position: relative; padding: 12px 0; border: 0; background: none;
+  font-size: 14px; font-weight: 500; color: var(--muted); cursor: pointer;
+}
+.tab.is-active { color: var(--ink); font-weight: 600; }
+.tab.is-active::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; background: var(--ink);
+}
+.tab__count { margin-left: 6px; font-weight: 500; color: var(--muted); }
+
+/* ---------- toolbar above a list ---------- */
+
+.toolbar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  padding: 16px 0; border-bottom: 1px solid var(--line);
+}
+.toolbar .searchpill { max-width: 360px; height: 44px; box-shadow: none; padding: 2px; }
+.toolbar .searchpill__seg { border: 0; display: flex; align-items: center; gap: 8px; padding: 0 14px; }
+.toolbar .searchpill__value { padding: 0; }
+.toolbar .spacer { margin-left: auto; }
+
+/* bulk action strip, only shown when rows are selected */
+.bulkbar {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px; border-radius: var(--r-control);
+  background: var(--inset); margin-bottom: 4px;
+}
+
+.check {
+  width: 18px; height: 18px; flex: none;
+  border: 1px solid #b0b0b0; border-radius: 4px; background: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.check.is-on { background: var(--ink); border-color: var(--ink); }
+.check svg { width: 12px; height: 12px; color: #fff; }
+
+/* ---------- key / value grid, for a record's details ---------- */
+
+.kv { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 24px; }
+.kv__item span { display: block; font-size: 13px; color: var(--muted); }
+.kv__item strong { display: block; font-size: 15px; font-weight: 600; margin-top: 2px; }
+
+/* ---------- month calendar ---------- */
+
+.cal { border: 1px solid var(--line); border-radius: var(--r-card); overflow: hidden; }
+.cal__head { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); }
+.cal__head .spacer { margin-left: auto; }
+.cal__weekdays {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  background: var(--inset); border-bottom: 1px solid var(--line);
+}
+.cal__weekdays span {
+  padding: 8px 10px; font-size: 11px; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase; color: var(--muted);
+}
+.cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.cal__cell {
+  min-height: 104px; padding: 8px;
+  border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
+}
+.cal__cell:nth-child(7n) { border-right: 0; }
+.cal__cell--muted { background: var(--inset); }
+.cal__day { font-size: 12px; font-weight: 600; }
+.cal__cell--today .cal__day { color: var(--bronze); }
+.cal__bar {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 6px; padding: 4px 8px; border-radius: var(--r-pill);
+  background: var(--inset); font-size: 11px; font-weight: 600;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.cal__bar--booked { background: #eff4ff; color: #1d4ed8; }
+.cal__bar--pending { background: #fffaeb; color: #b45309; }
+.cal__bar--blocked { background: #f2f4f7; color: #475467; }
+
+@media (max-width: 860px) {
+  .tabs { gap: 16px; overflow-x: auto; }
+  .kv { grid-template-columns: minmax(0, 1fr); }
+  .toolbar .searchpill { max-width: none; width: 100%; }
+  /* the month stays a month: cells shrink and the text inside the booking
+     bars is dropped, so seven columns still fit without sideways scrolling */
+  .cal__cell { min-height: 64px; padding: 4px; }
+  .cal__weekdays span { padding: 6px 4px; font-size: 10px; letter-spacing: .04em; }
+  .cal__bar { font-size: 0; padding: 3px 4px; gap: 0; }
+  .cal__bar::after { content: ""; display: block; width: 100%; height: 6px; border-radius: var(--r-pill); background: currentColor; opacity: .5; }
+}
