@@ -15,6 +15,15 @@
   color: #334155;
 }
 
+/* One rhythm between stacked host sections, from the shared spacing scale. */
+.op-host-today:not(.op-host-loading)>*+*,
+.op-host-listings>*+*,
+.op-host-earnings>*+*,
+.op-host-payouts>*+*,
+.op-host-calendar>*+* {
+  margin-top: var(--zl-space-section);
+}
+
 .op-host-heading {
   display: flex;
   align-items: flex-end;

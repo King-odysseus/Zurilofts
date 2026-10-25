@@ -1,3 +1,6 @@
+/* One rhythm between stacked trust sections, from the shared spacing scale. */
+.op-trust-wrap>*+*{margin-top:var(--zl-space-section)}
+
 .op-trust-page {
   min-height: 100vh;
   background: #fff;
