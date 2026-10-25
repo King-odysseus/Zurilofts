@@ -214,7 +214,10 @@ const BEDROOM_OPTIONS = countOptions('Any', [1, 2, 3, 4]);
 const BATHROOM_OPTIONS = countOptions('Any', [1, 2, 3]);
 
 function CategoryBar({ selected, onSelect, onFilters }) {
-  return <div className="mb-5 flex items-center gap-2">
+  // On phones the fixed-width Filters button squeezed the scrollable pill row
+  // into ~250px, so "Studios" was cut in half with no hint that it scrolls.
+  // Stacking it above the pills on small screens gives the row full width.
+  return <div className="mb-5 flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
     <div className="no-scrollbar flex flex-1 gap-2 overflow-x-auto pb-1">
       {categories.map((category) => <Button
         key={category}
