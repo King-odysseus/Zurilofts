@@ -675,7 +675,7 @@ function Navbar() {
               ref={searchFormRef}
               role="search"
               onSubmit={handleSearchSubmit}
-              className="zl-header-searchbar absolute right-0 top-1/2 z-30 flex h-11 w-full -translate-y-1/2 items-center gap-1.5 overflow-hidden rounded-full border border-[#E3E8EF] bg-elevated pl-1.5 pr-1.5 shadow-[0_8px_24px_rgba(11,31,66,0.12)]"
+              className="zl-header-searchbar absolute right-0 top-1/2 z-30 flex h-11 -translate-y-1/2 items-center gap-1.5 overflow-hidden rounded-full border border-[#E3E8EF] bg-elevated pl-1.5 pr-1.5 shadow-[0_8px_24px_rgba(11,31,66,0.12)]"
             >
               <button
                 type="button"

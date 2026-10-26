@@ -67,9 +67,16 @@
 }
 
 /* Header search opens inside the header band: the field grows from the right
-   edge (where the search icon sits) across the row instead of dropping a panel
-   below the navbar. Width is the only animated property so the field's own
-   height never shifts the header. */
+   edge (where the search icon sits) instead of dropping a panel below the
+   navbar. Width is the only animated property so the field's own height never
+   shifts the header. The open width is capped so the pill stays a compact
+   search field on wide screens while still filling a phone's header. */
+.zl-navbar .zl-header-searchbar {
+  --zl-header-search-width: min(100%, 34rem);
+  width: var(--zl-header-search-width);
+  animation: zl-header-search-open 220ms ease-out;
+}
+
 @keyframes zl-header-search-open {
   from {
     width: 0;
@@ -77,13 +84,9 @@
   }
 
   to {
-    width: 100%;
+    width: var(--zl-header-search-width);
     opacity: 1;
   }
-}
-
-.zl-navbar .zl-header-searchbar {
-  animation: zl-header-search-open 220ms ease-out;
 }
 
 @media (prefers-reduced-motion: reduce) {
