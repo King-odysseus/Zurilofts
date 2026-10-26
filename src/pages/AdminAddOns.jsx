@@ -266,13 +266,15 @@ function AdminAddOns() {
             <p className="text-xs leading-relaxed text-muted">Checking service inventory and property coverage.</p>
           </div>
         ) : visibleAddOns.length === 0 ? (
-          <Alert color="info">
-            <div className="flex w-full flex-col items-center gap-2 px-5 py-12 text-center">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><SearchIcon /></span>
-              <strong className="text-base font-semibold text-navy">No add-ons found</strong>
-              <p className="text-xs leading-relaxed text-muted">Create a guest service or adjust the current search.</p>
-            </div>
-          </Alert>
+          // Plain block, not an Alert: Alert wraps its children in an un-sized div
+          // inside a `flex items-center` row, so this centred block shrinks to its
+          // longest line and sits at the left edge instead of the middle. Every
+          // other admin empty state is a plain div, so this also matches them.
+          <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><SearchIcon /></span>
+            <strong className="text-base font-semibold text-navy">No add-ons found</strong>
+            <p className="text-xs leading-relaxed text-muted">Create a guest service or adjust the current search.</p>
+          </div>
         ) : (
           <div>
             <Table hoverable aria-label="Add-ons">

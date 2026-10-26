@@ -2,17 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the admin dashboard screens and nav to see what exists today",
+      "text": "Review Paystack code: payments, webhooks, transfers, payout service",
       "state": "done"
     },
     {
-      "text": "Check the admin API surface for data that has no screen yet",
-      "state": "active"
+      "text": "Check whether scheduled payouts actually run (scheduler) and how payout frequency is set",
+      "state": "done"
     },
     {
-      "text": "Write a prioritised list of recommended features",
-      "state": "pending"
+      "text": "Answer: is Paystack done properly, will hosts get paid, can frequency be set on Paystack",
+      "state": "done"
+    },
+    {
+      "text": "Identify off-centre 'No add-ons found' empty state",
+      "state": "done"
+    },
+    {
+      "text": "Find the component and CSS for the 'No add-ons found' empty state (src/pages/AdminAddOns.jsx)",
+      "state": "done"
+    },
+    {
+      "text": "Centre the empty state: replaced Alert wrapper with a plain centred flex column",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and build (both pass); browser check at desktop and phone widths not done",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-26T19:45:38.928Z"
+  "updatedAt": "2026-10-26T19:47:56.704Z"
 }

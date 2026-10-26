@@ -194,13 +194,13 @@ function AdminGuides() {
             <p className="text-xs leading-relaxed text-muted">Checking editorial status and publishing metadata.</p>
           </div>
         ) : visiblePosts.length === 0 ? (
-          <Alert color="info">
-            <div className="flex w-full flex-col items-center gap-2 px-5 py-12 text-center">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><SearchIcon /></span>
-              <strong className="text-base font-semibold text-navy">No guides found</strong>
-              <p className="text-xs leading-relaxed text-muted">Create the first guide or adjust the current search.</p>
-            </div>
-          </Alert>
+          // Same reason as the Add-ons page: an Alert wrapper shrinks this block
+          // to its longest line and pins it left, so it stayed off-centre.
+          <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><SearchIcon /></span>
+            <strong className="text-base font-semibold text-navy">No guides found</strong>
+            <p className="text-xs leading-relaxed text-muted">Create the first guide or adjust the current search.</p>
+          </div>
         ) : (
           <div>
             <Table hoverable aria-label="Travel guides">
