@@ -74,4 +74,8 @@ skills-lock.json
 
 # Local design review screenshots
 .kai/review/*.png
+# Review artefacts in per-run subfolders (screenshots, JSON reports, logs)
+.kai/review/**/*.png
+.kai/review/**/*.json
+.kai/review/**/*.log
 .kai/*.png
