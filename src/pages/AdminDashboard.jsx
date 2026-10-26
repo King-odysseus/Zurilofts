@@ -579,7 +579,9 @@ function DashboardOverview() {
     listingsPending: 0,
     verificationsPending: 0,
   });
-  const [landingStats, setLandingStats] = useState({ happyStays: '10', starRating: '5.0', satisfaction: '0' });
+  const [landingStats, setLandingStats] = useState({ starRating: '5.0', satisfaction: '0' });
+  // Happy stays is not editable, so it is read from the public summary instead.
+  const [liveStays, setLiveStays] = useState(null);
   const [trendDays, setTrendDays] = useState(30);
   const [trend, setTrend] = useState(null);
   const [savingLanding, setSavingLanding] = useState(false);
@@ -591,7 +593,7 @@ function DashboardOverview() {
       // Every list endpoint reports its own filtered total in `pagination`, so the
       // counts stay accurate without downloading whole tables. One failing panel
       // must not blank the others, hence the per-request fallbacks.
-      const [applicationsRes, accountsRes, pendingListingsRes, liveListingsRes, verificationsRes, landingRes] =
+      const [applicationsRes, accountsRes, pendingListingsRes, liveListingsRes, verificationsRes, landingRes, staysRes] =
         await Promise.all([
           apiClient.get('/admin/host-applications', { params: { status: 'SUBMITTED', limit: 5 } }).catch(() => null),
           apiClient.get('/admin/users', { params: { limit: 1 } }).catch(() => null),
@@ -599,6 +601,7 @@ function DashboardOverview() {
           apiClient.get('/admin/properties', { params: { status: 'PUBLISHED', limit: 1 } }).catch(() => null),
           apiClient.get('/admin/identity-verifications', { params: { status: 'SUBMITTED', limit: 1 } }).catch(() => null),
           apiClient.get('/admin/settings/landing-stats').catch(() => null),
+          apiClient.get('/reviews/summary').catch(() => null),
         ]);
       if (!active) return;
 
@@ -614,11 +617,15 @@ function DashboardOverview() {
       const landing = landingRes?.data?.data;
       if (landing) {
         setLandingStats({
-          happyStays: String(landing.happyStays ?? '10'),
           starRating: String(landing.starRating ?? '5.0'),
           satisfaction: String(landing.satisfaction ?? '0'),
         });
       }
+
+      // Read from the same public summary the landing page uses, so the figure
+      // shown to an admin is exactly the one a visitor sees.
+      const stays = staysRes?.data?.data?.happyStays;
+      setLiveStays(typeof stays === 'number' ? stays : null);
     }
     load();
     return () => { active = false; };
@@ -636,7 +643,7 @@ function DashboardOverview() {
     e.preventDefault();
     setSavingLanding(true); setLandingMsg('');
     try {
-      await apiClient.put('/admin/settings/landing-stats', { happyStays: Number(landingStats.happyStays), starRating: Number(landingStats.starRating), satisfaction: Number(landingStats.satisfaction) });
+      await apiClient.put('/admin/settings/landing-stats', { starRating: Number(landingStats.starRating), satisfaction: Number(landingStats.satisfaction) });
       setLandingMsg('Saved.');
     } catch { setLandingMsg('Save failed.'); }
     finally { setSavingLanding(false); }
@@ -754,9 +761,15 @@ function DashboardOverview() {
         <AccordionPanel>
           <AccordionTitle className="bg-white text-navy [&>button]:bg-white">Landing page statistics</AccordionTitle>
           <AccordionContent>
-            <p className={PANEL_SUBTITLE}>Set a value to 0 to use live review and booking data.</p>
+            <p className={PANEL_SUBTITLE}>Happy stays is counted from guest stays that have checked out, so it cannot be edited here. Set the other values to 0 to use live review data.</p>
             <form onSubmit={saveLandingStats} className="mt-3 flex flex-wrap items-end gap-3">
-              <label className="grid gap-1 text-xs font-semibold text-navy">Happy stays<TextInput type="number" min="0" className="w-32" value={landingStats.happyStays} onChange={(event) => setLandingStats({ ...landingStats, happyStays: event.target.value })} /></label>
+              {/* Deliberately not a field: it is a live count, so a box would invite typing. */}
+              <div className="grid w-28 gap-1 text-xs font-semibold text-navy">
+                <span>Happy stays</span>
+                <strong aria-label="Happy stays, counted from completed guest stays" className="flex min-h-[44px] items-center text-lg font-bold text-navy">
+                  {liveStays === null ? '...' : liveStays}
+                </strong>
+              </div>
               <label className="grid gap-1 text-xs font-semibold text-navy">Star rating<TextInput type="number" min="0" max="5" step="0.1" className="w-32" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
               <label className="grid gap-1 text-xs font-semibold text-navy">Satisfaction %<TextInput type="number" min="0" max="100" className="w-32" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
               <Button type="submit" size="sm" className={BTN_PRIMARY} disabled={savingLanding}>{savingLanding ? 'Saving...' : 'Update'}</Button>

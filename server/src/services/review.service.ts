@@ -183,12 +183,16 @@ export async function createReview(input: CreateReviewInput) {
 }
 
 /** Public summary: rating, stays, satisfaction for the landing page.
- *  Aggregates count visible reviews only; admin can override via settings. */
+ *  Aggregates count visible reviews only. Star rating and satisfaction can be
+ *  overridden in admin settings; happy stays cannot. */
 export async function getPublicStats() {
   const { getLandingStats } = await import('./settings.service.js');
-  const [reviewAgg, confirmedStays, landingStats] = await Promise.all([
+  const [reviewAgg, confirmedStays, completedStays, landingStats] = await Promise.all([
     prisma.review.aggregate({ where: { hidden: false }, _avg: { rating: true }, _count: { _all: true } }),
     prisma.booking.count({ where: { status: 'CONFIRMED' } }),
+    // A guest stay has happened once it is confirmed AND the guest has checked
+    // out. Upcoming bookings are not stays yet, so they are not counted here.
+    prisma.booking.count({ where: { status: 'CONFIRMED', checkOut: { lt: new Date() } } }),
     getLandingStats(),
   ]);
 
@@ -200,9 +204,9 @@ export async function getPublicStats() {
     : 5.0;
   const averageRating = landingStats.starRating > 0 ? landingStats.starRating : autoRating;
 
-  // Happy stays: auto-computed from confirmed bookings, admin can override.
-  // This is a marketing count separate from review sentiment.
-  const happyStays = landingStats.happyStays > 0 ? landingStats.happyStays : confirmedStays;
+  // Happy stays is deliberately not settable anywhere: it reports how many guest
+  // stays actually took place, so a typed figure would overstate real bookings.
+  const happyStays = completedStays;
 
   // Satisfaction: share of visible reviews rated 4+ stars, admin can override.
   // Derived from public star ratings only - never from private satisfaction/notes.
@@ -218,6 +222,7 @@ export async function getPublicStats() {
     averageRating,
     totalReviews,
     confirmedStays,
+    completedStays,
     happyStays,
     satisfaction,
   };

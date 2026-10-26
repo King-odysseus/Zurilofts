@@ -87,19 +87,20 @@ router.post('/messages/:userId', validate(messageCreateSchema), messageCtrl.admi
 // Per-property earnings / booking counts
 router.get('/analytics/properties', bookingCtrl.propertyEarnings);
 
-// Landing-page hero stats (editable by admin)
+// Landing-page hero stats. Happy stays is not among them: it is counted from
+// real completed guest stays and is read-only (see review.service.getPublicStats).
 router.get('/settings/landing-stats', async (_req: Request, res: Response, next: NextFunction) => {
   try { res.json({ success: true, data: await getLandingStats() }); }
   catch (e) { next(e); }
 });
 router.put('/settings/landing-stats', async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { happyStays, starRating, satisfaction } = req.body;
-    const stats = await setLandingStats(
-      happyStays !== undefined ? Number(happyStays) : undefined,
-      starRating !== undefined ? Number(starRating) : undefined,
-      satisfaction !== undefined ? Number(satisfaction) : undefined,
-    );
+    // A happyStays value in the body is ignored on purpose: the count is not editable.
+    const { starRating, satisfaction } = req.body;
+    const stats = await setLandingStats({
+      starRating: starRating !== undefined ? Number(starRating) : undefined,
+      satisfaction: satisfaction !== undefined ? Number(satisfaction) : undefined,
+    });
     res.json({ success: true, data: stats });
   } catch (e) { next(e); }
 });

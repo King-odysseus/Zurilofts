@@ -2,25 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Open screenshot and find the admin-driven control",
+      "text": "Survey UI: pages, shared styles, design tokens",
       "state": "done"
     },
     {
-      "text": "Trace its code and data source",
+      "text": "Look at key pages rendered at desktop and phone widths",
       "state": "done"
     },
     {
-      "text": "Make it follow real guest stays",
-      "state": "active"
+      "text": "Check rough edges (mobile, dark mode, empty states, consistency)",
+      "state": "done"
     },
     {
-      "text": "Verify in browser then lint and build",
-      "state": "pending"
-    },
-    {
-      "text": "Commit and push",
-      "state": "pending"
+      "text": "Write prioritised recommendations",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-26T19:51:24.380Z"
+  "updatedAt": "2026-10-26T19:55:31.688Z"
 }
