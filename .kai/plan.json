@@ -2,37 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Fix dark mode across guest, host and admin screens",
+      "text": "Check working tree state and what is uncommitted",
       "state": "done"
     },
     {
-      "text": "Build the fee calculator on the become-a-host page with a public fee endpoint",
+      "text": "Verify lint and build pass",
       "state": "done"
     },
     {
-      "text": "Wire the founding-host perk into approval and verify the cap against a throwaway database",
+      "text": "Ignore the KAI tool cache file instead of committing it",
       "state": "done"
     },
     {
-      "text": "Verify the referral reward and abandoned-application nudges end to end",
-      "state": "done"
+      "text": "Commit remaining work in focused commits",
+      "state": "active"
     },
     {
-      "text": "Verify production migrations: already applied by the deploy step, all 20 up to date, new columns and referral table present",
-      "state": "done"
-    },
-    {
-      "text": "Set HOST_COMMISSION_RATE to 10% on Railway and confirm the live fee endpoint reports it",
-      "state": "done"
-    },
-    {
-      "text": "Fix the production theme flash: inline theme script was blocked by the CSP, now loads from a same-origin file, verified live",
-      "state": "done"
-    },
-    {
-      "text": "Optional followed-up: switch on founding places and set a referral reward, which are still zero",
+      "text": "Push to remote and confirm main matches GitHub",
       "state": "pending"
+    },
+    {
+      "text": "Your side only: run npx prisma migrate deploy on Railway, then set HOST_COMMISSION_RATE and the other money settings",
+      "state": "pending"
+    },
+    {
+      "text": "Growth items built and wired: referral reward, founding-host perk, sign-up nudges, earnings calculator",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-26T21:32:33.493Z"
+  "updatedAt": "2026-10-26T21:50:28.701Z"
 }
