@@ -79,3 +79,6 @@ skills-lock.json
 .kai/review/**/*.json
 .kai/review/**/*.log
 .kai/*.png
+
+# KAI tool cache, not project source: lists Railway workspaces and ids.
+.kai/projects.json
