@@ -2,37 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Fix dark mode: guest search panel on discovery home (faint labels, dark native date boxes)",
-      "state": "active"
-    },
-    {
-      "text": "Audit other guest screens for the same dark mode problems and fix",
-      "state": "pending"
-    },
-    {
-      "text": "Run lint and build to verify the dark mode changes",
-      "state": "pending"
-    },
-    {
       "text": "Read current payout, payment and earnings code plus the booking schema",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Hold host funds until check-in instead of paying on payment confirmation",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Record commission and platform revenue on each booking",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Add admin revenue report endpoint and page",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Run tests, type-check, lint and build",
-      "state": "pending"
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-26T20:10:04.739Z"
+  "updatedAt": "2026-10-26T20:32:18.766Z"
 }

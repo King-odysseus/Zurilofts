@@ -54,6 +54,11 @@ const envSchema = z.object({
   // Pass the guest's cleaning fee / late check-out fee through to the host.
   HOST_PAY_CLEANING_FEE: z.string().default('false'),
   HOST_PAY_LATE_CHECKOUT_FEE: z.string().default('false'),
+  // Hours after check-in before a host's share becomes withdrawable. A stay
+  // has to have started before the money leaves the platform, so a guest
+  // cancelling or disputing cannot leave the platform chasing a paid-out host.
+  // 0 pays out at check-in.
+  HOST_FUNDS_HOLD_HOURS: z.string().default('24'),
   // Who funds a promo code. 'host' (default) takes the discount out of the
   // host's payout, which is the original behaviour. 'platform' pays the host on
   // the full price and absorbs the discount, except on a host's own code.
@@ -70,6 +75,14 @@ const envSchema = z.object({
           message: `${key} must be a fraction between 0 and 1 (0.1 means 10%), got "${data[key]}"`,
         });
       }
+    }
+    const holdHours = Number(data.HOST_FUNDS_HOLD_HOURS);
+    if (!Number.isFinite(holdHours) || holdHours < 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['HOST_FUNDS_HOLD_HOURS'],
+        message: `HOST_FUNDS_HOLD_HOURS must be zero or more hours, got "${data.HOST_FUNDS_HOLD_HOURS}"`,
+      });
     }
     if (data.JWT_ACCESS_SECRET === data.JWT_REFRESH_SECRET) {
       ctx.addIssue({

@@ -7,7 +7,7 @@ import { startTelegramPoller } from './services/chat.service.js';
 import { syncAll } from './services/ical.service.js';
 import { runDueAutoMessages } from './services/automated-message.service.js';
 import { syncConfiguredAdmin } from './services/admin-bootstrap.service.js';
-import { processScheduledPayouts } from './services/payout.service.js';
+import { processScheduledPayouts, releaseDueHostFunds } from './services/payout.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,21 +60,32 @@ function startCalendarSync() {
   setInterval(run, INTERVAL_MS);
 }
 
-// Periodically send host payouts that have come due. Without this the only way
-// money reaches a host is an admin remembering to press the button, so a host
-// on a weekly schedule could wait indefinitely. Skipped entirely when Paystack
-// is not configured, since every transfer would fail.
+// Periodically release host money whose hold has expired and send the payouts
+// that have come due. Without this the only way money reaches a host is an
+// admin remembering to press the button, so a host on a weekly schedule could
+// wait indefinitely.
+//
+// The release half runs even when Paystack is not configured: it only moves
+// numbers inside the database, and a host's balance should tell the truth
+// whether or not transfers are switched on yet.
 function startPayoutScheduler() {
   if (!env.PAYSTACK_SECRET_KEY) {
-    console.warn(' Paystack is not configured - scheduled host payouts are disabled.');
-    return;
+    console.warn(' Paystack is not configured - scheduled host transfers are disabled; held earnings still release on schedule.');
   }
   const INTERVAL_MS = 60 * 60 * 1000;
   const run = () => {
-    processScheduledPayouts()
-      .then(({ processed, failed }) => {
-        if (processed.length) console.log(` Payouts sent for ${processed.length} host(s)`);
-        for (const f of failed) console.warn(`Payout skipped for host ${f.hostId}: ${f.reason}`);
+    releaseDueHostFunds()
+      .then(({ released, amount }) => {
+        if (released > 0) console.log(` Released KES ${amount.toLocaleString()} to ${released} host booking(s)`);
+      })
+      .catch((err) => console.error('Host funds release failed:', err?.message || err))
+      .then(() => {
+        if (!env.PAYSTACK_SECRET_KEY) return undefined;
+        return processScheduledPayouts()
+          .then(({ processed, failed }) => {
+            if (processed.length) console.log(` Payouts sent for ${processed.length} host(s)`);
+            for (const f of failed) console.warn(`Payout skipped for host ${f.hostId}: ${f.reason}`);
+          });
       })
       .catch((err) => console.error('Scheduled payout run failed:', err?.message || err));
   };

@@ -127,3 +127,64 @@ test('a misconfigured rate cannot pay more than the stay was worth', () => {
   // 100% commission plus tax would be negative; the host payout floors at 0.
   assert.equal(result.hostNet, 0);
 });
+
+test('the split always reconciles: guest paid equals host net plus tax plus platform revenue', () => {
+  const result = calculateHostEarnings(
+    { subtotal: 40000, discountAmount: 4000, extraGuestFee: 1600, cleaningFee: 1500, lateCheckoutFee: 500, serviceFee: 4800 },
+    { ...ORIGINAL, commissionRate: 0.1, payCleaningFee: true, payLateCheckoutFee: true },
+    WHT,
+  );
+
+  assert.equal(result.guestPaid, 44400); // 40000 + 1500 + 4800 + 500 + 1600 - 4000
+  assert.equal(
+    result.guestPaid,
+    result.hostNet + result.withholdingTax + result.platformRevenue,
+    'no money may appear or disappear in the split',
+  );
+});
+
+test('under the original split the platform keeps the guest fee and the cleaning fee', () => {
+  const result = calculateHostEarnings(
+    { subtotal: 30000, cleaningFee: 1500, serviceFee: 3600 },
+    ORIGINAL,
+    WHT,
+  );
+
+  assert.equal(result.commission, 0);
+  assert.equal(result.platformRevenue, 5100); // 3600 guest fee + 1500 cleaning
+  assert.equal(result.hostNet, 28500); // 30000 - 5% tax
+});
+
+test('commission from the host adds to platform revenue', () => {
+  const off = calculateHostEarnings({ subtotal: 30000, serviceFee: 3600 }, ORIGINAL, WHT);
+  const on = calculateHostEarnings({ subtotal: 30000, serviceFee: 3600 }, { ...ORIGINAL, commissionRate: 0.1 }, WHT);
+
+  assert.equal(on.platformRevenue - off.platformRevenue, 3000); // the 10% commission
+  assert.equal(on.hostNet + 3000, off.hostNet, 'the host pays it, the guest does not');
+});
+
+test('passing the cleaning fee through moves it off platform revenue', () => {
+  const kept = calculateHostEarnings({ subtotal: 30000, cleaningFee: 1500, serviceFee: 3600 }, ORIGINAL, WHT);
+  const passed = calculateHostEarnings(
+    { subtotal: 30000, cleaningFee: 1500, serviceFee: 3600 },
+    { ...ORIGINAL, payCleaningFee: true },
+    WHT,
+  );
+
+  assert.equal(kept.platformRevenue - passed.platformRevenue, 1500);
+  assert.equal(passed.platformRevenue, 3600); // just the guest service fee
+});
+
+test('a platform-funded promo shows up as the platform spending money', () => {
+  const funded = calculateHostEarnings(
+    { subtotal: 30000, discountAmount: 3000, serviceFee: 3600 },
+    { ...ORIGINAL, platformFundsPromo: true },
+    WHT,
+  );
+
+  // Guest paid 30000 - 3000 + 3600; host still gets the full 30000 less tax, so
+  // the 3000 discount comes out of the platform's own fee.
+  assert.equal(funded.guestPaid, 30600);
+  assert.equal(funded.hostNet, 28500);
+  assert.equal(funded.platformRevenue, 600); // 3600 guest fee - 3000 absorbed
+});

@@ -7,7 +7,8 @@ import { calculateNights, computeExtraGuestFee } from '../utils/pricing.js';
 import { calculateHostEarnings, type HostEarningInput, type HostEarningPolicy } from '../utils/hostEarnings.js';
 import { sendTelegramAlert } from './chat.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
-import { computeNextPayoutDate, settleFailedTransfer } from './payout.service.js';
+import { settleFailedTransfer } from './payout.service.js';
+import { computeHostPayableAt } from '../utils/payoutTiming.js';
 
 const WITHHOLDING_TAX_RATE = Number(env.WITHHOLDING_TAX_RATE) / 100;
 
@@ -244,7 +245,7 @@ async function confirmBookingPayment(
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: {
-      property: { select: { hostId: true, title: true, host: { select: { payoutFrequency: true } } } },
+      property: { select: { hostId: true, title: true } },
       promoCode: { select: { hostId: true } },
       user: { select: { email: true } },
     },
@@ -298,71 +299,40 @@ async function confirmBookingPayment(
   const nights = calculateNights(booking.checkIn, booking.checkOut);
   const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
 
-  const { withholdingTax, hostNet } = calculateHostNet({
+  const { withholdingTax, hostNet, commission, platformRevenue } = calculateHostNet({
     subtotal: booking.subtotal,
     discountAmount: booking.discountAmount,
     extraGuestFee,
     cleaningFee: booking.cleaningFee,
     lateCheckoutFee: booking.lateCheckoutFee,
+    serviceFee: booking.serviceFee,
     promoOwnerHostId: booking.promoCode?.hostId ?? null,
   });
 
-  // New hosts have no next payout date, and the scheduled sweep only looks at
-  // hosts whose date has come due - so without this a host could earn forever
-  // and never be picked up automatically.
-  const nextPayoutAt = booking.property.host?.payoutFrequency
-    ? computeNextPayoutDate(booking.property.host.payoutFrequency)
-    : null;
+  // The host's share is only theirs once the stay has started. Crediting it now
+  // let a host withdraw money for a night that had not happened yet, so a later
+  // cancellation or dispute left the platform chasing it back.
+  const hostPayableAt = computeHostPayableAt(booking.checkIn, Number(env.HOST_FUNDS_HOLD_HOURS));
 
-  // Atomically flip PENDING -> CONFIRMED and credit the host wallet in one
-  // transaction. The affected-row count tells us whether THIS delivery performed
-  // the transition; the host wallet is credited only on that one transition, so
-  // duplicate callback/webhook deliveries can never double-credit a host, and a
-  // crash between the two steps can no longer leave a booking CONFIRMED whose
-  // host was never paid.
-  const confirmedCount = await prisma.$transaction(async (tx) => {
-    const confirmedNow = await tx.booking.updateMany({
-      where: { id: bookingId, status: { notIn: [...TERMINAL_BOOKING_STATUSES] } },
-      data: {
-        status: 'CONFIRMED',
-        paymentChannel: payment.channel,
-        paidAt: new Date(payment.paidAt),
-        hostNetAmount: hostNet,
-        withholdingTax,
-      },
-    });
-
-    if (confirmedNow.count === 0) return 0; // another delivery already confirmed it
-
-    // Credit host wallet
-    const hostId = booking.property.hostId;
-    if (hostId) {
-      await tx.hostWallet.upsert({
-        where: { hostId },
-        create: {
-          hostId,
-          balance: hostNet,
-          totalEarned: hostNet,
-        },
-        update: {
-          balance: { increment: hostNet },
-          totalEarned: { increment: hostNet },
-        },
-      });
-
-      // Also covers wallets created before this field was populated.
-      if (nextPayoutAt) {
-        await tx.hostWallet.updateMany({
-          where: { hostId, nextPayoutAt: null },
-          data: { nextPayoutAt },
-        });
-      }
-    }
-
-    return confirmedNow.count;
+  // Atomically flip PENDING -> CONFIRMED and record the split. The affected-row
+  // count tells us whether THIS delivery performed the transition, so duplicate
+  // callback/webhook deliveries can never apply the money twice. The wallet is
+  // credited later by releaseDueHostFunds, once hostPayableAt has passed.
+  const confirmedNow = await prisma.booking.updateMany({
+    where: { id: bookingId, status: { notIn: [...TERMINAL_BOOKING_STATUSES] } },
+    data: {
+      status: 'CONFIRMED',
+      paymentChannel: payment.channel,
+      paidAt: new Date(payment.paidAt),
+      hostNetAmount: hostNet,
+      withholdingTax,
+      hostCommission: commission,
+      platformRevenue,
+      hostPayableAt,
+    },
   });
 
-  if (confirmedCount === 0) return;
+  if (confirmedNow.count === 0) return; // another delivery already confirmed it
 }
 
 /** Handle an incoming Paystack webhook event */

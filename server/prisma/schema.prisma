@@ -294,6 +294,10 @@ model Booking {
   paidAt               DateTime? // When payment was confirmed
   hostNetAmount        Int? // What the host actually earns from this booking
   withholdingTax       Int? // KRA withholding tax amount (5% of host gross)
+  hostCommission       Int? // Platform commission taken from the host's share
+  platformRevenue      Int? // What the platform keeps, before Paystack fees
+  hostPayableAt        DateTime? // When the host's share becomes withdrawable
+  hostFundsReleasedAt  DateTime? // When it was moved into the withdrawable balance
   cancelledAt          DateTime? // When the booking was cancelled
   cancelledBy          String? // Who cancelled: "GUEST" | "ADMIN" | "SYSTEM"
   cancelledById        String? // userId of the canceller (GUEST/ADMIN)
@@ -315,6 +319,8 @@ model Booking {
   @@index([userId, createdAt])
   @@index([status])
   @@index([refundStatus])
+  // The payout sweep asks for confirmed bookings whose hold has expired.
+  @@index([status, hostPayableAt])
 }
 
 // Guest-facing identity verification, separate from the host's own

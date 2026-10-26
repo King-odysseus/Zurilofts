@@ -302,6 +302,10 @@ model Booking {
   paidAt           DateTime?
   hostNetAmount    Int?
   withholdingTax   Int?
+  hostCommission   Int?
+  platformRevenue  Int?
+  hostPayableAt    DateTime?
+  hostFundsReleasedAt DateTime?
   cancelledAt      DateTime?
   cancelledBy      String?
   cancelledById    String?
@@ -323,6 +327,8 @@ model Booking {
   @@index([userId, createdAt])
   @@index([status])
   @@index([refundStatus])
+  // The payout sweep asks for confirmed bookings whose hold has expired.
+  @@index([status, hostPayableAt])
 }
 
 // Guest-facing identity verification, separate from the host's own

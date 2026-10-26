@@ -87,6 +87,9 @@ router.post('/messages/:userId', validate(messageCreateSchema), messageCtrl.admi
 // Per-property earnings / booking counts
 router.get('/analytics/properties', bookingCtrl.propertyEarnings);
 
+// What the platform itself earned, and what it still holds for hosts.
+router.get('/revenue', bookingCtrl.revenue);
+
 // Landing-page hero stats. Happy stays is not among them: it is counted from
 // real completed guest stays and is read-only (see review.service.getPublicStats).
 router.get('/settings/landing-stats', async (_req: Request, res: Response, next: NextFunction) => {

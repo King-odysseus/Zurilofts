@@ -23,6 +23,8 @@ export interface HostEarningInput {
   extraGuestFee?: number;
   cleaningFee?: number;
   lateCheckoutFee?: number;
+  /** Guest-facing service fee charged on top of the stay (platform's cut). */
+  serviceFee?: number;
   /** Set when the promo belongs to this host, so they fund their own discount. */
   promoOwnerHostId?: string | null;
 }
@@ -37,6 +39,14 @@ export interface HostEarning {
   hostNet: number;
   /** The part of the promo discount that came out of the host's share. */
   hostFundedDiscount: number;
+  /** What the guest paid for the stay itself, add-ons excluded. */
+  guestPaid: number;
+  /**
+   * What the platform keeps from this booking, before card/transfer fees.
+   * Derived by subtraction so the split always reconciles:
+   * guestPaid = hostNet + withholdingTax + platformRevenue.
+   */
+  platformRevenue: number;
 }
 
 /**
@@ -56,8 +66,13 @@ export function calculateHostEarnings(
   const subtotal = Math.max(0, input.subtotal);
   const discountAmount = Math.max(0, input.discountAmount ?? 0);
   const extraGuestFee = Math.max(0, input.extraGuestFee ?? 0);
-  const cleaningFee = policy.payCleaningFee ? Math.max(0, input.cleaningFee ?? 0) : 0;
-  const lateCheckoutFee = policy.payLateCheckoutFee ? Math.max(0, input.lateCheckoutFee ?? 0) : 0;
+  // The guest is charged these whatever the pass-through policy says, so the
+  // reconciliation below uses the charged amounts, not the host's share.
+  const chargedCleaningFee = Math.max(0, input.cleaningFee ?? 0);
+  const chargedLateCheckoutFee = Math.max(0, input.lateCheckoutFee ?? 0);
+  const serviceFee = Math.max(0, input.serviceFee ?? 0);
+  const cleaningFee = policy.payCleaningFee ? chargedCleaningFee : 0;
+  const lateCheckoutFee = policy.payLateCheckoutFee ? chargedLateCheckoutFee : 0;
 
   // A platform-wide code is marketing spend. A host's own code is a discount
   // that host chose to give, so they still carry it.
@@ -72,5 +87,12 @@ export function calculateHostEarnings(
   // reporting, not silently move money out of the host's wallet.
   const hostNet = Math.max(0, hostGross - commission - withholdingTax);
 
-  return { hostGross, commission, withholdingTax, hostNet, hostFundedDiscount };
+  // What actually reached the platform's Paystack balance for this stay.
+  // Add-ons are excluded: they are not part of hostNetAmount and are paid out
+  // separately, so counting them here would overstate platform revenue.
+  const guestPaid =
+    subtotal + chargedCleaningFee + serviceFee + chargedLateCheckoutFee + extraGuestFee - discountAmount;
+  const platformRevenue = guestPaid - hostNet - withholdingTax;
+
+  return { hostGross, commission, withholdingTax, hostNet, hostFundedDiscount, guestPaid, platformRevenue };
 }

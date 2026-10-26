@@ -3,6 +3,7 @@ import * as bookingService from '../services/booking.service.js';
 import * as paymentService from '../services/payment.service.js';
 import { isApprovedForPayment } from '../services/identity-verification.service.js';
 import prisma from '../config/prisma.js';
+import * as revenueService from '../services/revenue.service.js';
 
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -103,6 +104,26 @@ export async function listAll(req: Request, res: Response, next: NextFunction): 
 
 // Per-property booking counts + earnings. Admins see all properties; other
 // roles are scoped to their own listings (token-derived).
+/**
+ * Platform revenue: what the platform kept from each paid booking, plus what is
+ * still held for hosts. Admin only - the route mounts behind requireAdmin.
+ */
+export async function revenue(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { from, to } = req.query;
+    const filter = from || to
+      ? {
+          ...(from ? { from: new Date(from as string) } : {}),
+          ...(to ? { to: new Date(to as string) } : {}),
+        }
+      : undefined;
+    const data = await revenueService.getPlatformRevenue(filter);
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function propertyEarnings(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { from, to } = req.query;

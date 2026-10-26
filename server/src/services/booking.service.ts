@@ -803,54 +803,54 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
     );
   }
 
-  // Compute host finances when admin resolves CONFLICT -> CONFIRMED
-  let hostNetAmount: number | undefined;
-  let withholdingTax: number | undefined;
+  // Compute host finances when admin resolves CONFLICT -> CONFIRMED. The wallet
+  // is not credited here either: the same hold that applies to a normal payment
+  // applies to an admin resolution, and releaseDueHostFunds credits it once
+  // hostPayableAt has passed.
+  let money: {
+    hostNetAmount: number;
+    withholdingTax: number;
+    commission: number;
+    platformRevenue: number;
+    hostPayableAt: Date;
+  } | null = null;
+
   if (isConflict && status === 'CONFIRMED') {
     const nights = calculateNights(booking.checkIn, booking.checkOut);
     const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
     const { calculateHostNet } = await import('./payment.service.js');
+    const { computeHostPayableAt } = await import('../utils/payoutTiming.js');
+    const { env } = await import('../config/env.js');
     const hn = calculateHostNet({
       subtotal: booking.subtotal,
       discountAmount: booking.discountAmount,
       extraGuestFee,
       cleaningFee: booking.cleaningFee,
       lateCheckoutFee: booking.lateCheckoutFee,
+      serviceFee: booking.serviceFee,
       promoOwnerHostId: booking.promoCode?.hostId ?? null,
     });
-    hostNetAmount = hn.hostNet;
-    withholdingTax = hn.withholdingTax;
+    money = {
+      hostNetAmount: hn.hostNet,
+      withholdingTax: hn.withholdingTax,
+      commission: hn.commission,
+      platformRevenue: hn.platformRevenue,
+      hostPayableAt: computeHostPayableAt(booking.checkIn, Number(env.HOST_FUNDS_HOLD_HOURS)),
+    };
   }
 
   const data: any = { status };
-  if (hostNetAmount != null) {
-    data.hostNetAmount = hostNetAmount;
-    data.withholdingTax = withholdingTax;
+  if (money) {
+    data.hostNetAmount = money.hostNetAmount;
+    data.withholdingTax = money.withholdingTax;
+    data.hostCommission = money.commission;
+    data.platformRevenue = money.platformRevenue;
+    data.hostPayableAt = money.hostPayableAt;
   }
 
-  // Wrap the money writes in a transaction: booking update + wallet credit
-  // are atomic. Push notification fires after commit - a failed push must
-  // never roll back a money write.
-  const updated = await prisma.$transaction(async (tx) => {
-    const result = await tx.booking.update({
-      where: { id: bookingId },
-      data,
-    });
-
-    // Credit host wallet on CONFLICT -> CONFIRMED resolution (double-credit
-    // guard: only runs when previous status was CONFLICT)
-    if (isConflict && status === 'CONFIRMED' && hostNetAmount != null) {
-      const hostId = booking.property?.hostId;
-      if (hostId) {
-        await tx.hostWallet.upsert({
-          where: { hostId },
-          create: { hostId, balance: hostNetAmount, totalEarned: hostNetAmount },
-          update: { balance: { increment: hostNetAmount }, totalEarned: { increment: hostNetAmount } },
-        });
-      }
-    }
-
-    return result;
+  const updated = await prisma.booking.update({
+    where: { id: bookingId },
+    data,
   });
 
   // Send push notification on status change (after transaction commit, best-effort)
@@ -929,10 +929,12 @@ export async function cancelBooking(bookingId: string, actor: CancelActor) {
   let shortfall = 0;
 
   await prisma.$transaction(async (tx) => {
-    // Reverse the host's earnings for the cancelled stay. Reversal is capped at
-    // the wallet's current balance: if the funds were already paid out, the
-    // difference is recorded so admin can claw it back on the next payout.
-    if (wasPaid && hostNet > 0 && hostId) {
+    // Reverse the host's earnings for the cancelled stay. Only released money
+    // can be reversed: a stay cancelled before check-in never reached the
+    // wallet, so there is nothing to take back. Reversal is capped at the
+    // current balance, and a shortfall is recorded for admin clawback when the
+    // funds had already been paid out.
+    if (wasPaid && hostNet > 0 && hostId && booking.hostFundsReleasedAt) {
       const wallet = await tx.hostWallet.findUnique({
         where: { hostId },
         select: { id: true, balance: true },

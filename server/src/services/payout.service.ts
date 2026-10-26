@@ -3,11 +3,108 @@ import * as paystack from '../config/paystack.js';
 import crypto from 'crypto';
 import { ValidationError, NotFoundError, ConflictError } from '../types/index.js';
 import { maskPayoutAccount, normalizeKenyanMpesaPhone, payoutRecipientKey } from '../utils/payoutDestination.js';
+import { isHostFundsDue } from '../utils/payoutTiming.js';
 
-/** Get a host's current wallet balance + stats */
+/**
+ * Get a host's wallet: the withdrawable balance plus what is still held.
+ *
+ * `balance` is the only number a payout may transfer, so money inside its hold
+ * window is reported separately as `pendingBalance` rather than being counted
+ * as available.
+ */
 export async function getHostWallet(hostId: string) {
   const wallet = await prisma.hostWallet.findUnique({ where: { hostId } });
-  return wallet || { balance: 0, totalEarned: 0, totalPaidOut: 0, lastPayoutAt: null, nextPayoutAt: null };
+  const held = await prisma.booking.aggregate({
+    where: {
+      property: { hostId },
+      status: 'CONFIRMED',
+      hostFundsReleasedAt: null,
+      hostNetAmount: { gt: 0 },
+    },
+    _sum: { hostNetAmount: true },
+    _count: true,
+  });
+
+  return {
+    ...(wallet || { balance: 0, totalEarned: 0, totalPaidOut: 0, lastPayoutAt: null, nextPayoutAt: null }),
+    pendingBalance: held._sum?.hostNetAmount ?? 0,
+    pendingBookings: held._count ?? 0,
+  };
+}
+
+/**
+ * Move every confirmed booking whose hold has expired into the host's
+ * withdrawable balance.
+ *
+ * Each booking is claimed and credited in one transaction, so overlapping
+ * sweeps cannot credit the same stay twice: the conditional update only matches
+ * while hostFundsReleasedAt is still null, and the wallet write happens in the
+ * same transaction as that claim.
+ */
+export async function releaseDueHostFunds(
+  now: Date = new Date(),
+): Promise<{ released: number; amount: number }> {
+  const candidates = await prisma.booking.findMany({
+    where: {
+      status: 'CONFIRMED',
+      hostFundsReleasedAt: null,
+      hostPayableAt: { not: null, lte: now },
+      hostNetAmount: { gt: 0 },
+    },
+    select: {
+      id: true,
+      hostNetAmount: true,
+      hostPayableAt: true,
+      hostFundsReleasedAt: true,
+      status: true,
+      property: { select: { hostId: true, host: { select: { payoutFrequency: true } } } },
+    },
+  });
+
+  let released = 0;
+  let amount = 0;
+
+  for (const booking of candidates) {
+    const hostId = booking.property?.hostId;
+    const hostNet = booking.hostNetAmount ?? 0;
+    // Re-check in memory as well: the rule lives in one pure function, so the
+    // sweep and its tests cannot drift apart.
+    if (!hostId || hostNet <= 0 || !isHostFundsDue(booking, now)) continue;
+
+    const frequency = booking.property?.host?.payoutFrequency ?? null;
+
+    const credited = await prisma.$transaction(async (tx) => {
+      const claim = await tx.booking.updateMany({
+        where: { id: booking.id, hostFundsReleasedAt: null },
+        data: { hostFundsReleasedAt: now },
+      });
+      if (claim.count === 0) return false;
+
+      await tx.hostWallet.upsert({
+        where: { hostId },
+        create: { hostId, balance: hostNet, totalEarned: hostNet },
+        update: { balance: { increment: hostNet }, totalEarned: { increment: hostNet } },
+      });
+
+      // New hosts have no next payout date, so without this the scheduled sweep
+      // would never pick them up.
+      if (frequency) {
+        await tx.hostWallet.updateMany({
+          where: { hostId, nextPayoutAt: null },
+          data: { nextPayoutAt: computeNextPayoutDate(frequency) },
+        });
+      }
+
+      return true;
+    });
+
+    if (credited) {
+      released += 1;
+      amount += hostNet;
+    }
+  }
+
+  return { released, amount };
 }
 
 export async function getHostPayoutDestination(hostId: string) {
@@ -30,6 +127,10 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
   payout: any;
   message: string;
 }> {
+  // Release anything whose hold has expired first, so an admin pressing the
+  // button and the hourly sweep pay the same amount.
+  await releaseDueHostFunds();
+
   // Check wallet balance
   const wallet = await prisma.hostWallet.findUnique({ where: { hostId } });
   if (!wallet || wallet.balance <= 0) {
@@ -123,12 +224,15 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
     }
   }
 
-  // Collect all unpaid bookings for this host to include in the payout
+  // Collect the unpaid bookings this payout covers. Only released funds count:
+  // the wallet balance is built from those, so listing a booking still inside
+  // its hold would mark it paid without its money having moved.
   const unpaidBookings = await prisma.booking.findMany({
     where: {
       property: { hostId },
       status: 'CONFIRMED',
       hostNetAmount: { gt: 0 },
+      hostFundsReleasedAt: { not: null },
       payoutBookings: { none: {} },
     },
     select: { id: true, hostNetAmount: true },
@@ -272,6 +376,9 @@ export async function settleFailedTransfer(
 
 /** Process all scheduled payouts for hosts whose next payout date is due */
 export async function processScheduledPayouts(): Promise<{ processed: string[]; failed: { hostId: string; reason: string }[] }> {
+  // Stays whose hold has expired become payable here, then get paid in the same
+  // run, so a host never waits an extra scheduling cycle for money already due.
+  await releaseDueHostFunds();
   const now = new Date();
 
   const dueWallets = await prisma.hostWallet.findMany({
