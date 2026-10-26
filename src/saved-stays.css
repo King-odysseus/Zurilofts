@@ -1,5 +1,5 @@
 .opg-saved-page{min-height:calc(100vh - 72px);padding:24px 0 72px;background:#fff;color:#0b1f42;font-family:Inter,Arial,sans-serif}
-.opg-saved-container{width:min(1296px,calc(100% - 48px));margin:0 auto}
+.opg-saved-container{width:calc(100% - 48px);margin:0 auto}
 .opg-saved-header{min-height:49px;display:flex;align-items:flex-start;justify-content:space-between;gap:24px}
 .opg-saved-heading h1{font:700 24px/1.2 Inter,Arial,sans-serif;color:#0b1f42;margin:0}
 .opg-saved-heading p{font-size:13px;line-height:1.3;color:#6b7280;margin-top:4px}
@@ -66,7 +66,7 @@
 .opg-shared-shortlist .opg-saved-auth{margin-bottom:40px}
 .opg-shortlist-created{margin-top:48px!important;padding-top:24px;border-top:1px solid #e3e8ef;text-align:center;font-size:12px;color:#6b7280}
 .opg-shortlist-created a{color:#c49a6c;font-weight:600;text-decoration:none}
-.opg-shared-shortlist .opg-saved-container{width:min(1200px,calc(100% - 48px))}
+.opg-shared-shortlist .opg-saved-container{width:calc(100% - 48px)}
 .opg-shortlist-back{display:inline-flex;align-items:center;gap:5px;margin-bottom:24px;color:#64748b;font-size:13px;text-decoration:none}
 .opg-shortlist-back svg{width:16px;height:16px}
 .opg-shortlist-back:hover{color:#0b1f42}

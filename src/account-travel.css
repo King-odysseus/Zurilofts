@@ -1,8 +1,10 @@
-.opg-account-page{min-height:100vh;background:#fff;color:#0b1f42;font-family:Inter,Arial,sans-serif}
-.opg-account-main{padding:96px 0 96px}
+.opg-account-page{min-height:calc(100vh - 64px);background:#fff;color:#0b1f42;font-family:Inter,Arial,sans-serif;display:flex;flex-direction:column}
+.opg-account-main{flex:1 1 auto;display:flex;flex-direction:column;padding:96px 0 96px}
+/* Column flex so a page can hand its leftover height to a child (the message panes do). */
+.opg-account-content{display:flex;flex-direction:column;min-height:0}
 .opg-account-content>*+*{margin-top:var(--zl-space-section)}
-.opg-account-container{width:min(1296px,calc(100% - 48px));margin:0 auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;align-items:start}
-.opg-account-sidebar{position:sticky;top:96px;padding:16px;border-radius:12px;background:#f8fafc}
+.opg-account-container{width:calc(100% - 48px);margin:0 auto;display:grid;grid-template-columns:260px minmax(0,1fr);gap:24px;align-items:stretch;flex:1 1 auto}
+.opg-account-sidebar{position:sticky;top:96px;align-self:start;padding:16px;border-radius:12px;background:#f8fafc}
 .opg-account-person{display:flex;align-items:center;gap:12px;padding-bottom:16px;border-bottom:1px solid #e3e8ef}
 .opg-account-person>img,.opg-account-person>span{display:grid;place-items:center;width:46px;height:46px;flex:none;border-radius:50%;background:#c49a6c;color:#fff;object-fit:cover;font:700 14px Montserrat,Arial,sans-serif}
 .opg-account-person>div{min-width:0}
@@ -120,8 +122,10 @@
 .opg-profile-loading span{display:block;height:88px;border-radius:12px;background:#f1f5f9;animation:opg-trip-pulse 1.5s ease-in-out infinite}
 .opg-profile-loading span:first-child{height:96px}.opg-profile-loading span:last-child{height:300px}
 
-.opg-messages-layout{display:grid;grid-template-columns:318px minmax(0,1fr);gap:16px;min-height:600px}
-.opg-conversation-list,.opg-message-pane{height:600px;min-width:0;overflow:hidden;border:1px solid #e8edf3;border-radius:12px}
+/* The message panes take the height left under the heading so they end near the bottom of the window,
+   instead of stopping at a fixed 600px. min-height keeps a short window scrollable. */
+.opg-messages-layout{display:grid;grid-template-columns:318px minmax(0,1fr);gap:16px;flex:1 1 auto;min-height:520px}
+.opg-conversation-list,.opg-message-pane{min-width:0;min-height:0;overflow:hidden;border:1px solid #e8edf3;border-radius:12px}
 .opg-conversation-list{display:flex;flex-direction:column;background:#fff}
 .opg-conversation-list-head{flex:none;padding:16px 16px 12px}
 .opg-conversation-list-head h2{margin:0 0 12px;color:#0b1f42;font:700 20px/1.2 Montserrat,Arial,sans-serif;letter-spacing:0}
@@ -198,6 +202,9 @@
 .opg-message-empty strong{display:block;color:#0b1f42;font:700 17px Montserrat,Arial,sans-serif}
 .opg-message-empty p{max-width:340px;margin:7px auto 0!important;color:#64748b;font-size:12px;line-height:1.55}
 .opg-message-inline-error{align-self:center;margin:0!important;color:#b42318;font-size:10px;text-align:center}
+/* The message panes reach the bottom of the screen, so these pages drop the large closing padding. */
+.opg-account-page.is-messages-index .opg-account-main,
+.opg-account-page.is-message-thread .opg-account-main{padding-bottom:40px}
 
 @media(max-width:980px){
   .opg-account-container{grid-template-columns:220px minmax(0,1fr)}
@@ -243,7 +250,7 @@
   .opg-profile-form{grid-template-columns:minmax(0,1fr)}
   .opg-profile-form>button{grid-column:auto}
   .opg-profile-frequency{width:100%}
-  .opg-messages-layout{display:block;min-height:0}
+  .opg-messages-layout{display:block;height:auto;min-height:0}
   .opg-account-page.is-messages-index .opg-account-main{padding:80px 0 calc(104px + env(safe-area-inset-bottom))}
   .opg-account-page.is-messages-index .opg-account-container{width:100%}
   .opg-account-page.is-messages-index .opg-account-heading{padding:0 16px}
