@@ -22,6 +22,10 @@
 
   /* OpenPencil surfaces (op-*) */
   --op-ink: #414D63;
+  /* Height of the slim legal strip on app screens. Screens that size
+     themselves with calc(100vh - header) subtract it, so the strip does not
+     push them one scrollbar below the fold. 0 where the strip is hidden. */
+  --zl-legal-strip-h: 54px;
   --op-muted: #6E7686;
   --op-line: #E2DAD0;
   --op-paper: #FFFFFF;

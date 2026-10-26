@@ -29,7 +29,7 @@
 @media(max-width:600px){.op-checkout-chrome{height:64px}.op-checkout-brand{font-size:15px}.op-checkout-brand img{width:24px;height:24px}.op-checkout-secure{font-size:0;padding:9px}.op-checkout-secure:first-letter{font-size:13px}.op-checkout-summary{min-height:56px}.op-checkout-summary strong{font-size:12px}.op-checkout-summary>strong{font-size:12px}.op-checkout-main>div{padding-top:16px}.op-checkout-main .shadow-lg{box-shadow:none}.op-checkout-country-code{width:96px;min-width:96px}}
 
 /* Payment result states use the checkout handoff card, one state at a time. */
-.op-payment-result{min-height:calc(100vh - 72px);background:#fff;color:#0B1F42;font-family:Inter,Arial,sans-serif}
+.op-payment-result{min-height:calc(100vh - 72px - var(--zl-legal-strip-h, 0px));background:#fff;color:#0B1F42;font-family:Inter,Arial,sans-serif}
 .op-payment-result-inner{width:100%;max-width:1080px;margin:0 auto;padding:34px 24px 88px}
 .op-payment-back{justify-self:start;margin-bottom:22px}
 .op-payment-result-heading{max-width:620px;margin:0 auto 24px;text-align:center}
@@ -89,7 +89,7 @@
 .op-payment-calendar .op-payment-link{margin-top:0}
 @keyframes op-payment-spin{to{transform:rotate(360deg)}}
 @media(max-width:600px){
-  .op-payment-result{min-height:calc(100vh - 64px)}
+  .op-payment-result{min-height:calc(100vh - 64px - var(--zl-legal-strip-h, 0px))}
   .op-payment-result-inner{padding:22px 16px 112px}
   .op-payment-result-heading{margin-bottom:20px;text-align:left}
   .op-payment-result-heading h1{font-size:26px}

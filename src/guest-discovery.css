@@ -161,7 +161,7 @@
 .opg-legal-strip span{display:flex;gap:20px}
 .opg-legal-strip a,.opg-legal-strip button{background:none;border:0;padding:0;font:inherit;color:var(--op-muted);text-decoration:none;cursor:pointer}
 .opg-legal-strip a:hover,.opg-legal-strip button:hover{color:#0B1F42;text-decoration:underline}
-@media(max-width:767px){.opg-legal-strip{display:none}}
+@media(max-width:767px){:root{--zl-legal-strip-h:0px}.opg-legal-strip{display:none}}
 
 /* The legal strip kept its white bar and slate grey links, so in dark mode it
    was a bright band of unreadable text under every public page. */

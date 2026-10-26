@@ -1,4 +1,4 @@
-.opg-account-page{min-height:calc(100vh - 64px);background:#fff;color:#0b1f42;font-family:Inter,Arial,sans-serif;display:flex;flex-direction:column}
+.opg-account-page{min-height:calc(100vh - 64px - var(--zl-legal-strip-h, 0px));background:#fff;color:#0b1f42;font-family:Inter,Arial,sans-serif;display:flex;flex-direction:column}
 .opg-account-main{flex:1 1 auto;display:flex;flex-direction:column;padding:96px 0 96px}
 /* Column flex so a page can hand its leftover height to a child (the message panes do). */
 .opg-account-content{display:flex;flex-direction:column;min-height:0}
