@@ -8,6 +8,7 @@ import { syncAll } from './services/ical.service.js';
 import { runDueAutoMessages } from './services/automated-message.service.js';
 import { syncConfiguredAdmin } from './services/admin-bootstrap.service.js';
 import { processScheduledPayouts, releaseDueHostFunds } from './services/payout.service.js';
+import { sendHostApplicationNudges } from './services/nudge.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -31,6 +32,7 @@ app.listen(Number(env.PORT), () => {
   startCalendarSync();
   startAutomatedMessageScheduler();
   startPayoutScheduler();
+  startHostNudgeScheduler();
 });
 
 // Unhandled promise rejections and process errors crash hard so Railway can
@@ -94,6 +96,23 @@ function startPayoutScheduler() {
   setInterval(run, INTERVAL_MS);
 }
 
+// Remind a host whose application has been sitting untouched. Runs twice a
+// day rather than hourly: the idle window is measured in days, so a faster
+// sweep would only re-read the same rows.
+function startHostNudgeScheduler() {
+  const INTERVAL_MS = 12 * 60 * 60 * 1000;
+  const run = () => {
+    sendHostApplicationNudges()
+      .then(({ sent }) => {
+        if (sent > 0) console.log(` Sent ${sent} host application nudge(s)`);
+      })
+      .catch((err) => console.error('Host nudge scan failed:', err?.message || err));
+  };
+  // Slow first run: boot is the busiest moment and no nudge is urgent.
+  setTimeout(run, 10 * 60 * 1000);
+  setInterval(run, INTERVAL_MS);
+}
+
 // Periodically deliver time-based automated host messages (pre-arrival
 // reminders, check-in/check-out day messages, post-stay review nudges). Runs
 // every 15 minutes; per-booking dedupe logs make overlapping runs a no-op.
@@ -109,3 +128,4 @@ function startAutomatedMessageScheduler() {
   setTimeout(run, 45 * 1000);
   setInterval(run, INTERVAL_MS);
 }
+

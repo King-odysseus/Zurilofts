@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as hostAppService from '../services/host-application.service.js';
+import { getReferralSummary } from '../services/referral.service.js';
 import { ValidationError } from '../types/index.js';
 
 // ── Applicant endpoints - userId is always taken from the JWT (req.user.sub) ──
@@ -9,6 +10,20 @@ export async function getOwn(req: Request, res: Response, next: NextFunction): P
   try {
     const application = await hostAppService.getOwnApplication(req.user!.sub);
     res.json({ success: true, data: application });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * GET /api/host-application/referral - the caller's own shareable code and
+ * what it has earned. Returns code:null when the caller has none yet, which the
+ * UI treats as "nothing to show" rather than an error.
+ */
+export async function getReferral(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const summary = await getReferralSummary(req.user!.sub);
+    res.json({ success: true, data: summary });
   } catch (error) {
     next(error);
   }

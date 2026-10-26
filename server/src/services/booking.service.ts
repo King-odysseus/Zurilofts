@@ -818,18 +818,27 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
   if (isConflict && status === 'CONFIRMED') {
     const nights = calculateNights(booking.checkIn, booking.checkOut);
     const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
-    const { calculateHostNet } = await import('./payment.service.js');
+    const { calculateHostNet, HOST_EARNING_POLICY } = await import('./payment.service.js');
+    const { resolveHostCommissionRate } = await import('./foundingHost.service.js');
     const { computeHostPayableAt } = await import('../utils/payoutTiming.js');
     const { env } = await import('../config/env.js');
-    const hn = calculateHostNet({
-      subtotal: booking.subtotal,
-      discountAmount: booking.discountAmount,
-      extraGuestFee,
-      cleaningFee: booking.cleaningFee,
-      lateCheckoutFee: booking.lateCheckoutFee,
-      serviceFee: booking.serviceFee,
-      promoOwnerHostId: booking.promoCode?.hostId ?? null,
-    });
+    // A founding host agreed a lower commission for the life of the account, so
+    // this path resolves their own rate too. Charging the global rate here would
+    // take money they were promised the moment an admin resolves a conflict.
+    const hostId = booking.property?.hostId ?? null;
+    const commissionRate = hostId ? await resolveHostCommissionRate(hostId) : null;
+    const hn = calculateHostNet(
+      {
+        subtotal: booking.subtotal,
+        discountAmount: booking.discountAmount,
+        extraGuestFee,
+        cleaningFee: booking.cleaningFee,
+        lateCheckoutFee: booking.lateCheckoutFee,
+        serviceFee: booking.serviceFee,
+        promoOwnerHostId: booking.promoCode?.hostId ?? null,
+      },
+      commissionRate === null ? undefined : { ...HOST_EARNING_POLICY, commissionRate },
+    );
     money = {
       hostNetAmount: hn.hostNet,
       withholdingTax: hn.withholdingTax,

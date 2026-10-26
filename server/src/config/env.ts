@@ -63,10 +63,27 @@ const envSchema = z.object({
   // host's payout, which is the original behaviour. 'platform' pays the host on
   // the full price and absorbs the discount, except on a host's own code.
   PLATFORM_PROMO_FUNDING: z.enum(['host', 'platform']).default('host'),
+  // Founding-host programme. The first FOUNDING_HOST_LIMIT approved hosts pay
+  // FOUNDING_HOST_COMMISSION_RATE instead of HOST_COMMISSION_RATE. A limit of 0
+  // switches the programme off, which is the default: a real cap only creates
+  // urgency once someone has decided how many places to give away.
+  FOUNDING_HOST_LIMIT: z.string().default('0'),
+  FOUNDING_HOST_COMMISSION_RATE: z.string().default('0.05'),
+  // KES credited to a host whose referred host completes a first stay. 0
+  // switches the referral bonus off.
+  REFERRAL_REWARD_KES: z.string().default('0'),
+  // Nudge an application left mid-way after this many idle days, at most
+  // HOST_NUDGE_MAX times. The nudges go out as push notifications; the server
+  // has no email provider, so a host without push is not reached this way.
+  HOST_NUDGE_AFTER_DAYS: z.string().default('2'),
+  HOST_NUDGE_MAX: z.string().default('2'),
 })
   .superRefine((data, ctx) => {
     // A rate outside 0..1 would pay a host a multiplied or negative amount.
-    for (const key of ['HOST_COMMISSION_RATE', 'GUEST_SERVICE_FEE_RATE'] as const) {
+    // FOUNDING_HOST_COMMISSION_RATE belongs here too: a founding place fixes
+    // that host's rate for the life of the account, so a typo would be
+    // permanent rather than a one-off overcharge.
+    for (const key of ['HOST_COMMISSION_RATE', 'GUEST_SERVICE_FEE_RATE', 'FOUNDING_HOST_COMMISSION_RATE'] as const) {
       const rate = Number(data[key]);
       if (!Number.isFinite(rate) || rate < 0 || rate > 1) {
         ctx.addIssue({

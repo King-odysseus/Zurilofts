@@ -9,6 +9,7 @@ import { sendTelegramAlert } from './chat.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
 import { settleFailedTransfer } from './payout.service.js';
 import { computeHostPayableAt } from '../utils/payoutTiming.js';
+import { resolveHostCommissionRate } from './foundingHost.service.js';
 
 const WITHHOLDING_TAX_RATE = Number(env.WITHHOLDING_TAX_RATE) / 100;
 
@@ -299,7 +300,17 @@ async function confirmBookingPayment(
   const nights = calculateNights(booking.checkIn, booking.checkOut);
   const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
 
-  const { withholdingTax, hostNet, commission, platformRevenue } = calculateHostNet({
+  // The commission is this host's own rate, not just the global default: a
+  // founding host agreed a lower rate for as long as they host, so charging them
+  // the global rate would take money they were promised. A booking with no host
+  // id (a legacy row) keeps the configured global policy unchanged.
+  const hostId = booking.property?.hostId ?? null;
+  const hostCommissionRate = hostId ? await resolveHostCommissionRate(hostId) : null;
+  const hostEarningsFor = (input: HostEarningInput) =>
+    hostCommissionRate === null
+      ? calculateHostNet(input)
+      : calculateHostNet(input, { ...HOST_EARNING_POLICY, commissionRate: hostCommissionRate });
+  const { withholdingTax, hostNet, commission, platformRevenue } = hostEarningsFor({
     subtotal: booking.subtotal,
     discountAmount: booking.discountAmount,
     extraGuestFee,

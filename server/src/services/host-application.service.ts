@@ -9,6 +9,8 @@ import {
   type HostDocumentKind,
 } from '../utils/hostDocumentCrypto.js';
 import { normalizeKenyanMpesaPhone } from '../utils/payoutDestination.js';
+import { enrolFoundingHost } from './foundingHost.service.js';
+import { applyReferralCode, ensureReferralCode, normaliseReferralCode } from './referral.service.js';
 
 // ============================================================
 // Host application lifecycle - pure transition logic
@@ -111,6 +113,7 @@ export interface ApplicantFields {
   payoutMpesaPhone?: string | null;
   experience?: string | null;
   agreedTerms?: boolean | null;
+  referredByCode?: string | null;
 }
 
 /** True when a field holds no usable value (blank string, null, undefined). */
@@ -265,6 +268,9 @@ export function toApplicantView(app: any) {
     payoutMpesaPhone: app.payoutMpesaPhone ?? null,
     experience: app.experience ?? null,
     agreedTerms: Boolean(app.agreedTerms),
+    // Shown to the applicant and the reviewer: a founding place changes the
+    // commission this host pays for the life of the account.
+    foundingHost: Boolean(app.foundingHost),
     documents: (app.documents || []).map(toDocumentMetadata),
     reviewNote: app.reviewNote ?? null,
     submittedAt: app.submittedAt ?? null,
@@ -393,6 +399,19 @@ export async function updateDraft(userId: string, data: ApplicantFields) {
     } else {
       patch[field] = data[field];
     }
+  }
+
+  // A referral link is resolved rather than stored raw: the applicant typed a
+  // code, and what the money depends on is the host behind it. An unknown or
+  // self-referring code clears the link instead of failing the whole save, so a
+  // typo never costs someone their application.
+  if (data.referredByCode !== undefined) {
+    const typed = normaliseReferralCode(data.referredByCode);
+    const referrerId = await prisma.$transaction((tx) =>
+      applyReferralCode(tx, userId, data.referredByCode),
+    );
+    patch.referredByCode = typed;
+    patch.referredByHostId = referrerId;
   }
 
   const updated = await prisma.hostApplication.update({
@@ -678,6 +697,16 @@ export async function adminApprove(id: string, reviewerId: string) {
     if (payoutPatch) {
       await tx.user.update({ where: { id: app.userId }, data: payoutPatch });
     }
+
+    // A founding place is claimed inside the same transaction as the promotion,
+    // so two admins approving at once cannot both take the last place. This runs
+    // before the status update so the row returned to the reviewer already
+    // carries the flag and shows what the host was granted.
+    await enrolFoundingHost(tx, id);
+
+    // Every approved host gets a shareable code, whether or not anyone referred
+    // them, so the referral card always has something to show.
+    await ensureReferralCode(tx, id);
 
     const updated = await tx.hostApplication.update({
       where: { id },

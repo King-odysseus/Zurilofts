@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { ValidationError, NotFoundError, ConflictError } from '../types/index.js';
 import { maskPayoutAccount, normalizeKenyanMpesaPhone, payoutRecipientKey } from '../utils/payoutDestination.js';
 import { isHostFundsDue } from '../utils/payoutTiming.js';
+import { creditReferralForFirstEarning } from './referral.service.js';
 
 /**
  * Get a host's wallet: the withdrawable balance plus what is still held.
@@ -101,6 +102,10 @@ export async function releaseDueHostFunds(
     if (credited) {
       released += 1;
       amount += hostNet;
+      // This host has just earned for the first time, which is the event a
+      // referral pays for. Called after the release has committed: a referral is
+      // a bonus, and it must never be able to undo a host's own earnings.
+      await creditReferralForFirstEarning(hostId, now);
     }
   }
 

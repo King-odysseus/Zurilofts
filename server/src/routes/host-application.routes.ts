@@ -30,6 +30,7 @@ function handleDocumentUpload(req: Request, res: Response, next: NextFunction): 
 router.use(authenticate);
 
 router.get('/', hostAppCtrl.getOwn);
+router.get('/referral', hostAppCtrl.getReferral);
 router.post('/', hostAppCtrl.ensureDraft);
 router.patch('/', validate(hostApplicationUpdateSchema), hostAppCtrl.update);
 router.post('/submit', hostAppCtrl.submit);

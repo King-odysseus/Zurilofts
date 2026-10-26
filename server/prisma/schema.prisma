@@ -122,6 +122,18 @@ model HostApplication {
   payoutMpesaPhone      String? // Safaricom number registered for M-PESA
   experience            String? // hosting background / notes for verification
   agreedTerms           Boolean                   @default(false)
+  // Founding-host programme. Enrolled at approval while places remain; a
+  // founding host pays a lower commission for as long as they host.
+  foundingHost          Boolean                   @default(false)
+  // Referrals. ownReferralCode is assigned at approval and shared by the host;
+  // referredByCode is what this applicant typed, resolved to referredByHostId.
+  ownReferralCode       String?                   @unique
+  referredByCode        String?
+  referredByHostId      String?
+  // Signup nudges for an application left half-finished. Counted so a host is
+  // reminded at most HOST_NUDGE_MAX times rather than every sweep.
+  nudgeCount            Int                       @default(0)
+  lastNudgeAt           DateTime?
   reviewNote            String? // applicant-visible reviewer note (reason for changes/rejection)
   reviewedBy            String? // audit: admin userId who last reviewed (no relation, like Payout.initiatedBy)
   submittedAt           DateTime?
@@ -759,4 +771,21 @@ model ConsentRecord {
 
   @@index([userId])
   @@index([visitorId])
+}
+
+// Bonus owed to a host who referred another host. One row per referred host, so
+// the reward can only ever be credited once however many times the sweep runs.
+// Referrer and referred are bare ids, like Payout.initiatedBy, to keep the User
+// model free of a growing set of back-relations.
+model HostReferral {
+  id             String    @id @default(cuid())
+  referrerHostId String
+  referredHostId String    @unique
+  amount         Int // KES, snapshotted at credit time
+  status         String    @default("PENDING") // PENDING | CREDITED | VOID
+  creditedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([referrerHostId])
+  @@index([status])
 }

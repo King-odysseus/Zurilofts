@@ -299,6 +299,10 @@ export const hostApplicationUpdateSchema = z.object({
   payoutMpesaPhone: z.string().trim().min(10).max(16).optional(),
   experience: z.string().max(2000).optional(),
   agreedTerms: z.boolean().optional(),
+  // Optional referral code typed by the applicant. Kept lenient on purpose: a
+  // mistyped code must never stop someone from applying, so it is resolved and
+  // quietly ignored when it matches no host.
+  referredByCode: z.string().trim().max(24).optional(),
 });
 
 // Admin request-changes / reject both require an applicant-visible reason.
