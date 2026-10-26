@@ -125,6 +125,34 @@ function normalizeProperty(property: any) {
   };
 }
 
+/**
+ * The rating/reviews columns on Property are a cache, and a seeded demo
+ * listing can carry numbers with no review rows behind them: the cards then
+ * advertise "4.8 from 7 reviews" while the detail page has nothing to show.
+ * Recompute both from the visible reviews on the way out so the card, the
+ * detail page and the admin views all report the same real figure.
+ */
+async function withLiveRatings<T extends { id: string }>(properties: T[]): Promise<T[]> {
+  if (!properties.length) return properties;
+  const aggregates = await prisma.review.groupBy({
+    by: ['propertyId'],
+    where: { hidden: false, propertyId: { in: properties.map((p) => p.id) } },
+    _avg: { rating: true },
+    _count: { _all: true },
+  });
+  const byProperty = new Map(aggregates.map((row) => [row.propertyId, row]));
+  return properties.map((property) => {
+    const row = byProperty.get(property.id);
+    const count = row?._count._all ?? 0;
+    const average = row?._avg.rating ?? 0;
+    return {
+      ...property,
+      rating: count > 0 ? Math.round(average * 10) / 10 : 0,
+      reviews: count,
+    };
+  });
+}
+
 function normalizeProperties(properties: any[]) {
   return properties.map(normalizeProperty);
 }
@@ -331,7 +359,7 @@ export async function listProperties(filters: PropertyFilters) {
     const total = available.length;
     const paged = available.slice(skip, skip + limit);
     return {
-      properties: normalizeProperties(paged),
+      properties: await withLiveRatings(normalizeProperties(paged)),
       pagination: {
         page,
         limit,
@@ -352,7 +380,7 @@ export async function listProperties(filters: PropertyFilters) {
   ]);
 
   return {
-    properties: normalizeProperties(properties),
+    properties: await withLiveRatings(normalizeProperties(properties)),
     pagination: {
       page,
       limit,
