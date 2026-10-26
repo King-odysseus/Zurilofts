@@ -13,7 +13,10 @@ const router = Router();
  * when config does.
  */
 router.get('/fees', (_req, res) => {
-  res.set('Cache-Control', 'public, max-age=300');
+  // Short because this is money messaging: a visitor who saw the old commission
+  // for five minutes after a rate change would be reading a broken promise.
+  // Still cached at all because the schedule only moves when config does.
+  res.set('Cache-Control', 'public, max-age=60');
   res.json({ success: true, data: getPublicFeeSchedule() });
 });
 
