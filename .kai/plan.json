@@ -2,25 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Find the footer markup and how the logo reads on its navy surface",
+      "text": "Check what is uncommitted and confirm the source code is already pushed",
       "state": "done"
     },
     {
-      "text": "Add the logo to the footer, sized and spaced for its first column",
+      "text": "Scan the untracked files for secrets or other things that must not be committed",
       "state": "done"
     },
     {
-      "text": "Check it in a browser, light and dark mode, desktop and tablet",
+      "text": "Confirm with the user whether the 16MB review screenshot dump goes into git",
       "state": "done"
     },
     {
-      "text": "Run lint and build",
+      "text": "Stage and commit the remaining files in logical groups",
       "state": "done"
     },
     {
-      "text": "Commit and push the change",
-      "state": "active"
+      "text": "Push to origin and confirm the working tree is clean and in sync",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-26T18:58:03.214Z"
+  "updatedAt": "2026-10-26T19:24:33.488Z"
 }
