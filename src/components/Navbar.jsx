@@ -61,6 +61,10 @@ function Navbar() {
   const dropdownRef = useRef(null);
   const navMenuRef = useRef(null);
   const searchRef = useRef(null);
+  // The search field opens inside the header row, so it lives outside the icon
+  // button's wrapper element; it needs its own ref so the outside-click handler
+  // does not close it while the visitor is typing.
+  const searchFormRef = useRef(null);
 
   const { user, isAuthenticated, logout } = useAuth();
   const { mode, setMode, canSelectHosting } = useMode();
@@ -167,7 +171,7 @@ function Navbar() {
       if (navMenuRef.current && !navMenuRef.current.contains(e.target)) {
         setOpenSubmenu(null);
       }
-      if (searchRef.current && !searchRef.current.contains(e.target)) {
+      if (!searchRef.current?.contains(e.target) && !searchFormRef.current?.contains(e.target)) {
         setSearchOpen(false);
       }
     }
@@ -288,16 +292,16 @@ function Navbar() {
         : 'bg-transparent'
     }`}>
       <div className="mx-auto w-full max-w-[1344px] px-4 md:px-6">
-        <div className="flex h-16 items-center justify-between md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+        <div className="relative flex h-16 items-center justify-between md:grid md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
           {/* Brand */}
-          <div className="flex min-w-0 items-center justify-self-start">
+          <div className={`flex min-w-0 items-center justify-self-start transition-opacity duration-150 ${searchOpen ? 'pointer-events-none opacity-0' : ''}`}>
             <Link to="/" className="flex flex-shrink-0 items-center">
               <BrandLogo imgClassName="h-9 w-auto md:h-10" />
             </Link>
           </div>
 
           {/* Desktop nav links */}
-          <div ref={navMenuRef} className="zl-desktop-nav hidden md:flex md:items-center md:justify-center md:px-4">
+          <div ref={navMenuRef} className={`zl-desktop-nav hidden md:flex md:items-center md:justify-center md:px-4 transition-opacity duration-150 ${searchOpen ? 'pointer-events-none opacity-0' : ''}`}>
             <ul className="flex items-center md:space-x-1 lg:space-x-6">
               {navItems.map((item) => {
                 const hasChildren = Array.isArray(item.children) && item.children.length > 0;
@@ -370,7 +374,7 @@ function Navbar() {
           </div>
 
           {/* Right side: search, account menu and mobile menu */}
-          <div className="zl-header-actions flex items-center gap-1 justify-self-end md:gap-2">
+          <div className={`zl-header-actions flex items-center gap-1 justify-self-end md:gap-2 transition-opacity duration-150 ${searchOpen ? 'pointer-events-none opacity-0' : ''}`}>
             <div className="relative" ref={searchRef}>
               <button
                 type="button"
@@ -389,27 +393,6 @@ function Navbar() {
               >
                 <Search className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
               </button>
-              {searchOpen && (
-                <form
-                  id="navbar-search"
-                  role="search"
-                  onSubmit={handleSearchSubmit}
-                  className="absolute right-0 top-full z-30 mt-2 flex w-[min(340px,calc(100vw-2rem))] items-center gap-2 rounded-2xl border border-[#E3E8EF] bg-elevated p-2 shadow-[0_16px_40px_rgba(11,31,66,0.16)]"
-                >
-                  <TextInput
-                    value={searchQuery}
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="Where do you want to stay?"
-                    aria-label="Search destination"
-                    sizing="sm"
-                    className="min-w-0 flex-1"
-                    autoFocus
-                  />
-                  <Button type="submit" size="sm" className="shrink-0 bg-[#C49A6C] text-[#0B1F42] enabled:hover:bg-[#B8895C]">
-                    Search
-                  </Button>
-                </form>
-              )}
             </div>
 
             {isAuthenticated ? (
@@ -682,6 +665,41 @@ function Navbar() {
               )}
             </button>
           </div>
+
+          {/* The search field expands inside the header row itself: it grows from
+              the right edge (where the icon sits) and stays within the header
+              band, so nothing ever opens as a panel below the header. */}
+          {searchOpen && (
+            <form
+              id="navbar-search"
+              ref={searchFormRef}
+              role="search"
+              onSubmit={handleSearchSubmit}
+              className="zl-header-searchbar absolute right-0 top-1/2 z-30 flex h-11 w-full -translate-y-1/2 items-center gap-1.5 overflow-hidden rounded-full border border-[#E3E8EF] bg-elevated pl-1.5 pr-1.5 shadow-[0_8px_24px_rgba(11,31,66,0.12)]"
+            >
+              <button
+                type="button"
+                onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
+                aria-label="Close search"
+                title="Close search"
+                className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[#5B6B82] transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+              >
+                <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+              </button>
+              <TextInput
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Where do you want to stay?"
+                aria-label="Search destination"
+                sizing="sm"
+                className="min-w-0 flex-1"
+                autoFocus
+              />
+              <Button type="submit" size="sm" className="shrink-0 rounded-full bg-[#C49A6C] text-white enabled:hover:bg-[#B8895C]">
+                Search
+              </Button>
+            </form>
+          )}
         </div>
 
         {/* Secondary navigation drawer */}

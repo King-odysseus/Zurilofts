@@ -66,6 +66,32 @@
   }
 }
 
+/* Header search opens inside the header band: the field grows from the right
+   edge (where the search icon sits) across the row instead of dropping a panel
+   below the navbar. Width is the only animated property so the field's own
+   height never shifts the header. */
+@keyframes zl-header-search-open {
+  from {
+    width: 0;
+    opacity: 0.35;
+  }
+
+  to {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+.zl-navbar .zl-header-searchbar {
+  animation: zl-header-search-open 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .zl-navbar .zl-header-searchbar {
+    animation: none;
+  }
+}
+
 /* Mobile destinations use one bronze state rail instead of competing pill fills. */
 .mobile-bottom-nav > a::after,
 .host-mobile-bottom-nav > a::after {
