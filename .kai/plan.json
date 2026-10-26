@@ -2,33 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Review Paystack code: payments, webhooks, transfers, payout service",
+      "text": "Open screenshot and find the admin-driven control",
       "state": "done"
     },
     {
-      "text": "Check whether scheduled payouts actually run (scheduler) and how payout frequency is set",
+      "text": "Trace its code and data source",
       "state": "done"
     },
     {
-      "text": "Answer: is Paystack done properly, will hosts get paid, can frequency be set on Paystack",
-      "state": "done"
+      "text": "Make it follow real guest stays",
+      "state": "active"
     },
     {
-      "text": "Identify off-centre 'No add-ons found' empty state",
-      "state": "done"
+      "text": "Verify in browser then lint and build",
+      "state": "pending"
     },
     {
-      "text": "Find the component and CSS for the 'No add-ons found' empty state (src/pages/AdminAddOns.jsx)",
-      "state": "done"
-    },
-    {
-      "text": "Centre the empty state: replaced Alert wrapper with a plain centred flex column",
-      "state": "done"
-    },
-    {
-      "text": "Run lint and build (both pass); browser check at desktop and phone widths not done",
-      "state": "done"
+      "text": "Commit and push",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-26T19:47:56.704Z"
+  "updatedAt": "2026-10-26T19:51:24.380Z"
 }
