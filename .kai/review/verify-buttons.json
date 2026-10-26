@@ -1,0 +1,133 @@
+{
+  "failedRoutes": [],
+  "rows": [
+    {
+      "route": "/profile",
+      "theme": "dark",
+      "kind": "A",
+      "label": "Sign Out",
+      "cls": "flex items-center justify-center w-full min-h-[44px] px-4 rounded-full",
+      "bg": "rgb(22,34,56)",
+      "fg": "rgb(248,113,113)",
+      "ratio": 5.75,
+      "routes": [
+        "/profile"
+      ]
+    },
+    {
+      "route": "/admin",
+      "theme": "light",
+      "kind": "A",
+      "label": "Sign Out",
+      "cls": "flex items-center text-white/60 transition-colors hover:text-white mt-",
+      "bg": "rgb(11,31,66)",
+      "fg": "rgb(157,165,179)",
+      "ratio": 6.6,
+      "routes": [
+        "/admin",
+        "/admin/users",
+        "/admin/addons",
+        "/admin/earnings",
+        "/admin/trust-safety",
+        "/host/today",
+        "/host/calendar",
+        "/host/earnings",
+        "/host/discounts"
+      ]
+    },
+    {
+      "route": "/admin",
+      "theme": "dark",
+      "kind": "A",
+      "label": "Sign Out",
+      "cls": "flex items-center text-white/60 transition-colors hover:text-white mt-",
+      "bg": "rgb(11,31,66)",
+      "fg": "rgb(157,165,179)",
+      "ratio": 6.6,
+      "routes": [
+        "/admin",
+        "/admin/users",
+        "/admin/addons",
+        "/admin/earnings",
+        "/admin/trust-safety",
+        "/host/today",
+        "/host/calendar",
+        "/host/earnings",
+        "/host/discounts"
+      ]
+    },
+    {
+      "route": "/admin",
+      "theme": "dark",
+      "kind": "A",
+      "label": "Switch to dark mode",
+      "cls": "grid h-9 w-9 place-items-center rounded-lg text-muted transition-color",
+      "bg": "rgb(22,34,55)",
+      "fg": "rgb(159,176,198)",
+      "ratio": 7.23,
+      "routes": [
+        "/admin",
+        "/admin/users",
+        "/admin/addons",
+        "/admin/earnings",
+        "/admin/trust-safety",
+        "/host/today",
+        "/host/calendar",
+        "/host/earnings",
+        "/host/discounts"
+      ]
+    },
+    {
+      "route": "/profile",
+      "theme": "dark",
+      "kind": "A",
+      "label": "AUAdmin",
+      "cls": "flex items-center space-x-2 px-2 py-2 rounded-full hover:bg-[#F6EFE7] ",
+      "bg": "rgb(13,23,40)",
+      "fg": "rgb(159,176,198)",
+      "ratio": 8.12,
+      "routes": [
+        "/profile"
+      ]
+    },
+    {
+      "route": "/profile",
+      "theme": "dark",
+      "kind": "A",
+      "label": "Booking History",
+      "cls": "",
+      "bg": "rgb(13,23,40)",
+      "fg": "rgb(159,176,198)",
+      "ratio": 8.12,
+      "routes": [
+        "/profile"
+      ]
+    },
+    {
+      "route": "/admin/addons",
+      "theme": "light",
+      "kind": "B",
+      "label": "Active",
+      "cls": "relative flex items-center justify-center text-center focus:outline-no",
+      "bg": "rgb(22,163,74)",
+      "fg": "rgb(255,255,255)",
+      "ratio": 3.3,
+      "routes": [
+        "/admin/addons"
+      ]
+    },
+    {
+      "route": "/admin/addons",
+      "theme": "dark",
+      "kind": "B",
+      "label": "Active",
+      "cls": "relative flex items-center justify-center text-center focus:outline-no",
+      "bg": "rgb(22,163,74)",
+      "fg": "rgb(255,255,255)",
+      "ratio": 3.3,
+      "routes": [
+        "/admin/addons"
+      ]
+    }
+  ]
+}

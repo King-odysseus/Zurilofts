@@ -1,0 +1,47 @@
+distinct=15 occurrences=509 errors=4
+
+A [dark] "Delete" ratio=2.62 bg=rgb(17,27,45) fg=rgb(180,35,24)
+    cls=flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition
+    pages: /admin/addons /admin/guides
+A [dark] "Show password" ratio=4.46 bg=rgb(17,27,45) fg=rgb(114,131,154)
+    cls=op-auth-password-toggle
+    pages: /login /register
+A [light] "Sign Out" ratio=6.6 bg=rgb(11,31,66) fg=rgb(157,165,179)
+    cls=flex items-center text-white/60 transition-colors hover:text-white mt-3 text-[15
+    pages: /admin/addons /admin/guides /admin/feedback /admin/governance /admin/host-applications /admin/trust-safety /admin/properties /admin/earnings /admin/payouts /admin/promos /admin/bookings /admin/messages /host/today /host/calendar /host/earnings /host/payouts /host/listings /host/discounts
+A [light] "Sign Out" ratio=6.6 bg=rgb(11,31,66) fg=rgb(157,165,179)
+    cls=flex items-center text-white/60 transition-colors hover:text-white mt-3 h-10 w-1
+    pages: /admin/addons /admin/guides /admin/feedback /admin/governance /admin/host-applications /admin/trust-safety /admin/properties /admin/earnings /admin/payouts /admin/promos /admin/bookings /admin/messages /host/today /host/calendar /host/earnings /host/payouts /host/listings /host/discounts
+A [dark] "Sign Out" ratio=6.6 bg=rgb(11,31,66) fg=rgb(157,165,179)
+    cls=flex items-center text-white/60 transition-colors hover:text-white mt-3 h-10 w-1
+    pages: /admin/addons /admin/guides /admin/feedback /admin/governance /admin/host-applications /admin/trust-safety /admin/properties /admin/earnings /admin/payouts /admin/promos /admin/bookings /admin/messages /host/today /host/calendar /host/earnings /host/payouts /host/listings /host/discounts
+A [dark] "Sign Out" ratio=6.6 bg=rgb(11,31,66) fg=rgb(157,165,179)
+    cls=flex items-center text-white/60 transition-colors hover:text-white mt-3 text-[15
+    pages: /admin/addons /admin/guides /admin/feedback /admin/governance /admin/host-applications /admin/trust-safety /admin/properties /admin/earnings /admin/payouts /admin/promos /admin/bookings /admin/messages /host/today /host/calendar /host/earnings /host/payouts /host/listings /host/discounts
+A [dark] "Switch to dark mode" ratio=7.23 bg=rgb(22,34,55) fg=rgb(159,176,198)
+    cls=grid h-9 w-9 place-items-center rounded-lg text-muted transition-colors hover:bg
+    pages: /admin/addons /admin/guides /admin/feedback /admin/governance /admin/host-applications /admin/trust-safety /admin/properties /admin/earnings /admin/payouts /admin/promos /admin/bookings /admin/messages /host/today /host/calendar /host/earnings /host/payouts /host/listings /host/discounts
+B [dark] "Save stay" ratio=1.04 bg=rgb(232,233,235) fg=rgb(231,238,248)
+    cls=absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-white/90 
+    pages: / /properties
+B [dark] "Back" ratio=1.17 bg=rgb(255,255,255) fg=rgb(231,238,248)
+    cls=inline-flex h-10 min-w-10 items-center justify-center gap-2 rounded-full bg-surf
+    pages: /login /register
+B [light] "Search stays" ratio=2.57 bg=rgb(196,154,108) fg=rgb(255,255,255)
+    cls=relative flex items-center justify-center text-center focus:outline-none shrink-
+    pages: / /properties
+B [light] "Search" ratio=2.57 bg=rgb(196,154,108) fg=rgb(255,255,255)
+    cls=relative flex items-center justify-center text-center focus:outline-none gap-2 w
+    pages: / /properties /guides
+B [light] "Sign in" ratio=2.57 bg=rgb(196,154,108) fg=rgb(255,255,255)
+    cls=op-auth-submit
+    pages: /login /register
+B [dark] "Sign in" ratio=2.57 bg=rgb(196,154,108) fg=rgb(255,255,255)
+    cls=op-auth-submit
+    pages: /login /register
+B [light] "Active" ratio=3.3 bg=rgb(22,163,74) fg=rgb(255,255,255)
+    cls=relative flex items-center justify-center text-center focus:outline-none shrink-
+    pages: /admin/addons
+B [dark] "Active" ratio=3.3 bg=rgb(22,163,74) fg=rgb(255,255,255)
+    cls=relative flex items-center justify-center text-center focus:outline-none shrink-
+    pages: /admin/addons

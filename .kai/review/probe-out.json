@@ -1,0 +1,26 @@
+{
+  "rows": [
+    {
+      "label": "Feedback",
+      "tag": "a",
+      "cls": "flex items-center gap-3 rounded-lg text-sm font-medium transition-colors text-white/80 hover:bg-white/10 hover:text-white px-3 py-2.5",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgba(255, 255, 255, 0.8)",
+      "opacity": "1"
+    },
+    {
+      "label": "Sign Out",
+      "tag": "button",
+      "cls": "flex items-center text-white/60 transition-colors hover:text-white mt-3 text-[15px]",
+      "bg": "rgba(0, 0, 0, 0)",
+      "color": "rgba(255, 255, 255, 0.6)",
+      "opacity": "1"
+    }
+  ],
+  "tokens": {
+    "surface": "17 27 45",
+    "elevated": "22 34 56",
+    "navy": "231 238 248"
+  },
+  "dark": true
+}

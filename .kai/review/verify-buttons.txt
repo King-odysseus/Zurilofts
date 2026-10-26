@@ -1,0 +1,26 @@
+distinct=8 occurrences=92 skippedRoutes=0
+
+A [dark] "Sign Out" ratio=5.75 bg=rgb(22,34,56) fg=rgb(248,113,113)
+    flex items-center justify-center w-full min-h-[44px] px-4 rounded-full
+    /profile
+A [light] "Sign Out" ratio=6.6 bg=rgb(11,31,66) fg=rgb(157,165,179)
+    flex items-center text-white/60 transition-colors hover:text-white mt-
+    /admin /admin/users /admin/addons /admin/earnings /admin/trust-safety /host/today /host/calendar /host/earnings /host/discounts
+A [dark] "Sign Out" ratio=6.6 bg=rgb(11,31,66) fg=rgb(157,165,179)
+    flex items-center text-white/60 transition-colors hover:text-white mt-
+    /admin /admin/users /admin/addons /admin/earnings /admin/trust-safety /host/today /host/calendar /host/earnings /host/discounts
+A [dark] "Switch to dark mode" ratio=7.23 bg=rgb(22,34,55) fg=rgb(159,176,198)
+    grid h-9 w-9 place-items-center rounded-lg text-muted transition-color
+    /admin /admin/users /admin/addons /admin/earnings /admin/trust-safety /host/today /host/calendar /host/earnings /host/discounts
+A [dark] "AUAdmin" ratio=8.12 bg=rgb(13,23,40) fg=rgb(159,176,198)
+    flex items-center space-x-2 px-2 py-2 rounded-full hover:bg-[#F6EFE7] 
+    /profile
+A [dark] "Booking History" ratio=8.12 bg=rgb(13,23,40) fg=rgb(159,176,198)
+    
+    /profile
+B [light] "Active" ratio=3.3 bg=rgb(22,163,74) fg=rgb(255,255,255)
+    relative flex items-center justify-center text-center focus:outline-no
+    /admin/addons
+B [dark] "Active" ratio=3.3 bg=rgb(22,163,74) fg=rgb(255,255,255)
+    relative flex items-center justify-center text-center focus:outline-no
+    /admin/addons
