@@ -2,33 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Build the four host growth features (calculator, founding hosts, referrals, signup nudges)",
+      "text": "Fix dark mode across guest, host and admin screens",
       "state": "done"
     },
     {
-      "text": "Verify: lint, build, 54 new tests, production build typechecked against a generated Postgres client",
+      "text": "Build the fee calculator on the become-a-host page with a public fee endpoint",
       "state": "done"
     },
     {
-      "text": "Confirm production migrations: deploy logs show 20 of 20 applied, none pending",
+      "text": "Wire the founding-host perk into approval and verify the cap against a throwaway database",
       "state": "done"
     },
     {
-      "text": "Set HOST_COMMISSION_RATE=0.1, FOUNDING_HOST_LIMIT=100, REFERRAL_REWARD_KES=2000 in Railway and confirm them live",
+      "text": "Verify the referral reward and abandoned-application nudges end to end",
       "state": "done"
     },
     {
-      "text": "Decide GUEST_SERVICE_FEE_RATE: still 12%, so guests still pay a markup at checkout, which contradicts the agreed 'guests pay the listed price' model",
-      "state": "pending"
+      "text": "Verify production migrations: already applied by the deploy step, all 20 up to date, new columns and referral table present",
+      "state": "done"
     },
     {
-      "text": "Decide HOST_PAY_CLEANING_FEE and HOST_PAY_LATE_CHECKOUT_FEE: both off, so hosts are not yet paid the cleaning or late check-out fees they are due",
-      "state": "pending"
+      "text": "Set HOST_COMMISSION_RATE to 10% on Railway and confirm the live fee endpoint reports it",
+      "state": "done"
     },
     {
-      "text": "Investigate the Telegram bot conflict in production logs: two pollers are running the same bot token",
+      "text": "Fix the production theme flash: inline theme script was blocked by the CSP, now loads from a same-origin file, verified live",
+      "state": "done"
+    },
+    {
+      "text": "Optional followed-up: switch on founding places and set a referral reward, which are still zero",
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-26T21:26:06.030Z"
+  "updatedAt": "2026-10-26T21:32:33.493Z"
 }
