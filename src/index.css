@@ -88,7 +88,12 @@ body {
 
 /* App shell. The rest of the old .zl-* prototype layer was deleted: it styled
    screens that no longer exist. Live pages use their own surface file. */
-.zl-app{min-height:100vh;background:#fff;color:#0B1F42}
+.zl-app{min-height:100vh;background:#fff;color:#0B1F42;display:flex;flex-direction:column}
+/* The page body grows to fill the shell, which keeps the footer pinned to the
+   bottom of the viewport on a short page (an empty state, a legal page).
+   Without it the navy footer band stopped where the content did and the
+   leftover height showed as a white strip underneath it. */
+.zl-app-main{flex:1 0 auto}
 .zl-header{height:72px;border-bottom:1px solid #E3E8EF;display:flex;align-items:center;justify-content:space-between;padding:0 max(24px,calc((100vw - 1344px)/2));background:#fff;position:sticky;top:0;z-index:20}
 .zl-desktop-nav{display:flex;gap:42px;margin-left:auto;margin-right:48px}
 .zl-desktop-nav a{text-decoration:none;font-size:15px}

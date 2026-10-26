@@ -40,7 +40,9 @@ function Explore() { return <GuestStays />; }
 function GuestShell({ children }) {
   return <div className="zl-app">
     <Navbar />
-    {children}
+    {/* Its own box so the shell can stretch the page body and hold the
+        footer at the bottom of a page that is shorter than the screen. */}
+    <div className="zl-app-main">{children}</div>
     <GuestFooter />
   </div>;
 }
