@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { ChevronLeft } from 'lucide-react';
 import { Button, TextInput } from 'flowbite-react';
 import { heroImage } from '../assets/images.js';
+import { formatPrice } from '../utils/currency.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 
@@ -31,7 +32,7 @@ function PropertyItem({ item, onRemove }) {
         {item.note && <p className="opg-shortlist-note">&ldquo;{item.note}&rdquo;</p>}
       </div>
       <div className="opg-shortlist-price">
-        <strong>KSh {property.price?.toLocaleString() || '-'}</strong>
+        <strong>{formatPrice(property.price) ?? '-'}</strong>
         <span>per night</span>
       </div>
       <Button className="opg-saved-remove" onClick={() => onRemove(item.propertyId)}>Remove</Button>

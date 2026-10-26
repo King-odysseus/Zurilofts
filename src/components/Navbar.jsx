@@ -296,7 +296,7 @@ function Navbar() {
           {/* Brand */}
           <div className={`flex min-w-0 items-center justify-self-start transition-opacity duration-150 ${searchOpen ? 'pointer-events-none opacity-0' : ''}`}>
             <Link to="/" className="flex flex-shrink-0 items-center">
-              <BrandLogo imgClassName="h-9 w-auto md:h-10" />
+              <BrandLogo imgClassName="h-10 w-auto md:h-11" />
             </Link>
           </div>
 

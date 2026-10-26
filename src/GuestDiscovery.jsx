@@ -125,7 +125,7 @@ function SearchForm({ initial = DEFAULT_SEARCH_LOCATION, allKenya = false }) {
         sizing="lg"
       />
     </Label>
-    <div className="opg-search-field">
+    <div className="opg-search-field opg-search-guests">
       <span>Guests</span>
       <Dropdown
         inline
@@ -176,7 +176,12 @@ function StayGrid({ items, loading, error, limit }) {
   if (loading) return <div className="opg-state" role="status">Finding stays…</div>;
   if (error) return <div className="opg-state" role="alert">{error}</div>;
   if (!items.length) return <div className="opg-state">No stays match this search. Try another area or category.</div>;
-  return <div className="opg-stay-grid">{items.slice(0, limit).map((stay) => <StayCard key={stay.id} stay={stay} />)}</div>;
+  // Show as many columns as there are cards, up to four. A fixed four-column
+  // grid stranded the two published listings in the left quarter of a wide
+  // screen, which read as an empty collection rather than a small one.
+  const visible = items.slice(0, limit);
+  const columns = Math.max(1, Math.min(visible.length, 4));
+  return <div className="opg-stay-grid" style={{ '--opg-stay-columns': columns }}>{visible.map((stay) => <StayCard key={stay.id} stay={stay} />)}</div>;
 }
 
 export function GuestHome() {

@@ -9,7 +9,8 @@ import AddOnsSection from './AddOnsSection';
 
 import apiClient from '../api/client.js';
 import { recordView } from '../utils/recentlyViewed.js';
-import { googleMapsSearchUrl } from '../utils/googleMaps.js';
+import { googleMapsSearchUrl, googleMapsDirectionsUrl } from '../utils/googleMaps.js';
+import { formatPrice } from '../utils/currency.js';
 
 /** Safely coerce a value to an array, no matter what the API sends. */
 function safeArray(value) {
@@ -31,6 +32,14 @@ function PropertyPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const recordedRef = useRef(false);
+  const [reviewSummary, setReviewSummary] = useState(null);
+  const [reviewsLoaded, setReviewsLoaded] = useState(false);
+  // ReviewSection owns the only fetch of the review summary, so it reports the
+  // result upward instead of the page asking for the same data twice.
+  const handleReviewSummary = useCallback((summary) => {
+    setReviewsLoaded(summary !== undefined);
+    setReviewSummary(summary ?? null);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -146,8 +155,13 @@ function PropertyPage() {
       : property.price;
   const bookingHref = `/booking/${property.id}${variant ? `?variant=${variant}` : ''}`;
 
-  const hasReviews = typeof property.rating === 'number' && property.rating > 0;
-  const reviewLabel = property.reviews === 1 ? '1 review' : `${property.reviews || 0} reviews`;
+  // The cached rating/reviews columns can lag behind the real reviews: a
+  // seeded listing advertised "12 reviews" in the header while the section
+  // under it said "No reviews yet". The live summary wins once it arrives.
+  const liveReviewCount = reviewsLoaded ? (reviewSummary?.totalReviews ?? 0) : null;
+  const shownReviewCount = liveReviewCount ?? property.reviews ?? 0;
+  const hasReviews = typeof property.rating === 'number' && property.rating > 0 && shownReviewCount > 0;
+  const reviewLabel = shownReviewCount === 1 ? '1 review' : `${shownReviewCount} reviews`;
 
   const variantLabel = variant === '1bed'
     ? '1-Bedroom Option'
@@ -258,12 +272,12 @@ function PropertyPage() {
               {property.location}
               <span className="text-xs font-semibold">Google Maps</span>
             </a>
-            {typeof property.rating === 'number' && property.rating > 0 && (
-              <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#0B1F42]" aria-label={`Rated ${property.rating} out of 5 from ${property.reviews || 0} reviews`}>
+            {hasReviews && (
+              <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#0B1F42]" aria-label={`Rated ${property.rating} out of 5 from ${shownReviewCount} reviews`}>
                 <Star className="w-4 h-4 text-amber-500" fill="currentColor" aria-hidden="true" />
                 {property.rating}
                 <span className="font-normal text-[#5B6B82]">
-                  &middot; {property.reviews === 1 ? '1 review' : `${property.reviews || 0} reviews`}
+                  &middot; {reviewLabel}
                 </span>
               </span>
             )}
@@ -272,8 +286,8 @@ function PropertyPage() {
 
         {/* ── Trust panel ────────────────────────────────────────── */}
         <PropertyTrustPanel
-          rating={property.rating}
-          reviewCount={property.reviews}
+          rating={hasReviews ? property.rating : 0}
+          reviewCount={shownReviewCount}
           type={property.type}
           location={property.location}
         />
@@ -374,6 +388,14 @@ function PropertyPage() {
                       <MapPin className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
                       Open in Google Maps
                     </a>
+                    <a
+                      href={googleMapsDirectionsUrl({ lat: property.lat, lng: property.lng, label: property.address || property.location })}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] border border-[#E3E8EF] bg-elevated px-5 py-2.5 text-sm font-semibold text-[#0B1F42] transition-colors hover:border-[#0B1F42] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+                    >
+                      Get directions
+                    </a>
                   </div>
                 </div>
               </section>
@@ -394,7 +416,7 @@ function PropertyPage() {
               {/* Price per night */}
               <div className="mb-5">
                 <span className="text-3xl font-bold text-[#0B1F42]">
-                  KES {displayPrice != null ? displayPrice.toLocaleString() : '-'}
+                  {formatPrice(displayPrice) ?? '-'}
                 </span>
                 <span className="text-[#5B6B82]"> / night</span>
               </div>
@@ -429,7 +451,7 @@ function PropertyPage() {
               <Link
                 to={bookingHref}
                 className="block min-h-[48px] w-full rounded-[10px] bg-[#C49A6C] py-4 text-center font-bold text-white transition-colors duration-200 hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] active:bg-[#9A744A]"
-                aria-label={`Continue to booking for ${variantLabel ? variantLabel + ' option' : 'this property'} at KES ${displayPrice != null ? displayPrice.toLocaleString() : '-'} per night`}
+                aria-label={`Continue to booking for ${variantLabel ? variantLabel + ' option' : 'this property'} at ${formatPrice(displayPrice) ?? '-'} per night`}
               >
                 Continue to booking
               </Link>
@@ -478,7 +500,7 @@ function PropertyPage() {
       {/* Public Reviews */}
       {property && (
         <div className="mx-auto w-full max-w-[1344px] px-4 sm:px-6 md:px-8">
-          <ReviewSection propertyId={property.id} />
+          <ReviewSection propertyId={property.id} onSummary={handleReviewSummary} />
         </div>
       )}
 

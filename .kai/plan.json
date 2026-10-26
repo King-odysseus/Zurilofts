@@ -2,45 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read pricing, payment, payout and settings code to confirm how fees, promo funding and payouts work",
-      "state": "done"
+      "text": "Fix dark mode: guest search panel on discovery home (faint labels, dark native date boxes)",
+      "state": "active"
     },
     {
-      "text": "Add config flags for host commission, guest service fee, cleaning/late fee pass-through and promo funding",
-      "state": "done"
+      "text": "Audit other guest screens for the same dark mode problems and fix",
+      "state": "pending"
     },
     {
-      "text": "Move host earnings maths into a pure module and cover it with tests",
-      "state": "done"
+      "text": "Run lint and build to verify the dark mode changes",
+      "state": "pending"
     },
     {
-      "text": "Pass cleaning fee, late check-out fee and promo ownership into the host earnings calculation",
-      "state": "done"
+      "text": "Read current payout, payment and earnings code plus the booking schema",
+      "state": "pending"
     },
     {
-      "text": "Restore the host balance and free the bookings when a transfer fails or is reversed",
-      "state": "done"
+      "text": "Hold host funds until check-in instead of paying on payment confirmation",
+      "state": "pending"
     },
     {
-      "text": "Make a payout safe against two runs paying the same balance twice",
-      "state": "done"
+      "text": "Record commission and platform revenue on each booking",
+      "state": "pending"
     },
     {
-      "text": "Set a next payout date when a host first earns so scheduled payouts can find them",
-      "state": "done"
+      "text": "Add admin revenue report endpoint and page",
+      "state": "pending"
     },
     {
-      "text": "Run due payouts hourly instead of only from an admin button",
-      "state": "done"
-    },
-    {
-      "text": "Identify which host-growth ideas need product decisions rather than code",
-      "state": "done"
-    },
-    {
-      "text": "Run server tests, root lint and root build",
-      "state": "done"
+      "text": "Run tests, type-check, lint and build",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-26T20:06:16.407Z"
+  "updatedAt": "2026-10-26T20:10:04.739Z"
 }

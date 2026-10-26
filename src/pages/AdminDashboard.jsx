@@ -319,7 +319,7 @@ function AdminLayout() {
     : 'pt-6 pb-24 lg:pb-6';
 
   return (
-    <div className="min-h-screen bg-surface text-charcoal">
+    <div className="min-h-screen bg-surface text-charcoal dark:bg-canvas">
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-10 hidden flex-col border-r border-white/10 bg-navy-bg text-white transition-all duration-300 lg:flex ${

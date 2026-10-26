@@ -14,7 +14,7 @@ function StarRating({ rating, size = 'sm' }) {
   );
 }
 
-function ReviewSection({ propertyId }) {
+function ReviewSection({ propertyId, onSummary }) {
   const [reviews, setReviews] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,13 +28,16 @@ function ReviewSection({ propertyId }) {
         const d = res.data.data;
         setReviews(d.reviews || []);
         setSummary(d.summary || null);
+        onSummary?.(d.summary ?? null);
       })
       .catch(() => {
         setReviews([]);
         setSummary(null);
+        // undefined means "could not load", which is not the same as "no reviews".
+        onSummary?.(undefined);
       })
       .finally(() => setLoading(false));
-  }, [propertyId]);
+  }, [propertyId, onSummary]);
 
   if (loading) {
     return (

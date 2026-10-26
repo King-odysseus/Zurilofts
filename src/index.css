@@ -445,6 +445,13 @@ html:not(.dark) .zl-navbar .op-brand-tile {
   box-shadow: none;
 }
 
+/* The mark is drawn in hairline bronze. On the white header that sits at about
+   2:1 against the page, so at 36px it read as a grey smudge. A modest contrast
+   lift keeps the artwork's own colours but holds the thin strokes. */
+html:not(.dark) .zl-navbar .op-brand-tile img {
+  filter: saturate(1.6) brightness(0.76);
+}
+
 /* Design-system 2026 tokens as raw RGB channels.
    Tailwind reads these through rgb(var(--ds-*) / <alpha-value>), so
    text-ink, border-line, bg-inset and bg-canvas all flip when html.dark

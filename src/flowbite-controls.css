@@ -445,6 +445,14 @@ html.dark .opg-guide-grid a {
   color: var(--dm-text) !important;
 }
 
+/* The phone search card gives each field its own pale row. In dark mode the
+   inputs inside turned near-black on that row while the CHECK IN label stayed
+   light, so the row read as an empty box with an unreadable heading. */
+html.dark .opg-search .opg-search-field {
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
 html.dark .opg-search .opg-search-field::after {
   background-color: var(--dm-border) !important;
 }
@@ -709,10 +717,6 @@ html.dark .op-admin-catalog-actions > button.is-danger { color: #F87171 !importa
 html.dark .op-admin-catalog-status.is-success { background: #173125 !important; color: #4ADE80 !important; }
 html.dark .op-admin-catalog-status.is-danger { background: #3A2228 !important; color: #F87171 !important; }
 html.dark .op-admin-catalog-status.is-neutral { background: #1D2B43 !important; color: #C8D4E5 !important; }
-
-html.dark .op-admin-main>div:last-child {
-  background-color: var(--dm-bg);
-}
 
 html.dark :where(.op-admin-finance-toolbar, .op-admin-finance-panel, .op-admin-finance-board, .op-admin-finance-chart-frame, .op-flowbite-gauge, .op-admin-finance-summary>p) {
   border-color: var(--dm-border) !important;

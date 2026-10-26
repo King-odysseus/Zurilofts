@@ -5,6 +5,7 @@ import { Star, UserRound } from 'lucide-react';
 import apiClient from '../api/client.js';
 import Spinner from '../components/Spinner.jsx';
 import { heroImage } from '../assets/images.js';
+import { formatPrice } from '../utils/currency.js';
 import { useAuth } from '../context/AuthContext.jsx';
 
 function SharedShortlistRow({ item }) {
@@ -31,7 +32,7 @@ function SharedShortlistRow({ item }) {
         )}
       </div>
       <div className="opg-shortlist-price">
-        <strong>KSh {property.price?.toLocaleString() || '-'}</strong>
+        <strong>{formatPrice(property.price) ?? '-'}</strong>
         <span>per night</span>
       </div>
     </Link>
