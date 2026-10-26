@@ -2,33 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Survey host signup/application pages, earnings page and public settings API (found: schema, migration and env config for all three features already exist; the service logic and the public fee endpoint did not)",
+      "text": "Survey host signup/application pages, earnings page and public settings API",
       "state": "done"
     },
     {
-      "text": "Build the fee comparison calculator on the become-a-host page (public /api/public/fees + page, verified against the live schedule)",
+      "text": "Build the fee comparison calculator on the become-a-host page",
       "state": "done"
     },
     {
       "text": "Add founding-host perk (capped lower commission for early hosts)",
-      "state": "active"
+      "state": "done"
     },
     {
       "text": "Add referral reward for hosts who bring in new hosts",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Add sign-up nudges for hosts who abandon their application",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Verify with lint, build and server tests, then commit and push",
-      "state": "pending"
+      "state": "done"
     },
     {
-      "text": "Your side: run npx prisma migrate deploy on Railway, then set HOST_COMMISSION_RATE and the other money settings",
+      "text": "Your side: run both migrations on Railway, then set HOST_COMMISSION_RATE, FOUNDING_HOST_LIMIT, REFERRAL_REWARD_KES and the other money settings",
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-26T20:54:59.920Z"
+  "updatedAt": "2026-10-26T21:04:04.359Z"
 }
