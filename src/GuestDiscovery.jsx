@@ -7,6 +7,7 @@ import SelectMenu from './components/SelectMenu.jsx';
 import { heroImage } from './assets/images.js';
 import { clearRecentlyViewed, getRecentlyViewed } from './utils/recentlyViewed.js';
 import StayCard from './components/StayCard.jsx';
+import BrandLogo from './components/BrandLogo.jsx';
 import { useAuth } from './context/AuthContext.jsx';
 import { openConsentManager } from './utils/consent.js';
 import { ALL_KENYA_SEARCH, DEFAULT_SEARCH_LOCATION, SEARCH_LOCATION_GROUPS } from './data/searchLocations.js';
@@ -222,5 +223,5 @@ export function GuestFooter() {
   const hostHref = !isAuthenticated
     ? '/register?role=HOST'
     : user?.role === 'USER' ? '/host/application' : '/host/today';
-  return <footer className="opg-footer"><div className="opg-container"><div className="opg-footer-columns"><div><Link className="opg-footer-brand" to="/">ZuriLofts</Link><p>Furnished apartments in Nairobi&apos;s best neighbourhoods, verified, flexible, and ready when you are.</p></div><div><h3>Explore</h3><Link to="/properties">Stays</Link><Link to="/places">Neighbourhoods</Link><Link to="/guides">Guides</Link><Link to="/restaurants">Restaurants</Link></div><div><h3>Company</h3><Link to={hostHref}>Become a host</Link></div><div><h3>Support</h3><Link to="/guides">Help centre</Link><Link to="/terms">Terms</Link><Link to="/privacy">Privacy</Link></div><div><h3>Stay updated</h3><p>New homes and city notes, once a month.</p></div></div><div className="opg-footer-bottom">© {new Date().getFullYear()} ZuriLofts. All rights reserved. <span><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><button type="button" onClick={openConsentManager}>Cookies</button></span></div></div></footer>;
+  return <footer className="opg-footer"><div className="opg-container"><div className="opg-footer-columns"><div><Link className="opg-footer-brand" to="/" aria-label="ZuriLofts home"><BrandLogo imgClassName="h-16 w-auto" alt="ZuriLofts" /></Link><p>Furnished apartments in Nairobi&apos;s best neighbourhoods, verified, flexible, and ready when you are.</p></div><div><h3>Explore</h3><Link to="/properties">Stays</Link><Link to="/places">Neighbourhoods</Link><Link to="/guides">Guides</Link><Link to="/restaurants">Restaurants</Link></div><div><h3>Company</h3><Link to={hostHref}>Become a host</Link></div><div><h3>Support</h3><Link to="/guides">Help centre</Link><Link to="/terms">Terms</Link><Link to="/privacy">Privacy</Link></div><div><h3>Stay updated</h3><p>New homes and city notes, once a month.</p></div></div><div className="opg-footer-bottom">© {new Date().getFullYear()} ZuriLofts. All rights reserved. <span><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><button type="button" onClick={openConsentManager}>Cookies</button></span></div></div></footer>;
 }

@@ -2,25 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Find every place a bronze background is set (Tailwind classes, CSS rules, shared button theme)",
+      "text": "Find the footer markup and how the logo reads on its navy surface",
       "state": "done"
     },
     {
-      "text": "Change text and icon ink on bronze surfaces to white",
+      "text": "Add the logo to the footer, sized and spaced for its first column",
       "state": "done"
     },
     {
-      "text": "Check near-bronze hover/active fills and icons inside bronze circles also carry white",
+      "text": "Check it in a browser, light and dark mode, desktop and tablet",
       "state": "done"
     },
     {
-      "text": "Run lint and build, then visually check home, login and dark mode",
+      "text": "Run lint and build",
       "state": "done"
     },
     {
-      "text": "Commit the colour change and push (the in-progress header search work was left untouched)",
-      "state": "done"
+      "text": "Commit and push the change",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-10-26T18:51:50.173Z"
+  "updatedAt": "2026-10-26T18:58:03.214Z"
 }
