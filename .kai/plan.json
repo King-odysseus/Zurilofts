@@ -2,25 +2,17 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check what is uncommitted and confirm the source code is already pushed",
+      "text": "Read the admin dashboard screens and nav to see what exists today",
       "state": "done"
     },
     {
-      "text": "Scan the untracked files for secrets or other things that must not be committed",
-      "state": "done"
+      "text": "Check the admin API surface for data that has no screen yet",
+      "state": "active"
     },
     {
-      "text": "Confirm with the user whether the 16MB review screenshot dump goes into git",
-      "state": "done"
-    },
-    {
-      "text": "Stage and commit the remaining files in logical groups",
-      "state": "done"
-    },
-    {
-      "text": "Push to origin and confirm the working tree is clean and in sync",
-      "state": "done"
+      "text": "Write a prioritised list of recommended features",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-26T19:24:33.488Z"
+  "updatedAt": "2026-10-26T19:45:38.928Z"
 }
