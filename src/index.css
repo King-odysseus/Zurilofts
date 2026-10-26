@@ -428,6 +428,18 @@ html.dark .op-brand-tile {
   border-color: rgba(255, 255, 255, .18);
 }
 
+/* In light mode the top bar is already white, so the tile only showed up as a
+   stray rounded box and shadow behind the mark. The artwork is transparent and
+   reads on white by itself, so the bar drops the tile entirely. Dark mode keeps
+   it: there the bar is navy and the wordmark is navy ink. */
+html:not(.dark) .zl-navbar .op-brand-tile {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 /* Design-system 2026 tokens as raw RGB channels.
    Tailwind reads these through rgb(var(--ds-*) / <alpha-value>), so
    text-ink, border-line, bg-inset and bg-canvas all flip when html.dark
