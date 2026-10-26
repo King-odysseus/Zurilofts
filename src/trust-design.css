@@ -1208,3 +1208,40 @@ html.dark .op-dispute-create-intro > span {
 html.dark .op-dispute-event-dot {
   border-color: var(--dm-surface) !important;
 }
+
+/* Remaining fixed ink on the trust pages: the field labels, the "Return to
+   trips" link and the document-type badge all kept light-mode colours that
+   disappear or fall under 3:1 on the dark surface. */
+html.dark .op-verify-field label,
+html.dark .op-dispute-field label,
+html.dark .op-dispute-label {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-verify-review-actions > a {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-verify-review-actions > a:hover,
+html.dark .op-verify-review-actions > a:focus-visible {
+  color: #D1A477 !important;
+}
+
+html.dark .op-verify-document strong em {
+  color: #F87171 !important;
+}
+
+/* The held-booking callout and the "Return to booking" recovery link both kept
+   light-mode ink, which reads at under 1.5:1 on the dark panel. */
+html.dark .op-verify-callout p {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-trust-recovery-actions > a {
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-trust-recovery-actions > a:hover,
+html.dark .op-trust-recovery-actions > a:focus-visible {
+  color: #D1A477 !important;
+}

@@ -51,3 +51,26 @@
 .op-auth-avatar-placeholder{display:grid;place-items:center;background:#F3E9DC;color:#0B1F42;font-weight:700}
 @media(max-width:500px){.op-auth-brand{font-size:18px}.op-auth-name-grid{grid-template-columns:1fr;gap:0}.op-auth-card .op-auth-submit{min-height:46px}}
 .op-auth-submit:disabled,.op-auth-card .op-auth-submit:disabled{color:#4A3A25!important}
+
+/* "Remember me" and the optional-photo hint kept their light-mode grey, and the
+   error banner kept its pale pink fill with dark red copy. */
+html.dark .op-auth-form-row {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-auth-label small {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .op-auth-error {
+  border-color: #5A2A2E !important;
+  background: #2A1618 !important;
+  color: #FCA5A5 !important;
+}
+
+/* The remember-me label sits in .op-auth-check, which the shared dark layer
+   does not reach, so it kept its 3.1:1 light-mode grey. */
+html.dark .op-auth-check,
+html.dark .op-auth-check label {
+  color: var(--dm-muted) !important;
+}

@@ -321,3 +321,107 @@ html.dark .opg-trip-price,
 html.dark .opg-trip-row-copy strong,
 html.dark .opg-trip-empty h2,
 html.dark .opg-history-title-row h2{color:rgb(var(--ds-navy))!important}
+
+/*
+ * Inbox rows, empty states and the account detail lists set their own white
+ * surfaces and navy/grey ink here; the shared dark layer cannot see these
+ * component classes, so the message list stayed a white card on a dark page.
+ */
+html.dark .opg-conversation-row {
+  border-color: var(--dm-border);
+  background: var(--dm-surface);
+  color: var(--dm-text);
+}
+
+html.dark .opg-conversation-row:hover,
+html.dark .opg-conversation-row:focus-visible {
+  background: var(--dm-surface-soft);
+}
+
+html.dark .opg-conversation-row.is-selected {
+  border-color: var(--dm-border-strong);
+  background: var(--dm-surface-raised);
+  box-shadow: inset 3px 0 0 #7EA6FF;
+}
+
+html.dark .opg-support-row {
+  border-top-color: var(--dm-border);
+}
+
+html.dark .opg-conversation-error,
+html.dark .opg-conversation-empty {
+  background: var(--dm-surface);
+  color: var(--dm-text);
+}
+
+html.dark .opg-conversation-empty strong,
+html.dark .opg-detail-money-total dt {
+  color: var(--dm-text);
+}
+
+html.dark .opg-conversation-empty span,
+html.dark .opg-detail-list,
+html.dark .opg-detail-note,
+html.dark .opg-history-count {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .opg-detail-money-total {
+  border-top-color: var(--dm-border);
+}
+
+html.dark .opg-detail-money-total dd {
+  color: #D1A477;
+}
+
+html.dark .opg-detail-error {
+  background: #3A2318;
+  color: #FCA5A5;
+}
+
+html.dark .opg-profile-verify {
+  color: #7EA6FF;
+}
+
+html.dark .opg-profile-verify:hover,
+html.dark .opg-profile-verify:focus-visible {
+  color: #D1A477;
+}
+
+/*
+ * Profile form labels (#475569), the history meta values and the per-item money
+ * rows (#334155) were the last dark slate inks in this file. On the dark card
+ * they measure about 2:1, so the label above each field and the dates and
+ * amounts beside them read as grey smudges. They follow the muted ink the rest
+ * of the account surface uses; the totals row keeps its bronze, set above.
+ */
+html.dark .opg-profile-form label,
+html.dark .opg-history-meta dd,
+html.dark .opg-detail-money-row dd {
+  color: var(--dm-muted) !important;
+}
+
+/* Trip tab counters: a pale sand chip with bronze digits in light mode. */
+html.dark .opg-trip-tabs span {
+  background: #3A2E18;
+  color: #DDBE97;
+}
+
+/* Desktop-only message column. The list heading, the "select a conversation"
+   placeholder and the row helper text are hidden on phones, so they were never
+   part of the mobile pass and kept their navy ink and slate grey. */
+html.dark .opg-conversation-list-head h2,
+html.dark .opg-message-context h2,
+html.dark .opg-message-placeholder h2 {
+  color: rgb(var(--ds-navy)) !important;
+}
+
+html.dark .opg-message-placeholder p,
+html.dark .opg-conversation-line span {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .opg-message-placeholder > span {
+  background: var(--dm-surface-soft);
+  color: var(--dm-muted);
+}

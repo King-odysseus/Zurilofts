@@ -304,11 +304,15 @@ html.dark :where([data-testid="flowbite-dropdown"]) button:focus {
   color: #FFFFFF !important;
 }
 
-html.dark :where([class*="border-[#E3E8EF]"], [class*="border-[#e5e7eb]"], [class*="border-[#D9D9D9]"], [class*="border-[#E2DAD0]"], [class*="border-[#edf0f3]"], [class*="border-[#e8edf3]"]) {
+/* [class*=...] matching is case-sensitive, but the same hex is written in both
+   cases across the app (`text-[#64748B]` here, `text-[#64748b]` there). Every
+   hex match below therefore carries the `i` flag, otherwise whole screens keep
+   their light-mode ink. */
+html.dark :where([class*="border-[#E3E8EF]" i], [class*="border-[#e5e7eb]" i], [class*="border-[#D9D9D9]" i], [class*="border-[#E2DAD0]" i], [class*="border-[#edf0f3]" i], [class*="border-[#e8edf3]" i]) {
   border-color: var(--dm-border) !important;
 }
 
-html.dark :where([class*="text-[#0B1F42]"], [class*="text-[#414D63]"], [class*="text-[#334155]"], [class*="text-[#1f2937]"], [class*="text-[#111827]"]) {
+html.dark :where([class*="text-[#0B1F42]" i], [class*="text-[#414D63]" i], [class*="text-[#334155]" i], [class*="text-[#1f2937]" i], [class*="text-[#111827]" i]) {
   color: var(--dm-text) !important;
 }
 /* Bronze surfaces always carry white ink. The rule above turns every dark text
@@ -328,8 +332,58 @@ html.dark :where(
 }
 
 
-html.dark :where([class*="text-[#5B6B82]"], [class*="text-[#64748b]"], [class*="text-[#6b7280]"], [class*="text-[#6E7686]"], [class*="text-[#94a3b8]"], [class*="text-[#53616F]"]) {
+html.dark :where([class*="text-[#5B6B82]" i], [class*="text-[#64748b]" i], [class*="text-[#6b7280]" i], [class*="text-[#6E7686]" i], [class*="text-[#94a3b8]" i], [class*="text-[#53616F]" i], [class*="text-[#52606F]" i], [class*="text-[#98A0B0]" i]) {
   color: var(--dm-muted) !important;
+}
+
+/* Muted bronze used for overlines and secondary prices. The light-mode tone is
+   only 4.0:1 on the dark surface, so it lifts to the same bronze the rest of the
+   dark theme uses for accent text. */
+html.dark :where([class*="text-[#9A744A]" i], [class*="text-[#9A6A3A]" i], [class*="text-[#8B6841]" i]) {
+  color: #D1A477 !important;
+}
+
+/* Unavailable calendar days: a pale pill with pale grey digits. Both sides of
+   that pairing have to move for the date grid to be readable on dark. */
+html.dark :where([class*="bg-[#EAF0F4]" i]) {
+  background-color: var(--dm-surface-raised) !important;
+}
+
+/* Peach is the hover and in-range tint on the booking calendar. On the dark
+   surface it stays a bright patch behind now-light digits, so it becomes a
+   bronze tint instead.
+
+   This matched with [class*=...] until now, and that operator tests a substring:
+   `[class*="bg-[#FDE8D8]"]` also matches `hover:bg-[#FDE8D8]`, which is the ONLY
+   peach class on an available day and on the shortlist menu row. So every open
+   day was painted #3A2E18 at rest, and because this declaration is !important the
+   Tailwind hover could not take it back. The in-range band, the same colour,
+   was then indistinguishable from an available day, and the bronze check-in and
+   check-out endpoints lost their fill to it as well.
+
+   `~=` matches a whole whitespace-separated token instead, so the resting tint
+   only lands on elements that really carry bg-[#FDE8D8] (the bed-variant chip,
+   the add-on category chip, the active nav row, the in-range band) and the
+   hover-only elements get their tint from the rule below. */
+html.dark :where([class~="bg-[#FDE8D8]" i]) {
+  background-color: #3A2E18 !important;
+}
+
+html.dark :where([class~="hover:bg-[#FDE8D8]" i]:hover) {
+  background-color: #453722 !important;
+}
+
+/* Danger copy and warning panels were pinned to their light-mode tones. */
+html.dark :where(.text-red-700, .text-red-800) {
+  color: #F87171 !important;
+}
+
+html.dark :where([class*="bg-red-50" i]) {
+  background-color: #2A1618 !important;
+}
+
+html.dark :where(.border-red-200, .border-red-300) {
+  border-color: #5A2A2E !important;
 }
 
 /* The account tab strips and the workspace tab bars set their resting colour in
@@ -367,6 +421,68 @@ html.dark :where([class*="bg-[#F7F1EA]"]) {
 
 html.dark :where(.text-primary-700, .text-primary-800, .text-primary-900) {
   color: #DDBE97 !important;
+}
+
+/* Warm pale panels written as arbitrary utilities, plus two inks that the rules
+   above leave stranded.
+
+   #F3E9DC (sand) is the add-ons total row and the empty add-ons notice at
+   checkout. Its ink is text-[#0B1F42] / text-[#6b7280], and those are both
+   flipped to light by the rules above, so the row was light ink on a pale panel
+   and read as blank space. The peach panel next to it is already handled at the
+   "Peach is the hover and in-range tint" rule, so only sand is added here.
+
+   The same token matching as the peach rule above: [class*=...] would also hit
+   `hover:bg-[#F3E9DC]`, which RouteBackButton uses for its resting-state
+   background, and every back button would turn sand all the time in dark mode. */
+html.dark :where([class~="bg-[#F3E9DC]" i]) {
+  background-color: #2E2517 !important;
+}
+
+html.dark :where([class~="hover:bg-[#F3E9DC]" i]:hover) {
+  background-color: #3A2F1D !important;
+}
+
+/* The rust add-on category label sits on the peach chip, which the rule above
+   darkens to #3A2E18; #9A4A1D on that surface is about 2.3:1. It lifts to the
+   bronze the rest of dark mode uses for accent text. */
+html.dark :where([class*="text-[#9A4A1D]" i]) {
+  color: #E0A97E !important;
+}
+
+/* Booking status chips (trips, booking history, booking detail).
+   Four tinted pills that name a booking state. The neutral one was half
+   converted already: bg-[#F1F5F9] darkens to the raised surface while its ink
+   #475569 stayed put at 1.9:1, so a settled booking lost its label. The other
+   three kept pale fills and dark ink, which is legible but lands as three
+   bright blocks on a dark page. Converting all four together keeps the status
+   still readable as amber/green/red without breaking the dark surface. */
+html.dark :where([class*="text-[#475569]" i]) {
+  color: var(--dm-muted) !important;
+}
+
+html.dark :where([class*="bg-[#FDF3D8]" i]) {
+  background-color: #2E2410 !important;
+}
+
+html.dark :where([class*="text-[#8A5A00]" i]) {
+  color: #E8C07A !important;
+}
+
+html.dark :where([class*="bg-[#E7F6EE]" i]) {
+  background-color: #12291E !important;
+}
+
+html.dark :where([class*="text-[#157347]" i]) {
+  color: #7BD8A5 !important;
+}
+
+html.dark :where([class*="bg-[#FDECEC]" i]) {
+  background-color: #2A1618 !important;
+}
+
+html.dark :where([class*="text-[#B42318]" i]) {
+  color: #F87171 !important;
 }
 
 html.dark :where(.op-overline, .zl-overline, .opg-account-heading p, .opg-profile-identity span) {
@@ -462,6 +578,79 @@ html.dark .opg-search .opg-search-field input,
 html.dark .opg-search .opg-search-field select,
 html.dark .opg-guest-trigger {
   color: var(--dm-text) !important;
+}
+
+/* An empty CHECK IN or CHECK OUT field shows a placeholder, and the light rule
+   pins that placeholder to a 72%-opacity slate. On the dark field it dropped to
+   about 2.5:1, so the two empty date fields read as blank boxes while a chosen
+   date beside them was white. Muted ink at full opacity keeps "Add date" legible
+   without competing with a real value. */
+html.dark .opg-datepicker input::placeholder {
+  color: var(--dm-muted) !important;
+  opacity: 1;
+}
+
+/* Flowbite's own Datepicker theme is grey: the popup opens on dark:bg-gray-700
+   with gray-600 hovers, and the page stylesheet only fixed its geometry. Against
+   the navy dark mode that reads as an unstyled native-looking grey box, and the
+   navy drop shadow under it is invisible on a dark page, so nothing separated the
+   popup from the content behind it. Re-skin it on the shared dark surfaces. Every
+   selector stays under .opg-datepicker, which only the guest search bar renders. */
+html.dark .opg-datepicker > .absolute > div {
+  border: 1px solid var(--dm-border) !important;
+  background-color: var(--dm-surface-raised) !important;
+  color: var(--dm-text) !important;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Month arrows and the month title: grey chips with grey hovers. */
+html.dark .opg-datepicker > .absolute > div > div:first-child button {
+  background-color: transparent !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-datepicker > .absolute > div > div:first-child button:hover,
+html.dark .opg-datepicker > .absolute > div > div:first-child button:focus {
+  background-color: var(--dm-border) !important;
+  color: var(--dm-text) !important;
+}
+
+/* Day, month and year cells. The selected cell keeps the brand fill below and a
+   disabled cell never looks active, so the hover surface is only given to the
+   cells a guest can actually pick. */
+html.dark .opg-datepicker .grid > button:not(.bg-primary-700):not(:disabled):hover,
+html.dark .opg-datepicker .grid > button:not(.bg-primary-700):not(:disabled):focus {
+  background-color: var(--dm-border) !important;
+  color: var(--dm-text) !important;
+}
+
+/* A day outside the allowed range keeps Flowbite's base dark:text-white, so in
+   dark mode an unavailable date looked exactly as pickable as an open one. */
+html.dark .opg-datepicker .grid > button:disabled {
+  background-color: transparent !important;
+  color: var(--dm-subtle) !important;
+  cursor: not-allowed;
+}
+
+/* The chosen day is navy with white ink. Navy and the raised dark surface are
+   about 1.2:1 apart, so the selected date vanished into the popup. Bronze with
+   navy ink is the same brand contrast the primary buttons already use. */
+html.dark .opg-datepicker .grid > button.bg-primary-700 {
+  background-color: var(--op-bronze) !important;
+  color: var(--op-navy-bg) !important;
+}
+
+/* The Clear action is a grey chip in Flowbite's dark theme. Today is the filled
+   brand action and is left alone. */
+html.dark .opg-datepicker .mt-2 button:not(.bg-primary-700) {
+  border: 1px solid var(--dm-border-strong) !important;
+  background-color: transparent !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-datepicker .mt-2 button:not(.bg-primary-700):hover,
+html.dark .opg-datepicker .mt-2 button:not(.bg-primary-700):focus {
+  background-color: var(--dm-border) !important;
 }
 
 html.dark .opg-stay-content,
@@ -1105,7 +1294,7 @@ html.dark .op-auth-mode a.active {
 }
 
 html.dark .op-auth-divider {
-  color: var(--dm-subtle) !important;
+  color: var(--dm-muted) !important;
 }
 
 html.dark .op-auth-divider:before,

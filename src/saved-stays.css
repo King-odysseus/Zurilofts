@@ -121,3 +121,132 @@
   .opg-shortlist-row-managed .opg-shortlist-price{grid-column:2}
   .opg-shortlist-row-managed .opg-saved-remove{grid-column:2;justify-self:start}
 }
+
+/*
+ * Dark theme. Every surface here was painted with a literal white and navy ink,
+ * and the shared dark layer in flowbite-controls.css only reaches Tailwind
+ * utility classes, so Saved stays and shortlists stayed white with pale copy on
+ * top. Surfaces, ink and the red/gold accents each need their dark pairing.
+ */
+html.dark .opg-saved-page {
+  background: #08101F;
+  color: var(--dm-text);
+}
+
+html.dark .opg-saved-heading h1,
+html.dark .opg-saved-section-title h2,
+html.dark .opg-saved-collection-copy h3,
+html.dark .opg-saved-empty h2,
+html.dark .opg-shortlist-intro h1,
+html.dark .opg-shortlist-row-copy h3,
+html.dark .opg-shortlist-price strong,
+html.dark .opg-shortlist-rating,
+html.dark .opg-delete-dialog h2,
+html.dark .opg-saved-field-label,
+html.dark .opg-saved-auth p {
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-saved-heading p,
+html.dark .opg-saved-section-title p,
+html.dark .opg-saved-collection-copy p,
+html.dark .opg-saved-empty p,
+html.dark .opg-shortlist-row-copy p,
+html.dark .opg-shortlist-price span,
+html.dark .opg-shortlist-meta,
+html.dark .opg-shortlist-created,
+html.dark .opg-delete-dialog p {
+  color: var(--dm-muted) !important;
+}
+
+html.dark .opg-saved-tabs a,
+html.dark .opg-shortlist-breadcrumb,
+html.dark .opg-shortlist-breadcrumb a,
+html.dark .opg-shortlist-back {
+  color: var(--dm-muted);
+}
+
+html.dark .opg-saved-tabs a.is-active {
+  background: #C49A6C;
+  color: #FFFFFF;
+}
+
+html.dark .opg-saved-collection,
+html.dark .opg-saved-empty,
+html.dark .opg-saved-create-form,
+html.dark .opg-shortlist-row,
+html.dark .opg-delete-dialog {
+  border-color: var(--dm-border) !important;
+  background-color: var(--dm-surface) !important;
+  color: var(--dm-text);
+}
+
+html.dark .opg-saved-collage,
+html.dark .opg-shortlist-row img,
+html.dark .opg-saved-loading span {
+  background-color: var(--dm-surface-soft);
+}
+
+html.dark .opg-saved-empty svg {
+  color: var(--dm-subtle);
+}
+
+html.dark .opg-saved-collection-link {
+  color: var(--op-blue);
+}
+
+/* Outlined secondary buttons: white fill and navy ink in light mode. */
+html.dark .opg-saved-secondary,
+html.dark .opg-shortlist-card-actions .opg-saved-secondary {
+  border-color: var(--dm-border-strong) !important;
+  background: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .opg-saved-secondary:hover,
+html.dark .opg-saved-secondary:focus-visible,
+html.dark .opg-shortlist-card-actions .opg-saved-secondary:hover {
+  border-color: #C49A6C !important;
+  background: var(--dm-surface-raised) !important;
+  color: #FFFFFF !important;
+}
+
+html.dark .opg-saved-auth {
+  background-color: #2B2318;
+}
+
+html.dark .opg-shortlist-note {
+  color: #D1A477 !important;
+}
+
+/* Destructive actions: pale pink on white reads as a bright blob on dark. */
+html.dark .opg-saved-remove,
+html.dark .opg-shortlist-card-actions [color="failure"],
+html.dark .opg-shortlist-card-actions [class*="bg-red-600"],
+html.dark .opg-delete-dialog .opg-shortlist-actions [color="failure"],
+html.dark .opg-delete-dialog .opg-shortlist-actions [class*="bg-red-600"],
+html.dark .opg-shortlist-delete-row button {
+  background: #3A1D22 !important;
+  color: #FCA5A5 !important;
+}
+
+html.dark .opg-saved-remove:hover,
+html.dark .opg-shortlist-card-actions [color="failure"]:hover,
+html.dark .opg-delete-dialog .opg-shortlist-actions [color="failure"]:hover,
+html.dark .opg-shortlist-delete-row button:hover {
+  background: #4A2429 !important;
+  color: #FECACA !important;
+}
+
+html.dark .opg-saved-error {
+  background-color: #3A2318;
+  color: #FCA5A5;
+}
+
+html.dark .opg-delete-backdrop {
+  background: rgba(3, 7, 14, .72);
+}
+
+html.dark .opg-shortlist-created {
+  border-top-color: var(--dm-border);
+}
