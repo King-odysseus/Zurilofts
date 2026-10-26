@@ -287,8 +287,9 @@ function AdminRevenue() {
               are called out instead of being counted as platform profit. */}
           {unsettled.bookings > 0 && (
             <Alert color="warning" role="status">
-              {bookingsLabel(unsettled.bookings)} worth {money(unsettled.grossPaid)} were paid before the platform
-              split was recorded, so they are left out of these totals and listed under recent paid bookings.
+              {bookingsLabel(unsettled.bookings)} worth {money(unsettled.grossPaid)} {unsettled.bookings === 1 ? 'was' : 'were'} paid before the platform
+              split was recorded, so {unsettled.bookings === 1 ? 'it is' : 'they are'} left out of these totals and
+              listed under recent paid bookings.
             </Alert>
           )}
 
