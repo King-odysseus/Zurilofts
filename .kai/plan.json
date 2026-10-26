@@ -2,25 +2,13 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Open screenshot and find the admin-driven control",
+      "text": "Check how promos are funded in the booking and payout code",
       "state": "done"
     },
     {
-      "text": "Trace its code and data source",
-      "state": "done"
-    },
-    {
-      "text": "Make it follow real guest stays",
-      "state": "done"
-    },
-    {
-      "text": "Verify in browser then lint and build",
-      "state": "done"
-    },
-    {
-      "text": "Commit and push",
+      "text": "Answer: who funds promos, and how to recruit and motivate hosts",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-26T19:58:17.367Z"
+  "updatedAt": "2026-10-26T19:58:21.534Z"
 }
