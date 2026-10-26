@@ -1,7 +1,7 @@
 import { Suspense, lazy } from 'react';
 import PropTypes from 'prop-types';
 import { BrowserRouter, useLocation } from "react-router-dom";
-import { GuestFooter, GuestHome, GuestStays } from './GuestDiscovery.jsx';
+import { GuestFooter, GuestHome, GuestLegalStrip, GuestStays } from './GuestDiscovery.jsx';
 import RealPropertyPage from './components/PropertyPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
@@ -37,13 +37,28 @@ const TrustPage = lazy(() => import('./pages/TrustPage.jsx'));
 const WorkspaceRoutes = lazy(() => import('./WorkspaceRoutes.jsx'));
 function Home() { return <GuestHome />; }
 function Explore() { return <GuestStays />; }
+// Signed-in task screens read as an app: a marketing footer under an inbox is
+// a second navigation layer and a long scroll past the last message, so they
+// get the slim legal strip instead. Public pages keep the full footer - there
+// it carries the neighbourhoods, guides and hosting links, and a footer is
+// expected on a brochure page.
+const APP_SCREENS = [
+  '/trips', '/booking-history', '/bookings', '/inbox', '/messages',
+  '/profile', '/verify-identity', '/payment/callback',
+  '/favourites', '/shortlists',
+];
+function isAppScreen(pathname) {
+  return APP_SCREENS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
+
 function GuestShell({ children }) {
+  const { pathname } = useLocation();
   return <div className="zl-app">
     <Navbar />
     {/* Its own box so the shell can stretch the page body and hold the
         footer at the bottom of a page that is shorter than the screen. */}
     <div className="zl-app-main">{children}</div>
-    <GuestFooter />
+    {isAppScreen(pathname) ? <GuestLegalStrip /> : <GuestFooter />}
   </div>;
 }
 GuestShell.propTypes = { children: PropTypes.node.isRequired };
