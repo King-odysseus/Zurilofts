@@ -2,33 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Survey host signup/application pages, earnings page and public settings API",
+      "text": "Survey host signup/application pages, earnings page and public settings API (schema, migration, env config, referral and nudge services all existed; the fee endpoint did not)",
       "state": "done"
     },
     {
-      "text": "Build the fee comparison calculator on the become-a-host page",
+      "text": "Build the fee comparison calculator on the become-a-host page (new public /api/public/fees, one page serving both calculator URLs)",
       "state": "done"
     },
     {
-      "text": "Add founding-host perk (capped lower commission for early hosts)",
+      "text": "Add founding-host perk: enrolment was never called at approval, so no host could ever be enrolled; now wired and proven against a throwaway database",
       "state": "done"
     },
     {
-      "text": "Add referral reward for hosts who bring in new hosts",
+      "text": "Verify the referral reward end to end (code issued at approval, applied at signup, credited once on the referred host's first released payout)",
       "state": "done"
     },
     {
-      "text": "Add sign-up nudges for hosts who abandon their application",
+      "text": "Verify the abandoned-application nudges (sweep scheduled at boot, capped, push only)",
       "state": "done"
     },
     {
-      "text": "Verify with lint, build and server tests, then commit and push",
+      "text": "Verify with lint, build, type-check and server tests, then commit and push (f6bb3b6)",
       "state": "done"
     },
     {
-      "text": "Your side: run both migrations on Railway, then set HOST_COMMISSION_RATE, FOUNDING_HOST_LIMIT, REFERRAL_REWARD_KES and the other money settings",
+      "text": "Your side: run npx prisma migrate deploy on Railway, then set HOST_COMMISSION_RATE and the other money settings",
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-26T21:04:04.359Z"
+  "updatedAt": "2026-10-26T21:04:45.605Z"
 }
