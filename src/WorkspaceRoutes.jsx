@@ -4,6 +4,7 @@ import HostRoute from './components/HostRoute.jsx';
 import HostLayout from './components/HostLayout.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AdminDashboard, { AdminLayout } from './pages/AdminDashboard.jsx';
+import AdminRevenue from './pages/AdminRevenue.jsx';
 import AdminListingReview from './pages/AdminListingReview.jsx';
 import AdminPropertyForm from './pages/AdminPropertyForm.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
@@ -39,6 +40,7 @@ export default function WorkspaceRoutes() {
     <Route path="/host/discounts" element={hostPage(<HostPromosPage />)} />
     <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
       <Route index element={<AdminDashboard />} />
+      <Route path="revenue" element={<AdminRevenue />} />
       {/* Listings are host-owned. Admin keeps the approval queue only, so the
           old create/edit/calendar screens redirect instead of resolving. */}
       <Route path="properties" element={<AdminListingReview />} />

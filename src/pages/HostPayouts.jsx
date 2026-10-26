@@ -151,7 +151,7 @@ function HostPayouts() {
       </div>
     </Alert>}
 
-    <section className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Payout balance summary">
+    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Payout balance summary">
       <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">AVAILABLE BALANCE</span>
         <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.balance || 0).toLocaleString()}</strong>
@@ -166,6 +166,17 @@ function HostPayouts() {
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">TOTAL PAID OUT</span>
         <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.totalPaidOut || 0).toLocaleString()}</strong>
         <small className="mt-1 block text-xs text-muted">Completed host payouts</small>
+      </article>
+      {/* Earned but not yet withdrawable. Shown so a stay that has not started
+          does not look like missing money. */}
+      <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">HELD UNTIL CHECK-IN</span>
+        <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.pendingBalance || 0).toLocaleString()}</strong>
+        <small className="mt-1 block text-xs text-muted">
+          {(wallet?.pendingBookings || 0) === 1
+            ? '1 stay releasing after check-in'
+            : `${wallet?.pendingBookings || 0} stays releasing after check-in`}
+        </small>
       </article>
     </section>
 

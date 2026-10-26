@@ -36,6 +36,7 @@ import {
   SlidersHorizontal,
   Star,
   Users,
+  Wallet,
   X,
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle.jsx';
@@ -99,6 +100,7 @@ const adminNavGroups = [
   {
     label: 'Platform',
     items: [
+      { path: '/admin/revenue', label: 'Revenue', icon: Wallet },
       { path: '/admin/properties', label: 'Listing approvals', icon: House },
       { path: '/admin/addons', label: 'Add-ons', icon: SlidersHorizontal },
       { path: '/admin/guides', label: 'Guides', icon: BookOpen },
