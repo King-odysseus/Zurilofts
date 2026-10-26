@@ -2,33 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Survey host signup/application pages, earnings page and public settings API (schema, migration, env config, referral and nudge services all existed; the fee endpoint did not)",
+      "text": "Build the four host growth features (calculator, founding hosts, referrals, signup nudges)",
       "state": "done"
     },
     {
-      "text": "Build the fee comparison calculator on the become-a-host page (new public /api/public/fees, one page serving both calculator URLs)",
+      "text": "Verify: lint, build, 54 new tests, production build typechecked against a generated Postgres client",
       "state": "done"
     },
     {
-      "text": "Add founding-host perk: enrolment was never called at approval, so no host could ever be enrolled; now wired and proven against a throwaway database",
+      "text": "Confirm production migrations: deploy logs show 20 of 20 applied, none pending",
       "state": "done"
     },
     {
-      "text": "Verify the referral reward end to end (code issued at approval, applied at signup, credited once on the referred host's first released payout)",
+      "text": "Set HOST_COMMISSION_RATE=0.1, FOUNDING_HOST_LIMIT=100, REFERRAL_REWARD_KES=2000 in Railway and confirm them live",
       "state": "done"
     },
     {
-      "text": "Verify the abandoned-application nudges (sweep scheduled at boot, capped, push only)",
-      "state": "done"
+      "text": "Decide GUEST_SERVICE_FEE_RATE: still 12%, so guests still pay a markup at checkout, which contradicts the agreed 'guests pay the listed price' model",
+      "state": "pending"
     },
     {
-      "text": "Verify with lint, build, type-check and server tests, then commit and push (f6bb3b6)",
-      "state": "done"
+      "text": "Decide HOST_PAY_CLEANING_FEE and HOST_PAY_LATE_CHECKOUT_FEE: both off, so hosts are not yet paid the cleaning or late check-out fees they are due",
+      "state": "pending"
     },
     {
-      "text": "Your side: run npx prisma migrate deploy on Railway, then set HOST_COMMISSION_RATE and the other money settings",
+      "text": "Investigate the Telegram bot conflict in production logs: two pollers are running the same bot token",
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-26T21:04:45.605Z"
+  "updatedAt": "2026-10-26T21:26:06.030Z"
 }
