@@ -1,0 +1,920 @@
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Select } from 'flowbite-react';
+import { CalendarDays, Camera, ChevronRight, Heart, Info, Star } from 'lucide-react';
+import StayCard from '../components/StayCard.jsx';
+import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useFavorites } from '../context/FavoritesContext.jsx';
+import apiClient from '../api/client.js';
+import { openConsentManager } from '../utils/consent.js';
+
+import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
+
+function ProfilePage() {
+  const { user, setUser, logout } = useAuth();
+  const { favorites } = useFavorites();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState(() => {
+    const hash = window.location.hash.replace('#', '');
+    return ['info', 'bookings', 'favorites'].includes(hash) ? hash : 'info';
+  });
+  const [profile, setProfile] = useState(null);
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Profile form state
+  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', phone: '' });
+  const [countryCode, setCountryCode] = useState('KE');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState('');
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
+
+  // Bank / Payout state (HOST only)
+  const [bankSaving, setBankSaving] = useState(false);
+  const [bankMessage, setBankMessage] = useState('');
+  const [bankForm, setBankForm] = useState({ bankName: '', bankAccountNo: '', bankCode: '' });
+  const [payoutMethod, setPayoutMethod] = useState('bank');
+  const [mpesaPhone, setMpesaPhone] = useState('');
+  const [payoutFrequency, setPayoutFrequency] = useState('monthly');
+  const [banks, setBanks] = useState([]);
+  const [banksLoading, setBanksLoading] = useState(false);
+
+  // Per-booking review form state, keyed by booking id
+  const [reviewForms, setReviewForms] = useState({});
+
+  // Privacy and data controls
+  const [exporting, setExporting] = useState(false);
+  const [exportMessage, setExportMessage] = useState('');
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  // Mirrors the backend eligibility rules (createReview): a stay is reviewable
+  // only once it is CONFIRMED, paid, and has already ended. The backend remains
+  // authoritative; this just avoids showing a form that would be rejected.
+  const isStayCompleted = (booking) =>
+    booking.status === 'CONFIRMED' &&
+    Boolean(booking.paidAt) &&
+    new Date(booking.checkOut) < new Date();
+
+  const setReviewField = (bookingId, field, value) => {
+    setReviewForms((prev) => ({
+      ...prev,
+      [bookingId]: { rating: 0, publicComment: '', privateNote: '', ...prev[bookingId], [field]: value, error: '' },
+    }));
+  };
+
+  async function handleSubmitReview(bookingId) {
+    const form = reviewForms[bookingId] || {};
+    if (!form.rating) {
+      setReviewField(bookingId, 'error', 'Please select a star rating');
+      return;
+    }
+    setReviewForms((prev) => ({ ...prev, [bookingId]: { ...prev[bookingId], submitting: true, error: '' } }));
+    try {
+      const res = await apiClient.post('/reviews', {
+        bookingId,
+        rating: form.rating,
+        satisfaction: form.satisfaction || undefined,
+        publicComment: form.publicComment?.trim() || undefined,
+        privateNote: form.privateNote?.trim() || undefined,
+      });
+      // Attach the new review to its booking so the form is replaced by a summary
+      setBookings((prev) =>
+        prev.map((b) => (b.id === bookingId ? { ...b, review: res.data.data } : b))
+      );
+    } catch (err) {
+      setReviewForms((prev) => ({
+        ...prev,
+        [bookingId]: {
+          ...prev[bookingId],
+          submitting: false,
+          error: err.response?.data?.error || 'Could not submit review',
+        },
+      }));
+    }
+  }
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        const [profileRes, bookingsRes] = await Promise.all([
+          apiClient.get('/users/profile'),
+          apiClient.get('/bookings', { params: { limit: 100 } }),
+        ]);
+        const prof = profileRes.data.data;
+        setProfile(prof);
+        setBookings(bookingsRes.data.data || []);
+        setFormData({
+          firstName: prof.firstName || '',
+          lastName: prof.lastName || '',
+          email: prof.email || '',
+          phone: prof.phone || '',
+        });
+        // Parse out country code from stored phone
+        const { countryCode: cc, phoneNumber: pn } = detectCountry(prof.phone || '');
+        setCountryCode(cc);
+        setPhoneNumber(pn);
+        // Show completion banner if any required field is missing
+        const missing = !prof.firstName || !prof.lastName || !prof.email || !prof.phone;
+        setShowCompletionBanner(missing);
+      } catch {
+        // silent
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
+
+  // Populate bank form when profile loads (HOST only)
+  useEffect(() => {
+    if (!profile || profile.role !== 'HOST') return;
+    setBankForm({
+      bankName: profile.bankName || '',
+      bankAccountNo: profile.bankAccountNo || '',
+      bankCode: profile.bankCode || '',
+    });
+    setPayoutMethod(profile.payoutMethod || (profile.mpesaPhone ? 'mpesa' : 'bank'));
+    setMpesaPhone(profile.mpesaPhone || profile.phone || '');
+    setPayoutFrequency(profile.payoutFrequency || 'monthly');
+  }, [profile]);
+
+  const hostRole = profile?.role;
+  // Fetch bank list for dropdown
+  useEffect(() => {
+    if (hostRole !== 'HOST') return;
+    setBanksLoading(true);
+    apiClient.get('/payments/banks')
+      .then((res) => {
+        if (res.data?.data) setBanks(res.data.data);
+      })
+      .catch(() => {})
+      .finally(() => setBanksLoading(false));
+  }, [hostRole]);
+
+  async function handlePayoutDestinationSave(e) {
+    e.preventDefault();
+    if (payoutMethod === 'bank' && (!bankForm.bankName || !bankForm.bankAccountNo || !bankForm.bankCode)) {
+      setBankMessage('Please fill in all bank details');
+      return;
+    }
+    if (payoutMethod === 'mpesa' && !mpesaPhone.trim()) {
+      setBankMessage('Please enter your M-PESA number');
+      return;
+    }
+    setBankSaving(true);
+    setBankMessage('');
+    try {
+      const payload = payoutMethod === 'mpesa'
+        ? { payoutMethod, mpesaPhone: mpesaPhone.trim() }
+        : { payoutMethod, ...bankForm };
+      const res = await apiClient.put('/users/profile/payout-destination', payload);
+      setProfile((prev) => ({ ...prev, ...res.data.data }));
+      if (res.data.data.mpesaPhone) setMpesaPhone(res.data.data.mpesaPhone);
+      setBankMessage(payoutMethod === 'mpesa' ? 'M-PESA payout number saved!' : 'Bank details saved!');
+    } catch (err) {
+      setBankMessage(err.response?.data?.error || 'Failed to save payout destination');
+    } finally {
+      setBankSaving(false);
+    }
+  }
+
+  async function handleFrequencySave() {
+    setBankSaving(true);
+    setBankMessage('');
+    try {
+      const res = await apiClient.put('/users/profile/payout-frequency', { frequency: payoutFrequency });
+      setProfile((prev) => ({ ...prev, payoutFrequency: res.data.data.payoutFrequency }));
+      setBankMessage('Payout frequency updated!');
+    } catch (err) {
+      setBankMessage(err.response?.data?.error || 'Failed to update frequency');
+    } finally {
+      setBankSaving(false);
+    }
+  }
+
+  function handlePhoneChange(newCountryCode, newPhoneNumber) {
+    setCountryCode(newCountryCode);
+    setPhoneNumber(newPhoneNumber);
+    const country = COUNTRY_CODES.find((c) => c.code === newCountryCode);
+    const v = validatePhone(newPhoneNumber, country);
+    if (!newPhoneNumber) {
+      setPhoneError('');
+    } else if (!v.valid) {
+      setPhoneError(`Enter ${country.length} digits for ${country.name} (e.g. ${country.example})`);
+    } else {
+      setPhoneError('');
+    }
+  }
+
+  async function handleProfileUpdate(e) {
+    e.preventDefault();
+    // Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (formData.email && !emailRegex.test(formData.email)) {
+      setEmailError('Please enter a valid email address');
+      return;
+    }
+    setEmailError('');
+    // Validate phone
+    const country = COUNTRY_CODES.find((c) => c.code === countryCode);
+    const v = validatePhone(phoneNumber, country);
+    if (phoneNumber && !v.valid) {
+      setPhoneError(`Enter ${country.length} digits for ${country.name}`);
+      return;
+    }
+    setPhoneError('');
+    setSaving(true);
+    setMessage('');
+    try {
+      const payload = {
+        ...formData,
+        phone: phoneNumber ? country.dial + phoneNumber : '',
+      };
+      const res = await apiClient.put('/users/profile', payload);
+      setProfile(res.data.data);
+      // Sync to auth context so navbar shows updated name/avatar
+      setUser({ ...user, ...res.data.data });
+      setMessage('Profile updated successfully!');
+      setShowCompletionBanner(false);
+    } catch (err) {
+      setMessage(err.response?.data?.error || 'Update failed');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleAvatarUpload(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarUploading(true);
+    setMessage('');
+    try {
+      const form = new FormData();
+      form.append('avatar', file);
+      const res = await apiClient.post('/users/avatar', form, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setProfile(res.data.data);
+      // Sync avatar to auth context so navbar updates
+      setUser({ ...user, avatar: res.data.data.avatar });
+      setMessage('Profile photo updated!');
+    } catch (err) {
+      setMessage(err.response?.data?.error || 'Upload failed');
+    } finally {
+      setAvatarUploading(false);
+    }
+  }
+
+  async function handleExportData() {
+    setExporting(true);
+    setExportMessage('');
+    try {
+      const res = await apiClient.get('/me/export', { responseType: 'blob' });
+      const disposition = res.headers?.['content-disposition'] || '';
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      const filename = match?.[1] || `zurilofts-data-${new Date().toISOString().slice(0, 10)}.json`;
+      const url = window.URL.createObjectURL(new Blob([res.data]));
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setExportMessage('Your data has been downloaded.');
+    } catch (err) {
+      setExportMessage(err.response?.data?.error || 'Could not export your data. Please try again.');
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    if (deleteConfirm !== 'DELETE') return;
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      await apiClient.delete('/me', { data: { confirm: 'DELETE' } });
+      await logout();
+      navigate('/');
+    } catch (err) {
+      setDeleteError(err.response?.data?.error || 'Could not delete your account. Please try again.');
+      setDeleting(false);
+    }
+  }
+
+  const statusColors = {
+    PENDING: 'bg-yellow-100 text-yellow-800',
+    CONFIRMED: 'bg-green-100 text-green-800',
+    CANCELLED: 'bg-red-100 text-red-800',
+  };
+
+  if (loading) {
+    return <GuestAccountLayout active="profile" eyebrow="Account" title="Personal details" description="Keep your details current for stays and host communication.">
+      <div className="opg-profile-loading" aria-label="Loading profile"><span /><span /><span /></div>
+    </GuestAccountLayout>;
+  }
+
+  return <GuestAccountLayout
+    active="profile"
+    eyebrow="Account"
+    title="Personal details"
+    description="Keep your details current for stays and host communication."
+  >
+    <div className="opg-profile">
+          <div className="opg-profile-summary">
+            <div className="opg-profile-avatar-wrap">
+              <label className="relative cursor-pointer group">
+                {profile?.avatar ? (
+                  <img
+                    src={profile.avatar}
+                    alt="Profile"
+                    className="w-16 h-16 rounded-full object-cover border-2 border-[#D9D9D9]"
+                  />
+                ) : (
+                  <div className="w-16 h-16 bg-[#C49A6C] rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-2xl">
+                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    </span>
+                  </div>
+                )}
+                <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  {avatarUploading ? (
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  ) : (
+                    <Camera className="w-5 h-5 text-white" strokeWidth={2} aria-hidden="true" />
+                  )}
+                </div>
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleAvatarUpload}
+                  className="hidden"
+                  disabled={avatarUploading}
+                />
+              </label>
+              <div className="opg-profile-identity">
+                <h2>
+                  {profile?.firstName} {profile?.lastName}
+                </h2>
+                <p className="text-[#6b7280]">{profile?.email}</p>
+                <span>Guest account</span>
+              </div>
+            </div>
+            <Link to="/verify-identity" className="opg-profile-verify">View verification status</Link>
+          </div>
+
+          {/* Tabs */}
+          <div className="opg-profile-tabs" role="tablist" aria-label="Profile sections">
+            {['info', 'bookings', 'favorites'].map((tab) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab}
+                onClick={() => setActiveTab(tab)}
+                className={activeTab === tab ? 'is-active' : ''}
+              >
+                {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
+              </button>
+            ))}
+          </div>
+
+          {/* My Info Tab */}
+          {activeTab === 'info' && (
+            <div>
+              {showCompletionBanner && (
+                <div className="mb-6 bg-[#C49A6C]/10 border border-[#C49A6C] rounded-2xl p-5 flex items-start gap-3">
+                  <Info className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
+                  <div>
+                    <p className="font-semibold text-[#0B1F42] text-sm">Complete your profile</p>
+                    <p className="text-sm text-[#6b7280] mt-1">Fill in your details below to get the most out of ZuriLofts.</p>
+                  </div>
+                </div>
+              )}
+              <div className="neu-card p-6">
+                <h2 className="text-lg font-bold text-[#0B1F42] mb-6">Personal Information</h2>
+                {message && (
+                  <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
+                    message.includes('success')
+                      ? 'bg-green-50 border border-green-200 text-green-700'
+                      : 'bg-red-50 border border-red-200 text-red-700'
+                  }`}>
+                    {message}
+                  </div>
+                )}
+                <form onSubmit={handleProfileUpdate} className="opg-profile-form">
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">First Name</label>
+                    <input
+                      type="text"
+                      value={formData.firstName}
+                      onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Last Name</label>
+                    <input
+                      type="text"
+                      value={formData.lastName}
+                      onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email</label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937]"
+                    />
+                    {emailError && (
+                      <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label>
+                    <div className="flex gap-2">
+                      <Select
+                        value={countryCode}
+                        onChange={(event) => handlePhoneChange(event.target.value, phoneNumber)}
+                        aria-label="Select country code"
+                        className="opg-profile-country"
+                      >
+                        {COUNTRY_CODES.map((country) => <option key={country.code} value={country.code}>{country.dial}</option>)}
+                      </Select>
+                      <input
+                        type="tel"
+                        value={phoneNumber}
+                        onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
+                        maxLength={15}
+                        placeholder={COUNTRY_CODES.find((c) => c.code === countryCode)?.example || ''}
+                        className="neu-input flex-1 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                      />
+                    </div>
+                    {phoneError && (
+                      <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+                    )}
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="bg-[#C49A6C] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                  >
+                    {saving ? 'Saving...' : 'Save Changes'}
+                  </button>
+                </form>
+              </div>
+
+              {/* Privacy and data */}
+              <div id="privacy" className="scroll-mt-28 mt-10 pt-8 border-t-2 border-[#D9D9D9]">
+                <h3 className="text-xl font-bold text-[#0B1F42] mb-1">Privacy and data</h3>
+                <p className="text-sm text-[#6b7280] mb-6">
+                  Manage your personal data and consent choices. See our{' '}
+                  <Link to="/privacy" className="text-[#C49A6C] hover:underline font-medium">Privacy Policy</Link>{' '}
+                  for full details.
+                </p>
+
+                <div className="space-y-4">
+                  {/* Download my data */}
+                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1f2937]">Download my data</h4>
+                      <p className="text-sm text-[#6b7280] mt-1">
+                        Get a copy of the personal data we hold about you in a portable format.
+                      </p>
+                      {exportMessage && (
+                        <p className={`text-sm mt-2 font-medium ${exportMessage.includes('Could') ? 'text-red-500' : 'text-green-600'}`}>
+                          {exportMessage}
+                        </p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleExportData}
+                      disabled={exporting}
+                      className="flex-shrink-0 inline-flex items-center gap-2 bg-[#0B1F42] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
+                    >
+                      {exporting ? (
+                        <>
+                          <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                          Exporting...
+                        </>
+                      ) : (
+                        'Download my data'
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Cookie preferences */}
+                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1f2937]">Cookie preferences</h4>
+                      <p className="text-sm text-[#6b7280] mt-1">
+                        Review or change which optional cookies we may use. You can withdraw consent at any time.
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={openConsentManager}
+                      className="flex-shrink-0 bg-[#0B1F42] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200"
+                    >
+                      Manage preferences
+                    </button>
+                  </div>
+
+                  {/* Delete my account */}
+                  <div className="rounded-2xl border-2 border-red-200 bg-red-50/50 p-5">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h4 className="font-semibold text-red-700">Delete my account</h4>
+                        <p className="text-sm text-[#6b7280] mt-1">
+                          Permanently erase your account and personal data. Bookings and payment records are
+                          retained for legal and tax reasons but are anonymised so they no longer identify you.
+                          This action cannot be undone.
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => { setShowDeleteDialog(true); setDeleteConfirm(''); setDeleteError(''); }}
+                        className="flex-shrink-0 bg-red-600 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-red-700 transition-all duration-200"
+                      >
+                        Delete my account
+                      </button>
+                    </div>
+
+                    {showDeleteDialog && (
+                      <div className="mt-5 pt-5 border-t border-red-200">
+                        <p className="text-sm font-semibold text-[#1f2937] mb-2">
+                          To confirm, type <span className="font-mono font-bold text-red-700">DELETE</span> below.
+                        </p>
+                        <input
+                          type="text"
+                          value={deleteConfirm}
+                          onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
+                          placeholder="Type DELETE to confirm"
+                          className="neu-input w-full sm:w-72 px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] rounded-xl"
+                        />
+                        {deleteError && <p className="text-red-500 text-xs mt-2">{deleteError}</p>}
+                        <div className="flex gap-3 mt-4">
+                          <button
+                            type="button"
+                            onClick={handleDeleteAccount}
+                            disabled={deleteConfirm !== 'DELETE' || deleting}
+                            className="bg-red-600 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-red-700 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
+                          >
+                            {deleting ? 'Deleting...' : 'Permanently delete my account'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setShowDeleteDialog(false)}
+                            disabled={deleting}
+                            className="px-5 py-2.5 rounded-full border border-[#D9D9D9] text-[#1f2937] text-sm font-semibold hover:bg-[#f8f9fa] transition-colors duration-200 disabled:opacity-50"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Payout Settings - HOST only */}
+          {activeTab === 'info' && profile?.role === 'HOST' && (
+            <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
+              <h3 className="text-xl font-bold text-[#0B1F42] mb-1">Payout Settings</h3>
+              <p className="text-sm text-[#6b7280] mb-6">
+                Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
+              </p>
+
+              {/* Payout destination */}
+              <form onSubmit={handlePayoutDestinationSave} className="space-y-4 mb-8">
+                <h4 className="font-semibold text-[#1f2937]">Payout Destination</h4>
+
+                <div className="grid grid-cols-2 gap-2 rounded-full bg-[#0B1F42]/5 p-1">
+                  {[
+                    { value: 'bank', label: 'Bank account' },
+                    { value: 'mpesa', label: 'M-PESA' },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setPayoutMethod(option.value)}
+                      className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                        payoutMethod === option.value
+                          ? 'bg-[#0B1F42] text-white shadow-sm'
+                          : 'text-[#6b7280] hover:text-[#0B1F42]'
+                      }`}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+
+                {payoutMethod === 'bank' ? (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Bank Name *</label>
+                      {banksLoading ? (
+                        <p className="text-sm text-[#6b7280]">Loading banks...</p>
+                      ) : banks.length > 0 ? (
+                        <Select
+                          value={bankForm.bankCode}
+                          onChange={(event) => {
+                            const code = event.target.value;
+                            const bank = banks.find((item) => item.code === code);
+                            setBankForm((prev) => ({ ...prev, bankCode: code, bankName: bank?.name || '' }));
+                          }}
+                          aria-label="Select your bank"
+                          className="opg-profile-select"
+                        >
+                          {banks.map((bank) => <option key={bank.code} value={bank.code}>{bank.name}</option>)}
+                        </Select>
+                      ) : (
+                        <input
+                          type="text"
+                          value={bankForm.bankName}
+                          onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
+                          placeholder="e.g. KCB Bank"
+                          className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                          required
+                        />
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Account Number *</label>
+                      <input
+                        type="text"
+                        value={bankForm.bankAccountNo}
+                        onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 20) }))}
+                        maxLength={20}
+                        placeholder="Bank account number"
+                        className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                        required
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Safaricom M-PESA Number *</label>
+                    <input
+                      type="tel"
+                      value={mpesaPhone}
+                      onChange={(e) => setMpesaPhone(e.target.value)}
+                      placeholder="0712 345 678"
+                      autoComplete="tel"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280]"
+                      required
+                    />
+                    <p className="text-xs text-[#6b7280] mt-2">Use the Safaricom number registered to receive your host payouts.</p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={bankSaving}
+                  className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 text-sm"
+                >
+                  {bankSaving ? 'Saving...' : 'Save Payout Destination'}
+                </button>
+              </form>
+
+              {/* Payout Frequency */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-[#1f2937]">Payout Frequency</h4>
+                <p className="text-xs text-[#6b7280]">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
+                <div className="flex items-center gap-3">
+                  <Select
+                    value={payoutFrequency}
+                    onChange={(event) => setPayoutFrequency(event.target.value)}
+                    aria-label="Select payout frequency"
+                    className="opg-profile-frequency"
+                  >
+                    <option value="weekly">Weekly (every Monday)</option>
+                    <option value="biweekly">Bi-Weekly (every other Monday)</option>
+                    <option value="monthly">Monthly (1st of month)</option>
+                  </Select>
+                  <button
+                    type="button"
+                    onClick={handleFrequencySave}
+                    disabled={bankSaving}
+                    className="bg-[#0B1F42] text-white font-semibold px-4 py-2.5 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50 text-sm"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+
+              {bankMessage && (
+                <p className={`text-sm mt-4 font-medium ${bankMessage.includes('failed') || bankMessage.includes('Failed') || bankMessage.includes('Please') ? 'text-red-500' : 'text-green-600'}`}>
+                  {bankMessage}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* My Bookings Tab */}
+          {activeTab === 'bookings' && (
+            <div className="space-y-4">
+              {bookings.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <CalendarDays className="w-8 h-8 text-[#6b7280]" strokeWidth={2} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[#0B1F42] mb-1">No bookings yet</h3>
+                  <p className="text-[#6b7280]">Your upcoming stays will appear here.</p>
+                </div>
+              ) : (
+                bookings.map((booking) => (
+                  <div key={booking.id} className="shadow-sm p-6">
+                    <div className="flex flex-col md:flex-row gap-4">
+                      {booking.property?.images?.[0] && (
+                        <img
+                          src={booking.property.images[0]}
+                          alt={booking.property.title}
+                          className="w-full md:w-48 h-32 object-cover rounded-xl"
+                        />
+                      )}
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-bold text-[#0B1F42]">{booking.property?.title}</h3>
+                            <p className="text-sm text-[#6b7280]">{booking.property?.location}</p>
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[booking.status]}`}>
+                            {booking.status}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
+                          <div>
+                            <span className="text-[#6b7280]">Check-in</span>
+                            <p className="font-semibold">{new Date(booking.checkIn).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <span className="text-[#6b7280]">Check-out</span>
+                            <p className="font-semibold">{new Date(booking.checkOut).toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <span className="text-[#6b7280]">Total</span>
+                            <p className="font-semibold text-[#C49A6C]">KES {booking.total.toLocaleString()}</p>
+                          </div>
+                        </div>
+                        {booking.promoCode && (
+                          <div className="mt-3">
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                              Promo: {booking.promoCode.code}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Post-stay review */}
+                        {booking.review ? (
+                          <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
+                            <p className="text-sm font-semibold text-[#0B1F42] mb-1">Your rating</p>
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star key={star} className={`w-5 h-5 ${star <= booking.review.rating ? 'text-[#C49A6C]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
+                              ))}
+                              <span className="ml-2 text-xs text-green-600 font-medium">Thanks for your feedback!</span>
+                            </div>
+                          </div>
+                        ) : isStayCompleted(booking) ? (
+                          <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
+                            <p className="text-sm font-semibold text-[#0B1F42] mb-2">Rate your stay</p>
+                            <div className="flex items-center gap-1 mb-3">
+                              {[1, 2, 3, 4, 5].map((star) => {
+                                const current = reviewForms[booking.id]?.rating || 0;
+                                return (
+                                  <button
+                                    key={star}
+                                    type="button"
+                                    onClick={() => setReviewField(booking.id, 'rating', star)}
+                                    className="p-0.5 transition-transform hover:scale-110"
+                                    aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                                  >
+                                    <Star className={`w-7 h-7 ${star <= current ? 'text-[#C49A6C]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <label className="block text-xs font-semibold text-[#6b7280] mb-2">
+                              How satisfied were you with your stay?
+                            </label>
+                            <div className="flex items-center gap-3 mb-4">
+                              {[
+                                { key: 'happy', emoji: '😊', label: 'Happy', color: 'bg-green-100 border-green-300 text-green-700' },
+                                { key: 'neutral', emoji: '😐', label: 'Neutral', color: 'bg-yellow-100 border-yellow-300 text-yellow-700' },
+                                { key: 'unhappy', emoji: '😞', label: 'Unhappy', color: 'bg-red-100 border-red-300 text-red-700' },
+                              ].map(({ key, emoji, label, color }) => {
+                                const current = reviewForms[booking.id]?.satisfaction;
+                                return (
+                                  <button
+                                    key={key}
+                                    type="button"
+                                    onClick={() => setReviewField(booking.id, 'satisfaction', key)}
+                                    className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all ${
+                                      current === key
+                                        ? color
+                                        : 'border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C]'
+                                    }`}
+                                  >
+                                    <span className="text-2xl">{emoji}</span>
+                                    <span className="text-xs">{label}</span>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                            <label className="block text-xs font-semibold text-[#6b7280] mb-1">
+                              Public review <span className="font-normal">(shown on the property page)</span>
+                            </label>
+                            <textarea
+                              value={reviewForms[booking.id]?.publicComment || ''}
+                              onChange={(e) => setReviewField(booking.id, 'publicComment', e.target.value)}
+                              placeholder="Share what other guests should know about this stay. This appears publicly with your first name."
+                              maxLength={1000}
+                              className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm mb-4"
+                            />
+                            <label className="block text-xs font-semibold text-[#6b7280] mb-1">
+                              Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
+                            </label>
+                            <textarea
+                              value={reviewForms[booking.id]?.privateNote || ''}
+                              onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
+                              placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
+                              maxLength={2000}
+                              className="neu-input w-full px-4 py-3 focus:outline-none bg-white text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
+                            />
+                            {reviewForms[booking.id]?.error && (
+                              <p className="text-red-500 text-xs mt-1">{reviewForms[booking.id].error}</p>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleSubmitReview(booking.id)}
+                              disabled={reviewForms[booking.id]?.submitting}
+                              className="mt-3 bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                            >
+                              {reviewForms[booking.id]?.submitting ? 'Submitting...' : 'Submit Review'}
+                            </button>
+                          </div>
+                        ) : null}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+              {bookings.length > 0 && (
+                <div className="mt-6 text-center">
+                  <Link
+                    to="/bookings"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
+                  >
+                    View all bookings
+                    <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
+                  </Link>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Favourites Tab */}
+          {activeTab === 'favorites' && (
+            <div>
+              {favorites.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Heart className="w-8 h-8 text-[#6b7280]" strokeWidth={2} aria-hidden="true" />
+                  </div>
+                  <h3 className="text-lg font-bold text-[#0B1F42] mb-1">No favourites yet</h3>
+                  <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
+                  <Link to="/properties" className="inline-block bg-[#C49A6C] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+                    Browse properties
+                  </Link>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {favorites.map((property) => (
+                    <StayCard key={property.id} stay={property} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+    </div>
+  </GuestAccountLayout>;
+}
+
+export default ProfilePage;
