@@ -18,9 +18,9 @@
       "state": "done"
     },
     {
-      "text": "Commit only the colour change and push (leaving the in-progress header search work untouched)",
-      "state": "active"
+      "text": "Commit the colour change and push (the in-progress header search work was left untouched)",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-26T18:51:18.279Z"
+  "updatedAt": "2026-10-26T18:51:50.173Z"
 }
