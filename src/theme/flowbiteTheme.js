@@ -135,9 +135,9 @@ export const brandTheme = {
       xl: 'min-h-[52px] px-7 text-base',
     },
     color: {
-      // Bronze is a light surface: navy ink on it reaches ~7:1, while white on it
-      // only reaches ~2.3:1 and read as washed out. Dark surfaces keep white text.
-      default: `bg-[${BRONZE}] text-[${NAVY}] hover:bg-[${BRONZE_HOVER}] ${FOCUS_RING} dark:bg-[${BRONZE}] dark:text-[${NAVY}] dark:hover:bg-[${BRONZE_HOVER}]`,
+      // Bronze is the primary surface and always carries white ink; dark
+      // surfaces keep white text too.
+      default: `bg-[${BRONZE}] text-white hover:bg-[${BRONZE_HOVER}] ${FOCUS_RING} dark:bg-[${BRONZE}] dark:text-white dark:hover:bg-[${BRONZE_HOVER}]`,
       alternative: `border border-[${CONTROL_BORDER}] bg-white text-[${NAVY}] hover:bg-[${BRONZE_TINT}] ${FOCUS_RING} dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700`,
       light: `border border-[${CONTROL_BORDER}] bg-white text-[${NAVY}] hover:bg-[${SURFACE}] ${FOCUS_RING} dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700`,
       dark: `bg-[${NAVY}] text-white hover:bg-[${NAVY_HOVER}] ${FOCUS_RING} dark:bg-[${NAVY}] dark:hover:bg-[${NAVY_HOVER}]`,
@@ -259,7 +259,7 @@ export const brandTheme = {
               // never reaches Tailwind's scanner as a real class, so the dark
               // branch silently did nothing and the active pill stayed navy with
               // navy text. Plain utilities are always generated.
-              on: 'rounded-full bg-navy-bg text-white dark:bg-primary dark:text-navy-bg',
+              on: 'rounded-full bg-navy-bg text-white dark:bg-primary dark:text-white',
               off: `rounded-full text-[${MUTED}] hover:bg-[#F1F5F9] hover:text-[${NAVY}] dark:text-gray-400 dark:hover:bg-gray-800`,
             },
           },
@@ -277,7 +277,7 @@ export const brandTheme = {
       },
       selector: {
         base: `w-12 border border-[${CONTROL_BORDER}] bg-white py-2 leading-tight text-[${MUTED}] enabled:hover:bg-[${SURFACE}] enabled:hover:text-[${NAVY}] dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400`,
-        active: `border-[${BRONZE}] bg-[${BRONZE}] text-[${NAVY}] hover:bg-[${BRONZE_HOVER}] hover:text-[${NAVY}] dark:border-[${BRONZE}] dark:bg-[${BRONZE}] dark:text-[${NAVY}]`,
+        active: `border-[${BRONZE}] bg-[${BRONZE}] text-white hover:bg-[${BRONZE_HOVER}] hover:text-white dark:border-[${BRONZE}] dark:bg-[${BRONZE}] dark:text-white`,
       },
     },
   },

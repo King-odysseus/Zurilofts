@@ -38,7 +38,7 @@ const NAV_LINK_IDLE = 'text-muted hover:bg-surface hover:text-navy';
 // The active pill paints bronze, so its label must be the fixed navy ink.
 // Keeping the colour out of the structural class stops an active item from
 // inheriting the idle `text-muted`, which rendered pale-on-bronze.
-const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-navy-bg hover:bg-primary hover:text-navy-bg';
+const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-white hover:bg-primary hover:text-white';
 
 // Host workspace shell. Hosts get their own frame instead of the guest site
 // header: the marketing nav (search, destinations, saved trips) is no use while

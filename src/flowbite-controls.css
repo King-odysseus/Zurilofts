@@ -282,13 +282,11 @@ html.dark :where([class*="border-[#E3E8EF]"], [class*="border-[#e5e7eb]"], [clas
 html.dark :where([class*="text-[#0B1F42]"], [class*="text-[#414D63]"], [class*="text-[#334155]"], [class*="text-[#1f2937]"], [class*="text-[#111827]"]) {
   color: var(--dm-text) !important;
 }
-/* Bronze surfaces keep dark brand ink. The rule above turns every dark text
-   hex light, which left primary buttons and bronze pills pale-on-bronze at
-   roughly 2.2:1. Anything that paints its own bronze background restores the
-   intended pairing; declared after the generic rule so it wins the tie.
-   The earlier version excluded `!bg-` utilities, which let buttons such as the
-   host promo submit fall back to near-white ink on bronze, so that guard is gone
-   (a bare `bg-[#C49A6C]` substring also matches `!bg-[#C49A6C]`). */
+/* Bronze surfaces always carry white ink. The rule above turns every dark text
+   hex light, so anything painting its own bronze background is pinned back to
+   white here; declared after the generic rule so it wins the tie.
+   A bare `bg-[#C49A6C]` substring also matches `!bg-[#C49A6C]`, so forced
+   utilities such as the host promo submit are covered too. */
 html.dark :where(
   [class*="bg-[#C49A6C]"][class*="text-[#0B1F42]"],
   [class*="bg-[#B8895C]"][class*="text-[#0B1F42]"],
@@ -297,7 +295,7 @@ html.dark :where(
   .bg-primary[class*="text-[#0B1F42]"],
   .bg-bronze[class*="text-[#0B1F42]"]
 ) {
-  color: #0B1F42 !important;
+  color: #FFFFFF !important;
 }
 
 
@@ -351,16 +349,14 @@ html.dark :where(.ui-btn-primary, .ui-btn-strong) {
   color: #FFFFFF !important;
 }
 
-/* Bronze surfaces keep the brand navy ink, which is the documented pairing and
-   measures 6.35:1. Forcing white here was the bug: it left every bronze CTA at
-   2.57:1, so the buttons read as pale and the label was hard to make out. */
+/* Bronze CTAs take white ink in both themes, matching the utility classes. */
 html.dark :where(
   .opg-account-action,
   .opg-trip-primary,
   .opg-message-send,
   .zl-header-register
 ) {
-  color: #0B1F42 !important;
+  color: #FFFFFF !important;
 }
 
 /* Any control that paints a dark surface must carry light ink. Each selector
@@ -1007,7 +1003,7 @@ html.dark .op-checkout-progress-circle {
 html.dark .op-checkout-progress-circle.is-active {
   border-color: #D1A477 !important;
   background-color: #D1A477 !important;
-  color: #0B1F42 !important;
+  color: #FFFFFF !important;
 }
 
 html.dark .op-checkout-progress-line {

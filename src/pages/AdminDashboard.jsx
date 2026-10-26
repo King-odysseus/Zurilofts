@@ -47,7 +47,7 @@ import ThemeToggle from '../components/ThemeToggle.jsx';
 // the old stylesheet drifted apart in the first place.
 // ---------------------------------------------------------------------------
 const NAV_LINK_BASE = 'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors';
-const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-navy-bg';
+const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-white';
 const NAV_LINK_IDLE = 'text-white/80 hover:bg-white/10 hover:text-white';
 
 const METRIC_CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
@@ -70,7 +70,7 @@ const ICON_BUTTON = 'grid h-9 w-9 place-items-center rounded-lg text-muted trans
 // instead of stacking next to it. Primary is bronze with fixed navy ink (it
 // must not flip in dark mode), secondary is white on the shared border token.
 const BTN_BASE = 'h-9 w-fit rounded-full px-4 text-[13px] font-semibold';
-const BTN_PRIMARY = `${BTN_BASE} bg-primary text-navy-bg enabled:hover:bg-[#B8895C]`;
+const BTN_PRIMARY = `${BTN_BASE} bg-primary text-white enabled:hover:bg-[#B8895C]`;
 const BTN_SECONDARY = `${BTN_BASE} border border-border bg-white text-navy enabled:hover:bg-surface`;
 
 // Status and count pills share one geometry so a badge never drifts from the
@@ -151,7 +151,7 @@ function HeaderUserMenu({ user, onLogout }) {
       // Tailwind hook on the element, so styling it through className is impossible.
       renderTrigger={() => (
         <button type="button" className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-surface">
-          <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-primary text-xs font-bold text-navy-bg">
+          <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-primary text-xs font-bold text-white">
             {user?.avatar ? (
               <img src={user.avatar} alt="" className="h-8 w-8 rounded-full object-cover" />
             ) : (
@@ -377,7 +377,7 @@ function AdminLayout() {
         </nav>
         <div className={`shrink-0 border-t border-white/10 ${collapsed ? 'flex flex-col items-center p-3' : 'px-5 py-5'}`}>
           <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-navy-bg">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
               {user?.firstName?.[0]}{user?.lastName?.[0]}
             </div>
             {!collapsed && (

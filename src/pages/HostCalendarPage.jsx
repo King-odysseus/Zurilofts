@@ -23,7 +23,7 @@ const DAY_STATE_CLASSES = {
 // ships its own radius, padding, alignment, background and text utilities for
 // the same properties, so the ones that clash are marked important - otherwise
 // the winner is decided by stylesheet order, not by the order in this string.
-const BTN_PRIMARY = 'h-9 !items-center !rounded-full !border-0 !bg-primary !px-4 !text-sm !font-semibold !text-navy-bg hover:!bg-primary-hover hover:!text-navy-bg';
+const BTN_PRIMARY = 'h-9 !items-center !rounded-full !border-0 !bg-primary !px-4 !text-sm !font-semibold !text-white hover:!bg-primary-hover hover:!text-white';
 // Secondary buttons need the admin panels' solid 1px token border; Flowbite's
 // light button border measures under a pixel on some display ratios. The
 // elevated/navy pair flips with the theme, so the label is never white on white.

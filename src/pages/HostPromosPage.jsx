@@ -24,7 +24,7 @@ const PANEL = 'min-w-0 rounded-2xl border border-[#EEF1F5] bg-[#F8FAFC] p-4 md:p
 
 const LABEL = 'mb-1.5 block text-[10px] font-extrabold text-[#475569]';
 
-const BRONZE_BUTTON = '!bg-[#C49A6C] !text-[#0B1F42] hover:!bg-[#B8895B] focus:!ring-[#C49A6C]';
+const BRONZE_BUTTON = '!bg-[#C49A6C] !text-white hover:!bg-[#B8895B] focus:!ring-[#C49A6C]';
 
 function Message({ tone, children }) {
   const isError = tone === 'error';

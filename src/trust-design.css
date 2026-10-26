@@ -256,12 +256,7 @@
 
 .op-trust-button-primary:hover,
 .op-trust-button-primary:focus {
-  background: #b8895c !important;color: #0b1f42 !important;
-}
-
-/* Navy text on the bronze CTA: white on #c49a6c reaches only 2.57:1 contrast. */
-.op-trust-button-primary {
-  color: #0b1f42 !important;
+  background: #b8895c !important;color:#fff !important;
 }
 
 .op-trust-inline-loading,
@@ -1202,13 +1197,6 @@ html.dark .op-verify-step:hover > span,
 html.dark .op-verify-step:focus-visible > span {
   background: #c49a6c !important;
   color: #fff !important;
-}
-
-/* Bronze numbered step badge keeps navy text for contrast (white on #c49a6c is 2.57:1). */
-html.dark .op-verify-step.is-active > span,
-html.dark .op-verify-step:hover > span,
-html.dark .op-verify-step:focus-visible > span {
-  color: #0b1f42 !important;
 }
 
 html.dark .op-verify-document-icon,

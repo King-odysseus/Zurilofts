@@ -363,7 +363,7 @@ function ProfilePage() {
                   />
                 ) : (
                   <div className="w-16 h-16 bg-[#C49A6C] rounded-full flex items-center justify-center">
-                    <span className="text-[#0B1F42] font-bold text-2xl">
+                    <span className="text-white font-bold text-2xl">
                       {user?.firstName?.[0]}{user?.lastName?.[0]}
                     </span>
                   </div>
@@ -490,7 +490,7 @@ function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="bg-[#C49A6C] text-[#0B1F42] font-semibold px-6 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                    className="bg-[#C49A6C] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -706,7 +706,7 @@ function ProfilePage() {
                 <button
                   type="submit"
                   disabled={bankSaving}
-                  className="bg-[#C49A6C] text-[#0B1F42] font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 text-sm"
+                  className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 text-sm"
                 >
                   {bankSaving ? 'Saving...' : 'Save Payout Destination'}
                 </button>
@@ -894,7 +894,7 @@ function ProfilePage() {
                               type="button"
                               onClick={() => handleSubmitReview(booking.id)}
                               disabled={reviewForms[booking.id]?.submitting}
-                              className="mt-3 bg-[#C49A6C] text-[#0B1F42] font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                              className="mt-3 bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
                             >
                               {reviewForms[booking.id]?.submitting ? 'Submitting...' : 'Submit Review'}
                             </button>
@@ -929,7 +929,7 @@ function ProfilePage() {
                   </div>
                   <h3 className="text-lg font-bold text-[#0B1F42] mb-1">No favourites yet</h3>
                   <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
-                  <Link to="/properties" className="inline-block bg-[#C49A6C] text-[#0B1F42] px-6 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+                  <Link to="/properties" className="inline-block bg-[#C49A6C] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
                     Browse properties
                   </Link>
                 </div>

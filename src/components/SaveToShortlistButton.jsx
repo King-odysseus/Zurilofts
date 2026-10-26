@@ -77,7 +77,7 @@ export default function SaveToShortlistButton({ propertyId }) {
         aria-label={isSaved ? "Saved to shortlist" : "Save to shortlist"}
         className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
           isSaved
-            ? "bg-[#C49A6C] text-[#0B1F42]"
+            ? "bg-[#C49A6C] text-white"
             : "border border-[#E3E8EF] bg-elevated text-[#0B1F42] shadow-sm hover:bg-surface hover:shadow-md"
         }`}
       >
@@ -125,7 +125,7 @@ export default function SaveToShortlistButton({ propertyId }) {
                   autoFocus
                   onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); if (e.key === "Escape") setShowCreate(false); }}
                 />
-                <button onClick={handleCreate} className="rounded-[10px] bg-[#C49A6C] px-2 py-1 text-xs font-semibold text-[#0B1F42]">Add</button>
+                <button onClick={handleCreate} className="rounded-[10px] bg-[#C49A6C] px-2 py-1 text-xs font-semibold text-white">Add</button>
               </div>
             ) : (
               <button

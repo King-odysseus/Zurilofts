@@ -2,29 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Find the shared button rules that set text colour (Flowbite theme plus custom CSS)",
+      "text": "Find every place a bronze background is set (Tailwind classes, CSS rules, shared button theme)",
       "state": "done"
     },
     {
-      "text": "Audit every button on every page in both themes and list the unreadable pairings",
+      "text": "Change text and icon ink on bronze surfaces to white",
       "state": "done"
     },
     {
-      "text": "Fix the central dark rules: dark surfaces take white ink, bronze takes navy ink, white pills darken",
+      "text": "Check near-bronze hover/active fills and icons inside bronze circles also carry white",
       "state": "done"
     },
     {
-      "text": "Fix the remaining bronze buttons that carry white ink across the stylesheets and components",
+      "text": "Run lint and build, then visually check home, login and dark mode",
       "state": "done"
     },
     {
-      "text": "Verify the fixed pages in both themes in the browser",
-      "state": "done"
-    },
-    {
-      "text": "Run lint and build, then report",
-      "state": "done"
+      "text": "Commit only the colour change and push (leaving the in-progress header search work untouched)",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-10-25T23:25:08.462Z"
+  "updatedAt": "2026-10-26T18:51:18.279Z"
 }

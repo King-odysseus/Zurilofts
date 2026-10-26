@@ -588,7 +588,7 @@ function PropertyPreview({ form }) {
           <div className="flex aspect-[4/3] w-full items-center justify-center bg-surface text-sm text-muted">No photo yet</div>
         )}
         {form.featured && (
-          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-navy-bg">Featured</span>
+          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-white">Featured</span>
         )}
         {!form.available && (
           <span className="absolute right-3 top-3 rounded-full bg-navy-bg px-3 py-1 text-[10px] font-semibold text-white">Unavailable</span>
@@ -622,7 +622,7 @@ function PropertyPreview({ form }) {
             <span className="text-xs text-muted">per night</span>
             <div className="text-xl font-bold text-primary-600">KES {price.toLocaleString()}</div>
           </div>
-          <span className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-navy-bg">Book Now</span>
+          <span className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white">Book Now</span>
         </div>
       </div>
     </div>
@@ -746,7 +746,7 @@ function FullPagePreview({ form, onClose }) {
               <div className="sticky top-20 rounded-xl border border-border bg-elevated p-6 shadow-sm">
                 <span className="text-3xl font-bold text-navy">KES {price.toLocaleString()}</span>
                 <span className="text-muted"> / night</span>
-                <div className="mt-4 block w-full rounded-full bg-primary py-3 text-center font-bold text-navy-bg">Book Now</div>
+                <div className="mt-4 block w-full rounded-full bg-primary py-3 text-center font-bold text-white">Book Now</div>
                 {!form.available && (
                   <p className="mt-3 text-center text-sm font-medium text-red-600">Currently marked unavailable</p>
                 )}
