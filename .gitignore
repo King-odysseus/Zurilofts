@@ -71,3 +71,7 @@ skills-lock.json
 
 # Local verification screenshots
 .kai/shots/
+
+# Local design review screenshots
+.kai/review/*.png
+.kai/*.png
