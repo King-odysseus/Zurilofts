@@ -94,3 +94,30 @@ test('a negative rate cannot become a negative commission', () => {
     assert.equal(getPublicFeeSchedule().commissionPercent, 0);
   });
 });
+
+// The page tells a prospective host where the cleaning fee goes, so the
+// schedule has to report the real setting. A page that promises the host the
+// fee while the payout code keeps it is a lie that only shows up after the
+// first stay, which is the worst possible time to discover it.
+test('the schedule reports whether the host is paid the cleaning and late check-out fees', () => {
+  withEnv({ HOST_PAY_CLEANING_FEE: 'true', HOST_PAY_LATE_CHECKOUT_FEE: 'true' }, () => {
+    const fees = getPublicFeeSchedule();
+    assert.equal(fees.payCleaningFee, true);
+    assert.equal(fees.payLateCheckoutFee, true);
+  });
+  withEnv({ HOST_PAY_CLEANING_FEE: 'false', HOST_PAY_LATE_CHECKOUT_FEE: 'false' }, () => {
+    const fees = getPublicFeeSchedule();
+    assert.equal(fees.payCleaningFee, false);
+    assert.equal(fees.payLateCheckoutFee, false);
+  });
+});
+
+// Anything other than the exact string 'true' must read as off. A typo in a
+// Railway variable should not silently start moving cleaning fees to hosts.
+test('only the exact string true switches a fee pass-through on', () => {
+  for (const value of ['TRUE', 'True', '1', 'yes', '', ' false']) {
+    withEnv({ HOST_PAY_CLEANING_FEE: value }, () => {
+      assert.equal(getPublicFeeSchedule().payCleaningFee, false, `"${value}" must read as off`);
+    });
+  }
+});

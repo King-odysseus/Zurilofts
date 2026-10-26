@@ -63,6 +63,11 @@ export interface PublicFeeSchedule {
   promoFunding: string;
   foundingPlaceLimit: number;
   foundingCommissionPercent: number;
+  // Whether the host is paid the cleaning and late check-out fees. The page
+  // states where that money goes, so it has to know the answer rather than
+  // guess and promise a host income the payout code will not deliver.
+  payCleaningFee: boolean;
+  payLateCheckoutFee: boolean;
 }
 
 // Config is free text, so a typo would otherwise reach the public page as NaN
@@ -102,5 +107,7 @@ export function getPublicFeeSchedule(): PublicFeeSchedule {
     promoFunding: env.PLATFORM_PROMO_FUNDING,
     foundingPlaceLimit: Math.max(0, Math.round(Number(env.FOUNDING_HOST_LIMIT) || 0)),
     foundingCommissionPercent: fractionAsPercent(env.FOUNDING_HOST_COMMISSION_RATE),
+    payCleaningFee: env.HOST_PAY_CLEANING_FEE === 'true',
+    payLateCheckoutFee: env.HOST_PAY_LATE_CHECKOUT_FEE === 'true',
   };
 }

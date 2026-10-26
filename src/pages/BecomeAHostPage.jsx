@@ -273,9 +273,23 @@ export default function BecomeAHostPage() {
                 </div>
 
                 <p className="mt-5 text-xs text-muted">
-                  Your guest pays {money(result.guestPays)} for the same month once the{' '}
-                  {fees.guestServiceFeePercent}% guest service fee is added. Cleaning (
-                  {money(fees.cleaningFee)}) is paid by the guest. This is an estimate, not an offer.
+                  {/* With the guest fee at zero the sentence has to say the price
+                      IS the price; "0% fee is added" reads like a mistake. */}
+                  {fees.guestServiceFeePercent > 0 ? (
+                    <>
+                      Your guest pays {money(result.guestPays)} for the same month once the{' '}
+                      {fees.guestServiceFeePercent}% guest service fee is added.
+                    </>
+                  ) : (
+                    <>
+                      Your guest pays {money(result.guestPays)}, the listed price, with no service
+                      fee added at checkout.
+                    </>
+                  )}{' '}
+                  {fees.payCleaningFee
+                    ? `The ${money(fees.cleaningFee)} cleaning fee goes to you.`
+                    : `Cleaning (${money(fees.cleaningFee)}) is paid by the guest and kept by ZuriLofts.`}{' '}
+                  This is an estimate, not an offer.
                 </p>
               </>
             )}
