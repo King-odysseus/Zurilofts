@@ -12,6 +12,7 @@ import Spinner from './components/Spinner.jsx';
 // else is fetched when its route is first opened, so a guest never pays to
 // download the host and admin workspaces they cannot open.
 const BookingPage = lazy(() => import('./pages/BookingPage.jsx'));
+const BecomeAHostPage = lazy(() => import('./pages/BecomeAHostPage.jsx'));
 const LoginPage = lazy(() => import('./pages/LoginPage.jsx'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage.jsx'));
 const PaymentCallback = lazy(() => import('./pages/PaymentCallback.jsx'));
@@ -65,6 +66,11 @@ GuestShell.propTypes = { children: PropTypes.node.isRequired };
 
 function Shell() {
   const { pathname } = useLocation();
+  // A public page that happens to begin with /host, so it has to be matched
+  // before the workspace shell below claims every /host path. The older
+  // calculator URL stays alive so existing links keep working; both land
+  // on one page so the fee maths cannot drift between two copies.
+  if (pathname === '/host-earnings-calculator') return <GuestShell><BecomeAHostPage /></GuestShell>;
   if (pathname.startsWith('/host') || pathname.startsWith('/admin')) return <WorkspaceRoutes />;
   if (pathname.startsWith('/booking/')) return <BookingPage />;
   if (pathname === '/login') return <LoginPage />;
@@ -82,6 +88,7 @@ function Shell() {
   if (pathname === '/verify-identity') return <GuestShell><ProtectedRoute><TrustPage /></ProtectedRoute></GuestShell>;
   let content;
   if (pathname === '/') content = <Home />;
+  else if (pathname === '/become-a-host') content = <BecomeAHostPage />;
   else if (pathname === '/properties') content = <Explore />;
   else if (pathname.startsWith('/property/')) content = <RealPropertyPage />;
   else if (pathname === '/places') content = <PlacesPage />;

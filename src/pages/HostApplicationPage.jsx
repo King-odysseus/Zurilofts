@@ -1,10 +1,12 @@
-import { useEffect, useMemo, useState } from 'react';
+import '../referral-card.css';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Alert, Badge, Button, Checkbox, FileInput, Label, Textarea, TextInput } from 'flowbite-react';
 import SelectMenu from '../components/SelectMenu.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
+import { formatPrice } from '../utils/currency.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
 
@@ -310,6 +312,12 @@ function HostApplicationPage() {
       });
     }
 
+    // A code arrives from a share link and is stored on this device until the
+    // applicant saves the form. The server resolves it to a host and quietly
+    // ignores it when it matches nobody, so a stale typo is harmless.
+    const storedReferralCode = window.localStorage.getItem('zurilofts_referral_code');
+    if (storedReferralCode) payload.referredByCode = storedReferralCode;
+
     if (form.propertyCount !== '') payload.propertyCount = Number(form.propertyCount);
     if (form.propertyTypes.length > 0) payload.propertyTypes = form.propertyTypes;
 
@@ -317,7 +325,11 @@ function HostApplicationPage() {
   }
 
   async function saveApplication() {
-    const response = await apiClient.patch('/host-application', applicationPayload());
+    const payload = applicationPayload();
+    const response = await apiClient.patch('/host-application', payload);
+    // Once the code has been accepted there is nothing left to send; keeping it
+    // would re-apply the link on every later save.
+    if (payload.referredByCode) window.localStorage.removeItem('zurilofts_referral_code');
     setApplication(response.data.data);
     return response.data.data;
   }
@@ -470,6 +482,10 @@ function HostApplicationPage() {
         <div className="space-y-5">
           {message && <Notice tone="success">{message}</Notice>}
           {error && <Notice tone="error">{error}</Notice>}
+
+          {/* Sits above the step forms: it is a share-and-leave note, not part of
+              the application, so it must not interrupt a host filling one in. */}
+          <HostReferralCard />
 
           {editable ? (
             <form onSubmit={handleSave} className="space-y-5">
@@ -748,6 +764,127 @@ function HostApplicationPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function referredHostsLabel(total) {
+  const count = Number(total) || 0;
+  return `${count.toLocaleString('en-KE')} host${count === 1 ? '' : 's'} referred`;
+}
+
+/**
+ * The host's shareable referral code.
+ *
+ * This is a bonus on the application page, not a step in it, so the card owns
+ * its own request and renders nothing at all when the code is unavailable: a
+ * 404 while the endpoint is not deployed yet, a slow network, or a host who has
+ * no code yet must not put an error banner in front of someone trying to finish
+ * their application.
+ */
+function HostReferralCard() {
+  const [referral, setReferral] = useState(null);
+  // 'idle' is the resting label, the other two are the transient confirmations.
+  const [copyStatus, setCopyStatus] = useState('idle');
+  const codeRef = useRef(null);
+  const copyTimer = useRef(null);
+
+  useEffect(() => {
+    let ignore = false;
+    apiClient.get('/host-application/referral')
+      .then((response) => {
+        if (ignore) return;
+        if (response.data?.success === false) {
+          setReferral(null);
+          return;
+        }
+        const data = response.data?.data;
+        const code = String(data?.code ?? '').trim();
+        // Without a code there is nothing to share, so nothing is rendered.
+        setReferral(code ? { ...data, code } : null);
+      })
+      .catch(() => {
+        // Deliberately silent: the host cannot act on this failure and the rest
+        // of the page is unaffected.
+        if (!ignore) setReferral(null);
+      });
+    return () => { ignore = true; };
+  }, []);
+
+  // The card unmounts whenever the page swaps between the form and the status
+  // card, so a pending confirmation timeout is cleared rather than firing on a
+  // component that is gone.
+  useEffect(() => () => {
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+  }, []);
+
+  if (!referral) return null;
+
+  const rewardKes = Number(referral.rewardKes) || 0;
+  const earnedKes = Number(referral.earnedKes) || 0;
+  const rewardLabel = rewardKes > 0 ? formatPrice(rewardKes) : null;
+  const earnedLabel = earnedKes > 0 ? formatPrice(earnedKes) : null;
+
+  /** Fallback for browsers without the async clipboard (old Safari, plain http). */
+  function selectCode() {
+    const node = codeRef.current;
+    const selection = window.getSelection?.();
+    if (!node || !selection) return;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  async function copyCode() {
+    const code = referral.code;
+    if (!code) return;
+    if (copyTimer.current) clearTimeout(copyTimer.current);
+
+    let copied = false;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(code);
+        copied = true;
+      }
+    } catch {
+      // writeText rejects in an insecure context or when permission is denied.
+      // That is expected on older browsers, so it falls through to the
+      // selection below instead of being reported to the host.
+      copied = false;
+    }
+
+    if (!copied) selectCode();
+    // "Copied" only appears when the clipboard write succeeded; otherwise the
+    // text is selected and the host is told to finish the copy themselves.
+    setCopyStatus(copied ? 'copied' : 'manual');
+    // Both labels revert on their own, so the button can never stay stuck on a
+    // confirmation that no longer describes its action.
+    copyTimer.current = setTimeout(() => setCopyStatus('idle'), copied ? 2000 : 4000);
+  }
+
+  const copyLabel = copyStatus === 'copied'
+    ? 'Copied'
+    : copyStatus === 'manual' ? 'Press Ctrl+C to copy' : 'Copy code';
+
+  return (
+    <section className="op-referral" aria-labelledby="host-referral-heading">
+      <h2 id="host-referral-heading" className="op-referral-heading">Invite another host</h2>
+      <p className="op-referral-lede">
+        {rewardLabel
+          ? `${rewardLabel} is credited to your wallet when a host you refer completes their first stay.`
+          : 'Share your code to help another host get started on ZuriLofts.'}
+      </p>
+      <div className="op-referral-code-row">
+        <code className="op-referral-code" ref={codeRef}>{referral.code}</code>
+        <button type="button" className="op-referral-copy" onClick={copyCode}>
+          <span aria-live="polite">{copyLabel}</span>
+        </button>
+      </div>
+      <p className="op-referral-stats">
+        <span>{referredHostsLabel(referral.referrals?.total)}</span>
+        {earnedLabel && <span>{earnedLabel} earned</span>}
+      </p>
+    </section>
   );
 }
 

@@ -231,10 +231,11 @@ export function GuestLegalStrip() {
 export function GuestFooter() {
   const { isAuthenticated, user } = useAuth();
   // A visitor with no account cannot open the host workspace, so this CTA has
-  // to start them on the shared sign-up form in hosting mode. Pointing it at
-  // /host/today used to bounce a new host straight to the sign-in page.
+  // to earn their interest first: /become-a-host explains the fees and links
+  // on to sign-up. Pointing it at /host/today used to bounce a new host
+  // straight to the sign-in page.
   const hostHref = !isAuthenticated
-    ? '/register?role=HOST'
+    ? '/become-a-host'
     : user?.role === 'USER' ? '/host/application' : '/host/today';
-  return <footer className="opg-footer"><div className="opg-container"><div className="opg-footer-columns"><div><Link className="opg-footer-brand" to="/" aria-label="ZuriLofts home"><BrandLogo imgClassName="h-16 w-auto" alt="ZuriLofts" /></Link><p>Furnished apartments in Nairobi&apos;s best neighbourhoods, verified, flexible, and ready when you are.</p></div><div><h3>Explore</h3><Link to="/properties">Stays</Link><Link to="/places">Neighbourhoods</Link><Link to="/guides">Guides</Link><Link to="/restaurants">Restaurants</Link></div><div><h3>Company</h3><Link to={hostHref}>Become a host</Link></div><div><h3>Support</h3><Link to="/guides">Help centre</Link><Link to="/terms">Terms</Link><Link to="/privacy">Privacy</Link></div><div><h3>Stay updated</h3><p>New homes and city notes, once a month.</p></div></div><div className="opg-footer-bottom">© {new Date().getFullYear()} ZuriLofts. All rights reserved. <span><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><button type="button" onClick={openConsentManager}>Cookies</button></span></div></div></footer>;
+  return <footer className="opg-footer"><div className="opg-container"><div className="opg-footer-columns"><div><Link className="opg-footer-brand" to="/" aria-label="ZuriLofts home"><BrandLogo imgClassName="h-16 w-auto" alt="ZuriLofts" /></Link><p>Furnished apartments in Nairobi&apos;s best neighbourhoods, verified, flexible, and ready when you are.</p></div><div><h3>Explore</h3><Link to="/properties">Stays</Link><Link to="/places">Neighbourhoods</Link><Link to="/guides">Guides</Link><Link to="/restaurants">Restaurants</Link></div><div><h3>Company</h3><Link to={hostHref}>Become a host</Link><Link to="/become-a-host">Fee calculator</Link></div><div><h3>Support</h3><Link to="/guides">Help centre</Link><Link to="/terms">Terms</Link><Link to="/privacy">Privacy</Link></div><div><h3>Stay updated</h3><p>New homes and city notes, once a month.</p></div></div><div className="opg-footer-bottom">© {new Date().getFullYear()} ZuriLofts. All rights reserved. <span><Link to="/privacy">Privacy</Link><Link to="/terms">Terms</Link><button type="button" onClick={openConsentManager}>Cookies</button></span></div></div></footer>;
 }

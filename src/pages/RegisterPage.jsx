@@ -18,6 +18,13 @@ function RegisterPage() {
   const [searchParams] = useSearchParams();
   const urlRole = (searchParams.get('role') || '').toUpperCase();
   const isHost = urlRole === 'HOST';
+  // A referral link carries the referring host's code. It is kept until the
+  // applicant reaches the application form, which is where it can actually be
+  // attached: at sign-up there is no application row yet to link it to.
+  const referralCode = (searchParams.get('ref') || '').trim();
+  useEffect(() => {
+    if (referralCode) localStorage.setItem('zurilofts_referral_code', referralCode);
+  }, [referralCode]);
   const googleHref = googleOAuthUrl();
   const [formData, setFormData] = useState({
     firstName: '',
