@@ -2,13 +2,45 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check how promos are funded in the booking and payout code",
+      "text": "Read pricing, payment, payout and settings code to confirm how fees, promo funding and payouts work",
       "state": "done"
     },
     {
-      "text": "Answer: who funds promos, and how to recruit and motivate hosts",
+      "text": "Add config flags for host commission, guest service fee, cleaning/late fee pass-through and promo funding",
+      "state": "done"
+    },
+    {
+      "text": "Move host earnings maths into a pure module and cover it with tests",
+      "state": "done"
+    },
+    {
+      "text": "Pass cleaning fee, late check-out fee and promo ownership into the host earnings calculation",
+      "state": "done"
+    },
+    {
+      "text": "Restore the host balance and free the bookings when a transfer fails or is reversed",
+      "state": "done"
+    },
+    {
+      "text": "Make a payout safe against two runs paying the same balance twice",
+      "state": "done"
+    },
+    {
+      "text": "Set a next payout date when a host first earns so scheduled payouts can find them",
+      "state": "done"
+    },
+    {
+      "text": "Run due payouts hourly instead of only from an admin button",
+      "state": "done"
+    },
+    {
+      "text": "Identify which host-growth ideas need product decisions rather than code",
+      "state": "done"
+    },
+    {
+      "text": "Run server tests, root lint and root build",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-26T19:58:21.534Z"
+  "updatedAt": "2026-10-26T20:06:16.407Z"
 }

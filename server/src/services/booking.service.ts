@@ -6,6 +6,7 @@ import { isRangeAvailable, isRangeAvailableWithDb, PENDING_HOLD_MINUTES } from '
 import { isBookable } from './property.service.js';
 import { isPromoUsableForProperty, type BookingTarget } from './promo.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
+import { env } from '../config/env.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
 function normalizeBooking(booking: any) {
@@ -71,7 +72,12 @@ function computeBookingPricing(params: BookingPricingParams) {
   const nights = calculateNights(params.checkIn, params.checkOut);
   const extraGuestFee = computeExtraGuestFee(params.guests, params.bedOption ?? undefined, nights);
   const subtotal = computeSubtotal(params.checkIn, nights, effectivePrice, params.priceRules);
-  const pricing = calculateFees(subtotal, params.discountPercent, params.maxDiscount);
+  const pricing = calculateFees(
+    subtotal,
+    params.discountPercent,
+    params.maxDiscount,
+    Number(env.GUEST_SERVICE_FEE_RATE),
+  );
   const lateFee = lateCheckoutFee(params.checkOutTime ?? undefined, effectivePrice);
   const total = pricing.total + lateFee + extraGuestFee;
   return {
@@ -781,7 +787,10 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
 export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED' | 'CANCELLED') {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { property: { select: { hostId: true } } },
+    include: {
+      property: { select: { hostId: true } },
+      promoCode: { select: { hostId: true } },
+    },
   });
   if (!booking) throw new NotFoundError('Booking');
 
@@ -801,7 +810,14 @@ export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED'
     const nights = calculateNights(booking.checkIn, booking.checkOut);
     const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
     const { calculateHostNet } = await import('./payment.service.js');
-    const hn = calculateHostNet(booking.subtotal, booking.discountAmount, extraGuestFee);
+    const hn = calculateHostNet({
+      subtotal: booking.subtotal,
+      discountAmount: booking.discountAmount,
+      extraGuestFee,
+      cleaningFee: booking.cleaningFee,
+      lateCheckoutFee: booking.lateCheckoutFee,
+      promoOwnerHostId: booking.promoCode?.hostId ?? null,
+    });
     hostNetAmount = hn.hostNet;
     withholdingTax = hn.withholdingTax;
   }

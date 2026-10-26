@@ -38,11 +38,39 @@ const envSchema = z.object({
   // at boot and every other ADMIN is demoted. Unset = no admin sync happens.
   ADMIN_EMAIL: z.string().email().optional(),
   ADMIN_PASSWORD: z.string().optional(),
-  // Platform fees
+  // Platform fees. Every rate below is configuration rather than code: a
+  // business decision changes the money split with an env var, no deploy.
   WITHHOLDING_TAX_RATE: z.string().default('5'),
   TRANSFER_FEE_PASS_TO_HOST: z.string().default('false'),
+  // Fraction of the accommodation subtotal the platform keeps, charged to the
+  // HOST (0.1 means 10%). Never charged on cleaning, extra-guest or late
+  // check-out amounts - those are pass-through costs. Default 0 preserves the
+  // original split until a commission rate is agreed.
+  HOST_COMMISSION_RATE: z.string().default('0'),
+  // Fraction of the nightly subtotal charged to the GUEST as a service fee.
+  // Setting this to 0 makes the guest pay the listed price only, which is what
+  // undercuts marketplaces that add their own fee on top.
+  GUEST_SERVICE_FEE_RATE: z.string().default('0.12'),
+  // Pass the guest's cleaning fee / late check-out fee through to the host.
+  HOST_PAY_CLEANING_FEE: z.string().default('false'),
+  HOST_PAY_LATE_CHECKOUT_FEE: z.string().default('false'),
+  // Who funds a promo code. 'host' (default) takes the discount out of the
+  // host's payout, which is the original behaviour. 'platform' pays the host on
+  // the full price and absorbs the discount, except on a host's own code.
+  PLATFORM_PROMO_FUNDING: z.enum(['host', 'platform']).default('host'),
 })
   .superRefine((data, ctx) => {
+    // A rate outside 0..1 would pay a host a multiplied or negative amount.
+    for (const key of ['HOST_COMMISSION_RATE', 'GUEST_SERVICE_FEE_RATE'] as const) {
+      const rate = Number(data[key]);
+      if (!Number.isFinite(rate) || rate < 0 || rate > 1) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [key],
+          message: `${key} must be a fraction between 0 and 1 (0.1 means 10%), got "${data[key]}"`,
+        });
+      }
+    }
     if (data.JWT_ACCESS_SECRET === data.JWT_REFRESH_SECRET) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,

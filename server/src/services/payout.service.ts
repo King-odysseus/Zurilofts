@@ -134,10 +134,44 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
     select: { id: true, hostNetAmount: true },
   });
 
-  const transferRef = `zrlft-pay-${crypto.randomUUID().slice(0, 12)}`;
   const transferAmount = wallet.balance;
 
-  // Initiate Paystack transfer
+  // Claim the balance before touching Paystack. This conditional update only
+  // matches while the balance is still exactly what we quoted, so an admin
+  // click and the scheduled sweep can never both transfer the same money.
+  const claimed = await prisma.hostWallet.updateMany({
+    where: { hostId, balance: transferAmount },
+    data: {
+      balance: { decrement: transferAmount },
+      totalPaidOut: { increment: transferAmount },
+    },
+  });
+  if (claimed.count === 0) {
+    throw new ConflictError('A payout for this host is already in progress');
+  }
+
+  const transferRef = `zrlft-pay-${crypto.randomUUID().slice(0, 12)}`;
+
+  // Record the payout before the transfer so a failure always leaves something
+  // to reverse the balance against.
+  let payout;
+  try {
+    payout = await prisma.payout.create({
+      data: {
+        hostId,
+        amount: transferAmount,
+        transferRef,
+        recipientCode,
+        status: 'PENDING',
+        initiatedBy,
+        bookingsCount: unpaidBookings.length,
+      },
+    });
+  } catch (e) {
+    await refundClaim(hostId, transferAmount);
+    throw e;
+  }
+
   let transferResult: { transferRef: string; status: string };
   try {
     transferResult = await paystack.initiateTransfer({
@@ -147,20 +181,14 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
       reference: transferRef,
     });
   } catch (e: any) {
+    // The claim is already taken, so put it back before failing.
+    await settleFailedTransfer(transferRef, 'FAILED', `Transfer initiation failed: ${e.message}`);
     throw new ValidationError(`Transfer initiation failed: ${e.message}`);
   }
 
-  // Create payout record
-  const payout = await prisma.payout.create({
-    data: {
-      hostId,
-      amount: transferAmount,
-      transferRef: transferResult.transferRef,
-      recipientCode,
-      status: 'PROCESSING',
-      initiatedBy,
-      bookingsCount: unpaidBookings.length,
-    },
+  await prisma.payout.update({
+    where: { id: payout.id },
+    data: { status: 'PROCESSING', transferRef: transferResult.transferRef },
   });
 
   // Link bookings to this payout
@@ -174,19 +202,72 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
     });
   }
 
-  // Reset wallet balance, update totals
+  // The balance was already reduced when the claim was taken, so only the
+  // payout timing fields are left to record.
   await prisma.hostWallet.update({
     where: { hostId },
     data: {
-      balance: { decrement: transferAmount },
-      totalPaidOut: { increment: transferAmount },
       lastPayoutAt: new Date(),
-      // Calculate next payout based on frequency
       nextPayoutAt: host.payoutFrequency ? computeNextPayoutDate(host.payoutFrequency) : null,
     },
   });
 
-  return { payout, message: `Payout of KES ${transferAmount.toLocaleString()} initiated` };
+  return {
+    payout: { ...payout, status: 'PROCESSING', transferRef: transferResult.transferRef },
+    message: `Payout of KES ${transferAmount.toLocaleString()} initiated`,
+  };
+}
+
+/** Put a claimed balance back when the payout record could not be created. */
+async function refundClaim(hostId: string, amount: number): Promise<void> {
+  await prisma.hostWallet.update({
+    where: { hostId },
+    data: { balance: { increment: amount }, totalPaidOut: { decrement: amount } },
+  });
+}
+
+/** Payout states from which nothing more can be reversed. */
+const SETTLED_PAYOUT_STATUSES = ['FAILED', 'REVERSED'];
+
+/**
+ * Settle a payout Paystack reports as FAILED or REVERSED.
+ *
+ * The host's balance is reduced when a transfer is initiated, so without this
+ * the host looked paid while receiving nothing. Releasing the payout's bookings
+ * matters just as much: they are excluded from every future payout while a
+ * payoutBooking row points at them, so a failed transfer used to strand that
+ * money permanently.
+ *
+ * Returns true when this call performed the settlement.
+ */
+export async function settleFailedTransfer(
+  transferRef: string,
+  status: 'FAILED' | 'REVERSED',
+  reason?: string,
+): Promise<boolean> {
+  const payout = await prisma.payout.findUnique({ where: { transferRef } });
+  if (!payout) return false;
+  // Guard against a duplicate delivery flipping an already-settled payout and
+  // crediting the host twice.
+  if (SETTLED_PAYOUT_STATUSES.includes(payout.status)) return false;
+
+  return prisma.$transaction(async (tx) => {
+    const flipped = await tx.payout.updateMany({
+      where: { id: payout.id, status: { notIn: [...SETTLED_PAYOUT_STATUSES] } },
+      data: { status, failureReason: reason ?? null },
+    });
+    if (flipped.count === 0) return false;
+
+    await tx.hostWallet.update({
+      where: { hostId: payout.hostId },
+      data: {
+        balance: { increment: payout.amount },
+        totalPaidOut: { decrement: payout.amount },
+      },
+    });
+    await tx.payoutBooking.deleteMany({ where: { payoutId: payout.id } });
+    return true;
+  });
 }
 
 /** Process all scheduled payouts for hosts whose next payout date is due */
@@ -197,6 +278,15 @@ export async function processScheduledPayouts(): Promise<{ processed: string[]; 
     where: {
       nextPayoutAt: { lte: now },
       balance: { gt: 0 },
+      // Skip hosts with nowhere to send money, otherwise an unattended hourly
+      // sweep would retry them forever and bury the real failures in logs.
+      host: {
+        OR: [
+          { payoutMethod: { not: null } },
+          { bankAccountNo: { not: null } },
+          { mpesaPhone: { not: null } },
+        ],
+      },
     },
     include: { host: { select: { payoutFrequency: true } } },
   });
@@ -252,7 +342,7 @@ export async function listPayouts(options: {
 }
 
 /** Calculate the next payout date based on frequency */
-function computeNextPayoutDate(frequency: string): Date {
+export function computeNextPayoutDate(frequency: string): Date {
   const now = new Date();
   switch (frequency) {
     case 'weekly': {

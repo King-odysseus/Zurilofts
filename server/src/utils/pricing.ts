@@ -3,9 +3,13 @@
  *
  * Rules (match frontend convention):
  * - cleaningFee: flat KES 1,500
- * - serviceFee: 12% of subtotal, rounded to nearest KES
+ * - serviceFee: GUEST_SERVICE_FEE_RATE of the subtotal (12% unless the caller
+ *   passes another rate), rounded to nearest KES
  * - discount: percentage off subtotal, capped at maxDiscount if set
  * - total = subtotal + cleaningFee + serviceFee - discount
+ *
+ * The guest fee rate arrives as an argument rather than being read from config
+ * here, so this module stays pure and testable without environment variables.
  */
 
 /** Flat fees and rates used across all pricing calculations. */
@@ -16,7 +20,7 @@ export const EXTRA_GUEST_FEE_PER_NIGHT = 800;
 /** Flat cleaning fee per stay in KES. */
 export const CLEANING_FEE = 1500;
 
-/** Service fee as a fraction of the subtotal. */
+/** Fallback guest service fee used when the caller passes no rate. */
 export const SERVICE_FEE_RATE = 0.12;
 
 /**
@@ -38,7 +42,8 @@ export function calculatePricing(
   pricePerNight: number,
   nights: number,
   discountPercent: number = 0,
-  maxDiscount?: number | null
+  maxDiscount?: number | null,
+  serviceFeeRate: number = SERVICE_FEE_RATE
 ): {
   subtotal: number;
   cleaningFee: number;
@@ -48,7 +53,7 @@ export function calculatePricing(
 } {
   const subtotal = pricePerNight * nights;
   const cleaningFee = CLEANING_FEE;
-  const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE);
+  const serviceFee = Math.round(subtotal * serviceFeeRate);
 
   const discountAmount = computeDiscountAmount(subtotal, discountPercent, maxDiscount);
 
@@ -64,7 +69,8 @@ export function calculatePricing(
 export function calculateFees(
   subtotal: number,
   discountPercent: number = 0,
-  maxDiscount?: number | null
+  maxDiscount?: number | null,
+  serviceFeeRate: number = SERVICE_FEE_RATE
 ): {
   subtotal: number;
   cleaningFee: number;
@@ -73,7 +79,7 @@ export function calculateFees(
   total: number;
 } {
   const cleaningFee = CLEANING_FEE;
-  const serviceFee = Math.round(subtotal * SERVICE_FEE_RATE);
+  const serviceFee = Math.round(subtotal * serviceFeeRate);
 
   const discountAmount = computeDiscountAmount(subtotal, discountPercent, maxDiscount);
 

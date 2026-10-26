@@ -4,8 +4,10 @@ import { env } from '../config/env.js';
 import crypto from 'crypto';
 import { isRangeAvailable } from './calendar.service.js';
 import { calculateNights, computeExtraGuestFee } from '../utils/pricing.js';
+import { calculateHostEarnings, type HostEarningInput, type HostEarningPolicy } from '../utils/hostEarnings.js';
 import { sendTelegramAlert } from './chat.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
+import { computeNextPayoutDate, settleFailedTransfer } from './payout.service.js';
 
 const WITHHOLDING_TAX_RATE = Number(env.WITHHOLDING_TAX_RATE) / 100;
 
@@ -23,18 +25,25 @@ export function paymentChannelsForMethod(method?: string): paystack.PaystackPaym
   }
 }
 
+export type { HostEarningInput, HostEarningPolicy } from '../utils/hostEarnings.js';
+
 /**
- * What the host earns from a booking. Platform revenue is the guest service
- * fee and cleaning fee, neither of which is part of hostGross, so withholding
- * tax is the only deduction here. A promo discount comes out of the host's
- * share by design: it reduces the nightly rate the host set, not the
- * platform's fee. Host-created discounts make that explicit.
+ * The money split the running server uses, taken from config so a rates change
+ * needs no deploy.
  */
-export function calculateHostNet(subtotal: number, discountAmount: number, extraGuestFee: number) {
-  const hostGross = subtotal - discountAmount + extraGuestFee;
-  const withholdingTax = Math.round(hostGross * WITHHOLDING_TAX_RATE);
-  const hostNet = hostGross - withholdingTax;
-  return { hostGross, withholdingTax, hostNet };
+export const HOST_EARNING_POLICY: HostEarningPolicy = {
+  commissionRate: Number(env.HOST_COMMISSION_RATE),
+  payCleaningFee: env.HOST_PAY_CLEANING_FEE === 'true',
+  payLateCheckoutFee: env.HOST_PAY_LATE_CHECKOUT_FEE === 'true',
+  platformFundsPromo: env.PLATFORM_PROMO_FUNDING === 'platform',
+};
+
+/** What the host earns from a booking, under the configured policy. */
+export function calculateHostNet(
+  input: HostEarningInput,
+  policy: HostEarningPolicy = HOST_EARNING_POLICY,
+) {
+  return calculateHostEarnings(input, policy, WITHHOLDING_TAX_RATE);
 }
 
 /** Generate a unique Paystack reference for a booking */
@@ -234,7 +243,11 @@ async function confirmBookingPayment(
 ): Promise<void> {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
-    include: { property: { select: { hostId: true, title: true } }, user: { select: { email: true } } },
+    include: {
+      property: { select: { hostId: true, title: true, host: { select: { payoutFrequency: true } } } },
+      promoCode: { select: { hostId: true } },
+      user: { select: { email: true } },
+    },
   });
 
   if (!booking) throw new Error(`Booking ${bookingId} not found`);
@@ -285,11 +298,21 @@ async function confirmBookingPayment(
   const nights = calculateNights(booking.checkIn, booking.checkOut);
   const extraGuestFee = computeExtraGuestFee(booking.guests, booking.bedOption, nights);
 
-  const { hostGross, withholdingTax, hostNet } = calculateHostNet(
-    booking.subtotal,
-    booking.discountAmount,
-    extraGuestFee
-  );
+  const { withholdingTax, hostNet } = calculateHostNet({
+    subtotal: booking.subtotal,
+    discountAmount: booking.discountAmount,
+    extraGuestFee,
+    cleaningFee: booking.cleaningFee,
+    lateCheckoutFee: booking.lateCheckoutFee,
+    promoOwnerHostId: booking.promoCode?.hostId ?? null,
+  });
+
+  // New hosts have no next payout date, and the scheduled sweep only looks at
+  // hosts whose date has come due - so without this a host could earn forever
+  // and never be picked up automatically.
+  const nextPayoutAt = booking.property.host?.payoutFrequency
+    ? computeNextPayoutDate(booking.property.host.payoutFrequency)
+    : null;
 
   // Atomically flip PENDING -> CONFIRMED and credit the host wallet in one
   // transaction. The affected-row count tells us whether THIS delivery performed
@@ -326,6 +349,14 @@ async function confirmBookingPayment(
           totalEarned: { increment: hostNet },
         },
       });
+
+      // Also covers wallets created before this field was populated.
+      if (nextPayoutAt) {
+        await tx.hostWallet.updateMany({
+          where: { hostId, nextPayoutAt: null },
+          data: { nextPayoutAt },
+        });
+      }
     }
 
     return confirmedNow.count;
@@ -390,22 +421,26 @@ export async function handleWebhookEvent(
       const reason = data.data?.reason || 'Unknown failure';
       if (!transferRef) return { handled: false, message: 'No transfer reference' };
 
-      await prisma.payout.updateMany({
-        where: { transferRef },
-        data: { status: 'FAILED', failureReason: reason },
-      });
-      return { handled: true, message: 'Payout marked FAILED' };
+      const refunded = await settleFailedTransfer(transferRef, 'FAILED', reason);
+      return {
+        handled: true,
+        message: refunded
+          ? 'Payout marked FAILED and the host balance was restored'
+          : 'Payout marked FAILED (already settled)',
+      };
     }
 
     case 'transfer.reversed': {
       const transferRef = data.data?.reference;
       if (!transferRef) return { handled: false, message: 'No transfer reference' };
 
-      await prisma.payout.updateMany({
-        where: { transferRef },
-        data: { status: 'REVERSED' },
-      });
-      return { handled: true, message: 'Payout marked REVERSED' };
+      const refunded = await settleFailedTransfer(transferRef, 'REVERSED', 'Transfer reversed by Paystack');
+      return {
+        handled: true,
+        message: refunded
+          ? 'Payout marked REVERSED and the host balance was restored'
+          : 'Payout marked REVERSED (already settled)',
+      };
     }
 
     default:

@@ -7,6 +7,7 @@ import { startTelegramPoller } from './services/chat.service.js';
 import { syncAll } from './services/ical.service.js';
 import { runDueAutoMessages } from './services/automated-message.service.js';
 import { syncConfiguredAdmin } from './services/admin-bootstrap.service.js';
+import { processScheduledPayouts } from './services/payout.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +30,7 @@ app.listen(Number(env.PORT), () => {
   startTelegramPoller();
   startCalendarSync();
   startAutomatedMessageScheduler();
+  startPayoutScheduler();
 });
 
 // Unhandled promise rejections and process errors crash hard so Railway can
@@ -55,6 +57,29 @@ function startCalendarSync() {
   };
   // First run shortly after boot, then on the interval
   setTimeout(run, 30 * 1000);
+  setInterval(run, INTERVAL_MS);
+}
+
+// Periodically send host payouts that have come due. Without this the only way
+// money reaches a host is an admin remembering to press the button, so a host
+// on a weekly schedule could wait indefinitely. Skipped entirely when Paystack
+// is not configured, since every transfer would fail.
+function startPayoutScheduler() {
+  if (!env.PAYSTACK_SECRET_KEY) {
+    console.warn(' Paystack is not configured - scheduled host payouts are disabled.');
+    return;
+  }
+  const INTERVAL_MS = 60 * 60 * 1000;
+  const run = () => {
+    processScheduledPayouts()
+      .then(({ processed, failed }) => {
+        if (processed.length) console.log(` Payouts sent for ${processed.length} host(s)`);
+        for (const f of failed) console.warn(`Payout skipped for host ${f.hostId}: ${f.reason}`);
+      })
+      .catch((err) => console.error('Scheduled payout run failed:', err?.message || err));
+  };
+  // Give the app time to finish booting before the first sweep.
+  setTimeout(run, 2 * 60 * 1000);
   setInterval(run, INTERVAL_MS);
 }
 
