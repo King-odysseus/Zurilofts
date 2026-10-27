@@ -13,6 +13,7 @@ import {
   Plus,
 } from 'lucide-react';
 import HostMobileBottomNav from './HostMobileBottomNav.jsx';
+import ModeSwitch from './ModeSwitch.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
 
@@ -95,6 +96,12 @@ function HostLayout({ children }) {
           </nav>
 
           <div className="flex items-center gap-2">
+            {/* The host header carries the same mode switch as the guest one, so
+                the way back to travelling is visible rather than buried in the
+                account menu. Hidden on small screens where the menu item wins. */}
+            <div className="hidden lg:block">
+              <ModeSwitch />
+            </div>
             <Button as={Link} to="/host/properties/new" size="sm" aria-label="New listing">
               <Plus className="h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
               <span className="hidden md:inline">New listing</span>

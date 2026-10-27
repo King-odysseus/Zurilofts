@@ -23,6 +23,7 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import ModeSwitch from './ModeSwitch.jsx';
 import { useMode } from '../context/ModeContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
@@ -397,6 +398,14 @@ function Navbar() {
 
             {isAuthenticated ? (
               <>
+                {/* The mode switch sits in the header itself, not only in the
+                    account menu: travelling and hosting are two places, so the
+                    current one is always on screen and changing it is a click. */}
+                {canSelectHosting && (
+                  <div className="mr-1 hidden min-[1380px]:block">
+                    <ModeSwitch />
+                  </div>
+                )}
                 {/* Notification bell with dropdown */}
                 <div className="relative" ref={notifRef}>
                   <button
