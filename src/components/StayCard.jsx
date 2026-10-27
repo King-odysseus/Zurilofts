@@ -52,7 +52,10 @@ function StayCard({ stay }) {
     </button>
 
     <Link to={`/property/${stay.id}`} className="block space-y-1 p-4">
-      <h3 className="line-clamp-2 min-h-[48px] text-base font-semibold leading-6 text-navy">{stay.title}</h3>
+      {/* One line, clipped if long. A two-line title reserved a second line for
+          itself, which left a blank band under every short name and read as a
+          gap between the name and the location rather than as spacing. */}
+      <h3 className="truncate text-base font-semibold text-navy">{stay.title}</h3>
       <p className="flex items-center gap-1 text-xs text-muted"><span className="truncate">{details.join(' · ')}</span></p>
       <div className="mt-2 flex items-baseline justify-between">
         <span className="flex items-baseline gap-1.5">
@@ -61,14 +64,13 @@ function StayCard({ stay }) {
           </span>
           {stay.price != null && <span className="text-xs text-muted">per night</span>}
         </span>
-        {Number(stay.rating) > 0 ? (
+        {/* No reviews yet: show nothing. A 0.00 star read as a terrible score,
+            and a "New listing" label put words in the space a score belongs in. */}
+        {Number(stay.rating) > 0 && (
           <span className="flex items-center gap-1 text-xs font-semibold text-navy">
             <Star className="h-3 w-3 text-primary" strokeWidth={2} fill="currentColor" aria-hidden="true" />
             {Number(stay.rating).toFixed(2)}
           </span>
-        ) : (
-          // No reviews yet: a 0.00 star would read as a terrible score.
-          <span className="text-xs font-medium text-muted">New listing</span>
         )}
       </div>
     </Link>
