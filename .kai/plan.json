@@ -18,21 +18,17 @@
       "state": "done"
     },
     {
-      "text": "Run lint and build, clean up scratch files and the test account",
-      "state": "done"
-    },
-    {
-      "text": "Commit and push both changes",
-      "state": "done"
-    },
-    {
       "text": "Run prisma migrate deploy on Railway and confirm the money settings are live",
       "state": "done"
     },
     {
-      "text": "Write the recommendation for better travel/host transitions",
-      "state": "done"
+      "text": "Re-verify the final state: dark mode of the selected row, lint, build, and nothing left uncommitted",
+      "state": "active"
+    },
+    {
+      "text": "Commit any remaining verified change and report",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-27T14:15:23.232Z"
+  "updatedAt": "2026-10-27T14:16:03.049Z"
 }
