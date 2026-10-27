@@ -96,10 +96,6 @@ function BookingHistoryPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = 'Booking history | ZuriLofts';
-  }, []);
-
-  useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setError(null);

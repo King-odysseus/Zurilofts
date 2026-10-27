@@ -172,10 +172,6 @@ export default function HostListingsPage() {
   const [busyId, setBusyId] = useState(null);
 
   useEffect(() => {
-    document.title = 'Your listings | ZuriLofts Host';
-  }, []);
-
-  useEffect(() => {
     let active = true;
     async function loadProperties() {
       try {

@@ -57,7 +57,6 @@ export default function TrustPage() {
   }, []);
 
   useEffect(() => {
-    document.title = 'Trust and recovery | ZuriLofts';
     loadTrustData();
   }, [loadTrustData]);
 

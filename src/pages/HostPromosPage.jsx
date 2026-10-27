@@ -53,10 +53,6 @@ export default function HostPromosPage() {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState('');
 
-  useEffect(() => {
-    document.title = 'Discounts | ZuriLofts Host';
-  }, []);
-
   const load = useCallback(async () => {
     const response = await apiClient.get('/promo/mine');
     setPromos(response.data.data || []);

@@ -29,10 +29,6 @@ function MessagesPage() {
   const [sending, setSending] = useState(false);
   const threadRef = useRef(null);
 
-  useEffect(() => {
-    document.title = 'Support | ZuriLofts';
-  }, []);
-
   const scrollToBottom = useCallback(() => {
     const thread = threadRef.current;
     if (thread) thread.scrollTop = thread.scrollHeight;

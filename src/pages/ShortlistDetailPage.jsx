@@ -106,7 +106,6 @@ export default function ShortlistDetailPage() {
   }, [id]);
 
   useEffect(() => {
-    document.title = 'Shortlist | ZuriLofts';
     if (isAuthenticated) fetchShortlist();
   }, [isAuthenticated, fetchShortlist]);
 

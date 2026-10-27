@@ -194,10 +194,6 @@ export default function HostCalendarPage() {
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    document.title = id ? 'Property calendar | ZuriLofts Host' : 'Availability calendar | ZuriLofts Host';
-  }, [id]);
-
   const load = useCallback(async () => {
     setLoading(true);
     setError('');

@@ -72,13 +72,17 @@ function PropertyPage() {
 
   useEffect(() => {
     if (!property) return;
-    document.title = `${property.title} - ZuriLofts`;
+    // A stored listing title often already opens with the brand ("ZuriLofts -
+    // Serenity Residency 1003"), so appending it again read as a stutter in the
+    // tab. Add the brand only when the title does not carry it.
+    const pageTitle = /zurilofts/i.test(property.title) ? property.title : `${property.title} - ZuriLofts`;
+    document.title = pageTitle;
     const setMeta = (prop, content) => {
       let el = document.querySelector(`meta[property="og:${prop}"]`);
       if (!el) { el = document.createElement('meta'); el.setAttribute('property', `og:${prop}`); document.head.appendChild(el); }
       el.setAttribute('content', content);
     };
-    setMeta('title', `${property.title} - ZuriLofts`);
+    setMeta('title', pageTitle);
     setMeta('description', property.description?.slice(0, 200) || '');
     setMeta('image', property.images?.[0] || '');
   }, [property]);

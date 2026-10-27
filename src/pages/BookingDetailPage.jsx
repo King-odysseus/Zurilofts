@@ -88,10 +88,6 @@ function BookingDetailPage() {
   const [paymentPending, setPaymentPending] = useState(false);
 
   useEffect(() => {
-    document.title = 'Booking details | ZuriLofts';
-  }, []);
-
-  useEffect(() => {
     let cancelled = false;
     // Reset first: the route param can change without remounting this page, and
     // a stale booking would briefly render against the new id.

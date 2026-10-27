@@ -113,10 +113,6 @@ export default function HostEarningsPage() {
   const periodLabel = PERIOD_OPTIONS.find((option) => option.value === period)?.label || 'This month';
 
   useEffect(() => {
-    document.title = 'Earnings | ZuriLofts Host';
-  }, []);
-
-  useEffect(() => {
     let active = true;
 
     async function loadPayoutSummary() {

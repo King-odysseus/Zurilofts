@@ -153,10 +153,6 @@ export default function HostTodayPage() {
   const [mobileTab, setMobileTab] = useState("arrival");
 
   useEffect(() => {
-    document.title = "Today | ZuriLofts Host";
-  }, []);
-
-  useEffect(() => {
     if (!isAuthenticated) return undefined;
     let active = true;
     async function loadToday() {

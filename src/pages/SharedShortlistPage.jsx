@@ -66,7 +66,6 @@ export default function SharedShortlistPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    document.title = 'Shared Shortlist | ZuriLofts';
     let cancelled = false;
     async function fetchShortlist() {
       try {

@@ -1,4 +1,4 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { BrowserRouter, useLocation } from "react-router-dom";
 import { GuestFooter, GuestHome, GuestLegalStrip, GuestStays } from './GuestDiscovery.jsx';
@@ -7,6 +7,7 @@ import NotFoundPage from './pages/NotFoundPage.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Navbar from './components/Navbar.jsx';
 import Spinner from './components/Spinner.jsx';
+import { resolveTitle } from './utils/pageTitle.js';
 
 // Only browsing (home, stays, a property) is in the first download. Everything
 // else is fetched when its route is first opened, so a guest never pays to
@@ -109,8 +110,20 @@ function RouteFallback() {
   return <div className="flex min-h-[60vh] items-center justify-center"><Spinner /></div>;
 }
 
+// The tab title follows the route, for every route. It runs before the page
+// below so a page that names itself from its own data (a property name, a
+// guide title) still has the last word.
+function RouteTitle() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    document.title = resolveTitle(pathname);
+  }, [pathname]);
+  return null;
+}
+
 export default function App() {
   return <BrowserRouter>
+    <RouteTitle />
     <Suspense fallback={<RouteFallback />}><Shell /></Suspense>
   </BrowserRouter>;
 }

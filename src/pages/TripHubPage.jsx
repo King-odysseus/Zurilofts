@@ -153,10 +153,6 @@ function TripHubPage() {
   const [messageBookingId, setMessageBookingId] = useState(null);
 
   useEffect(() => {
-    document.title = 'Trips | ZuriLofts';
-  }, []);
-
-  useEffect(() => {
     if (!isAuthenticated) return;
     let cancelled = false;
     async function fetchBookings() {

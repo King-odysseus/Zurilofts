@@ -41,10 +41,6 @@ function ConversationPage() {
   const [sending, setSending] = useState(false);
   const threadRef = useRef(null);
 
-  useEffect(() => {
-    document.title = 'Conversation | ZuriLofts';
-  }, []);
-
   const fetchConversations = useCallback(async () => {
     setConversationsLoading(true);
     try {

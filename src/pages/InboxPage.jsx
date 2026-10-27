@@ -20,10 +20,6 @@ function InboxPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    document.title = 'Messages | ZuriLofts';
-  }, []);
-
   const fetchConversations = useCallback(async () => {
     setLoading(true);
     try {
