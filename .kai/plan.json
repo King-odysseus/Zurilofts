@@ -2,37 +2,41 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Confirm the guest service fee default and every place it is defined or asserted",
+      "text": "Remove the border on the active/selected message row, keeping the active colour with enough vertical padding",
       "state": "done"
     },
     {
-      "text": "Set the guest platform fee to 0 so only the host pays the 10% commission",
+      "text": "Revert the header switch: host/travel switching stays in the account dropdown only",
       "state": "done"
     },
     {
-      "text": "Update the affected tests and the published price breakdown in the terms",
+      "text": "Make the header menu itself change with the mode, so host links replace travel links",
       "state": "done"
     },
     {
-      "text": "Verify: lint, frontend build, server typecheck, and the fee tests",
+      "text": "Add a visible transition animation when the mode switches, including route-driven switches",
       "state": "done"
     },
     {
-      "text": "Commit and push the guest-fee change",
+      "text": "Run prisma migrate deploy on Railway and confirm the money settings are live",
       "state": "done"
     },
     {
-      "text": "Tab title: one route-to-title table mounted in App, replacing the scattered per-page title setters",
+      "text": "Guest pays no platform fee: the 10% sits on the host side (code defaults, terms, tests)",
       "state": "done"
     },
     {
-      "text": "Verify titles in a browser across public, data-driven and signed-in host routes",
+      "text": "Give every route its own tab title from one table",
       "state": "done"
     },
     {
-      "text": "Commit and push the tab title change",
+      "text": "Re-verify the live fee schedule matches the policy (10% host, 0% guest)",
       "state": "done"
+    },
+    {
+      "text": "Commit the finished plan and confirm nothing of mine is left uncommitted",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-10-27T14:31:02.336Z"
+  "updatedAt": "2026-10-27T14:32:01.447Z"
 }
