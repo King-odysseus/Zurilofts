@@ -2,33 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Remove the border on the active/selected message row, keeping the active colour with enough vertical padding",
+      "text": "Confirm the guest service fee default and every place it is defined or asserted",
       "state": "done"
     },
     {
-      "text": "Revert the header switch: host/travel switching stays in the account dropdown only",
+      "text": "Set the guest platform fee to 0 so only the host pays the 10% commission",
       "state": "done"
     },
     {
-      "text": "Make the header menu itself change with the mode, so host links replace travel links",
+      "text": "Update the affected tests and the published price breakdown in the terms",
       "state": "done"
     },
     {
-      "text": "Add a visible transition animation when the mode switches, including route-driven switches",
+      "text": "Verify: lint, frontend build, server typecheck, and the fee tests",
       "state": "done"
     },
     {
-      "text": "Run prisma migrate deploy on Railway and confirm the money settings are live",
-      "state": "done"
-    },
-    {
-      "text": "Re-verify the final state: dark mode of the selected row, lint, build, and nothing left uncommitted",
+      "text": "Commit and push the change",
       "state": "active"
-    },
-    {
-      "text": "Commit any remaining verified change and report",
-      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-27T14:16:03.049Z"
+  "updatedAt": "2026-10-27T14:26:04.839Z"
 }

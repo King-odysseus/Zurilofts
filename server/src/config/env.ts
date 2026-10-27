@@ -44,13 +44,15 @@ const envSchema = z.object({
   TRANSFER_FEE_PASS_TO_HOST: z.string().default('false'),
   // Fraction of the accommodation subtotal the platform keeps, charged to the
   // HOST (0.1 means 10%). Never charged on cleaning, extra-guest or late
-  // check-out amounts - those are pass-through costs. Default 0 preserves the
-  // original split until a commission rate is agreed.
-  HOST_COMMISSION_RATE: z.string().default('0'),
+  // check-out amounts - those are pass-through costs. This is the platform's
+  // only fee, so the default below is the agreed split rather than a
+  // placeholder: a deploy that forgets the variable still takes the 10%.
+  HOST_COMMISSION_RATE: z.string().default('0.1'),
   // Fraction of the nightly subtotal charged to the GUEST as a service fee.
-  // Setting this to 0 makes the guest pay the listed price only, which is what
-  // undercuts marketplaces that add their own fee on top.
-  GUEST_SERVICE_FEE_RATE: z.string().default('0.12'),
+  // Zero means the guest pays the listed price only, which is what undercuts
+  // marketplaces that add their own fee on top. Zero is the policy: the
+  // platform's fee is HOST_COMMISSION_RATE, charged on the host's side.
+  GUEST_SERVICE_FEE_RATE: z.string().default('0'),
   // Pass the guest's cleaning fee / late check-out fee through to the host.
   HOST_PAY_CLEANING_FEE: z.string().default('false'),
   HOST_PAY_LATE_CHECKOUT_FEE: z.string().default('false'),

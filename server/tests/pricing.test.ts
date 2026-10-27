@@ -36,7 +36,9 @@ test('published rates are unchanged', () => {
   // (BookingPage and the property page both print the per-night guest fee).
   assert.equal(EXTRA_GUEST_FEE_PER_NIGHT, 800);
   assert.equal(CLEANING_FEE, 1500);
-  assert.equal(SERVICE_FEE_RATE, 0.12);
+  // No guest-side platform fee: the fee the platform keeps is the host
+  // commission, so the fallback rate must not add anything to a guest total.
+  assert.equal(SERVICE_FEE_RATE, 0);
   assert.equal(LATE_CHECKOUT_FULL_NIGHT_HOURS, 3);
 });
 
@@ -87,13 +89,22 @@ test('lateCheckoutFee is free at 10:00 and doubles each hour up to one night', (
   assert.equal(lateCheckoutFee('14:00', 10000), 10000);
 });
 
-test('calculateFees adds cleaning and the 12% service fee, then applies the discount', () => {
-  const fees = calculateFees(30000, 10);
+test('calculateFees adds cleaning and the guest fee rate it is given, then the discount', () => {
+  // A rate is applied exactly as passed, so a deliberate guest fee still works.
+  const fees = calculateFees(30000, 10, null, 0.12);
   assert.equal(fees.subtotal, 30000);
   assert.equal(fees.cleaningFee, 1500);
   assert.equal(fees.serviceFee, 3600);
   assert.equal(fees.discountAmount, 3000);
   assert.equal(fees.total, 32100);
+});
+
+// The guest pays the listed price plus costs, nothing else: no caller may rely on
+// an implicit guest fee, and the checked-out total must equal the quote.
+test('calculateFees with no rate passed adds no guest fee', () => {
+  const fees = calculateFees(30000, 10);
+  assert.equal(fees.serviceFee, 0);
+  assert.equal(fees.total, 28500);
 });
 
 test('calculatePricing and calculateFees agree for a flat-rate stay', () => {

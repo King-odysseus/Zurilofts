@@ -3,8 +3,8 @@
  *
  * Rules (match frontend convention):
  * - cleaningFee: flat KES 1,500
- * - serviceFee: GUEST_SERVICE_FEE_RATE of the subtotal (12% unless the caller
- *   passes another rate), rounded to nearest KES
+ * - serviceFee: GUEST_SERVICE_FEE_RATE of the subtotal, rounded to nearest KES.
+ *   The rate arrives as an argument; the fallback is 0 (no guest fee).
  * - discount: percentage off subtotal, capped at maxDiscount if set
  * - total = subtotal + cleaningFee + serviceFee - discount
  *
@@ -20,8 +20,13 @@ export const EXTRA_GUEST_FEE_PER_NIGHT = 800;
 /** Flat cleaning fee per stay in KES. */
 export const CLEANING_FEE = 1500;
 
-/** Fallback guest service fee used when the caller passes no rate. */
-export const SERVICE_FEE_RATE = 0.12;
+/**
+ * Fallback guest service fee used when the caller passes no rate. Zero, because
+ * the platform fee is charged to the host (HOST_COMMISSION_RATE) and a guest
+ * must never be charged a fee the advertised price did not include. A caller
+ * that wants a guest fee has to pass one deliberately.
+ */
+export const SERVICE_FEE_RATE = 0;
 
 /**
  * Discount amount in KES: discountPercent off the subtotal, capped at maxDiscount

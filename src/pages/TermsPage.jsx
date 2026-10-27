@@ -113,7 +113,7 @@ function TermsPage() {
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>Nightly Rate</strong> × number of nights, based on the selected Bed Option (KES 5,100/night for 1-Bed; KES 5,500/night for 2-Bed, subject to change). Seasonal Price Rules set by us may override the base Nightly Rate for specific date ranges.</li>
                 <li><strong>Cleaning Fee:</strong> A flat KES 1,500 per stay.</li>
-                <li><strong>Service Fee:</strong> 12% of the subtotal (nightly total before fees).</li>
+                <li><strong>Service Fee:</strong> None. Guests pay the listed nightly rate, cleaning fee, extra-guest fee and any late check-out fee. The platform&apos;s commission is charged to the host and is not added to a guest booking.</li>
                 <li><strong>Extra Guest Fee:</strong> KES 800 per additional guest per night, for each guest exceeding the included headcount (2 guests for 1-Bed; 4 guests for 2-Bed).</li>
                 <li><strong>Late Check-out Fee:</strong> Applicable if you select a check-out time later than 10:00 AM. The fee doubles each hour past 10:00 AM, up to a maximum of one full night&apos;s rate at 5 hours late.</li>
                 <li><strong>Promo Discount:</strong> Any discount from a valid promo code applied at the time of booking.</li>
