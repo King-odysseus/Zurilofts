@@ -67,6 +67,7 @@ skills-lock.json
 # Local KAI QA output and runtime logs
 .kai/audit-shots/
 .kai/screens/
+.kai/tmp/
 .kai/*.log
 
 # Local verification screenshots

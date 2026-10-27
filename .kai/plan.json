@@ -2,33 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check working tree state and what is uncommitted",
+      "text": "Check the money/commission env settings the checklist item refers to and confirm what Railway still needs",
       "state": "done"
     },
     {
-      "text": "Verify lint and build pass",
+      "text": "Remove the border on the active/selected message row in the guest messages list, keeping the active colour with enough vertical padding",
       "state": "done"
     },
     {
-      "text": "Ignore the KAI tool cache file instead of committing it",
+      "text": "Make travel vs host switching deliberate: clear header per mode and an explicit switch control",
       "state": "done"
     },
     {
-      "text": "Commit remaining work in focused commits",
+      "text": "Run lint and build, clean up scratch files, and report",
       "state": "active"
     },
     {
-      "text": "Push to remote and confirm main matches GitHub",
+      "text": "Write the suggestion for a better travel/host transition",
       "state": "pending"
-    },
-    {
-      "text": "Your side only: run npx prisma migrate deploy on Railway, then set HOST_COMMISSION_RATE and the other money settings",
-      "state": "pending"
-    },
-    {
-      "text": "Growth items built and wired: referral reward, founding-host perk, sign-up nudges, earnings calculator",
-      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-26T21:50:28.701Z"
+  "updatedAt": "2026-10-27T14:03:52.387Z"
 }
