@@ -23,7 +23,6 @@ import {
   X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
-import ModeSwitch from './ModeSwitch.jsx';
 import { useMode } from '../context/ModeContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
@@ -398,14 +397,6 @@ function Navbar() {
 
             {isAuthenticated ? (
               <>
-                {/* The mode switch sits in the header itself, not only in the
-                    account menu: travelling and hosting are two places, so the
-                    current one is always on screen and changing it is a click. */}
-                {canSelectHosting && (
-                  <div className="mr-1 hidden min-[1380px]:block">
-                    <ModeSwitch />
-                  </div>
-                )}
                 {/* Notification bell with dropdown */}
                 <div className="relative" ref={notifRef}>
                   <button
@@ -600,6 +591,14 @@ function Navbar() {
                       )}
                       {canSelectHosting && (
                         <div className="border-t border-[#E3E8EF] mt-1 pt-1">
+                          {/* The switch lives here, alone, and it first states which
+                              side the person is on. The header navigation follows
+                              that side, so this line is the only place the two can be
+                              confused - and switching from it is announced by the
+                              transition overlay. */}
+                          <p className="px-4 pt-2 pb-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8A97A8]">
+                            {effectiveMode === 'hosting' ? t('nav.browsingAsHost') : t('nav.browsingAsTraveler')}
+                          </p>
                           <button
                             onClick={handleSwitchMode}
                             className="flex items-center w-full px-4 py-2.5 text-sm text-[#0B1F42] hover:bg-[#F6EFE7] transition-colors"
@@ -867,12 +866,17 @@ function Navbar() {
                     </Link>
                   )}
                   {canSelectHosting && (
-                    <button
-                      onClick={handleSwitchMode}
-                      className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold text-[#9A744A] hover:bg-[#F6EFE7] transition-colors duration-200 text-center"
-                    >
-                      {effectiveMode === 'hosting' ? t('nav.switchToTravelling') : t('nav.switchToHosting')}
-                    </button>
+                    <div className="pt-1">
+                      <p className="pb-1 text-center text-[11px] font-medium uppercase tracking-[0.12em] text-[#8A97A8]">
+                        {effectiveMode === 'hosting' ? t('nav.browsingAsHost') : t('nav.browsingAsTraveler')}
+                      </p>
+                      <button
+                        onClick={handleSwitchMode}
+                        className="flex items-center justify-center w-full min-h-[44px] px-4 rounded-full font-semibold text-[#9A744A] hover:bg-[#F6EFE7] transition-colors duration-200 text-center"
+                      >
+                        {effectiveMode === 'hosting' ? t('nav.switchToTravelling') : t('nav.switchToHosting')}
+                      </button>
+                    </div>
                   )}
                   <button
                     onClick={handleLogout}

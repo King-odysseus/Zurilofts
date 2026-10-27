@@ -415,6 +415,93 @@ select:not(.neu-input) option {
   animation: toast-in 0.18s ease-out both;
 }
 
+/* Travelling and hosting share one product, so switching sides gets a moment of
+   its own: a bronze sweep along the top edge and a caption naming the side being
+   entered. It never blocks input - the change underneath is already live, this
+   only makes it visible. */
+@keyframes mode-transition-sweep {
+  0%   { transform: scaleX(0); opacity: 1; }
+  55%  { transform: scaleX(1); opacity: 1; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+
+@keyframes mode-transition-pill {
+  0%   { opacity: 0; transform: translate(-50%, -10px) scale(0.96); }
+  12%  { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  80%  { opacity: 1; transform: translate(-50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -6px) scale(0.99); }
+}
+
+.mode-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+}
+
+.mode-transition::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  transform-origin: left center;
+  background: linear-gradient(90deg, #c49a6c, #0b1f42);
+  animation: mode-transition-sweep 1.5s ease-out both;
+}
+
+.mode-transition-panel {
+  position: absolute;
+  top: 76px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 16px 9px 12px;
+  border-radius: 999px;
+  background: #0b1f42;
+  color: #fff;
+  box-shadow: 0 14px 34px rgba(11, 31, 66, 0.3);
+  animation: mode-transition-pill 1.5s ease-out both;
+}
+
+.mode-transition-icon {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #c49a6c;
+  color: #0b1f42;
+}
+
+.mode-transition-text {
+  display: grid;
+  gap: 1px;
+  line-height: 1.2;
+}
+
+.mode-transition-label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.mode-transition-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #cbd5e1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mode-transition::before,
+  .mode-transition-panel {
+    animation: none;
+  }
+}
+
 /* White tile behind the ZuriLofts mark: the artwork sits on a transparent
    background, so the card gives it a defined place on white headers. The tile
    stays white in dark mode too, so the wordmark's navy letters stay legible. */

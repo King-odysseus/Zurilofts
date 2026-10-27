@@ -1,7 +1,8 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from './AuthContext.jsx';
 import { NAV_MODE_STORAGE_KEY, rememberNavMode } from '../utils/authIntent.js';
+import ModeTransition from '../components/ModeTransition.jsx';
 
 const ModeContext = createContext(null);
 
@@ -31,6 +32,11 @@ export function ModeProvider({ children }) {
   const canSelectHosting = Boolean(user) && user.role !== 'ADMIN';
 
   const [mode, setModeState] = useState(() => readStoredMode());
+  // A switch is announced with a short overlay, so changing sides is something
+  // the person watches happen instead of something they discover after the page
+  // has already changed around them.
+  const [transition, setTransition] = useState(null);
+  const transitionCount = useRef(0);
 
   // Only HOST accounts and hosting-intent USERs may enter Hosting mode. For
   // an unapproved (pending) applicant the workspace opens so they can prepare
@@ -40,20 +46,40 @@ export function ModeProvider({ children }) {
     setModeState(canSelectHosting ? readStoredMode() : 'travelling');
   }, [canSelectHosting]);
 
-  const setMode = useCallback((next) => {
+  const setMode = useCallback((next, options = {}) => {
     const value = next === 'hosting' ? 'hosting' : 'travelling';
+    // Re-selecting the side you are already on is not a switch, so it gets no
+    // overlay. Route-driven syncs also announce, because arriving in the host
+    // workspace from a travel page is exactly the silent jump we want to show.
+    if (mode !== value && options.announce !== false) {
+      transitionCount.current += 1;
+      setTransition({ to: value, id: transitionCount.current });
+    }
     setModeState(value);
     rememberNavMode(value);
-  }, []);
+  }, [mode]);
+
+  // The overlay is a moment, not a state: drop it once it has played.
+  useEffect(() => {
+    if (!transition) return undefined;
+    const timer = setTimeout(() => setTransition(null), 1500);
+    return () => clearTimeout(timer);
+  }, [transition]);
 
   const value = {
     mode: canSelectHosting ? mode : 'travelling',
     setMode,
+    modeTransition: transition,
     canHost,
     canSelectHosting,
   };
 
-  return <ModeContext.Provider value={value}>{children}</ModeContext.Provider>;
+  return (
+    <ModeContext.Provider value={value}>
+      {children}
+      <ModeTransition transition={transition} />
+    </ModeContext.Provider>
+  );
 }
 
 ModeProvider.propTypes = {
