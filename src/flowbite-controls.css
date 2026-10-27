@@ -762,7 +762,6 @@ html.dark .opg-trip-row:focus-visible {
 
 html.dark .opg-conversation-row.is-selected {
   background-color: #172B47 !important;
-  box-shadow: inset 3px 0 0 #7EA6FF !important;
 }
 
 html.dark .opg-message-bubble {
