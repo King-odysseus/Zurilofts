@@ -2,25 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check the money/commission env settings the checklist item refers to and confirm what Railway still needs",
+      "text": "Remove the border on the active/selected message row, keeping the active colour with enough vertical padding",
       "state": "done"
     },
     {
-      "text": "Remove the border on the active/selected message row in the guest messages list, keeping the active colour with enough vertical padding",
+      "text": "Revert the header switch: host/travel switching stays in the account dropdown only",
       "state": "done"
     },
     {
-      "text": "Make travel vs host switching deliberate: clear header per mode and an explicit switch control",
+      "text": "Make the header menu itself change with the mode, so host links replace travel links",
       "state": "done"
     },
     {
-      "text": "Run lint and build, clean up scratch files, and report",
-      "state": "active"
+      "text": "Add a visible transition animation when the mode switches, including route-driven switches",
+      "state": "done"
     },
     {
-      "text": "Write the suggestion for a better travel/host transition",
-      "state": "pending"
+      "text": "Run lint and build, clean up scratch files and the test account",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push both changes",
+      "state": "done"
+    },
+    {
+      "text": "Run prisma migrate deploy on Railway and confirm the money settings are live",
+      "state": "done"
+    },
+    {
+      "text": "Write the recommendation for better travel/host transitions",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-27T14:03:52.387Z"
+  "updatedAt": "2026-10-27T14:15:23.232Z"
 }
