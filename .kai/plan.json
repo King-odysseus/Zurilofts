@@ -34,9 +34,9 @@
       "state": "done"
     },
     {
-      "text": "Commit the finished plan and confirm nothing of mine is left uncommitted",
-      "state": "active"
+      "text": "Check whether the ZuriLofts naming is a mistake or another app's name leaking in",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-27T14:32:01.447Z"
+  "updatedAt": "2026-10-28T10:20:07.248Z"
 }
