@@ -67,7 +67,7 @@ function Navbar() {
   const searchFormRef = useRef(null);
 
   const { user, isAuthenticated, logout } = useAuth();
-  const { mode, setMode, canSelectHosting } = useMode();
+  const { setMode, canSelectHosting } = useMode();
   const { setLang, t } = useLanguage();
   // Only an approved HOST account has verified host access. ADMINS are excluded
   // here (they administer the platform through /admin), so they get no Payouts
@@ -77,13 +77,15 @@ function Navbar() {
   // the host workspace - draft listings, calendar, messages - even before
   // approval. Only Payouts and publishing require full verification.
   const hasHostIntent = hasVerifiedHostAccess || user?.hostApplicationStatus != null;
-  // On the host workspace routes, always present the host navigation regardless
-  // of the persisted travelling/hosting toggle: a host arriving on /host/* (via
-  // login redirect, a bookmark, or a direct link) must see Today/Calendar/
-  // Listings/Messages/Earnings, not the guest destinations (design2 section 4).
-  // The stored mode still drives the account-menu switch action.
+  // The header follows the page, not a remembered preference. Host workspace
+  // routes get the host navigation (Today/Calendar/Listings/...) so a host is
+  // never handed travel links while working, and every travel page gets the
+  // travel navigation - otherwise an account that had last been hosting saw host
+  // tabs on the marketplace and its own travel inbox, which is the "am I in host
+  // or travelling?" confusion this replaced. The stored mode still decides what
+  // the account menu offers to switch to.
   const onHostRoute = location.pathname.startsWith('/host');
-  const effectiveMode = onHostRoute && canSelectHosting ? 'hosting' : mode;
+  const effectiveMode = onHostRoute && canSelectHosting ? 'hosting' : 'travelling';
   const [unreadMessages, setUnreadMessages] = useState(0);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef(null);
@@ -258,8 +260,14 @@ function Navbar() {
   })();
 
   function handleSwitchMode() {
-    const next = effectiveMode === 'hosting' ? 'travelling' : 'hosting';
-    setMode(next);
+    // Keyed off the page, not the header, so the button never offers to switch to
+    // the side you are already looking at.
+    const next = onHostRoute ? 'travelling' : 'hosting';
+    // Always announce a click. The stored side can already equal `next` (a host
+    // whose remembered side is hosting, clicking Switch to Hosting from a travel
+    // page), and comparing against it there would silently skip the animation
+    // even though the screen visibly changes.
+    setMode(next, { announce: true });
     setDropdownOpen(false);
     setMenuOpen(false);
     setOpenSubmenu(null);

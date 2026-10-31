@@ -33,10 +33,11 @@ const TABS = [
   { key: 'today', label: 'Today', to: '/host/today', icon: CalendarClock, match: (pathname) => pathname === '/host/today' },
   { key: 'calendar', label: 'Calendar', to: '/host/calendar', icon: CalendarDays, match: (pathname) => pathname.startsWith('/host/calendar') },
   { key: 'listings', label: 'Listings', to: '/host/listings', icon: Building2, match: (pathname) => pathname.startsWith('/host/listings') || pathname.startsWith('/host/properties') },
-  // Inbox is the host inbox, not the traveller one: a host reads the guests
-  // staying at their properties here. Traveller conversations live at /inbox
-  // and are reached from the travel header.
-  { key: 'inbox', label: 'Inbox', to: '/host/inbox', icon: MessageCircleMore, match: (pathname) => pathname.startsWith('/host/inbox') },
+  // Messages is the host inbox, not the traveller one: a host reads the guests
+  // staying at their properties here. Traveller conversations live at /inbox.
+  // The label matches the other host surfaces; the account menu says "Guest
+  // messages", which is where the distinction from travel actually matters.
+  { key: 'messages', label: 'Messages', to: '/host/inbox', icon: MessageCircleMore, match: (pathname) => pathname.startsWith('/host/inbox') },
   { key: 'earnings', label: 'Earnings', to: '/host/earnings', icon: ChartNoAxesCombined, match: (pathname) => pathname.startsWith('/host/earnings') || pathname.startsWith('/host/payouts') },
 ];
 
@@ -177,7 +178,7 @@ function HostLayout({ children }) {
                   className={`${NAV_LINK_BASE} ${active ? NAV_LINK_ACTIVE : NAV_LINK_IDLE}`}
                 >
                   {tab.label}
-                  {tab.key === 'inbox' && <UnreadBadge count={unreadGuestMessages} />}
+                  {tab.key === 'messages' && <UnreadBadge count={unreadGuestMessages} />}
                 </Link>
               );
             })}

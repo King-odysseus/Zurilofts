@@ -43,7 +43,10 @@ export function ModeProvider({ children }) {
     // Re-selecting the side you are already on is not a switch, so it gets no
     // overlay. Route-driven syncs also announce, because arriving in the host
     // workspace from a travel page is exactly the silent jump we want to show.
-    if (mode !== value && options.announce !== false) {
+    // `announce: true` forces the overlay: a deliberate click always changes the
+    // screen, even when the stored side already equals the one being entered.
+    const shouldAnnounce = options.announce === true || (mode !== value && options.announce !== false);
+    if (shouldAnnounce) {
       transitionCount.current += 1;
       setTransition({ to: value, id: transitionCount.current });
     }
