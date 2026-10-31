@@ -2,7 +2,15 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Record a plan for the recommendations write-up",
+      "text": "Remove the add-listing button and avatar pill outline from the host header",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and production build to verify the change",
+      "state": "done"
+    },
+    {
+      "text": "Commit the header change and the earlier uncommitted work, then push",
       "state": "done"
     },
     {
@@ -18,5 +26,5 @@
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T20:14:22.449Z"
+  "updatedAt": "2026-10-31T20:16:14.441Z"
 }
