@@ -16,23 +16,27 @@ export default function ListingEditorTabs({ listingId, active }) {
     { key: 'arrival', label: 'Arrival guide', to: `/host/properties/${listingId}/arrival-guide` },
   ];
 
+  // Capped rather than stretched. The editor header belongs to the listing, not
+  // to the width of whatever screen renders it, so on a wide page the title, the
+  // gear and the two-part switch stay a compact block on the left.
   return (
-    <div className="flex flex-col gap-4">
-      {/* Three fixed columns rather than space-between, so the title stays
-          optically centred whatever the icon widths are. */}
-      <div className="grid grid-cols-[44px_1fr_44px] items-center">
+    <div className="flex w-full max-w-md flex-col gap-5">
+      {/* The title sits left, right beside the back button, and takes the space
+          between the two round controls, so a long listing name truncates
+          instead of pushing the gear off the row. */}
+      <div className="flex items-center gap-3">
         <Link
           to="/host/listings"
           aria-label="Back to your listings"
-          className="grid h-11 w-11 place-items-center rounded-full text-navy transition-colors hover:bg-surface"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-inset text-navy transition-colors hover:bg-surface"
         >
           <ArrowLeft className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
         </Link>
-        <h1 className="min-w-0 truncate text-center text-base font-semibold text-navy sm:text-lg">Listing editor</h1>
+        <h1 className="min-w-0 flex-1 truncate text-2xl font-semibold tracking-tight text-navy">Listing editor</h1>
         <Link
           to="/host/settings"
           aria-label="Listing settings"
-          className="ml-auto grid h-11 w-11 place-items-center rounded-full text-navy transition-colors hover:bg-surface"
+          className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-inset text-navy transition-colors hover:bg-surface"
         >
           <Settings className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
         </Link>
@@ -56,7 +60,7 @@ export default function ListingEditorTabs({ listingId, active }) {
               aria-current={current ? 'page' : undefined}
               className={`flex min-h-[44px] items-center justify-center rounded-full px-3 text-sm font-semibold transition-colors ${
                 current
-                  ? 'border border-border bg-elevated text-navy shadow-sm'
+                  ? 'bg-elevated text-navy shadow-sm'
                   : 'text-muted hover:text-navy'
               }`}
             >

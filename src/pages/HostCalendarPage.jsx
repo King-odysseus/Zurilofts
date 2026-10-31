@@ -1120,6 +1120,16 @@ export default function HostCalendarPage() {
         onClear={clearSelection}
         settingsExpanded={settingsExpanded}
         onToggleSettings={() => setSettingsExpanded((open) => !open)}
+        onSettings={() => {
+          // The sheet is an overlay over the nights that are picked; the full
+          // pricing and availability card lives in the page itself. Dropping the
+          // selection closes the sheet, and the next frame scrolls to that card
+          // once the page is scrollable again.
+          clearSelection();
+          requestAnimationFrame(() => {
+            document.getElementById('calendar-settings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          });
+        }}
       >
         {nightSettings}
       </CalendarQuickSheet>

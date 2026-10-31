@@ -27,6 +27,7 @@ export default function CalendarQuickSheet({
   onClear,
   settingsExpanded,
   onToggleSettings,
+  onSettings,
   children,
 }) {
   if (!open) return null;
@@ -107,16 +108,17 @@ export default function CalendarQuickSheet({
         </div>
       </div>
 
-      {/* Custom settings is a dropdown, not a trip to another page: the row
-          opens in place and the editor it reveals writes straight to the nights
-          that are picked. The plus turns into a cross while it is open. */}
+      {/* Two routes out of the sheet, kept apart by what they change. The first
+          expands in place and edits only the picked nights; the second raises
+          the full pricing and availability card, which also carries blocks and
+          feeds that these three rows have no room for. */}
       <div className="overflow-hidden rounded-2xl bg-navy-bg shadow-xl">
         <button
           type="button"
           onClick={onToggleSettings}
           aria-expanded={settingsExpanded}
           aria-controls="quick-sheet-custom-settings"
-          className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-hover ${settingsExpanded ? '' : 'rounded-2xl'}`}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-hover"
         >
           <span>Custom settings</span>
           <Plus
@@ -126,10 +128,20 @@ export default function CalendarQuickSheet({
           />
         </button>
         {settingsExpanded && (
-          <div id="quick-sheet-custom-settings" className="max-h-[46vh] overflow-y-auto overscroll-contain border-t border-white/10">
+          <div
+            id="quick-sheet-custom-settings"
+            className="max-h-[46vh] overflow-y-auto overscroll-contain border-t border-white/10"
+          >
             {children}
           </div>
         )}
+        <button
+          type="button"
+          onClick={onSettings}
+          className="w-full border-t border-white/10 px-4 py-2.5 text-xs font-semibold text-white/70 transition-colors hover:bg-navy-hover hover:text-white"
+        >
+          Base rate, blocks and feeds
+        </button>
       </div>
     </div>
   );
@@ -151,5 +163,6 @@ CalendarQuickSheet.propTypes = {
   onClear: PropTypes.func.isRequired,
   settingsExpanded: PropTypes.bool.isRequired,
   onToggleSettings: PropTypes.func.isRequired,
+  onSettings: PropTypes.func.isRequired,
   children: PropTypes.node,
 };

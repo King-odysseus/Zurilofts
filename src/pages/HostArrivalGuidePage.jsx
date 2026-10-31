@@ -1,81 +1,134 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
-import PropTypes from 'prop-types';
-import { Button, Label, TextInput } from 'flowbite-react';
-import { CircleAlert, CircleCheck, CigaretteOff, Eye, PawPrint, Users } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { Button } from 'flowbite-react';
+import { ChevronLeft, CircleAlert } from 'lucide-react';
 import apiClient from '../api/client.js';
-import SelectMenu from '../components/SelectMenu.jsx';
 import ListingEditorTabs from '../components/ListingEditorTabs.jsx';
+import ArrivalSectionList from '../components/ArrivalSectionList.jsx';
+import CheckInCheckoutFields from '../components/CheckInCheckoutFields.jsx';
+import {
+  EditorFieldGroup,
+  EditorTextAreaRow,
+  EditorTextRow,
+} from '../components/EditorFieldGroup.jsx';
 
-// The arrival guide answers the questions a guest has after booking: how to get
-// in, the wifi, the manual and the rules. It lives beside the listing editor
-// because it is the same listing seen from the guest's side.
+// The arrival guide is the guest's instructions for arriving and settling in:
+// directions, how to get in, the wifi, the manual and the rules. It lives beside
+// the listing editor because it is the same listing seen from the guest's side.
+//
+// Two panes on a wide screen, as the reference does it: the sections on the left,
+// the open section's form on the right, and a Save that only lights up once
+// something has actually changed. A phone shows one pane at a time, because two
+// columns of this would leave neither readable.
 
-const CHECK_IN_OPTIONS = [
-  { value: 'Lockbox', label: 'Lockbox' },
-  { value: 'Keypad', label: 'Keypad' },
-  { value: 'Smart lock', label: 'Smart lock' },
-  { value: 'Building staff', label: 'Building staff' },
-  { value: 'Host greets', label: 'Host greets you' },
+const SECTIONS = [
+  { key: 'directions', title: 'Directions' },
+  // The card names the field a host recognises; the pane it opens covers the
+  // whole arrival and departure window, hence the different heading.
+  { key: 'checkIn', title: 'Check-in method', paneTitle: 'Check-in & checkout' },
+  { key: 'wifi', title: 'Wifi details' },
+  { key: 'manual', title: 'House manual' },
+  { key: 'rules', title: 'House rules and requests', paneTitle: 'House rules and requests' },
 ];
 
-const CARD = 'rounded-2xl bg-elevated p-5 text-left shadow-sm sm:p-6';
-const TITLE = 'block text-base font-semibold text-navy';
-const VALUE = 'mt-1 block whitespace-pre-line text-sm leading-relaxed text-muted';
-const PLACEHOLDER = 'mt-1 block text-sm text-muted';
-const FIELD = 'mt-3 flex flex-col gap-3';
-
-/** Rules carry an icon chosen from their own wording, as the reference does. */
-function ruleIcon(rule) {
-  const text = rule.toLowerCase();
-  if (/pet|dog|cat|animal/.test(text)) return PawPrint;
-  if (/smok|cigarette|vape/.test(text)) return CigaretteOff;
-  if (/guest|people|person|occupan/.test(text)) return Users;
-  return CircleCheck;
-}
-
-function ReadCard({ title, lines, onEdit, extra }) {
-  return (
-    <button
-      type="button"
-      onClick={onEdit}
-      className={`${CARD} w-full transition-colors hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/35`}
-    >
-      <span className={TITLE}>{title}</span>
-      {lines.length === 0 ? <span className={PLACEHOLDER}>Add details</span> : null}
-      {lines.map((line) => (
-        <span key={line} className={VALUE}>{line}</span>
-      ))}
-      {extra}
-    </button>
-  );
-}
-
-ReadCard.propTypes = {
-  title: PropTypes.string.isRequired,
-  lines: PropTypes.arrayOf(PropTypes.string).isRequired,
-  onEdit: PropTypes.func.isRequired,
-  extra: PropTypes.node,
+// Which drafted fields each section owns. A save sends only its own section's
+// fields, so text left unsaved in another section can never be overwritten by it.
+const SECTION_FIELDS = {
+  directions: ['directions'],
+  checkIn: ['checkInMethod', 'checkInWindowStart', 'checkInWindowEnd', 'checkOutTime'],
+  wifi: ['wifiNetwork', 'wifiPassword'],
+  manual: ['houseManual'],
+  rules: ['rulesText'],
 };
 
-function EditActions({ saving, onSave, onCancel }) {
-  return (
-    <span className="mt-4 flex flex-wrap items-center gap-2">
-      <Button type="button" size="sm" onClick={onSave} disabled={saving} isProcessing={saving}>
-        {saving ? 'Saving...' : 'Save'}
-      </Button>
-      <Button type="button" size="sm" color="light" onClick={onCancel} disabled={saving}>
-        Cancel
-      </Button>
-    </span>
-  );
+const HINT = 'mt-1.5 text-xs text-muted';
+
+function draftFrom(property) {
+  const rules = Array.isArray(property?.houseRules) ? property.houseRules : [];
+  return {
+    directions: property?.directions || '',
+    checkInMethod: property?.checkInMethod || '',
+    checkInWindowStart: property?.checkInWindowStart || '',
+    checkInWindowEnd: property?.checkInWindowEnd || '',
+    checkOutTime: property?.checkOutTime || '',
+    wifiNetwork: property?.wifiNetwork || '',
+    wifiPassword: property?.wifiPassword || '',
+    houseManual: property?.houseManual || '',
+    rulesText: rules.join('\n'),
+  };
 }
 
-EditActions.propTypes = {
-  saving: PropTypes.bool.isRequired,
-  onSave: PropTypes.func.isRequired,
-  onCancel: PropTypes.func.isRequired,
-};
+function rulesFromText(text) {
+  return String(text || '')
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+// What the stored listing says for one drafted field. Rules are held as an array
+// and edited as text, so both sides are compared in their text form.
+function storedValue(property, field) {
+  if (field === 'rulesText') {
+    const rules = Array.isArray(property?.houseRules) ? property.houseRules : [];
+    return rules.join('\n');
+  }
+  return property?.[field] || '';
+}
+
+function payloadFor(key, draft) {
+  const trimmed = (value) => String(value || '').trim();
+  switch (key) {
+    case 'directions':
+      return { directions: trimmed(draft.directions) || null };
+    case 'checkIn':
+      return {
+        checkInMethod: draft.checkInMethod || null,
+        checkInWindowStart: draft.checkInWindowStart || null,
+        checkInWindowEnd: draft.checkInWindowEnd || null,
+        checkOutTime: draft.checkOutTime || null,
+      };
+    case 'wifi':
+      return {
+        wifiNetwork: trimmed(draft.wifiNetwork) || null,
+        wifiPassword: trimmed(draft.wifiPassword) || null,
+      };
+    case 'manual':
+      return { houseManual: trimmed(draft.houseManual) || null };
+    case 'rules':
+      return { houseRules: rulesFromText(draft.rulesText) };
+    default:
+      return {};
+  }
+}
+
+/** The grey value lines under a section's title in the list. */
+function summaryFor(key, property) {
+  switch (key) {
+    case 'directions':
+      return [String(property?.directions || '').trim()].filter(Boolean);
+    case 'checkIn': {
+      const lines = [property?.checkInMethod].filter(Boolean);
+      if (property?.checkInWindowStart) {
+        lines.push(
+          `Check-in from ${property.checkInWindowStart}${
+            property.checkInWindowEnd ? ` until ${property.checkInWindowEnd}` : ''
+          }`
+        );
+      }
+      if (property?.checkOutTime) lines.push(`Check-out by ${property.checkOutTime}`);
+      return lines;
+    }
+    case 'wifi':
+      return [
+        property?.wifiNetwork ? `Network: ${property.wifiNetwork}` : '',
+        property?.wifiPassword ? `Password: ${property.wifiPassword}` : '',
+      ].filter(Boolean);
+    case 'manual':
+      return [String(property?.houseManual || '').trim()].filter(Boolean);
+    default:
+      return [];
+  }
+}
 
 export default function HostArrivalGuidePage() {
   const { id } = useParams();
@@ -83,12 +136,13 @@ export default function HostArrivalGuidePage() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
 
-  // Only one card edits at a time, so a half-typed wifi password cannot be lost
-  // by opening a second card, and a single Save cannot overwrite two fields.
-  const [openCard, setOpenCard] = useState('');
+  // Directions open first: it is the section a host fills in before a guest sets
+  // off, so an empty pane is never the first thing they see.
+  const [activeKey, setActiveKey] = useState('directions');
+  const [draft, setDraft] = useState(() => draftFrom(null));
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
-  const [draft, setDraft] = useState({ directions: '', checkInMethod: '', wifiNetwork: '', wifiPassword: '', houseManual: '', rulesText: '' });
+  const [savedNote, setSavedNote] = useState('');
   const [showAllRules, setShowAllRules] = useState(false);
 
   const load = useCallback(async () => {
@@ -98,6 +152,7 @@ export default function HostArrivalGuidePage() {
     try {
       const response = await apiClient.get(`/properties/${id}`);
       setProperty(response.data.data);
+      setDraft(draftFrom(response.data.data));
     } catch {
       setLoadError('Could not load this listing. Please try again.');
     } finally {
@@ -109,29 +164,46 @@ export default function HostArrivalGuidePage() {
     load();
   }, [load]);
 
-  function startEdit(card) {
-    const rules = Array.isArray(property?.houseRules) ? property.houseRules : [];
-    setDraft({
-      directions: property?.directions || '',
-      checkInMethod: property?.checkInMethod || '',
-      wifiNetwork: property?.wifiNetwork || '',
-      wifiPassword: property?.wifiPassword || '',
-      houseManual: property?.houseManual || '',
-      rulesText: rules.join('\n'),
-    });
-    setSaveError('');
-    setOpenCard(card);
+  // Compared trimmed, so a stray space at the end of a field does not present a
+  // Save button that would change nothing.
+  const dirty = useMemo(() => {
+    if (!property) return false;
+    const fields = SECTION_FIELDS[activeKey] || [];
+    return fields.some(
+      (field) => String(draft[field] || '').trim() !== String(storedValue(property, field) || '').trim()
+    );
+  }, [activeKey, draft, property]);
+
+  function update(field, value) {
+    setDraft((previous) => ({ ...previous, [field]: value }));
+    setSavedNote('');
   }
 
-  // A partial PUT: only the fields this card owns, so an untouched card can
-  // never be overwritten with stale text from when the page was loaded.
-  async function save(payload) {
+  function selectSection(key) {
+    setActiveKey(key);
+    setSaveError('');
+    setSavedNote('');
+  }
+
+  async function save() {
     setSaving(true);
     setSaveError('');
+    setSavedNote('');
     try {
-      const response = await apiClient.put(`/properties/${id}`, payload);
-      setProperty((previous) => ({ ...previous, ...payload, ...(response.data?.data || {}) }));
-      setOpenCard('');
+      const response = await apiClient.put(`/properties/${id}`, payloadFor(activeKey, draft));
+      const saved = response.data?.data;
+      if (saved) {
+        setProperty(saved);
+        // Only this section's fields are taken from the server copy: anything
+        // half-typed in a section the host has not saved yet stays on screen.
+        const savedDraft = draftFrom(saved);
+        setDraft((previous) => {
+          const next = { ...previous };
+          for (const field of SECTION_FIELDS[activeKey] || []) next[field] = savedDraft[field];
+          return next;
+        });
+      }
+      setSavedNote('Saved to this listing.');
     } catch (error) {
       setSaveError(error.response?.data?.error || 'Could not save. Please try again.');
     } finally {
@@ -145,7 +217,7 @@ export default function HostArrivalGuidePage() {
         <span className="block h-12 animate-pulse rounded-2xl bg-inset" />
         <span className="block h-24 animate-pulse rounded-2xl bg-inset" />
         <span className="block h-24 animate-pulse rounded-2xl bg-inset" />
-        <span className="block h-32 animate-pulse rounded-2xl bg-inset" />
+        <span className="block h-40 animate-pulse rounded-2xl bg-inset" />
       </div>
     );
   }
@@ -154,195 +226,162 @@ export default function HostArrivalGuidePage() {
     return (
       <div className="mx-auto w-full max-w-2xl">
         <ListingEditorTabs listingId={id || ''} active="arrival" />
-        <div className={`${CARD} mt-4 text-center`}>
+        <div className="mt-4 rounded-2xl bg-elevated p-6 text-center shadow-sm">
           <CircleAlert className="mx-auto h-6 w-6 text-muted" strokeWidth={1.8} aria-hidden="true" />
-          <p className="mt-2 text-sm text-muted">{loadError}</p>
+          <p role="alert" className="mt-2 text-sm text-muted">{loadError}</p>
           <Button className="mt-4" size="sm" onClick={load}>Try again</Button>
         </div>
       </div>
     );
   }
 
-  const rules = Array.isArray(property?.houseRules) ? property.houseRules : [];
-  const visibleRules = showAllRules ? rules : rules.slice(0, 3);
+  const listSections = SECTIONS.map((section) => ({
+    key: section.key,
+    title: section.title,
+    placeholder: 'Add details',
+    ...(section.key === 'rules'
+      ? { rules: Array.isArray(property?.houseRules) ? property.houseRules : [] }
+      : { lines: summaryFor(section.key, property) }),
+  }));
+
+  const active = SECTIONS.find((section) => section.key === activeKey) || SECTIONS[0];
+  const paneTitle = active.paneTitle || active.title;
 
   return (
-    <div className="mx-auto flex w-full max-w-2xl flex-col gap-4 pb-8">
-      <ListingEditorTabs listingId={id || ''} active="arrival" />
-
-      {saveError ? <p className="text-xs text-red-600" role="alert">{saveError}</p> : null}
-
-      {/* Directions */}
-      {openCard === 'directions' ? (
-        <div className={CARD}>
-          <Label htmlFor="guide-directions" className={TITLE}>Directions</Label>
-          <div className={FIELD}>
-            <textarea
-              id="guide-directions"
-              rows={4}
-              value={draft.directions}
-              onChange={(event) => setDraft((previous) => ({ ...previous, directions: event.target.value }))}
-              placeholder="Landmarks, the gate colour, where to park, which floor."
-            />
-          </div>
-          <EditActions saving={saving} onSave={() => save({ directions: draft.directions.trim() || null })} onCancel={() => setOpenCard('')} />
-        </div>
-      ) : (
-        <ReadCard title="Directions" lines={property?.directions ? [property.directions] : []} onEdit={() => startEdit('directions')} />
-      )}
-
-      {/* Check-in method */}
-      {openCard === 'checkIn' ? (
-        <div className={CARD}>
-          <Label htmlFor="guide-checkin" className={TITLE}>Check-in method</Label>
-          <div className={FIELD}>
-            <SelectMenu
-              id="guide-checkin"
-              value={draft.checkInMethod}
-              onChange={(next) => setDraft((previous) => ({ ...previous, checkInMethod: next }))}
-              options={CHECK_IN_OPTIONS}
-              placeholder="Choose how guests get in"
-              ariaLabel="Check-in method"
-            />
-          </div>
-          <EditActions saving={saving} onSave={() => save({ checkInMethod: draft.checkInMethod || null })} onCancel={() => setOpenCard('')} />
-        </div>
-      ) : (
-        <ReadCard title="Check-in method" lines={property?.checkInMethod ? [property.checkInMethod] : []} onEdit={() => startEdit('checkIn')} />
-      )}
-
-      {/* Wifi details */}
-      {openCard === 'wifi' ? (
-        <div className={CARD}>
-          <Label htmlFor="guide-wifi-network" className={TITLE}>Wifi details</Label>
-          <div className={FIELD}>
-            <TextInput
-              id="guide-wifi-network"
-              value={draft.wifiNetwork}
-              onChange={(event) => setDraft((previous) => ({ ...previous, wifiNetwork: event.target.value }))}
-              placeholder="Network name"
-            />
-            <TextInput
-              id="guide-wifi-password"
-              value={draft.wifiPassword}
-              onChange={(event) => setDraft((previous) => ({ ...previous, wifiPassword: event.target.value }))}
-              placeholder="Password"
-            />
-          </div>
-          <EditActions
-            saving={saving}
-            onSave={() => save({
-              wifiNetwork: draft.wifiNetwork.trim() || null,
-              wifiPassword: draft.wifiPassword.trim() || null,
-            })}
-            onCancel={() => setOpenCard('')}
+    <div className="grid gap-6 lg:grid-cols-[minmax(280px,360px)_minmax(0,1fr)] lg:items-start lg:gap-10">
+      {/* Section list. On a phone it is the whole screen, so it steps aside once
+          a section is open and the back link in the pane brings it back. The
+          column pins the header and scrolls only the cards, so "Listing editor"
+          and the two tabs never slide away behind a long rules list. */}
+      <div
+        className={`${activeKey ? 'hidden' : 'flex'} min-w-0 flex-col gap-5 lg:sticky lg:top-20 lg:flex lg:max-h-[calc(100dvh-7rem)]`}
+      >
+        <ListingEditorTabs listingId={id || ''} active="arrival" />
+        <div className="min-h-0 lg:flex-1 lg:overflow-y-auto lg:pb-4 lg:pr-1">
+          <ArrivalSectionList
+            sections={listSections}
+            activeKey={activeKey}
+            onSelect={selectSection}
+            showAllRules={showAllRules}
+            onToggleRules={() => setShowAllRules((previous) => !previous)}
           />
         </div>
-      ) : (
-        <ReadCard
-          title="Wifi details"
-          lines={[
-            property?.wifiNetwork ? `Network: ${property.wifiNetwork}` : '',
-            property?.wifiPassword ? `Password: ${property.wifiPassword}` : '',
-          ].filter(Boolean)}
-          onEdit={() => startEdit('wifi')}
-        />
-      )}
+      </div>
 
-      {/* House manual */}
-      {openCard === 'manual' ? (
-        <div className={CARD}>
-          <Label htmlFor="guide-manual" className={TITLE}>House manual</Label>
-          <div className={FIELD}>
-            <textarea
-              id="guide-manual"
-              rows={5}
-              value={draft.houseManual}
-              onChange={(event) => setDraft((previous) => ({ ...previous, houseManual: event.target.value }))}
-              placeholder="Appliances, hot water, bins, anything that is not obvious."
-            />
-          </div>
-          <EditActions saving={saving} onSave={() => save({ houseManual: draft.houseManual.trim() || null })} onCancel={() => setOpenCard('')} />
-        </div>
-      ) : (
-        <ReadCard title="House manual" lines={property?.houseManual ? [property.houseManual] : []} onEdit={() => startEdit('manual')} />
-      )}
+      {/* Capped rather than stretched: the reference keeps the form a readable
+          column and lets the rest of the pane stay empty. The pane is also at
+          least a screen tall so the Save bar rests at its foot, not under the
+          last field. */}
+      <div
+        className={`${activeKey ? 'flex' : 'hidden'} min-w-0 flex-col gap-6 lg:flex lg:min-h-[calc(100dvh-7rem)] lg:max-w-[680px] lg:border-l lg:border-border lg:pl-10`}
+      >
+        <button
+          type="button"
+          onClick={() => selectSection('')}
+          className="inline-flex items-center gap-1 self-start text-sm font-semibold text-muted transition-colors hover:text-navy lg:hidden"
+        >
+          <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+          All sections
+        </button>
 
-      {/* House rules and requests */}
-      <section className={CARD}>
-        <span className={TITLE}>House rules and requests</span>
+        <h2 className="text-2xl font-semibold tracking-tight text-navy sm:text-3xl">{paneTitle}</h2>
 
-        {openCard === 'rules' ? (
-          <>
-            <div className={FIELD}>
-              {/* One rule per line: a textarea is the fastest thing to edit on a
-                  phone, and removing a line is just deleting it. */}
-              <textarea
-                id="guide-rules"
-                rows={5}
-                value={draft.rulesText}
-                onChange={(event) => setDraft((previous) => ({ ...previous, rulesText: event.target.value }))}
-                placeholder={'Up to 2 overnight guests\nNo pets\nNo smoking'}
+        <div className="flex flex-col gap-2 pb-2">
+          {activeKey === 'directions' && (
+            <EditorFieldGroup>
+              <EditorTextAreaRow
+                id="guide-directions"
+                label="Directions"
+                rows={6}
+                value={draft.directions}
+                onChange={(next) => update('directions', next)}
+                placeholder="Landmarks, the gate colour, where to park, which floor."
               />
-            </div>
-            <EditActions
-              saving={saving}
-              onSave={() => save({
-                houseRules: draft.rulesText.split('\n').map((line) => line.trim()).filter(Boolean),
-              })}
-              onCancel={() => setOpenCard('')}
+            </EditorFieldGroup>
+          )}
+
+          {activeKey === 'checkIn' && (
+            <CheckInCheckoutFields
+              value={{
+                checkInMethod: draft.checkInMethod,
+                checkInWindowStart: draft.checkInWindowStart,
+                checkInWindowEnd: draft.checkInWindowEnd,
+                checkOutTime: draft.checkOutTime,
+              }}
+              onChange={update}
             />
-          </>
-        ) : (
-          <>
-            {rules.length === 0 ? <span className={PLACEHOLDER}>Add details</span> : null}
-            <ul className="mt-2 flex flex-col">
-              {visibleRules.map((rule) => {
-                const Icon = ruleIcon(rule);
-                return (
-                  <li key={rule} className="flex items-center gap-3 py-2">
-                    <Icon className="h-5 w-5 shrink-0 text-navy" strokeWidth={1.8} aria-hidden="true" />
-                    <span className="text-sm text-navy">{rule}</span>
-                  </li>
-                );
-              })}
-            </ul>
+          )}
 
-            <div className="mt-2 flex items-end justify-between gap-3">
-              <span className="flex items-center gap-3 text-xs">
-                {/* The reference reads "+ N more" next to the pill; keep that and
-                    put the way to change the rules beside it. */}
-                {rules.length > 3 && !showAllRules ? (
-                  <span className="text-muted">+ {rules.length - 3} more</span>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() => startEdit('rules')}
-                  className="font-semibold text-muted underline underline-offset-2 hover:text-navy"
-                >
-                  {rules.length === 0 ? 'Add house rules' : 'Edit'}
-                </button>
-              </span>
+          {activeKey === 'wifi' && (
+            <EditorFieldGroup>
+              <EditorTextRow
+                id="guide-wifi-network"
+                label="Network name"
+                value={draft.wifiNetwork}
+                onChange={(next) => update('wifiNetwork', next)}
+                placeholder="The name a guest picks from the wifi list"
+              />
+              <EditorTextRow
+                id="guide-wifi-password"
+                label="Password"
+                value={draft.wifiPassword}
+                onChange={(next) => update('wifiPassword', next)}
+                placeholder="Case matters, as it does on the router"
+              />
+            </EditorFieldGroup>
+          )}
 
-              {/* The pill only makes sense when there is something hidden. */}
-              {rules.length > 3 ? (
-                <button
-                  type="button"
-                  onClick={() => setShowAllRules((previous) => !previous)}
-                  className="inline-flex min-h-[44px] items-center gap-2 rounded-full bg-navy-bg px-5 text-sm font-semibold text-white transition-colors hover:bg-navy-hover"
-                >
-                  <Eye className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
-                  {showAllRules ? 'Show less' : 'View'}
-                </button>
-              ) : null}
-            </div>
-          </>
-        )}
-      </section>
+          {activeKey === 'manual' && (
+            <EditorFieldGroup>
+              <EditorTextAreaRow
+                id="guide-manual"
+                label="House manual"
+                rows={8}
+                value={draft.houseManual}
+                onChange={(next) => update('houseManual', next)}
+                placeholder="Appliances, hot water, bins, anything that is not obvious."
+              />
+            </EditorFieldGroup>
+          )}
 
-      <p className="text-xs text-muted">
-        Saved to this listing. <Link to={`/host/properties/${id}/edit`} className="font-semibold text-navy underline underline-offset-2">Back to your space</Link>
-      </p>
+          {activeKey === 'rules' && (
+            <>
+              <EditorFieldGroup>
+                <EditorTextAreaRow
+                  id="guide-rules"
+                  label="House rules"
+                  rows={6}
+                  value={draft.rulesText}
+                  onChange={(next) => update('rulesText', next)}
+                  placeholder={'Up to 2 overnight guests\nNo pets\nNo smoking'}
+                />
+              </EditorFieldGroup>
+              <p className={HINT}>One rule per line. The section card shows the first three.</p>
+            </>
+          )}
+        </div>
+
+        {/* The bar stays put at the bottom of the pane, as the reference does, so
+            Save is reachable however far down the form sits. */}
+        <div className="sticky bottom-0 z-10 mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border bg-canvas py-4">
+          <span className="min-w-0 text-xs" role="status">
+            {saveError ? <span className="text-red-600">{saveError}</span> : null}
+            {!saveError && savedNote ? <span className="text-muted">{savedNote}</span> : null}
+          </span>
+          <button
+            type="button"
+            onClick={save}
+            disabled={!dirty || saving}
+            className={`inline-flex min-h-[44px] items-center justify-center rounded-lg px-7 text-sm font-semibold transition-colors ${
+              dirty && !saving
+                ? 'bg-navy-bg text-white hover:bg-navy-hover'
+                : 'cursor-not-allowed bg-inset text-muted'
+            }`}
+          >
+            {saving ? 'Saving...' : 'Save'}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

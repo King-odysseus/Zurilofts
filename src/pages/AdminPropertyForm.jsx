@@ -5,6 +5,7 @@ import { Check, ChevronLeft, Eye, MapPin, Upload, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
+import ListingEditorTabs from '../components/ListingEditorTabs.jsx';
 import { findSearchLocation, isNairobiSearchLocation, SEARCH_LOCATION_GROUPS } from '../data/searchLocations.js';
 
 // SelectMenu renders a flat option list, so the optgroups the native select used
@@ -262,25 +263,44 @@ function AdminPropertyForm() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <Link to="/host/listings" className="inline-flex items-center gap-1 text-xs font-semibold text-muted transition-colors hover:text-navy">
-            <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
-            Listings
-          </Link>
-          <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Host setup</p>
-          <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{isEdit ? 'Edit listing' : 'Create a listing'}</h1>
-          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare the basics, photos, amenities and pricing guests will see.</p>
+      {/* Editing an existing listing wears the same header as the arrival guide:
+          "Your space" and "Arrival guide" are two halves of one listing, so the
+          switch has to stay on screen. Without this the tab vanished the moment
+          it was used, which read as a broken control. A brand-new listing has no
+          second half yet, so it keeps the plainer "Create a listing" header. */}
+      {isEdit ? (
+        <div className="flex flex-col gap-5">
+          <ListingEditorTabs listingId={id} active="space" />
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="mr-auto max-w-xl text-sm leading-relaxed text-muted">
+              Prepare the basics, photos, amenities and pricing guests will see.
+            </p>
+            <Button type="button" color="light" onClick={() => setShowFullPreview(true)}>
+              <Eye className="mr-2 h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
+              Preview listing
+            </Button>
+            <Button as={Link} to={`/host/calendar/${id}`} color="light">Manage calendar</Button>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" color="light" onClick={() => setShowFullPreview(true)}>
-            <Eye className="mr-2 h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
-            Preview listing
-          </Button>
-          {isEdit && <Button as={Link} to={`/host/properties/${id}/arrival-guide`} color="light">Arrival guide</Button>}
-          {isEdit && <Button as={Link} to={`/host/calendar/${id}`} color="light">Manage calendar</Button>}
-        </div>
-      </header>
+      ) : (
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <Link to="/host/listings" className="inline-flex items-center gap-1 text-xs font-semibold text-muted transition-colors hover:text-navy">
+              <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+              Listings
+            </Link>
+            <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Host setup</p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Create a listing</h1>
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare the basics, photos, amenities and pricing guests will see.</p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="button" color="light" onClick={() => setShowFullPreview(true)}>
+              <Eye className="mr-2 h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
+              Preview listing
+            </Button>
+          </div>
+        </header>
+      )}
 
       {showFullPreview && (
         <FullPagePreview form={form} onClose={() => setShowFullPreview(false)} />
