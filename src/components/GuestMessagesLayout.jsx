@@ -1,6 +1,7 @@
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { MessageCircleMore } from 'lucide-react';
+import { MessageCircleMore, Search } from 'lucide-react';
 import GuestAccountLayout from './GuestAccountLayout.jsx';
 import { firstImage } from '../utils/images.js';
 import { getConversationParticipant } from '../utils/conversations.js';
@@ -34,12 +35,12 @@ function ConversationRow({ conversation, currentUserId, selected }) {
     </span>
     <span className="opg-conversation-summary">
       <span className="opg-conversation-line">
-        <strong>{participant.name} <i>·</i> {property.title || 'Stay conversation'}</strong>
+        <strong>{participant.name}<span className="opg-conversation-stay"> <i>·</i> {property.title || 'Stay conversation'}</span></strong>
         <time dateTime={timestamp || undefined}>{formatListTime(timestamp)}</time>
       </span>
       <span className="opg-conversation-preview">{preview}</span>
     </span>
-    {unread && <span className="opg-conversation-unread" aria-label="Unread messages" />}
+    {unread && <span className="opg-conversation-unread" aria-label={`${conversation.unreadCount} unread`}>{conversation.unreadCount}</span>}
   </Link>;
 }
 
@@ -91,21 +92,57 @@ function SupportRow({ selected }) {
 SupportRow.propTypes = { selected: PropTypes.bool };
 
 function ConversationList({ activeTab, conversations, currentUserId, selectedId, loading, error, onRetry }) {
+  const [query, setQuery] = useState('');
+  const [filter, setFilter] = useState('all');
+
+  const unreadCount = conversations.filter((conversation) => Number(conversation.unreadCount) > 0).length;
+
+  // Filtering stays client-side: the inbox is fetched whole, so search and the
+  // unread toggle never need a round trip.
+  const visible = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return conversations.filter((conversation) => {
+      if (filter === 'unread' && !(Number(conversation.unreadCount) > 0)) return false;
+      if (!needle) return true;
+      const participant = getConversationParticipant(conversation, currentUserId);
+      const haystack = `${participant.name} ${conversation.booking?.property?.title || ''} ${conversation.lastMessage?.content || ''}`;
+      return haystack.toLowerCase().includes(needle);
+    });
+  }, [conversations, currentUserId, filter, query]);
+
+  const narrowed = query.trim().length > 0 || filter === 'unread';
+
   return <aside className="opg-conversation-list" aria-label="Conversations">
     <div className="opg-conversation-list-head">
       <h2>Messages</h2>
+      <label className="opg-conversation-search">
+        <Search strokeWidth={2} aria-hidden="true" />
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search messages"
+          aria-label="Search messages"
+        />
+      </label>
       <div className="opg-message-tabs" role="tablist" aria-label="Message type">
         <Link to="/inbox" role="tab" aria-selected={activeTab === 'inbox'} className={activeTab === 'inbox' ? 'is-active' : ''}>Inbox</Link>
         <Link to="/messages" role="tab" aria-selected={activeTab === 'support'} className={activeTab === 'support' ? 'is-active' : ''}>Support</Link>
       </div>
+      {activeTab === 'inbox' && <div className="opg-conversation-filters" role="group" aria-label="Filter conversations">
+        <button type="button" className={filter === 'all' ? 'is-active' : ''} aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>All<span>{conversations.length}</span></button>
+        <button type="button" className={filter === 'unread' ? 'is-active' : ''} aria-pressed={filter === 'unread'} onClick={() => setFilter('unread')}>Unread<span>{unreadCount}</span></button>
+      </div>}
     </div>
 
     <div className="opg-conversation-scroll">
       {loading ? <div className="opg-conversation-loading" aria-label="Loading conversations"><span /><span /><span /></div> : error ? <div className="opg-conversation-error"><p>{error}</p><button type="button" onClick={onRetry}>Try again</button></div> : <>
         {conversations.length === 0 && <div className="opg-conversation-empty"><strong>No stay messages</strong><span>Conversations with hosts will appear here.</span></div>}
-        {conversations.map((conversation) => <ConversationRow key={conversation.id} conversation={conversation} currentUserId={currentUserId} selected={selectedId === conversation.id} />)}
+        {conversations.length > 0 && visible.length === 0 && <div className="opg-conversation-empty"><strong>No matches</strong><span>Try a different name, or clear the search.</span></div>}
+        {visible.map((conversation) => <ConversationRow key={conversation.id} conversation={conversation} currentUserId={currentUserId} selected={selectedId === conversation.id} />)}
       </>}
-      <SupportRow selected={activeTab === 'support'} />
+      {/* Support stays reachable even when search or the unread filter hides every stay. */}
+      {!narrowed && <SupportRow selected={activeTab === 'support'} />}
     </div>
   </aside>;
 }
