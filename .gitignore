@@ -83,3 +83,6 @@ skills-lock.json
 
 # KAI tool cache, not project source: lists Railway workspaces and ids.
 .kai/projects.json
+
+# Browser tool scratch output (snapshots, console logs)
+.playwright-mcp/
