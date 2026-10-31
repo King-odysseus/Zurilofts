@@ -14,6 +14,18 @@ const TONE_COLORS = { arrival: "info", inhouse: "warning", departure: "success" 
 
 const SKELETON_HEIGHTS = ["h-24", "h-44", "h-24", "h-64"];
 
+// The three day-count switches have to stay on one line on a phone, so the
+// shared pill theme is tightened for this row only: no wrapping, smaller
+// padding. Passed as the Tabs theme prop so the global tab style is untouched.
+const MOBILE_TAB_THEME = {
+  tablist: {
+    // A narrow phone cannot fit three labels plus their counts, so the row
+    // scrolls sideways instead of dropping to a second line.
+    variant: { pills: "flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" },
+    tabitem: { base: "px-2 py-2 text-[13px]" },
+  },
+};
+
 function formatToday() {
   return new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long" });
 }
@@ -322,6 +334,7 @@ export default function HostTodayPage() {
       <Tabs
         aria-label="Today's operations"
         variant="pills"
+        theme={MOBILE_TAB_THEME}
         onActiveTabChange={(index) => setMobileTab(["arrival", "inhouse", "departure"][index])}
       >
         {[
@@ -330,7 +343,12 @@ export default function HostTodayPage() {
           ["departure", "Departures", departures],
         ].map(([key, label, items]) => <TabItem
           key={key}
-          title={<span className="flex flex-col leading-tight"><span className="whitespace-nowrap">{label}</span><span className="text-[11px] opacity-70">{items.length}</span></span>}
+          title={<span className="flex items-center gap-1.5 whitespace-nowrap leading-none">
+            {label}
+            {/* The count rides beside its label so all three switches read in one
+                row; the tint follows the pill so the badge stays legible on navy. */}
+            <span className={`inline-grid h-5 min-w-[20px] place-items-center rounded-full px-1.5 text-[11px] font-semibold tabular-nums ${mobileTab === key ? "bg-white/20 text-white" : "bg-navy/10 text-navy"}`}>{items.length}</span>
+          </span>}
           active={mobileTab === key}
         >
           <div className="space-y-3">
