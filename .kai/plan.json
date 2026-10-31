@@ -2,29 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the attached image: Airbnb search results split view - scrolling card column on the left, map with price pins on the right, filter row above (Filters / Price / Type of place), search pill on top, open account menu",
+      "text": "Check git status for uncommitted files",
       "state": "done"
     },
     {
-      "text": "Check the current search results page and whether any map code or map library exists",
+      "text": "Review diff for secrets or generated files",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and build checks",
+      "state": "done"
+    },
+    {
+      "text": "Commit changes and push",
       "state": "active"
-    },
-    {
-      "text": "Decide map approach (library vs no new dependency) and confirm with user if a dependency is needed",
-      "state": "pending"
-    },
-    {
-      "text": "Build the split view: scrolling card column, filter row, map panel with price pins",
-      "state": "pending"
-    },
-    {
-      "text": "Compare the account dropdown with the image and fix any gaps",
-      "state": "pending"
-    },
-    {
-      "text": "Verify on screen at desktop and phone width, run lint and build",
-      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-31T17:03:03.250Z"
+  "updatedAt": "2026-10-31T17:51:28.123Z"
 }
