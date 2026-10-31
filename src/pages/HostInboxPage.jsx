@@ -6,7 +6,6 @@ import {
   CalendarDays,
   ChevronLeft,
   MessageCircleMore,
-  MessageSquareQuote,
   Search,
   Settings2,
   Users,
@@ -205,7 +204,7 @@ function GuestRow({ conversation, currentUserId, selected }) {
   return <Link
     to={`/host/inbox/${conversation.id}`}
     aria-current={selected ? 'page' : undefined}
-    className={`relative flex min-h-[72px] items-start gap-3 px-4 py-3 transition-colors ${selected ? 'bg-surface' : 'hover:bg-surface'}`}
+    className={`relative flex min-h-[72px] items-start gap-3 px-4 py-4 transition-colors ${selected ? 'bg-surface' : 'hover:bg-surface'}`}
   >
     {selected && <span className="absolute inset-y-0 left-0 w-0.5 bg-primary" aria-hidden="true" />}
     {/* Stay first, guest second: the thumbnail identifies the property and the
@@ -227,8 +226,8 @@ function GuestRow({ conversation, currentUserId, selected }) {
         <strong className={`truncate text-sm text-navy ${unread > 0 ? 'font-bold' : 'font-semibold'}`}>{participant.name}</strong>
         <time className="shrink-0 text-[10px] text-muted" dateTime={conversation.lastMessage?.createdAt || conversation.updatedAt}>{formatWhen(conversation.lastMessage?.createdAt || conversation.updatedAt)}</time>
       </div>
-      <p className={`mt-0.5 truncate text-xs ${unread > 0 ? 'font-semibold text-navy' : 'text-muted'}`}>{conversation.lastMessage?.content || (conversation.lastMessage?.attachments?.length ? 'Sent an attachment' : 'No messages yet')}</p>
-      <p className="mt-1 flex min-w-0 items-center gap-1.5 text-[11px] text-muted">
+      <p className={`mt-1.5 truncate text-xs ${unread > 0 ? 'font-semibold text-navy' : 'text-muted'}`}>{conversation.lastMessage?.content || (conversation.lastMessage?.attachments?.length ? 'Sent an attachment' : 'No messages yet')}</p>
+      <p className="mt-2 flex min-w-0 items-center gap-1.5 text-[11px] text-muted">
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${status.dot}`} aria-hidden="true" />
         <span className="truncate">{status.label}, {stay}, {property.title || 'Your stay'}</span>
       </p>
@@ -299,7 +298,7 @@ function ConversationList({
       </div>
     </div>}
   >
-    <div className="shrink-0 border-b border-border px-4 py-3">
+    <div className="shrink-0 border-b border-border px-4 py-4">
       <label className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 text-muted focus-within:border-primary">
         <Search className="h-3.5 w-3.5 shrink-0" strokeWidth={1.9} aria-hidden="true" />
         <input
@@ -311,7 +310,7 @@ function ConversationList({
           className="w-full min-w-0 border-0 bg-transparent p-0 text-sm text-navy placeholder:text-muted focus:outline-none focus:ring-0"
         />
       </label>
-      <div className="mt-2 flex items-center gap-2" role="group" aria-label="Filter conversations">
+      <div className="mt-3 flex items-center gap-2" role="group" aria-label="Filter conversations">
         {[['all', `All ${totalCount}`], ['unread', `Unread ${unreadCount}`]].map(([key, label]) => (
           <button
             key={key}
@@ -327,14 +326,14 @@ function ConversationList({
     </div>
 
     <div className="min-h-0 flex-1 overflow-y-auto">
-      {loading ? <div className="flex flex-col gap-2 p-3" role="status" aria-label="Loading guest conversations">
+      {loading ? <div className="flex flex-col gap-3 p-3" role="status" aria-label="Loading guest conversations">
         <span className="block h-16 animate-pulse rounded-xl bg-inset" />
         <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:150ms]" />
         <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:300ms]" />
       </div> : error ? <div className="m-3 rounded-xl border border-dashed border-border p-4 text-center">
         <p className="text-xs text-muted">{error}</p>
         <Button type="button" size="sm" color="light" className="mt-2 min-h-[44px]" onClick={onRetry}>Try again</Button>
-      </div> : conversations.length === 0 ? <div className="m-3 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border px-4 py-10 text-center">
+      </div> : conversations.length === 0 ? <div className="m-3 flex flex-col items-center gap-3 rounded-xl border border-dashed border-border px-4 py-10 text-center">
         <span className="grid h-9 w-9 place-items-center rounded-full bg-surface text-muted"><MessageCircleMore className="h-4 w-4" strokeWidth={1.7} aria-hidden="true" /></span>
         <strong className="text-sm font-semibold text-navy">{totalCount === 0 ? 'No guest messages yet' : 'Nothing matches'}</strong>
         <p className="text-xs leading-relaxed text-muted">
@@ -381,7 +380,7 @@ function MessagingSettings({ open, hideEnded, onHideEndedChange, onClose }) {
     <div className="absolute right-0 top-full z-40 mt-1 w-[min(18rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-border bg-elevated shadow-xl" role="dialog" aria-label="Messaging settings">
       <p className="border-b border-border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">Messaging settings</p>
 
-      <label className="flex min-h-[44px] cursor-pointer items-start gap-2.5 px-3 py-3 hover:bg-surface">
+      <label className="flex min-h-[44px] cursor-pointer items-start gap-2.5 px-3 py-4 hover:bg-surface">
         <input
           type="checkbox"
           checked={hideEnded}
@@ -394,12 +393,12 @@ function MessagingSettings({ open, hideEnded, onHideEndedChange, onClose }) {
         </span>
       </label>
 
-      <Link to="/host/listings" className="block min-h-[44px] border-t border-border px-3 py-3 hover:bg-surface">
+      <Link to="/host/listings" className="block min-h-[44px] border-t border-border px-3 py-4 hover:bg-surface">
         <span className="block text-xs font-semibold text-navy">Saved replies</span>
         <span className="block text-[11px] leading-relaxed text-muted">They belong to each listing, alongside its automatic messages.</span>
       </Link>
 
-      <Link to="/contact" className="block min-h-[44px] border-t border-border px-3 py-3 hover:bg-surface">
+      <Link to="/contact" className="block min-h-[44px] border-t border-border px-3 py-4 hover:bg-surface">
         <span className="block text-xs font-semibold text-navy">Give feedback</span>
         <span className="block text-[11px] leading-relaxed text-muted">Tell us what would make replying faster.</span>
       </Link>
@@ -415,40 +414,6 @@ MessagingSettings.propTypes = {
 };
 
 /* ---------------------------------------------------------------- thread ---- */
-
-function SavedReplyMenu({ replies, onInsert, onClose }) {
-  return <>
-    <button type="button" className="fixed inset-0 z-30 cursor-default" aria-label="Close saved replies" onClick={onClose} />
-    {/* Anchored to the right edge: the trigger now sits at the right end of the
-        composer pill, so a left-anchored menu would run off a phone screen. The
-        width guard keeps it inside the viewport from either side. */}
-    <div className="absolute bottom-full right-0 z-40 mb-2 max-h-[min(24rem,60vh)] w-[min(22rem,calc(100vw-3.5rem))] overflow-y-auto rounded-xl border border-border bg-elevated shadow-xl">
-      <p className="border-b border-border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">Saved replies</p>
-      {replies.length === 0 ? <p className="px-3 py-4 text-xs leading-relaxed text-muted">No saved replies yet for this stay. Add them under the listing&apos;s guest messages, or just type your own.</p> : replies.map((reply) => (
-        <button
-          key={reply.trigger}
-          type="button"
-          onClick={() => onInsert(reply.body)}
-          className="block min-h-[44px] w-full border-b border-border px-3 py-3 text-left transition-colors last:border-b-0 hover:bg-surface"
-        >
-          <span className="block text-xs font-semibold text-navy">{reply.label}</span>
-          <span className="mt-0.5 line-clamp-2 block text-[11px] leading-relaxed text-muted">{reply.preview}</span>
-        </button>
-      ))}
-    </div>
-  </>;
-}
-
-SavedReplyMenu.propTypes = {
-  replies: PropTypes.arrayOf(PropTypes.shape({
-    trigger: PropTypes.string.isRequired,
-    label: PropTypes.string.isRequired,
-    body: PropTypes.string.isRequired,
-    preview: PropTypes.string.isRequired,
-  })).isRequired,
-  onInsert: PropTypes.func.isRequired,
-  onClose: PropTypes.func.isRequired,
-};
 
 function Thread({
   conversation,
@@ -466,7 +431,6 @@ function Thread({
 }) {
   const threadRef = useRef(null);
   const [draft, setDraft] = useState('');
-  const [repliesOpen, setRepliesOpen] = useState(false);
 
   useEffect(() => {
     const thread = threadRef.current;
@@ -490,33 +454,6 @@ function Thread({
     return sent;
   }
 
-  // Saved replies ride inside the composer pill as a small circular trigger, so
-  // the reply field keeps its full width. Hidden while the templates load and
-  // when this stay has none: a button that can only open an empty menu is worse
-  // than no button.
-  const savedReplyAction = !savedRepliesLoading && savedReplies.length > 0
-    ? <div className="relative shrink-0">
-      <button
-        type="button"
-        onClick={() => setRepliesOpen((open) => !open)}
-        className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
-        aria-label="Insert a saved reply"
-        aria-haspopup="true"
-        aria-expanded={repliesOpen}
-      >
-        <MessageSquareQuote className="h-4 w-4" strokeWidth={1.9} aria-hidden="true" />
-      </button>
-      {repliesOpen && <SavedReplyMenu
-        replies={savedReplies}
-        onClose={() => setRepliesOpen(false)}
-        onInsert={(body) => {
-          setDraft(renderSavedReply(body, booking, property));
-          setRepliesOpen(false);
-        }}
-      />}
-    </div>
-    : null;
-
   // No HostCard head: the thread head carries an avatar, a name and two actions,
   // which is more than the shared head slot takes. flush keeps the custom head
   // on the card edge so its gutter matches the list beside it.
@@ -524,7 +461,7 @@ function Thread({
   // border, radius, shadow and surface (see THREAD_PAGE_SHELL) and restore them
   // from md up, where the list and reservation columns sit beside it.
   return <HostCard flush className={`${THREAD_PAGE_SHELL} ${className || ''} ${PAGE_THREAD_HEIGHT} overflow-hidden`.trim()}>
-    <header className="shrink-0 border-b border-border px-4 py-3">
+    <header className="shrink-0 border-b border-border px-4 py-4">
       {/* One obvious way out on a phone: two columns squeezed into 360px would
           leave neither pane readable, so mobile shows one pane at a time and
           this row is a full 44px tap target. */}
@@ -548,7 +485,7 @@ function Thread({
       </div>
     </header>
 
-    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4" ref={threadRef} aria-live="polite">
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5" ref={threadRef} aria-live="polite">
       {loading ? <div className="flex flex-col gap-2" role="status" aria-label="Loading messages">
         <span className="block h-12 w-2/3 animate-pulse rounded-xl bg-inset" />
         <span className="ml-auto block h-12 w-1/2 animate-pulse rounded-xl bg-inset" />
@@ -558,21 +495,21 @@ function Thread({
         <Button type="button" size="sm" color="light" className="mt-2 min-h-[44px]" onClick={onRetry}>Try again</Button>
       </div> : messages.length === 0 ? <div className="rounded-xl border border-dashed border-border p-6 text-center">
         <strong className="block text-sm font-semibold text-navy">No messages yet</strong>
-        <p className="mt-1 text-xs leading-relaxed text-muted">Say hello to {participant.name} and share the arrival details.</p>
+        <p className="mt-2 text-xs leading-relaxed text-muted">Say hello to {participant.name} and share the arrival details.</p>
       </div> : <>
         {/* The stay sits at the top of the thread the way a booking marker does in
             a mature host inbox: it dates every message below it. */}
-        {booking.id && <div className="mb-4 text-center">
+        {booking.id && <div className="mb-5 text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">{status.label}</p>
-          <p className="mt-1 text-xs text-muted">{plural(booking.guests || 1, 'guest')}, {stay}</p>
+          <p className="mt-2 text-xs text-muted">{plural(booking.guests || 1, 'guest')}, {stay}</p>
           {/* A 44px button rather than a small inline link: on a phone the stay
               marker is the only way into the reservation from the thread. */}
           <Button type="button" size="sm" color="light" className="mt-2 min-h-[44px] xl:hidden" onClick={onShowReservation}>Show reservation</Button>
         </div>}
 
-        {groups.map((group) => <div key={group.key} className="mb-4 last:mb-0">
-          <p className="mb-2 text-center text-[11px] font-semibold text-muted">{group.label}</p>
-          <div className="space-y-3">
+        {groups.map((group) => <div key={group.key} className="mb-5 last:mb-0">
+          <p className="mb-3 text-center text-[11px] font-semibold text-muted">{group.label}</p>
+          <div className="space-y-4">
             {group.messages.map((message) => {
               const mine = message.senderId === currentUserId;
               return <div key={message.id} className={`flex flex-col ${mine ? 'items-end' : 'items-start'}`}>
@@ -605,7 +542,8 @@ function Thread({
         placeholder={`Reply to ${participant.name}...`}
         ariaLabel="Reply to guest"
         sending={sending}
-        actions={savedReplyAction}
+        savedReplies={savedRepliesLoading ? [] : savedReplies}
+        onInsertSavedReply={(reply) => setDraft(renderSavedReply(reply.body, booking, property))}
       />
     </div>
   </HostCard>;
@@ -678,34 +616,34 @@ function ReservationPanel({ conversation, currentUserId, onClose, className }) {
       <X className="h-4 w-4" strokeWidth={1.9} aria-hidden="true" />
     </button>}
   >
-    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
+    <div className="min-h-0 flex-1 overflow-y-auto px-4 py-5">
       <div className="flex flex-col items-center text-center">
         <span className="grid h-16 w-16 place-items-center overflow-hidden rounded-full bg-navy-bg text-lg font-bold text-white">
           {participant.avatar ? <img src={participant.avatar} alt="" className="h-full w-full object-cover" /> : initialsFor(participant.name)}
         </span>
         <h3 className="mt-3 text-base font-semibold text-navy">{participant.name}</h3>
-        <p className="mt-0.5 text-xs text-muted">
+        <p className="mt-1.5 text-xs text-muted">
           {plural(booking.guests || 1, 'guest')}, {plural(nights, 'night')}
         </p>
-        <p className="mt-1 text-xs text-muted">{property.title || 'Stay'}</p>
+        <p className="mt-2 text-xs text-muted">{property.title || 'Stay'}</p>
       </div>
 
-      <div className="mt-4 rounded-xl border border-border">
+      <div className="mt-5 rounded-xl border border-border">
         <div className="grid grid-cols-2 divide-x divide-border">
           <div className="p-3">
             <p className="text-[11px] font-semibold text-navy">Check-in</p>
-            <p className="mt-0.5 text-xs text-muted">{formatDay(booking.checkIn)}</p>
+            <p className="mt-1.5 text-xs text-muted">{formatDay(booking.checkIn)}</p>
             <p className="text-[11px] text-muted">{booking.checkInTime ? `${booking.checkInTime} EAT` : 'Time flexible'}</p>
           </div>
           <div className="p-3">
             <p className="text-[11px] font-semibold text-navy">Check-out</p>
-            <p className="mt-0.5 text-xs text-muted">{formatDay(booking.checkOut)}</p>
+            <p className="mt-1.5 text-xs text-muted">{formatDay(booking.checkOut)}</p>
             <p className="text-[11px] text-muted">{booking.checkOutTime ? `${booking.checkOutTime} EAT` : 'By 10:00 EAT'}</p>
           </div>
         </div>
       </div>
 
-      <div className="mt-3 space-y-2 rounded-xl border border-border p-3">
+      <div className="mt-4 space-y-3 rounded-xl border border-border p-3.5">
         <p className="flex items-center gap-2 text-xs text-navy">
           <Users className="h-3.5 w-3.5 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />
           {plural(booking.guests || 1, 'guest')}
@@ -721,7 +659,7 @@ function ReservationPanel({ conversation, currentUserId, onClose, className }) {
       </div>
 
       {/* Label above field, same rhythm as the host settings forms. */}
-      <div className="mt-4">
+      <div className="mt-5">
         <Label htmlFor="host-private-note" className="mb-1.5 block">Your notes</Label>
         <Textarea
           id="host-private-note"
@@ -751,7 +689,7 @@ function EmptyThread({ className }) {
       <div className="flex flex-col items-center">
         <span className="grid h-11 w-11 place-items-center rounded-full bg-surface text-muted"><MessageCircleMore className="h-5 w-5" strokeWidth={1.7} aria-hidden="true" /></span>
         <strong className="mt-3 text-base font-semibold text-navy">Select a conversation</strong>
-        <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted">Open a guest conversation to read the thread and reply. Messages about your stays arrive here, not in your travel inbox.</p>
+        <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted">Open a guest conversation to read the thread and reply. Messages about your stays arrive here, not in your travel inbox.</p>
       </div>
     </div>
   </HostCard>;
@@ -944,8 +882,8 @@ export default function HostInboxPage() {
     ? 'md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,290px)]'
     : 'md:grid-cols-[minmax(0,320px)_minmax(0,1fr)]';
 
-  return <div className="flex flex-col gap-4">
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+  return <div className="flex flex-col gap-5 sm:gap-6">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div>
         <p className={HOST_EYEBROW}>Host workspace</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Messages</h1>
@@ -960,7 +898,7 @@ export default function HostInboxPage() {
       </div>
     </Alert>}
 
-    <div className={`grid grid-cols-1 gap-4 ${gridColumns}`}>
+    <div className={`grid grid-cols-1 gap-5 ${gridColumns}`}>
       <ConversationList
         conversations={visibleConversations}
         totalCount={conversations.length}
