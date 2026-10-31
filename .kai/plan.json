@@ -2,37 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Inventory how colours are defined (tokens, Tailwind config, hardcoded hexes) and capture the before state",
+      "text": "Check the working tree: what is changed, untracked, or another session's work",
       "state": "done"
     },
     {
-      "text": "Confirm the primary action colour (action blue #2563EB) with the user",
+      "text": "Confirm the tree is sound (lint and build) before staging anything",
       "state": "done"
     },
     {
-      "text": "Retint the token layer in styles.css, tailwind.config.js and the Flowbite theme",
+      "text": "Stage and commit in logical groups, leaving build output and scratch files out",
       "state": "done"
     },
     {
-      "text": "Sweep hardcoded navy/bronze hexes across src to the new palette",
-      "state": "done"
-    },
-    {
-      "text": "Convert bronze buttons to action blue, keep brass for hairlines and small accents",
-      "state": "done"
-    },
-    {
-      "text": "Update DESIGN.md and CLAUDE.md so the documented palette matches the code",
-      "state": "done"
-    },
-    {
-      "text": "Re-apply the palette after the parallel navy pass and confirm it holds",
-      "state": "done"
-    },
-    {
-      "text": "Verify with lint, build and screenshots of home, footer, messages, host and property pages",
+      "text": "Push and report the commit hashes",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T14:54:47.277Z"
+  "updatedAt": "2026-10-31T14:56:31.412Z"
 }
