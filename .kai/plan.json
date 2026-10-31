@@ -11,12 +11,12 @@
     },
     {
       "text": "Verify in the browser at desktop and phone, run lint and build",
-      "state": "active"
+      "state": "done"
     },
     {
       "text": "Commit and push",
-      "state": "pending"
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T12:50:42.415Z"
+  "updatedAt": "2026-10-31T12:55:03.901Z"
 }
