@@ -353,6 +353,7 @@ export default function HostCalendarPage() {
     const bookings = calendar?.bookings || [];
     return selectedDays.filter((day) => !bookings.some((booking) => inStay(day, booking.start, booking.end)) && !blocks.some((block) => inStay(day, block.start, block.end)));
   }, [calendar, selectedDays]);
+  const selectedAllOpen = selectedDays.length > 0 && selectedBlockedDays.length === 0;
 
   /** Block every open night in the selection, one request per consecutive run. */
   async function blockSelected() {
@@ -596,17 +597,31 @@ export default function HostCalendarPage() {
 
         <SidebarSection title="Availability" icon={Ban}>
           {selectionCount > 0 && <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-2.5">
-            <p className="text-[11px] font-semibold text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</p>
-            <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
-              {selectedOpenDays.length > 0 && `${selectedOpenDays.length} open`}
-              {selectedOpenDays.length > 0 && selectedBlockedDays.length > 0 && ' \u00b7 '}
-              {selectedBlockedDays.length > 0 && `${selectedBlockedDays.length} blocked`}
-            </p>
-            <div className="mt-2 grid grid-cols-2 gap-1.5">
-              <Button type="button" size="xs" className={BTN_PRIMARY} disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>Block</Button>
-              <Button type="button" size="xs" color="light" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <p className="text-[11px] font-semibold text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</p>
+                <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
+                  {selectedOpenDays.length > 0 && `${selectedOpenDays.length} open`}
+                  {selectedOpenDays.length > 0 && selectedBlockedDays.length > 0 && ' \u00b7 '}
+                  {selectedBlockedDays.length > 0 && `${selectedBlockedDays.length} blocked`}
+                </p>
+              </div>
+              {/* One switch for the pick, like the reference's Available toggle:
+                  on opens every selected night, off blocks them. */}
+              <button
+                type="button"
+                role="switch"
+                aria-checked={selectedAllOpen}
+                aria-label="Selected nights are available"
+                disabled={saving}
+                onClick={selectedAllOpen ? blockSelected : openSelected}
+                className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-semibold transition-colors ${selectedAllOpen ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-border bg-elevated text-muted'}`}
+              >
+                <span className={`h-3 w-3 rounded-full ${selectedAllOpen ? 'bg-emerald-500' : 'bg-[#c3cbd6]'}`} aria-hidden="true" />
+                {selectedAllOpen ? 'Available' : 'Blocked'}
+              </button>
             </div>
-            <button type="button" onClick={clearSelection} className="mt-1.5 w-full text-[10px] text-muted underline underline-offset-2 hover:text-navy">Clear selection</button>
+            <button type="button" onClick={clearSelection} className="mt-2 w-full text-[10px] text-muted underline underline-offset-2 hover:text-navy">Clear selection</button>
           </div>}
           <form onSubmit={addBlock} className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
