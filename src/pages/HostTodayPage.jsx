@@ -62,7 +62,7 @@ function GuestOperationCard({ booking, type, compact = false, onMessage, message
           traveller support thread, which is a different inbox entirely. */}
       <button type="button" onClick={() => onMessage(booking.id)} disabled={messagePending} className="text-xs font-semibold text-navy underline-offset-2 hover:underline disabled:opacity-60">{messagePending ? "Opening..." : "Message guest"}</button>
     </div>
-    <Link className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-navy" to={`/bookings/${booking.id}`}>View</Link>
+    <Link className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-navy" to={`/host/reservations/${booking.id}`}>View</Link>
   </article>;
 }
 
@@ -223,7 +223,10 @@ export default function HostTodayPage() {
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Today</h1>
         <span className="mt-1 block text-sm text-muted">{formatToday()}</span>
       </div>
-      <Button as={Link} to="/host/calendar" color="light" size="sm" className="hidden md:inline-flex">Open calendar</Button>
+      <div className="flex flex-wrap gap-2">
+        <Button as={Link} to="/host/reservations" color="light" size="sm" className="hidden md:inline-flex">All reservations</Button>
+        <Button as={Link} to="/host/calendar" color="light" size="sm" className="hidden md:inline-flex">Open calendar</Button>
+      </div>
     </header>
 
     {messageError && <Alert color="failure">
@@ -249,7 +252,7 @@ export default function HostTodayPage() {
         {/* The card only needs its own action when there is a booking to open.
             With nothing scheduled the call to action repeated the calendar
             button already shown above, so the card stays informational. */}
-        {priority && <Button as={Link} to={`/bookings/${priority.id}`} size="sm" className="mt-4 self-start">Review booking</Button>}
+        {priority && <Button as={Link} to={`/host/reservations/${priority.id}`} size="sm" className="mt-4 self-start">Review booking</Button>}
       </section>
     </div>
 

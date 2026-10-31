@@ -77,7 +77,7 @@ export async function getOrCreateConversation(input: GetOrCreateInput) {
     include: {
       booking: {
         include: {
-          property: { select: { id: true, title: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
+          property: { select: { id: true, title: true, location: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -91,7 +91,7 @@ export async function getOrCreateConversation(input: GetOrCreateInput) {
     include: {
       booking: {
         include: {
-          property: { select: { id: true, title: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
+          property: { select: { id: true, title: true, location: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -133,7 +133,7 @@ export async function listUserConversations(userId: string, side?: ConversationS
       },
       booking: {
         include: {
-          property: { select: { id: true, title: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
+          property: { select: { id: true, title: true, location: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },

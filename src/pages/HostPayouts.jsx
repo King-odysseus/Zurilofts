@@ -141,7 +141,7 @@ function HostPayouts() {
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Payouts</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Manage how you get paid and review your payout history.</p>
       </div>
-      <Button as={Link} to="/profile#payouts" size="sm">{destination?.method ? 'Change destination' : 'Set up payouts'}</Button>
+      <Button as={Link} to="/host/settings" size="sm">{destination?.method ? 'Change destination' : 'Set up payouts'}</Button>
     </header>
 
     {error && <Alert color="failure">
@@ -192,7 +192,7 @@ function HostPayouts() {
           <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Next payout</dt><dd className="font-semibold text-navy">{wallet?.nextPayoutAt ? new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not scheduled'}</dd></div>
           <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Destination status</dt><dd className="font-semibold text-navy">{destination?.method ? 'Ready' : 'Needs setup'}</dd></div>
         </dl>
-        <Button as={Link} to="/profile#payouts" color="light" size="sm" className="mt-4 w-fit">{destination?.method ? 'Update payout details' : 'Add payout details'}</Button>
+        <Button as={Link} to="/host/settings" color="light" size="sm" className="mt-4 w-fit">{destination?.method ? 'Update payout details' : 'Add payout details'}</Button>
       </section>
 
       <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm lg:col-span-2">

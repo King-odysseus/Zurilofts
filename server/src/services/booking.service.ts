@@ -467,6 +467,11 @@ export async function getBooking(bookingId: string, scope?: { userId?: string; h
     where: { id: bookingId },
     include: {
       property: true,
+      // The host side of a reservation needs to know who is arriving. The caller
+      // is always either the booking's guest or the host who owns the listing
+      // (enforced by the scope check below), so this reveals nothing to a stranger.
+      user: { select: { id: true, firstName: true, lastName: true, email: true, avatar: true } },
+      conversation: { select: { id: true } },
       promoCode: { select: { code: true, discountPercent: true } },
       addOns: { include: { addOn: true } },
     },

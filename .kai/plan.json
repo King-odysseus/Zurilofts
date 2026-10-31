@@ -2,53 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the two attached dropdown screenshots and the current Navbar dropdown code",
+      "text": "Locate and read the Airbnb reference images",
       "state": "done"
     },
     {
-      "text": "Trace how Messages resolves in host mode vs traveller mode (routes, pages, conversation API)",
+      "text": "Build the host inbox to match the reference (list, thread, reservation, saved replies)",
       "state": "done"
     },
     {
-      "text": "Give the user a recap of what I understand before making changes",
+      "text": "Audit host pages for links into guest pages and list missing host pages",
       "state": "done"
     },
     {
-      "text": "Give hosts their own inbox: side filter on the conversations API, /host/inbox routes, host-styled inbox page, traveller inbox limited to guest conversations",
+      "text": "Build the missing host pages (reservations list, reservation detail, host settings) and repoint host links",
       "state": "done"
     },
     {
-      "text": "Rebuild the host account dropdown to match the traveller one (avatar header, icons, grouped sections, browsing-as eyebrow)",
-      "state": "done"
-    },
-    {
-      "text": "Point every host Messages entry at the host inbox (header tab, mobile bar, Navbar, Today page links)",
-      "state": "done"
-    },
-    {
-      "text": "Fix the remembered side leaking between accounts on one browser",
-      "state": "done"
-    },
-    {
-      "text": "Make the header follow the page (host nav only on host routes) so travel pages never show host tabs",
-      "state": "done"
-    },
-    {
-      "text": "Make every deliberate side switch play the transition, including when the stored side already matches",
-      "state": "done"
-    },
-    {
-      "text": "Unify the name of the host inbox across header, mobile bar and menu",
-      "state": "done"
-    },
-    {
-      "text": "Verify end to end in a browser: both inboxes, both headers, switch animation, mobile and dark mode, lint, build, server typecheck",
+      "text": "Verify host inbox and new host pages in the browser, run lint and build",
       "state": "done"
     },
     {
       "text": "Commit and push",
-      "state": "done"
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-10-31T12:19:31.303Z"
+  "updatedAt": "2026-10-31T12:37:02.089Z"
 }

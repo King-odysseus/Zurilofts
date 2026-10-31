@@ -147,7 +147,7 @@ function CalendarDetail({ selected, row, onOpenProperty }) {
       <span className={LABEL}>RESERVED STAY</span>
       <strong className="mt-1 block text-sm font-semibold">{state.item.guestName || 'Guest'}</strong>
       <p className="mt-1 text-xs leading-relaxed text-white/80">{sameDay(selected.date, new Date(state.item.start)) ? 'Check-in today' : sameDay(selected.date, addDays(new Date(state.item.end), -1)) ? 'Check-out today' : 'Stay in progress'} · {state.item.guests || 1} guest{state.item.guests === 1 ? '' : 's'}</p>
-      <Link to={`/bookings/${state.item.id}`} className="mt-2 inline-block text-xs font-semibold underline">View booking</Link>
+      <Link to={`/host/reservations/${state.item.id}`} className="mt-2 inline-block text-xs font-semibold underline">View booking</Link>
     </div> : state.type === 'blocked' ? <div className="rounded-lg bg-surface p-3">
       <span className={LABEL}>BLOCKED DATE</span>
       <strong className="mt-1 block text-sm font-semibold text-navy">{state.item.summary || 'Unavailable'}</strong>

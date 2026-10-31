@@ -211,9 +211,13 @@ function HostLayout({ children }) {
                   <p className="truncate text-xs text-muted">{user?.email}</p>
                 </div>
 
-                <Link to="/profile#info" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
+                <Link to="/host/settings" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <CircleUserRound className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
                   My Profile
+                </Link>
+                <Link to="/host/reservations" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
+                  <ClipboardList className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
+                  Reservations
                 </Link>
                 <Link to="/host/inbox" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <MessagesSquare className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
