@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { Check, Plus, X } from 'lucide-react';
+import { Check, ChevronRight, X } from 'lucide-react';
 
 /**
  * The phone counterpart of the desktop action bar on the host calendar.
@@ -25,10 +25,8 @@ export default function CalendarQuickSheet({
   onBlock,
   onOpen,
   onClear,
-  settingsExpanded,
-  onToggleSettings,
+  onEditPrice,
   onSettings,
-  children,
 }) {
   if (!open) return null;
 
@@ -109,32 +107,19 @@ export default function CalendarQuickSheet({
       </div>
 
       {/* Two routes out of the sheet, kept apart by what they change. The first
-          expands in place and edits only the picked nights; the second raises
-          the full pricing and availability card, which also carries blocks and
-          feeds that these three rows have no room for. */}
+          opens the day editor over the sheet, which prices exactly the nights that
+          are picked; the second raises the full pricing and availability card,
+          which also carries blocks and feeds these three rows have no room for. */}
       <div className="overflow-hidden rounded-2xl bg-navy-bg shadow-xl">
         <button
           type="button"
-          onClick={onToggleSettings}
-          aria-expanded={settingsExpanded}
-          aria-controls="quick-sheet-custom-settings"
-          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-hover"
+          onClick={onEditPrice}
+          disabled={saving}
+          className="flex w-full items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-hover disabled:opacity-60"
         >
-          <span>Custom settings</span>
-          <Plus
-            className={`h-4 w-4 shrink-0 transition-transform duration-200 ${settingsExpanded ? 'rotate-45' : ''}`}
-            strokeWidth={2}
-            aria-hidden="true"
-          />
+          <span>Set price and discount</span>
+          <ChevronRight className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
         </button>
-        {settingsExpanded && (
-          <div
-            id="quick-sheet-custom-settings"
-            className="max-h-[46vh] overflow-y-auto overscroll-contain border-t border-white/10"
-          >
-            {children}
-          </div>
-        )}
         <button
           type="button"
           onClick={onSettings}
@@ -161,8 +146,6 @@ CalendarQuickSheet.propTypes = {
   onBlock: PropTypes.func.isRequired,
   onOpen: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
-  settingsExpanded: PropTypes.bool.isRequired,
-  onToggleSettings: PropTypes.func.isRequired,
+  onEditPrice: PropTypes.func.isRequired,
   onSettings: PropTypes.func.isRequired,
-  children: PropTypes.node,
 };

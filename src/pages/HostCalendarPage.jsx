@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import CalendarQuickSheet from '../components/CalendarQuickSheet.jsx';
-import NightSettingsPanel from '../components/NightSettingsPanel.jsx';
+import DayRateDialog from '../components/DayRateDialog.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
@@ -457,9 +457,9 @@ export default function HostCalendarPage() {
   const [syncing, setSyncing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  // The phone sheet's "Custom settings" is a dropdown that edits the picked
-  // nights in place, so it needs nothing more than its own open state here.
-  const [settingsExpanded, setSettingsExpanded] = useState(false);
+  // The day editor is a popup over the calendar. It prices whichever nights are
+  // picked, so it needs nothing more than its own open state here.
+  const [dayRateOpen, setDayRateOpen] = useState(false);
 
   const loadProperties = useCallback(async () => {
     try {
@@ -528,11 +528,22 @@ export default function HostCalendarPage() {
       }
       return current.includes(key) ? current.filter((item) => item !== key) : [...current, key];
     });
+
+    // A plain click means "price this night", so the editor opens straight on the
+    // pick. Shift-click only extends a range, which keeps multi-night picking
+    // usable without the popup reopening over the calendar on every night.
+    // A phone gets its own sheet on a pick instead, which already offers the same
+    // editor one tap away, so raising both at once would bury the availability
+    // controls a host needs more often.
+    if (!extend) {
+      const roomForPopup = window.matchMedia('(min-width: 768px)').matches;
+      setDayRateOpen(roomForPopup && !selectedKeys.includes(key));
+    }
   }
 
   function clearSelection() {
     setSelectedKeys([]);
-    setSettingsExpanded(false);
+    setDayRateOpen(false);
   }
 
   const selectedDays = useMemo(() => selectedKeys.map(fromDayKey).sort((a, b) => a.getTime() - b.getTime()), [selectedKeys]);
@@ -706,17 +717,6 @@ export default function HostCalendarPage() {
     });
   }
 
-  function clearPromotion() {
-    return runDatedEdit({
-      path: priceRulesPath,
-      runs: groupRuns(selectedDays),
-      makeRule: () => null,
-      keepOutside: (rule, piece) => ({ name: rule.name || undefined, start: dayKey(piece.start), end: dayKey(piece.end), price: rule.price }),
-      successMessage: 'Promotion removed from those nights.',
-      failureMessage: 'Could not remove that promotion.',
-    });
-  }
-
   /** One night means no minimum, so clearing deletes the rule instead of storing a 1. */
   function saveMinimumStay(nights) {
     return runDatedEdit({
@@ -844,25 +844,33 @@ export default function HostCalendarPage() {
     : Math.round(selectedDays.reduce((sum, day) => sum + priceFor(day, basePrice, priceRules), 0) / selectedDays.length);
   const selectionSummary = `${selectedOpenDays.length} open, ${selectedBlockedDays.length} blocked`;
 
-  // What the sheet's Custom settings dropdown reads out for the pick. A minimum
-  // stay is judged from the first night, which is the night a booking would
-  // check in on and the night the server enforces the rule against.
+  // What the day editor reads out for the pick. A minimum stay is judged from
+  // the first night, which is the night a booking would check in on and the
+  // night the server enforces the rule against.
   const hasDatedRate = selectedDays.some((day) => priceRules.some((rule) => coversNight(rule, day)));
-  const promotionRule = selectedDays.length > 0
-    ? priceRules.find((rule) => isPromotionRule(rule) && coversNight(rule, selectedDays[0]))
+  // A discount chip is only marked as applied when every picked night carries the
+  // same percentage. A mixed pick (one discounted night beside three full-price
+  // ones) would otherwise claim the whole range was discounted.
+  const promotionPercents = selectedDays.map((day) => {
+    const rule = priceRules.find((item) => isPromotionRule(item) && coversNight(item, day));
+    return rule ? promotionPercentIn(rule) : null;
+  });
+  const promotionPercent = promotionPercents.length > 0 && promotionPercents.every((percent) => percent === promotionPercents[0])
+    ? promotionPercents[0]
     : null;
-  const promotionPercent = promotionRule ? promotionPercentIn(promotionRule) : null;
   const selectionMinNights = selectedDays.length > 0
     ? (calendar?.stayRules || []).reduce((longest, rule) => (
       coversNight(rule, selectedDays[0]) ? Math.max(longest, rule.minNights) : longest
     ), 1)
     : 1;
 
-  // One panel, two homes: inside the phone sheet's dropdown and above the
-  // wide-screen bar. Both edit the nights that are picked right now.
-  const nightSettings = (
-    <NightSettingsPanel
-      nightsLabel={selectionCount === 1 ? '1 night picked' : `${selectionCount} nights picked`}
+  // One editor, opened from the action bar, the phone sheet, or by clicking a
+  // night itself, and always for the nights that are picked right now.
+  const dayRateDialog = (
+    <DayRateDialog
+      open={dayRateOpen}
+      title={selectionLabel}
+      subtitle={selectionCount === 1 ? '1 night' : `${selectionCount} nights`}
       baseRate={basePrice}
       nightRate={selectionRate}
       hasDatedRate={hasDatedRate}
@@ -872,8 +880,8 @@ export default function HostCalendarPage() {
       onSaveRate={saveNightlyRate}
       onClearRate={clearDatedRate}
       onSavePromotion={savePromotion}
-      onClearPromotion={clearPromotion}
       onSaveMinimumStay={saveMinimumStay}
+      onClose={() => setDayRateOpen(false)}
     />
   );
 
@@ -884,14 +892,14 @@ export default function HostCalendarPage() {
    */
   function renderSettings() {
     return <HostCard flush>
-      <div className="border-b border-border px-4 py-3">
+      <div className="border-b border-border px-4 py-4">
         <h2 className="text-sm font-semibold text-navy">Pricing and availability</h2>
-        <p className="mt-0.5 text-[11px] leading-relaxed text-muted">Changes here apply to this stay only.</p>
+        <p className="mt-1.5 text-[11px] leading-relaxed text-muted">Changes here apply to this stay only.</p>
       </div>
 
-      {selectionCount > 0 && <div className="border-b border-border bg-[#F7F9FC] px-4 py-3">
+      {selectionCount > 0 && <div className="border-b border-border bg-[#F7F9FC] px-4 py-4">
         <p className="text-[11px] font-semibold text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</p>
-        <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
+        <p className="mt-1.5 text-[10px] leading-relaxed text-muted">
           {selectedOpenDays.length > 0 && `${selectedOpenDays.length} open`}
           {selectedOpenDays.length > 0 && selectedBlockedDays.length > 0 && ' · '}
           {selectedBlockedDays.length > 0 && `${selectedBlockedDays.length} blocked`}
@@ -921,7 +929,20 @@ export default function HostCalendarPage() {
             <span className="shrink-0 tabular-nums text-muted">{money(rule.price)} <span className="text-[10px]">({formatDay(rule.start)}-{formatDay(addDays(new Date(rule.end), -1))})</span></span>
           </li>)}
         </ul> : <p className="mt-2 text-[11px] leading-relaxed text-muted">No dated rates. Every night uses the base rate.</p>}
-        <Button as={Link} to={`/host/properties/${activePropertyId}/edit`} color="light" size="xs" className="mt-3 w-full">Edit pricing</Button>
+        {/* Dates are priced on the calendar itself: pick nights on the grid and the
+            day editor opens. The listing editor is only for the base rate, so it is
+            a quiet second link rather than the way in. */}
+        <Button
+          type="button"
+          color="dark"
+          size="xs"
+          className="mt-3 w-full min-h-[44px]"
+          disabled={selectedDays.length === 0}
+          onClick={() => setDayRateOpen(true)}
+        >
+          {selectedDays.length > 0 ? 'Set price for picked nights' : 'Pick nights to set a price'}
+        </Button>
+        <Link to={`/host/properties/${activePropertyId}/edit`} className="mt-2 block text-center text-[11px] text-muted underline underline-offset-2 hover:text-navy">Edit the base rate in the listing</Link>
       </SidebarSection>
 
       <SidebarSection title="Availability" icon={Ban}>
@@ -985,12 +1006,12 @@ export default function HostCalendarPage() {
     </HostCard>;
   }
 
-  return <div className="space-y-4">
+  return <div className="space-y-6">
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         <p className={HOST_EYEBROW}>HOST WORKSPACE</p>
-        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Calendar</h1>
-        <p className="mt-1 hidden max-w-2xl text-sm leading-relaxed text-muted sm:block">Every night you can sell, what it costs, and who is already booked.</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Calendar</h1>
+        <p className="mt-2 hidden max-w-2xl text-sm leading-relaxed text-muted sm:block">Every night you can sell, what it costs, and who is already booked.</p>
       </div>
 
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end">
@@ -1048,7 +1069,7 @@ export default function HostCalendarPage() {
     </HostCard> : !activePropertyId ? <HostCard className="py-12 text-center">
       <CalendarDays className="mx-auto h-6 w-6 text-muted" strokeWidth={1.6} aria-hidden="true" />
       <strong className="mt-2 block text-base font-semibold text-navy">No listings to manage</strong>
-      <p className="mx-auto mt-1 max-w-md text-sm leading-relaxed text-muted">Add a listing before setting availability.</p>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">Add a listing before setting availability.</p>
       <Button as={Link} to="/host/properties/new" size="sm" className="mx-auto mt-4 w-fit">Add a listing</Button>
     </HostCard> : <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
       {/* Flush: the grid and the totals strip run edge to edge, while the head
@@ -1057,7 +1078,7 @@ export default function HostCalendarPage() {
       {/* Overflow stays visible on a phone so the weekday strip can pin to the
           viewport; a clipping ancestor would trap it inside the card. */}
       <HostCard flush className="overflow-visible sm:overflow-hidden">
-        <div className="flex flex-col gap-2 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+        <div className="flex flex-col gap-3 border-b border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <div className="min-w-0">
             <h2 className="truncate text-base font-semibold text-navy">{calendar?.property?.title || 'Your stay'}</h2>
             <p className="text-xs text-muted">
@@ -1118,8 +1139,7 @@ export default function HostCalendarPage() {
         onBlock={blockSelected}
         onOpen={openSelected}
         onClear={clearSelection}
-        settingsExpanded={settingsExpanded}
-        onToggleSettings={() => setSettingsExpanded((open) => !open)}
+        onEditPrice={() => setDayRateOpen(true)}
         onSettings={() => {
           // The sheet is an overlay over the nights that are picked; the full
           // pricing and availability card lives in the page itself. Dropping the
@@ -1130,50 +1150,25 @@ export default function HostCalendarPage() {
             document.getElementById('calendar-settings')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           });
         }}
-      >
-        {nightSettings}
-      </CalendarQuickSheet>
+      />
 
-      <div className="fixed bottom-6 right-6 z-30 hidden flex-col items-end gap-2 md:flex">
-        {settingsExpanded && (
-          <div className="w-[360px] overflow-hidden rounded-2xl bg-navy-bg shadow-2xl">
-            <div className="flex items-center justify-between gap-2 px-3 py-2">
-              <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-white/60">Custom settings</span>
-              <button
-                type="button"
-                onClick={() => setSettingsExpanded(false)}
-                aria-label="Close custom settings"
-                className="grid h-8 w-8 place-items-center rounded-full text-white/70 transition-colors hover:bg-white/10"
-              >
-                <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-              </button>
-            </div>
-            <div className="max-h-[60vh] overflow-y-auto border-t border-white/10">{nightSettings}</div>
-          </div>
-        )}
+      <div className="fixed bottom-6 right-6 z-30 hidden items-center md:flex">
         <div
           className="flex items-center gap-2 rounded-full border border-border bg-elevated px-2 py-2 shadow-xl"
           role="region"
           aria-label="Selected dates, actions"
         >
           <span className="pl-1 pr-1 text-xs font-semibold tabular-nums text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</span>
-          <Button type="button" size="xs" color="dark" className="min-h-[44px]" disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
+          <Button type="button" size="xs" color="dark" className="min-h-[44px]" disabled={saving} onClick={() => setDayRateOpen(true)}>Price and discount</Button>
+          <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
           <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
-          <Button
-            type="button"
-            size="xs"
-            color="light"
-            className="min-h-[44px]"
-            aria-expanded={settingsExpanded}
-            onClick={() => setSettingsExpanded((open) => !open)}
-          >
-            Custom settings
-          </Button>
           <button type="button" onClick={clearSelection} aria-label="Clear selection" className="ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy">
             <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </div>
+
+      {dayRateDialog}
     </>}
   </div>;
 }
