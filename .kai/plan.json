@@ -2,45 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Inspect reference images and current host/guest messaging screens",
-      "state": "active"
+      "text": "Compare the remaining host pages against the Airbnb references to list what is still missing",
+      "state": "done"
     },
     {
-      "text": "Mobile messaging: reference-style list (search, All/Unread/Groups, avatars, previews, timestamps) in Zuri colours",
-      "state": "pending"
+      "text": "Today page: follow-ups row from the reference",
+      "state": "done"
     },
     {
-      "text": "Desktop messaging: host and guest 3-column look (list, thread, details panel)",
-      "state": "pending"
-    },
-    {
-      "text": "Fix mobile bottom nav staying visible during messaging",
-      "state": "pending"
-    },
-    {
-      "text": "Compare remaining host pages against references and list gaps",
-      "state": "pending"
-    },
-    {
-      "text": "Today page: reservation cards and follow-ups row",
-      "state": "pending"
-    },
-    {
-      "text": "Listings page: status badges and grid/list toggle",
-      "state": "pending"
+      "text": "Listings page: status badges and grid/list toggle from the reference",
+      "state": "done"
     },
     {
       "text": "Host insights page with rating breakdown and reviews",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Messaging settings entry from the messages reference",
-      "state": "pending"
+      "state": "done"
     },
     {
-      "text": "Verify in browser, run lint and build, commit and push",
-      "state": "pending"
+      "text": "Verify in the browser, run lint and build, commit and push",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T12:42:18.634Z"
+  "updatedAt": "2026-10-31T12:48:05.960Z"
 }
