@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import BrandLogo from './BrandLogo.jsx';
 import PropTypes from 'prop-types';
-import { Button } from 'flowbite-react';
 import {
   ArrowLeftRight,
   Building2,
@@ -19,7 +18,6 @@ import {
   MessageCircleMore,
   MessagesSquare,
   Percent,
-  Plus,
   Wallet,
 } from 'lucide-react';
 import HostMobileBottomNav from './HostMobileBottomNav.jsx';
@@ -187,11 +185,6 @@ function HostLayout({ children }) {
           </nav>
 
           <div className="flex items-center gap-2">
-            <Button as={Link} to="/host/properties/new" size="sm" aria-label="New listing">
-              <Plus className="h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
-              <span className="hidden md:inline">New listing</span>
-            </Button>
-
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
@@ -199,7 +192,7 @@ function HostLayout({ children }) {
                 aria-haspopup="true"
                 aria-expanded={menuOpen}
                 aria-label="Open host account menu"
-                className="inline-flex items-center gap-1 rounded-full border border-border bg-elevated p-1 transition-colors hover:border-primary-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                className="inline-flex items-center gap-1 p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <span aria-hidden="true" className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-navy-bg text-[11px] font-bold tracking-wide text-white">
                   {user?.avatar ? <img src={user.avatar} alt="" className="h-full w-full object-cover" /> : hostInitials(user)}
@@ -276,7 +269,7 @@ function HostLayout({ children }) {
       {/* The floating bottom bar's clearance is reserved once, on <body>, via
           --zl-bottom-nav-space (see styles.css). Reserving it again here would
           double it and leave a dead band under the last card. */}
-      <main className="mx-auto w-full max-w-7xl px-4 py-6 lg:px-6">{children}</main>
+      <main className="mx-auto w-full max-w-7xl px-4 py-8 lg:px-6 lg:py-10">{children}</main>
       <HostMobileBottomNav />
     </div>
   );
