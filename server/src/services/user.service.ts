@@ -179,6 +179,26 @@ export async function listAllUsers(
   };
 }
 
+/**
+ * One account for an admin-facing detail view (e.g. the host behind a listing
+ * under review). Same field set as the list so the two views cannot drift, with
+ * the bank number masked exactly like the list.
+ */
+export async function getAdminUser(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      ...ADMIN_USER_SELECT,
+      _count: { select: { properties: true, bookings: true } },
+    },
+  });
+  if (!user) throw new NotFoundError('User');
+  return {
+    ...user,
+    bankAccountNo: user.bankAccountNo ? `••••${user.bankAccountNo.slice(-4)}` : null,
+  };
+}
+
 export async function adminUpdateUser(
   userId: string,
   data: {

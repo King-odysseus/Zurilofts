@@ -73,6 +73,8 @@ const ROUTE_TITLES = [
   [/^\/admin$/, 'Overview | ZuriLofts Admin'],
   [/^\/admin\/revenue$/, 'Revenue | ZuriLofts Admin'],
   [/^\/admin\/properties$/, 'Listing review | ZuriLofts Admin'],
+  [/^\/admin\/properties\/[^/]+$/, 'Listing review | ZuriLofts Admin'],
+  [/^\/admin\/settings$/, 'Account settings | ZuriLofts Admin'],
   [/^\/admin\/users$/, 'Users | ZuriLofts Admin'],
   [/^\/admin\/host-applications$/, 'Host applications | ZuriLofts Admin'],
   [/^\/admin\/trust-safety$/, 'Trust and safety | ZuriLofts Admin'],

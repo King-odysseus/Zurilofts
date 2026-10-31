@@ -95,7 +95,7 @@ export default function AdminListingReview() {
           <small className="mt-1 block text-xs text-muted">{listing.location || listing.neighborhood || 'Location pending'} · {listing.images?.length || 0} photos · {listing.type || 'Stay'}</small>
         </div>
         <span className="whitespace-nowrap text-xs font-semibold capitalize text-navy">{listing.status?.replaceAll('_', ' ').toLowerCase()}</span>
-        <Link to={`/property/${listing.id}`} className="text-sm font-semibold text-primary-600 hover:underline">Preview</Link>
+        <Link to={`/admin/properties/${listing.id}`} className="text-sm font-semibold text-primary-600 hover:underline">Preview</Link>
         {listing.status === 'PENDING_REVIEW' && <Button size="xs" type="button" onClick={() => { setReviewing(listing); setNote(''); }}>Decide</Button>}
       </div>) : <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
         <strong className="text-sm font-semibold text-navy">No listings in this view</strong>
@@ -107,8 +107,10 @@ export default function AdminListingReview() {
       <ModalHeader>Review {reviewing.title}</ModalHeader>
       <ModalBody>
         <p className="text-sm text-charcoal">Check the listing details and photos before making a decision.</p>
-        <Link to={`/property/${reviewing.id}`} target="_blank" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline">
-          Preview stay <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+        {/* A new tab on purpose: the decision modal and any note typed into it
+            survive while the admin reads the full listing in the workspace. */}
+        <Link to={`/admin/properties/${reviewing.id}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline">
+          Open full listing <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
         </Link>
         <div className="mt-4">
           <Label htmlFor="review-note" value="Reason or note (required for rejection)" />

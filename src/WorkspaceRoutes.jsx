@@ -6,6 +6,8 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import AdminDashboard, { AdminLayout } from './pages/AdminDashboard.jsx';
 import AdminRevenue from './pages/AdminRevenue.jsx';
 import AdminListingReview from './pages/AdminListingReview.jsx';
+import AdminListingDetail from './pages/AdminListingDetail.jsx';
+import AdminSettings from './pages/AdminSettings.jsx';
 import AdminPropertyForm from './pages/AdminPropertyForm.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
 import AdminHostApplications from './pages/AdminHostApplications.jsx';
@@ -59,6 +61,10 @@ export default function WorkspaceRoutes() {
       {/* Listings are host-owned. Admin keeps the approval queue only, so the
           old create/edit/calendar screens redirect instead of resolving. */}
       <Route path="properties" element={<AdminListingReview />} />
+      {/* One listing, reviewed in place. The public guest page is the wrong
+          context for a moderator: it carries the booking widget and none of the
+          review controls, and leaving /admin loses the workspace entirely. */}
+      <Route path="properties/:id" element={<AdminListingDetail />} />
       <Route path="properties/new" element={<Navigate to="/admin/properties" replace />} />
       <Route path="properties/:id/edit" element={<Navigate to="/admin/properties" replace />} />
       <Route path="properties/:id/calendar" element={<Navigate to="/admin/properties" replace />} />
@@ -79,6 +85,9 @@ export default function WorkspaceRoutes() {
       <Route path="messages" element={<AdminMessages />} />
       <Route path="messages/:userId" element={<AdminMessages />} />
       <Route path="guides" element={<AdminGuides />} />
+      {/* The admin's own account, kept inside the workspace instead of sending
+          them to /profile, which is the traveller account page. */}
+      <Route path="settings" element={<AdminSettings />} />
     </Route>
     <Route path="*" element={<NotFoundPage />} />
   </Routes>;

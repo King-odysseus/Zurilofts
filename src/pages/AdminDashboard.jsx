@@ -32,6 +32,7 @@ import {
   MessageCircle,
   ScrollText,
   Search,
+  Settings,
   ShieldCheck,
   SlidersHorizontal,
   Star,
@@ -108,6 +109,15 @@ const adminNavGroups = [
       { path: '/admin/governance', label: 'Governance', icon: ScrollText },
     ],
   },
+  {
+    // Last because it is about the admin's own account, not the platform. Without
+    // this entry the page is only reachable from the avatar menu, which is the
+    // one place a moderator looks last when hunting for settings.
+    label: 'Account',
+    items: [
+      { path: '/admin/settings', label: 'Account settings', icon: Settings, exact: true },
+    ],
+  },
 ];
 
 const adminMobilePrimaryItems = [
@@ -169,9 +179,13 @@ function HeaderUserMenu({ user, onLogout }) {
         <span className="block w-full truncate text-[11px] text-muted">{user?.email}</span>
         <small className="block w-full text-[10px] font-bold uppercase tracking-wider text-primary-600">Admin</small>
       </DropdownHeader>
-      <DropdownItem as={Link} to="/profile#info">My Profile</DropdownItem>
+      <DropdownItem as={Link} to="/admin/settings">Account settings</DropdownItem>
       <DropdownItem as={Link} to="/admin/messages">Messages</DropdownItem>
-      <DropdownItem as={Link} to="/">Client view</DropdownItem>
+      {/* The public site is a different product surface: a fresh tab keeps the
+          workspace (and any half-finished review) exactly where it was. A plain
+          anchor is deliberate: DropdownItem swallows the target on a Link, which
+          turned this into a same-tab jump out of the admin workspace. */}
+      <DropdownItem as="a" href="/" target="_blank" rel="noreferrer">View public site</DropdownItem>
       <DropdownDivider />
       <DropdownItem className="text-red-600" onClick={onLogout}>Sign Out</DropdownItem>
     </Dropdown>
@@ -214,7 +228,7 @@ function AdminSearch() {
         <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-xl border border-border bg-elevated py-1 shadow-lg" role="listbox">
           {!hasResults && <p className="px-3 py-2 text-xs text-muted">No matches</p>}
           {results.users.map((u) => <button type="button" key={u.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go(`/admin/users?search=${encodeURIComponent(u.email)}`)}><strong className="text-xs font-semibold text-navy">{u.firstName} {u.lastName}</strong><span className="text-[11px] text-muted">{u.email} · {u.role}</span></button>)}
-          {results.properties.map((p) => <button type="button" key={p.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go('/admin/properties')}><strong className="text-xs font-semibold text-navy">{p.title}</strong><span className="text-[11px] text-muted">{p.location} · {p.status}</span></button>)}
+          {results.properties.map((p) => <button type="button" key={p.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go(`/admin/properties/${p.id}`)}><strong className="text-xs font-semibold text-navy">{p.title}</strong><span className="text-[11px] text-muted">{p.location} · {p.status}</span></button>)}
         </div>
       )}
     </div>
@@ -331,7 +345,9 @@ function AdminLayout() {
       >
         {/* Brand sits in its own band: more room above than below so it reads as the top of the column, and a hairline closes the band so the Workspace label below starts a new section instead of floating under the logo. */}
         <div className={`flex shrink-0 items-center border-b border-white/10 ${collapsed ? 'justify-center px-2 pb-5 pt-7' : 'justify-between px-6 pb-5 pt-7'}`}>
-          <Link to="/" className="inline-flex items-center gap-2 text-white">
+          {/* The brand stays inside the workspace: an admin who clicks the logo
+              wants the dashboard, not the guest home page. */}
+          <Link to="/admin" className="inline-flex items-center gap-2 text-white">
             <BrandLogo imgClassName="h-7 w-auto" />
             {!collapsed && <strong className="font-montserrat text-base font-bold tracking-tight">zuri.admin</strong>}
           </Link>
@@ -421,7 +437,7 @@ function AdminLayout() {
       {/* Mobile header and floating section nav */}
       <div className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-elevated px-4 lg:hidden">
         <div className="flex items-center">
-          <Link to="/" className="inline-flex items-center gap-2">
+          <Link to="/admin" className="inline-flex items-center gap-2">
             <BrandLogo imgClassName="h-6 w-auto" alt="" />
             <span className="flex flex-col leading-tight">
               <strong className="font-montserrat text-sm font-bold text-navy">zuri.admin</strong>

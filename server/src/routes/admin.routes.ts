@@ -33,6 +33,9 @@ router.use(authenticate, requireAdmin);
 
 // User / host account management
 router.get('/users', userCtrl.adminListUsers);
+// Single account, for admin detail views (the host behind a listing, the user
+// behind a conversation) so those pages can stay inside the admin workspace.
+router.get('/users/:id', userCtrl.adminGetUser);
 router.get('/stats/signups', userCtrl.adminSignupTrend);
 router.get('/search', userCtrl.adminSearch);
 router.patch('/users/:id', validate(adminUserUpdateSchema), userCtrl.adminUpdateUser);

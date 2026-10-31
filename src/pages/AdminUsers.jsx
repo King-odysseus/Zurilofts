@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import { useLocation } from 'react-router-dom';
 import {
   Alert, Badge, Button, Checkbox, Label, Modal, ModalBody, ModalFooter, ModalHeader,
   Spinner, Table, TableBody, TableCell, TableHead, TableHeadCell, TableRow, Textarea, TextInput,
@@ -49,6 +50,7 @@ function userInitials(user) {
 
 function AdminUsers() {
   const { user: currentUser } = useAuth();
+  const location = useLocation();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [roleFilter, setRoleFilter] = useState('');
@@ -88,6 +90,14 @@ function AdminUsers() {
       setLoading(false);
     }
   }, [roleFilter, search]);
+
+  // The header search links here as ?search=<email>, which can arrive while this
+  // page is already mounted. useState reads the URL only once, so without this
+  // the second search would land on an unchanged list and look like a no-op.
+  useEffect(() => {
+    const fromUrl = new URLSearchParams(location.search).get('search') || '';
+    setSearch((current) => (current === fromUrl ? current : fromUrl));
+  }, [location.search]);
 
   // Debounce search; refetch on role change
   useEffect(() => {
