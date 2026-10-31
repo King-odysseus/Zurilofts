@@ -329,7 +329,15 @@ model Booking {
   promoCodeId          String?
   promoCode            PromoCode?      @relation(fields: [promoCodeId], references: [id])
   discountAmount       Int             @default(0)
+  // Paystack's collection fee, charged to the guest on top of the stay. Kept as
+  // its own column so the total still reconciles (total = stay + add-ons +
+  // paymentFee) and so it is never mistaken for platform income: it passes
+  // straight through to Paystack.
+  paymentFee           Int             @default(0)
   total                Int
+  // Add-on money collected with this booking, snapshotted at payment so a later
+  // catalogue change cannot rewrite what the guest was charged.
+  addOnsTotal          Int             @default(0)
   paymentReference     String?         @unique // Paystack transaction reference
   paymentChannel       String? // Actual channel from Paystack (card, mobile_money)
   paymentGateway       String? // "paystack" or null

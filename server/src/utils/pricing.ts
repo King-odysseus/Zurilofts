@@ -92,6 +92,81 @@ export function calculateFees(
   return { subtotal, cleaningFee, serviceFee, discountAmount, total };
 }
 
+// ---------------------------------------------------------------
+// Payment gateway fee (what Paystack charges for collecting the money)
+// ---------------------------------------------------------------
+
+/**
+ * Paystack's Kenya collection fee as a fraction of the amount charged: 2.9% per
+ * local card transaction. The guest pays it, so a stay's advertised price is
+ * never quietly reduced by the cost of taking the payment.
+ */
+export const GATEWAY_FEE_RATE = 0.029;
+
+/** Flat part of the gateway fee per transaction, in KES. Nil on collections. */
+export const GATEWAY_FEE_FIXED_KES = 0;
+
+/** Ceiling on the gateway fee in KES. 0 means no ceiling. */
+export const GATEWAY_FEE_CAP_KES = 0;
+
+export interface GatewayFeeConfig {
+  /** Fraction of the amount charged, e.g. 0.029 for 2.9%. */
+  rate: number;
+  /** Flat KES added per transaction. */
+  fixedKes: number;
+  /** Maximum KES the gateway fee may reach. 0 = uncapped. */
+  capKes: number;
+}
+
+/**
+ * The gateway fee to add on top of netAmountKes so the platform still receives
+ * netAmountKes after Paystack takes its cut.
+ *
+ * The fee has to be solved from the grossed-up total, not from the net, because
+ * Paystack charges a percentage of what is actually collected:
+ *
+ *   gross = net + fee   and   fee = rate * gross + fixed
+ *   =>  fee = (rate * net + fixed) / (1 - rate)
+ *
+ * Charging rate * net instead would leave the platform short by the fee that
+ * Paystack takes on the fee itself. The result is rounded UP to the whole
+ * shilling, so rounding can only favour the platform, never leave a shortfall.
+ *
+ * A rate of 0 switches the fee off, which makes the platform absorb it.
+ */
+export function computeGatewayFee(netAmountKes: number, config: GatewayFeeConfig): number {
+  if (!Number.isFinite(netAmountKes) || netAmountKes <= 0) return 0;
+  const { rate, fixedKes, capKes } = config;
+  if (!Number.isFinite(rate) || rate <= 0) return 0;
+  // At or above 100% the gross-up has no finite answer, so a bad config must
+  // fail here rather than charge an absurd amount.
+  if (rate >= 1) {
+    throw new Error(`Gateway fee rate must be below 1 (100%), got ${rate}`);
+  }
+
+  const raw = (rate * netAmountKes + fixedKes) / (1 - rate);
+  let fee = Math.ceil(raw);
+  if (capKes > 0 && fee > capKes) fee = Math.round(capKes);
+  return Math.max(0, fee);
+}
+
+/**
+ * The guest-facing total for a charge, and the gateway fee folded into it.
+ *
+ * chargeableKes is everything the guest owes BEFORE the gateway fee (stay,
+ * add-ons and fees, discount already applied). The returned total is what gets
+ * sent to Paystack, so total === chargeableKes + gatewayFee by construction and
+ * a booking row always reconciles against what was actually collected.
+ */
+export function totalWithGatewayFee(
+  chargeableKes: number,
+  config: GatewayFeeConfig,
+): { gatewayFee: number; total: number } {
+  const chargeable = Math.max(0, Math.round(chargeableKes));
+  const gatewayFee = computeGatewayFee(chargeable, config);
+  return { gatewayFee, total: chargeable + gatewayFee };
+}
+
 /**
  * Standard stay times and the late check-out policy.
  * Check-in from 3:00 PM, check-out by 10:00 AM. A guest may request a later

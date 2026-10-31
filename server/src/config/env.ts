@@ -41,7 +41,19 @@ const envSchema = z.object({
   // Platform fees. Every rate below is configuration rather than code: a
   // business decision changes the money split with an env var, no deploy.
   WITHHOLDING_TAX_RATE: z.string().default('5'),
-  TRANSFER_FEE_PASS_TO_HOST: z.string().default('false'),
+  // Paystack's collection fee, charged to the GUEST on top of the booking total
+  // and grossed up so the platform still receives the full total afterwards.
+  // 0.029 is Paystack Kenya's 2.9% local-card rate. Set the rate to 0 to have
+  // the platform absorb the fee instead.
+  PAYSTACK_FEE_RATE: z.string().default('0.029'),
+  // Flat KES part of the collection fee; nil on Paystack collections.
+  PAYSTACK_FEE_FIXED_KES: z.string().default('0'),
+  // Ceiling on the guest-paid gateway fee in KES. 0 = no ceiling.
+  PAYSTACK_FEE_CAP_KES: z.string().default('0'),
+  // Headroom kept in the Paystack balance before a host transfer is attempted.
+  // Paystack deducts its own transfer fee (KES 20-180 on typical amounts) from
+  // the balance, so without headroom a payout for the exact balance is refused.
+  PAYSTACK_TRANSFER_FEE_RESERVE_KES: z.string().default('200'),
   // Fraction of the accommodation subtotal the platform keeps, charged to the
   // HOST (0.1 means 10%). Never charged on cleaning, extra-guest or late
   // check-out amounts - those are pass-through costs. This is the platform's
@@ -92,6 +104,26 @@ const envSchema = z.object({
           code: z.ZodIssueCode.custom,
           path: [key],
           message: `${key} must be a fraction between 0 and 1 (0.1 means 10%), got "${data[key]}"`,
+        });
+      }
+    }
+    // The gateway fee is grossed up as rate / (1 - rate), so a rate of 1 or
+    // more has no finite answer and a negative one would pay the guest.
+    const gatewayRate = Number(data.PAYSTACK_FEE_RATE);
+    if (!Number.isFinite(gatewayRate) || gatewayRate < 0 || gatewayRate >= 1) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['PAYSTACK_FEE_RATE'],
+        message: `PAYSTACK_FEE_RATE must be a fraction from 0 up to but below 1 (0.029 means 2.9%), got "${data.PAYSTACK_FEE_RATE}"`,
+      });
+    }
+    for (const key of ['PAYSTACK_FEE_FIXED_KES', 'PAYSTACK_FEE_CAP_KES', 'PAYSTACK_TRANSFER_FEE_RESERVE_KES'] as const) {
+      const kes = Number(data[key]);
+      if (!Number.isFinite(kes) || kes < 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [key],
+          message: `${key} must be zero or more KES, got "${data[key]}"`,
         });
       }
     }

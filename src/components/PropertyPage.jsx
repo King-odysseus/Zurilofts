@@ -473,6 +473,10 @@ function PropertyPage() {
                   <span>Service fee</span>
                   <span className="text-[#5B6B82]">Shown at checkout</span>
                 </div>
+                <div className="flex justify-between text-[#203565]">
+                  <span>Payment processing fee</span>
+                  <span className="text-[#5B6B82]">Shown at checkout</span>
+                </div>
                 <div className="flex justify-between border-t border-[#E3E8EF] pt-3 font-bold text-[#203565]">
                   <span>Total</span>
                   <span className="font-normal text-[#5B6B82]">Add dates for total</span>

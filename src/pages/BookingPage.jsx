@@ -75,6 +75,20 @@ function BookingPage() {
   // in server/src/utils/pricing.ts.
   const EXTRA_GUEST_FEE = 800;
 
+  // Fallback only. The live rate arrives with the quote as gatewayFeeRate, and
+  // PAYSTACK_FEE_RATE on the server is authoritative for what is charged.
+  const GATEWAY_FEE_RATE_FALLBACK = 0.029;
+
+  // Paystack's fee, grossed up so the platform still receives the full charge:
+  // the fee is a slice of what is collected, not of the net, otherwise the
+  // platform is short by the fee charged on the fee. Mirrors computeGatewayFee
+  // in server/src/utils/pricing.ts, which decides the amount actually charged.
+  function gatewayFeeFor(chargeableKes, rate) {
+    if (!Number.isFinite(chargeableKes) || chargeableKes <= 0) return 0;
+    if (!Number.isFinite(rate) || rate <= 0 || rate >= 1) return 0;
+    return Math.ceil((rate * chargeableKes) / (1 - rate));
+  }
+
   // Standard stay times. Check-in from 3:00 PM, check-out by 10:00 AM. The late
   // check-out ladder (1h = quarter night, 2h = half, 3h = one full night, capped
   // at 3 hours) is priced by the server and served here as a fee per option.
@@ -302,6 +316,12 @@ function BookingPage() {
     : (bedOption === '1bed' ? (property?.price1Bed ?? property?.price ?? 0) : (property?.price ?? 0));
   const addOnsTotal = selectedAddOns.reduce((sum, item) => sum + item.quantity * (item.addOn.price || 0), 0);
 
+  const gatewayFeeRate = quote?.gatewayFeeRate ?? GATEWAY_FEE_RATE_FALLBACK;
+  // Everything the guest owes before Paystack's fee: the stay from the quote
+  // (which excludes add-ons) plus the add-ons selected here.
+  const chargeable = (quote?.chargeable ?? quote?.total ?? 0) + addOnsTotal;
+  const paymentFee = gatewayFeeFor(chargeable, gatewayFeeRate);
+
   const pricing = {
     nights: quote?.nights ?? requestedNights,
     propertyPrice: quote?.nightlyPrice ?? listNightlyPrice,
@@ -316,9 +336,13 @@ function BookingPage() {
     lateCheckoutFee: quote?.lateCheckoutFee ?? 0,
     discountAmount: quote?.discountAmount ?? 0,
     addOnsTotal,
-    // Add-ons attach after the booking exists, so the quote excludes them; the
-    // breakdown adds the guest's current selection on top.
-    total: (quote?.total ?? 0) + addOnsTotal,
+    gatewayFeeRate,
+    paymentFee,
+    // Add-ons attach after the booking exists, so the quote's fee covers the stay
+    // only; the same gross-up is applied above over the whole charge. A preview:
+    // the server recomputes the fee when the booking is saved, and that figure
+    // is what Paystack collects.
+    total: chargeable + paymentFee,
   };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -1098,6 +1122,12 @@ function BookingPage() {
             <span>-KES {pricing.discountAmount.toLocaleString()}</span>
           </div>
         )}
+        {pricing.paymentFee > 0 && (
+          <div className="flex justify-between text-[#1f2937]">
+            <span>Card and M-PESA processing fee ({(pricing.gatewayFeeRate * 100).toFixed(1)}%)</span>
+            <span>KES {pricing.paymentFee.toLocaleString()}</span>
+          </div>
+        )}
         <div className="border-t border-[#203565]/20 pt-3 flex justify-between font-bold text-[#203565]">
           <span>Total</span>
           <span>KES {pricing.total.toLocaleString()}</span>
@@ -1369,6 +1399,12 @@ function BookingPage() {
                         <div className="flex justify-between text-green-600">
                           <span>Promo discount</span>
                           <span>-KES {pricing.discountAmount.toLocaleString()}</span>
+                        </div>
+                      )}
+                      {pricing.paymentFee > 0 && (
+                        <div className="flex justify-between text-[#1f2937]">
+                          <span>Card and M-PESA processing fee ({(pricing.gatewayFeeRate * 100).toFixed(1)}%)</span>
+                          <span>KES {pricing.paymentFee.toLocaleString()}</span>
                         </div>
                       )}
                       <div className="pt-3 border-t border-[#D9D9D9] flex justify-between font-bold text-[#203565]">

@@ -2,29 +2,41 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Remove the add-listing button and avatar pill outline from the host header",
+      "text": "Review Paystack, payout and fee configuration",
       "state": "done"
     },
     {
-      "text": "Run lint and production build to verify the change",
+      "text": "Guest pays the Paystack collection fee, grossed up and stored on the booking",
       "state": "done"
     },
     {
-      "text": "Commit the header change and the earlier uncommitted work, then push",
+      "text": "Lock add-ons once a booking is paid and record add-on money on the booking",
       "state": "done"
     },
     {
-      "text": "Re-read the add-on money path, payout balance check and fee wiring to ground each recommendation",
+      "text": "Reserve Paystack's transfer fee in the payout balance check",
       "state": "done"
     },
     {
-      "text": "Check what config/secrets are missing to take real money safely",
+      "text": "Report add-on and gateway fee money in the revenue report",
       "state": "done"
     },
     {
-      "text": "Write prioritised recommendations with effort, risk and order",
+      "text": "Add gateway fee tests; server suite, lint and build pass",
       "state": "done"
+    },
+    {
+      "text": "Re-run the server tests and the frontend build to confirm the committed state",
+      "state": "active"
+    },
+    {
+      "text": "Stage the twelve files, the migration and the new test",
+      "state": "pending"
+    },
+    {
+      "text": "Commit as one focused change and push to origin/main",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-31T20:16:14.441Z"
+  "updatedAt": "2026-10-31T20:43:01.278Z"
 }

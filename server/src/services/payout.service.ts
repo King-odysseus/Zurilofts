@@ -1,4 +1,5 @@
 import prisma from '../config/prisma.js';
+import { env } from '../config/env.js';
 import * as paystack from '../config/paystack.js';
 import crypto from 'crypto';
 import { ValidationError, NotFoundError, ConflictError } from '../types/index.js';
@@ -169,10 +170,18 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
   }
 
   // Check Paystack balance before attempting
+  // Paystack deducts its own transfer fee from the balance, so a payout for the
+  // exact balance gets refused even though the money looks sufficient. Reserve
+  // the configured headroom up front rather than discovering it as a failed
+  // transfer. The reserve is only a pre-flight estimate: the real fee is taken
+  // by Paystack, and a transfer that still fails is reversed.
+  const transferFeeReserve = Number(env.PAYSTACK_TRANSFER_FEE_RESERVE_KES);
   const paystackBalance = await paystack.checkBalance();
-  if (paystackBalance < wallet.balance) {
+  const balanceNeeded = wallet.balance + transferFeeReserve;
+  if (paystackBalance < balanceNeeded) {
     throw new ValidationError(
-      `Insufficient Paystack balance. Available: KES ${paystackBalance.toLocaleString()}, needed: KES ${wallet.balance.toLocaleString()}`
+      `Insufficient Paystack balance. Available: KES ${paystackBalance.toLocaleString()}, needed: KES ${balanceNeeded.toLocaleString()} ` +
+      `(payout KES ${wallet.balance.toLocaleString()} plus KES ${transferFeeReserve.toLocaleString()} held back for Paystack's transfer fee)`
     );
   }
 

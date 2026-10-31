@@ -156,11 +156,22 @@ async function getBookingForGuest(bookingId: string, userId: string) {
   if (!booking) throw new NotFoundError('Booking');
   if (booking.userId !== userId) throw new ForbiddenError('You are not the guest for this booking');
   if (booking.status === 'CANCELLED') throw new ValidationError('Cannot modify a cancelled booking');
-  // PENDING and CONFIRMED are the only valid statuses at this point (the
-  // schema also has CANCELLED). Treat CONFIRMED as still mutable for add-ons
-  // since they are concierge items that can be added after payment.
 
   return booking;
+}
+
+/**
+ * Add-ons raise the booking total, and the total is what the guest was charged.
+ * Letting them change after payment meant an extra could be taken for free, and
+ * add-on money never reached the platform's books. They are therefore locked the
+ * moment the booking is paid; anything extra is arranged with the host directly.
+ */
+function assertAddOnsMutable(booking: { paidAt: Date | null; status: string }) {
+  if (booking.paidAt || booking.status === 'CONFIRMED') {
+    throw new ValidationError(
+      'Add-ons are locked once a booking is paid. Contact us if you would like to arrange something extra.'
+    );
+  }
 }
 
 export async function getBookingAddOns(bookingId: string, userId: string) {
@@ -179,6 +190,7 @@ export async function addAddOnToBooking(
   userId: string
 ) {
   const booking = await getBookingForGuest(bookingId, userId);
+  assertAddOnsMutable(booking);
   const qty = validateQuantity(quantity);
 
   // Verify the add-on exists, is active, and is assigned to this property
@@ -231,7 +243,8 @@ export async function updateBookingAddOn(
   quantity: number,
   userId: string
 ) {
-  await getBookingForGuest(bookingId, userId);
+  const booking = await getBookingForGuest(bookingId, userId);
+  assertAddOnsMutable(booking);
   const qty = validateQuantity(quantity);
 
   const existing = await prisma.bookingAddOn.findUnique({
@@ -254,7 +267,8 @@ export async function updateBookingAddOn(
 }
 
 export async function removeBookingAddOn(bookingId: string, addOnId: string, userId: string) {
-  await getBookingForGuest(bookingId, userId);
+  const booking = await getBookingForGuest(bookingId, userId);
+  assertAddOnsMutable(booking);
 
   const existing = await prisma.bookingAddOn.findUnique({
     where: { bookingId_addOnId: { bookingId, addOnId } },

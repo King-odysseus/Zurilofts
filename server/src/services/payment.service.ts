@@ -249,6 +249,7 @@ async function confirmBookingPayment(
       property: { select: { hostId: true, title: true } },
       promoCode: { select: { hostId: true } },
       user: { select: { email: true } },
+      addOns: { select: { quantity: true, unitPrice: true } },
     },
   });
 
@@ -325,6 +326,14 @@ async function confirmBookingPayment(
   // cancellation or dispute left the platform chasing it back.
   const hostPayableAt = computeHostPayableAt(booking.checkIn, Number(env.HOST_FUNDS_HOLD_HOURS));
 
+  // Snapshot the add-on money at payment. Add-ons are locked from this moment
+  // on, so this figure is final and the booking stays reconcilable against what
+  // Paystack actually collected. Add-on money is not host income: it pays for
+  // concierge items the platform arranges, so it is reported separately.
+  const addOnsTotal = Math.round(
+    booking.addOns.reduce((sum, a) => sum + a.quantity * a.unitPrice, 0),
+  );
+
   // Atomically flip PENDING -> CONFIRMED and record the split. The affected-row
   // count tells us whether THIS delivery performed the transition, so duplicate
   // callback/webhook deliveries can never apply the money twice. The wallet is
@@ -339,6 +348,7 @@ async function confirmBookingPayment(
       withholdingTax,
       hostCommission: commission,
       platformRevenue,
+      addOnsTotal,
       hostPayableAt,
     },
   });

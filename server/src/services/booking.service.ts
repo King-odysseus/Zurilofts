@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
-import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee, lateCheckoutOptions, EXTRA_GUEST_FEE_PER_NIGHT } from '../utils/pricing.js';
+import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee, lateCheckoutOptions, EXTRA_GUEST_FEE_PER_NIGHT, totalWithGatewayFee, type GatewayFeeConfig } from '../utils/pricing.js';
 import { isRangeAvailable, isRangeAvailableWithDb, PENDING_HOLD_MINUTES } from './calendar.service.js';
 import { isBookable } from './property.service.js';
 import { isPromoUsableForProperty, type BookingTarget } from './promo.service.js';
@@ -65,9 +65,23 @@ interface BookingPricingParams {
   maxDiscount: number | null;
 }
 
+/**
+ * Paystack's collection fee, charged to the guest, from config. Read on each
+ * call rather than cached at module load so a policy change applies to the next
+ * booking instead of needing a redeploy.
+ */
+function gatewayFeeConfig(): GatewayFeeConfig {
+  return {
+    rate: Number(env.PAYSTACK_FEE_RATE),
+    fixedKes: Number(env.PAYSTACK_FEE_FIXED_KES),
+    capKes: Number(env.PAYSTACK_FEE_CAP_KES),
+  };
+}
+
 /** Single-source-of-truth computation of all price line items for a booking
  *  (nightly rate, cleaning, service, discount, late checkout, extra guests).
- *  Does NOT include add-ons - those are layered on top by the caller. */
+ *  Does NOT include add-ons - those are layered on top by the caller - but does
+ *  include the guest-paid gateway fee on everything it does cover. */
 function computeBookingPricing(params: BookingPricingParams) {
   const effectivePrice = getBedPrice(params.property, params.bedOption ?? undefined);
   const nights = calculateNights(params.checkIn, params.checkOut);
@@ -80,7 +94,11 @@ function computeBookingPricing(params: BookingPricingParams) {
     Number(env.GUEST_SERVICE_FEE_RATE),
   );
   const lateFee = lateCheckoutFee(params.checkOutTime ?? undefined, effectivePrice);
-  const total = pricing.total + lateFee + extraGuestFee;
+  // Everything the guest owes before the gateway fee. chargeable is returned so
+  // a caller that adds its own extras (add-ons) can still charge one consistent
+  // gateway fee over the whole amount rather than one fee per component.
+  const chargeable = pricing.total + lateFee + extraGuestFee;
+  const gateway = totalWithGatewayFee(chargeable, gatewayFeeConfig());
   return {
     effectivePrice,
     nights,
@@ -90,7 +108,9 @@ function computeBookingPricing(params: BookingPricingParams) {
     discountAmount: pricing.discountAmount,
     lateCheckoutFee: lateFee,
     extraGuestFee,
-    total,
+    chargeable,
+    paymentFee: gateway.gatewayFee,
+    total: gateway.total,
   };
 }
 
@@ -125,11 +145,18 @@ export async function recalculateBookingTotal(bookingId: string, client?: any): 
     + booking.lateCheckoutFee - booking.discountAmount + extraGuestFee;
 
   const addonsSubtotal = computeAddonsSubtotal(booking.addOns);
-  const newTotal = baseTotal + addonsSubtotal;
+  // The gateway fee is a percentage of everything collected, so it is charged
+  // over the add-ons too and recomputed here whenever a component changes. This
+  // is the one place the fee is re-derived, so every add-on edit lands on the
+  // same total the guest would be charged.
+  const { gatewayFee, total: newTotal } = totalWithGatewayFee(
+    baseTotal + addonsSubtotal,
+    gatewayFeeConfig(),
+  );
 
   await db.booking.update({
     where: { id: bookingId },
-    data: { total: newTotal },
+    data: { total: newTotal, paymentFee: gatewayFee, addOnsTotal: addonsSubtotal },
   });
 }
 
@@ -273,7 +300,9 @@ export async function createBooking(input: CreateBookingInput) {
     serviceFee: bp.serviceFee,
     lateCheckoutFee: bp.lateCheckoutFee,
     discountAmount: bp.discountAmount,
+    paymentFee: bp.paymentFee,
     total: bp.total,
+    addOnsTotal: 0, // no add-ons exist until the guest picks them after creation
   };
 
   // The isRangeAvailable() check above is a UX fast-fail. The authoritative gate
@@ -435,6 +464,11 @@ export async function quoteBooking(input: QuoteBookingInput) {
     lateCheckoutFee: bp.lateCheckoutFee,
     discountAmount: bp.discountAmount,
     promo,
+    // The guest-paid gateway fee over the stay. The checkout applies the same
+    // gross-up to any add-ons it adds on top, so the two never disagree.
+    chargeable: bp.chargeable,
+    paymentFee: bp.paymentFee,
+    gatewayFeeRate: Number(env.PAYSTACK_FEE_RATE),
     total: bp.total,
   };
 }
@@ -1201,7 +1235,11 @@ export async function updateBooking(bookingId: string, input: UpdateBookingInput
     select: { quantity: true, unitPrice: true },
   });
   const addonsSubtotal = computeAddonsSubtotal(bookingAddOns);
-  const total = bp.total + addonsSubtotal;
+  // Re-priced on the same gross-up basis as every other path, over the stay and
+  // the add-ons together, so an edit lands on exactly the total
+  // recalculateBookingTotal would produce.
+  const repriced = totalWithGatewayFee(bp.chargeable + addonsSubtotal, gatewayFeeConfig());
+  const total = repriced.total;
 
   const data: any = {
     checkIn,
@@ -1213,7 +1251,9 @@ export async function updateBooking(bookingId: string, input: UpdateBookingInput
     serviceFee: bp.serviceFee,
     lateCheckoutFee: bp.lateCheckoutFee,
     discountAmount: bp.discountAmount,
+    paymentFee: repriced.gatewayFee,
     total,
+    addOnsTotal: addonsSubtotal,
   };
 
   // Optional fields: undefined = don't change, null = clear, string = set

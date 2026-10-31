@@ -336,7 +336,9 @@ model Booking {
   promoCodeId     String?
   promoCode       PromoCode?    @relation(fields: [promoCodeId], references: [id])
   discountAmount  Int           @default(0)
+  paymentFee      Int           @default(0)
   total           Int
+  addOnsTotal     Int           @default(0)
   paymentReference String?  @unique
   paymentChannel   String?
   paymentGateway   String?

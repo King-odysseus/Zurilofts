@@ -23,6 +23,10 @@ export interface RevenueRow {
   withholdingTax: number;
   commission: number;
   platformRevenue: number;
+  /** Add-on money collected with this booking. Not host income. */
+  addOnRevenue: number;
+  /** Paystack's collection fee the guest paid. Passes straight to Paystack. */
+  gatewayFee: number;
   hostId: string | null;
   hostName: string;
   hostEmail: string;
@@ -83,6 +87,8 @@ export async function getPlatformRevenue(filter?: { from?: Date; to?: Date }) {
       withholdingTax: true,
       hostCommission: true,
       platformRevenue: true,
+      paymentFee: true,
+      addOnsTotal: true,
       property: {
         select: {
           title: true,
@@ -111,6 +117,8 @@ export async function getPlatformRevenue(filter?: { from?: Date; to?: Date }) {
       withholdingTax,
       commission: b.hostCommission ?? 0,
       platformRevenue,
+      addOnRevenue: b.addOnsTotal ?? 0,
+      gatewayFee: b.paymentFee ?? 0,
       hostId: host?.id ?? null,
       hostName: host ? `${host.firstName} ${host.lastName}`.trim() : 'Unknown host',
       hostEmail: host?.email ?? '',
@@ -131,12 +139,22 @@ export async function getPlatformRevenue(filter?: { from?: Date; to?: Date }) {
       acc.withholdingTax += r.withholdingTax;
       acc.commission += r.commission;
       acc.platformRevenue += r.platformRevenue;
+      acc.addOnRevenue += r.addOnRevenue;
+      acc.gatewayFee += r.gatewayFee;
       return acc;
     },
     {
       bookings: 0, grossPaid: 0, hostNet: 0, withholdingTax: 0, commission: 0, platformRevenue: 0,
+      addOnRevenue: 0, gatewayFee: 0,
     },
   );
+
+  // What Paystack actually collected across these bookings, which is what the
+  // Paystack balance should cover: collected = grossPaid + add-on money + the
+  // guest-paid gateway fee. Stay money splits into hostNet + withholdingTax +
+  // platformRevenue, the gateway fee is passed to Paystack, and add-on money is
+  // the platform's for the concierge item it arranges.
+  const collected = totals.grossPaid + totals.addOnRevenue + totals.gatewayFee;
 
   // Twelve months ending with the filter's end date (or now), so a month with no
   // revenue still appears as a zero rather than vanishing from the chart.
@@ -193,6 +211,7 @@ export async function getPlatformRevenue(filter?: { from?: Date; to?: Date }) {
 
   return {
     totals,
+    collected,
     monthly,
     byHost,
     recent: rows.slice(0, 50),
