@@ -1645,18 +1645,20 @@ html.dark .opg-shortlist-created {
 .opg-message-item.is-mine .opg-message-bubble{border-color:transparent;border-radius:16px;border-bottom-right-radius:6px;background:#16294B;color:#fff}
 .opg-message-meta{margin-top:5px;color:#94a3b8;font-size:10px}
 .opg-message-composer{flex:none;padding:12px 14px 10px;border-top:1px solid #e5e7eb;background:#fff}
-.opg-message-compose-surface{position:relative;min-width:0;overflow:hidden;border:1px solid #cbd5e1;border-radius:12px;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.04);transition:border-color .15s ease,box-shadow .15s ease}
-.opg-message-compose-surface:focus-within{border-color:#203565;box-shadow:0 0 0 3px rgba(0,22,102,.1)}
-.opg-message-composer .opg-message-textarea{display:block;width:100%;min-height:72px!important;max-height:128px;margin:0!important;padding:13px 92px 13px 13px!important;resize:none;border:0!important;border-radius:0!important;background:transparent!important;color:#203565!important;font-size:13px!important;line-height:20px!important;box-shadow:none!important}
-.opg-message-composer .opg-message-textarea::placeholder{color:#94a3b8}
-.opg-message-composer .opg-message-textarea:focus{border:0!important;box-shadow:none!important}
-.opg-message-compose-actions{position:absolute;right:8px;bottom:8px;display:flex;align-items:center}
-.opg-message-send{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;min-width:72px;padding:0 14px;border:0;border-radius:999px;background: var(--op-action);color:#fff;font-size:13px;font-weight:600;cursor:pointer}
-.opg-message-send:hover:not(:disabled),.opg-message-send:focus-visible:not(:disabled){background:var(--op-action-hover)}
-.opg-message-send:disabled{background:#d7dde5;color:#64748B;cursor:not-allowed}
-.opg-message-send svg{width:15px;height:15px}
-.opg-message-send>span:not(.opg-message-send-spinner){line-height:1}
-.opg-message-send-spinner{width:14px;height:14px;border:2px solid #fff;border-top-color:transparent;border-radius:50%;animation:spin 1s linear infinite}
+/* An opened conversation is the page, not a card floating on it: the pane loses
+   its edge and the bubbles sit straight on the page surface. The conversation
+   list beside it keeps its card so the two areas still read as separate. */
+.opg-messages-layout.is-thread-open .opg-message-pane{border:0;border-radius:0;background:transparent}
+/* Shared composer field (guest, admin and host). The pill is the input, so the
+   textarea must not draw one: the app-wide :where(textarea) rules add a border,
+   a 44px minimum height and their own focus ring, and the dark theme sets those
+   with !important, so these overrides need !important as well. */
+.msg-composer-input{min-height:32px;padding:6px 0;border:0!important;border-radius:0!important;background:transparent!important;color:inherit!important;font-size:14px;line-height:20px;box-shadow:none!important;outline:0!important;resize:none}
+.msg-composer-input:focus,.msg-composer-input:focus-visible{border:0!important;background:transparent!important;box-shadow:none!important;outline:0!important}
+.msg-composer-input::placeholder{color:#94a3b8!important;opacity:1}
+.msg-composer-input::-webkit-resizer{display:none}
+/* 16px keeps iOS from zooming the page when the field takes focus. */
+@media(max-width:767px){.msg-composer-input{font-size:16px}}
 .opg-message-placeholder{display:grid;place-items:center;align-content:center;height:100%;padding:40px;text-align:center}
 .opg-message-placeholder>span{display:grid;place-items:center;width:54px;height:54px;margin-bottom:14px;border-radius:12px;background:#e8eef7;color:#64748b}
 .opg-message-placeholder svg{width:25px;height:25px}
@@ -1760,16 +1762,10 @@ html.dark .opg-shortlist-created {
   .opg-message-booking-link{display:none}
   .opg-message-thread{gap:10px;padding:14px 12px 16px}
   .opg-message-item{width:88%}
-  .opg-message-composer{padding:10px 12px 10px}
-  .opg-message-compose-surface{border-radius:22px;border-color:#dbe1e9}
+  .opg-message-composer{padding:10px 12px calc(10px + env(safe-area-inset-bottom))}
   .opg-message-bubble{font-size:13.5px}
   .opg-message-item{width:auto;max-width:86%}
   .opg-message-meta{font-size:10.5px}
-  .opg-message-composer .opg-message-textarea{min-height:60px!important;padding:11px 56px 11px 12px!important;font-size:16px!important;line-height:20px!important}
-  .opg-message-compose-actions{right:6px;bottom:6px}
-  .opg-message-send{min-width:40px;width:40px;height:40px;padding:0;box-shadow:0 4px 12px rgba(37,99,235,.35)}
-  .opg-message-send>span:not(.opg-message-send-spinner){display:none}
-  .opg-message-send svg{width:17px;height:17px}
 }
 
 /* Booking detail page (/bookings/:bookingId) */
@@ -3939,13 +3935,13 @@ html.dark .opg-message-item.is-mine .opg-message-bubble {
   color: #FFFFFF !important;
 }
 
-html.dark .opg-message-compose-surface {
-  border-color: var(--dm-border-strong) !important;
-  background-color: var(--dm-surface-soft) !important;
+html.dark .opg-message-composer {
+  border-top-color: var(--dm-border);
+  background-color: var(--dm-surface);
 }
 
-html.dark .opg-message-composer .opg-message-textarea {
-  color: var(--dm-text) !important;
+html.dark .msg-composer-input::placeholder {
+  color: var(--dm-subtle) !important;
 }
 
 html.dark .opg-history-image,

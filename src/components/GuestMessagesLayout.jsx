@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { MessageCircleMore, Search } from 'lucide-react';
 import GuestAccountLayout from './GuestAccountLayout.jsx';
+import MessageAttachments from './MessageAttachments.jsx';
 import { firstImage } from '../utils/images.js';
 import { getConversationParticipant } from '../utils/conversations.js';
 
@@ -25,7 +26,10 @@ function ConversationRow({ conversation, currentUserId, selected }) {
   const property = conversation.booking?.property || {};
   const participant = getConversationParticipant(conversation, currentUserId);
   const image = firstImage(property);
-  const preview = conversation.lastMessage?.content || 'No messages yet';
+  // A file-only message has no text, so the preview names the file instead of
+  // claiming the conversation is empty.
+  const lastMessage = conversation.lastMessage;
+  const preview = lastMessage?.content || (lastMessage?.attachments?.length ? 'Sent an attachment' : 'No messages yet');
   const timestamp = conversation.lastMessage?.createdAt || conversation.updatedAt;
   const unread = Number(conversation.unreadCount) > 0;
 
@@ -52,11 +56,12 @@ ConversationRow.propTypes = {
     lastMessage: PropTypes.shape({
       content: PropTypes.string,
       createdAt: PropTypes.string,
+      attachments: PropTypes.array,
     }),
     booking: PropTypes.shape({
       property: PropTypes.shape({
         title: PropTypes.string,
-        images: PropTypes.arrayOf(PropTypes.string),
+        images: PropTypes.array,
         imagesJson: PropTypes.string,
         host: PropTypes.shape({
           id: PropTypes.string,
@@ -157,9 +162,16 @@ ConversationList.propTypes = {
   onRetry: PropTypes.func,
 };
 
-export function GuestMessageBubble({ mine, meta, children }) {
+// One message: its text and the files that travelled with it. The attachments
+// live inside the bubble so a received photo reads as part of the message
+// rather than a separate row, and MessageAttachments styles its links from
+// `mine` so they stay legible on the navy outgoing bubble.
+export function GuestMessageBubble({ mine, meta, attachments, children }) {
   return <div className={`opg-message-item${mine ? ' is-mine' : ''}`}>
-    <div className="opg-message-bubble">{children}</div>
+    <div className="opg-message-bubble">
+      {children}
+      <MessageAttachments attachments={attachments} mine={mine} className="mt-2" />
+    </div>
     {meta && <span className="opg-message-meta">{meta}</span>}
   </div>;
 }
@@ -167,6 +179,9 @@ export function GuestMessageBubble({ mine, meta, children }) {
 GuestMessageBubble.propTypes = {
   mine: PropTypes.bool,
   meta: PropTypes.string,
+  // Raw API value or a parsed list: messages written before attachments existed
+  // come back without the field, and MessageAttachments tolerates both.
+  attachments: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
   children: PropTypes.node.isRequired,
 };
 
@@ -178,7 +193,10 @@ function GuestMessagesLayout({ activeTab, conversations = [], currentUserId, sel
     description="Stay conversations and ZuriLofts support in one place."
     pageClassName={detailOpen ? 'is-message-thread' : 'is-messages-index'}
   >
-    <div className={`opg-messages-layout${detailOpen ? ' is-detail-open' : ''}`}>
+    {/* `is-thread-open` marks the opened conversation for the stylesheet, which
+        turns the pane into the page itself (no card edge, bubbles on the page
+        surface). `is-detail-open` keeps the phone view hiding the list. */}
+    <div className={`opg-messages-layout${detailOpen ? ' is-detail-open is-thread-open' : ''}`}>
       <ConversationList
         activeTab={activeTab}
         conversations={conversations}

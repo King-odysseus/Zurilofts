@@ -8,12 +8,13 @@ import {
   MessageCircleMore,
   MessageSquareQuote,
   Search,
-  Send,
   Settings2,
   Users,
   X,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
+import MessageAttachments from '../components/MessageAttachments.jsx';
+import MessageComposer from '../components/MessageComposer.jsx';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { CONVERSATIONS_READ_EVENT, getConversationParticipant } from '../utils/conversations.js';
@@ -31,10 +32,27 @@ import { firstImage } from '../utils/images.js';
 
 const DAY_MS = 86_400_000;
 
-// The list column fills the space between the page header and the phone's
-// bottom bar, so the composer stays on screen instead of sitting under the
-// navigation. On desktop it grows to a tall fixed column with its own scrolling.
+// The list and reservation columns fill the space between the page header and
+// the phone's bottom bar, so nothing important sits under the navigation. On
+// desktop they grow to a tall fixed column with their own scrolling.
 const COLUMN_HEIGHT = 'max-h-[calc(100dvh-19rem)] min-h-[360px] md:max-h-none md:h-[calc(100vh-14rem)] md:min-h-[520px]';
+
+// An opened thread is a page on a phone, not a card on one: it takes the height
+// between the page heading and the phone's bottom bar, so the composer stays
+// pinned to the bottom instead of floating where the last message happened to
+// end. md keeps the tall fixed column the side-by-side layout needs.
+const PAGE_THREAD_HEIGHT = 'h-[calc(100dvh-19rem)] min-h-[360px] md:h-[calc(100vh-14rem)] md:min-h-[520px]';
+
+// Flowbite's card theme owns the radius, border, shadow and surface, and Tailwind
+// picks between two utilities of the same kind by emission order rather than by
+// the order they appear in the class attribute. The important marks are what make
+// the card chrome disappear on small screens for certain, so no stray hairline
+// or shadow is left framing the thread; md restores the card for the two and
+// three column layout. The colours are theme tokens, so both themes follow.
+const THREAD_PAGE_SHELL = [
+  '-mx-4 !rounded-none !border-0 !bg-canvas !shadow-none',
+  'md:mx-0 md:!rounded-[14px] md:!border md:!bg-elevated md:!shadow-sm',
+].join(' ');
 
 const STATUS_TONE = {
   CONFIRMED: { label: 'Confirmed', dot: 'bg-emerald-500' },
@@ -209,7 +227,7 @@ function GuestRow({ conversation, currentUserId, selected }) {
         <strong className={`truncate text-sm text-navy ${unread > 0 ? 'font-bold' : 'font-semibold'}`}>{participant.name}</strong>
         <time className="shrink-0 text-[10px] text-muted" dateTime={conversation.lastMessage?.createdAt || conversation.updatedAt}>{formatWhen(conversation.lastMessage?.createdAt || conversation.updatedAt)}</time>
       </div>
-      <p className={`mt-0.5 truncate text-xs ${unread > 0 ? 'font-semibold text-navy' : 'text-muted'}`}>{conversation.lastMessage?.content || 'No messages yet'}</p>
+      <p className={`mt-0.5 truncate text-xs ${unread > 0 ? 'font-semibold text-navy' : 'text-muted'}`}>{conversation.lastMessage?.content || (conversation.lastMessage?.attachments?.length ? 'Sent an attachment' : 'No messages yet')}</p>
       <p className="mt-1 flex min-w-0 items-center gap-1.5 text-[11px] text-muted">
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${status.dot}`} aria-hidden="true" />
         <span className="truncate">{status.label}, {stay}, {property.title || 'Your stay'}</span>
@@ -226,7 +244,7 @@ GuestRow.propTypes = {
     id: PropTypes.string.isRequired,
     unreadCount: PropTypes.number,
     updatedAt: PropTypes.string,
-    lastMessage: PropTypes.shape({ content: PropTypes.string, createdAt: PropTypes.string }),
+    lastMessage: PropTypes.shape({ content: PropTypes.string, createdAt: PropTypes.string, attachments: PropTypes.array }),
     booking: PropTypes.object,
   }).isRequired,
   currentUserId: PropTypes.string,
@@ -401,7 +419,10 @@ MessagingSettings.propTypes = {
 function SavedReplyMenu({ replies, onInsert, onClose }) {
   return <>
     <button type="button" className="fixed inset-0 z-30 cursor-default" aria-label="Close saved replies" onClick={onClose} />
-    <div className="absolute bottom-full left-0 z-40 mb-2 max-h-[min(24rem,60vh)] w-[min(22rem,calc(100vw-2.5rem))] overflow-y-auto rounded-xl border border-border bg-elevated shadow-xl">
+    {/* Anchored to the right edge: the trigger now sits at the right end of the
+        composer pill, so a left-anchored menu would run off a phone screen. The
+        width guard keeps it inside the viewport from either side. */}
+    <div className="absolute bottom-full right-0 z-40 mb-2 max-h-[min(24rem,60vh)] w-[min(22rem,calc(100vw-3.5rem))] overflow-y-auto rounded-xl border border-border bg-elevated shadow-xl">
       <p className="border-b border-border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">Saved replies</p>
       {replies.length === 0 ? <p className="px-3 py-4 text-xs leading-relaxed text-muted">No saved replies yet for this stay. Add them under the listing&apos;s guest messages, or just type your own.</p> : replies.map((reply) => (
         <button
@@ -456,22 +477,53 @@ function Thread({
   const booking = conversation?.booking || {};
   const property = booking.property || {};
   const image = firstImage(property);
-  const canSend = draft.trim().length > 0 && !sending;
   const groups = useMemo(() => groupByDay(messages), [messages]);
   const status = statusOf(booking.status);
   const stay = formatStayRange(booking.checkIn, booking.checkOut);
 
-  async function submit() {
-    const content = draft.trim();
-    if (!content || sending) return;
-    const sent = await onSend(content);
+  // The composer clears its own staged files once this resolves true, but the
+  // draft lives here, so a successful send has to clear it too. A failed one
+  // keeps both, and the host retries without retyping.
+  async function handleSend({ text, attachments }) {
+    const sent = await onSend({ text, attachments });
     if (sent) setDraft('');
+    return sent;
   }
+
+  // Saved replies ride inside the composer pill as a small circular trigger, so
+  // the reply field keeps its full width. Hidden while the templates load and
+  // when this stay has none: a button that can only open an empty menu is worse
+  // than no button.
+  const savedReplyAction = !savedRepliesLoading && savedReplies.length > 0
+    ? <div className="relative shrink-0">
+      <button
+        type="button"
+        onClick={() => setRepliesOpen((open) => !open)}
+        className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600"
+        aria-label="Insert a saved reply"
+        aria-haspopup="true"
+        aria-expanded={repliesOpen}
+      >
+        <MessageSquareQuote className="h-4 w-4" strokeWidth={1.9} aria-hidden="true" />
+      </button>
+      {repliesOpen && <SavedReplyMenu
+        replies={savedReplies}
+        onClose={() => setRepliesOpen(false)}
+        onInsert={(body) => {
+          setDraft(renderSavedReply(body, booking, property));
+          setRepliesOpen(false);
+        }}
+      />}
+    </div>
+    : null;
 
   // No HostCard head: the thread head carries an avatar, a name and two actions,
   // which is more than the shared head slot takes. flush keeps the custom head
   // on the card edge so its gutter matches the list beside it.
-  return <HostCard flush className={`${className || ''} ${COLUMN_HEIGHT} overflow-hidden`.trim()}>
+  // Below md the thread is a full page: the shell classes strip the card's
+  // border, radius, shadow and surface (see THREAD_PAGE_SHELL) and restore them
+  // from md up, where the list and reservation columns sit beside it.
+  return <HostCard flush className={`${THREAD_PAGE_SHELL} ${className || ''} ${PAGE_THREAD_HEIGHT} overflow-hidden`.trim()}>
     <header className="shrink-0 border-b border-border px-4 py-3">
       {/* One obvious way out on a phone: two columns squeezed into 360px would
           leave neither pane readable, so mobile shows one pane at a time and
@@ -528,7 +580,14 @@ function Thread({
                     timestamp reads as a card, not a message. */}
                 <span className="mb-1 text-[10px] text-muted">{formatTime(message.createdAt)}</span>
                 <div className={`max-w-[min(82%,34rem)] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${mine ? 'bg-navy-bg text-white' : 'bg-surface text-navy'}`}>
-                  <p className="whitespace-pre-wrap break-words">{message.content}</p>
+                  {/* A bubble is drawn for its content: an attachment-only message
+                      must not leave an empty line where the text would be. */}
+                  {message.content ? <p className="whitespace-pre-wrap break-words">{message.content}</p> : null}
+                  <MessageAttachments
+                    attachments={message.attachments}
+                    mine={mine}
+                    className={message.content ? 'mt-2' : ''}
+                  />
                 </div>
               </div>;
             })}
@@ -539,48 +598,15 @@ function Thread({
     </div>
 
     <div className="border-t border-border p-3">
-      <div className="flex items-end gap-2">
-        <div className="relative shrink-0">
-          <Button
-            type="button"
-            color="light"
-            size="sm"
-            className="h-11 w-11 p-0"
-            aria-label="Insert a saved reply"
-            aria-expanded={repliesOpen}
-            disabled={savedRepliesLoading}
-            onClick={() => setRepliesOpen((open) => !open)}
-          >
-            <MessageSquareQuote className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
-          </Button>
-          {repliesOpen && <SavedReplyMenu
-            replies={savedReplies}
-            onClose={() => setRepliesOpen(false)}
-            onInsert={(body) => {
-              setDraft(renderSavedReply(body, booking, property));
-              setRepliesOpen(false);
-            }}
-          />}
-        </div>
-        <Textarea
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              submit();
-            }
-          }}
-          rows={1}
-          placeholder={`Reply to ${participant.name}...`}
-          aria-label="Reply to guest"
-          className="min-w-0 flex-1"
-        />
-        <Button type="button" onClick={submit} disabled={!canSend} className="shrink-0" aria-label={sending ? 'Sending message' : 'Send message'}>
-          <Send className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
-          <span className="ml-2 hidden sm:inline">{sending ? 'Sending...' : 'Send'}</span>
-        </Button>
-      </div>
+      <MessageComposer
+        value={draft}
+        onChange={setDraft}
+        onSubmit={handleSend}
+        placeholder={`Reply to ${participant.name}...`}
+        ariaLabel="Reply to guest"
+        sending={sending}
+        actions={savedReplyAction}
+      />
     </div>
   </HostCard>;
 }
@@ -890,11 +916,18 @@ export default function HostInboxPage() {
     });
   }, [conversations, filter, hideEnded, search]);
 
-  async function sendMessage(content) {
+  // The composer hands back the text and any already-uploaded attachments, and
+  // clears them only when this resolves true - so a failed post leaves both the
+  // draft and the staged files where the host can retry them.
+  async function sendMessage({ text, attachments }) {
     if (!routeId) return false;
+    const content = (text || '').trim();
+    const files = Array.isArray(attachments) ? attachments : [];
+    // A file on its own is a message; nothing at all is not.
+    if (!content && files.length === 0) return false;
     setSending(true);
     try {
-      await apiClient.post(`/conversations/${routeId}/messages`, { content });
+      await apiClient.post(`/conversations/${routeId}/messages`, { content, attachments: files });
       await loadMessages();
       await loadConversations();
       return true;

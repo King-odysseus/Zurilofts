@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ForbiddenError, ValidationError } from '../types/index.js';
+import { normalizeAttachments, withParsedAttachments } from '../utils/messageAttachments.js';
 
 // ---------------------------------------------------------------
 // Normalize helpers
@@ -9,9 +10,11 @@ function stripHtml(input: string): string {
   return input.replace(/<[^>]*>/g, '');
 }
 
-function sanitizeContent(raw: string): string {
-  const trimmed = raw.trim();
-  if (!trimmed) throw new ValidationError('Message content cannot be empty');
+// Text is optional when the message carries a file, so emptiness is the caller's
+// decision; only trimming, length and markup are handled here.
+function sanitizeContent(raw: unknown): string {
+  const trimmed = typeof raw === 'string' ? raw.trim() : '';
+  // Deliberately no emptiness check here: an attachment-only message is valid.
   if (trimmed.length > 5000) throw new ValidationError('Message content exceeds 5000 characters');
   return stripHtml(trimmed);
 }
@@ -126,6 +129,7 @@ export async function listUserConversations(userId: string, side?: ConversationS
         select: {
           id: true,
           content: true,
+          attachments: true,
           senderId: true,
           read: true,
           createdAt: true,
@@ -153,7 +157,8 @@ export async function listUserConversations(userId: string, side?: ConversationS
       });
       return {
         ...c,
-        lastMessage: c.messages[0] ?? null,
+        // Parsed so a preview can show that a file was sent; content is unchanged.
+        lastMessage: c.messages[0] ? withParsedAttachments(c.messages[0]) : null,
         unreadCount,
         messages: undefined,
       };
@@ -193,13 +198,24 @@ export async function getMessages(
   ]);
 
   return {
-    messages: messages.reverse(), // return chronological order
+    messages: messages.reverse().map(withParsedAttachments), // return chronological order
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   };
 }
 
-export async function sendMessage(conversationId: string, senderId: string, rawContent: string) {
+export async function sendMessage(
+  conversationId: string,
+  senderId: string,
+  rawContent: unknown,
+  rawAttachments: unknown
+) {
+  // Both validations run before the insert, so a rejected attachment list never
+  // leaves a partial message behind.
+  const attachments = normalizeAttachments(rawAttachments);
   const content = sanitizeContent(rawContent);
+  if (!content && !attachments) {
+    throw new ValidationError('Message content cannot be empty');
+  }
 
   // Verify participation via the booking
   const conversation = await prisma.conversation.findUnique({
@@ -226,6 +242,7 @@ export async function sendMessage(conversationId: string, senderId: string, rawC
       conversationId,
       senderId,
       content,
+      attachments,
     },
     include: {
       sender: { select: { id: true, firstName: true, lastName: true, avatar: true } },
@@ -247,7 +264,7 @@ export async function sendMessage(conversationId: string, senderId: string, rawC
     } catch (err) { console.error('Push notification failed:', err); }
   }
 
-  return message;
+  return withParsedAttachments(message);
 }
 
 export async function markAsRead(conversationId: string, userId: string, isAdmin: boolean) {

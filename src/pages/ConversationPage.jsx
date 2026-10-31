@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { Textarea } from 'flowbite-react';
-import { ChevronLeft, Send } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMessagesLayout.jsx';
+import MessageComposer from '../components/MessageComposer.jsx';
 import { getConversationParticipant } from '../utils/conversations.js';
 import { firstImage } from '../utils/images.js';
 
@@ -106,23 +106,24 @@ function ConversationPage() {
     };
   }, [conversationId, loadMessages]);
 
-  const canSend = draft.trim().length > 0 && !sending;
-
-  async function handleSend() {
-    const content = draft.trim();
-    if (!content || sending) return;
+  // Resolving true is what tells the composer the message was accepted; on a
+  // failed post it resolves false, so the typed text and staged files stay put.
+  const sendMessage = useCallback(async ({ text, attachments }) => {
     setSending(true);
     try {
-      const response = await apiClient.post(`/conversations/${conversationId}/messages`, { content });
+      const response = await apiClient.post(`/conversations/${conversationId}/messages`, { content: text, attachments });
       setMessages((current) => [...current, response.data.data]);
       setDraft('');
+      setError(null);
       requestAnimationFrame(scrollToBottom);
+      return true;
     } catch {
       setError('Could not send your message. Please try again.');
+      return false;
     } finally {
       setSending(false);
     }
-  }
+  }, [conversationId, scrollToBottom]);
 
   const participant = getConversationParticipant(conversation, user?.id);
   const property = conversation?.booking?.property || {};
@@ -154,34 +155,22 @@ function ConversationPage() {
       {loading ? <div className="opg-message-loading" aria-label="Loading messages"><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadMessages}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>No messages yet</strong><p>Say hello to {participant.name} and start planning the stay.</p></div> : messages.map((message) => {
         const isMine = message.senderId === user?.id;
         const senderName = [message.sender?.firstName, message.sender?.lastName].filter(Boolean).join(' ') || 'User';
-        return <GuestMessageBubble key={message.id} mine={isMine} meta={`${isMine ? 'You' : senderName} · ${formatMessageTime(message.createdAt)}`}>{message.content}</GuestMessageBubble>;
+        return <GuestMessageBubble key={message.id} mine={isMine} attachments={message.attachments} meta={`${isMine ? 'You' : senderName} · ${formatMessageTime(message.createdAt)}`}>{message.content}</GuestMessageBubble>;
       })}
       {error && messages.length > 0 && <p className="opg-message-inline-error">{error}</p>}
     </div>
 
+    {/* Kept as the pane's footer element so the existing spacing rules still
+        position the composer; the control itself is the shared MessageComposer. */}
     <div className="opg-message-composer">
-      <div className="opg-message-compose-surface">
-        <Textarea
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              handleSend();
-            }
-          }}
-          rows={1}
-          placeholder="Write a message..."
-          aria-label="Message"
-          className="opg-message-textarea"
-        />
-        <div className="opg-message-compose-actions">
-          <button className="opg-message-send" type="button" onClick={handleSend} disabled={!canSend} aria-label={sending ? 'Sending message' : 'Send message'}>
-            {sending ? <span className="opg-message-send-spinner" /> : <Send strokeWidth={1.8} aria-hidden="true" />}
-            <span>Send</span>
-          </button>
-        </div>
-      </div>
+      <MessageComposer
+        value={draft}
+        onChange={setDraft}
+        onSubmit={sendMessage}
+        placeholder={`Reply to ${participant.name}...`}
+        ariaLabel={`Message ${participant.name}`}
+        sending={sending}
+      />
     </div>
   </GuestMessagesLayout>;
 }

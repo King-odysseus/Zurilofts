@@ -60,7 +60,8 @@ export async function sendMessage(req: Request, res: Response, next: NextFunctio
     const message = await conversationService.sendMessage(
       req.params.id,
       req.user!.sub,
-      req.body.content
+      req.body.content,
+      req.body.attachments
     );
     res.status(201).json({ success: true, data: message });
   } catch (error) {

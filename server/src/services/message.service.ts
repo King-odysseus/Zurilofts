@@ -1,4 +1,12 @@
 import prisma from '../config/prisma.js';
+import { ValidationError } from '../types/index.js';
+import { normalizeAttachments, withParsedAttachments } from '../utils/messageAttachments.js';
+
+// A message needs text or a file. The text itself is optional so an
+// attachment-only message is allowed, but one of the two must be there.
+function readBody(raw: unknown): string {
+  return typeof raw === 'string' ? raw.trim() : '';
+}
 
 // ---- Customer side ----
 
@@ -12,7 +20,7 @@ export async function getUserThread(userId: string) {
     where: { userId, senderRole: 'ADMIN', readByUser: false },
     data: { readByUser: true },
   });
-  return messages;
+  return messages.map(withParsedAttachments);
 }
 
 /** Count of unread admin replies for the customer's nav badge. */
@@ -20,9 +28,17 @@ export async function getUserUnreadCount(userId: string) {
   return prisma.message.count({ where: { userId, senderRole: 'ADMIN', readByUser: false } });
 }
 
-export async function sendUserMessage(userId: string, body: string) {
+export async function sendUserMessage(userId: string, rawBody: unknown, rawAttachments: unknown) {
+  // Validate before the insert so a bad attachment list never leaves a partial
+  // message behind.
+  const attachments = normalizeAttachments(rawAttachments);
+  const body = readBody(rawBody);
+  if (!body && !attachments) {
+    throw new ValidationError('Message cannot be empty');
+  }
+
   const message = await prisma.message.create({
-    data: { userId, senderRole: 'USER', body, readByAdmin: false, readByUser: true },
+    data: { userId, senderRole: 'USER', body, attachments, readByAdmin: false, readByUser: true },
   });
 
   // Notify all admins of the new support message (best-effort)
@@ -36,7 +52,7 @@ export async function sendUserMessage(userId: string, body: string) {
     );
   } catch (err) { console.error('Push notification failed:', err); }
 
-  return message;
+  return withParsedAttachments(message);
 }
 
 // ---- Admin side ----
@@ -60,7 +76,9 @@ export async function listConversations() {
       firstName: u.firstName,
       lastName: u.lastName,
       email: u.email,
-      lastMessage: u.messages[0] || null,
+      // Parsed so the inbox can show "sent a file" without knowing the column
+      // holds JSON. content is left exactly as stored.
+      lastMessage: u.messages[0] ? withParsedAttachments(u.messages[0]) : null,
       unread: await prisma.message.count({
         where: { userId: u.id, senderRole: 'USER', readByAdmin: false },
       }),
@@ -90,12 +108,18 @@ export async function getAdminThread(userId: string) {
     where: { userId, senderRole: 'USER', readByAdmin: false },
     data: { readByAdmin: true },
   });
-  return messages;
+  return messages.map(withParsedAttachments);
 }
 
-export async function sendAdminMessage(userId: string, body: string) {
+export async function sendAdminMessage(userId: string, rawBody: unknown, rawAttachments: unknown) {
+  const attachments = normalizeAttachments(rawAttachments);
+  const body = readBody(rawBody);
+  if (!body && !attachments) {
+    throw new ValidationError('Message cannot be empty');
+  }
+
   const message = await prisma.message.create({
-    data: { userId, senderRole: 'ADMIN', body, readByAdmin: true, readByUser: false },
+    data: { userId, senderRole: 'ADMIN', body, attachments, readByAdmin: true, readByUser: false },
   });
 
   try {
@@ -103,5 +127,5 @@ export async function sendAdminMessage(userId: string, body: string) {
     sendPushToUser(userId, 'New Message from ZuriLofts', 'Support has replied to your message.', '/messages');
   } catch (err) { console.error('Push notification failed:', err); }
 
-  return message;
+  return withParsedAttachments(message);
 }

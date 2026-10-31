@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Textarea } from 'flowbite-react';
-import { ChevronLeft, MessageCircleMore, Send } from 'lucide-react';
+import { ChevronLeft, MessageCircleMore } from 'lucide-react';
 import apiClient from '../api/client.js';
 import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMessagesLayout.jsx';
+import MessageComposer from '../components/MessageComposer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 
 function formatMessageTime(iso) {
@@ -37,7 +37,9 @@ function MessagesPage() {
   const loadConversations = useCallback(async () => {
     setConversationsLoading(true);
     try {
-      const response = await apiClient.get('/conversations');
+      // Same guest-side list as /inbox: support lives beside the traveller's
+      // stay threads, never the host-side ones an account may also have.
+      const response = await apiClient.get('/conversations', { params: { side: 'guest' } });
       setConversations(response.data.data || []);
       setConversationsError(null);
     } catch {
@@ -70,23 +72,24 @@ function MessagesPage() {
     return () => clearInterval(interval);
   }, [loadThread]);
 
-  async function handleSend(event) {
-    event.preventDefault();
-    const text = body.trim();
-    if (!text || sending) return;
+  // Resolving true is what tells the composer the message was accepted; on a
+  // failed post it resolves false, so the typed text and staged files stay put.
+  const sendMessage = useCallback(async ({ text, attachments }) => {
     setSending(true);
     try {
-      const response = await apiClient.post('/messages', { body: text });
+      const response = await apiClient.post('/messages', { body: text, attachments });
       setMessages((current) => [...current, response.data.data]);
       setBody('');
       setError(null);
       requestAnimationFrame(scrollToBottom);
+      return true;
     } catch {
       setError('Could not send your support message. Please try again.');
+      return false;
     } finally {
       setSending(false);
     }
-  }
+  }, [scrollToBottom]);
 
   return <GuestMessagesLayout
     activeTab="support"
@@ -113,35 +116,23 @@ function MessagesPage() {
     <div className="opg-message-thread" ref={threadRef} aria-live="polite">
       {loading ? <div className="opg-message-loading" aria-label="Loading support messages"><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadThread}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>How can we help?</strong><p>Send the team a message about your booking or account.</p></div> : messages.map((message) => {
         const mine = message.senderRole === 'USER';
-        return <GuestMessageBubble key={message.id} mine={mine} meta={`${mine ? 'You' : 'ZuriLofts Support'} · ${formatMessageTime(message.createdAt)}`}>{message.body}</GuestMessageBubble>;
+        return <GuestMessageBubble key={message.id} mine={mine} attachments={message.attachments} meta={`${mine ? 'You' : 'ZuriLofts Support'} · ${formatMessageTime(message.createdAt)}`}>{message.body}</GuestMessageBubble>;
       })}
       {error && messages.length > 0 && <p className="opg-message-inline-error">{error}</p>}
     </div>
 
-    <form className="opg-message-composer" onSubmit={handleSend}>
-      <div className="opg-message-compose-surface">
-        <Textarea
-          value={body}
-          onChange={(event) => setBody(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              handleSend(event);
-            }
-          }}
-          rows={1}
-          placeholder="Write a message..."
-          aria-label="Message"
-          className="opg-message-textarea"
-        />
-        <div className="opg-message-compose-actions">
-          <button className="opg-message-send" type="submit" disabled={sending || !body.trim()} aria-label={sending ? 'Sending message' : 'Send message'}>
-            {sending ? <span className="opg-message-send-spinner" /> : <Send strokeWidth={1.8} aria-hidden="true" />}
-            <span>Send</span>
-          </button>
-        </div>
-      </div>
-    </form>
+    {/* Kept as the pane's footer element so the existing spacing rules still
+        position the composer; the control itself is the shared MessageComposer. */}
+    <div className="opg-message-composer">
+      <MessageComposer
+        value={body}
+        onChange={setBody}
+        onSubmit={sendMessage}
+        placeholder="Write a message"
+        ariaLabel="Message ZuriLofts Support"
+        sending={sending}
+      />
+    </div>
   </GuestMessagesLayout>;
 }
 

@@ -534,6 +534,10 @@ model Message {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   senderRole  String
+  // JSON array of { url, name, mimeType, size }, at most five. Null for every
+  // message sent before attachments existed, and for text-only messages:
+  // normalizeAttachments stores null instead of "[]" so "none" has one form.
+  attachments String?
   body        String
   readByAdmin Boolean  @default(false)
   readByUser  Boolean  @default(true)
@@ -694,6 +698,8 @@ model ConversationMessage {
   senderId       String
   sender         User         @relation(fields: [senderId], references: [id], onDelete: Cascade)
   content        String
+  // JSON array of { url, name, mimeType, size }, same shape as Message.attachments.
+  attachments    String?
   read           Boolean      @default(false)
   createdAt      DateTime     @default(now())
 

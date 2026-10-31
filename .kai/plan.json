@@ -2,21 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Show Today's mobile Arrivals / In house / Departures counts as badges beside the labels, in one row",
+      "text": "Read the attached image: Airbnb search results split view - scrolling card column on the left, map with price pins on the right, filter row above (Filters / Price / Type of place), search pill on top, open account menu",
+      "state": "done"
+    },
+    {
+      "text": "Check the current search results page and whether any map code or map library exists",
       "state": "active"
     },
     {
-      "text": "Check the new tab row on screen at phone width",
+      "text": "Decide map approach (library vs no new dependency) and confirm with user if a dependency is needed",
       "state": "pending"
     },
     {
-      "text": "Verify the earnings page shows the unsettled-booking notice instead of a bare zero",
+      "text": "Build the split view: scrolling card column, filter row, map panel with price pins",
       "state": "pending"
     },
     {
-      "text": "Run lint and build",
+      "text": "Compare the account dropdown with the image and fix any gaps",
+      "state": "pending"
+    },
+    {
+      "text": "Verify on screen at desktop and phone width, run lint and build",
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-31T16:46:27.498Z"
+  "updatedAt": "2026-10-31T17:03:03.250Z"
 }

@@ -23,7 +23,9 @@ export async function myUnreadCount(req: Request, res: Response, next: NextFunct
 
 export async function send(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const data = await messageService.sendUserMessage(req.user!.sub, req.body.body);
+    // body may be empty when files are attached; the service decides whether the
+    // pair is usable.
+    const data = await messageService.sendUserMessage(req.user!.sub, req.body.body, req.body.attachments);
     res.status(201).json({ success: true, data });
   } catch (error) {
     next(error);
@@ -53,7 +55,11 @@ export async function adminThread(req: Request, res: Response, next: NextFunctio
 
 export async function adminReply(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const data = await messageService.sendAdminMessage(req.params.userId, req.body.body);
+    const data = await messageService.sendAdminMessage(
+      req.params.userId,
+      req.body.body,
+      req.body.attachments
+    );
     res.status(201).json({ success: true, data });
   } catch (error) {
     next(error);
