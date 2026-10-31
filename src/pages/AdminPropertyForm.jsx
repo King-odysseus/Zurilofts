@@ -262,7 +262,7 @@ function AdminPropertyForm() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Editing an existing listing wears the same header as the arrival guide:
           "Your space" and "Arrival guide" are two halves of one listing, so the
           switch has to stay on screen. Without this the tab vanished the moment
@@ -310,9 +310,9 @@ function AdminPropertyForm() {
         <Alert color="failure" role="alert">{error}</Alert>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-8">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[230px_minmax(0,1fr)_300px] lg:items-start">
-          <aside className="space-y-2 rounded-xl border border-border bg-elevated p-5 shadow-sm lg:sticky lg:top-24">
+          <aside className="space-y-3 rounded-xl border border-border bg-elevated p-5 shadow-sm lg:sticky lg:top-24">
             <div>
               <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Listing progress</span>
               <strong className="mt-1 block text-sm font-semibold text-navy">{completedCount} of 4 steps complete</strong>
@@ -320,7 +320,7 @@ function AdminPropertyForm() {
                 <i className="block h-full rounded-full bg-primary" style={{ width: `${(completedCount / EDITOR_STEPS.length) * 100}%` }} />
               </div>
             </div>
-            <nav className="space-y-2 pt-2" aria-label="Listing setup steps">
+            <nav className="space-y-2 pt-3" aria-label="Listing setup steps">
               {EDITOR_STEPS.map((step, index) => {
                 const item = completionItems.find((entry) => entry.key === step.key);
                 const active = activeStep === step.key;
@@ -346,10 +346,10 @@ function AdminPropertyForm() {
             <p className="border-t border-border pt-3 text-xs text-muted">Your progress is saved when you submit this listing.</p>
           </aside>
 
-          <div className="space-y-5">
+          <div className="space-y-6">
             <section id="host-editor-basics" className={`${CARD_CLASS} scroll-mt-24`}>
               <SectionHeader step="1" title="Listing basics" description="Tell guests what makes your stay special." />
-              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="listing-title">Listing title</Label>
                   <TextInput id="listing-title" value={form.title} onChange={(e) => update('title', e.target.value)} placeholder="Bright two-bedroom loft" required />
@@ -384,7 +384,7 @@ function AdminPropertyForm() {
             <section id="host-editor-photos" className={`${CARD_CLASS} scroll-mt-24`}>
               <SectionHeader step="2" title="Photos" description="Add clear, well-lit images. The first photo becomes the cover." />
               {form.images.length > 0 && (
-                <div className="mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                   {form.images.map((src, i) => (
                     <div key={src + i} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
                       <img src={src} alt={`Property photo ${i + 1}`} className="h-full w-full object-cover" />
@@ -420,7 +420,7 @@ function AdminPropertyForm() {
 
             <section id="host-editor-amenities" className={`${CARD_CLASS} scroll-mt-24`}>
               <SectionHeader step="3" title="Amenities and rules" description="List the essentials and useful places around the stay." />
-              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="listing-amenities">Amenities</Label>
                   <Textarea id="listing-amenities" rows={5} placeholder={'WiFi\nPool\nParking'} value={form.amenities} onChange={(e) => update('amenities', e.target.value)} />
@@ -436,7 +436,7 @@ function AdminPropertyForm() {
 
             <section id="host-editor-pricing" className={`${CARD_CLASS} scroll-mt-24`}>
               <SectionHeader step="4" title="Pricing and availability" description="Set the nightly rate, capacity and booking state." />
-              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
                   <Label htmlFor="listing-price">Base price / night (KES)</Label>
                   <TextInput id="listing-price" type="number" min="1" value={form.price} onChange={(e) => update('price', e.target.value)} required />
@@ -460,7 +460,7 @@ function AdminPropertyForm() {
                   <h3 className="text-sm font-semibold text-navy">Bed size options</h3>
                   <p className="mt-1 text-xs text-muted">Add a one-bed or two-bed rate when the same stay can be booked at different capacities.</p>
                 </div>
-                <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div className={`flex items-start gap-3 rounded-lg border p-3 ${form.price1Bed !== '' ? 'border-primary bg-primary-50 dark:bg-primary/15' : 'border-border bg-elevated'}`}>
                     <Checkbox
                       id="listing-variant-1"
@@ -474,7 +474,7 @@ function AdminPropertyForm() {
                       <Label htmlFor="listing-variant-1">List as 1-bed</Label>
                       <span className="block text-xs text-muted">Appears as a separate one-bedroom option.</span>
                       {form.price1Bed !== '' && (
-                        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                           <TextInput type="number" min="1" placeholder="Price per night" value={form.price1Bed} onChange={(e) => update('price1Bed', e.target.value)} required />
                           <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms1Bed} onChange={(e) => update('bathrooms1Bed', e.target.value)} />
                         </div>
@@ -494,7 +494,7 @@ function AdminPropertyForm() {
                       <Label htmlFor="listing-variant-2">List as 2-bed</Label>
                       <span className="block text-xs text-muted">Appears as a separate two-bedroom option.</span>
                       {form.price2Bed !== '' && (
-                        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                           <TextInput type="number" min="1" placeholder="Price per night" value={form.price2Bed} onChange={(e) => update('price2Bed', e.target.value)} required />
                           <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms2Bed} onChange={(e) => update('bathrooms2Bed', e.target.value)} />
                         </div>
@@ -504,12 +504,12 @@ function AdminPropertyForm() {
                 </div>
               </div>
 
-              <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="listing-type">Property type</Label>
                   <SelectMenu id="listing-type" ariaLabel="Property type" value={form.type} onChange={(next) => update('type', next)} options={PROPERTY_TYPE_OPTIONS} />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
                     <div>
                       <strong className="block text-sm font-semibold text-navy">Available for bookings</strong>
@@ -544,7 +544,7 @@ function AdminPropertyForm() {
           </aside>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <Button type="submit" disabled={saving}>
             {saving ? 'Saving...' : isEdit ? 'Save changes' : 'Create listing'}
           </Button>
@@ -750,7 +750,7 @@ function FullPagePreview({ form, onClose }) {
               {nearby.length > 0 && (
                 <div>
                   <h2 className="mb-3 text-xl font-bold text-navy">What&apos;s nearby</h2>
-                  <ul className="space-y-2">
+                  <ul className="space-y-3">
                     {nearby.map((n, i) => (
                       <li key={i} className="flex items-center text-charcoal">
                         <MapPin className="mr-2 h-5 w-5 text-primary-600" strokeWidth={2} aria-hidden="true" />
@@ -845,12 +845,12 @@ function SeasonalPricing({ propertyId }) {
       <h2 className="text-base font-semibold text-navy">Seasonal Pricing</h2>
       <p className="mt-1 text-xs text-muted">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
 
-      {error && <Alert color="failure" className="mt-4">{error}</Alert>}
+      {error && <Alert color="failure" className="mt-5">{error}</Alert>}
 
       {loading ? (
-        <p className="mt-4 text-sm text-muted">Loading...</p>
+        <p className="mt-5 text-sm text-muted">Loading...</p>
       ) : rules.length > 0 ? (
-        <div className="mt-4 space-y-2">
+        <div className="mt-5 space-y-3">
           {rules.map((r) => (
             <div key={r.id} className="flex items-center justify-between rounded-lg bg-surface px-4 py-2.5 text-sm">
               <div>
@@ -865,10 +865,10 @@ function SeasonalPricing({ propertyId }) {
           ))}
         </div>
       ) : (
-        <p className="mt-4 text-sm text-muted">No seasonal rates yet.</p>
+        <p className="mt-5 text-sm text-muted">No seasonal rates yet.</p>
       )}
 
-      <div className="mt-4 grid grid-cols-1 items-end gap-3 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="mt-5 grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div className="sm:col-span-2 lg:col-span-1">
           <Label htmlFor="seasonal-name">Name</Label>
           <TextInput id="seasonal-name" placeholder="Peak" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />

@@ -68,6 +68,9 @@ StatusPill.propTypes = {
   status: PropTypes.string.isRequired,
 };
 
+// The account-travel rules in styles.css are emitted after Tailwind's utility
+// layer and pin their own margins and gaps, so a plain spacing utility loses to
+// them. The ! prefix on the spacing utilities below is what makes them apply.
 function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
   const property = booking.property || {};
   const nights = getNights(booking.checkIn, booking.checkOut);
@@ -77,14 +80,14 @@ function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
       <img src={getBookingImage(booking, index)} alt="" />
     </Link>
     <div className="opg-trip-feature-copy">
-      <div className="opg-trip-meta">
+      <div className="opg-trip-meta !mb-4">
         <StatusPill status={booking.status} />
         <time dateTime={booking.checkIn}>{formatDateRange(booking.checkIn, booking.checkOut)}</time>
       </div>
       <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || 'Your upcoming stay'}</Link></h2>
       <p className="opg-trip-subtitle">{[property.location || 'Nairobi', `${booking.guests || 1} guest${booking.guests === 1 ? '' : 's'}`, `${nights} night${nights === 1 ? '' : 's'}`].join(' / ')}</p>
       {booking.total != null && <p className="opg-trip-price"><strong>KES {Number(booking.total).toLocaleString()}</strong> total</p>}
-      <div className="opg-trip-actions">
+      <div className="opg-trip-actions !mt-6">
         <Button as={Link} to={`/bookings/${booking.id}`} size="sm">View check-in details</Button>
         <Button color="light" size="sm" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</Button>
         <Button as="a" href={getMapUrl(property)} target="_blank" rel="noreferrer" color="light" size="sm">Directions</Button>
@@ -102,16 +105,18 @@ UpcomingTripCard.propTypes = {
   messagePending: PropTypes.bool.isRequired,
 };
 
+// Row height rises from 12px to 16px vertical padding so the two lines in each
+// row stop touching the row edge; the list gap above keeps the rows apart.
 function TripRow({ booking, index, isPast }) {
   const property = booking.property || {};
   const reviewed = Boolean(booking.review?.id);
   const status = STATUS_META[booking.status]?.label || booking.status;
 
-  return <article className="opg-trip-row">
+  return <article className="opg-trip-row !py-4">
     <img src={getBookingImage(booking, index + 1)} alt="" />
     <div className="opg-trip-row-copy">
       <strong>{property.title || 'Your stay'}</strong>
-      <span>{formatDateRange(booking.checkIn, booking.checkOut)} / {status}</span>
+      <span className="!mt-2.5">{formatDateRange(booking.checkIn, booking.checkOut)} / {status}</span>
     </div>
     {/* The grid has three columns, so the row actions share one cell; two
         separate buttons would wrap into a squeezed implicit row. */}
@@ -132,7 +137,7 @@ TripRow.propTypes = {
 
 function EmptyTrips({ isPast }) {
   return <div className="opg-trip-empty">
-    <CalendarDays strokeWidth={1.6} aria-hidden="true" />
+    <CalendarDays strokeWidth={1.6} aria-hidden="true" className="!mb-5" />
     <h2>{isPast ? 'No past trips' : 'No upcoming trips'}</h2>
     <p>{isPast ? 'Completed stays will appear here with review and rebooking options.' : 'When you book a stay, your check-in details and host messages will appear here.'}</p>
     {!isPast && <Button as={Link} to="/properties" size="sm">Browse stays</Button>}
@@ -212,7 +217,7 @@ function TripHubPage() {
       <button type="button" role="tab" aria-selected={activeTab === 'past'} onClick={() => setActiveTab('past')}>Past{past.length > 0 && <span>{past.length}</span>}</button>
     </div>
 
-    {loading ? <div className="opg-trip-loading" aria-label="Loading trips"><span /><span /><span /></div> : error ? <div className="opg-trip-error"><p>{error}</p><Button className="mx-auto w-fit" size="sm" type="button" onClick={() => window.location.reload()}>Try again</Button></div> : displayed.length === 0 ? <EmptyTrips isPast={activeTab === 'past'} /> : <div className="opg-trips-list">
+    {loading ? <div className="opg-trip-loading" aria-label="Loading trips"><span /><span /><span /></div> : error ? <div className="opg-trip-error"><p>{error}</p><Button className="mx-auto w-fit" size="sm" type="button" onClick={() => window.location.reload()}>Try again</Button></div> : displayed.length === 0 ? <EmptyTrips isPast={activeTab === 'past'} /> : <div className="opg-trips-list !mt-6 !gap-6">
       {featured && <UpcomingTripCard booking={featured} index={0} onMessage={openConversation} messagePending={messageBookingId === featured.id} />}
       {rows.map((booking, index) => <TripRow key={booking.id} booking={booking} index={index} isPast={activeTab === 'past'} />)}
     </div>}

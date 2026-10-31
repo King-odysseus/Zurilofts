@@ -38,7 +38,7 @@ function GuidesPage() {
   return (
     <main className="op-guides-page">
       <header className="op-guides-hero">
-        <div className="op-content-container">
+        <div className="op-content-container space-y-4">
           <nav className="op-breadcrumbs" aria-label="Breadcrumb">
             <Link to="/">Home</Link>
             <span>/</span>
@@ -53,7 +53,7 @@ function GuidesPage() {
       <section className="op-guides-content">
         <div className="op-content-container">
           {posts.length === 0 ? (
-            <div className="op-guides-empty">
+            <div className="op-guides-empty space-y-5">
               <div className="op-guides-empty-icon">
                 <BookOpen strokeWidth={2} aria-hidden="true" />
               </div>
@@ -72,7 +72,7 @@ function GuidesPage() {
                     <img src={post.coverImage || guideImages[index % guideImages.length]} alt="" loading="lazy" />
                     <span>City guide</span>
                   </div>
-                  <div className="op-guide-card-copy">
+                  <div className="op-guide-card-copy gap-2">
                     <p className="op-guide-date">
                       {new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>

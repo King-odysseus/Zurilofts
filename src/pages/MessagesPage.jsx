@@ -113,7 +113,11 @@ function MessagesPage() {
       </div>
     </header>
 
-    <div className="opg-message-thread" ref={threadRef} aria-live="polite">
+    {/* The pane header sits straight above the first bubble, so the thread's own
+        top padding is the only gap between them. The ! prefix is needed because
+        the thread rule in styles.css ships after Tailwind's utilities and pins
+        its padding. */}
+    <div className="opg-message-thread !pt-6" ref={threadRef} aria-live="polite">
       {loading ? <div className="opg-message-loading" aria-label="Loading support messages"><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadThread}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>How can we help?</strong><p>Send the team a message about your booking or account.</p></div> : messages.map((message) => {
         const mine = message.senderRole === 'USER';
         return <GuestMessageBubble key={message.id} mine={mine} attachments={message.attachments} meta={`${mine ? 'You' : 'ZuriLofts Support'} · ${formatMessageTime(message.createdAt)}`}>{message.body}</GuestMessageBubble>;

@@ -215,8 +215,8 @@ function AdminAddOns() {
   }, [visibleAddOns, assignments]);
 
   return (
-    <div className="space-y-6" data-openpencil-frame="0:7343">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-8" data-openpencil-frame="0:7343">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · CONTENT</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Add-ons</h1>
@@ -225,7 +225,7 @@ function AdminAddOns() {
         <Button onClick={openCreate}>Create add-on</Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">ACTIVE SERVICES</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.active}</strong>
@@ -249,7 +249,7 @@ function AdminAddOns() {
       </div>
 
       <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-sm">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
             <TextInput className="pl-9" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search service, category or description" aria-label="Search add-ons" />
@@ -257,7 +257,7 @@ function AdminAddOns() {
           <span className="shrink-0 self-start rounded-full bg-surface px-2.5 py-1 text-[11px] font-semibold text-muted sm:self-auto">{visibleAddOns.length} service{visibleAddOns.length === 1 ? '' : 's'}</span>
         </div>
 
-        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="mx-5 mt-4" role="status">{message}</Alert>}
+        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="mx-5 mt-5" role="status">{message}</Alert>}
 
         {loading ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
@@ -338,11 +338,11 @@ function AdminAddOns() {
               <span className="block">{editingId ? 'Edit add-on' : 'Create add-on'}</span>
             </ModalHeader>
             <ModalBody>
-              {formError && <Alert color="failure" className="mb-4">{formError}</Alert>}
-              <form onSubmit={handleSubmit} className="space-y-4">
+              {formError && <Alert color="failure" className="mb-5">{formError}</Alert>}
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div><Label htmlFor="addon-name">Service name</Label><TextInput id="addon-name" value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Airport pickup" required /></div>
                 <div><Label htmlFor="addon-description">Description</Label><Textarea id="addon-description" rows={3} value={formData.description} onChange={(event) => setFormData({ ...formData, description: event.target.value })} placeholder="Describe what guests receive and when." required /></div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div><Label htmlFor="addon-price">Price (KES)</Label><TextInput id="addon-price" type="number" min="1" value={formData.price} onChange={(event) => setFormData({ ...formData, price: event.target.value })} required /></div>
                   <div><Label htmlFor="addon-category">Category</Label><SelectMenu id="addon-category" ariaLabel="Category" value={formData.category} onChange={(next) => setFormData({ ...formData, category: next })} options={CATEGORIES.map((category) => ({ value: category, label: CATEGORY_LABELS[category] }))} /></div>
                 </div>
@@ -350,7 +350,7 @@ function AdminAddOns() {
                 <div className="rounded-lg border border-border bg-surface p-3"><ToggleSwitch checked={formData.active} label="Available to guests" onChange={(event) => setFormData({ ...formData, active: event.target.checked })} /></div>
 
                 {editingId && (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <div className="flex items-start justify-between gap-3"><div><Label>Assigned properties</Label><p className="mt-1 text-xs text-muted">Choose which stays may offer this service.</p></div></div>
                     <div className="max-h-44 overflow-y-auto rounded-lg border border-border bg-elevated p-2">
                       {properties.length === 0 ? <p className="p-2 text-xs text-muted">No properties are available.</p> : properties.map((property) => {

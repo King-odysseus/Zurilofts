@@ -125,7 +125,9 @@ export default function SharedShortlistPage() {
                 </div>
               </div>
             ) : (
-              <section className="opg-shortlist-rows" aria-label={`${shortlist.name} stays`}>
+              /* The row list gaps its rows by 12px in the stylesheet; space-y-3 tops that
+                 up to 24px so the bordered rows are not welded together. */
+              <section className="opg-shortlist-rows space-y-3" aria-label={`${shortlist.name} stays`}>
                 {shortlist.items.map((item) => <SharedShortlistRow key={item.id} item={item} />)}
               </section>
             )}

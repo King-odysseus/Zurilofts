@@ -116,7 +116,7 @@ function UnsettledNotice({ unsettled }) {
   const count = unsettled.bookings;
   const singular = count === 1;
   return (
-    <div className="mb-4 flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+    <div className="mb-6 flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3">
       <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-300" strokeWidth={1.9} aria-hidden="true" />
       <p className="min-w-0 text-sm leading-relaxed text-charcoal">
         <strong className="font-semibold text-navy">
@@ -206,7 +206,7 @@ function PaneHeading({ title, description, children }) {
     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
         <h2 className="text-2xl font-bold tracking-tight text-navy">{title}</h2>
-        {description && <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{description}</p>}
+        {description && <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{description}</p>}
       </div>
       {children}
     </div>
@@ -455,7 +455,7 @@ export default function HostEarningsPage() {
       <div className="min-w-0 lg:pl-8">
         {error && (
           <HostCard
-            className="mb-4 border-dashed"
+            className="mb-6 border-dashed"
             eyebrow="Earnings unavailable"
             title="We could not load this period"
             description="Your figures are unchanged. Retry the request or pick another period."
@@ -468,14 +468,14 @@ export default function HostEarningsPage() {
         )}
 
         {loading ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Loading earnings" aria-busy="true">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3" aria-label="Loading earnings" aria-busy="true">
             {[0, 1, 2].map((key) => <HostCard key={key} className="h-24 animate-pulse" />)}
           </div>
         ) : !error && (
           <>
             <UnsettledNotice unsettled={unsettled} />
             {section === 'performance' && (
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-8">
                 <PaneHeading
                   title="Performance"
                   description="What you have earned each period, split between money confirmed and money still pending."
@@ -537,10 +537,10 @@ export default function HostEarningsPage() {
                       <tbody className="divide-y divide-border">
                         {buckets.map((bucket) => (
                           <tr key={bucket.key} className={bucket.key === activeBucket?.key ? 'bg-surface' : undefined}>
-                            <th scope="row" className="px-4 py-3 text-left font-semibold text-navy">{bucket.dateLabel}</th>
-                            <td className="px-4 py-3 text-right tabular-nums text-charcoal">{formatMoney(bucket.paid)}</td>
-                            <td className="px-4 py-3 text-right tabular-nums text-charcoal">{formatMoney(bucket.upcoming)}</td>
-                            <td className="px-4 py-3 text-right font-semibold tabular-nums text-navy">{formatMoney(bucket.total)}</td>
+                            <th scope="row" className="px-4 py-4 text-left font-semibold text-navy">{bucket.dateLabel}</th>
+                            <td className="px-4 py-4 text-right tabular-nums text-charcoal">{formatMoney(bucket.paid)}</td>
+                            <td className="px-4 py-4 text-right tabular-nums text-charcoal">{formatMoney(bucket.upcoming)}</td>
+                            <td className="px-4 py-4 text-right font-semibold tabular-nums text-navy">{formatMoney(bucket.total)}</td>
                           </tr>
                         ))}
                         {buckets.length === 0 && (
@@ -566,7 +566,7 @@ export default function HostEarningsPage() {
             )}
 
             {section === 'upcoming' && (
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-8">
                 <PaneHeading
                   title="Upcoming"
                   description="Money from stays that are booked but not yet recorded as earned."
@@ -584,7 +584,7 @@ export default function HostEarningsPage() {
             )}
 
             {section === 'paid' && (
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-8">
                 <PaneHeading
                   title="Paid"
                   description="Confirmed earnings, property by property, all of which count towards your payouts."
@@ -602,7 +602,7 @@ export default function HostEarningsPage() {
             )}
 
             {section === 'reports' && (
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-8">
                 <PaneHeading
                   title="Reports"
                   description="Download the figures for a period, or check what was withheld."
@@ -618,12 +618,12 @@ export default function HostEarningsPage() {
                   />
                 </PaneHeading>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <HostCard>
                     <div>
                       <p className={HOST_EYEBROW}>Earnings report</p>
-                      <strong className="mt-1 block text-xl font-bold leading-tight tabular-nums text-navy lg:text-2xl">{formatMoney(totals.hostNet)}</strong>
-                      <p className="mt-1 text-xs leading-relaxed text-muted">
+                      <strong className="mt-1.5 block text-xl font-bold leading-tight tabular-nums text-navy lg:text-2xl">{formatMoney(totals.hostNet)}</strong>
+                      <p className="mt-2 text-xs leading-relaxed text-muted">
                         Net earnings, gross rent, WHT, and property totals for {rangeLabel.toLowerCase()}.
                       </p>
                     </div>
@@ -636,8 +636,8 @@ export default function HostEarningsPage() {
                   <HostCard>
                     <div>
                       <p className={HOST_EYEBROW}>WHT certificate</p>
-                      <strong className="mt-1 block text-xl font-bold leading-tight tabular-nums text-navy lg:text-2xl">{formatMoney(totals.wht)}</strong>
-                      <p className="mt-1 text-xs leading-relaxed text-muted">
+                      <strong className="mt-1.5 block text-xl font-bold leading-tight tabular-nums text-navy lg:text-2xl">{formatMoney(totals.wht)}</strong>
+                      <p className="mt-2 text-xs leading-relaxed text-muted">
                         Withholding tax held from this period. Monthly statements live in the payout workspace.
                       </p>
                     </div>
@@ -653,7 +653,7 @@ export default function HostEarningsPage() {
                 >
                   <dl className="divide-y divide-border">
                     {incomeBreakdown.map((item) => (
-                      <div key={item.label} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-3 sm:px-5">
+                      <div key={item.label} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-4 sm:px-5">
                         <dt className="min-w-0 flex-1">
                           <span className="block text-sm font-medium text-navy">{item.label}</span>
                           <span className="block text-xs leading-relaxed text-muted">{item.note}</span>
@@ -669,8 +669,8 @@ export default function HostEarningsPage() {
                 <HostCard title="Payouts" description="Where the available balance is sent.">
                   <div className="rounded-xl bg-surface px-4 py-3">
                     <span className={HOST_EYEBROW}>Destination</span>
-                    <strong className="mt-1 block truncate text-sm font-semibold text-navy">{destination?.label || 'Not configured'}</strong>
-                    <small className="mt-1 block text-xs leading-relaxed text-muted">{destination?.maskedAccount || 'Add a payout destination in settings'}</small>
+                    <strong className="mt-1.5 block truncate text-sm font-semibold text-navy">{destination?.label || 'Not configured'}</strong>
+                    <small className="mt-2 block text-xs leading-relaxed text-muted">{destination?.maskedAccount || 'Add a payout destination in settings'}</small>
                   </div>
                   {wallet?.nextPayoutAt && (
                     <p className="text-sm text-muted">

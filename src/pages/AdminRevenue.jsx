@@ -202,8 +202,8 @@ function AdminRevenue() {
   const hasRange = Boolean(range.from || range.to);
 
   return (
-    <div className="space-y-6" data-openpencil-frame="0:7343">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-8" data-openpencil-frame="0:7343">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS / ADMIN / PLATFORM</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Revenue</h1>
@@ -213,7 +213,7 @@ function AdminRevenue() {
           </p>
         </div>
 
-        <form className="flex flex-wrap items-end gap-3" onSubmit={applyRange}>
+        <form className="flex flex-wrap items-end gap-5" onSubmit={applyRange}>
           <div className="flex flex-col gap-1">
             <label htmlFor="revenue-from" className="text-[11px] font-semibold uppercase tracking-wide text-muted">FROM</label>
             <TextInput
@@ -260,7 +260,7 @@ function AdminRevenue() {
         <>
           {error && <Alert color="failure" role="alert">{error}</Alert>}
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             <MetricCard
               label="PLATFORM REVENUE"
               value={money(totals.platformRevenue)}

@@ -427,7 +427,7 @@ function HostApplicationPage() {
       <header>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Host setup</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Get your space ready to host</h1>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Complete your identity, property details and review before you publish.</p>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Complete your identity, property details and review before you publish.</p>
       </header>
 
       <section className="grid grid-cols-1 gap-3 sm:grid-cols-3" aria-label="Application summary">
@@ -566,13 +566,13 @@ function HostApplicationPage() {
                       { value: 'mpesa', label: 'M-PESA' },
                       { value: 'bank', label: 'Bank transfer' },
                     ]} />
-                    <p className="mt-1 text-xs text-muted">Earnings are paid out by Paystack to the account below. M-PESA goes straight to your phone number; bank transfer goes to your account number using your bank code.</p>
+                    <p className="mt-2 text-xs text-muted">Earnings are paid out by Paystack to the account below. M-PESA goes straight to your phone number; bank transfer goes to your account number using your bank code.</p>
                   </div>
                   {form.preferredPayoutMethod === 'mpesa' ? (
                     <div>
                       <Label htmlFor="host-payout-mpesa">M-PESA number for payouts</Label>
                       <TextInput id="host-payout-mpesa" type="tel" value={form.payoutMpesaPhone} onChange={(e) => update('payoutMpesaPhone', e.target.value)} placeholder="0712345678" required />
-                      <p className="mt-1 text-xs text-muted">Use the Safaricom number registered in your own name, for example 0712345678 or 254712345678.</p>
+                      <p className="mt-2 text-xs text-muted">Use the Safaricom number registered in your own name, for example 0712345678 or 254712345678.</p>
                     </div>
                   ) : banks.length > 0 ? (
                     <div>
@@ -593,7 +593,7 @@ function HostApplicationPage() {
                         <Label htmlFor="host-payout-bank-code">Bank code</Label>
                         <TextInput id="host-payout-bank-code" value={form.payoutBankCode} onChange={(e) => update('payoutBankCode', e.target.value)} placeholder="068" required />
                       </div>
-                      <p className="mt-1 text-xs text-muted">Enter the Paystack bank code, for example 068 for Equity Bank. We could not load the bank list automatically.</p>
+                      <p className="mt-2 text-xs text-muted">Enter the Paystack bank code, for example 068 for Equity Bank. We could not load the bank list automatically.</p>
                     </div>
                   )}
                   {form.preferredPayoutMethod === 'bank' && (
@@ -744,7 +744,7 @@ function HostApplicationPage() {
           ) : !application && user.role !== 'HOST' ? (
             <section className="rounded-xl border border-border bg-elevated p-6 shadow-sm sm:p-8">
               <h2 className="text-xl font-bold tracking-tight text-navy sm:text-2xl">Start your host application</h2>
-              <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Open your application to add your identity, business and property details.</p>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Open your application to add your identity, business and property details.</p>
               <div className="mt-5">
                 <Button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
                   {error ? 'Retry application' : 'Start application'}
@@ -966,7 +966,7 @@ function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravel
     <section className="rounded-xl border border-border bg-elevated p-6 shadow-sm sm:p-8">
       <Badge color={statusColor}>{statusLabel}</Badge>
       <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{approved ? 'You are ready to host' : 'Application status'}</h2>
-      <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{statusMeta}</p>
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{statusMeta}</p>
       {application?.reviewNote && (
         <div className="mt-5 rounded-lg bg-surface p-4">
           <strong className="block text-sm font-semibold text-navy">Reviewer note</strong>

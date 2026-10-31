@@ -19,7 +19,7 @@ const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 
 // The column gutter is 0 on phones: a 7 column grid inside the 360px date sheet
 // only clears a 44px touch target with no gutter, and from sm up there is room
 // for one, so the tint band and gutters both scale with the space available.
-const CALENDAR_GRID = 'grid grid-cols-7 gap-x-0 gap-y-1 sm:gap-x-1';
+const CALENDAR_GRID = 'grid grid-cols-7 gap-x-0 gap-y-1.5 sm:gap-x-1';
 
 // Flowbite's Button carries its own palette and padding, so the geometry that
 // must not lose (44px square, quiet navy icon) is forced here instead of being
@@ -145,7 +145,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
       <div className="min-w-0 flex-1">
         {/* Arrows live inside their own month's header row - one at each end of
             the month name - so it is obvious which month they move. */}
-        <div className="mb-1 flex items-center gap-1">
+        <div className="mb-4 flex items-center gap-1">
           <Button
             type="button"
             color="light"
@@ -172,7 +172,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
 
         {/* Hidden from assistive tech: each day button already announces its own
             weekday, so repeating the header row would only add noise. */}
-        <div className={`${CALENDAR_GRID} mb-1`} aria-hidden="true">
+        <div className={`${CALENDAR_GRID} mb-4`} aria-hidden="true">
           {WEEKDAYS.map((w) => (
             <div
               key={w}
@@ -239,14 +239,14 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
   return (
     <div className="w-full rounded-2xl border border-border bg-elevated p-2 shadow-sm sm:p-4">
       {/* One month on phones (cells stay tappable), the pair from md up. */}
-      <div className="flex flex-col gap-4 md:flex-row md:gap-5">
+      <div className="flex flex-col gap-6 md:flex-row md:gap-8">
         {renderMonth(viewMonth)}
         <div className="hidden min-w-0 flex-1 border-border md:block md:border-l md:pl-5">
           {renderMonth(nextMonth)}
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border pt-3 text-xs text-muted">
+      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-border pt-4 text-xs text-muted">
         <span className="flex items-center gap-1.5">
           <span aria-hidden="true" className="inline-block h-3 w-3 rounded-[4px] bg-navy-bg" />
           Selected

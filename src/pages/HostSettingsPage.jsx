@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Alert, Button, Label, Select, TextInput } from 'flowbite-react';
+import { Alert, Button, Label, TextInput } from 'flowbite-react';
 import { BadgeCheck, Banknote, CircleAlert, Smartphone } from 'lucide-react';
 import apiClient from '../api/client.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import SelectMenu from '../components/SelectMenu.jsx';
 
 // Host settings, inside the host workspace. Payouts and profile links used to
 // send a host to /profile, which is the traveller account page and reads as the
@@ -27,7 +28,7 @@ function Section({ title, description, children, icon: Icon }) {
       ? <span className="grid h-9 w-9 place-items-center rounded-full bg-surface text-muted"><Icon className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" /></span>
       : undefined}
   >
-    <div className="flex flex-col gap-4">{children}</div>
+    <div className="flex flex-col gap-6">{children}</div>
   </HostCard>;
 }
 
@@ -173,7 +174,7 @@ export default function HostSettingsPage() {
   }
 
   if (loading) {
-    return <div className="flex flex-col gap-3" role="status" aria-label="Loading host settings">
+    return <div className="flex flex-col gap-4" role="status" aria-label="Loading host settings">
       <span className="block h-24 animate-pulse rounded-2xl bg-inset" />
       <span className="block h-40 animate-pulse rounded-2xl bg-inset" />
       <span className="block h-28 animate-pulse rounded-2xl bg-inset" />
@@ -195,11 +196,11 @@ export default function HostSettingsPage() {
   const displayName = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') || 'Host';
   const hasDestination = Boolean(profile?.payoutMethod || profile?.mpesaPhone || profile?.bankAccountNo);
 
-  return <div className="flex flex-col gap-4">
+  return <div className="flex flex-col gap-6 lg:gap-8">
     <header>
       <p className={HOST_EYEBROW}>Host workspace</p>
       <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Host settings</h1>
-      <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Your host profile, how you get paid, and when funds reach you.</p>
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Your host profile, how you get paid, and when funds reach you.</p>
     </header>
 
     <HostCard>
@@ -225,10 +226,10 @@ export default function HostSettingsPage() {
       description="The name guests see when they book, and the number we use to reach you about a stay."
       icon={BadgeCheck}
     >
-      {/* One rhythm for every group: label above field, gap-4 between groups,
+      {/* One rhythm for every group: label above field, gap-6 between groups,
           one full-width action at the end of the form. */}
-      <form onSubmit={saveProfile} className="flex flex-col gap-4">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <form onSubmit={saveProfile} className="flex flex-col gap-6">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <Label htmlFor="host-first-name" className="mb-1.5 block">First name</Label>
             <TextInput
@@ -262,7 +263,7 @@ export default function HostSettingsPage() {
           <TextInput id="host-email" value={profile?.email || ''} readOnly disabled />
           <p className="mt-1.5 text-xs text-muted">Email changes go through support so your booking history stays attached.</p>
         </div>
-        <div className="flex flex-col gap-1 border-t border-border pt-4">
+        <div className="flex flex-col gap-1 border-t border-border pt-6">
           <Button type="submit" disabled={savingProfile} className="min-h-[44px] w-full sm:w-fit">{savingProfile ? 'Saving...' : 'Save details'}</Button>
           <Message>{profileMessage}</Message>
           <Message tone="error">{profileError}</Message>
@@ -275,7 +276,7 @@ export default function HostSettingsPage() {
       description={hasDestination ? 'Guests pay the platform; your share is paid out to this destination.' : 'Add a destination so your earnings can be paid out.'}
       icon={Banknote}
     >
-      <form onSubmit={savePayout} className="flex flex-col gap-4">
+      <form onSubmit={savePayout} className="flex flex-col gap-6">
         <div className="flex flex-wrap gap-2" role="group" aria-label="Payout destination type">
           {[
             { key: 'mpesa', label: 'M-PESA', icon: Smartphone },
@@ -301,24 +302,31 @@ export default function HostSettingsPage() {
             placeholder="07xx xxx xxx"
           />
           <p className="mt-1.5 text-xs text-muted">Use the Safaricom number registered in your name.</p>
-        </div> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        </div> : <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
             <Label htmlFor="host-bank-name" className="mb-1.5 block">Bank</Label>
-            {banks.length > 0 ? <Select
+            {/* SelectMenu, not Flowbite's Select: a native <select> opens the
+                operating system's blue option list, which ignores the palette.
+                Codes are compared as strings so Paystack codes that start with a
+                zero ("011") survive the trip. */}
+            {banks.length > 0 ? <SelectMenu
               id="host-bank-name"
               value={bankForm.bankCode}
-              onChange={(event) => {
-                const bank = banks.find((entry) => String(entry.code) === event.target.value);
+              onChange={(next) => {
+                const bank = banks.find((entry) => String(entry.code) === next);
                 setBankForm((previous) => ({
                   ...previous,
-                  bankCode: event.target.value,
+                  bankCode: next,
                   bankName: bank?.name || previous.bankName,
                 }));
               }}
-            >
-              <option value="">Choose your bank</option>
-              {banks.map((bank) => <option key={bank.code} value={bank.code}>{bank.name}</option>)}
-            </Select> : <TextInput
+              options={[
+                { value: '', label: 'Choose your bank' },
+                ...banks.map((bank) => ({ value: String(bank.code), label: bank.name })),
+              ]}
+              ariaLabel="Bank"
+              placeholder="Choose your bank"
+            /> : <TextInput
               id="host-bank-name"
               value={bankForm.bankName}
               onChange={(event) => setBankForm((previous) => ({ ...previous, bankName: event.target.value }))}
@@ -344,7 +352,7 @@ export default function HostSettingsPage() {
           </div>
         </div>}
 
-        <div className="flex flex-col gap-1 border-t border-border pt-4">
+        <div className="flex flex-col gap-1 border-t border-border pt-6">
           <Button type="submit" disabled={savingPayout} className="min-h-[44px] w-full sm:w-fit">{savingPayout ? 'Saving...' : 'Save payout destination'}</Button>
           <Message>{payoutMessage}</Message>
           <Message tone="error">{payoutError}</Message>

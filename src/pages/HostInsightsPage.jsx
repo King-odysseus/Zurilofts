@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Alert, Button, Select } from 'flowbite-react';
+import { Alert, Button } from 'flowbite-react';
 import { Filter, MessageCircleMore, Star } from 'lucide-react';
 import apiClient from '../api/client.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import SelectMenu from '../components/SelectMenu.jsx';
 
 // Host insights, laid out like the reference screen: a listing selector, the
 // overall rating with a score bar per category, and the reviews themselves.
@@ -47,7 +48,7 @@ function formatDate(iso) {
 
 function ScoreBar({ label, score }) {
   const percent = score == null ? 0 : Math.max(0, Math.min(100, (score / 5) * 100));
-  return <div className="py-3">
+  return <div className="py-4">
     <div className="flex items-baseline justify-between gap-3">
       <h3 className="text-sm font-semibold text-navy">{label}</h3>
       {score == null
@@ -69,7 +70,7 @@ ScoreBar.propTypes = {
 };
 
 function ReviewRow({ review }) {
-  return <article className="border-b border-border py-3 last:border-b-0">
+  return <article className="border-b border-border py-4 last:border-b-0">
     <div className="flex items-start gap-3">
       <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-bg text-[11px] font-bold text-white">
         {review.guestAvatar
@@ -104,19 +105,31 @@ ReviewRow.propTypes = {
 };
 
 function ListingSelector({ listings, value, onChange, counts }) {
-  return <div>
-    <label className="sr-only" htmlFor="insights-listing">Listing</label>
-    <Select
-      id="insights-listing"
-      value={value}
-      onChange={(event) => onChange(event.target.value)}
-    >
-      <option value="all">All listings ({listings.length})</option>
-      {listings.map((listing) => <option key={listing.id} value={listing.id}>
-        {listing.title}{counts[listing.id] ? ` (${counts[listing.id]} reviews)` : ''}
-      </option>)}
-    </Select>
-  </div>;
+  // SelectMenu replaces Flowbite's Select because that still renders a real
+  // <select>, whose option list is drawn by the operating system and ignores
+  // the app's styling. SelectMenu is a Dropdown, so the panel matches every
+  // other menu on the page.
+  //
+  // Two API differences: options are { value, label } pairs, and onChange hands
+  // back the value itself rather than a DOM event. The trigger is a button, so
+  // the accessible name comes from ariaLabel instead of a htmlFor <label>.
+  // Values are stringified so the selection compares exactly like the native
+  // <option> value it replaced. A missing title falls back to a word: a template string would otherwise print "undefined".
+  const options = [
+    { value: 'all', label: `All listings (${listings.length})` },
+    ...listings.map((listing) => ({
+      value: String(listing.id),
+      label: `${listing.title || 'Untitled listing'}${counts[listing.id] ? ` (${counts[listing.id]} reviews)` : ''}`,
+    })),
+  ];
+
+  return <SelectMenu
+    id="insights-listing"
+    value={value}
+    onChange={onChange}
+    options={options}
+    ariaLabel="Listing"
+  />;
 }
 
 ListingSelector.propTypes = {
@@ -180,7 +193,7 @@ export default function HostInsightsPage() {
   }, [data, listing]);
 
   if (loading) {
-    return <div className="space-y-3" aria-label="Loading insights">
+    return <div className="space-y-4" aria-label="Loading insights">
       <span className="block h-16 animate-pulse rounded-xl bg-surface" />
       <span className="block h-48 animate-pulse rounded-xl bg-surface" />
       <span className="block h-32 animate-pulse rounded-xl bg-surface" />
@@ -196,11 +209,11 @@ export default function HostInsightsPage() {
     </HostCard>;
   }
 
-  return <div className="space-y-4">
+  return <div className="space-y-6 lg:space-y-8">
     <header>
       <p className={HOST_EYEBROW}>HOST WORKSPACE</p>
       <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Insights</h1>
-      <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">What guests say about your stays, and what still needs a reply.</p>
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">What guests say about your stays, and what still needs a reply.</p>
     </header>
 
     <div className="flex flex-wrap items-center gap-1 border-b border-border" role="tablist" aria-label="Insights views">

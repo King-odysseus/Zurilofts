@@ -101,7 +101,7 @@ function ReservationRow({ booking }) {
 
   return <Link
     to={`/host/reservations/${booking.id}`}
-    className="flex min-w-0 flex-wrap items-start gap-3 px-4 py-3 transition-colors hover:bg-surface"
+    className="flex min-w-0 flex-wrap items-start gap-3 px-4 py-4 transition-colors hover:bg-surface"
   >
     <span className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-surface">
       {image
@@ -116,10 +116,10 @@ function ReservationRow({ booking }) {
           {STATUS_LABEL[booking.status] || booking.status}
         </Badge>
       </div>
-      <p className="mt-1 text-xs leading-relaxed text-muted">
+      <p className="mt-2 text-xs leading-relaxed text-muted">
         {formatRange(booking.checkIn, booking.checkOut)} <span aria-hidden="true" className="text-border">|</span> {plural(nights, 'night')} <span aria-hidden="true" className="text-border">|</span> {plural(booking.guests || 1, 'guest')}
       </p>
-      <p className="mt-0.5 truncate text-xs text-muted">{property.title || 'Your listing'}</p>
+      <p className="mt-1.5 truncate text-xs text-muted">{property.title || 'Your listing'}</p>
     </div>
 
     {/* On a phone the amount drops under the thumbnail, indented to the text
@@ -134,7 +134,7 @@ function ReservationRow({ booking }) {
 ReservationRow.propTypes = { booking: PropTypes.object.isRequired };
 
 function LoadingRows() {
-  return <div className="flex flex-col gap-2 px-4 py-4" role="status" aria-label="Loading reservations">
+  return <div className="flex flex-col gap-3 px-4 py-4" role="status" aria-label="Loading reservations">
     <span className="block h-16 animate-pulse rounded-xl bg-inset" />
     <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:150ms]" />
     <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:300ms]" />
@@ -190,12 +190,12 @@ export default function HostReservationsPage() {
       });
   }, [bookings, filter, search]);
 
-  return <div className="flex flex-col gap-6">
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+  return <div className="flex flex-col gap-6 sm:gap-8">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         <p className={HOST_EYEBROW}>Host workspace</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Reservations</h1>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Every booking across your listings, newest first.</p>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Every booking across your listings, newest first.</p>
       </div>
       <Button as={Link} to="/host/today" color="light" size="sm" className="w-full min-h-11 sm:w-fit sm:min-h-0">
         Today&apos;s schedule
@@ -211,7 +211,7 @@ export default function HostReservationsPage() {
       description="Open a reservation for the guest, the dates and what you earn."
       action={loading ? undefined : <Badge color="gray">{visible.length} shown</Badge>}
     >
-      {error && <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-3">
+      {error && <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4">
         <div className="flex min-w-0 flex-1 items-start gap-2.5">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />
           <p className="min-w-0 text-sm leading-relaxed text-charcoal">{error}</p>
@@ -219,7 +219,7 @@ export default function HostReservationsPage() {
         <Button type="button" color="light" size="sm" onClick={load} className="min-h-11 sm:min-h-0">Try again</Button>
       </div>}
 
-      <div className="border-b border-border px-4 py-3">
+      <div className="border-b border-border px-4 py-4">
         <div className="flex flex-wrap items-center gap-2">
           {FILTERS.map((item) => <button
             key={item.key}
@@ -234,7 +234,7 @@ export default function HostReservationsPage() {
 
         {/* The icon sits outside the field so the input keeps the shared theme
             focus ring; [&_input]:pl-9 reserves the room for it. */}
-        <div className="relative mt-3 [&_input]:pl-9">
+        <div className="relative mt-4 [&_input]:pl-9">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.9} aria-hidden="true" />
           <TextInput
             type="search"
@@ -247,7 +247,7 @@ export default function HostReservationsPage() {
       </div>
 
       {loading ? <LoadingRows /> : visible.length === 0 ? (
-        <div className="flex flex-col items-center gap-1.5 px-4 py-12 text-center">
+        <div className="flex flex-col items-center gap-3 px-4 py-12 text-center">
           <span className="grid h-11 w-11 place-items-center rounded-full bg-surface text-muted">
             <CalendarDays className="h-5 w-5" strokeWidth={1.6} aria-hidden="true" />
           </span>
@@ -266,7 +266,7 @@ export default function HostReservationsPage() {
         </ul>
       )}
 
-      {!loading && visible.length > 0 && <p className="border-t border-border px-4 py-3 text-[11px] text-muted">
+      {!loading && visible.length > 0 && <p className="border-t border-border px-4 py-4 text-[11px] text-muted">
         Showing {visible.length} of {bookings.length} reservations{bookings.length >= 100 ? ' (the 100 most recent)' : ''}.
       </p>}
     </HostCard>

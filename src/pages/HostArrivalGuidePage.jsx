@@ -213,7 +213,7 @@ export default function HostArrivalGuidePage() {
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-3" role="status" aria-label="Loading arrival guide">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4" role="status" aria-label="Loading arrival guide">
         <span className="block h-12 animate-pulse rounded-2xl bg-inset" />
         <span className="block h-24 animate-pulse rounded-2xl bg-inset" />
         <span className="block h-24 animate-pulse rounded-2xl bg-inset" />
@@ -226,7 +226,7 @@ export default function HostArrivalGuidePage() {
     return (
       <div className="mx-auto w-full max-w-2xl">
         <ListingEditorTabs listingId={id || ''} active="arrival" />
-        <div className="mt-4 rounded-2xl bg-elevated p-6 text-center shadow-sm">
+        <div className="mt-6 rounded-2xl bg-elevated p-6 text-center shadow-sm">
           <CircleAlert className="mx-auto h-6 w-6 text-muted" strokeWidth={1.8} aria-hidden="true" />
           <p role="alert" className="mt-2 text-sm text-muted">{loadError}</p>
           <Button className="mt-4" size="sm" onClick={load}>Try again</Button>
@@ -254,7 +254,7 @@ export default function HostArrivalGuidePage() {
           column pins the header and scrolls only the cards, so "Listing editor"
           and the two tabs never slide away behind a long rules list. */}
       <div
-        className={`${activeKey ? 'hidden' : 'flex'} min-w-0 flex-col gap-5 lg:sticky lg:top-20 lg:flex lg:max-h-[calc(100dvh-7rem)]`}
+        className={`${activeKey ? 'hidden' : 'flex'} min-w-0 flex-col gap-6 lg:sticky lg:top-20 lg:flex lg:max-h-[calc(100dvh-7rem)]`}
       >
         <ListingEditorTabs listingId={id || ''} active="arrival" />
         <div className="min-h-0 lg:flex-1 lg:overflow-y-auto lg:pb-4 lg:pr-1">

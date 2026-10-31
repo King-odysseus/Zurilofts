@@ -244,8 +244,8 @@ function AdminUsers() {
   };
 
   return (
-    <div className="space-y-6" data-openpencil-frame="0:7228">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-8" data-openpencil-frame="0:7228">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · PEOPLE</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Users &amp; hosts</h1>
@@ -253,7 +253,7 @@ function AdminUsers() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PEOPLE IN VIEW</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.total}</strong><small className="mt-1 block text-xs text-muted">Matching the current filters</small></article>
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">GUESTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.guests}</strong><small className="mt-1 block text-xs text-muted">Travelling accounts</small></article>
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">HOSTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.hosts}</strong><small className="mt-1 block text-xs text-muted">Workspace access</small></article>
@@ -283,13 +283,13 @@ function AdminUsers() {
         </div>
 
         {message && (
-          <Alert color={message.toLowerCase().includes('fail') ? 'failure' : 'success'} className="mx-5 mt-4" role="status">
+          <Alert color={message.toLowerCase().includes('fail') ? 'failure' : 'success'} className="mx-5 mt-5" role="status">
             {message}
           </Alert>
         )}
 
         {selectedIds.length > 0 && (
-          <div className="mx-5 mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface px-4 py-3" role="toolbar" aria-label="Bulk actions">
+          <div className="mx-5 mt-5 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface px-4 py-3" role="toolbar" aria-label="Bulk actions">
             <strong className="mr-auto text-sm font-semibold text-navy">{selectedIds.length} selected</strong>
             <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => bulkSetSuspended(true)}>Suspend</Button>
             <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => bulkSetSuspended(false)}>Reactivate</Button>
@@ -418,10 +418,10 @@ function AdminUsers() {
             <span className="block text-base font-semibold text-navy">Edit {editing.firstName} {editing.lastName}</span>
           </ModalHeader>
           <form onSubmit={handleSave}>
-            <ModalBody>
+            <ModalBody className="space-y-5">
               {formError && <Alert color="failure">{formError}</Alert>}
 
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                 <Field label="First Name" value={formData.firstName} onChange={(v) => setFormData({ ...formData, firstName: v })} />
                 <Field label="Last Name" value={formData.lastName} onChange={(v) => setFormData({ ...formData, lastName: v })} />
               </div>
@@ -431,7 +431,7 @@ function AdminUsers() {
               <div className="rounded-lg border border-border bg-surface p-4">
                 <p className="text-sm font-semibold text-navy">Host payout details</p>
                 <span className="mt-0.5 block text-xs text-muted">Used for bank transfers to hosts. Leave blank for non-hosts.</span>
-                <div className="mt-3 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
                   <Field label="Bank Name" value={formData.bankName} onChange={(v) => setFormData({ ...formData, bankName: v })} />
                   <Field label="Account No." value={formData.bankAccountNo} onChange={(v) => setFormData({ ...formData, bankAccountNo: v })} />
                   <Field label="Bank Code" value={formData.bankCode} onChange={(v) => setFormData({ ...formData, bankCode: v })} />
@@ -463,7 +463,7 @@ function AdminUsers() {
             <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ACCOUNT ERASURE</span>
             <span className="block text-base font-semibold text-navy">Delete user account</span>
           </ModalHeader>
-          <ModalBody>
+          <ModalBody className="space-y-5">
             <p className="text-sm leading-relaxed text-charcoal">
               You are deleting {deleteTarget.firstName} {deleteTarget.lastName} ({deleteTarget.email}).
               Personal data will be erased. Records required for bookings, payouts, and legal compliance

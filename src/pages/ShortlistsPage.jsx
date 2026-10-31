@@ -14,7 +14,7 @@ function SkeletonCard() {
 
 function EmptyState({ onCreateClick }) {
   return (
-    <div className="opg-saved-empty">
+    <div className="opg-saved-empty mt-6">
       <div>
         <Heart strokeWidth={1.6} aria-hidden="true" />
         <h2>No shortlists yet</h2>
@@ -202,18 +202,20 @@ export default function ShortlistsPage() {
         {showCreate && <CreateForm onSubmit={handleCreate} onCancel={() => setShowCreate(false)} saving={saving} />}
 
         {error && (
-          <div className="opg-saved-error">
+          <div className="opg-saved-error mt-6">
             <p>{error}</p>
             <Button className="opg-saved-action mt-4" onClick={fetchShortlists}>Try again</Button>
           </div>
         )}
 
         {loading ? (
-          <div className="opg-saved-collections"><SkeletonCard /><SkeletonCard /><SkeletonCard /></div>
+          <div className="opg-saved-collections mt-6"><SkeletonCard /><SkeletonCard /><SkeletonCard /></div>
         ) : !error && shortlists.length === 0 && !showCreate ? (
           <EmptyState onCreateClick={() => setShowCreate(true)} />
         ) : (
-          <div className="opg-saved-collections opg-shortlists-grid">
+          /* The card grid gaps 16px in the stylesheet; !gap-5 outranks it so the
+              collection cards sit 20px apart. */
+          <div className="opg-saved-collections opg-shortlists-grid !gap-5">
             {shortlists.map((shortlist) => (
               <ShortlistCard key={shortlist.id} shortlist={shortlist} onDelete={handleDelete} onRename={handleRename} />
             ))}

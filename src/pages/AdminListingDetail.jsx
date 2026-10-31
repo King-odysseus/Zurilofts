@@ -66,7 +66,7 @@ function Panel({ title, children }) {
   return (
     <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
       <h2 className="text-base font-semibold text-navy">{title}</h2>
-      <div className="mt-3">{children}</div>
+      <div className="mt-4">{children}</div>
     </section>
   );
 }
@@ -150,7 +150,7 @@ export default function AdminListingDetail() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-elevated px-5 py-16 text-center shadow-sm" role="status">
           <Spinner size="lg" aria-hidden="true" />
           <strong className="text-sm font-semibold text-navy">Loading listing...</strong>
@@ -162,7 +162,7 @@ export default function AdminListingDetail() {
 
   if (!listing) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <Link to="/admin/properties" className="inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
           <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           Listing approvals
@@ -172,7 +172,7 @@ export default function AdminListingDetail() {
           <p role="alert" className="mx-auto mt-1 max-w-md text-sm leading-relaxed text-muted">
             {loadError || 'This listing does not exist, or it has been removed.'}
           </p>
-          <Button as={Link} to="/admin/properties" size="sm" className="mx-auto mt-4 w-fit">Back to listing approvals</Button>
+          <Button as={Link} to="/admin/properties" size="sm" className="mx-auto mt-5 w-fit">Back to listing approvals</Button>
         </section>
       </div>
     );
@@ -210,13 +210,13 @@ export default function AdminListingDetail() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <Link to="/admin/properties" className="inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
           <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           Listing approvals
         </Link>
-        <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · LISTING</p>
+        <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · LISTING</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{listing.title || 'Untitled listing'}</h1>
         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
           <StatusBadge status={listing.status} />
@@ -224,8 +224,8 @@ export default function AdminListingDetail() {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="space-y-6">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="space-y-8">
           <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
             {activeImageUrl ? (
               <img
@@ -240,7 +240,7 @@ export default function AdminListingDetail() {
               </div>
             )}
             {images.length > 1 && (
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 {images.map((url, index) => (
                   <button key={`${url}-${index}`} type="button" onClick={() => setActiveImage(index)} aria-label={`Show photo ${index + 1}`} aria-pressed={index === activeImage} className={`overflow-hidden rounded-lg border-2 transition-colors ${index === activeImage ? 'border-primary-600' : 'border-transparent hover:border-border'}`}>
                     <img src={url} alt="" className="h-16 w-20 object-cover" />
@@ -252,7 +252,7 @@ export default function AdminListingDetail() {
 
           <Panel title="About this stay">
             <p className="whitespace-pre-line text-sm leading-relaxed text-charcoal">{listing.description || 'No description provided.'}</p>
-            <dl className="mt-5 grid grid-cols-1 gap-4 border-t border-border pt-4 sm:grid-cols-2">
+            <dl className="mt-5 grid grid-cols-1 gap-5 border-t border-border pt-4 sm:grid-cols-2">
               {facts.map(([label, value]) => (
                 <div key={label} className="min-w-0">
                   <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</dt>
@@ -280,14 +280,14 @@ export default function AdminListingDetail() {
           </Panel>
         </div>
 
-        <aside className="space-y-6">
+        <aside className="space-y-8">
           <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <h2 className="text-base font-semibold text-navy">Review</h2>
               <StatusBadge status={listing.status} />
             </div>
 
-            <dl className="mt-4 space-y-2">
+            <dl className="mt-5 space-y-3">
               {[['Submitted', listing.submittedAt], ['Last reviewed', listing.listingReviewedAt]].map(([label, value]) => (
                 <div key={label} className="flex items-center justify-between gap-3">
                   <dt className="text-xs text-muted">{label}</dt>
@@ -297,14 +297,14 @@ export default function AdminListingDetail() {
             </dl>
 
             {listing.listingReviewNote && (
-              <div className="mt-4 rounded-lg border-l-2 border-primary-600 bg-surface px-3 py-2">
+              <div className="mt-5 rounded-lg border-l-2 border-primary-600 bg-surface px-3 py-2">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-muted">Latest note</p>
                 <p className="mt-1 text-sm leading-relaxed text-charcoal">{listing.listingReviewNote}</p>
               </div>
             )}
 
             {actions.length ? (
-              <div className="mt-4 space-y-3">
+              <div className="mt-5 space-y-3">
                 <div>
                   <Label htmlFor="listing-review-note" value="Reason or note (required for rejection)" />
                   <Textarea
@@ -326,16 +326,16 @@ export default function AdminListingDetail() {
                 </div>
               </div>
             ) : (
-              <p className="mt-4 rounded-lg bg-surface px-3 py-2 text-sm leading-relaxed text-muted">
+              <p className="mt-5 rounded-lg bg-surface px-3 py-2 text-sm leading-relaxed text-muted">
                 {NOTHING_TO_REVIEW[listing.status] || 'This listing cannot be reviewed at the moment.'}
               </p>
             )}
 
-            {error && <p role="alert" className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
-            {message && <p role="status" className="mt-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">{message}</p>}
+            {error && <p role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+            {message && <p role="status" className="mt-4 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">{message}</p>}
 
             {listing.status === 'PUBLISHED' && (
-              <Link to={`/admin/properties/${listing.id}/preview`} className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
+              <Link to={`/admin/properties/${listing.id}/preview`} className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
                 Preview as a guest sees it
                 <Eye className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </Link>
@@ -355,7 +355,7 @@ export default function AdminListingDetail() {
 
             {host ? (
               <>
-                <div className="mt-3 flex items-center gap-3">
+                <div className="mt-4 flex items-center gap-3">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-navy-bg text-xs font-bold text-white" aria-hidden="true">
                     {`${host.firstName?.[0] || ''}${host.lastName?.[0] || ''}`.toUpperCase() || 'H'}
                   </span>
@@ -367,19 +367,19 @@ export default function AdminListingDetail() {
                   </div>
                 </div>
 
-                <div className="mt-3 flex flex-wrap items-center gap-2">
+                <div className="mt-4 flex flex-wrap items-center gap-2">
                   <Badge color="gray">{ROLE_LABELS[host.role] || host.role || 'Account'}</Badge>
                   {host.suspended && <Badge color="failure">Suspended</Badge>}
                 </div>
 
                 {host.phone && (
-                  <p className="mt-3 flex items-center gap-2 text-xs text-charcoal">
+                  <p className="mt-4 flex items-center gap-2 text-xs text-charcoal">
                     <Phone className="h-3.5 w-3.5 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />
                     {host.phone}
                   </p>
                 )}
 
-                <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-border pt-4">
+                <dl className="mt-5 grid grid-cols-2 gap-4 border-t border-border pt-4">
                   {[['Listings', host._count?.properties], ['Bookings', host._count?.bookings]].map(([label, value]) => (
                     <div key={label}>
                       <dt className="text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</dt>
@@ -388,10 +388,10 @@ export default function AdminListingDetail() {
                   ))}
                 </dl>
 
-                <p className="mt-4 text-xs text-muted">Member since {formatDate(host.createdAt)}</p>
+                <p className="mt-5 text-xs text-muted">Member since {formatDate(host.createdAt)}</p>
               </>
             ) : (
-              <p className="mt-3 text-sm text-muted">
+              <p className="mt-4 text-sm text-muted">
                 {listing.hostId ? 'The host account could not be loaded.' : 'No host assigned'}
               </p>
             )}

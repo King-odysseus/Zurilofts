@@ -45,7 +45,7 @@ const HEADING = 'text-sm font-semibold text-navy';
 export default function CheckInCheckoutFields({ value, onChange }) {
   return (
     <div className="flex flex-col gap-7">
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <span className={HEADING}>Check-in method</span>
         <EditorFieldGroup>
           <EditorSelectRow
@@ -60,7 +60,7 @@ export default function CheckInCheckoutFields({ value, onChange }) {
         </EditorFieldGroup>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <span className={HEADING}>Check-in window</span>
         <EditorFieldGroup>
           <EditorSelectRow
@@ -84,7 +84,7 @@ export default function CheckInCheckoutFields({ value, onChange }) {
         </EditorFieldGroup>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-4">
         <span className={HEADING}>Checkout</span>
         <EditorFieldGroup>
           <EditorSelectRow

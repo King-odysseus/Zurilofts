@@ -181,8 +181,8 @@ function AdminGovernance() {
   };
 
   return (
-    <div className="space-y-6" data-openpencil-frame="0:7458">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-8" data-openpencil-frame="0:7458">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · GOVERNANCE</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Governance and audit</h1>
@@ -196,7 +196,7 @@ function AdminGovernance() {
 
       {error && <Alert color="failure" role="alert">{error}</Alert>}
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <article className={METRIC_CARD}>
           <span className={METRIC_LABEL}>ADMIN USERS</span>
           <strong className={METRIC_VALUE}>{adminUsers.length}</strong>
@@ -219,7 +219,7 @@ function AdminGovernance() {
         </article>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3 lg:gap-6">
         <section className={`${PANEL} lg:col-span-2`} aria-labelledby="audit-log-title">
           <div className={PANEL_HEAD}>
             <div>
@@ -229,7 +229,7 @@ function AdminGovernance() {
             <Badge color="info">{filteredEvents.length} records</Badge>
           </div>
 
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-3 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-4 border-b border-border px-5 py-3 sm:flex-row sm:items-center">
             <div className="relative flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
               <TextInput
@@ -320,7 +320,7 @@ function AdminGovernance() {
         {selectedEvent && (
           <>
             <ModalHeader>{EVENT_META[selectedEvent.type].label} record</ModalHeader>
-            <ModalBody>
+            <ModalBody className="space-y-5">
               <div className="flex items-start gap-3">
                 <span className={ICON_TILE} aria-hidden="true">
                   {(() => { const Icon = EVENT_META[selectedEvent.type].icon; return <Icon strokeWidth={1.8} />; })()}
@@ -331,7 +331,7 @@ function AdminGovernance() {
                   <p className="mt-1 text-sm leading-relaxed text-charcoal">{selectedEvent.meta}</p>
                 </div>
               </div>
-              <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
                 <p>
                   <span className={METRIC_LABEL}>Recorded</span>
                   <strong className="mt-1 block text-sm font-semibold text-navy">{formatDate(selectedEvent.createdAt, true)}</strong>

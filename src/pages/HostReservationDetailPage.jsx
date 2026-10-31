@@ -78,10 +78,10 @@ StatusPill.propTypes = { status: PropTypes.string };
 // figure kept unwrapped on the right, so every money card on the page lines its
 // figures up in the same column no matter how long the label runs.
 function MoneyRow({ label, value, tone, hint }) {
-  return <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 py-2">
+  return <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 py-3">
     <div className="min-w-0">
       <p className={`text-xs ${tone === 'total' ? 'font-semibold text-navy' : 'text-muted'}`}>{label}</p>
-      {hint && <p className="mt-0.5 text-[11px] leading-relaxed text-muted">{hint}</p>}
+      {hint && <p className="mt-1.5 text-[11px] leading-relaxed text-muted">{hint}</p>}
     </div>
     <strong className={`shrink-0 whitespace-nowrap text-right tabular-nums ${tone === 'total' ? 'text-base font-bold text-navy' : 'text-xs text-navy'}`}>{value}</strong>
   </div>;
@@ -167,7 +167,7 @@ export default function HostReservationDetailPage() {
 
   if (error && !booking) {
     return <HostCard>
-      <div className="mx-auto flex max-w-md flex-col items-center gap-2 py-6 text-center">
+      <div className="mx-auto flex max-w-md flex-col items-center gap-3 py-6 text-center">
         <span className="grid h-11 w-11 place-items-center rounded-full bg-surface text-muted">
           <CalendarDays className="h-5 w-5" strokeWidth={1.6} aria-hidden="true" />
         </span>
@@ -193,7 +193,7 @@ export default function HostReservationDetailPage() {
   const addOnTotal = booking.addonsSubtotal ?? (booking.addOns || []).reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const additionalGuests = booking.additionalGuests || [];
 
-  return <div className="flex flex-col gap-4">
+  return <div className="flex flex-col gap-5 sm:gap-6">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <Link to="/host/reservations" className="inline-flex min-h-11 items-center gap-1.5 text-xs font-semibold text-muted transition-colors hover:text-navy">
         <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
@@ -209,11 +209,11 @@ export default function HostReservationDetailPage() {
       </div>
     </Alert>}
 
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
         <p className={HOST_EYEBROW}>Reservation</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{guestName}</h1>
-        <p className="mt-1 text-sm leading-relaxed text-muted">
+        <p className="mt-2 text-sm leading-relaxed text-muted">
           {property.title || 'Your listing'} <span aria-hidden="true" className="text-border">|</span> {plural(booking.guests || 1, 'guest')} <span aria-hidden="true" className="text-border">|</span> {plural(nights, 'night')}
         </p>
       </div>
@@ -226,8 +226,8 @@ export default function HostReservationDetailPage() {
       </div>
     </header>
 
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
-      <div className="flex flex-col gap-4">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
+      <div className="flex flex-col gap-5 lg:gap-6">
         {/* flush: the special-request hairline runs to the card edge, so the
             body and that strip re-apply the same 16px gutter as the card head. */}
         <HostCard flush title="Stay" className="overflow-hidden">
@@ -250,9 +250,9 @@ export default function HostReservationDetailPage() {
             </div>
           </div>
 
-          {booking.specialRequests && <div className="border-t border-border px-4 py-3">
+          {booking.specialRequests && <div className="border-t border-border px-4 py-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">What the guest asked for</p>
-            <p className="mt-1 text-sm leading-relaxed text-navy">{booking.specialRequests}</p>
+            <p className="mt-2 text-sm leading-relaxed text-navy">{booking.specialRequests}</p>
           </div>}
         </HostCard>
 
@@ -277,9 +277,9 @@ export default function HostReservationDetailPage() {
 
           {/* Inset rather than outlined: a border here would be a box inside the
               card's own border. */}
-          {additionalGuests.length > 0 && <div className="rounded-xl bg-surface px-4 py-3">
+          {additionalGuests.length > 0 && <div className="rounded-xl bg-surface px-4 py-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">Also staying</p>
-            <ul className="mt-1 space-y-0.5">
+            <ul className="mt-2 space-y-1.5">
               {additionalGuests.map((person, index) => <li key={`${person.firstName}-${person.lastName}-${index}`} className="text-sm text-navy">
                 {[person.firstName, person.lastName].filter(Boolean).join(' ') || 'Guest'}
               </li>)}
@@ -288,7 +288,7 @@ export default function HostReservationDetailPage() {
         </HostCard>
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-5 lg:gap-6">
         <HostCard title={<span className="flex items-center gap-2">
           <Wallet className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />
           What you earn
@@ -302,7 +302,7 @@ export default function HostReservationDetailPage() {
                 {booking.hostPayableAt && <MoneyRow label="Releases to your balance" value={formatDate(booking.hostPayableAt)} />}
                 {booking.hostFundsReleasedAt && <MoneyRow label="Released" value={formatDate(booking.hostFundsReleasedAt)} />}
               </>
-              : <p className="py-3 text-xs leading-relaxed text-muted">
+              : <p className="py-4 text-xs leading-relaxed text-muted">
                 Earnings appear here once the guest&apos;s payment clears. Nothing is deducted from a booking that has not been paid.
               </p>}
           </div>
@@ -325,7 +325,7 @@ export default function HostReservationDetailPage() {
         </HostCard>
 
         {(booking.addOns || []).length > 0 && <HostCard title="Add-ons booked">
-          <ul className="space-y-1.5">
+          <ul className="space-y-2">
             {booking.addOns.map((item) => <li key={item.id} className="flex items-center justify-between gap-3 text-xs">
               <span className="min-w-0 truncate text-navy">{item.addOn?.name || 'Add-on'} <span className="text-muted">x{item.quantity}</span></span>
               <span className="shrink-0 tabular-nums text-muted">{money(item.quantity * item.unitPrice)}</span>

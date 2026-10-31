@@ -164,7 +164,7 @@ export default function ShortlistDetailPage() {
         {loading ? (
           <div className="opg-saved-loading mt-6"><SkeletonCard /><SkeletonCard /></div>
         ) : error && !shortlist ? (
-          <div className="opg-saved-error">
+          <div className="opg-saved-error mt-6">
             <p>{error}</p>
             <Button className="opg-saved-action mt-4" onClick={fetchShortlist}>Try again</Button>
           </div>
@@ -203,7 +203,9 @@ export default function ShortlistDetailPage() {
                 </div>
               </div>
             ) : (
-              <section className="opg-shortlist-rows" aria-label={`${shortlist.name} stays`}>
+              /* The row list keeps a 12px grid gap from the stylesheet; space-y-3
+                  adds 12px more so the bordered rows sit 24px apart. */
+              <section className="opg-shortlist-rows space-y-3" aria-label={`${shortlist.name} stays`}>
                 {shortlist.items.map((item) => (
                   <PropertyItem key={item.id} item={item} onRemove={handleRemoveItem} />
                 ))}

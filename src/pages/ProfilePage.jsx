@@ -395,7 +395,10 @@ function ProfilePage() {
           </div>
 
           {/* Tabs */}
-          <div className="opg-profile-tabs" role="tablist" aria-label="Profile sections">
+          {/* The account grid in the stylesheet spaces its children by 18px. A 6px
+              margin on the surface below lifts every stacked block in this page to
+              24px, the same rhythm the rest of the app uses, without touching CSS. */}
+          <div className="opg-profile-tabs mt-1.5" role="tablist" aria-label="Profile sections">
             {['info', 'bookings', 'favorites'].map((tab) => (
               <button
                 key={tab}
@@ -412,13 +415,13 @@ function ProfilePage() {
 
           {/* My Info Tab */}
           {activeTab === 'info' && (
-            <div>
+            <div className="mt-1.5">
               {showCompletionBanner && (
                 <div className="mb-6 bg-[#F4F0E8] border border-[#C5A28C] rounded-2xl p-5 flex items-start gap-3">
                   <Info className="w-5 h-5 text-[#8A6B52] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
                   <div>
                     <p className="font-semibold text-[#203565] text-sm">Complete your profile</p>
-                    <p className="text-sm text-[#6b7280] mt-1">Fill in your details below to get the most out of ZuriLofts.</p>
+                    <p className="text-sm text-[#6b7280] mt-2">Fill in your details below to get the most out of ZuriLofts.</p>
                   </div>
                 </div>
               )}
@@ -506,12 +509,12 @@ function ProfilePage() {
                   for full details.
                 </p>
 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {/* Download my data */}
-                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                     <div>
                       <h4 className="font-semibold text-[#1f2937]">Download my data</h4>
-                      <p className="text-sm text-[#6b7280] mt-1">
+                      <p className="text-sm text-[#6b7280] mt-2">
                         Get a copy of the personal data we hold about you in a portable format.
                       </p>
                       {exportMessage && (
@@ -538,10 +541,10 @@ function ProfilePage() {
                   </div>
 
                   {/* Cookie preferences */}
-                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                     <div>
                       <h4 className="font-semibold text-[#1f2937]">Cookie preferences</h4>
-                      <p className="text-sm text-[#6b7280] mt-1">
+                      <p className="text-sm text-[#6b7280] mt-2">
                         Review or change which optional cookies we may use. You can withdraw consent at any time.
                       </p>
                     </div>
@@ -556,10 +559,10 @@ function ProfilePage() {
 
                   {/* Delete my account */}
                   <div className="rounded-2xl border-2 border-red-200 bg-red-50/50 p-5">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                       <div>
                         <h4 className="font-semibold text-red-700">Delete my account</h4>
-                        <p className="text-sm text-[#6b7280] mt-1">
+                        <p className="text-sm text-[#6b7280] mt-2">
                           Permanently erase your account and personal data. Bookings and payment records are
                           retained for legal and tax reasons but are anonymised so they no longer identify you.
                           This action cannot be undone.
@@ -622,7 +625,7 @@ function ProfilePage() {
               </p>
 
               {/* Payout destination */}
-              <form onSubmit={handlePayoutDestinationSave} className="space-y-4 mb-8">
+              <form onSubmit={handlePayoutDestinationSave} className="space-y-5 mb-8">
                 <h4 className="font-semibold text-[#1f2937]">Payout Destination</h4>
 
                 <div className="grid grid-cols-2 gap-2 rounded-full bg-[#16294B]/5 p-1">
@@ -713,10 +716,14 @@ function ProfilePage() {
               </form>
 
               {/* Payout Frequency */}
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <h4 className="font-semibold text-[#1f2937]">Payout Frequency</h4>
                 <p className="text-xs text-[#6b7280]">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
-                <div className="flex items-center gap-3">
+                {/* The select is pinned to 280px by the shared stylesheet and forced
+                    to full width below 768px, so a Save button beside it was pushed
+                    off the right edge at 390px. Stacking until md keeps both visible
+                    and matches the breakpoint the stylesheet itself switches on. */}
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
                   <SelectMenu
                     value={payoutFrequency}
                     onChange={(next) => setPayoutFrequency(next)}
@@ -728,7 +735,7 @@ function ProfilePage() {
                     type="button"
                     onClick={handleFrequencySave}
                     disabled={bankSaving}
-                    className="bg-[#16294B] text-white font-semibold px-4 py-2.5 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50 text-sm"
+                    className="bg-[#16294B] text-white font-semibold px-4 py-2.5 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50 text-sm md:flex-shrink-0"
                   >
                     Save
                   </button>
@@ -745,7 +752,7 @@ function ProfilePage() {
 
           {/* My Bookings Tab */}
           {activeTab === 'bookings' && (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {bookings.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
@@ -757,7 +764,7 @@ function ProfilePage() {
               ) : (
                 bookings.map((booking) => (
                   <div key={booking.id} className="shadow-sm p-6">
-                    <div className="flex flex-col md:flex-row gap-4">
+                    <div className="flex flex-col md:flex-row gap-5">
                       {booking.property?.images?.[0] && (
                         <img
                           src={booking.property.images[0]}
@@ -775,7 +782,7 @@ function ProfilePage() {
                             {booking.status}
                           </span>
                         </div>
-                        <div className="grid grid-cols-3 gap-4 mt-4 text-sm">
+                        <div className="grid grid-cols-3 gap-4 mt-5 text-sm">
                           <div>
                             <span className="text-[#6b7280]">Check-in</span>
                             <p className="font-semibold">{new Date(booking.checkIn).toLocaleDateString()}</p>
@@ -799,7 +806,7 @@ function ProfilePage() {
 
                         {/* Post-stay review */}
                         {booking.review ? (
-                          <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
+                          <div className="mt-5 pt-5 border-t border-[#D9D9D9]">
                             <p className="text-sm font-semibold text-[#203565] mb-1">Your rating</p>
                             <div className="flex items-center gap-1">
                               {[1, 2, 3, 4, 5].map((star) => (
@@ -809,7 +816,7 @@ function ProfilePage() {
                             </div>
                           </div>
                         ) : isStayCompleted(booking) ? (
-                          <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
+                          <div className="mt-5 pt-5 border-t border-[#D9D9D9]">
                             <p className="text-sm font-semibold text-[#203565] mb-2">Rate your stay</p>
                             <div className="flex items-center gap-1 mb-3">
                               {[1, 2, 3, 4, 5].map((star) => {
@@ -921,7 +928,7 @@ function ProfilePage() {
 
           {/* Favourites Tab */}
           {activeTab === 'favorites' && (
-            <div>
+            <div className="mt-1.5">
               {favorites.length === 0 ? (
                 <div className="text-center py-12">
                   <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">

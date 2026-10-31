@@ -39,8 +39,8 @@ export default function AdminListingReview() {
 
   const visible = filter === 'ALL' ? listings : listings.filter((listing) => listing.status === filter);
   const count = (status) => listings.filter((listing) => listing.status === status).length;
-  return <div className="space-y-6" data-openpencil-frame="0:7015">
-    <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+  return <div className="space-y-8" data-openpencil-frame="0:7015">
+    <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · APPROVALS</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Listing approvals</h1>
@@ -48,7 +48,7 @@ export default function AdminListingReview() {
       </div>
     </div>
 
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
       <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PENDING</span>
         <strong className="mt-2 block text-2xl font-bold text-navy">{count('PENDING_REVIEW')}</strong>
@@ -72,11 +72,11 @@ export default function AdminListingReview() {
     </div>
 
     <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
-      <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-base font-semibold text-navy">Review queue</h2>
         <span className="text-xs text-muted">{count('PENDING_REVIEW')} pending</span>
       </div>
-      <div className="flex flex-col gap-2 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:gap-3">
+      <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:gap-4">
         <label htmlFor="listing-review-filter" className="text-xs font-semibold uppercase tracking-wide text-muted">Show</label>
         <SelectMenu
           id="listing-review-filter"
@@ -87,7 +87,7 @@ export default function AdminListingReview() {
           options={statuses.map((status) => ({ value: status, label: status === 'ALL' ? 'All listings' : status.replaceAll('_', ' ').toLowerCase() }))}
         />
       </div>
-      {error && <p role="alert" className="mx-5 my-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="mx-5 my-5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
       {loading ? <p className="px-5 py-12 text-center text-sm text-muted">Loading listings…</p> : visible.length ? visible.map((listing) => <div className="flex flex-col gap-3 border-b border-border px-5 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between" key={listing.id}>
         {listing.images?.[0] ? <img src={listing.images[0]} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" /> : <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 dark:bg-primary/15 text-navy"><House className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" /></span>}
         <div className="min-w-0 flex-1">
@@ -109,10 +109,10 @@ export default function AdminListingReview() {
         <p className="text-sm text-charcoal">Check the listing details and photos before making a decision.</p>
         {/* A new tab on purpose: the decision modal and any note typed into it
             survive while the admin reads the full listing in the workspace. */}
-        <Link to={`/admin/properties/${reviewing.id}`} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline">
+        <Link to={`/admin/properties/${reviewing.id}`} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline">
           Open full listing <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
         </Link>
-        <div className="mt-4">
+        <div className="mt-5">
           <Label htmlFor="review-note" value="Reason or note (required for rejection)" />
           <Textarea id="review-note" value={note} onChange={(event) => setNote(event.target.value)} rows={3} />
         </div>

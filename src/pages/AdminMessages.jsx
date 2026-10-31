@@ -158,8 +158,8 @@ function AdminMessages() {
   // heading, metrics and section are dropped while it is open on a phone and
   // restored from lg up, where the card layout returns.
   return (
-    <div className={activeUserId ? 'space-y-0 lg:space-y-6' : 'space-y-6'} data-openpencil-frame="0:7458">
-      <div className={`flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between ${activeUserId ? 'hidden lg:flex' : ''}`}>
+    <div className={activeUserId ? 'space-y-0 lg:space-y-8' : 'space-y-8'} data-openpencil-frame="0:7458">
+      <div className={`flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between ${activeUserId ? 'hidden lg:flex' : ''}`}>
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS / ADMIN / OPERATIONS</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Messages</h1>
@@ -167,7 +167,7 @@ function AdminMessages() {
         </div>
       </div>
 
-      <div className={`grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 ${activeUserId ? 'hidden lg:grid' : ''}`}>
+      <div className={`grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4 ${activeUserId ? 'hidden lg:grid' : ''}`}>
         <article className={METRIC_CARD}>
           <span className={METRIC_LABEL}>CONVERSATIONS</span>
           <strong className={METRIC_VALUE}>{conversations.length}</strong>

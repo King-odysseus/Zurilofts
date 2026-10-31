@@ -17,7 +17,10 @@ import PropTypes from 'prop-types';
  */
 // Grey, not bronze: the label is a wayfinding mark on every panel, so bronze
 // here would turn the whole workspace bronze one small label at a time.
-export const HOST_EYEBROW = 'text-[11px] font-semibold uppercase tracking-[0.14em] text-muted';
+// The trailing margin is the gap between this label and whatever it names. It
+// lives on the constant so every workspace header gets it; without it the label
+// sat flush against the page title and the two read as one cramped block.
+export const HOST_EYEBROW = 'mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted';
 
 export default function HostCard({
   eyebrow,
@@ -35,11 +38,15 @@ export default function HostCard({
     id={id}
     className={`${flush ? '[&>div]:gap-0 [&>div]:p-0' : ''} ${className}`.trim()}
   >
-    {hasHead && <div className={`flex flex-wrap items-start justify-between gap-x-3 gap-y-2 ${flush ? 'border-b border-border px-4 py-3' : ''}`}>
+    {hasHead && <div className={`flex flex-wrap items-start justify-between gap-x-3 gap-y-2.5 ${flush ? 'border-b border-border px-5 py-4' : ''}`}>
       <div className="min-w-0 flex-1">
         {eyebrow && <p className={HOST_EYEBROW}>{eyebrow}</p>}
-        {title && <h2 className="truncate text-base font-semibold text-navy">{title}</h2>}
-        {description && <p className="mt-0.5 text-xs leading-relaxed text-muted">{description}</p>}
+        {/* Two lines, not one: a card head on a phone is often title plus an
+            action button, and a single nowrap line cut real names off ("Good
+            evening, Hann..."). Clamping keeps a very long title from growing
+            the head without limit. */}
+        {title && <h2 className="line-clamp-2 text-base font-semibold text-navy">{title}</h2>}
+        {description && <p className="mt-2 text-xs leading-relaxed text-muted">{description}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>}

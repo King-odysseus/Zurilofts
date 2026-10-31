@@ -102,7 +102,9 @@ function FavouritesPage() {
         />
 
         {!isAuthenticated && !sharedIds ? (
-          <section className="opg-saved-auth" aria-label="Sign in to save stays">
+          // The stylesheet spaces sibling sections itself, but this card is the
+          // first block under the heading and had no gap at all.
+          <section className="opg-saved-auth mt-6" aria-label="Sign in to save stays">
             <UserRound strokeWidth={1.7} aria-hidden="true" />
             <p>Sign in to save stays to your account and keep your lists in sync across devices.</p>
             <Link to="/login?returnUrl=/favourites">Sign in</Link>
@@ -119,7 +121,8 @@ function FavouritesPage() {
                     <p>Favourites and lists, ready for your next trip.</p>
                   </div>
                 </div>
-                <div className="opg-saved-collections">
+                {/* Stylesheet gaps here are 14px above the cards and 16px between them, both under the 20px floor. mt-5 collapses with the title's 14px to render 20px, and !gap-5 outranks the 16px. */}
+                <div className="opg-saved-collections mt-5 !gap-5">
                   <CollectionCard
                     title="Favourites"
                     meta={`${favorites.length} ${favorites.length === 1 ? 'stay' : 'stays'} saved`}
@@ -142,7 +145,7 @@ function FavouritesPage() {
             )}
 
             {sharedIds && sharedProperties.length === 0 && (
-              <div className="opg-saved-empty">
+              <div className="opg-saved-empty mt-6">
                 <div>
                   <h2>No stays in this wishlist</h2>
                   <p>The shared link is valid, but there are no properties to display.</p>

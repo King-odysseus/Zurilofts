@@ -240,8 +240,8 @@ function AdminTrustSafety() {
   }
 
   return (
-    <div className="space-y-6" data-openpencil-frame="0:7228">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-8" data-openpencil-frame="0:7228">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · TRUST</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Verification and disputes</h1>
@@ -255,9 +255,9 @@ function AdminTrustSafety() {
 
       {error && <Alert color="failure" role="alert">{error}</Alert>}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
         <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm" aria-labelledby="verification-queue-title">
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 id="verification-queue-title" className="text-base font-semibold text-navy">Verification queue</h2>
               <p className="text-xs text-muted">Submitted identity checks with document evidence attached.</p>
@@ -297,7 +297,7 @@ function AdminTrustSafety() {
         </section>
 
         <aside className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm" aria-labelledby="dispute-queue-title">
-          <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 id="dispute-queue-title" className="text-base font-semibold text-navy">Disputes</h2>
               <p className="text-xs text-muted">Booking-linked cases needing mediation.</p>
@@ -305,7 +305,7 @@ function AdminTrustSafety() {
             <Badge color="warning">{summary.openDisputes.length} open</Badge>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 border-b border-border px-5 py-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 border-b border-border px-5 py-4 sm:grid-cols-4">
             {Object.entries(summary.disputeCounts).map(([status, count]) => (
               <div key={status} className="flex items-center justify-between gap-2 rounded-xl border border-border bg-surface px-3 py-2">
                 <span className="text-xs text-muted">{DISPUTE_META[status]?.label || status}</span>
@@ -348,7 +348,7 @@ function AdminTrustSafety() {
                   </Badge>
                 </section>
 
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
                   <p className="rounded-xl border border-border bg-elevated p-3">
                     <span className="block text-xs text-muted">Legal name</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.fullName || 'Not supplied'}</strong>
@@ -384,7 +384,7 @@ function AdminTrustSafety() {
                     <span className="text-xs text-muted">{selectedVerification.documents?.length || 0} files</span>
                   </div>
                   {selectedVerification.documents?.length ? (
-                    <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                       {selectedVerification.documents.map((document) => (
                         <Button key={document.id} color="light" disabled={busy === document.id} onClick={() => downloadDocument(document)}>
                           <FileText strokeWidth={1.8} aria-hidden="true" />
@@ -455,7 +455,7 @@ function AdminTrustSafety() {
                   </Badge>
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                   <section className="rounded-xl border border-border bg-surface p-4">
                     <h3 className="text-sm font-semibold text-navy">Issue summary</h3>
                     <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-charcoal">{selectedDispute.description || 'No description was supplied.'}</p>
@@ -464,7 +464,7 @@ function AdminTrustSafety() {
                       <h3 className="text-sm font-semibold text-navy">Evidence</h3>
                       <p className="mt-1 text-xs text-muted">Secure participant uploads.</p>
                       {selectedDispute.evidence?.length ? (
-                        <div className="mt-2 space-y-2">
+                        <div className="mt-3 space-y-3">
                           {selectedDispute.evidence.map((evidence) => (
                             <Button key={evidence.id} color="light" disabled={busy === evidence.id} onClick={() => downloadEvidence(evidence)}>
                               <FileText strokeWidth={1.8} aria-hidden="true" />
@@ -478,9 +478,9 @@ function AdminTrustSafety() {
                       ) : <p className="mt-2 text-xs text-muted">No evidence has been added.</p>}
                     </div>
 
-                    <div className="mt-4">
+                    <div className="mt-5">
                       <h3 className="text-sm font-semibold text-navy">Timeline</h3>
-                      <div className="mt-2 space-y-3">
+                      <div className="mt-3 space-y-3">
                         {(selectedDispute.timeline || []).map((entry, index) => (
                           <div key={`${entry.createdAt}-${entry.action}-${index}`} className="flex items-start gap-3">
                             <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary-600" aria-hidden="true" />
@@ -502,7 +502,7 @@ function AdminTrustSafety() {
                       <h3 className="text-sm font-semibold text-navy">Conversation</h3>
                       <p className="mt-1 text-xs text-muted">Messages visible to the guest, host and admin team.</p>
                     </div>
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-4 space-y-3">
                       {selectedDispute.messages?.length ? selectedDispute.messages.map((message) => (
                         <article key={message.id} className={`rounded-xl border border-border p-3 ${message.senderRole === 'ADMIN' ? 'bg-primary-50 dark:bg-primary/15' : 'bg-elevated'}`}>
                           <span className="block text-[11px] font-semibold uppercase tracking-wide text-primary-600">{message.senderRole}</span>
@@ -514,7 +514,7 @@ function AdminTrustSafety() {
                   </section>
                 </div>
 
-                <div className="flex flex-col gap-4 rounded-xl border border-border bg-surface p-4 lg:flex-row lg:items-end lg:justify-between">
+                <div className="flex flex-col gap-5 rounded-xl border border-border bg-surface p-4 lg:flex-row lg:items-end lg:justify-between">
                   <div className="w-full space-y-1 lg:max-w-md">
                     <Label htmlFor="dispute-resolution">Resolution summary</Label>
                     <TextInput
@@ -544,7 +544,7 @@ function AdminTrustSafety() {
                     <p className="mt-1 text-xs text-muted">Never shown to the guest or host.</p>
                   </div>
                   {selectedDispute.notes?.length > 0 && (
-                    <div className="mt-3 space-y-2">
+                    <div className="mt-4 space-y-3">
                       {selectedDispute.notes.map((note) => (
                         <p key={note.id} className="rounded-xl border border-border bg-elevated p-3">
                           <strong className="block text-sm font-medium text-navy">{note.body}</strong>
@@ -553,7 +553,7 @@ function AdminTrustSafety() {
                       ))}
                     </div>
                   )}
-                  <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-start">
+                  <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start">
                     <Textarea
                       rows={2}
                       maxLength={2000}

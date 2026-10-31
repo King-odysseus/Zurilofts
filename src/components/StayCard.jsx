@@ -109,11 +109,11 @@ function StayCard({ stay, checkIn, checkOut }) {
         </span>}
       </div>
 
-      <p className="truncate text-[13px] leading-snug text-muted">{stay.title}</p>
-      {facts.length > 0 && <p className="truncate text-[13px] leading-snug text-muted">{facts.join(' · ')}</p>}
-      {stayDates && <p className="text-[13px] leading-snug text-muted">{stayDates}</p>}
+      <p className="mt-1 truncate text-[13px] leading-snug text-muted">{stay.title}</p>
+      {facts.length > 0 && <p className="mt-1 truncate text-[13px] leading-snug text-muted">{facts.join(' · ')}</p>}
+      {stayDates && <p className="mt-1 text-[13px] leading-snug text-muted">{stayDates}</p>}
 
-      <p className="mt-1 text-[15px] leading-snug text-ink">
+      <p className="mt-1.5 text-[15px] leading-snug text-ink">
         <span className="font-semibold">{formatPrice(stay.price) ?? 'Price on request'}</span>
         {/* Only a stay with dates can be priced as a total; without them the
             honest unit is the nightly rate. */}

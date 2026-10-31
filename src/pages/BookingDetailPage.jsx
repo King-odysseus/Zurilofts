@@ -55,9 +55,13 @@ function formatCurrency(value) {
   return value == null ? '-' : `KES ${Number(value).toLocaleString()}`;
 }
 
+// The account-travel and detail rules in styles.css are emitted after Tailwind's
+// utility layer and pin their own margins and padding, so a plain spacing
+// utility loses to them. The ! prefix on the spacing utilities below is what
+// makes them apply.
 function MoneyRow({ label, value }) {
   return (
-    <div className="opg-detail-money-row">
+    <div className="opg-detail-money-row !py-3">
       <dt>{label}</dt>
       <dd>{value}</dd>
     </div>
@@ -213,14 +217,14 @@ function BookingDetailPage() {
             <span className={`${STATUS_PILL} ${status.className}`}>{status.label}</span>
           </div>
 
-          <dl className="opg-history-meta">
+          <dl className="opg-history-meta !mt-6">
             <div><dt>Check-in</dt><dd>{formatDate(booking.checkIn)}</dd></div>
             <div><dt>Check-out</dt><dd>{formatDate(booking.checkOut)}</dd></div>
             <div><dt>Guests</dt><dd>{booking.guests || 1}</dd></div>
             <div><dt>Total</dt><dd>{formatCurrency(booking.total)}</dd></div>
           </dl>
 
-          <dl className="opg-history-meta">
+          <dl className="opg-history-meta !mt-6">
             <div><dt>Arrival time</dt><dd>{formatTime(booking.checkInTime)}</dd></div>
             <div><dt>Departure time</dt><dd>{formatTime(booking.checkOutTime)}</dd></div>
             <div><dt>Payment</dt><dd>{booking.paidAt ? `Paid ${formatDate(booking.paidAt)}` : (booking.paymentMethod || '-')}</dd></div>
@@ -229,8 +233,8 @@ function BookingDetailPage() {
         </div>
       </article>
 
-      <section className="opg-detail-panel rounded-xl border border-border" aria-labelledby="detail-payment">
-        <h2 id="detail-payment">Payment summary</h2>
+      <section className="opg-detail-panel !mt-6 rounded-xl border border-border" aria-labelledby="detail-payment">
+        <h2 id="detail-payment" className="!mb-5">Payment summary</h2>
         <dl className="opg-detail-money">
           <MoneyRow label={`Accommodation (${booking.bedOption === '2bed' ? '2-bed' : '1-bed'})`} value={formatCurrency(booking.subtotal)} />
           {booking.lateCheckoutFee > 0 && <MoneyRow label="Late check-out" value={formatCurrency(booking.lateCheckoutFee)} />}
@@ -243,7 +247,9 @@ function BookingDetailPage() {
               value={`- ${formatCurrency(booking.discountAmount)}`}
             />
           )}
-          <div className="opg-detail-money-total">
+          {/* The total sits 32px below the last money row (16px margin plus 16px
+              padding above the rule) instead of the previous 22px. */}
+          <div className="opg-detail-money-total !mt-4 !pt-4">
             <dt>Total</dt>
             <dd>{formatCurrency(booking.total)}</dd>
           </div>
@@ -272,11 +278,11 @@ function BookingDetailPage() {
       </section>
 
       {(additionalGuests.length > 0 || booking.specialRequests) && (
-        <section className="opg-detail-panel rounded-xl border border-border" aria-labelledby="detail-stay">
-          <h2 id="detail-stay">Guest details</h2>
+        <section className="opg-detail-panel !mt-6 rounded-xl border border-border" aria-labelledby="detail-stay">
+          <h2 id="detail-stay" className="!mb-5">Guest details</h2>
           {additionalGuests.length > 0 && (
             <>
-              <h3>Additional guests</h3>
+              <h3 className="!mb-3">Additional guests</h3>
               <ul className="opg-detail-list">
                 {additionalGuests.map((guest, index) => (
                   <li key={`guest-${index}-${guest.lastName || ''}`}>{[guest.firstName, guest.lastName].filter(Boolean).join(' ') || 'Guest'}</li>
@@ -286,7 +292,7 @@ function BookingDetailPage() {
           )}
           {booking.specialRequests && (
             <>
-              <h3>Special requests</h3>
+              <h3 className="!mb-3">Special requests</h3>
               <p className="opg-detail-note">{booking.specialRequests}</p>
             </>
           )}

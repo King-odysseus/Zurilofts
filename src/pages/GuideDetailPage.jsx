@@ -53,7 +53,7 @@ function GuideDetailPage() {
     return (
       <main className="op-public-page op-guide-detail-page">
         <div className="op-content-container op-public-loader">
-          <div className="op-guide-not-found">
+          <div className="op-guide-not-found space-y-4">
             <span>Guide not found</span>
             <h1>This story has moved</h1>
             <p>The guide may have been removed or its address changed.</p>
@@ -68,7 +68,7 @@ function GuideDetailPage() {
 
   return (
     <main className="op-public-page op-guide-detail-page">
-      <article className="op-content-container op-guide-detail">
+      <article className="op-content-container op-guide-detail space-y-9">
         <Link
           to="/guides"
           className="op-directory-back"
@@ -83,7 +83,7 @@ function GuideDetailPage() {
           className="op-guide-detail-cover"
         />
 
-        <header className="op-guide-detail-header">
+        <header className="op-guide-detail-header space-y-4">
           <span className="op-eyebrow">City guide</span>
           <h1>{post.title}</h1>
           <p>

@@ -2,21 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check git status for uncommitted files",
+      "text": "Record a plan for the recommendations write-up",
       "state": "done"
     },
     {
-      "text": "Review diff for secrets or generated files",
+      "text": "Re-read the add-on money path, payout balance check and fee wiring to ground each recommendation",
       "state": "done"
     },
     {
-      "text": "Run lint and build checks",
+      "text": "Check what config/secrets are missing to take real money safely",
       "state": "done"
     },
     {
-      "text": "Commit changes and push",
-      "state": "active"
+      "text": "Write prioritised recommendations with effort, risk and order",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T17:51:28.123Z"
+  "updatedAt": "2026-10-31T20:14:22.449Z"
 }

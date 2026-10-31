@@ -6,7 +6,7 @@ import { PLACES_TO_VISIT, AREAS, PLACE_CATEGORIES } from '../data/nearby.js';
 function PlacesPage() {
   return (
     <main className="op-public-page op-public-directory">
-      <div className="op-content-container">
+      <div className="op-content-container pt-2 sm:pt-4">
         <Link to="/" className="op-directory-back">
           <ChevronLeft className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           Back to Home

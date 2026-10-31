@@ -680,8 +680,8 @@ function DashboardOverview() {
   // reads as a shape instead of a flat line at the bottom.
   const peakSignups = trend ? Math.max(1, ...trend.series.map((p) => p.signups)) : 1;
 
-  return <div className="space-y-6" data-openpencil-frame="0:6909">
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+  return <div className="space-y-8" data-openpencil-frame="0:6909">
+    <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · PEOPLE & PLATFORM</p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Platform overview</h1>
@@ -701,7 +701,7 @@ function DashboardOverview() {
         </Dropdown>
       </div>
     </div>
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
       <article className={METRIC_CARD}><span className={METRIC_LABEL}>HOST APPLICATIONS</span><strong className={METRIC_VALUE}>{summary.applicationsPending}</strong><small className={METRIC_NOTE}>Awaiting your review</small></article>
       <article className={METRIC_CARD}><span className={METRIC_LABEL}>ACCOUNTS</span><strong className={METRIC_VALUE}>{summary.accounts}</strong><small className={METRIC_NOTE}>Guests and hosts</small></article>
       <article className={METRIC_CARD}><span className={METRIC_LABEL}>LISTING APPROVALS</span><strong className={METRIC_VALUE}>{summary.listingsPending}</strong><small className={METRIC_NOTE}>Submitted by hosts</small></article>
@@ -766,7 +766,7 @@ function DashboardOverview() {
         <div className={PANEL_HEAD}>
           <h2 className={PANEL_TITLE}>Platform at a glance</h2>
         </div>
-        <div className="space-y-2 px-5 py-4">
+        <div className="space-y-3 px-5 py-4">
           <p className="flex items-center justify-between text-xs text-muted"><span>Live listings</span><strong className="text-sm font-semibold text-navy">{summary.listingsLive}</strong></p>
           <p className="flex items-center justify-between text-xs text-muted"><span>Awaiting approval</span><strong className="text-sm font-semibold text-navy">{summary.listingsPending}</strong></p>
           <p className="flex items-center justify-between text-xs text-muted"><span>Identity checks</span><strong className="text-sm font-semibold text-navy">{summary.verificationsPending}</strong></p>
@@ -782,7 +782,7 @@ function DashboardOverview() {
           <AccordionTitle className="bg-white text-navy [&>button]:bg-white">Landing page statistics</AccordionTitle>
           <AccordionContent>
             <p className={PANEL_SUBTITLE}>Happy stays is counted from guest stays that have checked out, so it cannot be edited here. Set the other values to 0 to use live review data.</p>
-            <form onSubmit={saveLandingStats} className="mt-3 flex flex-wrap items-end gap-3">
+            <form onSubmit={saveLandingStats} className="mt-5 flex flex-wrap items-end gap-5">
               {/* Deliberately not a field: it is a live count, so a box would invite typing. */}
               <div className="grid w-28 gap-1 text-xs font-semibold text-navy">
                 <span>Happy stays</span>

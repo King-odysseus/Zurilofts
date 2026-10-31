@@ -146,17 +146,17 @@ function HostPayouts() {
     URL.revokeObjectURL(url);
   }
 
-  if (loading) return <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Loading payout information">
+  if (loading) return <div className="grid grid-cols-1 gap-5 sm:grid-cols-3" aria-label="Loading payout information">
     {[0, 1, 2].map((key) => <HostCard key={key} className="h-24 animate-pulse" />)}
   </div>;
 
-  return <div className="space-y-6">
+  return <div className="space-y-6 lg:space-y-8">
     <header className="flex flex-wrap items-start justify-between gap-4">
       <div>
         <Link to="/host/earnings" className="text-xs font-semibold text-muted transition-colors hover:text-navy">Back to earnings</Link>
         <p className={HOST_EYEBROW}>Host workspace</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Payouts</h1>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Manage how you get paid and review your payout history.</p>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Manage how you get paid and review your payout history.</p>
       </div>
       <Button as={Link} to="/host/settings" size="sm">{destination?.method ? 'Change destination' : 'Set up payouts'}</Button>
     </header>
@@ -168,7 +168,7 @@ function HostPayouts() {
       </div>
     </Alert>}
 
-    <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Payout balance summary">
+    <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4" aria-label="Payout balance summary">
       <HostCard eyebrow="Available balance">
         <strong className="block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.balance || 0).toLocaleString()}</strong>
         <small className="block text-xs text-muted">Ready for the next payout</small>
@@ -193,7 +193,7 @@ function HostPayouts() {
       </HostCard>
     </section>
 
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
       <HostCard
         title="Payout destination"
         description="Where your available balance is sent."
@@ -201,10 +201,10 @@ function HostPayouts() {
       >
         <div className="rounded-xl bg-surface px-4 py-3">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{destination?.method || 'NOT CONFIGURED'}</span>
-          <strong className="mt-1 block text-sm font-semibold text-navy">{destination?.label || 'Add a payout destination'}</strong>
-          <small className="mt-1 block text-xs text-muted">{destination?.maskedAccount || 'Bank or mobile money details are required before payout.'}</small>
+          <strong className="mt-1.5 block text-sm font-semibold text-navy">{destination?.label || 'Add a payout destination'}</strong>
+          <small className="mt-2 block text-xs text-muted">{destination?.maskedAccount || 'Bank or mobile money details are required before payout.'}</small>
         </div>
-        <dl className="space-y-2 text-sm">
+        <dl className="space-y-3 text-sm">
           <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Next payout</dt><dd className="font-semibold text-navy">{wallet?.nextPayoutAt ? new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not scheduled'}</dd></div>
           <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Last payout</dt><dd className="font-semibold text-navy">{formatDate(wallet?.lastPayoutAt)}</dd></div>
         </dl>
@@ -224,17 +224,17 @@ function HostPayouts() {
           </div>
           <Button type="button" size="sm" onClick={loadWht}>View statement</Button>
         </div>
-        {whtData ? <div className="space-y-4">
+        {whtData ? <div className="space-y-5">
           <div className="rounded-xl bg-surface px-4 py-3">
             <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{whtMonth || 'ALL TIME'}</span>
-            <strong className="mt-1 block text-xl font-bold text-navy tabular-nums">KES {(whtData.totalWht || 0).toLocaleString()} WHT</strong>
-            <small className="mt-1 block text-xs text-muted">From KES {(whtData.totalEarnings || 0).toLocaleString()} host earnings</small>
+            <strong className="mt-1.5 block text-xl font-bold text-navy tabular-nums">KES {(whtData.totalWht || 0).toLocaleString()} WHT</strong>
+            <small className="mt-2 block text-xs text-muted">From KES {(whtData.totalEarnings || 0).toLocaleString()} host earnings</small>
           </div>
 
           {/* Four columns cannot fit 390px without sideways scrolling, so narrow
               screens get the same rows stacked instead of a scrolling table. */}
           <ul className="divide-y divide-border text-sm sm:hidden">
-            {whtData.bookings.map((booking, index) => <li key={booking.id || index} className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-2">
+            {whtData.bookings.map((booking, index) => <li key={booking.id || index} className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-3">
               <span className="w-full break-words font-medium text-navy">{booking.property?.title || 'Property'}</span>
               <span className="text-xs text-muted">{formatDate(booking.paidAt)}</span>
               <span className="tabular-nums text-navy">KES {(booking.hostNetAmount || 0).toLocaleString()}</span>
@@ -284,7 +284,7 @@ function HostPayouts() {
         <p className="text-xs text-muted">Your first payout will appear here after a transfer is created.</p>
       </div> : <>
         <ul className="divide-y divide-border text-sm sm:hidden">
-          {payouts.map((payout) => <li key={payout.id} className="space-y-1 py-3">
+          {payouts.map((payout) => <li key={payout.id} className="space-y-2 py-4">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <strong className="tabular-nums text-navy">KES {(payout.amount || 0).toLocaleString()}</strong>
               <Badge color={STATUS_BADGE_COLORS[payout.status] || 'gray'}>{payout.status}</Badge>
@@ -309,7 +309,7 @@ function HostPayouts() {
               <TableCell className="tabular-nums text-right">{payout.bookingsCount || 0}</TableCell>
               <TableCell>
                 <Badge color={STATUS_BADGE_COLORS[payout.status] || 'gray'}>{payout.status}</Badge>
-                {payout.failureReason && <small className="mt-1 block text-xs text-muted">{payout.failureReason}</small>}
+                {payout.failureReason && <small className="mt-2 block text-xs text-muted">{payout.failureReason}</small>}
               </TableCell>
               <TableCell>{formatDate(payout.createdAt)}</TableCell>
             </TableRow>)}</TableBody>

@@ -125,7 +125,7 @@ export default function HostListingPreviewPage() {
           <div>
             <p className={HOST_EYEBROW}>Host workspace</p>
             <h1 className="mt-1 text-2xl font-semibold tracking-tight text-navy sm:text-3xl">Guest preview</h1>
-            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
               Your own copy of this listing, laid out as a guest reads it. Nothing you click here books or pays for anything.
             </p>
           </div>

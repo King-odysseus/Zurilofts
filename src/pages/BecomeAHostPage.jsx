@@ -17,7 +17,7 @@ function ResultRow({ label, value, hint, emphasis }) {
     <div className="flex items-baseline justify-between gap-4 border-b border-line py-3 last:border-b-0">
       <div className="min-w-0">
         <dt className={`text-sm ${emphasis ? 'font-semibold text-navy' : 'text-muted'}`}>{label}</dt>
-        {hint && <p className="mt-0.5 text-xs text-muted">{hint}</p>}
+        {hint && <p className="mt-1.5 text-xs text-muted">{hint}</p>}
       </div>
       <dd className={`shrink-0 tabular-nums ${emphasis ? 'text-lg font-semibold text-navy' : 'text-sm font-medium text-navy'}`}>
         {value}
@@ -131,7 +131,7 @@ export default function BecomeAHostPage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
           <div className="rounded-xl border border-line bg-elevated p-5 shadow-sm sm:p-6">
             <h2 className="font-montserrat text-xl font-bold text-navy">Your stay, your numbers</h2>
-            <p className="mt-1 text-sm text-muted">Monthly figures assume every night you enter is booked.</p>
+            <p className="mt-2 text-sm text-muted">Monthly figures assume every night you enter is booked.</p>
 
             <div className="mt-6 space-y-5">
               <div>
@@ -157,7 +157,7 @@ export default function BecomeAHostPage() {
                   onChange={(e) => setNights(Math.min(31, Math.max(0, Number(e.target.value) || 0)))}
                   className="mt-1"
                 />
-                <p className="mt-1 text-xs text-muted">Between 0 and 31.</p>
+                <p className="mt-2 text-xs text-muted">Between 0 and 31.</p>
               </div>
               <div>
                 <Label htmlFor="other-platform" className="text-navy">
@@ -176,14 +176,14 @@ export default function BecomeAHostPage() {
                 />
                 {/* Left to the host rather than guessed: quoting a rival's rate
                     we have not verified would be misleading. */}
-                <p className="mt-1 text-xs text-muted">
+                <p className="mt-2 text-xs text-muted">
                   Enter the rate you pay today. If you have not hosted before, leave it as it is.
                 </p>
               </div>
             </div>
 
             {fees && (
-              <dl className="mt-6 space-y-2 border-t border-line pt-4 text-sm">
+              <dl className="mt-6 space-y-2.5 border-t border-line pt-4 text-sm">
                 <div className="flex justify-between gap-3">
                   <dt className="text-muted">Our commission</dt>
                   <dd className="font-medium text-navy">{fees.commissionPercent}%</dd>

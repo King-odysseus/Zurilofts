@@ -26,7 +26,7 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
   return (
     <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(20,58,128,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
       {/* Price */}
-      <div className="mb-5">
+      <div className="mb-6">
         <span className="text-3xl font-bold text-[#203565]">
           KES {price != null ? price.toLocaleString() : '-'}
         </span>
@@ -35,7 +35,7 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
 
       {/* Bed variant chip - only when arriving from a variant card */}
       {variantLabel && (
-        <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#203565]">
+        <div className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#203565]">
           <House className="w-4 h-4 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
           {variantLabel}
         </div>
@@ -43,16 +43,16 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
 
       {/* Selected add-ons - only when provided */}
       {addOnItems.length > 0 && (
-        <div className="mb-5 border-t border-[#E3E8EF] pt-5">
-          <h4 className="mb-3 font-semibold text-[#203565]">Add-ons</h4>
-          <div className="space-y-2 text-sm">
+        <div className="mb-6 border-t border-[#E3E8EF] pt-6">
+          <h4 className="mb-4 font-semibold text-[#203565]">Add-ons</h4>
+          <div className="space-y-3 text-sm">
             {addOnItems.map((a) => (
               <div key={a.id} className="flex justify-between text-[#5B6B82]">
                 <span>{a.name} x {a.quantity}</span>
                 <span>KES {(a.quantity * (a.price || 0)).toLocaleString()}</span>
               </div>
             ))}
-            <div className="flex justify-between border-t border-[#E3E8EF] pt-2 font-semibold text-[#203565]">
+            <div className="flex justify-between border-t border-[#E3E8EF] pt-3 font-semibold text-[#203565]">
               <span>Add-ons total</span>
               <span>KES {addOnsTotal.toLocaleString()}</span>
             </div>
@@ -69,14 +69,14 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
         Book Now
       </Link>
 
-      <p className="mt-4 text-center text-sm text-[#5B6B82]">
+      <p className="mt-5 text-center text-sm text-[#5B6B82]">
         You won&apos;t be charged yet
       </p>
 
       {/* Trust context - only facts from the API */}
       <div className="mt-6 border-t border-[#E3E8EF] pt-6">
-        <h4 className="mb-3 font-semibold text-[#203565]">About this listing</h4>
-        <ul className="space-y-2 text-sm text-[#5B6B82]">
+        <h4 className="mb-4 font-semibold text-[#203565]">About this listing</h4>
+        <ul className="space-y-3 text-sm text-[#5B6B82]">
           {hasReviews && (
             <li className="flex items-start gap-2">
               <Star className="w-4 h-4 text-[#8A6B52] mt-0.5 shrink-0" fill="currentColor" aria-hidden="true" />

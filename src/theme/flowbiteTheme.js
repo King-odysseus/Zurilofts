@@ -195,7 +195,7 @@ export const brandTheme = {
   card: {
     root: {
       base: 'flex rounded-[14px] border border-border bg-elevated text-navy shadow-sm',
-      children: 'flex h-full w-full flex-col gap-3 p-4 sm:p-5',
+      children: 'flex h-full w-full flex-col gap-4 p-5',
       href: 'transition-colors hover:bg-surface dark:hover:bg-surface',
     },
     img: {

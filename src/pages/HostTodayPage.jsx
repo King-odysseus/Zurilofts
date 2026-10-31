@@ -64,7 +64,7 @@ function GuestOperationCard({ booking, type, compact = false, onMessage, message
       <span className="block truncate text-xs text-muted">{propertyTitle} · {time}</span>
       {/* A guest conversation belongs to the host inbox. This used to open the
           traveller support thread, which is a different inbox entirely. */}
-      <button type="button" onClick={() => onMessage(booking.id)} disabled={messagePending} className="text-xs font-semibold text-navy underline-offset-2 hover:underline disabled:opacity-60">{messagePending ? "Opening..." : "Message guest"}</button>
+      <button type="button" onClick={() => onMessage(booking.id)} disabled={messagePending} className="mt-1.5 text-xs font-semibold text-navy underline-offset-2 hover:underline disabled:opacity-60">{messagePending ? "Opening..." : "Message guest"}</button>
     </div>
     <Link className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-navy" to={`/host/reservations/${booking.id}`}>View</Link>
   </article>;
@@ -91,7 +91,7 @@ GuestOperationCard.propTypes = {
 };
 
 function EmptyPanel({ label }) {
-  return <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center">
+  return <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center">
     <span className="grid h-9 w-9 place-items-center rounded-full bg-surface text-muted"><CalendarDays className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" /></span>
     <strong className="text-sm font-semibold text-navy">No {label.toLowerCase()} today</strong>
     <p className="text-xs text-muted">This panel will update when the schedule changes.</p>
@@ -105,7 +105,7 @@ function StatTile({ label, hint, value }) {
     <div className="flex items-center justify-between gap-4">
       <div className="min-w-0">
         <span className="block truncate text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</span>
-        <small className="mt-1 block text-xs text-muted">{hint}</small>
+        <small className="mt-2 block text-xs text-muted">{hint}</small>
       </div>
       <strong className="text-2xl font-bold tabular-nums text-navy">{value}</strong>
     </div>
@@ -120,7 +120,7 @@ StatTile.propTypes = {
 
 function OperationPanel({ title, count, tone, bookings, type, onMessage, messageBookingId }) {
   return <HostCard title={title} action={<Badge color={TONE_COLORS[tone]}>{count} today</Badge>}>
-    <div className="space-y-3">
+    <div className="space-y-4">
       {bookings.length === 0 ? <EmptyPanel label={title} /> : bookings.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={type} compact onMessage={onMessage} messagePending={messageBookingId === booking.id} />)}
     </div>
   </HostCard>;
@@ -143,25 +143,25 @@ function RecentMessages({ conversations, loading }) {
     action={<Button as={Link} to="/host/inbox" color="light" size="sm">View inbox</Button>}
   >
     {loading
-      ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      ? <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <span className="block h-20 animate-pulse rounded-xl bg-surface" />
         <span className="block h-20 animate-pulse rounded-xl bg-surface" />
       </div>
       : conversations.length === 0
-        ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border px-5 py-12 text-center">
+        ? <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border px-5 py-12 text-center">
           <strong className="text-sm font-semibold text-navy">No guest messages yet</strong>
           <p className="text-xs text-muted">New stay conversations will appear here.</p>
         </div>
-        : <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+        : <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       {conversations.map((conversation) => {
         const booking = conversation.booking || {};
         const property = booking.property || {};
         const user = booking.user || {};
         const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || "Guest";
         const image = firstImage(property);
-        return <Link key={conversation.id} to={`/host/inbox/${conversation.id}`} className="flex items-start gap-3 rounded-xl bg-surface p-3 transition-colors hover:bg-surface">
+        return <Link key={conversation.id} to={`/host/inbox/${conversation.id}`} className="flex items-start gap-3 rounded-xl bg-surface px-3 py-3.5 transition-colors hover:bg-surface">
           <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-elevated text-xs font-bold uppercase text-muted">{image ? <img src={image} alt="" className="h-full w-full object-cover" /> : name.slice(0, 1)}</span>
-          <div className="min-w-0 flex-1"><strong className="block truncate text-sm font-semibold text-navy">{name}</strong><small className="block truncate text-xs text-muted">{property.title || "Stay"}</small><p className="mt-1 truncate text-xs text-muted">{conversation.lastMessage?.content || "No messages yet"}</p></div>
+          <div className="min-w-0 flex-1"><strong className="block truncate text-sm font-semibold text-navy">{name}</strong><small className="block truncate text-xs text-muted">{property.title || "Stay"}</small><p className="mt-2 truncate text-xs text-muted">{conversation.lastMessage?.content || "No messages yet"}</p></div>
           <time className="shrink-0 text-[10px] text-muted">{relativeTime(conversation.lastMessage?.createdAt || conversation.updatedAt)}</time>
         </Link>;
       })}
@@ -259,12 +259,12 @@ export default function HostTodayPage() {
   const priority = arrivals[0] || inHouse[0] || departures[0];
   const priorityType = arrivals[0] ? "arrival" : inHouse[0] ? "inhouse" : "departure";
 
-  return <div className="space-y-6">
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+  return <div className="space-y-8">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
         <p className={HOST_EYEBROW}>HOST WORKSPACE</p>
-        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Today</h1>
-        <span className="mt-1 block text-sm text-muted">{formatToday()}</span>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Today</h1>
+        <span className="mt-2 block text-sm text-muted">{formatToday()}</span>
       </div>
       <div className="flex flex-wrap gap-2">
         <Button as={Link} to="/host/reservations" color="light" size="sm" className="hidden md:inline-flex">All reservations</Button>
@@ -279,7 +279,7 @@ export default function HostTodayPage() {
       </div>
     </Alert>}
 
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
       <HostCard
         className="lg:col-span-2"
         eyebrow="TODAY AT YOUR STAYS"
@@ -292,7 +292,7 @@ export default function HostTodayPage() {
           card body itself: flush removes the body padding and overflow-hidden
           trims the fill to the card radius. */}
       <HostCard flush className="overflow-hidden">
-        <div className="flex h-full flex-col gap-3 bg-navy-bg p-4 sm:p-5">
+        <div className="flex h-full flex-col gap-4 bg-navy-bg p-4 sm:p-5">
           <div className="min-w-0">
             <p className={HOST_EYEBROW}>PRIORITY NEXT STEP</p>
             <h2 className="mt-1 text-base font-semibold text-white">{priority ? (priorityType === "arrival" ? "Confirm arrival details" : priorityType === "departure" ? "Review today's checkout" : "Check your in-house guest") : "Your day is clear"}</h2>
@@ -306,13 +306,13 @@ export default function HostTodayPage() {
       </HostCard>
     </div>
 
-    <div className="hidden grid-cols-1 gap-4 sm:grid sm:grid-cols-3">
+    <div className="hidden grid-cols-1 gap-5 sm:grid sm:grid-cols-3">
       <StatTile label="Arrivals" hint="Guests checking in" value={summary.arrivals || 0} />
       <StatTile label="Departures" hint="Guests checking out" value={summary.departures || 0} />
       <StatTile label="In house" hint="Stays in progress" value={summary.inHouse || 0} />
     </div>
 
-    <div className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:[&>div:last-child]:col-span-2 lg:[&>div:last-child]:col-span-1">
+    <div className="hidden gap-5 md:grid md:grid-cols-2 lg:grid-cols-3 md:[&>div:last-child]:col-span-2 lg:[&>div:last-child]:col-span-1">
       <OperationPanel title="Arrivals" count={arrivals.length} tone="arrival" bookings={arrivals} type="arrival" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
       <OperationPanel title="In house" count={inHouse.length} tone="inhouse" bookings={inHouse} type="inhouse" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
       <OperationPanel title="Departures" count={departures.length} tone="departure" bookings={departures} type="departure" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
@@ -354,7 +354,7 @@ export default function HostTodayPage() {
         role="tabpanel"
         id={`day-panel-${key}`}
         aria-labelledby={`day-tab-${key}`}
-        className="mt-4 space-y-3"
+        className="mt-6 space-y-5"
       >
         {items.length === 0
           ? <EmptyPanel label={key === "arrival" ? "Arrivals" : key === "departure" ? "Departures" : "In-house guests"} />

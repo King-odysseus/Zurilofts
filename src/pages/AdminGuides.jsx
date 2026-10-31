@@ -143,8 +143,8 @@ function AdminGuides() {
   }), [visiblePosts]);
 
   return (
-    <div className="space-y-6" data-openpencil-frame="0:7343">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-8" data-openpencil-frame="0:7343">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · CONTENT</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Travel guides</h1>
@@ -153,7 +153,7 @@ function AdminGuides() {
         <Button onClick={handleCreate}>New guide</Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PUBLISHED GUIDES</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.published}</strong>
@@ -177,7 +177,7 @@ function AdminGuides() {
       </div>
 
       <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-sm">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
             <TextInput className="pl-9" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search guide title, slug or content" aria-label="Search guides" />
@@ -185,7 +185,7 @@ function AdminGuides() {
           <span className="shrink-0 self-start rounded-full bg-surface px-2.5 py-1 text-[11px] font-semibold text-muted sm:self-auto">{visiblePosts.length} guide{visiblePosts.length === 1 ? '' : 's'}</span>
         </div>
 
-        {message && <Alert color="failure" className="mx-5 mt-4" role="status">{message}</Alert>}
+        {message && <Alert color="failure" className="mx-5 mt-5" role="status">{message}</Alert>}
 
         {loading ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
@@ -258,10 +258,10 @@ function AdminGuides() {
               <span className="block">{editing === 'new' ? 'Create travel guide' : 'Edit travel guide'}</span>
             </ModalHeader>
             <ModalBody>
-              {error && <Alert color="failure" className="mb-4">{error}</Alert>}
-              <form onSubmit={handleSave} className="space-y-4">
+              {error && <Alert color="failure" className="mb-5">{error}</Alert>}
+              <form onSubmit={handleSave} className="space-y-5">
                 <div><Label htmlFor="guide-title">Title</Label><TextInput id="guide-title" value={form.title} onChange={(event) => handleTitleChange(event.target.value)} placeholder="Best areas to stay in Nairobi" required /></div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div><Label htmlFor="guide-slug">Slug</Label><TextInput id="guide-slug" value={form.slug} onChange={(event) => setForm({ ...form, slug: event.target.value })} /></div>
                   <div><Label htmlFor="guide-cover">Cover image URL</Label><TextInput id="guide-cover" value={form.coverImage} onChange={(event) => setForm({ ...form, coverImage: event.target.value })} placeholder="/images/..." /></div>
                 </div>

@@ -92,18 +92,18 @@ export default function HostPromosPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 lg:gap-8">
       <header>
         <p className={HOST_EYEBROW}>Host workspace</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Discounts</h1>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Create offers funded from your own booking earnings.</p>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Create offers funded from your own booking earnings.</p>
       </header>
 
       {message.text && <Alert color={message.tone === 'error' ? 'failure' : 'success'}>{message.text}</Alert>}
 
       <HostCard title="Create a discount" description="Required fields are the code, the percentage, and the valid dates.">
-        <form onSubmit={createPromo} className="flex flex-col gap-4">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <form onSubmit={createPromo} className="flex flex-col gap-6">
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {FIELDS.map((name) => {
               const meta = FIELD_META[name];
               return (
@@ -144,7 +144,7 @@ export default function HostPromosPage() {
         action={loading ? undefined : <Badge color="gray">{promos.length} {promos.length === 1 ? 'code' : 'codes'}</Badge>}
       >
         {loading ? (
-          <div className="flex flex-col gap-2 px-4 py-4" aria-label="Loading discounts" role="status">
+          <div className="flex flex-col gap-3 px-4 py-4" aria-label="Loading discounts" role="status">
             <span className="block h-16 animate-pulse rounded-xl bg-inset" />
             <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:150ms]" />
           </div>
@@ -156,10 +156,10 @@ export default function HostPromosPage() {
         ) : (
           <ul className="divide-y divide-border">
             {promos.map((promo) => (
-              <li key={promo.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 px-4 py-3">
+              <li key={promo.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 px-4 py-4">
                 <div className="min-w-0">
                   <strong className="block truncate font-mono text-sm text-navy">{promo.code}</strong>
-                  <p className="mt-0.5 text-xs text-muted">
+                  <p className="mt-1.5 text-xs text-muted">
                     {promo.discountPercent}% off · {promo.currentUses || 0}{promo.maxUses ? ` / ${promo.maxUses}` : ''} uses
                   </p>
                 </div>

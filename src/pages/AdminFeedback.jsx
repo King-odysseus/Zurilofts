@@ -94,8 +94,8 @@ function AdminFeedback() {
   }), [visibleReviews]);
 
   return (
-    <div className="space-y-6" data-openpencil-frame="0:7343">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-8" data-openpencil-frame="0:7343">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · CONTENT</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Guest feedback</h1>
@@ -103,7 +103,7 @@ function AdminFeedback() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">AVERAGE RATING</span><strong className="mt-2 block text-2xl font-bold text-navy">{Number(summary.averageRating || 0).toFixed(2)}</strong><div className="mt-1"><StarRow rating={Math.round(summary.averageRating || 0)} size="lg" /></div><small className="mt-1 block text-xs text-muted">Across all completed-stay reviews</small></article>
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">TOTAL REVIEWS</span><strong className="mt-2 block text-2xl font-bold text-navy">{summary.totalReviews || 0}</strong><small className="mt-1 block text-xs text-muted">Published rating records</small></article>
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">FIVE-STAR REVIEWS</span><strong className="mt-2 block text-2xl font-bold text-navy">{metrics.fiveStar}</strong><small className="mt-1 block text-xs text-muted">Highest-rated guest experiences</small></article>
@@ -111,7 +111,7 @@ function AdminFeedback() {
       </div>
 
       <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 sm:max-w-xs">
             <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"><SearchIcon /></span>
             <TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search property, guest or review" aria-label="Search guest feedback" className="pl-9" />
@@ -187,13 +187,13 @@ function AdminFeedback() {
               <span className="block text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">GUEST REVIEW · {selected.rating}/5</span>
               <span className="block text-base font-semibold text-navy">{selected.property?.title || 'Guest feedback'}</span>
             </ModalHeader>
-            <ModalBody>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <ModalBody className="space-y-5">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
                 <div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Guest</span><strong className="mt-1 block text-sm font-semibold text-navy">{selected.user?.firstName} {selected.user?.lastName}</strong><small className="block text-xs text-muted">{selected.user?.email}</small></div>
                 <div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Stay location</span><strong className="mt-1 block text-sm font-semibold text-navy">{selected.property?.location || 'Not recorded'}</strong><small className="block text-xs text-muted">{formatDate(selected.createdAt, true)}</small></div>
                 <div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Rating</span><div className="mt-1"><StarRow rating={Number(selected.rating) || 0} size="lg" /></div><small className="block text-xs text-muted">{selected.rating} out of 5</small></div>
               </div>
-              <section className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <section className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                 <div><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PUBLIC REVIEW</span><p className="mt-1 text-sm leading-relaxed text-charcoal">{selected.publicComment || 'No public review was submitted.'}</p></div>
                 <div className="rounded-lg border border-border bg-surface p-3"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PRIVATE OPERATIONAL NOTE</span><p className="mt-1 text-sm leading-relaxed text-charcoal">{selected.privateNote || 'No private note was supplied.'}</p></div>
               </section>

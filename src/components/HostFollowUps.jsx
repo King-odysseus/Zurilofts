@@ -67,7 +67,7 @@ export default function HostFollowUps({ items, loading }) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
             <p className="text-[11px] font-semibold text-muted">{kicker(item)}</p>
-            <strong className="mt-0.5 block text-sm font-semibold leading-snug text-navy">{headline(item)}</strong>
+            <strong className="mt-1.5 block text-sm font-semibold leading-snug text-navy">{headline(item)}</strong>
             <p className="mt-1 truncate text-xs text-muted">{item.propertyTitle}</p>
           </div>
           <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-bg text-[11px] font-bold text-white">

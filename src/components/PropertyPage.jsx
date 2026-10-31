@@ -204,7 +204,7 @@ function PropertyPage() {
       <div className="mx-auto w-full max-w-[1344px] px-4 sm:px-6 md:px-8 lg:px-16 py-6 md:py-10 lg:py-14">
         {/* ── Image gallery: large primary + supporting thumbnail grid ── */}
         {images.length > 0 && (
-          <section className="mb-6 md:mb-8" aria-label="Property photo gallery">
+          <section className="mb-8 lg:mb-12" aria-label="Property photo gallery">
             {images.length === 1 ? (
               <img
                 className="h-56 w-full cursor-pointer rounded-2xl border border-[#E3E8EF] object-cover shadow-sm sm:h-72 md:h-[460px]"
@@ -260,7 +260,7 @@ function PropertyPage() {
         )}
 
         {/* ── Property identity: title, location, rating ────────── */}
-        <header className="mb-6 md:mb-8">
+        <header className="mb-8 lg:mb-12">
           <h1 className="mb-2 text-2xl font-bold leading-tight text-[#203565] sm:text-3xl md:text-4xl">
             {property.title}
           </h1>
@@ -297,11 +297,12 @@ function PropertyPage() {
         />
 
         {/* ── Two-column body ────────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
+        {/* mt-8 lg:mt-12 keeps the two-column body clear of the trust panel above it. */}
+        <div className="mt-8 lg:mt-12 grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
           {/* ── Left column - property details ─────────────────── */}
           <div className="lg:col-span-2">
             {/* Quick facts */}
-            <section className="flex flex-wrap gap-5 sm:gap-8 mb-8 py-8 md:py-10 border-b border-[#E3E8EF]" aria-label="Key facts">
+            <section className="flex flex-wrap gap-5 sm:gap-8 mb-8 lg:mb-12 py-8 md:py-10 border-b border-[#E3E8EF]" aria-label="Key facts">
               <div className="flex items-center gap-2">
                 <House className="h-6 w-6 shrink-0 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                 <div>
@@ -333,9 +334,9 @@ function PropertyPage() {
             </section>
 
             {/* Description */}
-            <section className="mb-8 md:mb-10" aria-labelledby="about-heading">
+            <section className="mb-8 lg:mb-12" aria-labelledby="about-heading">
               <h2 id="about-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">About this {typeLabel.toLowerCase()}</h2>
-              <div className="text-[#1f2937] leading-relaxed space-y-3">
+              <div className="text-[#1f2937] leading-relaxed space-y-4">
                 {(property.description || 'No description provided.').replace(/<[^>]*>?/gm, '').split('\n').filter(Boolean).map((paragraph, i) => (
                   <p key={i}>{paragraph}</p>
                 ))}
@@ -344,9 +345,9 @@ function PropertyPage() {
 
             {/* Amenities */}
             {amenities.length > 0 && (
-              <section className="mb-8 md:mb-10" aria-labelledby="amenities-heading">
+              <section className="mb-8 lg:mb-12" aria-labelledby="amenities-heading">
                 <h2 id="amenities-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">What this place offers</h2>
-                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="list">
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5" role="list">
                   {amenities.map((amenity, index) => (
                     <li key={index} className="flex items-center gap-3">
                       <Check className="h-5 w-5 shrink-0 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
@@ -359,9 +360,9 @@ function PropertyPage() {
 
             {/* Nearby */}
             {nearby.length > 0 && (
-              <section className="mb-8 md:mb-10" aria-labelledby="nearby-heading">
+              <section className="mb-8 lg:mb-12" aria-labelledby="nearby-heading">
                 <h2 id="nearby-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">What&apos;s nearby</h2>
-                <ul className="space-y-3" role="list">
+                <ul className="space-y-4" role="list">
                   {nearby.map((item, index) => (
                     <li key={index} className="flex items-start gap-3 text-[#1f2937]">
                       <MapPin className="w-5 h-5 text-[#5B6B82] shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
@@ -375,7 +376,7 @@ function PropertyPage() {
             {/* Where you'll be - shown whenever the listing has a place name or
                 street address. No map is embedded; the link opens Google Maps. */}
             {(property.location || property.address) && (
-              <section className="mb-8 md:mb-10" aria-labelledby="location-heading">
+              <section className="mb-8 lg:mb-12" aria-labelledby="location-heading">
                 <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">Where you&apos;ll be</h2>
                 <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_24px_rgba(20,58,128,0.06)]">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -418,7 +419,7 @@ function PropertyPage() {
           <aside className="lg:col-span-1" aria-label="Booking">
             <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(20,58,128,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
               {/* Price per night */}
-              <div className="mb-5">
+              <div className="mb-6">
                 <span className="text-3xl font-bold text-[#203565]">
                   {formatPrice(displayPrice) ?? '-'}
                 </span>
@@ -427,7 +428,7 @@ function PropertyPage() {
 
               {/* Bed variant chip - only when arriving from a variant card */}
               {variantLabel && (
-                <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#203565]">
+                <div className="mb-6 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#203565]">
                   <House className="w-4 h-4 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                   {variantLabel}
                 </div>
@@ -436,7 +437,7 @@ function PropertyPage() {
               {/* Dates & guests summary - selection happens on the booking flow */}
               <Link
                 to={bookingHref}
-                className="mb-5 block rounded-2xl border border-[#E3E8EF] p-4 transition-colors duration-200 hover:border-[#C5A28C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
+                className="mb-6 block rounded-2xl border border-[#E3E8EF] p-4 transition-colors duration-200 hover:border-[#C5A28C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
                 aria-label="Choose check-in, check-out, and guests"
               >
                 <div className="grid grid-cols-2 divide-x divide-[#E3E8EF]">
@@ -460,10 +461,10 @@ function PropertyPage() {
                 Continue to booking
               </Link>
 
-              <p className="mt-4 text-center text-sm text-[#5B6B82]">You won&apos;t be charged yet</p>
+              <p className="mt-5 text-center text-sm text-[#5B6B82]">You won&apos;t be charged yet</p>
 
               {/* Fee / total rows - resolved at checkout once dates are selected */}
-              <div className="mt-6 space-y-2 border-t border-[#E3E8EF] pt-6 text-sm">
+              <div className="mt-6 space-y-3 border-t border-[#E3E8EF] pt-6 text-sm">
                 <div className="flex justify-between text-[#203565]">
                   <span>Cleaning fee</span>
                   <span className="text-[#5B6B82]">Shown at checkout</span>
@@ -472,7 +473,7 @@ function PropertyPage() {
                   <span>Service fee</span>
                   <span className="text-[#5B6B82]">Shown at checkout</span>
                 </div>
-                <div className="flex justify-between border-t border-[#E3E8EF] pt-2 font-bold text-[#203565]">
+                <div className="flex justify-between border-t border-[#E3E8EF] pt-3 font-bold text-[#203565]">
                   <span>Total</span>
                   <span className="font-normal text-[#5B6B82]">Add dates for total</span>
                 </div>
@@ -480,8 +481,8 @@ function PropertyPage() {
 
               {/* Trust context - only facts from the API */}
               <div className="mt-6 border-t border-[#E3E8EF] pt-6">
-                <h4 className="mb-3 font-semibold text-[#203565]">About this listing</h4>
-                <ul className="space-y-2 text-sm text-[#5B6B82]">
+                <h4 className="mb-4 font-semibold text-[#203565]">About this listing</h4>
+                <ul className="space-y-3 text-sm text-[#5B6B82]">
                   {hasReviews && (
                     <li className="flex items-start gap-2">
                       <Star className="w-4 h-4 text-[#8A6B52] mt-0.5 shrink-0" fill="currentColor" aria-hidden="true" />

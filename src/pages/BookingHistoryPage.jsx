@@ -41,11 +41,17 @@ function getBookingImage(booking, index = 0) {
   return firstImage(booking.property) || zuriImages[index % zuriImages.length];
 }
 
+// The account-travel rules in styles.css are emitted after Tailwind's utility
+// layer and pin their own margins and gaps, so a plain spacing utility loses to
+// them. The ! prefix on the spacing utilities below is what makes them apply.
+// The card is one column on phones, so its 18px column gap becomes the gap
+// between the photo and the copy; max-md raises only that stack to 20px and
+// leaves the desktop photo-to-copy gap as it was.
 function HistoryCard({ booking, index, onMessage, messagePending }) {
   const property = booking.property || {};
   const status = STATUS_META[booking.status] || { label: booking.status || 'Unknown', className: STATUS_TONE_IDLE };
 
-  return <article className="opg-history-card rounded-xl border border-border">
+  return <article className="opg-history-card max-md:!gap-5 rounded-xl border border-border">
     <Link to={`/property/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={`View ${property.title || 'stay'}`}>
       <img src={getBookingImage(booking, index)} alt="" />
     </Link>
@@ -58,14 +64,14 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
         <span className={`${STATUS_PILL} ${status.className}`}>{status.label}</span>
       </div>
 
-      <dl className="opg-history-meta">
+      <dl className="opg-history-meta !mt-6">
         <div><dt>Check-in</dt><dd>{formatDate(booking.checkIn)}</dd></div>
         <div><dt>Check-out</dt><dd>{formatDate(booking.checkOut)}</dd></div>
         <div><dt>Guests</dt><dd>{booking.guests || 1}</dd></div>
         <div><dt>Total</dt><dd>{formatCurrency(booking.total)}</dd></div>
       </dl>
 
-      <div className="opg-history-actions">
+      <div className="opg-history-actions !pt-6">
         <Button size="sm" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</Button>
         <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>Invoice</Button>
         {canAddToCalendar(booking) && isUpcomingStay(booking) && (
@@ -141,7 +147,7 @@ function BookingHistoryPage() {
 
     <p className="opg-history-count">{loading ? 'Loading bookings...' : `${filtered.length} booking${filtered.length === 1 ? '' : 's'}`}</p>
 
-    {loading ? <div className="opg-trip-loading" aria-label="Loading booking history"><span /><span /><span /></div> : error ? <div className="opg-trip-error"><p>{error}</p><Button className="mx-auto w-fit" size="sm" type="button" onClick={() => window.location.reload()}>Try again</Button></div> : filtered.length === 0 ? <EmptyHistory /> : <div className="opg-history-list">
+    {loading ? <div className="opg-trip-loading" aria-label="Loading booking history"><span /><span /><span /></div> : error ? <div className="opg-trip-error"><p>{error}</p><Button className="mx-auto w-fit" size="sm" type="button" onClick={() => window.location.reload()}>Try again</Button></div> : filtered.length === 0 ? <EmptyHistory /> : <div className="opg-history-list !mt-6 !gap-6">
       {filtered.map((booking, index) => <HistoryCard key={booking.id} booking={booking} index={index} onMessage={openConversation} messagePending={messageBookingId === booking.id} />)}
     </div>}
   </GuestAccountLayout>;

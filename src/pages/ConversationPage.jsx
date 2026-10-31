@@ -151,7 +151,9 @@ function ConversationPage() {
       {property.id && <Link className="opg-message-booking-link" to={`/property/${property.id}`}>View stay</Link>}
     </header>
 
-    <div className="opg-message-thread" ref={threadRef} aria-live="polite">
+    {/* Same gap under the pane header as the support thread: the thread rule in
+        styles.css pins its own padding, so the ! prefix is what applies here. */}
+    <div className="opg-message-thread !pt-6" ref={threadRef} aria-live="polite">
       {loading ? <div className="opg-message-loading" aria-label="Loading messages"><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadMessages}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>No messages yet</strong><p>Say hello to {participant.name} and start planning the stay.</p></div> : messages.map((message) => {
         const isMine = message.senderId === user?.id;
         const senderName = [message.sender?.firstName, message.sender?.lastName].filter(Boolean).join(' ') || 'User';

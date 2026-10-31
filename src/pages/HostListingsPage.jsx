@@ -91,7 +91,7 @@ StatusPill.propTypes = {
 // Placeholder cards rather than placeholder bars: the loading shapes have to
 // match what lands, otherwise the page jumps when the request resolves.
 function ListingSkeleton() {
-  return <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Loading listings">
+  return <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3" aria-label="Loading listings">
     {[0, 1, 2].map((key) => <HostCard key={key} className="h-72 animate-pulse" />)}
   </div>;
 }
@@ -113,7 +113,7 @@ function QualityMeter({ property }) {
       {/* Computed fill width: data-driven, so it stays an inline style. */}
       <div className="h-full rounded-full bg-primary" style={{ width: `${quality.score}%` }} />
     </div>
-    {quality.tips.length > 0 && <ul className="mt-2 space-y-1 text-[11px] leading-relaxed text-muted">
+    {quality.tips.length > 0 && <ul className="mt-3 space-y-2 text-[11px] leading-relaxed text-muted">
       {quality.tips.slice(0, 2).map((tip) => <li key={tip}>{tip}</li>)}
     </ul>}
   </div>;
@@ -154,7 +154,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
       <div className="absolute left-3 top-3"><StatusPill tone={status.tone}>{status.label}</StatusPill></div>
     </div>
 
-    <div className="flex flex-1 flex-col gap-3">
+    <div className="flex flex-1 flex-col gap-4">
       <div>
         <div className="flex items-start justify-between gap-3">
           <h2 className="text-[15px] font-semibold leading-snug text-navy">
@@ -164,7 +164,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
             KES {(property.price || 0).toLocaleString()}<span className="text-[11px] font-medium text-muted"> /night</span>
           </strong>
         </div>
-        <p className="mt-1 text-[13px] text-muted">{bedSummary(property)} · {where(property)}</p>
+        <p className="mt-2 text-[13px] text-muted">{bedSummary(property)} · {where(property)}</p>
         <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted">{listingStatusCopy(property)}</p>
       </div>
 
@@ -185,7 +185,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
+      <div className="flex items-center justify-between gap-2 border-t border-border pt-4">
         <div className="flex items-center gap-2">
           <ToggleSwitch
             checked={Boolean(property.available)}
@@ -244,10 +244,10 @@ function HostListingRow({ property, onToggleAvailability, onDelete, onReview, bu
           </h2>
           <StatusPill tone={status.tone}>{status.label}</StatusPill>
         </div>
-        <p className="mt-1 truncate text-[13px] text-muted">{bedSummary(property)} · {where(property)}</p>
+        <p className="mt-2 truncate text-[13px] text-muted">{bedSummary(property)} · {where(property)}</p>
         <p className="mt-0.5 text-sm font-bold text-navy">KES {(property.price || 0).toLocaleString()}<span className="text-[11px] font-medium text-muted"> /night</span></p>
 
-        <div className="mt-2 flex flex-wrap items-center gap-1">
+        <div className="mt-3 flex flex-wrap items-center gap-1">
           <Button as={Link} to={`/host/properties/${property.id}/edit`} size="xs" className="rounded-full" disabled={busy}>
             {property.status === 'DRAFT' ? 'Continue' : 'Edit'}
           </Button>
@@ -362,12 +362,12 @@ export default function HostListingsPage() {
     }
   }
 
-  return <div className="space-y-6">
+  return <div className="space-y-8">
     <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div>
         <p className={HOST_EYEBROW}>Host workspace</p>
-        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Your listings</h1>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare, publish, and manage your stays.</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Your listings</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Prepare, publish, and manage your stays.</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <button
@@ -414,15 +414,15 @@ export default function HostListingsPage() {
     </Alert>}
 
     {loading ? <ListingSkeleton /> : !error && visibleProperties.length === 0 ? <HostCard className="border-dashed">
-      <div className="flex flex-col items-center gap-2 px-2 py-8 text-center">
+      <div className="flex flex-col items-center gap-3 px-2 py-8 text-center">
         <span className="text-muted"><Building2 strokeWidth={1.6} aria-hidden="true" /></span>
         <strong className="text-base font-semibold text-navy">{properties.length === 0 ? 'No listings yet' : 'Nothing in this view'}</strong>
         <p className="max-w-md text-sm leading-relaxed text-muted">{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>
         {properties.length === 0 ? <Button as={Link} to="/host/properties/new" size="sm" className="rounded-full">Add a listing</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>Show all stays</Button>}
       </div>
-    </HostCard> : view === 'list' ? <div className="space-y-2">
+    </HostCard> : view === 'list' ? <div className="space-y-5 sm:space-y-6">
       {visibleProperties.map((property) => <HostListingRow key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
-    </div> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+    </div> : <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
       {visibleProperties.map((property) => <HostListingCard key={property.id} property={property} busy={busyId === property.id} showTips={showTips} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
     </div>}
   </div>;

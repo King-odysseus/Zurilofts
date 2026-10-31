@@ -4,9 +4,13 @@ import { MessageCircleMore } from 'lucide-react';
 import apiClient from '../api/client.js';
 import GuestMessagesLayout from '../components/GuestMessagesLayout.jsx';
 
+// The icon tile carries the gap above the heading. The paragraph's own margin is
+// !important in styles.css and cannot be raised from here, so the tile's bottom
+// margin (with the ! prefix, since that rule ships after Tailwind's utilities)
+// holds the stack spacing for the whole empty state.
 function ConversationPlaceholder() {
   return <div className="opg-message-placeholder">
-    <span>
+    <span className="!mb-5">
       <MessageCircleMore strokeWidth={1.7} aria-hidden="true" />
     </span>
     <h2>Select a conversation</h2>

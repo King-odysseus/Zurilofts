@@ -63,7 +63,7 @@ export default function AdminListingPreviewPage() {
   }
 
   if (error || !listing) {
-    return <div className="space-y-4">
+    return <div className="space-y-5">
       {backLink}
       <Alert color="failure">{error || 'This listing could not be found.'}</Alert>
     </div>;
@@ -75,7 +75,7 @@ export default function AdminListingPreviewPage() {
       <Badge color={BADGE_COLOR[listing.status] || 'gray'}>{listingStatusLabel(listing.status)}</Badge>
     </div>
 
-    <dl className="mt-4 space-y-3 text-sm">
+    <dl className="mt-5 space-y-3 text-sm">
       <div>
         <dt className="text-xs text-muted">Submitted</dt>
         <dd className="font-medium text-navy">{displayDate(listing.submittedAt)}</dd>
@@ -94,7 +94,7 @@ export default function AdminListingPreviewPage() {
       )}
     </dl>
 
-    <div className="mt-4 flex items-start gap-2 rounded-lg border border-border bg-surface p-3 text-xs leading-relaxed text-muted">
+    <div className="mt-5 flex items-start gap-2 rounded-lg border border-border bg-surface p-3 text-xs leading-relaxed text-muted">
       <Eye className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
       <p>
         Guests also see live availability, a Book button and the checkout. None of that is shown here,
@@ -102,14 +102,14 @@ export default function AdminListingPreviewPage() {
       </p>
     </div>
 
-    <Button as={Link} to={`/admin/properties/${id}`} size="sm" color="light" className="mt-4 w-full rounded-full">
+    <Button as={Link} to={`/admin/properties/${id}`} size="sm" color="light" className="mt-5 w-full rounded-full">
       <ShieldCheck className="mr-1.5 h-4 w-4" strokeWidth={2} aria-hidden="true" />
       Open review actions
     </Button>
   </section>;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       <div>
         {backLink}
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">

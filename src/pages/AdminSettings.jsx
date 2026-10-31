@@ -28,7 +28,7 @@ function Panel({ title, description, icon: Icon, children }) {
           </span>
         )}
       </div>
-      <div className="mt-4 flex flex-col gap-4">{children}</div>
+      <div className="mt-5 flex flex-col gap-5">{children}</div>
     </section>
   );
 }
@@ -214,7 +214,7 @@ export default function AdminSettings() {
 
   if (loading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-elevated px-5 py-16 text-center shadow-sm" role="status" aria-label="Loading account settings">
           <Spinner size="lg" aria-hidden="true" />
           <strong className="text-sm font-semibold text-navy">Loading account...</strong>
@@ -226,7 +226,7 @@ export default function AdminSettings() {
 
   if (!profile) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-8">
         <div>
           <p className={EYEBROW}>ZURILOFTS · ADMIN · ACCOUNT</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Account settings</h1>
@@ -249,7 +249,7 @@ export default function AdminSettings() {
   const usesGoogleSignIn = Boolean(profile.googleId);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div>
         <p className={EYEBROW}>ZURILOFTS · ADMIN · ACCOUNT</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Account settings</h1>
@@ -258,15 +258,15 @@ export default function AdminSettings() {
         </p>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="space-y-6">
+      <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="space-y-8">
           <Panel
             title="Your details"
             description="Shown beside every decision you record in the admin workspace."
             icon={UserRound}
           >
-            <form onSubmit={saveDetails} className="flex flex-col gap-4">
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <form onSubmit={saveDetails} className="flex flex-col gap-5">
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="admin-first-name" className="mb-1.5 block">First name</Label>
                   <TextInput
@@ -325,7 +325,7 @@ export default function AdminSettings() {
                 Sign-in runs through Google. Manage the credential in your Google account, or contact support to add a password.
               </p>
             ) : (
-              <form onSubmit={savePassword} className="flex flex-col gap-4">
+              <form onSubmit={savePassword} className="flex flex-col gap-5">
                 <div>
                   <Label htmlFor="admin-current-password" className="mb-1.5 block">Current password</Label>
                   <TextInput
@@ -336,7 +336,7 @@ export default function AdminSettings() {
                     onChange={(event) => setPasswords((previous) => ({ ...previous, current: event.target.value }))}
                   />
                 </div>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="admin-new-password" className="mb-1.5 block">New password</Label>
                     <TextInput
@@ -371,10 +371,10 @@ export default function AdminSettings() {
           </Panel>
         </div>
 
-        <aside className="space-y-6">
+        <aside className="space-y-8">
           <section className={CARD}>
             <h2 className="text-base font-semibold text-navy">Your account</h2>
-            <div className="mt-4 flex items-center gap-3">
+            <div className="mt-5 flex items-center gap-3">
               <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-bg text-sm font-bold text-white">
                 {profile.avatar
                   ? <img src={profile.avatar} alt="" className="h-full w-full object-cover" />
@@ -386,7 +386,7 @@ export default function AdminSettings() {
               </div>
             </div>
 
-            <div className="mt-4 flex flex-wrap items-center gap-2">
+            <div className="mt-5 flex flex-wrap items-center gap-2">
               <span className="inline-flex items-center rounded-full bg-primary-50 dark:bg-primary/15 px-2.5 py-1 text-[11px] font-semibold text-navy">
                 {profile.role || 'ADMIN'}
               </span>
@@ -397,17 +397,17 @@ export default function AdminSettings() {
             <Button
               color="light"
               size="sm"
-              className="mt-4 w-full"
+              className="mt-5 w-full"
               disabled={avatarBusy}
               onClick={() => fileInput.current?.click()}
             >
               <Camera className="mr-1.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
               {avatarBusy ? 'Uploading...' : 'Change photo'}
             </Button>
-            <div className="mt-2">
+            <div className="mt-3">
               <Message tone="error">{avatarError}</Message>
             </div>
-            <p className="mt-2 text-xs text-muted">JPEG, PNG or WebP, up to 5MB.</p>
+            <p className="mt-3 text-xs text-muted">JPEG, PNG or WebP, up to 5MB.</p>
           </section>
 
           <section className={CARD}>
@@ -417,11 +417,11 @@ export default function AdminSettings() {
                 <ShieldCheck className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </span>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-muted">
+            <p className="mt-4 text-sm leading-relaxed text-muted">
               You are signed in as <span className="font-medium text-charcoal">{profile.email}</span>. Admin access is limited to
               reviews, accounts and platform settings.
             </p>
-            <Button color="light" size="sm" className="mt-4 w-full" disabled={signingOut} onClick={handleSignOut}>
+            <Button color="light" size="sm" className="mt-5 w-full" disabled={signingOut} onClick={handleSignOut}>
               <LogOut className="mr-1.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
               {signingOut ? 'Signing out...' : 'Sign out'}
             </Button>

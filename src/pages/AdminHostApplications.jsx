@@ -198,8 +198,8 @@ function AdminHostApplications() {
   }
 
   return (
-    <div className="space-y-6" data-openpencil-frame="0:7228">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+    <div className="space-y-8" data-openpencil-frame="0:7228">
+      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · VERIFICATION</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Host applications</h1>
@@ -207,7 +207,7 @@ function AdminHostApplications() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">APPLICATIONS IN VIEW</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{visibleApplications.length}</strong>
@@ -231,7 +231,7 @@ function AdminHostApplications() {
       </div>
 
       <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative w-full sm:max-w-sm">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
             <TextInput
@@ -252,7 +252,7 @@ function AdminHostApplications() {
           />
         </div>
 
-        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="mx-5 mt-4" role="status">{message}</Alert>}
+        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="mx-5 mt-5" role="status">{message}</Alert>}
 
         {loading ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
@@ -341,7 +341,7 @@ function AdminHostApplications() {
             <ModalBody className="space-y-5">
               {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} role="status">{message}</Alert>}
 
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
                 <DetailSection title="Identity & contact">
                   <Detail label="Legal name" value={selected.legalName} />
                   <Detail label="Date of birth" value={selected.dateOfBirth} />
@@ -396,7 +396,7 @@ function AdminHostApplications() {
                   <span className="text-xs text-muted">{selected.documents?.length || 0} files</span>
                 </div>
                 {selected.documents?.length ? (
-                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {selected.documents.map((document) => (
                       <Button key={document.id} color="light" onClick={() => downloadDocument(document)} disabled={busy === document.id}>
                         <FileText strokeWidth={1.6} aria-hidden="true" />
