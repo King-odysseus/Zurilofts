@@ -11,6 +11,29 @@ import { ThemeProvider as FlowbiteThemeProvider } from 'flowbite-react'
 import { brandTheme } from './theme/flowbiteTheme.js'
 import './styles.css'
 
+// A service worker left behind by an earlier build keeps serving the shell it
+// precached, so a dev-server change never reaches the page: one device shows the
+// new menu while another still shows the old one. There is no offline support to
+// protect in development, so any worker and its caches are dropped on load.
+if (import.meta.env.DEV && 'serviceWorker' in navigator) {
+  const hadController = Boolean(navigator.serviceWorker.controller);
+  const CLEARED = 'zuri-dev-sw-cleared';
+  navigator.serviceWorker.getRegistrations()
+    .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+    .then(() => (typeof caches === 'undefined' ? [] : caches.keys()))
+    .then((keys) => Promise.all((keys || []).map((key) => caches.delete(key))))
+    .then(() => {
+      // Unregistering does not release the worker already controlling this page,
+      // so it would keep replaying its cached shell until the next navigation.
+      // One reload clears it; the stored flag stops a reload loop.
+      if (hadController && !sessionStorage.getItem(CLEARED)) {
+        sessionStorage.setItem(CLEARED, '1');
+        window.location.reload();
+      }
+    })
+    .catch((workerError) => console.warn('Could not clear a stale service worker:', workerError));
+}
+
 // PWA update handling - when a new service worker activates, reload so the
 // user is always on the latest version (registerType: 'autoUpdate').
 if ('serviceWorker' in navigator) {
