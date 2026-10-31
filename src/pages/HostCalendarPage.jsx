@@ -15,6 +15,8 @@ import {
   X,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
+import CalendarQuickSheet from '../components/CalendarQuickSheet.jsx';
+import SelectMenu from '../components/SelectMenu.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
 // The host calendar, shaped like the reference screen: one month at a time, a
@@ -23,14 +25,15 @@ import { useToast } from '../context/ToastContext.jsx';
 // rather than on another page. A host should be able to answer "is this night
 // free, and what does it cost" without leaving the month.
 
-const DAY_MS = 86_400_000;
-
 const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 
-// A booking bar sits below the date/price line, one 22px lane per stay, so a
-// week with two bookings never hides one behind the other. The week's cells
-// reserve that much height through the --cal-min custom property below.
+// Each night is its own rounded tile, so a week has to be tall enough for the
+// number, the rate and any stay lanes. A booking bar sits below the date/price
+// line, one 22px lane per stay, so a week with two bookings never hides one
+// behind the other. The week's tiles reserve that height through the --cal-min
+// custom property below.
+const TILE_MIN = 92;
 const BAR_TOP = 40;
 const BAR_STEP = 22;
 const BAR_HEIGHT = 20;
@@ -47,8 +50,15 @@ function firstOfMonth(value) {
   return new Date(date.getFullYear(), date.getMonth(), 1);
 }
 
+// Calendar arithmetic, not "now plus 24 hours at a stretch": a fixed DAY_MS
+// step drifts across a daylight-saving change, which shifted every week after
+// the transition back by an hour and made the grid repeat a day (25 October
+// appeared twice, and 1 November never rendered). setDate() moves in calendar
+// days, so midnight stays midnight in whatever zone the host is in.
 function addDays(date, amount) {
-  return new Date(date.getTime() + amount * DAY_MS);
+  const next = new Date(date.getTime());
+  next.setDate(next.getDate() + amount);
+  return next;
 }
 
 function sameDay(a, b) {
@@ -180,27 +190,23 @@ function StayBar({ booking, weekStart, row }) {
     if (inStay(weekDays[index], booking.start, booking.end)) lastVisible = index;
   }
 
-  // A bar clipped by the week edge loses its rounded cap on that side, so a stay
-  // spanning two weeks reads as one continuous run instead of two pills.
-  const startsHere = !inStay(addDays(weekDays[firstVisible], -1), booking.start, booking.end);
-  const endsHere = !inStay(addDays(weekDays[lastVisible], 1), booking.start, booking.end);
-
+  // The chip spans grid tracks rather than a percentage of the row: the overlay
+  // grid carries the same tracks and gap as the night tiles, so a stay lines up
+  // with the nights it covers even when the gap changes. Phone tiles have no
+  // room for a name, so the chip is a desktop layer; on a phone the same nights
+  // read as the solid navy tile fill underneath.
   return <Link
     to={`/host/reservations/${booking.id}`}
-    // Phone cells have no room for a name, so the bar is a desktop layer; on a
-    // phone the same nights read as the solid navy cell fill underneath.
-    // The night it sits on is solid navy already, so the bar borrows the darker
-    // navy plus a hairline edge to stay a legible chip on top of its own run.
-    className={`absolute hidden items-center gap-1.5 overflow-hidden bg-navy-hover px-2 text-[11px] font-semibold text-white ring-1 ring-inset ring-white/25 transition-opacity hover:opacity-90 sm:flex ${startsHere ? 'rounded-l-md' : ''} ${endsHere ? 'rounded-r-md' : ''}`}
+    className="pointer-events-auto flex items-center gap-1.5 self-start overflow-hidden rounded-full bg-white px-2 text-[11px] font-semibold text-navy-bg shadow-sm ring-1 ring-inset ring-navy-bg/15 transition-opacity hover:opacity-90"
     style={{
-      left: `${(firstVisible / 7) * 100}%`,
-      width: `${((lastVisible - firstVisible + 1) / 7) * 100}%`,
-      top: `${BAR_TOP + row * BAR_STEP}px`,
+      gridColumn: `${firstVisible + 1} / span ${lastVisible - firstVisible + 1}`,
+      gridRow: 1,
+      marginTop: `${BAR_TOP + row * BAR_STEP}px`,
       height: `${BAR_HEIGHT}px`,
     }}
     title={`${booking.guestName || 'Guest'}, ${formatDay(booking.start)} to ${formatDay(booking.end)}`}
   >
-    {startsHere && <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-white/20 text-[8px] font-bold">{initialsOf(booking.guestName)}</span>}
+    <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-navy-bg text-[8px] font-bold text-white">{initialsOf(booking.guestName)}</span>
     <span className="truncate">{booking.guestName || 'Guest'}{booking.guests > 1 ? ` + ${booking.guests - 1}` : ''}</span>
   </Link>;
 }
@@ -211,39 +217,87 @@ StayBar.propTypes = {
   row: PropTypes.number.isRequired,
 };
 
+/**
+ * A booked run on a phone. The reference replaces the individual night cells of
+ * a stay with one tile carrying the guest's initials and "Reserved", so the
+ * dates of those nights are covered rather than shown. A one-night stay is a
+ * single column (~46px) with no room for the label, so it shows initials alone.
+ */
+function ReservedTile({ booking, weekStart }) {
+  const weekDays = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+  const firstVisible = weekDays.findIndex((day) => inStay(day, booking.start, booking.end));
+  if (firstVisible < 0) return null;
+
+  let lastVisible = firstVisible;
+  for (let index = firstVisible; index < 7; index += 1) {
+    if (inStay(weekDays[index], booking.start, booking.end)) lastVisible = index;
+  }
+  const span = lastVisible - firstVisible + 1;
+
+  return <Link
+    to={`/host/reservations/${booking.id}`}
+    aria-label={`Reserved, ${booking.guestName || 'guest'}, ${formatDay(booking.start)} to ${formatDay(booking.end)}`}
+    className="pointer-events-auto flex h-full min-w-0 items-center gap-1.5 overflow-hidden rounded-[10px] border border-border bg-elevated px-1.5"
+    style={{ gridColumn: `${firstVisible + 1} / span ${span}`, gridRow: 1 }}
+  >
+    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-navy-bg text-[9px] font-bold text-white">{initialsOf(booking.guestName)}</span>
+    {span > 1 && <span className="min-w-0 truncate text-[10px] font-semibold text-navy">Reserved</span>}
+  </Link>;
+}
+
+ReservedTile.propTypes = {
+  booking: PropTypes.object.isRequired,
+  weekStart: PropTypes.instanceOf(Date).isRequired,
+};
+
 function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
+  // The grid is generated as six whole weeks so the arithmetic never runs short.
+  // A month that ends mid-week leaves a last row made entirely of next-month
+  // days, which would draw a band of empty tiles under the month, so any week
+  // holding no night of this month is dropped.
+  const visibleWeeks = weeks.filter((weekStart) => Array.from({ length: 7 }, (_, index) => addDays(weekStart, index))
+    .some((day) => day.getMonth() === monthAnchor.getMonth()));
+
   const today = midnight(new Date());
   const basePrice = calendar?.property?.price ?? 0;
   const priceRules = calendar?.priceRules || [];
   const bookings = calendar?.bookings || [];
   const blocks = calendar?.blocks || [];
 
-  return <div className="select-none">
-    {/* The weekday row shares the week row's exact template: seven equal
-        tracks, no gap, the same width, so a label can never drift off its
-        column. Only the bottom hairline is drawn, because the hint line above
-        the grid already owns the top edge. */}
-    <div className="grid grid-cols-7 border-b border-border bg-surface/60">
-      {WEEKDAYS.map((day) => <span key={day} className="min-w-0 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted sm:text-[11px]">
-        {/* A phone column is ~46px wide, so it gets a single letter. */}
-        <span className="sm:hidden">{day[0]}</span>
-        <span className="hidden sm:inline">{day}</span>
-      </span>)}
+  // Airbnb's month is a field of separate rounded tiles: the gap between tiles
+  // carries the rhythm, so no cell is drawn with grid lines. The weekday row
+  // keeps the same seven tracks and the same gap, or a label would drift off
+  // its column.
+  return <div className="select-none px-4 pb-3 sm:pb-4">
+    {/* The weekday strip pins under the workspace header while the month
+        scrolls beneath it, the way the reference keeps the column letters in
+        view down a long month. The negative margin lets the strip run full
+        bleed while the letters stay on the same gutter as the tiles below. Its
+        background must be opaque: the tiles pass underneath it. */}
+    <div className="sticky top-16 z-20 -mx-4 bg-elevated px-4 pb-1 pt-1.5 sm:static sm:mx-0 sm:px-0 sm:py-0">
+      <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+        {WEEKDAYS.map((day) => <span key={day} className="min-w-0 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted sm:text-[11px]">
+          {/* A phone column is ~46px wide, so it gets a single letter. */}
+          <span className="sm:hidden">{day[0]}</span>
+          <span className="hidden sm:inline">{day}</span>
+        </span>)}
+      </div>
     </div>
 
-    {weeks.map((weekStart) => {
+    {visibleWeeks.map((weekStart) => {
       const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
       const weekBookings = bookings.filter((booking) => days.some((day) => inStay(day, booking.start, booking.end)));
       // Bars stack, so an imported block and a booking on the same week never
       // hide each other.
       const barRows = weekBookings.length;
 
-      // An empty week needs no extra lane, so the 72px floor covers it and each
-      // bar past the first adds its own lane.
-      const weekMinHeight = Math.max(64, 44 + barRows * BAR_STEP);
+      // The tile floor covers a week with no stays; each stay past the first
+      // adds its own lane, then 26px keeps the lanes clear of the rate at the
+      // foot of the tile.
+      const weekMinHeight = Math.max(TILE_MIN, BAR_TOP + barRows * BAR_STEP + 26);
 
-      return <div key={weekStart.toISOString()} className="relative border-b border-border last:border-b-0">
-        <div className="grid grid-cols-7" style={{ '--cal-min': `${weekMinHeight}px` }}>
+      return <div key={weekStart.toISOString()} className="relative">
+        <div className="grid grid-cols-7 gap-1.5 sm:gap-2" style={{ '--cal-min': `${weekMinHeight}px` }}>
           {days.map((day) => {
             const outside = day.getMonth() !== monthAnchor.getMonth();
             const isToday = sameDay(day, today);
@@ -261,33 +315,38 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
               aria-pressed={isSelected}
               disabled={stay || outside}
               aria-label={`${label}${outside ? ', outside this month' : stay ? ', not editable' : isSelected ? ', selected' : ', tap to select'}`}
-              className={`flex min-h-[48px] min-w-0 flex-col border-l border-border px-1 pb-1 pt-1 text-left transition-colors first:border-l-0 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary sm:min-h-[var(--cal-min,64px)] sm:px-2 sm:pb-1.5 sm:pt-1.5 ${
-                isSelected
-                  ? 'bg-navy/10 ring-1 ring-inset ring-navy'
-                  : stay
-                    ? 'bg-navy-bg'
-                    : blocked
-                      ? 'bg-[#B9C3D1] hover:bg-[#AEBAC9]'
-                      : `${outside ? 'bg-canvas' : 'bg-elevated'} hover:bg-surface`
-              }${isToday && !isSelected ? ' ring-1 ring-inset ring-bronze' : ''}`}
+              className={`flex min-h-[92px] min-w-0 flex-col justify-between gap-1 rounded-[10px] border p-1.5 text-left transition-colors focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary sm:min-h-[var(--cal-min,104px)] sm:rounded-2xl sm:p-2.5 ${
+                isSelected || stay
+                  ? 'border-navy-bg bg-navy-bg text-white'
+                  : blocked
+                    ? 'border-transparent bg-[#B9C3D1] hover:bg-[#AEBAC9]'
+                    : outside
+                      ? 'border-transparent bg-transparent'
+                      : 'border-border bg-elevated hover:border-primary/40 hover:bg-surface'
+              }${isToday && !isSelected && !stay ? ' ring-1 ring-inset ring-bronze' : ''}`}
             >
-              {/* Number over price, both left-aligned from sm up and centred on
-                  a phone. Stacking holds every rate in the same place, so a
-                  column of prices reads straight down instead of drifting out to
-                  the far edge of each cell. */}
-              <span className="flex min-w-0 flex-col items-center gap-0.5 sm:items-start sm:gap-px">
-                <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-sm font-semibold tabular-nums sm:text-[15px] ${isSelected ? 'bg-navy text-white' : stay ? 'text-white' : outside ? 'text-muted/60' : 'text-navy'}`}>
-                  {day.getDate()}
-                </span>
-                <span className={`min-w-0 max-w-full truncate text-[9px] font-medium leading-tight tabular-nums sm:text-[10px] ${stay ? 'text-white/75' : blocked ? 'text-navy-bg/70' : outside ? 'text-muted/50' : 'text-muted'}`}>
-                  <span className="sm:hidden">{compactMoney(nightPrice)}</span>
-                  <span className="hidden sm:inline">{money(nightPrice)}</span>
-                </span>
+              {/* Number at the top of the tile and the rate at its foot, the way
+                  a bookable night reads on Airbnb: the tile is the unit, so a
+                  column of rates still lines up without cell borders. A day lent
+                  in from the next month draws no tile at all. */}
+              <span className={`text-sm font-semibold leading-none tabular-nums sm:text-[15px] ${stay || isSelected ? 'text-white' : outside ? 'text-muted/50' : 'text-navy'}`}>
+                {day.getDate()}
               </span>
 
-              {blocked && !stay && <span className="mt-1 hidden items-center gap-1 text-[10px] text-navy-bg/70 sm:inline-flex">
-                <Ban className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" />Blocked
-              </span>}
+              {blocked && !stay
+                ? <span className="inline-flex min-w-0 items-center gap-1 truncate text-[10px] font-medium leading-tight text-navy-bg/70">
+                  <Ban className="h-2.5 w-2.5 shrink-0" strokeWidth={2} aria-hidden="true" />
+                  <span className="hidden truncate sm:inline">Blocked</span>
+                </span>
+                : outside
+                  // A day lent in from the next month draws no tile and no rate:
+                  // it is not a night of this month, so printing a price beside
+                  // it would invent an offer the host cannot sell here.
+                  ? null
+                  : <span className={`min-w-0 max-w-full truncate text-[10px] font-medium leading-tight tabular-nums sm:text-[11px] ${stay || isSelected ? 'text-white/80' : 'text-muted'}`}>
+                    <span className="sm:hidden">{compactMoney(nightPrice)}</span>
+                    <span className="hidden sm:inline">{money(nightPrice)}</span>
+                  </span>}
 
               {/* The fill alone reads the state on a phone - booked is navy,
                   blocked is grey - so the foot strip that duplicated it is gone. */}
@@ -297,7 +356,21 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
           })}
         </div>
 
-        {weekBookings.map((booking, index) => <StayBar key={booking.id} booking={booking} weekStart={weekStart} row={index} />)}
+        {/* On a phone a stay reads as one tile spanning the nights it holds,
+            with the guest's initials and the word Reserved, which is how the
+            reference draws a booked run. Two stays can never share a night, so
+            their spans within a week are disjoint and both fit the single row. */}
+        <div className="pointer-events-none absolute inset-0 grid grid-cols-7 gap-1.5 sm:hidden">
+          {weekBookings.map((booking) => <ReservedTile key={booking.id} booking={booking} weekStart={weekStart} />)}
+        </div>
+
+        {/* Stay chips ride in an overlay grid built on the same seven tracks and
+            gap as the tiles, so each chip spans exactly the nights it covers.
+            The layer ignores pointer events, so taps still reach the tiles; only
+            the chips take a click, and only they link away. */}
+        <div className="pointer-events-none absolute inset-0 hidden grid-cols-7 gap-1.5 sm:grid sm:gap-2">
+          {weekBookings.map((booking, index) => <StayBar key={booking.id} booking={booking} weekStart={weekStart} row={index} />)}
+        </div>
       </div>;
     })}
   </div>;
@@ -328,6 +401,10 @@ export default function HostCalendarPage() {
   const [syncing, setSyncing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
+  // The phone sheet's "Custom settings" opens the pricing and availability card
+  // as a panel over the calendar. Scrolling to the card in the page was not that:
+  // the fixed sheet stayed on top of it, so a tap moved nothing the host could see.
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const loadProperties = useCallback(async () => {
     try {
@@ -366,6 +443,22 @@ export default function HostCalendarPage() {
     load();
   }, [load]);
 
+  // While the phone settings panel is up, Escape closes it and the page behind
+  // keeps still: a background scroll under a fixed panel loses the host's place.
+  useEffect(() => {
+    if (!settingsOpen) return undefined;
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') setSettingsOpen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [settingsOpen]);
+
   const weeks = useMemo(() => {
     const gridStart = startOfMonthGrid(monthAnchor);
     return Array.from({ length: 6 }, (_, index) => addDays(gridStart, index * 7));
@@ -400,6 +493,11 @@ export default function HostCalendarPage() {
 
   function clearSelection() {
     setSelectedKeys([]);
+  }
+
+  /** Phone only: the sheet's "Custom settings" raises the pricing card over the month. */
+  function openSettings() {
+    setSettingsOpen(true);
   }
 
   const selectedDays = useMemo(() => selectedKeys.map(fromDayKey).sort((a, b) => a.getTime() - b.getTime()), [selectedKeys]);
@@ -594,26 +692,151 @@ export default function HostCalendarPage() {
     { label: 'Base rate', shortLabel: 'Base rate', value: money(basePrice) },
   ];
 
+  // The sheet names the pick the way the reference does: one date, or the span.
+  const selectionLabel = selectionCount === 0
+    ? ''
+    : selectionCount === 1
+      ? formatDay(selectedDays[0])
+      : `${formatDay(selectedDays[0])} - ${formatDay(selectedDays[selectedDays.length - 1])}`;
+
+  // One night bills at its own rate; a run shows the average, because a dated
+  // rate can price the nights within the same selection differently.
+  const selectionRate = selectedDays.length === 0
+    ? basePrice
+    : Math.round(selectedDays.reduce((sum, day) => sum + priceFor(day, basePrice, priceRules), 0) / selectedDays.length);
+  const selectionSummary = `${selectedOpenDays.length} open, ${selectedBlockedDays.length} blocked`;
+
+  /**
+   * The pricing and availability card, drawn once and used in two places: the
+   * side column on a wide screen, and the panel the phone sheet raises. Both can
+   * be mounted together, so the form fields carry `prefix` to keep their ids
+   * unique - duplicate ids would point a label at the copy the host cannot see.
+   */
+  function renderSettings(prefix = '') {
+    return <HostCard flush>
+      <div className="border-b border-border px-4 py-3">
+        <h2 className="text-sm font-semibold text-navy">Pricing and availability</h2>
+        <p className="mt-0.5 text-[11px] leading-relaxed text-muted">Changes here apply to this stay only.</p>
+      </div>
+
+      {selectionCount > 0 && <div className="border-b border-border bg-[#F7F9FC] px-4 py-3">
+        <p className="text-[11px] font-semibold text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</p>
+        <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
+          {selectedOpenDays.length > 0 && `${selectedOpenDays.length} open`}
+          {selectedOpenDays.length > 0 && selectedBlockedDays.length > 0 && ' · '}
+          {selectedBlockedDays.length > 0 && `${selectedBlockedDays.length} blocked`}
+        </p>
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <span className="text-[11px] font-semibold text-navy">Available</span>
+          <ToggleSwitch
+            checked={selectedAllOpen}
+            onChange={toggleSelectedAvailability}
+            disabled={saving}
+            sizing="sm"
+            aria-label="Selected nights are available"
+          />
+        </div>
+        <p className="mt-1.5 text-[10px] leading-relaxed text-muted">On opens these nights, off blocks them.</p>
+        <button type="button" onClick={clearSelection} className="mt-2 w-full text-left text-[10px] text-muted underline underline-offset-2 hover:text-navy">Clear selection</button>
+      </div>}
+
+      <SidebarSection title="Pricing" icon={Wallet} defaultOpen>
+        <div className="flex items-baseline justify-between gap-3 border-b border-border pb-2">
+          <span className="text-xs text-muted">Base nightly rate</span>
+          <strong className="text-sm font-bold tabular-nums text-navy">{money(basePrice)}</strong>
+        </div>
+        {priceRules.length > 0 ? <ul className="mt-2 space-y-1.5">
+          {priceRules.map((rule) => <li key={rule.id} className="flex items-center justify-between gap-3 text-xs">
+            <span className="min-w-0 truncate text-navy">{rule.name || 'Date range'}</span>
+            <span className="shrink-0 tabular-nums text-muted">{money(rule.price)} <span className="text-[10px]">({formatDay(rule.start)}-{formatDay(rule.end)})</span></span>
+          </li>)}
+        </ul> : <p className="mt-2 text-[11px] leading-relaxed text-muted">No dated rates. Every night uses the base rate.</p>}
+        <Button as={Link} to={`/host/properties/${activePropertyId}/edit`} color="light" size="xs" className="mt-3 w-full">Edit pricing</Button>
+      </SidebarSection>
+
+      <SidebarSection title="Availability" icon={Ban}>
+        <form onSubmit={addBlock} className="space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <Label htmlFor={`${prefix}block-start`} className="text-[11px]">From</Label>
+              <TextInput id={`${prefix}block-start`} type="date" sizing="sm" value={blockDraft.start} onChange={(event) => setBlockDraft((current) => ({ ...current, start: event.target.value }))} required />
+            </div>
+            <div>
+              <Label htmlFor={`${prefix}block-end`} className="text-[11px]">To</Label>
+              <TextInput id={`${prefix}block-end`} type="date" sizing="sm" value={blockDraft.end} onChange={(event) => setBlockDraft((current) => ({ ...current, end: event.target.value }))} required />
+            </div>
+          </div>
+          <div>
+            <Label htmlFor={`${prefix}block-summary`} className="text-[11px]">Reason (optional)</Label>
+            <TextInput id={`${prefix}block-summary`} sizing="sm" value={blockDraft.summary} onChange={(event) => setBlockDraft((current) => ({ ...current, summary: event.target.value }))} placeholder="Maintenance" />
+          </div>
+          <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>{saving ? 'Saving...' : 'Block these dates'}</Button>
+        </form>
+
+        {(calendar?.blocks || []).length > 0 && <ul className="mt-3 space-y-1.5 border-t border-border pt-2">
+          {calendar.blocks.map((block) => <li key={block.id} className="flex items-center justify-between gap-2 text-[11px]">
+            <span className="min-w-0 truncate text-navy">{formatDay(block.start)} - {formatDay(block.end)}</span>
+            <span className="flex shrink-0 items-center gap-1.5">
+              <span className="text-muted">{block.manual ? 'Manual' : block.sourceName || 'Imported'}</span>
+              {block.manual && <button type="button" onClick={() => removeBlock(block.id)} className="text-muted underline underline-offset-2 hover:text-navy" disabled={saving}>Undo</button>}
+            </span>
+          </li>)}
+        </ul>}
+      </SidebarSection>
+
+      <SidebarSection title="Connected calendars" icon={Link2}>
+        <p className="text-[11px] leading-relaxed text-muted">Pull bookings from other platforms so a stay is never double-sold.</p>
+        {(calendar?.sources || []).length > 0 ? <ul className="mt-2 space-y-2">
+          {calendar.sources.map((source) => <li key={source.id} className="rounded-lg border border-border p-2">
+            <p className="truncate text-xs font-semibold text-navy">{source.name}</p>
+            <p className={`text-[10px] ${source.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-muted'}`}>
+              {source.lastSyncedAt ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}` : 'Not synced yet'}
+            </p>
+            <button type="button" onClick={() => removeSource(source.id)} className="mt-1 text-[10px] text-muted underline underline-offset-2 hover:text-navy" disabled={saving}>Remove</button>
+          </li>)}
+        </ul> : <p className="mt-2 text-[11px] text-muted">No external calendars connected.</p>}
+
+        <Button color="light" size="xs" className="mt-2 w-full" disabled={syncing || (calendar?.sources || []).length === 0} onClick={syncNow}>
+          {syncing ? 'Syncing...' : 'Sync now'}
+        </Button>
+
+        <form onSubmit={addSource} className="mt-2 space-y-2 border-t border-border pt-2">
+          <TextInput id={`${prefix}calendar-platform`} sizing="sm" value={sourceDraft.name} onChange={(event) => setSourceDraft((current) => ({ ...current, name: event.target.value }))} placeholder="Platform, e.g. Airbnb" required />
+          <TextInput id={`${prefix}calendar-url`} sizing="sm" type="url" value={sourceDraft.url} onChange={(event) => setSourceDraft((current) => ({ ...current, url: event.target.value }))} placeholder="https://example.com/calendar.ics" required />
+          <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>Add feed</Button>
+        </form>
+      </SidebarSection>
+
+      <SidebarSection title="Export to another platform" icon={Info}>
+        <p className="text-[11px] leading-relaxed text-muted">Paste this link where the other platform asks for an iCal address.</p>
+        <TextInput readOnly sizing="sm" className="mt-2" value={calendar?.feedUrl || ''} onFocus={(event) => event.target.select()} />
+        <Button color="light" size="xs" className="mt-2 w-full" onClick={copyFeed}>{copied ? 'Copied' : 'Copy link'}</Button>
+      </SidebarSection>
+    </HostCard>;
+  }
+
   return <div className="space-y-4">
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
         <p className={HOST_EYEBROW}>HOST WORKSPACE</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Calendar</h1>
-        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Every night you can sell, what it costs, and who is already booked.</p>
+        <p className="mt-1 hidden max-w-2xl text-sm leading-relaxed text-muted sm:block">Every night you can sell, what it costs, and who is already booked.</p>
       </div>
 
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end">
-        {properties.length > 1 && <div className="relative w-full sm:w-64">
-          <label className="sr-only" htmlFor="calendar-property">Listing</label>
-          <select
+        {properties.length > 1 && <div className="w-full sm:w-80">
+          {/* The app's own select, not a native <select>: the browser's popup
+              ignores the palette and renders the blue system list. Pill shape
+              and self-hiding chevron to match the month pager beside it. */}
+          <SelectMenu
             id="calendar-property"
             value={activePropertyId || ''}
-            onChange={(event) => navigate(`/host/calendar/${event.target.value}`)}
-            className="h-11 w-full appearance-none rounded-full border border-border bg-elevated pl-3 pr-8 text-xs font-semibold text-navy focus:border-primary focus:outline-none focus:ring-0"
-          >
-            {properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" strokeWidth={2} aria-hidden="true" />
+            onChange={(next) => navigate(`/host/calendar/${next}`)}
+            options={properties.map((property) => ({ value: property.id, label: property.title }))}
+            ariaLabel="Listing"
+            shape="pill"
+            className="font-semibold"
+          />
         </div>}
 
         {/* Month paging is one control, not two arrows at opposite edges: on a
@@ -661,7 +884,9 @@ export default function HostCalendarPage() {
       {/* Flush: the grid and the totals strip run edge to edge, while the head
           keeps its padding so it still lines up with the side panel. */}
       <section aria-label="Month calendar">
-      <HostCard flush className="overflow-hidden">
+      {/* Overflow stays visible on a phone so the weekday strip can pin to the
+          viewport; a clipping ancestor would trap it inside the card. */}
+      <HostCard flush className="overflow-visible sm:overflow-hidden">
         <div className="flex flex-col gap-2 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <div className="min-w-0">
             <h2 className="truncate text-base font-semibold text-navy">{calendar?.property?.title || 'Your stay'}</h2>
@@ -670,7 +895,7 @@ export default function HostCalendarPage() {
               {selectionCount > 0 && <> <span aria-hidden="true">·</span> {selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</>}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted">
+          <div className="hidden flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted sm:flex">
             <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-navy-bg" aria-hidden="true" />Booked</span>
             <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[#B9C3D1]" aria-hidden="true" />Blocked</span>
             <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-border bg-elevated" aria-hidden="true" />Open</span>
@@ -678,14 +903,16 @@ export default function HostCalendarPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 divide-x divide-border border-b border-border bg-surface/40">
+        {/* Phone keeps the month clean, as the reference does: the totals and
+            the legend move aside and the figures live in the sheet. */}
+        <div className="hidden grid-cols-3 divide-x divide-border border-b border-border bg-surface/40 sm:grid">
           {monthStats.map((stat) => <div key={stat.label} className="min-w-0 px-3 py-2 sm:px-4">
             <p className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-muted"><span className="sm:hidden">{stat.shortLabel}</span><span className="hidden sm:inline">{stat.label}</span></p>
             <p className="mt-0.5 truncate text-sm font-bold tabular-nums text-navy">{stat.value}</p>
           </div>)}
         </div>
 
-        <p className="border-b border-border px-4 py-2 text-[11px] leading-relaxed text-muted">
+        <p className="hidden border-b border-border px-4 py-2 text-[11px] leading-relaxed text-muted sm:block">
           Tap the nights you want, then block or open them together. Shift-click fills a whole range.
         </p>
 
@@ -699,123 +926,76 @@ export default function HostCalendarPage() {
         </HostCard>
       </section>
 
-      <aside aria-label="Calendar settings" className="h-fit">
-        <HostCard flush>
-        <div className="border-b border-border px-4 py-3">
-          <h2 className="text-sm font-semibold text-navy">Pricing and availability</h2>
-          <p className="mt-0.5 text-[11px] leading-relaxed text-muted">Changes here apply to this stay only.</p>
-        </div>
-
-        {selectionCount > 0 && <div className="border-b border-border bg-[#F7F9FC] px-4 py-3">
-          <p className="text-[11px] font-semibold text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</p>
-          <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
-            {selectedOpenDays.length > 0 && `${selectedOpenDays.length} open`}
-            {selectedOpenDays.length > 0 && selectedBlockedDays.length > 0 && ' · '}
-            {selectedBlockedDays.length > 0 && `${selectedBlockedDays.length} blocked`}
-          </p>
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <span className="text-[11px] font-semibold text-navy">Available</span>
-            <ToggleSwitch
-              checked={selectedAllOpen}
-              onChange={toggleSelectedAvailability}
-              disabled={saving}
-              sizing="sm"
-              aria-label="Selected nights are available"
-            />
-          </div>
-          <p className="mt-1.5 text-[10px] leading-relaxed text-muted">On opens these nights, off blocks them.</p>
-          <button type="button" onClick={clearSelection} className="mt-2 w-full text-left text-[10px] text-muted underline underline-offset-2 hover:text-navy">Clear selection</button>
-        </div>}
-
-        <SidebarSection title="Pricing" icon={Wallet} defaultOpen>
-          <div className="flex items-baseline justify-between gap-3 border-b border-border pb-2">
-            <span className="text-xs text-muted">Base nightly rate</span>
-            <strong className="text-sm font-bold tabular-nums text-navy">{money(basePrice)}</strong>
-          </div>
-          {priceRules.length > 0 ? <ul className="mt-2 space-y-1.5">
-            {priceRules.map((rule) => <li key={rule.id} className="flex items-center justify-between gap-3 text-xs">
-              <span className="min-w-0 truncate text-navy">{rule.name || 'Date range'}</span>
-              <span className="shrink-0 tabular-nums text-muted">{money(rule.price)} <span className="text-[10px]">({formatDay(rule.start)}-{formatDay(rule.end)})</span></span>
-            </li>)}
-          </ul> : <p className="mt-2 text-[11px] leading-relaxed text-muted">No dated rates. Every night uses the base rate.</p>}
-          <Button as={Link} to={`/host/properties/${activePropertyId}/edit`} color="light" size="xs" className="mt-3 w-full">Edit pricing</Button>
-        </SidebarSection>
-
-        <SidebarSection title="Availability" icon={Ban}>
-          <form onSubmit={addBlock} className="space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label htmlFor="block-start" className="text-[11px]">From</Label>
-                <TextInput id="block-start" type="date" sizing="sm" value={blockDraft.start} onChange={(event) => setBlockDraft((current) => ({ ...current, start: event.target.value }))} required />
-              </div>
-              <div>
-                <Label htmlFor="block-end" className="text-[11px]">To</Label>
-                <TextInput id="block-end" type="date" sizing="sm" value={blockDraft.end} onChange={(event) => setBlockDraft((current) => ({ ...current, end: event.target.value }))} required />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="block-summary" className="text-[11px]">Reason (optional)</Label>
-              <TextInput id="block-summary" sizing="sm" value={blockDraft.summary} onChange={(event) => setBlockDraft((current) => ({ ...current, summary: event.target.value }))} placeholder="Maintenance" />
-            </div>
-            <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>{saving ? 'Saving...' : 'Block these dates'}</Button>
-          </form>
-
-          {(calendar?.blocks || []).length > 0 && <ul className="mt-3 space-y-1.5 border-t border-border pt-2">
-            {calendar.blocks.map((block) => <li key={block.id} className="flex items-center justify-between gap-2 text-[11px]">
-              <span className="min-w-0 truncate text-navy">{formatDay(block.start)} - {formatDay(block.end)}</span>
-              <span className="flex shrink-0 items-center gap-1.5">
-                <span className="text-muted">{block.manual ? 'Manual' : block.sourceName || 'Imported'}</span>
-                {block.manual && <button type="button" onClick={() => removeBlock(block.id)} className="text-muted underline underline-offset-2 hover:text-navy" disabled={saving}>Undo</button>}
-              </span>
-            </li>)}
-          </ul>}
-        </SidebarSection>
-
-        <SidebarSection title="Connected calendars" icon={Link2}>
-          <p className="text-[11px] leading-relaxed text-muted">Pull bookings from other platforms so a stay is never double-sold.</p>
-          {(calendar?.sources || []).length > 0 ? <ul className="mt-2 space-y-2">
-            {calendar.sources.map((source) => <li key={source.id} className="rounded-lg border border-border p-2">
-              <p className="truncate text-xs font-semibold text-navy">{source.name}</p>
-              <p className={`text-[10px] ${source.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-muted'}`}>
-                {source.lastSyncedAt ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}` : 'Not synced yet'}
-              </p>
-              <button type="button" onClick={() => removeSource(source.id)} className="mt-1 text-[10px] text-muted underline underline-offset-2 hover:text-navy" disabled={saving}>Remove</button>
-            </li>)}
-          </ul> : <p className="mt-2 text-[11px] text-muted">No external calendars connected.</p>}
-
-          <Button color="light" size="xs" className="mt-2 w-full" disabled={syncing || (calendar?.sources || []).length === 0} onClick={syncNow}>
-            {syncing ? 'Syncing...' : 'Sync now'}
-          </Button>
-
-          <form onSubmit={addSource} className="mt-2 space-y-2 border-t border-border pt-2">
-            <TextInput id="calendar-platform" sizing="sm" value={sourceDraft.name} onChange={(event) => setSourceDraft((current) => ({ ...current, name: event.target.value }))} placeholder="Platform, e.g. Airbnb" required />
-            <TextInput id="calendar-url" sizing="sm" type="url" value={sourceDraft.url} onChange={(event) => setSourceDraft((current) => ({ ...current, url: event.target.value }))} placeholder="https://example.com/calendar.ics" required />
-            <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>Add feed</Button>
-          </form>
-        </SidebarSection>
-
-        <SidebarSection title="Export to another platform" icon={Info}>
-          <p className="text-[11px] leading-relaxed text-muted">Paste this link where the other platform asks for an iCal address.</p>
-          <TextInput readOnly sizing="sm" className="mt-2" value={calendar?.feedUrl || ''} onFocus={(event) => event.target.select()} />
-          <Button color="light" size="xs" className="mt-2 w-full" onClick={copyFeed}>{copied ? 'Copied' : 'Copy link'}</Button>
-        </SidebarSection>
-        </HostCard>
+      <aside id="calendar-settings" aria-label="Calendar settings" className="h-fit scroll-mt-20">
+        {renderSettings()}
       </aside>
     </div>}
 
-    {/* Floating action bar: the grid is tall, so the buttons for a multi-day
-        pick follow the host instead of sitting off-screen above the month. */}
-    {!loading && activePropertyId && selectionCount > 0 && <div
-      className="fixed inset-x-3 bottom-[calc(var(--zl-bottom-nav-space)_+_10px)] z-30 mx-auto flex max-w-md items-center gap-2 rounded-full border border-border bg-elevated px-2 py-2 shadow-xl md:inset-x-auto md:right-6 md:bottom-6"
-      role="region"
-      aria-label="Selected dates"
-    >
-      <span className="pl-1 pr-1 text-xs font-semibold tabular-nums text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</span>
-      <Button type="button" size="xs" color="dark" className="min-h-[44px]" disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
-      <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
-      <button type="button" onClick={clearSelection} aria-label="Clear selection" className="ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy">
-        <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-      </button>
-    </div>}
+    {/* The pick follows the host. On a phone it is the reference sheet; on a
+        wide screen there is room for the inline bar beside the grid. */}
+    {!loading && activePropertyId && selectionCount > 0 && <>
+      <CalendarQuickSheet
+        open
+        title={selectionLabel}
+        subtitle={selectionCount === 1 ? '1 night' : `${selectionCount} nights`}
+        rateLabel={selectionCount === 1 ? 'Nightly rate' : 'Average a night'}
+        rate={money(selectionRate)}
+        summary={selectionSummary}
+        allOpen={selectedAllOpen}
+        saving={saving}
+        canBlock={selectedOpenDays.length > 0}
+        canOpen={selectedBlockedDays.length > 0}
+        onBlock={blockSelected}
+        onOpen={openSelected}
+        onClear={clearSelection}
+        onSettings={openSettings}
+      />
+
+      <div
+        className="fixed bottom-6 right-6 z-30 hidden items-center gap-2 rounded-full border border-border bg-elevated px-2 py-2 shadow-xl md:flex"
+        role="region"
+        aria-label="Selected dates, actions"
+      >
+        <span className="pl-1 pr-1 text-xs font-semibold tabular-nums text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</span>
+        <Button type="button" size="xs" color="dark" className="min-h-[44px]" disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
+        <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
+        <button type="button" onClick={clearSelection} aria-label="Clear selection" className="ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy">
+          <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+        </button>
+      </div>
+    </>}
+
+    {/* Phone: the sheet's "Custom settings" raises this panel, so the card is
+        reachable and editable instead of hidden under the sheet. Desktop keeps
+        the side column, where the same card is always on screen. */}
+    {settingsOpen && (
+      <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label="Custom settings">
+        <button
+          type="button"
+          onClick={() => setSettingsOpen(false)}
+          aria-label="Close custom settings"
+          className="absolute inset-0 h-full w-full cursor-default bg-navy-bg/40 backdrop-blur-[2px]"
+        />
+        <div className="absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col overflow-hidden rounded-t-3xl bg-elevated shadow-2xl">
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3">
+            <div className="min-w-0">
+              <p className={HOST_EYEBROW}>Calendar</p>
+              <h2 className="truncate text-base font-semibold text-navy">Custom settings</h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSettingsOpen(false)}
+              aria-label="Close custom settings"
+              className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-navy transition-colors hover:bg-surface"
+            >
+              <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[calc(var(--zl-bottom-nav-space)_+_8px)]">
+            {renderSettings('sheet-')}
+          </div>
+        </div>
+      </div>
+    )}
   </div>;
 }
