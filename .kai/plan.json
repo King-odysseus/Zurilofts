@@ -27,16 +27,20 @@
     },
     {
       "text": "Re-run the server tests and the frontend build to confirm the committed state",
-      "state": "active"
+      "state": "done"
     },
     {
       "text": "Stage the twelve files, the migration and the new test",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Commit as one focused change and push to origin/main",
-      "state": "pending"
+      "state": "done"
+    },
+    {
+      "text": "Record the pushed change in the project plan",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T20:43:01.278Z"
+  "updatedAt": "2026-10-31T20:44:23.247Z"
 }
