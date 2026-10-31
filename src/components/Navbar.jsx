@@ -762,9 +762,9 @@ function Navbar() {
           role="dialog"
           aria-modal="true"
           aria-label="Account and navigation menu"
-          className={`fixed left-1/2 top-20 z-30 w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-6rem)] -translate-x-1/2 overflow-y-auto rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_20px_60px_rgba(20,58,128,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
+          className={`fixed left-1/2 top-20 z-30 flex w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-6rem)] -translate-x-1/2 flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_20px_60px_rgba(20,58,128,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
         >
-          <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[#E3E8EF] bg-elevated px-4 py-3">
+          <div className="flex shrink-0 items-center justify-between border-b border-[#E3E8EF] bg-elevated px-4 py-3">
             <div className="flex items-center gap-3 min-w-0">
               {isAuthenticated ? (
                 <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#16294B] text-sm font-bold text-white">
@@ -787,7 +787,10 @@ function Navbar() {
               <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
             </button>
           </div>
-          <ul className="px-2 pt-3 pb-24 space-y-0.5">
+          {/* Only the rows scroll. The switch and sign out sit outside this list
+              so they stay on screen without scrolling - they were the two last
+              rows of a drawer taller than a phone, so both fell below the fold. */}
+          <ul className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-2 pt-3 pb-3 space-y-0.5">
             {navItems.map((item) => {
               const hasChildren = Array.isArray(item.children) && item.children.length > 0;
               if (hasChildren) {
@@ -938,29 +941,29 @@ function Navbar() {
               </>
             )}
 
-            {isAuthenticated && canSelectHosting && (
-              <li className="mt-2 border-t border-[#E3E8EF] pt-1">
-                {/* States which side the person is on before offering the other one,
-                    the same order and wording as the desktop dropdown. */}
-                <p className="px-4 pt-2 pb-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8A97A8]">
-                  {effectiveMode === 'hosting' ? t('nav.browsingAsHost') : t('nav.browsingAsTraveler')}
-                </p>
-                <button type="button" onClick={handleSwitchMode} className={menuRowClass()}>
-                  <ArrowLeftRight className="w-4 h-4 mr-3 shrink-0 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
-                  <span className="flex-1">{effectiveMode === 'hosting' ? t('nav.switchToTravelling') : t('nav.switchToHosting')}</span>
-                </button>
-              </li>
-            )}
-
-            {isAuthenticated && (
-              <li className="mt-2 border-t border-[#E3E8EF] pt-1">
-                <button type="button" onClick={handleLogout} className={menuDangerRowClass}>
-                  <LogOut className="w-4 h-4 mr-3 shrink-0" strokeWidth={2} aria-hidden="true" />
-                  <span className="flex-1">{t('nav.signOut')}</span>
-                </button>
-              </li>
-            )}
           </ul>
+
+          {isAuthenticated ? (
+            <div className="shrink-0 border-t border-[#E3E8EF] bg-elevated px-2 pb-2 pt-1">
+              {canSelectHosting && (
+                <>
+                  {/* States which side the person is on before offering the other
+                      one, the same order and wording as the desktop dropdown. */}
+                  <p className="px-4 pt-2 pb-1 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8A97A8]">
+                    {effectiveMode === 'hosting' ? t('nav.browsingAsHost') : t('nav.browsingAsTraveler')}
+                  </p>
+                  <button type="button" onClick={handleSwitchMode} className={menuRowClass()}>
+                    <ArrowLeftRight className="w-4 h-4 mr-3 shrink-0 text-[#5B6B82]" strokeWidth={2} aria-hidden="true" />
+                    <span className="flex-1">{effectiveMode === 'hosting' ? t('nav.switchToTravelling') : t('nav.switchToHosting')}</span>
+                  </button>
+                </>
+              )}
+              <button type="button" onClick={handleLogout} className={menuDangerRowClass}>
+                <LogOut className="w-4 h-4 mr-3 shrink-0" strokeWidth={2} aria-hidden="true" />
+                <span className="flex-1">{t('nav.signOut')}</span>
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     </nav><MobileBottomNav /></>
