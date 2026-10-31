@@ -19,10 +19,20 @@ import { Check, ChevronDown } from 'lucide-react';
  */
 
 // Trigger styling mirrors brandTheme's TextInput (theme/flowbiteTheme.js) so a
-// select and a text field on the same row line up. It lives here, not in a page
-// stylesheet, because this is the single place selects are defined.
+// select and a text field on the same row line up. The radius is chosen by the
+// `shape` prop rather than passed in through className: two utilities for the
+// same property resolve by CSS order, not by prop order, so `rounded-full` in a
+// caller's className may silently lose to the field radius. It lives here, not
+// in a page stylesheet, because this is the single place selects are defined.
 const TRIGGER_BASE =
-  'flex w-full items-center justify-between gap-2 rounded-[10px] border border-[#E2DAD0] bg-elevated text-left text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#C5A28C] dark:border-gray-600 dark:bg-gray-700 dark:text-white';
+  'flex w-full items-center justify-between gap-2 border border-[#E2DAD0] bg-elevated text-left text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#C5A28C] dark:border-gray-600 dark:bg-gray-700 dark:text-white';
+
+// A select on a form is a field (10px); one sitting in a header toolbar beside
+// pill controls is a pill, so the two never look mismatched on the same row.
+const TRIGGER_SHAPES = {
+  field: 'rounded-[10px]',
+  pill: 'rounded-full',
+};
 
 const TRIGGER_SIZES = {
   sm: 'min-h-[38px] px-3 text-xs',
@@ -47,6 +57,7 @@ function SelectMenu({
   options,
   placeholder = 'Select',
   sizing = 'md',
+  shape = 'field',
   disabled = false,
   invalid = false,
   ariaLabel,
@@ -82,6 +93,7 @@ function SelectMenu({
             aria-invalid={invalid || undefined}
             className={[
               TRIGGER_BASE,
+              TRIGGER_SHAPES[shape] || TRIGGER_SHAPES.field,
               TRIGGER_SIZES[sizing] || TRIGGER_SIZES.md,
               invalid ? 'border-red-500 focus:ring-red-500' : '',
               disabled ? 'cursor-not-allowed opacity-50' : '',
@@ -128,6 +140,7 @@ SelectMenu.propTypes = {
   ).isRequired,
   placeholder: PropTypes.string,
   sizing: PropTypes.oneOf(['sm', 'md', 'lg']),
+  shape: PropTypes.oneOf(['field', 'pill']),
   disabled: PropTypes.bool,
   invalid: PropTypes.bool,
   ariaLabel: PropTypes.string,
