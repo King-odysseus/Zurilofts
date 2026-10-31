@@ -4,6 +4,7 @@ import prisma from '../config/prisma.js';
 import { ValidationError, ForbiddenError, NotFoundError, ConflictError } from '../types/index.js';
 import { getConsentRecordsForUser } from './consent.service.js';
 import { deleteImage } from '../utils/imageStorage.js';
+import { withParsedAttachments } from '../utils/messageAttachments.js';
 import { hasOutstandingHostFunds, requiresAccountRetention } from '../utils/accountErasure.js';
 
 // ---------------------------------------------------------------
@@ -109,7 +110,8 @@ export async function exportUserData(userId: string) {
                 id: (c.booking.property.host as any)?.id,
                 displayName: `${(c.booking.property.host as any)?.firstName} ${(c.booking.property.host as any)?.lastName}`,
               },
-        myMessages,
+        // Parsed so the export carries the same shape every other endpoint returns.
+        myMessages: myMessages.map(withParsedAttachments),
       };
     })
   );
@@ -157,7 +159,7 @@ export async function exportUserData(userId: string) {
     profile: user,
     bookings,
     conversations: conversationData,
-    legacyMessages,
+    legacyMessages: legacyMessages.map(withParsedAttachments),
     favorites,
     shortlists,
     pushSubscriptions,

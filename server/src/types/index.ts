@@ -194,7 +194,13 @@ export const favoriteCreateSchema = z.object({
 });
 
 export const messageCreateSchema = z.object({
-  body: z.string().min(1, 'Message cannot be empty').max(2000),
+  // Text may be empty when the message carries a file, so the "text or at least
+  // one attachment" rule is enforced in the service, the only place that knows
+  // whether an attachment list survived normalisation.
+  // nullish rather than optional: a client that sends body: null for an
+  // attachment-only message is expressing the same thing as leaving it out.
+  body: z.string().max(2000).nullish(),
+  attachments: z.array(z.unknown()).max(5, 'At most 5 attachments per message').nullish(),
 });
 
 export const promoCreateSchema = z.object({
