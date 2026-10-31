@@ -1,6 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError } from '../types/index.js';
-import { firstPropertyImage } from './property.service.js';
+import { firstPropertyImage, withLiveRatings } from './property.service.js';
 
 interface CreateShortlistInput {
   userId: string;
@@ -87,13 +87,19 @@ export async function getShortlist(shortlistId: string, userId: string) {
   if (!shortlist) throw new NotFoundError('Shortlist');
   if (shortlist.ownerId !== userId) throw new NotFoundError('Shortlist');
 
+  // The rating/reviews columns are a cache and a seeded listing can carry
+  // numbers with no reviews behind them. Recompute them so a row here never
+  // out-advertises the same listing on the Stays grid.
+  const liveRatings = await withLiveRatings(shortlist.items.map((item) => item.property));
+  const byId = new Map(liveRatings.map((property) => [property.id, property]));
+
   // Normalize imagesJson to images array
   return {
     ...shortlist,
     items: shortlist.items.map((item) => ({
       ...item,
       property: {
-        ...item.property,
+        ...(byId.get(item.property.id) ?? item.property),
         images: (() => {
           try {
             const parsed = JSON.parse((item.property as any).imagesJson || '[]');
@@ -206,12 +212,17 @@ export async function getSharedShortlist(token: string) {
 
   if (!shortlist) throw new NotFoundError('Shortlist');
 
+  // Same reason as getShortlist: a public share link must not advertise a
+  // rating that no review supports.
+  const liveRatings = await withLiveRatings(shortlist.items.map((item) => item.property));
+  const byId = new Map(liveRatings.map((property) => [property.id, property]));
+
   return {
     ...shortlist,
     items: shortlist.items.map((item) => ({
       ...item,
       property: {
-        ...item.property,
+        ...(byId.get(item.property.id) ?? item.property),
         images: (() => {
           try {
             const parsed = JSON.parse((item.property as any).imagesJson || '[]');

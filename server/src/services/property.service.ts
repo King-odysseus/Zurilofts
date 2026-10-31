@@ -136,7 +136,7 @@ function normalizeProperty(property: any) {
  * Recompute both from the visible reviews on the way out so the card, the
  * detail page and the admin views all report the same real figure.
  */
-async function withLiveRatings<T extends { id: string }>(properties: T[]): Promise<T[]> {
+export async function withLiveRatings<T extends { id: string }>(properties: T[]): Promise<T[]> {
   if (!properties.length) return properties;
   const aggregates = await prisma.review.groupBy({
     by: ['propertyId'],
@@ -205,6 +205,9 @@ function buildCreateData(data: any) {
     // same way images/amenities/nearby are.
     if (data.directions !== undefined) base.directions = data.directions;
     if (data.checkInMethod !== undefined) base.checkInMethod = data.checkInMethod;
+    if (data.checkInWindowStart !== undefined) base.checkInWindowStart = data.checkInWindowStart;
+    if (data.checkInWindowEnd !== undefined) base.checkInWindowEnd = data.checkInWindowEnd;
+    if (data.checkOutTime !== undefined) base.checkOutTime = data.checkOutTime;
     if (data.wifiNetwork !== undefined) base.wifiNetwork = data.wifiNetwork;
     if (data.wifiPassword !== undefined) base.wifiPassword = data.wifiPassword;
     if (data.houseManual !== undefined) base.houseManual = data.houseManual;

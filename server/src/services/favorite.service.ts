@@ -1,5 +1,6 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError } from '../types/index.js';
+import { withLiveRatings } from './property.service.js';
 
 function normalizeProperty(p: any) {
   if (!p) return p;
@@ -18,7 +19,10 @@ export async function listFavorites(userId: string) {
     orderBy: { createdAt: 'desc' },
     include: { property: true },
   });
-  return favs.map((f) => normalizeProperty(f.property));
+  // The saved grid must report the same figures as the Stays grid. Without this
+  // a seeded listing showed "5.0 (12)" on Saved stays and nothing at all on the
+  // listing cards, because only the listing query recomputed the rating.
+  return withLiveRatings(favs.map((f) => normalizeProperty(f.property)));
 }
 
 export async function addFavorite(userId: string, propertyId: string) {
