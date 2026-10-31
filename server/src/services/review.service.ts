@@ -292,6 +292,149 @@ export async function getPropertyReviews(propertyId: string) {
   };
 }
 
+/**
+ * Host: ratings and reviews across the host's own listings, plus the follow-ups
+ * that need the host's attention. A host cannot yet review a guest (that needs
+ * its own record, not a guest-authored Review row), so a finished stay without a
+ * guest review becomes 'ask for a review' rather than 'leave a review'.
+ */
+export async function getHostInsights(hostId: string, limit = 20) {
+  const take = Math.min(Math.max(limit, 1), 50);
+  const properties = await prisma.property.findMany({
+    where: { hostId },
+    select: { id: true, title: true, status: true, rating: true, reviews: true },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const empty = {
+    listings: properties,
+    overall: computeReviewAggregate([]),
+    perListing: [] as Array<Record<string, unknown>>,
+    recent: [] as Array<Record<string, unknown>>,
+    followUps: {
+      reviewsToRead: 0,
+      reviewsToAskFor: 0,
+      items: [] as Array<Record<string, unknown>>,
+    },
+  };
+
+  if (properties.length === 0) return empty;
+  const propertyIds = properties.map((property) => property.id);
+
+  const [reviews, awaitingReview] = await Promise.all([
+    prisma.review.findMany({
+      where: { propertyId: { in: propertyIds }, hidden: false },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        rating: true,
+        cleanlinessRating: true,
+        locationRating: true,
+        valueRating: true,
+        publicComment: true,
+        createdAt: true,
+        user: { select: { firstName: true, lastName: true, avatar: true } },
+        property: { select: { id: true, title: true } },
+        booking: { select: { id: true, checkIn: true, checkOut: true } },
+      },
+    }),
+    prisma.booking.findMany({
+      where: {
+        property: { hostId },
+        status: 'CONFIRMED',
+        review: null,
+        checkOut: { lt: new Date() },
+      },
+      orderBy: { checkOut: 'desc' },
+      take: 10,
+      select: {
+        id: true,
+        checkIn: true,
+        checkOut: true,
+        guests: true,
+        user: { select: { firstName: true, lastName: true, avatar: true } },
+        property: { select: { id: true, title: true } },
+      },
+    }),
+  ]);
+
+  const overall = computeReviewAggregate(
+    reviews.map((review) => review.rating),
+    {
+      cleanliness: reviews.map((review) => review.cleanlinessRating),
+      location: reviews.map((review) => review.locationRating),
+      value: reviews.map((review) => review.valueRating),
+    },
+  );
+
+  const perListing = properties.map((property) => {
+    const own = reviews.filter((review) => review.property.id === property.id);
+    return {
+      id: property.id,
+      title: property.title,
+      status: property.status,
+      totalReviews: own.length,
+      averageRating: own.length
+        ? Math.round((own.reduce((sum, review) => sum + review.rating, 0) / own.length) * 10) / 10
+        : null,
+      subScores: {
+        cleanliness: averageSubScore(own.map((review) => review.cleanlinessRating)),
+        location: averageSubScore(own.map((review) => review.locationRating)),
+        value: averageSubScore(own.map((review) => review.valueRating)),
+      },
+    };
+  });
+
+  const personName = (person: { firstName?: string | null; lastName?: string | null } | null | undefined) =>
+    [person?.firstName, person?.lastName].filter(Boolean).join(' ') || 'Guest';
+
+  return {
+    listings: properties,
+    overall,
+    recent: reviews.slice(0, take).map((review) => ({
+      id: review.id,
+      rating: review.rating,
+      subScores: {
+        cleanliness: review.cleanlinessRating,
+        location: review.locationRating,
+        value: review.valueRating,
+      },
+      comment: review.publicComment,
+      createdAt: review.createdAt,
+      guestName: personName(review.user),
+      guestAvatar: review.user?.avatar || null,
+      propertyId: review.property.id,
+      propertyTitle: review.property.title,
+      bookingId: review.booking?.id || null,
+    })),
+    followUps: {
+      reviewsToRead: reviews.slice(0, take).length,
+      reviewsToAskFor: awaitingReview.length,
+      items: [
+        ...reviews.slice(0, 5).map((review) => ({
+          kind: 'read-review' as const,
+          id: review.id,
+          guestName: personName(review.user),
+          guestAvatar: review.user?.avatar || null,
+          rating: review.rating,
+          propertyTitle: review.property.title,
+          createdAt: review.createdAt,
+        })),
+        ...awaitingReview.map((booking) => ({
+          kind: 'ask-for-review' as const,
+          id: booking.id,
+          bookingId: booking.id,
+          guestName: personName(booking.user),
+          guestAvatar: booking.user?.avatar || null,
+          propertyTitle: booking.property.title,
+          checkOut: booking.checkOut,
+          daysSince: Math.max(0, Math.floor((Date.now() - new Date(booking.checkOut).getTime()) / 86400000)),
+        })),
+      ],
+    },
+  };
+}
+
 /** Admin: toggle hidden status on a review, then recalculate the public aggregate. */
 export async function updateReview(id: string, data: { hidden?: boolean }) {
   const review = await prisma.review.findUnique({ where: { id } });

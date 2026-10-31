@@ -12,6 +12,7 @@ import {
   ChevronDown,
   CircleUserRound,
   ClipboardList,
+  Star,
   FileText,
   LockKeyhole,
   LogOut,
@@ -38,6 +39,7 @@ const TABS = [
   // The label matches the other host surfaces; the account menu says "Guest
   // messages", which is where the distinction from travel actually matters.
   { key: 'messages', label: 'Messages', to: '/host/inbox', icon: MessageCircleMore, match: (pathname) => pathname.startsWith('/host/inbox') },
+  { key: 'insights', label: 'Insights', to: '/host/insights', icon: Star, match: (pathname) => pathname.startsWith('/host/insights') || pathname.startsWith('/host/reservations') },
   { key: 'earnings', label: 'Earnings', to: '/host/earnings', icon: ChartNoAxesCombined, match: (pathname) => pathname.startsWith('/host/earnings') || pathname.startsWith('/host/payouts') },
 ];
 

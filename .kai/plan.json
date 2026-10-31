@@ -2,29 +2,45 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Locate and read the Airbnb reference images",
-      "state": "done"
-    },
-    {
-      "text": "Build the host inbox to match the reference (list, thread, reservation, saved replies)",
-      "state": "done"
-    },
-    {
-      "text": "Audit host pages for links into guest pages and list missing host pages",
-      "state": "done"
-    },
-    {
-      "text": "Build the missing host pages (reservations list, reservation detail, host settings) and repoint host links",
-      "state": "done"
-    },
-    {
-      "text": "Verify host inbox and new host pages in the browser, run lint and build",
-      "state": "done"
-    },
-    {
-      "text": "Commit and push",
+      "text": "Inspect reference images and current host/guest messaging screens",
       "state": "active"
+    },
+    {
+      "text": "Mobile messaging: reference-style list (search, All/Unread/Groups, avatars, previews, timestamps) in Zuri colours",
+      "state": "pending"
+    },
+    {
+      "text": "Desktop messaging: host and guest 3-column look (list, thread, details panel)",
+      "state": "pending"
+    },
+    {
+      "text": "Fix mobile bottom nav staying visible during messaging",
+      "state": "pending"
+    },
+    {
+      "text": "Compare remaining host pages against references and list gaps",
+      "state": "pending"
+    },
+    {
+      "text": "Today page: reservation cards and follow-ups row",
+      "state": "pending"
+    },
+    {
+      "text": "Listings page: status badges and grid/list toggle",
+      "state": "pending"
+    },
+    {
+      "text": "Host insights page with rating breakdown and reviews",
+      "state": "pending"
+    },
+    {
+      "text": "Messaging settings entry from the messages reference",
+      "state": "pending"
+    },
+    {
+      "text": "Verify in browser, run lint and build, commit and push",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-31T12:37:02.089Z"
+  "updatedAt": "2026-10-31T12:42:18.634Z"
 }

@@ -67,6 +67,7 @@ const ROUTE_TITLES = [
   [/^\/host\/reservations$/, 'Reservations | ZuriLofts Host'],
   [/^\/host\/reservations\/[^/]+$/, 'Reservation | ZuriLofts Host'],
   [/^\/host\/settings$/, 'Host settings | ZuriLofts Host'],
+  [/^\/host\/insights$/, 'Insights | ZuriLofts Host'],
 
   // Admin
   [/^\/admin$/, 'Overview | ZuriLofts Admin'],

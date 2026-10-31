@@ -25,6 +25,7 @@ import HostPayouts from './pages/HostPayouts.jsx';
 import HostReservationsPage from './pages/HostReservationsPage.jsx';
 import HostReservationDetailPage from './pages/HostReservationDetailPage.jsx';
 import HostSettingsPage from './pages/HostSettingsPage.jsx';
+import HostInsightsPage from './pages/HostInsightsPage.jsx';
 import HostPromosPage from './pages/HostPromosPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
 
@@ -43,6 +44,7 @@ export default function WorkspaceRoutes() {
     <Route path="/host/inbox/:conversationId" element={hostPage(<HostInboxPage />)} />
     <Route path="/host/reservations" element={hostPage(<HostReservationsPage />)} />
     <Route path="/host/reservations/:id" element={hostPage(<HostReservationDetailPage />)} />
+    <Route path="/host/insights" element={hostPage(<HostInsightsPage />)} />
     <Route path="/host/earnings" element={hostPage(<HostEarningsPage />)} />
     <Route path="/host/properties/new" element={hostPage(<AdminPropertyForm />)} />
     <Route path="/host/properties/:id/edit" element={hostPage(<AdminPropertyForm />)} />

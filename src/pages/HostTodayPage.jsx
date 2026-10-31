@@ -6,6 +6,7 @@ import { CalendarDays } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 import { firstImage } from "../utils/images.js";
+import HostFollowUps from "../components/HostFollowUps.jsx";
 
 // Badge tones replace the old per-tone status pills on each panel header.
 const TONE_COLORS = { arrival: "info", inhouse: "warning", departure: "success" };
@@ -160,6 +161,8 @@ export default function HostTodayPage() {
   const [mobileTab, setMobileTab] = useState("arrival");
   const [messageBookingId, setMessageBookingId] = useState(null);
   const [messageError, setMessageError] = useState("");
+  const [followUps, setFollowUps] = useState([]);
+  const [followUpsLoading, setFollowUpsLoading] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) return undefined;
@@ -188,8 +191,20 @@ export default function HostTodayPage() {
         if (active) setConversationsLoading(false);
       }
     }
+    async function loadFollowUps() {
+      try {
+        const response = await apiClient.get("/reviews/host", { params: { limit: 10 } });
+        if (active) setFollowUps(response.data.data?.followUps?.items || []);
+      } catch {
+        // A missing follow-up list must not hide the day's real schedule.
+        if (active) setFollowUps([]);
+      } finally {
+        if (active) setFollowUpsLoading(false);
+      }
+    }
     loadToday();
     loadConversations();
+    loadFollowUps();
     return () => { active = false; };
   }, [isAuthenticated]);
 
@@ -291,6 +306,8 @@ export default function HostTodayPage() {
         </TabItem>)}
       </Tabs>
     </div>
+
+    <HostFollowUps items={followUps} loading={followUpsLoading} />
 
     <RecentMessages conversations={conversations} loading={conversationsLoading} />
   </div>;

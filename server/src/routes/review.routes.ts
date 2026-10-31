@@ -9,6 +9,9 @@ const router = Router();
 // Public landing-page stats
 router.get('/summary', ctrl.publicStats);
 
+// Host: insights across the host's own listings
+router.get('/host', authenticate, ctrl.hostInsights);
+
 // Guest leaves a post-stay review
 router.post('/', authenticate, validate(reviewCreateSchema), ctrl.create);
 

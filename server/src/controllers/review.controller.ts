@@ -14,6 +14,17 @@ export async function create(req: Request, res: Response, next: NextFunction): P
   }
 }
 
+// Host: ratings and reviews across the host's own listings, plus follow-ups
+export async function hostInsights(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { limit } = req.query;
+    const data = await reviewService.getHostInsights(req.user!.sub, limit ? Number(limit) : 20);
+    res.json({ success: true, data });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // Public: summary stats for the landing page (rating, stays, satisfaction)
 export async function publicStats(_req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

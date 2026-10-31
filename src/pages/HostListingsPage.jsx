@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Alert, Badge, Button, ToggleSwitch } from 'flowbite-react';
 import PropTypes from 'prop-types';
-import { Building2 } from 'lucide-react';
+import { Building2, LayoutGrid, List } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { firstImage } from '../utils/images.js';
@@ -163,6 +163,52 @@ HostListingCard.propTypes = {
   busy: PropTypes.bool.isRequired,
 };
 
+function HostListingRow({ property, onToggleAvailability, onDelete, onReview, busy }) {
+  const image = firstImage(property);
+  const status = propertyStatus(property);
+  const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
+
+  return <article className="flex flex-col gap-3 rounded-xl border border-border bg-elevated p-3 shadow-sm sm:flex-row sm:items-center">
+    <span className="h-16 w-full shrink-0 overflow-hidden rounded-lg bg-surface sm:h-14 sm:w-20">
+      {image
+        ? <img src={image} alt="" className="h-full w-full object-cover" />
+        : <span className="grid h-full w-full place-items-center text-[10px] text-muted">No photo</span>}
+    </span>
+
+    <div className="min-w-0 flex-1">
+      <div className="flex flex-wrap items-center gap-2">
+        <h2 className="truncate text-sm font-semibold text-navy">
+          <Link to={`/property/${property.id}`} className="hover:text-primary-600">{property.title}</Link>
+        </h2>
+        <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold text-muted">
+          <span className={`h-1.5 w-1.5 rounded-full ${property.status === 'PUBLISHED' ? 'bg-emerald-500' : property.status === 'PENDING_REVIEW' ? 'bg-amber-500' : property.status === 'SUSPENDED' || property.status === 'REJECTED' ? 'bg-red-500' : 'bg-slate-400'}`} aria-hidden="true" />
+          {status.label}
+        </span>
+        {!property.available && <span className="text-[10px] font-semibold text-muted">Not accepting bookings</span>}
+      </div>
+      <p className="mt-0.5 truncate text-xs text-muted">{bedSummary(property)} · {property.neighborhood || property.location || 'Nairobi'}</p>
+    </div>
+
+    <div className="flex shrink-0 flex-wrap items-center gap-2">
+      <strong className="whitespace-nowrap text-sm font-bold tabular-nums text-navy">KES {(property.price || 0).toLocaleString()}<small className="text-[10px] font-medium text-muted">/night</small></strong>
+      <ToggleSwitch
+        checked={Boolean(property.available)}
+        onChange={() => onToggleAvailability(property)}
+        disabled={busy}
+        aria-label={`${property.title} availability`}
+      />
+      <Button as={Link} to={`/host/properties/${property.id}/edit`} size="xs">
+        {property.status === 'DRAFT' ? 'Continue setup' : 'Edit'}
+      </Button>
+      {canSubmit && <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onReview(property)}>Submit</Button>}
+      <Button as={Link} to={`/host/calendar/${property.id}`} color="light" size="xs">Calendar</Button>
+      <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onDelete(property)}>Delete</Button>
+    </div>
+  </article>;
+}
+
+HostListingRow.propTypes = HostListingCard.propTypes;
+
 export default function HostListingsPage() {
   const toast = useToast();
   const [properties, setProperties] = useState([]);
@@ -170,6 +216,22 @@ export default function HostListingsPage() {
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('ALL');
   const [busyId, setBusyId] = useState(null);
+  // Remembered so a host who prefers rows does not re-pick it on every visit.
+  const [view, setView] = useState(() => {
+    try {
+      return window.localStorage.getItem('zuri:host-listings-view') === 'list' ? 'list' : 'grid';
+    } catch {
+      return 'grid';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('zuri:host-listings-view', view);
+    } catch {
+      // A blocked storage read is not worth failing the page over.
+    }
+  }, [view]);
 
   useEffect(() => {
     let active = true;
@@ -240,7 +302,21 @@ export default function HostListingsPage() {
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Your listings</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare, publish, and manage your stays.</p>
       </div>
-      <Button as={Link} to="/host/properties/new" size="sm">+ Add a listing</Button>
+      <div className="flex items-center gap-2">
+        <div className="inline-flex rounded-full border border-border bg-elevated p-1" role="group" aria-label="Listing view">
+          {[['grid', LayoutGrid, 'Grid view'], ['list', List, 'List view']].map(([key, Icon, label]) => <button
+            key={key}
+            type="button"
+            onClick={() => setView(key)}
+            aria-pressed={view === key}
+            aria-label={label}
+            className={`grid h-7 w-7 place-items-center rounded-full transition-colors ${view === key ? 'bg-navy-bg text-white' : 'text-muted hover:text-navy'}`}
+          >
+            <Icon className="h-3.5 w-3.5" strokeWidth={1.9} aria-hidden="true" />
+          </button>)}
+        </div>
+        <Button as={Link} to="/host/properties/new" size="sm">+ Add a listing</Button>
+      </div>
     </header>
 
     <div className="inline-flex flex-wrap gap-1 rounded-full border border-border bg-elevated p-1" role="group" aria-label="Listing status">
@@ -262,6 +338,8 @@ export default function HostListingsPage() {
       <strong className="text-base font-semibold text-navy">{properties.length === 0 ? 'No listings yet' : 'Nothing in this view'}</strong>
       <p className="max-w-md text-sm leading-relaxed text-muted">{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>
       {properties.length === 0 ? <Button as={Link} to="/host/properties/new" size="sm">Add a listing</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>Show all stays</Button>}
+    </div> : view === 'list' ? <div className="space-y-2">
+      {visibleProperties.map((property) => <HostListingRow key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
     </div> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {visibleProperties.map((property) => <HostListingCard key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
     </div>}

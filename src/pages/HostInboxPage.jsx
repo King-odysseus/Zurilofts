@@ -9,6 +9,7 @@ import {
   MessageSquareQuote,
   Search,
   Send,
+  Settings2,
   Users,
   X,
 } from 'lucide-react';
@@ -243,13 +244,37 @@ function ConversationList({
   onFilterChange,
   search,
   onSearchChange,
+  settingsOpen,
+  onToggleSettings,
+  hideEnded,
+  onHideEndedChange,
+  onCloseSettings,
   className,
 }) {
   return <section className={`${CARD} ${className} ${COLUMN_HEIGHT} flex-col overflow-hidden`} aria-label="Guest conversations">
     <header className="border-b border-border px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-lg font-bold text-navy">Messages</h2>
-        {unreadCount > 0 && <span className="rounded-full bg-primary-50 px-2.5 py-1 text-[11px] font-semibold text-primary-700">{plural(unreadCount, 'unread')}</span>}
+        <div className="flex items-center gap-1.5">
+          {unreadCount > 0 && <span className="rounded-full bg-primary-50 px-2.5 py-1 text-[11px] font-semibold text-primary-700">{plural(unreadCount, 'unread')}</span>}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={onToggleSettings}
+              aria-label="Messaging settings"
+              aria-expanded={settingsOpen}
+              className="grid h-7 w-7 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy"
+            >
+              <Settings2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+            </button>
+            <MessagingSettings
+              open={settingsOpen}
+              hideEnded={hideEnded}
+              onHideEndedChange={onHideEndedChange}
+              onClose={onCloseSettings}
+            />
+          </div>
+        </div>
       </div>
       <label className="mt-2.5 flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-muted focus-within:border-primary">
         <Search className="h-3.5 w-3.5 shrink-0" strokeWidth={1.9} aria-hidden="true" />
@@ -291,7 +316,9 @@ function ConversationList({
         <p className="text-xs leading-relaxed text-muted">
           {totalCount === 0
             ? 'When a guest messages you about a stay, the conversation appears here.'
-            : 'Try a different name, or clear the filter to see every conversation.'}
+            : hideEnded
+              ? 'Stays that have already ended are hidden. Turn that off in messaging settings to see them.'
+              : 'Try a different name, or clear the filter to see every conversation.'}
         </p>
       </div> : conversations.map((conversation) => <GuestRow key={conversation.id} conversation={conversation} currentUserId={currentUserId} selected={selectedId === conversation.id} />)}
     </div>
@@ -311,7 +338,52 @@ ConversationList.propTypes = {
   onFilterChange: PropTypes.func.isRequired,
   search: PropTypes.string.isRequired,
   onSearchChange: PropTypes.func.isRequired,
+  settingsOpen: PropTypes.bool.isRequired,
+  onToggleSettings: PropTypes.func.isRequired,
+  hideEnded: PropTypes.bool.isRequired,
+  onHideEndedChange: PropTypes.func.isRequired,
+  onCloseSettings: PropTypes.func.isRequired,
   className: PropTypes.string,
+};
+
+function MessagingSettings({ open, hideEnded, onHideEndedChange, onClose }) {
+  if (!open) return null;
+  return <>
+    <button type="button" className="fixed inset-0 z-30 cursor-default" aria-label="Close messaging settings" onClick={onClose} />
+    <div className="absolute right-0 top-full z-40 mt-1 w-[min(18rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-border bg-elevated shadow-xl" role="dialog" aria-label="Messaging settings">
+      <p className="border-b border-border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">Messaging settings</p>
+
+      <label className="flex cursor-pointer items-start gap-2.5 px-3 py-2.5 hover:bg-surface">
+        <input
+          type="checkbox"
+          checked={hideEnded}
+          onChange={(event) => onHideEndedChange(event.target.checked)}
+          className="mt-0.5 h-3.5 w-3.5 rounded border-border text-primary focus:ring-0"
+        />
+        <span>
+          <span className="block text-xs font-semibold text-navy">Hide stays that have ended</span>
+          <span className="block text-[11px] leading-relaxed text-muted">Keeps the list to guests who are coming or in house.</span>
+        </span>
+      </label>
+
+      <Link to="/host/listings" className="block border-t border-border px-3 py-2.5 hover:bg-surface">
+        <span className="block text-xs font-semibold text-navy">Saved replies</span>
+        <span className="block text-[11px] leading-relaxed text-muted">They belong to each listing, alongside its automatic messages.</span>
+      </Link>
+
+      <Link to="/contact" className="block border-t border-border px-3 py-2.5 hover:bg-surface">
+        <span className="block text-xs font-semibold text-navy">Give feedback</span>
+        <span className="block text-[11px] leading-relaxed text-muted">Tell us what would make replying faster.</span>
+      </Link>
+    </div>
+  </>;
+}
+
+MessagingSettings.propTypes = {
+  open: PropTypes.bool.isRequired,
+  hideEnded: PropTypes.bool.isRequired,
+  onHideEndedChange: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 /* ---------------------------------------------------------------- thread ---- */
@@ -649,6 +721,16 @@ export default function HostInboxPage() {
   const [sending, setSending] = useState(false);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  // Off by default: a host who just checked someone out still wants the thread
+  // they were using a minute ago.
+  const [hideEnded, setHideEnded] = useState(() => {
+    try {
+      return window.localStorage.getItem('zuri:host-inbox-hide-ended') === '1';
+    } catch {
+      return false;
+    }
+  });
   const [reservationOpen, setReservationOpen] = useState(false);
   const [savedTemplates, setSavedTemplates] = useState([]);
   const [savedRepliesLoading, setSavedRepliesLoading] = useState(false);
@@ -769,7 +851,10 @@ export default function HostInboxPage() {
 
   const visibleConversations = useMemo(() => {
     const term = search.trim().toLowerCase();
+    const now = Date.now();
     return conversations.filter((conversation) => {
+      const checkOut = conversation.booking?.checkOut;
+      if (hideEnded && checkOut && new Date(checkOut).getTime() < now) return false;
       if (filter === 'unread' && !(Number(conversation.unreadCount) > 0)) return false;
       if (!term) return true;
       const guest = conversation.booking?.user || {};
@@ -777,7 +862,7 @@ export default function HostInboxPage() {
       const title = (conversation.booking?.property?.title || '').toLowerCase();
       return name.includes(term) || title.includes(term);
     });
-  }, [conversations, filter, search]);
+  }, [conversations, filter, hideEnded, search]);
 
   async function sendMessage(content) {
     if (!routeId) return false;
@@ -830,6 +915,18 @@ export default function HostInboxPage() {
         onFilterChange={setFilter}
         search={search}
         onSearchChange={setSearch}
+        settingsOpen={settingsOpen}
+        onToggleSettings={() => setSettingsOpen((open) => !open)}
+        hideEnded={hideEnded}
+        onHideEndedChange={(next) => {
+          setHideEnded(next);
+          try {
+            window.localStorage.setItem('zuri:host-inbox-hide-ended', next ? '1' : '0');
+          } catch {
+            // Preference is a nicety; the list still filters this session.
+          }
+        }}
+        onCloseSettings={() => setSettingsOpen(false)}
         className={routeId ? 'hidden md:flex' : 'flex'}
       />
 
