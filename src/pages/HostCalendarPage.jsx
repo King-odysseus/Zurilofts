@@ -11,6 +11,7 @@ import {
   Info,
   Link2,
   Wallet,
+  X,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
@@ -58,6 +59,35 @@ function startOfMonthGrid(monthAnchor) {
   const first = firstOfMonth(monthAnchor);
   const weekdayOffset = (first.getDay() + 6) % 7;
   return addDays(first, -weekdayOffset);
+}
+
+/* Selection is keyed by calendar day (YYYY-MM-DD in local time) so a set of
+   picks survives re-renders and can be merged into runs for the API, which
+   stores availability as start/end ranges rather than single nights. */
+function dayKey(date) {
+  const day = midnight(date);
+  return `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+}
+
+function fromDayKey(key) {
+  const [year, month, date] = key.split('-').map(Number);
+  return new Date(year, month - 1, date);
+}
+
+/** Group picked nights into consecutive start/end runs; `end` is the check-out day. */
+function groupRuns(days) {
+  const sorted = [...days].sort((a, b) => a.getTime() - b.getTime());
+  const runs = [];
+  sorted.forEach((day) => {
+    const last = runs[runs.length - 1];
+    // last.end is already the day after the run, so a touching day extends it.
+    if (last && last.end.getTime() === day.getTime()) {
+      last.end = addDays(day, 1);
+      return;
+    }
+    runs.push({ start: day, end: addDays(day, 1) });
+  });
+  return runs;
 }
 
 function priceFor(day, basePrice, priceRules) {
@@ -162,7 +192,7 @@ StayBar.propTypes = {
   row: PropTypes.number.isRequired,
 };
 
-function MonthGrid({ weeks, monthAnchor, calendar, selectedDate, onSelect }) {
+function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
   const today = midnight(new Date());
   const basePrice = calendar?.property?.price ?? 0;
   const priceRules = calendar?.priceRules || [];
@@ -187,23 +217,26 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedDate, onSelect }) {
             {days.map((day) => {
               const outside = day.getMonth() !== monthAnchor.getMonth();
               const isToday = sameDay(day, today);
-              const isSelected = selectedDate && sameDay(day, selectedDate);
+              const isSelected = selectedKeys.includes(dayKey(day));
               const blocked = blocks.some((block) => inStay(day, block.start, block.end));
               const stay = bookings.some((booking) => inStay(day, booking.start, booking.end));
+              // A booked night cannot be blocked or opened, so it is a label rather
+              // than a pick target; every other night can be added to the selection.
+              const label = `${day.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}: ${stay ? 'booked' : blocked ? 'blocked' : `open, ${money(priceFor(day, basePrice, priceRules))}`}`;
               return <button
                 key={day.toISOString()}
                 type="button"
-                onClick={() => onSelect(day)}
-                aria-pressed={Boolean(isSelected)}
-                aria-label={`${day.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}: ${stay ? 'booked' : blocked ? 'blocked' : `open, ${money(priceFor(day, basePrice, priceRules))}`}`}
-                className={`flex flex-col items-start gap-0.5 border-l border-border px-2 pt-1.5 text-left transition-colors first:border-l-0 ${outside ? 'bg-surface/60' : 'bg-elevated'} hover:bg-surface ${isSelected ? 'ring-2 ring-inset ring-primary' : ''}`}
+                onClick={(event) => onToggle(day, event.shiftKey)}
+                aria-pressed={isSelected}
+                aria-label={`${label}${stay ? '' : isSelected ? ', selected' : ', tap to select'}`}
+                className={`flex flex-col items-start gap-0.5 border-l border-border px-2 pt-1.5 text-left transition-colors first:border-l-0 ${stay ? 'cursor-default' : 'hover:bg-surface'} ${isSelected ? 'bg-primary/10 ring-2 ring-inset ring-primary' : blocked ? 'bg-[#F1F3F6]' : outside ? 'bg-surface/60' : 'bg-elevated'}`}
                 style={{ minHeight: `${Math.max(92, 78 + barRows * 26)}px` }}
               >
-                <span className={`grid h-5 w-5 place-items-center rounded-full text-[11px] font-semibold ${isToday ? 'bg-primary text-white' : outside ? 'text-muted' : 'text-navy'}`}>
+                <span className={`grid h-5 w-5 place-items-center rounded-full text-[11px] font-semibold ${isSelected ? 'bg-primary text-white' : isToday ? 'bg-navy text-white' : outside ? 'text-muted' : 'text-navy'}`}>
                   {day.getDate()}
                 </span>
-                {blocked && !stay && <span className="inline-flex items-center gap-1 text-[10px] text-muted"><Ban className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" />Blocked</span>}
-                {!stay && !blocked && <span className="text-[10px] text-muted">{money(priceFor(day, basePrice, priceRules))}</span>}
+                {blocked && !stay && <span className={`inline-flex items-center gap-1 text-[10px] ${isSelected ? 'text-primary-700' : 'text-muted'}`}><Ban className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" />Blocked</span>}
+                {!stay && !blocked && <span className={`text-[10px] ${isSelected ? 'text-primary-700' : 'text-muted'}`}>{money(priceFor(day, basePrice, priceRules))}</span>}
               </button>;
             })}
           </div>
@@ -219,8 +252,8 @@ MonthGrid.propTypes = {
   weeks: PropTypes.arrayOf(PropTypes.instanceOf(Date)).isRequired,
   monthAnchor: PropTypes.instanceOf(Date).isRequired,
   calendar: PropTypes.object,
-  selectedDate: PropTypes.instanceOf(Date),
-  onSelect: PropTypes.func.isRequired,
+  selectedKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onToggle: PropTypes.func.isRequired,
 };
 
 /* ------------------------------------------------------------------ page ---- */
@@ -234,7 +267,7 @@ export default function HostCalendarPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [monthAnchor, setMonthAnchor] = useState(() => firstOfMonth(new Date()));
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedKeys, setSelectedKeys] = useState([]);
   const [sourceDraft, setSourceDraft] = useState({ name: '', url: '' });
   const [blockDraft, setBlockDraft] = useState({ start: '', end: '', summary: '' });
   const [syncing, setSyncing] = useState(false);
@@ -285,6 +318,100 @@ export default function HostCalendarPage() {
 
   function moveMonth(amount) {
     setMonthAnchor((current) => new Date(current.getFullYear(), current.getMonth() + amount, 1));
+  }
+
+  /** Click picks a night; shift-click fills the range from the previous pick. */
+  function toggleDay(day, extend) {
+    const key = dayKey(day);
+    setSelectedKeys((current) => {
+      const anchor = current[current.length - 1];
+      if (extend && anchor) {
+        const from = fromDayKey(anchor);
+        const to = midnight(day);
+        const step = to.getTime() >= from.getTime() ? 1 : -1;
+        const keys = new Set(current);
+        for (let cursor = from; step > 0 ? cursor.getTime() <= to.getTime() : cursor.getTime() >= to.getTime(); cursor = addDays(cursor, step)) {
+          keys.add(dayKey(cursor));
+        }
+        return [...keys];
+      }
+      return current.includes(key) ? current.filter((item) => item !== key) : [...current, key];
+    });
+  }
+
+  function clearSelection() {
+    setSelectedKeys([]);
+  }
+
+  const selectedDays = useMemo(() => selectedKeys.map(fromDayKey).sort((a, b) => a.getTime() - b.getTime()), [selectedKeys]);
+  const selectedBlockedDays = useMemo(() => {
+    const blocks = calendar?.blocks || [];
+    return selectedDays.filter((day) => blocks.some((block) => inStay(day, block.start, block.end)));
+  }, [calendar, selectedDays]);
+  const selectedOpenDays = useMemo(() => {
+    const blocks = calendar?.blocks || [];
+    const bookings = calendar?.bookings || [];
+    return selectedDays.filter((day) => !bookings.some((booking) => inStay(day, booking.start, booking.end)) && !blocks.some((block) => inStay(day, block.start, block.end)));
+  }, [calendar, selectedDays]);
+
+  /** Block every open night in the selection, one request per consecutive run. */
+  async function blockSelected() {
+    if (!activePropertyId || selectedOpenDays.length === 0) return;
+    setSaving(true);
+    try {
+      const runs = groupRuns(selectedOpenDays);
+      for (const run of runs) {
+        await apiClient.post(`/properties/${activePropertyId}/calendar/blocks`, {
+          start: dayKey(run.start),
+          end: dayKey(run.end),
+          summary: 'Blocked from calendar',
+        });
+      }
+      await load({ silent: true });
+      clearSelection();
+      const nights = selectedOpenDays.length;
+      toast.success(`${nights} ${nights === 1 ? 'night' : 'nights'} blocked.`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.response?.data?.error || 'Could not block those dates.');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  /**
+   * Reopen blocked nights in the selection. Unblocking a single night splits its
+   * block server-side and hands back new block ids, so each call re-reads the
+   * calendar before picking the next block to trim.
+   */
+  async function openSelected() {
+    if (!activePropertyId || selectedBlockedDays.length === 0) return;
+    setSaving(true);
+    let remaining = new Set(selectedBlockedDays.map(dayKey));
+    try {
+      for (let attempt = 0; attempt < 60 && remaining.size > 0; attempt += 1) {
+        const response = await apiClient.get(`/properties/${activePropertyId}/calendar`);
+        const latest = response.data.data;
+        const blocks = latest?.blocks || [];
+        const target = [...remaining].map(fromDayKey).find((day) => blocks.some((block) => inStay(day, block.start, block.end)));
+        if (!target) break;
+        const block = blocks.find((item) => inStay(target, item.start, item.end));
+        if (!block.manual) {
+          // Imported blocks belong to the other platform; say so once and stop.
+          toast.error('Some dates come from a connected calendar. Remove that feed to free them.');
+          break;
+        }
+        await apiClient.post(`/properties/${activePropertyId}/calendar/blocks/${block.id}/unblock-date`, { date: dayKey(target) });
+        remaining.delete(dayKey(target));
+      }
+      await load({ silent: true });
+      const opened = selectedBlockedDays.length - remaining.size;
+      clearSelection();
+      if (opened > 0) toast.success(`${opened} ${opened === 1 ? 'night' : 'nights'} opened again.`);
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.response?.data?.error || 'Could not open those dates.');
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function addSource(event) {
@@ -374,8 +501,8 @@ export default function HostCalendarPage() {
 
   const basePrice = calendar?.property?.price ?? 0;
   const priceRules = calendar?.priceRules || [];
-  const selectedPrice = selectedDate ? priceFor(selectedDate, basePrice, priceRules) : null;
   const stayCount = (calendar?.bookings || []).length;
+  const selectionCount = selectedDays.length;
 
   return <div className="space-y-4">
     <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -426,7 +553,7 @@ export default function HostCalendarPage() {
             <h2 className="truncate text-base font-semibold text-navy">{calendar?.property?.title || 'Your stay'}</h2>
             <p className="text-xs text-muted">
               {stayCount} {stayCount === 1 ? 'stay' : 'stays'} booked
-              {selectedDate && <> <span aria-hidden="true">·</span> {formatDay(selectedDate)} at {money(selectedPrice)}</>}
+              {selectionCount > 0 && <> <span aria-hidden="true">·</span> {selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</>}
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted">
@@ -435,12 +562,15 @@ export default function HostCalendarPage() {
             <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-border bg-elevated" aria-hidden="true" />Open</span>
           </div>
         </div>
+        <p className="border-b border-border bg-surface/60 px-4 py-2 text-[11px] leading-relaxed text-muted">
+          Tap the nights you want, then block or open them together. Shift-click fills a whole range.
+        </p>
         <MonthGrid
           weeks={weeks}
           monthAnchor={monthAnchor}
           calendar={calendar}
-          selectedDate={selectedDate}
-          onSelect={setSelectedDate}
+          selectedKeys={selectedKeys}
+          onToggle={toggleDay}
         />
       </section>
 
@@ -465,6 +595,19 @@ export default function HostCalendarPage() {
         </SidebarSection>
 
         <SidebarSection title="Availability" icon={Ban}>
+          {selectionCount > 0 && <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-2.5">
+            <p className="text-[11px] font-semibold text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</p>
+            <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
+              {selectedOpenDays.length > 0 && `${selectedOpenDays.length} open`}
+              {selectedOpenDays.length > 0 && selectedBlockedDays.length > 0 && ' \u00b7 '}
+              {selectedBlockedDays.length > 0 && `${selectedBlockedDays.length} blocked`}
+            </p>
+            <div className="mt-2 grid grid-cols-2 gap-1.5">
+              <Button type="button" size="xs" className={BTN_PRIMARY} disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>Block</Button>
+              <Button type="button" size="xs" color="light" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
+            </div>
+            <button type="button" onClick={clearSelection} className="mt-1.5 w-full text-[10px] text-muted underline underline-offset-2 hover:text-navy">Clear selection</button>
+          </div>}
           <form onSubmit={addBlock} className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
               <div>
@@ -523,6 +666,21 @@ export default function HostCalendarPage() {
           <Button color="light" size="xs" className="mt-2 w-full" onClick={copyFeed}>{copied ? 'Copied' : 'Copy link'}</Button>
         </SidebarSection>
       </aside>
+    </div>}
+
+    {/* Floating action bar: the grid is tall, so the buttons for a multi-day
+        pick follow the host instead of sitting off-screen above the month. */}
+    {!loading && activePropertyId && selectionCount > 0 && <div
+      className="fixed inset-x-3 bottom-[calc(var(--zl-bottom-nav-space,0px)+12px)] z-30 mx-auto flex items-center gap-2 rounded-2xl border border-border bg-elevated px-2 py-2 shadow-xl md:inset-x-auto md:right-6 md:bottom-6"
+      role="region"
+      aria-label="Selected dates"
+    >
+      <span className="pl-1 pr-1 text-xs font-semibold tabular-nums text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</span>
+      <Button type="button" size="xs" className={BTN_PRIMARY} disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
+      <Button type="button" size="xs" color="light" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
+      <button type="button" onClick={clearSelection} aria-label="Clear selection" className="grid h-7 w-7 place-items-center rounded-full text-muted hover:bg-surface hover:text-navy">
+        <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+      </button>
     </div>}
   </div>;
 }
