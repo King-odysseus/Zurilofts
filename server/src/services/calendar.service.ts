@@ -104,6 +104,16 @@ export async function deleteSource(id: string, ownerId?: string) {
   return prisma.calendarSource.delete({ where: { id } });
 }
 
+/**
+ * Calendar nights are date-only, so they are pinned to UTC midnight. Using
+ * setHours (local) instead would move a block by an hour across a daylight
+ * saving boundary, which is enough to make "unblock this date" reject its own
+ * block as out of range.
+ */
+export function calendarDay(value: Date): Date {
+  return new Date(Date.UTC(value.getUTCFullYear(), value.getUTCMonth(), value.getUTCDate()));
+}
+
 export async function addManualBlock(
   propertyId: string,
   start: Date,
@@ -112,9 +122,11 @@ export async function addManualBlock(
   ownerId?: string
 ) {
   await requireProperty(propertyId, ownerId);
-  if (end <= start) throw new ValidationError('Block end date must be after the start date');
+  const from = calendarDay(start);
+  const to = calendarDay(end);
+  if (to <= from) throw new ValidationError('Block end date must be after the start date');
   return prisma.calendarBlock.create({
-    data: { propertyId, sourceId: null, start, end, summary: summary || 'Blocked' },
+    data: { propertyId, sourceId: null, start: from, end: to, summary: summary || 'Blocked' },
   });
 }
 
@@ -133,10 +145,8 @@ export async function unblockCalendarDate(id: string, date: Date, ownerId?: stri
   if (!block) throw new NotFoundError('Calendar block');
   if (block.sourceId !== null) throw new ValidationError('Imported blocks can only be changed in their source calendar');
 
-  const day = new Date(date);
-  day.setHours(0, 0, 0, 0);
-  const nextDay = new Date(day);
-  nextDay.setDate(nextDay.getDate() + 1);
+  const day = calendarDay(date);
+  const nextDay = new Date(day.getTime() + 86_400_000);
   if (day < block.start || day >= block.end) throw new ValidationError('Selected date is outside this block');
 
   await prisma.$transaction(async (tx) => {
