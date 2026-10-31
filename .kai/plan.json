@@ -22,25 +22,33 @@
       "state": "done"
     },
     {
-      "text": "Point every host Messages entry at the host inbox (header tabs, mobile bar, Navbar, Today page links)",
+      "text": "Point every host Messages entry at the host inbox (header tab, mobile bar, Navbar, Today page links)",
       "state": "done"
     },
     {
-      "text": "Fix the stored side leaking between accounts on one browser",
+      "text": "Fix the remembered side leaking between accounts on one browser",
       "state": "done"
     },
     {
-      "text": "Verify: dark mode selected row, mobile composer clearance, lint, build, server typecheck, switch overlay",
+      "text": "Make the header follow the page (host nav only on host routes) so travel pages never show host tabs",
       "state": "done"
     },
     {
-      "text": "Commit and push the work",
+      "text": "Make every deliberate side switch play the transition, including when the stored side already matches",
       "state": "done"
     },
     {
-      "text": "Write the design guidance: what to take from the reference dropdown, and where to differentiate from Airbnb",
+      "text": "Unify the name of the host inbox across header, mobile bar and menu",
+      "state": "done"
+    },
+    {
+      "text": "Verify end to end in a browser: both inboxes, both headers, switch animation, mobile and dark mode, lint, build, server typecheck",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T12:10:49.100Z"
+  "updatedAt": "2026-10-31T12:19:31.303Z"
 }
