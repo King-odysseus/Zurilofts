@@ -144,6 +144,24 @@ const envSchema = z.object({
           '  Paystack keys are not fully configured (PAYSTACK_SECRET_KEY, PAYSTACK_PUBLIC_KEY). Payments and payouts are disabled until these are set.'
         );
       }
+      // A test-mode key is more dangerous than a missing one: every charge would
+      // report success against Paystack sandbox while no real money moves, so
+      // the platform would confirm bookings and release host payouts against
+      // funds it never received. Absence is tolerated above; a wrong key is not.
+      const secretKey = data.PAYSTACK_SECRET_KEY;
+      const keyLooksFake =
+        !!secretKey &&
+        (secretKey.startsWith('sk_test_') ||
+          /^sk_live_x+$/.test(secretKey) ||
+          secretKey === 'your_paystack_secret_key');
+      if (keyLooksFake) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['PAYSTACK_SECRET_KEY'],
+          message:
+            'PAYSTACK_SECRET_KEY is a test-mode or placeholder key. Production must use the live secret key (sk_live_...), or leave it unset so payments stay disabled.',
+        });
+      }
       // Require Cloudinary in production - Railway's filesystem is ephemeral, so
       // local-disk uploads would be lost on every redeploy.
       if (!data.CLOUDINARY_URL) {
