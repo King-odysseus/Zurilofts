@@ -565,7 +565,7 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     ...bookingHost,
   };
 
-  const [properties, all, confirmed, byBed, trendBookings] = await Promise.all([
+  const [properties, all, confirmed, byBed, trendBookings, unsettledAgg] = await Promise.all([
     prisma.property.findMany({
       where: propertyWhere,
       include: isAdminView
@@ -608,7 +608,25 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     }),
     prisma.booking.findMany({
       where: monthlyTrendWhere,
-      select: { createdAt: true, total: true },
+      // `status` and `hostNetAmount` are here for the earnings chart: it splits
+      // every month into the part already earned (CONFIRMED) and the part still
+      // pending, and it shows the host's take rather than the guest's total.
+      select: { createdAt: true, total: true, status: true, hostNetAmount: true },
+    }),
+    // Bookings whose money split was never recorded, because they were confirmed
+    // before it existed. Reported rather than summed as zero: guessing the host's
+    // share would either overstate what they are owed or quietly round the
+    // shortfall in the platform's favour. The admin revenue report already draws
+    // the same line (see revenue.service.ts `unsettled`).
+    prisma.booking.aggregate({
+      where: {
+        status: { in: ['PENDING', 'CONFIRMED'] },
+        ...whereDate,
+        ...bookingHost,
+        hostNetAmount: null,
+      },
+      _count: true,
+      _sum: { total: true },
     }),
   ]);
 
@@ -617,14 +635,29 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     return {
       key: `${month.getFullYear()}-${month.getMonth()}`,
       label: month.toLocaleString('en-GB', { month: 'short' }),
+      year: month.getFullYear(),
       earnings: 0,
+      // Host take-home for the month, and how much of it is already confirmed.
+      // `earnings` above stays the guest-facing total it has always been, so the
+      // admin revenue screens read exactly the numbers they read before.
+      netEarnings: 0,
+      paidNetEarnings: 0,
+      bookings: 0,
+      paidBookings: 0,
     };
   });
   const trendByMonth = new Map(monthlyTrend.map((month) => [month.key, month]));
   for (const booking of trendBookings) {
     const key = `${booking.createdAt.getFullYear()}-${booking.createdAt.getMonth()}`;
     const month = trendByMonth.get(key);
-    if (month) month.earnings += booking.total ?? 0;
+    if (!month) continue;
+    month.earnings += booking.total ?? 0;
+    month.netEarnings += booking.hostNetAmount ?? 0;
+    month.bookings += 1;
+    if (booking.status === 'CONFIRMED') {
+      month.paidNetEarnings += booking.hostNetAmount ?? 0;
+      month.paidBookings += 1;
+    }
   }
 
   const allMap = new Map(all.map((r) => [r.propertyId, r]));
@@ -798,7 +831,16 @@ export async function getPropertyEarnings(dateFilter?: { from?: Date; to?: Date 
     hosts = Array.from(hostMap.values()).sort((a, b) => b.earnings - a.earnings);
   }
 
-  return { properties: rows, totals, monthlyTrend, ...(isAdminView ? { hosts } : {}) };
+  return {
+    properties: rows,
+    totals,
+    monthlyTrend,
+    unsettled: {
+      bookings: unsettledAgg._count ?? 0,
+      guestTotal: unsettledAgg._sum?.total ?? 0,
+    },
+    ...(isAdminView ? { hosts } : {}),
+  };
 }
 
 export async function updateBookingStatus(bookingId: string, status: 'CONFIRMED' | 'CANCELLED') {

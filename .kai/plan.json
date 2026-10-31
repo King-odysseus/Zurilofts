@@ -2,29 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read current calendar sheet, page and pricing backend to see what a night edit can actually do",
-      "state": "done"
-    },
-    {
-      "text": "Add a dated minimum-stay rule to the backend (schema, migration, service, routes, calendar payload, booking check)",
-      "state": "done"
-    },
-    {
-      "text": "Build the in-sheet Custom settings dropdown: nightly rate, promotion, minimum stay, each edited in place",
+      "text": "Show Today's mobile Arrivals / In house / Departures counts as badges beside the labels, in one row",
       "state": "active"
     },
     {
-      "text": "Wire the page: save rate/promotion/min stay for the selected nights and reload the calendar",
+      "text": "Check the new tab row on screen at phone width",
       "state": "pending"
     },
     {
-      "text": "Fix the calendar's dated-rate range so it matches what guests are charged",
+      "text": "Verify the earnings page shows the unsettled-booking notice instead of a bare zero",
       "state": "pending"
     },
     {
-      "text": "Run lint and build, apply the migration, and confirm the phone sheet behaves",
+      "text": "Run lint and build",
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-31T16:23:31.844Z"
+  "updatedAt": "2026-10-31T16:46:27.498Z"
 }
