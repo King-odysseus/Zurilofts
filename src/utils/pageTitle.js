@@ -56,6 +56,8 @@ const ROUTE_TITLES = [
   [/^\/host\/calendar\/[^/]+$/, 'Property calendar | ZuriLofts Host'],
   [/^\/host\/calendar$/, 'Availability calendar | ZuriLofts Host'],
   [/^\/host\/listings$/, 'Your listings | ZuriLofts Host'],
+  [/^\/host\/inbox$/, 'Guest messages | ZuriLofts Host'],
+  [/^\/host\/inbox\/[^/]+$/, 'Guest conversation | ZuriLofts Host'],
   [/^\/host\/properties\/new$/, 'New listing | ZuriLofts Host'],
   [/^\/host\/properties\/[^/]+\/edit$/, 'Edit listing | ZuriLofts Host'],
   [/^\/host\/earnings$/, 'Earnings | ZuriLofts Host'],

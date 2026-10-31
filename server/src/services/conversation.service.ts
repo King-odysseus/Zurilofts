@@ -101,16 +101,24 @@ export async function getOrCreateConversation(input: GetOrCreateInput) {
   return conversation;
 }
 
-export async function listUserConversations(userId: string) {
+/**
+ * Which side of a conversation the caller is asking about. One account can be on
+ * both sides at once - a host who books a stay is a guest in that conversation -
+ * and those are two separate inboxes rather than one merged list.
+ */
+export type ConversationSide = 'guest' | 'host';
+
+/** The relation filter for one side, or both when no side is asked for. */
+function conversationSideFilter(userId: string, side?: ConversationSide) {
+  if (side === 'guest') return { booking: { userId } };
+  if (side === 'host') return { booking: { property: { hostId: userId } } };
+  // Unscoped callers (admin tooling) still want everything the account touches.
+  return { booking: { OR: [{ userId }, { property: { hostId: userId } }] } };
+}
+
+export async function listUserConversations(userId: string, side?: ConversationSide) {
   const conversations = await prisma.conversation.findMany({
-    where: {
-      booking: {
-        OR: [
-          { userId },
-          { property: { hostId: userId } },
-        ],
-      },
-    },
+    where: conversationSideFilter(userId, side),
     include: {
       messages: {
         orderBy: { createdAt: 'desc' },
@@ -258,18 +266,11 @@ export async function markAsRead(conversationId: string, userId: string, isAdmin
   return { markedRead: result.count };
 }
 
-export async function getUnreadCount(userId: string) {
-  // Count unread messages where the message is NOT from the caller,
-  // across all conversations where the caller participates
+export async function getUnreadCount(userId: string, side?: ConversationSide) {
+  // Count unread messages where the message is NOT from the caller, across the
+  // conversations of one side so each header badge counts its own inbox only.
   const conversations = await prisma.conversation.findMany({
-    where: {
-      booking: {
-        OR: [
-          { userId },
-          { property: { hostId: userId } },
-        ],
-      },
-    },
+    where: conversationSideFilter(userId, side),
     select: { id: true },
   });
 

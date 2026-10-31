@@ -23,7 +23,9 @@ function InboxPage() {
   const fetchConversations = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await apiClient.get('/conversations');
+      // This is the traveller inbox: only the conversations booked as a guest.
+      // Host-side threads belong to the host inbox at /host/inbox.
+      const response = await apiClient.get('/conversations', { params: { side: 'guest' } });
       setConversations(response.data.data || []);
       setError(null);
     } catch {

@@ -6,7 +6,7 @@ const TABS = [
   { key: 'today', label: 'Today', to: '/host/today', match: (p) => p === '/host/today', icon: CalendarClock },
   { key: 'calendar', label: 'Calendar', to: '/host/calendar', match: (p) => p.startsWith('/host/calendar'), icon: CalendarDays },
   { key: 'listings', label: 'Listings', to: '/host/listings', match: (p) => p.startsWith('/host/listings') || p.startsWith('/host/properties'), icon: Building2 },
-  { key: 'messages', label: 'Inbox', to: '/inbox', match: (p) => p.startsWith('/inbox'), icon: MessageCircleMore },
+  { key: 'messages', label: 'Inbox', to: '/host/inbox', match: (p) => p.startsWith('/host/inbox'), icon: MessageCircleMore },
   { key: 'earnings', label: 'Earnings', to: '/host/earnings', match: (p) => p.startsWith('/host/earnings') || p.startsWith('/host/payouts'), icon: ChartNoAxesCombined },
 ];
 

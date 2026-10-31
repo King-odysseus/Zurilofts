@@ -1,5 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import * as conversationService from '../services/conversation.service.js';
+import type { ConversationSide } from '../services/conversation.service.js';
+
+// An unknown or missing side is not an error: the caller then gets every
+// conversation the account touches, which is what older clients send.
+function readSide(value: unknown): ConversationSide | undefined {
+  return value === 'guest' || value === 'host' ? value : undefined;
+}
 
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -15,7 +22,7 @@ export async function create(req: Request, res: Response, next: NextFunction): P
 
 export async function listMine(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const conversations = await conversationService.listUserConversations(req.user!.sub);
+    const conversations = await conversationService.listUserConversations(req.user!.sub, readSide(req.query.side));
     res.json({ success: true, data: conversations });
   } catch (error) {
     next(error);
@@ -24,7 +31,7 @@ export async function listMine(req: Request, res: Response, next: NextFunction):
 
 export async function unreadCount(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const result = await conversationService.getUnreadCount(req.user!.sub);
+    const result = await conversationService.getUnreadCount(req.user!.sub, readSide(req.query.side));
     res.json({ success: true, data: result });
   } catch (error) {
     next(error);

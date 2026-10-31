@@ -18,6 +18,7 @@ import AdminGovernance from './pages/AdminGovernance.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
 import HostCalendarPage from './pages/HostCalendarPage.jsx';
 import HostEarningsPage from './pages/HostEarningsPage.jsx';
+import HostInboxPage from './pages/HostInboxPage.jsx';
 import HostListingsPage from './pages/HostListingsPage.jsx';
 import HostTodayPage from './pages/HostTodayPage.jsx';
 import HostPayouts from './pages/HostPayouts.jsx';
@@ -33,6 +34,10 @@ export default function WorkspaceRoutes() {
     <Route path="/host/calendar" element={hostPage(<HostCalendarPage />)} />
     <Route path="/host/calendar/:id" element={hostPage(<HostCalendarPage />)} />
     <Route path="/host/listings" element={hostPage(<HostListingsPage />)} />
+    {/* Host messages are their own inbox: guests writing about a stay. The
+        traveller inbox at /inbox is the other side of the same table. */}
+    <Route path="/host/inbox" element={hostPage(<HostInboxPage />)} />
+    <Route path="/host/inbox/:conversationId" element={hostPage(<HostInboxPage />)} />
     <Route path="/host/earnings" element={hostPage(<HostEarningsPage />)} />
     <Route path="/host/properties/new" element={hostPage(<AdminPropertyForm />)} />
     <Route path="/host/properties/:id/edit" element={hostPage(<AdminPropertyForm />)} />

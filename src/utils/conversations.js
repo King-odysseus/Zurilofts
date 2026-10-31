@@ -15,3 +15,7 @@ export function getConversationParticipant(conversation, currentUserId) {
     isHost: currentUserIsGuest,
   };
 }
+
+// Fired after a thread is marked read. The header badge listens for it so the
+// count drops as soon as the messages have actually been seen.
+export const CONVERSATIONS_READ_EVENT = 'zuri:conversations-read';

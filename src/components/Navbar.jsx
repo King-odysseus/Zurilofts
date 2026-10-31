@@ -138,9 +138,12 @@ function Navbar() {
         } catch (err) { console.error(err); }
       }
 
-      // Reservation conversation unread count (separate from the support inbox)
+      // Reservation conversation unread count (separate from the support inbox).
+      // This header is the traveller one, so it counts the guest side only: a host
+      // reading their travel header should not be alerted about guest messages
+      // waiting in the host inbox.
       try {
-        const r = await apiClient.get('/conversations/unread-count');
+        const r = await apiClient.get('/conversations/unread-count', { params: { side: 'guest' } });
         if (!active) return;
         setConversationUnread(r.data.data?.count || 0);
       } catch (err) { console.error(err); }
@@ -240,7 +243,7 @@ function Navbar() {
         { name: 'Today', key: 'today', href: '/host/today' },
         { name: 'Calendar', key: 'calendar', href: '/host/calendar' },
         { name: 'Listings', key: 'listings', href: '/host/listings' },
-        { name: 'Messages', key: 'messages', href: '/inbox' },
+        { name: 'Messages', key: 'messages', href: '/host/inbox' },
         { name: 'Earnings', key: 'earnings', href: '/host/earnings' },
         { name: 'Discounts', key: 'discounts', href: '/host/discounts' },
       ];

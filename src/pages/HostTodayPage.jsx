@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Badge, Button, TabItem, Tabs } from "flowbite-react";
-import { Link } from "react-router-dom";
+import { Alert, Badge, Button, TabItem, Tabs } from "flowbite-react";
+import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { CalendarDays } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
@@ -45,7 +45,7 @@ function relativeTime(iso) {
   return days < 7 ? `${days}d` : date.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
 }
 
-function GuestOperationCard({ booking, type, compact = false }) {
+function GuestOperationCard({ booking, type, compact = false, onMessage, messagePending }) {
   const property = booking.property || {};
   const image = firstImage(property) || property.coverImage;
   const propertyTitle = property.title || "Your stay";
@@ -58,7 +58,9 @@ function GuestOperationCard({ booking, type, compact = false }) {
     <div className="min-w-0 flex-1">
       <strong className="block truncate text-sm font-semibold text-navy">{guestName(booking)}</strong>
       <span className="block truncate text-xs text-muted">{propertyTitle} · {time}</span>
-      <Link to={`/messages?booking=${booking.id}`} className="text-xs font-semibold text-navy underline-offset-2 hover:underline">Message guest</Link>
+      {/* A guest conversation belongs to the host inbox. This used to open the
+          traveller support thread, which is a different inbox entirely. */}
+      <button type="button" onClick={() => onMessage(booking.id)} disabled={messagePending} className="text-xs font-semibold text-navy underline-offset-2 hover:underline disabled:opacity-60">{messagePending ? "Opening..." : "Message guest"}</button>
     </div>
     <Link className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-navy" to={`/bookings/${booking.id}`}>View</Link>
   </article>;
@@ -80,6 +82,8 @@ GuestOperationCard.propTypes = {
   }).isRequired,
   type: PropTypes.oneOf(["arrival", "departure", "inhouse"]).isRequired,
   compact: PropTypes.bool,
+  onMessage: PropTypes.func.isRequired,
+  messagePending: PropTypes.bool,
 };
 
 function EmptyPanel({ label }) {
@@ -92,14 +96,14 @@ function EmptyPanel({ label }) {
 
 EmptyPanel.propTypes = { label: PropTypes.string.isRequired };
 
-function OperationPanel({ title, count, tone, bookings, type }) {
+function OperationPanel({ title, count, tone, bookings, type, onMessage, messageBookingId }) {
   return <section className={CARD}>
     <header className="mb-3 flex items-center justify-between gap-3">
       <h2 className="text-base font-semibold text-navy">{title}</h2>
       <Badge color={TONE_COLORS[tone]}>{count} today</Badge>
     </header>
     <div className="space-y-3">
-      {bookings.length === 0 ? <EmptyPanel label={title} /> : bookings.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={type} compact />)}
+      {bookings.length === 0 ? <EmptyPanel label={title} /> : bookings.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={type} compact onMessage={onMessage} messagePending={messageBookingId === booking.id} />)}
     </div>
   </section>;
 }
@@ -110,6 +114,8 @@ OperationPanel.propTypes = {
   tone: PropTypes.oneOf(["arrival", "departure", "inhouse"]).isRequired,
   bookings: PropTypes.arrayOf(PropTypes.object).isRequired,
   type: PropTypes.oneOf(["arrival", "departure", "inhouse"]).isRequired,
+  onMessage: PropTypes.func.isRequired,
+  messageBookingId: PropTypes.string,
 };
 
 function RecentMessages({ conversations, loading }) {
@@ -119,7 +125,7 @@ function RecentMessages({ conversations, loading }) {
         <span className={`block ${EYEBROW}`}>GUEST MESSAGES</span>
         <h2 className="mt-1 text-base font-semibold text-navy">Recent conversations</h2>
       </div>
-      <Button as={Link} to="/inbox" color="light" size="sm">View inbox</Button>
+      <Button as={Link} to="/host/inbox" color="light" size="sm">View inbox</Button>
     </header>
     {loading ? <div className="grid grid-cols-1 gap-3 lg:grid-cols-3"><span className="block h-20 animate-pulse rounded-xl border border-border bg-surface" /><span className="block h-20 animate-pulse rounded-xl border border-border bg-surface" /></div> : conversations.length === 0 ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-surface px-5 py-12 text-center"><strong className="text-sm font-semibold text-navy">No guest messages yet</strong><p className="text-xs text-muted">New stay conversations will appear here.</p></div> : <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
       {conversations.map((conversation) => {
@@ -128,7 +134,7 @@ function RecentMessages({ conversations, loading }) {
         const user = booking.user || {};
         const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || "Guest";
         const image = firstImage(property);
-        return <Link key={conversation.id} to={`/inbox/${conversation.id}`} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-3 transition-colors hover:bg-primary-50">
+        return <Link key={conversation.id} to={`/host/inbox/${conversation.id}`} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-3 transition-colors hover:bg-primary-50">
           <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-elevated text-xs font-bold uppercase text-muted">{image ? <img src={image} alt="" className="h-full w-full object-cover" /> : name.slice(0, 1)}</span>
           <div className="min-w-0 flex-1"><strong className="block truncate text-sm font-semibold text-navy">{name}</strong><small className="block truncate text-xs text-muted">{property.title || "Stay"}</small><p className="mt-1 truncate text-xs text-muted">{conversation.lastMessage?.content || "No messages yet"}</p></div>
           <time className="shrink-0 text-[10px] text-muted">{relativeTime(conversation.lastMessage?.createdAt || conversation.updatedAt)}</time>
@@ -145,12 +151,15 @@ RecentMessages.propTypes = {
 
 export default function HostTodayPage() {
   const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [conversations, setConversations] = useState([]);
   const [conversationsLoading, setConversationsLoading] = useState(true);
   const [mobileTab, setMobileTab] = useState("arrival");
+  const [messageBookingId, setMessageBookingId] = useState(null);
+  const [messageError, setMessageError] = useState("");
 
   useEffect(() => {
     if (!isAuthenticated) return undefined;
@@ -169,7 +178,9 @@ export default function HostTodayPage() {
     }
     async function loadConversations() {
       try {
-        const response = await apiClient.get("/conversations");
+        // Guest conversations only: this is the host dashboard, so the traveller
+        // threads this account may also have are left to the travel inbox.
+        const response = await apiClient.get("/conversations", { params: { side: "host" } });
         if (active) setConversations((response.data.data || []).slice(0, 3));
       } catch {
         if (active) setConversations([]);
@@ -181,6 +192,21 @@ export default function HostTodayPage() {
     loadConversations();
     return () => { active = false; };
   }, [isAuthenticated]);
+
+  // The conversation is created on demand, so a host writing to a guest they have
+  // never messaged lands in the same thread the guest will see.
+  async function openGuestConversation(bookingId) {
+    setMessageBookingId(bookingId);
+    setMessageError("");
+    try {
+      const response = await apiClient.post("/conversations", { bookingId });
+      navigate(`/host/inbox/${response.data.data.id}`);
+    } catch {
+      setMessageError("Could not open that conversation. Please try again.");
+    } finally {
+      setMessageBookingId(null);
+    }
+  }
 
   if (loading) return <div className="space-y-6" aria-label="Loading host dashboard"><span className="block h-24 animate-pulse rounded-xl border border-border bg-elevated" /><span className="block h-44 animate-pulse rounded-xl border border-border bg-elevated" /><span className="block h-24 animate-pulse rounded-xl border border-border bg-elevated" /><span className="block h-64 animate-pulse rounded-xl border border-border bg-elevated" /></div>;
 
@@ -199,6 +225,13 @@ export default function HostTodayPage() {
       </div>
       <Button as={Link} to="/host/calendar" color="light" size="sm" className="hidden md:inline-flex">Open calendar</Button>
     </header>
+
+    {messageError && <Alert color="failure">
+      <div className="flex w-full flex-wrap items-center justify-between gap-3">
+        <p className="min-w-0 flex-1">{messageError}</p>
+        <Button size="xs" color="light" onClick={() => setMessageError("")}>Dismiss</Button>
+      </div>
+    </Alert>}
 
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <section className="flex flex-col justify-between gap-4 rounded-xl border border-border bg-primary-50 dark:bg-primary/15 p-5 shadow-sm sm:flex-row sm:items-center lg:col-span-2">
@@ -227,9 +260,9 @@ export default function HostTodayPage() {
     </div>
 
     <div className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:[&>section:last-child]:col-span-2 lg:[&>section:last-child]:col-span-1">
-      <OperationPanel title="Arrivals" count={arrivals.length} tone="arrival" bookings={arrivals} type="arrival" />
-      <OperationPanel title="In house" count={inHouse.length} tone="inhouse" bookings={inHouse} type="inhouse" />
-      <OperationPanel title="Departures" count={departures.length} tone="departure" bookings={departures} type="departure" />
+      <OperationPanel title="Arrivals" count={arrivals.length} tone="arrival" bookings={arrivals} type="arrival" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
+      <OperationPanel title="In house" count={inHouse.length} tone="inhouse" bookings={inHouse} type="inhouse" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
+      <OperationPanel title="Departures" count={departures.length} tone="departure" bookings={departures} type="departure" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
     </div>
 
     <div className="md:hidden">
@@ -250,7 +283,7 @@ export default function HostTodayPage() {
           <div className="space-y-3">
             {items.length === 0
               ? <EmptyPanel label={key === "arrival" ? "Arrivals" : key === "departure" ? "Departures" : "In-house guests"} />
-              : items.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={key} compact />)}
+              : items.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={key} compact onMessage={openGuestConversation} messagePending={messageBookingId === booking.id} />)}
           </div>
         </TabItem>)}
       </Tabs>

@@ -1,20 +1,10 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { useAuth } from './AuthContext.jsx';
-import { NAV_MODE_STORAGE_KEY, rememberNavMode } from '../utils/authIntent.js';
+import { rememberNavMode, readNavMode } from '../utils/authIntent.js';
 import ModeTransition from '../components/ModeTransition.jsx';
 
 const ModeContext = createContext(null);
-
-function readStoredMode() {
-  try {
-    const stored = window.localStorage.getItem(NAV_MODE_STORAGE_KEY);
-    return stored === 'hosting' ? 'hosting' : 'travelling';
-  } catch {
-    // Safari private mode throws on storage access - degrade to default
-    return 'travelling';
-  }
-}
 
 export function ModeProvider({ children }) {
   const { user } = useAuth();
@@ -31,7 +21,9 @@ export function ModeProvider({ children }) {
   // /admin) and guests are excluded.
   const canSelectHosting = Boolean(user) && user.role !== 'ADMIN';
 
-  const [mode, setModeState] = useState(() => readStoredMode());
+  // The remembered side is read per account (see readNavMode): two people can
+  // share a browser without inheriting each other's header.
+  const [mode, setModeState] = useState(() => readNavMode(user?.id));
   // A switch is announced with a short overlay, so changing sides is something
   // the person watches happen instead of something they discover after the page
   // has already changed around them.
@@ -43,8 +35,8 @@ export function ModeProvider({ children }) {
   // draft listings; publishing and payouts still require an approved HOST
   // account. ADMINS are forced back to travelling mode - they use /admin.
   useEffect(() => {
-    setModeState(canSelectHosting ? readStoredMode() : 'travelling');
-  }, [canSelectHosting]);
+    setModeState(canSelectHosting ? readNavMode(user?.id) : 'travelling');
+  }, [canSelectHosting, user?.id]);
 
   const setMode = useCallback((next, options = {}) => {
     const value = next === 'hosting' ? 'hosting' : 'travelling';
@@ -56,8 +48,8 @@ export function ModeProvider({ children }) {
       setTransition({ to: value, id: transitionCount.current });
     }
     setModeState(value);
-    rememberNavMode(value);
-  }, [mode]);
+    rememberNavMode(value, user?.id);
+  }, [mode, user?.id]);
 
   // The overlay is a moment, not a state: drop it once it has played.
   useEffect(() => {

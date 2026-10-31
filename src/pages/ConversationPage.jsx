@@ -44,7 +44,9 @@ function ConversationPage() {
   const fetchConversations = useCallback(async () => {
     setConversationsLoading(true);
     try {
-      const response = await apiClient.get('/conversations');
+      // Traveller-side list: the thread opened here is one this account booked as a
+      // guest, so the list beside it must match, not the host inbox.
+      const response = await apiClient.get('/conversations', { params: { side: 'guest' } });
       const items = response.data.data || [];
       setConversations(items);
       setConversation(items.find((item) => item.id === conversationId) || null);
