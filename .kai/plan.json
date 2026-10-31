@@ -2,41 +2,45 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Remove the border on the active/selected message row, keeping the active colour with enough vertical padding",
+      "text": "Read the two attached dropdown screenshots and the current Navbar dropdown code",
       "state": "done"
     },
     {
-      "text": "Revert the header switch: host/travel switching stays in the account dropdown only",
+      "text": "Trace how Messages resolves in host mode vs traveller mode (routes, pages, conversation API)",
       "state": "done"
     },
     {
-      "text": "Make the header menu itself change with the mode, so host links replace travel links",
+      "text": "Give the user a recap of what I understand before making changes",
       "state": "done"
     },
     {
-      "text": "Add a visible transition animation when the mode switches, including route-driven switches",
+      "text": "Give hosts their own inbox: side filter on the conversations API, /host/inbox routes, host-styled inbox page, traveller inbox limited to guest conversations",
       "state": "done"
     },
     {
-      "text": "Run prisma migrate deploy on Railway and confirm the money settings are live",
+      "text": "Rebuild the host account dropdown to match the traveller one (avatar header, icons, grouped sections, browsing-as eyebrow)",
       "state": "done"
     },
     {
-      "text": "Guest pays no platform fee: the 10% sits on the host side (code defaults, terms, tests)",
+      "text": "Point every host Messages entry at the host inbox (header tabs, mobile bar, Navbar, Today page links)",
       "state": "done"
     },
     {
-      "text": "Give every route its own tab title from one table",
+      "text": "Fix the stored side leaking between accounts on one browser",
       "state": "done"
     },
     {
-      "text": "Re-verify the live fee schedule matches the policy (10% host, 0% guest)",
+      "text": "Verify: dark mode selected row, mobile composer clearance, lint, build, server typecheck, switch overlay",
       "state": "done"
     },
     {
-      "text": "Check whether the ZuriLofts naming is a mistake or another app's name leaking in",
+      "text": "Commit and push the work",
+      "state": "done"
+    },
+    {
+      "text": "Write the design guidance: what to take from the reference dropdown, and where to differentiate from Airbnb",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-28T10:20:07.248Z"
+  "updatedAt": "2026-10-31T12:10:49.100Z"
 }
