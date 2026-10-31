@@ -2,7 +2,7 @@
 
 This document is the single source of truth for visual design. All AI agents and developers must follow these guidelines when building any page or component.
 
-> Last updated: 2026-09-08 - redesign: bronze is now the primary CTA color and navy the strong secondary; blue is reserved for links, active/selected states, focus rings, and informational UI - never the default CTA. Admin navigation is a light surface, not navy; buttons default to `rounded-lg` (12px), with pills reserved for filters/status badges.
+> Last updated: 2026-10-31 - palette revision: brand navy `#143A80` is the primary CTA colour and the brand ink, deep navy `#0B2A5E` carries inverse surfaces and hover states, the page canvas is white, and antique brass `#C5A28C` is an accent for hairlines and small marks only - never a button fill. The navy is deliberately blue enough to be told apart from black at button size, and white type on it still passes AAA (10.8:1).
 
 ---
 
@@ -10,29 +10,32 @@ This document is the single source of truth for visual design. All AI agents and
 
 | Role              | Name            | Hex       | Usage                                                        |
 |-------------------|-----------------|-----------|---------------------------------------------------------------|
-| Primary CTA       | Warm Bronze     | `#C49A6C` | Primary buttons - white text                                  |
-| Primary CTA Hover | Bronze Hover    | `#B8895C` | Hover/active state for primary buttons                        |
-| Strong Secondary  | Dark Navy       | `#0B1F42` | Strong secondary buttons (white text), logo wordmark, footer background, brand headers/dividers |
-| Navy Hover        | Navy Hover      | `#07072e` | Hover/active state for navy strong secondary buttons          |
-| Interactive Blue  | Interactive Blue| `#2563EB` | Links, active nav/tab state, selected filters/radios/toggles, focus rings, informational UI |
-| Blue Hover        | Blue Hover      | `#1D4ED8` | Hover/active state for anything using Interactive Blue        |
-| Canvas            | Off-White       | `#F7F7F5` | Page background                                                |
+| Primary CTA       | Brand Navy     | `#143A80` | Filled primary buttons - white text                           |
+| Primary CTA Hover | Navy Deep    | `#0B2A5E` | Hover/active state for primary buttons                        |
+| Inverse Surface   | Deep Navy     | `#0B2A5E` | Footer, mobile nav, dark panels, avatars - white text          |
+| Brand Navy        | Brand Navy     | `#143A80` | Headings, brand ink, icon accents, strong secondary buttons    |
+| Navy Hover        | Navy Hover      | `#0B2A5E` | Hover/active state for navy surfaces and buttons              |
+| Accent (rare)     | Antique Brass   | `#C5A28C` | Hairlines, dividers, eyebrows, small marks - never a button    |
+| Accent Ink        | Brass Ink       | `#8A6B52` | Brass-toned text on light surfaces (4.9:1 on white)            |
+| Accent Light      | Champagne       | `#E5CCB3` | Brass-toned text on dark surfaces                              |
+| Warm Tint         | Floral White    | `#F4F0E8` | Soft warm washes behind icons and notes                        |
+| Canvas            | White           | `#ffffff` | Page background                                                |
 | Surface           | White           | `#ffffff` | Cards, inputs, modals, navbar - flat surfaces                  |
 | Border            | Neutral Grey    | `#E5E7EB` | Card borders, input borders, dividers, outlined secondary buttons |
 | Body Text         | Charcoal        | `#222222` | Paragraphs, labels, headings on light backgrounds              |
 | Muted Text        | Cool Grey       | `#6b7280` | Captions, placeholders, meta info                               |
-| White Text        | White           | `#ffffff` | Text on bronze, navy, blue, or dark backgrounds                |
+| White Text        | White           | `#ffffff` | Text on brand navy, navy, or dark backgrounds                 |
 
 ### Color Rules
-- **Warm Bronze `#C49A6C`** is the primary CTA color - every filled primary button uses bronze with white text. Hover/active state darkens to `#B8895C`.
-- **Dark Navy `#0B1F42`** is the strong secondary button color (white text, hover/active darkens to `#07072e`) and the brand color for the logo wordmark, footer background, brand headers/dividers, and decorative accents.
-- **Interactive Blue `#2563EB`** is reserved for links, active navigation/tab indicators, selected filters/radios/toggles, focus rings, and informational UI - it is never a filled CTA or primary button. Hover/active state darkens to `#1D4ED8`.
-- **Canvas `#F7F7F5`** is the page background. **White `#ffffff`** is reserved for cards, inputs, modals, and other flat surfaces sitting on the canvas.
+- **Brand Navy `#143A80`** is the one interactive colour and the brand ink: filled primary buttons, active tabs, selected states, links, focus rings, headings and strong secondary elements. Hover/active darkens to `#0B2A5E`.
+- **Deep Navy `#0B2A5E`** paints inverse surfaces (footer, mobile nav, priority panels, avatars) and every navy hover state.
+- **Antique Brass `#C5A28C`** is an accent, not an action colour. It belongs on hairlines, dividers, underlines, eyebrows, and small marks. It is never a button fill, and brass-toned text uses `#8A6B52` on light surfaces so it stays readable.
+- **Canvas `#ffffff`** is the page background; **Floral White `#F4F0E8`** is the only warm tint, used sparingly behind icons and short notes.
 - **Neutral Grey `#E5E7EB`** is the shared border color for cards, inputs, dividers, and outlined secondary buttons.
-- Secondary/tertiary controls are **outlined and neutral** (white background, `#E5E7EB` border, charcoal text) - never bronze or navy outlines.
+- Secondary/tertiary controls are **outlined and neutral** (white background, `#E5E7EB` border, charcoal text) - never brass or navy outlines.
 - Semantic status colors (green/amber/red) are used for success/pending/error/danger states only, and must always be paired with a text label or icon, never color alone (see Semantic Status Colors below).
-- Never place bronze or navy text on white for body copy - use charcoal. Bronze and navy appear as solid button fills (primary and strong secondary respectively) and inside their reserved brand contexts (logo, footer, brand headers, dividers/decorative accents).
-- Bronze and navy buttons use white text; outlined neutral buttons use charcoal text with a grey border; blue appears only on links, active/selected states, focus rings, and informational UI.
+- Never place brass or navy text on white for body copy - use charcoal.
+- Buttons carry white text on brand navy or navy; outlined neutral buttons use charcoal text with a grey border.
 
 ### Semantic Status Colors
 
@@ -87,7 +90,7 @@ All text follows a consistent scale. Never use arbitrary `text-[Npx]` - use the 
 | Price / amount | `font-semibold text-[#222222]` |
 | Error text | `text-sm text-red-600` |
 | Success text | `text-sm text-green-600` |
-| Link | `text-sm font-medium text-[#2563EB] hover:text-[#1D4ED8]` |
+| Link | `text-sm font-medium text-[#143A80] hover:text-[#0B2A5E]` |
 | Badge / pill | `text-xs font-semibold` |
 | Placeholder | `text-sm text-[#6b7280]` |
 
@@ -177,7 +180,7 @@ All form inputs are flat and bordered - no inset shadows.
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .neu-input:focus {
-  border-color: #2563EB;
+  border-color: #143A80;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
   outline: none;
 }
@@ -192,11 +195,11 @@ All form inputs are flat and bordered - no inset shadows.
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .neu-radio-card:hover {
-  border-color: #2563EB;
+  border-color: #143A80;
   box-shadow: 0 2px 8px rgb(37 99 235 / 0.12);
 }
 .neu-radio-selected {
-  border: 2px solid #2563EB;
+  border: 2px solid #143A80;
   border-radius: 14px;
 }
 ```
@@ -215,13 +218,13 @@ Auth cards over dark photo backgrounds use a single soft drop shadow - no neumor
 
 | Variant        | Background | Text       | Border         | Hover              |
 |----------------|------------|------------|----------------|--------------------|
-| Primary (CTA) | `#C49A6C` | `#ffffff` | None | `#B8895C` darken |
-| Strong secondary | `#0B1F42` | `#ffffff` | None | `#07072e` darken |
-| Secondary (outlined, neutral) | White | `#222222` | 1px `#E5E7EB` | `#F7F7F5` bg |
-| Ghost | Transparent | `#2563EB` | None | Blue underline |
+| Primary (CTA) | `#143A80` | `#ffffff` | None | `#0B2A5E` darken |
+| Strong secondary | `#0B2A5E` | `#ffffff` | None | `#0B2A5E` darken |
+| Secondary (outlined, neutral) | White | `#222222` | 1px `#E5E7EB` | `#F4F0E8` bg |
+| Ghost | Transparent | `#143A80` | None | Navy underline |
 | Danger | `#dc2626` | `#ffffff` | None | `#b91c1c` darken |
 
-Primary actions use bronze, strong secondary actions use navy, and lighter secondary/tertiary actions use the outlined neutral style (or the ghost text button). Blue `#2563EB` never appears as a button fill - it is reserved for links, active/selected states, focus rings, and informational UI.
+Primary and strong secondary actions are both brand navy `#143A80` (hover `#0B2A5E`); lighter secondary and tertiary actions use the outlined neutral style. Brass never fills a button - it is a hairline, an eyebrow, a focus accent or a small mark.
 
 All buttons: `rounded-lg` (12px), `px-6 py-2.5`, `font-semibold`, `transition-all`, inline-flex with gap-2. Fully rounded (`rounded-full`) is reserved for filter chips and status/badge pills, not general buttons.
 
@@ -251,7 +254,7 @@ Dashboard stat cards use a consistent pattern:
 | `label` | string | Stat description (e.g. "Total Revenue") |
 | `value` | string/number | Display value |
 | `icon` | LucideIcon | Icon component |
-| `tone` | `"primary"` / `"success"` / `"warning"` / `"danger"` / `"info"` | Color theme (primary = bronze `#C49A6C`; info = blue `#2563EB`; success/warning/danger are semantic status colors, always paired with a label/icon) |
+| `tone` | `"primary"` / `"success"` / `"warning"` / `"danger"` / `"info"` | Color theme (primary = bronze `#C5A28C`; info = blue `#143A80`; success/warning/danger are semantic status colors, always paired with a label/icon) |
 | `hint` | string? | Small hint text below value |
 
 StatCards sit in responsive grids: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4`.
@@ -351,7 +354,7 @@ useEffect(() => {
 - Search bar width: max `680px`, centered
 
 **Design Techniques:**
-- **Multi-layer gradient overlay**: `bg-gradient-to-b from-[#0B1F42]/70 via-[#0B1F42]/40 to-[#0B1F42]/70` for depth
+- **Multi-layer gradient overlay**: `bg-gradient-to-b from-[#0B2A5E]/70 via-[#0B2A5E]/40 to-[#0B2A5E]/70` for depth
 - **Animated number counters**: Custom `AnimatedNumber` component using `IntersectionObserver` and `requestAnimationFrame` with easing
 - **Easing function**: `easeOutQuart = 1 - Math.pow(1 - progress, 4)` for smooth number animation
 - **Status badge with pulse**: Green pulse dot using `animate-pulse` to indicate availability
@@ -365,7 +368,7 @@ useEffect(() => {
 - Border radius: `9999px` (fully rounded pill)
 - Padding: `px-5 py-3`
 - Left icon: magnifying glass in charcoal
-- Button: Bronze background `#C49A6C`, white text, `rounded-full`, `px-6 py-3`
+- Button: Bronze background `#C5A28C`, white text, `rounded-full`, `px-6 py-3`
 - Box shadow: `shadow-lg`
 
 ### Property Card
@@ -404,7 +407,7 @@ useEffect(() => {
 - **Asymmetric image gallery**: Main large image + stacked smaller images using `md:col-span-2`
 - **Sticky sidebar**: `sticky top-24` for booking card that follows scroll
 - **Icon + text pairs**: Consistent pattern of charcoal icon + label + value
-- **Form input styling**: Uses `.neu-input` with `focus:border-[#2563EB]` focus ring
+- **Form input styling**: Uses `.neu-input` with `focus:border-[#143A80]` focus ring
 - **Custom Tailwind colors**: Uses extended colors from `tailwind.config.js` (`text-primary`, `text-navy`, `text-bronze`, etc.)
 - **Back navigation**: Styled link with icon for intuitive navigation
 
@@ -421,24 +424,24 @@ Used on the guest Trip Hub, host Today page, and admin Overview. Defaults to a l
 </div>
 ```
 
-A navy gradient variant (`from-[#0B1F42] to-[#07072e]`, white text) is available as an optional brand/promotional moment - not the default header, and used sparingly rather than as a template for buttons or interactive surfaces elsewhere.
+A navy gradient variant (`from-[#0B2A5E] to-[#0B2A5E]`, white text) is available as an optional brand/promotional moment - not the default header, and used sparingly rather than as a template for buttons or interactive surfaces elsewhere.
 
 Key properties:
 - Default: light surface (`bg-white`), `rounded-[14px]`, `border-[#E5E7EB]`, charcoal/cool-grey text
-- Optional navy brand variant: `bg-gradient-to-br from-[#0B1F42] to-[#07072e]`, white text
+- Optional navy brand variant: `bg-gradient-to-br from-[#0B2A5E] to-[#0B2A5E]`, white text
 - Never use decorative orbs/blobs behind text
-- Quick actions button: bronze `bg-[#C49A6C]` with `Plus` icon
+- Quick actions button: bronze `bg-[#C5A28C]` with `Plus` icon
 - Quick actions menu: white card with `shadow-elevated`, `rounded-xl`, `animate-fade-in`
 
 ### Contact Section
 - Two-column layout: form (left) + contact info (right)
-- Canvas background `#F7F7F5`
+- Canvas background `#ffffff`
 - Form card with white background and restrained shadow
 
 ### Footer
-- Dark Navy `#0B1F42` background for the footer and occasional brand moments
+- Deep navy `#0B2A5E` background for the footer and occasional brand moments
 - White text for links and headings
-- Blue `#2563EB` for link hover states; bronze for the logo accent
+- Brand navy for link hover states as a tinted underline; brass only for the logo accent
 - Minimal: copyright left, social icons right
 
 ---
@@ -548,14 +551,16 @@ Used with gradient mask edges (`mask-image: linear-gradient(...)`) for smooth fa
 ### Custom Colors (tailwind.config.js)
 ```javascript
 colors: {
-  primary:        '#C49A6C', // Warm Bronze - primary CTA
-  'primary-hover':'#B8895C', // Bronze Hover
-  navy:     '#0B1F42',    // Dark Navy - strong secondary + brand
-  'navy-hover': '#07072e', // Navy Hover
-  bronze:   '#C49A6C',    // Warm Bronze (alias of primary)
-  blue:     '#2563EB',    // Interactive Blue - links/active/focus/informational
-  'blue-hover': '#1D4ED8', // Blue Hover
-  canvas:   '#F7F7F5',    // Off-White page background
+  primary:        '#143A80', // Brand Navy - primary CTA and active states
+  'primary-hover':'#0B2A5E', // Navy Deep
+  navy:     '#143A80',    // Brand Navy - brand ink
+  'navy-bg':'#0B2A5E',    // Deep Navy - inverse surfaces
+  'navy-hover': '#0B2A5E', // Navy Hover
+  bronze:   '#C5A28C',    // Antique Brass - hairlines and accents only
+  champagne:'#E5CCB3',    // Brass on dark surfaces
+  floral:   '#F4F0E8',    // Warm tint
+  action:   '#143A80',    // Alias of primary
+  canvas:   '#ffffff',    // White page background
   border:   '#E5E7EB',    // Neutral Grey
   charcoal: '#222222',    // Body text
   'cool-grey': '#6b7280', // Muted Text
@@ -581,7 +586,7 @@ Today, Calendar, Listings, Messages, Earnings.
 ### Admin Navigation
 Grouped: Overview, Listings, Bookings, Payments, People, Content.
 - Expanded submenus must retain access to every existing admin route (properties, bookings, earnings, users, host applications, identity verifications, disputes, promos, addons, feedback, messages, guides, payouts).
-- Admin sidebar uses a light background (white or `#F7F7F5`) with collapsible `w-64 <-> w-16` behavior; active nav item uses blue, not navy or bronze.
+- Admin sidebar uses a light background (white or `#ffffff`) with collapsible `w-64 <-> w-16` behavior; active nav item uses blue, not navy or bronze.
 
 ---
 
@@ -624,7 +629,7 @@ Three steps: **Stay -> Details -> Payment.**
 - Instant state changes without `transition-*`
 - Decorative orbs, gradient blobs, or bokeh circles as backgrounds
 - Black (`#000`) for text - use charcoal `#222222` instead
-- Blue `#2563EB` as a filled button or CTA - blue is reserved for links, active/selected states, focus rings, and informational UI
+- Blue `#143A80` as a filled button or CTA - blue is reserved for links, active/selected states, focus rings, and informational UI
 - Bronze or navy as a link, active-state, selected-state, or focus ring - bronze is the primary CTA fill and navy the strong secondary fill; links and selection states stay blue
 - Status color (green/amber/red) used alone without an accompanying text label or icon
 - Raw `<input>`/`<select>`/`<textarea>` without `.neu-input` styling in form contexts
@@ -636,7 +641,7 @@ Three steps: **Stay -> Details -> Payment.**
 
 When implementing new components:
 
-- [ ] Use bronze `#C49A6C` for primary CTAs, navy `#0B1F42` for strong secondary buttons, neutral outlined for lighter secondary actions, and blue `#2563EB` only for links, active/selected states, focus rings, and informational UI
+- [ ] Use brand navy `#143A80` for primary CTAs and active/selected states, navy `#0B2A5E` for inverse surfaces and strong secondary buttons, neutral outlines for lighter secondary actions, and antique brass `#C5A28C` only for hairlines, dividers and small accents - never for a button fill
 - [ ] Pair every status color (success/warning/danger) with a text label or icon
 - [ ] Apply appropriate border-radius (`rounded-[14px]` for cards/modals/stat cards, `rounded-lg` for buttons, `rounded-xl` for inputs, `rounded-full` for filter chips/status badges)
 - [ ] Add `transition-all duration-200` for interactive elements

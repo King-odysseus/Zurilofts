@@ -2,21 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the current host calendar page and its data source",
+      "text": "Inventory how colours are defined (tokens, Tailwind config, hardcoded hexes) and capture the before state",
       "state": "done"
     },
     {
-      "text": "Rebuild the month grid to match the reference: night prices, booking bars across dates, sidebar",
+      "text": "Confirm the primary action colour (action blue #2563EB) with the user",
       "state": "done"
     },
     {
-      "text": "Verify in the browser at desktop and phone, run lint and build",
+      "text": "Retint the token layer in styles.css, tailwind.config.js and the Flowbite theme",
       "state": "done"
     },
     {
-      "text": "Commit and push",
+      "text": "Sweep hardcoded navy/bronze hexes across src to the new palette",
+      "state": "done"
+    },
+    {
+      "text": "Convert bronze buttons to action blue, keep brass for hairlines and small accents",
+      "state": "done"
+    },
+    {
+      "text": "Update DESIGN.md and CLAUDE.md so the documented palette matches the code",
+      "state": "done"
+    },
+    {
+      "text": "Re-apply the palette after the parallel navy pass and confirm it holds",
+      "state": "done"
+    },
+    {
+      "text": "Verify with lint, build and screenshots of home, footer, messages, host and property pages",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T12:55:03.901Z"
+  "updatedAt": "2026-10-31T14:54:47.277Z"
 }

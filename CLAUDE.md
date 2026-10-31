@@ -64,19 +64,21 @@ server/               # Express + Prisma backend
 **Source:** [DESIGN.md](DESIGN.md) and the brain's `ZuriLofts design system` pattern (recall it before UI work).
 
 **Core colors (use arbitrary hex, per file convention):**
-- `#0B1F42` Dark Navy - headings, navbar, admin sidebar, footer
-- `#C49A6C` Warm Bronze - CTAs, accents, highlights, active states
-- `#D9D9D9` Silver Grey - borders, dividers, disabled
+- `#143A80` Brand Navy - the only button/CTA fill, active tabs, selected states, links, focus rings, and the brand ink for headings (white type on it still passes AAA)
+- `#0B2A5E` Deep Navy - inverse surfaces (footer, mobile nav, dark panels, avatars) and every navy hover state
+- `#C5A28C` Antique Brass - hairlines, dividers, eyebrows, small accents; never a button fill (`#8A6B52` as text on white, `#E5CCB3` on dark)
+- `#F4F0E8` Floral White - the only warm tint, for washes behind icons and notes
+- `#FFFFFF` White - page canvas and card surfaces; `#E5E7EB` Neutral Grey for borders and dividers
 - `#1f2937` Charcoal - body text
 - `#6b7280` Cool Grey - muted/secondary
 
-**Neumorphic classes** (from `src/index.css`): `.neu-card`, `.neu-card-hover`, `.neu-input`, `.neu-btn`, `.neu-radio-card`. Admin forms use flat inputs (`rounded-xl border border-[#D9D9D9]`).
+**Neumorphic classes** (from `src/styles.css`, the single stylesheet entry point): `.neu-card`, `.neu-card-hover`, `.neu-input`, `.neu-btn`, `.neu-radio-card`. Admin forms use flat inputs (`rounded-xl border border-[#D9D9D9]`).
 
-**Buttons:** Primary = bronze pill `bg-[#C49A6C] text-[#0B1F42] rounded-full`, Dark = `bg-[#0B1F42] text-white rounded-full`.
+**Buttons:** Primary = brand navy pill `bg-[#143A80] text-white rounded-full`, Dark = `bg-[#0B2A5E] text-white rounded-full`. Never fill a button with brass.
 
 **Rounding:** cards `rounded-2xl`, pills/buttons `rounded-full`, inputs/thumbnails `rounded-xl`.
 
-**Admin:** sidebar bg `#0B1F42`, active nav `bg-[#C49A6C]`, collapsible w-64<->w-16, routes nested under `/admin` via `<Outlet/>`.
+**Admin:** sidebar bg `#0B2A5E`, active nav `bg-[#143A80]`, collapsible w-64<->w-16, routes nested under `/admin` via `<Outlet/>`.
 
 ## Key Patterns
 
