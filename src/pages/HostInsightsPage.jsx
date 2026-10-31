@@ -52,10 +52,12 @@ function ScoreBar({ label, score, reasons }) {
   return <div className="py-3">
     <div className="flex items-baseline justify-between gap-3">
       <h3 className="text-sm font-semibold text-navy">{label}</h3>
-      <span className="inline-flex items-center gap-1 text-sm font-semibold tabular-nums text-navy">
-        <Star className="h-3.5 w-3.5" fill="currentColor" strokeWidth={0} aria-hidden="true" />
-        {score == null ? '-' : score.toFixed(2)}
-      </span>
+      {score == null
+        ? <span className="text-xs text-muted">Not rated yet</span>
+        : <span className="inline-flex items-center gap-1 text-sm font-semibold tabular-nums text-navy">
+          <Star className="h-3.5 w-3.5" fill="currentColor" strokeWidth={0} aria-hidden="true" />
+          {score.toFixed(2)}
+        </span>}
     </div>
     <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface" role="img" aria-label={score == null ? `${label}: not rated yet` : `${label}: ${score.toFixed(2)} out of 5`}>
       <span className="block h-full rounded-full bg-primary" style={{ width: `${percent}%` }} />
