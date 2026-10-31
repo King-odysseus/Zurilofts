@@ -2,29 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Compare the remaining host pages against the Airbnb references to list what is still missing",
+      "text": "Read the current host calendar page and its data source",
       "state": "done"
     },
     {
-      "text": "Today page: follow-ups row from the reference",
+      "text": "Rebuild the month grid to match the reference: night prices, booking bars across dates, sidebar",
       "state": "done"
     },
     {
-      "text": "Listings page: status badges and grid/list toggle from the reference",
-      "state": "done"
+      "text": "Verify in the browser at desktop and phone, run lint and build",
+      "state": "active"
     },
     {
-      "text": "Host insights page with rating breakdown and reviews",
-      "state": "done"
-    },
-    {
-      "text": "Messaging settings entry from the messages reference",
-      "state": "done"
-    },
-    {
-      "text": "Verify in the browser, run lint and build, commit and push",
-      "state": "done"
+      "text": "Commit and push",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-31T12:48:05.960Z"
+  "updatedAt": "2026-10-31T12:50:42.415Z"
 }
