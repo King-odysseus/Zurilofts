@@ -1,4 +1,3 @@
-import '../referral-card.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
@@ -426,7 +425,7 @@ function HostApplicationPage() {
   return (
     <div className="space-y-6">
       <header>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Host setup</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Host setup</p>
         <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Get your space ready to host</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Complete your identity, property details and review before you publish.</p>
       </header>
@@ -464,7 +463,7 @@ function HostApplicationPage() {
                 onClick={() => goToStep(step.key)}
                 aria-current={activeStep === step.key ? 'step' : undefined}
               >
-                <span className={`${STEP_CIRCLE_BASE} ${step.complete || activeStep === step.key ? 'bg-primary-50 dark:bg-primary/15 text-navy' : 'text-muted'}`}>
+                <span className={`${STEP_CIRCLE_BASE} ${step.complete || activeStep === step.key ? 'bg-surface dark:bg-primary/15 text-navy' : 'text-muted'}`}>
                   {step.complete ? '\u2713' : index + 1}
                 </span>
                 <span className="flex min-w-0 flex-col gap-0.5">
@@ -650,7 +649,7 @@ function HostApplicationPage() {
                       return (
                         <label
                           key={value}
-                          className={`flex min-h-[46px] cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium text-navy ${selected ? 'border-primary bg-primary-50 dark:bg-primary/15' : 'border-border bg-surface'}`}
+                          className={`flex min-h-[46px] cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium text-navy ${selected ? 'border-primary bg-surface dark:bg-primary/15' : 'border-border bg-surface'}`}
                         >
                           <Checkbox
                             checked={selected}
@@ -725,7 +724,7 @@ function HostApplicationPage() {
                   />
                   <span>
                     I confirm the information is accurate, I am authorised to list these properties,
-                    and I agree to the <Link to="/terms" className="font-semibold text-primary-600 hover:underline">Terms of Service</Link> and verification checks.
+                    and I agree to the <Link to="/terms" className="font-semibold text-muted hover:underline">Terms of Service</Link> and verification checks.
                   </span>
                 </label>
 
@@ -891,7 +890,7 @@ function HostReferralCard() {
 function ApplicationCardHeader({ step, title, description }) {
   return (
     <header className="flex items-start gap-3 border-b border-border pb-4">
-      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-bold text-navy">{step}</span>
+      <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface dark:bg-primary/15 text-xs font-bold text-navy">{step}</span>
       <div className="min-w-0 flex-1">
         <h2 className="text-base font-semibold text-navy">{title}</h2>
         <p className="text-xs text-muted">{description}</p>
@@ -916,11 +915,11 @@ function StepActions({ saving, uploading, onSave, onContinue }) {
 
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
   return (
-    <div className={`flex flex-col gap-3 rounded-xl border p-4 ${document ? 'border-primary bg-primary-50 dark:bg-primary/15' : 'border-border bg-surface'}`}>
+    <div className={`flex flex-col gap-3 rounded-xl border p-4 ${document ? 'border-primary bg-surface dark:bg-primary/15' : 'border-border bg-surface'}`}>
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
-          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${document ? 'bg-navy-bg text-white' : 'bg-elevated text-primary-600'}`}
+          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${document ? 'bg-navy-bg text-white' : 'bg-elevated text-muted'}`}
         >
           {document ? '\u2713' : '+'}
         </span>

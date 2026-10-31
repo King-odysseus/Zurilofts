@@ -57,15 +57,15 @@ FlowbiteChart.propTypes = {
   ariaLabel: PropTypes.string,
 };
 
-function FlowbiteGauge({ label, value, note, color = '#C49A6C', height = 150 }) {
+function FlowbiteGauge({ label, value, note, color = '#C5A28C', height = 150 }) {
   const { isDark } = useTheme();
   const safeValue = Math.min(100, Math.max(0, Number(value) || 0));
   const displayValue = Number.isInteger(safeValue) ? safeValue : safeValue.toFixed(1);
   const trackColor = isDark ? '#26364F' : '#E8EDF7';
   const resolvedColor = isDark ? ({
-    '#0B1F42': '#8FB4FF',
+    '#203565': '#8FB4FF',
     '#3F8F62': '#69C98A',
-    '#C49A6C': '#E3B987',
+    '#C5A28C': '#E3B987',
     '#C85C52': '#E47C72',
   }[color] || color) : color;
   const options = useMemo(() => ({
@@ -86,7 +86,7 @@ function FlowbiteGauge({ label, value, note, color = '#C49A6C', height = 150 }) 
           name: { show: false },
           value: {
             offsetY: 7,
-            color: isDark ? '#F8FAFC' : '#0B1F42',
+            color: isDark ? '#F8FAFC' : '#203565',
             fontSize: '22px',
             fontFamily: 'Montserrat, Arial, sans-serif',
             fontWeight: 700,

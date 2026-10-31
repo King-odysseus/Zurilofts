@@ -19,7 +19,7 @@ function AuthShell({ children }) {
 
   return (
     <main className="op-auth-page">
-      <section className="op-auth-story" style={{ backgroundImage: `linear-gradient(90deg,rgba(11,31,66,.83),rgba(44,67,112,.72)),url("${bgImage}")` }}>
+      <section className="op-auth-story" style={{ backgroundImage: `linear-gradient(90deg,rgba(20,58,128,.83),rgba(44,67,112,.72)),url("${bgImage}")` }}>
         <Link to="/" className="op-auth-brand"><BrandLogo imgClassName="h-8 w-auto" />ZuriLofts</Link>
         <div className="op-auth-story-copy">
           <span className="op-auth-proof">✦ &nbsp;Verified stays in Nairobi</span>

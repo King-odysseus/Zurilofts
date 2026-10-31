@@ -23,7 +23,7 @@ const TABS = [
     to: '/',
     match: (p) => p === '/' || p.startsWith('/properties') || p.startsWith('/property/'),
     icon: (active) => (
-      <Home className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
+      <Home className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),
   },
   {
@@ -32,7 +32,7 @@ const TABS = [
     to: '/favourites',
     match: (p) => p.startsWith('/favourites') || p.startsWith('/shortlists'),
     icon: (active) => (
-      <Heart className="h-6 w-6" fill={active ? 'currentColor' : 'none'} strokeWidth={1.8} aria-hidden="true" />
+      <Heart className="h-[18px] w-[18px]" fill={active ? 'currentColor' : 'none'} strokeWidth={1.8} aria-hidden="true" />
     ),
   },
   {
@@ -41,7 +41,7 @@ const TABS = [
     to: '/trips',
     match: (p) => p.startsWith('/trips') || p.startsWith('/bookings'),
     icon: (active) => (
-      <Luggage className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
+      <Luggage className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),
   },
   {
@@ -50,7 +50,7 @@ const TABS = [
     to: '/inbox',
     match: (p) => p.startsWith('/inbox') || p.startsWith('/messages') || p.startsWith('/disputes'),
     icon: (active) => (
-      <MessageCircleMore className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
+      <MessageCircleMore className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),
   },
   {
@@ -59,7 +59,7 @@ const TABS = [
     to: '/profile',
     match: (p) => p.startsWith('/profile') || p.startsWith('/verify-identity') || p.startsWith('/login') || p.startsWith('/register'),
     icon: (active) => (
-      <CircleUserRound className="h-6 w-6" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
+      <CircleUserRound className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),
   },
 ];
@@ -88,24 +88,38 @@ function MobileBottomNav() {
 
   if (hidden) return null;
 
+  // The .mobile-bottom-nav class stays on the bar because styles.css uses it for
+  // the bronze active rail and for the page space reserved by
+  // body.has-mobile-bottom-nav. That rule sits after the Tailwind layers, so a
+  // pb-* utility would lose to it; the home-indicator inset is therefore set
+  // inline, where it also stays visible to whoever restyles this bar next.
   return (
     <nav
       aria-label="Primary"
-      className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto flex max-w-[390px] items-center gap-1 rounded-full border border-white/10 bg-[#0B1F42] p-1.5 text-white shadow-[0_16px_36px_rgba(11,31,66,0.34)] backdrop-blur md:hidden"
+      style={{ paddingBottom: 'calc(6px + env(safe-area-inset-bottom))' }}
+      className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto grid max-w-[390px] grid-cols-5 items-stretch rounded-full border border-border bg-elevated text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] md:hidden"
     >
       {TABS.map((tab) => {
         const active = tab.match(location.pathname);
+        // Equal grid columns plus min-w-0 keep all five tabs the same width at
+        // 360px, so the label truncates instead of the bar scrolling sideways.
+        // Active is navy ink only; the bronze hairline below it is the single
+        // accent, drawn by the shared .mobile-bottom-nav rules.
         return (
           <Link
             key={tab.key}
             to={tab.to}
             aria-current={active ? 'page' : undefined}
-            className={`relative flex min-h-[54px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-full px-1 py-1.5 text-[10px] font-semibold leading-none transition-colors focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-white ${
-              active ? 'text-white' : 'text-white/80 hover:text-white'
+            className={`relative flex min-h-[44px] min-w-0 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-[10px] font-semibold leading-none transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary ${
+              active ? 'text-navy' : 'text-muted hover:text-navy'
             }`}
           >
-            {tab.icon(active)}
-            {tab.label}
+            {/* An unread dot belongs absolutely inside this box, so showing one
+                never pushes the icon off the centre line of its column. */}
+            <span className="relative flex h-[18px] w-[18px] items-center justify-center">
+              {tab.icon(active)}
+            </span>
+            <span className="w-full truncate text-center">{tab.label}</span>
           </Link>
         );
       })}

@@ -49,7 +49,7 @@ export function LegalPageContentsMobile({ containerRef }) {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="legal-toc-mobile"
-        className="flex min-h-[44px] w-full items-center justify-between gap-2 px-5 py-3 text-left text-sm font-semibold text-[#0B1F42]"
+        className="flex min-h-[44px] w-full items-center justify-between gap-2 px-5 py-3 text-left text-sm font-semibold text-[#203565]"
       >
         Contents
         <ChevronDown className={`h-4 w-4 text-[#5B6B82] transition-transform ${open ? 'rotate-180' : ''}`} strokeWidth={2} aria-hidden="true" />
@@ -58,7 +58,7 @@ export function LegalPageContentsMobile({ containerRef }) {
         <ul id="legal-toc-mobile" className="space-y-2 border-t border-[#E3E8EF] px-5 py-4">
           {items.map((item) => (
             <li key={item.id}>
-              <a href={`#${item.id}`} onClick={() => setOpen(false)} className="text-sm text-[#0B1F42] hover:text-[#C49A6C]">{item.text}</a>
+              <a href={`#${item.id}`} onClick={() => setOpen(false)} className="text-sm text-[#203565] hover:text-[#8A6B52]">{item.text}</a>
             </li>
           ))}
         </ul>
@@ -75,11 +75,11 @@ export function LegalPageContentsDesktop({ containerRef }) {
 
   return (
     <nav aria-label="Table of contents" className="hidden lg:sticky lg:top-24 lg:block">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#C49A6C]">Contents</p>
+      <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#8A6B52]">Contents</p>
       <ul className="max-h-[70vh] space-y-2 overflow-y-auto border-l border-[#E3E8EF] pl-4">
         {items.map((item) => (
           <li key={item.id}>
-            <a href={`#${item.id}`} className="text-sm text-[#5B6B82] transition-colors hover:text-[#C49A6C]">{item.text}</a>
+            <a href={`#${item.id}`} className="text-sm text-[#5B6B82] transition-colors hover:text-[#8A6B52]">{item.text}</a>
           </li>
         ))}
       </ul>

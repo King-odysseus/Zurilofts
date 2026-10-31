@@ -41,7 +41,7 @@ export default defineConfig({
         name: 'ZuriLofts',
         short_name: 'ZuriLofts',
         description: 'Premium Short-Let Apartments in Nairobi',
-        theme_color: '#0B1F42',
+        theme_color: '#143A80',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait-primary',

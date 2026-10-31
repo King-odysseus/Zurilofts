@@ -362,7 +362,7 @@ function ProfilePage() {
                     className="w-16 h-16 rounded-full object-cover border-2 border-[#D9D9D9]"
                   />
                 ) : (
-                  <div className="w-16 h-16 bg-[#C49A6C] rounded-full flex items-center justify-center">
+                  <div className="w-16 h-16 bg-[#16294B] rounded-full flex items-center justify-center">
                     <span className="text-white font-bold text-2xl">
                       {user?.firstName?.[0]}{user?.lastName?.[0]}
                     </span>
@@ -414,16 +414,16 @@ function ProfilePage() {
           {activeTab === 'info' && (
             <div>
               {showCompletionBanner && (
-                <div className="mb-6 bg-[#C49A6C]/10 border border-[#C49A6C] rounded-2xl p-5 flex items-start gap-3">
-                  <Info className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
+                <div className="mb-6 bg-[#F4F0E8] border border-[#C5A28C] rounded-2xl p-5 flex items-start gap-3">
+                  <Info className="w-5 h-5 text-[#8A6B52] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
                   <div>
-                    <p className="font-semibold text-[#0B1F42] text-sm">Complete your profile</p>
+                    <p className="font-semibold text-[#203565] text-sm">Complete your profile</p>
                     <p className="text-sm text-[#6b7280] mt-1">Fill in your details below to get the most out of ZuriLofts.</p>
                   </div>
                 </div>
               )}
               <div className="neu-card p-6">
-                <h2 className="text-lg font-bold text-[#0B1F42] mb-6">Personal Information</h2>
+                <h2 className="text-lg font-bold text-[#203565] mb-6">Personal Information</h2>
                 {message && (
                   <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
                     message.includes('success')
@@ -490,7 +490,7 @@ function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="bg-[#C49A6C] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                    className="bg-[#2563EB] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -499,10 +499,10 @@ function ProfilePage() {
 
               {/* Privacy and data */}
               <div id="privacy" className="scroll-mt-28 mt-10 pt-8 border-t-2 border-[#D9D9D9]">
-                <h3 className="text-xl font-bold text-[#0B1F42] mb-1">Privacy and data</h3>
+                <h3 className="text-xl font-bold text-[#203565] mb-1">Privacy and data</h3>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Manage your personal data and consent choices. See our{' '}
-                  <Link to="/privacy" className="text-[#C49A6C] hover:underline font-medium">Privacy Policy</Link>{' '}
+                  <Link to="/privacy" className="text-[#8A6B52] hover:underline font-medium">Privacy Policy</Link>{' '}
                   for full details.
                 </p>
 
@@ -524,7 +524,7 @@ function ProfilePage() {
                       type="button"
                       onClick={handleExportData}
                       disabled={exporting}
-                      className="flex-shrink-0 inline-flex items-center gap-2 bg-[#0B1F42] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
+                      className="flex-shrink-0 inline-flex items-center gap-2 bg-[#16294B] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50"
                     >
                       {exporting ? (
                         <>
@@ -548,7 +548,7 @@ function ProfilePage() {
                     <button
                       type="button"
                       onClick={openConsentManager}
-                      className="flex-shrink-0 bg-[#0B1F42] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200"
+                      className="flex-shrink-0 bg-[#16294B] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200"
                     >
                       Manage preferences
                     </button>
@@ -616,7 +616,7 @@ function ProfilePage() {
           {/* Payout Settings - HOST only */}
           {activeTab === 'info' && profile?.role === 'HOST' && (
             <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
-              <h3 className="text-xl font-bold text-[#0B1F42] mb-1">Payout Settings</h3>
+              <h3 className="text-xl font-bold text-[#203565] mb-1">Payout Settings</h3>
               <p className="text-sm text-[#6b7280] mb-6">
                 Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
               </p>
@@ -625,7 +625,7 @@ function ProfilePage() {
               <form onSubmit={handlePayoutDestinationSave} className="space-y-4 mb-8">
                 <h4 className="font-semibold text-[#1f2937]">Payout Destination</h4>
 
-                <div className="grid grid-cols-2 gap-2 rounded-full bg-[#0B1F42]/5 p-1">
+                <div className="grid grid-cols-2 gap-2 rounded-full bg-[#16294B]/5 p-1">
                   {[
                     { value: 'bank', label: 'Bank account' },
                     { value: 'mpesa', label: 'M-PESA' },
@@ -636,8 +636,8 @@ function ProfilePage() {
                       onClick={() => setPayoutMethod(option.value)}
                       className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
                         payoutMethod === option.value
-                          ? 'bg-[#0B1F42] text-white shadow-sm'
-                          : 'text-[#6b7280] hover:text-[#0B1F42]'
+                          ? 'bg-[#16294B] text-white shadow-sm'
+                          : 'text-[#6b7280] hover:text-[#203565]'
                       }`}
                     >
                       {option.label}
@@ -706,7 +706,7 @@ function ProfilePage() {
                 <button
                   type="submit"
                   disabled={bankSaving}
-                  className="bg-[#C49A6C] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50 text-sm"
+                  className="bg-[#2563EB] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50 text-sm"
                 >
                   {bankSaving ? 'Saving...' : 'Save Payout Destination'}
                 </button>
@@ -728,7 +728,7 @@ function ProfilePage() {
                     type="button"
                     onClick={handleFrequencySave}
                     disabled={bankSaving}
-                    className="bg-[#0B1F42] text-white font-semibold px-4 py-2.5 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50 text-sm"
+                    className="bg-[#16294B] text-white font-semibold px-4 py-2.5 rounded-full hover:bg-[#06062a] transition-all duration-200 disabled:opacity-50 text-sm"
                   >
                     Save
                   </button>
@@ -751,7 +751,7 @@ function ProfilePage() {
                   <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
                     <CalendarDays className="w-8 h-8 text-[#6b7280]" strokeWidth={2} aria-hidden="true" />
                   </div>
-                  <h3 className="text-lg font-bold text-[#0B1F42] mb-1">No bookings yet</h3>
+                  <h3 className="text-lg font-bold text-[#203565] mb-1">No bookings yet</h3>
                   <p className="text-[#6b7280]">Your upcoming stays will appear here.</p>
                 </div>
               ) : (
@@ -768,7 +768,7 @@ function ProfilePage() {
                       <div className="flex-1">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h3 className="font-bold text-[#0B1F42]">{booking.property?.title}</h3>
+                            <h3 className="font-bold text-[#203565]">{booking.property?.title}</h3>
                             <p className="text-sm text-[#6b7280]">{booking.property?.location}</p>
                           </div>
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[booking.status]}`}>
@@ -786,7 +786,7 @@ function ProfilePage() {
                           </div>
                           <div>
                             <span className="text-[#6b7280]">Total</span>
-                            <p className="font-semibold text-[#C49A6C]">KES {booking.total.toLocaleString()}</p>
+                            <p className="font-semibold text-[#8A6B52]">KES {booking.total.toLocaleString()}</p>
                           </div>
                         </div>
                         {booking.promoCode && (
@@ -800,17 +800,17 @@ function ProfilePage() {
                         {/* Post-stay review */}
                         {booking.review ? (
                           <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
-                            <p className="text-sm font-semibold text-[#0B1F42] mb-1">Your rating</p>
+                            <p className="text-sm font-semibold text-[#203565] mb-1">Your rating</p>
                             <div className="flex items-center gap-1">
                               {[1, 2, 3, 4, 5].map((star) => (
-                                <Star key={star} className={`w-5 h-5 ${star <= booking.review.rating ? 'text-[#C49A6C]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
+                                <Star key={star} className={`w-5 h-5 ${star <= booking.review.rating ? 'text-[#8A6B52]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
                               ))}
                               <span className="ml-2 text-xs text-green-600 font-medium">Thanks for your feedback!</span>
                             </div>
                           </div>
                         ) : isStayCompleted(booking) ? (
                           <div className="mt-4 pt-4 border-t border-[#D9D9D9]">
-                            <p className="text-sm font-semibold text-[#0B1F42] mb-2">Rate your stay</p>
+                            <p className="text-sm font-semibold text-[#203565] mb-2">Rate your stay</p>
                             <div className="flex items-center gap-1 mb-3">
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const current = reviewForms[booking.id]?.rating || 0;
@@ -822,7 +822,7 @@ function ProfilePage() {
                                     className="p-0.5 transition-transform hover:scale-110"
                                     aria-label={`${star} star${star > 1 ? 's' : ''}`}
                                   >
-                                    <Star className={`w-7 h-7 ${star <= current ? 'text-[#C49A6C]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
+                                    <Star className={`w-7 h-7 ${star <= current ? 'text-[#8A6B52]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
                                   </button>
                                 );
                               })}
@@ -858,7 +858,7 @@ function ProfilePage() {
                                     className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl border-2 text-sm font-medium transition-all ${
                                       current === key
                                         ? color
-                                        : 'border-[#D9D9D9] text-[#6b7280] hover:border-[#C49A6C]'
+                                        : 'border-[#D9D9D9] text-[#6b7280] hover:border-[#C5A28C]'
                                     }`}
                                   >
                                     <span className="text-2xl">{emoji}</span>
@@ -894,7 +894,7 @@ function ProfilePage() {
                               type="button"
                               onClick={() => handleSubmitReview(booking.id)}
                               disabled={reviewForms[booking.id]?.submitting}
-                              className="mt-3 bg-[#C49A6C] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#b8895c] transition-all duration-200 disabled:opacity-50"
+                              className="mt-3 bg-[#2563EB] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
                             >
                               {reviewForms[booking.id]?.submitting ? 'Submitting...' : 'Submit Review'}
                             </button>
@@ -909,7 +909,7 @@ function ProfilePage() {
                 <div className="mt-6 text-center">
                   <Link
                     to="/bookings"
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#C49A6C] hover:text-[#b8895c] transition-colors"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#8A6B52] hover:text-[#203565] transition-colors"
                   >
                     View all bookings
                     <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
@@ -927,9 +927,9 @@ function ProfilePage() {
                   <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
                     <Heart className="w-8 h-8 text-[#6b7280]" strokeWidth={2} aria-hidden="true" />
                   </div>
-                  <h3 className="text-lg font-bold text-[#0B1F42] mb-1">No favourites yet</h3>
+                  <h3 className="text-lg font-bold text-[#203565] mb-1">No favourites yet</h3>
                   <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
-                  <Link to="/properties" className="inline-block bg-[#C49A6C] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200">
+                  <Link to="/properties" className="inline-block bg-[#2563EB] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#1D4ED8] transition-all duration-200">
                     Browse properties
                   </Link>
                 </div>

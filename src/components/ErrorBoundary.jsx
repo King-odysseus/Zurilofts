@@ -49,13 +49,13 @@ class ErrorBoundary extends Component {
               <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDECEC]">
                 <CircleAlert className="h-10 w-10 text-[#B42318]" strokeWidth={2} aria-hidden="true" />
               </div>
-              <h1 className="mb-2 text-2xl font-bold text-[#0B1F42]">Something went wrong</h1>
+              <h1 className="mb-2 text-2xl font-bold text-[#203565]">Something went wrong</h1>
               <p className="mb-6 text-[#5B6B82]">
                 We&apos;re sorry - an unexpected error occurred. Try refreshing the page.
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="rounded-[10px] bg-[#0B1F42] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#07072E]"
+                className="rounded-[10px] bg-[#16294B] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#16294B]"
               >
                 Refresh Page
               </button>

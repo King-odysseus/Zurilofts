@@ -77,8 +77,8 @@ export default function SaveToShortlistButton({ propertyId }) {
         aria-label={isSaved ? "Saved to shortlist" : "Save to shortlist"}
         className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
           isSaved
-            ? "bg-[#C49A6C] text-white"
-            : "border border-[#E3E8EF] bg-elevated text-[#0B1F42] shadow-sm hover:bg-surface hover:shadow-md"
+            ? "bg-[#2563EB] text-white"
+            : "border border-[#E3E8EF] bg-elevated text-[#203565] shadow-sm hover:bg-surface hover:shadow-md"
         }`}
       >
         <Heart className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} strokeWidth={2} aria-hidden="true" />
@@ -88,8 +88,8 @@ export default function SaveToShortlistButton({ propertyId }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-elevated p-3 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
-            <h4 className="mb-2 text-sm font-semibold text-[#0B1F42]">Save to shortlist</h4>
+          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-elevated p-3 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
+            <h4 className="mb-2 text-sm font-semibold text-[#203565]">Save to shortlist</h4>
 
             {loading ? (
               <p className="py-2 text-xs text-[#5B6B82]">Loading...</p>
@@ -100,13 +100,13 @@ export default function SaveToShortlistButton({ propertyId }) {
                 {shortlists.map((sl) => (
                   <label
                     key={sl.id}
-                    className="flex cursor-pointer items-center gap-2 rounded-[10px] px-2 py-1.5 text-sm text-[#0B1F42] hover:bg-surface"
+                    className="flex cursor-pointer items-center gap-2 rounded-[10px] px-2 py-1.5 text-sm text-[#203565] hover:bg-surface"
                   >
                     <input
                       type="checkbox"
                       checked={savedIds.has(sl.id)}
                       onChange={() => toggleShortlist(sl.id)}
-                      className="rounded border-[#C9D3DF] text-[#C49A6C] focus:ring-[#C49A6C]"
+                      className="rounded border-[#C9D3DF] text-[#8A6B52] focus:ring-[#C5A28C]"
                     />
                     {sl.name}
                   </label>
@@ -121,17 +121,17 @@ export default function SaveToShortlistButton({ propertyId }) {
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
                   placeholder="Shortlist name"
-                  className="min-h-[36px] flex-1 rounded-[10px] border border-[#E3E8EF] px-2 py-1 text-xs text-[#0B1F42] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+                  className="min-h-[36px] flex-1 rounded-[10px] border border-[#E3E8EF] px-2 py-1 text-xs text-[#203565] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
                   autoFocus
                   onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); if (e.key === "Escape") setShowCreate(false); }}
                 />
-                <button onClick={handleCreate} className="rounded-[10px] bg-[#C49A6C] px-2 py-1 text-xs font-semibold text-white">Add</button>
+                <button onClick={handleCreate} className="rounded-[10px] bg-[#2563EB] px-2 py-1 text-xs font-semibold text-white">Add</button>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => setShowCreate(true)}
-                className="w-full rounded-[10px] px-2 py-1.5 text-left text-xs font-medium text-[#9A744A] transition-colors hover:bg-[#FDE8D8]"
+                className="w-full rounded-[10px] px-2 py-1.5 text-left text-xs font-medium text-[#9A7B61] transition-colors hover:bg-[#FDE8D8]"
               >
                 + Create new shortlist
               </button>

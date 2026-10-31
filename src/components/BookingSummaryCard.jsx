@@ -24,10 +24,10 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
   const addOnsTotal = addOnItems.reduce((sum, a) => sum + (a.quantity * (a.price || 0)), 0);
 
   return (
-    <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
+    <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(20,58,128,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
       {/* Price */}
       <div className="mb-5">
-        <span className="text-3xl font-bold text-[#0B1F42]">
+        <span className="text-3xl font-bold text-[#203565]">
           KES {price != null ? price.toLocaleString() : '-'}
         </span>
         <span className="text-[#5B6B82]"> / night</span>
@@ -35,8 +35,8 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
 
       {/* Bed variant chip - only when arriving from a variant card */}
       {variantLabel && (
-        <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#0B1F42]">
-          <House className="w-4 h-4 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+        <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#203565]">
+          <House className="w-4 h-4 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
           {variantLabel}
         </div>
       )}
@@ -44,7 +44,7 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
       {/* Selected add-ons - only when provided */}
       {addOnItems.length > 0 && (
         <div className="mb-5 border-t border-[#E3E8EF] pt-5">
-          <h4 className="mb-3 font-semibold text-[#0B1F42]">Add-ons</h4>
+          <h4 className="mb-3 font-semibold text-[#203565]">Add-ons</h4>
           <div className="space-y-2 text-sm">
             {addOnItems.map((a) => (
               <div key={a.id} className="flex justify-between text-[#5B6B82]">
@@ -52,7 +52,7 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
                 <span>KES {(a.quantity * (a.price || 0)).toLocaleString()}</span>
               </div>
             ))}
-            <div className="flex justify-between border-t border-[#E3E8EF] pt-2 font-semibold text-[#0B1F42]">
+            <div className="flex justify-between border-t border-[#E3E8EF] pt-2 font-semibold text-[#203565]">
               <span>Add-ons total</span>
               <span>KES {addOnsTotal.toLocaleString()}</span>
             </div>
@@ -63,7 +63,7 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
       {/* Booking CTA */}
       <Link
         to={bookingHref}
-        className="block min-h-[48px] w-full rounded-[10px] bg-[#C49A6C] py-4 text-center font-bold text-white transition-colors duration-200 hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] active:bg-[#9A744A]"
+        className="block min-h-[48px] w-full rounded-[10px] bg-[#2563EB] py-4 text-center font-bold text-white transition-colors duration-200 hover:bg-[#1D4ED8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C] active:bg-[#1D4ED8]"
         aria-label={`Book ${variantLabel ? variantLabel + ' option' : 'this property'} for KES ${price != null ? price.toLocaleString() : '-'} per night`}
       >
         Book Now
@@ -75,18 +75,18 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
 
       {/* Trust context - only facts from the API */}
       <div className="mt-6 border-t border-[#E3E8EF] pt-6">
-        <h4 className="mb-3 font-semibold text-[#0B1F42]">About this listing</h4>
+        <h4 className="mb-3 font-semibold text-[#203565]">About this listing</h4>
         <ul className="space-y-2 text-sm text-[#5B6B82]">
           {hasReviews && (
             <li className="flex items-start gap-2">
-              <Star className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" fill="currentColor" aria-hidden="true" />
+              <Star className="w-4 h-4 text-[#8A6B52] mt-0.5 shrink-0" fill="currentColor" aria-hidden="true" />
               <span>
-                <span className="font-semibold text-[#0B1F42]">{rating}</span> rating &middot; {reviewLabel}
+                <span className="font-semibold text-[#203565]">{rating}</span> rating &middot; {reviewLabel}
               </span>
             </li>
           )}
           <li className="flex items-start gap-2">
-            <ShieldCheck className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" strokeWidth={2} aria-hidden="true" />
+            <ShieldCheck className="w-4 h-4 text-[#8A6B52] mt-0.5 shrink-0" strokeWidth={2} aria-hidden="true" />
             <span>Secure booking via Paystack</span>
           </li>
         </ul>

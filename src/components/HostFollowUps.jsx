@@ -2,12 +2,11 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { Button } from 'flowbite-react';
 import { ChevronRight } from 'lucide-react';
+import HostCard from './HostCard.jsx';
 
 // The reference puts follow-ups directly on the day view: what a host owes a
 // guest, and what a guest owes them, each with a face and a stay. They come from
 // the same insights endpoint as the Insights page, so the two never disagree.
-const CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
-const EYEBROW = 'text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600';
 
 function headline(item) {
   if (item.kind === 'read-review') return `Read ${item.guestName}'s ${item.rating}-star review`;
@@ -40,35 +39,30 @@ function actionLabel(item) {
 
 export default function HostFollowUps({ items, loading }) {
   if (loading) {
-    return <section className={CARD}>
-      <span className={`block ${EYEBROW}`}>FOLLOW-UPS</span>
-      <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+    return <HostCard eyebrow="FOLLOW-UPS">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <span className="block h-24 animate-pulse rounded-xl bg-surface" />
         <span className="block h-24 animate-pulse rounded-xl bg-surface" />
       </div>
-    </section>;
+    </HostCard>;
   }
 
   // Nothing to chase today: the section disappears rather than showing an empty
   // box on a page that already has three panels.
   if (items.length === 0) return null;
 
-  return <section className={CARD}>
-    <header className="flex flex-wrap items-end justify-between gap-2">
-      <div>
-        <span className={`block ${EYEBROW}`}>FOLLOW-UPS</span>
-        <h2 className="mt-1 text-base font-semibold text-navy">Your follow-ups</h2>
-      </div>
-      <Button as={Link} to="/host/insights" color="light" size="sm">See insights</Button>
-    </header>
-
+  return <HostCard
+    eyebrow="FOLLOW-UPS"
+    title="Your follow-ups"
+    action={<Button as={Link} to="/host/insights" color="light" size="sm">See insights</Button>}
+  >
     {/* A row that scrolls sideways on a phone, like the reference, and settles
         into a grid once there is width for two cards side by side. */}
-    <div className="mt-3 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0">
+    <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0">
       {items.slice(0, 4).map((item) => <Link
         key={`${item.kind}-${item.id}`}
         to={destination(item)}
-        className="group flex w-[17rem] shrink-0 snap-start flex-col justify-between gap-3 rounded-xl border border-border p-3 transition-colors hover:border-primary/50 hover:bg-primary-50 sm:w-auto"
+        className="group flex w-[min(17rem,85%)] shrink-0 snap-start flex-col justify-between gap-3 rounded-xl bg-surface p-3 transition-colors hover:bg-surface sm:w-auto"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -89,8 +83,8 @@ export default function HostFollowUps({ items, loading }) {
       </Link>)}
     </div>
 
-    <Link to="/host/reservations" className="mx-auto mt-3 block w-fit text-xs font-semibold text-navy underline-offset-2 hover:underline">See all reservations</Link>
-  </section>;
+    <Link to="/host/reservations" className="mx-auto block w-fit text-xs font-semibold text-navy underline-offset-2 hover:underline">See all reservations</Link>
+  </HostCard>;
 }
 
 HostFollowUps.propTypes = {

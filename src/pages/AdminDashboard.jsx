@@ -71,7 +71,7 @@ const ICON_BUTTON = 'grid h-9 w-9 place-items-center rounded-lg text-muted trans
 // instead of stacking next to it. Primary is bronze with fixed navy ink (it
 // must not flip in dark mode), secondary is white on the shared border token.
 const BTN_BASE = 'h-9 w-fit rounded-full px-4 text-[13px] font-semibold';
-const BTN_PRIMARY = `${BTN_BASE} bg-primary text-white enabled:hover:bg-[#B8895C]`;
+const BTN_PRIMARY = `${BTN_BASE} bg-primary text-white enabled:hover:bg-[#16294B]`;
 const BTN_SECONDARY = `${BTN_BASE} border border-border bg-white text-navy enabled:hover:bg-surface`;
 
 // Status and count pills share one geometry so a badge never drifts from the
@@ -313,15 +313,16 @@ function AdminLayout() {
     });
   }
 
-  // A message thread owns the phone viewport: the panel is sized to the screen,
-  // so the outlet gutter drops its own padding and only clears the two fixed
-  // bars (56px sticky header + 92px bottom nav) that frame it.
+  // The admin workspace is the one shell with its own phone bar (it does not use
+  // MobileBottomNav), so it must clear that bar itself. The two numbers below are
+  // one contract: the bar's 58px height plus the page's 24px py-6 gutter. The bar
+  // carries the matching min-h-[58px], so change them together.
   const contentSpacing = isMessageThreadRoute
     ? 'pt-20 pb-[calc(92px_+_env(safe-area-inset-bottom))] lg:pt-6 lg:pb-6'
-    : 'pt-6 pb-24 lg:pb-6';
+    : 'pt-6 pb-[calc(58px_+_env(safe-area-inset-bottom))] lg:pb-6';
 
   return (
-    <div className="min-h-screen bg-surface text-charcoal dark:bg-canvas">
+    <div className="min-h-screen bg-canvas text-charcoal">
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-10 hidden flex-col border-r border-white/10 bg-navy-bg text-white transition-all duration-300 lg:flex ${
@@ -449,7 +450,8 @@ function AdminLayout() {
           <HeaderUserMenu user={user} onLogout={handleLogout} />
         </div>
       </div>
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-around border-t border-border bg-elevated pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Admin workspace sections">
+      {/* min-h-[58px] is half of the clearance contract in contentSpacing. */}
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex min-h-[58px] items-center justify-around border-t border-border bg-elevated pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Admin workspace sections">
         {mobilePrimaryItems.map((item) => {
           const active = matchesMobilePrimary(item);
           const Icon = item.icon;

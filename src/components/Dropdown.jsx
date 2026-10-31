@@ -45,7 +45,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
         aria-label={ariaLabel}
         className={`flex items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#3B6FD4] focus-visible:ring-offset-2 ${triggerClassName}`}
       >
-        <span className={selected ? 'truncate text-[#0B1F42]' : 'truncate text-[#94A3B8]'}>
+        <span className={selected ? 'truncate text-[#203565]' : 'truncate text-[#94A3B8]'}>
           {selected ? selected.label : placeholder}
         </span>
         <ChevronDown className={`h-4 w-4 flex-shrink-0 text-[#5B6B82] transition-transform duration-200 ${open ? 'rotate-180' : ''}`} strokeWidth={2} aria-hidden="true" />
@@ -69,12 +69,12 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
                   setOpen(false);
                 }}
                 className={`flex items-center w-full text-left px-3 py-2.5 text-sm rounded-md transition-colors ${
-                  isSel ? 'bg-[#E8EDF7] font-semibold text-[#0B1F42]' : 'text-[#0B1F42] hover:bg-[#F3F4F6]'
+                  isSel ? 'bg-[#E8EDF7] font-semibold text-[#203565]' : 'text-[#203565] hover:bg-[#F3F4F6]'
                 }`}
               >
                 <span className="flex-1">{o.label}</span>
                 {isSel && (
-                  <Check className="ml-2 h-4 w-4 flex-shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+                  <Check className="ml-2 h-4 w-4 flex-shrink-0 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                 )}
               </button>
             );

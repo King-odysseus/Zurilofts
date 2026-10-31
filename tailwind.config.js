@@ -11,30 +11,38 @@ export default {
   theme: {
     extend: {
       colors: {
+        // `primary` is the interactive colour and it is the brand navy: the app
+        // should read navy first, brass only as a highlight. #143A80 is the
+        // lightest navy that still carries white text at AAA (10.8:1) and it is
+        // blue enough to be told apart from black at button size.
         primary: {
-          DEFAULT: '#C49A6C',
-          50:  '#FBF7F1',
-          100: '#F6EDE0',
-          200: '#EAD8BE',
-          300: '#DDBE97',
-          400: '#D0A981',
-          500: '#C49A6C',
-          600: '#B8895C',
-          700: '#9A744A',
-          800: '#7C5D3B',
-          900: '#5E472C',
-          950: '#3D2E1B',
+          DEFAULT: '#2563EB',
+          50:  '#EEF3FB',
+          100: '#DCE6F5',
+          200: '#BFD0EC',
+          300: '#9AB3DC',
+          400: '#5A7FBF',
+          500: '#2D5699',
+          600: '#143A80',
+          700: '#0B2A5E',
+          800: '#0A2450',
+          900: '#071C3F',
+          950: '#05142C',
         },
-        'primary-hover': '#B8895C',
+        'primary-hover': '#1D4ED8',
+        action:         '#143A80',
+        'action-hover': '#0B2A5E',
         // 'navy' is the heading/body ink and therefore flips in dark mode;
         // 'navy-bg' is the fixed brand surface that always carries white text
         // (footer, primary buttons, avatars). Keeping them apart is what lets
         // a dark theme invert text without inverting buttons behind white text.
         navy:           'rgb(var(--ds-navy) / <alpha-value>)',
-        'navy-bg':      '#0B1F42',
-        'navy-hover':   '#07072E',
+        'navy-bg':      '#0D1E3B',
+        'navy-hover':   '#16294B',
         indigo:         'rgb(var(--ds-navy) / <alpha-value>)', // Alias to navy, flips with it
-        bronze:         '#C49A6C', // Branding
+        bronze:         '#C5A28C', // Antique brass: hairlines and rare accents only
+        champagne:      '#E5CCB3', // Lighter brass, sparingly
+        floral:         '#F4F0E8', // Warm off-white tint
         silver:         '#D9D9D9',
         charcoal:       'rgb(var(--ds-ink) / <alpha-value>)',
         muted:          'rgb(var(--ds-muted) / <alpha-value>)',
@@ -78,15 +86,15 @@ export default {
     themes: [
       {
         zuriloft: {
-          primary:            '#C49A6C',  // Bronze
-          secondary:          '#0B1F42',  // Dark Navy
-          accent:             '#C49A6C',  // Warm Bronze
+          primary:            '#143A80',  // Brand navy
+          secondary:          '#0B2A5E',  // Deep navy
+          accent:             '#C5A28C',  // Antique brass, accents only
           neutral:            '#E5E7EB',  // Border Grey
-          'base-100':         '#ffffff',  // White
-          'base-200':         '#F7F7F5',  // Canvas
+          'base-100':         '#ffffff',  // White canvas
+          'base-200':         '#F4F0E8',  // Floral white tint
           'base-300':         '#D1D5DB',  // Darker grey
           'base-content':     '#222222',  // Charcoal
-          'primary-content':  '#ffffff',  // White on blue
+          'primary-content':  '#ffffff',  // White on navy
           'secondary-content':'#ffffff',  // White on navy
         },
       },

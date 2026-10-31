@@ -18,8 +18,8 @@ const KIND_META = {
     icon: <X className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />,
   },
   info: {
-    iconBg: 'bg-[#C49A6C]/15',
-    iconColor: 'text-[#C49A6C]',
+    iconBg: 'bg-[#F4F0E8]',
+    iconColor: 'text-[#8A6B52]',
     icon: <Info className="w-4 h-4" strokeWidth={2.5} aria-hidden="true" />,
   },
 };
@@ -35,7 +35,7 @@ function ToastCard({ toast, onDismiss }) {
         {meta.icon}
       </span>
       <div className="flex-1 min-w-0">
-        {toast.title && <p className="text-sm font-semibold text-[#0B1F42] leading-snug">{toast.title}</p>}
+        {toast.title && <p className="text-sm font-semibold text-[#203565] leading-snug">{toast.title}</p>}
         <p className="text-sm text-[#6b7280] leading-snug break-words">{toast.message}</p>
       </div>
       <button

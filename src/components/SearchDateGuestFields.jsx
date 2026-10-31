@@ -66,9 +66,9 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           onClick={() => setOpenField(openField === 'dates' ? null : 'dates')}
           aria-haspopup="dialog"
           aria-expanded={openField === 'dates'}
-          className="block min-h-[44px] w-full rounded-[10px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+          className="block min-h-[44px] w-full rounded-[10px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
         >
-        <span className="block text-sm font-semibold text-[#0B1F42]">{t('home.when')}</span>
+        <span className="block text-sm font-semibold text-[#203565]">{t('home.when')}</span>
           <span className="block truncate text-sm text-[#5B6B82]">{datesLabel}</span>
         </button>
 
@@ -76,10 +76,10 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label="Choose dates"
-            className="fixed inset-0 z-[100] overflow-y-auto bg-elevated p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[min(640px,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(11,31,66,0.14)]"
+            className="fixed inset-0 z-[100] overflow-y-auto bg-elevated p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[min(640px,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(20,58,128,0.14)]"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
-              <span className="text-base font-semibold text-[#0B1F42]">Choose dates</span>
+              <span className="text-base font-semibold text-[#203565]">Choose dates</span>
               <button
                 type="button"
                 onClick={() => setOpenField(null)}
@@ -94,14 +94,14 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
               <button
                 type="button"
                 onClick={() => onDatesChange({ checkIn: '', checkOut: '' })}
-                className="text-sm font-semibold text-[#0B1F42] underline underline-offset-2 hover:text-[#C49A6C]"
+                className="text-sm font-semibold text-[#203565] underline underline-offset-2 hover:text-[#8A6B52]"
               >
                 Clear dates
               </button>
               <button
                 type="button"
                 onClick={() => setOpenField(null)}
-                className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-6 text-sm font-semibold text-white hover:bg-[#07072E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+                className="min-h-[44px] rounded-[10px] bg-[#16294B] px-6 text-sm font-semibold text-white hover:bg-[#16294B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
               >
                 Done
               </button>
@@ -117,9 +117,9 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           onClick={() => setOpenField(openField === 'guests' ? null : 'guests')}
           aria-haspopup="dialog"
           aria-expanded={openField === 'guests'}
-          className="block min-h-[44px] w-full rounded-[10px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+          className="block min-h-[44px] w-full rounded-[10px] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
         >
-        <span className="block text-sm font-semibold text-[#0B1F42]">{t('home.who')}</span>
+        <span className="block text-sm font-semibold text-[#203565]">{t('home.who')}</span>
           <span className="block truncate text-sm text-[#5B6B82]">{guestsLabel}</span>
         </button>
 
@@ -127,10 +127,10 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label="Choose guests"
-            className="fixed inset-0 z-[100] bg-elevated p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-[min(18rem,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(11,31,66,0.14)]"
+            className="fixed inset-0 z-[100] bg-elevated p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-[min(18rem,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(20,58,128,0.14)]"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
-              <span className="text-base font-semibold text-[#0B1F42]">Guests</span>
+              <span className="text-base font-semibold text-[#203565]">Guests</span>
               <button
                 type="button"
                 onClick={() => setOpenField(null)}
@@ -142,7 +142,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
             </div>
             <div className="flex items-center justify-between py-2">
               <div>
-                <p className="text-sm font-semibold text-[#0B1F42]">Guests</p>
+                <p className="text-sm font-semibold text-[#203565]">Guests</p>
                 <p className="text-xs text-[#5B6B82]">Ages 18 and up</p>
               </div>
               <div className="flex items-center gap-3">
@@ -151,17 +151,17 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
                   onClick={() => onGuestsChange(clampGuests(guests - 1))}
                   disabled={guests <= 1}
                   aria-label="Decrease guests"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#203565] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
                 >
                   &minus;
                 </button>
-                <span className="w-6 text-center text-sm font-semibold text-[#0B1F42]" aria-live="polite">{guests}</span>
+                <span className="w-6 text-center text-sm font-semibold text-[#203565]" aria-live="polite">{guests}</span>
                 <button
                   type="button"
                   onClick={() => onGuestsChange(clampGuests(guests + 1))}
                   disabled={guests >= 16}
                   aria-label="Increase guests"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#0B1F42] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#203565] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
                 >
                   +
                 </button>
@@ -171,7 +171,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
               <button
                 type="button"
                 onClick={() => setOpenField(null)}
-                className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-6 text-sm font-semibold text-white hover:bg-[#07072E] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C49A6C]"
+                className="min-h-[44px] rounded-[10px] bg-[#16294B] px-6 text-sm font-semibold text-white hover:bg-[#16294B] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
               >
                 Done
               </button>

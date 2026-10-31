@@ -108,13 +108,13 @@ function CookieConsent() {
         visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
       }`}
     >
-      <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+      <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
         <div className="flex items-start gap-3 mb-3">
-          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[#C49A6C]/15 flex items-center justify-center">
-            <Cookie className="w-5 h-5 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+          <div className="flex-shrink-0 w-9 h-9 rounded-full bg-[#F4F0E8] flex items-center justify-center">
+            <Cookie className="w-5 h-5 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-base font-semibold text-[#0B1F42]">
+            <h2 className="text-base font-semibold text-[#203565]">
               {mode === 'manage' ? 'Manage your preferences' : 'We value your privacy'}
             </h2>
             <p className="text-sm text-[#5B6B82] mt-1 leading-relaxed">
@@ -123,7 +123,7 @@ function CookieConsent() {
                 : 'We use essential cookies to keep you signed in and your bookings working, plus optional cookies to understand how the site is used. Read our '}
               {mode === 'banner' && (
                 <>
-                  <a href="/privacy#cookies" className="text-[#C49A6C] hover:underline font-medium">
+                  <a href="/privacy#cookies" className="text-[#8A6B52] hover:underline font-medium">
                     Cookie Policy
                   </a>
                   .
@@ -141,7 +141,7 @@ function CookieConsent() {
                 className="flex items-start justify-between gap-3 rounded-xl shadow-sm p-3"
               >
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#0B1F42]">{cat.label}</p>
+                  <p className="text-sm font-semibold text-[#203565]">{cat.label}</p>
                   <p className="mt-0.5 text-xs leading-relaxed text-[#5B6B82]">{cat.description}</p>
                 </div>
                 {cat.alwaysOn ? (
@@ -154,7 +154,7 @@ function CookieConsent() {
                       type="checkbox"
                       checked={prefs[cat.key]}
                       onChange={(e) => setPrefs((prev) => ({ ...prev, [cat.key]: e.target.checked }))}
-                      className="w-4 h-4 accent-[#C49A6C]"
+                      className="w-4 h-4 accent-[#C5A28C]"
                     />
                     <span className="sr-only">{cat.label}</span>
                   </label>
@@ -169,7 +169,7 @@ function CookieConsent() {
             <button
               type="button"
               onClick={handleSaveChoices}
-              className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#07072E]"
+              className="min-h-[44px] rounded-[10px] bg-[#16294B] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#16294B]"
             >
               Save choices
             </button>
@@ -178,21 +178,21 @@ function CookieConsent() {
               <button
                 type="button"
                 onClick={handleAcceptAll}
-                className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#07072E]"
+                className="min-h-[44px] rounded-[10px] bg-[#16294B] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#16294B]"
               >
                 Accept all
               </button>
               <button
                 type="button"
                 onClick={handleRejectAll}
-                className="min-h-[44px] rounded-[10px] bg-[#0B1F42] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#07072E]"
+                className="min-h-[44px] rounded-[10px] bg-[#16294B] px-5 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#16294B]"
               >
                 Reject all
               </button>
               <button
                 type="button"
                 onClick={() => setMode('manage')}
-                className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-elevated px-5 py-2 text-sm font-semibold text-[#0B1F42] transition-colors hover:bg-surface"
+                className="min-h-[44px] rounded-[10px] border border-[#E3E8EF] bg-elevated px-5 py-2 text-sm font-semibold text-[#203565] transition-colors hover:bg-surface"
               >
                 Manage preferences
               </button>

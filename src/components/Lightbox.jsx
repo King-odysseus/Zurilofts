@@ -101,7 +101,7 @@ function Lightbox({ images, initialIndex = 0, onClose }) {
                 key={i}
                 onClick={() => setIndex(i)}
                 className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden transition-all duration-200 ${
-                  i === index ? 'ring-2 ring-[#C49A6C] scale-105' : 'opacity-50 hover:opacity-80'
+                  i === index ? 'ring-2 ring-[#C5A28C] scale-105' : 'opacity-50 hover:opacity-80'
                 }`}
               >
                 <img src={img} alt="" className="w-full h-full object-cover" />

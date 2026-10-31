@@ -208,14 +208,14 @@ function SearchBar({ discovery = false }) {
 
       {/* Dropdown results */}
       {open && results.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_8px_28px_rgba(11,31,66,0.14)]">
+        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
           <ul>
             {results.map((p) => (
               <li key={p.id}>
                 <button
                   type="button"
                   onClick={() => handleSelect(p.id)}
-                  className="w-full border-b border-[#E3E8EF] px-5 py-3 text-left transition-colors last:border-b-0 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C49A6C] flex items-center gap-4"
+                  className="w-full border-b border-[#E3E8EF] px-5 py-3 text-left transition-colors last:border-b-0 hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#C5A28C] flex items-center gap-4"
                 >
                   {p.images?.[0] ? (
                     <img
@@ -229,11 +229,11 @@ function SearchBar({ discovery = false }) {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="truncate text-sm font-semibold text-[#0B1F42]">{p.title}</p>
+                    <p className="truncate text-sm font-semibold text-[#203565]">{p.title}</p>
                     <p className="truncate text-xs text-[#5B6B82]">{p.location}</p>
                   </div>
                   <div className="flex-shrink-0 text-right">
-                    <p className="text-sm font-bold text-[#0B1F42]">KES {p.price.toLocaleString()}</p>
+                    <p className="text-sm font-bold text-[#203565]">KES {p.price.toLocaleString()}</p>
                     <p className="text-xs text-[#5B6B82]">/ night</p>
                   </div>
                 </button>
@@ -244,7 +244,7 @@ function SearchBar({ discovery = false }) {
             <button
               type="button"
               onClick={handleSearch}
-              className="w-full border-t border-[#E3E8EF] py-3 text-center text-sm font-semibold text-[#0B1F42] hover:bg-surface"
+              className="w-full border-t border-[#E3E8EF] py-3 text-center text-sm font-semibold text-[#203565] hover:bg-surface"
             >
               View all results &rarr;
             </button>
@@ -263,7 +263,7 @@ function RoleToggle({ mode, onChange }) {
         onClick={() => onChange('traveler')}
         className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
           mode === 'traveler'
-            ? 'bg-white text-[#0B1F42] shadow-md'
+            ? 'bg-white text-[#203565] shadow-md'
             : 'text-white/70 hover:text-white'
         }`}
       >
@@ -274,7 +274,7 @@ function RoleToggle({ mode, onChange }) {
         onClick={() => onChange('host')}
         className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
           mode === 'host'
-            ? 'bg-white text-[#0B1F42] shadow-md'
+            ? 'bg-white text-[#203565] shadow-md'
             : 'text-white/70 hover:text-white'
         }`}
       >
@@ -314,7 +314,7 @@ function Hero({ stats }) {
       </div>
 
       {/* Gradient overlay - dark navy tint, kept only for photo legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0B1F42]/70 via-[#0B1F42]/40 to-[#0B1F42]/70"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-[#203565]/70 via-[#203565]/40 to-[#203565]/70"></div>
 
       {/* Navbar */}
       <Navbar />
@@ -331,7 +331,7 @@ function Hero({ stats }) {
           {/* Headline and Description */}
           <div className="text-center mb-14">
             <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-              <span className={`h-2 w-2 animate-pulse rounded-full ${isHost ? 'bg-[#C49A6C]' : 'bg-green-500'}`}></span>
+              <span className={`h-2 w-2 animate-pulse rounded-full ${isHost ? 'bg-[#C5A28C]' : 'bg-green-500'}`}></span>
               <span className="text-white/90 text-sm font-medium">
                 {isHost ? 'List Your Property' : 'Available for Booking'}
               </span>
@@ -362,7 +362,7 @@ function Hero({ stats }) {
             <div className="mt-14 flex justify-center">
               <Link
                 to="/register?role=HOST"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] bg-[#C49A6C] px-10 py-3 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:bg-[#B8895C] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B1F42]"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] bg-[#2563EB] px-10 py-3 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:bg-[#1D4ED8] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#203565]"
               >
                 <House className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
                 Get Started as a Host

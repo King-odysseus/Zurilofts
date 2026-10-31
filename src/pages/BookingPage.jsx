@@ -519,7 +519,7 @@ function BookingPage() {
   // Step 1: Dates & Guests
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold text-[#0B1F42]">Select your dates</h2>
+      <h2 className="text-2xl font-bold text-[#203565]">Select your dates</h2>
 
       <div>
         <label className="block text-sm font-semibold text-[#1f2937] mb-2">Select your dates *</label>
@@ -532,11 +532,11 @@ function BookingPage() {
           <div className="flex gap-4 mt-3">
             <div className="flex-1 neu-input px-4 py-2 bg-elevated">
               <span className="text-xs text-[#6b7280] block">Check-in</span>
-              <span className="font-semibold text-[#0B1F42]">{bookingData.checkIn || '-'}</span>
+              <span className="font-semibold text-[#203565]">{bookingData.checkIn || '-'}</span>
             </div>
             <div className="flex-1 neu-input px-4 py-2 bg-elevated">
               <span className="text-xs text-[#6b7280] block">Check-out</span>
-              <span className="font-semibold text-[#0B1F42]">{bookingData.checkOut || '-'}</span>
+              <span className="font-semibold text-[#203565]">{bookingData.checkOut || '-'}</span>
             </div>
           </div>
         )}
@@ -571,24 +571,24 @@ function BookingPage() {
 
       {/* Bed Option - shown as read-only since it was selected on the property card */}
       {bedOption && (
-        <div className="bg-[#C49A6C]/10 rounded-xl p-4 flex items-center justify-between">
+        <div className="bg-[#F4F0E8] rounded-xl p-4 flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-[#0B1F42]">
+            <p className="text-sm font-semibold text-[#203565]">
               {bedOption === '2bed' ? '2-Bed Configuration' : '1-Bed Configuration'}
             </p>
             <p className="text-xs text-[#6b7280]">
               Apartment fits up to {pricing.maxGuests} guests &middot; KES {pricing.propertyPrice.toLocaleString()}/night
             </p>
           </div>
-          <span className="bg-[#C49A6C] text-white text-xs font-bold px-3 py-1 rounded-full">
+          <span className="bg-[#16294B] text-white text-xs font-bold px-3 py-1 rounded-full">
             {bedOption === '2bed' ? '2 Bed' : '1 Bed'}
           </span>
         </div>
       )}
 
       {/* Standard times note */}
-      <div className="bg-[#0B1F42]/5 rounded-xl p-4 flex items-start gap-3">
-        <Clock className="w-5 h-5 text-[#C49A6C] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
+      <div className="bg-[#16294B]/5 rounded-xl p-4 flex items-start gap-3">
+        <Clock className="w-5 h-5 text-[#8A6B52] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
         <p className="text-sm text-[#1f2937]">
           Standard <span className="font-semibold">check-in from 3:00 PM</span> and{' '}
           <span className="font-semibold">check-out by 10:00 AM</span>. You may extend up to{' '}
@@ -629,7 +629,7 @@ function BookingPage() {
             ariaLabel="Check-out time"
           />
           {pricing.lateCheckoutFee > 0 && (
-            <p className="text-xs text-[#C49A6C] font-medium mt-1">
+            <p className="text-xs text-[#8A6B52] font-medium mt-1">
               Late check-out fee: KES {pricing.lateCheckoutFee.toLocaleString()}
             </p>
           )}
@@ -637,8 +637,8 @@ function BookingPage() {
       </div>
 
       {requestedNights > 0 && (
-        <div className="bg-[#C49A6C]/10 rounded-xl p-4">
-          <p className="text-[#0B1F42] font-medium">
+        <div className="bg-[#F4F0E8] rounded-xl p-4">
+          <p className="text-[#203565] font-medium">
             {requestedNights} {requestedNights === 1 ? 'night' : 'nights'} selected
           </p>
           <p className="text-[#6b7280] text-sm">
@@ -674,7 +674,7 @@ function BookingPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-[#0B1F42]">Guest Information</h2>
+        <h2 className="text-2xl font-bold text-[#203565]">Guest Information</h2>
         <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account. Edit anything that&apos;s changed.</p>
       </div>
 
@@ -757,7 +757,7 @@ function BookingPage() {
             type="button"
             onClick={addGuest}
             disabled={bookingData.guests >= pricing.maxGuests}
-            className="text-sm font-semibold text-[#C49A6C] hover:text-[#0B1F42] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            className="text-sm font-semibold text-[#8A6B52] hover:text-[#203565] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add guest
           </button>
@@ -847,7 +847,7 @@ function BookingPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-[#0B1F42]">Enhance your stay</h2>
+        <h2 className="text-2xl font-bold text-[#203565]">Enhance your stay</h2>
         <p className="text-sm text-[#6b7280] mt-1">
           Add optional services to your booking. You can change quantities any time before payment.
         </p>
@@ -861,10 +861,10 @@ function BookingPage() {
 
       {loadingAddOns ? (
         <div className="flex items-center justify-center py-12">
-          <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin" />
+          <div className="w-10 h-10 border-4 border-[#C5A28C] border-t-transparent rounded-full animate-spin" />
         </div>
       ) : availableAddOns.length === 0 ? (
-        <div className="rounded-xl bg-[#F3E9DC] p-6 text-center">
+        <div className="rounded-xl bg-[#F4F0E8] p-6 text-center">
           <p className="text-[#6b7280]">No add-ons are available for this property.</p>
         </div>
       ) : (
@@ -878,13 +878,13 @@ function BookingPage() {
               <div key={addOn.id} className="border border-[#D9D9D9] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-semibold text-[#0B1F42]">{addOn.name}</h3>
-                    <span className="bg-[#C49A6C]/10 text-[#0B1F42] text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize">
+                    <h3 className="font-semibold text-[#203565]">{addOn.name}</h3>
+                    <span className="bg-[#F4F0E8] text-[#203565] text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize">
                       {addOn.category}
                     </span>
                   </div>
                   <p className="text-sm text-[#6b7280] mt-1">{addOn.description}</p>
-                  <p className="text-sm font-semibold text-[#0B1F42] mt-1">
+                  <p className="text-sm font-semibold text-[#203565] mt-1">
                     KES {addOn.price != null ? addOn.price.toLocaleString() : '-'} each
                   </p>
                 </div>
@@ -894,25 +894,25 @@ function BookingPage() {
                       type="button"
                       onClick={() => changeAddOnQuantity(addOn, qty - 1)}
                       disabled={busy || qty === 0}
-                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#0B1F42] font-bold hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#203565] font-bold hover:border-[#C5A28C] hover:text-[#8A6B52] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       aria-label={`Decrease ${addOn.name} quantity`}
                     >
                       −
                     </button>
-                    <span className="w-8 text-center font-semibold text-[#0B1F42]" aria-live="polite">
+                    <span className="w-8 text-center font-semibold text-[#203565]" aria-live="polite">
                       {busy ? '…' : qty}
                     </span>
                     <button
                       type="button"
                       onClick={() => changeAddOnQuantity(addOn, qty + 1)}
                       disabled={busy || qty >= 20}
-                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#0B1F42] font-bold hover:border-[#C49A6C] hover:text-[#C49A6C] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                      className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#203565] font-bold hover:border-[#C5A28C] hover:text-[#8A6B52] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                       aria-label={`Increase ${addOn.name} quantity`}
                     >
                       +
                     </button>
                   </div>
-                  <p className="text-sm font-semibold text-[#0B1F42]">
+                  <p className="text-sm font-semibold text-[#203565]">
                     {qty > 0 ? `KES ${subtotal.toLocaleString()}` : '-'}
                   </p>
                 </div>
@@ -922,9 +922,9 @@ function BookingPage() {
         </div>
       )}
 
-      <div className="flex items-center justify-between rounded-xl bg-[#F3E9DC] p-4">
-        <span className="font-semibold text-[#0B1F42]">Add-ons total</span>
-        <span className="font-bold text-[#0B1F42]">KES {pricing.addOnsTotal.toLocaleString()}</span>
+      <div className="flex items-center justify-between rounded-xl bg-[#F4F0E8] p-4">
+        <span className="font-semibold text-[#203565]">Add-ons total</span>
+        <span className="font-bold text-[#203565]">KES {pricing.addOnsTotal.toLocaleString()}</span>
       </div>
 
       <Button
@@ -952,7 +952,7 @@ function BookingPage() {
         </Button>
       </div>
 
-      <h2 className="text-2xl font-bold text-[#0B1F42]">Payment</h2>
+      <h2 className="text-2xl font-bold text-[#203565]">Payment</h2>
 
       <div className="space-y-3">
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
@@ -966,7 +966,7 @@ function BookingPage() {
             onChange={handleInputChange}
           />
           <div className="ml-4 flex items-center flex-1">
-            <CreditCard className="w-8 h-8 text-[#0B1F42] mr-3" strokeWidth={1.5} aria-hidden="true" />
+            <CreditCard className="w-8 h-8 text-[#203565] mr-3" strokeWidth={1.5} aria-hidden="true" />
             <div>
               <p className="font-semibold text-[#1f2937]">Credit/Debit Card</p>
               <p className="text-sm text-[#6b7280]">Pay securely with your card</p>
@@ -1006,7 +1006,7 @@ function BookingPage() {
             onChange={handleInputChange}
           />
           <div className="ml-4 flex items-center flex-1">
-            <Landmark className="w-8 h-8 text-[#0B1F42] mr-3" strokeWidth={1.5} aria-hidden="true" />
+            <Landmark className="w-8 h-8 text-[#203565] mr-3" strokeWidth={1.5} aria-hidden="true" />
             <div>
               <p className="font-semibold text-[#1f2937]">Bank Transfer</p>
               <p className="text-sm text-[#6b7280]">Pay via bank transfer</p>
@@ -1098,7 +1098,7 @@ function BookingPage() {
             <span>-KES {pricing.discountAmount.toLocaleString()}</span>
           </div>
         )}
-        <div className="border-t border-[#0B1F42]/20 pt-2 flex justify-between font-bold text-[#0B1F42]">
+        <div className="border-t border-[#203565]/20 pt-2 flex justify-between font-bold text-[#203565]">
           <span>Total</span>
           <span>KES {pricing.total.toLocaleString()}</span>
         </div>
@@ -1116,7 +1116,7 @@ function BookingPage() {
           <button
             type="button"
             onClick={retryQuote}
-            className="mt-1 text-sm font-semibold text-[#C49A6C] hover:underline"
+            className="mt-1 text-sm font-semibold text-[#8A6B52] hover:underline"
           >
             Try again
           </button>
@@ -1161,18 +1161,18 @@ function BookingPage() {
         <Navbar />
         <div className="pt-24 pb-16 flex items-center justify-center min-h-[80vh]">
           <div className="max-w-md mx-auto px-6 text-center">
-            <div className="w-24 h-24 bg-[#C49A6C]/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Check className="w-12 h-12 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+            <div className="w-24 h-24 bg-[#F4F0E8] rounded-full flex items-center justify-center mx-auto mb-6">
+              <Check className="w-12 h-12 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
             </div>
-            <h1 className="text-3xl font-bold text-[#0B1F42] mb-4">Booking Confirmed!</h1>
+            <h1 className="text-3xl font-bold text-[#203565] mb-4">Booking Confirmed!</h1>
             <p className="text-[#6b7280] mb-6">
               Thank you for your booking. We have sent a confirmation email to {bookingData.email} with all the details.
             </p>
             <div className="bg-[#D9D9D9] rounded-2xl p-6 mb-6 text-left">
-              <h3 className="font-bold text-[#0B1F42] mb-2">Booking Summary</h3>
+              <h3 className="font-bold text-[#203565] mb-2">Booking Summary</h3>
               <p className="text-[#1f2937]">{property?.title}</p>
               <p className="text-[#6b7280] text-sm">{property?.location}</p>
-              <div className="mt-3 pt-3 border-t border-[#0B1F42]/10">
+              <div className="mt-3 pt-3 border-t border-[#203565]/10">
                 <div className="flex justify-between text-sm">
                   <span className="text-[#6b7280]">Check-in</span>
                   <span className="font-medium">{bookingData.checkIn}</span>
@@ -1197,7 +1197,7 @@ function BookingPage() {
                   <span className="text-[#6b7280]">Guests</span>
                   <span className="font-medium">{bookingData.guests}</span>
                 </div>
-                <div className="flex justify-between font-bold text-[#0B1F42] mt-2 pt-2 border-t border-[#0B1F42]/10">
+                <div className="flex justify-between font-bold text-[#203565] mt-2 pt-2 border-t border-[#203565]/10">
                   <span>Total Paid</span>
                   <span>KES {pricing.total.toLocaleString()}</span>
                 </div>
@@ -1206,13 +1206,13 @@ function BookingPage() {
             <div className="space-y-3">
               <button
                 onClick={() => navigate('/')}
-                className="w-full bg-[#C49A6C] text-white py-3 rounded-full font-semibold hover:bg-[#b8895c] transition-all duration-200"
+                className="w-full bg-[#2563EB] text-white py-3 rounded-full font-semibold hover:bg-[#1D4ED8] transition-all duration-200"
               >
                 Return to Home
               </button>
               <button
                 onClick={() => window.print()}
-                className="w-full border-2 border-[#0B1F42] text-[#0B1F42] py-3 rounded-full font-semibold hover:bg-[#0B1F42] hover:text-white transition-all duration-200"
+                className="w-full border-2 border-[#203565] text-[#203565] py-3 rounded-full font-semibold hover:bg-[#16294B] hover:text-white transition-all duration-200"
               >
                 Print Confirmation
               </button>
@@ -1230,7 +1230,7 @@ function BookingPage() {
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
-            <div className="w-10 h-10 border-4 border-[#C49A6C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-10 h-10 border-4 border-[#C5A28C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-[#6b7280]">Loading property...</p>
           </div>
         </div>
@@ -1246,7 +1246,7 @@ function BookingPage() {
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center max-w-md px-4">
-            <h1 className="text-lg font-semibold text-[#0B1F42] mb-2">Property unavailable</h1>
+            <h1 className="text-lg font-semibold text-[#203565] mb-2">Property unavailable</h1>
             <p className="text-[#6b7280] mb-6">{propertyError || 'This listing could not be loaded.'}</p>
             <div className="flex items-center justify-center gap-3">
               <Button color="light" onClick={() => setReloadKey((key) => key + 1)}>
@@ -1254,7 +1254,7 @@ function BookingPage() {
               </Button>
               <Link
                 to="/properties"
-                className="rounded-full bg-[#0B1F42] px-5 py-2.5 text-sm font-medium text-white"
+                className="rounded-full bg-[#16294B] px-5 py-2.5 text-sm font-medium text-white"
               >
                 Browse properties
               </Link>
@@ -1309,9 +1309,9 @@ function BookingPage() {
                     className="w-full h-48 object-cover rounded-xl mb-4"
                   />
                 </Link>
-                <h3 className="font-bold text-[#0B1F42] text-lg">{property?.title}</h3>
+                <h3 className="font-bold text-[#203565] text-lg">{property?.title}</h3>
                 {bedOption && (
-                  <p className="text-sm text-[#C49A6C] font-medium mt-1">
+                  <p className="text-sm text-[#8A6B52] font-medium mt-1">
                     {bedOption === '2bed' ? '2 Bed' : '1 Bed'} &middot; KES {pricing.propertyPrice.toLocaleString()}/night
                   </p>
                 )}
@@ -1322,7 +1322,7 @@ function BookingPage() {
 
                 <div className="flex items-center mt-2 space-x-4 text-sm">
                   <div className="flex items-center">
-                    <Star className="w-4 h-4 text-[#C49A6C] mr-1" fill="currentColor" aria-hidden="true" />
+                    <Star className="w-4 h-4 text-[#8A6B52] mr-1" fill="currentColor" aria-hidden="true" />
                     <span className="font-medium">{property?.rating}</span>
                   </div>
                   <div className="flex items-center text-[#6b7280]">
@@ -1333,7 +1333,7 @@ function BookingPage() {
 
                 {pricing.nights > 0 && (
                   <div className="mt-6 pt-6 border-t border-[#D9D9D9]">
-                    <h4 className="font-semibold text-[#0B1F42] mb-3">Price Details</h4>
+                    <h4 className="font-semibold text-[#203565] mb-3">Price Details</h4>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between text-[#1f2937]">
                         <span>KES {pricing.propertyPrice.toLocaleString()} x {pricing.nights} nights</span>
@@ -1371,7 +1371,7 @@ function BookingPage() {
                           <span>-KES {pricing.discountAmount.toLocaleString()}</span>
                         </div>
                       )}
-                      <div className="pt-2 border-t border-[#D9D9D9] flex justify-between font-bold text-[#0B1F42]">
+                      <div className="pt-2 border-t border-[#D9D9D9] flex justify-between font-bold text-[#203565]">
                         <span>Total</span>
                         <span>KES {pricing.total.toLocaleString()}</span>
                       </div>

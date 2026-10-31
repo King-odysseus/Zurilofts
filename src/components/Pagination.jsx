@@ -43,7 +43,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
             aria-label="Previous page"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-elevated text-[#0B1F42] shadow-sm transition-all hover:bg-surface hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-elevated text-[#203565] shadow-sm transition-all hover:bg-surface hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
           >
             <ChevronLeft className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           </button>
@@ -57,8 +57,8 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
                 aria-current={p === page ? 'page' : undefined}
                 className={`min-w-[2.25rem] h-9 px-2 inline-flex items-center justify-center rounded-full text-sm font-semibold transition-all ${
                   p === page
-                    ? 'bg-[#0B1F42] text-white shadow-md'
-                    : 'border border-[#E3E8EF] bg-elevated text-[#0B1F42] shadow-sm hover:bg-surface hover:shadow-md'
+                    ? 'bg-[#16294B] text-white shadow-md'
+                    : 'border border-[#E3E8EF] bg-elevated text-[#203565] shadow-sm hover:bg-surface hover:shadow-md'
                 }`}
               >
                 {p}
@@ -69,7 +69,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
             aria-label="Next page"
-            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-elevated text-[#0B1F42] shadow-sm transition-all hover:bg-surface hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-elevated text-[#203565] shadow-sm transition-all hover:bg-surface hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
           >
             <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
           </button>

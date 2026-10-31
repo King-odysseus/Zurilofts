@@ -18,11 +18,11 @@ export default function HostMobileBottomNav() {
   }, []);
 
   return (
-    <nav aria-label="Host workspace" className="fixed inset-x-3 bottom-3 z-40 mx-auto flex min-h-[68px] max-w-[358px] items-center justify-between rounded-full border border-border bg-elevated/95 px-[9px] pb-[calc(9px+env(safe-area-inset-bottom))] pt-[9px] text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] backdrop-blur md:hidden">
+    <nav aria-label="Host workspace" className="fixed inset-x-3 bottom-3 z-40 mx-auto flex min-h-[54px] max-w-[358px] items-center justify-between rounded-full border border-border bg-elevated/95 px-[9px] pb-[calc(5px+env(safe-area-inset-bottom))] pt-[5px] text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] backdrop-blur md:hidden">
       {TABS.map((tab) => {
         const active = tab.match(location.pathname);
         const Icon = tab.icon;
-        return <Link key={tab.key} to={tab.to} aria-current={active ? 'page' : undefined} className={`relative flex min-h-[48px] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-2xl px-1 text-[9px] font-semibold transition-colors ${active ? 'text-[#0B1F42]' : 'text-[#64748B] hover:text-[#0B1F42]'}`}><Icon className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" /><span className="truncate">{tab.label}</span></Link>;
+        return <Link key={tab.key} to={tab.to} aria-current={active ? 'page' : undefined} className={`relative flex min-h-[44px] min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-2xl px-1 text-[9px] font-semibold transition-colors ${active ? 'text-[#203565]' : 'text-[#64748B] hover:text-[#203565]'}`}><Icon className="h-4 w-4" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" /><span className="truncate">{tab.label}</span></Link>;
       })}
     </nav>
   );

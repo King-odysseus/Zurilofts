@@ -18,19 +18,19 @@ function NearbyCard({ item, areaLabels, categoryLabels }) {
       <div className="h-48 overflow-hidden relative">
         <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-[14px]" src={item.image} alt={item.name} />
         <span className="op-place-area">{areaLabels[item.area] || item.area}</span><a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
-           className="absolute bottom-2 right-2 z-10 rounded-full bg-white/90 p-2 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-[#0B1F42] hover:text-white">
+           className="absolute bottom-2 right-2 z-10 rounded-full bg-white/90 p-2 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-[#16294B] hover:text-white">
           <MapPin className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
         </a>
       </div>
       <div className="op-place-copy p-5">
         <span className="op-place-category">{categoryLabels?.[item.category] || item.category}</span>
-        <h3 className="mb-2 text-lg font-bold text-[#0B1F42]">{item.name}</h3>
+        <h3 className="mb-2 text-lg font-bold text-[#203565]">{item.name}</h3>
         <p className="text-charcoal text-sm leading-relaxed">{item.desc}</p>
         <a
           href={mapsUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-2 min-h-[44px] rounded-lg bg-[#C49A6C] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#B8895C]"
+          className="mt-4 inline-flex items-center gap-2 min-h-[44px] rounded-lg bg-[#2563EB] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#1D4ED8]"
         >
           Get directions
           <span aria-hidden="true">↗</span>
@@ -68,8 +68,8 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   return (
     <div className="op-places-list mt-8 md:mt-12 mb-16">
       {/* Centered Header */}
-      <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-elevated px-5 py-8 text-center shadow-[0_4px_16px_rgba(11,31,66,0.04)] md:px-8 md:py-10">
-        <h2 className="text-3xl font-bold text-[#0B1F42] md:text-4xl">{title}</h2>
+      <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-elevated px-5 py-8 text-center shadow-[0_4px_16px_rgba(20,58,128,0.04)] md:px-8 md:py-10">
+        <h2 className="text-3xl font-bold text-[#203565] md:text-4xl">{title}</h2>
         <p className="text-cool-grey max-w-2xl mx-auto text-base md:text-lg mt-3 px-2 md:px-0">{subtitle}</p>
       </div>
 
@@ -112,7 +112,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             <div className="text-center mt-10">
               <Link
                 to={viewMoreLink}
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] px-8 py-3 font-semibold text-[#0B1F42] transition-all duration-200 hover:bg-surface"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] px-8 py-3 font-semibold text-[#203565] transition-all duration-200 hover:bg-surface"
               >
                 View All {filtered.length} Places
                 <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />

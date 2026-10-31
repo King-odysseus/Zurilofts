@@ -2,10 +2,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Alert, Badge, Button, ToggleSwitch } from 'flowbite-react';
 import PropTypes from 'prop-types';
-import { Building2, LayoutGrid, List } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { firstImage } from '../utils/images.js';
+import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 
 const STATUS_META = {
   DRAFT: { label: 'Draft', tone: 'draft' },
@@ -36,6 +37,12 @@ const FILTERS = [
     matches: (property) => ['REJECTED', 'SUSPENDED'].includes(property.status),
   },
 ];
+
+// The grid/list toggle and the status filter are the same control: one pill
+// group with a single selected state, so the two strings live here once.
+const PILL_GROUP = 'inline-flex rounded-full border border-border bg-elevated p-1';
+const PILL_SELECTED = 'bg-navy-bg text-white';
+const PILL_IDLE = 'text-muted hover:text-navy';
 
 function propertyStatus(property) {
   return STATUS_META[property.status] || STATUS_META.DRAFT;
@@ -71,11 +78,11 @@ function listingQuality(property) {
   return { score: Math.round((done / checks.length) * 100), tips: checks.filter((check) => !check.ok).map((check) => check.tip) };
 }
 
+// Placeholder cards rather than placeholder bars: the loading shapes have to
+// match what lands, otherwise the page jumps when the request resolves.
 function ListingSkeleton() {
   return <div className="space-y-3" aria-label="Loading listings">
-    <span className="block h-24 animate-pulse rounded-xl border border-border bg-surface" />
-    <span className="block h-24 animate-pulse rounded-xl border border-border bg-surface" />
-    <span className="block h-24 animate-pulse rounded-xl border border-border bg-surface" />
+    {[0, 1, 2].map((key) => <HostCard key={key} className="h-24 animate-pulse" />)}
   </div>;
 }
 
@@ -85,21 +92,23 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
   const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
   const quality = listingQuality(property);
 
-  return <article className="flex flex-col overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
+  // flush lets the hero photo run to the card edge; the body re-applies the
+  // padding so the text still lines up with the padded cards beside it.
+  return <HostCard flush className="overflow-hidden">
     <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface">
       {image ? <img src={image} alt="" className="aspect-[4/3] w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-muted">No photo yet</div>}
       <Badge color={STATUS_BADGE_COLOR[status.tone] || 'gray'} className="absolute left-3 top-3">{status.label}</Badge>
     </div>
-    <div className="flex flex-1 flex-col gap-4 p-5">
+    <div className="flex flex-1 flex-col gap-4 p-4 sm:p-5">
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h2 className="text-base font-semibold text-navy"><Link to={`/property/${property.id}`} className="hover:text-primary-600">{property.title}</Link></h2>
+          <h2 className="text-base font-semibold text-navy"><Link to={`/property/${property.id}`} className="hover:text-muted">{property.title}</Link></h2>
           <p className="mt-1 text-xs text-muted">{bedSummary(property)} · {property.neighborhood || property.location || 'Nairobi'}</p>
         </div>
         <strong className="whitespace-nowrap text-lg font-bold text-navy">KES {(property.price || 0).toLocaleString()}<small className="text-xs font-medium text-muted">/night</small></strong>
       </header>
       <p className="rounded-xl bg-surface px-3 py-2 text-xs leading-relaxed text-muted">{statusCopy(property)}</p>
-      <div className="rounded-xl border border-border p-3">
+      <div className="rounded-xl bg-surface p-3">
         <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-muted"><span>Listing quality</span><strong className="text-navy">{quality.score}%</strong></div>
         <div
           className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border"
@@ -125,8 +134,8 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
         {property.status === 'PUBLISHED' && <Button as={Link} to={`/property/${property.id}`} color="light" size="sm">View listing</Button>}
         <Button as={Link} to={`/host/calendar/${property.id}`} color="light" size="sm">Calendar</Button>
       </div>
-      <footer className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-3">
-        <div className="flex items-center gap-2">
+      <footer className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
+        <div className="flex flex-wrap items-center gap-2">
           <ToggleSwitch
             checked={Boolean(property.available)}
             onChange={() => onToggleAvailability(property)}
@@ -140,7 +149,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
         </Button>
       </footer>
     </div>
-  </article>;
+  </HostCard>;
 }
 
 HostListingCard.propTypes = {
@@ -168,43 +177,42 @@ function HostListingRow({ property, onToggleAvailability, onDelete, onReview, bu
   const status = propertyStatus(property);
   const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
 
-  return <article className="flex flex-col gap-3 rounded-xl border border-border bg-elevated p-3 shadow-sm sm:flex-row sm:items-center">
-    <span className="h-16 w-full shrink-0 overflow-hidden rounded-lg bg-surface sm:h-14 sm:w-20">
-      {image
-        ? <img src={image} alt="" className="h-full w-full object-cover" />
-        : <span className="grid h-full w-full place-items-center text-[10px] text-muted">No photo</span>}
-    </span>
+  return <HostCard>
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <span className="h-16 w-full shrink-0 overflow-hidden rounded-lg bg-surface sm:h-14 sm:w-20">
+        {image
+          ? <img src={image} alt="" className="h-full w-full object-cover" />
+          : <span className="grid h-full w-full place-items-center text-[10px] text-muted">No photo</span>}
+      </span>
 
-    <div className="min-w-0 flex-1">
-      <div className="flex flex-wrap items-center gap-2">
-        <h2 className="truncate text-sm font-semibold text-navy">
-          <Link to={`/property/${property.id}`} className="hover:text-primary-600">{property.title}</Link>
-        </h2>
-        <span className="inline-flex items-center gap-1 rounded-full border border-border px-2 py-0.5 text-[10px] font-semibold text-muted">
-          <span className={`h-1.5 w-1.5 rounded-full ${property.status === 'PUBLISHED' ? 'bg-emerald-500' : property.status === 'PENDING_REVIEW' ? 'bg-amber-500' : property.status === 'SUSPENDED' || property.status === 'REJECTED' ? 'bg-red-500' : 'bg-slate-400'}`} aria-hidden="true" />
-          {status.label}
-        </span>
-        {!property.available && <span className="text-[10px] font-semibold text-muted">Not accepting bookings</span>}
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="max-w-full truncate text-sm font-semibold text-navy">
+            <Link to={`/property/${property.id}`} className="hover:text-muted">{property.title}</Link>
+          </h2>
+          <Badge color={STATUS_BADGE_COLOR[status.tone] || 'gray'}>{status.label}</Badge>
+          {!property.available && <span className="text-[10px] font-semibold text-muted">Not accepting bookings</span>}
+        </div>
+        <p className="mt-0.5 truncate text-xs text-muted">{bedSummary(property)} · {property.neighborhood || property.location || 'Nairobi'}</p>
       </div>
-      <p className="mt-0.5 truncate text-xs text-muted">{bedSummary(property)} · {property.neighborhood || property.location || 'Nairobi'}</p>
-    </div>
 
-    <div className="flex shrink-0 flex-wrap items-center gap-2">
-      <strong className="whitespace-nowrap text-sm font-bold tabular-nums text-navy">KES {(property.price || 0).toLocaleString()}<small className="text-[10px] font-medium text-muted">/night</small></strong>
-      <ToggleSwitch
-        checked={Boolean(property.available)}
-        onChange={() => onToggleAvailability(property)}
-        disabled={busy}
-        aria-label={`${property.title} availability`}
-      />
-      <Button as={Link} to={`/host/properties/${property.id}/edit`} size="xs">
-        {property.status === 'DRAFT' ? 'Continue setup' : 'Edit'}
-      </Button>
-      {canSubmit && <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onReview(property)}>Submit</Button>}
-      <Button as={Link} to={`/host/calendar/${property.id}`} color="light" size="xs">Calendar</Button>
-      <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onDelete(property)}>Delete</Button>
+      <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <strong className="whitespace-nowrap text-sm font-bold tabular-nums text-navy">KES {(property.price || 0).toLocaleString()}<small className="text-[10px] font-medium text-muted">/night</small></strong>
+        <ToggleSwitch
+          checked={Boolean(property.available)}
+          onChange={() => onToggleAvailability(property)}
+          disabled={busy}
+          aria-label={`${property.title} availability`}
+        />
+        <Button as={Link} to={`/host/properties/${property.id}/edit`} size="xs">
+          {property.status === 'DRAFT' ? 'Continue setup' : 'Edit'}
+        </Button>
+        {canSubmit && <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onReview(property)}>Submit</Button>}
+        <Button as={Link} to={`/host/calendar/${property.id}`} color="light" size="xs">Calendar</Button>
+        <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onDelete(property)}>Delete</Button>
+      </div>
     </div>
-  </article>;
+  </HostCard>;
 }
 
 HostListingRow.propTypes = HostListingCard.propTypes;
@@ -282,7 +290,7 @@ export default function HostListingsPage() {
   }
 
   async function handleDelete(property) {
-    if (!window.confirm(`Delete “${property.title}”? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete "${property.title}"? This cannot be undone.`)) return;
     setBusyId(property.id);
     try {
       await apiClient.delete(`/properties/${property.id}`);
@@ -298,34 +306,34 @@ export default function HostListingsPage() {
   return <div className="space-y-6">
     <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">HOST WORKSPACE</p>
+        <p className={HOST_EYEBROW}>Host workspace</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Your listings</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare, publish, and manage your stays.</p>
       </div>
-      <div className="flex items-center gap-2">
-        <div className="inline-flex rounded-full border border-border bg-elevated p-1" role="group" aria-label="Listing view">
-          {[['grid', LayoutGrid, 'Grid view'], ['list', List, 'List view']].map(([key, Icon, label]) => <button
+      <div className="flex flex-wrap items-center gap-2">
+        <div className={`${PILL_GROUP} items-center`} role="group" aria-label="Listing view">
+          {[['grid', 'Grid'], ['list', 'List']].map(([key, label]) => <button
             key={key}
             type="button"
             onClick={() => setView(key)}
             aria-pressed={view === key}
-            aria-label={label}
-            className={`grid h-7 w-7 place-items-center rounded-full transition-colors ${view === key ? 'bg-navy-bg text-white' : 'text-muted hover:text-navy'}`}
+            aria-label={`${label} view`}
+            className={`h-7 rounded-full px-3 text-xs font-semibold transition-colors ${view === key ? PILL_SELECTED : PILL_IDLE}`}
           >
-            <Icon className="h-3.5 w-3.5" strokeWidth={1.9} aria-hidden="true" />
+            {label}
           </button>)}
         </div>
         <Button as={Link} to="/host/properties/new" size="sm">+ Add a listing</Button>
       </div>
     </header>
 
-    <div className="inline-flex flex-wrap gap-1 rounded-full border border-border bg-elevated p-1" role="group" aria-label="Listing status">
+    <div className={`${PILL_GROUP} flex-wrap gap-1`} role="group" aria-label="Listing status">
       {FILTERS.map((item) => <button
         key={item.key}
         type="button"
         aria-pressed={filter === item.key}
         onClick={() => setFilter(item.key)}
-        className={`h-8 rounded-full px-4 text-sm font-semibold transition-colors ${filter === item.key ? 'bg-navy-bg text-white' : 'text-muted hover:text-navy'}`}
+        className={`h-8 rounded-full px-4 text-sm font-semibold transition-colors ${filter === item.key ? PILL_SELECTED : PILL_IDLE}`}
       >{item.label} · {counts[item.key] || 0}</button>)}
     </div>
 
@@ -333,12 +341,15 @@ export default function HostListingsPage() {
       <p>{error}</p>
       <div><Button type="button" color="light" size="sm" onClick={() => window.location.reload()}>Try again</Button></div>
     </Alert>}
-    {loading ? <ListingSkeleton /> : !error && visibleProperties.length === 0 ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center">
-      <span className="text-primary-600"><Building2 strokeWidth={1.6} aria-hidden="true" /></span>
-      <strong className="text-base font-semibold text-navy">{properties.length === 0 ? 'No listings yet' : 'Nothing in this view'}</strong>
-      <p className="max-w-md text-sm leading-relaxed text-muted">{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>
-      {properties.length === 0 ? <Button as={Link} to="/host/properties/new" size="sm">Add a listing</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>Show all stays</Button>}
-    </div> : view === 'list' ? <div className="space-y-2">
+
+    {loading ? <ListingSkeleton /> : !error && visibleProperties.length === 0 ? <HostCard className="border-dashed">
+      <div className="flex flex-col items-center gap-2 px-2 py-8 text-center">
+        <span className="text-muted"><Building2 strokeWidth={1.6} aria-hidden="true" /></span>
+        <strong className="text-base font-semibold text-navy">{properties.length === 0 ? 'No listings yet' : 'Nothing in this view'}</strong>
+        <p className="max-w-md text-sm leading-relaxed text-muted">{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>
+        {properties.length === 0 ? <Button as={Link} to="/host/properties/new" size="sm">Add a listing</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>Show all stays</Button>}
+      </div>
+    </HostCard> : view === 'list' ? <div className="space-y-2">
       {visibleProperties.map((property) => <HostListingRow key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
     </div> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {visibleProperties.map((property) => <HostListingCard key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}

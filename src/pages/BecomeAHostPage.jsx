@@ -112,7 +112,7 @@ export default function BecomeAHostPage() {
                 override paints the fill navy, which hides the label. */}
             <Link
               to="/register?role=HOST"
-              className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#C49A6C] px-5 py-3 text-sm font-semibold text-white hover:bg-[#B8895C]"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#2563EB] px-5 py-3 text-sm font-semibold text-white hover:bg-[#1D4ED8]"
             >
               Start hosting
             </Link>

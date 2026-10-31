@@ -104,7 +104,7 @@ function PropertyPage() {
       <div className="min-h-screen bg-elevated">
         <main className="flex items-center justify-center min-h-[60vh]" role="status" aria-label="Loading property">
           <div className="text-center">
-            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C49A6C] border-t-transparent" />
+            <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-[#C5A28C] border-t-transparent" />
             <p className="text-[#5B6B82]">Loading property...</p>
           </div>
         </main>
@@ -121,9 +121,9 @@ function PropertyPage() {
             <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CircleAlert className="w-10 h-10 text-red-500" strokeWidth={2} aria-hidden="true" />
             </div>
-            <h2 className="mb-2 text-xl font-bold text-[#0B1F42]">Property Not Found</h2>
+            <h2 className="mb-2 text-xl font-bold text-[#203565]">Property Not Found</h2>
             <p className="mb-4 text-[#5B6B82]">{error || 'This property could not be loaded.'}</p>
-            <Link to="/properties" className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#0B1F42] px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-[#07072E]">
+            <Link to="/properties" className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#16294B] px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-[#16294B]">
               View All Stays
             </Link>
           </div>
@@ -189,14 +189,14 @@ function PropertyPage() {
             <li>
               <Link
                 to="/properties"
-                className="inline-flex min-h-[44px] items-center rounded text-[#0B1F42] transition-colors duration-200 hover:text-[#9A744A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+                className="inline-flex min-h-[44px] items-center rounded text-[#203565] transition-colors duration-200 hover:text-[#203565] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
               >
                 <ArrowLeft className="w-4 h-4 mr-1.5" strokeWidth={2} aria-hidden="true" />
                 Back to Stays
               </Link>
             </li>
             <li aria-hidden="true" className="text-[#94A3B8]">/</li>
-            <li className="truncate font-medium text-[#0B1F42]" aria-current="page">{typeLabel}</li>
+            <li className="truncate font-medium text-[#203565]" aria-current="page">{typeLabel}</li>
           </ol>
         </div>
       </nav>
@@ -225,17 +225,17 @@ function PropertyPage() {
                   {/* Previous / Next - only show when there are multiple images */}
                   <button
                     onClick={goPrev}
-                    className="absolute top-1/2 -translate-y-1/2 left-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] transition-colors shadow-md"
+                    className="absolute top-1/2 -translate-y-1/2 left-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C] transition-colors shadow-md"
                     aria-label="Previous photo"
                   >
-                    <ChevronLeft className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
+                    <ChevronLeft className="h-5 w-5 text-[#203565]" strokeWidth={2} aria-hidden="true" />
                   </button>
                   <button
                     onClick={goNext}
-                    className="absolute top-1/2 -translate-y-1/2 right-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] transition-colors shadow-md"
+                    className="absolute top-1/2 -translate-y-1/2 right-3 w-11 h-11 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C] transition-colors shadow-md"
                     aria-label="Next photo"
                   >
-                    <ChevronRight className="h-5 w-5 text-[#0B1F42]" strokeWidth={2} aria-hidden="true" />
+                    <ChevronRight className="h-5 w-5 text-[#203565]" strokeWidth={2} aria-hidden="true" />
                   </button>
                 </div>
 
@@ -244,7 +244,7 @@ function PropertyPage() {
                   <button
                     key={i}
                     onClick={() => { setFeaturedImage(i); setLightboxIndex(i); setLightboxOpen(true); }}
-                    className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#E3E8EF] shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+                    className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#E3E8EF] shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
                     aria-label={`View photo ${i + 1}`}
                   >
                     <img
@@ -261,7 +261,7 @@ function PropertyPage() {
 
         {/* ── Property identity: title, location, rating ────────── */}
         <header className="mb-6 md:mb-8">
-          <h1 className="mb-2 text-2xl font-bold leading-tight text-[#0B1F42] sm:text-3xl md:text-4xl">
+          <h1 className="mb-2 text-2xl font-bold leading-tight text-[#203565] sm:text-3xl md:text-4xl">
             {property.title}
           </h1>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[#5B6B82]">
@@ -269,7 +269,7 @@ function PropertyPage() {
               href={googleMapsSearchUrl({ lat: property.lat, lng: property.lng, label: property.location })}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 min-h-[44px] rounded-full transition-colors hover:text-[#9A744A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+              className="inline-flex items-center gap-1.5 min-h-[44px] rounded-full transition-colors hover:text-[#203565] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
               title="Open in Google Maps"
             >
               <MapPin className="w-5 h-5 text-[#5B6B82] shrink-0" strokeWidth={2} aria-hidden="true" />
@@ -277,7 +277,7 @@ function PropertyPage() {
               <span className="text-xs font-semibold">Google Maps</span>
             </a>
             {hasReviews && (
-              <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#0B1F42]" aria-label={`Rated ${property.rating} out of 5 from ${shownReviewCount} reviews`}>
+              <span className="inline-flex items-center gap-1 text-sm font-semibold text-[#203565]" aria-label={`Rated ${property.rating} out of 5 from ${shownReviewCount} reviews`}>
                 <Star className="w-4 h-4 text-amber-500" fill="currentColor" aria-hidden="true" />
                 {property.rating}
                 <span className="font-normal text-[#5B6B82]">
@@ -303,30 +303,30 @@ function PropertyPage() {
             {/* Quick facts */}
             <section className="flex flex-wrap gap-5 sm:gap-8 mb-8 py-8 md:py-10 border-b border-[#E3E8EF]" aria-label="Key facts">
               <div className="flex items-center gap-2">
-                <House className="h-6 w-6 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+                <House className="h-6 w-6 shrink-0 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                 <div>
-                  <p className="font-bold text-[#0B1F42]">{displayBedrooms}</p>
+                  <p className="font-bold text-[#203565]">{displayBedrooms}</p>
                   <p className="text-sm text-[#5B6B82]">{displayBedrooms === 1 ? 'Bedroom' : 'Bedrooms'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Bath className="h-6 w-6 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+                <Bath className="h-6 w-6 shrink-0 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                 <div>
-                  <p className="font-bold text-[#0B1F42]">{displayBathrooms}</p>
+                  <p className="font-bold text-[#203565]">{displayBathrooms}</p>
                   <p className="text-sm text-[#5B6B82]">{displayBathrooms === 1 ? 'Bathroom' : 'Bathrooms'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Ruler className="h-6 w-6 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+                <Ruler className="h-6 w-6 shrink-0 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                 <div>
-                  <p className="font-bold text-[#0B1F42]">{property.area} sq ft</p>
+                  <p className="font-bold text-[#203565]">{property.area} sq ft</p>
                   <p className="text-sm text-[#5B6B82]">Area</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Building2 className="h-6 w-6 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+                <Building2 className="h-6 w-6 shrink-0 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                 <div>
-                  <p className="font-bold text-[#0B1F42]">{typeLabel}</p>
+                  <p className="font-bold text-[#203565]">{typeLabel}</p>
                   <p className="text-sm text-[#5B6B82]">Type</p>
                 </div>
               </div>
@@ -334,7 +334,7 @@ function PropertyPage() {
 
             {/* Description */}
             <section className="mb-8 md:mb-10" aria-labelledby="about-heading">
-              <h2 id="about-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">About this {typeLabel.toLowerCase()}</h2>
+              <h2 id="about-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">About this {typeLabel.toLowerCase()}</h2>
               <div className="text-[#1f2937] leading-relaxed space-y-3">
                 {(property.description || 'No description provided.').replace(/<[^>]*>?/gm, '').split('\n').filter(Boolean).map((paragraph, i) => (
                   <p key={i}>{paragraph}</p>
@@ -345,11 +345,11 @@ function PropertyPage() {
             {/* Amenities */}
             {amenities.length > 0 && (
               <section className="mb-8 md:mb-10" aria-labelledby="amenities-heading">
-                <h2 id="amenities-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">What this place offers</h2>
+                <h2 id="amenities-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">What this place offers</h2>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-3" role="list">
                   {amenities.map((amenity, index) => (
                     <li key={index} className="flex items-center gap-3">
-                      <Check className="h-5 w-5 shrink-0 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+                      <Check className="h-5 w-5 shrink-0 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                       <span className="text-[#1f2937]">{amenity}</span>
                     </li>
                   ))}
@@ -360,7 +360,7 @@ function PropertyPage() {
             {/* Nearby */}
             {nearby.length > 0 && (
               <section className="mb-8 md:mb-10" aria-labelledby="nearby-heading">
-                <h2 id="nearby-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">What&apos;s nearby</h2>
+                <h2 id="nearby-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">What&apos;s nearby</h2>
                 <ul className="space-y-3" role="list">
                   {nearby.map((item, index) => (
                     <li key={index} className="flex items-start gap-3 text-[#1f2937]">
@@ -376,18 +376,18 @@ function PropertyPage() {
                 street address. No map is embedded; the link opens Google Maps. */}
             {(property.location || property.address) && (
               <section className="mb-8 md:mb-10" aria-labelledby="location-heading">
-                <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#0B1F42] mb-4">Where you&apos;ll be</h2>
-                <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_24px_rgba(11,31,66,0.06)]">
+                <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">Where you&apos;ll be</h2>
+                <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_24px_rgba(20,58,128,0.06)]">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div className="min-w-0 flex-1">
-                      {property.location && <p className="font-semibold text-[#0B1F42]">{property.location}</p>}
+                      {property.location && <p className="font-semibold text-[#203565]">{property.location}</p>}
                       {property.address && <p className="mt-1 break-words text-sm text-[#5B6B82]">{property.address}</p>}
                     </div>
                     <a
                       href={googleMapsSearchUrl({ lat: property.lat, lng: property.lng, label: property.address || property.location })}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] bg-[#0B1F42] px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#07072E]"
+                      className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] bg-[#16294B] px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-[#16294B]"
                     >
                       <MapPin className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
                       Open in Google Maps
@@ -396,7 +396,7 @@ function PropertyPage() {
                       href={googleMapsDirectionsUrl({ lat: property.lat, lng: property.lng, label: property.address || property.location })}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] border border-[#E3E8EF] bg-elevated px-5 py-2.5 text-sm font-semibold text-[#0B1F42] transition-colors hover:border-[#0B1F42] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+                      className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-2 rounded-[10px] border border-[#E3E8EF] bg-elevated px-5 py-2.5 text-sm font-semibold text-[#203565] transition-colors hover:border-[#203565] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
                     >
                       Get directions
                     </a>
@@ -416,10 +416,10 @@ function PropertyPage() {
 
           {/* ── Right column - sticky booking summary ─────────────── */}
           <aside className="lg:col-span-1" aria-label="Booking">
-            <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(11,31,66,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
+            <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(20,58,128,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
               {/* Price per night */}
               <div className="mb-5">
-                <span className="text-3xl font-bold text-[#0B1F42]">
+                <span className="text-3xl font-bold text-[#203565]">
                   {formatPrice(displayPrice) ?? '-'}
                 </span>
                 <span className="text-[#5B6B82]"> / night</span>
@@ -427,8 +427,8 @@ function PropertyPage() {
 
               {/* Bed variant chip - only when arriving from a variant card */}
               {variantLabel && (
-                <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#0B1F42]">
-                  <House className="w-4 h-4 text-[#C49A6C]" strokeWidth={2} aria-hidden="true" />
+                <div className="mb-5 inline-flex items-center gap-1.5 rounded-full bg-[#FDE8D8] px-3 py-1.5 text-sm font-medium text-[#203565]">
+                  <House className="w-4 h-4 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                   {variantLabel}
                 </div>
               )}
@@ -436,17 +436,17 @@ function PropertyPage() {
               {/* Dates & guests summary - selection happens on the booking flow */}
               <Link
                 to={bookingHref}
-                className="mb-5 block rounded-2xl border border-[#E3E8EF] p-4 transition-colors duration-200 hover:border-[#C49A6C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C]"
+                className="mb-5 block rounded-2xl border border-[#E3E8EF] p-4 transition-colors duration-200 hover:border-[#C5A28C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
                 aria-label="Choose check-in, check-out, and guests"
               >
                 <div className="grid grid-cols-2 divide-x divide-[#E3E8EF]">
                   <div className="pr-3">
                     <p className="text-[11px] font-bold uppercase tracking-wide text-[#5B6B82]">Check-in / Check-out</p>
-                    <p className="mt-1 text-sm text-[#0B1F42]">Add dates</p>
+                    <p className="mt-1 text-sm text-[#203565]">Add dates</p>
                   </div>
                   <div className="pl-3">
                     <p className="text-[11px] font-bold uppercase tracking-wide text-[#5B6B82]">Guests</p>
-                    <p className="mt-1 text-sm text-[#0B1F42]">Add guests</p>
+                    <p className="mt-1 text-sm text-[#203565]">Add guests</p>
                   </div>
                 </div>
               </Link>
@@ -454,7 +454,7 @@ function PropertyPage() {
               {/* Continue to booking CTA */}
               <Link
                 to={bookingHref}
-                className="block min-h-[48px] w-full rounded-[10px] bg-[#C49A6C] py-4 text-center font-bold text-white transition-colors duration-200 hover:bg-[#B8895C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C49A6C] active:bg-[#9A744A]"
+                className="block min-h-[48px] w-full rounded-[10px] bg-[#2563EB] py-4 text-center font-bold text-white transition-colors duration-200 hover:bg-[#1D4ED8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C] active:bg-[#1D4ED8]"
                 aria-label={`Continue to booking for ${variantLabel ? variantLabel + ' option' : 'this property'} at ${formatPrice(displayPrice) ?? '-'} per night`}
               >
                 Continue to booking
@@ -464,15 +464,15 @@ function PropertyPage() {
 
               {/* Fee / total rows - resolved at checkout once dates are selected */}
               <div className="mt-6 space-y-2 border-t border-[#E3E8EF] pt-6 text-sm">
-                <div className="flex justify-between text-[#0B1F42]">
+                <div className="flex justify-between text-[#203565]">
                   <span>Cleaning fee</span>
                   <span className="text-[#5B6B82]">Shown at checkout</span>
                 </div>
-                <div className="flex justify-between text-[#0B1F42]">
+                <div className="flex justify-between text-[#203565]">
                   <span>Service fee</span>
                   <span className="text-[#5B6B82]">Shown at checkout</span>
                 </div>
-                <div className="flex justify-between border-t border-[#E3E8EF] pt-2 font-bold text-[#0B1F42]">
+                <div className="flex justify-between border-t border-[#E3E8EF] pt-2 font-bold text-[#203565]">
                   <span>Total</span>
                   <span className="font-normal text-[#5B6B82]">Add dates for total</span>
                 </div>
@@ -480,18 +480,18 @@ function PropertyPage() {
 
               {/* Trust context - only facts from the API */}
               <div className="mt-6 border-t border-[#E3E8EF] pt-6">
-                <h4 className="mb-3 font-semibold text-[#0B1F42]">About this listing</h4>
+                <h4 className="mb-3 font-semibold text-[#203565]">About this listing</h4>
                 <ul className="space-y-2 text-sm text-[#5B6B82]">
                   {hasReviews && (
                     <li className="flex items-start gap-2">
-                      <Star className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" fill="currentColor" aria-hidden="true" />
+                      <Star className="w-4 h-4 text-[#8A6B52] mt-0.5 shrink-0" fill="currentColor" aria-hidden="true" />
                       <span>
-                        <span className="font-semibold text-[#0B1F42]">{property.rating}</span> rating &middot; {reviewLabel}
+                        <span className="font-semibold text-[#203565]">{property.rating}</span> rating &middot; {reviewLabel}
                       </span>
                     </li>
                   )}
                   <li className="flex items-start gap-2">
-                    <ShieldCheck className="w-4 h-4 text-[#C49A6C] mt-0.5 shrink-0" strokeWidth={2} aria-hidden="true" />
+                    <ShieldCheck className="w-4 h-4 text-[#8A6B52] mt-0.5 shrink-0" strokeWidth={2} aria-hidden="true" />
                     <span>Secure booking via Paystack</span>
                   </li>
                 </ul>

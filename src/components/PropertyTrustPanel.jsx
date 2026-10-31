@@ -21,12 +21,12 @@ const TYPE_LABELS = {
 function TrustBadge({ icon, label, value }) {
   return (
     <div className="flex items-center gap-2 rounded-2xl bg-surface px-4 py-3">
-      <span className="text-[#C49A6C] shrink-0" aria-hidden="true">
+      <span className="text-[#8A6B52] shrink-0" aria-hidden="true">
         {icon}
       </span>
       <div>
         <p className="text-xs uppercase tracking-wide text-[#5B6B82]">{label}</p>
-        <p className="text-sm font-semibold text-[#0B1F42]">{value}</p>
+        <p className="text-sm font-semibold text-[#203565]">{value}</p>
       </div>
     </div>
   );

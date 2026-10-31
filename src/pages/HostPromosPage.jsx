@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Button, Label, TextInput } from 'flowbite-react';
-import PropTypes from 'prop-types';
+import { Alert, Badge, Button, Label, TextInput } from 'flowbite-react';
 
 import apiClient from '../api/client.js';
+import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 
 const EMPTY = { code: '', discountPercent: 10, validFrom: '', validUntil: '', maxDiscount: '', minBookingAmount: '', maxUses: '' };
 
@@ -10,37 +10,18 @@ const FIELDS = ['code', 'discountPercent', 'validFrom', 'validUntil', 'maxDiscou
 
 // Explicit labels beat a regex that has to guess where the capital letters are,
 // and the optional money fields carry their unit so the value is unambiguous.
+// min/max/step/minLength mirror the server schemas so the browser blocks a bad
+// value before it becomes a 400 the host has to interpret.
 const FIELD_META = {
-  code: { label: 'Code', type: 'text', required: true, hint: 'Guests type this at checkout' },
-  discountPercent: { label: 'Discount %', type: 'number', required: true, min: 1, max: 100 },
+  code: { label: 'Code', type: 'text', required: true, minLength: 3, maxLength: 20, hint: '3-20 characters, letters, numbers, hyphens or underscores' },
+  discountPercent: { label: 'Discount %', type: 'number', required: true, min: 1, max: 100, step: 1 },
   validFrom: { label: 'Valid from', type: 'date', required: true },
   validUntil: { label: 'Valid until', type: 'date', required: true },
-  maxDiscount: { label: 'Max discount (KES)', type: 'number', min: 0, optional: true },
-  minBookingAmount: { label: 'Min booking (KES)', type: 'number', min: 0, optional: true },
-  maxUses: { label: 'Max uses', type: 'number', min: 0, optional: true },
-};
-
-const PANEL = 'min-w-0 rounded-2xl border border-[#EEF1F5] bg-[#F8FAFC] p-4 md:p-5';
-
-const LABEL = 'mb-1.5 block text-[10px] font-extrabold text-[#475569]';
-
-const BRONZE_BUTTON = '!bg-[#C49A6C] !text-white hover:!bg-[#B8895B] focus:!ring-[#C49A6C]';
-
-function Message({ tone, children }) {
-  const isError = tone === 'error';
-  return (
-    <p
-      role={isError ? 'alert' : 'status'}
-      className={`m-0 rounded-xl px-4 py-3 text-xs font-semibold ${isError ? 'bg-[#FFF7F7] text-[#9F3A3A]' : 'bg-[#F7F1EA] text-[#0B1F42]'}`}
-    >
-      {children}
-    </p>
-  );
-}
-
-Message.propTypes = {
-  tone: PropTypes.oneOf(['success', 'error']),
-  children: PropTypes.node.isRequired,
+  // min 1, not 0: the API validates these as positive integers, so letting a
+  // zero through would only produce a server rejection the host has to decode.
+  maxDiscount: { label: 'Max discount (KES)', type: 'number', min: 1, step: 1, optional: true },
+  minBookingAmount: { label: 'Min booking (KES)', type: 'number', min: 1, step: 1, optional: true },
+  maxUses: { label: 'Max uses', type: 'number', min: 1, step: 1, optional: true },
 };
 
 export default function HostPromosPage() {
@@ -71,7 +52,9 @@ export default function HostPromosPage() {
   }, [load]);
 
   function updateField(name, value) {
-    setForm((current) => ({ ...current, [name]: value }));
+    // The API's code regex only accepts uppercase letters, so upper-casing on
+    // entry keeps a lower-case code from coming back as a 400 the host has to decode.
+    setForm((current) => ({ ...current, [name]: name === 'code' ? value.toUpperCase() : value }));
   }
 
   async function createPromo(event) {
@@ -109,86 +92,85 @@ export default function HostPromosPage() {
   }
 
   return (
-    <div className="flex flex-col gap-10 text-[#334155] max-md:gap-[26px]">
+    <div className="flex flex-col gap-6">
       <header>
-        <p className="m-0 mb-[7px] font-montserrat text-[11px] font-extrabold tracking-[1.2px] text-[#9A6A3A]">HOST WORKSPACE</p>
-        <h1 className="m-0 text-[29px] leading-[1.14] text-[#0B1F42] max-md:text-[25px]">Discounts</h1>
-        <p className="m-0 mt-1.5 max-w-[560px] text-[13px] text-[#64748B] max-md:text-xs">Create offers funded from your own booking earnings.</p>
+        <p className={HOST_EYEBROW}>Host workspace</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Discounts</h1>
+        <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Create offers funded from your own booking earnings.</p>
       </header>
 
-      {message.text && <Message tone={message.tone}>{message.text}</Message>}
+      {message.text && <Alert color={message.tone === 'error' ? 'failure' : 'success'}>{message.text}</Alert>}
 
-      <form onSubmit={createPromo} className={PANEL}>
-        <div className="mb-[18px]">
-          <h2 className="m-0 text-[17px] leading-[1.25] text-[#0B1F42]">Create a discount</h2>
-          <p className="m-0 mt-[5px] text-[11px] text-[#64748B]">Required fields are the code, the percentage, and the valid dates.</p>
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FIELDS.map((name) => {
-            const meta = FIELD_META[name];
-            return (
-              <div key={name}>
-                <Label htmlFor={`host-promo-${name}`} className={LABEL}>
-                  {meta.label}{meta.optional ? <span className="font-medium text-[#94A3B8]"> (optional)</span> : null}
-                </Label>
-                <TextInput
-                  id={`host-promo-${name}`}
-                  type={meta.type}
-                  min={meta.min}
-                  max={meta.max}
-                  value={form[name]}
-                  onChange={(event) => updateField(name, event.target.value)}
-                  required={meta.required}
-                />
-                {meta.hint && <p className="m-0 mt-1.5 text-[10px] text-[#94A3B8]">{meta.hint}</p>}
-              </div>
-            );
-          })}
-        </div>
-
-        <Button type="submit" className={`mt-5 ${BRONZE_BUTTON}`} disabled={saving}>
-          {saving ? 'Creating...' : 'Create discount'}
-        </Button>
-      </form>
-
-      <section className={PANEL}>
-        <div className="mb-4 flex items-start justify-between gap-4">
-          <div>
-            <h2 className="m-0 text-[17px] leading-[1.25] text-[#0B1F42]">Your discounts</h2>
-            <p className="m-0 mt-[5px] text-[11px] text-[#64748B]">Deactivated codes stop working immediately; existing bookings keep their discount.</p>
+      <HostCard title="Create a discount" description="Required fields are the code, the percentage, and the valid dates.">
+        <form onSubmit={createPromo} className="flex flex-col gap-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {FIELDS.map((name) => {
+              const meta = FIELD_META[name];
+              return (
+                <div key={name}>
+                  <Label htmlFor={`host-promo-${name}`} className="mb-1.5 block">
+                    {meta.label}{meta.optional ? <span className="font-medium text-muted"> (optional)</span> : null}
+                  </Label>
+                  <TextInput
+                    id={`host-promo-${name}`}
+                    type={meta.type}
+                    min={meta.min}
+                    max={meta.max}
+                    step={meta.step}
+                    minLength={meta.minLength}
+                    maxLength={meta.maxLength}
+                    value={form[name]}
+                    onChange={(event) => updateField(name, event.target.value)}
+                    required={meta.required}
+                  />
+                  {meta.hint && <p className="mt-1.5 text-xs text-muted">{meta.hint}</p>}
+                </div>
+              );
+            })}
           </div>
-          {!loading && <span className="flex-none rounded-full bg-elevated px-[9px] py-[5px] text-[10px] font-extrabold text-[#64748B]">{promos.length} code{promos.length === 1 ? '' : 's'}</span>}
-        </div>
 
+          <Button type="submit" disabled={saving} className="w-full sm:w-fit">
+            {saving ? 'Creating...' : 'Create discount'}
+          </Button>
+        </form>
+      </HostCard>
+
+      {/* flush: the discount rows are edge to edge, so the card supplies the
+          border and the rows supply their own padding. */}
+      <HostCard
+        flush
+        title="Your discounts"
+        description="Deactivated codes stop working immediately; existing bookings keep their discount."
+        action={loading ? undefined : <Badge color="gray">{promos.length} {promos.length === 1 ? 'code' : 'codes'}</Badge>}
+      >
         {loading ? (
-          <div className="flex flex-col gap-2" aria-label="Loading discounts" role="status">
-            <span className="h-16 animate-pulse rounded-[13px] bg-elevated" />
-            <span className="h-16 animate-pulse rounded-[13px] bg-elevated [animation-delay:150ms]" />
+          <div className="flex flex-col gap-2 px-4 py-4" aria-label="Loading discounts" role="status">
+            <span className="block h-16 animate-pulse rounded-xl bg-inset" />
+            <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:150ms]" />
           </div>
         ) : promos.length === 0 ? (
-          <div className="grid min-h-[160px] place-items-center content-center rounded-[13px] bg-elevated p-6 text-center">
-            <strong className="text-xs text-[#0B1F42]">No discounts yet</strong>
-            <p className="mx-auto mt-1.5 max-w-[320px] text-[10px] leading-normal text-[#94A3B8]">Create your first code above and it will appear here.</p>
+          <div className="flex flex-col items-center gap-1.5 px-4 py-10 text-center">
+            <strong className="text-sm font-semibold text-navy">No discounts yet</strong>
+            <p className="mx-auto max-w-[320px] text-xs leading-relaxed text-muted">Create your first code above and it will appear here.</p>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
+          <ul className="divide-y divide-border">
             {promos.map((promo) => (
-              <article key={promo.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-[13px] bg-elevated p-3.5">
+              <li key={promo.id} className="flex min-w-0 flex-wrap items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">
-                  <strong className="block font-mono text-[13px] text-[#0B1F42]">{promo.code}</strong>
-                  <p className="m-0 mt-1 text-[11px] text-[#64748B]">
+                  <strong className="block truncate font-mono text-sm text-navy">{promo.code}</strong>
+                  <p className="mt-0.5 text-xs text-muted">
                     {promo.discountPercent}% off · {promo.currentUses || 0}{promo.maxUses ? ` / ${promo.maxUses}` : ''} uses
                   </p>
                 </div>
-                <Button color="light" onClick={() => deactivate(promo.id)} disabled={!promo.active || busyId === promo.id}>
+                <Button type="button" color="light" size="sm" onClick={() => deactivate(promo.id)} disabled={!promo.active || busyId === promo.id}>
                   {busyId === promo.id ? 'Working...' : promo.active ? 'Deactivate' : 'Inactive'}
                 </Button>
-              </article>
+              </li>
             ))}
-          </div>
+          </ul>
         )}
-      </section>
+      </HostCard>
     </div>
   );
 }

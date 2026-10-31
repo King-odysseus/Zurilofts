@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Button, Dropdown, DropdownItem, TabItem, Tabs } from 'flowbite-react';
+import { Button, Select, TabItem, Tabs } from 'flowbite-react';
+import PropTypes from 'prop-types';
 import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import apiClient from '../api/client.js';
+import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 
 const PERIOD_OPTIONS = [
   { value: 'this-month', label: 'This month' },
@@ -25,13 +27,9 @@ const EMPTY_TOTALS = {
   wht: 0,
 };
 
-// Tone -> classes for the income-breakdown cards. Kept as a lookup so the
-// neutral/positive/deduction variants stay readable in the JSX below.
-const BREAKDOWN_TONE = {
-  neutral: { card: 'border-border bg-elevated', value: 'text-navy' },
-  positive: { card: 'border-primary-200 bg-primary-50 dark:bg-primary/15', value: 'text-navy' },
-  deduction: { card: 'border-red-200 bg-red-50', value: 'text-red-700' },
-};
+// One column template for the per-listing header row and every listing row.
+// Declared once so the money columns cannot drift apart between the two.
+const LISTING_GRID = 'md:grid-cols-[minmax(0,1fr)_4.5rem_7.5rem_7.5rem]';
 
 function periodDates(period) {
   const now = new Date();
@@ -96,6 +94,44 @@ function reportRange(period, dates) {
   if (!dates.from) return PERIOD_OPTIONS.find((option) => option.value === period)?.label || '';
   return `${formatDate(dates.from)} - ${formatDate(dates.to)}`;
 }
+
+/**
+ * One cell of the summary strip. The label sits above the figure so the three
+ * figures share a baseline and stay aligned when the strip is stacked on a phone.
+ * The hairlines come from the wrapping dl, so they reach the card edge.
+ */
+function SummaryCell({ label, value, note }) {
+  return <div className="px-4 py-4 sm:px-5 sm:py-5">
+    <dt className={HOST_EYEBROW}>{label}</dt>
+    <dd className="mt-1">
+      <span className="block text-xl font-bold leading-tight tabular-nums text-navy lg:text-2xl">{value}</span>
+      <span className="mt-1 block text-xs leading-relaxed text-muted">{note}</span>
+    </dd>
+  </div>;
+}
+
+SummaryCell.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.string.isRequired,
+  note: PropTypes.string,
+};
+
+/**
+ * A money or count column in the per-listing list. Below md the column label
+ * travels with the figure, because the header row is hidden on phones.
+ */
+function ListingFigure({ label, value, emphasis = false }) {
+  return <div className="min-w-0 md:text-right">
+    <span className={`${HOST_EYEBROW} md:hidden`}>{label}</span>
+    <strong className={`block text-xs tabular-nums text-navy md:text-sm ${emphasis ? 'font-bold' : 'font-semibold'}`}>{value}</strong>
+  </div>;
+}
+
+ListingFigure.propTypes = {
+  label: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  emphasis: PropTypes.bool,
+};
 
 export default function HostEarningsPage() {
   const [period, setPeriod] = useState('this-month');
@@ -174,19 +210,23 @@ export default function HostEarningsPage() {
   const earningRows = rows.filter((row) => row.bookings > 0 || row.earnings > 0 || row.hostNet > 0);
   const trendRows = trend.slice(-6);
   const trendMax = Math.max(...trendRows.map((item) => item.earnings || 0), 1);
+  // A row of zero-height bars looks like a rendering fault, so fall back to a
+  // plain sentence when every month in the window is empty.
+  const hasTrend = trendRows.some((item) => (item.earnings || 0) > 0);
   const latestTrend = trendRows[trendRows.length - 1]?.earnings || 0;
   const previousTrend = trendRows[trendRows.length - 2]?.earnings || 0;
   const trendChange = previousTrend > 0 ? Math.round(((latestTrend - previousTrend) / previousTrend) * 100) : null;
   const rangeLabel = reportRange(period, dates);
 
+  // `emphasis` only lifts the closing row; the amounts themselves are untouched.
   const breakdown = [
-    { label: 'Gross rent', value: totals.grossRent, note: 'Stay subtotal before deductions', tone: 'neutral' },
-    { label: 'Cleaning fees', value: totals.cleaningFees, note: 'Passed through on paid stays', tone: 'neutral' },
-    { label: 'Guest service fees', value: totals.serviceFees, note: 'Platform fee paid by guests', tone: 'neutral' },
-    { label: 'Discounts', value: -totals.discounts, note: 'Promotions applied to bookings', tone: 'deduction' },
-    { label: 'Host net earnings', value: totals.hostNet, note: 'After withholding tax', tone: 'positive' },
-    { label: 'Withholding tax', value: -totals.wht, note: 'Remitted to KRA at 5%', tone: 'deduction' },
-    { label: 'Take-home', value: Math.max(totals.hostNet, 0), note: 'Recorded host earnings for payouts', tone: 'positive' },
+    { label: 'Gross rent', value: totals.grossRent, note: 'Stay subtotal before deductions' },
+    { label: 'Cleaning fees', value: totals.cleaningFees, note: 'Passed through on paid stays' },
+    { label: 'Guest service fees', value: totals.serviceFees, note: 'Platform fee paid by guests' },
+    { label: 'Discounts', value: -totals.discounts, note: 'Promotions applied to bookings' },
+    { label: 'Host net earnings', value: totals.hostNet, note: 'After withholding tax' },
+    { label: 'Withholding tax', value: -totals.wht, note: 'Remitted to KRA at 5%' },
+    { label: 'Take-home', value: Math.max(totals.hostNet, 0), note: 'Recorded host earnings for payouts', emphasis: true },
   ];
 
   function exportCsv() {
@@ -214,7 +254,7 @@ export default function HostEarningsPage() {
   function exportPdf() {
     const doc = new jsPDF({ orientation: 'landscape' });
     const margin = 14;
-    doc.setFillColor(11, 11, 69);
+    doc.setFillColor(11, 47, 107);
     doc.rect(0, 0, doc.internal.pageSize.width, 28, 'F');
     doc.setTextColor(255, 255, 255);
     doc.setFontSize(18);
@@ -229,7 +269,7 @@ export default function HostEarningsPage() {
       head: [['Net earnings', 'Processing', 'Available payout']],
       body: [[formatMoney(totals.hostNet), formatMoney(processing), formatMoney(availablePayout)]],
       theme: 'grid',
-      headStyles: { fillColor: [196, 154, 108], textColor: [255, 255, 255] },
+      headStyles: { fillColor: [11, 47, 107], textColor: [255, 255, 255] },
       styles: { fontSize: 10, cellPadding: 4 },
       margin: { left: margin, right: margin },
     });
@@ -245,7 +285,7 @@ export default function HostEarningsPage() {
         formatMoney(row.wht),
       ]),
       theme: 'grid',
-      headStyles: { fillColor: [11, 11, 69], textColor: [255, 255, 255] },
+      headStyles: { fillColor: [11, 47, 107], textColor: [255, 255, 255] },
       alternateRowStyles: { fillColor: [248, 250, 252] },
       styles: { fontSize: 8, cellPadding: 3 },
       margin: { left: margin, right: margin },
@@ -254,151 +294,217 @@ export default function HostEarningsPage() {
     doc.save(`ZuriLofts_Earnings_${rangeLabel.replace(/\s/g, '_')}.pdf`);
   }
 
-  return <div className="space-y-6">
-    <header className="flex flex-wrap items-start justify-between gap-4">
-      <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">HOST WORKSPACE</p>
-        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Earnings</h1>
+  return <div className="flex flex-col gap-5">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+      <div className="min-w-0">
+        <p className={HOST_EYEBROW}>Host workspace</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Earnings</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">A clear view of stay income, pending amounts, and payouts.</p>
       </div>
-      <div className="flex flex-wrap items-center gap-3">
-        <Dropdown
-          placement="bottom-end"
-          dismissOnClick
-          label={<span className="inline-flex min-h-[40px] items-center rounded-full border border-border bg-elevated px-4 py-2 text-sm font-medium text-navy transition-colors hover:bg-surface">{periodLabel}</span>}
-        >
-          {PERIOD_OPTIONS.map((option) => <DropdownItem key={option.value} onClick={() => setPeriod(option.value)}>{option.label}</DropdownItem>)}
-        </Dropdown>
-        <Link to="/host/payouts" className="text-sm font-medium text-primary-600 hover:underline">Payout settings</Link>
+      <div className="flex flex-wrap items-center gap-2">
+        {/* A Flowbite Select, not a Dropdown: the Dropdown trigger is styled by
+            the shared theme and painted a navy block around this label. */}
+        <div className="min-h-[44px]">
+          <span className="sr-only" id="earnings-period-label">Period</span>
+          <Select
+            sizing="sm"
+            aria-labelledby="earnings-period-label"
+            value={period}
+            onChange={(event) => setPeriod(event.target.value)}
+            className="h-11 w-full min-w-[9rem] rounded-full text-sm font-semibold sm:w-auto"
+          >
+            {PERIOD_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
+          </Select>
+        </div>
+        <Button as={Link} to="/host/payouts" color="light">Payout settings</Button>
       </div>
     </header>
 
-
-    {error && <Alert color="failure">
-      <div className="flex w-full flex-wrap items-center justify-between gap-3">
-        <p className="min-w-0 flex-1">{error}</p>
-        <Button size="xs" color="light" onClick={() => setReloadToken((current) => current + 1)}>Try again</Button>
+    {/* The failure is a panel in the workspace rather than a banner above it,
+        so an empty screen still says what it is and offers the retry. */}
+    {error && <HostCard
+      className="border-dashed"
+      eyebrow="Earnings unavailable"
+      title="We could not load this period"
+      description="Your figures are unchanged. Retry the request or pick another period."
+    >
+      <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="min-w-0 flex-1 text-sm leading-relaxed text-muted">{error}</p>
+        <Button color="light" onClick={() => setReloadToken((current) => current + 1)}>Try again</Button>
       </div>
-    </Alert>}
+    </HostCard>}
 
-    {loading ? <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Loading earnings">
-      <span className="h-24 animate-pulse rounded-xl border border-border bg-surface" />
-      <span className="h-24 animate-pulse rounded-xl border border-border bg-surface" />
-      <span className="h-24 animate-pulse rounded-xl border border-border bg-surface" />
+    {loading ? <div className="grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label="Loading earnings" aria-busy="true">
+      {[0, 1, 2].map((key) => <HostCard key={key} className="h-24 animate-pulse" />)}
     </div> : !error && <>
       <Tabs
         aria-label="Earnings views"
         variant="pills"
+        // Four pills wrap as three plus an orphan on a phone, so they become an
+        // even 2x2 block there and a single row from sm up.
+        className="[&_[role=tablist]]:!grid [&_[role=tablist]]:!w-full [&_[role=tablist]]:!grid-cols-2 [&_[role=tablist]]:!gap-2 sm:[&_[role=tablist]]:!flex sm:[&_[role=tablist]]:!w-auto"
         onActiveTabChange={(index) => setActiveTab(['overview', 'properties', 'breakdown', 'reports'][index])}
       >
+      {/* TabItem owns which panel is visible through its `active` prop, so the
+          panels are not gated a second time here. Two sources of truth could
+          disagree and leave a clicked tab showing nothing. */}
       <TabItem title="Overview" active={activeTab === 'overview'}>
-      {activeTab === 'overview' && <>
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">NET EARNINGS</span>
-            <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">{formatMoney(totals.hostNet)}</strong>
-            <small className="mt-1 block text-xs text-muted">After withholding tax</small>
-          </article>
-          <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PROCESSING</span>
-            <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">{formatMoney(processing)}</strong>
-            <small className="mt-1 block text-xs text-muted">From upcoming stays</small>
-          </article>
-          <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">AVAILABLE PAYOUT</span>
-            <strong className="mt-1 block text-2xl font-bold text-navy tabular-nums">{formatMoney(availablePayout)}</strong>
-            <small className="mt-1 block text-xs text-muted">Eligible for payout</small>
-          </article>
+      <>
+        <section aria-label="Earnings summary">
+          {/* One strip, not three cards: the figures read as a single headline
+              row and the hairlines keep the three columns aligned. */}
+          <HostCard flush>
+            <dl className="grid grid-cols-1 divide-y divide-border sm:grid-cols-3 sm:divide-x sm:divide-y-0">
+              <SummaryCell label="Net earnings" value={formatMoney(totals.hostNet)} note="After withholding tax" />
+              <SummaryCell label="Processing" value={formatMoney(processing)} note="From upcoming stays" />
+              <SummaryCell label="Available payout" value={formatMoney(availablePayout)} note="Eligible for payout" />
+            </dl>
+          </HostCard>
         </section>
 
         <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm lg:col-span-2">
-            <header className="flex flex-wrap items-start justify-between gap-3">
-              <h2 className="text-base font-semibold text-navy">Stay income trend</h2>
-              {trendChange != null && <span className={`text-xs font-semibold ${trendChange >= 0 ? 'text-green-600' : 'text-red-600'}`}>{trendChange >= 0 ? '+' : ''}{trendChange}% vs previous month</span>}
-            </header>
-            {trendRows.length > 0 ? <div className="mt-5 flex items-end gap-2 sm:gap-3">
-              {trendRows.map((item) => <div key={item.key || item.label} className="flex flex-1 flex-col items-center gap-2">
-                <div className="flex h-40 w-full items-end">
-                  <i className="block w-full rounded-t-md bg-primary" style={{ height: `${Math.max(((item.earnings || 0) / trendMax) * 100, 7)}%` }} />
-                </div>
-                <span className="w-full truncate text-center text-[11px] text-muted">{item.label}</span>
-              </div>)}
-            </div> : <p className="mt-5 text-sm text-muted">No income trend for this period.</p>}
-          </section>
+          <HostCard
+            className="lg:col-span-2"
+            title="Stay income trend"
+            description="Recorded earnings for the last six months."
+            action={trendChange != null &&
+              <span className={`text-xs font-semibold tabular-nums ${trendChange >= 0 ? 'text-emerald-700' : 'text-red-700'}`}>
+                {trendChange >= 0 ? '+' : ''}{trendChange}% vs last month
+              </span>}
+          >
+            {hasTrend ? <>
+              {/* The bars carry no text for a screen reader, so the same numbers
+                  are read out once as a sentence and the bars stay decorative. */}
+              <p className="sr-only">
+                Monthly earnings: {trendRows.map((item) => `${item.label} ${formatMoney(item.earnings)}`).join(', ')}.
+              </p>
+              <div className="flex items-end gap-2 sm:gap-3" aria-hidden="true">
+                {trendRows.map((item) => <div key={item.key || item.label} className="flex min-w-0 flex-1 flex-col items-center gap-2">
+                  <div className="flex h-32 w-full items-end sm:h-40">
+                    <i className="block w-full rounded-t-md bg-navy-bg" style={{ height: `${Math.max(((item.earnings || 0) / trendMax) * 100, 2)}%` }} />
+                  </div>
+                  <span className="w-full truncate text-center text-[11px] text-muted">{item.label}</span>
+                </div>)}
+              </div>
+            </> : <p className="py-10 text-center text-sm text-muted">No income recorded in the last six months, so there is no trend to draw yet.</p>}
+          </HostCard>
 
-          <aside className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-            <h2 className="text-base font-semibold text-navy">Payouts</h2>
-            <div className="mt-4 rounded-lg bg-surface px-4 py-3">
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">Destination</span>
-              <strong className="mt-1 block text-sm font-semibold text-navy">{destination?.label || 'Not configured'}</strong>
-              <small className="mt-1 block text-xs text-muted">{destination?.maskedAccount || 'Add a payout destination in settings'}</small>
+          <HostCard title="Payouts" description="Where the available balance is sent.">
+            <div className="rounded-xl bg-surface px-4 py-3">
+              <span className={HOST_EYEBROW}>Destination</span>
+              <strong className="mt-1 block truncate text-sm font-semibold text-navy">{destination?.label || 'Not configured'}</strong>
+              <small className="mt-1 block text-xs leading-relaxed text-muted">{destination?.maskedAccount || 'Add a payout destination in settings'}</small>
             </div>
-            {wallet?.nextPayoutAt && <p className="mt-4 text-sm text-muted">Next scheduled payout: <strong className="font-semibold text-navy">{formatDate(wallet.nextPayoutAt)}</strong></p>}
-            <p className="mt-3 text-xs leading-relaxed text-muted">Available payout is separate from net earnings recorded for this period.</p>
-            <Link to="/host/payouts" className="mt-4 inline-flex text-sm font-medium text-primary-600 hover:underline">View payout details</Link>
-          </aside>
+            {wallet?.nextPayoutAt && <p className="text-sm text-muted">
+              Next scheduled payout: <strong className="font-semibold text-navy">{formatDate(wallet.nextPayoutAt)}</strong>
+            </p>}
+            <p className="text-xs leading-relaxed text-muted">Available payout is separate from net earnings recorded for this period.</p>
+            <Button as={Link} to="/host/payouts" color="light" className="w-fit">View payout details</Button>
+          </HostCard>
         </div>
-      </>}
+      </>
 
       </TabItem>
       <TabItem title="Properties" active={activeTab === 'properties'}>
-      {activeTab === 'properties' && <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-        <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Property earnings</h2><p className="mt-1 text-xs text-muted">{earningRows.length} properties with bookings in this period.</p></div><span className="text-xs font-medium text-muted">{periodLabel}</span></header>
-        {earningRows.length > 0 ? <div className="mt-4 divide-y divide-border">
-          {earningRows.map((row) => <article key={row.id} className="flex flex-wrap items-center gap-4 py-4">
-            <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-surface">
-              {row.image ? <img src={row.image} alt="" className="h-full w-full object-cover" /> : <span className="flex h-full w-full items-center justify-center text-xs font-semibold text-muted">{row.title?.slice(0, 2).toUpperCase()}</span>}
-            </div>
-            <div className="min-w-0 flex-1">
-              <Link to={`/property/${row.id}`} className="text-sm font-semibold text-navy hover:underline">{row.title}</Link>
-              <span className="block text-xs text-muted">{row.location || 'Nairobi'}</span>
-            </div>
-            <div className="text-right"><small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Bookings</small><strong className="mt-1 block text-sm font-semibold text-navy tabular-nums">{row.bookings || 0}</strong></div>
-            <div className="text-right"><small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Gross rent</small><strong className="mt-1 block text-sm font-semibold text-navy tabular-nums">{formatMoney(row.grossRent)}</strong></div>
-            <div className="text-right"><small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Host net</small><strong className="mt-1 block text-sm font-bold text-navy tabular-nums">{formatMoney(row.hostNet)}</strong></div>
-          </article>)}
-        </div> : <div className="mt-4 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center"><strong className="text-sm font-semibold text-navy">No property earnings</strong><p className="text-xs text-muted">There are no bookings with income in this period.</p></div>}
-      </section>}
+      <HostCard
+        flush
+        title="Property earnings"
+        description={earningRows.length > 0
+          ? `${earningRows.length} ${earningRows.length === 1 ? 'property' : 'properties'} with bookings in this period.`
+          : 'Nothing earned in this period yet.'}
+        action={<span className="text-xs font-medium text-muted">{periodLabel}</span>}
+      >
+        {earningRows.length > 0 ? <>
+          {/* Column headings only exist once the row is a real grid; on a phone
+              each figure carries its own label instead. */}
+          <div className={`hidden gap-x-4 border-b border-border px-4 py-2 md:grid md:px-5 ${LISTING_GRID}`} aria-hidden="true">
+            <span className={HOST_EYEBROW}>Property</span>
+            <span className={`${HOST_EYEBROW} text-right`}>Bookings</span>
+            <span className={`${HOST_EYEBROW} text-right`}>Gross rent</span>
+            <span className={`${HOST_EYEBROW} text-right`}>Host net</span>
+          </div>
+
+          <ul className="divide-y divide-border">
+            {earningRows.map((row) => <li
+              key={row.id}
+              className={`grid grid-cols-3 items-center gap-x-3 gap-y-3 px-4 py-3.5 md:gap-x-4 md:px-5 ${LISTING_GRID}`}
+            >
+              <div className="col-span-3 flex min-w-0 items-center gap-3 md:col-span-1">
+                <div className="h-10 w-10 shrink-0 overflow-hidden rounded-xl bg-surface">
+                  {row.image
+                    ? <img src={row.image} alt="" className="h-full w-full object-cover" />
+                    : <span className="flex h-full w-full items-center justify-center text-xs font-semibold text-muted">{row.title?.slice(0, 2).toUpperCase()}</span>}
+                </div>
+                <div className="min-w-0">
+                  <Link to={`/property/${row.id}`} className="block truncate text-sm font-semibold text-navy hover:underline">{row.title}</Link>
+                  <span className="block truncate text-xs text-muted">{row.location || 'Nairobi'}</span>
+                </div>
+              </div>
+              <ListingFigure label="Bookings" value={row.bookings || 0} />
+              <ListingFigure label="Gross rent" value={formatMoney(row.grossRent)} />
+              <ListingFigure label="Host net" value={formatMoney(row.hostNet)} emphasis />
+            </li>)}
+          </ul>
+        </> : <div className="flex flex-col items-center gap-2 px-4 py-12 text-center">
+          <strong className="text-sm font-semibold text-navy">No property earnings</strong>
+          <p className="max-w-sm text-xs leading-relaxed text-muted">
+            No bookings with income fall inside {periodLabel.toLowerCase()}. Pick another period to see earlier stays.
+          </p>
+          <Button as={Link} to="/host/listings" color="light" className="mt-1 w-fit">View listings</Button>
+        </div>
+      }
+      </HostCard>
 
       </TabItem>
       <TabItem title="Breakdown" active={activeTab === 'breakdown'}>
-      {activeTab === 'breakdown' && <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-        <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Income breakdown</h2><p className="mt-1 text-xs text-muted">How booking value and deductions contribute to your earnings.</p></div><span className="text-xs font-medium text-muted">{periodLabel}</span></header>
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {breakdown.map((item) => {
-            const tone = BREAKDOWN_TONE[item.tone] || BREAKDOWN_TONE.neutral;
-            return <article key={item.label} className={`rounded-lg border px-4 py-3 ${tone.card}`}>
-              <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{item.label}</span>
-              <strong className={`mt-1 block text-xl font-bold tabular-nums ${tone.value}`}>{item.value < 0 ? '-' : ''}{formatMoney(Math.abs(item.value))}</strong>
-              <small className="mt-1 block text-xs text-muted">{item.note}</small>
-            </article>;
-          })}
-        </div>
-      </section>}
+      <HostCard
+        flush
+        title="Income breakdown"
+        description="How booking value and deductions add up to your earnings."
+        action={<span className="text-xs font-medium text-muted">{periodLabel}</span>}
+      >
+        <dl className="divide-y divide-border">
+          {breakdown.map((item) => <div key={item.label} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-4 py-3 sm:px-5">
+            <dt className="min-w-0 flex-1">
+              <span className="block text-sm font-medium text-navy">{item.label}</span>
+              <span className="block text-xs leading-relaxed text-muted">{item.note}</span>
+            </dt>
+            <dd className={`shrink-0 tabular-nums ${item.emphasis ? 'text-base font-bold' : 'text-sm font-semibold'} ${item.value < 0 ? 'text-red-700' : 'text-navy'}`}>
+              {item.value < 0 ? '-' : ''}{formatMoney(Math.abs(item.value))}
+            </dd>
+          </div>)}
+        </dl>
+      </HostCard>
 
       </TabItem>
       <TabItem title="Reports" active={activeTab === 'reports'}>
-      {activeTab === 'reports' && <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-        <header className="flex flex-wrap items-start justify-between gap-3"><div><h2 className="text-base font-semibold text-navy">Reports</h2><p className="mt-1 text-xs text-muted">Export a property-level earnings summary for {rangeLabel}.</p></div><span className="text-xs font-medium text-muted">{earningRows.length} properties</span></header>
-        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <article className="rounded-lg border border-border bg-surface p-5">
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">EARNINGS REPORT</span>
-            <strong className="mt-1 block text-xl font-bold text-navy tabular-nums">{formatMoney(totals.hostNet)}</strong>
-            <p className="mt-2 text-xs leading-relaxed text-muted">Net earnings, gross rent, WHT, and property totals for the selected period.</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              <Button color="light" onClick={exportCsv}>Download CSV</Button>
-              <Button onClick={exportPdf}>Print PDF</Button>
-            </div>
-          </article>
-          <article className="rounded-lg border border-border bg-surface p-5">
-            <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">WHT CERTIFICATE</span>
-            <strong className="mt-1 block text-xl font-bold text-navy tabular-nums">{formatMoney(totals.wht)}</strong>
-            <p className="mt-2 text-xs leading-relaxed text-muted">Use the payout workspace to view or print withholding tax statements by month.</p>
-            <Link to="/host/payouts" className="mt-4 inline-flex text-sm font-medium text-primary-600 hover:underline">Open WHT statement</Link>
-          </article>
-        </div>
-      </section>}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <HostCard>
+          <div>
+            <p className={HOST_EYEBROW}>Earnings report</p>
+            <strong className="mt-1 block text-xl font-bold leading-tight tabular-nums text-navy lg:text-2xl">{formatMoney(totals.hostNet)}</strong>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
+              Net earnings, gross rent, WHT, and property totals for {rangeLabel}.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={exportCsv}>Download CSV</Button>
+            <Button color="light" onClick={exportPdf}>Print PDF</Button>
+          </div>
+        </HostCard>
+
+        <HostCard>
+          <div>
+            <p className={HOST_EYEBROW}>WHT certificate</p>
+            <strong className="mt-1 block text-xl font-bold leading-tight tabular-nums text-navy lg:text-2xl">{formatMoney(totals.wht)}</strong>
+            <p className="mt-1 text-xs leading-relaxed text-muted">
+              Withholding tax held from this period. Monthly statements live in the payout workspace.
+            </p>
+          </div>
+          <Button as={Link} to="/host/payouts" color="light" className="w-fit">Open WHT statement</Button>
+        </HostCard>
+      </div>
+
       </TabItem>
       </Tabs>
     </>}

@@ -28,7 +28,7 @@ export function ThemeProvider({ children }) {
     root.style.colorScheme = theme;
 
     const themeColor = document.querySelector('meta[name="theme-color"]');
-    themeColor?.setAttribute('content', isDark ? '#08101F' : '#0B1F42');
+    themeColor?.setAttribute('content', isDark ? '#08101F' : '#203565');
 
     try {
       localStorage.setItem(STORAGE_KEY, theme);

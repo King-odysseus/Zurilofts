@@ -141,7 +141,7 @@ function ChatWidget() {
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#0B1F42] shadow-lg transition-all duration-200 group hover:scale-110 hover:shadow-xl"
+          className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#16294B] shadow-lg transition-all duration-200 group hover:scale-110 hover:shadow-xl"
           aria-label="Open chat"
         >
           <MessagesSquare className="w-7 h-7 text-white" strokeWidth={2} aria-hidden="true" />
@@ -151,11 +151,11 @@ function ChatWidget() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_8px_28px_rgba(11,31,66,0.14)] transition-all duration-300" style={{ maxHeight: '520px' }}>
+        <div className="fixed bottom-6 right-6 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_8px_28px_rgba(20,58,128,0.14)] transition-all duration-300" style={{ maxHeight: '520px' }}>
           {/* Header */}
-          <div className="flex items-center justify-between bg-[#0B1F42] px-5 py-4">
+          <div className="flex items-center justify-between bg-[#16294B] px-5 py-4">
             <div className="flex items-center space-x-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#C49A6C]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#16294B]">
                 <MessagesSquare className="w-5 h-5 text-white" strokeWidth={2} aria-hidden="true" />
               </div>
               <div>
@@ -174,7 +174,7 @@ function ChatWidget() {
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   m.from === 'user'
-                    ? 'bg-[#C49A6C] text-white rounded-br-md font-medium'
+                    ? 'bg-[#2563EB] text-white rounded-br-md font-medium'
                     : 'bg-elevated text-[#1f2937] rounded-bl-md shadow-sm'
                 }`}>
                   {m.text}
@@ -193,21 +193,21 @@ function ChatWidget() {
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError(''); }}
                   placeholder="Your name"
-                  className="w-full rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
+                  className="w-full rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#203565] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C5A28C]/40"
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Email (optional)"
-                  className="w-full rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40"
+                  className="w-full rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#203565] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C5A28C]/40"
                 />
                 {error && <p className="text-red-500 text-xs">{error}</p>}
                 <button
                   type="button"
                   onClick={handleStart}
                   disabled={sending}
-                  className="w-full rounded-[10px] bg-[#0B1F42] py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50"
+                  className="w-full rounded-[10px] bg-[#16294B] py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#16294B] disabled:opacity-50"
                 >
                   Start Chat
                 </button>
@@ -215,11 +215,11 @@ function ChatWidget() {
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#5B6B82]">Chatting as <span className="font-semibold text-[#0B1F42]">{name}</span></span>
+                  <span className="text-xs text-[#5B6B82]">Chatting as <span className="font-semibold text-[#203565]">{name}</span></span>
                   <button
                     type="button"
                     onClick={() => { setStarted(false); setName(''); setEmail(''); setMessages([{ from: 'bot', text: 'Hi! 👋 How can we help you today? Ask us anything about our apartments.' }]); setSent(false); }}
-                    className="text-xs text-[#C49A6C] hover:text-[#0B1F42]"
+                    className="text-xs text-[#8A6B52] hover:text-[#203565]"
                   >
                     New chat
                   </button>
@@ -230,12 +230,12 @@ function ChatWidget() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Type your message..."
-                    className="min-w-0 flex-1 rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#0B1F42] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C49A6C]/40 disabled:opacity-50"
+                    className="min-w-0 flex-1 rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#203565] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C5A28C]/40 disabled:opacity-50"
                   />
                   <button
                     type="submit"
                     disabled={sending}
-                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#0B1F42] transition-all duration-200 hover:bg-[#07072E] disabled:opacity-50"
+                    className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#16294B] transition-all duration-200 hover:bg-[#16294B] disabled:opacity-50"
                   >
                     {sending ? (
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></div>

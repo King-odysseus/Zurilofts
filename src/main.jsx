@@ -9,7 +9,7 @@ import { LanguageProvider } from './context/LanguageContext.jsx'
 import { ThemeProvider } from './context/ThemeContext.jsx'
 import { ThemeProvider as FlowbiteThemeProvider } from 'flowbite-react'
 import { brandTheme } from './theme/flowbiteTheme.js'
-import './tailwind.css'
+import './styles.css'
 
 // PWA update handling - when a new service worker activates, reload so the
 // user is always on the latest version (registerType: 'autoUpdate').

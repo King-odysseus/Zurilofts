@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Alert, Button, Label, TextInput } from 'flowbite-react';
+import { Alert, Button, Label, TextInput, ToggleSwitch } from 'flowbite-react';
+import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 import PropTypes from 'prop-types';
 import {
   Ban,
@@ -23,12 +24,17 @@ import { useToast } from '../context/ToastContext.jsx';
 // free, and what does it cost" without leaving the month.
 
 const DAY_MS = 86_400_000;
-const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-const CARD = 'rounded-xl border border-border bg-elevated shadow-sm';
-const PANEL_HEAD = 'text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600';
 
-const BTN_PRIMARY = 'h-9 !items-center !rounded-full !border-0 !bg-primary !px-4 !text-sm !font-semibold !text-white hover:!bg-primary-hover hover:!text-white';
-const BTN_ICON = 'h-8 !w-8 !items-center !justify-center !rounded-full !border !border-border !bg-elevated !px-0 !text-navy hover:!bg-surface hover:!text-navy';
+const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+
+// A booking bar sits below the date/price line, one 22px lane per stay, so a
+// week with two bookings never hides one behind the other. The week's cells
+// reserve that much height through the --cal-min custom property below.
+const BAR_TOP = 40;
+const BAR_STEP = 22;
+const BAR_HEIGHT = 20;
+
 
 function midnight(value) {
   const date = new Date(value);
@@ -115,6 +121,15 @@ function money(value) {
   return value == null ? '-' : `KES ${Number(value).toLocaleString()}`;
 }
 
+/** Nightly rate as it fits a phone cell: 6,300 becomes 6.3k. */
+function compactMoney(value) {
+  if (value == null) return '-';
+  const amount = Number(value);
+  if (amount < 1000) return amount.toLocaleString();
+  const thousands = amount / 1000;
+  return `${Number.isInteger(thousands) ? thousands : thousands.toFixed(1)}k`;
+}
+
 function initialsOf(name) {
   return (name || 'G')
     .split(' ')
@@ -134,11 +149,11 @@ function SidebarSection({ title, children, defaultOpen = false, icon: Icon }) {
       type="button"
       onClick={() => setOpen((value) => !value)}
       aria-expanded={open}
-      className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
+      className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left transition-colors hover:bg-surface/60"
     >
-      <span className="inline-flex items-center gap-2 text-sm font-semibold text-navy">
+      <span className="inline-flex min-w-0 items-center gap-2 text-sm font-semibold text-navy">
         {Icon && <Icon className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />}
-        {title}
+        <span className="truncate">{title}</span>
       </span>
       <ChevronDown className={`h-4 w-4 shrink-0 text-muted transition-transform ${open ? 'rotate-180' : ''}`} strokeWidth={1.9} aria-hidden="true" />
     </button>
@@ -172,12 +187,16 @@ function StayBar({ booking, weekStart, row }) {
 
   return <Link
     to={`/host/reservations/${booking.id}`}
-    className={`absolute flex items-center gap-1.5 overflow-hidden bg-[#64748B] px-2 text-[11px] font-semibold text-white transition-opacity hover:opacity-90 ${startsHere ? 'rounded-l-md' : ''} ${endsHere ? 'rounded-r-md' : ''}`}
+    // Phone cells have no room for a name, so the bar is a desktop layer; on a
+    // phone the same nights read as the solid navy cell fill underneath.
+    // The night it sits on is solid navy already, so the bar borrows the darker
+    // navy plus a hairline edge to stay a legible chip on top of its own run.
+    className={`absolute hidden items-center gap-1.5 overflow-hidden bg-navy-hover px-2 text-[11px] font-semibold text-white ring-1 ring-inset ring-white/25 transition-opacity hover:opacity-90 sm:flex ${startsHere ? 'rounded-l-md' : ''} ${endsHere ? 'rounded-r-md' : ''}`}
     style={{
       left: `${(firstVisible / 7) * 100}%`,
       width: `${((lastVisible - firstVisible + 1) / 7) * 100}%`,
-      top: `${row * 26 + 46}px`,
-      height: '22px',
+      top: `${BAR_TOP + row * BAR_STEP}px`,
+      height: `${BAR_HEIGHT}px`,
     }}
     title={`${booking.guestName || 'Guest'}, ${formatDay(booking.start)} to ${formatDay(booking.end)}`}
   >
@@ -199,52 +218,88 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
   const bookings = calendar?.bookings || [];
   const blocks = calendar?.blocks || [];
 
-  return <div className="overflow-x-auto">
-    <div className="min-w-[640px]">
-      <div className="grid grid-cols-7 border-b border-border bg-surface">
-        {WEEKDAYS.map((day) => <span key={day} className="px-2 py-2 text-center text-[11px] font-semibold uppercase tracking-wide text-muted">{day}</span>)}
-      </div>
+  return <div className="select-none">
+    {/* The weekday row shares the week row's exact template: seven equal
+        tracks, no gap, the same width, so a label can never drift off its
+        column. Only the bottom hairline is drawn, because the hint line above
+        the grid already owns the top edge. */}
+    <div className="grid grid-cols-7 border-b border-border bg-surface/60">
+      {WEEKDAYS.map((day) => <span key={day} className="min-w-0 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted sm:text-[11px]">
+        {/* A phone column is ~46px wide, so it gets a single letter. */}
+        <span className="sm:hidden">{day[0]}</span>
+        <span className="hidden sm:inline">{day}</span>
+      </span>)}
+    </div>
 
-      {weeks.map((weekStart) => {
-        const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
-        const weekBookings = bookings.filter((booking) => days.some((day) => inStay(day, booking.start, booking.end)));
-        // Bars stack, so an imported block and a booking on the same week never
-        // hide each other.
-        const barRows = weekBookings.length;
+    {weeks.map((weekStart) => {
+      const days = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
+      const weekBookings = bookings.filter((booking) => days.some((day) => inStay(day, booking.start, booking.end)));
+      // Bars stack, so an imported block and a booking on the same week never
+      // hide each other.
+      const barRows = weekBookings.length;
 
-        return <div key={weekStart.toISOString()} className="relative border-b border-border last:border-b-0">
-          <div className="grid grid-cols-7">
-            {days.map((day) => {
-              const outside = day.getMonth() !== monthAnchor.getMonth();
-              const isToday = sameDay(day, today);
-              const isSelected = selectedKeys.includes(dayKey(day));
-              const blocked = blocks.some((block) => inStay(day, block.start, block.end));
-              const stay = bookings.some((booking) => inStay(day, booking.start, booking.end));
-              // A booked night cannot be blocked or opened, so it is a label rather
-              // than a pick target; every other night can be added to the selection.
-              const label = `${day.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}: ${stay ? 'booked' : blocked ? 'blocked' : `open, ${money(priceFor(day, basePrice, priceRules))}`}`;
-              return <button
-                key={day.toISOString()}
-                type="button"
-                onClick={(event) => onToggle(day, event.shiftKey)}
-                aria-pressed={isSelected}
-                aria-label={`${label}${stay ? '' : isSelected ? ', selected' : ', tap to select'}`}
-                className={`flex flex-col items-start gap-0.5 border-l border-border px-2 pt-1.5 text-left transition-colors first:border-l-0 ${stay ? 'cursor-default' : 'hover:bg-surface'} ${isSelected ? 'bg-primary/10 ring-2 ring-inset ring-primary' : blocked ? 'bg-[#F1F3F6]' : outside ? 'bg-surface/60' : 'bg-elevated'}`}
-                style={{ minHeight: `${Math.max(92, 78 + barRows * 26)}px` }}
-              >
-                <span className={`grid h-5 w-5 place-items-center rounded-full text-[11px] font-semibold ${isSelected ? 'bg-primary text-white' : isToday ? 'bg-navy text-white' : outside ? 'text-muted' : 'text-navy'}`}>
+      // An empty week needs no extra lane, so the 72px floor covers it and each
+      // bar past the first adds its own lane.
+      const weekMinHeight = Math.max(64, 44 + barRows * BAR_STEP);
+
+      return <div key={weekStart.toISOString()} className="relative border-b border-border last:border-b-0">
+        <div className="grid grid-cols-7" style={{ '--cal-min': `${weekMinHeight}px` }}>
+          {days.map((day) => {
+            const outside = day.getMonth() !== monthAnchor.getMonth();
+            const isToday = sameDay(day, today);
+            const isSelected = selectedKeys.includes(dayKey(day));
+            const blocked = blocks.some((block) => inStay(day, block.start, block.end));
+            const stay = bookings.some((booking) => inStay(day, booking.start, booking.end));
+            const nightPrice = priceFor(day, basePrice, priceRules);
+            // A booked night cannot be blocked or opened, and a day lent in from
+            // the next month is not a night of this month, so both are labels.
+            const label = `${day.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}: ${stay ? 'booked' : blocked ? 'blocked' : `open, ${money(nightPrice)}`}`;
+            return <button
+              key={day.toISOString()}
+              type="button"
+              onClick={(event) => { if (!stay && !outside) onToggle(day, event.shiftKey); }}
+              aria-pressed={isSelected}
+              disabled={stay || outside}
+              aria-label={`${label}${outside ? ', outside this month' : stay ? ', not editable' : isSelected ? ', selected' : ', tap to select'}`}
+              className={`flex min-h-[48px] min-w-0 flex-col border-l border-border px-1 pb-1 pt-1 text-left transition-colors first:border-l-0 focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary sm:min-h-[var(--cal-min,64px)] sm:px-2 sm:pb-1.5 sm:pt-1.5 ${
+                isSelected
+                  ? 'bg-navy/10 ring-1 ring-inset ring-navy'
+                  : stay
+                    ? 'bg-navy-bg'
+                    : blocked
+                      ? 'bg-[#B9C3D1] hover:bg-[#AEBAC9]'
+                      : `${outside ? 'bg-canvas' : 'bg-elevated'} hover:bg-surface`
+              }${isToday && !isSelected ? ' ring-1 ring-inset ring-bronze' : ''}`}
+            >
+              {/* Number over price, both left-aligned from sm up and centred on
+                  a phone. Stacking holds every rate in the same place, so a
+                  column of prices reads straight down instead of drifting out to
+                  the far edge of each cell. */}
+              <span className="flex min-w-0 flex-col items-center gap-0.5 sm:items-start sm:gap-px">
+                <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-sm font-semibold tabular-nums sm:text-[15px] ${isSelected ? 'bg-navy text-white' : stay ? 'text-white' : outside ? 'text-muted/60' : 'text-navy'}`}>
                   {day.getDate()}
                 </span>
-                {blocked && !stay && <span className={`inline-flex items-center gap-1 text-[10px] ${isSelected ? 'text-primary-700' : 'text-muted'}`}><Ban className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" />Blocked</span>}
-                {!stay && !blocked && <span className={`text-[10px] ${isSelected ? 'text-primary-700' : 'text-muted'}`}>{money(priceFor(day, basePrice, priceRules))}</span>}
-              </button>;
-            })}
-          </div>
+                <span className={`min-w-0 max-w-full truncate text-[9px] font-medium leading-tight tabular-nums sm:text-[10px] ${stay ? 'text-white/75' : blocked ? 'text-navy-bg/70' : outside ? 'text-muted/50' : 'text-muted'}`}>
+                  <span className="sm:hidden">{compactMoney(nightPrice)}</span>
+                  <span className="hidden sm:inline">{money(nightPrice)}</span>
+                </span>
+              </span>
 
-          {weekBookings.map((booking, index) => <StayBar key={booking.id} booking={booking} weekStart={weekStart} row={index} />)}
-        </div>;
-      })}
-    </div>
+              {blocked && !stay && <span className="mt-1 hidden items-center gap-1 text-[10px] text-navy-bg/70 sm:inline-flex">
+                <Ban className="h-2.5 w-2.5" strokeWidth={2} aria-hidden="true" />Blocked
+              </span>}
+
+              {/* The fill alone reads the state on a phone - booked is navy,
+                  blocked is grey - so the foot strip that duplicated it is gone. */}
+
+
+            </button>;
+          })}
+        </div>
+
+        {weekBookings.map((booking, index) => <StayBar key={booking.id} booking={booking} weekStart={weekStart} row={index} />)}
+      </div>;
+    })}
   </div>;
 }
 
@@ -320,6 +375,10 @@ export default function HostCalendarPage() {
     setMonthAnchor((current) => new Date(current.getFullYear(), current.getMonth() + amount, 1));
   }
 
+  function goToday() {
+    setMonthAnchor(firstOfMonth(new Date()));
+  }
+
   /** Click picks a night; shift-click fills the range from the previous pick. */
   function toggleDay(day, extend) {
     const key = dayKey(day);
@@ -354,6 +413,22 @@ export default function HostCalendarPage() {
     return selectedDays.filter((day) => !bookings.some((booking) => inStay(day, booking.start, booking.end)) && !blocks.some((block) => inStay(day, block.start, block.end)));
   }, [calendar, selectedDays]);
   const selectedAllOpen = selectedDays.length > 0 && selectedBlockedDays.length === 0;
+
+  // Month totals for the strip above the grid: the summary a host would
+  // otherwise work out by counting cells.
+  const monthNights = useMemo(() => {
+    const offerings = calendar?.bookings || [];
+    const blocks = calendar?.blocks || [];
+    const daysInMonth = new Date(monthAnchor.getFullYear(), monthAnchor.getMonth() + 1, 0).getDate();
+    let booked = 0;
+    let blocked = 0;
+    for (let date = 1; date <= daysInMonth; date += 1) {
+      const day = new Date(monthAnchor.getFullYear(), monthAnchor.getMonth(), date);
+      if (offerings.some((booking) => inStay(day, booking.start, booking.end))) booked += 1;
+      else if (blocks.some((block) => inStay(day, block.start, block.end))) blocked += 1;
+    }
+    return { booked, blocked };
+  }, [calendar, monthAnchor]);
 
   /** Block every open night in the selection, one request per consecutive run. */
   async function blockSelected() {
@@ -413,6 +488,13 @@ export default function HostCalendarPage() {
     } finally {
       setSaving(false);
     }
+  }
+
+  /** One switch for the pick, like the reference's Available toggle: on opens
+      every selected night, off blocks them. */
+  function toggleSelectedAvailability(nextAvailable) {
+    if (nextAvailable) openSelected();
+    else blockSelected();
   }
 
   async function addSource(event) {
@@ -504,31 +586,59 @@ export default function HostCalendarPage() {
   const priceRules = calendar?.priceRules || [];
   const stayCount = (calendar?.bookings || []).length;
   const selectionCount = selectedDays.length;
+  const shownMonth = firstOfMonth(new Date());
+  const onCurrentMonth = monthAnchor.getFullYear() === shownMonth.getFullYear() && monthAnchor.getMonth() === shownMonth.getMonth();
+  const monthStats = [
+    { label: 'Nights booked', shortLabel: 'Booked', value: monthNights.booked },
+    { label: 'Nights blocked', shortLabel: 'Blocked', value: monthNights.blocked },
+    { label: 'Base rate', shortLabel: 'Base rate', value: money(basePrice) },
+  ];
 
   return <div className="space-y-4">
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <p className={PANEL_HEAD}>HOST WORKSPACE</p>
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="min-w-0">
+        <p className={HOST_EYEBROW}>HOST WORKSPACE</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Calendar</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Every night you can sell, what it costs, and who is already booked.</p>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        {properties.length > 1 && <div className="relative w-full sm:w-auto">
+
+      <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end">
+        {properties.length > 1 && <div className="relative w-full sm:w-64">
           <label className="sr-only" htmlFor="calendar-property">Listing</label>
           <select
             id="calendar-property"
             value={activePropertyId || ''}
             onChange={(event) => navigate(`/host/calendar/${event.target.value}`)}
-            className="w-full appearance-none rounded-full border border-border bg-elevated py-1.5 pl-3 pr-8 text-xs font-semibold text-navy focus:border-primary focus:outline-none focus:ring-0 sm:w-auto"
+            className="h-11 w-full appearance-none rounded-full border border-border bg-elevated pl-3 pr-8 text-xs font-semibold text-navy focus:border-primary focus:outline-none focus:ring-0"
           >
             {properties.map((property) => <option key={property.id} value={property.id}>{property.title}</option>)}
           </select>
           <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted" strokeWidth={2} aria-hidden="true" />
         </div>}
-        <div className="flex w-full items-center justify-between gap-1.5 sm:w-auto sm:justify-start">
-          <Button type="button" className={BTN_ICON} aria-label="Previous month" onClick={() => moveMonth(-1)}><ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" /></Button>
-          <span className="min-w-[7.5rem] text-center text-sm font-semibold text-navy">{formatMonth(monthAnchor)}</span>
-          <Button type="button" className={BTN_ICON} aria-label="Next month" onClick={() => moveMonth(1)}><ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" /></Button>
+
+        {/* Month paging is one control, not two arrows at opposite edges: on a
+            phone the label and its arrows stay together as a single pill. */}
+        <div className="flex w-full items-center gap-2 sm:w-auto">
+          <div className="flex min-w-0 flex-1 items-center justify-between gap-1 rounded-full border border-border bg-elevated p-1 sm:flex-none">
+            <button
+              type="button"
+              onClick={() => moveMonth(-1)}
+              aria-label="Previous month"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-navy transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+            </button>
+            <span className="min-w-0 flex-1 truncate px-1 text-center text-sm font-semibold text-navy sm:min-w-[7.5rem] sm:flex-none">{formatMonth(monthAnchor)}</span>
+            <button
+              type="button"
+              onClick={() => moveMonth(1)}
+              aria-label="Next month"
+              className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-navy transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+            </button>
+          </div>
+          <Button type="button" size="xs" color="light" onClick={goToday} disabled={onCurrentMonth} className="min-h-[44px] shrink-0">Today</Button>
         </div>
       </div>
     </header>
@@ -540,16 +650,19 @@ export default function HostCalendarPage() {
       </div>
     </Alert>}
 
-    {loading ? <div className={`${CARD} p-5`} aria-label="Loading calendar">
+    {loading ? <HostCard aria-label="Loading calendar">
       <span className="block h-[420px] animate-pulse rounded-lg bg-surface" />
-    </div> : !activePropertyId ? <div className={`${CARD} px-5 py-12 text-center`}>
+    </HostCard> : !activePropertyId ? <HostCard className="py-12 text-center">
       <CalendarDays className="mx-auto h-6 w-6 text-muted" strokeWidth={1.6} aria-hidden="true" />
       <strong className="mt-2 block text-base font-semibold text-navy">No listings to manage</strong>
       <p className="mx-auto mt-1 max-w-md text-sm leading-relaxed text-muted">Add a listing before setting availability.</p>
-      <Button as={Link} to="/host/properties/new" className={`mx-auto mt-4 w-fit ${BTN_PRIMARY}`}>Add a listing</Button>
-    </div> : <div className="grid grid-cols-1 gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,300px)]">
-      <section className={`${CARD} overflow-hidden`} aria-label="Month calendar">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
+      <Button as={Link} to="/host/properties/new" size="sm" className="mx-auto mt-4 w-fit">Add a listing</Button>
+    </HostCard> : <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
+      {/* Flush: the grid and the totals strip run edge to edge, while the head
+          keeps its padding so it still lines up with the side panel. */}
+      <section aria-label="Month calendar">
+      <HostCard flush className="overflow-hidden">
+        <div className="flex flex-col gap-2 border-b border-border px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
           <div className="min-w-0">
             <h2 className="truncate text-base font-semibold text-navy">{calendar?.property?.title || 'Your stay'}</h2>
             <p className="text-xs text-muted">
@@ -557,15 +670,25 @@ export default function HostCalendarPage() {
               {selectionCount > 0 && <> <span aria-hidden="true">·</span> {selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</>}
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted">
-            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[#64748B]" aria-hidden="true" />Booked</span>
-            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-silver" aria-hidden="true" />Blocked</span>
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted">
+            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-navy-bg" aria-hidden="true" />Booked</span>
+            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[#B9C3D1]" aria-hidden="true" />Blocked</span>
             <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-border bg-elevated" aria-hidden="true" />Open</span>
+            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-primary bg-elevated" aria-hidden="true" />Today</span>
           </div>
         </div>
-        <p className="border-b border-border bg-surface/60 px-4 py-2 text-[11px] leading-relaxed text-muted">
+
+        <div className="grid grid-cols-3 divide-x divide-border border-b border-border bg-surface/40">
+          {monthStats.map((stat) => <div key={stat.label} className="min-w-0 px-3 py-2 sm:px-4">
+            <p className="truncate text-[10px] font-semibold uppercase tracking-[0.08em] text-muted"><span className="sm:hidden">{stat.shortLabel}</span><span className="hidden sm:inline">{stat.label}</span></p>
+            <p className="mt-0.5 truncate text-sm font-bold tabular-nums text-navy">{stat.value}</p>
+          </div>)}
+        </div>
+
+        <p className="border-b border-border px-4 py-2 text-[11px] leading-relaxed text-muted">
           Tap the nights you want, then block or open them together. Shift-click fills a whole range.
         </p>
+
         <MonthGrid
           weeks={weeks}
           monthAnchor={monthAnchor}
@@ -573,16 +696,39 @@ export default function HostCalendarPage() {
           selectedKeys={selectedKeys}
           onToggle={toggleDay}
         />
+        </HostCard>
       </section>
 
-      <aside className={`${CARD} h-fit overflow-hidden`} aria-label="Calendar settings">
+      <aside aria-label="Calendar settings" className="h-fit">
+        <HostCard flush>
         <div className="border-b border-border px-4 py-3">
           <h2 className="text-sm font-semibold text-navy">Pricing and availability</h2>
           <p className="mt-0.5 text-[11px] leading-relaxed text-muted">Changes here apply to this stay only.</p>
         </div>
 
+        {selectionCount > 0 && <div className="border-b border-border bg-[#F7F9FC] px-4 py-3">
+          <p className="text-[11px] font-semibold text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</p>
+          <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
+            {selectedOpenDays.length > 0 && `${selectedOpenDays.length} open`}
+            {selectedOpenDays.length > 0 && selectedBlockedDays.length > 0 && ' · '}
+            {selectedBlockedDays.length > 0 && `${selectedBlockedDays.length} blocked`}
+          </p>
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <span className="text-[11px] font-semibold text-navy">Available</span>
+            <ToggleSwitch
+              checked={selectedAllOpen}
+              onChange={toggleSelectedAvailability}
+              disabled={saving}
+              sizing="sm"
+              aria-label="Selected nights are available"
+            />
+          </div>
+          <p className="mt-1.5 text-[10px] leading-relaxed text-muted">On opens these nights, off blocks them.</p>
+          <button type="button" onClick={clearSelection} className="mt-2 w-full text-left text-[10px] text-muted underline underline-offset-2 hover:text-navy">Clear selection</button>
+        </div>}
+
         <SidebarSection title="Pricing" icon={Wallet} defaultOpen>
-          <div className="flex items-baseline justify-between gap-3">
+          <div className="flex items-baseline justify-between gap-3 border-b border-border pb-2">
             <span className="text-xs text-muted">Base nightly rate</span>
             <strong className="text-sm font-bold tabular-nums text-navy">{money(basePrice)}</strong>
           </div>
@@ -596,33 +742,6 @@ export default function HostCalendarPage() {
         </SidebarSection>
 
         <SidebarSection title="Availability" icon={Ban}>
-          {selectionCount > 0 && <div className="mb-3 rounded-lg border border-primary/30 bg-primary/5 p-2.5">
-            <div className="flex items-center justify-between gap-2">
-              <div>
-                <p className="text-[11px] font-semibold text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</p>
-                <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
-                  {selectedOpenDays.length > 0 && `${selectedOpenDays.length} open`}
-                  {selectedOpenDays.length > 0 && selectedBlockedDays.length > 0 && ' \u00b7 '}
-                  {selectedBlockedDays.length > 0 && `${selectedBlockedDays.length} blocked`}
-                </p>
-              </div>
-              {/* One switch for the pick, like the reference's Available toggle:
-                  on opens every selected night, off blocks them. */}
-              <button
-                type="button"
-                role="switch"
-                aria-checked={selectedAllOpen}
-                aria-label="Selected nights are available"
-                disabled={saving}
-                onClick={selectedAllOpen ? blockSelected : openSelected}
-                className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-1 text-[10px] font-semibold transition-colors ${selectedAllOpen ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-border bg-elevated text-muted'}`}
-              >
-                <span className={`h-3 w-3 rounded-full ${selectedAllOpen ? 'bg-emerald-500' : 'bg-[#c3cbd6]'}`} aria-hidden="true" />
-                {selectedAllOpen ? 'Available' : 'Blocked'}
-              </button>
-            </div>
-            <button type="button" onClick={clearSelection} className="mt-2 w-full text-[10px] text-muted underline underline-offset-2 hover:text-navy">Clear selection</button>
-          </div>}
           <form onSubmit={addBlock} className="space-y-2">
             <div className="grid grid-cols-2 gap-2">
               <div>
@@ -680,20 +799,21 @@ export default function HostCalendarPage() {
           <TextInput readOnly sizing="sm" className="mt-2" value={calendar?.feedUrl || ''} onFocus={(event) => event.target.select()} />
           <Button color="light" size="xs" className="mt-2 w-full" onClick={copyFeed}>{copied ? 'Copied' : 'Copy link'}</Button>
         </SidebarSection>
+        </HostCard>
       </aside>
     </div>}
 
     {/* Floating action bar: the grid is tall, so the buttons for a multi-day
         pick follow the host instead of sitting off-screen above the month. */}
     {!loading && activePropertyId && selectionCount > 0 && <div
-      className="fixed inset-x-3 bottom-[calc(var(--zl-bottom-nav-space,0px)+12px)] z-30 mx-auto flex items-center gap-2 rounded-2xl border border-border bg-elevated px-2 py-2 shadow-xl md:inset-x-auto md:right-6 md:bottom-6"
+      className="fixed inset-x-3 bottom-[calc(var(--zl-bottom-nav-space)_+_10px)] z-30 mx-auto flex max-w-md items-center gap-2 rounded-full border border-border bg-elevated px-2 py-2 shadow-xl md:inset-x-auto md:right-6 md:bottom-6"
       role="region"
       aria-label="Selected dates"
     >
       <span className="pl-1 pr-1 text-xs font-semibold tabular-nums text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</span>
-      <Button type="button" size="xs" className={BTN_PRIMARY} disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
-      <Button type="button" size="xs" color="light" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
-      <button type="button" onClick={clearSelection} aria-label="Clear selection" className="grid h-7 w-7 place-items-center rounded-full text-muted hover:bg-surface hover:text-navy">
+      <Button type="button" size="xs" color="dark" className="min-h-[44px]" disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
+      <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
+      <button type="button" onClick={clearSelection} aria-label="Clear selection" className="ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy">
         <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
       </button>
     </div>}

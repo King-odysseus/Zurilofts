@@ -52,10 +52,10 @@ function hostInitials(user) {
 // Shared nav-link styling so the desktop tabs cannot drift apart.
 const NAV_LINK_BASE = 'inline-flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-colors';
 const NAV_LINK_IDLE = 'text-muted hover:bg-surface hover:text-navy';
-// The active pill paints bronze, so its label must be the fixed navy ink.
-// Keeping the colour out of the structural class stops an active item from
-// inheriting the idle `text-muted`, which rendered pale-on-bronze.
-const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-white hover:bg-primary hover:text-white';
+// Navy, not bronze: the workspace's main colour should be what marks where you
+// are. Bronze stays a highlight (a count, a focus ring), and white type on
+// bronze was too pale to read.
+const NAV_LINK_ACTIVE = 'bg-navy-bg font-semibold text-white hover:bg-navy-hover hover:text-white';
 
 // The account menu mirrors the traveller one row for row: icon, label, the
 // browsing-as line, then the switch. A host menu that looked different from the
@@ -161,12 +161,12 @@ function HostLayout({ children }) {
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Your account';
 
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-canvas">
       <header className="sticky top-0 z-30 border-b border-border bg-elevated/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 lg:px-6">
           <Link to="/host/today" className="inline-flex shrink-0 items-center gap-2.5" aria-label="Host workspace home">
             <BrandLogo imgClassName="h-8 w-auto" />
-            <span className="hidden items-center rounded-full bg-primary-50 dark:bg-primary/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600 dark:text-primary-300 md:inline-flex">Host</span>
+            <span className="hidden items-center rounded-full bg-surface dark:bg-primary/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted dark:text-primary-300 md:inline-flex">Host</span>
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Host workspace">
@@ -273,9 +273,10 @@ function HostLayout({ children }) {
         </div>
       </header>
 
-      {/* The mobile bottom bar floats over the page, so the last element on
-          every host screen needs clearance or a composer sits behind it. */}
-      <main className="mx-auto w-full max-w-7xl px-4 py-6 pb-28 md:pb-6 lg:px-6">{children}</main>
+      {/* The floating bottom bar's clearance is reserved once, on <body>, via
+          --zl-bottom-nav-space (see styles.css). Reserving it again here would
+          double it and leave a dead band under the last card. */}
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 lg:px-6">{children}</main>
       <HostMobileBottomNav />
     </div>
   );

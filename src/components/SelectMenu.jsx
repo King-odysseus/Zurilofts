@@ -22,7 +22,7 @@ import { Check, ChevronDown } from 'lucide-react';
 // select and a text field on the same row line up. It lives here, not in a page
 // stylesheet, because this is the single place selects are defined.
 const TRIGGER_BASE =
-  'flex w-full items-center justify-between gap-2 rounded-[10px] border border-[#E2DAD0] bg-elevated text-left text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#C49A6C] dark:border-gray-600 dark:bg-gray-700 dark:text-white';
+  'flex w-full items-center justify-between gap-2 rounded-[10px] border border-[#E2DAD0] bg-elevated text-left text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#C5A28C] dark:border-gray-600 dark:bg-gray-700 dark:text-white';
 
 const TRIGGER_SIZES = {
   sm: 'min-h-[38px] px-3 text-xs',
@@ -101,11 +101,11 @@ function SelectMenu({
             <DropdownItem
               key={option.value}
               onClick={() => onChange(option.value)}
-              className={isSelected ? 'font-semibold text-[#0B1F42] dark:text-white' : undefined}
+              className={isSelected ? 'font-semibold text-[#203565] dark:text-white' : undefined}
             >
               <span className="flex items-center justify-between gap-3">
                 <span className="truncate">{option.label}</span>
-                {isSelected && <Check className="h-4 w-4 shrink-0 text-[#C49A6C]" strokeWidth={2.5} aria-hidden="true" />}
+                {isSelected && <Check className="h-4 w-4 shrink-0 text-[#8A6B52]" strokeWidth={2.5} aria-hidden="true" />}
               </span>
             </DropdownItem>
           );

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Alert, Button } from 'flowbite-react';
+import { Alert, Badge, Button } from 'flowbite-react';
 import {
   CalendarDays,
   ChevronLeft,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
+import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 
 // The host's own view of one reservation. The guest side of the same row lives
 // at /bookings/:id inside the traveller shell; a host who clicked through from
@@ -21,18 +22,16 @@ import { firstImage } from '../utils/images.js';
 // page exists. Same booking, host framing: who is arriving, what they asked for,
 // and what the host actually earns.
 
-const CARD = 'rounded-xl border border-border bg-elevated shadow-sm';
-const PANEL_HEAD = 'text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600';
 const DAY_MS = 86_400_000;
 
+// Status reads through the shared Badge, so the colours come from the theme
+// rather than a set of hex fills copied onto this page.
 const STATUS_META = {
-  PENDING: { label: 'Awaiting payment', className: 'bg-[#FDF3D8] text-[#8A5A00]' },
-  CONFIRMED: { label: 'Confirmed', className: 'bg-[#E7F6EE] text-[#157347]' },
-  CANCELLED: { label: 'Cancelled', className: 'bg-[#FDECEC] text-[#B42318]' },
-  CONFLICT: { label: 'Needs review', className: 'bg-[#FDECEC] text-[#B42318]' },
+  PENDING: { label: 'Awaiting payment', color: 'warning' },
+  CONFIRMED: { label: 'Confirmed', color: 'success' },
+  CANCELLED: { label: 'Cancelled', color: 'failure' },
+  CONFLICT: { label: 'Needs review', color: 'failure' },
 };
-
-const STATUS_PILL = 'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold';
 
 function money(value) {
   if (value == null) return '-';
@@ -69,19 +68,22 @@ function plural(count, word) {
 }
 
 function StatusPill({ status }) {
-  const meta = STATUS_META[status] || { label: status || 'Status unavailable', className: 'bg-[#F1F5F9] text-[#475569]' };
-  return <span className={`${STATUS_PILL} ${meta.className}`}>{meta.label}</span>;
+  const meta = STATUS_META[status] || { label: status || 'Status unavailable', color: 'gray' };
+  return <Badge color={meta.color}>{meta.label}</Badge>;
 }
 
 StatusPill.propTypes = { status: PropTypes.string };
 
+// A key/value row. Two columns with the label clamped to the free space and the
+// figure kept unwrapped on the right, so every money card on the page lines its
+// figures up in the same column no matter how long the label runs.
 function MoneyRow({ label, value, tone, hint }) {
-  return <div className="flex items-start justify-between gap-4 py-2">
+  return <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 py-2">
     <div className="min-w-0">
       <p className={`text-xs ${tone === 'total' ? 'font-semibold text-navy' : 'text-muted'}`}>{label}</p>
-      {hint && <p className="text-[10px] text-muted">{hint}</p>}
+      {hint && <p className="mt-0.5 text-[11px] leading-relaxed text-muted">{hint}</p>}
     </div>
-    <strong className={`shrink-0 text-xs tabular-nums ${tone === 'total' ? 'text-base font-bold text-navy' : 'text-navy'}`}>{value}</strong>
+    <strong className={`shrink-0 whitespace-nowrap text-right tabular-nums ${tone === 'total' ? 'text-base font-bold text-navy' : 'text-xs text-navy'}`}>{value}</strong>
   </div>;
 }
 
@@ -108,10 +110,16 @@ DetailRow.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+// Placeholder cards, not bare bars: the loading shapes have to match the cards
+// that land, otherwise the page jumps when the request resolves.
 function Skeleton() {
-  return <div className="space-y-3" aria-label="Loading reservation">
-    <span className="block h-40 animate-pulse rounded-xl bg-surface" />
-    <span className="block h-28 animate-pulse rounded-xl bg-surface" />
+  return <div className="flex flex-col gap-4" role="status" aria-label="Loading reservation">
+    <HostCard>
+      <span className="block h-40 animate-pulse rounded-xl bg-inset" />
+    </HostCard>
+    <HostCard>
+      <span className="block h-28 animate-pulse rounded-xl bg-inset" />
+    </HostCard>
   </div>;
 }
 
@@ -155,16 +163,24 @@ export default function HostReservationDetailPage() {
     }
   }
 
-  if (loading) return <div className="space-y-4"><Skeleton /></div>;
+  if (loading) return <Skeleton />;
 
   if (error && !booking) {
-    return <div className={`${CARD} px-5 py-12 text-center`}>
-      <p className="text-sm text-muted">{error}</p>
-      <div className="mt-4 flex justify-center gap-2">
-        <Button type="button" size="sm" onClick={load}>Try again</Button>
-        <Button as={Link} to="/host/reservations" color="light" size="sm">All reservations</Button>
+    return <HostCard>
+      <div className="mx-auto flex max-w-md flex-col items-center gap-2 py-6 text-center">
+        <span className="grid h-11 w-11 place-items-center rounded-full bg-surface text-muted">
+          <CalendarDays className="h-5 w-5" strokeWidth={1.6} aria-hidden="true" />
+        </span>
+        <h1 className="mt-1 text-base font-semibold text-navy">Reservation unavailable</h1>
+        <p className="text-sm leading-relaxed text-muted">{error}</p>
+        <div className="mt-2 flex flex-wrap justify-center gap-2">
+          <Button type="button" size="sm" onClick={load} className="min-h-11 sm:min-h-0">Try again</Button>
+          <Button as={Link} to="/host/reservations" color="light" size="sm" className="min-h-11 sm:min-h-0">
+            All reservations
+          </Button>
+        </div>
       </div>
-    </div>;
+    </HostCard>;
   }
 
   if (!booking) return null;
@@ -177,9 +193,9 @@ export default function HostReservationDetailPage() {
   const addOnTotal = booking.addonsSubtotal ?? (booking.addOns || []).reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const additionalGuests = booking.additionalGuests || [];
 
-  return <div className="space-y-4">
+  return <div className="flex flex-col gap-4">
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <Link to="/host/reservations" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted transition-colors hover:text-navy">
+      <Link to="/host/reservations" className="inline-flex min-h-11 items-center gap-1.5 text-xs font-semibold text-muted transition-colors hover:text-navy">
         <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
         All reservations
       </Link>
@@ -189,31 +205,33 @@ export default function HostReservationDetailPage() {
     {error && <Alert color="failure">
       <div className="flex w-full flex-wrap items-center justify-between gap-3">
         <p className="min-w-0 flex-1">{error}</p>
-        <Button size="xs" color="light" onClick={load}>Try again</Button>
+        <Button size="sm" color="light" onClick={load} className="min-h-11 sm:min-h-0">Try again</Button>
       </div>
     </Alert>}
 
     <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div className="min-w-0">
-        <p className={PANEL_HEAD}>RESERVATION</p>
-        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{guestName}</h1>
-        <p className="mt-1 text-sm text-muted">
-          {property.title || 'Your listing'} <span aria-hidden="true">·</span> {plural(booking.guests || 1, 'guest')} <span aria-hidden="true">·</span> {plural(nights, 'night')}
+        <p className={HOST_EYEBROW}>Reservation</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{guestName}</h1>
+        <p className="mt-1 text-sm leading-relaxed text-muted">
+          {property.title || 'Your listing'} <span aria-hidden="true" className="text-border">|</span> {plural(booking.guests || 1, 'guest')} <span aria-hidden="true" className="text-border">|</span> {plural(nights, 'night')}
         </p>
       </div>
-      <div className="flex flex-wrap gap-2">
-        <Button type="button" size="sm" onClick={openConversation} disabled={messagePending}>
-          <MessageCircleMore className="mr-1.5 h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Button type="button" size="sm" onClick={openConversation} disabled={messagePending} className="min-h-11 sm:min-h-0">
+          <MessageCircleMore className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           {messagePending ? 'Opening...' : 'Message guest'}
         </Button>
-        {property.id && <Button as={Link} to={`/host/calendar/${property.id}`} color="light" size="sm">Calendar</Button>}
+        {property.id && <Button as={Link} to={`/host/calendar/${property.id}`} color="light" size="sm" className="min-h-11 sm:min-h-0">Calendar</Button>}
       </div>
     </header>
 
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,340px)]">
-      <div className="space-y-4">
-        <section className={`${CARD} overflow-hidden`} aria-label="Stay">
-          <div className="flex flex-col gap-4 p-4 sm:flex-row">
+      <div className="flex flex-col gap-4">
+        {/* flush: the special-request hairline runs to the card edge, so the
+            body and that strip re-apply the same 16px gutter as the card head. */}
+        <HostCard flush title="Stay" className="overflow-hidden">
+          <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row">
             <div className="h-32 w-full shrink-0 overflow-hidden rounded-xl bg-surface sm:h-24 sm:w-32">
               {image
                 ? <img src={image} alt="" className="h-full w-full object-cover" />
@@ -224,7 +242,7 @@ export default function HostReservationDetailPage() {
                 {formatDate(booking.checkIn)} <span className="text-muted">to</span> {formatDate(booking.checkOut)}
               </DetailRow>
               <DetailRow icon={Clock3} label="Arrival and departure">
-                Check-in {formatTime(booking.checkInTime) || 'flexible'} <span aria-hidden="true">·</span> check-out {formatTime(booking.checkOutTime) || 'by 10:00 AM'}
+                Check-in {formatTime(booking.checkInTime) || 'flexible'} <span aria-hidden="true" className="text-border">|</span> check-out {formatTime(booking.checkOutTime) || 'by 10:00 AM'}
               </DetailRow>
               <DetailRow icon={MapPin} label="Listing">
                 {property.title || 'Your listing'}{property.location ? `, ${property.location}` : ''}
@@ -236,11 +254,10 @@ export default function HostReservationDetailPage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">What the guest asked for</p>
             <p className="mt-1 text-sm leading-relaxed text-navy">{booking.specialRequests}</p>
           </div>}
-        </section>
+        </HostCard>
 
-        <section className={`${CARD} p-4`} aria-label="Who is arriving">
-          <h2 className="text-sm font-semibold text-navy">Who is arriving</h2>
-          <div className="mt-3 flex items-center gap-3">
+        <HostCard title="Who is arriving">
+          <div className="flex items-center gap-3">
             <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-bg text-xs font-bold text-white">
               {guest.avatar ? <img src={guest.avatar} alt="" className="h-full w-full object-cover" /> : (guestName[0] || 'G').toUpperCase()}
             </span>
@@ -253,12 +270,14 @@ export default function HostReservationDetailPage() {
             </div>
           </div>
 
-          {guest.email && <p className="mt-3 flex items-center gap-2 text-xs text-muted">
+          {guest.email && <p className="flex items-center gap-2 text-xs text-muted">
             <Mail className="h-3.5 w-3.5 shrink-0" strokeWidth={1.8} aria-hidden="true" />
-            <a href={`mailto:${guest.email}`} className="truncate underline underline-offset-2 hover:text-navy">{guest.email}</a>
+            <a href={`mailto:${guest.email}`} className="min-w-0 truncate underline underline-offset-2 hover:text-navy">{guest.email}</a>
           </p>}
 
-          {additionalGuests.length > 0 && <div className="mt-3 rounded-lg border border-border p-3">
+          {/* Inset rather than outlined: a border here would be a box inside the
+              card's own border. */}
+          {additionalGuests.length > 0 && <div className="rounded-xl bg-surface px-4 py-3">
             <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">Also staying</p>
             <ul className="mt-1 space-y-0.5">
               {additionalGuests.map((person, index) => <li key={`${person.firstName}-${person.lastName}-${index}`} className="text-sm text-navy">
@@ -266,16 +285,15 @@ export default function HostReservationDetailPage() {
               </li>)}
             </ul>
           </div>}
-        </section>
+        </HostCard>
       </div>
 
-      <div className="space-y-4">
-        <section className={`${CARD} p-4`} aria-label="What you earn">
-          <h2 className="flex items-center gap-2 text-sm font-semibold text-navy">
-            <Wallet className="h-4 w-4 text-muted" strokeWidth={1.8} aria-hidden="true" />
-            What you earn
-          </h2>
-          <div className="mt-2 divide-y divide-border">
+      <div className="flex flex-col gap-4">
+        <HostCard title={<span className="flex items-center gap-2">
+          <Wallet className="h-4 w-4 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />
+          What you earn
+        </span>}>
+          <div className="divide-y divide-border">
             {booking.hostNetAmount != null
               ? <>
                 <MoneyRow label="Your earnings from this stay" value={money(booking.hostNetAmount)} tone="total" />
@@ -288,11 +306,10 @@ export default function HostReservationDetailPage() {
                 Earnings appear here once the guest&apos;s payment clears. Nothing is deducted from a booking that has not been paid.
               </p>}
           </div>
-        </section>
+        </HostCard>
 
-        <section className={`${CARD} p-4`} aria-label="What the guest paid">
-          <h2 className="text-sm font-semibold text-navy">What the guest paid</h2>
-          <div className="mt-2 divide-y divide-border">
+        <HostCard title="What the guest paid">
+          <div className="divide-y divide-border">
             <MoneyRow label={`${plural(nights, 'night')} at the nightly rate`} value={money(booking.subtotal)} />
             {booking.cleaningFee > 0 && <MoneyRow label="Cleaning fee" value={money(booking.cleaningFee)} />}
             {booking.serviceFee > 0 && <MoneyRow label="Guest service fee" value={money(booking.serviceFee)} />}
@@ -301,21 +318,20 @@ export default function HostReservationDetailPage() {
             {addOnTotal > 0 && <MoneyRow label="Add-ons" value={money(addOnTotal)} />}
             <MoneyRow label="Guest total" value={money(booking.total)} tone="total" />
           </div>
-          {booking.paymentMethod && <p className="mt-2 text-[11px] text-muted">
+          {booking.paymentMethod && <p className="text-[11px] text-muted">
             Paid by {booking.paymentMethod === 'mpesa' ? 'M-PESA' : booking.paymentMethod}
             {booking.paidAt ? ` on ${formatDate(booking.paidAt)}` : ''}
           </p>}
-        </section>
+        </HostCard>
 
-        {(booking.addOns || []).length > 0 && <section className={`${CARD} p-4`} aria-label="Add-ons booked">
-          <h2 className="text-sm font-semibold text-navy">Add-ons booked</h2>
-          <ul className="mt-2 space-y-1.5">
+        {(booking.addOns || []).length > 0 && <HostCard title="Add-ons booked">
+          <ul className="space-y-1.5">
             {booking.addOns.map((item) => <li key={item.id} className="flex items-center justify-between gap-3 text-xs">
               <span className="min-w-0 truncate text-navy">{item.addOn?.name || 'Add-on'} <span className="text-muted">x{item.quantity}</span></span>
               <span className="shrink-0 tabular-nums text-muted">{money(item.quantity * item.unitPrice)}</span>
             </li>)}
           </ul>
-        </section>}
+        </HostCard>}
       </div>
     </div>
   </div>;

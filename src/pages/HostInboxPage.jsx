@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { Alert, Button, Textarea } from 'flowbite-react';
+import { Alert, Badge, Button, Label, Textarea } from 'flowbite-react';
 import PropTypes from 'prop-types';
 import {
   CalendarDays,
@@ -14,6 +14,7 @@ import {
   X,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
+import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { CONVERSATIONS_READ_EVENT, getConversationParticipant } from '../utils/conversations.js';
 import { firstImage } from '../utils/images.js';
@@ -28,8 +29,6 @@ import { firstImage } from '../utils/images.js';
 // message with the stay in front of them, so the booking never lives on
 // another page.
 
-const CARD = 'rounded-xl border border-border bg-elevated shadow-sm';
-const PANEL_HEAD = 'text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600';
 const DAY_MS = 86_400_000;
 
 // The list column fills the space between the page header and the phone's
@@ -181,41 +180,44 @@ function GuestRow({ conversation, currentUserId, selected }) {
   const status = statusOf(booking.status);
   const stay = formatStayRange(booking.checkIn, booking.checkOut);
 
+  // Full-bleed row on one shared gutter: the divider runs straight across and
+  // nothing is inset, so every row and the thread header beside it start at the
+  // same x. The selected row is a fill plus a bronze hairline drawn on the edge,
+  // which shifts no content, rather than a bordered tile inside list padding.
   return <Link
     to={`/host/inbox/${conversation.id}`}
     aria-current={selected ? 'page' : undefined}
-    // The selected row is a fill, not a border: a bordered tile inside the list
-    // padding reads as a box that was cut short at the top and bottom. The dark
-    // value comes from the shared pale-tint rule in flowbite-controls.css, which
-    // darkens bg-primary-50 app-wide, so no dark: class is needed here.
-    className={`flex items-start gap-3 rounded-xl px-3 py-3.5 transition-colors ${selected ? 'bg-primary-50' : 'hover:bg-surface'}`}
+    className={`relative flex min-h-[72px] items-start gap-3 px-4 py-3 transition-colors ${selected ? 'bg-surface' : 'hover:bg-surface'}`}
   >
+    {selected && <span className="absolute inset-y-0 left-0 w-0.5 bg-primary" aria-hidden="true" />}
     {/* Stay first, guest second: the thumbnail identifies the property and the
-        small avatar says who wrote, which is how a host scans a full inbox. */}
-    <span className="relative h-12 w-12 shrink-0">
-      <span className="block h-12 w-12 overflow-hidden rounded-lg bg-surface">
+        small avatar says who wrote, which is how a host scans a full inbox.
+        40px matches the thread header avatar so the two panes line up. */}
+    <span className="relative h-10 w-10 shrink-0">
+      <span className="block h-10 w-10 overflow-hidden rounded-lg bg-surface">
         {image
           ? <img src={image} alt="" className="h-full w-full object-cover" />
           : <span className="grid h-full w-full place-items-center text-muted"><CalendarDays className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" /></span>}
       </span>
-      <span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center overflow-hidden rounded-full border-2 border-elevated bg-navy-bg text-[9px] font-bold text-white">
+      <span className="absolute -bottom-1 -right-1 grid h-5 w-5 place-items-center overflow-hidden rounded-full border-2 border-elevated bg-navy-bg text-[8px] font-bold text-white">
         {participant.avatar ? <img src={participant.avatar} alt="" className="h-full w-full object-cover" /> : initialsFor(participant.name)}
       </span>
     </span>
 
     <div className="min-w-0 flex-1">
-      <div className="flex items-center justify-between gap-2">
-        <strong className={`truncate text-sm ${unread > 0 ? 'font-bold text-navy' : 'font-semibold text-navy'}`}>{participant.name}</strong>
+      <div className="flex items-baseline justify-between gap-2">
+        <strong className={`truncate text-sm text-navy ${unread > 0 ? 'font-bold' : 'font-semibold'}`}>{participant.name}</strong>
         <time className="shrink-0 text-[10px] text-muted" dateTime={conversation.lastMessage?.createdAt || conversation.updatedAt}>{formatWhen(conversation.lastMessage?.createdAt || conversation.updatedAt)}</time>
       </div>
       <p className={`mt-0.5 truncate text-xs ${unread > 0 ? 'font-semibold text-navy' : 'text-muted'}`}>{conversation.lastMessage?.content || 'No messages yet'}</p>
-      <p className="mt-1 flex items-center gap-1.5 truncate text-[11px] text-muted">
+      <p className="mt-1 flex min-w-0 items-center gap-1.5 text-[11px] text-muted">
         <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${status.dot}`} aria-hidden="true" />
-        <span className="truncate">{status.label} <span aria-hidden="true">·</span> {stay} <span aria-hidden="true">·</span> {property.title || 'Your stay'}</span>
+        <span className="truncate">{status.label}, {stay}, {property.title || 'Your stay'}</span>
       </p>
     </div>
 
-    {unread > 0 && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" aria-label={`${unread} unread message${unread === 1 ? '' : 's'}`} />}
+    {/* Bronze as a mark only: one 8px dot, never a filled block. */}
+    {unread > 0 && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" aria-label={`${unread} unread message${unread === 1 ? '' : 's'}`} />}
   </Link>;
 }
 
@@ -251,32 +253,36 @@ function ConversationList({
   onCloseSettings,
   className,
 }) {
-  return <section className={`${CARD} ${className} ${COLUMN_HEIGHT} flex-col overflow-hidden`} aria-label="Guest conversations">
-    <header className="border-b border-border px-4 py-3">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-lg font-bold text-navy">Messages</h2>
-        <div className="flex items-center gap-1.5">
-          {unreadCount > 0 && <span className="rounded-full bg-primary-50 px-2.5 py-1 text-[11px] font-semibold text-primary-700">{plural(unreadCount, 'unread')}</span>}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={onToggleSettings}
-              aria-label="Messaging settings"
-              aria-expanded={settingsOpen}
-              className="grid h-7 w-7 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy"
-            >
-              <Settings2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
-            </button>
-            <MessagingSettings
-              open={settingsOpen}
-              hideEnded={hideEnded}
-              onHideEndedChange={onHideEndedChange}
-              onClose={onCloseSettings}
-            />
-          </div>
-        </div>
+  // flush: the rows run edge to edge, so the divider is one straight line and
+  // every row shares the px-4 gutter the thread header uses beside it.
+  return <HostCard
+    flush
+    title="Messages"
+    className={`${className || ''} ${COLUMN_HEIGHT} overflow-hidden`.trim()}
+    action={<div className="flex items-center gap-1">
+      {/* Bronze stays a mark: a small count pill, never a filled block. */}
+      {unreadCount > 0 && <Badge color="gray">{plural(unreadCount, 'unread')}</Badge>}
+      <div className="relative">
+        <button
+          type="button"
+          onClick={onToggleSettings}
+          aria-label="Messaging settings"
+          aria-expanded={settingsOpen}
+          className="grid h-11 w-11 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy"
+        >
+          <Settings2 className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+        </button>
+        <MessagingSettings
+          open={settingsOpen}
+          hideEnded={hideEnded}
+          onHideEndedChange={onHideEndedChange}
+          onClose={onCloseSettings}
+        />
       </div>
-      <label className="mt-2.5 flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-muted focus-within:border-primary">
+    </div>}
+  >
+    <div className="shrink-0 border-b border-border px-4 py-3">
+      <label className="flex items-center gap-2 rounded-full border border-border bg-surface px-3 py-2 text-muted focus-within:border-primary">
         <Search className="h-3.5 w-3.5 shrink-0" strokeWidth={1.9} aria-hidden="true" />
         <input
           type="search"
@@ -284,33 +290,33 @@ function ConversationList({
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Search guests or stays"
           aria-label="Search guest conversations"
-          className="w-full border-0 bg-transparent p-0 text-xs text-navy placeholder:text-muted focus:outline-none focus:ring-0"
+          className="w-full min-w-0 border-0 bg-transparent p-0 text-sm text-navy placeholder:text-muted focus:outline-none focus:ring-0"
         />
       </label>
-      <div className="mt-2.5 flex items-center gap-2" role="group" aria-label="Filter conversations">
+      <div className="mt-2 flex items-center gap-2" role="group" aria-label="Filter conversations">
         {[['all', `All ${totalCount}`], ['unread', `Unread ${unreadCount}`]].map(([key, label]) => (
           <button
             key={key}
             type="button"
             onClick={() => onFilterChange(key)}
             aria-pressed={filter === key}
-            className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${filter === key ? 'bg-navy-bg text-white' : 'border border-border text-muted hover:text-navy'}`}
+            className={`inline-flex min-h-[44px] items-center rounded-full px-3.5 text-xs font-semibold transition-colors ${filter === key ? 'bg-navy-bg text-white hover:bg-navy-hover' : 'border border-border text-muted hover:text-navy'}`}
           >
             {label}
           </button>
         ))}
       </div>
-    </header>
+    </div>
 
-    <div className="min-h-0 flex-1 overflow-y-auto p-2">
-      {loading ? <div className="space-y-2 p-1" aria-label="Loading guest conversations">
-        <span className="block h-16 animate-pulse rounded-lg bg-surface" />
-        <span className="block h-16 animate-pulse rounded-lg bg-surface" />
-        <span className="block h-16 animate-pulse rounded-lg bg-surface" />
-      </div> : error ? <div className="m-2 rounded-lg border border-dashed border-border p-4 text-center">
+    <div className="min-h-0 flex-1 overflow-y-auto">
+      {loading ? <div className="flex flex-col gap-2 p-3" role="status" aria-label="Loading guest conversations">
+        <span className="block h-16 animate-pulse rounded-xl bg-inset" />
+        <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:150ms]" />
+        <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:300ms]" />
+      </div> : error ? <div className="m-3 rounded-xl border border-dashed border-border p-4 text-center">
         <p className="text-xs text-muted">{error}</p>
-        <Button type="button" size="xs" color="light" className="mt-2" onClick={onRetry}>Try again</Button>
-      </div> : conversations.length === 0 ? <div className="m-2 flex flex-col items-center gap-2 rounded-lg border border-dashed border-border px-4 py-10 text-center">
+        <Button type="button" size="sm" color="light" className="mt-2 min-h-[44px]" onClick={onRetry}>Try again</Button>
+      </div> : conversations.length === 0 ? <div className="m-3 flex flex-col items-center gap-2 rounded-xl border border-dashed border-border px-4 py-10 text-center">
         <span className="grid h-9 w-9 place-items-center rounded-full bg-surface text-muted"><MessageCircleMore className="h-4 w-4" strokeWidth={1.7} aria-hidden="true" /></span>
         <strong className="text-sm font-semibold text-navy">{totalCount === 0 ? 'No guest messages yet' : 'Nothing matches'}</strong>
         <p className="text-xs leading-relaxed text-muted">
@@ -320,9 +326,13 @@ function ConversationList({
               ? 'Stays that have already ended are hidden. Turn that off in messaging settings to see them.'
               : 'Try a different name, or clear the filter to see every conversation.'}
         </p>
-      </div> : conversations.map((conversation) => <GuestRow key={conversation.id} conversation={conversation} currentUserId={currentUserId} selected={selectedId === conversation.id} />)}
+      </div> : <ul className="divide-y divide-border">
+        {conversations.map((conversation) => <li key={conversation.id}>
+          <GuestRow conversation={conversation} currentUserId={currentUserId} selected={selectedId === conversation.id} />
+        </li>)}
+      </ul>}
     </div>
-  </section>;
+  </HostCard>;
 }
 
 ConversationList.propTypes = {
@@ -353,12 +363,12 @@ function MessagingSettings({ open, hideEnded, onHideEndedChange, onClose }) {
     <div className="absolute right-0 top-full z-40 mt-1 w-[min(18rem,calc(100vw-2rem))] overflow-hidden rounded-xl border border-border bg-elevated shadow-xl" role="dialog" aria-label="Messaging settings">
       <p className="border-b border-border px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">Messaging settings</p>
 
-      <label className="flex cursor-pointer items-start gap-2.5 px-3 py-2.5 hover:bg-surface">
+      <label className="flex min-h-[44px] cursor-pointer items-start gap-2.5 px-3 py-3 hover:bg-surface">
         <input
           type="checkbox"
           checked={hideEnded}
           onChange={(event) => onHideEndedChange(event.target.checked)}
-          className="mt-0.5 h-3.5 w-3.5 rounded border-border text-primary focus:ring-0"
+          className="mt-0.5 h-4 w-4 rounded border-border text-primary focus:ring-0"
         />
         <span>
           <span className="block text-xs font-semibold text-navy">Hide stays that have ended</span>
@@ -366,12 +376,12 @@ function MessagingSettings({ open, hideEnded, onHideEndedChange, onClose }) {
         </span>
       </label>
 
-      <Link to="/host/listings" className="block border-t border-border px-3 py-2.5 hover:bg-surface">
+      <Link to="/host/listings" className="block min-h-[44px] border-t border-border px-3 py-3 hover:bg-surface">
         <span className="block text-xs font-semibold text-navy">Saved replies</span>
         <span className="block text-[11px] leading-relaxed text-muted">They belong to each listing, alongside its automatic messages.</span>
       </Link>
 
-      <Link to="/contact" className="block border-t border-border px-3 py-2.5 hover:bg-surface">
+      <Link to="/contact" className="block min-h-[44px] border-t border-border px-3 py-3 hover:bg-surface">
         <span className="block text-xs font-semibold text-navy">Give feedback</span>
         <span className="block text-[11px] leading-relaxed text-muted">Tell us what would make replying faster.</span>
       </Link>
@@ -398,7 +408,7 @@ function SavedReplyMenu({ replies, onInsert, onClose }) {
           key={reply.trigger}
           type="button"
           onClick={() => onInsert(reply.body)}
-          className="block w-full border-b border-border px-3 py-2.5 text-left transition-colors last:border-b-0 hover:bg-surface"
+          className="block min-h-[44px] w-full border-b border-border px-3 py-3 text-left transition-colors last:border-b-0 hover:bg-surface"
         >
           <span className="block text-xs font-semibold text-navy">{reply.label}</span>
           <span className="mt-0.5 line-clamp-2 block text-[11px] leading-relaxed text-muted">{reply.preview}</span>
@@ -458,34 +468,43 @@ function Thread({
     if (sent) setDraft('');
   }
 
-  return <section className={`${CARD} ${className} ${COLUMN_HEIGHT} flex-col overflow-hidden`} aria-label="Conversation">
-    <header className="flex items-center gap-3 border-b border-border px-4 py-3">
-      <Link to="/host/inbox" className="grid h-8 w-8 place-items-center rounded-full text-muted hover:bg-surface hover:text-navy md:hidden" aria-label="Back to guest messages">
-        <ChevronLeft className="h-4 w-4" strokeWidth={1.9} aria-hidden="true" />
+  // No HostCard head: the thread head carries an avatar, a name and two actions,
+  // which is more than the shared head slot takes. flush keeps the custom head
+  // on the card edge so its gutter matches the list beside it.
+  return <HostCard flush className={`${className || ''} ${COLUMN_HEIGHT} overflow-hidden`.trim()}>
+    <header className="shrink-0 border-b border-border px-4 py-3">
+      {/* One obvious way out on a phone: two columns squeezed into 360px would
+          leave neither pane readable, so mobile shows one pane at a time and
+          this row is a full 44px tap target. */}
+      <Link to="/host/inbox" className="mb-2 flex min-h-[44px] items-center gap-1 text-sm font-semibold text-navy md:hidden">
+        <ChevronLeft className="h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
+        Back to messages
       </Link>
-      <span className="relative h-10 w-10 shrink-0">
-        <span className="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-navy-bg text-[11px] font-bold text-white">
-          {participant.avatar ? <img src={participant.avatar} alt="" className="h-full w-full object-cover" /> : initialsFor(participant.name)}
+      <div className="flex items-center gap-3">
+        <span className="relative h-10 w-10 shrink-0">
+          <span className="grid h-10 w-10 place-items-center overflow-hidden rounded-full bg-navy-bg text-[11px] font-bold text-white">
+            {participant.avatar ? <img src={participant.avatar} alt="" className="h-full w-full object-cover" /> : initialsFor(participant.name)}
+          </span>
+          {image && <img className="absolute -bottom-1 -right-1 h-4 w-4 rounded border border-elevated object-cover" src={image} alt="" />}
         </span>
-        {image && <img className="absolute -bottom-1 -right-1 h-4 w-4 rounded border border-elevated object-cover" src={image} alt="" />}
-      </span>
-      <div className="min-w-0 flex-1">
-        <h2 className="truncate text-base font-semibold text-navy">{participant.name}</h2>
-        <p className="truncate text-xs text-muted">{property.title || 'Stay conversation'} <span aria-hidden="true">·</span> {stay}</p>
+        <div className="min-w-0 flex-1">
+          <h2 className="truncate text-base font-semibold text-navy">{participant.name}</h2>
+          <p className="truncate text-xs text-muted">{property.title || 'Stay conversation'}, {stay}</p>
+        </div>
+        <Button type="button" size="sm" color="light" className="min-h-[44px] shrink-0 xl:hidden" onClick={onShowReservation}>Reservation</Button>
+        {conversation?.booking?.id && <Button as={Link} to={`/host/reservations/${conversation.booking.id}`} size="sm" color="light" className="hidden shrink-0 sm:inline-flex">Open booking</Button>}
       </div>
-      <Button type="button" size="xs" color="light" className="xl:hidden" onClick={onShowReservation}>Reservation</Button>
-      {conversation?.booking?.id && <Button as={Link} to={`/host/reservations/${conversation.booking.id}`} size="xs" color="light" className="hidden sm:inline-flex">Open booking</Button>}
     </header>
 
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4" ref={threadRef} aria-live="polite">
-      {loading ? <div className="space-y-2" aria-label="Loading messages">
-        <span className="block h-12 w-2/3 animate-pulse rounded-xl bg-surface" />
-        <span className="ml-auto block h-12 w-1/2 animate-pulse rounded-xl bg-surface" />
-        <span className="block h-12 w-3/5 animate-pulse rounded-xl bg-surface" />
-      </div> : error && messages.length === 0 ? <div className="rounded-lg border border-dashed border-border p-4 text-center">
+      {loading ? <div className="flex flex-col gap-2" role="status" aria-label="Loading messages">
+        <span className="block h-12 w-2/3 animate-pulse rounded-xl bg-inset" />
+        <span className="ml-auto block h-12 w-1/2 animate-pulse rounded-xl bg-inset" />
+        <span className="block h-12 w-3/5 animate-pulse rounded-xl bg-inset" />
+      </div> : error && messages.length === 0 ? <div className="rounded-xl border border-dashed border-border p-4 text-center">
         <p className="text-xs text-muted">{error}</p>
-        <Button type="button" size="xs" color="light" className="mt-2" onClick={onRetry}>Try again</Button>
-      </div> : messages.length === 0 ? <div className="rounded-lg border border-dashed border-border p-6 text-center">
+        <Button type="button" size="sm" color="light" className="mt-2 min-h-[44px]" onClick={onRetry}>Try again</Button>
+      </div> : messages.length === 0 ? <div className="rounded-xl border border-dashed border-border p-6 text-center">
         <strong className="block text-sm font-semibold text-navy">No messages yet</strong>
         <p className="mt-1 text-xs leading-relaxed text-muted">Say hello to {participant.name} and share the arrival details.</p>
       </div> : <>
@@ -493,10 +512,10 @@ function Thread({
             a mature host inbox: it dates every message below it. */}
         {booking.id && <div className="mb-4 text-center">
           <p className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">{status.label}</p>
-          <p className="mt-1 text-xs text-muted">
-            {plural(booking.guests || 1, 'guest')}, {stay}
-            <button type="button" className="ml-1.5 font-semibold text-navy underline underline-offset-2 xl:hidden" onClick={onShowReservation}>Show reservation</button>
-          </p>
+          <p className="mt-1 text-xs text-muted">{plural(booking.guests || 1, 'guest')}, {stay}</p>
+          {/* A 44px button rather than a small inline link: on a phone the stay
+              marker is the only way into the reservation from the thread. */}
+          <Button type="button" size="sm" color="light" className="mt-2 min-h-[44px] xl:hidden" onClick={onShowReservation}>Show reservation</Button>
         </div>}
 
         {groups.map((group) => <div key={group.key} className="mb-4 last:mb-0">
@@ -521,12 +540,12 @@ function Thread({
 
     <div className="border-t border-border p-3">
       <div className="flex items-end gap-2">
-        <div className="relative">
+        <div className="relative shrink-0">
           <Button
             type="button"
             color="light"
             size="sm"
-            className="h-9 w-9 p-0"
+            className="h-11 w-11 p-0"
             aria-label="Insert a saved reply"
             aria-expanded={repliesOpen}
             disabled={savedRepliesLoading}
@@ -555,15 +574,15 @@ function Thread({
           rows={1}
           placeholder={`Reply to ${participant.name}...`}
           aria-label="Reply to guest"
-          className="flex-1"
+          className="min-w-0 flex-1"
         />
-        <Button type="button" onClick={submit} disabled={!canSend} aria-label={sending ? 'Sending message' : 'Send message'}>
+        <Button type="button" onClick={submit} disabled={!canSend} className="shrink-0" aria-label={sending ? 'Sending message' : 'Send message'}>
           <Send className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           <span className="ml-2 hidden sm:inline">{sending ? 'Sending...' : 'Send'}</span>
         </Button>
       </div>
     </div>
-  </section>;
+  </HostCard>;
 }
 
 Thread.propTypes = {
@@ -623,14 +642,16 @@ function ReservationPanel({ conversation, currentUserId, onClose, className }) {
   const nights = nightsBetween(booking.checkIn, booking.checkOut);
   const status = statusOf(booking.status);
 
-  return <section className={`${CARD} ${className} ${COLUMN_HEIGHT} flex-col overflow-hidden`} aria-label="Reservation details">
-    <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-3">
-      <h2 className="text-sm font-semibold text-navy">Reservation</h2>
-      <button type="button" onClick={onClose} className="grid h-7 w-7 place-items-center rounded-full text-muted hover:bg-surface hover:text-navy xl:hidden" aria-label="Close reservation details">
-        <X className="h-4 w-4" strokeWidth={1.9} aria-hidden="true" />
-      </button>
-    </header>
-
+  // The card head is the shared one: title on the left, close on the right, so
+  // the panel edge lines up with the list and thread cards beside it.
+  return <HostCard
+    flush
+    title="Reservation"
+    className={`${className || ''} ${COLUMN_HEIGHT} overflow-hidden`.trim()}
+    action={<button type="button" onClick={onClose} className="grid h-11 w-11 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy xl:hidden" aria-label="Close reservation details">
+      <X className="h-4 w-4" strokeWidth={1.9} aria-hidden="true" />
+    </button>}
+  >
     <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
       <div className="flex flex-col items-center text-center">
         <span className="grid h-16 w-16 place-items-center overflow-hidden rounded-full bg-navy-bg text-lg font-bold text-white">
@@ -638,7 +659,7 @@ function ReservationPanel({ conversation, currentUserId, onClose, className }) {
         </span>
         <h3 className="mt-3 text-base font-semibold text-navy">{participant.name}</h3>
         <p className="mt-0.5 text-xs text-muted">
-          {plural(booking.guests || 1, 'guest')} <span aria-hidden="true">·</span> {plural(nights, 'night')}
+          {plural(booking.guests || 1, 'guest')}, {plural(nights, 'night')}
         </p>
         <p className="mt-1 text-xs text-muted">{property.title || 'Stay'}</p>
       </div>
@@ -673,21 +694,22 @@ function ReservationPanel({ conversation, currentUserId, onClose, className }) {
         </p>}
       </div>
 
-      <label className="mt-4 block">
-        <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-muted">Your notes</span>
-        <textarea
+      {/* Label above field, same rhythm as the host settings forms. */}
+      <div className="mt-4">
+        <Label htmlFor="host-private-note" className="mb-1.5 block">Your notes</Label>
+        <Textarea
+          id="host-private-note"
           value={note}
           onChange={(event) => setNote(event.target.value)}
           rows={3}
           placeholder="Add a note to yourself"
-          className="mt-1.5 w-full rounded-xl border border-border bg-surface px-3 py-2 text-xs leading-relaxed text-navy placeholder:text-muted focus:border-primary focus:outline-none focus:ring-0"
         />
-        <span className="mt-1 block text-[10px] text-muted">Only you see this. It is saved on this device.</span>
-      </label>
+        <p className="mt-1.5 text-xs text-muted">Only you see this. It is saved on this device.</p>
+      </div>
 
-      {booking.id && <Button as={Link} to={`/host/reservations/${booking.id}`} color="light" size="sm" className="mt-4 w-full">Open booking</Button>}
+      {booking.id && <Button as={Link} to={`/host/reservations/${booking.id}`} color="light" size="sm" className="mt-4 min-h-[44px] w-full">Open booking</Button>}
     </div>
-  </section>;
+  </HostCard>;
 }
 
 ReservationPanel.propTypes = {
@@ -698,11 +720,15 @@ ReservationPanel.propTypes = {
 };
 
 function EmptyThread({ className }) {
-  return <section className={`${CARD} ${className} ${COLUMN_HEIGHT} flex-col items-center justify-center px-6 py-12 text-center`}>
-    <span className="grid h-11 w-11 place-items-center rounded-full bg-surface text-muted"><MessageCircleMore className="h-5 w-5" strokeWidth={1.7} aria-hidden="true" /></span>
-    <strong className="mt-3 text-base font-semibold text-navy">Select a conversation</strong>
-    <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted">Open a guest conversation to read the thread and reply. Messages about your stays arrive here, not in your travel inbox.</p>
-  </section>;
+  return <HostCard flush className={`${className || ''} ${COLUMN_HEIGHT} overflow-hidden`.trim()}>
+    <div className="grid flex-1 place-items-center px-6 py-12 text-center">
+      <div className="flex flex-col items-center">
+        <span className="grid h-11 w-11 place-items-center rounded-full bg-surface text-muted"><MessageCircleMore className="h-5 w-5" strokeWidth={1.7} aria-hidden="true" /></span>
+        <strong className="mt-3 text-base font-semibold text-navy">Select a conversation</strong>
+        <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted">Open a guest conversation to read the thread and reply. Messages about your stays arrive here, not in your travel inbox.</p>
+      </div>
+    </div>
+  </HostCard>;
 }
 
 EmptyThread.propTypes = { className: PropTypes.string };
@@ -885,19 +911,19 @@ export default function HostInboxPage() {
     ? 'md:grid-cols-[minmax(0,320px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,320px)_minmax(0,1fr)_minmax(0,290px)]'
     : 'md:grid-cols-[minmax(0,320px)_minmax(0,1fr)]';
 
-  return <div className="space-y-4">
-    <header className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+  return <div className="flex flex-col gap-4">
+    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <p className={PANEL_HEAD}>HOST WORKSPACE</p>
-        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Messages</h1>
+        <p className={HOST_EYEBROW}>Host workspace</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Messages</h1>
       </div>
-      <Button as={Link} to="/host/today" size="sm" color="light" className="w-fit">Today&apos;s schedule</Button>
+      <Button as={Link} to="/host/today" size="sm" color="light" className="min-h-[44px] w-full sm:min-h-0 sm:w-fit">Today&apos;s schedule</Button>
     </header>
 
     {conversationsError && <Alert color="failure">
       <div className="flex w-full flex-wrap items-center justify-between gap-3">
         <p className="min-w-0 flex-1">{conversationsError}</p>
-        <Button size="xs" color="light" onClick={loadConversations}>Try again</Button>
+        <Button size="sm" color="light" className="min-h-[44px] shrink-0" onClick={loadConversations}>Try again</Button>
       </div>
     </Alert>}
 

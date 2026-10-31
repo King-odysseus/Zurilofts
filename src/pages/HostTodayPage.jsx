@@ -6,13 +6,13 @@ import { CalendarDays } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
 import { firstImage } from "../utils/images.js";
+import HostCard, { HOST_EYEBROW } from "../components/HostCard.jsx";
 import HostFollowUps from "../components/HostFollowUps.jsx";
 
 // Badge tones replace the old per-tone status pills on each panel header.
 const TONE_COLORS = { arrival: "info", inhouse: "warning", departure: "success" };
 
-const CARD = "rounded-xl border border-border bg-elevated p-5 shadow-sm";
-const EYEBROW = "text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600";
+const SKELETON_HEIGHTS = ["h-24", "h-44", "h-24", "h-64"];
 
 function formatToday() {
   return new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long" });
@@ -52,8 +52,11 @@ function GuestOperationCard({ booking, type, compact = false, onMessage, message
   const propertyTitle = property.title || "Your stay";
   const time = bookingTime(booking, type);
 
-  return <article className={`flex items-center gap-3 rounded-xl border border-border bg-elevated ${compact ? "p-2.5" : "p-3"}`}>
-    <Link to={`/property/${property.id || ""}`} className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-surface text-sm font-bold uppercase text-muted" aria-label={propertyTitle}>
+  // Rows sit inside a HostCard on desktop and directly on the page on mobile,
+  // so the tile carries its own surface tint instead of a border that would
+  // double up with the card outline.
+  return <article className={`flex items-center gap-3 rounded-xl bg-surface ${compact ? "p-2.5" : "p-3"}`}>
+    <Link to={`/property/${property.id || ""}`} className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-elevated text-sm font-bold uppercase text-muted" aria-label={propertyTitle}>
       {image ? <img src={image} alt="" className="h-full w-full object-cover" /> : <span>{guestInitials(booking)}</span>}
     </Link>
     <div className="min-w-0 flex-1">
@@ -97,16 +100,30 @@ function EmptyPanel({ label }) {
 
 EmptyPanel.propTypes = { label: PropTypes.string.isRequired };
 
+function StatTile({ label, hint, value }) {
+  return <HostCard>
+    <div className="flex items-center justify-between gap-4">
+      <div className="min-w-0">
+        <span className="block truncate text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</span>
+        <small className="mt-1 block text-xs text-muted">{hint}</small>
+      </div>
+      <strong className="text-2xl font-bold tabular-nums text-navy">{value}</strong>
+    </div>
+  </HostCard>;
+}
+
+StatTile.propTypes = {
+  label: PropTypes.string.isRequired,
+  hint: PropTypes.string.isRequired,
+  value: PropTypes.node.isRequired,
+};
+
 function OperationPanel({ title, count, tone, bookings, type, onMessage, messageBookingId }) {
-  return <section className={CARD}>
-    <header className="mb-3 flex items-center justify-between gap-3">
-      <h2 className="text-base font-semibold text-navy">{title}</h2>
-      <Badge color={TONE_COLORS[tone]}>{count} today</Badge>
-    </header>
+  return <HostCard title={title} action={<Badge color={TONE_COLORS[tone]}>{count} today</Badge>}>
     <div className="space-y-3">
       {bookings.length === 0 ? <EmptyPanel label={title} /> : bookings.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={type} compact onMessage={onMessage} messagePending={messageBookingId === booking.id} />)}
     </div>
-  </section>;
+  </HostCard>;
 }
 
 OperationPanel.propTypes = {
@@ -120,29 +137,36 @@ OperationPanel.propTypes = {
 };
 
 function RecentMessages({ conversations, loading }) {
-  return <section className={CARD}>
-    <header className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-      <div>
-        <span className={`block ${EYEBROW}`}>GUEST MESSAGES</span>
-        <h2 className="mt-1 text-base font-semibold text-navy">Recent conversations</h2>
+  return <HostCard
+    eyebrow="GUEST MESSAGES"
+    title="Recent conversations"
+    action={<Button as={Link} to="/host/inbox" color="light" size="sm">View inbox</Button>}
+  >
+    {loading
+      ? <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <span className="block h-20 animate-pulse rounded-xl bg-surface" />
+        <span className="block h-20 animate-pulse rounded-xl bg-surface" />
       </div>
-      <Button as={Link} to="/host/inbox" color="light" size="sm">View inbox</Button>
-    </header>
-    {loading ? <div className="grid grid-cols-1 gap-3 lg:grid-cols-3"><span className="block h-20 animate-pulse rounded-xl border border-border bg-surface" /><span className="block h-20 animate-pulse rounded-xl border border-border bg-surface" /></div> : conversations.length === 0 ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border bg-surface px-5 py-12 text-center"><strong className="text-sm font-semibold text-navy">No guest messages yet</strong><p className="text-xs text-muted">New stay conversations will appear here.</p></div> : <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+      : conversations.length === 0
+        ? <div className="flex flex-col items-center gap-2 rounded-xl border border-dashed border-border px-5 py-12 text-center">
+          <strong className="text-sm font-semibold text-navy">No guest messages yet</strong>
+          <p className="text-xs text-muted">New stay conversations will appear here.</p>
+        </div>
+        : <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
       {conversations.map((conversation) => {
         const booking = conversation.booking || {};
         const property = booking.property || {};
         const user = booking.user || {};
         const name = [user.firstName, user.lastName].filter(Boolean).join(" ") || "Guest";
         const image = firstImage(property);
-        return <Link key={conversation.id} to={`/host/inbox/${conversation.id}`} className="flex items-start gap-3 rounded-xl border border-border bg-surface p-3 transition-colors hover:bg-primary-50">
+        return <Link key={conversation.id} to={`/host/inbox/${conversation.id}`} className="flex items-start gap-3 rounded-xl bg-surface p-3 transition-colors hover:bg-surface">
           <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-elevated text-xs font-bold uppercase text-muted">{image ? <img src={image} alt="" className="h-full w-full object-cover" /> : name.slice(0, 1)}</span>
           <div className="min-w-0 flex-1"><strong className="block truncate text-sm font-semibold text-navy">{name}</strong><small className="block truncate text-xs text-muted">{property.title || "Stay"}</small><p className="mt-1 truncate text-xs text-muted">{conversation.lastMessage?.content || "No messages yet"}</p></div>
           <time className="shrink-0 text-[10px] text-muted">{relativeTime(conversation.lastMessage?.createdAt || conversation.updatedAt)}</time>
         </Link>;
       })}
     </div>}
-  </section>;
+  </HostCard>;
 }
 
 RecentMessages.propTypes = {
@@ -223,9 +247,13 @@ export default function HostTodayPage() {
     }
   }
 
-  if (loading) return <div className="space-y-6" aria-label="Loading host dashboard"><span className="block h-24 animate-pulse rounded-xl border border-border bg-elevated" /><span className="block h-44 animate-pulse rounded-xl border border-border bg-elevated" /><span className="block h-24 animate-pulse rounded-xl border border-border bg-elevated" /><span className="block h-64 animate-pulse rounded-xl border border-border bg-elevated" /></div>;
+  if (loading) return <div className="space-y-6" aria-label="Loading host dashboard">
+    {SKELETON_HEIGHTS.map((height, index) => <HostCard key={`${height}-${index}`}>
+      <span className={`block ${height} animate-pulse rounded-xl bg-surface`} />
+    </HostCard>)}
+  </div>;
 
-  if (error) return <div className="space-y-6"><div className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><p className="text-sm text-charcoal">{error}</p><Button type="button" size="sm" className="mt-3" onClick={() => window.location.reload()}>Try again</Button></div></div>;
+  if (error) return <div className="space-y-6"><HostCard><p className="text-sm text-charcoal">{error}</p><Button type="button" size="sm" onClick={() => window.location.reload()}>Try again</Button></HostCard></div>;
 
   const { arrivals = [], departures = [], inHouse = [], summary = {} } = data || {};
   const priority = arrivals[0] || inHouse[0] || departures[0];
@@ -234,7 +262,7 @@ export default function HostTodayPage() {
   return <div className="space-y-6">
     <header className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <p className={EYEBROW}>HOST WORKSPACE</p>
+        <p className={HOST_EYEBROW}>HOST WORKSPACE</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Today</h1>
         <span className="mt-1 block text-sm text-muted">{formatToday()}</span>
       </div>
@@ -252,32 +280,39 @@ export default function HostTodayPage() {
     </Alert>}
 
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-      <section className="flex flex-col justify-between gap-4 rounded-xl border border-border bg-primary-50 dark:bg-primary/15 p-5 shadow-sm sm:flex-row sm:items-center lg:col-span-2">
-        <div>
-          <p className={EYEBROW}>TODAY AT YOUR STAYS</p>
-          <h2 className="mt-1 text-xl font-semibold text-navy">Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}{user?.firstName ? `, ${user.firstName}` : ""}</h2>
-          <span className="mt-2 block text-sm leading-relaxed text-muted">{summary.arrivals || 0} arrivals, {summary.departures || 0} departures, and {summary.inHouse || 0} in-house guests on today&apos;s schedule.</span>
+      <HostCard
+        className="lg:col-span-2"
+        eyebrow="TODAY AT YOUR STAYS"
+        title={`Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}${user?.firstName ? `, ${user.firstName}` : ""}`}
+        action={<Button as={Link} to="/host/calendar" size="sm" className="md:hidden">Open calendar</Button>}
+      >
+        <p className="text-sm leading-relaxed text-muted">{summary.arrivals || 0} arrivals, {summary.departures || 0} departures, and {summary.inHouse || 0} in-house guests on today&apos;s schedule.</p>
+      </HostCard>
+      {/* White-on-navy text cannot use the shared head props, so the tint is the
+          card body itself: flush removes the body padding and overflow-hidden
+          trims the fill to the card radius. */}
+      <HostCard flush className="overflow-hidden">
+        <div className="flex h-full flex-col gap-3 bg-navy-bg p-4 sm:p-5">
+          <div className="min-w-0">
+            <p className={HOST_EYEBROW}>PRIORITY NEXT STEP</p>
+            <h2 className="mt-1 text-base font-semibold text-white">{priority ? (priorityType === "arrival" ? "Confirm arrival details" : priorityType === "departure" ? "Review today's checkout" : "Check your in-house guest") : "Your day is clear"}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">{priority ? `${guestName(priority)} at ${priority.property?.title || "your property"} · ${bookingTime(priority, priorityType)}` : "There are no urgent guest actions scheduled right now."}</p>
+          </div>
+          {/* The card only needs its own action when there is a booking to open.
+              With nothing scheduled the call to action repeated the calendar
+              button already shown above, so the card stays informational. */}
+          {priority && <Button as={Link} to={`/host/reservations/${priority.id}`} size="sm" className="self-start">Review booking</Button>}
         </div>
-        <Button as={Link} to="/host/calendar" size="sm" className="self-start md:hidden">Open calendar</Button>
-      </section>
-      <section className="flex flex-col items-start rounded-xl border border-border bg-navy-bg p-5 shadow-sm">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">PRIORITY NEXT STEP</p>
-        <h2 className="mt-1 text-xl font-semibold text-white">{priority ? (priorityType === "arrival" ? "Confirm arrival details" : priorityType === "departure" ? "Review today's checkout" : "Check your in-house guest") : "Your day is clear"}</h2>
-        <span className="mt-2 block text-sm leading-relaxed text-white/70">{priority ? `${guestName(priority)} at ${priority.property?.title || "your property"} · ${bookingTime(priority, priorityType)}` : "There are no urgent guest actions scheduled right now."}</span>
-        {/* The card only needs its own action when there is a booking to open.
-            With nothing scheduled the call to action repeated the calendar
-            button already shown above, so the card stays informational. */}
-        {priority && <Button as={Link} to={`/host/reservations/${priority.id}`} size="sm" className="mt-4 self-start">Review booking</Button>}
-      </section>
+      </HostCard>
     </div>
 
     <div className="hidden grid-cols-1 gap-4 sm:grid sm:grid-cols-3">
-      <article className="flex items-center justify-between gap-4 rounded-xl border border-border bg-elevated p-4 shadow-sm"><div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Arrivals</span><small className="mt-1 block text-xs text-muted">Guests checking in</small></div><strong className="text-2xl font-bold text-navy">{summary.arrivals || 0}</strong></article>
-      <article className="flex items-center justify-between gap-4 rounded-xl border border-border bg-elevated p-4 shadow-sm"><div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Departures</span><small className="mt-1 block text-xs text-muted">Guests checking out</small></div><strong className="text-2xl font-bold text-navy">{summary.departures || 0}</strong></article>
-      <article className="flex items-center justify-between gap-4 rounded-xl border border-border bg-elevated p-4 shadow-sm"><div><span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">In house</span><small className="mt-1 block text-xs text-muted">Stays in progress</small></div><strong className="text-2xl font-bold text-navy">{summary.inHouse || 0}</strong></article>
+      <StatTile label="Arrivals" hint="Guests checking in" value={summary.arrivals || 0} />
+      <StatTile label="Departures" hint="Guests checking out" value={summary.departures || 0} />
+      <StatTile label="In house" hint="Stays in progress" value={summary.inHouse || 0} />
     </div>
 
-    <div className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:[&>section:last-child]:col-span-2 lg:[&>section:last-child]:col-span-1">
+    <div className="hidden gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 md:[&>div:last-child]:col-span-2 lg:[&>div:last-child]:col-span-1">
       <OperationPanel title="Arrivals" count={arrivals.length} tone="arrival" bookings={arrivals} type="arrival" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
       <OperationPanel title="In house" count={inHouse.length} tone="inhouse" bookings={inHouse} type="inhouse" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
       <OperationPanel title="Departures" count={departures.length} tone="departure" bookings={departures} type="departure" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
