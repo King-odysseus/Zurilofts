@@ -221,6 +221,11 @@ model Property {
   // Arrival guide - what a guest needs once the booking is confirmed.
   directions     String?
   checkInMethod  String?
+  // Check-in and checkout times, set by the host in the listing editor's
+  // arrival guide and shown to guests after a booking is confirmed.
+  checkInWindowStart String?
+  checkInWindowEnd   String?
+  checkOutTime       String?
   wifiNetwork    String?
   wifiPassword   String?
   houseManual    String?
@@ -235,6 +240,7 @@ model Property {
   calendarSources CalendarSource[]
   calendarBlocks  CalendarBlock[]
   priceRules      PriceRule[]
+  stayRules       StayRule[]
   guestReviews    Review[]
   favoritedBy     Favorite[]
   shortlistItems ShortlistItem[]
@@ -290,6 +296,22 @@ model PriceRule {
 
   @@index([propertyId])
 }
+
+// Date-range minimum stay. A night covered by no rule has no minimum, which is
+// the platform default, so a rule here only ever tightens a booking.
+model StayRule {
+  id         String   @id @default(uuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  start      DateTime
+  end        DateTime
+  minNights  Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([propertyId])
+}
+
 
 model Booking {
   id              String        @id @default(uuid())

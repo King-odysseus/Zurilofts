@@ -5,6 +5,7 @@ import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, 
 import { isRangeAvailable, isRangeAvailableWithDb, PENDING_HOLD_MINUTES } from './calendar.service.js';
 import { isBookable } from './property.service.js';
 import { isPromoUsableForProperty, type BookingTarget } from './promo.service.js';
+import { minNightsForCheckIn } from './stayRule.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
 import { env } from '../config/env.js';
 
@@ -191,6 +192,17 @@ export async function createBooking(input: CreateBookingInput) {
   const available = await isRangeAvailable(input.propertyId, checkInDate, checkOutDate);
   if (!available) {
     throw new ConflictError('Those dates are no longer available for this property');
+  }
+
+  // A host can require more than one night for a date range. The rule is read
+  // for the check-in night, the night the requirement is set on, and a property
+  // with no rule resolves to 1 so nothing tightens by default.
+  const requiredNights = await minNightsForCheckIn(input.propertyId, checkInDate);
+  const requestedNights = calculateNights(checkInDate, checkOutDate);
+  if (requestedNights < requiredNights) {
+    throw new ValidationError(
+      `This listing has a ${requiredNights}-night minimum for those dates. Please stay ${requiredNights} nights or more.`
+    );
   }
 
   // Enforce occupancy limits: 2 per bed, 6 absolute max

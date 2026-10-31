@@ -95,6 +95,11 @@ export const propertyCreateSchema = z.object({
   // emptying a field clears it rather than leaving the old text behind.
   directions: z.string().max(1000).nullable().optional(),
   checkInMethod: z.string().max(100).nullable().optional(),
+  // Arrival and departure times, free text so the host can write "15:00" or
+  // "Flexible" without the API rejecting a perfectly clear answer.
+  checkInWindowStart: z.string().max(20).nullable().optional(),
+  checkInWindowEnd: z.string().max(20).nullable().optional(),
+  checkOutTime: z.string().max(20).nullable().optional(),
   wifiNetwork: z.string().max(100).nullable().optional(),
   wifiPassword: z.string().max(100).nullable().optional(),
   houseManual: z.string().max(4000).nullable().optional(),
@@ -431,6 +436,14 @@ export const priceRuleSchema = z.object({
   start: dateString,
   end: dateString,
   price: z.number().int().positive(),
+});
+
+// A dated minimum stay. One night means no minimum, so the floor is 1 and the
+// calendar deletes a rule to lift the restriction rather than sending a zero.
+export const stayRuleSchema = z.object({
+  start: dateString,
+  end: dateString,
+  minNights: z.number().int().min(1).max(30),
 });
 
 // ---- Guides (blog) ----

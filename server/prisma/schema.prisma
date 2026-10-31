@@ -214,6 +214,11 @@ model Property {
   // the listing so a host writes it once and can correct it later.
   directions        String? // how to find the property
   checkInMethod     String? // Lockbox | Keypad | Smart lock | Building staff | Host greets
+  // Check-in and checkout times, set by the host in the listing editor's
+  // arrival guide and shown to guests after a booking is confirmed.
+  checkInWindowStart String? // time guests may arrive from, e.g. "15:00"
+  checkInWindowEnd   String? // last arrival time, or "Flexible"
+  checkOutTime       String? // time guests must leave by, e.g. "10:00"
   wifiNetwork       String? // network name (SSID)
   wifiPassword      String?
   houseManual       String? // free-text house manual
@@ -228,6 +233,7 @@ model Property {
   calendarSources   CalendarSource[]
   calendarBlocks    CalendarBlock[]
   priceRules        PriceRule[]
+  stayRules       StayRule[]
   guestReviews      Review[]
   favoritedBy       Favorite[]
   shortlistItems    ShortlistItem[]
@@ -283,6 +289,22 @@ model PriceRule {
 
   @@index([propertyId])
 }
+
+// Date-range minimum stay. A night covered by no rule has no minimum, which is
+// the platform default, so a rule here only ever tightens a booking.
+model StayRule {
+  id         String   @id @default(cuid())
+  propertyId String
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  start      DateTime
+  end        DateTime
+  minNights  Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([propertyId])
+}
+
 
 model Booking {
   id                   String          @id @default(cuid())

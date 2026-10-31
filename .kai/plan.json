@@ -2,37 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Fix phone calendar: Custom settings opens an editable panel instead of scrolling behind the sheet",
+      "text": "Read current calendar sheet, page and pricing backend to see what a night edit can actually do",
       "state": "done"
     },
     {
-      "text": "Check the calendar sheet and settings panel on screen at phone width",
+      "text": "Add a dated minimum-stay rule to the backend (schema, migration, service, routes, calendar payload, booking check)",
       "state": "done"
     },
     {
-      "text": "Find the host arrival guide page (another run had just built and committed it, so I reviewed it instead of rebuilding)",
-      "state": "done"
+      "text": "Build the in-sheet Custom settings dropdown: nightly rate, promotion, minimum stay, each edited in place",
+      "state": "active"
     },
     {
-      "text": "Page shell checked: centred header, gear action, Your space / Arrival guide toggle",
-      "state": "done"
+      "text": "Wire the page: save rate/promotion/min stay for the selected nights and reload the calendar",
+      "state": "pending"
     },
     {
-      "text": "Section cards checked: rounded white card, bold title, grey value line, Add details when empty",
-      "state": "done"
+      "text": "Fix the calendar's dated-rate range so it matches what guests are charged",
+      "state": "pending"
     },
     {
-      "text": "House rules checked: icon rows, + 2 more, black View pill, and saving from the page works",
-      "state": "done"
-    },
-    {
-      "text": "Checked the arrival guide at desktop and phone width",
-      "state": "done"
-    },
-    {
-      "text": "Lint and build pass with the arrival guide in the tree",
-      "state": "done"
+      "text": "Run lint and build, apply the migration, and confirm the phone sheet behaves",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-31T16:04:43.313Z"
+  "updatedAt": "2026-10-31T16:23:31.844Z"
 }

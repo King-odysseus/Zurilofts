@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as calendarService from '../services/calendar.service.js';
 import * as icalService from '../services/ical.service.js';
 import * as priceRuleService from '../services/priceRule.service.js';
+import * as stayRuleService from '../services/stayRule.service.js';
 import { NotFoundError } from '../types/index.js';
 import prisma from '../config/prisma.js';
 
@@ -124,6 +125,39 @@ export async function deletePriceRule(req: Request, res: Response, next: NextFun
   try {
     await priceRuleService.deletePriceRule(req.params.ruleId, ownerScope(req));
     res.json({ success: true, message: 'Price rule removed' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// ---- Admin: dated minimum stays ----
+
+export async function listStayRules(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const rules = await stayRuleService.listStayRules(req.params.id, ownerScope(req));
+    res.json({ success: true, data: rules });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function addStayRule(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const rule = await stayRuleService.addStayRule(req.params.id, {
+      start: new Date(req.body.start),
+      end: new Date(req.body.end),
+      minNights: req.body.minNights,
+    }, ownerScope(req));
+    res.status(201).json({ success: true, data: rule });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deleteStayRule(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    await stayRuleService.deleteStayRule(req.params.ruleId, ownerScope(req));
+    res.json({ success: true, message: 'Stay rule removed' });
   } catch (error) {
     next(error);
   }

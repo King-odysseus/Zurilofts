@@ -25,7 +25,9 @@ export default function CalendarQuickSheet({
   onBlock,
   onOpen,
   onClear,
-  onSettings,
+  settingsExpanded,
+  onToggleSettings,
+  children,
 }) {
   if (!open) return null;
 
@@ -105,14 +107,30 @@ export default function CalendarQuickSheet({
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={onSettings}
-        className="flex w-full items-center justify-between gap-3 rounded-2xl bg-navy-bg px-4 py-3 text-sm font-semibold text-white shadow-xl transition-colors hover:bg-navy-hover"
-      >
-        <span>Custom settings</span>
-        <Plus className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />
-      </button>
+      {/* Custom settings is a dropdown, not a trip to another page: the row
+          opens in place and the editor it reveals writes straight to the nights
+          that are picked. The plus turns into a cross while it is open. */}
+      <div className="overflow-hidden rounded-2xl bg-navy-bg shadow-xl">
+        <button
+          type="button"
+          onClick={onToggleSettings}
+          aria-expanded={settingsExpanded}
+          aria-controls="quick-sheet-custom-settings"
+          className={`flex w-full items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-hover ${settingsExpanded ? '' : 'rounded-2xl'}`}
+        >
+          <span>Custom settings</span>
+          <Plus
+            className={`h-4 w-4 shrink-0 transition-transform duration-200 ${settingsExpanded ? 'rotate-45' : ''}`}
+            strokeWidth={2}
+            aria-hidden="true"
+          />
+        </button>
+        {settingsExpanded && (
+          <div id="quick-sheet-custom-settings" className="max-h-[46vh] overflow-y-auto overscroll-contain border-t border-white/10">
+            {children}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -131,5 +149,7 @@ CalendarQuickSheet.propTypes = {
   onBlock: PropTypes.func.isRequired,
   onOpen: PropTypes.func.isRequired,
   onClear: PropTypes.func.isRequired,
-  onSettings: PropTypes.func.isRequired,
+  settingsExpanded: PropTypes.bool.isRequired,
+  onToggleSettings: PropTypes.func.isRequired,
+  children: PropTypes.node,
 };

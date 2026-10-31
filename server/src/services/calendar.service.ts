@@ -34,7 +34,7 @@ export async function getPropertyCalendar(propertyId: string, ownerId?: string) 
 
   const token = await ensureIcalToken(propertyId);
 
-  const [sources, blocks, bookings, priceRules] = await Promise.all([
+  const [sources, blocks, bookings, priceRules, stayRules] = await Promise.all([
     prisma.calendarSource.findMany({
       where: { propertyId },
       orderBy: { createdAt: 'asc' },
@@ -52,6 +52,9 @@ export async function getPropertyCalendar(propertyId: string, ownerId?: string) 
     // The host calendar prices each night, so the base rate and any dated
     // overrides travel with the calendar rather than in a second request.
     prisma.priceRule.findMany({ where: { propertyId }, orderBy: { start: 'asc' } }),
+    // Minimum stays travel with the calendar too, so the sheet can show the
+    // rule covering the picked nights and offer to remove it.
+    prisma.stayRule.findMany({ where: { propertyId }, orderBy: { start: 'asc' } }),
   ]);
 
   return {
@@ -69,6 +72,12 @@ export async function getPropertyCalendar(propertyId: string, ownerId?: string) 
       start: rule.start,
       end: rule.end,
       price: rule.price,
+    })),
+    stayRules: stayRules.map((rule) => ({
+      id: rule.id,
+      start: rule.start,
+      end: rule.end,
+      minNights: rule.minNights,
     })),
     icalToken: token,
     sources,

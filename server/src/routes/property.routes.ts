@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate, requireHost, requireHostWorkspace } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { propertyCreateSchema, propertyUpdateSchema, autoMessageTemplatesSchema, calendarSourceSchema, calendarBlockSchema, priceRuleSchema } from '../types/index.js';
+import { propertyCreateSchema, propertyUpdateSchema, autoMessageTemplatesSchema, calendarSourceSchema, calendarBlockSchema, priceRuleSchema, stayRuleSchema } from '../types/index.js';
 import * as ctrl from '../controllers/property.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
 import * as autoMsgCtrl from '../controllers/auto-message.controller.js';
@@ -42,6 +42,9 @@ router.delete('/:id/calendar/blocks/:blockId', authenticate, requireHostWorkspac
 router.get('/:id/price-rules', authenticate, requireHostWorkspace, calendarCtrl.listPriceRules);
 router.post('/:id/price-rules', authenticate, requireHostWorkspace, validate(priceRuleSchema), calendarCtrl.addPriceRule);
 router.delete('/:id/price-rules/:ruleId', authenticate, requireHostWorkspace, calendarCtrl.deletePriceRule);
+router.get('/:id/stay-rules', authenticate, requireHostWorkspace, calendarCtrl.listStayRules);
+router.post('/:id/stay-rules', authenticate, requireHostWorkspace, validate(stayRuleSchema), calendarCtrl.addStayRule);
+router.delete('/:id/stay-rules/:ruleId', authenticate, requireHostWorkspace, calendarCtrl.deleteStayRule);
 
 
 // Public reviews for a property

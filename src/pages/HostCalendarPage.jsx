@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import CalendarQuickSheet from '../components/CalendarQuickSheet.jsx';
+import NightSettingsPanel from '../components/NightSettingsPanel.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
 import { useToast } from '../context/ToastContext.jsx';
 
@@ -111,10 +112,65 @@ function priceFor(day, basePrice, priceRules) {
   const rule = (priceRules || []).find((item) => {
     const start = midnight(item.start).getTime();
     const end = midnight(item.end).getTime();
-    // A dated rate covers whole days, and its final day counts.
-    return night >= start && night <= end;
+    // `end` is the check-out day, the same half-open range the server prices
+    // with, so the last night a rule covers is the day before it.
+    return night >= start && night < end;
   });
   return rule ? rule.price : basePrice;
+}
+
+function coversNight(rule, day) {
+  const night = midnight(day).getTime();
+  return midnight(rule.start).getTime() <= night && night < midnight(rule.end).getTime();
+}
+
+/** A promotion is a dated rate whose name carries the percentage it took off. */
+function isPromotionRule(rule) {
+  return (rule.name || '').startsWith('Promotion ');
+}
+
+function promotionPercentIn(rule) {
+  const percent = Number((rule.name || '').replace(/[^0-9]/g, ''));
+  return percent > 0 ? percent : null;
+}
+
+function runNights(run) {
+  const nights = [];
+  for (let day = midnight(run.start); day.getTime() < midnight(run.end).getTime(); day = addDays(day, 1)) {
+    nights.push(day);
+  }
+  return nights;
+}
+
+/**
+ * Rewrite the dated rules of one kind for a run of picked nights.
+ *
+ * The API can add and delete a rule but not update one, so a rule overlapping
+ * the run is cut: it is deleted and the nights before and after it are written
+ * back with the same terms. The run's own rule goes in last, which leaves one
+ * rule per night instead of several quietly competing for the same date.
+ * Returning null from `makeRule` clears the run instead of setting anything.
+ */
+async function replaceDatedRulesForRuns({ listPath, runs, makeRule, keepOutside }) {
+  for (const run of runs) {
+    const from = midnight(run.start).getTime();
+    const to = midnight(run.end).getTime();
+    const latest = (await apiClient.get(listPath)).data.data || [];
+    for (const rule of latest) {
+      const start = midnight(rule.start).getTime();
+      const end = midnight(rule.end).getTime();
+      if (start >= to || end <= from) continue;
+      await apiClient.delete(`${listPath}/${rule.id}`);
+      if (start < from) {
+        await apiClient.post(listPath, keepOutside(rule, { start: rule.start, end: run.start }));
+      }
+      if (end > to) {
+        await apiClient.post(listPath, keepOutside(rule, { start: run.end, end: rule.end }));
+      }
+    }
+    const body = makeRule(run);
+    if (body) await apiClient.post(listPath, body);
+  }
 }
 
 function formatMonth(date) {
@@ -401,10 +457,9 @@ export default function HostCalendarPage() {
   const [syncing, setSyncing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
-  // The phone sheet's "Custom settings" opens the pricing and availability card
-  // as a panel over the calendar. Scrolling to the card in the page was not that:
-  // the fixed sheet stayed on top of it, so a tap moved nothing the host could see.
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  // The phone sheet's "Custom settings" is a dropdown that edits the picked
+  // nights in place, so it needs nothing more than its own open state here.
+  const [settingsExpanded, setSettingsExpanded] = useState(false);
 
   const loadProperties = useCallback(async () => {
     try {
@@ -443,22 +498,6 @@ export default function HostCalendarPage() {
     load();
   }, [load]);
 
-  // While the phone settings panel is up, Escape closes it and the page behind
-  // keeps still: a background scroll under a fixed panel loses the host's place.
-  useEffect(() => {
-    if (!settingsOpen) return undefined;
-    const onKeyDown = (event) => {
-      if (event.key === 'Escape') setSettingsOpen(false);
-    };
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    window.addEventListener('keydown', onKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener('keydown', onKeyDown);
-    };
-  }, [settingsOpen]);
-
   const weeks = useMemo(() => {
     const gridStart = startOfMonthGrid(monthAnchor);
     return Array.from({ length: 6 }, (_, index) => addDays(gridStart, index * 7));
@@ -493,11 +532,7 @@ export default function HostCalendarPage() {
 
   function clearSelection() {
     setSelectedKeys([]);
-  }
-
-  /** Phone only: the sheet's "Custom settings" raises the pricing card over the month. */
-  function openSettings() {
-    setSettingsOpen(true);
+    setSettingsExpanded(false);
   }
 
   const selectedDays = useMemo(() => selectedKeys.map(fromDayKey).sort((a, b) => a.getTime() - b.getTime()), [selectedKeys]);
@@ -593,6 +628,109 @@ export default function HostCalendarPage() {
   function toggleSelectedAvailability(nextAvailable) {
     if (nextAvailable) openSelected();
     else blockSelected();
+  }
+
+  // ---- Custom settings: dated edits for the picked nights, made in the sheet ----
+
+  const priceRulesPath = activePropertyId ? `/properties/${activePropertyId}/price-rules` : null;
+  const stayRulesPath = activePropertyId ? `/properties/${activePropertyId}/stay-rules` : null;
+
+  /** The rate a run already carries, before anything is rewritten. */
+  function rateForRun(run, rules = priceRules) {
+    const nights = runNights(run);
+    const total = nights.reduce((sum, day) => sum + priceFor(day, basePrice, rules), 0);
+    return Math.round(total / Math.max(1, nights.length));
+  }
+
+  /** The rate before any promotion, so picking a second percentage never compounds. */
+  function undiscountedRateForRun(run) {
+    return rateForRun(run, priceRules.filter((rule) => !isPromotionRule(rule)));
+  }
+
+  async function runDatedEdit({ path, runs, makeRule, keepOutside, successMessage, failureMessage }) {
+    if (!path || runs.length === 0) return false;
+    setSaving(true);
+    try {
+      await replaceDatedRulesForRuns({ listPath: path, runs, makeRule, keepOutside });
+      await load({ silent: true });
+      toast.success(successMessage);
+      return true;
+    } catch (err) {
+      toast.error(err.response?.data?.message || err.response?.data?.error || failureMessage);
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function saveNightlyRate(amount) {
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toast.error('Enter a nightly rate above zero.');
+      return Promise.resolve(false);
+    }
+    const rate = Math.round(amount);
+    return runDatedEdit({
+      path: priceRulesPath,
+      runs: groupRuns(selectedDays),
+      makeRule: (run) => ({ name: 'Calendar rate', start: dayKey(run.start), end: dayKey(run.end), price: rate }),
+      keepOutside: (rule, piece) => ({ name: rule.name || undefined, start: dayKey(piece.start), end: dayKey(piece.end), price: rule.price }),
+      successMessage: `Those nights now cost ${money(rate)} a night.`,
+      failureMessage: 'Could not set that rate.',
+    });
+  }
+
+  function clearDatedRate() {
+    return runDatedEdit({
+      path: priceRulesPath,
+      runs: groupRuns(selectedDays),
+      makeRule: () => null,
+      keepOutside: (rule, piece) => ({ name: rule.name || undefined, start: dayKey(piece.start), end: dayKey(piece.end), price: rule.price }),
+      successMessage: 'Those nights use the base rate again.',
+      failureMessage: 'Could not clear that rate.',
+    });
+  }
+
+  function savePromotion(percent) {
+    return runDatedEdit({
+      path: priceRulesPath,
+      runs: groupRuns(selectedDays),
+      makeRule: (run) => ({
+        name: `Promotion ${percent}%`,
+        start: dayKey(run.start),
+        end: dayKey(run.end),
+        price: Math.max(1, Math.round(undiscountedRateForRun(run) * (1 - percent / 100))),
+      }),
+      keepOutside: (rule, piece) => ({ name: rule.name || undefined, start: dayKey(piece.start), end: dayKey(piece.end), price: rule.price }),
+      successMessage: `${percent}% comes off those nights.`,
+      failureMessage: 'Could not apply that promotion.',
+    });
+  }
+
+  function clearPromotion() {
+    return runDatedEdit({
+      path: priceRulesPath,
+      runs: groupRuns(selectedDays),
+      makeRule: () => null,
+      keepOutside: (rule, piece) => ({ name: rule.name || undefined, start: dayKey(piece.start), end: dayKey(piece.end), price: rule.price }),
+      successMessage: 'Promotion removed from those nights.',
+      failureMessage: 'Could not remove that promotion.',
+    });
+  }
+
+  /** One night means no minimum, so clearing deletes the rule instead of storing a 1. */
+  function saveMinimumStay(nights) {
+    return runDatedEdit({
+      path: stayRulesPath,
+      runs: groupRuns(selectedDays),
+      makeRule: (run) => (nights > 1
+        ? { start: dayKey(run.start), end: dayKey(run.end), minNights: nights }
+        : null),
+      keepOutside: (rule, piece) => ({ start: dayKey(piece.start), end: dayKey(piece.end), minNights: rule.minNights }),
+      successMessage: nights > 1
+        ? `Guests must now book ${nights} nights across those dates.`
+        : 'Minimum stay removed from those dates.',
+      failureMessage: 'Could not change the minimum stay.',
+    });
   }
 
   async function addSource(event) {
@@ -706,13 +844,45 @@ export default function HostCalendarPage() {
     : Math.round(selectedDays.reduce((sum, day) => sum + priceFor(day, basePrice, priceRules), 0) / selectedDays.length);
   const selectionSummary = `${selectedOpenDays.length} open, ${selectedBlockedDays.length} blocked`;
 
+  // What the sheet's Custom settings dropdown reads out for the pick. A minimum
+  // stay is judged from the first night, which is the night a booking would
+  // check in on and the night the server enforces the rule against.
+  const hasDatedRate = selectedDays.some((day) => priceRules.some((rule) => coversNight(rule, day)));
+  const promotionRule = selectedDays.length > 0
+    ? priceRules.find((rule) => isPromotionRule(rule) && coversNight(rule, selectedDays[0]))
+    : null;
+  const promotionPercent = promotionRule ? promotionPercentIn(promotionRule) : null;
+  const selectionMinNights = selectedDays.length > 0
+    ? (calendar?.stayRules || []).reduce((longest, rule) => (
+      coversNight(rule, selectedDays[0]) ? Math.max(longest, rule.minNights) : longest
+    ), 1)
+    : 1;
+
+  // One panel, two homes: inside the phone sheet's dropdown and above the
+  // wide-screen bar. Both edit the nights that are picked right now.
+  const nightSettings = (
+    <NightSettingsPanel
+      nightsLabel={selectionCount === 1 ? '1 night picked' : `${selectionCount} nights picked`}
+      baseRate={basePrice}
+      nightRate={selectionRate}
+      hasDatedRate={hasDatedRate}
+      promotionPercent={promotionPercent}
+      minNights={selectionMinNights}
+      saving={saving}
+      onSaveRate={saveNightlyRate}
+      onClearRate={clearDatedRate}
+      onSavePromotion={savePromotion}
+      onClearPromotion={clearPromotion}
+      onSaveMinimumStay={saveMinimumStay}
+    />
+  );
+
   /**
-   * The pricing and availability card, drawn once and used in two places: the
-   * side column on a wide screen, and the panel the phone sheet raises. Both can
-   * be mounted together, so the form fields carry `prefix` to keep their ids
-   * unique - duplicate ids would point a label at the copy the host cannot see.
+   * The pricing, availability and connected-calendar card for the side column.
+   * The sheet's Custom settings dropdown edits the picked nights on its own, so
+   * these form ids only exist once and need no prefix.
    */
-  function renderSettings(prefix = '') {
+  function renderSettings() {
     return <HostCard flush>
       <div className="border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold text-navy">Pricing and availability</h2>
@@ -748,7 +918,7 @@ export default function HostCalendarPage() {
         {priceRules.length > 0 ? <ul className="mt-2 space-y-1.5">
           {priceRules.map((rule) => <li key={rule.id} className="flex items-center justify-between gap-3 text-xs">
             <span className="min-w-0 truncate text-navy">{rule.name || 'Date range'}</span>
-            <span className="shrink-0 tabular-nums text-muted">{money(rule.price)} <span className="text-[10px]">({formatDay(rule.start)}-{formatDay(rule.end)})</span></span>
+            <span className="shrink-0 tabular-nums text-muted">{money(rule.price)} <span className="text-[10px]">({formatDay(rule.start)}-{formatDay(addDays(new Date(rule.end), -1))})</span></span>
           </li>)}
         </ul> : <p className="mt-2 text-[11px] leading-relaxed text-muted">No dated rates. Every night uses the base rate.</p>}
         <Button as={Link} to={`/host/properties/${activePropertyId}/edit`} color="light" size="xs" className="mt-3 w-full">Edit pricing</Button>
@@ -758,17 +928,17 @@ export default function HostCalendarPage() {
         <form onSubmit={addBlock} className="space-y-2">
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label htmlFor={`${prefix}block-start`} className="text-[11px]">From</Label>
-              <TextInput id={`${prefix}block-start`} type="date" sizing="sm" value={blockDraft.start} onChange={(event) => setBlockDraft((current) => ({ ...current, start: event.target.value }))} required />
+              <Label htmlFor={`block-start`} className="text-[11px]">From</Label>
+              <TextInput id={`block-start`} type="date" sizing="sm" value={blockDraft.start} onChange={(event) => setBlockDraft((current) => ({ ...current, start: event.target.value }))} required />
             </div>
             <div>
-              <Label htmlFor={`${prefix}block-end`} className="text-[11px]">To</Label>
-              <TextInput id={`${prefix}block-end`} type="date" sizing="sm" value={blockDraft.end} onChange={(event) => setBlockDraft((current) => ({ ...current, end: event.target.value }))} required />
+              <Label htmlFor={`block-end`} className="text-[11px]">To</Label>
+              <TextInput id={`block-end`} type="date" sizing="sm" value={blockDraft.end} onChange={(event) => setBlockDraft((current) => ({ ...current, end: event.target.value }))} required />
             </div>
           </div>
           <div>
-            <Label htmlFor={`${prefix}block-summary`} className="text-[11px]">Reason (optional)</Label>
-            <TextInput id={`${prefix}block-summary`} sizing="sm" value={blockDraft.summary} onChange={(event) => setBlockDraft((current) => ({ ...current, summary: event.target.value }))} placeholder="Maintenance" />
+            <Label htmlFor={`block-summary`} className="text-[11px]">Reason (optional)</Label>
+            <TextInput id={`block-summary`} sizing="sm" value={blockDraft.summary} onChange={(event) => setBlockDraft((current) => ({ ...current, summary: event.target.value }))} placeholder="Maintenance" />
           </div>
           <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>{saving ? 'Saving...' : 'Block these dates'}</Button>
         </form>
@@ -801,8 +971,8 @@ export default function HostCalendarPage() {
         </Button>
 
         <form onSubmit={addSource} className="mt-2 space-y-2 border-t border-border pt-2">
-          <TextInput id={`${prefix}calendar-platform`} sizing="sm" value={sourceDraft.name} onChange={(event) => setSourceDraft((current) => ({ ...current, name: event.target.value }))} placeholder="Platform, e.g. Airbnb" required />
-          <TextInput id={`${prefix}calendar-url`} sizing="sm" type="url" value={sourceDraft.url} onChange={(event) => setSourceDraft((current) => ({ ...current, url: event.target.value }))} placeholder="https://example.com/calendar.ics" required />
+          <TextInput id={`calendar-platform`} sizing="sm" value={sourceDraft.name} onChange={(event) => setSourceDraft((current) => ({ ...current, name: event.target.value }))} placeholder="Platform, e.g. Airbnb" required />
+          <TextInput id={`calendar-url`} sizing="sm" type="url" value={sourceDraft.url} onChange={(event) => setSourceDraft((current) => ({ ...current, url: event.target.value }))} placeholder="https://example.com/calendar.ics" required />
           <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>Add feed</Button>
         </form>
       </SidebarSection>
@@ -948,54 +1118,52 @@ export default function HostCalendarPage() {
         onBlock={blockSelected}
         onOpen={openSelected}
         onClear={clearSelection}
-        onSettings={openSettings}
-      />
-
-      <div
-        className="fixed bottom-6 right-6 z-30 hidden items-center gap-2 rounded-full border border-border bg-elevated px-2 py-2 shadow-xl md:flex"
-        role="region"
-        aria-label="Selected dates, actions"
+        settingsExpanded={settingsExpanded}
+        onToggleSettings={() => setSettingsExpanded((open) => !open)}
       >
-        <span className="pl-1 pr-1 text-xs font-semibold tabular-nums text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</span>
-        <Button type="button" size="xs" color="dark" className="min-h-[44px]" disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
-        <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
-        <button type="button" onClick={clearSelection} aria-label="Clear selection" className="ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy">
-          <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-        </button>
-      </div>
-    </>}
+        {nightSettings}
+      </CalendarQuickSheet>
 
-    {/* Phone: the sheet's "Custom settings" raises this panel, so the card is
-        reachable and editable instead of hidden under the sheet. Desktop keeps
-        the side column, where the same card is always on screen. */}
-    {settingsOpen && (
-      <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true" aria-label="Custom settings">
-        <button
-          type="button"
-          onClick={() => setSettingsOpen(false)}
-          aria-label="Close custom settings"
-          className="absolute inset-0 h-full w-full cursor-default bg-navy-bg/40 backdrop-blur-[2px]"
-        />
-        <div className="absolute inset-x-0 bottom-0 flex max-h-[88vh] flex-col overflow-hidden rounded-t-3xl bg-elevated shadow-2xl">
-          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3">
-            <div className="min-w-0">
-              <p className={HOST_EYEBROW}>Calendar</p>
-              <h2 className="truncate text-base font-semibold text-navy">Custom settings</h2>
+      <div className="fixed bottom-6 right-6 z-30 hidden flex-col items-end gap-2 md:flex">
+        {settingsExpanded && (
+          <div className="w-[360px] overflow-hidden rounded-2xl bg-navy-bg shadow-2xl">
+            <div className="flex items-center justify-between gap-2 px-3 py-2">
+              <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-white/60">Custom settings</span>
+              <button
+                type="button"
+                onClick={() => setSettingsExpanded(false)}
+                aria-label="Close custom settings"
+                className="grid h-8 w-8 place-items-center rounded-full text-white/70 transition-colors hover:bg-white/10"
+              >
+                <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={() => setSettingsOpen(false)}
-              aria-label="Close custom settings"
-              className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-navy transition-colors hover:bg-surface"
-            >
-              <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-            </button>
+            <div className="max-h-[60vh] overflow-y-auto border-t border-white/10">{nightSettings}</div>
           </div>
-          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain pb-[calc(var(--zl-bottom-nav-space)_+_8px)]">
-            {renderSettings('sheet-')}
-          </div>
+        )}
+        <div
+          className="flex items-center gap-2 rounded-full border border-border bg-elevated px-2 py-2 shadow-xl"
+          role="region"
+          aria-label="Selected dates, actions"
+        >
+          <span className="pl-1 pr-1 text-xs font-semibold tabular-nums text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</span>
+          <Button type="button" size="xs" color="dark" className="min-h-[44px]" disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
+          <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
+          <Button
+            type="button"
+            size="xs"
+            color="light"
+            className="min-h-[44px]"
+            aria-expanded={settingsExpanded}
+            onClick={() => setSettingsExpanded((open) => !open)}
+          >
+            Custom settings
+          </Button>
+          <button type="button" onClick={clearSelection} aria-label="Clear selection" className="ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy">
+            <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+          </button>
         </div>
       </div>
-    )}
+    </>}
   </div>;
 }
