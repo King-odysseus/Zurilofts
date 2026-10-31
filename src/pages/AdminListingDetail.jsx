@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Badge, Button, Label, Spinner, Textarea } from 'flowbite-react';
-import { ArrowLeft, ArrowUpRight, ExternalLink, House, MapPin, Phone } from 'lucide-react';
+import { ArrowLeft, ArrowUpRight, Eye, House, MapPin, Phone } from 'lucide-react';
 import apiClient from '../api/client.js';
 
 const STATUS_META = {
@@ -335,9 +335,9 @@ export default function AdminListingDetail() {
             {message && <p role="status" className="mt-3 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">{message}</p>}
 
             {listing.status === 'PUBLISHED' && (
-              <Link to={`/property/${listing.id}`} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
-                Open public listing
-                <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+              <Link to={`/admin/properties/${listing.id}/preview`} className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
+                Preview as a guest sees it
+                <Eye className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </Link>
             )}
           </section>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Alert, Badge, Button, TabItem, Tabs } from "flowbite-react";
+import { Alert, Badge, Button } from "flowbite-react";
 import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { CalendarDays } from "lucide-react";
@@ -13,18 +13,6 @@ import HostFollowUps from "../components/HostFollowUps.jsx";
 const TONE_COLORS = { arrival: "info", inhouse: "warning", departure: "success" };
 
 const SKELETON_HEIGHTS = ["h-24", "h-44", "h-24", "h-64"];
-
-// The three day-count switches have to stay on one line on a phone, so the
-// shared pill theme is tightened for this row only: no wrapping, smaller
-// padding. Passed as the Tabs theme prop so the global tab style is untouched.
-const MOBILE_TAB_THEME = {
-  tablist: {
-    // A narrow phone cannot fit three labels plus their counts, so the row
-    // scrolls sideways instead of dropping to a second line.
-    variant: { pills: "flex-nowrap gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" },
-    tabitem: { base: "px-2 py-2 text-[13px]" },
-  },
-};
 
 function formatToday() {
   return new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long" });
@@ -68,7 +56,7 @@ function GuestOperationCard({ booking, type, compact = false, onMessage, message
   // so the tile carries its own surface tint instead of a border that would
   // double up with the card outline.
   return <article className={`flex items-center gap-3 rounded-xl bg-surface ${compact ? "p-2.5" : "p-3"}`}>
-    <Link to={`/property/${property.id || ""}`} className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-elevated text-sm font-bold uppercase text-muted" aria-label={propertyTitle}>
+    <Link to={`/host/listings/${property.id || ""}/preview`} className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-elevated text-sm font-bold uppercase text-muted" aria-label={propertyTitle}>
       {image ? <img src={image} alt="" className="h-full w-full object-cover" /> : <span>{guestInitials(booking)}</span>}
     </Link>
     <div className="min-w-0 flex-1">
@@ -331,33 +319,47 @@ export default function HostTodayPage() {
     </div>
 
     <div className="md:hidden">
-      <Tabs
-        aria-label="Today's operations"
-        variant="pills"
-        theme={MOBILE_TAB_THEME}
-        onActiveTabChange={(index) => setMobileTab(["arrival", "inhouse", "departure"][index])}
-      >
+      {/* Hand-built rather than <Tabs>: a theme passed to Tabs reaches the row but
+          not the segments, which always read the app-wide tab theme and kept its
+          p-4 padding. Three switches inside one control is small enough to draw
+          directly, and then the selected and unselected looks cannot drift. */}
+      <div role="tablist" aria-label="Today's operations" className="inline-flex max-w-full flex-nowrap gap-1 rounded-full border border-border bg-surface p-1">
         {[
           ["arrival", "Arrivals", arrivals],
           ["inhouse", "In house", inHouse],
           ["departure", "Departures", departures],
-        ].map(([key, label, items]) => <TabItem
+        ].map(([key, label, items]) => <button
           key={key}
-          title={<span className="flex items-center gap-1.5 whitespace-nowrap leading-none">
-            {label}
-            {/* The count rides beside its label so all three switches read in one
-                row; the tint follows the pill so the badge stays legible on navy. */}
-            <span className={`inline-grid h-5 min-w-[20px] place-items-center rounded-full px-1.5 text-[11px] font-semibold tabular-nums ${mobileTab === key ? "bg-white/20 text-white" : "bg-navy/10 text-navy"}`}>{items.length}</span>
-          </span>}
-          active={mobileTab === key}
+          type="button"
+          role="tab"
+          id={`day-tab-${key}`}
+          aria-selected={mobileTab === key}
+          aria-controls={`day-panel-${key}`}
+          onClick={() => setMobileTab(key)}
+          className={`flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-2 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-600 focus-visible:ring-offset-1 ${mobileTab === key ? "bg-navy-bg text-white shadow-sm" : "text-muted hover:bg-elevated hover:text-navy"}`}
         >
-          <div className="space-y-3">
-            {items.length === 0
-              ? <EmptyPanel label={key === "arrival" ? "Arrivals" : key === "departure" ? "Departures" : "In-house guests"} />
-              : items.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={key} compact onMessage={openGuestConversation} messagePending={messageBookingId === booking.id} />)}
-          </div>
-        </TabItem>)}
-      </Tabs>
+          {label}
+          {/* The count rides beside its label so all three switches read in one
+              row; the tint follows the pill so the badge stays legible on navy. */}
+          <span className={`inline-grid h-[18px] min-w-[18px] place-items-center rounded-full px-1 text-[10px] font-semibold tabular-nums ${mobileTab === key ? "bg-white/20 text-white" : "bg-navy/10 text-navy"}`}>{items.length}</span>
+        </button>)}
+      </div>
+
+      {[
+        ["arrival", "Arrivals", arrivals],
+        ["inhouse", "In house", inHouse],
+        ["departure", "Departures", departures],
+      ].filter(([key]) => key === mobileTab).map(([key, , items]) => <div
+        key={key}
+        role="tabpanel"
+        id={`day-panel-${key}`}
+        aria-labelledby={`day-tab-${key}`}
+        className="mt-4 space-y-3"
+      >
+        {items.length === 0
+          ? <EmptyPanel label={key === "arrival" ? "Arrivals" : key === "departure" ? "Departures" : "In-house guests"} />
+          : items.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={key} compact onMessage={openGuestConversation} messagePending={messageBookingId === booking.id} />)}
+      </div>)}
     </div>
 
     <HostFollowUps items={followUps} loading={followUpsLoading} />

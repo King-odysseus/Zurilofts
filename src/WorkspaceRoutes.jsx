@@ -7,6 +7,7 @@ import AdminDashboard, { AdminLayout } from './pages/AdminDashboard.jsx';
 import AdminRevenue from './pages/AdminRevenue.jsx';
 import AdminListingReview from './pages/AdminListingReview.jsx';
 import AdminListingDetail from './pages/AdminListingDetail.jsx';
+import AdminListingPreviewPage from './pages/AdminListingPreviewPage.jsx';
 import AdminSettings from './pages/AdminSettings.jsx';
 import AdminPropertyForm from './pages/AdminPropertyForm.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
@@ -23,6 +24,8 @@ import HostCalendarPage from './pages/HostCalendarPage.jsx';
 import HostEarningsPage from './pages/HostEarningsPage.jsx';
 import HostInboxPage from './pages/HostInboxPage.jsx';
 import HostListingsPage from './pages/HostListingsPage.jsx';
+import HostListingPreviewPage from './pages/HostListingPreviewPage.jsx';
+import HostVerificationPage from './pages/HostVerificationPage.jsx';
 import HostTodayPage from './pages/HostTodayPage.jsx';
 import HostPayouts from './pages/HostPayouts.jsx';
 import HostReservationsPage from './pages/HostReservationsPage.jsx';
@@ -41,6 +44,9 @@ export default function WorkspaceRoutes() {
     <Route path="/host/calendar" element={hostPage(<HostCalendarPage />)} />
     <Route path="/host/calendar/:id" element={hostPage(<HostCalendarPage />)} />
     <Route path="/host/listings" element={hostPage(<HostListingsPage />)} />
+    {/* The host's own read of the listing, not the traveller page: same content,
+        host chrome, and no way to book a stay they own. */}
+    <Route path="/host/listings/:id/preview" element={hostPage(<HostListingPreviewPage />)} />
     {/* Host messages are their own inbox: guests writing about a stay. The
         traveller inbox at /inbox is the other side of the same table. */}
     <Route path="/host/inbox" element={hostPage(<HostInboxPage />)} />
@@ -55,6 +61,7 @@ export default function WorkspaceRoutes() {
     <Route path="/host/payouts" element={hostPage(<HostPayouts />)} />
     <Route path="/host/discounts" element={hostPage(<HostPromosPage />)} />
     <Route path="/host/settings" element={hostPage(<HostSettingsPage />)} />
+    <Route path="/host/verification" element={hostPage(<HostVerificationPage />)} />
     <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
       <Route index element={<AdminDashboard />} />
       <Route path="revenue" element={<AdminRevenue />} />
@@ -65,6 +72,7 @@ export default function WorkspaceRoutes() {
           context for a moderator: it carries the booking widget and none of the
           review controls, and leaving /admin loses the workspace entirely. */}
       <Route path="properties/:id" element={<AdminListingDetail />} />
+      <Route path="properties/:id/preview" element={<AdminListingPreviewPage />} />
       <Route path="properties/new" element={<Navigate to="/admin/properties" replace />} />
       <Route path="properties/:id/edit" element={<Navigate to="/admin/properties" replace />} />
       <Route path="properties/:id/calendar" element={<Navigate to="/admin/properties" replace />} />

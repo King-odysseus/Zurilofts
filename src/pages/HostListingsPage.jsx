@@ -8,13 +8,16 @@ import { useToast } from '../context/ToastContext.jsx';
 import { firstImage } from '../utils/images.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
+import { listingStatusCopy, listingStatusLabel } from '../utils/listingStatus.js';
 
-const STATUS_META = {
-  DRAFT: { label: 'Draft', tone: 'draft' },
-  PENDING_REVIEW: { label: 'In review', tone: 'review' },
-  PUBLISHED: { label: 'Published', tone: 'published' },
-  REJECTED: { label: 'Needs changes', tone: 'attention' },
-  SUSPENDED: { label: 'Suspended', tone: 'suspended' },
+// Only the pill colour lives here; the wording comes from the shared status
+// helper so the listings grid, the host preview and the admin preview agree.
+const STATUS_TONE = {
+  DRAFT: 'draft',
+  PENDING_REVIEW: 'review',
+  PUBLISHED: 'published',
+  REJECTED: 'attention',
+  SUSPENDED: 'suspended',
 };
 
 // Soft tinted pills rather than Flowbite's solid Badge colours: the status is a
@@ -44,7 +47,7 @@ const PILL_SELECTED = 'bg-navy-bg text-white';
 const PILL_IDLE = 'text-muted hover:text-navy';
 
 function propertyStatus(property) {
-  return STATUS_META[property.status] || STATUS_META.DRAFT;
+  return { label: listingStatusLabel(property.status), tone: STATUS_TONE[property.status] || 'draft' };
 }
 
 function bedSummary(property) {
@@ -58,14 +61,6 @@ function bedSummary(property) {
 
 function where(property) {
   return property.neighborhood || property.location || 'Nairobi';
-}
-
-function statusCopy(property) {
-  if (property.status === 'PUBLISHED') return 'Visible to guests and open for bookings.';
-  if (property.status === 'PENDING_REVIEW') return 'Submitted for review. Your changes stay private until approved.';
-  if (property.status === 'REJECTED') return property.listingReviewNote || 'Update the requested details before submitting again.';
-  if (property.status === 'SUSPENDED') return property.listingReviewNote || 'Hidden from guests while it is suspended.';
-  return 'Add the details, photos, and pricing, then submit for review.';
 }
 
 // Completeness checks mirror what guests look for on Airbnb/Booking.com listings; each is worth equal points.
@@ -163,14 +158,14 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
       <div>
         <div className="flex items-start justify-between gap-3">
           <h2 className="text-[15px] font-semibold leading-snug text-navy">
-            <Link to={`/property/${property.id}`} className="hover:text-muted">{property.title}</Link>
+            <Link to={`/host/listings/${property.id}/preview`} className="hover:text-muted">{property.title}</Link>
           </h2>
           <strong className="whitespace-nowrap text-sm font-bold text-navy">
             KES {(property.price || 0).toLocaleString()}<span className="text-[11px] font-medium text-muted"> /night</span>
           </strong>
         </div>
         <p className="mt-1 text-[13px] text-muted">{bedSummary(property)} · {where(property)}</p>
-        <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted">{statusCopy(property)}</p>
+        <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted">{listingStatusCopy(property)}</p>
       </div>
 
       {showTips && <QualityMeter property={property} />}
@@ -182,7 +177,10 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
         <div className="flex flex-wrap items-center gap-0.5">
           {canSubmit && <QuietAction onClick={() => onReview(property)}>{busy ? 'Submitting...' : 'Submit for review'}</QuietAction>}
           {property.status === 'PENDING_REVIEW' && <span className="px-2 text-xs font-medium text-muted">Awaiting review</span>}
-          {property.status === 'PUBLISHED' && <QuietAction to={`/property/${property.id}`}>View listing</QuietAction>}
+          {/* A host can look at any listing as a guest would, published or not:
+              the preview reads the owner-scoped endpoint, which is the only
+              place an unpublished listing is visible. */}
+          <QuietAction to={`/host/listings/${property.id}/preview`}>Preview</QuietAction>
           <QuietAction to={`/host/calendar/${property.id}`}>Calendar</QuietAction>
         </div>
       </div>
@@ -242,7 +240,7 @@ function HostListingRow({ property, onToggleAvailability, onDelete, onReview, bu
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <h2 className="min-w-0 flex-1 truncate text-[15px] font-semibold text-navy">
-            <Link to={`/property/${property.id}`} className="hover:text-muted">{property.title}</Link>
+            <Link to={`/host/listings/${property.id}/preview`} className="hover:text-muted">{property.title}</Link>
           </h2>
           <StatusPill tone={status.tone}>{status.label}</StatusPill>
         </div>

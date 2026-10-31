@@ -46,7 +46,7 @@ const VERIFICATION_STEPS = [
  * Reused on the Profile "Verification" tab and on the standalone /verify-identity
  * page a guest is sent to mid-checkout.
  */
-function IdentityVerificationPanel({ onApproved }) {
+function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verification', showTripsLink = true, context = 'traveller' }) {
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -111,7 +111,7 @@ function IdentityVerificationPanel({ onApproved }) {
 
   async function handleSaveAndExit() {
     const saved = await saveDetails();
-    if (saved) navigate('/profile#verification');
+    if (saved) navigate(afterSavePath);
   }
 
   async function handleUpload(kind, file) {
@@ -156,7 +156,9 @@ function IdentityVerificationPanel({ onApproved }) {
     <header className="op-verify-head">
       <div>
         <h2>Verify your identity</h2>
-        <p>Complete the required details securely to continue your booking.</p>
+        {context === 'host'
+          ? <p>Complete the required details securely to verify your identity.</p>
+          : <p>Complete the required details securely to continue your booking.</p>}
       </div>
       <Badge color={status.color} icon={StatusIcon}>{status.label}</Badge>
     </header>
@@ -214,8 +216,10 @@ function IdentityVerificationPanel({ onApproved }) {
         </div>
         <aside className="op-verify-callout">
           <span><Clock3 size={18} strokeWidth={1.8} aria-hidden="true" /></span>
-          <strong>Your booking is held</strong>
-          <p>Return to payment after your identity has been approved.</p>
+          {context === 'host' ? <strong>Payouts need a verified identity</strong> : <strong>Your booking is held</strong>}
+          {context === 'host'
+            ? <p>Your payout stays on hold until the review approves your documents.</p>
+            : <p>Return to payment after your identity has been approved.</p>}
         </aside>
       </div>
     </section>
@@ -261,7 +265,7 @@ function IdentityVerificationPanel({ onApproved }) {
       {editable ? <div className="op-verify-review-actions">
         <Button onClick={handleSubmit} disabled={saving} className="op-trust-button-primary">{saving ? <Spinner size="sm" /> : <><ShieldCheck size={16} strokeWidth={1.8} aria-hidden="true" />Submit for review</>}</Button>
         <Button color="light" disabled={saving} onClick={handleSaveAndExit}>Save and exit</Button>
-        <Link to="/trips">Return to trips</Link>
+        {showTripsLink && <Link to="/trips">Return to trips</Link>}
       </div> : <div className="op-verify-submitted"><FileText size={17} strokeWidth={1.8} aria-hidden="true" /><span>Your submitted information is shown above.</span></div>}
     </section>
   </div>;
@@ -269,6 +273,14 @@ function IdentityVerificationPanel({ onApproved }) {
 
 IdentityVerificationPanel.propTypes = {
   onApproved: PropTypes.func,
+  // Where "Save and exit" lands. The panel is shared, so each app passes its
+  // own home instead of every caller inheriting a traveller route.
+  afterSavePath: PropTypes.string,
+  // "Return to trips" is traveller language; the host workspace hides it.
+  showTripsLink: PropTypes.bool,
+  // Which app is showing the panel: the traveller copy talks about a held
+  // booking, while a host needs to hear about payouts.
+  context: PropTypes.oneOf(['traveller', 'host']),
 };
 
 export default IdentityVerificationPanel;

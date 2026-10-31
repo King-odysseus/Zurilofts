@@ -213,7 +213,7 @@ export default function HostSettingsPage() {
             <p className="truncate text-xs text-muted">{profile?.email}</p>
           </div>
         </div>
-        <Button as={Link} to="/verify-identity" color="light" size="sm" className="min-h-[44px] w-full sm:w-fit">
+        <Button as={Link} to="/host/verification" color="light" size="sm" className="min-h-[44px] w-full sm:w-fit">
           <BadgeCheck className="mr-1.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
           Verification status
         </Button>
