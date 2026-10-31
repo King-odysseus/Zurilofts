@@ -91,6 +91,14 @@ export const propertyCreateSchema = z.object({
   lng: z.number().min(-180).max(180).optional(),
   // Editable, and nullable because the form submits null to clear a stale one.
   address: z.string().max(300).nullable().optional(),
+  // Arrival guide, edited on its own screen once the listing exists. Nullable so
+  // emptying a field clears it rather than leaving the old text behind.
+  directions: z.string().max(1000).nullable().optional(),
+  checkInMethod: z.string().max(100).nullable().optional(),
+  wifiNetwork: z.string().max(100).nullable().optional(),
+  wifiPassword: z.string().max(100).nullable().optional(),
+  houseManual: z.string().max(4000).nullable().optional(),
+  houseRules: z.array(z.string().max(200)).optional(),
 });
 
 export const propertyUpdateSchema = propertyCreateSchema.partial();

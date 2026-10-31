@@ -210,6 +210,14 @@ model Property {
   imagesJson        String           @default("[]") // JSON array of image URLs
   amenitiesJson     String           @default("[]") // JSON array
   nearbyJson        String           @default("[]") // JSON array
+  // Arrival guide - what a guest needs once the booking is confirmed. Kept on
+  // the listing so a host writes it once and can correct it later.
+  directions        String? // how to find the property
+  checkInMethod     String? // Lockbox | Keypad | Smart lock | Building staff | Host greets
+  wifiNetwork       String? // network name (SSID)
+  wifiPassword      String?
+  houseManual       String? // free-text house manual
+  houseRulesJson    String           @default("[]") // JSON array of rule strings
   type              String // "apartment" | "studio" | "penthouse"
   available         Boolean          @default(true)
   featured          Boolean          @default(false)

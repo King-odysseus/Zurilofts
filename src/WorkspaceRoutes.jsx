@@ -16,6 +16,7 @@ import AdminGuides from './pages/AdminGuides.jsx';
 import AdminTrustSafety from './pages/AdminTrustSafety.jsx';
 import AdminGovernance from './pages/AdminGovernance.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
+import HostArrivalGuidePage from './pages/HostArrivalGuidePage.jsx';
 import HostCalendarPage from './pages/HostCalendarPage.jsx';
 import HostEarningsPage from './pages/HostEarningsPage.jsx';
 import HostInboxPage from './pages/HostInboxPage.jsx';
@@ -48,6 +49,7 @@ export default function WorkspaceRoutes() {
     <Route path="/host/earnings" element={hostPage(<HostEarningsPage />)} />
     <Route path="/host/properties/new" element={hostPage(<AdminPropertyForm />)} />
     <Route path="/host/properties/:id/edit" element={hostPage(<AdminPropertyForm />)} />
+    <Route path="/host/properties/:id/arrival-guide" element={hostPage(<HostArrivalGuidePage />)} />
     <Route path="/host/payouts" element={hostPage(<HostPayouts />)} />
     <Route path="/host/discounts" element={hostPage(<HostPromosPage />)} />
     <Route path="/host/settings" element={hostPage(<HostSettingsPage />)} />

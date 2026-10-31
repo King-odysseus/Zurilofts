@@ -2,21 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check the working tree: what is changed, untracked, or another session's work",
+      "text": "Find the host arrival guide page and how it renders today (it did not exist)",
       "state": "done"
     },
     {
-      "text": "Confirm the tree is sound (lint and build) before staging anything",
+      "text": "Store guide fields on the listing: both Prisma schemas, validation, service read/write, Postgres migration",
       "state": "done"
     },
     {
-      "text": "Stage and commit in logical groups, leaving build output and scratch files out",
+      "text": "Rebuild the page shell: centred header, gear action, segmented Your space / Arrival guide toggle",
       "state": "done"
     },
     {
-      "text": "Push and report the commit hashes",
+      "text": "Restyle each section as a rounded white card with bold title and grey value line",
+      "state": "done"
+    },
+    {
+      "text": "Render house rules as icon rows with + N more and a dark View pill",
+      "state": "done"
+    },
+    {
+      "text": "Wire the route and a way in from the listing editor",
+      "state": "done"
+    },
+    {
+      "text": "Check it on screen at desktop and phone width, and confirm saves persist",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and build",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T14:56:31.412Z"
+  "updatedAt": "2026-10-31T15:58:43.430Z"
 }

@@ -102,13 +102,10 @@ export function planListingReview(status: string, action: ListingReviewAction): 
 // SQLite stores arrays as JSON strings; Postgres uses native arrays.
 // This helper normalizes both to JS arrays for API responses.
 function normalizeProperty(property: any) {
-  if (property.images !== undefined) {
-    // PostgreSQL - native arrays
-    return property;
-  }
-  // SQLite - JSON fields, map to expected property names
-  const { imagesJson, amenitiesJson, nearbyJson, ...rest } = property;
-  const parseArray = (value: string | null | undefined) => {
+  // houseRulesJson is a JSON string under both providers (Postgres keeps the
+  // same string column), so it is parsed before the early return below.
+  const { houseRulesJson, ...rest } = property;
+  const toArray = (value: string | null | undefined) => {
     if (!value) return [];
     try {
       const parsed = JSON.parse(value);
@@ -117,11 +114,18 @@ function normalizeProperty(property: any) {
       return [];
     }
   };
+  if (property.images !== undefined) {
+    // PostgreSQL - native arrays
+    return { ...rest, houseRules: toArray(houseRulesJson) };
+  }
+  // SQLite - JSON fields, map to expected property names
+  const { imagesJson, amenitiesJson, nearbyJson, ...fields } = rest;
   return {
-    ...rest,
-    images: parseArray(imagesJson),
-    amenities: parseArray(amenitiesJson),
-    nearby: parseArray(nearbyJson),
+    ...fields,
+    images: toArray(imagesJson),
+    amenities: toArray(amenitiesJson),
+    nearby: toArray(nearbyJson),
+    houseRules: toArray(houseRulesJson),
   };
 }
 
@@ -197,10 +201,20 @@ function buildCreateData(data: any) {
     if (data.price2Bed !== undefined) base.price2Bed = data.price2Bed;
     if (data.bathrooms1Bed !== undefined) base.bathrooms1Bed = data.bathrooms1Bed;
     if (data.bathrooms2Bed !== undefined) base.bathrooms2Bed = data.bathrooms2Bed;
+    // Arrival guide. houseRules travels as an array and is stored as JSON, the
+    // same way images/amenities/nearby are.
+    if (data.directions !== undefined) base.directions = data.directions;
+    if (data.checkInMethod !== undefined) base.checkInMethod = data.checkInMethod;
+    if (data.wifiNetwork !== undefined) base.wifiNetwork = data.wifiNetwork;
+    if (data.wifiPassword !== undefined) base.wifiPassword = data.wifiPassword;
+    if (data.houseManual !== undefined) base.houseManual = data.houseManual;
+    base.houseRulesJson = JSON.stringify(data.houseRules || []);
     return base;
   }
-  const { status: _ignoredStatus, ...rest } = data;
-  return { ...rest, status: 'DRAFT' };
+  const { status: _ignoredStatus, houseRules, ...rest } = data;
+  // Rules are stored as a JSON string under both providers, so the conversion
+  // happens here as well as in the SQLite branch above.
+  return { ...rest, houseRulesJson: JSON.stringify(houseRules || []), status: 'DRAFT' };
 }
 
 function buildUpdateData(data: any) {
@@ -222,6 +236,12 @@ function buildUpdateData(data: any) {
       updateData.nearbyJson = JSON.stringify(data.nearby);
       delete updateData.nearby;
     }
+  }
+  // Rules are a JSON string under both providers, so this conversion cannot sit
+  // inside the SQLite-only block: Postgres also rejects an unknown houseRules key.
+  if (data.houseRules !== undefined) {
+    updateData.houseRulesJson = JSON.stringify(data.houseRules);
+    delete updateData.houseRules;
   }
   // Allow clearing bed prices & bathrooms by sending null
   if (data.price1Bed === null) updateData.price1Bed = null;

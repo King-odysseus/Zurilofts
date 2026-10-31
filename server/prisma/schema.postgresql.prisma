@@ -218,6 +218,13 @@ model Property {
   imagesJson   String    @default("[]")
   amenitiesJson String   @default("[]")
   nearbyJson   String    @default("[]")
+  // Arrival guide - what a guest needs once the booking is confirmed.
+  directions     String?
+  checkInMethod  String?
+  wifiNetwork    String?
+  wifiPassword   String?
+  houseManual    String?
+  houseRulesJson String    @default("[]") // JSON array of rule strings
   type        String
   available   Boolean  @default(true)
   featured    Boolean  @default(false)

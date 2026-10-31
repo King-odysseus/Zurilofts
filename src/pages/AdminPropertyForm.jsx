@@ -277,6 +277,7 @@ function AdminPropertyForm() {
             <Eye className="mr-2 h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
             Preview listing
           </Button>
+          {isEdit && <Button as={Link} to={`/host/properties/${id}/arrival-guide`} color="light">Arrival guide</Button>}
           {isEdit && <Button as={Link} to={`/host/calendar/${id}`} color="light">Manage calendar</Button>}
         </div>
       </header>
