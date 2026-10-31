@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Alert, Badge, Button, ToggleSwitch } from 'flowbite-react';
+import { Alert, Button, ToggleSwitch } from 'flowbite-react';
 import PropTypes from 'prop-types';
-import { Building2 } from 'lucide-react';
+import { Building2, Lightbulb, LayoutGrid, List as ListIcon, Plus } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useToast } from '../context/ToastContext.jsx';
 import { firstImage } from '../utils/images.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import SelectMenu from '../components/SelectMenu.jsx';
 
 const STATUS_META = {
   DRAFT: { label: 'Draft', tone: 'draft' },
@@ -16,14 +17,14 @@ const STATUS_META = {
   SUSPENDED: { label: 'Suspended', tone: 'suspended' },
 };
 
-// The tone vocabulary is presentation-only; the Badge palette names its colours
-// differently, so the mapping lives here instead of on each call site.
-const STATUS_BADGE_COLOR = {
-  draft: 'gray',
-  review: 'info',
-  published: 'success',
-  attention: 'warning',
-  suspended: 'failure',
+// Soft tinted pills rather than Flowbite's solid Badge colours: the status is a
+// quiet label over a photo, not a call to action competing with the buttons.
+const STATUS_PILL = {
+  draft: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200',
+  review: 'bg-blue-100 text-blue-800 dark:bg-blue-500/15 dark:text-blue-200',
+  published: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-200',
+  attention: 'bg-amber-100 text-amber-900 dark:bg-amber-500/15 dark:text-amber-200',
+  suspended: 'bg-red-100 text-red-800 dark:bg-red-500/15 dark:text-red-200',
 };
 
 const FILTERS = [
@@ -38,9 +39,7 @@ const FILTERS = [
   },
 ];
 
-// The grid/list toggle and the status filter are the same control: one pill
-// group with a single selected state, so the two strings live here once.
-const PILL_GROUP = 'inline-flex rounded-full border border-border bg-elevated p-1';
+const PILL_GROUP = 'inline-flex rounded-full border border-border bg-elevated p-0.5';
 const PILL_SELECTED = 'bg-navy-bg text-white';
 const PILL_IDLE = 'text-muted hover:text-navy';
 
@@ -57,12 +56,16 @@ function bedSummary(property) {
   return `${property.bedrooms || 1} ${property.bedrooms === 1 ? 'bed' : 'beds'}`;
 }
 
+function where(property) {
+  return property.neighborhood || property.location || 'Nairobi';
+}
+
 function statusCopy(property) {
   if (property.status === 'PUBLISHED') return 'Visible to guests and open for bookings.';
-  if (property.status === 'PENDING_REVIEW') return 'Submitted for review. Your changes remain private until approved.';
+  if (property.status === 'PENDING_REVIEW') return 'Submitted for review. Your changes stay private until approved.';
   if (property.status === 'REJECTED') return property.listingReviewNote || 'Update the requested details before submitting again.';
-  if (property.status === 'SUSPENDED') return property.listingReviewNote || 'This listing is hidden from guests while it is suspended.';
-  return 'Complete the details, photos, and pricing before submitting.';
+  if (property.status === 'SUSPENDED') return property.listingReviewNote || 'Hidden from guests while it is suspended.';
+  return 'Add the details, photos, and pricing, then submit for review.';
 }
 
 // Completeness checks mirror what guests look for on Airbnb/Booking.com listings; each is worth equal points.
@@ -78,64 +81,114 @@ function listingQuality(property) {
   return { score: Math.round((done / checks.length) * 100), tips: checks.filter((check) => !check.ok).map((check) => check.tip) };
 }
 
+function StatusPill({ tone, children }) {
+  return <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_PILL[tone] || STATUS_PILL.draft}`}>
+    <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+    {children}
+  </span>;
+}
+
+StatusPill.propTypes = {
+  tone: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
+
 // Placeholder cards rather than placeholder bars: the loading shapes have to
 // match what lands, otherwise the page jumps when the request resolves.
 function ListingSkeleton() {
-  return <div className="space-y-3" aria-label="Loading listings">
-    {[0, 1, 2].map((key) => <HostCard key={key} className="h-24 animate-pulse" />)}
+  return <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3" aria-label="Loading listings">
+    {[0, 1, 2].map((key) => <HostCard key={key} className="h-72 animate-pulse" />)}
   </div>;
 }
 
-function HostListingCard({ property, onToggleAvailability, onDelete, onReview, busy }) {
+function QualityMeter({ property }) {
+  const quality = listingQuality(property);
+  return <div className="rounded-xl bg-surface p-3">
+    <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-muted">
+      <span>Listing quality</span><strong className="text-navy">{quality.score}%</strong>
+    </div>
+    <div
+      className="mt-2 h-1 w-full overflow-hidden rounded-full bg-border"
+      role="progressbar"
+      aria-valuenow={quality.score}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-label={`Listing quality ${quality.score} percent`}
+    >
+      {/* Computed fill width: data-driven, so it stays an inline style. */}
+      <div className="h-full rounded-full bg-primary" style={{ width: `${quality.score}%` }} />
+    </div>
+    {quality.tips.length > 0 && <ul className="mt-2 space-y-1 text-[11px] leading-relaxed text-muted">
+      {quality.tips.slice(0, 2).map((tip) => <li key={tip}>{tip}</li>)}
+    </ul>}
+  </div>;
+}
+
+QualityMeter.propTypes = {
+  property: PropTypes.shape({ images: PropTypes.array, description: PropTypes.string, amenities: PropTypes.array, lat: PropTypes.number, lng: PropTypes.number, address: PropTypes.string }).isRequired,
+};
+
+// A quiet text action, for the controls that should not compete with the one
+// primary button on each card.
+function QuietAction({ to, onClick, danger = false, children }) {
+  const className = `inline-flex items-center rounded-full px-2.5 py-1.5 text-xs font-semibold transition-colors hover:bg-surface ${danger ? 'text-muted hover:text-red-600' : 'text-muted hover:text-navy'}`;
+  return to
+    ? <Link to={to} className={className}>{children}</Link>
+    : <button type="button" onClick={onClick} className={className}>{children}</button>;
+}
+
+QuietAction.propTypes = {
+  to: PropTypes.string,
+  onClick: PropTypes.func,
+  danger: PropTypes.bool,
+  children: PropTypes.node.isRequired,
+};
+
+function HostListingCard({ property, onToggleAvailability, onDelete, onReview, busy, showTips }) {
   const image = firstImage(property);
   const status = propertyStatus(property);
   const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
-  const quality = listingQuality(property);
 
-  // flush lets the hero photo run to the card edge; the body re-applies the
-  // padding so the text still lines up with the padded cards beside it.
-  return <HostCard flush className="overflow-hidden">
-    <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface">
-      {image ? <img src={image} alt="" className="aspect-[4/3] w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm text-muted">No photo yet</div>}
-      <Badge color={STATUS_BADGE_COLOR[status.tone] || 'gray'} className="absolute left-3 top-3">{status.label}</Badge>
-    </div>
-    <div className="flex flex-1 flex-col gap-4 p-4 sm:p-5">
-      <header className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="text-base font-semibold text-navy"><Link to={`/property/${property.id}`} className="hover:text-muted">{property.title}</Link></h2>
-          <p className="mt-1 text-xs text-muted">{bedSummary(property)} · {property.neighborhood || property.location || 'Nairobi'}</p>
-        </div>
-        <strong className="whitespace-nowrap text-lg font-bold text-navy">KES {(property.price || 0).toLocaleString()}<small className="text-xs font-medium text-muted">/night</small></strong>
-      </header>
-      <p className="rounded-xl bg-surface px-3 py-2 text-xs leading-relaxed text-muted">{statusCopy(property)}</p>
-      <div className="rounded-xl bg-surface p-3">
-        <div className="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-muted"><span>Listing quality</span><strong className="text-navy">{quality.score}%</strong></div>
-        <div
-          className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-border"
-          role="progressbar"
-          aria-valuenow={quality.score}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={`Listing quality ${quality.score} percent`}
-        >
-          {/* Computed fill width: data-driven, so it stays an inline style. */}
-          <div className="h-full rounded-full bg-primary" style={{ width: `${quality.score}%` }} />
-        </div>
-        {quality.tips.length > 0 && <ul className="mt-2 space-y-1 text-xs text-muted">{quality.tips.slice(0, 2).map((tip) => <li key={tip}>{tip}</li>)}</ul>}
+  return <HostCard className="group h-full transition-shadow hover:shadow-md">
+    <div className="relative overflow-hidden rounded-xl bg-surface">
+      <div className="aspect-[4/3]">
+        {image
+          ? <img src={image} alt="" loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
+          : <div className="flex h-full items-center justify-center text-sm text-muted">No photo yet</div>}
       </div>
-      <div className="flex flex-wrap items-center gap-2">
-        <Button as={Link} to={`/host/properties/${property.id}/edit`} size="sm">
+      <div className="absolute left-3 top-3"><StatusPill tone={status.tone}>{status.label}</StatusPill></div>
+    </div>
+
+    <div className="flex flex-1 flex-col gap-3">
+      <div>
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-[15px] font-semibold leading-snug text-navy">
+            <Link to={`/property/${property.id}`} className="hover:text-muted">{property.title}</Link>
+          </h2>
+          <strong className="whitespace-nowrap text-sm font-bold text-navy">
+            KES {(property.price || 0).toLocaleString()}<span className="text-[11px] font-medium text-muted"> /night</span>
+          </strong>
+        </div>
+        <p className="mt-1 text-[13px] text-muted">{bedSummary(property)} · {where(property)}</p>
+        <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-muted">{statusCopy(property)}</p>
+      </div>
+
+      {showTips && <QualityMeter property={property} />}
+
+      <div className="mt-auto flex flex-wrap items-center justify-between gap-1 pt-1">
+        <Button as={Link} to={`/host/properties/${property.id}/edit`} size="sm" className="rounded-full" disabled={busy}>
           {property.status === 'DRAFT' ? 'Continue setup' : 'Edit listing'}
         </Button>
-        {canSubmit && <Button type="button" color="light" size="sm" disabled={busy} onClick={() => onReview(property)}>
-          {busy ? 'Submitting...' : 'Submit for review'}
-        </Button>}
-        {property.status === 'PENDING_REVIEW' && <span className="text-xs font-medium text-muted">Awaiting review</span>}
-        {property.status === 'PUBLISHED' && <Button as={Link} to={`/property/${property.id}`} color="light" size="sm">View listing</Button>}
-        <Button as={Link} to={`/host/calendar/${property.id}`} color="light" size="sm">Calendar</Button>
+        <div className="flex flex-wrap items-center gap-0.5">
+          {canSubmit && <QuietAction onClick={() => onReview(property)}>{busy ? 'Submitting...' : 'Submit for review'}</QuietAction>}
+          {property.status === 'PENDING_REVIEW' && <span className="px-2 text-xs font-medium text-muted">Awaiting review</span>}
+          {property.status === 'PUBLISHED' && <QuietAction to={`/property/${property.id}`}>View listing</QuietAction>}
+          <QuietAction to={`/host/calendar/${property.id}`}>Calendar</QuietAction>
+        </div>
       </div>
-      <footer className="mt-auto flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
-        <div className="flex flex-wrap items-center gap-2">
+
+      <div className="flex items-center justify-between gap-2 border-t border-border pt-3">
+        <div className="flex items-center gap-2">
           <ToggleSwitch
             checked={Boolean(property.available)}
             onChange={() => onToggleAvailability(property)}
@@ -144,10 +197,8 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
           />
           <span className="text-xs text-muted">{property.available ? 'Accepting bookings' : 'Not accepting bookings'}</span>
         </div>
-        <Button type="button" color="light" size="sm" disabled={busy} onClick={() => onDelete(property)}>
-          {busy ? 'Working...' : 'Delete'}
-        </Button>
-      </footer>
+        <QuietAction onClick={() => onDelete(property)} danger>{busy ? 'Working...' : 'Delete'}</QuietAction>
+      </div>
     </div>
   </HostCard>;
 }
@@ -170,6 +221,7 @@ HostListingCard.propTypes = {
   onDelete: PropTypes.func.isRequired,
   onReview: PropTypes.func.isRequired,
   busy: PropTypes.bool.isRequired,
+  showTips: PropTypes.bool.isRequired,
 };
 
 function HostListingRow({ property, onToggleAvailability, onDelete, onReview, busy }) {
@@ -178,38 +230,41 @@ function HostListingRow({ property, onToggleAvailability, onDelete, onReview, bu
   const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
 
   return <HostCard>
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-      <span className="h-16 w-full shrink-0 overflow-hidden rounded-lg bg-surface sm:h-14 sm:w-20">
+    <div className="flex items-start gap-3 sm:gap-4">
+      <span className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-surface sm:h-24 sm:w-24">
         {image
-          ? <img src={image} alt="" className="h-full w-full object-cover" />
+          ? <img src={image} alt="" loading="lazy" className="h-full w-full object-cover" />
           : <span className="grid h-full w-full place-items-center text-[10px] text-muted">No photo</span>}
       </span>
 
+      {/* Actions sit under the text rather than beside it: a beside-column on a
+          phone squeezed the title down to a single letter. */}
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-2">
-          <h2 className="max-w-full truncate text-sm font-semibold text-navy">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <h2 className="min-w-0 flex-1 truncate text-[15px] font-semibold text-navy">
             <Link to={`/property/${property.id}`} className="hover:text-muted">{property.title}</Link>
           </h2>
-          <Badge color={STATUS_BADGE_COLOR[status.tone] || 'gray'}>{status.label}</Badge>
-          {!property.available && <span className="text-[10px] font-semibold text-muted">Not accepting bookings</span>}
+          <StatusPill tone={status.tone}>{status.label}</StatusPill>
         </div>
-        <p className="mt-0.5 truncate text-xs text-muted">{bedSummary(property)} · {property.neighborhood || property.location || 'Nairobi'}</p>
-      </div>
+        <p className="mt-1 truncate text-[13px] text-muted">{bedSummary(property)} · {where(property)}</p>
+        <p className="mt-0.5 text-sm font-bold text-navy">KES {(property.price || 0).toLocaleString()}<span className="text-[11px] font-medium text-muted"> /night</span></p>
 
-      <div className="flex shrink-0 flex-wrap items-center gap-2">
-        <strong className="whitespace-nowrap text-sm font-bold tabular-nums text-navy">KES {(property.price || 0).toLocaleString()}<small className="text-[10px] font-medium text-muted">/night</small></strong>
-        <ToggleSwitch
-          checked={Boolean(property.available)}
-          onChange={() => onToggleAvailability(property)}
-          disabled={busy}
-          aria-label={`${property.title} availability`}
-        />
-        <Button as={Link} to={`/host/properties/${property.id}/edit`} size="xs">
-          {property.status === 'DRAFT' ? 'Continue setup' : 'Edit'}
-        </Button>
-        {canSubmit && <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onReview(property)}>Submit</Button>}
-        <Button as={Link} to={`/host/calendar/${property.id}`} color="light" size="xs">Calendar</Button>
-        <Button type="button" color="light" size="xs" disabled={busy} onClick={() => onDelete(property)}>Delete</Button>
+        <div className="mt-2 flex flex-wrap items-center gap-1">
+          <Button as={Link} to={`/host/properties/${property.id}/edit`} size="xs" className="rounded-full" disabled={busy}>
+            {property.status === 'DRAFT' ? 'Continue' : 'Edit'}
+          </Button>
+          {canSubmit && <QuietAction onClick={() => onReview(property)}>{busy ? 'Submitting...' : 'Submit'}</QuietAction>}
+          <QuietAction to={`/host/calendar/${property.id}`}>Calendar</QuietAction>
+          <button
+            type="button"
+            onClick={() => onToggleAvailability(property)}
+            disabled={busy}
+            className="rounded-full px-2.5 py-1.5 text-xs font-semibold text-muted transition-colors hover:bg-surface hover:text-navy disabled:opacity-50"
+          >
+            {property.available ? 'Pause' : 'Resume'}
+          </button>
+          <QuietAction onClick={() => onDelete(property)} danger>Delete</QuietAction>
+        </div>
       </div>
     </div>
   </HostCard>;
@@ -223,6 +278,9 @@ export default function HostListingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('ALL');
+  // Tips are coaching, not data: a host who knows the checklist can hide it and
+  // keep the cards short.
+  const [showTips, setShowTips] = useState(true);
   const [busyId, setBusyId] = useState(null);
   // Remembered so a host who prefers rows does not re-pick it on every visit.
   const [view, setView] = useState(() => {
@@ -237,7 +295,7 @@ export default function HostListingsPage() {
     try {
       window.localStorage.setItem('zuri:host-listings-view', view);
     } catch {
-      // A blocked storage read is not worth failing the page over.
+      // A blocked storage write is not worth failing the page over.
     }
   }, [view]);
 
@@ -262,6 +320,9 @@ export default function HostListingsPage() {
     const activeFilter = FILTERS.find((item) => item.key === filter) || FILTERS[0];
     return properties.filter(activeFilter.matches);
   }, [filter, properties]);
+  // Counts belong on the filter itself: a host should not have to open it to
+  // find out whether anything needs attention.
+  const filterOptions = useMemo(() => FILTERS.map((item) => ({ value: item.key, label: `${item.label} · ${counts[item.key] || 0}` })), [counts]);
 
   async function handleToggleAvailability(property) {
     setBusyId(property.id);
@@ -304,38 +365,50 @@ export default function HostListingsPage() {
   }
 
   return <div className="space-y-6">
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div>
         <p className={HOST_EYEBROW}>Host workspace</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Your listings</h1>
         <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare, publish, and manage your stays.</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <div className={`${PILL_GROUP} items-center`} role="group" aria-label="Listing view">
-          {[['grid', 'Grid'], ['list', 'List']].map(([key, label]) => <button
+        <button
+          type="button"
+          onClick={() => setShowTips((current) => !current)}
+          aria-pressed={showTips}
+          className={`inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-sm font-semibold transition-colors hover:bg-surface ${showTips ? 'text-navy' : 'text-muted'}`}
+        >
+          <Lightbulb className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+          Show tips
+        </button>
+        <SelectMenu
+          value={filter}
+          onChange={setFilter}
+          options={filterOptions}
+          ariaLabel="Filter listings by status"
+          sizing="sm"
+          shape="pill"
+          wrapperClassName="w-40"
+        />
+        <div className={`${PILL_GROUP} items-center gap-0.5`} role="group" aria-label="Listing view">
+          {[['grid', 'Grid', LayoutGrid], ['list', 'List', ListIcon]].map(([key, label, Icon]) => <button
             key={key}
             type="button"
             onClick={() => setView(key)}
             aria-pressed={view === key}
             aria-label={`${label} view`}
-            className={`h-7 rounded-full px-3 text-xs font-semibold transition-colors ${view === key ? PILL_SELECTED : PILL_IDLE}`}
+            className={`inline-flex h-8 items-center gap-1 rounded-full px-2.5 text-xs font-semibold transition-colors ${view === key ? PILL_SELECTED : PILL_IDLE}`}
           >
-            {label}
+            <Icon className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+            <span className="hidden sm:inline">{label}</span>
           </button>)}
         </div>
-        <Button as={Link} to="/host/properties/new" size="sm">+ Add a listing</Button>
+        <Button as={Link} to="/host/properties/new" size="sm" className="rounded-full">
+          <Plus className="mr-1.5 h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
+          Add listing
+        </Button>
       </div>
     </header>
-
-    <div className={`${PILL_GROUP} flex-wrap gap-1`} role="group" aria-label="Listing status">
-      {FILTERS.map((item) => <button
-        key={item.key}
-        type="button"
-        aria-pressed={filter === item.key}
-        onClick={() => setFilter(item.key)}
-        className={`h-8 rounded-full px-4 text-sm font-semibold transition-colors ${filter === item.key ? PILL_SELECTED : PILL_IDLE}`}
-      >{item.label} · {counts[item.key] || 0}</button>)}
-    </div>
 
     {error && <Alert color="failure">
       <p>{error}</p>
@@ -347,12 +420,12 @@ export default function HostListingsPage() {
         <span className="text-muted"><Building2 strokeWidth={1.6} aria-hidden="true" /></span>
         <strong className="text-base font-semibold text-navy">{properties.length === 0 ? 'No listings yet' : 'Nothing in this view'}</strong>
         <p className="max-w-md text-sm leading-relaxed text-muted">{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>
-        {properties.length === 0 ? <Button as={Link} to="/host/properties/new" size="sm">Add a listing</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>Show all stays</Button>}
+        {properties.length === 0 ? <Button as={Link} to="/host/properties/new" size="sm" className="rounded-full">Add a listing</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>Show all stays</Button>}
       </div>
     </HostCard> : view === 'list' ? <div className="space-y-2">
       {visibleProperties.map((property) => <HostListingRow key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
     </div> : <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-      {visibleProperties.map((property) => <HostListingCard key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
+      {visibleProperties.map((property) => <HostListingCard key={property.id} property={property} busy={busyId === property.id} showTips={showTips} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
     </div>}
   </div>;
 }

@@ -2,37 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Find the host arrival guide page and how it renders today (it did not exist)",
+      "text": "Fix phone calendar: Custom settings opens an editable panel instead of scrolling behind the sheet",
       "state": "done"
     },
     {
-      "text": "Store guide fields on the listing: both Prisma schemas, validation, service read/write, Postgres migration",
+      "text": "Check the calendar sheet and settings panel on screen at phone width",
       "state": "done"
     },
     {
-      "text": "Rebuild the page shell: centred header, gear action, segmented Your space / Arrival guide toggle",
+      "text": "Find the host arrival guide page (another run had just built and committed it, so I reviewed it instead of rebuilding)",
       "state": "done"
     },
     {
-      "text": "Restyle each section as a rounded white card with bold title and grey value line",
+      "text": "Page shell checked: centred header, gear action, Your space / Arrival guide toggle",
       "state": "done"
     },
     {
-      "text": "Render house rules as icon rows with + N more and a dark View pill",
+      "text": "Section cards checked: rounded white card, bold title, grey value line, Add details when empty",
       "state": "done"
     },
     {
-      "text": "Wire the route and a way in from the listing editor",
+      "text": "House rules checked: icon rows, + 2 more, black View pill, and saving from the page works",
       "state": "done"
     },
     {
-      "text": "Check it on screen at desktop and phone width, and confirm saves persist",
+      "text": "Checked the arrival guide at desktop and phone width",
       "state": "done"
     },
     {
-      "text": "Run lint and build",
+      "text": "Lint and build pass with the arrival guide in the tree",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-10-31T15:58:43.430Z"
+  "updatedAt": "2026-10-31T16:04:43.313Z"
 }
