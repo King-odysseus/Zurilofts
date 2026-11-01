@@ -42,9 +42,20 @@ const TRIGGER_SIZES = {
 
 // Panel and item styling for this component only. Kept as a module constant
 // rather than inline per call site so every select menu looks identical.
+//
+// The two clamp utilities carry Tailwind's `!` modifier on purpose. Flowbite
+// measures the trigger once, when the menu mounts, and writes that width onto
+// the open panel as an inline `min-width`. Rotate a phone, or drag a window
+// narrower, and the panel keeps the old, wider measurement - at that point the
+// open list runs off the right of the screen and the whole page scrolls
+// sideways. A class cannot beat an inline style without `!`, and a viewport
+// cap cannot beat `min-width` at all, so both the floor and the cap are
+// important here. The floor stays useful (an `sm` select in a narrow table
+// still opens a readable list) and is itself capped, so it can never exceed the
+// screen.
 const MENU_THEME = {
   floating: {
-    base: 'z-50 w-full overflow-hidden rounded-[10px] border border-[#E2DAD0] bg-elevated shadow-lg dark:border-gray-600 dark:bg-gray-700',
+    base: 'z-50 w-full overflow-hidden rounded-[10px] border border-[#E2DAD0] bg-elevated shadow-lg dark:border-gray-600 dark:bg-gray-700 !min-w-[min(11rem,calc(100vw-2rem))] !max-w-[calc(100vw-2rem)]',
     content: 'max-h-72 overflow-y-auto py-1 text-sm text-[#111827] dark:text-gray-200',
   },
 };

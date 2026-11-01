@@ -179,7 +179,7 @@ function HeaderUserMenu({ user, onLogout }) {
               <>{user?.firstName?.[0]}{user?.lastName?.[0]}</>
             )}
           </span>
-          <span className="text-sm font-semibold text-navy">{user?.firstName}</span>
+          <span className="hidden max-w-[9rem] truncate text-sm font-semibold text-navy sm:inline">{user?.firstName}</span>
         </button>
       )}
     >
@@ -449,18 +449,22 @@ function AdminLayout() {
         </button>
       </aside>
 
-      {/* Mobile header and floating section nav */}
-      <div className="sticky top-0 z-30 flex h-14 items-center justify-between gap-2 border-b border-border bg-elevated px-4 lg:hidden">
-        <div className="flex items-center">
-          <Link to="/admin" className="inline-flex items-center gap-2">
-            <BrandLogo imgClassName="h-6 w-auto" alt="" />
-            <span className="flex flex-col leading-tight">
-              <strong className="font-montserrat text-sm font-bold text-navy">zuri.admin</strong>
-              <small className="text-[10px] uppercase tracking-wide text-muted">{t('admin.workspace')}</small>
+      {/* Mobile header and floating section nav.
+          Everything in this row must be able to shrink: the logo lockup, the
+          wordmark and a long admin first name are all content-sized, and at 320px
+          (or with a long translated wordmark) they used to push the page wider
+          than the screen. */}
+      <div className="sticky top-0 z-30 flex h-14 items-center justify-between gap-1.5 border-b border-border bg-elevated px-3 sm:gap-2 sm:px-4 lg:hidden">
+        <div className="flex min-w-0 items-center">
+          <Link to="/admin" className="flex min-w-0 items-center gap-2">
+            <BrandLogo imgClassName="h-6 w-auto shrink-0" alt="" />
+            <span className="flex min-w-0 flex-col leading-tight">
+              <strong className="truncate font-montserrat text-sm font-bold text-navy">zuri.admin</strong>
+              <small className="truncate text-[10px] uppercase tracking-wide text-muted">{t('admin.workspace')}</small>
             </span>
           </Link>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
           <ThemeToggle className={ICON_BUTTON} />
           <LanguageSwitcher triggerClassName={ICON_BUTTON} />
           <div className="relative">

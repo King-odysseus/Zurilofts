@@ -385,7 +385,7 @@ function Navbar() {
                       <span className={underlineClass(isActive)} />
                     </button>
                     {open && (
-                      <div className="absolute left-0 top-full z-30 mt-2 w-56 rounded-2xl border border-[#E3E8EF] bg-elevated py-2 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
+                      <div className="absolute left-0 top-full z-30 mt-2 w-[min(14rem,calc(100vw-2rem))] rounded-2xl border border-[#E3E8EF] bg-elevated py-2 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
                         {submenuItems.map((child) => {
                           const childActive = isActiveHref(location.pathname, child.href);
                           return (
@@ -455,7 +455,7 @@ function Navbar() {
                     </span>
                   )}
                   {notifOpen && (
-                    <div className="absolute right-0 z-30 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-elevated py-2 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
+                    <div className="absolute right-0 z-30 mt-2 w-[min(16rem,calc(100vw-2rem))] rounded-2xl border border-[#E3E8EF] bg-elevated py-2 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
                       <div className="border-b border-[#E3E8EF] px-4 py-2">
                         <p className="text-sm font-semibold text-[#203565]">Notifications</p>
                       </div>
@@ -536,7 +536,7 @@ function Navbar() {
                   </button>
 
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-56 bg-elevated rounded-2xl shadow-xl py-2 z-30 border border-[#E3E8EF]">
+                    <div className="absolute right-0 mt-2 w-[min(14rem,calc(100vw-2rem))] bg-elevated rounded-2xl shadow-xl py-2 z-30 border border-[#E3E8EF]">
                       <div className="px-4 py-3 border-b border-[#E3E8EF]">
                         <p className="text-sm font-semibold text-[#203565]">{user?.firstName} {user?.lastName}</p>
                         <p className="text-xs text-[#5B6B82]">{user?.email}</p>

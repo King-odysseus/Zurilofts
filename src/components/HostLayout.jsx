@@ -257,7 +257,7 @@ function HostLayout({ children }) {
                 )}
               </button>
 
-              {notifOpen && <div className="absolute right-0 z-30 mt-2 w-72 rounded-2xl bg-elevated py-2 shadow-xl">
+              {notifOpen && <div className="absolute right-0 z-30 mt-2 w-[min(18rem,calc(100vw-2rem))] rounded-2xl bg-elevated py-2 shadow-xl">
                 <div className="border-b border-border px-4 py-2">
                   <p className="text-sm font-semibold text-navy">{t('host.notifications')}</p>
                 </div>

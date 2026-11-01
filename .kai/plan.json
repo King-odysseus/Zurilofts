@@ -2,17 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check git status and diff",
+      "text": "Read translation service and route",
       "state": "done"
     },
     {
-      "text": "Run lint, build and key checker",
+      "text": "Check env config and frontend caller",
       "state": "done"
     },
     {
-      "text": "Commit the i18n foundation, then the page and UI work, then push",
-      "state": "active"
+      "text": "Live-test the endpoint and clean up test rig",
+      "state": "done"
+    },
+    {
+      "text": "Run frontend build, then report",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-01T13:12:28.455Z"
+  "updatedAt": "2026-11-01T14:34:33.042Z"
 }

@@ -13,6 +13,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* A phone must never be able to drag the page sideways. Every surface here has a
+   pop-up, fly-out or long translated label that could reach past the right edge,
+   and once one does the whole page shifts and content disappears off-screen.
+   `clip` (not `hidden`) is deliberate: it stops the sideways scroll without
+   turning the root into a scroll container, which would break the sticky
+   workspace headers and the drawer/sheet scroll areas. */
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* No rubber-band to the side either: on iOS the overscroll glow still hints at
+   hidden content that no longer exists. */
+body {
+  overscroll-behavior-x: none;
+}
+
 /* Single source of truth for the design system tokens.
    Every other CSS file reads these values; no other file defines its own
    :root token block anymore. Keeping the three namespaces (zl / op / control)
@@ -1318,7 +1336,14 @@ html.dark .op-auth-check label {
 @media(max-width:767px){
   .opg-saved-page{min-height:calc(100vh - 64px - var(--zl-legal-strip-h, 0px) - var(--zl-bottom-nav-space, 0px));padding:20px 0 var(--zl-space-page)}
   .opg-saved-container{width:calc(100% - 32px)}
-  .opg-saved-header{align-items:center}
+  /* The page action is a nowrap pill; on a narrow phone it cannot sit beside the
+     heading without pushing the page wider, so let it drop onto its own line. */
+  .opg-saved-header{align-items:center;flex-wrap:wrap;gap:12px}
+  .opg-saved-action{white-space:normal;text-align:center}
+  /* Three nowrap pills do not fit a 320px screen either: scroll them inside the
+     row instead of letting them push the page sideways. */
+  .opg-saved-tabs{overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .opg-saved-tabs::-webkit-scrollbar{display:none}
   .opg-saved-heading h1{font-size:22px}
   .opg-saved-heading p{font-size:12px}
   .opg-saved-collections{grid-template-columns:1fr}
