@@ -2,29 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Verify the 'Finish your profile' notice clears after saving the missing field, without a reload",
+      "text": "Identify the surface: the screenshot's wording exists only in the June build of offline-app, not in current source",
       "state": "done"
     },
     {
-      "text": "Verify the selfie row shows 'Retake photo' once a selfie is already on file",
+      "text": "Confirm current source already names the missing details (live check on the running app)",
       "state": "done"
     },
     {
-      "text": "Verify the camera dialog renders its Swahili copy",
+      "text": "Determine why the copy they see is stale: offline-app no longer builds (7 removed imports)",
       "state": "done"
     },
     {
-      "text": "Wire the profile form labels to their inputs (they were unlabelled for assistive tech)",
+      "text": "Report findings; no repo change was needed for the wording",
       "state": "done"
-    },
-    {
-      "text": "Re-run lint and build on the final tree",
-      "state": "done"
-    },
-    {
-      "text": "Review the full diff, then commit and push so the reminder work reaches the deployed build",
-      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-01T17:47:28.222Z"
+  "updatedAt": "2026-11-01T18:25:28.238Z"
 }
