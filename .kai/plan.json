@@ -2,29 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check what is uncommitted with git status",
+      "text": "Verify the 'Finish your profile' notice clears after saving the missing field, without a reload",
       "state": "done"
     },
     {
-      "text": "Review the diff for anything unintended or secret",
+      "text": "Verify the selfie row shows 'Retake photo' once a selfie is already on file",
       "state": "done"
     },
     {
-      "text": "Run lint and build on the current tree",
+      "text": "Verify the camera dialog renders its Swahili copy",
       "state": "done"
     },
     {
-      "text": "Stage the relevant files and commit",
+      "text": "Wire the profile form labels to their inputs (they were unlabelled for assistive tech)",
       "state": "done"
     },
     {
-      "text": "Push and confirm the branch is level with origin",
+      "text": "Re-run lint and build on the final tree",
       "state": "done"
     },
     {
-      "text": "Commit the plan record and push it so no working tree changes are left behind",
-      "state": "done"
+      "text": "Review the full diff, then commit and push so the reminder work reaches the deployed build",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-01T16:36:01.061Z"
+  "updatedAt": "2026-11-01T17:47:28.222Z"
 }
