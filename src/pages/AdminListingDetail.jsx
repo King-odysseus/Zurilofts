@@ -183,7 +183,7 @@ export default function AdminListingDetail() {
   if (!listing) {
     return (
       <div className="space-y-8">
-        <Link to="/admin/properties" className="inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
+        <Link to="/admin/listings" className="inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
           <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           {t('adminlisting.backToApprovals')}
         </Link>
@@ -192,7 +192,7 @@ export default function AdminListingDetail() {
           <p role="alert" className="mx-auto mt-1 max-w-md text-sm leading-relaxed text-muted">
             {loadError || 'This listing does not exist, or it has been removed.'}
           </p>
-          <Button as={Link} to="/admin/properties" size="sm" className="mx-auto mt-5 w-fit">{t('adminlisting.backToApprovals')}</Button>
+          <Button as={Link} to="/admin/listings" size="sm" className="mx-auto mt-5 w-fit">{t('adminlisting.backToApprovals')}</Button>
         </section>
       </div>
     );
@@ -232,7 +232,7 @@ export default function AdminListingDetail() {
   return (
     <div className="space-y-8">
       <div>
-        <Link to="/admin/properties" className="inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
+        <Link to="/admin/listings" className="inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
           <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           {t('adminlisting.backToApprovals')}
         </Link>
@@ -354,7 +354,7 @@ export default function AdminListingDetail() {
             {message && <p role="status" className="mt-4 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">{message}</p>}
 
             {listing.status === 'PUBLISHED' && (
-              <Link to={`/admin/properties/${listing.id}/preview`} className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
+              <Link to={`/admin/listings/${listing.id}/preview`} className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">
                 Preview as a guest sees it
                 <Eye className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </Link>

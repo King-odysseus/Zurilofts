@@ -56,7 +56,7 @@ export default function AdminListingPreviewPage() {
     return () => { cancelled = true; };
   }, [id, t]);
 
-  const backLink = <Link to={`/admin/properties/${id}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-navy">
+  const backLink = <Link to={`/admin/listings/${id}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-navy">
     <ArrowLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
     {t('adminlisting.backToReviewRecord')}
   </Link>;
@@ -102,7 +102,7 @@ export default function AdminListingPreviewPage() {
       <p>{t('adminlisting.guestsAlsoSee')}</p>
     </div>
 
-    <Button as={Link} to={`/admin/properties/${id}`} size="sm" color="light" className="mt-5 w-full rounded-full">
+    <Button as={Link} to={`/admin/listings/${id}`} size="sm" color="light" className="mt-5 w-full rounded-full">
       <ShieldCheck className="mr-1.5 h-4 w-4" strokeWidth={2} aria-hidden="true" />
       {t('adminlisting.openReviewActions')}
     </Button>

@@ -14,8 +14,8 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 export default function ListingEditorTabs({ listingId, active }) {
   const { t } = useLanguage();
   const sections = [
-    { key: 'space', label: 'Your space', to: `/host/properties/${listingId}/edit` },
-    { key: 'arrival', label: 'Arrival guide', to: `/host/properties/${listingId}/arrival-guide` },
+    { key: 'space', label: 'Your space', to: `/host/listings/${listingId}/edit` },
+    { key: 'arrival', label: 'Arrival guide', to: `/host/listings/${listingId}/arrival-guide` },
   ];
 
   // Capped rather than stretched. The editor header belongs to the listing, not

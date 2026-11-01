@@ -97,7 +97,7 @@ export default function HostListingPreviewPage() {
       </ul>
 
       <div className="flex flex-col gap-2 border-t border-border pt-4">
-        <Button as={Link} to={`/host/properties/${property.id}/edit`} size="sm" className="rounded-full">
+        <Button as={Link} to={`/host/listings/${property.id}/edit`} size="sm" className="rounded-full">
           <PencilLine className="mr-1.5 h-4 w-4" strokeWidth={2} aria-hidden="true" />
           {t('hostpreview.editListing')}
         </Button>
@@ -106,7 +106,7 @@ export default function HostListingPreviewPage() {
           {t('hostpreview.manageCalendar')}
         </Button>
         <Link
-          to={`/host/properties/${property.id}/arrival-guide`}
+          to={`/host/listings/${property.id}/arrival-guide`}
           className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-full px-3 text-xs font-semibold text-muted hover:text-navy"
         >
           <MapPin className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />

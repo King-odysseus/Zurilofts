@@ -100,7 +100,7 @@ function AdminPropertyForm() {
   const navigate = useNavigate();
 
   // Host-only screen. Listing writes go to /properties (host-scoped) and the
-  // listing index lives at /host/listings; /admin/properties is review-only.
+  // listing index lives at /host/listings; /admin/listings is review-only.
 
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(isEdit);
@@ -231,7 +231,7 @@ function AdminPropertyForm() {
       } else {
         const res = await apiClient.post(endpoint, payload);
         // Go to edit so seasonal pricing & calendar (which need an id) are available
-        navigate(`/host/properties/${res.data.data.id}/edit`);
+        navigate(`/host/listings/${res.data.data.id}/edit`);
       }
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.error || t('admin.savePropertyFailed'));

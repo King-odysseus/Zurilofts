@@ -248,7 +248,7 @@ export default function HostInsightsPage() {
     {listings.length === 0 ? <HostCard>
       <div className="flex flex-col items-center gap-3 py-6 text-center">
         <p className="text-sm text-muted">{t('hostaccount.nothingToReview')}</p>
-        <Button as={Link} to="/host/properties/new" size="sm">{t('hostaccount.createListing')}</Button>
+        <Button as={Link} to="/host/listings/new" size="sm">{t('hostaccount.createListing')}</Button>
       </div>
     </HostCard> : tab === 'ratings' ? <section aria-label={t('hostaccount.ratingBreakdown')}>
       <HostCard

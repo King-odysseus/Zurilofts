@@ -176,7 +176,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
       {showTips && <QualityMeter property={property} />}
 
       <div className="mt-auto flex flex-wrap items-center justify-between gap-1 pt-1">
-        <Button as={Link} to={`/host/properties/${property.id}/edit`} size="sm" className="rounded-full" disabled={busy}>
+        <Button as={Link} to={`/host/listings/${property.id}/edit`} size="sm" className="rounded-full" disabled={busy}>
           {property.status === 'DRAFT' ? t('host.continueSetup') : t('host.editListing')}
         </Button>
         <div className="flex flex-wrap items-center gap-0.5">
@@ -254,7 +254,7 @@ function HostListingRow({ property, onToggleAvailability, onDelete, onReview, bu
         <p className="mt-0.5 text-sm font-bold text-navy">KES {(property.price || 0).toLocaleString()}<span className="text-[11px] font-medium text-muted"> {t('host.perNightShort')}</span></p>
 
         <div className="mt-3 flex flex-wrap items-center gap-1">
-          <Button as={Link} to={`/host/properties/${property.id}/edit`} size="xs" className="rounded-full" disabled={busy}>
+          <Button as={Link} to={`/host/listings/${property.id}/edit`} size="xs" className="rounded-full" disabled={busy}>
             {property.status === 'DRAFT' ? 'Continue' : 'Edit'}
           </Button>
           {canSubmit && <QuietAction onClick={() => onReview(property)}>{busy ? 'Submitting...' : 'Submit'}</QuietAction>}
@@ -408,7 +408,7 @@ export default function HostListingsPage() {
             <span className="hidden sm:inline">{t(label)}</span>
           </button>)}
         </div>
-        <Button as={Link} to="/host/properties/new" size="sm" className="rounded-full">
+        <Button as={Link} to="/host/listings/new" size="sm" className="rounded-full">
           <Plus className="mr-1.5 h-4 w-4" strokeWidth={2.2} aria-hidden="true" />
           {t('host.addListingShort')}
         </Button>
@@ -425,7 +425,7 @@ export default function HostListingsPage() {
         <span className="text-muted"><Building2 strokeWidth={1.6} aria-hidden="true" /></span>
         <strong className="text-base font-semibold text-navy">{properties.length === 0 ? t('host.noListings') : t('host.nothingInView')}</strong>
         <p className="max-w-md text-sm leading-relaxed text-muted">{properties.length === 0 ? 'Create your first stay and start preparing it for guests.' : 'Try another status filter to see your listings.'}</p>
-        {properties.length === 0 ? <Button as={Link} to="/host/properties/new" size="sm" className="rounded-full">{t('host.addListing')}</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>{t('host.showAllStays')}</Button>}
+        {properties.length === 0 ? <Button as={Link} to="/host/listings/new" size="sm" className="rounded-full">{t('host.addListing')}</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>{t('host.showAllStays')}</Button>}
       </div>
     </HostCard> : view === 'list' ? <div className="space-y-5 sm:space-y-6">
       {visibleProperties.map((property) => <HostListingRow key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}

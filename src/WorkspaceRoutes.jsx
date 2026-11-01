@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import AdminRoute from './components/AdminRoute.jsx';
 import HostRoute from './components/HostRoute.jsx';
 import HostLayout from './components/HostLayout.jsx';
@@ -38,6 +38,19 @@ import NotFoundPage from './pages/NotFoundPage.jsx';
 
 const hostPage = (page) => <HostRoute><HostLayout>{page}</HostLayout></HostRoute>;
 
+// The host editor and the admin listing screens used to sit under
+// /host/properties and /admin/properties. Those addresses are in bookmarks and
+// in links already sent, so they map onto the renamed paths instead of
+// resolving to nothing. The listing id is carried over, so a saved editor link
+// still opens the same listing rather than the index.
+function LegacyListingPath() {
+  const { pathname, search } = useLocation();
+  const target = pathname.startsWith('/host/')
+    ? pathname.replace('/host/properties', '/host/listings')
+    : pathname.replace('/admin/properties', '/admin/listings');
+  return <Navigate to={`${target}${search}`} replace />;
+}
+
 export default function WorkspaceRoutes() {
   return <Routes>
     <Route path="/host/application" element={<ProtectedRoute><HostLayout><HostApplicationPage /></HostLayout></ProtectedRoute>} />
@@ -56,9 +69,11 @@ export default function WorkspaceRoutes() {
     <Route path="/host/reservations/:id" element={hostPage(<HostReservationDetailPage />)} />
     <Route path="/host/insights" element={hostPage(<HostInsightsPage />)} />
     <Route path="/host/earnings" element={hostPage(<HostEarningsPage />)} />
-    <Route path="/host/properties/new" element={hostPage(<AdminPropertyForm />)} />
-    <Route path="/host/properties/:id/edit" element={hostPage(<AdminPropertyForm />)} />
-    <Route path="/host/properties/:id/arrival-guide" element={hostPage(<HostArrivalGuidePage />)} />
+    <Route path="/host/listings/new" element={hostPage(<AdminPropertyForm />)} />
+    <Route path="/host/listings/:id/edit" element={hostPage(<AdminPropertyForm />)} />
+    <Route path="/host/listings/:id/arrival-guide" element={hostPage(<HostArrivalGuidePage />)} />
+    {/* Old host addresses, kept alive for bookmarks and sent links. */}
+    <Route path="/host/properties/*" element={<LegacyListingPath />} />
     <Route path="/host/payouts" element={hostPage(<HostPayouts />)} />
     <Route path="/host/discounts" element={hostPage(<HostPromosPage />)} />
     <Route path="/host/settings" element={hostPage(<HostSettingsPage />)} />
@@ -68,15 +83,20 @@ export default function WorkspaceRoutes() {
       <Route path="revenue" element={<AdminRevenue />} />
       {/* Listings are host-owned. Admin keeps the approval queue only, so the
           old create/edit/calendar screens redirect instead of resolving. */}
-      <Route path="properties" element={<AdminListingReview />} />
+      <Route path="listings" element={<AdminListingReview />} />
       {/* One listing, reviewed in place. The public guest page is the wrong
           context for a moderator: it carries the booking widget and none of the
           review controls, and leaving /admin loses the workspace entirely. */}
-      <Route path="properties/:id" element={<AdminListingDetail />} />
-      <Route path="properties/:id/preview" element={<AdminListingPreviewPage />} />
-      <Route path="properties/new" element={<Navigate to="/admin/properties" replace />} />
-      <Route path="properties/:id/edit" element={<Navigate to="/admin/properties" replace />} />
-      <Route path="properties/:id/calendar" element={<Navigate to="/admin/properties" replace />} />
+      <Route path="listings/:id" element={<AdminListingDetail />} />
+      <Route path="listings/:id/preview" element={<AdminListingPreviewPage />} />
+      {/* Old admin addresses. The id is preserved where there is one, so a
+          bookmarked review page reopens the same listing. */}
+      <Route path="properties" element={<LegacyListingPath />} />
+      <Route path="properties/:id" element={<LegacyListingPath />} />
+      <Route path="properties/:id/preview" element={<LegacyListingPath />} />
+      <Route path="properties/new" element={<Navigate to="/admin/listings" replace />} />
+      <Route path="properties/:id/edit" element={<Navigate to="/admin/listings" replace />} />
+      <Route path="properties/:id/calendar" element={<Navigate to="/admin/listings" replace />} />
       {/* Bookings are host-owned day to day, but a reservation that needs
           confirming, cancelling or refunding is an admin decision, so the
           platform keeps a cross-host list. Money and discounts stay with hosts. */}

@@ -1285,7 +1285,7 @@ function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravel
       <div className="mt-6 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center">
         {approved ? (
           <>
-            <Button as={Link} to="/host/properties/new">{t('hostsetup.setUpProperty')}</Button>
+            <Button as={Link} to="/host/listings/new">{t('hostsetup.setUpProperty')}</Button>
             <Button as={Link} to="/host/today" color="light">{t('hostsetup.openDashboard')}</Button>
           </>
         ) : (

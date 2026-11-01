@@ -6,7 +6,7 @@ import { Building2, CalendarClock, CalendarDays, ChartNoAxesCombined, MessageCir
 const TABS = [
   { key: 'today', label: 'mobileNav.today', to: '/host/today', match: (p) => p === '/host/today', icon: CalendarClock },
   { key: 'calendar', label: 'mobileNav.calendar', to: '/host/calendar', match: (p) => p.startsWith('/host/calendar'), icon: CalendarDays },
-  { key: 'listings', label: 'mobileNav.listings', to: '/host/listings', match: (p) => p.startsWith('/host/listings') || p.startsWith('/host/properties'), icon: Building2 },
+  { key: 'listings', label: 'mobileNav.listings', to: '/host/listings', match: (p) => p.startsWith('/host/listings'), icon: Building2 },
   { key: 'messages', label: 'mobileNav.inbox', to: '/host/inbox', match: (p) => p.startsWith('/host/inbox'), icon: MessageCircleMore },
   { key: 'earnings', label: 'mobileNav.earnings', to: '/host/earnings', match: (p) => p.startsWith('/host/earnings') || p.startsWith('/host/payouts'), icon: ChartNoAxesCombined },
 ];

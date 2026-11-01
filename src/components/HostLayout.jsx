@@ -35,7 +35,7 @@ import LanguageSwitcher from './LanguageSwitcher.jsx';
 const TABS = [
   { key: 'today', label: 'host.tabToday', to: '/host/today', icon: CalendarClock, match: (pathname) => pathname === '/host/today' },
   { key: 'calendar', label: 'host.tabCalendar', to: '/host/calendar', icon: CalendarDays, match: (pathname) => pathname.startsWith('/host/calendar') },
-  { key: 'listings', label: 'host.tabListings', to: '/host/listings', icon: Building2, match: (pathname) => pathname.startsWith('/host/listings') || pathname.startsWith('/host/properties') },
+  { key: 'listings', label: 'host.tabListings', to: '/host/listings', icon: Building2, match: (pathname) => pathname.startsWith('/host/listings') },
   // Messages is the host inbox, not the traveller one: a host reads the guests
   // staying at their properties here. Traveller conversations live at /inbox.
   // The label matches the other host surfaces; the account menu says "Guest

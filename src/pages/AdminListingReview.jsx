@@ -228,7 +228,7 @@ export default function AdminListingReview() {
                 <StateBadge state={listing.status} />
                 <div className="flex items-center gap-3">
                   <Link
-                    to={`/admin/properties/${listing.id}`}
+                    to={`/admin/listings/${listing.id}`}
                     className="text-sm font-semibold text-primary-600 hover:underline"
                   >
                     {t('admin.preview')}
@@ -266,7 +266,7 @@ export default function AdminListingReview() {
             {/* A new tab on purpose: the decision modal and any note typed into
                 it survive while the admin reads the full listing. */}
             <Link
-              to={`/admin/properties/${reviewing.id}`}
+              to={`/admin/listings/${reviewing.id}`}
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline"

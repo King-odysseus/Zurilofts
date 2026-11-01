@@ -75,7 +75,7 @@ export async function createPromoCode(data: any) {
         subs.map((s: { endpoint: string; keys: string }) => ({ endpoint: s.endpoint, keys: s.keys })),
         'New Promo Code!',
         `Use code ${promo.code} for ${promo.discountPercent}% off your next stay.`,
-        '/properties',
+        '/stays',
       );
     } catch (err) { console.error('Push notification failed:', err); }
   }

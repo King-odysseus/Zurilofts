@@ -959,7 +959,7 @@ export default function HostCalendarPage() {
         >
           {selectedDays.length > 0 ? t('host.setPriceForPicked') : t('host.pickNightsToSetPrice')}
         </Button>
-        <Link to={`/host/properties/${activePropertyId}/edit`} className="mt-2 block text-center text-[11px] text-muted underline underline-offset-2 hover:text-navy">{t('host.editBaseRate')}</Link>
+        <Link to={`/host/listings/${activePropertyId}/edit`} className="mt-2 block text-center text-[11px] text-muted underline underline-offset-2 hover:text-navy">{t('host.editBaseRate')}</Link>
       </SidebarSection>
 
       <SidebarSection title={t('host.availability')} icon={Ban}>
@@ -1087,7 +1087,7 @@ export default function HostCalendarPage() {
       <CalendarDays className="mx-auto h-6 w-6 text-muted" strokeWidth={1.6} aria-hidden="true" />
       <strong className="mt-2 block text-base font-semibold text-navy">{t('host.noListingsToManage')}</strong>
       <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{t('host.addListingBeforeAvailability')}</p>
-      <Button as={Link} to="/host/properties/new" size="sm" className="mx-auto mt-4 w-fit">{t('host.addListing')}</Button>
+      <Button as={Link} to="/host/listings/new" size="sm" className="mx-auto mt-4 w-fit">{t('host.addListing')}</Button>
     </HostCard> : <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
       {/* Flush: the grid and the totals strip run edge to edge, while the head
           keeps its padding so it still lines up with the side panel. */}

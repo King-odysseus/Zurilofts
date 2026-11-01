@@ -110,7 +110,7 @@ const adminNavGroups = [
     items: [
       { path: '/admin/revenue', label: 'admin.navRevenue', icon: Wallet },
       { path: '/admin/bookings', label: 'admin.navReservations', icon: CalendarCheck },
-      { path: '/admin/properties', label: 'admin.navListingApprovals', icon: House },
+      { path: '/admin/listings', label: 'admin.navListingApprovals', icon: House },
       { path: '/admin/addons', label: 'admin.navAddons', icon: SlidersHorizontal },
       { path: '/admin/guides', label: 'admin.navGuides', icon: BookOpen },
       { path: '/admin/feedback', label: 'admin.navReviews', icon: Star },
@@ -238,7 +238,7 @@ function AdminSearch() {
         <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-xl bg-elevated py-1 shadow-lg" role="listbox">
           {!hasResults && <p className="px-3 py-2 text-xs text-muted">{t('admin.noMatches')}</p>}
           {results.users.map((u) => <button type="button" key={u.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go(`/admin/users?search=${encodeURIComponent(u.email)}`)}><strong className="text-xs font-semibold text-navy">{u.firstName} {u.lastName}</strong><span className="text-[11px] text-muted">{u.email} · {u.role}</span></button>)}
-          {results.properties.map((p) => <button type="button" key={p.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go(`/admin/properties/${p.id}`)}><strong className="text-xs font-semibold text-navy">{p.title}</strong><span className="text-[11px] text-muted">{p.location} · {p.status}</span></button>)}
+          {results.properties.map((p) => <button type="button" key={p.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go(`/admin/listings/${p.id}`)}><strong className="text-xs font-semibold text-navy">{p.title}</strong><span className="text-[11px] text-muted">{p.location} · {p.status}</span></button>)}
         </div>
       )}
     </div>
@@ -715,7 +715,7 @@ function DashboardOverview() {
   const quickLinks = [
     { to: '/admin/host-applications', label: 'admin.quickReviewApplications' },
     { to: '/admin/users', label: 'admin.quickManageAccounts' },
-    { to: '/admin/properties', label: 'admin.quickOpenApprovals' },
+    { to: '/admin/listings', label: 'admin.quickOpenApprovals' },
     { to: '/admin/trust-safety', label: 'admin.quickOpenTrustSafety' },
   ];
 
@@ -819,7 +819,7 @@ function DashboardOverview() {
           <p className="flex items-center justify-between text-xs text-muted"><span>{t('admin.identityChecks')}</span><strong className="text-sm font-semibold text-navy">{summary.verificationsPending}</strong></p>
         </div>
         <div className="px-5 pb-5">
-          <Button as={Link} to="/admin/properties" size="sm" className={BTN_PRIMARY}>{t('admin.quickOpenApprovals')}</Button>
+          <Button as={Link} to="/admin/listings" size="sm" className={BTN_PRIMARY}>{t('admin.quickOpenApprovals')}</Button>
         </div>
       </section>
     </div>
