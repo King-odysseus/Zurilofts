@@ -2,21 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Identify the surface: the screenshot's wording exists only in the June build of offline-app, not in current source",
+      "text": "Fix the \"Your booking is held\" card wrapping (stale flex rule removed)",
       "state": "done"
     },
     {
-      "text": "Confirm current source already names the missing details (live check on the running app)",
-      "state": "done"
+      "text": "Re-read the theme files and how sign-out works",
+      "state": "active"
     },
     {
-      "text": "Determine why the copy they see is stale: offline-app no longer builds (7 removed imports)",
-      "state": "done"
+      "text": "Save the theme per account instead of per browser, and clear the account marker on sign-out",
+      "state": "pending"
     },
     {
-      "text": "Report findings; no repo change was needed for the wording",
-      "state": "done"
+      "text": "Make light the default when nothing is saved, including before first paint",
+      "state": "pending"
+    },
+    {
+      "text": "Verify in a browser: two accounts, returning user, fresh visitor on a dark device",
+      "state": "pending"
+    },
+    {
+      "text": "Run lint and build",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-01T18:25:28.238Z"
+  "updatedAt": "2026-11-01T18:26:58.407Z"
 }
