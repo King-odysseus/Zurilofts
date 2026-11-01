@@ -438,7 +438,11 @@ function AdminLayout() {
         <button
           type="button"
           onClick={toggleSidebar}
-          className="absolute left-full top-1/2 z-50 grid h-14 w-5 -translate-y-1/2 place-items-center rounded-r-lg bg-navy-bg text-white shadow-sm transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          // This handle sits at left-full: it hangs outside the navy column, over the
+          // white page. A translucent hover (bg-white/10) replaces the navy fill
+          // instead of lightening it, so over white the handle vanished. The hover
+          // must stay an opaque navy.
+          className="absolute left-full top-1/2 z-50 grid h-14 w-5 -translate-y-1/2 place-items-center rounded-r-lg bg-navy-bg text-white shadow-sm transition-colors hover:bg-navy-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           aria-expanded={!collapsed}
           aria-label={collapsed ? t('admin.expandSidebar') : t('admin.collapseSidebar')}
           title={collapsed ? t('admin.expandSidebarShort') : t('admin.collapseSidebarShort')}
