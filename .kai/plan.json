@@ -2,29 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Fix the \"Your booking is held\" card wrapping (stale flex rule removed)",
+      "text": "Inspect theme storage, auth wiring and git state",
       "state": "done"
     },
     {
-      "text": "Re-read the theme files and how sign-out works",
+      "text": "Make the theme choice per account",
+      "state": "done"
+    },
+    {
+      "text": "Wipe the old shared theme value",
+      "state": "done"
+    },
+    {
+      "text": "Verify in a browser",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and build, then commit and push",
       "state": "active"
-    },
-    {
-      "text": "Save the theme per account instead of per browser, and clear the account marker on sign-out",
-      "state": "pending"
-    },
-    {
-      "text": "Make light the default when nothing is saved, including before first paint",
-      "state": "pending"
-    },
-    {
-      "text": "Verify in a browser: two accounts, returning user, fresh visitor on a dark device",
-      "state": "pending"
-    },
-    {
-      "text": "Run lint and build",
-      "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-01T18:26:58.407Z"
+  "updatedAt": "2026-11-01T18:42:20.018Z"
 }

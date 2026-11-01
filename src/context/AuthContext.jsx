@@ -1,6 +1,7 @@
 import { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import apiClient, { setAccessToken, clearAccessToken, refreshSession } from '../api/client.js';
 import { clearRecentlyViewed } from '../utils/recentlyViewed.js';
+import { setActiveThemeAccount } from '../utils/themeStorage.js';
 
 const AuthContext = createContext(null);
 
@@ -87,6 +88,16 @@ export function AuthProvider({ children }) {
     window.addEventListener('auth:logout', handleForceLogout);
     return () => window.removeEventListener('auth:logout', handleForceLogout);
   }, []);
+
+  // The light/dark choice is stored per account, and the pre-paint script reads
+  // the account marker from storage because the cookie-held session cannot be
+  // checked before React mounts. isLoading is checked so the marker is not
+  // wiped while that restore is still in flight - clearing it early would drop
+  // a returning person to the device theme and repaint in the wrong colours.
+  useEffect(() => {
+    if (state.isLoading) return;
+    setActiveThemeAccount(state.user?.id ?? null);
+  }, [state.isLoading, state.user]);
 
   const login = useCallback(async (email, password, remember = true) => {
     dispatch({ type: 'AUTH_START' });
