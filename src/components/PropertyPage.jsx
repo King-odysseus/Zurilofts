@@ -96,9 +96,14 @@ function PropertyPage() {
   useEffect(() => {
     if (!property) return;
     // A stored listing title often already opens with the brand ("ZuriLofts -
-    // Serenity Residency 1003"), so appending it again read as a stutter in the
-    // tab. Add the brand only when the title does not carry it.
-    const pageTitle = /zurilofts/i.test(property.title) ? property.title : `${property.title} - ZuriLofts`;
+    // Serenity Residency 1003"), so strip it and add it back once. Worded to
+    // match the server-rendered head (seo.service.ts) so the tab, the search
+    // result and a link preview all read the same.
+    const brandPrefixes = ['zurilofts - ', 'zurilofts: ', 'zurilofts | '];
+    const prefix = brandPrefixes.find((candidate) => property.title.toLowerCase().startsWith(candidate));
+    const listingTitle = (prefix ? property.title.slice(prefix.length) : property.title).trim();
+    const place = property.neighborhood || property.location;
+    const pageTitle = place ? `${listingTitle} in ${place} | ZuriLofts` : `${listingTitle} | ZuriLofts`;
     document.title = pageTitle;
     const setMeta = (prop, content) => {
       let el = document.querySelector(`meta[property="og:${prop}"]`);

@@ -1,4 +1,5 @@
 import express from 'express';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import app from './app.js';
@@ -9,6 +10,7 @@ import { runDueAutoMessages } from './services/automated-message.service.js';
 import { syncConfiguredAdmin } from './services/admin-bootstrap.service.js';
 import { processScheduledPayouts, releaseDueHostFunds } from './services/payout.service.js';
 import { sendHostApplicationNudges } from './services/nudge.service.js';
+import { injectMeta, metaForPath } from './services/seo.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,9 +18,35 @@ const __dirname = path.dirname(__filename);
 // In production, serve the built frontend
 if (env.NODE_ENV === 'production') {
   const clientDist = path.resolve(__dirname, '../../dist');
-  app.use(express.static(clientDist));
-  app.get('*', (_req, res) => {
-    res.sendFile(path.join(clientDist, 'index.html'));
+  const indexHtmlPath = path.join(clientDist, 'index.html');
+
+  // The shell is read once at boot: it never changes while the process runs,
+  // and every page view rewrites its head with that page's own tags.
+  let shellHtml: string | null = null;
+  try {
+    shellHtml = fs.readFileSync(indexHtmlPath, 'utf8');
+  } catch (err) {
+    console.warn(`Could not read ${indexHtmlPath}: serving the app without per-page metadata.`);
+  }
+
+  // index:false keeps "/" out of the static handler so the home page gets
+  // its own head tags like every other route.
+  app.use(express.static(clientDist, { index: false }));
+  app.get('*', async (req, res) => {
+    // Metadata is resolved per path so search engines and link previews, which
+    // do not run JavaScript, get the right title, description and share image.
+    try {
+      const meta = shellHtml ? await metaForPath(req.path, req) : null;
+      if (!meta || !shellHtml) {
+        res.sendFile(indexHtmlPath);
+        return;
+      }
+      if (meta.status === 404) res.status(404);
+      res.type('html').send(injectMeta(shellHtml, meta));
+    } catch (err) {
+      console.error('Per-page metadata failed, serving the plain shell:', err);
+      res.sendFile(indexHtmlPath);
+    }
   });
   console.log(` Serving static files from ${clientDist}`);
 }

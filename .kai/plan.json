@@ -2,25 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Map every place that uses /properties: router, links, i18n labels, SEO/PWA, server",
+      "text": "Fix the calendar/dropdown popup overflowing the right edge on mobile so it stays inside the viewport",
       "state": "done"
     },
     {
-      "text": "Work out what renaming URLs to /stays would break (shared links, SEO, saved bookmarks)",
+      "text": "Verify with lint/build and a real mobile-width check in the browser",
       "state": "done"
     },
     {
-      "text": "Verify the mobile 50px section spacing: lint, build, phone-width browser check",
+      "text": "Audit current SEO: sitemap, robots.txt, meta tags, structured data, prerender, canonical URLs",
       "state": "done"
     },
     {
-      "text": "Rename guest URLs to /stays and /stay/<id>, redirect old paths, repoint all internal links",
+      "text": "Report what is missing and the highest-impact fixes",
       "state": "done"
     },
     {
-      "text": "Verify in the browser: new pages load, old addresses redirect, nav and titles match; lint and build clean",
-      "state": "done"
+      "text": "Get the decision on renaming public URLs, then apply it with old links kept working if approved",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-01T19:21:33.248Z"
+  "updatedAt": "2026-11-01T19:29:22.873Z"
 }
