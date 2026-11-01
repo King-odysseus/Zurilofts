@@ -2,25 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Fix the calendar/dropdown popup overflowing the right edge on mobile so it stays inside the viewport",
+      "text": "Check git status and diff to see what is uncommitted",
       "state": "done"
     },
     {
-      "text": "Verify with lint/build and a real mobile-width check in the browser",
+      "text": "Run lint, build, server type check and the new tests",
       "state": "done"
     },
     {
-      "text": "Audit current SEO: sitemap, robots.txt, meta tags, structured data, prerender, canonical URLs",
+      "text": "Commit in logical groups: guest reviews and badges, old URL redirects and share-image escaping, account menu controls, phone layout fixes",
       "state": "done"
     },
     {
-      "text": "Report what is missing and the highest-impact fixes",
-      "state": "done"
-    },
-    {
-      "text": "Get the decision on renaming public URLs, then apply it with old links kept working if approved",
+      "text": "Push to origin and finish the plan",
       "state": "active"
     }
   ],
-  "updatedAt": "2026-11-01T19:29:22.873Z"
+  "updatedAt": "2026-11-01T19:57:32.715Z"
 }
