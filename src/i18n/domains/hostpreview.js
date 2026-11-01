@@ -95,6 +95,32 @@ export const hostpreview = {
       paidOn: 'on {date}',
       addOnsBooked: 'Add-ons booked',
 
+      // The guest behind a reservation. A host weighs who is arriving before
+      // they confirm, so identity and past reviews sit together here, and the
+      // review form is what this host leaves behind for the next one.
+      verifiedGuest: 'Verified guest',
+      verifiedGuestHint: 'ZuriLofts confirmed this guest identity.',
+      guestReviewsTitle: 'Reviews about this guest',
+      guestReviewsEmpty: 'No host has reviewed this guest yet.',
+      guestReviewsSummary_one: '{rating} from 1 host',
+      guestReviewsSummary_other: '{rating} from {count} hosts',
+      guestReviewsFailed: 'Reviews about this guest could not be loaded.',
+      reviewGuest: 'Review this guest',
+      reviewGuestHeading: 'How was this guest?',
+      reviewGuestRating: 'Your rating',
+      reviewGuestComment: 'What should other hosts know?',
+      reviewGuestCommentPlaceholder: 'Describe how they treated your place.',
+      reviewGuestPrivate: 'Private note for ZuriLofts',
+      reviewGuestPrivatePlaceholder: 'Only our team will read this.',
+      reviewGuestSubmit: 'Submit review',
+      reviewGuestSubmitting: 'Saving...',
+      reviewGuestSaved: 'Your review has been saved.',
+      reviewGuestFailed: 'Your review could not be saved. Try again.',
+      reviewGuestRatingRequired: 'Choose a rating before submitting.',
+      reviewGuestWaiting: 'You can review this guest once their stay has ended.',
+      reviewGuestDone: 'You reviewed this guest.',
+      guestIdentityUnverified: 'Identity not verified',
+
       // Identity verification
       backToSettings: 'Back to settings',
       identityVerification: 'Identity verification',
@@ -182,6 +208,31 @@ export const hostpreview = {
       paidBy: 'Imelipwa kwa {method}',
       paidOn: 'tarehe {date}',
       addOnsBooked: 'Nyongeza zilizohifadhiwa',
+
+      // The guest behind a reservation, in the same order as the English block
+      // above.
+      verifiedGuest: 'Mgeni aliyethibitishwa',
+      verifiedGuestHint: 'ZuriLofts ilithibitisha utambulisho wa mgeni huyu.',
+      guestReviewsTitle: 'Maoni kuhusu mgeni huyu',
+      guestReviewsEmpty: 'Hakuna mwenyeji aliyempa mgeni huyu maoni bado.',
+      guestReviewsSummary_one: '{rating} kutoka kwa mwenyeji 1',
+      guestReviewsSummary_other: '{rating} kutoka kwa wenyeji {count}',
+      guestReviewsFailed: 'Maoni kuhusu mgeni huyu hayakuweza kupakiwa.',
+      reviewGuest: 'Mpe mgeni huyu maoni',
+      reviewGuestHeading: 'Mgeni huyu alikuwaje?',
+      reviewGuestRating: 'Tathmini yako',
+      reviewGuestComment: 'Wenyeji wengine wanapaswa kujua nini?',
+      reviewGuestCommentPlaceholder: 'Eleza jinsi walivyotunza makaazi yako.',
+      reviewGuestPrivate: 'Maoni ya faragha kwa ZuriLofts',
+      reviewGuestPrivatePlaceholder: 'Ni timu yetu pekee itakayosoma hii.',
+      reviewGuestSubmit: 'Wasilisha maoni',
+      reviewGuestSubmitting: 'Inahifadhi...',
+      reviewGuestSaved: 'Maoni yako yamehifadhiwa.',
+      reviewGuestFailed: 'Maoni yako hayakuweza kuhifadhiwa. Jaribu tena.',
+      reviewGuestRatingRequired: 'Chagua tathmini kabla ya kuwasilisha.',
+      reviewGuestWaiting: 'Unaweza kumpa mgeni huyu maoni baada ya makaazi yao kumalizika.',
+      reviewGuestDone: 'Ulimpa mgeni huyu maoni.',
+      guestIdentityUnverified: 'Utambulisho haujathibitishwa',
 
       // Identity verification
       backToSettings: 'Rudi kwa mipangilio',

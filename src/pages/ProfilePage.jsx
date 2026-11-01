@@ -5,6 +5,7 @@ import { CalendarDays, Camera, ChevronRight, Heart, Star, UserRound } from 'luci
 import StayCard from '../components/StayCard.jsx';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import VerificationNudge from '../components/VerificationNudge.jsx';
+import VerifiedBadge from '../components/VerifiedBadge.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
@@ -58,6 +59,14 @@ function joinFieldLabels(labelKeys, t) {
   return `${labels.slice(0, -1).join(', ')} ${t('common.and')} ${labels[labels.length - 1]}`;
 }
 
+// A review about this person arrives with its host attached, but the account may
+// since have been deleted, in which case the name is empty and the line falls
+// back to the date alone instead of showing a stranded comma.
+function reviewAuthorName(host) {
+  if (!host) return '';
+  return [host.firstName, host.lastName].filter(Boolean).join(' ');
+}
+
 function ProfilePage() {
   const { t } = useLanguage();
   const { user, setUser, logout } = useAuth();
@@ -96,6 +105,13 @@ function ProfilePage() {
 
   // Per-booking review form state, keyed by booking id
   const [reviewForms, setReviewForms] = useState({});
+
+  // Reviews hosts have left about this person. Null means the request is still in
+  // flight, which is deliberately not the empty state: showing "no reviews yet"
+  // before the answer arrives would be a lie for a moment. A failure gets its own
+  // flag so "could not load" never reads as "nobody reviewed you".
+  const [guestReviews, setGuestReviews] = useState(null);
+  const [guestReviewsFailed, setGuestReviewsFailed] = useState(false);
 
   // Privacy and data controls
   const [exporting, setExporting] = useState(false);
@@ -156,6 +172,17 @@ function ProfilePage() {
 
   useEffect(() => {
     async function loadData() {
+      // Started before the await below and never awaited: the profile and bookings
+      // are what the page is for, so this request must not delay them, and its
+      // rejection must not reach the shared catch that decides the page loaded.
+      apiClient
+        .get('/guest-reviews/mine')
+        .then((res) => {
+          const data = res.data?.data;
+          setGuestReviews({ summary: data?.summary ?? null, reviews: data?.reviews ?? [] });
+        })
+        .catch(() => setGuestReviewsFailed(true));
+
       try {
         const [profileRes, bookingsRes] = await Promise.all([
           apiClient.get('/users/profile'),
@@ -372,6 +399,18 @@ function ProfilePage() {
     CANCELLED: 'bg-red-100 text-red-800',
   };
 
+  // The auth payload already carries the identity status, so the badge needs no
+  // request of its own. Only APPROVED counts: every other value is a review still
+  // in progress or already rejected, and both are the nudge's job, not a mark
+  // beside the name.
+  const identityApproved = user?.identityVerificationStatus === 'APPROVED';
+  const receivedReviews = guestReviews?.reviews ?? [];
+  // The summary is authoritative when it arrives; falling back to the list length
+  // means a payload without one still renders its reviews instead of claiming
+  // there are none.
+  const receivedReviewCount = guestReviews?.summary?.totalReviews ?? receivedReviews.length;
+  const receivedAverage = Number(guestReviews?.summary?.averageRating) || 0;
+
   if (loading) {
     return <GuestAccountLayout active="profile" eyebrow="Account" title={t('profile.title')} description={t('profile.description')}>
       <div className="opg-profile-loading" aria-label={t('profile.loadingProfile')}><span /><span /><span /></div>
@@ -423,6 +462,15 @@ function ProfilePage() {
                 <p className="text-[#6b7280]">{profile?.email}</p>
                 <span>{t('profile.guestAccount')}</span>
               </div>
+              {/* Rendered beside the name rather than inside the identity block:
+                  that block repaints every span it contains as a small uppercase
+                  bronze label, which would strip the badge's own colours. */}
+              {identityApproved && (
+                <VerifiedBadge
+                  label={t('profile.verifiedBadge')}
+                  className="shrink-0 self-start"
+                />
+              )}
             </div>
             <Link to="/verify-identity" className="opg-profile-verify">{t('profile.viewVerification')}</Link>
           </div>
@@ -962,6 +1010,78 @@ function ProfilePage() {
                   </Link>
                 </div>
               )}
+
+              {/* The other half of a two-way review: what hosts said about this
+                  person. Read only, and public only - the payload carries no
+                  private note, so nothing here can show one. Stars are icons with
+                  the rating beside them as text, so a screen reader reads a
+                  number instead of "star star star". */}
+              <section className="pt-8 border-t-2 border-[#D9D9D9]" aria-labelledby="profile-reviews-about-you">
+                <h3 id="profile-reviews-about-you" className="text-lg font-bold text-[#203565] mb-1">
+                  {t('profile.reviewsAboutYou')}
+                </h3>
+                <p className="text-sm text-[#6b7280] mb-5">{t('profile.reviewsAboutYouHint')}</p>
+
+                {guestReviewsFailed && (
+                  <p className="text-sm text-[#6b7280]">{t('profile.reviewsAboutYouFailed')}</p>
+                )}
+
+                {!guestReviewsFailed && guestReviews && receivedReviewCount === 0 && (
+                  <p className="text-sm text-[#6b7280]">{t('profile.noReviewsAboutYou')}</p>
+                )}
+
+                {!guestReviewsFailed && receivedReviewCount > 0 && (
+                  <>
+                    <div className="flex flex-wrap items-center gap-3 mb-5">
+                      <div className="flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <Star
+                            key={star}
+                            className={`w-4 h-4 ${star <= Math.round(receivedAverage) ? 'text-[#8A6B52]' : 'text-[#D9D9D9]'}`}
+                            fill="currentColor"
+                            aria-hidden="true"
+                          />
+                        ))}
+                      </div>
+                      <span className="text-lg font-bold text-[#203565]">{receivedAverage.toFixed(1)}</span>
+                      <span className="text-sm text-[#6b7280]">
+                        {t(receivedReviewCount === 1
+                          ? 'profile.reviewsAboutYouCount_one'
+                          : 'profile.reviewsAboutYouCount_other', { count: receivedReviewCount })}
+                      </span>
+                    </div>
+
+                    <div className="space-y-4">
+                      {receivedReviews.map((review) => {
+                        const rating = Number(review.rating) || 0;
+                        const author = reviewAuthorName(review.host);
+                        const date = new Date(review.createdAt).toLocaleDateString();
+                        return (
+                          <article key={review.id} className="neu-card p-5">
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-4 h-4 ${star <= rating ? 'text-[#8A6B52]' : 'text-[#D9D9D9]'}`}
+                                  fill="currentColor"
+                                  aria-hidden="true"
+                                />
+                              ))}
+                              <span className="ml-2 text-sm font-semibold text-[#1f2937]">{rating.toFixed(1)}</span>
+                            </div>
+                            {review.publicComment && (
+                              <p className="mt-2 text-sm leading-relaxed text-[#1f2937]">{review.publicComment}</p>
+                            )}
+                            <p className="mt-3 text-xs text-[#6b7280]">
+                              {author ? `${author}, ${date}` : date}
+                            </p>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+              </section>
             </div>
           )}
 
@@ -975,7 +1095,7 @@ function ProfilePage() {
                   </div>
                   <h3 className="text-lg font-bold text-[#203565] mb-1">{t('profile.noFavouritesYet')}</h3>
                   <p className="text-[#6b7280] mb-4">{t('profile.tapHeartHint')}</p>
-                  <Link to="/properties" className="inline-block bg-[#143A80] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#0B2A5E] transition-all duration-200">
+                  <Link to="/stays" className="inline-block bg-[#143A80] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#0B2A5E] transition-all duration-200">
                     {t('profile.browseProperties')}
                   </Link>
                 </div>

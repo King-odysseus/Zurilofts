@@ -8,6 +8,28 @@ export const PROPERTY_STATUSES = ['DRAFT', 'PENDING_REVIEW', 'PUBLISHED', 'REJEC
 export type PropertyStatus = (typeof PROPERTY_STATUSES)[number];
 export type ListingReviewAction = 'approve' | 'reject' | 'suspend' | 'unsuspend';
 
+/**
+ * The host summary on the public property detail response.
+ *
+ * Only what a guest needs to judge whether to book: who the host is, when they
+ * joined, and whether ZuriLofts has verified them. Contact details and payout
+ * destinations are deliberately absent, because this object is served to
+ * anyone on the internet. Built by getProperty, never read straight off the
+ * User row.
+ */
+export interface PublicHostSummary {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string | null;
+  /** When the host account was created, so the badge can say "host since ...". */
+  memberSince: Date;
+  /** User identity verification APPROVED - the person is who they say they are. */
+  identityVerified: boolean;
+  /** HostApplication APPROVED - ZuriLofts has approved them to host. */
+  hostVerified: boolean;
+}
+
 // ============================================================
 // Listing lifecycle - pure transition logic, no database. Every DB-facing
 // function below (submitPropertyForReview, adminReviewProperty) delegates its
@@ -420,13 +442,57 @@ export async function listProperties(filters: PropertyFilters) {
 // admin (e.g. previewing a draft before submitting it) while staying 404 to
 // everyone else - draft/pending/rejected/suspended listings are never public.
 export async function getProperty(id: string, viewer?: { sub: string; role: string } | null) {
-  const property = await prisma.property.findUnique({ where: { id } });
+  const property = await prisma.property.findUnique({
+    where: { id },
+    // This select is the security boundary for the public detail response.
+    // Whatever is listed here is served to signed-out visitors, so it must
+    // never grow email, phone, bankName, bankAccountNo, bankCode, mpesaPhone,
+    // any paystack* recipient field, or any document relation. Add a field here
+    // only if it is safe to publish on a billboard.
+    include: {
+      host: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          avatar: true,
+          createdAt: true,
+          identityVerification: { select: { status: true } },
+          hostApplication: { select: { status: true } },
+        },
+      },
+    },
+  });
   if (!property) throw new NotFoundError('Property');
   const isOwnerOrAdmin = viewer && (viewer.role === 'ADMIN' || viewer.sub === property.hostId);
   if (property.status !== 'PUBLISHED' && !isOwnerOrAdmin) {
     throw new NotFoundError('Property');
   }
-  return normalizeProperty(property);
+
+  // The summary is hand-built from the narrow select above instead of passing
+  // the relation through. That way the shape of a public response is decided
+  // here and cannot silently widen when a column is added to User: a new
+  // contact or payout field is invisible to this payload until someone edits
+  // this object on purpose. The two verification relations are collapsed to
+  // booleans for the same reason - the host only ever shows as verified or not.
+  //
+  // The aggregate guest rating is not part of this object; it is attached by
+  // the caller that already reads reviews for the listing.
+  const { host, ...rest } = property;
+  // hostId is nullable, so a property can exist with no host row left to read.
+  const hostSummary: PublicHostSummary | null = host
+    ? {
+        id: host.id,
+        firstName: host.firstName,
+        lastName: host.lastName,
+        avatar: host.avatar,
+        memberSince: host.createdAt,
+        identityVerified: host.identityVerification?.status === 'APPROVED',
+        hostVerified: host.hostApplication?.status === 'APPROVED',
+      }
+    : null;
+
+  return { ...normalizeProperty(rest), host: hostSummary };
 }
 
 export async function createProperty(data: any) {

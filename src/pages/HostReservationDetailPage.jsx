@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Alert, Badge, Button } from 'flowbite-react';
+import { Alert, Badge, Button, Label, Textarea } from 'flowbite-react';
 import {
   CalendarDays,
   ChevronLeft,
@@ -9,13 +9,16 @@ import {
   Mail,
   MapPin,
   MessageCircleMore,
+  Star,
   Users,
   Wallet,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTranslatedLookup } from '../i18n/useTranslated.js';
 import { firstImage } from '../utils/images.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import VerifiedBadge from '../components/VerifiedBadge.jsx';
 
 // The host's own view of one reservation. The guest side of the same row lives
 // at /bookings/:id inside the traveller shell; a host who clicked through from
@@ -119,6 +122,88 @@ DetailRow.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+// The star row the rest of the app shows on a review. Empty stars keep the same
+// brass hue at low opacity rather than a second pale hex: every arbitrary hex on
+// this page has to be one styles.css already remaps for dark mode, and opacity
+// needs no remap at all.
+function GuestStars({ rating }) {
+  const { t } = useLanguage();
+  const value = Number(rating) || 0;
+  return <span role="img" aria-label={t('stays.ratingOutOfFive', { rating: value })} className="flex items-center gap-0.5">
+    {[1, 2, 3, 4, 5].map((star) => <Star
+      key={star}
+      className={`h-3.5 w-3.5 shrink-0 text-[#8A6B52] ${star <= value ? '' : 'opacity-30'}`}
+      fill="currentColor"
+      aria-hidden="true"
+    />)}
+  </span>;
+}
+
+GuestStars.propTypes = { rating: PropTypes.oneOfType([PropTypes.number, PropTypes.string]) };
+
+// Clickable stars for the review form. Real buttons, so Enter and Space work and
+// focus is visible without extra handling.
+function RatingInput({ value, onChange }) {
+  const { t } = useLanguage();
+  // Every star up to the chosen value reports pressed, which matches the stars
+  // drawn filled. The live line under the row names the number for anyone who
+  // cannot see which stars filled in.
+  return <div className="mt-1.5">
+    <div role="group" aria-label={t('hostpreview.reviewGuestRating')} className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((star) => <button
+        key={star}
+        type="button"
+        aria-pressed={star <= value}
+        aria-label={t('stays.ratingOutOfFive', { rating: star })}
+        onClick={() => onChange(star)}
+        className="grid h-11 w-10 place-items-center rounded-lg text-[#8A6B52] transition-colors hover:bg-surface"
+      >
+        <Star className={`h-6 w-6 ${star <= value ? '' : 'opacity-30'}`} fill="currentColor" aria-hidden="true" />
+      </button>)}
+    </div>
+    <p aria-live="polite" className="text-xs text-muted">{value ? t('stays.ratingOutOfFive', { rating: value }) : ''}</p>
+  </div>;
+}
+
+RatingInput.propTypes = {
+  value: PropTypes.number.isRequired,
+  onChange: PropTypes.func.isRequired,
+};
+
+// What other hosts said about this guest. A review comment is database text in
+// whatever language its author wrote, so it goes through the translation hook
+// rather than the dictionary, the same way the listing reviews do.
+function GuestReviewList({ reviews }) {
+  const { t } = useLanguage();
+  const comments = useTranslatedLookup(reviews.map((review) => review.publicComment || ''));
+
+  if (reviews.length === 0) {
+    return <p className="text-xs leading-relaxed text-muted">{t('hostpreview.guestReviewsEmpty')}</p>;
+  }
+
+  return <ul className="flex flex-col divide-y divide-border">
+    {reviews.map((review) => {
+      const hostName = [review.host?.firstName, review.host?.lastName].filter(Boolean).join(' ');
+      return <li key={review.id} className="flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <GuestStars rating={review.rating} />
+          <span className="text-[11px] text-muted">{formatDate(review.createdAt)}</span>
+        </div>
+        {review.publicComment && <p className="text-sm leading-relaxed text-navy">{comments.get(review.publicComment) ?? review.publicComment}</p>}
+        {/* A host can be deleted later, so the name is optional rather than a
+            reason to drop the review. */}
+        {hostName && <p className="text-[11px] text-muted">{hostName}</p>}
+      </li>;
+    })}
+  </ul>;
+}
+
+GuestReviewList.propTypes = {
+  reviews: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  })).isRequired,
+};
+
 // Placeholder cards, not bare bars: the loading shapes have to match the cards
 // that land, otherwise the page jumps when the request resolves.
 function Skeleton() {
@@ -142,6 +227,26 @@ export default function HostReservationDetailPage() {
   const [error, setError] = useState('');
   const [messagePending, setMessagePending] = useState(false);
 
+  // The guest block (identity, past reviews, review eligibility) is its own
+  // request. A failure here is reported inside that section only, because the
+  // reservation itself loaded fine.
+  const [guestBlock, setGuestBlock] = useState(null);
+  const [guestState, setGuestState] = useState('loading');
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewComment, setReviewComment] = useState('');
+  const [reviewPrivateNote, setReviewPrivateNote] = useState('');
+  const [reviewSaving, setReviewSaving] = useState(false);
+  // '' | 'rating' | 'failed'. The key is chosen where it renders, so the copy
+  // stays translated if the language changes while the form is open.
+  const [reviewError, setReviewError] = useState('');
+  // The review this host just posted, kept until the refetch returns the
+  // server's own copy of it.
+  const [submittedReview, setSubmittedReview] = useState(null);
+  // A second click can land before React re-renders the disabled button, so the
+  // in-flight guard is a ref; the state flag only drives the button label.
+  const reviewInFlightRef = useRef(false);
+
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -160,6 +265,72 @@ export default function HostReservationDetailPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const loadGuestBlock = useCallback(async () => {
+    setGuestState('loading');
+    try {
+      const response = await apiClient.get(`/guest-reviews/booking/${routeId}`);
+      setGuestBlock(response.data.data);
+      setGuestState('ready');
+    } catch {
+      // The section keeps whatever it already had; only a first load has nothing
+      // to show, and that case renders the failure line with a retry.
+      setGuestState('failed');
+    }
+  }, [routeId]);
+
+  useEffect(() => {
+    // Everything in this block belongs to one reservation, so switching
+    // reservations drops it (and any half-written review of the previous guest)
+    // before the new request starts.
+    setGuestBlock(null);
+    setSubmittedReview(null);
+    setReviewOpen(false);
+    setReviewError('');
+    setReviewRating(0);
+    setReviewComment('');
+    setReviewPrivateNote('');
+    loadGuestBlock();
+  }, [loadGuestBlock]);
+
+  async function submitGuestReview(event) {
+    event.preventDefault();
+    if (reviewInFlightRef.current) return;
+    if (!reviewRating) {
+      setReviewError('rating');
+      return;
+    }
+
+    reviewInFlightRef.current = true;
+    setReviewSaving(true);
+    setReviewError('');
+    try {
+      const response = await apiClient.post('/guest-reviews', {
+        bookingId: booking.id,
+        rating: reviewRating,
+        publicComment: reviewComment.trim() || undefined,
+        privateNote: reviewPrivateNote.trim() || undefined,
+      });
+      const created = response.data.data;
+      // Shown at the top of the list straight away so the host sees their words
+      // without waiting for the round trip below.
+      if (created) {
+        setGuestBlock((current) => (current
+          ? { ...current, reviews: [created, ...(current.reviews || []).filter((item) => item.id !== created.id)] }
+          : current));
+        setSubmittedReview(created);
+      }
+      setReviewOpen(false);
+      // Eligibility and the list come from the server afterwards: a cached
+      // "canReview: true" must not leave the form open for a second review.
+      await loadGuestBlock();
+    } catch {
+      setReviewError('failed');
+    } finally {
+      reviewInFlightRef.current = false;
+      setReviewSaving(false);
+    }
+  }
 
   async function openConversation() {
     if (!booking) return;
@@ -203,6 +374,21 @@ export default function HostReservationDetailPage() {
   const guestName = [guest.firstName, guest.lastName].filter(Boolean).join(' ') || t('hostpreview.guest');
   const addOnTotal = booking.addonsSubtotal ?? (booking.addOns || []).reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
   const additionalGuests = booking.additionalGuests || [];
+
+  // The guest block arrives separately, so every field here is optional.
+  const guestProfile = guestBlock?.guest || null;
+  const guestProfileName = [guestProfile?.firstName, guestProfile?.lastName].filter(Boolean).join(' ') || guestName;
+  const guestReviews = guestBlock?.reviews || [];
+  const guestSummary = guestBlock?.summary || null;
+  const guestEligibility = guestBlock?.eligibility || {};
+  // The server's copy of this host's review wins once the refetch lands; until
+  // then the one just posted stands in for it.
+  const myReview = guestBlock?.myReview || submittedReview;
+  const reviewIsDone = Boolean(myReview) || Boolean(guestEligibility.alreadyReviewed);
+  // Not reviewable and not yet reviewed means not reviewable yet. Reading an
+  // unknown reason that way keeps a form from opening that the API would reject.
+  const reviewIsWaiting = !reviewIsDone && !guestEligibility.canReview;
+  const listedReviewIds = new Set(guestReviews.map((review) => review.id));
 
   return <div className="flex flex-col gap-5 sm:gap-6">
     <div className="flex flex-wrap items-center justify-between gap-3">
@@ -295,6 +481,110 @@ export default function HostReservationDetailPage() {
                 {[person.firstName, person.lastName].filter(Boolean).join(' ') || t('hostpreview.guest')}
               </li>)}
             </ul>
+          </div>}
+        </HostCard>
+
+        {/* Who this guest is and what other hosts made of them, plus the review
+            this host leaves behind. Loaded after the reservation so a slow
+            review service can never hold up the details above it. */}
+        <HostCard title={t('hostpreview.guestReviewsTitle')}>
+          {guestState === 'failed' && <div className="mb-3 flex flex-wrap items-center gap-2">
+            <p className="min-w-0 flex-1 text-xs leading-relaxed text-muted">{t('hostpreview.guestReviewsFailed')}</p>
+            <Button type="button" size="sm" color="light" onClick={loadGuestBlock} className="min-h-11 sm:min-h-0">{t('hostpreview.tryAgain')}</Button>
+          </div>}
+
+          {/* Only the first load has nothing to show; later refetches keep the
+              block on screen instead of flashing a loading line. */}
+          {guestState === 'loading' && !guestBlock && <p role="status" className="text-xs text-muted">{t('common.loading')}</p>}
+
+          {guestBlock && <div className="flex flex-col gap-4">
+            {/* On one reservation an unverified identity is a legitimate
+                caution, so it is stated as a fact and left at that. */}
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">
+              <p className="min-w-0 truncate text-sm font-semibold text-navy">{guestProfileName}</p>
+              {guestProfile?.identityVerified
+                ? <VerifiedBadge label={t('hostpreview.verifiedGuest')} hint={t('hostpreview.verifiedGuestHint')} />
+                : guestProfile && <span className="text-xs text-muted">{t('hostpreview.guestIdentityUnverified')}</span>}
+            </div>
+
+            {guestSummary && guestSummary.totalReviews > 0 && <p className="text-xs font-semibold text-navy">
+              {t(guestSummary.totalReviews === 1
+                ? 'hostpreview.guestReviewsSummary_one'
+                : 'hostpreview.guestReviewsSummary_other', {
+                rating: Number(guestSummary.averageRating || 0).toFixed(1),
+                count: guestSummary.totalReviews,
+              })}
+            </p>}
+
+            <GuestReviewList reviews={guestReviews} />
+
+            {reviewIsDone
+              ? <div className="rounded-xl bg-surface px-4 py-3">
+                <p className="text-sm font-semibold text-navy">
+                  {submittedReview ? t('hostpreview.reviewGuestSaved') : t('hostpreview.reviewGuestDone')}
+                </p>
+                {myReview && <div className="mt-2 flex flex-col gap-1.5">
+                  <GuestStars rating={myReview.rating} />
+                  {/* The same review can arrive in both the list above and
+                      myReview, so its words are only repeated when the list does
+                      not already carry them. */}
+                  {myReview.publicComment && !listedReviewIds.has(myReview.id) && <p className="text-xs leading-relaxed text-muted">{myReview.publicComment}</p>}
+                </div>}
+              </div>
+              : reviewIsWaiting
+                ? <p className="rounded-xl bg-surface px-4 py-3 text-xs leading-relaxed text-muted">{t('hostpreview.reviewGuestWaiting')}</p>
+                : !reviewOpen
+                  ? <div>
+                    <Button type="button" size="sm" onClick={() => setReviewOpen(true)} className="min-h-11 sm:min-h-0">
+                      <Star className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+                      {t('hostpreview.reviewGuest')}
+                    </Button>
+                  </div>
+                  : <form onSubmit={submitGuestReview} className="flex flex-col gap-3 rounded-xl bg-surface px-4 py-3">
+                    <h3 className="text-sm font-semibold text-navy">{t('hostpreview.reviewGuestHeading')}</h3>
+
+                    <div>
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">{t('hostpreview.reviewGuestRating')}</p>
+                      <RatingInput value={reviewRating} onChange={(next) => { setReviewRating(next); if (reviewError === 'rating') setReviewError(''); }} />
+                      {/* Beside the stars, which is where the mistake is. */}
+                      {reviewError === 'rating' && <p role="alert" className="mt-1 text-xs font-semibold text-red-600">{t('hostpreview.reviewGuestRatingRequired')}</p>}
+                    </div>
+
+                    <div>
+                      <Label htmlFor="guest-review-comment" className="mb-1.5 block">{t('hostpreview.reviewGuestComment')}</Label>
+                      <Textarea
+                        id="guest-review-comment"
+                        rows={4}
+                        value={reviewComment}
+                        onChange={(event) => setReviewComment(event.target.value)}
+                        placeholder={t('hostpreview.reviewGuestCommentPlaceholder')}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="guest-review-private" className="mb-1.5 block">{t('hostpreview.reviewGuestPrivate')}</Label>
+                      <Textarea
+                        id="guest-review-private"
+                        rows={3}
+                        value={reviewPrivateNote}
+                        onChange={(event) => setReviewPrivateNote(event.target.value)}
+                        placeholder={t('hostpreview.reviewGuestPrivatePlaceholder')}
+                      />
+                    </div>
+
+                    {reviewError === 'failed' && <p role="alert" className="text-xs font-semibold text-red-600">{t('hostpreview.reviewGuestFailed')}</p>}
+
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="submit" size="sm" disabled={reviewSaving} className="min-h-11 sm:min-h-0">
+                        {reviewSaving ? t('hostpreview.reviewGuestSubmitting') : t('hostpreview.reviewGuestSubmit')}
+                      </Button>
+                      {/* Cancelling keeps the typed text, so reopening the form
+                          does not lose a half-written review. */}
+                      <Button type="button" size="sm" color="light" disabled={reviewSaving} onClick={() => { setReviewOpen(false); setReviewError(''); }} className="min-h-11 sm:min-h-0">
+                        {t('common.cancel')}
+                      </Button>
+                    </div>
+                  </form>}
           </div>}
         </HostCard>
       </div>

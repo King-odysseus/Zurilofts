@@ -47,6 +47,8 @@ model User {
   identityVerification  IdentityVerification?
   disputesRaised        Dispute[]
   refreshSessions       RefreshSession[]
+  guestReviewsAuthored  GuestReview[]         @relation("GuestReviewsAuthored")
+  guestReviewsReceived  GuestReview[]         @relation("GuestReviewsReceived")
 }
 
 // Server-side record of an issued refresh token. Enables rotation on every
@@ -239,6 +241,10 @@ model Property {
   shortlistItems    ShortlistItem[]
   addOns            PropertyAddOn[]
   messageTemplates  PropertyMessageTemplate[]
+  // Hosts' reviews of the guests who stayed here (GuestReview). Named
+  // guestReviewEntries because guestReviews above is already taken by the
+  // guest-authored Review relation.
+  guestReviewEntries GuestReview[]
 
   @@index([hostId])
   @@index([status])
@@ -362,6 +368,7 @@ model Booking {
   conversation         Conversation?
   disputes             Dispute[]
   autoMessageLogs      AutomatedMessageLog[]
+  guestReview          GuestReview?
 
   // Hot query paths: availability overlap checks (property + window), a user's
   // booking history, and status-filtered admin/host lists.
@@ -522,6 +529,33 @@ model Review {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  @@index([propertyId])
+}
+
+// The reverse of Review: a host rating the guest after a stay.
+// Its own table rather than a second Review row because Review.bookingId is
+// @unique (one review per booking) and because the property rating aggregate
+// sums Review rows only, so a guest rating could never be counted into a
+// listing's score. Written by a host, read by the person who stayed.
+model GuestReview {
+  id            String   @id @default(cuid())
+  bookingId     String   @unique
+  booking       Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  hostId        String
+  host          User     @relation("GuestReviewsAuthored", fields: [hostId], references: [id])
+  guestId       String
+  guest         User     @relation("GuestReviewsReceived", fields: [guestId], references: [id])
+  propertyId    String
+  property      Property @relation(fields: [propertyId], references: [id])
+  rating        Int // 1-5 stars, as on Review
+  publicComment String? // shown to the guest, never on the listing
+  privateNote   String? // PRIVATE: host note to the ZuriLofts team, never shown to the guest
+  hidden        Boolean  @default(false) // admin moderation, as on Review
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([guestId])
+  @@index([hostId])
   @@index([propertyId])
 }
 

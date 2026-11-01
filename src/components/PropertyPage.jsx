@@ -3,6 +3,7 @@ import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ArrowLeft, Bath, Building2, Check, ChevronLeft, ChevronRight, CircleAlert, House, MapPin, Ruler, ShieldCheck, Star } from 'lucide-react';
 import Lightbox from './Lightbox.jsx';
 import ReviewSection from './ReviewSection.jsx';
+import VerifiedBadge from './VerifiedBadge.jsx';
 import PropertyTrustPanel from './PropertyTrustPanel';
 import SimilarProperties from './SimilarProperties';
 import AddOnsSection from './AddOnsSection';
@@ -151,7 +152,7 @@ function PropertyPage() {
             </div>
             <h2 className="mb-2 text-xl font-bold text-[#203565]">{t('stays.notFoundTitle')}</h2>
             <p className="mb-4 text-[#5B6B82]">{error || t('stays.notFoundBody')}</p>
-            <Link to="/properties" className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#16294B] px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-[#16294B]">
+            <Link to="/stays" className="inline-flex min-h-[44px] items-center justify-center rounded-[10px] bg-[#16294B] px-6 py-2 font-semibold text-white transition-colors duration-200 hover:bg-[#16294B]">
               {t('stays.viewAllStays')}
             </Link>
           </div>
@@ -204,6 +205,21 @@ function PropertyPage() {
   const typeLabels = { apartment: t('stays.typeApartment'), studio: t('stays.typeStudio'), penthouse: t('stays.typePenthouse') };
   const typeLabel = typeLabels[property.type] || property.type || t('stays.typeProperty');
 
+  // The API resolves the host alongside the listing (name, avatar, member since
+  // and whether ZuriLofts confirmed their identity), so verification is read
+  // from the payload and never inferred here, and no second request is made.
+  const host = property.host ?? null;
+  const hostName = host ? [host.firstName, host.lastName].filter(Boolean).join(' ') : '';
+  // Same initials rule as the account shells (GuestAccountLayout, HostLayout):
+  // first letter of each name part, uppercased, so the circle is never blank.
+  const hostInitials = `${host?.firstName?.[0] ?? ''}${host?.lastName?.[0] ?? ''}`.toUpperCase();
+  // memberSince arrives as an ISO string; an unparseable value is left out
+  // rather than printing "Invalid Date" or a guessed year.
+  const hostSinceDate = host?.memberSince ? new Date(host.memberSince) : null;
+  const hostSinceYear = hostSinceDate && !Number.isNaN(hostSinceDate.getTime())
+    ? hostSinceDate.getFullYear()
+    : null;
+
   // ── Render ───────────────────────────────────────────────────────────
   return (
     // Bottom padding matches the ~88px the other public pages already leave
@@ -216,7 +232,7 @@ function PropertyPage() {
           <ol className="flex items-center gap-2 text-sm">
             <li>
               <Link
-                to="/properties"
+                to="/stays"
                 className="inline-flex min-h-[44px] items-center rounded text-[#203565] transition-colors duration-200 hover:text-[#203565] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
               >
                 <ArrowLeft className="w-4 h-4 mr-1.5" strokeWidth={2} aria-hidden="true" />
@@ -324,8 +340,61 @@ function PropertyPage() {
           location={location}
         />
 
+        {/* ── Host identity ──────────────────────────────────────── */}
+        {/* Sits between the trust strip and the details so the guest learns who
+            runs the place before reading about it. The badge comes only from
+            the API's identityVerified flag; no rating is claimed here because
+            ReviewSection below renders the real one. Nothing renders when the
+            payload has no host, or when the host carries no name to head the
+            block with. */}
+        {host && hostName && (
+          <section className="mt-8 lg:mt-12" aria-labelledby="host-heading">
+            <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_24px_rgba(20,58,128,0.06)] md:p-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+                {host.avatar ? (
+                  <img
+                    src={host.avatar}
+                    alt=""
+                    loading="lazy"
+                    className="h-14 w-14 shrink-0 rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-[#16294B] text-lg font-bold text-white"
+                    aria-hidden="true"
+                  >
+                    {hostInitials}
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                    <h2 id="host-heading" className="text-xl font-bold text-[#203565] sm:text-2xl">
+                      {t('stays.hostedBy', { name: hostName })}
+                    </h2>
+                    {host.identityVerified && (
+                      <VerifiedBadge label={t('stays.verifiedHost')} hint={t('stays.verifiedHostHint')} />
+                    )}
+                  </div>
+                  {hostSinceYear && (
+                    <p className="mt-1 text-sm text-[#5B6B82]">
+                      {t('stays.hostingSince', { year: hostSinceYear })}
+                    </p>
+                  )}
+                </div>
+                <a
+                  href="#reviews"
+                  className="inline-flex min-h-[44px] shrink-0 items-center justify-center gap-1.5 self-start rounded-[10px] border border-[#E3E8EF] bg-elevated px-5 py-2.5 text-sm font-semibold text-[#203565] transition-colors hover:border-[#C5A28C] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C] sm:self-auto"
+                >
+                  {t('stays.seeHostReviews')}
+                  <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+                </a>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* ── Two-column body ────────────────────────────────────── */}
-        {/* mt-8 lg:mt-12 keeps the two-column body clear of the trust panel above it. */}
+        {/* mt-8 lg:mt-12 keeps the two-column body clear of the block above it. */}
         <div className="mt-8 lg:mt-12 grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-12">
           {/* ── Left column - property details ─────────────────── */}
           <div className="lg:col-span-2">
@@ -534,9 +603,11 @@ function PropertyPage() {
         </div>
       </div>
 
-      {/* Public Reviews */}
+      {/* Public Reviews. The id is the target of the host block's "see host
+          reviews" link; scroll-mt keeps the sticky header from covering the
+          heading when the page lands here. */}
       {property && (
-        <div className="mx-auto w-full max-w-[1344px] px-4 sm:px-6 md:px-8">
+        <div id="reviews" className="mx-auto w-full max-w-[1344px] scroll-mt-24 px-4 sm:px-6 md:px-8">
           <ReviewSection propertyId={property.id} onSummary={handleReviewSummary} />
         </div>
       )}

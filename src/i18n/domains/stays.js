@@ -128,6 +128,16 @@ export const stays = {
       ratingWord: 'rating',
       secureBooking: 'Secure booking via Paystack',
       showPhoto: 'Show photo {position} of {total}',
+
+      // Host identity, shown to a guest on the property detail page: who runs
+      // the place and whether ZuriLofts has confirmed them. The guest reads
+      // this before booking, so the wording is about the person, not the
+      // listing, and the rating line never claims more than we hold.
+      hostedBy: 'Hosted by {name}',
+      verifiedHost: 'Verified host',
+      verifiedHostHint: 'ZuriLofts confirmed this host\'s identity.',
+      hostingSince: 'Hosting since {year}',
+      seeHostReviews: 'Read the reviews',
     },
   },
   sw: {
@@ -243,6 +253,14 @@ export const stays = {
       ratingWord: 'ukadiriaji',
       secureBooking: 'Uhifadhi salama kupitia Paystack',
       showPhoto: 'Onyesha picha {position} kati ya {total}',
+
+      // Host identity, in the same order as the English block above so the two
+      // can be read side by side.
+      hostedBy: 'Mwenyeji ni {name}',
+      verifiedHost: 'Mwenyeji aliyethibitishwa',
+      verifiedHostHint: 'ZuriLofts ilithibitisha utambulisho wa mwenyeji huyu.',
+      hostingSince: 'Anakaribisha tangu {year}',
+      seeHostReviews: 'Soma maoni',
     },
   },
 };

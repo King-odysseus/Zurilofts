@@ -6,6 +6,7 @@ import { AlertCircle, CalendarDays, Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import VerifiedBadge from '../components/VerifiedBadge.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Every reservation across the host's listings. Hosts used to reach this list
@@ -98,6 +99,7 @@ function bucketOf(booking, today) {
 // inside the flush list the divider line does that job, so the row only owns
 // its own padding and hover state.
 function ReservationRow({ booking }) {
+  const { t } = useLanguage();
   const property = booking.property || {};
   const image = firstImage(property);
   const nights = nightsBetween(booking.checkIn, booking.checkOut);
@@ -115,6 +117,14 @@ function ReservationRow({ booking }) {
     <div className="min-w-0 flex-1">
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
         <strong className="truncate text-sm font-semibold text-navy">{guestNameOf(booking)}</strong>
+        {/* Only a verified guest earns a mark here. A "not verified" badge would
+            turn an absence into an accusation in a list the host only scans, so
+            the missing badge is the signal. `user` is null for an erased account. */}
+        {booking.user?.identityVerified === true && <VerifiedBadge
+          label={t('hostpreview.verifiedGuest')}
+          hint={t('hostpreview.verifiedGuestHint')}
+          className="shrink-0"
+        />}
         <Badge color={STATUS_COLOR[booking.status] || 'gray'}>
           {STATUS_LABEL[booking.status] || booking.status}
         </Badge>

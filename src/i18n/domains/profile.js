@@ -64,6 +64,17 @@ export const profile = {
       tabInfo: 'My Info',
       tabBookings: 'Booking History',
       tabFavourites: 'Favourites',
+
+      // Trust, seen from the guest's own side: the badge that sits beside their
+      // name and the reviews hosts left about them. The copy talks about the
+      // person reading the page ("about you"), never about a third party.
+      verifiedBadge: 'Verified',
+      reviewsAboutYou: 'Reviews about you',
+      reviewsAboutYouHint: 'What hosts said after you stayed with them.',
+      noReviewsAboutYou: 'No host has reviewed you yet.',
+      reviewsAboutYouFailed: 'Your reviews could not be loaded.',
+      reviewsAboutYouCount_one: 'From 1 host',
+      reviewsAboutYouCount_other: 'From {count} hosts',
     },
   },
   sw: {
@@ -127,6 +138,16 @@ export const profile = {
       tabInfo: 'Taarifa zangu',
       tabBookings: 'Historia ya uhifadhi',
       tabFavourites: 'Vipendwa',
+
+      // Trust, in the same order as the English block above so the two can be
+      // read side by side.
+      verifiedBadge: 'Amethibitishwa',
+      reviewsAboutYou: 'Maoni kukuhusu',
+      reviewsAboutYouHint: 'Wenyeji walisema nini baada ya kukaa nao.',
+      noReviewsAboutYou: 'Hakuna mwenyeji aliyekupa maoni bado.',
+      reviewsAboutYouFailed: 'Maoni yako hayakuweza kupakiwa.',
+      reviewsAboutYouCount_one: 'Kutoka kwa mwenyeji 1',
+      reviewsAboutYouCount_other: 'Kutoka kwa wenyeji {count}',
     },
   },
 };

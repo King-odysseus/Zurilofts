@@ -513,10 +513,22 @@ export async function getBooking(bookingId: string, scope?: { userId?: string; h
     where: { id: bookingId },
     include: {
       property: true,
-      // The host side of a reservation needs to know who is arriving. The caller
-      // is always either the booking's guest or the host who owns the listing
-      // (enforced by the scope check below), so this reveals nothing to a stranger.
-      user: { select: { id: true, firstName: true, lastName: true, email: true, avatar: true } },
+      // The host side of a reservation needs to know who is arriving, and
+      // whether that guest has passed identity verification. The caller is
+      // always either the booking's guest or the host who owns the listing
+      // (enforced by the scope check below), so this reveals nothing to a
+      // stranger. Only the status is selected; the relation is collapsed to a
+      // boolean below.
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          avatar: true,
+          identityVerification: { select: { status: true } },
+        },
+      },
       conversation: { select: { id: true } },
       promoCode: { select: { code: true, discountPercent: true } },
       addOns: { include: { addOn: true } },
@@ -530,7 +542,16 @@ export async function getBooking(bookingId: string, scope?: { userId?: string; h
     if (!isGuestOwner && !isHostOwner) throw new NotFoundError('Booking');
   }
 
-  return normalizeBooking(booking);
+  // The verification relation is reduced to a boolean here rather than passed
+  // through. The host is entitled to know approved-or-not and nothing else, so
+  // no status string, document row or reviewer note can reach a booking
+  // payload. Guarded for the hollow relation an erased account can leave.
+  if (!booking.user) return normalizeBooking({ ...booking, user: null });
+  const { identityVerification, ...guest } = booking.user;
+  return normalizeBooking({
+    ...booking,
+    user: { ...guest, identityVerified: identityVerification?.status === 'APPROVED' },
+  });
 }
 
 // Lists bookings across properties. When `hostId` is provided, results are
@@ -550,7 +571,17 @@ export async function listAllBookings(status?: string, page = 1, limit = 20, hos
       take: limit,
       orderBy: { createdAt: 'desc' },
       include: {
-        user: { select: { id: true, email: true, firstName: true, lastName: true } },
+        // Host-facing booking list: the guest's verification is selected so the
+        // row can carry a badge, and collapsed to a boolean just below.
+        user: {
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            identityVerification: { select: { status: true } },
+          },
+        },
         property: true,
         promoCode: { select: { code: true } },
         addOns: { include: { addOn: true } },
@@ -559,8 +590,21 @@ export async function listAllBookings(status?: string, page = 1, limit = 20, hos
     prisma.booking.count({ where }),
   ]);
 
+  // Same rule as getBooking: derive the boolean before normalising, so the raw
+  // status - and anything hanging off the relation, such as document rows or
+  // review notes - never travels into a host's booking list. The host learns
+  // only whether the guest is approved.
+  const mapped = bookings.map(({ user, ...rest }) => {
+    if (!user) return { ...rest, user: null };
+    const { identityVerification, ...guest } = user;
+    return {
+      ...rest,
+      user: { ...guest, identityVerified: identityVerification?.status === 'APPROVED' },
+    };
+  });
+
   return {
-    bookings: normalizeBookings(bookings),
+    bookings: normalizeBookings(mapped),
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   };
 }
