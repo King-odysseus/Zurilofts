@@ -11,16 +11,16 @@
     },
     {
       "text": "Stage only the card change and the plan file",
-      "state": "active"
+      "state": "done"
     },
     {
       "text": "Commit with a message describing the change",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Push to the remote and report the commit hash",
-      "state": "pending"
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-01T08:21:46.555Z"
+  "updatedAt": "2026-11-01T08:22:03.207Z"
 }
