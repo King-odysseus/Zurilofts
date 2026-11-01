@@ -90,7 +90,7 @@ export default function SaveToShortlistButton({ propertyId }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-elevated p-3 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
+          <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl bg-elevated p-3 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
             <h4 className="mb-2 text-sm font-semibold text-[#203565]">{t('stays.saveToShortlist')}</h4>
 
             {loading ? (

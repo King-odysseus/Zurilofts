@@ -12,6 +12,7 @@ import { useTranslated, useTranslatedList } from '../i18n/useTranslated.js';
 
 import apiClient from '../api/client.js';
 import { recordView } from '../utils/recentlyViewed.js';
+import { applyPageOverrides } from '../utils/documentHead.js';
 import { googleMapsSearchUrl, googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 import { formatPrice } from '../utils/currency.js';
 
@@ -106,14 +107,14 @@ function PropertyPage() {
     const place = property.neighborhood || property.location;
     const pageTitle = place ? `${listingTitle} in ${place} | ZuriLofts` : `${listingTitle} | ZuriLofts`;
     document.title = pageTitle;
-    const setMeta = (prop, content) => {
-      let el = document.querySelector(`meta[property="og:${prop}"]`);
-      if (!el) { el = document.createElement('meta'); el.setAttribute('property', `og:${prop}`); document.head.appendChild(el); }
-      el.setAttribute('content', content);
-    };
-    setMeta('title', pageTitle);
-    setMeta('description', property.description?.slice(0, 200) || '');
-    setMeta('image', property.images?.[0] || '');
+    // Returned as the effect cleanup so the next page does not inherit this
+    // listing's share image and description.
+    return applyPageOverrides({
+      description: property.description?.slice(0, 200) || '',
+      ogTitle: pageTitle,
+      ogDescription: property.description?.slice(0, 200) || '',
+      ogImage: property.images?.[0] || '',
+    });
   }, [property]);
 
   // ── Stable gallery callbacks (must be above early returns - Rules of Hooks) ──
@@ -251,7 +252,7 @@ function PropertyPage() {
           <section className="mb-8 lg:mb-12" aria-label={t('stays.photoGallery')}>
             {images.length === 1 ? (
               <img
-                className="h-56 w-full cursor-pointer rounded-2xl border border-[#E3E8EF] object-cover shadow-sm sm:h-72 md:h-[460px]"
+                className="h-56 w-full cursor-pointer rounded-2xl object-cover shadow-sm sm:h-72 md:h-[460px]"
                 src={images[0]}
                 alt={t('stays.photoAltSingle', { title: property.title })}
                 onClick={() => { setLightboxIndex(0); setLightboxOpen(true); }}
@@ -259,7 +260,7 @@ function PropertyPage() {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-2 md:gap-3">
                 {/* Primary image - spans two columns and rows on desktop */}
-                <div className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-sm md:col-span-2">
+                <div className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl bg-elevated shadow-sm md:col-span-2">
                   <img
                     className="w-full h-56 sm:h-72 md:h-full md:min-h-[440px] object-cover cursor-pointer"
                     src={images[featuredImage]}
@@ -288,7 +289,7 @@ function PropertyPage() {
                   <button
                     key={i}
                     onClick={() => { setFeaturedImage(i); setLightboxIndex(i); setLightboxOpen(true); }}
-                    className="group relative cursor-pointer overflow-hidden rounded-2xl border border-[#E3E8EF] shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
+                    className="group relative cursor-pointer overflow-hidden rounded-2xl shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C]"
                     aria-label={t('stays.viewPhoto', { index: i + 1 })}
                   >
                     <img
@@ -349,7 +350,7 @@ function PropertyPage() {
             block with. */}
         {host && hostName && (
           <section className="mt-8 lg:mt-12" aria-labelledby="host-heading">
-            <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_24px_rgba(20,58,128,0.06)] md:p-6">
+            <div className="rounded-2xl bg-elevated p-5 shadow-[0_8px_24px_rgba(20,58,128,0.06)] md:p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                 {host.avatar ? (
                   <img
@@ -475,7 +476,7 @@ function PropertyPage() {
             {(property.location || property.address) && (
               <section className="mb-8 lg:mb-12" aria-labelledby="location-heading">
                 <h2 id="location-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">{t('stays.whereYoullBe')}</h2>
-                <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_24px_rgba(20,58,128,0.06)]">
+                <div className="rounded-2xl bg-elevated p-5 shadow-[0_8px_24px_rgba(20,58,128,0.06)]">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div className="min-w-0 flex-1">
                       {property.location && <p className="font-semibold text-[#203565]">{location}</p>}
@@ -514,7 +515,7 @@ function PropertyPage() {
 
           {/* ── Right column - sticky booking summary ─────────────── */}
           <aside className="lg:col-span-1" aria-label={t('stays.bookingAside')}>
-            <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(20,58,128,0.08)] md:p-6" role="complementary" aria-label={t('stays.bookingSummary')}>
+            <div className="sticky top-24 rounded-2xl bg-elevated p-5 shadow-[0_8px_28px_rgba(20,58,128,0.08)] md:p-6" role="complementary" aria-label={t('stays.bookingSummary')}>
               {/* Price per night */}
               <div className="mb-6">
                 <span className="text-3xl font-bold text-[#203565]">

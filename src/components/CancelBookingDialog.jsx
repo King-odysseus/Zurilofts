@@ -66,7 +66,7 @@ function CancelBookingDialog({ booking, onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/40" onClick={onClose}></div>
-      <div className="relative w-full max-w-sm rounded-2xl border border-[#E3E8EF] bg-elevated p-6 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
+      <div className="relative w-full max-w-sm rounded-2xl bg-elevated p-6 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
         <h3 className="mb-1 text-lg font-bold text-[#203565]">Cancel this booking?</h3>
         <p className="text-sm font-semibold text-[#203565]">{booking.property?.title || 'Property'}</p>
         {formatDates(booking.checkIn, booking.checkOut) && (

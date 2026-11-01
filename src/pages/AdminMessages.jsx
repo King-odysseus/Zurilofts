@@ -217,7 +217,7 @@ function AdminMessages() {
           and every one of those styles comes back. */}
       <section className={`overflow-hidden ${
         activeUserId
-          ? '-mx-4 -mb-[calc(92px_+_env(safe-area-inset-bottom))] bg-transparent lg:mx-0 lg:mb-0 lg:rounded-xl lg:border lg:border-border lg:bg-elevated lg:shadow-sm'
+          ? '-mx-4 -mb-[calc(92px_+_env(safe-area-inset-bottom))] bg-transparent lg:mx-0 lg:mb-0 lg:rounded-xl lg:bg-elevated lg:shadow-sm'
           : 'rounded-xl bg-elevated shadow-md'
       }`}>
         {/* Two panes on desktop; one pane at a time on phones, driven by the route.

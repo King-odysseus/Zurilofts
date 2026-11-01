@@ -210,7 +210,7 @@ function SearchBar({ discovery = false }) {
 
       {/* Dropdown results */}
       {open && results.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
+        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl bg-elevated shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
           <ul>
             {results.map((p) => (
               <li key={p.id}>

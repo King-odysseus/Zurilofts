@@ -78,7 +78,7 @@ function StatusBadge({ status }) {
 
 function Panel({ title, children }) {
   return (
-    <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
+    <section className="rounded-xl bg-elevated p-5 shadow-sm">
       <h2 className="text-base font-semibold text-navy">{title}</h2>
       <div className="mt-4">{children}</div>
     </section>
@@ -171,7 +171,7 @@ export default function AdminListingDetail() {
   if (loading) {
     return (
       <div className="space-y-8">
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-elevated px-5 py-16 text-center shadow-sm" role="status">
+        <div className="flex flex-col items-center gap-2 rounded-xl bg-elevated px-5 py-16 text-center shadow-sm" role="status">
           <Spinner size="lg" aria-hidden="true" />
           <strong className="text-sm font-semibold text-navy">{t('adminlisting.loadingTitle')}</strong>
           <p className="text-xs text-muted">{t('adminlisting.loadingBody')}</p>
@@ -187,7 +187,7 @@ export default function AdminListingDetail() {
           <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           {t('adminlisting.backToApprovals')}
         </Link>
-        <section className="rounded-xl border border-border bg-elevated p-8 text-center shadow-sm">
+        <section className="rounded-xl bg-elevated p-8 text-center shadow-sm">
           <strong className="block text-base font-semibold text-navy">{t('adminlisting.unavailableTitle')}</strong>
           <p role="alert" className="mx-auto mt-1 max-w-md text-sm leading-relaxed text-muted">
             {loadError || 'This listing does not exist, or it has been removed.'}
@@ -245,7 +245,7 @@ export default function AdminListingDetail() {
 
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-8">
-          <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
+          <section className="rounded-xl bg-elevated p-5 shadow-sm">
             {activeImageUrl ? (
               <img
                 src={activeImageUrl}
@@ -300,7 +300,7 @@ export default function AdminListingDetail() {
         </div>
 
         <aside className="space-y-8">
-          <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
+          <section className="rounded-xl bg-elevated p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <h2 className="text-base font-semibold text-navy">Review</h2>
               <StatusBadge status={listing.status} />
@@ -361,7 +361,7 @@ export default function AdminListingDetail() {
             )}
           </section>
 
-          <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
+          <section className="rounded-xl bg-elevated p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <h2 className="text-base font-semibold text-navy">Host</h2>
               {host?.email && (

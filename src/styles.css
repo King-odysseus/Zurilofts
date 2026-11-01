@@ -293,14 +293,13 @@ body {
 /* ===== Radio / option cards - borderless, shadow communicates the surface ===== */
 .neu-radio-card {
   background-color: #ffffff;
-  border: 1px solid #E3E8EF;
+  border: 0;
   border-radius: 16px;
   box-shadow: 0 8px 28px rgba(20,58,128,0.08);
   transition: box-shadow 0.2s, transform 0.2s;
 }
 
 .neu-radio-card:hover {
-  border-color: #C5A28C;
   box-shadow: 0 0 0 3px rgba(37,99,235,0.18);
   transform: translateY(-2px);
 }
@@ -2080,9 +2079,10 @@ html.dark .opg-message-placeholder > span {
 
 .op-trust-sidebar,
 .op-trust-panel {
-  border: 1px solid #e5e7eb;
+  border: 0;
   border-radius: 14px;
   background: #fff;
+  box-shadow: var(--op-shadow);
 }
 
 .op-trust-sidebar {
@@ -3141,6 +3141,7 @@ html.dark .op-trust-recovery-card {
 html.dark .op-trust-panel,
 html.dark .op-trust-sidebar {
   background: var(--dm-surface) !important;
+  box-shadow: var(--zl-shadow) !important;
 }
 
 html.dark .op-trust-person,

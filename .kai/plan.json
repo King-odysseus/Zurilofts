@@ -2,21 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check git status and diff to see what is uncommitted",
+      "text": "Read the established shadow/card style (styles.css tokens, Panel, zl-panel)",
       "state": "done"
     },
     {
-      "text": "Run lint, build, server type check and the new tests",
+      "text": "Audit every page and component for hairline borders on cards",
       "state": "done"
     },
     {
-      "text": "Commit in logical groups: guest reviews and badges, old URL redirects and share-image escaping, account menu controls, phone layout fixes",
+      "text": "Run a codemod stripping hairlines from card surfaces only",
       "state": "done"
     },
     {
-      "text": "Push to origin and finish the plan",
+      "text": "Review the diff file by file",
+      "state": "done"
+    },
+    {
+      "text": "Verify with lint, build and rendered-page checks",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push",
       "state": "active"
     }
   ],
-  "updatedAt": "2026-11-01T19:57:32.715Z"
+  "updatedAt": "2026-11-01T21:02:31.460Z"
 }

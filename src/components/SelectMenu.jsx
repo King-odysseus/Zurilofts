@@ -79,7 +79,7 @@ const TRIGGER_SIZES = {
 const MENU_THEME = {
   content: 'max-h-[min(18rem,40dvh)] overflow-y-auto overscroll-contain py-1 text-sm text-[#111827] focus:outline-none dark:text-gray-200',
   floating: {
-    base: 'z-50 w-full overflow-hidden rounded-[10px] border border-[#E2DAD0] bg-elevated shadow-lg dark:border-gray-600 dark:bg-gray-700 !min-w-[min(11rem,calc(100vw-2rem))] !max-w-[calc(100vw-2rem)]',
+    base: 'z-50 w-full overflow-hidden rounded-[10px] bg-elevated shadow-lg dark:bg-gray-700 !min-w-[min(11rem,calc(100vw-2rem))] !max-w-[calc(100vw-2rem)]',
   },
 };
 

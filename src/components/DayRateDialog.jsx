@@ -130,7 +130,7 @@ export default function DayRateDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="day-rate-dialog-title"
-        className="fixed inset-x-0 bottom-0 max-h-[85vh] w-full overflow-y-auto rounded-t-2xl border border-border bg-elevated shadow-lg sm:relative sm:inset-auto sm:mx-auto sm:my-auto sm:max-w-md sm:rounded-2xl"
+        className="fixed inset-x-0 bottom-0 max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-elevated shadow-lg sm:relative sm:inset-auto sm:mx-auto sm:my-auto sm:max-w-md sm:rounded-2xl"
       >
         <header className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
           <div className="min-w-0">

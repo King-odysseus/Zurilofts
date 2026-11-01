@@ -588,7 +588,7 @@ function ProfilePage() {
               </div>
 
               {/* Privacy and data */}
-              <div id="privacy" className="scroll-mt-28 mt-10 pt-8 border-t-2 border-[#D9D9D9]">
+              <div id="privacy" className="scroll-mt-28 mt-10 border-t border-line pt-8">
                 <h3 className="text-xl font-bold text-[#203565] mb-1">{t('profile.privacyAndData')}</h3>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Manage your personal data and consent choices. See our{' '}
@@ -645,7 +645,7 @@ function ProfilePage() {
                   </div>
 
                   {/* Delete my account */}
-                  <div className="rounded-2xl border-2 border-red-200 bg-red-50/50 p-5">
+                  <div className="rounded-2xl bg-red-50/50 p-5 shadow-sm">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                       <div>
                         <h4 className="font-semibold text-red-700">{t('profile.deleteMyAccount')}</h4>
@@ -705,7 +705,7 @@ function ProfilePage() {
 
           {/* Payout Settings - HOST only */}
           {activeTab === 'info' && profile?.role === 'HOST' && (
-            <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
+            <div className="mt-10 border-t border-line pt-8">
               <h3 className="text-xl font-bold text-[#203565] mb-1">{t('profile.payoutSettings')}</h3>
               <p className="text-sm text-[#6b7280] mb-6">
                 Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
@@ -1016,7 +1016,7 @@ function ProfilePage() {
                   private note, so nothing here can show one. Stars are icons with
                   the rating beside them as text, so a screen reader reads a
                   number instead of "star star star". */}
-              <section className="pt-8 border-t-2 border-[#D9D9D9]" aria-labelledby="profile-reviews-about-you">
+              <section className="border-t border-line pt-8" aria-labelledby="profile-reviews-about-you">
                 <h3 id="profile-reviews-about-you" className="text-lg font-bold text-[#203565] mb-1">
                   {t('profile.reviewsAboutYou')}
                 </h3>

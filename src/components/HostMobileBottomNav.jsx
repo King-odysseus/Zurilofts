@@ -20,7 +20,7 @@ export default function HostMobileBottomNav() {
   }, []);
 
   return (
-    <nav aria-label={t('host.workspace')} className="fixed inset-x-3 bottom-3 z-40 mx-auto flex min-h-[54px] max-w-[358px] items-center justify-between rounded-full border border-border bg-elevated/95 px-[9px] pb-[calc(5px+env(safe-area-inset-bottom))] pt-[5px] text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] backdrop-blur md:hidden">
+    <nav aria-label={t('host.workspace')} className="fixed inset-x-3 bottom-3 z-40 mx-auto flex min-h-[54px] max-w-[358px] items-center justify-between rounded-full bg-elevated/95 px-[9px] pb-[calc(5px+env(safe-area-inset-bottom))] pt-[5px] text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] backdrop-blur md:hidden">
       {TABS.map((tab) => {
         const active = tab.match(location.pathname);
         const Icon = tab.icon;

@@ -286,7 +286,7 @@ function BookingDetailPage() {
       </section>
 
       {(additionalGuests.length > 0 || booking.specialRequests) && (
-        <section className="opg-detail-panel !mt-6 rounded-xl border border-border" aria-labelledby="detail-stay">
+        <section className="opg-detail-panel !mt-6 rounded-xl" aria-labelledby="detail-stay">
           <h2 id="detail-stay" className="!mb-5">Guest details</h2>
           {additionalGuests.length > 0 && (
             <>

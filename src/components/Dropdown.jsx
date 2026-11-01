@@ -54,7 +54,7 @@ function Dropdown({ value, onChange, options, triggerClassName = '', menuClassNa
       {open && (
         <div
           role="listbox"
-          className={`absolute left-0 z-30 mt-2 max-h-72 min-w-full w-max max-w-[18rem] overflow-y-auto rounded-lg border border-[#E5E7EB] bg-white p-1 shadow-lg ${menuClassName}`}
+          className={`absolute left-0 z-30 mt-2 max-h-72 min-w-full w-max max-w-[18rem] overflow-y-auto rounded-lg bg-white p-1 shadow-lg ${menuClassName}`}
         >
           {options.map((o) => {
             const isSel = String(o.value) === String(value);

@@ -153,7 +153,7 @@ function ChatWidget() {
 
       {/* Chat panel */}
       {open && (
-        <div className="fixed bottom-6 right-6 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_8px_28px_rgba(20,58,128,0.14)] transition-all duration-300" style={{ maxHeight: '520px' }}>
+        <div className="fixed bottom-6 right-6 z-50 flex w-[360px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-2xl bg-elevated shadow-[0_8px_28px_rgba(20,58,128,0.14)] transition-all duration-300" style={{ maxHeight: '520px' }}>
           {/* Header */}
           <div className="flex items-center justify-between bg-[#16294B] px-5 py-4">
             <div className="flex items-center space-x-3">

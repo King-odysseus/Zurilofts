@@ -76,7 +76,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label={t('a11y1.chooseDates')}
-            className="fixed inset-0 z-[100] overflow-y-auto bg-elevated p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[min(640px,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(20,58,128,0.14)]"
+            className="fixed inset-0 z-[100] overflow-y-auto bg-elevated p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[min(640px,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:p-5 sm:shadow-[0_8px_28px_rgba(20,58,128,0.14)]"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
               <span className="text-base font-semibold text-[#203565]">Choose dates</span>
@@ -127,7 +127,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
           <div
             role="dialog"
             aria-label={t('a11y1.chooseGuests')}
-            className="fixed inset-0 z-[100] bg-elevated p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-[min(18rem,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(20,58,128,0.14)]"
+            className="fixed inset-0 z-[100] bg-elevated p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-[min(18rem,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:p-5 sm:shadow-[0_8px_28px_rgba(20,58,128,0.14)]"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
               <span className="text-base font-semibold text-[#203565]">Guests</span>

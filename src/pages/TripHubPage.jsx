@@ -82,7 +82,7 @@ function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
   const propertyTitle = useTranslated(property.title);
   const propertyLocation = useTranslated(property.location);
 
-  return <article className="opg-trip-feature rounded-xl border border-border">
+  return <article className="opg-trip-feature rounded-xl">
     <Link to={`/stay/${property.id || booking.propertyId}`} className="opg-trip-feature-image" aria-label={`View ${property.title || 'stay'}`}>
       <img src={getBookingImage(booking, index)} alt="" />
     </Link>

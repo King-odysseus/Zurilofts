@@ -130,7 +130,7 @@ export default function BecomeAHostPage() {
       {/* Calculator */}
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
-          <div className="rounded-xl border border-line bg-elevated p-5 shadow-sm sm:p-6">
+          <div className="rounded-xl bg-elevated p-5 shadow-sm sm:p-6">
             <h2 className="font-montserrat text-xl font-bold text-navy">{t('discovery.calcTitle')}</h2>
             <p className="mt-2 text-sm text-muted">{t('discovery.calcHint')}</p>
 
@@ -217,7 +217,7 @@ export default function BecomeAHostPage() {
             )}
           </div>
 
-          <div className="rounded-xl border border-line bg-elevated p-5 shadow-sm sm:p-6">
+          <div className="rounded-xl bg-elevated p-5 shadow-sm sm:p-6">
             <h2 className="font-montserrat text-xl font-bold text-navy">{t('discovery.resultTitle')}</h2>
 
             {error && (

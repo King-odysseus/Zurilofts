@@ -902,7 +902,7 @@ function BookingPage() {
             const subtotal = qty * (addOn.price || 0);
             const busy = pendingAddOnId === addOn.id;
             return (
-              <div key={addOn.id} className="border border-[#D9D9D9] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
+              <div key={addOn.id} className="rounded-2xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-semibold text-[#203565]">{addOn.name}</h3>
@@ -1324,7 +1324,7 @@ function BookingPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Left Column - Form */}
             <div className="lg:col-span-2">
-              <div className="bg-elevated rounded-2xl shadow-lg border border-[#D9D9D9] p-5 md:p-8">
+              <div className="bg-elevated rounded-2xl shadow-lg p-5 md:p-8">
                 {step === 1 && renderStep1()}
                 {step === 2 && renderStep2()}
                 {step === 3 && renderStep3()}
@@ -1334,7 +1334,7 @@ function BookingPage() {
 
             {/* Right Column - Property Summary */}
             <div className="lg:col-span-1">
-              <div className="bg-elevated rounded-2xl shadow-lg border border-[#D9D9D9] p-6 sticky top-24">
+              <div className="bg-elevated rounded-2xl shadow-lg p-6 sticky top-24">
                 <Link to={`/stay/${property?.id}`} className="block">
                   <img
                     src={(property?.images?.[0] || '')}

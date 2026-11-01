@@ -103,7 +103,7 @@ function ListingMirrorBody({ property, sidePanel }) {
             <button
               type="button"
               onClick={() => setLightboxIndex(0)}
-              className="block w-full overflow-hidden rounded-2xl border border-border bg-surface"
+              className="block w-full overflow-hidden rounded-2xl bg-surface"
             >
               <img
                 src={images[0]}
@@ -116,7 +116,7 @@ function ListingMirrorBody({ property, sidePanel }) {
               <button
                 type="button"
                 onClick={() => setLightboxIndex(featuredImage)}
-                className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl border border-border bg-surface"
+                className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl bg-surface"
               >
                 <img
                   src={images[featuredImage]}
@@ -129,7 +129,7 @@ function ListingMirrorBody({ property, sidePanel }) {
                   key={index}
                   type="button"
                   onClick={() => setFeaturedImage(index)}
-                  className="overflow-hidden rounded-2xl border border-border"
+                  className="overflow-hidden rounded-2xl"
                   aria-label={t('adminlisting.showPhoto', { number: index + 1 })}
                 >
                   <img src={src} alt="" className="h-20 w-full object-cover sm:h-24 md:h-full" />

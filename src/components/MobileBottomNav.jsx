@@ -99,7 +99,7 @@ function MobileBottomNav() {
     <nav
       aria-label={t('a11y1.primaryNav')}
       style={{ paddingBottom: 'calc(6px + env(safe-area-inset-bottom))' }}
-      className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto grid max-w-[390px] grid-cols-5 items-stretch rounded-full border border-border bg-elevated text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] md:hidden"
+      className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto grid max-w-[390px] grid-cols-5 items-stretch rounded-full bg-elevated text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] md:hidden"
     >
       {TABS.map((tab) => {
         const active = tab.match(location.pathname);

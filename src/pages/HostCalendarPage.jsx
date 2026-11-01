@@ -1171,7 +1171,7 @@ export default function HostCalendarPage() {
 
       <div className="fixed bottom-6 right-6 z-30 hidden items-center md:flex">
         <div
-          className="flex items-center gap-2 rounded-full border border-border bg-elevated px-2 py-2 shadow-xl"
+          className="flex items-center gap-2 rounded-full bg-elevated px-2 py-2 shadow-xl"
           role="region"
           aria-label={t('host.selectedDatesActions')}
         >

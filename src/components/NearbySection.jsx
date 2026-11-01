@@ -71,7 +71,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
   return (
     <div className="op-places-list mt-8 md:mt-12 mb-16">
       {/* Centered Header */}
-      <div className="mb-8 rounded-2xl border border-[#E3E8EF] bg-elevated px-5 py-8 text-center shadow-[0_4px_16px_rgba(20,58,128,0.04)] md:px-8 md:py-10">
+      <div className="mb-8 rounded-2xl bg-elevated px-5 py-8 text-center shadow-[0_4px_16px_rgba(20,58,128,0.04)] md:px-8 md:py-10">
         <h2 className="text-3xl font-bold text-[#203565] md:text-4xl">{title}</h2>
         <p className="text-cool-grey max-w-2xl mx-auto text-base md:text-lg mt-3 px-2 md:px-0">{subtitle}</p>
       </div>

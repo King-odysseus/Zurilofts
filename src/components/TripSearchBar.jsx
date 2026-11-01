@@ -7,7 +7,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading = false, ha
   const { t } = useLanguage();
   return (
     <form onSubmit={onSubmit} role="search" className="w-full max-w-full">
-      <div className={`flex flex-col gap-2 rounded-2xl border border-[#E3E8EF] bg-white/95 p-2 shadow-[0_8px_28px_rgba(20,58,128,0.12)] backdrop-blur-sm transition-shadow focus-within:border-[#C5A28C] focus-within:ring-2 focus-within:ring-[#C5A28C]/20 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:bg-elevated sm:backdrop-blur-none ${discovery ? 'sm:p-2' : ''}`}>
+      <div className={`flex flex-col gap-2 rounded-2xl bg-white/95 p-2 shadow-[0_8px_28px_rgba(20,58,128,0.12)] backdrop-blur-sm transition-shadow focus-within:border-[#C5A28C] focus-within:ring-2 focus-within:ring-[#C5A28C]/20 sm:flex-row sm:items-center sm:gap-0 sm:rounded-full sm:bg-elevated sm:backdrop-blur-none ${discovery ? 'sm:p-2' : ''}`}>
         <div className={`flex min-w-0 flex-1 items-center px-2 sm:px-4 ${discovery ? 'sm:border-r sm:border-[#E3E8EF]' : ''}`}>
           {loading ? (
             <div className="mr-2 h-5 w-5 flex-shrink-0 animate-spin rounded-full border-2 border-[#C5A28C] border-t-transparent sm:mr-3" />

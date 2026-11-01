@@ -72,7 +72,7 @@ export default function AdminListingPreviewPage() {
     </div>;
   }
 
-  const sidePanel = <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
+  const sidePanel = <section className="rounded-xl bg-elevated p-5 shadow-sm">
     <div className="flex items-center justify-between gap-2">
       <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">{t('adminlisting.moderation')}</p>
       <Badge color={BADGE_COLOR[listing.status] || 'gray'}>{listingStatusLabel(listing.status, t)}</Badge>
@@ -124,7 +124,7 @@ export default function AdminListingPreviewPage() {
         </div>
       </div>
 
-      <section className="rounded-2xl border border-border bg-elevated p-4 shadow-sm sm:p-6">
+      <section className="rounded-2xl bg-elevated p-4 shadow-sm sm:p-6">
         <ListingMirrorBody property={listing} sidePanel={sidePanel} />
       </section>
     </div>
