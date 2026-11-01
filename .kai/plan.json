@@ -2,18 +2,6 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Answer: is LibreTranslate hosted on Railway or must it be added as variables?",
-      "state": "done"
-    },
-    {
-      "text": "Check translation service + env config for provider/URL vars",
-      "state": "done"
-    },
-    {
-      "text": "Check railway.json / deployment config for a LibreTranslate service",
-      "state": "done"
-    },
-    {
       "text": "Identify the broken pill shape (dark search bar, desktop width)",
       "state": "done"
     },
@@ -22,11 +10,15 @@
       "state": "done"
     },
     {
-      "text": "Fix the pill so it stays a pill in dark mode",
+      "text": "Scope the phone-only field fill so the pill keeps its corners",
       "state": "done"
     },
     {
-      "text": "Verify in browser at phone and desktop widths, light and dark",
+      "text": "Stop the date inputs drawing their own box inside the bar",
+      "state": "done"
+    },
+    {
+      "text": "Verify at phone and desktop widths, light and dark",
       "state": "done"
     },
     {
@@ -34,9 +26,9 @@
       "state": "done"
     },
     {
-      "text": "Commit the fix",
-      "state": "active"
+      "text": "Commit and push the fix",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-01T14:44:16.014Z"
+  "updatedAt": "2026-11-01T14:44:35.620Z"
 }
