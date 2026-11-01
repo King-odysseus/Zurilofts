@@ -8,6 +8,7 @@ import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
 import { generateInvoice } from '../utils/invoice.js';
+import { useTranslated } from '../i18n/useTranslated.js';
 import { canAddToCalendar, downloadStayCalendar, isUpcomingStay } from '../utils/stayCalendar.js';
 
 // Booking state reads as a tinted pill: one shape, one tone per status, so the
@@ -51,6 +52,10 @@ function getBookingImage(booking, index = 0) {
 function HistoryCard({ booking, index, onMessage, messagePending }) {
   const { t } = useLanguage();
   const property = booking.property || {};
+  // A listing's title and area were typed by the host, so they are translated
+  // here rather than by the API. The photo link's aria-label keeps the raw title.
+  const propertyTitle = useTranslated(property.title);
+  const propertyLocation = useTranslated(property.location);
   const status = STATUS_META[booking.status] || { label: t('booking.statusUnknown'), className: STATUS_TONE_IDLE };
 
   return <article className="opg-history-card max-md:!gap-5 rounded-xl shadow-md">
@@ -60,8 +65,8 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
     <div className="opg-history-copy">
       <div className="opg-history-title-row">
         <div>
-          <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || 'Property'}</Link></h2>
-          <p>{property.location || 'Nairobi'}</p>
+          <h2><Link to={`/property/${property.id || booking.propertyId}`}>{propertyTitle || 'Property'}</Link></h2>
+          <p>{propertyLocation || 'Nairobi'}</p>
         </div>
         <span className={`${STATUS_PILL} ${status.className}`}>{t(status.label)}</span>
       </div>

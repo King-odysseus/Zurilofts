@@ -1,5 +1,5 @@
 import { useLocation, useParams, useSearchParams, Link } from 'react-router-dom';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { ArrowLeft, Bath, Building2, Check, ChevronLeft, ChevronRight, CircleAlert, House, MapPin, Ruler, ShieldCheck, Star } from 'lucide-react';
 import Lightbox from './Lightbox.jsx';
 import ReviewSection from './ReviewSection.jsx';
@@ -7,6 +7,7 @@ import PropertyTrustPanel from './PropertyTrustPanel';
 import SimilarProperties from './SimilarProperties';
 import AddOnsSection from './AddOnsSection';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTranslated, useTranslatedList } from '../i18n/useTranslated.js';
 
 import apiClient from '../api/client.js';
 import { recordView } from '../utils/recentlyViewed.js';
@@ -36,6 +37,26 @@ function PropertyPage() {
   const recordedRef = useRef(false);
   const [reviewSummary, setReviewSummary] = useState(null);
   const [reviewsLoaded, setReviewsLoaded] = useState(false);
+
+  // The listing's own words - title, description, where it is, and the lists the
+  // host filled in - are stored in whatever language the host typed them. The
+  // hooks give back the original until a translation exists, so none of these
+  // needs a loading branch. Declared above the early returns: hooks must run on
+  // every render, including the loading and error ones.
+  const title = useTranslated(property?.title);
+  // Tags are stripped before translating rather than after: the translator
+  // should be sent prose, and a '<' in its answer must not later be swallowed
+  // by the markup cleanup as if it were an HTML tag.
+  const descriptionSource = useMemo(
+    () => (property?.description ?? '').replace(/<[^>]*>?/gm, ''),
+    [property?.description]
+  );
+  const description = useTranslated(descriptionSource);
+  const location = useTranslated(property?.location);
+  const address = useTranslated(property?.address);
+  const amenityLabels = useTranslatedList(safeArray(property?.amenities));
+  const nearbyLabels = useTranslatedList(safeArray(property?.nearby));
+
   // ReviewSection owns the only fetch of the review summary, so it reports the
   // result upward instead of the page asking for the same data twice.
   const handleReviewSummary = useCallback((summary) => {
@@ -264,7 +285,7 @@ function PropertyPage() {
         {/* ── Property identity: title, location, rating ────────── */}
         <header className="mb-8 lg:mb-12">
           <h1 className="mb-2 text-2xl font-bold leading-tight text-[#203565] sm:text-3xl md:text-4xl">
-            {property.title}
+            {title}
           </h1>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-1 text-[#5B6B82]">
             <a
@@ -275,7 +296,7 @@ function PropertyPage() {
               title={t('stays.openInMaps')}
             >
               <MapPin className="w-5 h-5 text-[#5B6B82] shrink-0" strokeWidth={2} aria-hidden="true" />
-              {property.location}
+              {location}
               <span className="text-xs font-semibold">Google Maps</span>
             </a>
             {hasReviews && (
@@ -295,7 +316,7 @@ function PropertyPage() {
           rating={hasReviews ? property.rating : 0}
           reviewCount={shownReviewCount}
           type={property.type}
-          location={property.location}
+          location={location}
         />
 
         {/* ── Two-column body ────────────────────────────────────── */}
@@ -339,7 +360,7 @@ function PropertyPage() {
             <section className="mb-8 lg:mb-12" aria-labelledby="about-heading">
               <h2 id="about-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">{t('stays.aboutType', { type: typeLabel.toLowerCase() })}</h2>
               <div className="text-[#1f2937] leading-relaxed space-y-4">
-                {(property.description || t('stays.noDescription')).replace(/<[^>]*>?/gm, '').split('\n').filter(Boolean).map((paragraph, i) => (
+                {(description || t('stays.noDescription')).replace(/<[^>]*>?/gm, '').split('\n').filter(Boolean).map((paragraph, i) => (
                   <p key={i}>{paragraph}</p>
                 ))}
               </div>
@@ -350,7 +371,7 @@ function PropertyPage() {
               <section className="mb-8 lg:mb-12" aria-labelledby="amenities-heading">
                 <h2 id="amenities-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">{t('stays.amenitiesTitle')}</h2>
                 <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5" role="list">
-                  {amenities.map((amenity, index) => (
+                  {amenityLabels.map((amenity, index) => (
                     <li key={index} className="flex items-center gap-3">
                       <Check className="h-5 w-5 shrink-0 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
                       <span className="text-[#1f2937]">{amenity}</span>
@@ -365,7 +386,7 @@ function PropertyPage() {
               <section className="mb-8 lg:mb-12" aria-labelledby="nearby-heading">
                 <h2 id="nearby-heading" className="text-xl sm:text-2xl font-bold text-[#203565] mb-4">{t('stays.nearbyTitle')}</h2>
                 <ul className="space-y-4" role="list">
-                  {nearby.map((item, index) => (
+                  {nearbyLabels.map((item, index) => (
                     <li key={index} className="flex items-start gap-3 text-[#1f2937]">
                       <MapPin className="w-5 h-5 text-[#5B6B82] shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
                       <span>{item}</span>
@@ -383,8 +404,8 @@ function PropertyPage() {
                 <div className="rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_24px_rgba(20,58,128,0.06)]">
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                     <div className="min-w-0 flex-1">
-                      {property.location && <p className="font-semibold text-[#203565]">{property.location}</p>}
-                      {property.address && <p className="mt-1 break-words text-sm text-[#5B6B82]">{property.address}</p>}
+                      {property.location && <p className="font-semibold text-[#203565]">{location}</p>}
+                      {property.address && <p className="mt-1 break-words text-sm text-[#5B6B82]">{address}</p>}
                     </div>
                     <a
                       href={googleMapsSearchUrl({ lat: property.lat, lng: property.lng, label: property.address || property.location })}

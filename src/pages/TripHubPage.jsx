@@ -9,6 +9,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
+import { useTranslated } from '../i18n/useTranslated.js';
 
 // Booking state reads as a tinted pill: one shape, one tone per status, so the
 // guest pages match the admin and host surfaces.
@@ -76,6 +77,10 @@ function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
   const { t } = useLanguage();
   const property = booking.property || {};
   const nights = getNights(booking.checkIn, booking.checkOut);
+  // Listing title and area are host-typed, so they follow the reader's language.
+  // The photo link's aria-label keeps the raw title.
+  const propertyTitle = useTranslated(property.title);
+  const propertyLocation = useTranslated(property.location);
 
   return <article className="opg-trip-feature rounded-xl border border-border">
     <Link to={`/property/${property.id || booking.propertyId}`} className="opg-trip-feature-image" aria-label={`View ${property.title || 'stay'}`}>
@@ -86,8 +91,8 @@ function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
         <StatusPill status={booking.status} />
         <time dateTime={booking.checkIn}>{formatDateRange(booking.checkIn, booking.checkOut) || t('trips.datesUnavailable')}</time>
       </div>
-      <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || t('trips.upcomingStay')}</Link></h2>
-      <p className="opg-trip-subtitle">{[property.location || 'Nairobi', t((booking.guests || 1) === 1 ? 'common.guest_one' : 'common.guest_other', { count: booking.guests || 1 }), t(nights === 1 ? 'common.night_one' : 'common.night_other', { count: nights })].join(' / ')}</p>
+      <h2><Link to={`/property/${property.id || booking.propertyId}`}>{propertyTitle || t('trips.upcomingStay')}</Link></h2>
+      <p className="opg-trip-subtitle">{[propertyLocation || 'Nairobi', t((booking.guests || 1) === 1 ? 'common.guest_one' : 'common.guest_other', { count: booking.guests || 1 }), t(nights === 1 ? 'common.night_one' : 'common.night_other', { count: nights })].join(' / ')}</p>
       {booking.total != null && <p className="opg-trip-price"><strong>KES {Number(booking.total).toLocaleString()}</strong> {t('common.total')}</p>}
       <div className="opg-trip-actions !mt-6">
         <Button as={Link} to={`/bookings/${booking.id}`} size="sm">{t('trips.viewCheckInDetails')}</Button>
@@ -113,12 +118,13 @@ function TripRow({ booking, index, isPast }) {
   const { t } = useLanguage();
   const property = booking.property || {};
   const reviewed = Boolean(booking.review?.id);
+  const propertyTitle = useTranslated(property.title);
   const status = STATUS_META[booking.status]?.label || booking.status;
 
   return <article className="opg-trip-row !py-4">
     <img src={getBookingImage(booking, index + 1)} alt="" />
     <div className="opg-trip-row-copy">
-      <strong>{property.title || t('trips.yourStay')}</strong>
+      <strong>{propertyTitle || t('trips.yourStay')}</strong>
       <span className="!mt-2.5">{formatDateRange(booking.checkIn, booking.checkOut) || t('trips.datesUnavailable')} / {status}</span>
     </div>
     {/* The grid has three columns, so the row actions share one cell; two

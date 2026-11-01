@@ -7,6 +7,7 @@ import apiClient from '../api/client.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
+import { useTranslated, useTranslatedList } from '../i18n/useTranslated.js';
 
 // Host insights, laid out like the reference screen: a listing selector, the
 // overall rating with a score bar per category, and the reviews themselves.
@@ -73,6 +74,11 @@ ScoreBar.propTypes = {
 
 function ReviewRow({ review }) {
   const { t } = useLanguage();
+  // What the guest wrote, and the stay it is about, are database text: both read
+  // in the host's chosen language without waiting for a loading state.
+  const comment = useTranslated(review.comment);
+  const propertyTitle = useTranslated(review.propertyTitle);
+
   return <article className="border-b border-border py-4 last:border-b-0">
     <div className="flex items-start gap-3">
       <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-bg text-[11px] font-bold text-white">
@@ -87,9 +93,9 @@ function ReviewRow({ review }) {
         </div>
         <div className="mt-0.5 flex items-center gap-2">
           {starsOf(review.rating, t)}
-          <span className="truncate text-[11px] text-muted">{review.propertyTitle}</span>
+          <span className="truncate text-[11px] text-muted">{propertyTitle}</span>
         </div>
-        {review.comment && <p className="mt-1.5 text-sm leading-relaxed text-charcoal">{review.comment}</p>}
+        {review.comment && <p className="mt-1.5 text-sm leading-relaxed text-charcoal">{comment}</p>}
       </div>
     </div>
   </article>;
@@ -119,11 +125,14 @@ function ListingSelector({ listings, value, onChange, counts }) {
   // the accessible name comes from ariaLabel instead of a htmlFor <label>.
   // Values are stringified so the selection compares exactly like the native
   // <option> value it replaced. A missing title falls back to a word: a template string would otherwise print "undefined".
+  // The listing names are the host's own words from the API, so they are fetched
+  // translated once for the whole option list rather than per option.
+  const translatedTitles = useTranslatedList(listings.map((listing) => listing.title ?? ''));
   const options = [
     { value: 'all', label: `All listings (${listings.length})` },
-    ...listings.map((listing) => ({
+    ...listings.map((listing, index) => ({
       value: String(listing.id),
-      label: `${listing.title || 'Untitled listing'}${counts[listing.id] ? ` (${counts[listing.id]} reviews)` : ''}`,
+      label: `${translatedTitles[index] || 'Untitled listing'}${counts[listing.id] ? ` (${counts[listing.id]} reviews)` : ''}`,
     })),
   ];
 

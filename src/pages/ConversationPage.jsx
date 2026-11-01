@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTranslatedLookup } from '../i18n/useTranslated.js';
 import apiClient from '../api/client.js';
 import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMessagesLayout.jsx';
 import MessageComposer from '../components/MessageComposer.jsx';
@@ -127,6 +128,8 @@ function ConversationPage() {
     }
   }, [conversationId, scrollToBottom]);
 
+  // Private thread: see the note in MessagesPage.
+  const translatedMessages = useTranslatedLookup(messages.map((message) => message.content ?? ''), { private: true });
   const participant = getConversationParticipant(conversation, user?.id);
   const property = conversation?.booking?.property || {};
   const image = firstImage(property);
@@ -159,7 +162,7 @@ function ConversationPage() {
       {loading ? <div className="opg-message-loading" aria-label={t('a11y2.loadingMessages')}><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadMessages}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>No messages yet</strong><p>Say hello to {participant.name} and start planning the stay.</p></div> : messages.map((message) => {
         const isMine = message.senderId === user?.id;
         const senderName = [message.sender?.firstName, message.sender?.lastName].filter(Boolean).join(' ') || 'User';
-        return <GuestMessageBubble key={message.id} mine={isMine} attachments={message.attachments} meta={`${isMine ? 'You' : senderName} · ${formatMessageTime(message.createdAt)}`}>{message.content}</GuestMessageBubble>;
+        return <GuestMessageBubble key={message.id} mine={isMine} attachments={message.attachments} meta={`${isMine ? 'You' : senderName} · ${formatMessageTime(message.createdAt)}`}>{translatedMessages.get(message.content) ?? message.content}</GuestMessageBubble>;
       })}
       {error && messages.length > 0 && <p className="opg-message-inline-error">{error}</p>}
     </div>

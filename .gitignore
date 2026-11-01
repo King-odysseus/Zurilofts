@@ -86,3 +86,6 @@ skills-lock.json
 
 # Browser tool scratch output (snapshots, console logs)
 .playwright-mcp/
+
+# Local smoke-test doubles for third-party APIs (not part of the app)
+server/.tmp-*.mjs

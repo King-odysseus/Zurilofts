@@ -36,6 +36,7 @@ import consentRoutes from './routes/consent.routes.js';
 import meRoutes from './routes/me.routes.js';
 import recommendationRoutes from './routes/recommendation.routes.js';
 import publicRoutes from './routes/public.routes.js';
+import translationRoutes from './routes/translation.routes.js';
 
 const app = express();
 
@@ -120,6 +121,7 @@ app.use('/api/conversations', conversationRoutes);
 app.use('/api/consent', consentRoutes);
 app.use('/api/me', meRoutes);
 app.use('/api/public', publicRoutes);
+app.use('/api/translations', translationRoutes);
 
 // Unknown API route -> JSON 404 instead of the default HTML "Cannot GET".
 app.use('/api', (_req, res) => {

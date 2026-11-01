@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
+import { useTranslatedList } from '../i18n/useTranslated.js';
 
 /** Category label map - matches the server enum. */
 const CATEGORY_LABELS = {
@@ -25,6 +26,12 @@ function safeArray(value) {
 function AddOnsSection({ propertyId }) {
   const [addOns, setAddOns] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Add-on names and blurbs are written by the host in the admin form, so they
+  // are data, not dictionary copy. Batched above the early return below: a hook
+  // cannot sit inside the map that renders them.
+  const names = useTranslatedList(addOns.map((addOn) => addOn.name ?? ''));
+  const blurbs = useTranslatedList(addOns.map((addOn) => addOn.description ?? ''));
 
   useEffect(() => {
     let cancelled = false;
@@ -52,18 +59,18 @@ function AddOnsSection({ propertyId }) {
         Enhance your stay
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
-        {addOns.map((addOn) => (
+        {addOns.map((addOn, index) => (
           <div
             key={addOn.id}
             className="flex flex-col rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_4px_16px_rgba(20,58,128,0.04)]"
           >
             <div className="flex items-start justify-between gap-3 mb-3">
-              <h3 className="font-semibold text-[#203565]">{addOn.name}</h3>
+              <h3 className="font-semibold text-[#203565]">{names[index] ?? addOn.name}</h3>
               <span className="shrink-0 rounded-full bg-[#FDE8D8] px-3 py-1 text-xs font-semibold text-[#9A4A1D]">
                 {CATEGORY_LABELS[addOn.category] || addOn.category}
               </span>
             </div>
-            <p className="flex-1 text-sm text-[#5B6B82]">{addOn.description}</p>
+            <p className="flex-1 text-sm text-[#5B6B82]">{blurbs[index] ?? addOn.description}</p>
             <p className="mt-4 font-bold text-[#203565]">
               KES {addOn.price != null ? addOn.price.toLocaleString() : '-'}
             </p>

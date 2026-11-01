@@ -6,6 +6,7 @@ import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMess
 import MessageComposer from '../components/MessageComposer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTranslatedLookup } from '../i18n/useTranslated.js';
 
 function formatMessageTime(iso) {
   if (!iso) return '';
@@ -30,6 +31,9 @@ function MessagesPage() {
   const [error, setError] = useState(null);
   const [sending, setSending] = useState(false);
   const threadRef = useRef(null);
+  // Message bodies are private: the server only translates them when that has
+  // been enabled on purpose. Otherwise they come back as written.
+  const translatedMessages = useTranslatedLookup(messages.map((message) => message.body ?? ''), { private: true });
 
   const scrollToBottom = useCallback(() => {
     const thread = threadRef.current;
@@ -122,7 +126,7 @@ function MessagesPage() {
     <div className="opg-message-thread !pt-6" ref={threadRef} aria-live="polite">
       {loading ? <div className="opg-message-loading" aria-label={t('messages.loadingSupport')}><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadThread}>{t('common.retry')}</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>{t('messages.howCanWeHelp')}</strong><p>{t('messages.howCanWeHelpHint')}</p></div> : messages.map((message) => {
         const mine = message.senderRole === 'USER';
-        return <GuestMessageBubble key={message.id} mine={mine} attachments={message.attachments} meta={`${mine ? t('messages.you') : t('messages.supportName')} · ${formatMessageTime(message.createdAt)}`}>{message.body}</GuestMessageBubble>;
+        return <GuestMessageBubble key={message.id} mine={mine} attachments={message.attachments} meta={`${mine ? t('messages.you') : t('messages.supportName')} · ${formatMessageTime(message.createdAt)}`}>{translatedMessages.get(message.body) ?? message.body}</GuestMessageBubble>;
       })}
       {error && messages.length > 0 && <p className="opg-message-inline-error">{error}</p>}
     </div>

@@ -4,6 +4,7 @@ import { BookOpen, ChevronRight } from 'lucide-react';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTranslatedList } from '../i18n/useTranslated.js';
 
 const guideImages = [
   '/images/place-sarit-centre.jpg',
@@ -26,6 +27,12 @@ function GuidesPage() {
       .catch(() => setPosts([]))
       .finally(() => setLoading(false));
   }, []);
+
+  // Post titles and standfirsts are written in the database, so they are read in
+  // the reader's language too. Both hooks sit above the list's .map, in the order
+  // the rows render, so a translation always lands on the post it came from.
+  const titles = useTranslatedList(posts.map((post) => post.title ?? ''));
+  const excerpts = useTranslatedList(posts.map((post) => post.excerpt ?? ''));
 
   if (loading) {
     return (
@@ -78,9 +85,9 @@ function GuidesPage() {
                     <p className="op-guide-date">
                       {new Date(post.createdAt).toLocaleDateString(lang === 'sw' ? 'sw-KE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
-                    <h2>{post.title}</h2>
+                    <h2>{titles[index]}</h2>
                     {post.excerpt && (
-                      <p>{post.excerpt}</p>
+                      <p>{excerpts[index]}</p>
                     )}
                     <span className="op-guide-link">
                       {t('discovery.guidesRead')}

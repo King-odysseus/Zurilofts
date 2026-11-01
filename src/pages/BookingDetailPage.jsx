@@ -10,6 +10,7 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
 import { generateInvoice } from '../utils/invoice.js';
+import { useTranslated } from '../i18n/useTranslated.js';
 import { canAddToCalendar, downloadStayCalendar, googleCalendarUrl } from '../utils/stayCalendar.js';
 
 /**
@@ -162,6 +163,11 @@ function BookingDetailPage() {
   // calendar of the person preparing the apartment as in the guest's.
   const calendarReady = canAddToCalendar(booking);
   const calendarLink = calendarReady ? googleCalendarUrl(booking) : null;
+  // The listing's own words came from the database, so they follow the reader's
+  // language like the rest of the page. The photo link's aria-label keeps the raw
+  // title: it names a control, it is not page copy.
+  const propertyTitle = useTranslated(property.title);
+  const propertyLocation = useTranslated(property.location);
 
   if (loading) {
     return (
@@ -202,7 +208,7 @@ function BookingDetailPage() {
     <GuestAccountLayout
       active="bookings"
       eyebrow={t('booking.reservation')}
-      title={property.title || t('booking.bookingDetails')}
+      title={propertyTitle || t('booking.bookingDetails')}
       description={t('booking.bookedOn', { date: formatDate(booking.createdAt) })}
       action={<Button as={Link} to="/bookings" className="w-fit max-md:mt-3.5" size="sm">{t('booking.allBookings')}</Button>}
     >
@@ -213,8 +219,8 @@ function BookingDetailPage() {
         <div className="opg-history-copy">
           <div className="opg-history-title-row">
             <div>
-              <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || t('booking.propertyUnavailable')}</Link></h2>
-              <p><MapPin size={13} aria-hidden="true" /> {property.location || 'Nairobi'}</p>
+              <h2><Link to={`/property/${property.id || booking.propertyId}`}>{propertyTitle || t('booking.propertyUnavailable')}</Link></h2>
+              <p><MapPin size={13} aria-hidden="true" /> {propertyLocation || 'Nairobi'}</p>
             </div>
             <span className={`${STATUS_PILL} ${status.className}`}>{status.label}</span>
           </div>

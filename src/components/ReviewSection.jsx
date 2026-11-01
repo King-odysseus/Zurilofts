@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { NotebookPen, Star } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTranslatedList } from '../i18n/useTranslated.js';
 
 function StarRating({ rating, size = 'sm' }) {
   const { t } = useLanguage();
@@ -21,6 +22,11 @@ function ReviewSection({ propertyId, onSummary }) {
   const [reviews, setReviews] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Guests write reviews in their own words, so the text goes through the hook
+  // rather than the dictionary. Batched here, above the early returns, because a
+  // hook cannot be called from inside the list it feeds.
+  const comments = useTranslatedList(reviews.map((review) => review.publicComment ?? ''));
 
   useEffect(() => {
     if (!propertyId) return;
@@ -132,7 +138,7 @@ function ReviewSection({ propertyId, onSummary }) {
 
       {/* Review cards */}
       <div className="space-y-4">
-        {reviews.map((review) => (
+        {reviews.map((review, index) => (
         <div key={review.id} className="rounded-2xl border border-[#E3E8EF] bg-elevated p-4 shadow-[0_8px_28px_rgba(20,58,128,0.08)] md:p-5">
             <div className="flex items-center justify-between mb-2">
               <div>
@@ -146,7 +152,7 @@ function ReviewSection({ propertyId, onSummary }) {
             </div>
             <StarRating rating={review.rating} />
             {review.publicComment && (
-              <p className="mt-2 text-sm leading-relaxed text-[#203565]">{review.publicComment}</p>
+              <p className="mt-2 text-sm leading-relaxed text-[#203565]">{comments[index] ?? review.publicComment}</p>
             )}
           </div>
         ))}

@@ -105,6 +105,22 @@ const envSchema = z.object({
   // has no email provider, so a host without push is not reached this way.
   HOST_NUDGE_AFTER_DAYS: z.string().default('2'),
   HOST_NUDGE_MAX: z.string().default('2'),
+  // Machine translation for the text a hand-written dictionary cannot hold: the
+  // words a host or guest types themselves (listing copy, reviews, add-ons) and
+  // any screen added after it was translated. 'none' leaves the app exactly as
+  // it is today - the endpoint answers with the original text and no request
+  // ever leaves the server. See services/translation.service.ts.
+  TRANSLATION_PROVIDER: z.enum(['none', 'google', 'azure', 'libretranslate']).default('none'),
+  TRANSLATION_API_KEY: z.string().optional(),
+  // Azure: the region of the multi-service resource, e.g. "westeurope".
+  TRANSLATION_REGION: z.string().optional(),
+  // LibreTranslate: the base URL of the instance to call.
+  TRANSLATION_ENDPOINT: z.string().url().optional(),
+  // Private message bodies are a different promise from public listing copy:
+  // translating them sends a guest's words to a third party. Off by default and
+  // only switched on by someone who has decided that, and said so in the
+  // privacy policy.
+  TRANSLATION_PRIVATE_CONTENT: z.string().default('false'),
 })
   .superRefine((data, ctx) => {
     // A rate outside 0..1 would pay a host a multiplied or negative amount.
@@ -222,6 +238,17 @@ const envSchema = z.object({
           '  VAPID keys are not configured (VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY). Push notifications are disabled until these are set.'
         );
       }
+    }
+    // A provider without a key is a silent no-op, which looks like a broken
+    // translation feature rather than a missing setting. Say so at boot, in
+    // every environment, instead of leaving it to be discovered in a browser.
+    const translationReady = data.TRANSLATION_PROVIDER === 'libretranslate'
+      ? Boolean(data.TRANSLATION_ENDPOINT || data.TRANSLATION_API_KEY)
+      : Boolean(data.TRANSLATION_API_KEY);
+    if (data.TRANSLATION_PROVIDER !== 'none' && !translationReady) {
+      console.warn(
+        `  TRANSLATION_PROVIDER is "${data.TRANSLATION_PROVIDER}" but TRANSLATION_API_KEY is unset. Text outside the dictionaries will stay in English.`
+      );
     }
   });
 

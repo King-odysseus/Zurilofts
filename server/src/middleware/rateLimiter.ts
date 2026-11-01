@@ -62,3 +62,22 @@ export const chatLimiter = rateLimit({
     error: 'Too many chat requests. Please slow down.',
   },
 });
+
+/**
+ * Rate limiter for the translation endpoint - 60 requests per minute per IP.
+ *
+ * Each request carries at most MAX_TEXTS_PER_REQUEST strings, and the browser
+ * batches whatever a page needs into a handful of calls, so this is generous
+ * for a real reader while keeping an unauthenticated route from being used as
+ * an open relay to a paid translation API.
+ */
+export const translateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many translation requests. Please slow down.',
+  },
+});

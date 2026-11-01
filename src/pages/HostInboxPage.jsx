@@ -17,6 +17,7 @@ import MessageComposer from '../components/MessageComposer.jsx';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTranslatedLookup } from '../i18n/useTranslated.js';
 import { CONVERSATIONS_READ_EVENT, getConversationParticipant } from '../utils/conversations.js';
 import { firstImage } from '../utils/images.js';
 
@@ -468,6 +469,8 @@ function Thread({
   // Below md the thread is a full page: the shell classes strip the card's
   // border, radius, shadow and surface (see THREAD_PAGE_SHELL) and restore them
   // from md up, where the list and reservation columns sit beside it.
+  // Private thread: see the note in MessagesPage.
+  const translatedMessages = useTranslatedLookup(messages.map((message) => message.content ?? ''), { private: true });
   return <HostCard flush className={`${THREAD_PAGE_SHELL} ${className || ''} ${PAGE_THREAD_HEIGHT} overflow-hidden`.trim()}>
     <header className="shrink-0 border-b border-border px-4 py-4">
       {/* One obvious way out on a phone: two columns squeezed into 360px would
@@ -527,7 +530,7 @@ function Thread({
                 <div className={`max-w-[min(82%,34rem)] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${mine ? 'bg-navy-bg text-white' : 'bg-surface text-navy'}`}>
                   {/* A bubble is drawn for its content: an attachment-only message
                       must not leave an empty line where the text would be. */}
-                  {message.content ? <p className="whitespace-pre-wrap break-words">{message.content}</p> : null}
+                  {message.content ? <p className="whitespace-pre-wrap break-words">{translatedMessages.get(message.content) ?? message.content}</p> : null}
                   <MessageAttachments
                     attachments={message.attachments}
                     mine={mine}

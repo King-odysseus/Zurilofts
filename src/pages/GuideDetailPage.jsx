@@ -2,8 +2,10 @@ import { useState, useEffect } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import Spinner from '../components/Spinner.jsx';
+import TranslatedHtml from '../components/TranslatedHtml.jsx';
 import apiClient from '../api/client.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTranslated } from '../i18n/useTranslated.js';
 
 const detailImages = [
   '/images/place-sarit-centre.jpg',
@@ -20,6 +22,8 @@ function GuideDetailPage() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  // Above the loading and not-found returns so the hook order never changes.
+  const title = useTranslated(post?.title ?? '');
 
   useEffect(() => {
     setLoading(true);
@@ -87,16 +91,13 @@ function GuideDetailPage() {
 
         <header className="op-guide-detail-header space-y-4">
           <span className="op-eyebrow">{t('discovery.guidesCityGuide')}</span>
-          <h1>{post.title}</h1>
+          <h1>{title}</h1>
           <p>
           {new Date(post.createdAt).toLocaleDateString(lang === 'sw' ? 'sw-KE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </header>
 
-        <div
-          className="op-guide-detail-content"
-          dangerouslySetInnerHTML={{ __html: post.body }}
-        />
+        <TranslatedHtml html={post.body} className="op-guide-detail-content" />
       </article>
     </main>
   );

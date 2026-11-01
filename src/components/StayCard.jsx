@@ -7,6 +7,7 @@ import { useFavorites } from '../context/FavoritesContext.jsx';
 import { firstImage, propertyImages } from '../utils/images.js';
 import { formatStayDates, freeCancellationUntil, nightsBetween } from '../utils/stayDates.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTranslated } from '../i18n/useTranslated.js';
 
 /**
  * The single guest property card, used everywhere a guest sees listings: the
@@ -36,7 +37,12 @@ function StayCard({ stay, checkIn, checkOut }) {
 
   const images = propertyImages(stay);
   const image = images[photoIndex] || firstImage(stay);
-  const location = stay.neighborhood || stay.location || 'Nairobi';
+  // The listing's own words: the host typed the name and the area, so both go
+  // through the hook. "Nairobi" stays outside it - it is the card's fallback
+  // place name, not something a host wrote.
+  const title = useTranslated(stay.title);
+  const area = useTranslated(stay.neighborhood || stay.location);
+  const location = area || 'Nairobi';
   const typeKey = TYPE_KEYS[String(stay.type || '').toLowerCase()];
   const typeLabel = typeKey ? t(typeKey) : null;
 
@@ -113,7 +119,7 @@ function StayCard({ stay, checkIn, checkOut }) {
         </span>}
       </div>
 
-      <p className="mt-1 truncate text-[13px] leading-snug text-muted">{stay.title}</p>
+      <p className="mt-1 truncate text-[13px] leading-snug text-muted">{title}</p>
       {facts.length > 0 && <p className="mt-1 truncate text-[13px] leading-snug text-muted">{facts.join(' · ')}</p>}
       {stayDates && <p className="mt-1 text-[13px] leading-snug text-muted">{stayDates}</p>}
 
