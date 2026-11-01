@@ -88,6 +88,10 @@ export default function AdminListingDetail() {
   const { id } = useParams();
   const [listing, setListing] = useState(null);
   const [host, setHost] = useState(null);
+  // Distinguishes "this listing has no owner" from "the owner lookup failed".
+  // Both used to render an empty card, which looked like a missing host.
+  const [hostFailed, setHostFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState('');
   const [activeImage, setActiveImage] = useState(0);
@@ -103,6 +107,7 @@ export default function AdminListingDetail() {
     // Reset the host too: navigating between listings would otherwise carry the
     // previous owner's card over to a listing that has no host at all.
     setHost(null);
+    setHostFailed(false);
     apiClient.get(`/admin/properties/${id}`)
       .then((response) => {
         if (cancelled) return null;
@@ -114,14 +119,14 @@ export default function AdminListingDetail() {
         if (!property?.hostId) return null;
         return apiClient.get(`/admin/users/${property.hostId}`)
           .then((hostResponse) => { if (!cancelled) setHost(hostResponse.data.data); })
-          .catch(() => { if (!cancelled) setHost(null); });
+          .catch(() => { if (!cancelled) { setHost(null); setHostFailed(true); } });
       })
       .catch((cause) => {
         if (!cancelled) setLoadError(cause.response?.data?.error || 'This listing could not be loaded.');
       })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, reloadKey]);
 
   async function review(action) {
     if (!listing) return;
@@ -216,7 +221,6 @@ export default function AdminListingDetail() {
           <ArrowLeft className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
           Listing approvals
         </Link>
-        <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · LISTING</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{listing.title || 'Untitled listing'}</h1>
         <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1">
           <StatusBadge status={listing.status} />
@@ -391,9 +395,16 @@ export default function AdminListingDetail() {
                 <p className="mt-5 text-xs text-muted">Member since {formatDate(host.createdAt)}</p>
               </>
             ) : (
-              <p className="mt-4 text-sm text-muted">
-                {listing.hostId ? 'The host account could not be loaded.' : 'No host assigned'}
-              </p>
+              <div className="mt-4">
+                <p className="text-sm text-muted">
+                  {listing.hostId ? 'The host account could not be loaded.' : 'No host assigned'}
+                </p>
+                {hostFailed && listing.hostId && (
+                  <Button size="xs" color="light" className="mt-3" type="button" onClick={() => setReloadKey((key) => key + 1)}>
+                    Try again
+                  </Button>
+                )}
+              </div>
             )}
           </section>
         </aside>

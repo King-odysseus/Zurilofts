@@ -2,45 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Review Paystack, payout and fee configuration",
+      "text": "Inspect git status, branch and remote to see what is actually changed",
       "state": "done"
     },
     {
-      "text": "Guest pays the Paystack collection fee, grossed up and stored on the booking",
+      "text": "Separate real source changes from scratch/tooling files and confirm project identity",
       "state": "done"
     },
     {
-      "text": "Lock add-ons once a booking is paid and record add-on money on the booking",
-      "state": "done"
+      "text": "Re-run lint and build to confirm the tree that will be committed is green",
+      "state": "active"
     },
     {
-      "text": "Reserve Paystack's transfer fee in the payout balance check",
-      "state": "done"
+      "text": "Stage only the relevant files, commit with a message describing the change",
+      "state": "pending"
     },
     {
-      "text": "Report add-on and gateway fee money in the revenue report",
-      "state": "done"
-    },
-    {
-      "text": "Add gateway fee tests; server suite, lint and build pass",
-      "state": "done"
-    },
-    {
-      "text": "Re-run the server tests and the frontend build to confirm the committed state",
-      "state": "done"
-    },
-    {
-      "text": "Stage the twelve files, the migration and the new test",
-      "state": "done"
-    },
-    {
-      "text": "Commit as one focused change and push to origin/main",
-      "state": "done"
-    },
-    {
-      "text": "Record the pushed change in the project plan",
-      "state": "done"
+      "text": "Push to the remote and report the commit hash",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-10-31T20:44:23.247Z"
+  "updatedAt": "2026-11-01T07:58:33.578Z"
 }

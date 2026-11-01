@@ -1,16 +1,24 @@
-import { Navigate } from 'react-router-dom';
+import { Link, Navigate } from 'react-router-dom';
 import { TriangleAlert } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 
+/**
+ * Guards every /admin route.
+ *
+ * Both fallback screens used a hard-coded white background, so they flashed
+ * bright white inside an otherwise dark shell. They now use the same design
+ * tokens as the rest of the app, and denied access offers a way back into the
+ * product instead of dead-ending a signed-in user.
+ */
 function AdminRoute({ children }) {
   const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-[#C5A28C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[#5B6B82] text-sm">Loading...</p>
+      <div className="flex min-h-screen items-center justify-center bg-canvas">
+        <div className="text-center" role="status" aria-label="Checking your access">
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary" />
+          <p className="text-sm text-muted">Loading...</p>
         </div>
       </div>
     );
@@ -24,13 +32,21 @@ function AdminRoute({ children }) {
   // /host/* and must never reach /admin/*.
   if (user?.role !== 'ADMIN') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <TriangleAlert className="w-10 h-10 text-red-500" strokeWidth={2} aria-hidden="true" />
+      <div className="flex min-h-screen items-center justify-center bg-canvas px-4">
+        <div className="max-w-md text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#FEF3F2] text-[#B42318] dark:bg-[#B42318]/20">
+            <TriangleAlert className="h-8 w-8" strokeWidth={2} aria-hidden="true" />
           </div>
-          <h2 className="text-xl font-bold text-[#203565] mb-2">Access Denied</h2>
-          <p className="text-[#5B6B82]">You don&apos;t have permission to view this page.</p>
+          <h2 className="mb-2 text-xl font-bold text-navy">Access denied</h2>
+          <p className="mb-5 text-sm text-muted">
+            You do not have permission to view the admin workspace. Your account is signed in.
+          </p>
+          <Link
+            to="/"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-primary px-6 text-sm font-semibold text-white transition-colors hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+          >
+            Back to ZuriLofts
+          </Link>
         </div>
       </div>
     );

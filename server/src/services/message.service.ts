@@ -111,6 +111,24 @@ export async function getAdminThread(userId: string) {
   return messages.map(withParsedAttachments);
 }
 
+/**
+ * Explicit "the admin has read this customer's thread" marker.
+ *
+ * getAdminThread() already clears the flag, but only as a side effect of a
+ * fetch: if that response never reaches the browser the messages stay unread
+ * while the inbox looks clean, and nothing can be retried. This gives the client
+ * an intentional, idempotent call it can await before it hides the badge, and
+ * returns how many messages it actually cleared so a caller can tell a real
+ * change from a no-op.
+ */
+export async function markThreadReadByAdmin(userId: string) {
+  const { count } = await prisma.message.updateMany({
+    where: { userId, readByAdmin: false },
+    data: { readByAdmin: true },
+  });
+  return count;
+}
+
 export async function sendAdminMessage(userId: string, rawBody: unknown, rawAttachments: unknown) {
   const attachments = normalizeAttachments(rawAttachments);
   const body = readBody(rawBody);

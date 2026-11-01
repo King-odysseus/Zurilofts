@@ -74,7 +74,7 @@ export default function TrustPage() {
   const paymentLink = nextPaymentBooking ? `/bookings/${nextPaymentBooking.id}` : '/trips';
   const initials = `${user?.firstName?.[0] || user?.name?.[0] || 'G'}${user?.lastName?.[0] || ''}`.toUpperCase();
 
-  return <div className="op-trust-page" data-openpencil-frame="0:9724">
+  return <div className="op-trust-page">
     <main className="op-trust-wrap">
       <div className="op-trust-back"><RouteBackButton /></div>
 

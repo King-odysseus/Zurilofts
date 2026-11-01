@@ -78,6 +78,7 @@ function AdminGovernance() {
   const [query, setQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
   const [page, setPage] = useState(1);
+  const [truncated, setTruncated] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   const load = useCallback(async (silent = false) => {
@@ -95,6 +96,10 @@ function AdminGovernance() {
       setApplications(responses[1].data.data || []);
       setVerifications(responses[2].data.data || []);
       setDisputes(responses[3].data.data || []);
+      // Each list is fetched at most 100 rows deep. If a source reports more
+      // than that, older records are simply absent from this page, and saying
+      // so is better than presenting a partial trail as complete.
+      setTruncated(responses.some((response) => (response.data?.pagination?.total ?? 0) > 100));
     } catch (cause) {
       setError(cause.response?.data?.error || 'Governance records could not be loaded.');
     } finally {
@@ -181,10 +186,9 @@ function AdminGovernance() {
   };
 
   return (
-    <div className="space-y-8" data-openpencil-frame="0:7458">
+    <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · GOVERNANCE</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Governance and audit</h1>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Admin access, recorded reviews and operational history across the platform.</p>
         </div>
@@ -196,6 +200,14 @@ function AdminGovernance() {
 
       {error && <Alert color="failure" role="alert">{error}</Alert>}
 
+      {truncated && (
+        <p className="rounded-lg border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs leading-relaxed text-[#B54708] dark:border-[#B54708]/40 dark:bg-[#B54708]/15 dark:text-[#FEDF89]" role="note">
+          This timeline merges the most recent 100 records from each source (accounts, applications,
+          identity checks, disputes). Older activity is not shown. A complete trail needs a server-side
+          audit log, which does not exist yet.
+        </p>
+      )}
+
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <article className={METRIC_CARD}>
           <span className={METRIC_LABEL}>ADMIN USERS</span>
@@ -205,7 +217,7 @@ function AdminGovernance() {
         <article className={METRIC_CARD}>
           <span className={METRIC_LABEL}>RECORDED ACTIVITY</span>
           <strong className={METRIC_VALUE}>{events.length}</strong>
-          <small className={METRIC_NOTE}>Available audit records</small>
+          <small className={METRIC_NOTE}>Audit records on this page</small>
         </article>
         <article className={METRIC_CARD}>
           <span className={METRIC_LABEL}>OPEN CASES</span>

@@ -10,7 +10,6 @@ import { useAuth } from '../context/AuthContext.jsx';
 // fields an administrator never touches, and leaving /admin to correct a name
 // reads as the wrong section. Same endpoints back both, so no server work.
 
-const EYEBROW = 'text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600';
 const CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
 const CHIP_ICON = 'grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary-50 dark:bg-primary/15 text-primary-600';
 
@@ -228,7 +227,6 @@ export default function AdminSettings() {
     return (
       <div className="space-y-8">
         <div>
-          <p className={EYEBROW}>ZURILOFTS · ADMIN · ACCOUNT</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Account settings</h1>
         </div>
         <section className={`${CARD} text-center`}>
@@ -251,7 +249,6 @@ export default function AdminSettings() {
   return (
     <div className="space-y-8">
       <div>
-        <p className={EYEBROW}>ZURILOFTS · ADMIN · ACCOUNT</p>
         <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Account settings</h1>
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
           Your own administrator account: the name and photo on admin actions, and the password that protects them.

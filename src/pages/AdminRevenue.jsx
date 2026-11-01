@@ -154,6 +154,9 @@ function AdminRevenue() {
   // The applied range drives the request; the draft range only mirrors the inputs.
   const [range, setRange] = useState({ from: '', to: '' });
   const [draft, setDraft] = useState({ from: '', to: '' });
+  // When this report was pulled. A revenue figure without a timestamp is
+  // impossible to reconcile against a bank statement later.
+  const [loadedAt, setLoadedAt] = useState(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -166,6 +169,7 @@ function AdminRevenue() {
         },
       });
       setReport(response.data.data || null);
+      setLoadedAt(new Date());
     } catch (requestError) {
       setError(requestError.response?.data?.error || 'Revenue could not be loaded.');
       setReport(null);
@@ -201,11 +205,41 @@ function AdminRevenue() {
   const recent = Array.isArray(report?.recent) ? report.recent : [];
   const hasRange = Boolean(range.from || range.to);
 
+  /**
+   * Download the recent bookings as CSV.
+   *
+   * The report is an aggregate; an accountant needs the rows behind it. Values
+   * are quoted and any embedded quote doubled, so a property title containing a
+   * comma or a quote cannot break the file.
+   */
+  function exportCsv() {
+    const header = ['Booking', 'Property', 'Host', 'Paid at', 'Gross paid', 'Host net', 'Withholding tax', 'Commission', 'Platform revenue'];
+    const escape = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
+    const rows = recent.map((row) => [
+      row.id,
+      row.propertyTitle,
+      row.hostName,
+      row.paidAt ? new Date(row.paidAt).toISOString() : '',
+      row.grossPaid,
+      row.hostNet,
+      row.withholdingTax,
+      row.commission,
+      row.platformRevenue,
+    ].map(escape).join(','));
+    // A BOM keeps Excel from mangling non-ASCII names in the file.
+    const csv = '\uFEFF' + [header.map(escape).join(','), ...rows].join('\r\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `zurilofts-revenue-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
   return (
-    <div className="space-y-8" data-openpencil-frame="0:7343">
+    <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS / ADMIN / PLATFORM</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Revenue</h1>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
             What ZuriLofts itself kept from paid stays, before Paystack and card fees are deducted. Host money the
@@ -236,8 +270,16 @@ function AdminRevenue() {
           </div>
           <Button type="submit" size="sm" disabled={loading}>Apply</Button>
           {hasRange && <Button type="button" size="sm" color="light" onClick={clearRange} disabled={loading}>Clear</Button>}
+          <Button type="button" size="sm" color="light" onClick={exportCsv} disabled={recent.length === 0}>Export CSV</Button>
         </form>
       </div>
+
+      {loadedAt && !loading && (
+        <p className="text-xs text-muted">
+          Figures as of {new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(loadedAt)}
+          {hasRange ? ` for ${range.from || 'the start'} to ${range.to || 'today'}` : ' across all paid stays'}.
+        </p>
+      )}
 
       {loading ? (
         <section className={PANEL}>
@@ -262,22 +304,22 @@ function AdminRevenue() {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             <MetricCard
-              label="PLATFORM REVENUE"
+              label="Platform revenue"
               value={money(totals.platformRevenue)}
               note={`Platform share of ${bookingsLabel(totals.bookings)}`}
             />
             <MetricCard
-              label="GUEST PAYMENTS COLLECTED"
+              label="Guest payments collected"
               value={money(totals.grossPaid)}
               note="Charged to guests, before gateway fees"
             />
             <MetricCard
-              label="PAID TO HOSTS"
+              label="Paid to hosts"
               value={money(totals.hostNet)}
               note={`Net of ${money(totals.withholdingTax)} withholding tax`}
             />
             <MetricCard
-              label="HELD FOR HOSTS"
+              label="Held for hosts"
               value={money(held.amount)}
               note={`${bookingsLabel(held.bookings)} awaiting release, not date filtered`}
             />

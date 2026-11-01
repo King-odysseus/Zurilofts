@@ -53,6 +53,15 @@ export async function adminThread(req: Request, res: Response, next: NextFunctio
   }
 }
 
+export async function adminMarkThreadRead(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const updated = await messageService.markThreadReadByAdmin(req.params.userId);
+    res.json({ success: true, data: { updated } });
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function adminReply(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const data = await messageService.sendAdminMessage(

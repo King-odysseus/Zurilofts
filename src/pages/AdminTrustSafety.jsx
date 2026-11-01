@@ -79,6 +79,7 @@ function AdminTrustSafety() {
   const [disputeNote, setDisputeNote] = useState('');
   const [resolutionNote, setResolutionNote] = useState('');
   const [busy, setBusy] = useState('');
+  const [truncated, setTruncated] = useState({ verifications: false, disputes: false });
 
   const load = useCallback(async (silent = false) => {
     if (silent) setRefreshing(true);
@@ -91,6 +92,13 @@ function AdminTrustSafety() {
       ]);
       setVerifications(verificationResponse.data.data || []);
       setDisputes(disputeResponse.data.data || []);
+      // Both queues are fetched one page deep. If the platform holds more than
+      // that, older cases are absent from this screen, and the page says so
+      // rather than looking like an empty queue.
+      setTruncated({
+        verifications: (verificationResponse.data?.pagination?.total ?? 0) > 100,
+        disputes: (disputeResponse.data?.pagination?.total ?? 0) > 100,
+      });
     } catch (cause) {
       setError(cause.response?.data?.error || 'The trust and safety queues could not be loaded.');
     } finally {
@@ -240,10 +248,9 @@ function AdminTrustSafety() {
   }
 
   return (
-    <div className="space-y-8" data-openpencil-frame="0:7228">
+    <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · TRUST</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Verification and disputes</h1>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Identity checks, document review and guest or host dispute resolution.</p>
         </div>
@@ -254,6 +261,17 @@ function AdminTrustSafety() {
       </div>
 
       {error && <Alert color="failure" role="alert">{error}</Alert>}
+
+      {(truncated.verifications || truncated.disputes) && (
+        <p className="rounded-lg border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs leading-relaxed text-[#B54708] dark:border-[#B54708]/40 dark:bg-[#B54708]/15 dark:text-[#FEDF89]" role="note">
+          {truncated.verifications && truncated.disputes
+            ? 'Both queues hold more than 100 records, so older identity checks and disputes are not listed here.'
+            : truncated.verifications
+              ? 'There are more than 100 identity checks, so older ones are not listed here.'
+              : 'There are more than 100 disputes, so older ones are not listed here.'}
+          {' '}Resolve the open cases below to bring the rest into view.
+        </p>
+      )}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
         <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm" aria-labelledby="verification-queue-title">

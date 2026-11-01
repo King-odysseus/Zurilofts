@@ -21,6 +21,7 @@ import {
 import { FileText, Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
+import AdminPagination from '../components/admin/AdminPagination.jsx';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All applications' },
@@ -41,6 +42,11 @@ const STATUS_META = {
 
 // Status tones are semantic; the Badge palette names them differently.
 const BADGE_COLORS = { neutral: 'gray', pending: 'warning', warning: 'warning', success: 'success', danger: 'failure' };
+
+// Server page size for the queue. The endpoint caps at 100; asking explicitly
+// keeps every page reachable through the controls instead of silently
+// truncating the list at one fetch.
+const PAGE_SIZE = 20;
 
 const DOCUMENT_LABELS = {
   IDENTITY_FRONT: 'Identity - front/details',
@@ -88,39 +94,39 @@ function AdminHostApplications() {
   const [busy, setBusy] = useState('');
   const [message, setMessage] = useState('');
   const [messageTone, setMessageTone] = useState('success');
+  // Paging state. Without it the queue fetched 100 rows once and older
+  // applications simply vanished from view as new ones arrived.
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 });
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
   const load = useCallback(async () => {
     setLoading(true);
     setMessage('');
     try {
       const response = await apiClient.get('/admin/host-applications', {
-        params: { ...(status ? { status } : {}), limit: 100 },
+        params: { ...(status ? { status } : {}), ...(debouncedSearch ? { search: debouncedSearch } : {}), page, limit: PAGE_SIZE },
       });
       setApplications(response.data.data || []);
+      setPagination(response.data.pagination || { page, limit: PAGE_SIZE, total: response.data.data?.length || 0, totalPages: 1 });
     } catch (error) {
       setMessage(error.response?.data?.error || 'Could not load host applications.');
       setMessageTone('error');
     } finally {
       setLoading(false);
     }
-  }, [status]);
+  }, [status, page, debouncedSearch]);
+
+  // The endpoint supports a server-side search, so the term must not filter the
+  // loaded page in the browser: that would hide matches on every other page.
+  useEffect(() => {
+    const timer = setTimeout(() => { setDebouncedSearch(search.trim()); setPage(1); }, 300);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   useEffect(() => { load(); }, [load]);
 
-  const visibleApplications = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) return applications;
-    return applications.filter((application) => [
-      application.legalName,
-      application.businessName,
-      application.contactEmail,
-      application.contactPhone,
-      application.city,
-      application.user?.firstName,
-      application.user?.lastName,
-      application.user?.email,
-    ].filter(Boolean).join(' ').toLowerCase().includes(query));
-  }, [applications, search]);
+  const visibleApplications = useMemo(() => applications, [applications]);
 
   const viewTotals = useMemo(() => {
     const documents = visibleApplications.reduce((total, application) => total + (application.documents?.length || 0), 0);
@@ -198,10 +204,9 @@ function AdminHostApplications() {
   }
 
   return (
-    <div className="space-y-8" data-openpencil-frame="0:7228">
+    <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · VERIFICATION</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Host applications</h1>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Verify identity, authority, and hosting details before granting workspace access.</p>
         </div>
@@ -209,24 +214,24 @@ function AdminHostApplications() {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">APPLICATIONS IN VIEW</span>
-          <strong className="mt-2 block text-2xl font-bold text-navy">{visibleApplications.length}</strong>
-          <small className="mt-1 block text-xs text-muted">Matching the current review filter</small>
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">MATCHING APPLICATIONS</span>
+          <strong className="mt-2 block text-2xl font-bold text-navy">{pagination.total}</strong>
+          <small className="mt-1 block text-xs text-muted">Across all pages, under the current filters</small>
         </article>
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">ENCRYPTED FILES</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.documents}</strong>
-          <small className="mt-1 block text-xs text-muted">Documents available to review</small>
+          <small className="mt-1 block text-xs text-muted">Documents on this page</small>
         </article>
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">LOCATIONS</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.locations}</strong>
-          <small className="mt-1 block text-xs text-muted">Distinct primary areas</small>
+          <small className="mt-1 block text-xs text-muted">Distinct primary areas on this page</small>
         </article>
         <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">LAST UPDATE</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{formatDate(viewTotals.latest)}</strong>
-          <small className="mt-1 block text-xs text-muted">Most recent application activity</small>
+          <small className="mt-1 block text-xs text-muted">Most recent activity on this page</small>
         </article>
       </div>
 
@@ -246,7 +251,7 @@ function AdminHostApplications() {
           <SelectMenu
             ariaLabel="Filter host applications by status"
             value={status}
-            onChange={(next) => setStatus(next)}
+            onChange={(next) => { setStatus(next); setPage(1); }}
             wrapperClassName="sm:w-56"
             options={STATUS_OPTIONS}
           />
@@ -326,6 +331,19 @@ function AdminHostApplications() {
                 })}
               </TableBody>
             </Table>
+          </div>
+        )}
+
+        {!loading && visibleApplications.length > 0 && (
+          <div className="border-t border-border px-5 py-3">
+            <AdminPagination
+              page={pagination.page}
+              limit={pagination.limit}
+              total={pagination.total}
+              totalPages={pagination.totalPages}
+              noun="application"
+              onChange={setPage}
+            />
           </div>
         )}
       </section>

@@ -86,11 +86,29 @@ function AdminMessages() {
     setThread([]);
     setError('');
 
+    // The badge may only disappear once the server agrees it is gone. A local
+    // zero on its own is what the 30-second poll used to undo, so the read is
+    // recorded first and the count is cleared after it succeeds. A failed
+    // mark-read is logged and leaves the count visible, because rendering it as
+    // read while the server still holds it unread is the exact bug being fixed.
+    const markThreadRead = async () => {
+      try {
+        await apiClient.patch(`/admin/messages/${activeUserId}/read`);
+        if (!active) return;
+        setConversations((current) => current.map((entry) => entry.userId === activeUserId ? { ...entry, unread: 0 } : entry));
+        // Re-read the inbox so the page's unread totals come from the server
+        // rather than from the optimistic zero above.
+        await loadConversations({ quiet: true });
+      } catch (requestError) {
+        console.error('Could not mark the conversation as read:', requestError);
+      }
+    };
+
     apiClient.get(`/admin/messages/${activeUserId}`)
       .then((response) => {
         if (!active) return;
         setThread(response.data.data || []);
-        setConversations((current) => current.map((entry) => entry.userId === activeUserId ? { ...entry, unread: 0 } : entry));
+        markThreadRead();
       })
       .catch((requestError) => {
         if (!active) return;
@@ -103,7 +121,7 @@ function AdminMessages() {
     return () => {
       active = false;
     };
-  }, [activeUserId]);
+  }, [activeUserId, loadConversations]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -158,10 +176,9 @@ function AdminMessages() {
   // heading, metrics and section are dropped while it is open on a phone and
   // restored from lg up, where the card layout returns.
   return (
-    <div className={activeUserId ? 'space-y-0 lg:space-y-8' : 'space-y-8'} data-openpencil-frame="0:7458">
+    <div className={activeUserId ? 'space-y-0 lg:space-y-8' : 'space-y-8'}>
       <div className={`flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between ${activeUserId ? 'hidden lg:flex' : ''}`}>
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS / ADMIN / OPERATIONS</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Messages</h1>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Review guest conversations, keep support replies moving, and track unread demand.</p>
         </div>

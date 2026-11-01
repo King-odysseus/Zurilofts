@@ -306,7 +306,7 @@ export function buildPropertySearchWhere(search?: string) {
   };
 }
 
-type PropertySort = 'recommended' | 'price_asc' | 'price_desc' | 'rating' | 'newest';
+type PropertySort = 'recommended' | 'price_asc' | 'price_desc' | 'rating' | 'newest' | 'oldest';
 
 /** Maps the public ?sort= value to a Prisma orderBy; unknown values fall back to the default ranking. */
 export function buildPropertyOrderBy(sort?: string) {
@@ -315,6 +315,9 @@ export function buildPropertyOrderBy(sort?: string) {
     case 'price_desc': return [{ price: 'desc' as const }, { createdAt: 'desc' as const }];
     case 'rating': return [{ rating: 'desc' as const }, { reviews: 'desc' as const }];
     case 'newest': return [{ createdAt: 'desc' as const }];
+    // Oldest first is what a moderation queue wants: the longest-waiting
+    // submission is the one a guest or host is blocked on.
+    case 'oldest': return [{ createdAt: 'asc' as const }];
     default: return [{ featured: 'desc' as const }, { createdAt: 'desc' as const }];
   }
 }

@@ -10,6 +10,10 @@ import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
+import AdminPageHeader from '../components/admin/AdminPageHeader.jsx';
+import AdminPagination from '../components/admin/AdminPagination.jsx';
+import ConfirmDialog from '../components/admin/ConfirmDialog.jsx';
+import MetricCard from '../components/admin/MetricCard.jsx';
 
 const ROLE_LABELS = {
   USER: 'Guest',
@@ -43,6 +47,10 @@ const PAYOUT_FREQUENCY_OPTIONS = [
   { value: 'monthly', label: 'Monthly' },
 ];
 
+// Server-side page size. The API caps a request at 100 and defaults to 20, so
+// the screen asks for an explicit size instead of silently taking the default.
+const PAGE_SIZE = 20;
+
 function userInitials(user) {
   const initials = `${user?.firstName?.[0] || ''}${user?.lastName?.[0] || ''}`.trim();
   return initials ? initials.toUpperCase() : 'ZL';
@@ -56,9 +64,20 @@ function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState('');
   const [search, setSearch] = useState(() => new URLSearchParams(window.location.search).get('search') || '');
   const [message, setMessage] = useState('');
+  // Success and failure used to share one string and be told apart by looking
+  // for the word "fail", which mislabelled any server message containing it.
+  const [messageTone, setMessageTone] = useState('success');
   const [loadError, setLoadError] = useState('');
   const [busyId, setBusyId] = useState('');
   const [selectedIds, setSelectedIds] = useState([]);
+  // The page on screen, and the server's own pagination block. Without the
+  // latter the screen could not tell that more accounts existed.
+  const [page, setPage] = useState(1);
+  const [pagination, setPagination] = useState({ page: 1, limit: PAGE_SIZE, total: 0, totalPages: 0 });
+  // Destructive actions open a styled dialog instead of the browser confirm.
+  const [bulkTarget, setBulkTarget] = useState(null); // { suspended: boolean }
+  const [suspendTarget, setSuspendTarget] = useState(null); // the user object
+  const [actionError, setActionError] = useState('');
 
   // Edit modal
   const [editing, setEditing] = useState(null); // the user being edited
@@ -72,24 +91,33 @@ function AdminUsers() {
   const [deleteReason, setDeleteReason] = useState('');
   const [deleteError, setDeleteError] = useState('');
 
-  const loadUsers = useCallback(async () => {
+  const loadUsers = useCallback(async (pageToLoad = page) => {
     setLoading(true);
     try {
-      const params = {};
+      const params = { page: pageToLoad, limit: PAGE_SIZE };
       if (roleFilter) params.role = roleFilter;
       if (search.trim()) params.search = search.trim();
       const res = await apiClient.get('/admin/users', { params });
       setUsers(res.data.data || []);
+      // Keep the server's block. The screen used to discard it, which is why
+      // only the first page of accounts was ever reachable.
+      setPagination(res.data.pagination || {
+        page: pageToLoad,
+        limit: PAGE_SIZE,
+        total: res.data.data?.length || 0,
+        totalPages: 1,
+      });
       setLoadError('');
     } catch (err) {
       // Must not be silent: an empty list and a failed request look identical
       // on screen, so a server outage would read as "you have no users".
       setUsers([]);
+      setPagination({ page: pageToLoad, limit: PAGE_SIZE, total: 0, totalPages: 0 });
       setLoadError(err.response?.data?.error || 'Could not load accounts. Check your connection and try again.');
     } finally {
       setLoading(false);
     }
-  }, [roleFilter, search]);
+  }, [roleFilter, search, page]);
 
   // The header search links here as ?search=<email>, which can arrive while this
   // page is already mounted. useState reads the URL only once, so without this
@@ -97,13 +125,17 @@ function AdminUsers() {
   useEffect(() => {
     const fromUrl = new URLSearchParams(location.search).get('search') || '';
     setSearch((current) => (current === fromUrl ? current : fromUrl));
+    // A new term means page 1 of a new result set, and rows selected under the
+    // old term are no longer on screen to act on.
+    setPage(1);
+    setSelectedIds([]);
   }, [location.search]);
 
-  // Debounce search; refetch on role change
+  // Debounce search; refetch when the term, the role filter or the page changes.
   useEffect(() => {
-    const t = setTimeout(loadUsers, search ? 350 : 0);
+    const t = setTimeout(() => loadUsers(page), search ? 350 : 0);
     return () => clearTimeout(t);
-  }, [loadUsers, search]);
+  }, [loadUsers, search, page]);
 
   // Admins and your own account are never bulk-selectable, so a bulk suspend cannot lock the console.
   const selectableUsers = users.filter((u) => u.role !== 'ADMIN' && u.id !== currentUser?.id);
@@ -112,15 +144,19 @@ function AdminUsers() {
     setSelectedIds((current) => (current.includes(id) ? current.filter((x) => x !== id) : [...current, id]));
   }
 
-  async function bulkSetSuspended(suspended) {
-    if (!selectedIds.length) return;
-    if (!window.confirm(`${suspended ? 'Suspend' : 'Reactivate'} ${selectedIds.length} account(s)?`)) return;
+  async function runBulkSetSuspended() {
+    if (!selectedIds.length || !bulkTarget) return;
+    const { suspended } = bulkTarget;
     setBusyId('bulk');
-    setMessage('');
+    setActionError('');
     const results = await Promise.allSettled(selectedIds.map((id) => apiClient.patch(`/admin/users/${id}/suspend`, { suspended })));
     const failed = results.filter((result) => result.status === 'rejected').length;
-    setMessage(failed ? `Failed to update ${failed} of ${results.length} accounts` : `${results.length} accounts ${suspended ? 'suspended' : 'reactivated'}`);
+    setMessage(failed
+      ? `Failed to update ${failed} of ${results.length} accounts`
+      : `${results.length} accounts ${suspended ? 'suspended' : 'reactivated'}`);
+    setMessageTone(failed ? 'failure' : 'success');
     setSelectedIds([]);
+    setBulkTarget(null);
     setBusyId('');
     loadUsers();
   }
@@ -174,27 +210,32 @@ function AdminUsers() {
     try {
       await apiClient.patch(`/admin/users/${u.id}/role`, { role });
       setMessage(`${u.firstName} ${u.lastName} is now ${role}`);
+      setMessageTone('success');
       loadUsers();
     } catch (err) {
       setMessage(err.response?.data?.error || 'Failed to change role');
+      setMessageTone('failure');
     } finally {
       setBusyId('');
     }
   }
 
-  async function toggleSuspend(u) {
+  // The dialog drives the request; a row action only opens it.
+  async function runToggleSuspend() {
+    const u = suspendTarget;
+    if (!u) return;
     const next = !u.suspended;
-    if (!window.confirm(next
-      ? `Suspend ${u.firstName} ${u.lastName}? They will be unable to log in and their listings will be hidden.`
-      : `Reactivate ${u.firstName} ${u.lastName}?`)) return;
     setBusyId(u.id);
-    setMessage('');
+    setActionError('');
     try {
       await apiClient.patch(`/admin/users/${u.id}/suspend`, { suspended: next });
       setMessage(`${u.firstName} ${u.lastName} ${next ? 'suspended' : 'reactivated'}`);
+      setMessageTone('success');
+      setSuspendTarget(null);
       loadUsers();
     } catch (err) {
-      setMessage(err.response?.data?.error || 'Failed to update status');
+      // Kept inside the dialog so the reason sits next to the action that failed.
+      setActionError(err.response?.data?.error || 'Failed to update status');
     } finally {
       setBusyId('');
     }
@@ -225,6 +266,7 @@ function AdminUsers() {
         data: { confirm: 'DELETE', reason: deleteReason.trim() },
       });
       setMessage(res.data.data?.message || 'The account was deleted.');
+      setMessageTone('success');
       setDeleteTarget(null);
       setDeleteConfirm('');
       setDeleteReason('');
@@ -244,20 +286,28 @@ function AdminUsers() {
   };
 
   return (
-    <div className="space-y-8" data-openpencil-frame="0:7228">
-      <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · PEOPLE</p>
-          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Users &amp; hosts</h1>
-          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Manage guest accounts, host access, payout details, and account safety.</p>
-        </div>
-      </div>
+    <div className="space-y-8">
+      {/* The shell already names the section, so the page prints one title and
+          drops the uppercase eyebrow that used to repeat it. */}
+      <AdminPageHeader
+        title="Users & hosts"
+        description="Manage guest accounts, host access, payout details, and account safety."
+      />
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PEOPLE IN VIEW</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.total}</strong><small className="mt-1 block text-xs text-muted">Matching the current filters</small></article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">GUESTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.guests}</strong><small className="mt-1 block text-xs text-muted">Travelling accounts</small></article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">HOSTS</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.hosts}</strong><small className="mt-1 block text-xs text-muted">Workspace access</small></article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm"><span className="text-[11px] font-semibold uppercase tracking-wide text-muted">SUSPENDED</span><strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.suspended}</strong><small className="mt-1 block text-xs text-muted">Accounts currently restricted</small></article>
+        <MetricCard
+          label="Matching accounts"
+          value={pagination.total}
+          note={roleFilter || search.trim() ? 'Across all pages, after filters' : 'Every account on the platform'}
+        />
+        <MetricCard label="Guests on this page" value={viewTotals.guests} note="Travelling accounts" />
+        <MetricCard label="Hosts on this page" value={viewTotals.hosts} note="Workspace access" />
+        <MetricCard
+          label="Suspended on this page"
+          value={viewTotals.suspended}
+          note="Accounts currently restricted"
+          tone={viewTotals.suspended > 0 ? 'warning' : 'default'}
+        />
       </div>
 
       <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
@@ -267,7 +317,7 @@ function AdminUsers() {
             <TextInput
               type="search"
               value={search}
-              onChange={(event) => setSearch(event.target.value)}
+              onChange={(event) => { setSearch(event.target.value); setPage(1); setSelectedIds([]); }}
               placeholder="Search name or email"
               aria-label="Search users by name or email"
               className="pl-9"
@@ -276,14 +326,14 @@ function AdminUsers() {
           <SelectMenu
             ariaLabel="Filter by role"
             value={roleFilter}
-            onChange={(next) => setRoleFilter(next)}
+            onChange={(next) => { setRoleFilter(next); setPage(1); setSelectedIds([]); }}
             wrapperClassName="sm:w-44"
             options={ROLE_FILTER_OPTIONS}
           />
         </div>
 
         {message && (
-          <Alert color={message.toLowerCase().includes('fail') ? 'failure' : 'success'} className="mx-5 mt-5" role="status">
+          <Alert color={messageTone} className="mx-5 mt-5" role="status">
             {message}
           </Alert>
         )}
@@ -291,8 +341,8 @@ function AdminUsers() {
         {selectedIds.length > 0 && (
           <div className="mx-5 mt-5 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface px-4 py-3" role="toolbar" aria-label="Bulk actions">
             <strong className="mr-auto text-sm font-semibold text-navy">{selectedIds.length} selected</strong>
-            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => bulkSetSuspended(true)}>Suspend</Button>
-            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => bulkSetSuspended(false)}>Reactivate</Button>
+            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => { setActionError(''); setBulkTarget({ suspended: true }); }}>Suspend</Button>
+            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => { setActionError(''); setBulkTarget({ suspended: false }); }}>Reactivate</Button>
             <Button size="xs" color="light" type="button" onClick={() => setSelectedIds([])}>Clear</Button>
           </div>
         )}
@@ -394,7 +444,7 @@ function AdminUsers() {
                               // Suspend and Delete are withheld on your own account: an admin
                               // removing themselves here would lock the console.
                               ...(!isSelf ? [
-                                { label: u.suspended ? 'Reactivate' : 'Suspend', icon: u.suspended ? 'refresh' : 'pause', disabled: busy, onClick: () => toggleSuspend(u) },
+                                { label: u.suspended ? 'Reactivate' : 'Suspend', icon: u.suspended ? 'refresh' : 'pause', disabled: busy, onClick: () => { setActionError(''); setSuspendTarget(u); } },
                                 { label: 'Delete', icon: 'delete', danger: true, disabled: busy, onClick: () => openDelete(u) },
                               ] : []),
                             ]}
@@ -406,6 +456,19 @@ function AdminUsers() {
                 })}
               </TableBody>
             </Table>
+          </div>
+        )}
+
+        {!loading && !loadError && users.length > 0 && (
+          <div className="border-t border-border px-5 py-3">
+            <AdminPagination
+              page={pagination.page}
+              limit={pagination.limit}
+              total={pagination.total}
+              totalPages={pagination.totalPages}
+              noun="account"
+              onChange={(next) => { setPage(next); setSelectedIds([]); }}
+            />
           </div>
         )}
       </section>
@@ -504,6 +567,36 @@ function AdminUsers() {
           </ModalFooter>
         </Modal>
       )}
+
+      <ConfirmDialog
+        open={Boolean(bulkTarget)}
+        title={bulkTarget?.suspended ? 'Suspend selected accounts' : 'Reactivate selected accounts'}
+        description={bulkTarget?.suspended
+          ? `${selectedIds.length} account(s) will be unable to log in and their listings will be hidden.`
+          : `${selectedIds.length} account(s) will be able to log in again and their listings will be visible.`}
+        confirmLabel={bulkTarget?.suspended ? 'Suspend accounts' : 'Reactivate accounts'}
+        tone={bulkTarget?.suspended ? 'danger' : 'warning'}
+        busy={busyId === 'bulk'}
+        error={actionError}
+        onConfirm={runBulkSetSuspended}
+        onCancel={() => { setBulkTarget(null); setActionError(''); }}
+      />
+
+      <ConfirmDialog
+        open={Boolean(suspendTarget)}
+        title={suspendTarget?.suspended ? 'Reactivate account' : 'Suspend account'}
+        description={suspendTarget
+          ? (suspendTarget.suspended
+            ? `${suspendTarget.firstName} ${suspendTarget.lastName} will be able to log in again.`
+            : `${suspendTarget.firstName} ${suspendTarget.lastName} will be unable to log in and their listings will be hidden.`)
+          : ''}
+        confirmLabel={suspendTarget?.suspended ? 'Reactivate' : 'Suspend'}
+        tone={suspendTarget?.suspended ? 'warning' : 'danger'}
+        busy={Boolean(busyId) && busyId !== 'bulk'}
+        error={actionError}
+        onConfirm={runToggleSuspend}
+        onCancel={() => { setSuspendTarget(null); setActionError(''); }}
+      />
     </div>
   );
 }

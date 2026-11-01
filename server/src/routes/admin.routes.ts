@@ -86,6 +86,9 @@ router.delete('/reviews/:id', reviewCtrl.adminDeleteReview);
 router.get('/messages', messageCtrl.adminConversations);
 router.get('/messages/:userId', messageCtrl.adminThread);
 router.post('/messages/:userId', validate(messageCreateSchema), messageCtrl.adminReply);
+// Reading a thread has to be recorded on the server, not only in the inbox's
+// local state, otherwise the next poll puts the unread badge straight back.
+router.patch('/messages/:userId/read', messageCtrl.adminMarkThreadRead);
 
 // Per-property earnings / booking counts
 router.get('/analytics/properties', bookingCtrl.propertyEarnings);

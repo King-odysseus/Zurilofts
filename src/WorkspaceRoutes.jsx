@@ -18,6 +18,7 @@ import AdminMessages from './pages/AdminMessages.jsx';
 import AdminGuides from './pages/AdminGuides.jsx';
 import AdminTrustSafety from './pages/AdminTrustSafety.jsx';
 import AdminGovernance from './pages/AdminGovernance.jsx';
+import AdminBookings from './pages/AdminBookings.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
 import HostArrivalGuidePage from './pages/HostArrivalGuidePage.jsx';
 import HostCalendarPage from './pages/HostCalendarPage.jsx';
@@ -76,8 +77,10 @@ export default function WorkspaceRoutes() {
       <Route path="properties/new" element={<Navigate to="/admin/properties" replace />} />
       <Route path="properties/:id/edit" element={<Navigate to="/admin/properties" replace />} />
       <Route path="properties/:id/calendar" element={<Navigate to="/admin/properties" replace />} />
-      {/* Bookings, money and discounts are host workspace concerns now. */}
-      <Route path="bookings" element={<Navigate to="/admin" replace />} />
+      {/* Bookings are host-owned day to day, but a reservation that needs
+          confirming, cancelling or refunding is an admin decision, so the
+          platform keeps a cross-host list. Money and discounts stay with hosts. */}
+      <Route path="bookings" element={<AdminBookings />} />
       <Route path="earnings" element={<Navigate to="/admin" replace />} />
       <Route path="payouts" element={<Navigate to="/admin" replace />} />
       <Route path="promos" element={<Navigate to="/admin" replace />} />

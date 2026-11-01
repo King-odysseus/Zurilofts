@@ -20,6 +20,7 @@ import {
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
+import ConfirmDialog from '../components/admin/ConfirmDialog.jsx';
 
 const EMPTY = { title: '', slug: '', excerpt: '', body: '', coverImage: '', published: false };
 
@@ -44,6 +45,9 @@ function AdminGuides() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
   const [search, setSearch] = useState('');
 
   const fetchPosts = useCallback(async () => {
@@ -115,14 +119,20 @@ function AdminGuides() {
     }
   }
 
-  async function handleDelete(id) {
-    if (!window.confirm('Delete this guide?')) return;
+  async function handleDelete() {
+    const id = deleteTarget?.id;
+    if (!id) return;
+    setDeleteBusy(true);
+    setDeleteError('');
     try {
       await apiClient.delete(`/admin/guides/${id}`);
       setMessage('Guide deleted.');
+      setDeleteTarget(null);
       await fetchPosts();
     } catch (requestError) {
-      setMessage(requestError.response?.data?.error || 'Guide could not be deleted.');
+      setDeleteError(requestError.response?.data?.error || 'Guide could not be deleted.');
+    } finally {
+      setDeleteBusy(false);
     }
   }
 
@@ -143,10 +153,9 @@ function AdminGuides() {
   }), [visiblePosts]);
 
   return (
-    <div className="space-y-8" data-openpencil-frame="0:7343">
+    <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · CONTENT</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Travel guides</h1>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Publish area advice, local recommendations, and practical guest guidance.</p>
         </div>
@@ -238,7 +247,7 @@ function AdminGuides() {
                         label={`Actions for ${post.title}`}
                         actions={[
                           { label: 'Edit', icon: 'edit', onClick: () => handleEdit(post.id) },
-                          { label: 'Delete', icon: 'delete', danger: true, onClick: () => handleDelete(post.id) },
+                          { label: 'Delete', icon: 'delete', danger: true, onClick: () => { setDeleteError(''); setDeleteTarget(post); } },
                         ]}
                       />
                     </div></TableCell>
@@ -274,6 +283,20 @@ function AdminGuides() {
           </>
         )}
       </Modal>
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title="Delete this guide"
+        description={deleteTarget
+          ? `"${deleteTarget.title}" will be removed permanently. This cannot be undone.`
+          : ''}
+        confirmLabel="Delete guide"
+        tone="danger"
+        busy={deleteBusy}
+        error={deleteError}
+        onConfirm={handleDelete}
+        onCancel={() => { setDeleteTarget(null); setDeleteError(''); }}
+      />
     </div>
   );
 }

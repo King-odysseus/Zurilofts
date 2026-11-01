@@ -21,6 +21,7 @@ import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
+import ConfirmDialog from '../components/admin/ConfirmDialog.jsx';
 
 const CATEGORIES = ['transport', 'catering', 'housekeeping', 'concierge'];
 
@@ -58,6 +59,11 @@ function AdminAddOns() {
   const [search, setSearch] = useState('');
   const [message, setMessage] = useState('');
   const [messageTone, setMessageTone] = useState('success');
+  // Delete confirmation lives in a dialog so the wording matches the rest of
+  // the admin area instead of the operating system's grey prompt.
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   function openCreate() {
     setEditingId(null);
@@ -165,16 +171,21 @@ function AdminAddOns() {
     }
   }
 
-  async function handleDelete(id) {
-    if (!window.confirm('Delete this add-on permanently? This removes it from all properties and bookings.')) return;
+  async function handleDelete() {
+    const id = deleteTarget?.id;
+    if (!id) return;
+    setDeleteBusy(true);
+    setDeleteError('');
     try {
       await apiClient.delete(`/admin/addons/${id}`);
       setAddOns((current) => current.filter((addOn) => addOn.id !== id));
       setMessage('Add-on deleted.');
       setMessageTone('success');
+      setDeleteTarget(null);
     } catch (error) {
-      setMessage(error.response?.data?.error || 'Failed to delete add-on.');
-      setMessageTone('error');
+      setDeleteError(error.response?.data?.error || 'Failed to delete add-on.');
+    } finally {
+      setDeleteBusy(false);
     }
   }
 
@@ -215,10 +226,9 @@ function AdminAddOns() {
   }, [visibleAddOns, assignments]);
 
   return (
-    <div className="space-y-8" data-openpencil-frame="0:7343">
+    <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · CONTENT</p>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Add-ons</h1>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Manage guest services, pricing, availability, and property-level assignments.</p>
         </div>
@@ -317,7 +327,7 @@ function AdminAddOns() {
                           label={`Actions for ${addOn.name}`}
                           actions={[
                             { label: 'Edit', icon: 'edit', onClick: () => openEdit(addOn) },
-                            { label: 'Delete', icon: 'delete', danger: true, onClick: () => handleDelete(addOn.id) },
+                            { label: 'Delete', icon: 'delete', danger: true, onClick: () => { setDeleteError(''); setDeleteTarget(addOn); } },
                           ]}
                         />
                       </div></TableCell>
@@ -367,6 +377,20 @@ function AdminAddOns() {
           </>
         )}
       </Modal>
+
+      <ConfirmDialog
+        open={Boolean(deleteTarget)}
+        title="Delete this add-on"
+        description={deleteTarget
+          ? `${deleteTarget.name} will be removed permanently, including from every property and every booking that uses it. This cannot be undone.`
+          : ''}
+        confirmLabel="Delete add-on"
+        tone="danger"
+        busy={deleteBusy}
+        error={deleteError}
+        onConfirm={handleDelete}
+        onCancel={() => { setDeleteTarget(null); setDeleteError(''); }}
+      />
     </div>
   );
 }

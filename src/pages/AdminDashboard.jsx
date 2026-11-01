@@ -5,6 +5,7 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
+import ConfirmDialog from '../components/admin/ConfirmDialog.jsx';
 import { playMessageSound } from '../utils/notificationSound.js';
 import {
   Accordion,
@@ -22,6 +23,7 @@ import {
 import {
   Bell,
   BookOpen,
+  CalendarCheck,
   ChevronLeft,
   ChevronRight,
   Ellipsis,
@@ -102,10 +104,11 @@ const adminNavGroups = [
     label: 'Platform',
     items: [
       { path: '/admin/revenue', label: 'Revenue', icon: Wallet },
+      { path: '/admin/bookings', label: 'Reservations', icon: CalendarCheck },
       { path: '/admin/properties', label: 'Listing approvals', icon: House },
       { path: '/admin/addons', label: 'Add-ons', icon: SlidersHorizontal },
       { path: '/admin/guides', label: 'Guides', icon: BookOpen },
-      { path: '/admin/feedback', label: 'Feedback', icon: Star },
+      { path: '/admin/feedback', label: 'Reviews', icon: Star },
       { path: '/admin/governance', label: 'Governance', icon: ScrollText },
     ],
   },
@@ -606,6 +609,10 @@ function DashboardOverview() {
   const [trend, setTrend] = useState(null);
   const [savingLanding, setSavingLanding] = useState(false);
   const [landingMsg, setLandingMsg] = useState('');
+  // A failed fetch used to render as a zero, so an outage looked like "no
+  // accounts, nothing pending". These record which panels could not be read.
+  const [summaryFailed, setSummaryFailed] = useState(false);
+  const [trendError, setTrendError] = useState('');
 
   useEffect(() => {
     let active = true;
@@ -624,6 +631,9 @@ function DashboardOverview() {
           apiClient.get('/reviews/summary').catch(() => null),
         ]);
       if (!active) return;
+
+      // Anything that failed to load is named rather than counted as zero.
+      setSummaryFailed(!applicationsRes || !accountsRes || !pendingListingsRes || !liveListingsRes || !verificationsRes);
 
       setSummary({
         applications: applicationsRes?.data?.data || [],
@@ -654,20 +664,34 @@ function DashboardOverview() {
   useEffect(() => {
     let active = true;
     apiClient.get('/admin/stats/signups', { params: { days: trendDays } })
-      .then((res) => { if (active) setTrend(res.data?.data || null); })
-      .catch(() => { if (active) setTrend(null); });
+      .then((res) => { if (active) { setTrend(res.data?.data || null); setTrendError(''); } })
+      .catch((cause) => {
+        if (!active) return;
+        // Keep the failure visible: an empty chart is indistinguishable from a
+        // day with genuinely no signups.
+        setTrend(null);
+        setTrendError(cause.response?.data?.error || 'Signup trend could not be loaded.');
+      });
     return () => { active = false; };
   }, [trendDays]);
 
-  async function saveLandingStats(e) {
-    e.preventDefault();
+  // Submitting the form asks first; the dialog is what actually calls the API,
+  // because these figures publish straight to the marketing page.
+  function saveLandingStats(e) {
+    if (e) e.preventDefault();
+    setLandingConfirm(true);
+  }
+
+  async function publishLandingStats() {
     setSavingLanding(true); setLandingMsg('');
     try {
       await apiClient.put('/admin/settings/landing-stats', { starRating: Number(landingStats.starRating), satisfaction: Number(landingStats.satisfaction) });
       setLandingMsg('Saved.');
-    } catch { setLandingMsg('Save failed.'); }
-    finally { setSavingLanding(false); }
+    } catch (err) { setLandingMsg(err.response?.data?.error || 'Save failed.'); }
+    finally { setSavingLanding(false); setLandingConfirm(false); }
   }
+
+  const [landingConfirm, setLandingConfirm] = useState(false);
 
   const quickLinks = [
     { to: '/admin/host-applications', label: 'Review host applications' },
@@ -680,10 +704,9 @@ function DashboardOverview() {
   // reads as a shape instead of a flat line at the bottom.
   const peakSignups = trend ? Math.max(1, ...trend.series.map((p) => p.signups)) : 1;
 
-  return <div className="space-y-8" data-openpencil-frame="0:6909">
+  return <div className="space-y-8">
     <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">ZURILOFTS · ADMIN · PEOPLE & PLATFORM</p>
         <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Platform overview</h1>
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Host applications, accounts and listing approvals that need a decision. Listings, bookings and money are managed by hosts.</p>
       </div>
@@ -707,6 +730,11 @@ function DashboardOverview() {
       <article className={METRIC_CARD}><span className={METRIC_LABEL}>LISTING APPROVALS</span><strong className={METRIC_VALUE}>{summary.listingsPending}</strong><small className={METRIC_NOTE}>Submitted by hosts</small></article>
       <article className={METRIC_CARD}><span className={METRIC_LABEL}>IDENTITY CHECKS</span><strong className={METRIC_VALUE}>{summary.verificationsPending}</strong><small className={METRIC_NOTE}>Awaiting review</small></article>
     </div>
+    {summaryFailed && (
+      <p className="rounded-lg border border-[#FECDCA] bg-[#FEF3F2] px-4 py-3 text-sm font-medium text-[#B42318] dark:border-[#B42318]/40 dark:bg-[#B42318]/15 dark:text-[#FECDCA]" role="alert">
+        Some figures above could not be loaded and are showing zero. Refresh the page to try again.
+      </p>
+    )}
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2.7fr)_minmax(245px,1fr)]">
       <section className={PANEL}>
         <div className={PANEL_HEAD}>
@@ -759,7 +787,7 @@ function DashboardOverview() {
                 No sign-ups in the last {trend.days} days.
               </p>
             )}
-          </> : <p className={PANEL_SUBTITLE}>Trend data is unavailable right now.</p>}
+          </> : <p className={PANEL_SUBTITLE} role={trendError ? 'alert' : undefined}>{trendError || 'Trend data is unavailable right now.'}</p>}
         </div>
       </section>
       <section className={PANEL}>
@@ -779,9 +807,14 @@ function DashboardOverview() {
     <div>
       <Accordion alwaysOpen className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
         <AccordionPanel>
-          <AccordionTitle className="bg-white text-navy [&>button]:bg-white">Landing page statistics</AccordionTitle>
+          <AccordionTitle className="bg-elevated text-navy [&>button]:bg-elevated">Landing page statistics</AccordionTitle>
           <AccordionContent>
             <p className={PANEL_SUBTITLE}>Happy stays is counted from guest stays that have checked out, so it cannot be edited here. Set the other values to 0 to use live review data.</p>
+            {/* These numbers are published on the marketing page, so the form
+                says so and asks before overwriting them. */}
+            <p className="mt-3 rounded-lg border border-[#FEDF89] bg-[#FFFAEB] px-3 py-2 text-xs leading-relaxed text-[#B54708] dark:border-[#B54708]/40 dark:bg-[#B54708]/15 dark:text-[#FEDF89]">
+              The star rating and satisfaction figure are shown to visitors on the public landing page. Saving replaces them immediately.
+            </p>
             <form onSubmit={saveLandingStats} className="mt-5 flex flex-wrap items-end gap-5">
               {/* Deliberately not a field: it is a live count, so a box would invite typing. */}
               <div className="grid w-28 gap-1 text-xs font-semibold text-navy">
@@ -795,6 +828,16 @@ function DashboardOverview() {
               <Button type="submit" size="sm" className={BTN_PRIMARY} disabled={savingLanding}>{savingLanding ? 'Saving...' : 'Update'}</Button>
               {landingMsg && <span role="status" className="text-xs font-semibold text-primary-700">{landingMsg}</span>}
             </form>
+            <ConfirmDialog
+              open={landingConfirm}
+              title="Publish these statistics?"
+              description={`Visitors will see a ${landingStats.starRating} star rating and ${landingStats.satisfaction}% satisfaction on the landing page as soon as this is saved.`}
+              confirmLabel="Publish"
+              tone="warning"
+              busy={savingLanding}
+              onConfirm={() => { publishLandingStats(); }}
+              onCancel={() => setLandingConfirm(false)}
+            />
           </AccordionContent>
         </AccordionPanel>
       </Accordion>

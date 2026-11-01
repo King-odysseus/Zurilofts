@@ -833,8 +833,10 @@ function SeasonalPricing({ propertyId }) {
     try {
       await apiClient.delete(`${rulesPath}/${ruleId}`);
       setRules((r) => r.filter((x) => x.id !== ruleId));
-    } catch {
-      alert('Failed to delete rule');
+    } catch (err) {
+      // Surfaced in the panel instead of a browser alert, which blocks the page
+      // and vanishes the moment it is dismissed.
+      setError(err.response?.data?.error || 'Failed to delete rule');
     }
   }
 
