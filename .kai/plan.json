@@ -2,33 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Identify the broken pill shape (dark search bar, desktop width)",
+      "text": "Run git status to see the real dirty set, not just the four files this session touched",
       "state": "done"
     },
     {
-      "text": "Reproduce in browser before changing CSS",
+      "text": "Separate source edits from scratch output; confirm scratch is ignored",
       "state": "done"
     },
     {
-      "text": "Scope the phone-only field fill so the pill keeps its corners",
+      "text": "Verify the tree builds and lints before committing",
       "state": "done"
     },
     {
-      "text": "Stop the date inputs drawing their own box inside the bar",
+      "text": "Stage the source files and commit with a message describing the change",
       "state": "done"
     },
     {
-      "text": "Verify at phone and desktop widths, light and dark",
+      "text": "Push to origin/main and confirm the branch is level with the remote",
       "state": "done"
     },
     {
-      "text": "Run lint and build",
-      "state": "done"
-    },
-    {
-      "text": "Commit and push the fix",
+      "text": "Commit the plan record and push it so no working tree changes are left behind",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-01T14:44:35.620Z"
+  "updatedAt": "2026-11-01T15:30:10.102Z"
 }
