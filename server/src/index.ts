@@ -10,7 +10,7 @@ import { runDueAutoMessages } from './services/automated-message.service.js';
 import { syncConfiguredAdmin } from './services/admin-bootstrap.service.js';
 import { processScheduledPayouts, releaseDueHostFunds } from './services/payout.service.js';
 import { sendHostApplicationNudges } from './services/nudge.service.js';
-import { injectMeta, legacyRedirect, metaForPath } from './services/seo.service.js';
+import { injectMeta, isAppOnlyPath, legacyRedirect, metaForPath } from './services/seo.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -52,7 +52,11 @@ if (env.NODE_ENV === 'production') {
     try {
       const meta = shellHtml ? await metaForPath(req.path, req) : null;
       if (!meta || !shellHtml) {
-        res.sendFile(indexHtmlPath);
+        // An address that metaForPath does not recognise and the browser does not
+        // own is a real not-found. Serving it as 200 with the home page's head
+        // made every typo, dead share link and retired listing an indexable
+        // duplicate of the home page. Signed-in screens still keep the shell.
+        res.status(!shellHtml || isAppOnlyPath(req.path) ? 200 : 404).sendFile(indexHtmlPath);
         return;
       }
       if (meta.status === 404) res.status(404);

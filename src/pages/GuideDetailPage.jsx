@@ -4,6 +4,7 @@ import { ChevronLeft } from 'lucide-react';
 import Spinner from '../components/Spinner.jsx';
 import TranslatedHtml from '../components/TranslatedHtml.jsx';
 import apiClient from '../api/client.js';
+import { applyPageOverrides } from '../utils/documentHead.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useTranslated } from '../i18n/useTranslated.js';
 
@@ -34,15 +35,18 @@ function GuideDetailPage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  // SEO meta
+  // SEO meta: cleaned up on the way out so the next page does not inherit a
+  // guide's title, excerpt and cover image.
   useEffect(() => {
-    if (post) {
-      document.title = `${post.title} - ZuriLofts`;
-      const meta = document.querySelector('meta[name="description"]');
-      if (meta) meta.setAttribute('content', post.excerpt || post.title);
-      const ogTitle = document.querySelector('meta[property="og:title"]');
-      if (ogTitle) ogTitle.setAttribute('content', post.title);
-    }
+    if (!post) return undefined;
+    document.title = `${post.title} - ZuriLofts`;
+    const summary = post.excerpt || post.title;
+    return applyPageOverrides({
+      description: summary,
+      ogTitle: post.title,
+      ogDescription: summary,
+      ogImage: post.coverImage || post.image || '',
+    });
   }, [post]);
 
   if (loading) {

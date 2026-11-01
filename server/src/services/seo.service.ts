@@ -387,6 +387,39 @@ function staticMeta(origin: string, page: StaticPage): PageMeta {
 }
 
 /**
+ * Routes the browser handles on its own: signed-in screens, checkout, auth and
+ * the legacy addresses that redirect. They keep the plain shell and they are not
+ * not-founds, so the catch-all must answer 200 for them.
+ */
+const APP_ONLY_PREFIXES = [
+  '/admin',
+  '/host',
+  '/booking',
+  '/bookings',
+  '/booking-history',
+  '/payment',
+  '/auth',
+  '/login',
+  '/register',
+  '/profile',
+  '/trips',
+  '/inbox',
+  '/messages',
+  '/favourites',
+  '/shortlists',
+  '/verify-identity',
+  '/s/',
+  // Old addresses that the client redirects to their replacement.
+  '/properties',
+  '/property/',
+];
+
+export function isAppOnlyPath(pathname: string): boolean {
+  const clean = pathname.replace(/\/+$/, '') || '/';
+  return APP_ONLY_PREFIXES.some((prefix) => clean === prefix.replace(/\/$/, '') || clean.startsWith(prefix));
+}
+
+/**
  * Head metadata for a request path, or null when the path is app-only
  * (signed-in screens, checkout) and should keep the plain shell.
  */
@@ -466,7 +499,9 @@ export function buildRobots(origin: string): string {
   const disallow = [
     '/api/',
     '/admin',
-    '/host',
+    // Trailing slash matters: a bare '/host' is a prefix match that also blocks
+    // /host-earnings-calculator, a public page the sitemap advertises.
+    '/host/',
     '/booking/',
     '/bookings',
     '/payment/',

@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Navbar from './components/Navbar.jsx';
 import Spinner from './components/Spinner.jsx';
 import { resolveTitle } from './utils/pageTitle.js';
+import { syncCanonical } from './utils/documentHead.js';
 import { useLanguage } from './context/LanguageContext.jsx';
 
 // Only browsing (home, stays, a property) is in the first download. Everything
@@ -134,6 +135,9 @@ function RouteTitle() {
   const { pathname } = useLocation();
   useEffect(() => {
     document.title = resolveTitle(pathname, t);
+    // The canonical link is written by the server on a full load and would
+    // otherwise still name the page the visitor first landed on.
+    syncCanonical(pathname);
   }, [pathname, t, lang]);
   return null;
 }

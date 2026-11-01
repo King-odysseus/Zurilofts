@@ -74,3 +74,23 @@ test('buildRobots blocks signed-in and checkout screens and names the sitemap', 
   assert.ok(!lines.includes('Disallow: /stays'), 'public listing pages must stay crawlable');
   assert.ok(robots.includes('Sitemap: https://thezurilofts.com/sitemap.xml'));
 });
+
+test('buildRobots does not block a public page that merely starts with a private prefix', () => {
+  // A bare `Disallow: /host` is a prefix match, so it also hid
+  // /host-earnings-calculator - a public page the sitemap advertises. Asking a
+  // crawler to index a URL and to skip it at the same time loses the page.
+  const rules = buildRobots('https://thezurilofts.com')
+    .split('\n')
+    .filter((line) => line.startsWith('Disallow: '))
+    .map((line) => line.slice('Disallow: '.length));
+
+  const publicPages = [
+    '/', '/stays', '/places', '/restaurants', '/guides',
+    '/become-a-host', '/host-earnings-calculator', '/privacy', '/terms',
+  ];
+
+  for (const path of publicPages) {
+    const blocking = rules.filter((rule) => path.startsWith(rule));
+    assert.deepEqual(blocking, [], `${path} must not match any Disallow rule`);
+  }
+});
