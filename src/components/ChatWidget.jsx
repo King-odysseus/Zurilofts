@@ -174,7 +174,7 @@ function ChatWidget() {
               <div key={i} className={`flex ${m.from === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl text-sm ${
                   m.from === 'user'
-                    ? 'bg-[#2563EB] text-white rounded-br-md font-medium'
+                    ? 'bg-[#143A80] text-white rounded-br-md font-medium'
                     : 'bg-elevated text-[#1f2937] rounded-bl-md shadow-sm'
                 }`}>
                   {m.text}

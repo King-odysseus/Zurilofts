@@ -16,7 +16,7 @@ export default {
         // lightest navy that still carries white text at AAA (10.8:1) and it is
         // blue enough to be told apart from black at button size.
         primary: {
-          DEFAULT: '#2563EB',
+          DEFAULT: '#143A80',
           50:  '#EEF3FB',
           100: '#DCE6F5',
           200: '#BFD0EC',
@@ -29,7 +29,7 @@ export default {
           900: '#071C3F',
           950: '#05142C',
         },
-        'primary-hover': '#1D4ED8',
+        'primary-hover': '#0B2A5E',
         action:         '#143A80',
         'action-hover': '#0B2A5E',
         // 'navy' is the heading/body ink and therefore flips in dark mode;

@@ -117,7 +117,7 @@ function ReviewSection({ propertyId, onSummary }) {
               <Star className="w-4 h-4 text-[#8A6B52] flex-shrink-0" fill="currentColor" aria-hidden="true" />
               <div className="flex-1 h-3 overflow-hidden rounded-full bg-[#EAF0F4]">
                 <div
-                  className="h-full bg-[#2563EB] rounded-full transition-all duration-500"
+                  className="h-full bg-[#143A80] rounded-full transition-all duration-500"
                   style={{ width: `${maxCount > 0 ? (d.count / maxCount) * 100 : 0}%` }}
                 />
               </div>

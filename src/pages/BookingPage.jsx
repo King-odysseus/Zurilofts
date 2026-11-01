@@ -1236,7 +1236,7 @@ function BookingPage() {
             <div className="space-y-5">
               <button
                 onClick={() => navigate('/')}
-                className="w-full bg-[#2563EB] text-white py-3 rounded-full font-semibold hover:bg-[#1D4ED8] transition-all duration-200"
+                className="w-full bg-[#143A80] text-white py-3 rounded-full font-semibold hover:bg-[#0B2A5E] transition-all duration-200"
               >
                 Return to Home
               </button>

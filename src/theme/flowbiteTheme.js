@@ -19,12 +19,12 @@
 // so a class built from "[${CONST}]" is emitted as plain text and never compiled.
 // That is how a navy button once rendered as an invisible box.
 // Action blue #203565 is the interactive colour; brass #C5A28C is an accent only.
-const CONTROL_LIGHT = `border-[#E2DAD0] bg-white text-[#111827] placeholder-[#6b7280] focus:border-[#2563EB] focus:ring-[#2563EB]`;
+const CONTROL_LIGHT = `border-[#E2DAD0] bg-white text-[#111827] placeholder-[#6b7280] focus:border-[#143A80] focus:ring-[#143A80]`;
 
 // Dark variants stay on Flowbite's own greys: the app's dark mode is built on
 // them, and the brand border is too dark to read against a dark panel.
 const CONTROL_DARK =
-  `dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-[#2563EB] dark:focus:ring-[#2563EB]`;
+  `dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-[#143A80] dark:focus:ring-[#143A80]`;
 
 const ERROR_STATE =
   'border-red-500 bg-white text-red-900 placeholder-red-700 focus:border-red-500 focus:ring-red-500 dark:border-red-400 dark:bg-gray-700 dark:text-red-300';
@@ -37,7 +37,7 @@ const INPUT_SHAPE = 'rounded-[10px]';
 
 // Fill / outline pairs shared by Button and any other interactive surface. The
 // focus ring is a translucent navy ring so it reads on white and on tinted rows.
-const FOCUS_RING = `focus:ring-2 focus:ring-[#2563EB]/35`;
+const FOCUS_RING = `focus:ring-2 focus:ring-[#143A80]/35`;
 
 export const brandTheme = {
   // -- Form controls --------------------------------------------------------
@@ -89,7 +89,7 @@ export const brandTheme = {
   checkbox: {
     base: `h-4 w-4 appearance-none rounded border border-[#E2DAD0] bg-white bg-[length:0.55em_0.55em] bg-center bg-no-repeat checked:border-transparent checked:bg-current checked:bg-check-icon focus:outline-none focus:ring-2 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700`,
     color: {
-      default: `text-[#203565] focus:ring-[#2563EB] dark:ring-offset-gray-800 dark:focus:ring-[#2563EB]`,
+      default: `text-[#203565] focus:ring-[#143A80] dark:ring-offset-gray-800 dark:focus:ring-[#143A80]`,
     },
   },
   toggleSwitch: {
@@ -98,7 +98,7 @@ export const brandTheme = {
       checked: {
         off: `bg-[#E2DAD0] dark:bg-gray-700`,
         color: {
-          default: `bg-[#2563EB] group-focus:ring-[#2563EB]/30 dark:group-focus:ring-[#2563EB]/30`,
+          default: `bg-[#143A80] group-focus:ring-[#143A80]/30 dark:group-focus:ring-[#143A80]/30`,
         },
       },
     },
@@ -130,10 +130,10 @@ export const brandTheme = {
       // `default` is the primary action, so it carries the one interactive
       // colour in the palette. Brass stays on hairlines and small marks; navy is
       // the `dark` variant below when a surface wants a quieter button.
-      default: `bg-[#2563EB] text-white hover:bg-[#1D4ED8] ${FOCUS_RING} dark:bg-[#2563EB] dark:text-white dark:hover:bg-[#1D4ED8]`,
+      default: `bg-[#143A80] text-white hover:bg-[#0B2A5E] ${FOCUS_RING} dark:bg-[#143A80] dark:text-white dark:hover:bg-[#0B2A5E]`,
       alternative: `border border-[#E2DAD0] bg-white text-[#203565] hover:bg-[#F8FAFC] ${FOCUS_RING} dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700`,
       light: `border border-[#E2DAD0] bg-white text-[#203565] hover:bg-[#F8FAFC] ${FOCUS_RING} dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700`,
-      dark: `bg-[#2563EB] text-white hover:bg-[#1D4ED8] ${FOCUS_RING} dark:bg-[#2563EB] dark:hover:bg-[#1D4ED8]`,
+      dark: `bg-[#143A80] text-white hover:bg-[#0B2A5E] ${FOCUS_RING} dark:bg-[#143A80] dark:hover:bg-[#0B2A5E]`,
       gray: `bg-[#F1F5F9] text-[#203565] hover:bg-[#E2E8F0] ${FOCUS_RING} dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`,
       success: `bg-green-600 text-white hover:bg-green-700 ${FOCUS_RING} dark:bg-green-600 dark:hover:bg-green-700`,
       failure: `bg-red-600 text-white hover:bg-red-700 ${FOCUS_RING} dark:bg-red-600 dark:hover:bg-red-700`,
@@ -141,7 +141,7 @@ export const brandTheme = {
     },
     outlineColor: {
       default: `border border-[#203565] text-[#203565] hover:bg-[#F8FAFC] ${FOCUS_RING} dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700`,
-      dark: `border border-[#203565] text-[#203565] hover:bg-[#1D4ED8] hover:text-white ${FOCUS_RING} dark:border-gray-600 dark:text-gray-300`,
+      dark: `border border-[#203565] text-[#203565] hover:bg-[#0B2A5E] hover:text-white ${FOCUS_RING} dark:border-gray-600 dark:text-gray-300`,
     },
   },
 

@@ -741,7 +741,7 @@ function Navbar() {
                 className="min-w-0 flex-1"
                 autoFocus
               />
-              <Button type="submit" size="sm" className="shrink-0 rounded-full bg-[#2563EB] text-white enabled:hover:bg-[#1D4ED8]">
+              <Button type="submit" size="sm" className="shrink-0 rounded-full bg-[#143A80] text-white enabled:hover:bg-[#0B2A5E]">
                 Search
               </Button>
             </form>

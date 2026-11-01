@@ -63,7 +63,7 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
       {/* Booking CTA */}
       <Link
         to={bookingHref}
-        className="block min-h-[48px] w-full rounded-[10px] bg-[#2563EB] py-4 text-center font-bold text-white transition-colors duration-200 hover:bg-[#1D4ED8] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C] active:bg-[#1D4ED8]"
+        className="block min-h-[48px] w-full rounded-[10px] bg-[#143A80] py-4 text-center font-bold text-white transition-colors duration-200 hover:bg-[#0B2A5E] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C5A28C] active:bg-[#0B2A5E]"
         aria-label={`Book ${variantLabel ? variantLabel + ' option' : 'this property'} for KES ${price != null ? price.toLocaleString() : '-'} per night`}
       >
         Book Now

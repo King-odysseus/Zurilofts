@@ -362,7 +362,7 @@ function Hero({ stats }) {
             <div className="mt-14 flex justify-center">
               <Link
                 to="/register?role=HOST"
-                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] bg-[#2563EB] px-10 py-3 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:bg-[#1D4ED8] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#203565]"
+                className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] bg-[#143A80] px-10 py-3 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:bg-[#0B2A5E] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#203565]"
               >
                 <House className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
                 Get Started as a Host

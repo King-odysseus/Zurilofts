@@ -29,8 +29,8 @@
   --zl-navy-bg: #0D1E3B;
   --zl-bronze: #C5A28C;
   --zl-bronze-hover: #B08E77;
-  --zl-action: #2563EB;
-  --zl-action-hover: #1D4ED8;
+  --zl-action: #143A80;
+  --zl-action-hover: #0B2A5E;
   --zl-canvas: #FFFFFF;
   --zl-border: #E3E8EF;
   --zl-text: #203565;
@@ -42,8 +42,8 @@
   --op-ink: #414D63;
   /* Interactive colour. Every primary button, active tab and focus ring reads
      this token, so "what colour is a button" has one answer in the app. */
-  --op-action: #2563EB;
-  --op-action-hover: #1D4ED8;
+  --op-action: #143A80;
+  --op-action-hover: #0B2A5E;
   /* Height of the slim legal strip on app screens. Screens that size
      themselves with calc(100vh - header) subtract it, so the strip does not
      push them one scrollbar below the fold. 0 where the strip is hidden. */
@@ -602,7 +602,7 @@ html:not(.dark) .zl-navbar .op-brand-tile img {
   --ds-muted: 91 107 130;      /* #5B6B82 - secondary text */
   --ds-line: 229 231 235;      /* #E5E7EB - the only divider grey */
   --ds-inset: 246 248 252;     /* #F6F8FC - inset panels and hovers */
-  --ds-link: 37 99 235;        /* #2563EB - links and focus */
+  --ds-link: 37 99 235;        /* #2563EB - links and focus, kept distinct from heading ink */
   --ds-surface: 247 249 252;   /* #F7F9FC - faint cool panel, reads as white on the canvas */
   --ds-canvas: 255 255 255;    /* #FFFFFF - page background */
   --ds-elevated: 255 255 255;  /* raised card on the canvas */

@@ -493,7 +493,7 @@ function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="bg-[#2563EB] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
+                    className="bg-[#143A80] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#0B2A5E] transition-all duration-200 disabled:opacity-50"
                   >
                     {saving ? 'Saving...' : 'Save Changes'}
                   </button>
@@ -709,7 +709,7 @@ function ProfilePage() {
                 <button
                   type="submit"
                   disabled={bankSaving}
-                  className="bg-[#2563EB] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50 text-sm"
+                  className="bg-[#143A80] text-white font-semibold px-6 py-2.5 rounded-full hover:bg-[#0B2A5E] transition-all duration-200 disabled:opacity-50 text-sm"
                 >
                   {bankSaving ? 'Saving...' : 'Save Payout Destination'}
                 </button>
@@ -901,7 +901,7 @@ function ProfilePage() {
                               type="button"
                               onClick={() => handleSubmitReview(booking.id)}
                               disabled={reviewForms[booking.id]?.submitting}
-                              className="mt-3 bg-[#2563EB] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#1D4ED8] transition-all duration-200 disabled:opacity-50"
+                              className="mt-3 bg-[#143A80] text-white font-semibold px-5 py-2 rounded-full text-sm hover:bg-[#0B2A5E] transition-all duration-200 disabled:opacity-50"
                             >
                               {reviewForms[booking.id]?.submitting ? 'Submitting...' : 'Submit Review'}
                             </button>
@@ -936,7 +936,7 @@ function ProfilePage() {
                   </div>
                   <h3 className="text-lg font-bold text-[#203565] mb-1">No favourites yet</h3>
                   <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
-                  <Link to="/properties" className="inline-block bg-[#2563EB] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#1D4ED8] transition-all duration-200">
+                  <Link to="/properties" className="inline-block bg-[#143A80] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#0B2A5E] transition-all duration-200">
                     Browse properties
                   </Link>
                 </div>
