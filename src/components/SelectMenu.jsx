@@ -58,10 +58,28 @@ const TRIGGER_SIZES = {
 // important here. The floor stays useful (an `sm` select in a narrow table
 // still opens a readable list) and is itself capped, so it can never exceed the
 // screen.
+//
+// The height cap lives on the top-level `content` key, not on
+// `floating.content`. flowbite-react 0.12 renders an open menu as
+// <div class={floating.base}><ul class={content}>, so a cap written on
+// `floating.content` is never applied to anything and the list grows to its
+// full height. A 43-bank list then measured 1619px tall in a 720px window: the
+// panel flipped above the trigger, ran off the top of the screen, and took the
+// search box with it, so typing to narrow the list was impossible.
+//
+// The cap is min(18rem, 40dvh). The first value is the comfortable size on a
+// normal screen. The second is what makes the panel fit at every window size:
+// the trigger splits the screen into a side above and a side below it, so the
+// roomier of the two is always at least about half the viewport. Capping below
+// that half means one side can hold the whole panel, and floating-ui's flip is
+// then free to choose it. Capping against the full viewport instead (100dvh)
+// still left the panel 80px past the bottom edge of a 480px-tall window, whose
+// list was unusable past the fourth bank. `overscroll-contain` stops the page
+// scrolling once the list itself reaches its end.
 const MENU_THEME = {
+  content: 'max-h-[min(18rem,40dvh)] overflow-y-auto overscroll-contain py-1 text-sm text-[#111827] focus:outline-none dark:text-gray-200',
   floating: {
     base: 'z-50 w-full overflow-hidden rounded-[10px] border border-[#E2DAD0] bg-elevated shadow-lg dark:border-gray-600 dark:bg-gray-700 !min-w-[min(11rem,calc(100vw-2rem))] !max-w-[calc(100vw-2rem)]',
-    content: 'max-h-72 overflow-y-auto py-1 text-sm text-[#111827] dark:text-gray-200',
   },
 };
 

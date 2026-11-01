@@ -313,11 +313,21 @@ export const brandTheme = {
     },
   },
   dropdown: {
+    // Cap the list to the viewport and let it scroll: an open menu used to run
+    // past the screen with no way to reach the last options.
+    //
+    // This belongs on the top-level `content` key, which is the class the open
+    // menu's <ul> actually receives. In flowbite-react 0.12 the panel renders
+    // as <div class={floating.base}><ul class={content}>, so the same string on
+    // `floating.content` is handed to no element at all - which is why the cap
+    // silently did nothing and long menus grew to their full height.
+    // 40dvh, not 70vh: the menu opens above or below the trigger, so the side it
+    // lands on holds roughly half the viewport. A cap that ignores that half can
+    // still overflow the edge of a short window even though it is smaller than
+    // the window itself.
+    content: `max-h-[min(20rem,40dvh)] overflow-y-auto overscroll-contain py-1 text-sm text-[#111827] focus:outline-none dark:text-gray-200`,
     floating: {
       base: `z-[70] w-fit max-w-[min(24rem,calc(100vw-2rem))] divide-y divide-[#E3E8EF] rounded-[10px] shadow-md focus:outline-none`,
-      // Cap the panel to the viewport and let it scroll: an open menu used to run
-      // past the bottom of the screen with no way to reach the last options.
-      content: `max-h-[min(70vh,20rem)] overflow-y-auto py-1 text-sm text-[#111827] dark:text-gray-200`,
       header: `block px-4 py-2 text-sm font-semibold text-[#203565] dark:text-gray-200`,
       item: {
         // A menu row sits on a white panel, and the old hover tint was #F8FAFC -
