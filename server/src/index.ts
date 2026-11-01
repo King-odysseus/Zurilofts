@@ -10,7 +10,7 @@ import { runDueAutoMessages } from './services/automated-message.service.js';
 import { syncConfiguredAdmin } from './services/admin-bootstrap.service.js';
 import { processScheduledPayouts, releaseDueHostFunds } from './services/payout.service.js';
 import { sendHostApplicationNudges } from './services/nudge.service.js';
-import { injectMeta, metaForPath } from './services/seo.service.js';
+import { injectMeta, legacyRedirect, metaForPath } from './services/seo.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +32,20 @@ if (env.NODE_ENV === 'production') {
   // index:false keeps "/" out of the static handler so the home page gets
   // its own head tags like every other route.
   app.use(express.static(clientDist, { index: false }));
+  // Older listing addresses answer with a permanent redirect before anything
+  // else looks at the path, so a crawler never sees them as live pages.
+  app.get('*', (req, res, next) => {
+    const target = legacyRedirect(req.path);
+    if (!target) {
+      next();
+      return;
+    }
+    // The query string is carried over: the browse page reads its filters from
+    // it and a stay page reads ?review=true.
+    const query = req.originalUrl.slice(req.path.length);
+    res.redirect(301, `${target}${query}`);
+  });
+
   app.get('*', async (req, res) => {
     // Metadata is resolved per path so search engines and link previews, which
     // do not run JavaScript, get the right title, description and share image.

@@ -147,11 +147,21 @@ function toDescription(text: string | null | undefined, fallback: string): strin
   return `${(lastSpace > 100 ? cut.slice(0, lastSpace) : cut).trim()}...`;
 }
 
+/**
+ * Uploaded photo names keep whatever the host's camera wrote, spaces included
+ * ("Ely Homes Photography (13 of 20).jpg"). A browser fills those in, but
+ * crawlers and link-preview bots read the og:image string literally, so the
+ * characters that break a URL are escaped here once.
+ */
+function encodeUrlForMeta(url: string): string {
+  return url.replace(/[\s"<>]/g, (char) => encodeURIComponent(char));
+}
+
 /** Uploads are stored as /uploads/* in dev and absolute Cloudinary URLs in prod. */
 function absoluteUrl(origin: string, url: string | null | undefined): string | null {
   if (!url) return null;
-  if (/^https?:\/\//i.test(url)) return url;
-  return `${origin}${url.startsWith('/') ? '' : '/'}${url}`;
+  if (/^https?:\/\//i.test(url)) return encodeUrlForMeta(url);
+  return encodeUrlForMeta(`${origin}${url.startsWith('/') ? '' : '/'}${url}`);
 }
 
 function firstImageUrl(imagesJson: string): string | null {
@@ -433,6 +443,22 @@ export function injectMeta(html: string, meta: PageMeta): string {
     `<meta name="description" content="${description}">`
   );
   return withDescription.replace(/<\/head>/i, `    ${tags.join('\n    ')}\n  </head>`);
+}
+
+/**
+ * Addresses that were public before the /properties -> /stays rename. Search
+ * results, emails and old share links still point at them, and the client fixes
+ * those up in React, which a crawler only sees after it runs the app. Answering
+ * with a permanent redirect here consolidates their ranking on the new URL.
+ */
+export function legacyRedirect(pathname: string): string | null {
+  const clean = pathname.replace(/\/+$/, '') || '/';
+  if (clean === '/properties') return '/stays';
+  if (clean.startsWith('/property/')) {
+    const id = clean.slice('/property/'.length).split('/')[0];
+    if (id) return `/stay/${id}`;
+  }
+  return null;
 }
 
 /** robots.txt: block signed-in and checkout screens, point crawlers at the sitemap. */
