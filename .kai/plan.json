@@ -2,25 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Inspect git status, branch and remote to see what is actually changed",
+      "text": "Check git status and diff to see what is actually changed",
       "state": "done"
     },
     {
-      "text": "Separate real source changes from scratch/tooling files and confirm project identity",
+      "text": "Run lint and build to confirm the change is sound",
       "state": "done"
     },
     {
-      "text": "Re-run lint and build to confirm the tree that will be committed is green",
-      "state": "done"
+      "text": "Stage only the card change and the plan file",
+      "state": "active"
     },
     {
-      "text": "Stage only the relevant files, commit with a message describing the change",
-      "state": "done"
+      "text": "Commit with a message describing the change",
+      "state": "pending"
     },
     {
       "text": "Push to the remote and report the commit hash",
-      "state": "done"
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-01T08:06:03.834Z"
+  "updatedAt": "2026-11-01T08:21:46.555Z"
 }

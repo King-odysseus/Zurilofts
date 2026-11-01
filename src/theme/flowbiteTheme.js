@@ -194,7 +194,15 @@ export const brandTheme = {
   // have to stay related in both themes.
   card: {
     root: {
-      base: 'flex rounded-[14px] border border-border bg-elevated text-navy shadow-sm',
+      // Borderless on purpose: host cards sit on the white canvas, where a
+      // hairline grey outline plus a faint shadow read as a drawn box rather
+      // than a raised surface. The shadow alone carries the elevation now (the
+      // boxShadow scale in tailwind.config.js was built for borderless cards).
+      // `border-0` and `dark:bg-elevated` are not redundant: the component's own
+      // base still contributes `border border-gray-200 dark:border-gray-700
+      // dark:bg-gray-800`, and only a later class in the same group overrides it,
+      // so the hairline and the grey-800 dark surface would both leak through.
+      base: 'flex rounded-[14px] border-0 bg-elevated text-navy shadow-md dark:bg-elevated',
       children: 'flex h-full w-full flex-col gap-4 p-5',
       href: 'transition-colors hover:bg-surface dark:hover:bg-surface',
     },
