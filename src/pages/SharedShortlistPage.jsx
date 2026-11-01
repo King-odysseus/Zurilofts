@@ -20,7 +20,7 @@ function SharedShortlistRow({ item }) {
   ].filter(Boolean).join(' · ');
 
   return (
-    <Link className="opg-shortlist-row" to={`/property/${property.id}`}>
+    <Link className="opg-shortlist-row" to={`/stay/${property.id}`}>
       <img src={image} alt={property.title || 'Stay'} />
       <div className="opg-shortlist-row-copy">
         <h3>{property.title || 'ZuriLofts stay'}</h3>
@@ -98,7 +98,7 @@ export default function SharedShortlistPage() {
             <div>
               <h2>{t('misc.shortlistUnavailable')}</h2>
               <p>{error}</p>
-              <Link className="opg-saved-action" to="/properties">{t('booking.browseStays')}</Link>
+              <Link className="opg-saved-action" to="/stays">{t('booking.browseStays')}</Link>
             </div>
           </div>
         ) : shortlist ? (

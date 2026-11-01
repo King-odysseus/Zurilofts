@@ -7,7 +7,7 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 const fallbackRules = [
   [/^\/verify-identity$/, '/profile'],
   [/^\/payment\/callback$/, '/trips'],
-  [/^\/property\/[^/]+$/, '/properties'],
+  [/^\/stay\/[^/]+$/, '/stays'],
   [/^\/guides\/[^/]+$/, '/guides'],
   [/^\/shortlists\/[^/]+$/, '/shortlists'],
   [/^\/inbox\/[^/]+$/, '/inbox'],

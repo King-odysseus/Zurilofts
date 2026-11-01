@@ -2,25 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Inspect theme storage, auth wiring and git state",
+      "text": "Map every place that uses /properties: router, links, i18n labels, SEO/PWA, server",
       "state": "done"
     },
     {
-      "text": "Make the theme choice per account",
+      "text": "Work out what renaming URLs to /stays would break (shared links, SEO, saved bookmarks)",
       "state": "done"
     },
     {
-      "text": "Wipe the old shared theme value",
+      "text": "Verify the mobile 50px section spacing: lint, build, phone-width browser check",
       "state": "done"
     },
     {
-      "text": "Verify in a browser",
+      "text": "Rename guest URLs to /stays and /stay/<id>, redirect old paths, repoint all internal links",
       "state": "done"
     },
     {
-      "text": "Run lint and build, then commit and push",
-      "state": "active"
+      "text": "Verify in the browser: new pages load, old addresses redirect, nav and titles match; lint and build clean",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-01T18:42:20.018Z"
+  "updatedAt": "2026-11-01T19:21:33.248Z"
 }

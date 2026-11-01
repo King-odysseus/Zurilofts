@@ -5,7 +5,7 @@ import StayCard from './StayCard.jsx';
  * Reusable horizontally scrollable card strip.
  *
  * Renders at most 6 StayCards in a snap-scrolling row, using the same card as
- * the Stays grid so a property looks identical here and on /properties. Card
+ * the Stays grid so a property looks identical here and on /stays. Card
  * width tracks that grid's column (310px inside the shared max-w-[1344px] px-6
  * container) so both surfaces read as one design. The scrollbar is hidden but
  * keyboard and touch scrolling still work. Renders nothing at all

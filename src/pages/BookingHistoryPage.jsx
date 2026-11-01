@@ -59,13 +59,13 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
   const status = STATUS_META[booking.status] || { label: t('booking.statusUnknown'), className: STATUS_TONE_IDLE };
 
   return <article className="opg-history-card max-md:!gap-5 rounded-xl shadow-md">
-    <Link to={`/property/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={`View ${property.title || 'stay'}`}>
+    <Link to={`/stay/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={`View ${property.title || 'stay'}`}>
       <img src={getBookingImage(booking, index)} alt="" />
     </Link>
     <div className="opg-history-copy">
       <div className="opg-history-title-row">
         <div>
-          <h2><Link to={`/property/${property.id || booking.propertyId}`}>{propertyTitle || 'Property'}</Link></h2>
+          <h2><Link to={`/stay/${property.id || booking.propertyId}`}>{propertyTitle || 'Property'}</Link></h2>
           <p>{propertyLocation || 'Nairobi'}</p>
         </div>
         <span className={`${STATUS_PILL} ${status.className}`}>{t(status.label)}</span>
@@ -84,7 +84,7 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
         {canAddToCalendar(booking) && isUpcomingStay(booking) && (
           <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>{t('booking.addToCalendar')}</Button>
         )}
-        <Button as={Link} to={`/property/${property.id || booking.propertyId}`} color="light" size="sm">{t('booking.viewStay')}</Button>
+        <Button as={Link} to={`/stay/${property.id || booking.propertyId}`} color="light" size="sm">{t('booking.viewStay')}</Button>
         <Button as={Link} to={`/bookings/${booking.id}`} color="light" size="sm">{t('booking.bookingDetails')}</Button>
       </div>
     </div>
@@ -97,7 +97,7 @@ function EmptyHistory() {
     <ClipboardList strokeWidth={1.6} aria-hidden="true" />
     <h2>{t('booking.noBookings')}</h2>
     <p>{t('booking.noBookingsHint')}</p>
-    <Button as={Link} to="/properties" size="sm">{t('booking.browseStays')}</Button>
+    <Button as={Link} to="/stays" size="sm">{t('booking.browseStays')}</Button>
   </div>;
 }
 

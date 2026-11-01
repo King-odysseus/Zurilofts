@@ -153,7 +153,7 @@ function ConversationPage() {
         <h2>{participant.name}</h2>
         <p>{property.title || 'Stay conversation'} <span>·</span> {formatStayContext(conversation?.booking)}</p>
       </div>
-      {property.id && <Link className="opg-message-booking-link" to={`/property/${property.id}`}>View stay</Link>}
+      {property.id && <Link className="opg-message-booking-link" to={`/stay/${property.id}`}>View stay</Link>}
     </header>
 
     {/* Same gap under the pane header as the support thread: the thread rule in

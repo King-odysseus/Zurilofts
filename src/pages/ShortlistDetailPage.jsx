@@ -25,11 +25,11 @@ function PropertyItem({ item, onRemove }) {
 
   return (
     <article className="opg-shortlist-row opg-shortlist-row-managed">
-      <Link className="opg-shortlist-row-image" to={`/property/${property.id}`}>
+      <Link className="opg-shortlist-row-image" to={`/stay/${property.id}`}>
         <img src={image} alt={property.title || t('saved.stayAlt')} />
       </Link>
       <div className="opg-shortlist-row-copy">
-        <Link to={`/property/${property.id}`}><h3>{property.title || t('saved.untitledStay')}</h3></Link>
+        <Link to={`/stay/${property.id}`}><h3>{property.title || t('saved.untitledStay')}</h3></Link>
         <p>{meta}</p>
         {item.note && <p className="opg-shortlist-note">&ldquo;{item.note}&rdquo;</p>}
       </div>
@@ -203,7 +203,7 @@ export default function ShortlistDetailPage() {
                 <div>
                   <h2>{t('saved.noSavedPropertiesTitle')}</h2>
                   <p>{t('saved.noSavedPropertiesBody')}</p>
-                  <Link className="opg-saved-action" to="/properties">{t('saved.browseStays')}</Link>
+                  <Link className="opg-saved-action" to="/stays">{t('saved.browseStays')}</Link>
                 </div>
               </div>
             ) : (

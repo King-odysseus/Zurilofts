@@ -130,7 +130,7 @@ function FavouritesPage() {
                     meta={t(favorites.length === 1 ? 'saved.staysSavedOne' : 'saved.staysSavedOther', { count: favorites.length })}
                     images={favouriteImages}
                     linkLabel={favorites.length ? t('saved.browseFavourites') : t('saved.findAStay')}
-                    to={favorites.length ? '/favourites#saved-stays' : '/properties'}
+                    to={favorites.length ? '/favourites#saved-stays' : '/stays'}
                   />
                   {shortlistCards.map((shortlist) => (
                     <CollectionCard

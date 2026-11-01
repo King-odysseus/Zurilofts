@@ -83,7 +83,7 @@ function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
   const propertyLocation = useTranslated(property.location);
 
   return <article className="opg-trip-feature rounded-xl border border-border">
-    <Link to={`/property/${property.id || booking.propertyId}`} className="opg-trip-feature-image" aria-label={`View ${property.title || 'stay'}`}>
+    <Link to={`/stay/${property.id || booking.propertyId}`} className="opg-trip-feature-image" aria-label={`View ${property.title || 'stay'}`}>
       <img src={getBookingImage(booking, index)} alt="" />
     </Link>
     <div className="opg-trip-feature-copy">
@@ -91,7 +91,7 @@ function UpcomingTripCard({ booking, index, onMessage, messagePending }) {
         <StatusPill status={booking.status} />
         <time dateTime={booking.checkIn}>{formatDateRange(booking.checkIn, booking.checkOut) || t('trips.datesUnavailable')}</time>
       </div>
-      <h2><Link to={`/property/${property.id || booking.propertyId}`}>{propertyTitle || t('trips.upcomingStay')}</Link></h2>
+      <h2><Link to={`/stay/${property.id || booking.propertyId}`}>{propertyTitle || t('trips.upcomingStay')}</Link></h2>
       <p className="opg-trip-subtitle">{[propertyLocation || 'Nairobi', t((booking.guests || 1) === 1 ? 'common.guest_one' : 'common.guest_other', { count: booking.guests || 1 }), t(nights === 1 ? 'common.night_one' : 'common.night_other', { count: nights })].join(' / ')}</p>
       {booking.total != null && <p className="opg-trip-price"><strong>KES {Number(booking.total).toLocaleString()}</strong> {t('common.total')}</p>}
       <div className="opg-trip-actions !mt-6">
@@ -131,9 +131,9 @@ function TripRow({ booking, index, isPast }) {
         separate buttons would wrap into a squeezed implicit row. */}
     <div className="flex flex-wrap items-center gap-2 max-md:col-start-2">
       {isPast && !reviewed
-        ? <Button as={Link} to={`/property/${property.id || booking.propertyId}?review=true`} size="sm">{t('trips.leaveReview')}</Button>
-        : <Button as={Link} to={isPast ? `/property/${property.id || booking.propertyId}` : `/bookings/${booking.id}`} color="light" size="sm">{isPast ? t('booking.viewStay') : t('trips.viewTrip')}</Button>}
-      {isPast && booking.status !== 'CANCELLED' && <Button as={Link} to={`/property/${property.id || booking.propertyId}`} color="light" size="sm">{t('trips.bookAgain')}</Button>}
+        ? <Button as={Link} to={`/stay/${property.id || booking.propertyId}?review=true`} size="sm">{t('trips.leaveReview')}</Button>
+        : <Button as={Link} to={isPast ? `/stay/${property.id || booking.propertyId}` : `/bookings/${booking.id}`} color="light" size="sm">{isPast ? t('booking.viewStay') : t('trips.viewTrip')}</Button>}
+      {isPast && booking.status !== 'CANCELLED' && <Button as={Link} to={`/stay/${property.id || booking.propertyId}`} color="light" size="sm">{t('trips.bookAgain')}</Button>}
     </div>
   </article>;
 }
@@ -150,7 +150,7 @@ function EmptyTrips({ isPast }) {
     <CalendarDays strokeWidth={1.6} aria-hidden="true" className="!mb-5" />
     <h2>{isPast ? t('trips.noPastTrips') : t('trips.noUpcomingTrips')}</h2>
     <p>{isPast ? t('trips.noPastHint') : t('trips.noUpcomingHint')}</p>
-    {!isPast && <Button as={Link} to="/properties" size="sm">{t('booking.browseStays')}</Button>}
+    {!isPast && <Button as={Link} to="/stays" size="sm">{t('booking.browseStays')}</Button>}
   </div>;
 }
 

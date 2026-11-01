@@ -11,7 +11,7 @@ import { useTranslated } from '../i18n/useTranslated.js';
 
 /**
  * The single guest property card, used everywhere a guest sees listings: the
- * Stays grid ("Stays in Nairobi" and /properties), the Similar properties strip
+ * Stays grid ("Stays in Nairobi" and /stays), the Similar properties strip
  * and Saved stays.
  *
  * Keep this as the ONE card implementation. A forked card on the Similar
@@ -67,7 +67,7 @@ function StayCard({ stay, checkIn, checkOut }) {
 
   return <article className="group relative min-w-0">
     <div className="relative">
-      <Link to={`/property/${stay.id}`} className="block overflow-hidden rounded-2xl bg-surface" aria-label={t('stays.viewStay', { title: stay.title })}>
+      <Link to={`/stay/${stay.id}`} className="block overflow-hidden rounded-2xl bg-surface" aria-label={t('stays.viewStay', { title: stay.title })}>
         {image
           ? <img src={image} alt={stay.title} loading="lazy" className="aspect-[3/2] w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
           : <span className="grid aspect-[3/2] w-full place-items-center text-xs text-muted">{t('stays.photoComingSoon')}</span>}
@@ -108,7 +108,7 @@ function StayCard({ stay, checkIn, checkOut }) {
       </div>}
     </div>
 
-    <Link to={`/property/${stay.id}`} className="mt-3 block">
+    <Link to={`/stay/${stay.id}`} className="mt-3 block">
       <div className="flex items-start justify-between gap-3">
         <h3 className="truncate text-[15px] font-semibold leading-tight text-ink">{headline}</h3>
         {/* A score is only worth showing once a guest has actually rated it. */}

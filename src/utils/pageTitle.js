@@ -21,6 +21,10 @@ const ROUTE_TITLES = [
   [/^\/$/, 'title.home'],
 
   // Guest: discovery and public pages
+  [/^\/stays$/, 'title.stays'],
+  [/^\/stay\/[^/]+$/, 'title.stay'],
+  // Old guest addresses, which redirect. Listed so the tab title is already
+  // correct during that redirect instead of blinking "Page not found".
   [/^\/properties$/, 'title.stays'],
   [/^\/property\/[^/]+$/, 'title.stay'],
   [/^\/places$/, 'title.places'],

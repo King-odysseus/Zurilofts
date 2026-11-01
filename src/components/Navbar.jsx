@@ -229,7 +229,7 @@ function Navbar() {
   function handleSearchSubmit(event) {
     event.preventDefault();
     const query = searchQuery.trim();
-    navigate(query ? `/properties?search=${encodeURIComponent(query)}` : '/properties');
+    navigate(query ? `/stays?search=${encodeURIComponent(query)}` : '/stays');
     setSearchOpen(false);
     setSearchQuery('');
     setMenuOpen(false);
@@ -246,7 +246,7 @@ function Navbar() {
     if (!isAuthenticated) {
       return [
         { name: 'Home', key: 'home', href: '/' },
-        { name: 'Stays', key: 'properties', href: '/properties' },
+        { name: 'Stays', key: 'stays', href: '/stays' },
         { name: 'Places', key: 'places', href: '/places' },
         { name: 'Restaurants', key: 'restaurants', href: '/restaurants' },
         { name: 'Guides', key: 'guides', href: '/guides' },
@@ -267,7 +267,7 @@ function Navbar() {
     }
     return [
       { name: 'Home', key: 'home', href: '/' },
-      { name: 'Stays', key: 'properties', href: '/properties' },
+      { name: 'Stays', key: 'stays', href: '/stays' },
       { name: 'Places', key: 'places', href: '/places' },
       { name: 'Restaurants', key: 'restaurants', href: '/restaurants' },
       { name: 'Guides', key: 'guides', href: '/guides' },

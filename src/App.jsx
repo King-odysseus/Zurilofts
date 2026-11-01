@@ -1,6 +1,6 @@
 import { Suspense, lazy, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { BrowserRouter, useLocation } from "react-router-dom";
+import { BrowserRouter, Navigate, useLocation } from "react-router-dom";
 import { GuestFooter, GuestHome, GuestLegalStrip, GuestStays } from './GuestDiscovery.jsx';
 import RealPropertyPage from './components/PropertyPage.jsx';
 import NotFoundPage from './pages/NotFoundPage.jsx';
@@ -54,6 +54,19 @@ function isAppScreen(pathname) {
   return APP_SCREENS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 }
 
+// The guest pages were renamed to match their labels: /properties is now
+// /stays. Old addresses are still in bookmarks, shared links, emails and
+// search results, so they forward instead of landing on "not found". The
+// query string is carried over because the stay page reads ?review=true and
+// the browse page reads the whole filter set.
+function legacyStayTarget(pathname, search) {
+  if (pathname === '/properties') return `/stays${search}`;
+  if (pathname.startsWith('/property/')) {
+    return `/stay/${pathname.slice('/property/'.length)}${search}`;
+  }
+  return null;
+}
+
 function GuestShell({ children }) {
   const { pathname } = useLocation();
   return <div className="zl-app">
@@ -67,7 +80,9 @@ function GuestShell({ children }) {
 GuestShell.propTypes = { children: PropTypes.node.isRequired };
 
 function Shell() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  const legacyTarget = legacyStayTarget(pathname, search);
+  if (legacyTarget) return <Navigate to={legacyTarget} replace />;
   // A public page that happens to begin with /host, so it has to be matched
   // before the workspace shell below claims every /host path. The older
   // calculator URL stays alive so existing links keep working; both land
@@ -91,8 +106,8 @@ function Shell() {
   let content;
   if (pathname === '/') content = <Home />;
   else if (pathname === '/become-a-host') content = <BecomeAHostPage />;
-  else if (pathname === '/properties') content = <Explore />;
-  else if (pathname.startsWith('/property/')) content = <RealPropertyPage />;
+  else if (pathname === '/stays') content = <Explore />;
+  else if (pathname.startsWith('/stay/')) content = <RealPropertyPage />;
   else if (pathname === '/places') content = <PlacesPage />;
   else if (pathname === '/restaurants') content = <RestaurantsPage />;
   else if (pathname === '/guides') content = <GuidesPage />;

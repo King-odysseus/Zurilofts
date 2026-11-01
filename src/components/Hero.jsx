@@ -147,7 +147,7 @@ function SearchBar({ discovery = false }) {
   function handleSelect(propertyId) {
     setOpen(false);
     setQuery('');
-    navigate(`/property/${propertyId}`);
+    navigate(`/stay/${propertyId}`);
   }
 
   const handleSearch = useCallback(() => {
@@ -158,7 +158,7 @@ function SearchBar({ discovery = false }) {
       params.set('checkOut', dates.checkOut);
     }
     if (guests > 1) params.set('guests', String(guests));
-    navigate(`/properties${params.toString() ? `?${params.toString()}` : ''}`);
+    navigate(`/stays${params.toString() ? `?${params.toString()}` : ''}`);
     setOpen(false);
     setQuery('');
   }, [query, dates, guests, navigate]);

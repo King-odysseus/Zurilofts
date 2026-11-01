@@ -22,7 +22,7 @@ const TABS = [
     key: 'home',
     label: 'mobileNav.home',
     to: '/',
-    match: (p) => p === '/' || p.startsWith('/properties') || p.startsWith('/property/'),
+    match: (p) => p === '/' || p.startsWith('/stays') || p.startsWith('/stay/'),
     icon: (active) => (
       <Home className="h-[18px] w-[18px]" strokeWidth={active ? 2.2 : 1.8} aria-hidden="true" />
     ),

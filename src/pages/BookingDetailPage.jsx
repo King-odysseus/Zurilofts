@@ -213,13 +213,13 @@ function BookingDetailPage() {
       action={<Button as={Link} to="/bookings" className="w-fit max-md:mt-3.5" size="sm">{t('booking.allBookings')}</Button>}
     >
       <article className="opg-history-card rounded-xl shadow-md">
-        <Link to={`/property/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={t('a11y2.viewStay', { name: property.title || t('a11y2.stay') })}>
+        <Link to={`/stay/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={t('a11y2.viewStay', { name: property.title || t('a11y2.stay') })}>
           <img src={image} alt="" />
         </Link>
         <div className="opg-history-copy">
           <div className="opg-history-title-row">
             <div>
-              <h2><Link to={`/property/${property.id || booking.propertyId}`}>{propertyTitle || t('booking.propertyUnavailable')}</Link></h2>
+              <h2><Link to={`/stay/${property.id || booking.propertyId}`}>{propertyTitle || t('booking.propertyUnavailable')}</Link></h2>
               <p><MapPin size={13} aria-hidden="true" /> {propertyLocation || 'Nairobi'}</p>
             </div>
             <span className={`${STATUS_PILL} ${status.className}`}>{status.label}</span>
@@ -280,7 +280,7 @@ function BookingDetailPage() {
           {calendarLink && (
             <Button as="a" href={calendarLink} target="_blank" rel="noopener noreferrer" color="light" size="sm">{t('booking.googleCalendar')}</Button>
           )}
-          <Button as={Link} to={`/property/${property.id || booking.propertyId}`} color="light" size="sm">View stay</Button>
+          <Button as={Link} to={`/stay/${property.id || booking.propertyId}`} color="light" size="sm">View stay</Button>
           <Button as={Link} to={isGuestOwner ? '/trips' : '/host/today'} color="light" size="sm">{isGuestOwner ? 'My trips' : 'Today'}</Button>
         </div>
       </section>

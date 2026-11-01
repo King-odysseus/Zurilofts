@@ -181,7 +181,7 @@ function PaymentCallback() {
                 </div>
               )}
               {booking?.propertyId && (
-                <button type="button" className="op-payment-link" onClick={() => navigate(`/property/${booking.propertyId}`)}>
+                <button type="button" className="op-payment-link" onClick={() => navigate(`/stay/${booking.propertyId}`)}>
                   {t('payment.viewProperty')}
                 </button>
               )}
