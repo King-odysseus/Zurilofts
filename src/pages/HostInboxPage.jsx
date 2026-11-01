@@ -406,10 +406,12 @@ function MessagingSettings({ open, hideEnded, onHideEndedChange, onClose }) {
         <span className="block text-[11px] leading-relaxed text-muted">{t('hostinbox.savedRepliesHint')}</span>
       </Link>
 
-      <Link to="/contact" className="block min-h-[44px] border-t border-border px-3 py-4 hover:bg-surface">
+      {/* The Contact page was removed, so feedback goes to the published
+          support address rather than a route that no longer exists. */}
+      <a href="mailto:enquires@zurilofts.com?subject=Host%20feedback" className="block min-h-[44px] border-t border-border px-3 py-4 hover:bg-surface">
         <span className="block text-xs font-semibold text-navy">{t('hostinbox.giveFeedback')}</span>
         <span className="block text-[11px] leading-relaxed text-muted">{t('hostinbox.giveFeedbackHint')}</span>
-      </Link>
+      </a>
     </div>
   </>;
 }

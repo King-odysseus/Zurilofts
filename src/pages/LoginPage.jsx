@@ -96,7 +96,9 @@ function LoginPage() {
             <input type="checkbox" id="remember-me" defaultChecked />
             <label htmlFor="remember-me">{t('auth.rememberMe')}</label>
           </span>
-          <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
+          {/* There is no self-service reset flow (no page, no endpoint), so this
+              asks support to reset the account instead of linking to a 404. */}
+          <a href="mailto:enquires@zurilofts.com?subject=Password%20reset%20request">{t('auth.forgotPassword')}</a>
         </div>
 
         <button type="submit" className="op-auth-submit" disabled={submitting}>
