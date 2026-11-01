@@ -22,6 +22,34 @@ export function clearAccessToken() {
   accessToken = null;
 }
 
+// A refresh that fails because the endpoint is rate-limited or briefly
+// unreachable is not a signed-out user: treating it as one bounced every
+// protected route to the sign-in screen, so a transient blip looked like the
+// account had been logged out. Only a rejection from the server itself (a 401
+// for an expired or revoked token) ends the session.
+const TRANSIENT_REFRESH_STATUSES = new Set([429, 500, 502, 503, 504]);
+const REFRESH_ATTEMPTS = 3;
+
+function isTransientRefreshFailure(err) {
+  if (!err?.response) return true;
+  return TRANSIENT_REFRESH_STATUSES.has(err.response.status);
+}
+
+async function postRefresh() {
+  for (let attempt = 1; ; attempt += 1) {
+    try {
+      return await axios.post(
+        `${apiClient.defaults.baseURL}/auth/refresh`,
+        {},
+        { withCredentials: true }
+      );
+    } catch (err) {
+      if (attempt >= REFRESH_ATTEMPTS || !isTransientRefreshFailure(err)) throw err;
+      await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** (attempt - 1)));
+    }
+  }
+}
+
 /**
  * Exchange the refresh cookie for a new access token, deduplicated.
  *
@@ -34,12 +62,7 @@ export function clearAccessToken() {
  */
 export function refreshSession() {
   if (!refreshPromise) {
-    refreshPromise = axios
-      .post(
-        `${apiClient.defaults.baseURL}/auth/refresh`,
-        {},
-        { withCredentials: true }
-      )
+    refreshPromise = postRefresh()
       .then((res) => {
         const newToken = res.data.data?.accessToken;
         if (!newToken) {

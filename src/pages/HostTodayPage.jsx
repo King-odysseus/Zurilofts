@@ -68,14 +68,20 @@ function GuestOperationCard({ booking, type, compact = false, onMessage, message
   const image = firstImage(property) || property.coverImage;
   const propertyTitle = property.title || "Your stay";
   const time = bookingTime(booking, type);
+  const tileClass = "grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-elevated text-sm font-bold uppercase text-muted";
+  const tile = image
+    ? <img src={image} alt="" className="h-full w-full object-cover" />
+    : <span>{guestInitials(booking)}</span>;
 
   // Rows sit inside a HostCard on desktop and directly on the page on mobile,
   // so the tile carries its own surface tint instead of a border that would
   // double up with the card outline.
   return <article className={`flex items-center gap-3 rounded-xl bg-surface ${compact ? "p-2.5" : "p-3"}`}>
-    <Link to={`/host/listings/${property.id || ""}/preview`} className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-elevated text-sm font-bold uppercase text-muted" aria-label={propertyTitle}>
-      {image ? <img src={image} alt="" className="h-full w-full object-cover" /> : <span>{guestInitials(booking)}</span>}
-    </Link>
+    {/* A booking outlives its listing when the host retires it, and
+        `/host/listings//preview` is not a route - only link with an id. */}
+    {property.id
+      ? <Link to={`/host/listings/${property.id}/preview`} className={tileClass} aria-label={propertyTitle}>{tile}</Link>
+      : <span className={tileClass} aria-hidden="true">{tile}</span>}
     <div className="min-w-0 flex-1">
       <strong className="block truncate text-sm font-semibold text-navy">{guestName(booking)}</strong>
       <span className="block truncate text-xs text-muted">{propertyTitle} · {time}</span>
