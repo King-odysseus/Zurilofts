@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const EVENT_TYPES = [
   { value: '', label: 'All recorded activity' },
@@ -41,11 +42,11 @@ const EVENT_META = {
 };
 
 // Shared surface styles so the audit panel and the roles aside stay identical.
-const PANEL = 'overflow-hidden rounded-xl border border-border bg-elevated shadow-sm';
+const PANEL = 'overflow-hidden rounded-xl bg-elevated shadow-md';
 const PANEL_HEAD = 'flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between';
 const PANEL_TITLE = 'text-base font-semibold text-navy';
 const PANEL_SUBTITLE = 'text-xs text-muted';
-const METRIC_CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
+const METRIC_CARD = 'rounded-xl bg-elevated shadow-md p-5';
 const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
 const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
 const METRIC_NOTE = 'mt-1 block text-xs text-muted';
@@ -68,6 +69,7 @@ function userLabel(user) {
 }
 
 function AdminGovernance() {
+  const { t } = useLanguage();
   const [users, setUsers] = useState([]);
   const [applications, setApplications] = useState([]);
   const [verifications, setVerifications] = useState([]);
@@ -189,8 +191,8 @@ function AdminGovernance() {
     <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Governance and audit</h1>
-          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Admin access, recorded reviews and operational history across the platform.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.governanceTitle')}</h1>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('admin.governanceDescription')}</p>
         </div>
         <Button color="light" disabled={refreshing} onClick={() => load(true)}>
           <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} strokeWidth={1.8} aria-hidden="true" />
@@ -198,7 +200,7 @@ function AdminGovernance() {
         </Button>
       </div>
 
-      {error && <Alert color="failure" role="alert">{error}</Alert>}
+      {error && <Alert color="failure" role="alert" className="text-center">{error}</Alert>}
 
       {truncated && (
         <p className="rounded-lg border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs leading-relaxed text-[#B54708] dark:border-[#B54708]/40 dark:bg-[#B54708]/15 dark:text-[#FEDF89]" role="note">
@@ -210,24 +212,24 @@ function AdminGovernance() {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <article className={METRIC_CARD}>
-          <span className={METRIC_LABEL}>ADMIN USERS</span>
+          <span className={METRIC_LABEL}>{t('admin.adminUsers').toUpperCase()}</span>
           <strong className={METRIC_VALUE}>{adminUsers.length}</strong>
-          <small className={METRIC_NOTE}>Accounts with admin access</small>
+          <small className={METRIC_NOTE}>{t('admin.accountsWithAdmin')}</small>
         </article>
         <article className={METRIC_CARD}>
-          <span className={METRIC_LABEL}>RECORDED ACTIVITY</span>
+          <span className={METRIC_LABEL}>{t('admin.recordedActivity').toUpperCase()}</span>
           <strong className={METRIC_VALUE}>{events.length}</strong>
-          <small className={METRIC_NOTE}>Audit records on this page</small>
+          <small className={METRIC_NOTE}>{t('admin.auditRecordsPage')}</small>
         </article>
         <article className={METRIC_CARD}>
-          <span className={METRIC_LABEL}>OPEN CASES</span>
+          <span className={METRIC_LABEL}>{t('admin.openCases').toUpperCase()}</span>
           <strong className={METRIC_VALUE}>{openCases}</strong>
-          <small className={METRIC_NOTE}>Disputes needing attention</small>
+          <small className={METRIC_NOTE}>{t('admin.disputesNeedingAttention')}</small>
         </article>
         <article className={METRIC_CARD}>
-          <span className={METRIC_LABEL}>REVIEWS TODAY</span>
+          <span className={METRIC_LABEL}>{t('admin.reviewsToday').toUpperCase()}</span>
           <strong className={METRIC_VALUE}>{reviewsToday}</strong>
-          <small className={METRIC_NOTE}>Applications and identities</small>
+          <small className={METRIC_NOTE}>{t('admin.applicationsAndIdentities')}</small>
         </article>
       </div>
 
@@ -235,38 +237,37 @@ function AdminGovernance() {
         <section className={`${PANEL} lg:col-span-2`} aria-labelledby="audit-log-title">
           <div className={PANEL_HEAD}>
             <div>
-              <h2 id="audit-log-title" className={PANEL_TITLE}>Audit activity</h2>
-              <p className={PANEL_SUBTITLE}>Recorded application, identity and dispute actions, newest first.</p>
+              <h2 id="audit-log-title" className={PANEL_TITLE}>{t('admin.auditActivity')}</h2>
+              <p className={PANEL_SUBTITLE}>{t('admin.auditActivityHint')}</p>
             </div>
             <Badge color="info">{filteredEvents.length} records</Badge>
           </div>
 
           <div className="flex flex-col gap-4 border-b border-border px-5 py-3 sm:flex-row sm:items-center">
-            <div className="relative flex-1">
+            <div className="relative flex-1 [&_input]:border-0 [&_input]:bg-surface [&_input]:pl-9">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
               <TextInput
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search action, record or actor"
-                aria-label="Search governance activity"
-                className="pl-9"
+                placeholder={t('admin.searchAction')}
+                aria-label={t('admin.searchGovernanceLabel')}
               />
             </div>
-            <SelectMenu value={typeFilter} onChange={(next) => setTypeFilter(next)} ariaLabel="Filter audit activity by type" options={EVENT_TYPES} wrapperClassName="w-full sm:w-56" />
+            <SelectMenu value={typeFilter} onChange={(next) => setTypeFilter(next)} ariaLabel={t('a11y3.filterAuditByType')} options={EVENT_TYPES} wrapperClassName="w-full sm:w-56" />
           </div>
 
           {loading ? (
             <div className={EMPTY_STATE}>
               <Spinner size="lg" aria-hidden="true" />
-              <strong className="text-sm font-semibold text-navy">Loading governance records</strong>
-              <p className="text-xs text-muted">Fetching account, application, verification and dispute history.</p>
+              <strong className="text-sm font-semibold text-navy">{t('admin.loadingGovernance')}</strong>
+              <p className="text-xs text-muted">{t('admin.loadingGovernanceHint')}</p>
             </div>
           ) : visibleEvents.length === 0 ? (
             <div className={EMPTY_STATE}>
               <ScrollText className="h-6 w-6 text-muted" strokeWidth={1.6} aria-hidden="true" />
-              <strong className="text-sm font-semibold text-navy">No activity matches this view</strong>
-              <p className="text-xs text-muted">Try another record type or clear the search.</p>
+              <strong className="text-sm font-semibold text-navy">{t('admin.noActivityMatches')}</strong>
+              <p className="text-xs text-muted">{t('admin.noActivityHint')}</p>
             </div>
           ) : (
             <div>
@@ -306,8 +307,8 @@ function AdminGovernance() {
         <aside className={PANEL} aria-labelledby="roles-title">
           <div className={PANEL_HEAD}>
             <div>
-              <h2 id="roles-title" className={PANEL_TITLE}>Roles and permissions</h2>
-              <p className={PANEL_SUBTITLE}>Actual account distribution in the loaded workspace data.</p>
+              <h2 id="roles-title" className={PANEL_TITLE}>{t('admin.rolesAndPermissions')}</h2>
+              <p className={PANEL_SUBTITLE}>{t('admin.rolesDistribution')}</p>
             </div>
           </div>
           <div>
@@ -321,8 +322,8 @@ function AdminGovernance() {
           <div className="flex items-start gap-3 border-t border-border bg-surface px-5 py-4">
             <span className={ICON_TILE} aria-hidden="true"><ShieldCheck strokeWidth={1.8} /></span>
             <div>
-              <strong className="block text-sm font-semibold text-navy">Admin access is privilege-gated</strong>
-              <p className="mt-1 text-xs leading-relaxed text-muted">Every admin endpoint is protected by the server-side role check. Host privileges remain application-controlled.</p>
+              <strong className="block text-sm font-semibold text-navy">{t('admin.adminPrivilegeGated')}</strong>
+              <p className="mt-1 text-xs leading-relaxed text-muted">{t('admin.adminPrivilegeGatedHint')}</p>
             </div>
           </div>
         </aside>
@@ -345,21 +346,21 @@ function AdminGovernance() {
               </div>
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3">
                 <p>
-                  <span className={METRIC_LABEL}>Recorded</span>
+                  <span className={METRIC_LABEL}>{t('admin.recorded')}</span>
                   <strong className="mt-1 block text-sm font-semibold text-navy">{formatDate(selectedEvent.createdAt, true)}</strong>
                 </p>
                 <p>
-                  <span className={METRIC_LABEL}>Actor ID</span>
+                  <span className={METRIC_LABEL}>{t('admin.actorId')}</span>
                   <strong className="mt-1 block break-all text-sm font-semibold text-navy">{selectedEvent.actorId || 'Not recorded'}</strong>
                 </p>
                 <p>
-                  <span className={METRIC_LABEL}>Record ID</span>
+                  <span className={METRIC_LABEL}>{t('admin.recordId')}</span>
                   <strong className="mt-1 block break-all text-sm font-semibold text-navy">{selectedEvent.record}</strong>
                 </p>
               </div>
             </ModalBody>
             <div className="flex flex-col gap-2 border-t border-border px-6 py-4 sm:flex-row sm:justify-end">
-              <Button color="light" onClick={() => setSelectedEvent(null)}>Close</Button>
+              <Button color="light" onClick={() => setSelectedEvent(null)}>{t('common.close')}</Button>
               <Button as={Link} to={selectedEvent.to}>Open related workspace</Button>
             </div>
           </>

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { useEffect, useState } from 'react';
 import { Button, Label, Modal, ModalBody, ModalFooter, ModalHeader, TextInput } from 'flowbite-react';
+import { useLanguage } from '../../context/LanguageContext.jsx';
 import { CircleAlert } from 'lucide-react';
 
 /**
@@ -23,6 +24,7 @@ function ConfirmDialog({
   onConfirm,
   onCancel,
 }) {
+  const { t } = useLanguage();
   const [typed, setTyped] = useState('');
   const needsTyping = Boolean(expect);
   const canConfirm = !needsTyping || typed === expect;
@@ -59,7 +61,7 @@ function ConfirmDialog({
         {needsTyping && (
           <div>
             <Label htmlFor="confirm-dialog-expect">
-              Type <strong>{expect}</strong> to confirm
+              {t('common.typeToConfirm')} <strong>{expect}</strong>
             </Label>
             <TextInput
               id="confirm-dialog-expect"
@@ -80,7 +82,7 @@ function ConfirmDialog({
           onClick={onConfirm}
           disabled={busy || !canConfirm}
         >
-          {busy ? 'Working...' : confirmLabel}
+          {busy ? t('common.working') : confirmLabel}
         </Button>
       </ModalFooter>
     </Modal>

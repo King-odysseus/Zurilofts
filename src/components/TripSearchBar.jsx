@@ -15,7 +15,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading = false, ha
             <Search className="h-5 w-5 flex-shrink-0 text-[#203565] mr-2 sm:mr-3" strokeWidth={2} aria-hidden="true" />
           )}
           <label htmlFor="trip-search-destination" className="sr-only">
-            Search destinations or neighbourhoods
+            {t('a11y1.searchDestinations')}
           </label>
           {discovery && <span className="mr-3 hidden shrink-0 text-sm font-semibold text-[#203565] sm:inline">{t('home.where')}</span>}
           <input
@@ -31,7 +31,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading = false, ha
             <button
               type="button"
               onClick={onClear}
-              aria-label="Clear search"
+              aria-label={t('a11y1.clearSearch')}
               className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full text-[#5B6B82] transition-colors duration-150 hover:bg-surface hover:text-[#203565] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
             >
               <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
@@ -54,7 +54,7 @@ function TripSearchBar({ value, onChange, onSubmit, onClear, loading = false, ha
           {discovery ? (
             <Search className="mx-auto h-5 w-5 text-white" strokeWidth={2.5} aria-hidden="true" />
           ) : (loading ? 'Searching…' : 'Search')}
-          {discovery && <span className="sr-only">Search</span>}
+          {discovery && <span className="sr-only">{t('a11y1.search')}</span>}
         </button>
       </div>
     </form>

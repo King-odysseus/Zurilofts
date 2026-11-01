@@ -8,6 +8,7 @@ import apiClient from '../api/client.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
 import EarningsSideNav from '../components/EarningsSideNav.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import EarningsChart from '../components/EarningsChart.jsx';
 import EarningsMonthCard from '../components/EarningsMonthCard.jsx';
 import EarningsPropertyList from '../components/EarningsPropertyList.jsx';
@@ -116,7 +117,7 @@ function UnsettledNotice({ unsettled }) {
   const count = unsettled.bookings;
   const singular = count === 1;
   return (
-    <div className="mb-6 flex items-start gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+    <div className="mb-6 flex items-start gap-3 rounded-xl bg-elevated px-4 py-3 shadow-sm">
       <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary-600 dark:text-primary-300" strokeWidth={1.9} aria-hidden="true" />
       <p className="min-w-0 text-sm leading-relaxed text-charcoal">
         <strong className="font-semibold text-navy">
@@ -214,6 +215,7 @@ function PaneHeading({ title, description, children }) {
 }
 
 export default function HostEarningsPage() {
+  const { t } = useLanguage();
   const [section, setSection] = useState('performance');
   const [view, setView] = useState('monthly');
   const [chartMode, setChartMode] = useState('chart');
@@ -345,9 +347,9 @@ export default function HostEarningsPage() {
 
   const figures = activeBucket
     ? [
-      { key: 'paid', label: 'Paid', value: activeBucket.paid, dot: 'solid' },
-      { key: 'upcoming', label: 'Upcoming', value: activeBucket.upcoming, dot: 'hollow' },
-      { key: 'total', label: 'Total (KES)', value: activeBucket.total, dot: 'none' },
+      { key: 'paid', label: t('hostmoney.paid'), value: activeBucket.paid, dot: 'solid' },
+      { key: 'upcoming', label: t('hostmoney.upcoming'), value: activeBucket.upcoming, dot: 'hollow' },
+      { key: 'total', label: `${t('common.total')} (KES)`, value: activeBucket.total, dot: 'none' },
     ]
     : [];
 
@@ -457,18 +459,18 @@ export default function HostEarningsPage() {
           <HostCard
             className="mb-6 border-dashed"
             eyebrow="Earnings unavailable"
-            title="We could not load this period"
-            description="Your figures are unchanged. Retry the request or pick another period."
+            title={t('hostmoney.earningsLoadFailedTitle')}
+            description={t('hostmoney.earningsLoadFailedBody')}
           >
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="min-w-0 flex-1 text-sm leading-relaxed text-muted">{error}</p>
-              <Button color="light" onClick={() => setReloadToken((current) => current + 1)}>Try again</Button>
+              <Button color="light" onClick={() => setReloadToken((current) => current + 1)}>{t('common.retry')}</Button>
             </div>
           </HostCard>
         )}
 
         {loading ? (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3" aria-label="Loading earnings" aria-busy="true">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-3" aria-label={t('hostmoney.loadingEarnings')} aria-busy="true">
             {[0, 1, 2].map((key) => <HostCard key={key} className="h-24 animate-pulse" />)}
           </div>
         ) : !error && (
@@ -477,31 +479,31 @@ export default function HostEarningsPage() {
             {section === 'performance' && (
               <div className="flex flex-col gap-8">
                 <PaneHeading
-                  title="Performance"
-                  description="What you have earned each period, split between money confirmed and money still pending."
+                  title={t('hostmoney.performance')}
+                  description={t('hostmoney.performanceHint')}
                 />
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex items-center gap-3">
-                    <h3 className="text-lg font-semibold text-navy">Summary</h3>
+                    <h3 className="text-lg font-semibold text-navy">{t('hostmoney.summary')}</h3>
                     <SelectMenu
                       value={view}
                       onChange={setView}
                       options={VIEW_OPTIONS}
-                      ariaLabel="Chart period"
+                      ariaLabel={t('a11y2.chartPeriod')}
                       sizing="sm"
                       shape="pill"
                       wrapperClassName="w-40"
                     />
                   </div>
-                  <div className="flex items-center gap-2" role="group" aria-label="Chart or table">
-                    {[['chart', 'Chart view', BarChart3], ['table', 'Table view', Table2]].map(([key, label, Icon]) => (
+                  <div className="flex items-center gap-2" role="group" aria-label={t('hostmoney.chartOrTable')}>
+                    {[['chart', 'a11y2.chartView', BarChart3], ['table', 'a11y2.tableView', Table2]].map(([key, label, Icon]) => (
                       <button
                         key={key}
                         type="button"
                         onClick={() => setChartMode(key)}
                         aria-pressed={chartMode === key}
-                        aria-label={label}
+                        aria-label={t(label)}
                         className={`inline-flex h-10 w-10 items-center justify-center rounded-full border transition-colors ${
                           chartMode === key
                             ? 'border-transparent bg-surface text-navy'
@@ -521,17 +523,19 @@ export default function HostEarningsPage() {
                     onSelect={setSelectedKey}
                     emptyMessage={unsettled.bookings
                       ? 'No recorded host earnings to chart. The stays above predate earnings tracking, so their share is unknown rather than zero.'
-                      : 'No income recorded in the last eight months, so there is no chart to draw yet.'}
+                      : t('hostmoney.noIncomeLastEight')}
                   />
                 ) : (
-                  <div className="overflow-x-auto rounded-2xl border border-border bg-elevated">
+                  // Borderless like the shared host card: these panels show
+                  // elevation, so the shadow carries it and no hairline is drawn.
+                  <div className="overflow-x-auto rounded-2xl bg-elevated shadow-md">
                     <table className="w-full text-sm">
                       <thead>
                         <tr className="border-b border-border text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
-                          <th scope="col" className="px-4 py-3 text-left">Period</th>
-                          <th scope="col" className="px-4 py-3 text-right">Paid</th>
-                          <th scope="col" className="px-4 py-3 text-right">Upcoming</th>
-                          <th scope="col" className="px-4 py-3 text-right">Total</th>
+                          <th scope="col" className="px-4 py-3 text-left">{t('hostmoney.period')}</th>
+                          <th scope="col" className="px-4 py-3 text-right">{t('hostmoney.paid')}</th>
+                          <th scope="col" className="px-4 py-3 text-right">{t('hostmoney.upcoming')}</th>
+                          <th scope="col" className="px-4 py-3 text-right">{t('common.total')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-border">
@@ -546,7 +550,7 @@ export default function HostEarningsPage() {
                         {buckets.length === 0 && (
                           <tr>
                             <td colSpan={4} className="px-4 py-10 text-center text-sm text-muted">
-                              No income recorded in the last eight months.
+                              {t('hostmoney.noIncomeLastEight')}
                             </td>
                           </tr>
                         )}
@@ -568,16 +572,16 @@ export default function HostEarningsPage() {
             {section === 'upcoming' && (
               <div className="flex flex-col gap-8">
                 <PaneHeading
-                  title="Upcoming"
-                  description="Money from stays that are booked but not yet recorded as earned."
+                  title={t('hostmoney.seriesUpcoming')}
+                  description={t('hostmoney.upcomingHint')}
                 />
-                <div className="overflow-hidden rounded-2xl border border-border bg-elevated">
+                <div className="overflow-hidden rounded-2xl bg-elevated shadow-md">
                   <EarningsPropertyList
                     rows={upcomingRows}
                     amountLabel="Upcoming"
                     emptyTitle="Nothing upcoming"
                     emptyBody="When a guest books, the amount waiting to be confirmed appears here, property by property."
-                    emptyAction={<Button as={Link} to="/host/reservations" color="light" className="mt-1 w-fit">View reservations</Button>}
+                    emptyAction={<Button as={Link} to="/host/reservations" color="light" className="mt-1 w-fit">{t('hostmoney.viewReservations')}</Button>}
                   />
                 </div>
               </div>
@@ -586,16 +590,16 @@ export default function HostEarningsPage() {
             {section === 'paid' && (
               <div className="flex flex-col gap-8">
                 <PaneHeading
-                  title="Paid"
-                  description="Confirmed earnings, property by property, all of which count towards your payouts."
+                  title={t('hostmoney.seriesPaid')}
+                  description={t('hostmoney.confirmedByProperty')}
                 />
-                <div className="overflow-hidden rounded-2xl border border-border bg-elevated">
+                <div className="overflow-hidden rounded-2xl bg-elevated shadow-md">
                   <EarningsPropertyList
                     rows={paidRows}
                     amountLabel="Paid"
                     emptyTitle="Nothing paid yet"
                     emptyBody="Confirmed stays and their amounts land here once a guest has checked in."
-                    emptyAction={<Button as={Link} to="/host/listings" color="light" className="mt-1 w-fit">View listings</Button>}
+                    emptyAction={<Button as={Link} to="/host/listings" color="light" className="mt-1 w-fit">{t('hostmoney.viewListings')}</Button>}
                   />
                 </div>
               </div>
@@ -604,14 +608,14 @@ export default function HostEarningsPage() {
             {section === 'reports' && (
               <div className="flex flex-col gap-8">
                 <PaneHeading
-                  title="Reports"
-                  description="Download the figures for a period, or check what was withheld."
+                  title={t('hostmoney.reports')}
+                  description={t('hostmoney.reportsHint')}
                 >
                   <SelectMenu
                     value={period}
                     onChange={setPeriod}
                     options={PERIOD_OPTIONS}
-                    ariaLabel="Report period"
+                    ariaLabel={t('a11y2.reportPeriod')}
                     sizing="sm"
                     shape="pill"
                     wrapperClassName="w-40"
@@ -621,34 +625,34 @@ export default function HostEarningsPage() {
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <HostCard>
                     <div>
-                      <p className={HOST_EYEBROW}>Earnings report</p>
+                      <p className={HOST_EYEBROW}>{t('hostmoney.earningsReport')}</p>
                       <strong className="mt-1.5 block text-xl font-bold leading-tight tabular-nums text-navy lg:text-2xl">{formatMoney(totals.hostNet)}</strong>
                       <p className="mt-2 text-xs leading-relaxed text-muted">
                         Net earnings, gross rent, WHT, and property totals for {rangeLabel.toLowerCase()}.
                       </p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <Button onClick={exportCsv}>Download CSV</Button>
-                      <Button color="light" onClick={exportPdf}>Print PDF</Button>
+                      <Button onClick={exportCsv}>{t('hostmoney.downloadCsv')}</Button>
+                      <Button color="light" onClick={exportPdf}>{t('hostmoney.printPdf')}</Button>
                     </div>
                   </HostCard>
 
                   <HostCard>
                     <div>
-                      <p className={HOST_EYEBROW}>WHT certificate</p>
+                      <p className={HOST_EYEBROW}>{t('hostmoney.whtCertificate')}</p>
                       <strong className="mt-1.5 block text-xl font-bold leading-tight tabular-nums text-navy lg:text-2xl">{formatMoney(totals.wht)}</strong>
                       <p className="mt-2 text-xs leading-relaxed text-muted">
                         Withholding tax held from this period. Monthly statements live in the payout workspace.
                       </p>
                     </div>
-                    <Button as={Link} to="/host/payouts" color="light" className="w-fit">Open WHT statement</Button>
+                    <Button as={Link} to="/host/payouts" color="light" className="w-fit">{t('hostmoney.openWht')}</Button>
                   </HostCard>
                 </div>
 
                 <HostCard
                   flush
-                  title="Income breakdown"
-                  description="How booking value and deductions add up to your earnings."
+                  title={t('hostmoney.incomeBreakdown')}
+                  description={t('hostmoney.incomeBreakdownHint')}
                   action={<span className="text-xs font-medium text-muted">{periodLabel}</span>}
                 >
                   <dl className="divide-y divide-border">
@@ -666,9 +670,9 @@ export default function HostEarningsPage() {
                   </dl>
                 </HostCard>
 
-                <HostCard title="Payouts" description="Where the available balance is sent.">
+                <HostCard title={t('hostmoney.payoutsCardTitle')} description={t('hostmoney.payoutsHint')}>
                   <div className="rounded-xl bg-surface px-4 py-3">
-                    <span className={HOST_EYEBROW}>Destination</span>
+                    <span className={HOST_EYEBROW}>{t('hostmoney.destination')}</span>
                     <strong className="mt-1.5 block truncate text-sm font-semibold text-navy">{destination?.label || 'Not configured'}</strong>
                     <small className="mt-2 block text-xs leading-relaxed text-muted">{destination?.maskedAccount || 'Add a payout destination in settings'}</small>
                   </div>
@@ -677,7 +681,7 @@ export default function HostEarningsPage() {
                       Next scheduled payout: <strong className="font-semibold text-navy">{formatDate(wallet.nextPayoutAt)}</strong>
                     </p>
                   )}
-                  <Button as={Link} to="/host/payouts" color="light" className="w-fit">View payout details</Button>
+                  <Button as={Link} to="/host/payouts" color="light" className="w-fit">{t('hostmoney.viewPayoutDetails')}</Button>
                 </HostCard>
               </div>
             )}

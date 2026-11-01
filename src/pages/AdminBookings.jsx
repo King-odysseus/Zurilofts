@@ -14,6 +14,7 @@ import AdminPagination from '../components/admin/AdminPagination.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
 import usePagedResource from '../hooks/usePagedResource.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { formatPrice } from '../utils/currency.js';
 
 // Module scope on purpose: rebuilt inside a row, these would be a fresh array for
@@ -59,6 +60,7 @@ function formatDay(value) {
 }
 
 function ReservationRow({ booking, onConfirm, onCancel, onRefund }) {
+  const { t } = useLanguage();
   const guests = booking.guests ?? 0;
   const bedLabel = BED_LABELS[booking.bedOption];
   const refundPending = booking.status === 'CANCELLED' && booking.refundStatus === 'REFUND_PENDING';
@@ -117,17 +119,17 @@ function ReservationRow({ booking, onConfirm, onCancel, onRefund }) {
       </TableCell>
       <TableCell>
         <strong className="block text-sm font-semibold text-navy">
-          {guests} guest{guests === 1 ? '' : 's'}
+          <span className="block text-right tabular-nums">{guests} guest{guests === 1 ? '' : 's'}</span>
         </strong>
-        {bedLabel && <span className="block text-xs text-muted">{bedLabel}</span>}
+        {bedLabel && <span className="block text-right text-xs text-muted">{bedLabel}</span>}
       </TableCell>
       <TableCell>
         <strong className="block whitespace-nowrap text-sm font-semibold text-navy">
-          {formatPrice(booking.total) || '-'}
+          <span className="block text-right tabular-nums">{formatPrice(booking.total) || '-'}</span>
         </strong>
         {/* The promo explains why the total sits below the listed price. */}
         {booking.promoCode?.code && (
-          <span className="block text-xs text-muted">Promo {booking.promoCode.code}</span>
+          <span className="block text-right text-xs text-muted">Promo {booking.promoCode.code}</span>
         )}
       </TableCell>
       <TableCell>
@@ -148,12 +150,12 @@ function ReservationRow({ booking, onConfirm, onCancel, onRefund }) {
         {actions.length > 0 ? (
           <div className="flex items-center justify-end">
             <TableActionsMenu
-              label={`Actions for the booking by ${guestName(booking)}`}
+              label={t('a11y3.actionsForBookingBy', { name: guestName(booking) })}
               actions={actions}
             />
           </div>
         ) : (
-          <span className="block text-right text-xs text-muted">No actions</span>
+          <span className="block text-right text-xs text-muted">{t('admin.noActions')}</span>
         )}
       </TableCell>
     </TableRow>
@@ -192,13 +194,13 @@ ReservationRow.propTypes = {
  * Copy for the one dialog this page uses. Keeping it out of the component means
  * every action's wording is stated once, in the same shape.
  */
-function dialogCopy(dialog) {
+function dialogCopy(dialog, t) {
   if (!dialog) return null;
   const booking = dialog.booking;
 
   if (dialog.kind === 'cleanup') {
     return {
-      title: 'Release expired holds',
+      title: t('admin.releaseHolds'),
       description: (
         <>
           An unpaid reservation holds its dates until the payment window closes. Releasing expired
@@ -206,7 +208,7 @@ function dialogCopy(dialog) {
           reservations are never touched.
         </>
       ),
-      confirmLabel: 'Release expired holds',
+      confirmLabel: t('admin.releaseHolds'),
       cancelLabel: 'Keep holds',
       tone: 'warning',
     };
@@ -280,6 +282,7 @@ function dialogCopy(dialog) {
 }
 
 function AdminBookings() {
+  const { t } = useLanguage();
   const [status, setStatus] = useState('');
   const [message, setMessage] = useState('');
   const [messageTone, setMessageTone] = useState('success');
@@ -380,45 +383,45 @@ function AdminBookings() {
     setDialogError('');
   }
 
-  const copy = dialogCopy(dialog);
+  const copy = dialogCopy(dialog, t);
 
   return (
     <div className="space-y-8">
       <AdminPageHeader
-        title="Reservations"
-        description="Every booking across all hosts, newest first. Confirm or cancel a stay, resolve refunds, and release abandoned holds that are blocking dates."
+        title={t('admin.bookingsTitle')}
+        description={t('admin.bookingsDescription')}
         actions={(
           <Button type="button" onClick={() => openDialog({ kind: 'cleanup' })}>
-            Release expired holds
+            {t('admin.releaseHolds')}
           </Button>
         )}
       />
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          label="Bookings on this page"
+          label={t('admin.bookingsOnPage')}
           value={pageCounts.total}
           note={`Page ${page} of ${pagination.totalPages || 1}`}
         />
         <MetricCard
-          label="Pending on this page"
+          label={t('admin.pendingOnPage')}
           value={pageCounts.pending}
-          note="Awaiting payment or review"
+          note={t('admin.awaitingPayment')}
           tone={pageCounts.pending > 0 ? 'warning' : 'default'}
         />
         <MetricCard
-          label="Confirmed on this page"
+          label={t('admin.confirmedOnPage')}
           value={pageCounts.confirmed}
-          note="Paid and booked"
+          note={t('admin.paidAndBooked')}
           tone={pageCounts.confirmed > 0 ? 'positive' : 'default'}
         />
         <MetricCard
-          label="Cancelled on this page"
+          label={t('admin.cancelledOnPage')}
           value={pageCounts.cancelled}
           note={
             pageCounts.refundsPending > 0
               ? `${pageCounts.refundsPending} refund${pageCounts.refundsPending === 1 ? '' : 's'} to resolve`
-              : 'Dates released'
+              : t('admin.datesReleased')
           }
           tone={pageCounts.refundsPending > 0 ? 'warning' : 'default'}
         />
@@ -426,14 +429,14 @@ function AdminBookings() {
 
       <Panel>
         <PanelHead
-          title="All reservations"
-          subtitle="Server-paginated, newest first. Counts above cover this page only."
+          title={t('admin.allReservationsAdmin')}
+          subtitle={t('admin.reservationsSubtitle')}
           actions={(
             <SelectMenu
               value={status}
               onChange={changeStatusFilter}
               options={STATUS_FILTER_OPTIONS}
-              ariaLabel="Filter by status"
+              ariaLabel={t('a11y3.filterByStatus')}
               wrapperClassName="sm:w-48"
               sizing="md"
             />
@@ -443,7 +446,7 @@ function AdminBookings() {
         {message && (
           <Alert
             color={messageTone === 'error' ? 'failure' : 'success'}
-            className="mx-5 mt-5"
+            className="mx-5 mt-5 text-center"
             role="status"
           >
             {message}
@@ -453,53 +456,53 @@ function AdminBookings() {
         {loading ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
             <Spinner size="lg" />
-            <strong className="text-sm font-semibold text-navy">Loading reservations</strong>
-            <p className="text-xs text-muted">Fetching bookings across every host.</p>
+            <strong className="text-sm font-semibold text-navy">{t('admin.loadingReservations')}</strong>
+            <p className="text-xs text-muted">{t('admin.loadingReservationsHint')}</p>
           </div>
         ) : error ? (
           // A failed fetch must not look like an empty list, so it gets its own
           // state with the reason and a way to retry.
           <EmptyState
             kind="error"
-            title="Could not load reservations"
+            title={t('admin.couldNotLoadReservations')}
             description={error}
             action={(
               <Button color="light" type="button" onClick={refetch}>
-                Try again
+                {t('common.retry')}
               </Button>
             )}
           />
         ) : data.length === 0 ? (
           <EmptyState
             kind="empty"
-            title={status ? 'No reservations with this status' : 'No reservations yet'}
+            title={status ? t('admin.noReservationsThisStatus') : t('admin.noReservationsYet')}
             description={
               status
-                ? 'Nothing on this page matches the status filter. Show every status to see the full list.'
-                : 'Bookings appear here as soon as a guest starts checkout.'
+                ? t('admin.noReservationsStatusHint')
+                : t('admin.noReservationsHint')
             }
             action={
               status ? (
                 <Button color="light" type="button" onClick={() => changeStatusFilter('')}>
-                  Show all statuses
+                  {t('admin.showAllStatuses')}
                 </Button>
               ) : undefined
             }
           />
         ) : (
           <div className="overflow-x-auto">
-            <Table hoverable aria-label="Reservations">
+            <Table hoverable aria-label={t('admin.bookingsTitle')}>
               <TableHead>
                 <TableRow>
-                  <TableHeadCell>GUEST</TableHeadCell>
-                  <TableHeadCell>PROPERTY</TableHeadCell>
-                  <TableHeadCell>DATES</TableHeadCell>
-                  <TableHeadCell>GUESTS</TableHeadCell>
-                  <TableHeadCell>TOTAL</TableHeadCell>
-                  <TableHeadCell>PAYMENT</TableHeadCell>
-                  <TableHeadCell>STATUS</TableHeadCell>
+                  <TableHeadCell>{t('admin.colGuest').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colProperty').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colDates').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell><span className="block text-right">{t('admin.colGuests').toUpperCase()}</span></TableHeadCell>
+                  <TableHeadCell><span className="block text-right">{t('common.total').toUpperCase()}</span></TableHeadCell>
+                  <TableHeadCell>{t('admin.colPayment').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('common.status').toUpperCase()}</TableHeadCell>
                   <TableHeadCell>
-                    <span className="block text-right">ACTIONS</span>
+                    <span className="block text-right">{t('common.actions').toUpperCase()}</span>
                   </TableHeadCell>
                 </TableRow>
               </TableHead>

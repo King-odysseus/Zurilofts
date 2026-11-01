@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 import PropertyCardRow from './PropertyCardRow';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * "Similar properties" strip shown at the bottom of the property detail page.
@@ -13,6 +14,7 @@ import PropertyCardRow from './PropertyCardRow';
  * limited to 4. Replace this with a call to the real endpoint when it lands.
  */
 function SimilarProperties({ property }) {
+  const { t } = useLanguage();
   const [similar, setSimilar] = useState([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -48,9 +50,9 @@ function SimilarProperties({ property }) {
 
   return (
     <PropertyCardRow
-      title="Similar properties"
+      title={t('stays.similarTitle')}
       properties={similar}
-      emptyMessage="No similar properties found right now."
+      emptyMessage={t('stays.similarEmpty')}
     />
   );
 }

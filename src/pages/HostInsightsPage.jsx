@@ -5,6 +5,7 @@ import { Alert, Button } from 'flowbite-react';
 import { Filter, MessageCircleMore, Star } from 'lucide-react';
 import apiClient from '../api/client.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
 
 // Host insights, laid out like the reference screen: a listing selector, the
@@ -13,8 +14,8 @@ import SelectMenu from '../components/SelectMenu.jsx';
 // review never counts here either.
 
 const TABS = [
-  { key: 'reviews', label: 'Reviews' },
-  { key: 'ratings', label: 'Ratings' },
+  { key: 'reviews', label: 'hostaccount.tabReviews' },
+  { key: 'ratings', label: 'hostaccount.tabRatings' },
 ];
 
 const SUBSCORE_LABELS = [
@@ -27,8 +28,8 @@ function reviewCount(count) {
   return `${count} ${count === 1 ? 'review' : 'reviews'}`;
 }
 
-function starsOf(rating) {
-  return <span className="inline-flex items-center gap-0.5" aria-label={`${rating} out of 5`}>
+function starsOf(rating, t) {
+  return <span className="inline-flex items-center gap-0.5" aria-label={t('a11y2.outOfFive', { rating })}>
     {[1, 2, 3, 4, 5].map((star) => <Star
       key={star}
       className={`h-3.5 w-3.5 ${star <= Math.round(rating) ? 'text-navy' : 'text-border'}`}
@@ -47,18 +48,19 @@ function formatDate(iso) {
 }
 
 function ScoreBar({ label, score }) {
+  const { t } = useLanguage();
   const percent = score == null ? 0 : Math.max(0, Math.min(100, (score / 5) * 100));
   return <div className="py-4">
     <div className="flex items-baseline justify-between gap-3">
       <h3 className="text-sm font-semibold text-navy">{label}</h3>
       {score == null
-        ? <span className="text-xs text-muted">Not rated yet</span>
+        ? <span className="text-xs text-muted">{t('hostaccount.notRatedYet')}</span>
         : <span className="inline-flex items-center gap-1 text-sm font-semibold tabular-nums text-navy">
           <Star className="h-3.5 w-3.5" fill="currentColor" strokeWidth={0} aria-hidden="true" />
           {score.toFixed(2)}
         </span>}
     </div>
-    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface" role="img" aria-label={score == null ? `${label}: not rated yet` : `${label}: ${score.toFixed(2)} out of 5`}>
+    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-surface" role="img" aria-label={score == null ? t('a11y2.scoreNotRated', { label }) : t('a11y2.scoreOutOfFive', { label, score: score.toFixed(2) })}>
       <span className="block h-full rounded-full bg-primary" style={{ width: `${percent}%` }} />
     </div>
   </div>;
@@ -70,6 +72,7 @@ ScoreBar.propTypes = {
 };
 
 function ReviewRow({ review }) {
+  const { t } = useLanguage();
   return <article className="border-b border-border py-4 last:border-b-0">
     <div className="flex items-start gap-3">
       <span className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-bg text-[11px] font-bold text-white">
@@ -83,7 +86,7 @@ function ReviewRow({ review }) {
           <span className="text-[11px] text-muted">{formatDate(review.createdAt)}</span>
         </div>
         <div className="mt-0.5 flex items-center gap-2">
-          {starsOf(review.rating)}
+          {starsOf(review.rating, t)}
           <span className="truncate text-[11px] text-muted">{review.propertyTitle}</span>
         </div>
         {review.comment && <p className="mt-1.5 text-sm leading-relaxed text-charcoal">{review.comment}</p>}
@@ -105,6 +108,7 @@ ReviewRow.propTypes = {
 };
 
 function ListingSelector({ listings, value, onChange, counts }) {
+  const { t } = useLanguage();
   // SelectMenu replaces Flowbite's Select because that still renders a real
   // <select>, whose option list is drawn by the operating system and ignores
   // the app's styling. SelectMenu is a Dropdown, so the panel matches every
@@ -128,7 +132,7 @@ function ListingSelector({ listings, value, onChange, counts }) {
     value={value}
     onChange={onChange}
     options={options}
-    ariaLabel="Listing"
+    ariaLabel={t('a11y2.listing')}
   />;
 }
 
@@ -140,6 +144,7 @@ ListingSelector.propTypes = {
 };
 
 export default function HostInsightsPage() {
+  const { t } = useLanguage();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -193,7 +198,7 @@ export default function HostInsightsPage() {
   }, [data, listing]);
 
   if (loading) {
-    return <div className="space-y-4" aria-label="Loading insights">
+    return <div className="space-y-4" aria-label={t('hostaccount.loadingInsights')}>
       <span className="block h-16 animate-pulse rounded-xl bg-surface" />
       <span className="block h-48 animate-pulse rounded-xl bg-surface" />
       <span className="block h-32 animate-pulse rounded-xl bg-surface" />
@@ -204,19 +209,19 @@ export default function HostInsightsPage() {
     return <HostCard>
       <div className="flex flex-col items-center gap-3 py-6 text-center">
         <p className="text-sm text-muted">{error}</p>
-        <Button size="sm" onClick={load}>Try again</Button>
+        <Button size="sm" onClick={load}>{t('common.retry')}</Button>
       </div>
     </HostCard>;
   }
 
   return <div className="space-y-6 lg:space-y-8">
     <header>
-      <p className={HOST_EYEBROW}>HOST WORKSPACE</p>
-      <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Insights</h1>
-      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">What guests say about your stays, and what still needs a reply.</p>
+      <p className={HOST_EYEBROW}>{t('host.todayEyebrow')}</p>
+      <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('hostaccount.insightsTitle')}</h1>
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t('hostaccount.insightsDescription')}</p>
     </header>
 
-    <div className="flex flex-wrap items-center gap-1 border-b border-border" role="tablist" aria-label="Insights views">
+    <div className="flex flex-wrap items-center gap-1 border-b border-border" role="tablist" aria-label={t('hostaccount.insightsViews')}>
       {TABS.map((item) => <button
         key={item.key}
         type="button"
@@ -225,7 +230,7 @@ export default function HostInsightsPage() {
         onClick={() => setTab(item.key)}
         className={`-mb-px border-b-2 px-3 py-2 text-sm font-semibold transition-colors ${tab === item.key ? 'border-navy text-navy' : 'border-transparent text-muted hover:text-navy'}`}
       >
-        {item.label}
+        {t(item.label)}
       </button>)}
     </div>
 
@@ -233,12 +238,12 @@ export default function HostInsightsPage() {
 
     {listings.length === 0 ? <HostCard>
       <div className="flex flex-col items-center gap-3 py-6 text-center">
-        <p className="text-sm text-muted">Add a listing and host a stay before there is anything to review.</p>
-        <Button as={Link} to="/host/properties/new" size="sm">Create a listing</Button>
+        <p className="text-sm text-muted">{t('hostaccount.nothingToReview')}</p>
+        <Button as={Link} to="/host/properties/new" size="sm">{t('hostaccount.createListing')}</Button>
       </div>
-    </HostCard> : tab === 'ratings' ? <section aria-label="Rating breakdown">
+    </HostCard> : tab === 'ratings' ? <section aria-label={t('hostaccount.ratingBreakdown')}>
       <HostCard
-        title="Rating breakdown"
+        title={t('hostaccount.ratingBreakdown')}
         action={<span className="text-xs text-muted">{reviewCount(summary?.totalReviews || 0)}</span>}
       >
         <div className="divide-y divide-border">
@@ -276,7 +281,7 @@ export default function HostInsightsPage() {
           </div>)}
         </div>
       </HostCard>
-    </section> : <section aria-label="Reviews">
+    </section> : <section aria-label={t('hostaccount.reviewsLabel')}>
       <HostCard
         title={<span className="inline-flex items-center gap-2">
           <Star className="h-4 w-4 shrink-0" fill="currentColor" strokeWidth={0} aria-hidden="true" />
@@ -300,7 +305,7 @@ export default function HostInsightsPage() {
         </Button>}
       >
         {visibleReviews.length === 0
-          ? <p className="py-8 text-center text-sm text-muted">No reviews yet. They appear here after a guest checks out and reviews their stay.</p>
+          ? <p className="py-8 text-center text-sm text-muted">{t('hostaccount.noReviewsYet')}</p>
           : <div>{visibleReviews.map((review) => <ReviewRow key={review.id} review={review} />)}</div>}
       </HostCard>
     </section>}

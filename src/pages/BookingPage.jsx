@@ -7,16 +7,18 @@ import AvailabilityCalendar from '../components/AvailabilityCalendar.jsx';
 import apiClient from '../api/client.js';
 import BrandLogo from '../components/BrandLogo.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
 
 function CheckoutDropdown({ value, options, onChange, ariaLabel, className = '' }) {
   const selected = options.find((option) => String(option.value) === String(value));
+  const { t } = useLanguage();
   return (
     <FlowbiteDropdown
       inline
       theme={{ inlineWrapper: `op-checkout-select ${className}`.trim() }}
-      label={<span className="op-checkout-select-value">{selected?.label ?? 'Select'}</span>}
+      label={<span className="op-checkout-select-value">{selected?.label ?? t('booking.selectPlaceholder')}</span>}
       placement="bottom-start"
       aria-label={ariaLabel}
     >
@@ -39,6 +41,7 @@ function BookingPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { isAuthenticated } = useAuth();
+  const { t } = useLanguage();
   const urlVariant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [step, setStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -543,10 +546,10 @@ function BookingPage() {
   // Step 1: Dates & Guests
   const renderStep1 = () => (
     <div className="space-y-7">
-      <h2 className="text-2xl font-bold text-[#203565]">Select your dates</h2>
+      <h2 className="text-2xl font-bold text-[#203565]">{t('booking.selectDates')}</h2>
 
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-3">Select your dates *</label>
+        <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.selectDatesRequired')}</label>
         <AvailabilityCalendar
           value={{ checkIn: bookingData.checkIn, checkOut: bookingData.checkOut }}
           onChange={({ checkIn, checkOut }) => setBookingData((prev) => ({ ...prev, checkIn, checkOut }))}
@@ -555,11 +558,11 @@ function BookingPage() {
         {(bookingData.checkIn || bookingData.checkOut) && (
           <div className="flex gap-4 mt-4">
             <div className="flex-1 neu-input px-4 py-2 bg-elevated">
-              <span className="text-xs text-[#6b7280] block">Check-in</span>
+              <span className="text-xs text-[#6b7280] block">{t('booking.checkIn')}</span>
               <span className="font-semibold text-[#203565]">{bookingData.checkIn || '-'}</span>
             </div>
             <div className="flex-1 neu-input px-4 py-2 bg-elevated">
-              <span className="text-xs text-[#6b7280] block">Check-out</span>
+              <span className="text-xs text-[#6b7280] block">{t('booking.checkOut')}</span>
               <span className="font-semibold text-[#203565]">{bookingData.checkOut || '-'}</span>
             </div>
           </div>
@@ -567,7 +570,7 @@ function BookingPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-3">Number of Guests *</label>
+        <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.numberOfGuests')}</label>
         <CheckoutDropdown
           value={bookingData.guests}
           onChange={(v) => setGuestCount(Number(v))}
@@ -575,7 +578,7 @@ function BookingPage() {
             value: num,
             label: `${num} ${num === 1 ? 'guest' : 'guests'}`,
           }))}
-          ariaLabel="Number of guests"
+          ariaLabel={t('a11y2.numberOfGuests')}
         />
         {bedOption && (
           <p className="text-xs text-[#6b7280] mt-2">
@@ -589,7 +592,7 @@ function BookingPage() {
           <p className="text-red-500 text-xs mt-1 font-semibold">Maximum {pricing.maxGuests} guests for this room type. Exceeding this is grounds for removal.</p>
         )}
         {!bedOption && (
-          <p className="text-xs text-[#6b7280] mt-2">Select a bed option above to see guest limits.</p>
+          <p className="text-xs text-[#6b7280] mt-2">{t('booking.selectBedOptionFirst')}</p>
         )}
       </div>
 
@@ -624,7 +627,7 @@ function BookingPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-3">Estimated Check-in Time</label>
+          <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.estimatedCheckInTime')}</label>
           <TextInput
             type="time"
             name="checkInTime"
@@ -633,10 +636,10 @@ function BookingPage() {
             className="op-checkout-input"
             sizing="lg"
           />
-          <p className="text-xs text-[#6b7280] mt-2">From 3:00 PM</p>
+          <p className="text-xs text-[#6b7280] mt-2">{t('booking.fromTime', { time: '3:00 PM' })}</p>
         </div>
         <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-3">Check-out Time</label>
+          <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.checkOutTime')}</label>
           <CheckoutDropdown
             value={bookingData.checkOutTime}
             onChange={(v) => setBookingData((prev) => ({ ...prev, checkOutTime: v }))}
@@ -650,7 +653,7 @@ function BookingPage() {
                 label: `${formatTime12h(time)}${!hasQuote ? '' : fee > 0 ? ` (+KES ${fee.toLocaleString()})` : ' (Standard)'}`,
               };
             })}
-            ariaLabel="Check-out time"
+            ariaLabel={t('a11y2.checkOutTime')}
           />
           {pricing.lateCheckoutFee > 0 && (
             <p className="text-xs text-[#8A6B52] font-medium mt-1">
@@ -698,32 +701,32 @@ function BookingPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-[#203565]">Guest Information</h2>
-        <p className="text-sm text-[#6b7280] mt-1">Pre-filled from your account. Edit anything that&apos;s changed.</p>
+        <h2 className="text-2xl font-bold text-[#203565]">{t('booking.guestInformation')}</h2>
+        <p className="text-sm text-[#6b7280] mt-1">{t('booking.guestInformationHint')}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-3">First Name *</label>
+          <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.firstNameRequired')}</label>
           <TextInput
             type="text"
             name="firstName"
             value={bookingData.firstName}
             onChange={handleInputChange}
-            placeholder="John"
+            placeholder={t('booking.firstNamePlaceholder')}
             className="op-checkout-input"
             sizing="lg"
             required
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold text-[#1f2937] mb-3">Last Name *</label>
+          <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.lastNameRequired')}</label>
           <TextInput
             type="text"
             name="lastName"
             value={bookingData.lastName}
             onChange={handleInputChange}
-            placeholder="Doe"
+            placeholder={t('booking.lastNamePlaceholder')}
             className="op-checkout-input"
             sizing="lg"
             required
@@ -732,13 +735,13 @@ function BookingPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-3">Email *</label>
+        <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.emailRequired')}</label>
         <TextInput
           type="email"
           name="email"
           value={bookingData.email}
           onChange={handleInputChange}
-          placeholder="john@example.com"
+          placeholder="jina@mfano.com"
           className="op-checkout-input"
           sizing="lg"
           required
@@ -746,13 +749,13 @@ function BookingPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-3">Phone Number *</label>
+        <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.phoneRequired')}</label>
         <div className="flex gap-2">
           <CheckoutDropdown
             value={phoneCountryCode}
             onChange={(val) => handlePhoneChange(val, phoneNumber)}
             options={COUNTRY_CODES.map((c) => ({ value: c.code, label: c.dial }))}
-            ariaLabel="Select country code"
+            ariaLabel={t('a11y2.selectCountryCode')}
             className="op-checkout-country-code"
           />
           <TextInput
@@ -783,37 +786,37 @@ function BookingPage() {
             disabled={bookingData.guests >= pricing.maxGuests}
             className="text-sm font-semibold text-[#8A6B52] hover:text-[#203565] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            + Add guest
+            + {t('booking.addGuest')}
           </button>
         </div>
         <p className="text-xs text-[#6b7280] mb-4">
-          You&apos;re booking for {bookingData.guests} {bookingData.guests === 1 ? 'guest' : 'guests'}. Add the names of anyone staying with you.
+          {t('booking.bookingForGuests', { count: bookingData.guests })}
         </p>
 
         {additionalGuests.length === 0 ? (
-          <p className="text-sm text-[#6b7280] italic">Just you - add a guest if others are staying.</p>
+          <p className="text-sm text-[#6b7280] italic">{t('booking.justYou')}</p>
         ) : (
           <div className="space-y-5">
             {additionalGuests.map((g, i) => (
               <div key={i} className="flex items-end gap-3">
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-[#6b7280] mb-1">Guest {i + 2} first name</label>
+                  <label className="block text-xs font-medium text-[#6b7280] mb-1">{t('booking.guestNumberFirstName', { number: i + 2 })}</label>
                   <TextInput
                     type="text"
                     value={g.firstName}
                     onChange={(e) => updateAdditionalGuest(i, 'firstName', e.target.value)}
-                    placeholder="First name"
+                    placeholder={t('booking.firstNamePlaceholder')}
                     className="op-checkout-input"
                     sizing="lg"
                   />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-xs font-medium text-[#6b7280] mb-1">Last name</label>
+                  <label className="block text-xs font-medium text-[#6b7280] mb-1">{t('booking.lastName')}</label>
                   <TextInput
                     type="text"
                     value={g.lastName}
                     onChange={(e) => updateAdditionalGuest(i, 'lastName', e.target.value)}
-                    placeholder="Last name"
+                    placeholder={t('booking.lastNamePlaceholder')}
                     className="op-checkout-input"
                     sizing="lg"
                   />
@@ -822,7 +825,7 @@ function BookingPage() {
                   type="button"
                   onClick={() => removeGuest(i)}
                   className="mb-1 w-10 h-10 flex items-center justify-center rounded-xl text-[#6b7280] hover:text-red-600 hover:bg-red-50 transition-colors flex-shrink-0"
-                  aria-label="Remove guest"
+                  aria-label={t('booking.removeGuest')}
                 >
                   <Trash2 className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
                 </button>
@@ -833,12 +836,12 @@ function BookingPage() {
       </div>
 
       <div>
-        <label className="block text-sm font-semibold text-[#1f2937] mb-3">Special Requests</label>
+        <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.specialRequests')}</label>
         <Textarea
           name="specialRequests"
           value={bookingData.specialRequests}
           onChange={handleInputChange}
-          placeholder="Any special requirements or requests..."
+          placeholder={t('booking.specialRequestsPlaceholder')}
           className="op-checkout-input"
           rows={4}
         />
@@ -850,7 +853,7 @@ function BookingPage() {
         className="op-checkout-primary"
         pill
       >
-        {creatingBooking ? 'Starting your booking...' : 'Continue to Add-ons'}
+        {creatingBooking ? t('booking.startingBooking') : t('booking.continueToAddOns')}
       </Button>
     </div>
   );
@@ -871,9 +874,9 @@ function BookingPage() {
       </div>
 
       <div>
-        <h2 className="text-2xl font-bold text-[#203565]">Enhance your stay</h2>
+        <h2 className="text-2xl font-bold text-[#203565]">{t('booking.enhanceYourStay')}</h2>
         <p className="text-sm text-[#6b7280] mt-1">
-          Add optional services to your booking. You can change quantities any time before payment.
+          {t('booking.addOnsHint')}
         </p>
       </div>
 
@@ -889,7 +892,7 @@ function BookingPage() {
         </div>
       ) : availableAddOns.length === 0 ? (
         <div className="rounded-xl bg-[#F4F0E8] p-6 text-center">
-          <p className="text-[#6b7280]">No add-ons are available for this property.</p>
+          <p className="text-[#6b7280]">{t('booking.noAddOns')}</p>
         </div>
       ) : (
         <div className="space-y-5">
@@ -919,7 +922,7 @@ function BookingPage() {
                       onClick={() => changeAddOnQuantity(addOn, qty - 1)}
                       disabled={busy || qty === 0}
                       className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#203565] font-bold hover:border-[#C5A28C] hover:text-[#8A6B52] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      aria-label={`Decrease ${addOn.name} quantity`}
+                      aria-label={t('a11y2.decreaseQuantity', { name: addOn.name })}
                     >
                       −
                     </button>
@@ -931,7 +934,7 @@ function BookingPage() {
                       onClick={() => changeAddOnQuantity(addOn, qty + 1)}
                       disabled={busy || qty >= 20}
                       className="w-9 h-9 rounded-full border border-[#D9D9D9] text-[#203565] font-bold hover:border-[#C5A28C] hover:text-[#8A6B52] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      aria-label={`Increase ${addOn.name} quantity`}
+                      aria-label={t('a11y2.increaseQuantity', { name: addOn.name })}
                     >
                       +
                     </button>
@@ -947,7 +950,7 @@ function BookingPage() {
       )}
 
       <div className="flex items-center justify-between rounded-xl bg-[#F4F0E8] p-4">
-        <span className="font-semibold text-[#203565]">Add-ons total</span>
+        <span className="font-semibold text-[#203565]">{t('booking.addOnsTotal')}</span>
         <span className="font-bold text-[#203565]">KES {pricing.addOnsTotal.toLocaleString()}</span>
       </div>
 
@@ -956,7 +959,7 @@ function BookingPage() {
         className="op-checkout-primary"
         pill
       >
-        Continue to Payment
+        {t('booking.continueToPayment')}
       </Button>
     </div>
   );
@@ -976,7 +979,7 @@ function BookingPage() {
         </Button>
       </div>
 
-      <h2 className="text-2xl font-bold text-[#203565]">Payment</h2>
+      <h2 className="text-2xl font-bold text-[#203565]">{t('booking.payment')}</h2>
 
       <div className="space-y-5">
         <label className={`flex items-center p-4 cursor-pointer transition-all ${
@@ -992,8 +995,8 @@ function BookingPage() {
           <div className="ml-4 flex items-center flex-1">
             <CreditCard className="w-8 h-8 text-[#203565] mr-3" strokeWidth={1.5} aria-hidden="true" />
             <div>
-              <p className="font-semibold text-[#1f2937]">Credit/Debit Card</p>
-              <p className="text-sm text-[#6b7280]">Pay securely with your card</p>
+              <p className="font-semibold text-[#1f2937]">{t('booking.payByCard')}</p>
+              <p className="text-sm text-[#6b7280]">{t('booking.payByCardHint')}</p>
             </div>
           </div>
         </label>
@@ -1013,8 +1016,8 @@ function BookingPage() {
               <span className="text-white font-bold text-xs">M</span>
             </div>
             <div>
-              <p className="font-semibold text-[#1f2937]">M-Pesa</p>
-              <p className="text-sm text-[#6b7280]">Pay with M-Pesa mobile money</p>
+              <p className="font-semibold text-[#1f2937]">{t('booking.payByMpesa')}</p>
+              <p className="text-sm text-[#6b7280]">{t('booking.payByMpesaHint')}</p>
             </div>
           </div>
         </label>
@@ -1032,8 +1035,8 @@ function BookingPage() {
           <div className="ml-4 flex items-center flex-1">
             <Landmark className="w-8 h-8 text-[#203565] mr-3" strokeWidth={1.5} aria-hidden="true" />
             <div>
-              <p className="font-semibold text-[#1f2937]">Bank Transfer</p>
-              <p className="text-sm text-[#6b7280]">Pay via bank transfer</p>
+              <p className="font-semibold text-[#1f2937]">{t('booking.payByBank')}</p>
+              <p className="text-sm text-[#6b7280]">{t('booking.payByBankHint')}</p>
             </div>
           </div>
         </label>
@@ -1041,13 +1044,13 @@ function BookingPage() {
 
       {/* Promo Code */}
       <div className="mt-6">
-        <label className="block text-sm font-semibold text-[#1f2937] mb-3">Promo Code</label>
+        <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.promoCode')}</label>
         <div className="flex gap-2">
           <TextInput
             type="text"
             value={promoCode}
             onChange={(e) => { setPromoCode(e.target.value); setPromoError(''); }}
-            placeholder="Enter code"
+            placeholder={t('booking.promoCodePlaceholder')}
             className="op-checkout-input uppercase"
             sizing="lg"
             disabled={!!promoResult}
@@ -1091,7 +1094,7 @@ function BookingPage() {
           <span>KES {pricing.subtotal.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-[#1f2937]">
-          <span>Cleaning fee</span>
+          <span>{t('booking.cleaningFee')}</span>
           <span>KES {pricing.cleaningFee.toLocaleString()}</span>
         </div>
         {pricing.extraGuestFee > 0 && (
@@ -1101,7 +1104,7 @@ function BookingPage() {
           </div>
         )}
         <div className="flex justify-between text-[#1f2937]">
-          <span>Service fee</span>
+          <span>{t('booking.serviceFee')}</span>
           <span>KES {pricing.serviceFee.toLocaleString()}</span>
         </div>
         {selectedAddOns.map((item) => (
@@ -1112,13 +1115,13 @@ function BookingPage() {
         ))}
         {pricing.lateCheckoutFee > 0 && (
           <div className="flex justify-between text-[#1f2937]">
-            <span>Late check-out ({formatTime12h(bookingData.checkOutTime)})</span>
+            <span>{t('booking.lateCheckout')} ({formatTime12h(bookingData.checkOutTime)})</span>
             <span>KES {pricing.lateCheckoutFee.toLocaleString()}</span>
           </div>
         )}
         {pricing.discountAmount > 0 && (
           <div className="flex justify-between text-green-600">
-            <span>Promo discount</span>
+            <span>{t('booking.promoDiscount')}</span>
             <span>-KES {pricing.discountAmount.toLocaleString()}</span>
           </div>
         )}
@@ -1129,7 +1132,7 @@ function BookingPage() {
           </div>
         )}
         <div className="border-t border-[#203565]/20 pt-3 flex justify-between font-bold text-[#203565]">
-          <span>Total</span>
+          <span>{t('booking.total')}</span>
           <span>KES {pricing.total.toLocaleString()}</span>
         </div>
       </div>
@@ -1153,7 +1156,7 @@ function BookingPage() {
         </div>
       )}
       {quoteLoading && !quote && (
-        <p className="mb-3 text-sm text-[#6b7280]">Pricing your stay...</p>
+        <p className="mb-3 text-sm text-[#6b7280]">{t('booking.pricingYourStay')}</p>
       )}
 
       <form onSubmit={handleSubmit}>
@@ -1194,12 +1197,12 @@ function BookingPage() {
             <div className="w-24 h-24 bg-[#F4F0E8] rounded-full flex items-center justify-center mx-auto mb-6">
               <Check className="w-12 h-12 text-[#8A6B52]" strokeWidth={2} aria-hidden="true" />
             </div>
-            <h1 className="text-3xl font-bold text-[#203565] mb-4">Booking Confirmed!</h1>
+            <h1 className="text-3xl font-bold text-[#203565] mb-4">{t('booking.bookingConfirmed')}</h1>
             <p className="text-[#6b7280] mb-6">
               Thank you for your booking. We have sent a confirmation email to {bookingData.email} with all the details.
             </p>
             <div className="bg-[#D9D9D9] rounded-2xl p-6 mb-6 text-left">
-              <h3 className="font-bold text-[#203565] mb-4">Booking Summary</h3>
+              <h3 className="font-bold text-[#203565] mb-4">{t('booking.bookingSummary')}</h3>
               <p className="text-[#1f2937]">{property?.title}</p>
               <p className="text-[#6b7280] text-sm">{property?.location}</p>
               <div className="mt-3 pt-3 border-t border-[#203565]/10">
@@ -1213,7 +1216,7 @@ function BookingPage() {
                 </div>
                 {pricing.lateCheckoutFee > 0 && (
                   <div className="flex justify-between text-sm mt-2">
-                    <span className="text-[#6b7280]">Late check-out fee</span>
+                    <span className="text-[#6b7280]">{t('booking.lateCheckoutFee')}</span>
                     <span className="font-medium">KES {pricing.lateCheckoutFee.toLocaleString()}</span>
                   </div>
                 )}
@@ -1224,11 +1227,11 @@ function BookingPage() {
                   </div>
                 ))}
                 <div className="flex justify-between text-sm mt-2">
-                  <span className="text-[#6b7280]">Guests</span>
+                  <span className="text-[#6b7280]">{t('booking.guests')}</span>
                   <span className="font-medium">{bookingData.guests}</span>
                 </div>
                 <div className="flex justify-between font-bold text-[#203565] mt-3 pt-3 border-t border-[#203565]/10">
-                  <span>Total Paid</span>
+                  <span>{t('booking.totalPaid')}</span>
                   <span>KES {pricing.total.toLocaleString()}</span>
                 </div>
               </div>
@@ -1238,7 +1241,7 @@ function BookingPage() {
                 onClick={() => navigate('/')}
                 className="w-full bg-[#143A80] text-white py-3 rounded-full font-semibold hover:bg-[#0B2A5E] transition-all duration-200"
               >
-                Return to Home
+                {t('booking.returnToHome')}
               </button>
               <button
                 onClick={() => window.print()}
@@ -1261,7 +1264,7 @@ function BookingPage() {
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center">
             <div className="w-10 h-10 border-4 border-[#C5A28C] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-[#6b7280]">Loading property...</p>
+            <p className="text-[#6b7280]">{t('booking.loadingProperty')}</p>
           </div>
         </div>
       </div>
@@ -1276,7 +1279,7 @@ function BookingPage() {
         <Navbar />
         <div className="pt-24 flex items-center justify-center min-h-[60vh]">
           <div className="text-center max-w-md px-4">
-            <h1 className="text-lg font-semibold text-[#203565] mb-2">Property unavailable</h1>
+            <h1 className="text-lg font-semibold text-[#203565] mb-2">{t('booking.propertyUnavailable')}</h1>
             <p className="text-[#6b7280] mb-6">{propertyError || 'This listing could not be loaded.'}</p>
             <div className="flex items-center justify-center gap-3">
               <Button color="light" onClick={() => setReloadKey((key) => key + 1)}>
@@ -1302,7 +1305,7 @@ function BookingPage() {
       <div className="op-checkout-main pb-12 md:pb-16">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
           {/* Progress Steps */}
-          <div className="op-checkout-progress" aria-label="Checkout progress">
+          <div className="op-checkout-progress" aria-label={t('booking.checkoutProgress')}>
             {[1, 2, 4].map((s, i, steps) => (
               <Fragment key={s}>
                 <div className="op-checkout-progress-step">
@@ -1363,14 +1366,14 @@ function BookingPage() {
 
                 {pricing.nights > 0 && (
                   <div className="mt-6 pt-6 border-t border-[#D9D9D9]">
-                    <h4 className="font-semibold text-[#203565] mb-4">Price Details</h4>
+                    <h4 className="font-semibold text-[#203565] mb-4">{t('booking.priceDetails')}</h4>
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between text-[#1f2937]">
                         <span>KES {pricing.propertyPrice.toLocaleString()} x {pricing.nights} nights</span>
                         <span>KES {pricing.subtotal.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between text-[#1f2937]">
-                        <span>Cleaning fee</span>
+                        <span>{t('booking.cleaningFee')}</span>
                         <span>KES {pricing.cleaningFee.toLocaleString()}</span>
                       </div>
                       {pricing.extraGuestFee > 0 && (
@@ -1380,7 +1383,7 @@ function BookingPage() {
                         </div>
                       )}
                       <div className="flex justify-between text-[#1f2937]">
-                        <span>Service fee</span>
+                        <span>{t('booking.serviceFee')}</span>
                         <span>KES {pricing.serviceFee.toLocaleString()}</span>
                       </div>
                       {selectedAddOns.map((item) => (
@@ -1397,7 +1400,7 @@ function BookingPage() {
                       )}
                       {pricing.discountAmount > 0 && (
                         <div className="flex justify-between text-green-600">
-                          <span>Promo discount</span>
+                          <span>{t('booking.promoDiscount')}</span>
                           <span>-KES {pricing.discountAmount.toLocaleString()}</span>
                         </div>
                       )}
@@ -1408,7 +1411,7 @@ function BookingPage() {
                         </div>
                       )}
                       <div className="pt-3 border-t border-[#D9D9D9] flex justify-between font-bold text-[#203565]">
-                        <span>Total</span>
+                        <span>{t('booking.total')}</span>
                         <span>KES {pricing.total.toLocaleString()}</span>
                       </div>
                     </div>

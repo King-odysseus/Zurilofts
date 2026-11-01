@@ -8,6 +8,7 @@ import {
 import { Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
 import AdminPageHeader from '../components/admin/AdminPageHeader.jsx';
@@ -57,6 +58,7 @@ function userInitials(user) {
 }
 
 function AdminUsers() {
+  const { t } = useLanguage();
   const { user: currentUser } = useAuth();
   const location = useLocation();
   const [users, setUsers] = useState([]);
@@ -290,41 +292,41 @@ function AdminUsers() {
       {/* The shell already names the section, so the page prints one title and
           drops the uppercase eyebrow that used to repeat it. */}
       <AdminPageHeader
-        title="Users & hosts"
-        description="Manage guest accounts, host access, payout details, and account safety."
+        title={t('admin.usersTitle')}
+        description={t('admin.usersDescription')}
       />
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          label="Matching accounts"
+          label={t('admin.matchingAccounts')}
           value={pagination.total}
-          note={roleFilter || search.trim() ? 'Across all pages, after filters' : 'Every account on the platform'}
+          note={roleFilter || search.trim() ? t('admin.acrossAllPages') : t('admin.everyAccount')}
         />
-        <MetricCard label="Guests on this page" value={viewTotals.guests} note="Travelling accounts" />
-        <MetricCard label="Hosts on this page" value={viewTotals.hosts} note="Workspace access" />
+        <MetricCard label={t('admin.guestsOnPage')} value={viewTotals.guests} note={t('admin.travellingAccounts')} />
+        <MetricCard label={t('admin.hostsOnPage')} value={viewTotals.hosts} note={t('admin.workspaceAccess')} />
         <MetricCard
-          label="Suspended on this page"
+          label={t('admin.suspendedOnPage')}
           value={viewTotals.suspended}
-          note="Accounts currently restricted"
+          note={t('admin.currentlyRestricted')}
           tone={viewTotals.suspended > 0 ? 'warning' : 'default'}
         />
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
+      <section className="overflow-hidden rounded-xl bg-elevated shadow-md">
         <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative flex-1 sm:max-w-xs">
+          <div className="relative flex-1 sm:max-w-xs [&_input]:border-0 [&_input]:bg-surface [&_input]:pl-9">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
             <TextInput
               type="search"
               value={search}
               onChange={(event) => { setSearch(event.target.value); setPage(1); setSelectedIds([]); }}
-              placeholder="Search name or email"
-              aria-label="Search users by name or email"
-              className="pl-9"
+              placeholder={t('admin.searchNameOrEmail')}
+              aria-label={t('admin.searchUsersLabel')}
+              
             />
           </div>
           <SelectMenu
-            ariaLabel="Filter by role"
+            ariaLabel={t('admin.filterByRole')}
             value={roleFilter}
             onChange={(next) => { setRoleFilter(next); setPage(1); setSelectedIds([]); }}
             wrapperClassName="sm:w-44"
@@ -333,55 +335,58 @@ function AdminUsers() {
         </div>
 
         {message && (
-          <Alert color={messageTone} className="mx-5 mt-5" role="status">
+          <Alert color={messageTone} className="mx-5 mt-5 text-center" role="status">
             {message}
           </Alert>
         )}
 
         {selectedIds.length > 0 && (
-          <div className="mx-5 mt-5 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-surface px-4 py-3" role="toolbar" aria-label="Bulk actions">
+          <div className="mx-5 mt-5 flex flex-wrap items-center gap-2 rounded-lg bg-surface px-4 py-3 shadow-sm" role="toolbar" aria-label={t('admin.bulkActions')}>
             <strong className="mr-auto text-sm font-semibold text-navy">{selectedIds.length} selected</strong>
-            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => { setActionError(''); setBulkTarget({ suspended: true }); }}>Suspend</Button>
-            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => { setActionError(''); setBulkTarget({ suspended: false }); }}>Reactivate</Button>
-            <Button size="xs" color="light" type="button" onClick={() => setSelectedIds([])}>Clear</Button>
+            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => { setActionError(''); setBulkTarget({ suspended: true }); }}>{t('admin.suspend')}</Button>
+            <Button size="xs" color="light" type="button" disabled={busyId === 'bulk'} onClick={() => { setActionError(''); setBulkTarget({ suspended: false }); }}>{t('admin.reactivate')}</Button>
+            <Button size="xs" color="light" type="button" onClick={() => setSelectedIds([])}>{t('common.clear')}</Button>
           </div>
         )}
 
         {loading ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
             <Spinner size="lg" />
-            <strong className="text-sm font-semibold text-navy">Loading people</strong>
-            <p className="text-xs text-muted">Fetching guest, host, and administrator accounts.</p>
+            <strong className="text-sm font-semibold text-navy">{t('admin.loadingPeople')}</strong>
+            <p className="text-xs text-muted">{t('admin.loadingPeopleHint')}</p>
           </div>
         ) : loadError ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center" role="alert">
-            <strong className="text-sm font-semibold text-navy">Could not load accounts</strong>
+            <strong className="text-sm font-semibold text-navy">{t('admin.couldNotLoadAccounts')}</strong>
             <p className="text-xs text-muted">{loadError}</p>
-            <Button color="light" type="button" onClick={loadUsers}>Try again</Button>
+            <Button color="light" type="button" onClick={loadUsers}>{t('common.retry')}</Button>
           </div>
         ) : users.length === 0 ? (
-          <Alert color="info" className="m-5">
-            <strong className="block">No accounts found</strong>
-            <p>Try a different search or role filter.</p>
+          <Alert color="info" className="m-5 text-center">
+            <strong className="block">{t('admin.noAccountsFound')}</strong>
+            <p>{t('admin.noAccountsHint')}</p>
           </Alert>
         ) : (
           <div className="overflow-x-auto">
-            <Table hoverable aria-label="Users and hosts">
+            <Table hoverable aria-label={t('admin.usersTitle')}>
               <TableHead>
                 <TableRow>
                   <TableHeadCell>
                     <Checkbox
-                      aria-label="Select all accounts"
+                      aria-label={t('admin.selectAll')}
                       checked={selectableUsers.length > 0 && selectedIds.length === selectableUsers.length}
                       onChange={(event) => setSelectedIds(event.target.checked ? selectableUsers.map((u) => u.id) : [])}
                     />
                   </TableHeadCell>
-                  <TableHeadCell>PERSON</TableHeadCell>
-                  <TableHeadCell>ROLE</TableHeadCell>
-                  <TableHeadCell>LISTINGS</TableHeadCell>
-                  <TableHeadCell>WALLET</TableHeadCell>
-                  <TableHeadCell>STATUS</TableHeadCell>
-                  <TableHeadCell>ACTIONS</TableHeadCell>
+                  <TableHeadCell>{t('admin.colPerson').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colRole').toUpperCase()}</TableHeadCell>
+                  {/* Number columns right-align, so their labels sit on the same edge as the values. */}
+                  <TableHeadCell><span className="block text-right">{t('admin.colListings').toUpperCase()}</span></TableHeadCell>
+                  <TableHeadCell><span className="block text-right">{t('admin.colWallet').toUpperCase()}</span></TableHeadCell>
+                  <TableHeadCell>{t('common.status').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>
+                    <span className="block text-right">{t('common.actions').toUpperCase()}</span>
+                  </TableHeadCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -392,53 +397,53 @@ function AdminUsers() {
                     <TableRow key={u.id} className={u.suspended ? 'opacity-70' : undefined}>
                       <TableCell>
                         {!isSelf && u.role !== 'ADMIN' && (
-                          <Checkbox aria-label={`Select ${u.firstName} ${u.lastName}`} checked={selectedIds.includes(u.id)} onChange={() => toggleSelected(u.id)} />
+                          <Checkbox aria-label={t('a11y3.selectUser', { name: `${u.firstName} ${u.lastName}` })} checked={selectedIds.includes(u.id)} onChange={() => toggleSelected(u.id)} />
                         )}
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-3">
                           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-semibold text-primary-600 dark:text-primary-300" aria-hidden="true">{userInitials(u)}</span>
                           <div className="min-w-0">
-                            <strong className="block truncate text-sm font-semibold text-navy">{u.firstName} {u.lastName}{isSelf && <small> · you</small>}</strong>
+                            <strong className="block truncate text-sm font-semibold text-navy">{u.firstName} {u.lastName}{isSelf && <small> · {t('admin.you')}</small>}</strong>
                             <span className="block truncate text-xs text-charcoal">{u.email}</span>
-                            <small className="block truncate text-xs text-muted">{u.phone || 'Phone not added'}</small>
+                            <small className="block truncate text-xs text-muted">{u.phone || t('admin.noPhone')}</small>
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
                         {isSelf || u.role === 'ADMIN' ? (
-                          <Badge color="gray">Admin</Badge>
+                          <Badge color="gray">{t('admin.adminOnly')}</Badge>
                         ) : (
                           <SelectMenu
                             sizing="sm"
                             value={u.role}
                             onChange={(next) => changeRole(u, next)}
                             disabled={busy}
-                            ariaLabel={`Change role for ${u.firstName} ${u.lastName}`}
+                            ariaLabel={t('a11y3.changeRoleFor', { name: `${u.firstName} ${u.lastName}` })}
                             wrapperClassName="min-w-[120px]"
                             options={ASSIGNABLE_ROLE_OPTIONS}
                           />
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-col gap-1">
-                          <strong className="text-sm font-semibold text-navy">{u._count?.properties ?? 0}</strong>
+                        <div className="flex flex-col gap-1 text-right">
+                          <strong className="text-sm font-semibold tabular-nums text-navy">{u._count?.properties ?? 0}</strong>
                           <small className="text-xs text-muted">properties</small>
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-col gap-1">
-                          <strong className="text-sm font-semibold text-navy">{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '-'}</strong>
-                          <small className="text-xs text-muted">host balance</small>
+                        <div className="flex flex-col gap-1 text-right">
+                          <strong className="text-sm font-semibold tabular-nums text-navy">{u.wallet?.balance != null ? `KES ${Number(u.wallet.balance).toLocaleString()}` : '-'}</strong>
+                          <small className="text-xs text-muted">{t('admin.hostBalance')}</small>
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge color={u.suspended ? 'failure' : 'success'}>{u.suspended ? 'Suspended' : 'Active'}</Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="flex flex-wrap items-center gap-2">
+                        <div className="flex flex-wrap items-center justify-end gap-2">
                           <TableActionsMenu
-                            label={`Actions for ${u.firstName} ${u.lastName}`}
+                            label={t('a11y3.actionsFor', { name: `${u.firstName} ${u.lastName}` })}
                             actions={[
                               { label: 'Edit', icon: 'edit', onClick: () => openEdit(u) },
                               // Suspend and Delete are withheld on your own account: an admin
@@ -482,7 +487,7 @@ function AdminUsers() {
           </ModalHeader>
           <form onSubmit={handleSave}>
             <ModalBody className="space-y-5">
-              {formError && <Alert color="failure">{formError}</Alert>}
+              {formError && <Alert color="failure" className="text-center">{formError}</Alert>}
 
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                 <Field label="First Name" value={formData.firstName} onChange={(v) => setFormData({ ...formData, firstName: v })} />
@@ -491,7 +496,7 @@ function AdminUsers() {
               <Field label="Email" type="email" value={formData.email} onChange={(v) => setFormData({ ...formData, email: v })} />
               <Field label="Phone" value={formData.phone} onChange={(v) => setFormData({ ...formData, phone: v })} />
 
-              <div className="rounded-lg border border-border bg-surface p-4">
+              <div className="rounded-lg bg-surface p-4 shadow-sm">
                 <p className="text-sm font-semibold text-navy">Host payout details</p>
                 <span className="mt-0.5 block text-xs text-muted">Used for bank transfers to hosts. Leave blank for non-hosts.</span>
                 <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
@@ -505,7 +510,7 @@ function AdminUsers() {
                       value={formData.payoutFrequency}
                       onChange={(next) => setFormData({ ...formData, payoutFrequency: next })}
                       options={PAYOUT_FREQUENCY_OPTIONS}
-                      ariaLabel="Payout frequency"
+                      ariaLabel={t('a11y3.payoutFrequency')}
                     />
                   </div>
                 </div>
@@ -532,7 +537,7 @@ function AdminUsers() {
               Personal data will be erased. Records required for bookings, payouts, and legal compliance
               will be retained only in anonymised form. This cannot be undone.
             </p>
-            {deleteError && <Alert color="failure">{deleteError}</Alert>}
+            {deleteError && <Alert color="failure" className="text-center">{deleteError}</Alert>}
             <div>
               <Label htmlFor="delete-user-reason">Reason for deletion</Label>
               <Textarea
@@ -541,7 +546,7 @@ function AdminUsers() {
                 onChange={(e) => { setDeleteReason(e.target.value); setDeleteError(''); }}
                 rows={3}
                 maxLength={500}
-                placeholder="For example: Customer requested account erasure"
+                placeholder={t('a11y3.deleteReasonPlaceholder')}
               />
             </div>
             <div>

@@ -4,6 +4,7 @@ import BrandLogo from './BrandLogo.jsx';
 import PropTypes from 'prop-types';
 import {
   ArrowLeftRight,
+  Bell,
   Building2,
   CalendarClock,
   CalendarDays,
@@ -25,20 +26,23 @@ import { CONVERSATIONS_READ_EVENT } from '../utils/conversations.js';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
+import LanguageSwitcher from './LanguageSwitcher.jsx';
 
 // The five things a host repeats every day. One list feeds the desktop tabs and
 // the mobile bottom bar so the two navigations cannot drift apart.
 const TABS = [
-  { key: 'today', label: 'Today', to: '/host/today', icon: CalendarClock, match: (pathname) => pathname === '/host/today' },
-  { key: 'calendar', label: 'Calendar', to: '/host/calendar', icon: CalendarDays, match: (pathname) => pathname.startsWith('/host/calendar') },
-  { key: 'listings', label: 'Listings', to: '/host/listings', icon: Building2, match: (pathname) => pathname.startsWith('/host/listings') || pathname.startsWith('/host/properties') },
+  { key: 'today', label: 'host.tabToday', to: '/host/today', icon: CalendarClock, match: (pathname) => pathname === '/host/today' },
+  { key: 'calendar', label: 'host.tabCalendar', to: '/host/calendar', icon: CalendarDays, match: (pathname) => pathname.startsWith('/host/calendar') },
+  { key: 'listings', label: 'host.tabListings', to: '/host/listings', icon: Building2, match: (pathname) => pathname.startsWith('/host/listings') || pathname.startsWith('/host/properties') },
   // Messages is the host inbox, not the traveller one: a host reads the guests
   // staying at their properties here. Traveller conversations live at /inbox.
   // The label matches the other host surfaces; the account menu says "Guest
   // messages", which is where the distinction from travel actually matters.
-  { key: 'messages', label: 'Messages', to: '/host/inbox', icon: MessageCircleMore, match: (pathname) => pathname.startsWith('/host/inbox') },
-  { key: 'insights', label: 'Insights', to: '/host/insights', icon: Star, match: (pathname) => pathname.startsWith('/host/insights') || pathname.startsWith('/host/reservations') },
-  { key: 'earnings', label: 'Earnings', to: '/host/earnings', icon: ChartNoAxesCombined, match: (pathname) => pathname.startsWith('/host/earnings') || pathname.startsWith('/host/payouts') },
+  { key: 'messages', label: 'host.tabMessages', to: '/host/inbox', icon: MessageCircleMore, match: (pathname) => pathname.startsWith('/host/inbox') },
+  { key: 'insights', label: 'host.tabInsights', to: '/host/insights', icon: Star, match: (pathname) => pathname.startsWith('/host/insights') || pathname.startsWith('/host/reservations') },
+  { key: 'earnings', label: 'host.tabEarnings', to: '/host/earnings', icon: ChartNoAxesCombined, match: (pathname) => pathname.startsWith('/host/earnings') || pathname.startsWith('/host/payouts') },
 ];
 
 function hostInitials(user) {
@@ -62,6 +66,11 @@ const ACCOUNT_ITEM = 'flex w-full items-center rounded-[10px] px-4 py-2.5 text-s
 const ACCOUNT_ICON = 'mr-3 h-4 w-4 text-muted';
 const ACCOUNT_EYEBROW = 'px-4 pb-1 pt-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muted';
 
+// Bell rows: the same shape as an account row, with the icon parked in a tinted
+// tile so a glance tells a booking request from a message.
+const NOTIF_ITEM = 'flex items-center gap-3 px-4 py-3 text-sm text-navy transition-colors hover:bg-surface';
+const NOTIF_TILE = 'grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-50 text-primary-600 dark:bg-primary/15 dark:text-primary-300';
+
 function UnreadBadge({ count }) {
   if (!count) return null;
   return <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">{count > 9 ? '9+' : count}</span>;
@@ -79,13 +88,20 @@ UnreadBadge.propTypes = { count: PropTypes.number };
 // draws no navbar of its own. It used to sit outside this shell and rendered a
 // second navbar above its content.
 function HostLayout({ children }) {
+  const { t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { mode, setMode } = useMode();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [unreadGuestMessages, setUnreadGuestMessages] = useState(0);
+  // Bookings still waiting on the host's decision. Counted apart from messages
+  // because the two lead to different pages and mean different things: one is a
+  // conversation, the other is money and dates that stay blocked until answered.
+  const [pendingBookings, setPendingBookings] = useState(0);
   const menuRef = useRef(null);
+  const notifRef = useRef(null);
 
   // Opening any host workspace page is a change of sides, not just a change of
   // page. Record it so the header cannot quietly become the host header after a
@@ -121,18 +137,45 @@ function HostLayout({ children }) {
     };
   }, [location.pathname]);
 
+  // Booking requests need their own poll: /notifications scopes that count to
+  // bookings on this host's properties, which the conversation endpoint above
+  // knows nothing about.
+  useEffect(() => {
+    let active = true;
+    async function loadPendingBookings() {
+      try {
+        const response = await apiClient.get('/notifications');
+        if (active) setPendingBookings(Number(response.data.data?.pendingBookings) || 0);
+      } catch {
+        // A failed count must not leave a stale badge claiming work is waiting.
+        if (active) setPendingBookings(0);
+      }
+    }
+    loadPendingBookings();
+    const interval = setInterval(loadPendingBookings, 60000);
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [location.pathname]);
+
   // A menu that survives the page change behind it would look stuck open.
   useEffect(() => {
     setMenuOpen(false);
+    setNotifOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
-    if (!menuOpen) return undefined;
+    if (!menuOpen && !notifOpen) return undefined;
     function onPointerDown(event) {
       if (menuRef.current && !menuRef.current.contains(event.target)) setMenuOpen(false);
+      if (notifRef.current && !notifRef.current.contains(event.target)) setNotifOpen(false);
     }
     function onKeyDown(event) {
-      if (event.key === 'Escape') setMenuOpen(false);
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+        setNotifOpen(false);
+      }
     }
     document.addEventListener('mousedown', onPointerDown);
     document.addEventListener('keydown', onKeyDown);
@@ -140,7 +183,7 @@ function HostLayout({ children }) {
       document.removeEventListener('mousedown', onPointerDown);
       document.removeEventListener('keydown', onKeyDown);
     };
-  }, [menuOpen]);
+  }, [menuOpen, notifOpen]);
 
   function handleTravelling() {
     // Hosting mode is a stored preference, so leaving through this exit also
@@ -158,16 +201,21 @@ function HostLayout({ children }) {
 
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Your account';
 
+  // A returned application is a notification too: it blocks publishing until the
+  // host corrects it, and nothing else in this header says so.
+  const applicationNeedsChanges = user?.hostApplicationStatus === 'CHANGES_REQUESTED';
+  const totalNotifications = unreadGuestMessages + pendingBookings + (applicationNeedsChanges ? 1 : 0);
+
   return (
     <div className="min-h-screen bg-canvas">
       <header className="sticky top-0 z-30 border-b border-border bg-elevated/95 backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 lg:px-6">
-          <Link to="/host/today" className="inline-flex shrink-0 items-center gap-2.5" aria-label="Host workspace home">
+          <Link to="/host/today" className="inline-flex shrink-0 items-center gap-2.5" aria-label={t('host.workspaceHome')}>
             <BrandLogo imgClassName="h-8 w-auto" />
-            <span className="hidden items-center rounded-full bg-surface dark:bg-primary/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted dark:text-primary-300 md:inline-flex">Host</span>
+            <span className="hidden items-center rounded-full bg-surface dark:bg-primary/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted dark:text-primary-300 md:inline-flex">{t('host.badge')}</span>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Host workspace">
+          <nav className="hidden items-center gap-1 lg:flex" aria-label={t('host.workspace')}>
             {TABS.map((tab) => {
               const active = tab.match(location.pathname);
               return (
@@ -177,7 +225,7 @@ function HostLayout({ children }) {
                   aria-current={active ? 'page' : undefined}
                   className={`${NAV_LINK_BASE} ${active ? NAV_LINK_ACTIVE : NAV_LINK_IDLE}`}
                 >
-                  {tab.label}
+                  {t(tab.label)}
                   {tab.key === 'messages' && <UnreadBadge count={unreadGuestMessages} />}
                 </Link>
               );
@@ -185,13 +233,71 @@ function HostLayout({ children }) {
           </nav>
 
           <div className="flex items-center gap-2">
+            {/* The bell the admin workspace already has, on the host side and next
+                to the avatar. Each row names one thing to do and links to the page
+                that does it, so the badge is a way in rather than a number to
+                interpret on a page the host then has to find. */}
+            <ThemeToggle className="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" />
+            <LanguageSwitcher triggerClassName="inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary" />
+            <div className="relative" ref={notifRef}>
+              <button
+                type="button"
+                onClick={() => { setNotifOpen((open) => !open); setMenuOpen(false); }}
+                aria-haspopup="true"
+                aria-expanded={notifOpen}
+                aria-label={totalNotifications > 0 ? t('host.notificationsNew', { count: totalNotifications }) : t('host.notifications')}
+                title={t('host.notifications')}
+                className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+              >
+                <Bell className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
+                {totalNotifications > 0 && (
+                  <span className="absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+                    {totalNotifications > 99 ? '99+' : totalNotifications}
+                  </span>
+                )}
+              </button>
+
+              {notifOpen && <div className="absolute right-0 z-30 mt-2 w-72 rounded-2xl bg-elevated py-2 shadow-xl">
+                <div className="border-b border-border px-4 py-2">
+                  <p className="text-sm font-semibold text-navy">{t('host.notifications')}</p>
+                </div>
+                {totalNotifications === 0 ? (
+                  <p className="px-4 py-6 text-center text-sm text-muted">{t('host.noNewNotifications')}</p>
+                ) : (
+                  <>
+                    {applicationNeedsChanges && <Link to="/host/application" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>
+                      <span className={NOTIF_TILE} aria-hidden="true"><ClipboardList className="h-4 w-4" strokeWidth={2} /></span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold text-navy">{t('host.applicationNeedsChanges')}</span>
+                        <span className="block text-[11px] text-muted">{t('host.applicationNeedsChangesHint')}</span>
+                      </span>
+                    </Link>}
+                    {pendingBookings > 0 && <Link to="/host/reservations" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>
+                      <span className={NOTIF_TILE} aria-hidden="true"><ClipboardList className="h-4 w-4" strokeWidth={2} /></span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold text-navy">{t('host.bookingsToConfirm')}</span>
+                        <span className="block text-[11px] text-muted">{t(pendingBookings === 1 ? 'host.bookingsAwaitingOne' : 'host.bookingsAwaitingOther', { count: pendingBookings })}</span>
+                      </span>
+                    </Link>}
+                    {unreadGuestMessages > 0 && <Link to="/host/inbox" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>
+                      <span className={NOTIF_TILE} aria-hidden="true"><MessageCircleMore className="h-4 w-4" strokeWidth={2} /></span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold text-navy">{t('host.guestMessages')}</span>
+                        <span className="block text-[11px] text-muted">{t(unreadGuestMessages === 1 ? 'host.unreadOne' : 'host.unreadOther', { count: unreadGuestMessages })}</span>
+                      </span>
+                    </Link>}
+                  </>
+                )}
+              </div>}
+            </div>
+
             <div className="relative" ref={menuRef}>
               <button
                 type="button"
-                onClick={() => setMenuOpen((open) => !open)}
+                onClick={() => { setMenuOpen((open) => !open); setNotifOpen(false); }}
                 aria-haspopup="true"
                 aria-expanded={menuOpen}
-                aria-label="Open host account menu"
+                aria-label={t('host.openAccountMenu')}
                 className="inline-flex items-center gap-1 p-1 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               >
                 <span aria-hidden="true" className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-navy-bg text-[11px] font-bold tracking-wide text-white">
@@ -200,7 +306,7 @@ function HostLayout({ children }) {
                 <ChevronDown className={`h-3.5 w-3.5 text-muted transition-transform ${menuOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
               </button>
 
-              {menuOpen && <div className="absolute right-0 z-30 mt-2 w-64 rounded-2xl border border-border bg-elevated py-2 shadow-xl">
+              {menuOpen && <div className="absolute right-0 z-30 mt-2 w-64 rounded-2xl bg-elevated py-2 shadow-xl">
                 <div className="border-b border-border px-4 py-3">
                   <p className="text-sm font-semibold text-navy">{displayName}</p>
                   <p className="truncate text-xs text-muted">{user?.email}</p>
@@ -208,38 +314,38 @@ function HostLayout({ children }) {
 
                 <Link to="/host/settings" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <CircleUserRound className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
-                  My Profile
+                  {t('host.menuMyProfile')}
                 </Link>
                 <Link to="/host/reservations" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <ClipboardList className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
-                  Reservations
+                  {t('host.menuReservations')}
                 </Link>
                 <Link to="/host/inbox" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <MessagesSquare className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
-                  <span className="flex-1">Guest messages</span>
+                  <span className="flex-1">{t('host.guestMessages')}</span>
                   <UnreadBadge count={unreadGuestMessages} />
                 </Link>
                 <Link to="/host/discounts" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <Percent className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
-                  Discounts
+                  {t('host.menuDiscounts')}
                 </Link>
                 {/* Payouts need an approved HOST account, so pending applicants are
                     not offered a destination they cannot use yet. */}
                 {user?.role === 'HOST' && <Link to="/host/payouts" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <Wallet className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
-                  Payouts
+                  {t('host.menuPayouts')}
                 </Link>}
                 <Link to="/host/application" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <ClipboardList className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
-                  Host setup
+                  {t('host.menuHostSetup')}
                 </Link>
                 <Link to="/terms" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <FileText className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
-                  Terms of Service
+                  {t('host.menuTerms')}
                 </Link>
                 <Link to="/privacy" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <LockKeyhole className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
-                  Privacy Policy
+                  {t('host.menuPrivacy')}
                 </Link>
 
                 <div className="mt-1 border-t border-border pt-1">
@@ -247,17 +353,17 @@ function HostLayout({ children }) {
                       as the traveller menu does: the header changes shape with the
                       side, so this line is the one place the two cannot be
                       confused, and the transition overlay announces the change. */}
-                  <p className={ACCOUNT_EYEBROW}>You&apos;re browsing as a host</p>
+                  <p className={ACCOUNT_EYEBROW}>{t('host.browsingAsHost')}</p>
                   <button type="button" onClick={handleTravelling} className={ACCOUNT_ITEM}>
                     <ArrowLeftRight className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
-                    Switch to Travelling
+                    {t('host.switchToTravelling')}
                   </button>
                 </div>
 
                 <div className="mt-1 border-t border-border pt-1">
                   <button type="button" onClick={handleLogout} className={ACCOUNT_ITEM}>
                     <LogOut className="mr-3 h-4 w-4 text-red-600" strokeWidth={2} aria-hidden="true" />
-                    <span className="text-red-600">Sign Out</span>
+                    <span className="text-red-600">{t('host.signOut')}</span>
                   </button>
                 </div>
               </div>}

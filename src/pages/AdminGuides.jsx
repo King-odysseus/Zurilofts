@@ -1,3 +1,4 @@
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -38,6 +39,7 @@ function SearchIcon() {
 }
 
 function AdminGuides() {
+  const { t } = useLanguage();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
@@ -157,69 +159,71 @@ function AdminGuides() {
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Travel guides</h1>
-          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Publish area advice, local recommendations, and practical guest guidance.</p>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('admin.guidesDescription')}</p>
         </div>
-        <Button onClick={handleCreate}>New guide</Button>
+        <Button onClick={handleCreate}>{t('admin.newGuide')}</Button>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PUBLISHED GUIDES</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.publishedGuides').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.published}</strong>
-          <small className="mt-1 block text-xs text-muted">Visible on the public guides route</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.publishedGuidesNote')}</small>
         </article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">DRAFTS</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.drafts').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.drafts}</strong>
-          <small className="mt-1 block text-xs text-muted">Waiting for review or completion</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.draftsNote')}</small>
         </article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">WITH COVER IMAGE</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.withCoverImage').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.withCover}</strong>
-          <small className="mt-1 block text-xs text-muted">Ready for editorial presentation</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.withCoverImageNote')}</small>
         </article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">GUIDES IN VIEW</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.guidesInView').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{visiblePosts.length}</strong>
-          <small className="mt-1 block text-xs text-muted">Matching the current search</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.guidesInViewNote')}</small>
         </article>
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
+      <section className="overflow-hidden rounded-xl bg-elevated shadow-md">
         <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-sm">
+          <div className="relative w-full sm:max-w-sm [&_input]:border-0 [&_input]:bg-surface [&_input]:pl-9">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
-            <TextInput className="pl-9" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search guide title, slug or content" aria-label="Search guides" />
+            <TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('admin.searchGuide')} aria-label={t('admin.searchGuidesLabel')} />
           </div>
           <span className="shrink-0 self-start rounded-full bg-surface px-2.5 py-1 text-[11px] font-semibold text-muted sm:self-auto">{visiblePosts.length} guide{visiblePosts.length === 1 ? '' : 's'}</span>
         </div>
 
-        {message && <Alert color="failure" className="mx-5 mt-5" role="status">{message}</Alert>}
+        {message && <Alert color="failure" className="mx-5 mt-5 text-center" role="status">{message}</Alert>}
 
         {loading ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
             <span className="h-8 w-8 animate-spin rounded-full border-[3px] border-primary border-t-transparent" aria-hidden="true" />
-            <strong className="text-base font-semibold text-navy">Loading travel guides</strong>
-            <p className="text-xs leading-relaxed text-muted">Checking editorial status and publishing metadata.</p>
+            <strong className="text-base font-semibold text-navy">{t('admin.loadingGuides')}</strong>
+            <p className="text-xs leading-relaxed text-muted">{t('admin.loadingGuidesHint')}</p>
           </div>
         ) : visiblePosts.length === 0 ? (
           // Same reason as the Add-ons page: an Alert wrapper shrinks this block
           // to its longest line and pins it left, so it stayed off-centre.
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
             <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><SearchIcon /></span>
-            <strong className="text-base font-semibold text-navy">No guides found</strong>
-            <p className="text-xs leading-relaxed text-muted">Create the first guide or adjust the current search.</p>
+            <strong className="text-base font-semibold text-navy">{t('admin.noGuidesFound')}</strong>
+            <p className="text-xs leading-relaxed text-muted">{t('admin.noGuidesHint')}</p>
           </div>
         ) : (
           <div>
-            <Table hoverable aria-label="Travel guides">
+            <Table hoverable aria-label={t('admin.guidesTitle')}>
               <TableHead>
                 <TableRow>
-                  <TableHeadCell>GUIDE</TableHeadCell>
-                  <TableHeadCell>STATUS</TableHeadCell>
-                  <TableHeadCell>EXCERPT</TableHeadCell>
-                  <TableHeadCell>PUBLISHED</TableHeadCell>
-                  <TableHeadCell>ACTIONS</TableHeadCell>
+                  <TableHeadCell>{t('admin.colGuide').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('common.status').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colExcerpt').toUpperCase()}</TableHeadCell>
+                  {/* The cells show updatedAt labelled "UPDATED", so the header has
+                      to say the same thing or the column reads as a publish date. */}
+                  <TableHeadCell>{t('admin.colUpdated').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell><span className="block text-right">{t('common.actions').toUpperCase()}</span></TableHeadCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -238,13 +242,13 @@ function AdminGuides() {
                       <span className="text-xs text-muted">{post.body ? `${post.body.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length} words` : 'No body content'}</span>
                     </div></TableCell>
                     <TableCell><div className="grid gap-1">
-                      <small className="text-[11px] font-semibold uppercase tracking-wide text-muted">UPDATED</small>
+                      <small className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.colUpdated').toUpperCase()}</small>
                       <strong className="truncate text-sm font-semibold text-navy">{formatDate(post.updatedAt || post.createdAt)}</strong>
                       <span className="text-xs text-muted">{post.published ? 'Publicly available' : 'Not yet visible'}</span>
                     </div></TableCell>
                     <TableCell><div className="flex items-center justify-end">
                       <TableActionsMenu
-                        label={`Actions for ${post.title}`}
+                        label={t('a11y3.actionsFor', { name: post.title })}
                         actions={[
                           { label: 'Edit', icon: 'edit', onClick: () => handleEdit(post.id) },
                           { label: 'Delete', icon: 'delete', danger: true, onClick: () => { setDeleteError(''); setDeleteTarget(post); } },
@@ -267,16 +271,16 @@ function AdminGuides() {
               <span className="block">{editing === 'new' ? 'Create travel guide' : 'Edit travel guide'}</span>
             </ModalHeader>
             <ModalBody>
-              {error && <Alert color="failure" className="mb-5">{error}</Alert>}
+              {error && <Alert color="failure" className="mb-5 text-center">{error}</Alert>}
               <form onSubmit={handleSave} className="space-y-5">
-                <div><Label htmlFor="guide-title">Title</Label><TextInput id="guide-title" value={form.title} onChange={(event) => handleTitleChange(event.target.value)} placeholder="Best areas to stay in Nairobi" required /></div>
+                <div><Label htmlFor="guide-title">Title</Label><TextInput id="guide-title" value={form.title} onChange={(event) => handleTitleChange(event.target.value)} placeholder={t('a11y3.guideTitlePlaceholder')} required /></div>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div><Label htmlFor="guide-slug">Slug</Label><TextInput id="guide-slug" value={form.slug} onChange={(event) => setForm({ ...form, slug: event.target.value })} /></div>
                   <div><Label htmlFor="guide-cover">Cover image URL</Label><TextInput id="guide-cover" value={form.coverImage} onChange={(event) => setForm({ ...form, coverImage: event.target.value })} placeholder="/images/..." /></div>
                 </div>
-                <div><Label htmlFor="guide-excerpt">Excerpt</Label><TextInput id="guide-excerpt" value={form.excerpt} onChange={(event) => setForm({ ...form, excerpt: event.target.value })} placeholder="A concise summary for listing cards and search." /></div>
+                <div><Label htmlFor="guide-excerpt">Excerpt</Label><TextInput id="guide-excerpt" value={form.excerpt} onChange={(event) => setForm({ ...form, excerpt: event.target.value })} placeholder={t('a11y3.guideExcerptPlaceholder')} /></div>
                 <div><Label htmlFor="guide-body">Body (HTML)</Label><Textarea id="guide-body" rows={12} value={form.body} onChange={(event) => setForm({ ...form, body: event.target.value })} className="font-mono" /></div>
-                <div className="rounded-lg border border-border bg-surface p-3"><ToggleSwitch checked={form.published} label="Publish this guide" onChange={(event) => setForm({ ...form, published: event.target.checked })} /></div>
+                <div className="rounded-lg bg-surface p-3 shadow-sm"><ToggleSwitch checked={form.published} label="Publish this guide" onChange={(event) => setForm({ ...form, published: event.target.checked })} /></div>
                 <div className="flex items-center justify-end gap-2 pt-1"><Button color="light" type="button" onClick={handleCancel} disabled={saving}>Cancel</Button><Button type="submit" disabled={saving}>{saving ? 'Saving...' : editing === 'new' ? 'Create guide' : 'Save changes'}</Button></div>
               </form>
             </ModalBody>
@@ -286,7 +290,7 @@ function AdminGuides() {
 
       <ConfirmDialog
         open={Boolean(deleteTarget)}
-        title="Delete this guide"
+        title={t('admin.deleteGuide')}
         description={deleteTarget
           ? `"${deleteTarget.title}" will be removed permanently. This cannot be undone.`
           : ''}

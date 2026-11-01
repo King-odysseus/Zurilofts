@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Label, TextInput } from 'flowbite-react';
 import apiClient from '../api/client.js';
 import Spinner from '../components/Spinner.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Published by GET /api/public/fees so the calculator can never quote a rate the
 // booking flow does not charge. Percentages arrive as percentages (10 = 10%).
@@ -64,6 +65,7 @@ function calculate({ nightlyPrice, nights, currentPlatformPercent, fees }) {
 }
 
 export default function BecomeAHostPage() {
+  const { t } = useLanguage();
   const [fees, setFees] = useState(null);
   const [error, setError] = useState('');
   const [nightlyPrice, setNightlyPrice] = useState(6500);
@@ -80,12 +82,12 @@ export default function BecomeAHostPage() {
       .catch(() => {
         // Without the real schedule the calculator would quote invented numbers,
         // so it stays hidden and the page falls back to "see what you'd earn".
-        if (!cancelled) setError('We could not load the current fee schedule. Please refresh to try again.');
+        if (!cancelled) setError(t('discovery.hostFeeError'));
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [t]);
 
   const result = useMemo(
     () => (fees ? calculate({ nightlyPrice, nights, currentPlatformPercent, fees }) : null),
@@ -98,14 +100,13 @@ export default function BecomeAHostPage() {
       <section className="border-b border-line bg-surface">
         <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6 lg:py-20">
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary-700 dark:text-primary-300">
-            Hosting with ZuriLofts
+            {t('discovery.hostEyebrow')}
           </p>
           <h1 className="mt-3 max-w-3xl font-montserrat text-3xl font-bold leading-tight text-navy sm:text-4xl lg:text-5xl">
-            Know exactly what you keep, before you list
+            {t('discovery.hostTitle')}
           </h1>
           <p className="mt-4 max-w-2xl text-base text-muted sm:text-lg">
-            One flat commission, no listing fee, and a payout that lands after your guest checks in.
-            Move the numbers below to see your own month.
+            {t('discovery.hostBody')}
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-3">
             {/* Explicit brand classes rather than the Button component: its dark
@@ -114,13 +115,13 @@ export default function BecomeAHostPage() {
               to="/register?role=HOST"
               className="inline-flex min-h-[44px] items-center justify-center rounded-lg bg-[#143A80] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0B2A5E]"
             >
-              Start hosting
+              {t('discovery.hostStart')}
             </Link>
             <Link
               to="/host/application"
               className="rounded-lg border border-line px-5 py-3 text-sm font-semibold text-navy hover:border-primary-500"
             >
-              I already applied
+              {t('discovery.hostAlreadyApplied')}
             </Link>
           </div>
         </div>
@@ -130,12 +131,12 @@ export default function BecomeAHostPage() {
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:py-16">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
           <div className="rounded-xl border border-line bg-elevated p-5 shadow-sm sm:p-6">
-            <h2 className="font-montserrat text-xl font-bold text-navy">Your stay, your numbers</h2>
-            <p className="mt-2 text-sm text-muted">Monthly figures assume every night you enter is booked.</p>
+            <h2 className="font-montserrat text-xl font-bold text-navy">{t('discovery.calcTitle')}</h2>
+            <p className="mt-2 text-sm text-muted">{t('discovery.calcHint')}</p>
 
             <div className="mt-6 space-y-5">
               <div>
-                <Label htmlFor="nightly-price" className="text-navy">Nightly price (KES)</Label>
+                <Label htmlFor="nightly-price" className="text-navy">{t('discovery.calcNightlyPrice')}</Label>
                 <TextInput
                   id="nightly-price"
                   type="number"
@@ -147,7 +148,7 @@ export default function BecomeAHostPage() {
                 />
               </div>
               <div>
-                <Label htmlFor="nights" className="text-navy">Nights booked per month</Label>
+                <Label htmlFor="nights" className="text-navy">{t('discovery.calcNights')}</Label>
                 <TextInput
                   id="nights"
                   type="number"
@@ -157,11 +158,11 @@ export default function BecomeAHostPage() {
                   onChange={(e) => setNights(Math.min(31, Math.max(0, Number(e.target.value) || 0)))}
                   className="mt-1"
                 />
-                <p className="mt-2 text-xs text-muted">Between 0 and 31.</p>
+                <p className="mt-2 text-xs text-muted">{t('discovery.calcNightsHint')}</p>
               </div>
               <div>
                 <Label htmlFor="other-platform" className="text-navy">
-                  The commission you pay another platform (%)
+                  {t('discovery.calcOtherPercent')}
                 </Label>
                 <TextInput
                   id="other-platform"
@@ -177,7 +178,7 @@ export default function BecomeAHostPage() {
                 {/* Left to the host rather than guessed: quoting a rival's rate
                     we have not verified would be misleading. */}
                 <p className="mt-2 text-xs text-muted">
-                  Enter the rate you pay today. If you have not hosted before, leave it as it is.
+                  {t('discovery.calcOtherHint')}
                 </p>
               </div>
             </div>
@@ -185,31 +186,31 @@ export default function BecomeAHostPage() {
             {fees && (
               <dl className="mt-6 space-y-2.5 border-t border-line pt-4 text-sm">
                 <div className="flex justify-between gap-3">
-                  <dt className="text-muted">Our commission</dt>
+                  <dt className="text-muted">{t('discovery.feeCommission')}</dt>
                   <dd className="font-medium text-navy">{fees.commissionPercent}%</dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-muted">Withholding tax</dt>
+                  <dt className="text-muted">{t('discovery.feeWithholding')}</dt>
                   <dd className="font-medium text-navy">{fees.withholdingTaxPercent}%</dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-muted">Guest service fee</dt>
+                  <dt className="text-muted">{t('discovery.feeGuestService')}</dt>
                   <dd className="font-medium text-navy">{fees.guestServiceFeePercent}%</dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-muted">Payout released</dt>
+                  <dt className="text-muted">{t('discovery.feePayoutReleased')}</dt>
                   <dd className="font-medium text-navy">
                     {fees.fundsHoldHours === 0
-                      ? 'At check-in'
-                      : `${fees.fundsHoldHours}h after check-in`}
+                      ? t('discovery.feeAtCheckIn')
+                      : t('discovery.feeHoursAfterCheckIn', { hours: fees.fundsHoldHours })}
                   </dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                  <dt className="text-muted">Promo codes</dt>
+                  <dt className="text-muted">{t('discovery.feePromoCodes')}</dt>
                   <dd className="text-right font-medium text-navy">
                     {fees.promoFunding === 'platform'
-                      ? 'Funded by us, except your own codes'
-                      : 'Deducted from your payout'}
+                      ? t('discovery.feePromoPlatform')
+                      : t('discovery.feePromoHost')}
                   </dd>
                 </div>
               </dl>
@@ -217,7 +218,7 @@ export default function BecomeAHostPage() {
           </div>
 
           <div className="rounded-xl border border-line bg-elevated p-5 shadow-sm sm:p-6">
-            <h2 className="font-montserrat text-xl font-bold text-navy">What you keep in a month</h2>
+            <h2 className="font-montserrat text-xl font-bold text-navy">{t('discovery.resultTitle')}</h2>
 
             {error && (
               <p role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700 dark:border-red-500/40 dark:bg-red-500/10 dark:text-red-300">
@@ -228,45 +229,45 @@ export default function BecomeAHostPage() {
             {!fees && !error && (
               <div className="mt-8 flex items-center gap-3 text-sm text-muted">
                 <Spinner />
-                Loading the current fee schedule
+                {t('discovery.resultLoading')}
               </div>
             )}
 
             {result && (
               <>
                 <dl className="mt-4">
-                  <ResultRow label="Accommodation revenue" value={money(result.gross)} />
+                  <ResultRow label={t('discovery.rowRevenue')} value={money(result.gross)} />
                   <ResultRow
-                    label="Our commission"
+                    label={t('discovery.feeCommission')}
                     value={`- ${money(result.commission)}`}
-                    hint={`${fees.commissionPercent}% of accommodation only`}
+                    hint={t('discovery.rowCommissionHint', { percent: fees.commissionPercent })}
                   />
                   <ResultRow
-                    label="Withholding tax"
+                    label={t('discovery.feeWithholding')}
                     value={`- ${money(result.withholding)}`}
-                    hint={`${fees.withholdingTaxPercent}%, paid to KRA on your behalf`}
+                    hint={t('discovery.rowWithholdingHint', { percent: fees.withholdingTaxPercent })}
                   />
-                  <ResultRow label="Your take-home" value={money(result.zuriNet)} emphasis />
+                  <ResultRow label={t('discovery.rowTakeHome')} value={money(result.zuriNet)} emphasis />
                 </dl>
 
                 <div className="mt-6 rounded-lg border border-line bg-surface p-4">
                   <h3 className="text-sm font-semibold text-navy">
-                    Against the {currentPlatformPercent}% you pay now
+                    {t('discovery.againstTitle', { percent: currentPlatformPercent })}
                   </h3>
                   <dl className="mt-2">
-                    <ResultRow label="Their commission" value={`- ${money(result.theirCommission)}`} />
-                    <ResultRow label="Your take-home there" value={money(result.theirNet)} />
+                    <ResultRow label={t('discovery.rowTheirCommission')} value={`- ${money(result.theirCommission)}`} />
+                    <ResultRow label={t('discovery.rowTakeHomeThere')} value={money(result.theirNet)} />
                   </dl>
                   <p className="mt-3 text-sm text-navy">
                     {result.difference >= 0 ? (
                       <>
-                        That is <strong>{money(result.difference)}</strong> more in your pocket each month
-                        with ZuriLofts.
+                        {t('discovery.diffIs')} <strong>{money(result.difference)}</strong>{' '}
+                        {t('discovery.diffMoreAfter')}
                       </>
                     ) : (
                       <>
-                        That is <strong>{money(Math.abs(result.difference))}</strong> less each month
-                        than you would keep there.
+                        {t('discovery.diffIs')} <strong>{money(Math.abs(result.difference))}</strong>{' '}
+                        {t('discovery.diffLessAfter')}
                       </>
                     )}
                   </p>
@@ -277,19 +278,17 @@ export default function BecomeAHostPage() {
                       IS the price; "0% fee is added" reads like a mistake. */}
                   {fees.guestServiceFeePercent > 0 ? (
                     <>
-                      Your guest pays {money(result.guestPays)} for the same month once the{' '}
-                      {fees.guestServiceFeePercent}% guest service fee is added.
+                      {t('discovery.guestPaysWithFee', { amount: money(result.guestPays), percent: fees.guestServiceFeePercent })}
                     </>
                   ) : (
                     <>
-                      Your guest pays {money(result.guestPays)}, the listed price, with no service
-                      fee added at checkout.
+                      {t('discovery.guestPaysNoFee', { amount: money(result.guestPays) })}
                     </>
                   )}{' '}
                   {fees.payCleaningFee
-                    ? `The ${money(fees.cleaningFee)} cleaning fee goes to you.`
-                    : `Cleaning (${money(fees.cleaningFee)}) is paid by the guest and kept by ZuriLofts.`}{' '}
-                  This is an estimate, not an offer.
+                    ? t('discovery.cleaningToHost', { amount: money(fees.cleaningFee) })
+                    : t('discovery.cleaningToPlatform', { amount: money(fees.cleaningFee) })}{' '}
+                  {t('discovery.estimateNote')}
                 </p>
               </>
             )}
@@ -300,11 +299,10 @@ export default function BecomeAHostPage() {
         {fees && fees.foundingPlaceLimit > 0 && (
           <div className="mt-6 rounded-xl border border-primary-500 bg-primary-50 p-5 dark:bg-primary/15 sm:p-6">
             <h2 className="font-montserrat text-lg font-bold text-navy">
-              Founding host: {fees.foundingCommissionPercent}% instead of {fees.commissionPercent}%
+              {t('discovery.foundingTitle', { founding: fees.foundingCommissionPercent, commission: fees.commissionPercent })}
             </h2>
             <p className="mt-2 max-w-2xl text-sm text-navy">
-              The first {fees.foundingPlaceLimit} hosts to publish a listing keep the lower commission
-              for as long as they host. Places are taken as applications are approved.
+              {t('discovery.foundingBody', { limit: fees.foundingPlaceLimit })}
             </p>
           </div>
         )}

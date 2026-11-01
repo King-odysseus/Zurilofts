@@ -2,25 +2,17 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check git status and diff to see what is actually changed",
+      "text": "Check git status and diff",
       "state": "done"
     },
     {
-      "text": "Run lint and build to confirm the change is sound",
+      "text": "Run lint, build and key checker",
       "state": "done"
     },
     {
-      "text": "Stage only the card change and the plan file",
-      "state": "done"
-    },
-    {
-      "text": "Commit with a message describing the change",
-      "state": "done"
-    },
-    {
-      "text": "Push to the remote and report the commit hash",
-      "state": "done"
+      "text": "Commit the i18n foundation, then the page and UI work, then push",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-01T08:22:03.207Z"
+  "updatedAt": "2026-11-01T13:12:28.455Z"
 }

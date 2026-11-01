@@ -7,8 +7,10 @@ import Spinner from '../components/Spinner.jsx';
 import { heroImage } from '../assets/images.js';
 import { formatPrice } from '../utils/currency.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function SharedShortlistRow({ item }) {
+  const { t } = useLanguage();
   const property = item.property || {};
   const image = property.images?.[0] || heroImage;
   const meta = [
@@ -33,7 +35,7 @@ function SharedShortlistRow({ item }) {
       </div>
       <div className="opg-shortlist-price">
         <strong>{formatPrice(property.price) ?? '-'}</strong>
-        <span>per night</span>
+        <span>{t('common.perNight')}</span>
       </div>
     </Link>
   );
@@ -57,6 +59,7 @@ SharedShortlistRow.propTypes = {
 };
 
 export default function SharedShortlistPage() {
+  const { t } = useLanguage();
   const { token: routeToken } = useParams();
   const { pathname } = useLocation();
   const { isAuthenticated } = useAuth();
@@ -93,16 +96,16 @@ export default function SharedShortlistPage() {
         ) : error ? (
           <div className="opg-saved-empty">
             <div>
-              <h2>Shortlist unavailable</h2>
+              <h2>{t('misc.shortlistUnavailable')}</h2>
               <p>{error}</p>
-              <Link className="opg-saved-action" to="/properties">Browse stays</Link>
+              <Link className="opg-saved-action" to="/properties">{t('booking.browseStays')}</Link>
             </div>
           </div>
         ) : shortlist ? (
           <>
             <header className="opg-shortlist-intro">
-              <p className="opg-shortlist-breadcrumb"><Link to="/">Home</Link><span>/</span>Shared shortlist</p>
-              <p className="opg-shortlist-eyebrow">Shared shortlist</p>
+              <p className="opg-shortlist-breadcrumb"><Link to="/">{t('mobileNav.home')}</Link><span>/</span>{t('misc.sharedShortlist')}</p>
+              <p className="opg-shortlist-eyebrow">{t('misc.sharedShortlist')}</p>
               <h1>{shortlist.name}</h1>
               <p className="opg-shortlist-meta">
                 {itemCount} {itemCount === 1 ? 'stay' : 'stays'}{ownerName ? ` · Shared by ${ownerName}` : ''}
@@ -112,16 +115,16 @@ export default function SharedShortlistPage() {
             {!isAuthenticated && (
               <aside className="opg-saved-auth">
                 <UserRound strokeWidth={1.7} aria-hidden="true" />
-                <p>Sign in to save this shortlist to your account and keep it in sync across devices.</p>
-                <Link to={`/login?returnUrl=${encodeURIComponent(pathname)}`}>Sign in</Link>
+                <p>{t('misc.signInToSave')}</p>
+                <Link to={`/login?returnUrl=${encodeURIComponent(pathname)}`}>{t('misc.signIn')}</Link>
               </aside>
             )}
 
             {itemCount === 0 ? (
               <div className="opg-saved-empty mt-6">
                 <div>
-                  <h2>No stays in this shortlist</h2>
-                  <p>This collection has been shared, but no properties have been added yet.</p>
+                  <h2>{t('misc.noStaysInShortlist')}</h2>
+                  <p>{t('misc.shortlistSharedEmpty')}</p>
                 </div>
               </div>
             ) : (

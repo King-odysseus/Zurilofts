@@ -1,3 +1,4 @@
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
@@ -19,19 +20,22 @@ import { formatPrice } from '../utils/currency.js';
 // Shared admin surface recipes. PANEL_TITLE and friends are module-local in
 // AdminDashboard/AdminGovernance, so the same Tailwind strings are repeated here
 // rather than imported - a new page must not depend on another page's internals.
-const METRIC_CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
+const METRIC_CARD = 'rounded-xl bg-elevated shadow-md p-5';
 const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
 const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy tabular-nums';
 const METRIC_NOTE = 'mt-1 block text-xs text-muted';
 
-const PANEL = 'overflow-hidden rounded-xl border border-border bg-elevated shadow-sm';
+const PANEL = 'overflow-hidden rounded-xl bg-elevated shadow-md';
 const PANEL_HEAD = 'flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between';
 const PANEL_TITLE = 'text-base font-semibold text-navy';
 const PANEL_SUBTITLE = 'text-xs text-muted';
 const EMPTY_STATE = 'flex flex-col items-center gap-2 px-5 py-12 text-center';
 const ICON_TILE = 'inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy';
 const COUNT_PILL = 'inline-flex shrink-0 items-center rounded-full bg-surface px-2.5 py-1 text-[11px] font-semibold text-muted';
-const MONEY_CELL = 'whitespace-nowrap text-sm tabular-nums text-navy';
+// One shared recipe for every numeric cell, so a count and a money value cannot
+// drift apart. The block right alignment is what makes the digits line up down
+// the column, which is the whole point of a figure table.
+const MONEY_CELL = 'block whitespace-nowrap text-right text-sm tabular-nums text-navy';
 
 const EMPTY_TOTALS = {
   bookings: 0,
@@ -103,11 +107,12 @@ MetricCard.propTypes = {
  * month, so a bar is a div whose height is a percentage of the peak month.
  * Two rows of six on a phone keeps every label legible without rotating text.
  */
-function RevenueChart({ monthly = [] }) {
+function RevenueChart({ monthly = [], unplacedRevenue = 0, unplacedBookings = 0 }) {
+  const { t } = useLanguage();
   const peak = monthly.reduce((highest, month) => Math.max(highest, Number(month.platformRevenue) || 0), 0);
 
   if (monthly.length === 0) {
-    return <p className="text-sm text-muted">No monthly revenue is available for this range.</p>;
+    return <p className="text-sm text-muted">{t('admin.noMonthlyRevenue')}</p>;
   }
 
   return (
@@ -130,13 +135,22 @@ function RevenueChart({ monthly = [] }) {
         })}
       </div>
       {peak === 0 && (
-        <p className="mt-4 text-xs leading-relaxed text-muted">No platform revenue was recorded in these twelve months.</p>
+        // Totals above can carry revenue that never reaches a month, because a
+        // paid booking without a payment date has nowhere to be placed. Saying
+        // "no revenue" while a card above reports some is a contradiction.
+        <p className="mt-4 text-center text-xs leading-relaxed text-muted">
+          {unplacedBookings > 0
+            ? `${bookingsLabel(unplacedBookings)} worth ${money(unplacedRevenue)} ${unplacedBookings === 1 ? 'has' : 'have'} no recorded payment date, so ${unplacedBookings === 1 ? 'it' : 'they'} cannot be placed on a month. ${unplacedBookings === 1 ? 'That booking is' : 'Those bookings are'} still counted in the totals above.`
+            : 'No platform revenue was recorded in these twelve months.'}
+        </p>
       )}
     </div>
   );
 }
 
 RevenueChart.propTypes = {
+  unplacedRevenue: PropTypes.number,
+  unplacedBookings: PropTypes.number,
   monthly: PropTypes.arrayOf(PropTypes.shape({
     key: PropTypes.string,
     label: PropTypes.string,
@@ -148,6 +162,7 @@ RevenueChart.propTypes = {
 };
 
 function AdminRevenue() {
+  const { t, lang } = useLanguage();
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -200,6 +215,7 @@ function AdminRevenue() {
   const totals = report?.totals ?? EMPTY_TOTALS;
   const held = report?.held ?? { amount: 0, bookings: 0 };
   const unsettled = report?.unsettled ?? { bookings: 0, grossPaid: 0 };
+  const undated = report?.undated ?? { bookings: 0, grossPaid: 0, platformRevenue: 0 };
   const monthly = Array.isArray(report?.monthly) ? report.monthly : [];
   const byHost = Array.isArray(report?.byHost) ? report.byHost : [];
   const recent = Array.isArray(report?.recent) ? report.recent : [];
@@ -240,16 +256,15 @@ function AdminRevenue() {
     <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Revenue</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.revenueTitle')}</h1>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-            What ZuriLofts itself kept from paid stays, before Paystack and card fees are deducted. Host money the
-            platform is still holding until release is reported separately.
+            {t('admin.revenueIntro')}
           </p>
         </div>
 
         <form className="flex flex-wrap items-end gap-5" onSubmit={applyRange}>
           <div className="flex flex-col gap-1">
-            <label htmlFor="revenue-from" className="text-[11px] font-semibold uppercase tracking-wide text-muted">FROM</label>
+            <label htmlFor="revenue-from" className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('common.from').toUpperCase()}</label>
             <TextInput
               id="revenue-from"
               type="date"
@@ -259,7 +274,7 @@ function AdminRevenue() {
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="revenue-to" className="text-[11px] font-semibold uppercase tracking-wide text-muted">TO</label>
+            <label htmlFor="revenue-to" className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('common.to').toUpperCase()}</label>
             <TextInput
               id="revenue-to"
               type="date"
@@ -268,15 +283,15 @@ function AdminRevenue() {
               onChange={(event) => setDraft({ ...draft, to: event.target.value })}
             />
           </div>
-          <Button type="submit" size="sm" disabled={loading}>Apply</Button>
-          {hasRange && <Button type="button" size="sm" color="light" onClick={clearRange} disabled={loading}>Clear</Button>}
-          <Button type="button" size="sm" color="light" onClick={exportCsv} disabled={recent.length === 0}>Export CSV</Button>
+          <Button type="submit" size="sm" disabled={loading}>{t('common.apply')}</Button>
+          {hasRange && <Button type="button" size="sm" color="light" onClick={clearRange} disabled={loading}>{t('common.clear')}</Button>}
+          <Button type="button" size="sm" color="light" onClick={exportCsv} disabled={recent.length === 0}>{t('admin.exportCsv')}</Button>
         </form>
       </div>
 
       {loadedAt && !loading && (
         <p className="text-xs text-muted">
-          Figures as of {new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(loadedAt)}
+          {t('admin.figuresAsOf', { date: new Intl.DateTimeFormat(lang === 'sw' ? 'sw-KE' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(loadedAt) })}
           {hasRange ? ` for ${range.from || 'the start'} to ${range.to || 'today'}` : ' across all paid stays'}.
         </p>
       )}
@@ -285,41 +300,41 @@ function AdminRevenue() {
         <section className={PANEL}>
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
             <Spinner size="lg" />
-            <strong className="text-sm font-semibold text-navy">Loading revenue</strong>
-            <p className="text-xs text-muted">Totalling paid bookings, host payouts and held host balances.</p>
+            <strong className="text-sm font-semibold text-navy">{t('admin.loadingRevenue')}</strong>
+            <p className="text-xs text-muted">{t('admin.loadingRevenueHint')}</p>
           </div>
         </section>
       ) : !report ? (
         <section className={PANEL}>
           <div className={EMPTY_STATE}>
             <span className={ICON_TILE} aria-hidden="true"><Wallet strokeWidth={1.8} /></span>
-            <strong className="text-base font-semibold text-navy">Revenue could not be loaded</strong>
+            <strong className="text-base font-semibold text-navy">{t('admin.revenueCouldNotLoad')}</strong>
             <p className="text-xs leading-relaxed text-muted">{error || 'The revenue report is unavailable right now.'}</p>
-            <Button size="sm" color="light" className="mt-2" onClick={load}>Try again</Button>
+            <Button size="sm" color="light" className="mt-2" onClick={load}>{t('common.retry')}</Button>
           </div>
         </section>
       ) : (
         <>
-          {error && <Alert color="failure" role="alert">{error}</Alert>}
+          {error && <Alert color="failure" role="alert" className="text-center">{error}</Alert>}
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
             <MetricCard
-              label="Platform revenue"
+              label={t('admin.platformRevenue')}
               value={money(totals.platformRevenue)}
               note={`Platform share of ${bookingsLabel(totals.bookings)}`}
             />
             <MetricCard
-              label="Guest payments collected"
+              label={t('admin.guestPayments')}
               value={money(totals.grossPaid)}
               note="Charged to guests, before gateway fees"
             />
             <MetricCard
-              label="Paid to hosts"
+              label={t('admin.paidToHosts')}
               value={money(totals.hostNet)}
               note={`Net of ${money(totals.withholdingTax)} withholding tax`}
             />
             <MetricCard
-              label="Held for hosts"
+              label={t('admin.heldForHosts')}
               value={money(held.amount)}
               note={`${bookingsLabel(held.bookings)} awaiting release, not date filtered`}
             />
@@ -328,7 +343,7 @@ function AdminRevenue() {
           {/* Paid stays from before the split was stored cannot be split, so they
               are called out instead of being counted as platform profit. */}
           {unsettled.bookings > 0 && (
-            <Alert color="warning" role="status">
+            <Alert color="warning" role="status" className="text-center">
               {bookingsLabel(unsettled.bookings)} worth {money(unsettled.grossPaid)} {unsettled.bookings === 1 ? 'was' : 'were'} paid before the platform
               split was recorded, so {unsettled.bookings === 1 ? 'it is' : 'they are'} left out of these totals and
               listed under recent paid bookings.
@@ -338,20 +353,24 @@ function AdminRevenue() {
           <section className={PANEL}>
             <div className={PANEL_HEAD}>
               <div>
-                <h2 className={PANEL_TITLE}>Platform revenue by month</h2>
-                <p className={PANEL_SUBTITLE}>Last twelve months in range, oldest first.</p>
+                <h2 className={PANEL_TITLE}>{t('admin.revenueByMonth')}</h2>
+                <p className={PANEL_SUBTITLE}>{t('admin.revenueByMonthHint')}</p>
               </div>
             </div>
             <div className="px-5 py-6">
-              <RevenueChart monthly={monthly} />
+              <RevenueChart
+                monthly={monthly}
+                unplacedRevenue={Number(undated.platformRevenue) || 0}
+                unplacedBookings={Number(undated.bookings) || 0}
+              />
             </div>
           </section>
 
           <section className={PANEL}>
             <div className={PANEL_HEAD}>
               <div>
-                <h2 className={PANEL_TITLE}>Revenue by host</h2>
-                <p className={PANEL_SUBTITLE}>Sorted by what the platform earned, highest first.</p>
+                <h2 className={PANEL_TITLE}>{t('admin.revenueByHost')}</h2>
+                <p className={PANEL_SUBTITLE}>{t('admin.revenueByHostHint')}</p>
               </div>
               <span className={COUNT_PILL}>{hostsLabel(byHost.length)}</span>
             </div>
@@ -359,19 +378,19 @@ function AdminRevenue() {
             {byHost.length === 0 ? (
               <div className={EMPTY_STATE}>
                 <span className={ICON_TILE} aria-hidden="true"><Users strokeWidth={1.8} /></span>
-                <strong className="text-base font-semibold text-navy">No host revenue yet</strong>
-                <p className="text-xs leading-relaxed text-muted">A confirmed, paid stay is what puts a host on this table.</p>
+                <strong className="text-base font-semibold text-navy">{t('admin.noHostRevenue')}</strong>
+                <p className="text-xs leading-relaxed text-muted">{t('admin.noHostRevenueHint')}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <Table hoverable aria-label="Revenue by host">
+                <Table hoverable aria-label={t('a11y3.revenueByHost')}>
                   <TableHead>
                     <TableRow>
-                      <TableHeadCell>HOST</TableHeadCell>
-                      <TableHeadCell>BOOKINGS</TableHeadCell>
-                      <TableHeadCell>GROSS PAID</TableHeadCell>
-                      <TableHeadCell>HOST NET</TableHeadCell>
-                      <TableHeadCell>PLATFORM REVENUE</TableHeadCell>
+                      <TableHeadCell>{t('admin.colHost').toUpperCase()}</TableHeadCell>
+                      <TableHeadCell><span className="block text-right">BOOKINGS</span></TableHeadCell>
+                      <TableHeadCell><span className="block text-right">{t('admin.grossPaid').toUpperCase()}</span></TableHeadCell>
+                      <TableHeadCell><span className="block text-right">HOST NET</span></TableHeadCell>
+                      <TableHeadCell><span className="block text-right">{t('admin.platformRevenue').toUpperCase()}</span></TableHeadCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -398,8 +417,8 @@ function AdminRevenue() {
           <section className={PANEL}>
             <div className={PANEL_HEAD}>
               <div>
-                <h2 className={PANEL_TITLE}>Recent paid bookings</h2>
-                <p className={PANEL_SUBTITLE}>The 50 most recently paid stays, newest first.</p>
+                <h2 className={PANEL_TITLE}>{t('admin.recentPaidBookings')}</h2>
+                <p className={PANEL_SUBTITLE}>{t('admin.recentPaidBookingsHint')}</p>
               </div>
               <span className={COUNT_PILL}>{bookingsLabel(recent.length)}</span>
             </div>
@@ -407,20 +426,20 @@ function AdminRevenue() {
             {recent.length === 0 ? (
               <div className={EMPTY_STATE}>
                 <span className={ICON_TILE} aria-hidden="true"><TrendingUp strokeWidth={1.8} /></span>
-                <strong className="text-base font-semibold text-navy">No paid bookings in range</strong>
-                <p className="text-xs leading-relaxed text-muted">Widen the dates or clear the filter to see earlier payments.</p>
+                <strong className="text-base font-semibold text-navy">{t('admin.noPaidBookings')}</strong>
+                <p className="text-xs leading-relaxed text-muted">{t('admin.widenDateRange')}</p>
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <Table hoverable aria-label="Recent paid bookings">
+                <Table hoverable aria-label={t('a11y3.recentPaidBookings')}>
                   <TableHead>
                     <TableRow>
                       <TableHeadCell>DATE</TableHeadCell>
                       <TableHeadCell>PROPERTY</TableHeadCell>
-                      <TableHeadCell>HOST</TableHeadCell>
-                      <TableHeadCell>GROSS PAID</TableHeadCell>
-                      <TableHeadCell>HOST NET</TableHeadCell>
-                      <TableHeadCell>PLATFORM REVENUE</TableHeadCell>
+                      <TableHeadCell>{t('admin.colHost').toUpperCase()}</TableHeadCell>
+                      <TableHeadCell><span className="block text-right">{t('admin.grossPaid').toUpperCase()}</span></TableHeadCell>
+                      <TableHeadCell><span className="block text-right">HOST NET</span></TableHeadCell>
+                      <TableHeadCell><span className="block text-right">{t('admin.platformRevenue').toUpperCase()}</span></TableHeadCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>

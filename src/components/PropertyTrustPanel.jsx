@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { Building2, MapPin, Star } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * PropertyTrustPanel - a slim confidence strip that surfaces only verified
@@ -12,10 +13,12 @@ import { Building2, MapPin, Star } from 'lucide-react';
  *  - location    : human-readable location string
  */
 
-const TYPE_LABELS = {
-  apartment: 'Apartment',
-  studio: 'Studio',
-  penthouse: 'Penthouse',
+// Dictionary keys rather than literals: the label is resolved inside the
+// component so it follows the selected language.
+const TYPE_KEYS = {
+  apartment: 'stays.typeApartment',
+  studio: 'stays.typeStudio',
+  penthouse: 'stays.typePenthouse',
 };
 
 function TrustBadge({ icon, label, value }) {
@@ -39,26 +42,27 @@ TrustBadge.propTypes = {
 };
 
 function PropertyTrustPanel({ rating = 0, reviewCount = 0, type = '', location = '' }) {
+  const { t } = useLanguage();
   const hasReviews = typeof rating === 'number' && rating > 0;
-  const typeLabel = TYPE_LABELS[type] || type || 'Property';
-  const ratingDisplay = hasReviews ? `${rating} ★` : 'New';
+  const typeLabel = TYPE_KEYS[type] ? t(TYPE_KEYS[type]) : (type || t('stays.typeProperty'));
+  const ratingDisplay = hasReviews ? `${rating} ★` : t('stays.newListing');
   const reviewDisplay = hasReviews
     ? reviewCount === 1
-      ? '1 review'
-      : `${reviewCount} reviews`
-    : 'No reviews yet';
+      ? t('common.review_one', { count: 1 })
+      : t('common.review_other', { count: reviewCount })
+    : t('stays.noReviewsYet');
 
   return (
     <section
       className="flex flex-wrap gap-3"
-      aria-label="Property overview"
+      aria-label={t('stays.overview')}
     >
       {/* Rating */}
       <TrustBadge
         icon={
           <Star className="w-5 h-5" fill="currentColor" aria-hidden="true" />
         }
-        label="Guest rating"
+        label={t('stays.guestRating')}
         value={`${ratingDisplay} · ${reviewDisplay}`}
       />
 
@@ -67,7 +71,7 @@ function PropertyTrustPanel({ rating = 0, reviewCount = 0, type = '', location =
         icon={
           <Building2 className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
         }
-        label="Property type"
+        label={t('stays.propertyType')}
         value={typeLabel}
       />
 
@@ -77,7 +81,7 @@ function PropertyTrustPanel({ rating = 0, reviewCount = 0, type = '', location =
           icon={
             <MapPin className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
           }
-          label="Location"
+          label={t('stays.location')}
           value={location}
         />
       )}

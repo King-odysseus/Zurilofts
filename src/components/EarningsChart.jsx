@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * Host earnings chart: one bar per month (or quarter), gridlines and value
@@ -64,6 +65,7 @@ function formatKes(value) {
 }
 
 export default function EarningsChart({ buckets, selectedKey, onSelect, emptyMessage }) {
+  const { t } = useLanguage();
   const periods = Array.isArray(buckets) ? buckets : [];
   const largest = periods.reduce((max, period) => Math.max(max, Number(period.total) || 0), 0);
   const axisMax = niceMax(largest);
@@ -73,7 +75,7 @@ export default function EarningsChart({ buckets, selectedKey, onSelect, emptyMes
   });
 
   return (
-    <div role="group" aria-label="Monthly earnings chart">
+    <div role="group" aria-label={t('hostmoney.earningsChartLabel')}>
       {/* One sentence per period for screen readers. The bars themselves are
           hidden below, so the figures are announced once rather than once per
           column plus once here. */}
@@ -92,7 +94,7 @@ export default function EarningsChart({ buckets, selectedKey, onSelect, emptyMes
           month list says so in words instead. */}
       {largest <= 0 ? (
         <p className="py-12 text-center text-sm text-muted">
-          {emptyMessage || 'No earnings to chart yet.'}
+          {emptyMessage || t('hostmoney.noEarningsYet')}
         </p>
       ) : (
         <div className="relative">

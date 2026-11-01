@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Check, Info, X } from 'lucide-react';
+import { useLanguage } from './LanguageContext.jsx';
 
 const ToastContext = createContext(null);
 
@@ -25,6 +26,7 @@ const KIND_META = {
 };
 
 function ToastCard({ toast, onDismiss }) {
+  const { t } = useLanguage();
   const meta = KIND_META[toast.kind] || KIND_META.info;
   return (
     <div
@@ -40,7 +42,7 @@ function ToastCard({ toast, onDismiss }) {
       </div>
       <button
         onClick={onDismiss}
-        aria-label="Dismiss notification"
+        aria-label={t('trust.dismissNotification')}
         className="flex-shrink-0 -mr-1 text-[#6b7280]/60 hover:text-[#1f2937] transition-colors"
       >
         <X className="w-4 h-4" strokeWidth={2} aria-hidden="true" />

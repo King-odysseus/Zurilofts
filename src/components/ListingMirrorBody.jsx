@@ -4,6 +4,7 @@ import { Bath, Building2, Check, House, MapPin, Ruler, Star, Users } from 'lucid
 import Lightbox from './Lightbox.jsx';
 import { formatPrice } from '../utils/currency.js';
 import { googleMapsDirectionsUrl, googleMapsSearchUrl } from '../utils/googleMaps.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * Read-only mirror of the traveller listing content, for the host and admin
@@ -18,7 +19,13 @@ import { googleMapsDirectionsUrl, googleMapsSearchUrl } from '../utils/googleMap
  * ever being the same screen.
  */
 
-const TYPE_LABELS = { apartment: 'Apartment', studio: 'Studio', penthouse: 'Penthouse' };
+// Keys, not words: the type is read at render time so the label follows the
+// selected language.
+const TYPE_LABELS = {
+  apartment: 'adminlisting.typeApartment',
+  studio: 'adminlisting.typeStudio',
+  penthouse: 'adminlisting.typePenthouse',
+};
 
 // Same typographic rhythm for every block, so a long and a short listing still
 // read as one page.
@@ -44,37 +51,42 @@ Fact.propTypes = {
 };
 
 /** Only the facts this listing actually has: a row of "-" reads as broken data. */
-function buildFacts(property, typeLabel) {
+function buildFacts(property, typeLabel, t) {
   const facts = [];
 
   if (property.bedrooms != null) {
-    facts.push({ icon: House, value: property.bedrooms, label: property.bedrooms === 1 ? 'Bedroom' : 'Bedrooms' });
+    facts.push({ icon: House, value: property.bedrooms, label: t(property.bedrooms === 1 ? 'adminlisting.bedroomLabel' : 'adminlisting.bedroomsLabel') });
   }
   if (property.bathrooms != null) {
-    facts.push({ icon: Bath, value: property.bathrooms, label: property.bathrooms === 1 ? 'Bathroom' : 'Bathrooms' });
+    facts.push({ icon: Bath, value: property.bathrooms, label: t(property.bathrooms === 1 ? 'adminlisting.bathroomLabel' : 'adminlisting.bathroomsLabel') });
   }
   if (property.maxGuests != null) {
-    facts.push({ icon: Users, value: property.maxGuests, label: property.maxGuests === 1 ? 'Guest' : 'Guests' });
+    facts.push({ icon: Users, value: property.maxGuests, label: t(property.maxGuests === 1 ? 'adminlisting.guestLabel' : 'adminlisting.guestsLabel') });
   }
   if (property.area != null) {
-    facts.push({ icon: Ruler, value: `${property.area} sq ft`, label: 'Area' });
+    facts.push({ icon: Ruler, value: t('adminlisting.areaSqft', { area: property.area }), label: t('adminlisting.labelArea') });
   }
   // The type is always present, so the row never collapses to nothing.
-  facts.push({ icon: Building2, value: typeLabel, label: 'Type' });
+  facts.push({ icon: Building2, value: typeLabel, label: t('adminlisting.labelType') });
 
   return facts;
 }
 
 function ListingMirrorBody({ property, sidePanel }) {
+  const { t } = useLanguage();
   const [featuredImage, setFeaturedImage] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
   const images = Array.isArray(property.images) ? property.images.filter(Boolean) : [];
   const amenities = Array.isArray(property.amenities) ? property.amenities.filter(Boolean) : [];
   const nearby = Array.isArray(property.nearby) ? property.nearby.filter(Boolean) : [];
-  const typeLabel = TYPE_LABELS[property.type] || property.type || 'Property';
-  const facts = buildFacts(property, typeLabel);
+  const typeLabel = TYPE_LABELS[property.type] ? t(TYPE_LABELS[property.type]) : property.type || t('adminlisting.typeProperty');
+  const facts = buildFacts(property, typeLabel, t);
   const price = formatPrice(property.price);
+  // The alt placeholder is only substituted when its value is defined, so a
+  // listing with no title would render the literal "{title}" to a screen
+  // reader. Fall back to a translated name instead.
+  const photoTitle = property.title || t('adminlisting.untitledListing');
 
   // The primary photo can be swapped with the thumbnails, so the supporting set
   // has to be recomputed each time rather than sliced once.
@@ -86,7 +98,7 @@ function ListingMirrorBody({ property, sidePanel }) {
   return (
     <>
       {images.length > 0 ? (
-        <section aria-label="Listing photos" className="mb-6">
+        <section aria-label={t('adminlisting.listingPhotosAria')} className="mb-6">
           {images.length === 1 ? (
             <button
               type="button"
@@ -95,7 +107,7 @@ function ListingMirrorBody({ property, sidePanel }) {
             >
               <img
                 src={images[0]}
-                alt={`${property.title} - photo 1 of 1`}
+                alt={t('adminlisting.photoAltSingle', { title: photoTitle })}
                 className="h-56 w-full object-cover sm:h-72 md:h-[400px]"
               />
             </button>
@@ -108,7 +120,7 @@ function ListingMirrorBody({ property, sidePanel }) {
               >
                 <img
                   src={images[featuredImage]}
-                  alt={`${property.title} - photo ${featuredImage + 1} of ${images.length}`}
+                  alt={t('adminlisting.photoAlt', { title: photoTitle, number: featuredImage + 1, total: images.length })}
                   className="h-56 w-full object-cover sm:h-72 md:h-full md:min-h-[380px]"
                 />
               </button>
@@ -118,7 +130,7 @@ function ListingMirrorBody({ property, sidePanel }) {
                   type="button"
                   onClick={() => setFeaturedImage(index)}
                   className="overflow-hidden rounded-2xl border border-border"
-                  aria-label={`Show photo ${index + 1}`}
+                  aria-label={t('adminlisting.showPhoto', { number: index + 1 })}
                 >
                   <img src={src} alt="" className="h-20 w-full object-cover sm:h-24 md:h-full" />
                 </button>
@@ -128,7 +140,7 @@ function ListingMirrorBody({ property, sidePanel }) {
         </section>
       ) : (
         <div className="mb-6 grid h-40 place-items-center rounded-2xl border border-dashed border-border bg-surface text-sm text-muted">
-          No photos on this listing yet
+          {t('adminlisting.noPhotosYet')}
         </div>
       )}
 
@@ -150,12 +162,12 @@ function ListingMirrorBody({ property, sidePanel }) {
             <span className="inline-flex items-center gap-1 font-semibold text-navy">
               <Star className="h-4 w-4 text-amber-500" fill="currentColor" aria-hidden="true" />
               {property.rating}
-              {property.reviewCount ? <span className="font-normal text-muted">({property.reviewCount} reviews)</span> : null}
+              {property.reviewCount ? <span className="font-normal text-muted">{t('adminlisting.reviewsCount', { count: property.reviewCount })}</span> : null}
             </span>
           ) : null}
           {price && (
             <span className="font-semibold text-navy">
-              {price} <span className="font-normal text-muted">per night</span>
+              {price} <span className="font-normal text-muted">{t('adminlisting.perNight')}</span>
             </span>
           )}
         </div>
@@ -163,12 +175,12 @@ function ListingMirrorBody({ property, sidePanel }) {
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-10">
         <div className="lg:col-span-2">
-          <section aria-label="Key facts" className="mb-6 flex flex-wrap gap-5 border-b border-border pb-6 sm:gap-8">
+          <section aria-label={t('adminlisting.keyFacts')} className="mb-6 flex flex-wrap gap-5 border-b border-border pb-6 sm:gap-8">
             {facts.map((fact) => <Fact key={fact.label} {...fact} />)}
           </section>
 
           <section aria-labelledby="mirror-about" className="mb-6">
-            <h2 id="mirror-about" className={SECTION_HEADING}>About this {typeLabel.toLowerCase()}</h2>
+            <h2 id="mirror-about" className={SECTION_HEADING}>{t('adminlisting.aboutType', { type: typeLabel.toLowerCase() })}</h2>
             {property.description ? (
               <div className="space-y-3 text-sm leading-relaxed text-charcoal">
                 {property.description
@@ -178,12 +190,12 @@ function ListingMirrorBody({ property, sidePanel }) {
                   .map((paragraph, index) => <p key={index}>{paragraph}</p>)}
               </div>
             ) : (
-              <p className={MUTED}>No description written yet.</p>
+              <p className={MUTED}>{t('adminlisting.noDescriptionYet')}</p>
             )}
           </section>
 
           <section aria-labelledby="mirror-amenities" className="mb-6">
-            <h2 id="mirror-amenities" className={SECTION_HEADING}>What this place offers</h2>
+            <h2 id="mirror-amenities" className={SECTION_HEADING}>{t('adminlisting.whatPlaceOffers')}</h2>
             {amenities.length > 0 ? (
               <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 {amenities.map((amenity, index) => (
@@ -194,13 +206,13 @@ function ListingMirrorBody({ property, sidePanel }) {
                 ))}
               </ul>
             ) : (
-              <p className={MUTED}>No amenities listed yet.</p>
+              <p className={MUTED}>{t('adminlisting.noAmenitiesYet')}</p>
             )}
           </section>
 
           {nearby.length > 0 && (
             <section aria-labelledby="mirror-nearby" className="mb-6">
-              <h2 id="mirror-nearby" className={SECTION_HEADING}>What&apos;s nearby</h2>
+              <h2 id="mirror-nearby" className={SECTION_HEADING}>{t('adminlisting.nearbyHeading')}</h2>
               <ul className="space-y-2">
                 {nearby.map((item, index) => (
                   <li key={index} className="flex items-start gap-2.5 text-sm text-charcoal">
@@ -214,8 +226,8 @@ function ListingMirrorBody({ property, sidePanel }) {
 
           {(property.location || property.address) && (
             <section aria-labelledby="mirror-location" className="mb-6">
-              <h2 id="mirror-location" className={SECTION_HEADING}>Where guests will be</h2>
-              <div className="rounded-2xl border border-border bg-surface p-4">
+              <h2 id="mirror-location" className={SECTION_HEADING}>{t('adminlisting.whereGuests')}</h2>
+              <div className="rounded-2xl bg-surface p-4 shadow-sm">
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="min-w-0">
                     {property.location && <p className="text-sm font-semibold text-navy">{property.location}</p>}
@@ -228,7 +240,7 @@ function ListingMirrorBody({ property, sidePanel }) {
                       rel="noopener noreferrer"
                       className="inline-flex min-h-[40px] items-center rounded-full border border-border bg-elevated px-4 text-xs font-semibold text-navy hover:border-navy"
                     >
-                      Open in Google Maps
+                      {t('adminlisting.openInMaps')}
                     </a>
                     <a
                       href={googleMapsDirectionsUrl({ lat: property.lat, lng: property.lng, label: property.address || property.location })}
@@ -236,7 +248,7 @@ function ListingMirrorBody({ property, sidePanel }) {
                       rel="noopener noreferrer"
                       className="inline-flex min-h-[40px] items-center rounded-full border border-border bg-elevated px-4 text-xs font-semibold text-navy hover:border-navy"
                     >
-                      Get directions
+                      {t('adminlisting.getDirections')}
                     </a>
                   </div>
                 </div>
@@ -245,7 +257,7 @@ function ListingMirrorBody({ property, sidePanel }) {
           )}
         </div>
 
-        <aside aria-label="Workspace actions" className="lg:col-span-1">
+        <aside aria-label={t('adminlisting.workspaceActionsAria')} className="lg:col-span-1">
           <div className="lg:sticky lg:top-24">{sidePanel}</div>
         </aside>
       </div>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ClipboardList } from 'lucide-react';
 import { Button } from 'flowbite-react';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
@@ -15,16 +16,16 @@ const STATUS_PILL = 'inline-flex items-center rounded-full px-2.5 py-1 text-[11p
 const STATUS_TONE_IDLE = 'bg-[#F1F5F9] text-[#475569]';
 
 const STATUS_META = {
-  PENDING: { label: 'Pending', className: 'bg-[#FDF3D8] text-[#8A5A00]' },
-  CONFIRMED: { label: 'Confirmed', className: 'bg-[#E7F6EE] text-[#157347]' },
-  CANCELLED: { label: 'Cancelled', className: 'bg-[#FDECEC] text-[#B42318]' },
+  PENDING: { label: 'booking.statusPending', className: 'bg-[#FDF3D8] text-[#8A5A00]' },
+  CONFIRMED: { label: 'booking.statusConfirmed', className: 'bg-[#E7F6EE] text-[#157347]' },
+  CANCELLED: { label: 'booking.statusCancelled', className: 'bg-[#FDECEC] text-[#B42318]' },
 };
 
 const FILTERS = [
-  { value: 'all', label: 'All bookings' },
-  { value: 'upcoming', label: 'Upcoming' },
-  { value: 'past', label: 'Past' },
-  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'all', label: 'booking.allBookings' },
+  { value: 'upcoming', label: 'booking.upcoming' },
+  { value: 'past', label: 'booking.past' },
+  { value: 'cancelled', label: 'booking.cancelled' },
 ];
 
 function formatDate(iso) {
@@ -48,10 +49,11 @@ function getBookingImage(booking, index = 0) {
 // between the photo and the copy; max-md raises only that stack to 20px and
 // leaves the desktop photo-to-copy gap as it was.
 function HistoryCard({ booking, index, onMessage, messagePending }) {
+  const { t } = useLanguage();
   const property = booking.property || {};
-  const status = STATUS_META[booking.status] || { label: booking.status || 'Unknown', className: STATUS_TONE_IDLE };
+  const status = STATUS_META[booking.status] || { label: t('booking.statusUnknown'), className: STATUS_TONE_IDLE };
 
-  return <article className="opg-history-card max-md:!gap-5 rounded-xl border border-border">
+  return <article className="opg-history-card max-md:!gap-5 rounded-xl shadow-md">
     <Link to={`/property/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={`View ${property.title || 'stay'}`}>
       <img src={getBookingImage(booking, index)} alt="" />
     </Link>
@@ -61,39 +63,41 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
           <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || 'Property'}</Link></h2>
           <p>{property.location || 'Nairobi'}</p>
         </div>
-        <span className={`${STATUS_PILL} ${status.className}`}>{status.label}</span>
+        <span className={`${STATUS_PILL} ${status.className}`}>{t(status.label)}</span>
       </div>
 
       <dl className="opg-history-meta !mt-6">
-        <div><dt>Check-in</dt><dd>{formatDate(booking.checkIn)}</dd></div>
-        <div><dt>Check-out</dt><dd>{formatDate(booking.checkOut)}</dd></div>
-        <div><dt>Guests</dt><dd>{booking.guests || 1}</dd></div>
-        <div><dt>Total</dt><dd>{formatCurrency(booking.total)}</dd></div>
+        <div><dt>{t('booking.checkIn')}</dt><dd>{formatDate(booking.checkIn)}</dd></div>
+        <div><dt>{t('booking.checkOut')}</dt><dd>{formatDate(booking.checkOut)}</dd></div>
+        <div><dt>{t('booking.guests')}</dt><dd>{booking.guests || 1}</dd></div>
+        <div><dt>{t('booking.total')}</dt><dd>{formatCurrency(booking.total)}</dd></div>
       </dl>
 
       <div className="opg-history-actions !pt-6">
         <Button size="sm" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</Button>
-        <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>Invoice</Button>
+        <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>{t('booking.invoice')}</Button>
         {canAddToCalendar(booking) && isUpcomingStay(booking) && (
-          <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</Button>
+          <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>{t('booking.addToCalendar')}</Button>
         )}
-        <Button as={Link} to={`/property/${property.id || booking.propertyId}`} color="light" size="sm">View stay</Button>
-        <Button as={Link} to={`/bookings/${booking.id}`} color="light" size="sm">Booking details</Button>
+        <Button as={Link} to={`/property/${property.id || booking.propertyId}`} color="light" size="sm">{t('booking.viewStay')}</Button>
+        <Button as={Link} to={`/bookings/${booking.id}`} color="light" size="sm">{t('booking.bookingDetails')}</Button>
       </div>
     </div>
   </article>;
 }
 
 function EmptyHistory() {
+  const { t } = useLanguage();
   return <div className="opg-trip-empty">
     <ClipboardList strokeWidth={1.6} aria-hidden="true" />
-    <h2>No bookings found</h2>
-    <p>Try another filter, or browse available stays to plan your next trip.</p>
-    <Button as={Link} to="/properties" size="sm">Browse stays</Button>
+    <h2>{t('booking.noBookings')}</h2>
+    <p>{t('booking.noBookingsHint')}</p>
+    <Button as={Link} to="/properties" size="sm">{t('booking.browseStays')}</Button>
   </div>;
 }
 
 function BookingHistoryPage() {
+  const { t } = useLanguage();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -137,17 +141,17 @@ function BookingHistoryPage() {
   return <GuestAccountLayout
     active="bookings"
     eyebrow="Travel"
-    title="Booking history"
-    description="Every reservation, receipt, and conversation in one place."
-    action={<Button as={Link} to="/trips" className="w-fit max-md:mt-3.5" size="sm">Upcoming trips</Button>}
+    title={t('booking.yourBookings')}
+    description={t('booking.historyDescription')}
+    action={<Button as={Link} to="/trips" className="w-fit max-md:mt-3.5" size="sm">{t('booking.myTrips')}</Button>}
   >
-    <div className="opg-history-tabs" role="tablist" aria-label="Booking status">
-      {FILTERS.map((filter) => <button key={filter.value} type="button" role="tab" aria-selected={statusFilter === filter.value} onClick={() => setStatusFilter(filter.value)}>{filter.label}</button>)}
+    <div className="opg-history-tabs" role="tablist" aria-label={t('booking.bookingStatus')}>
+      {FILTERS.map((filter) => <button key={filter.value} type="button" role="tab" aria-selected={statusFilter === filter.value} onClick={() => setStatusFilter(filter.value)}>{t(filter.label)}</button>)}
     </div>
 
-    <p className="opg-history-count">{loading ? 'Loading bookings...' : `${filtered.length} booking${filtered.length === 1 ? '' : 's'}`}</p>
+    <p className="opg-history-count">{loading ? t('common.loading') : t(filtered.length === 1 ? 'common.booking_one' : 'common.booking_other', { count: filtered.length })}</p>
 
-    {loading ? <div className="opg-trip-loading" aria-label="Loading booking history"><span /><span /><span /></div> : error ? <div className="opg-trip-error"><p>{error}</p><Button className="mx-auto w-fit" size="sm" type="button" onClick={() => window.location.reload()}>Try again</Button></div> : filtered.length === 0 ? <EmptyHistory /> : <div className="opg-history-list !mt-6 !gap-6">
+    {loading ? <div className="opg-trip-loading" aria-label={t('booking.loadingHistoryLabel')}><span /><span /><span /></div> : error ? <div className="opg-trip-error"><p>{error}</p><Button className="mx-auto w-fit" size="sm" type="button" onClick={() => window.location.reload()}>{t('common.retry')}</Button></div> : filtered.length === 0 ? <EmptyHistory /> : <div className="opg-history-list !mt-6 !gap-6">
       {filtered.map((booking, index) => <HistoryCard key={booking.id} booking={booking} index={index} onMessage={openConversation} messagePending={messageBookingId === booking.id} />)}
     </div>}
   </GuestAccountLayout>;

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { House, ShieldCheck, Star } from 'lucide-react';
 
 /**
@@ -16,21 +17,21 @@ import { House, ShieldCheck, Star } from 'lucide-react';
  *                   each { id, name, quantity, price } (price in KES)
  */
 function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, variantLabel = null, addOns = [] }) {
+  const { t } = useLanguage();
   const hasReviews = typeof rating === 'number' && rating > 0;
-  const reviewLabel =
-    reviewCount === 1 ? '1 review' : `${reviewCount || 0} reviews`;
+    const reviewLabel = t(reviewCount === 1 ? 'common.review_one' : 'common.review_other', { count: reviewCount || 0 });
 
   const addOnItems = Array.isArray(addOns) ? addOns : [];
   const addOnsTotal = addOnItems.reduce((sum, a) => sum + (a.quantity * (a.price || 0)), 0);
 
   return (
-    <div className="sticky top-24 rounded-2xl border border-[#E3E8EF] bg-elevated p-5 shadow-[0_8px_28px_rgba(20,58,128,0.08)] md:p-6" role="complementary" aria-label="Booking summary">
+    <div className="sticky top-24 rounded-2xl bg-elevated p-5 shadow-[0_8px_28px_rgba(20,58,128,0.08)] md:p-6" role="complementary" aria-label={t('booking.bookingSummaryLabel')}>
       {/* Price */}
       <div className="mb-6">
         <span className="text-3xl font-bold text-[#203565]">
           KES {price != null ? price.toLocaleString() : '-'}
         </span>
-        <span className="text-[#5B6B82]"> / night</span>
+        <span className="text-[#5B6B82]"> {t('booking.perNightShort')}</span>
       </div>
 
       {/* Bed variant chip - only when arriving from a variant card */}
@@ -44,7 +45,7 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
       {/* Selected add-ons - only when provided */}
       {addOnItems.length > 0 && (
         <div className="mb-6 border-t border-[#E3E8EF] pt-6">
-          <h4 className="mb-4 font-semibold text-[#203565]">Add-ons</h4>
+          <h4 className="mb-4 font-semibold text-[#203565]">{t('booking.addOns')}</h4>
           <div className="space-y-3 text-sm">
             {addOnItems.map((a) => (
               <div key={a.id} className="flex justify-between text-[#5B6B82]">
@@ -53,7 +54,7 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
               </div>
             ))}
             <div className="flex justify-between border-t border-[#E3E8EF] pt-3 font-semibold text-[#203565]">
-              <span>Add-ons total</span>
+              <span>{t('booking.addOnsTotal')}</span>
               <span>KES {addOnsTotal.toLocaleString()}</span>
             </div>
           </div>
@@ -75,19 +76,19 @@ function BookingSummaryCard({ price, bookingHref, rating = 0, reviewCount = 0, v
 
       {/* Trust context - only facts from the API */}
       <div className="mt-6 border-t border-[#E3E8EF] pt-6">
-        <h4 className="mb-4 font-semibold text-[#203565]">About this listing</h4>
+        <h4 className="mb-4 font-semibold text-[#203565]">{t('booking.aboutThisListing')}</h4>
         <ul className="space-y-3 text-sm text-[#5B6B82]">
           {hasReviews && (
             <li className="flex items-start gap-2">
               <Star className="w-4 h-4 text-[#8A6B52] mt-0.5 shrink-0" fill="currentColor" aria-hidden="true" />
               <span>
-                <span className="font-semibold text-[#203565]">{rating}</span> rating &middot; {reviewLabel}
+                <span className="font-semibold text-[#203565]">{rating}</span> {t('stays.ratingWord')} &middot; {reviewLabel}
               </span>
             </li>
           )}
           <li className="flex items-start gap-2">
             <ShieldCheck className="w-4 h-4 text-[#8A6B52] mt-0.5 shrink-0" strokeWidth={2} aria-hidden="true" />
-            <span>Secure booking via Paystack</span>
+            <span>{t('stays.secureBooking')}</span>
           </li>
         </ul>
       </div>

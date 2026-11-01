@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function pageList(page, totalPages) {
   const pages = [];
@@ -22,6 +23,7 @@ function pageList(page, totalPages) {
  * Renders nothing when there is only one page and no total was provided.
  */
 function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel }) {
+  const { t } = useLanguage();
   if (total == null && totalPages <= 1) return null;
 
   const from = total != null ? (page - 1) * limit + 1 : null;
@@ -31,18 +33,18 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-2 py-3">
       {total != null ? (
         <p className="text-sm text-[#5B6B82]">
-          Showing {total === 0 ? 0 : from}-{to} of {total}
+          {t('stays.showing', { from: total === 0 ? 0 : from, to, total })}
           {itemLabel ? ` ${itemLabel}` : ''}
         </p>
       ) : (
         <span />
       )}
       {totalPages > 1 && (
-        <nav className="flex items-center gap-1.5" aria-label="Pagination">
+        <nav className="flex items-center gap-1.5" aria-label={t('stays.pagination')}>
           <button
             onClick={() => onPageChange(page - 1)}
             disabled={page <= 1}
-            aria-label="Previous page"
+            aria-label={t('stays.previousPage')}
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-elevated text-[#203565] shadow-sm transition-all hover:bg-surface hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
           >
             <ChevronLeft className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
@@ -68,7 +70,7 @@ function Pagination({ page, totalPages, onPageChange, total, limit, itemLabel })
           <button
             onClick={() => onPageChange(page + 1)}
             disabled={page >= totalPages}
-            aria-label="Next page"
+            aria-label={t('stays.nextPage')}
             className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] bg-elevated text-[#203565] shadow-sm transition-all hover:bg-surface hover:shadow-md disabled:opacity-40 disabled:hover:shadow-sm"
           >
             <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />

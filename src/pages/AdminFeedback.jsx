@@ -28,6 +28,7 @@ import AdminPagination from '../components/admin/AdminPagination.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
 import TableActionsMenu from '../components/TableActionsMenu.jsx';
 import usePagedResource from '../hooks/usePagedResource.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Module scope: rebuilt per render they would be new arrays every time, and the
 // filter selects would remount on every keystroke in the search box.
@@ -106,6 +107,7 @@ StarRating.propTypes = {
 
 /** One optional sub-score. Nulls are normal: a guest may skip the sub-ratings. */
 function SubRating({ label, value }) {
+  const { t } = useLanguage();
   const numeric = Number(value);
   const rated = Number.isFinite(numeric) && numeric > 0;
   return (
@@ -117,7 +119,7 @@ function SubRating({ label, value }) {
           <span className="text-xs text-charcoal">{numeric}/5</span>
         </span>
       ) : (
-        <span className="mt-1 block text-xs text-muted">Not rated</span>
+        <span className="mt-1 block text-xs text-muted">{t('admin.notRated')}</span>
       )}
     </div>
   );
@@ -129,6 +131,7 @@ SubRating.propTypes = {
 };
 
 function ReviewRow({ review, onView, onModerate }) {
+  const { t } = useLanguage();
   const comment = (review.publicComment || '').trim();
   const isLongComment = comment.length > 90;
 
@@ -173,12 +176,12 @@ function ReviewRow({ review, onView, onModerate }) {
                 onClick={() => onView(review)}
                 className="mt-1 text-xs font-semibold text-primary-600 hover:underline"
               >
-                Read full review
+                {t('admin.readFullReview')}
               </button>
             )}
           </>
         ) : (
-          <p className="text-sm text-muted">No public comment was left.</p>
+          <p className="text-sm text-muted">{t('admin.noPublicComment')}</p>
         )}
       </TableCell>
 
@@ -280,6 +283,7 @@ function moderationCopy(dialog) {
 }
 
 function AdminFeedback() {
+  const { t } = useLanguage();
   const [search, setSearch] = useState('');
   const [visibility, setVisibility] = useState('');
   const [ratingFilter, setRatingFilter] = useState('');
@@ -421,8 +425,8 @@ function AdminFeedback() {
   return (
     <div className="space-y-8">
       <AdminPageHeader
-        title="Reviews"
-        description="Moderate the reviews guests leave after a stay. Hide a review to take it off the public listing while keeping the record, or delete it permanently. Private feedback is visible to admins only."
+        title={t('admin.reviewsTitle')}
+        description={t('admin.reviewsDescription')}
         actions={(
           <Button color="light" type="button" onClick={refetch}>
             Refresh
@@ -432,38 +436,38 @@ function AdminFeedback() {
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          label="Average rating"
+          label={t('admin.averageRating')}
           value={averageRating === null ? '-' : averageRating.toFixed(1)}
-          note="Out of 5. The server average includes hidden reviews"
+          note={t('admin.averageNote')}
         />
         <MetricCard
-          label="Total reviews"
+          label={t('admin.totalReviews')}
           value={totalReviews === null ? '-' : totalReviews}
-          note="Platform-wide, not just this page"
+          note={t('admin.platformWide')}
         />
         <MetricCard
-          label="Hidden on this page"
+          label={t('admin.hiddenOnPage')}
           value={hiddenOnPage}
           note={`Of the ${data.length} review${data.length === 1 ? '' : 's'} shown here`}
           tone={hiddenOnPage > 0 ? 'warning' : 'default'}
         />
         <MetricCard
-          label="Low rated on this page"
+          label={t('admin.lowRatedOnPage')}
           value={lowRatedOnPage}
-          note="Rated 2 stars or fewer"
+          note={t('admin.ratedTwoOrFewer')}
           tone={lowRatedOnPage > 0 ? 'warning' : 'default'}
         />
       </div>
 
       <Panel>
         <PanelHead
-          title="Review moderation"
-          subtitle="Newest first, 20 per page. Search, visibility and rating filters apply to the reviews on this page only."
+          title={t('admin.reviewModeration')}
+          subtitle={t('admin.reviewModerationHint')}
         />
 
         <div className="space-y-3 border-b border-border px-5 py-4">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="relative w-full lg:max-w-xs">
+            <div className="relative w-full lg:max-w-xs [&_input]:border-0 [&_input]:bg-surface [&_input]:pl-9">
               <Search
                 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
                 strokeWidth={1.8}
@@ -473,9 +477,8 @@ function AdminFeedback() {
                 type="search"
                 value={search}
                 onChange={(event) => changeFilter(setSearch, event.target.value)}
-                placeholder="Search guest, listing or comment"
-                aria-label="Search this page of reviews by guest name, listing title or comment text"
-                className="pl-9"
+                placeholder={t('admin.searchReview')}
+                aria-label={t('admin.searchReviewLabel')}
               />
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -483,7 +486,7 @@ function AdminFeedback() {
                 value={visibility}
                 onChange={(next) => changeFilter(setVisibility, next)}
                 options={VISIBILITY_OPTIONS}
-                ariaLabel="Filter by visibility"
+                ariaLabel={t('admin.filterVisibility')}
                 wrapperClassName="w-40"
                 sizing="sm"
               />
@@ -491,13 +494,13 @@ function AdminFeedback() {
                 value={ratingFilter}
                 onChange={(next) => changeFilter(setRatingFilter, next)}
                 options={RATING_OPTIONS}
-                ariaLabel="Filter by rating"
+                ariaLabel={t('admin.filterRating')}
                 wrapperClassName="w-40"
                 sizing="sm"
               />
               {filtersActive && (
                 <Button size="xs" color="light" type="button" onClick={clearFilters}>
-                  Clear filters
+                  {t('admin.clearFilters')}
                 </Button>
               )}
             </div>
@@ -512,7 +515,7 @@ function AdminFeedback() {
         {message && (
           <Alert
             color={messageTone === 'error' ? 'failure' : 'success'}
-            className="mx-5 mt-5"
+            className="mx-5 mt-5 text-center"
             role="status"
           >
             {message}
@@ -522,15 +525,15 @@ function AdminFeedback() {
         {loading ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
             <Spinner size="lg" />
-            <strong className="text-sm font-semibold text-navy">Loading reviews</strong>
-            <p className="text-xs text-muted">Fetching guest ratings, comments and private notes.</p>
+            <strong className="text-sm font-semibold text-navy">{t('admin.loadingReviews')}</strong>
+            <p className="text-xs text-muted">{t('admin.loadingReviewsHint')}</p>
           </div>
         ) : error ? (
           // A failed request must not look like an empty list, so it gets its own
           // state, the server's reason, and a way to retry.
           <EmptyState
             kind="error"
-            title="Could not load reviews"
+            title={t('admin.couldNotLoadReviews')}
             description={error}
             action={(
               <Button color="light" type="button" onClick={refetch}>
@@ -543,7 +546,7 @@ function AdminFeedback() {
           // empty, which is a different story from "the platform has no reviews".
           <EmptyState
             kind="empty"
-            title={filtersActive ? 'No reviews on this page' : 'No reviews yet'}
+            title={filtersActive ? t('admin.noReviewsOnPage') : t('admin.noReviewsYet')}
             description={
               filtersActive
                 ? 'Filters only cover the page in view, and this page has no reviews. Clear the filters or open another page.'
@@ -552,7 +555,7 @@ function AdminFeedback() {
             action={
               filtersActive ? (
                 <Button color="light" type="button" onClick={clearFilters}>
-                  Clear filters
+                  {t('admin.clearFilters')}
                 </Button>
               ) : undefined
             }
@@ -560,25 +563,25 @@ function AdminFeedback() {
         ) : visibleReviews.length === 0 ? (
           <EmptyState
             kind="empty"
-            title="No reviews match these filters"
-            description="Nothing on this page matches the search, visibility or rating filter. Clear the filters to see every review on this page."
+            title={t('admin.noReviewsMatch')}
+            description={t('admin.noReviewsMatchHint')}
             action={(
               <Button color="light" type="button" onClick={clearFilters}>
-                Clear filters
+                {t('admin.clearFilters')}
               </Button>
             )}
           />
         ) : (
           <div className="overflow-x-auto">
-            <Table hoverable aria-label="Guest reviews">
+            <Table hoverable aria-label={t('admin.guestReviews')}>
               <TableHead>
                 <TableRow>
-                  <TableHeadCell>GUEST</TableHeadCell>
-                  <TableHeadCell>PROPERTY</TableHeadCell>
-                  <TableHeadCell>RATING</TableHeadCell>
-                  <TableHeadCell>COMMENT</TableHeadCell>
-                  <TableHeadCell>SUBMITTED</TableHeadCell>
-                  <TableHeadCell>VISIBILITY</TableHeadCell>
+                  <TableHeadCell>{t('admin.colGuest').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colProperty').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colRating').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colComment').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colSubmitted').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colVisibility').toUpperCase()}</TableHeadCell>
                   <TableHeadCell>
                     <span className="block text-right">ACTIONS</span>
                   </TableHeadCell>
@@ -634,7 +637,7 @@ function AdminFeedback() {
                   <span className="block text-xs text-muted">{detail.user?.email || 'No email on file'}</span>
                 </div>
                 <div>
-                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Stay dates</span>
+                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.stayDates')}</span>
                   <strong className="mt-1 block text-sm font-semibold text-navy">
                     {detail.booking
                       ? `${formatDay(detail.booking.checkIn)} to ${formatDay(detail.booking.checkOut)}`
@@ -656,21 +659,21 @@ function AdminFeedback() {
               </div>
 
               <div>
-                <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Overall rating</span>
+                <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.overallRating')}</span>
                 <div className="mt-1 flex items-center gap-2">
                   <StarRating rating={Number(detail.rating)} />
                   <span className="text-sm text-charcoal">{detail.rating} out of 5</span>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 rounded-lg border border-border bg-surface p-4 sm:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 rounded-lg bg-surface p-4 shadow-sm sm:grid-cols-3">
                 <SubRating label="Cleanliness" value={detail.cleanlinessRating} />
                 <SubRating label="Location" value={detail.locationRating} />
                 <SubRating label="Value" value={detail.valueRating} />
               </div>
 
               <div>
-                <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Public comment</span>
+                <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.publicComment')}</span>
                 <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-charcoal">
                   {(detail.publicComment || '').trim() || 'No public comment was left.'}
                 </p>
@@ -678,18 +681,18 @@ function AdminFeedback() {
 
               {/* Admin-only fields. Labelled as private in the UI so nobody
                   mistakes them for something the guest or host can read. */}
-              <div className="space-y-3 rounded-lg border border-border bg-surface p-4">
+              <div className="space-y-3 rounded-lg bg-surface p-4 shadow-sm">
                 <p className="text-[11px] font-semibold uppercase tracking-wide text-primary-600">
                   Private - visible to admins only
                 </p>
                 <div>
-                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Guest satisfaction</span>
+                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.guestSatisfaction')}</span>
                   <strong className="mt-1 block text-sm font-semibold text-navy">
                     {satisfactionLabel(detail.satisfaction)}
                   </strong>
                 </div>
                 <div>
-                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">Private note</span>
+                  <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.privateNote')}</span>
                   <p className="mt-1 whitespace-pre-line text-sm leading-relaxed text-charcoal">
                     {(detail.privateNote || '').trim() || 'No private note was supplied.'}
                   </p>

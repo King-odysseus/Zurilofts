@@ -22,22 +22,25 @@ import { FileText, Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
 import AdminPagination from '../components/admin/AdminPagination.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
+// Keys rather than words: both the filter menu and the status pill resolve
+// them at render time, so one state reads the same in either language.
 const STATUS_OPTIONS = [
-  { value: '', label: 'All applications' },
-  { value: 'SUBMITTED', label: 'Awaiting review' },
-  { value: 'CHANGES_REQUESTED', label: 'Changes requested' },
-  { value: 'APPROVED', label: 'Approved' },
-  { value: 'REJECTED', label: 'Rejected' },
-  { value: 'DRAFT', label: 'Draft' },
+  { value: '', labelKey: 'admin.allApplications' },
+  { value: 'SUBMITTED', labelKey: 'admin.awaitingReview' },
+  { value: 'CHANGES_REQUESTED', labelKey: 'admin.changesRequested' },
+  { value: 'APPROVED', labelKey: 'admin.verificationApproved' },
+  { value: 'REJECTED', labelKey: 'adminlisting.statusRejected' },
+  { value: 'DRAFT', labelKey: 'adminlisting.statusDraft' },
 ];
 
 const STATUS_META = {
-  DRAFT: { label: 'Draft', tone: 'neutral' },
-  SUBMITTED: { label: 'Awaiting review', tone: 'pending' },
-  CHANGES_REQUESTED: { label: 'Changes requested', tone: 'warning' },
-  APPROVED: { label: 'Approved', tone: 'success' },
-  REJECTED: { label: 'Rejected', tone: 'danger' },
+  DRAFT: { labelKey: 'adminlisting.statusDraft', tone: 'neutral' },
+  SUBMITTED: { labelKey: 'admin.awaitingReview', tone: 'pending' },
+  CHANGES_REQUESTED: { labelKey: 'admin.changesRequested', tone: 'warning' },
+  APPROVED: { labelKey: 'admin.verificationApproved', tone: 'success' },
+  REJECTED: { labelKey: 'adminlisting.statusRejected', tone: 'danger' },
 };
 
 // Status tones are semantic; the Badge palette names them differently.
@@ -77,7 +80,7 @@ function formatFileSize(size) {
 }
 
 function statusMeta(status) {
-  return STATUS_META[status] || { label: String(status || 'Unknown').replace(/_/g, ' '), tone: 'neutral' };
+  return STATUS_META[status] || { label: String(status || '-').replace(/_/g, ' '), tone: 'neutral' };
 }
 
 function SearchIcon() {
@@ -85,6 +88,7 @@ function SearchIcon() {
 }
 
 function AdminHostApplications() {
+  const { t } = useLanguage();
   const [applications, setApplications] = useState([]);
   const [status, setStatus] = useState('SUBMITTED');
   const [search, setSearch] = useState('');
@@ -208,86 +212,90 @@ function AdminHostApplications() {
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Host applications</h1>
-          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Verify identity, authority, and hosting details before granting workspace access.</p>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('admin.applicationsDescription')}</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">MATCHING APPLICATIONS</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.matchingApplications').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{pagination.total}</strong>
-          <small className="mt-1 block text-xs text-muted">Across all pages, under the current filters</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.acrossAllPagesFilters')}</small>
         </article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">ENCRYPTED FILES</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.encryptedFiles').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.documents}</strong>
-          <small className="mt-1 block text-xs text-muted">Documents on this page</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.documentsOnPage')}</small>
         </article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">LOCATIONS</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.locations').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{viewTotals.locations}</strong>
-          <small className="mt-1 block text-xs text-muted">Distinct primary areas on this page</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.distinctAreas')}</small>
         </article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">LAST UPDATE</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.lastUpdate').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{formatDate(viewTotals.latest)}</strong>
-          <small className="mt-1 block text-xs text-muted">Most recent activity on this page</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.recentActivity')}</small>
         </article>
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
+      <section className="overflow-hidden rounded-xl bg-elevated shadow-md">
         <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-sm">
+          <div className="relative w-full sm:max-w-sm [&_input]:border-0 [&_input]:bg-surface [&_input]:pl-9">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
             <TextInput
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search applicant, business, email or area"
-              aria-label="Search host applications"
-              className="pl-9"
+              placeholder={t('admin.searchApplicant')}
+              aria-label={t('admin.searchApplicationsLabel')}
             />
           </div>
           <SelectMenu
-            ariaLabel="Filter host applications by status"
+            ariaLabel={t('a11y3.filterApplicationsByStatus')}
             value={status}
             onChange={(next) => { setStatus(next); setPage(1); }}
             wrapperClassName="sm:w-56"
-            options={STATUS_OPTIONS}
+            options={STATUS_OPTIONS.map((option) => ({ value: option.value, label: t(option.labelKey) }))}
           />
         </div>
 
-        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="mx-5 mt-5" role="status">{message}</Alert>}
+        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="mx-5 mt-5 text-center" role="status">{message}</Alert>}
 
         {loading ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
             <Spinner size="lg" aria-hidden="true" />
-            <strong className="text-sm font-semibold text-navy">Loading applications</strong>
-            <p className="text-xs text-muted">Fetching the verification queue and encrypted document records.</p>
+            <strong className="text-sm font-semibold text-navy">{t('admin.loadingApplications')}</strong>
+            <p className="text-xs text-muted">{t('admin.loadingApplicationsHint')}</p>
           </div>
         ) : visibleApplications.length === 0 ? (
-          <Alert color="info" className="m-5">
-            <span aria-hidden="true"><SearchIcon /></span>
-            <strong>No applications in this view</strong>
-            <p>Nothing is waiting under the selected status and search. Try another filter.</p>
+          <Alert color="info" className="m-5 text-center">
+            {/* Tailwind's preflight makes every svg a block element, so the icon
+                ignored the centred text and stuck to the left edge of the banner. */}
+            <span aria-hidden="true" className="flex justify-center"><SearchIcon /></span>
+            <strong>{t('admin.noApplicationsInView')}</strong>
+            <p>{t('admin.noApplicationsInViewHint')}</p>
           </Alert>
         ) : (
           <div className="overflow-x-auto">
-            <Table hoverable aria-label="Host applications">
+            <Table hoverable aria-label={t('admin.applicationsTitle')}>
               <TableHead>
                 <TableRow>
-                  <TableHeadCell>APPLICANT</TableHeadCell>
-                  <TableHeadCell>BUSINESS</TableHeadCell>
-                  <TableHeadCell>HOSTING</TableHeadCell>
-                  <TableHeadCell>DOCUMENTS</TableHeadCell>
-                  <TableHeadCell>UPDATED</TableHeadCell>
-                  <TableHeadCell>STATUS</TableHeadCell>
-                  <TableHeadCell>ACTION</TableHeadCell>
+                  <TableHeadCell>{t('admin.colApplicant').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colBusiness').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colHosting').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell><span className="block text-right">{t('admin.colDocuments').toUpperCase()}</span></TableHeadCell>
+                  <TableHeadCell>{t('admin.colUpdated').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('common.status').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell><span className="block text-right">{t('admin.colAction').toUpperCase()}</span></TableHeadCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {visibleApplications.map((application) => {
                   const meta = statusMeta(application.status);
+                  // A status the table does not know keeps its raw token, which is
+                  // still readable, rather than showing a blank pill.
+                  const statusLabel = meta.labelKey ? t(meta.labelKey) : meta.label;
                   return (
                     <TableRow key={application.id}>
                       <TableCell>
@@ -301,30 +309,34 @@ function AdminHostApplications() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">BUSINESS</small>
+                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.colBusiness').toUpperCase()}</small>
                         <strong className="mt-0.5 block text-sm font-medium text-navy">{application.businessName || 'Individual host'}</strong>
                         <span className="mt-0.5 block text-xs text-muted">{application.businessType ? String(application.businessType).replace(/\b\w/g, (letter) => letter.toUpperCase()) : 'Type not set'}</span>
                       </TableCell>
                       <TableCell>
-                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">HOSTING</small>
+                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.colHosting').toUpperCase()}</small>
                         <strong className="mt-0.5 block text-sm font-medium text-navy">{application.city || 'Area not set'}</strong>
                         <span className="mt-0.5 block text-xs text-muted">{application.propertyCount ? `${application.propertyCount} propert${application.propertyCount === 1 ? 'y' : 'ies'}` : 'Count not set'}</span>
                       </TableCell>
                       <TableCell>
-                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">DOCUMENTS</small>
-                        <strong className="mt-0.5 block text-sm font-medium text-navy">{application.documents?.length || 0} encrypted</strong>
-                        <span className="mt-0.5 block text-xs text-muted">{application.documents?.length ? 'Ready to inspect' : 'No files uploaded'}</span>
+                        <small className="block text-right text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.colDocuments').toUpperCase()}</small>
+                        <strong className="mt-0.5 block text-sm font-medium text-navy">
+                          <span className="block text-right tabular-nums">{application.documents?.length || 0} encrypted</span>
+                        </strong>
+                        <span className="mt-0.5 block text-right text-xs text-muted">{application.documents?.length ? 'Ready to inspect' : 'No files uploaded'}</span>
                       </TableCell>
                       <TableCell>
-                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">UPDATED</small>
+                        <small className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.colUpdated').toUpperCase()}</small>
                         <strong className="mt-0.5 block text-sm font-medium text-navy">{formatDate(application.updatedAt || application.submittedAt)}</strong>
                         <span className="mt-0.5 block text-xs text-muted">{application.reviewedAt ? `Reviewed ${formatDate(application.reviewedAt)}` : 'Not reviewed yet'}</span>
                       </TableCell>
-                      <TableCell><Badge color={BADGE_COLORS[meta.tone] || 'gray'}>{meta.label}</Badge></TableCell>
+                      <TableCell><Badge color={BADGE_COLORS[meta.tone] || 'gray'}>{statusLabel}</Badge></TableCell>
                       <TableCell>
-                        <Button size="xs" onClick={() => openApplication(application.id)} disabled={busy === application.id}>
-                          {busy === application.id ? 'Loading...' : 'Review'}
-                        </Button>
+                        <div className="flex justify-end">
+                          <Button size="xs" onClick={() => openApplication(application.id)} disabled={busy === application.id}>
+                            {busy === application.id ? 'Loading...' : 'Review'}
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );
@@ -357,59 +369,59 @@ function AdminHostApplications() {
               <span className="mt-0.5 block text-xs font-normal text-muted">{selected.contactEmail || selected.user?.email}</span>
             </ModalHeader>
             <ModalBody className="space-y-5">
-              {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} role="status">{message}</Alert>}
+              {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="text-center" role="status">{message}</Alert>}
 
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-                <DetailSection title="Identity & contact">
-                  <Detail label="Legal name" value={selected.legalName} />
-                  <Detail label="Date of birth" value={selected.dateOfBirth} />
-                  <Detail label="Nationality" value={selected.nationality} />
-                  <Detail label="Identity type" value={selected.identityType} />
-                  <Detail label="KRA PIN" value={selected.kraPin} />
-                  <Detail label="Contact phone" value={selected.contactPhone} />
-                  <Detail label="Contact email" value={selected.contactEmail} />
-                  <Detail label="Preferred payout" value={selected.preferredPayoutMethod} />
+                <DetailSection title={t('admin.identityAndContact')}>
+                  <Detail label={t('hostsetup.legalName')} value={selected.legalName} />
+                  <Detail label={t('hostsetup.dateOfBirth')} value={selected.dateOfBirth} />
+                  <Detail label={t('hostsetup.nationality')} value={selected.nationality} />
+                  <Detail label={t('hostsetup.identityDocument')} value={selected.identityType} />
+                  <Detail label={t('hostsetup.kraPin')} value={selected.kraPin} />
+                  <Detail label={t('hostsetup.contactPhone')} value={selected.contactPhone} />
+                  <Detail label={t('hostsetup.contactEmail')} value={selected.contactEmail} />
+                  <Detail label={t('hostsetup.preferredPayout')} value={selected.preferredPayoutMethod} />
                   {selected.preferredPayoutMethod === 'mpesa' ? (
-                    <Detail label="M-PESA number" value={selected.payoutMpesaPhone} />
+                    <Detail label={t('hostsetup.mpesaNumber')} value={selected.payoutMpesaPhone} />
                   ) : (
                     <>
-                      <Detail label="Bank" value={selected.payoutBankName} />
-                      <Detail label="Bank code" value={selected.payoutBankCode} />
-                      <Detail label="Account number" value={selected.payoutBankAccountNo} />
+                      <Detail label={t('hostsetup.bank')} value={selected.payoutBankName} />
+                      <Detail label={t('hostsetup.bankCode')} value={selected.payoutBankCode} />
+                      <Detail label={t('hostsetup.bankAccount')} value={selected.payoutBankAccountNo} />
                     </>
                   )}
                 </DetailSection>
 
-                <DetailSection title="Business">
-                  <Detail label="Business name" value={selected.businessName} />
-                  <Detail label="Business type" value={selected.businessType} />
-                  <Detail label="Registration" value={selected.companyRegistrationNo} />
-                  <Detail label="Applicant account" value={`${selected.user?.firstName || ''} ${selected.user?.lastName || ''}`.trim() || selected.user?.email} />
+                <DetailSection title={t('admin.businessSection')}>
+                  <Detail label={t('admin.businessName')} value={selected.businessName} />
+                  <Detail label={t('admin.businessType')} value={selected.businessType} />
+                  <Detail label={t('admin.registration')} value={selected.companyRegistrationNo} />
+                  <Detail label={t('admin.applicantAccount')} value={`${selected.user?.firstName || ''} ${selected.user?.lastName || ''}`.trim() || selected.user?.email} />
                 </DetailSection>
 
-                <DetailSection title="Hosting plan">
-                  <Detail label="Primary area" value={selected.city} />
-                  <Detail label="Property locations" value={selected.propertyLocations} />
-                  <Detail label="Property count" value={selected.propertyCount} />
-                  <Detail label="Relationship" value={selected.propertyRelationship} />
-                  <Detail label="Property types" value={selected.propertyTypes?.join(', ')} />
-                  <Detail label="Years hosting" value={selected.yearsHosting} />
+                <DetailSection title={t('admin.hostingPlan')}>
+                  <Detail label={t('admin.primaryArea')} value={selected.city} />
+                  <Detail label={t('hostsetup.propertyLocations')} value={selected.propertyLocations} />
+                  <Detail label={t('admin.propertyCountField')} value={selected.propertyCount} />
+                  <Detail label={t('admin.relationshipField')} value={selected.propertyRelationship} />
+                  <Detail label={t('admin.propertyTypesField')} value={selected.propertyTypes?.join(', ')} />
+                  <Detail label={t('admin.yearsHostingField')} value={selected.yearsHosting} />
                 </DetailSection>
               </div>
 
-              <section className="rounded-xl border border-border bg-surface p-4">
+              <section className="rounded-xl bg-surface p-4 shadow-sm">
                 <div>
-                  <h3 className="text-sm font-semibold text-navy">Experience</h3>
-                  <p className="mt-1 text-xs text-muted">Applicant notes supplied for verification.</p>
+                  <h3 className="text-sm font-semibold text-navy">{t('admin.experience')}</h3>
+                  <p className="mt-1 text-xs text-muted">{t('admin.applicantNotes')}</p>
                 </div>
                 <p className="mt-2 text-sm leading-relaxed text-charcoal">{selected.experience || 'No additional hosting notes were supplied.'}</p>
               </section>
 
-              <section className="rounded-xl border border-border bg-surface p-4">
+              <section className="rounded-xl bg-surface p-4 shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-sm font-semibold text-navy">Encrypted documents</h3>
-                    <p className="mt-1 text-xs text-muted">Files are decrypted only for this authorised review download.</p>
+                    <h3 className="text-sm font-semibold text-navy">{t('admin.encryptedDocuments')}</h3>
+                    <p className="mt-1 text-xs text-muted">{t('admin.decryptedForReview')}</p>
                   </div>
                   <span className="text-xs text-muted">{selected.documents?.length || 0} files</span>
                 </div>
@@ -425,23 +437,23 @@ function AdminHostApplications() {
                       </Button>
                     ))}
                   </div>
-                ) : <div className="mt-3 rounded-xl border border-border bg-elevated px-4 py-6 text-center text-sm text-muted">No documents have been uploaded for this application.</div>}
+                ) : <div className="mt-3 rounded-xl bg-elevated shadow-md px-4 py-6 text-center text-sm text-muted">{t('admin.noDocumentsUploaded')}</div>}
               </section>
 
               {selected.status === 'SUBMITTED' && (
-                <section className="space-y-3 rounded-xl border border-border bg-surface p-4">
+                <section className="space-y-3 rounded-xl bg-surface p-4 shadow-sm">
                   <div>
-                    <h3 className="text-sm font-semibold text-navy">Review decision</h3>
-                    <p className="mt-1 text-xs text-muted">Approve to grant host access, or return the application with a clear, applicant-visible note.</p>
+                    <h3 className="text-sm font-semibold text-navy">{t('admin.reviewDecision')}</h3>
+                    <p className="mt-1 text-xs text-muted">{t('admin.reviewDecisionHint')}</p>
                   </div>
-                  <Label htmlFor="host-application-note">Reviewer note</Label>
+                  <Label htmlFor="host-application-note">{t('admin.reviewerNote')}</Label>
                   <Textarea
                     id="host-application-note"
                     value={note}
                     onChange={(event) => setNote(event.target.value)}
                     rows={3}
                     maxLength={2000}
-                    placeholder="Required for changes or rejection"
+                    placeholder={t('a11y3.reviewerNotePlaceholder')}
                   />
                   <div className="flex flex-wrap items-center gap-2">
                     <Button color="failure" onClick={() => review('reject')} disabled={Boolean(busy)}>Reject</Button>
@@ -452,9 +464,9 @@ function AdminHostApplications() {
               )}
 
               {selected.reviewNote && selected.status !== 'SUBMITTED' && (
-                <section className="rounded-xl border border-border bg-surface p-4">
+                <section className="rounded-xl bg-surface p-4 shadow-sm">
                   <div>
-                    <h3 className="text-sm font-semibold text-navy">Reviewer note</h3>
+                    <h3 className="text-sm font-semibold text-navy">{t('admin.reviewerNote')}</h3>
                     <p className="mt-1 text-xs text-muted">Shared with the applicant.</p>
                   </div>
                   <p className="mt-2 text-sm leading-relaxed text-charcoal">{selected.reviewNote}</p>
@@ -462,7 +474,7 @@ function AdminHostApplications() {
               )}
 
               {selected.auditLogs?.length > 0 && (
-                <section className="rounded-xl border border-border bg-surface p-4">
+                <section className="rounded-xl bg-surface p-4 shadow-sm">
                   <div>
                     <h3 className="text-sm font-semibold text-navy">Review history</h3>
                     <p className="mt-1 text-xs text-muted">Immutable actions recorded for this application.</p>
@@ -493,7 +505,7 @@ function AdminHostApplications() {
 
 function DetailSection({ title, children }) {
   return (
-    <section className="rounded-xl border border-border bg-surface p-4">
+    <section className="rounded-xl bg-surface p-4 shadow-sm">
       <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted">{title}</h3>
       <div className="mt-2">{children}</div>
     </section>

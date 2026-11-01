@@ -1,3 +1,4 @@
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   Alert,
@@ -46,6 +47,7 @@ function SearchIcon() {
 }
 
 function AdminAddOns() {
+  const { t } = useLanguage();
   const [addOns, setAddOns] = useState([]);
   const [properties, setProperties] = useState([]);
   const [assignments, setAssignments] = useState({});
@@ -229,51 +231,51 @@ function AdminAddOns() {
     <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Add-ons</h1>
-          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Manage guest services, pricing, availability, and property-level assignments.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.addOnsTitle')}</h1>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('admin.addOnsDescription')}</p>
         </div>
-        <Button onClick={openCreate}>Create add-on</Button>
+        <Button onClick={openCreate}>{t('admin.createAddOn')}</Button>
       </div>
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">ACTIVE SERVICES</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.activeServices').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.active}</strong>
-          <small className="mt-1 block text-xs text-muted">Available during eligible stays</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.availableDuringStays')}</small>
         </article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">AVERAGE PRICE</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.averagePrice').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">KES {totals.averagePrice.toLocaleString()}</strong>
-          <small className="mt-1 block text-xs text-muted">Across services in view</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.acrossServices')}</small>
         </article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">CATEGORIES</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.categories').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.categories}</strong>
-          <small className="mt-1 block text-xs text-muted">Service categories represented</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.categoriesRepresented')}</small>
         </article>
-        <article className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">PROPERTY ASSIGNMENTS</span>
+        <article className="rounded-xl bg-elevated shadow-md p-5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.propertyAssignments').toUpperCase()}</span>
           <strong className="mt-2 block text-2xl font-bold text-navy">{totals.assigned}</strong>
-          <small className="mt-1 block text-xs text-muted">Active property-service links</small>
+          <small className="mt-1 block text-xs text-muted">{t('admin.activeLinks')}</small>
         </article>
       </div>
 
-      <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
+      <section className="overflow-hidden rounded-xl bg-elevated shadow-md">
         <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative w-full sm:max-w-sm">
+          <div className="relative w-full sm:max-w-sm [&_input]:border-0 [&_input]:bg-surface [&_input]:pl-9">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
-            <TextInput className="pl-9" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search service, category or description" aria-label="Search add-ons" />
+            <TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('admin.searchAddOn')} aria-label={t('admin.searchAddOnsLabel')} />
           </div>
           <span className="shrink-0 self-start rounded-full bg-surface px-2.5 py-1 text-[11px] font-semibold text-muted sm:self-auto">{visibleAddOns.length} service{visibleAddOns.length === 1 ? '' : 's'}</span>
         </div>
 
-        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="mx-5 mt-5" role="status">{message}</Alert>}
+        {message && <Alert color={messageTone === 'error' ? 'failure' : 'success'} className="mx-5 mt-5 text-center" role="status">{message}</Alert>}
 
         {loading ? (
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
             <span className="h-8 w-8 animate-spin rounded-full border-[3px] border-primary border-t-transparent" aria-hidden="true" />
-            <strong className="text-base font-semibold text-navy">Loading add-ons</strong>
-            <p className="text-xs leading-relaxed text-muted">Checking service inventory and property coverage.</p>
+            <strong className="text-base font-semibold text-navy">{t('admin.loadingAddOns')}</strong>
+            <p className="text-xs leading-relaxed text-muted">{t('admin.loadingAddOnsHint')}</p>
           </div>
         ) : visibleAddOns.length === 0 ? (
           // Plain block, not an Alert: Alert wraps its children in an un-sized div
@@ -282,20 +284,20 @@ function AdminAddOns() {
           // other admin empty state is a plain div, so this also matches them.
           <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
             <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><SearchIcon /></span>
-            <strong className="text-base font-semibold text-navy">No add-ons found</strong>
-            <p className="text-xs leading-relaxed text-muted">Create a guest service or adjust the current search.</p>
+            <strong className="text-base font-semibold text-navy">{t('admin.noAddOnsFound')}</strong>
+            <p className="text-xs leading-relaxed text-muted">{t('admin.noAddOnsHint')}</p>
           </div>
         ) : (
           <div>
-            <Table hoverable aria-label="Add-ons">
+            <Table hoverable aria-label={t('a11y3.addOnsTable')}>
               <TableHead>
                 <TableRow>
-                  <TableHeadCell>SERVICE</TableHeadCell>
-                  <TableHeadCell>CATEGORY</TableHeadCell>
-                  <TableHeadCell>PRICE</TableHeadCell>
-                  <TableHeadCell>PROPERTY COVERAGE</TableHeadCell>
-                  <TableHeadCell>STATUS</TableHeadCell>
-                  <TableHeadCell>ACTIONS</TableHeadCell>
+                  <TableHeadCell>{t('admin.colService').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell>{t('admin.colCategory').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell><span className="block text-right">{t('admin.colPrice').toUpperCase()}</span></TableHeadCell>
+                  <TableHeadCell><span className="block text-right">{t('admin.colCoverage').toUpperCase()}</span></TableHeadCell>
+                  <TableHeadCell>{t('common.status').toUpperCase()}</TableHeadCell>
+                  <TableHeadCell><span className="block text-right">{t('common.actions').toUpperCase()}</span></TableHeadCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -311,20 +313,23 @@ function AdminAddOns() {
                         </div>
                       </div></TableCell>
                       <TableCell><span className="inline-flex whitespace-nowrap rounded-full bg-primary-50 dark:bg-primary/15 px-2.5 py-1 text-[11px] font-semibold text-navy">{CATEGORY_LABELS[addOn.category] || addOn.category}</span></TableCell>
-                      <TableCell><div className="grid gap-1">
-                        <small className="text-[11px] font-semibold uppercase tracking-wide text-muted">RATE</small>
-                        <strong className="truncate text-sm font-semibold text-navy">KES {Number(addOn.price).toLocaleString()}</strong>
-                        <span className="text-xs text-muted">Per booking or service</span>
+                      {/* Money and counts sit right with tabular figures so the
+                          digits stack down the column against the RATE/ASSIGNED
+                          labels above them. */}
+                      <TableCell><div className="grid gap-1 text-right">
+                        <small className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.colRate').toUpperCase()}</small>
+                        <strong className="block truncate text-sm font-semibold tabular-nums text-navy">KES {Number(addOn.price).toLocaleString()}</strong>
+                        <span className="text-xs text-muted">{t('admin.perBooking')}</span>
                       </div></TableCell>
-                      <TableCell><div className="grid gap-1">
-                        <small className="text-[11px] font-semibold uppercase tracking-wide text-muted">ASSIGNED</small>
-                        <strong className="truncate text-sm font-semibold text-navy">{assigned.size ? `${assigned.size} propert${assigned.size === 1 ? 'y' : 'ies'}` : 'Not assigned'}</strong>
+                      <TableCell><div className="grid gap-1 text-right">
+                        <small className="text-[11px] font-semibold uppercase tracking-wide text-muted">{t('admin.colAssigned').toUpperCase()}</small>
+                        <strong className="block truncate text-sm font-semibold tabular-nums text-navy">{assigned.size ? `${assigned.size} propert${assigned.size === 1 ? 'y' : 'ies'}` : 'Not assigned'}</strong>
                         <span className="text-xs text-muted">{assigned.size ? 'Offered on selected stays' : 'No property coverage'}</span>
                       </div></TableCell>
                       <TableCell><Button size="xs" color={addOn.active ? 'success' : 'warning'} onClick={() => handleToggle(addOn)}>{addOn.active ? 'Active' : 'Paused'}</Button></TableCell>
                       <TableCell><div className="flex items-center justify-end">
                         <TableActionsMenu
-                          label={`Actions for ${addOn.name}`}
+                          label={t('a11y3.actionsFor', { name: addOn.name })}
                           actions={[
                             { label: 'Edit', icon: 'edit', onClick: () => openEdit(addOn) },
                             { label: 'Delete', icon: 'delete', danger: true, onClick: () => { setDeleteError(''); setDeleteTarget(addOn); } },
@@ -348,22 +353,22 @@ function AdminAddOns() {
               <span className="block">{editingId ? 'Edit add-on' : 'Create add-on'}</span>
             </ModalHeader>
             <ModalBody>
-              {formError && <Alert color="failure" className="mb-5">{formError}</Alert>}
+              {formError && <Alert color="failure" className="mb-5 text-center">{formError}</Alert>}
               <form onSubmit={handleSubmit} className="space-y-5">
-                <div><Label htmlFor="addon-name">Service name</Label><TextInput id="addon-name" value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder="Airport pickup" required /></div>
-                <div><Label htmlFor="addon-description">Description</Label><Textarea id="addon-description" rows={3} value={formData.description} onChange={(event) => setFormData({ ...formData, description: event.target.value })} placeholder="Describe what guests receive and when." required /></div>
+                <div><Label htmlFor="addon-name">{t('admin.serviceName')}</Label><TextInput id="addon-name" value={formData.name} onChange={(event) => setFormData({ ...formData, name: event.target.value })} placeholder={t('admin.serviceNamePlaceholder')} required /></div>
+                <div><Label htmlFor="addon-description">{t('admin.descriptionField')}</Label><Textarea id="addon-description" rows={3} value={formData.description} onChange={(event) => setFormData({ ...formData, description: event.target.value })} placeholder={t('admin.descriptionPlaceholder')} required /></div>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <div><Label htmlFor="addon-price">Price (KES)</Label><TextInput id="addon-price" type="number" min="1" value={formData.price} onChange={(event) => setFormData({ ...formData, price: event.target.value })} required /></div>
-                  <div><Label htmlFor="addon-category">Category</Label><SelectMenu id="addon-category" ariaLabel="Category" value={formData.category} onChange={(next) => setFormData({ ...formData, category: next })} options={CATEGORIES.map((category) => ({ value: category, label: CATEGORY_LABELS[category] }))} /></div>
+                  <div><Label htmlFor="addon-price">{t('admin.priceKes')}</Label><TextInput id="addon-price" type="number" min="1" value={formData.price} onChange={(event) => setFormData({ ...formData, price: event.target.value })} required /></div>
+                  <div><Label htmlFor="addon-category">{t('admin.category')}</Label><SelectMenu id="addon-category" ariaLabel={t('a11y3.category')} value={formData.category} onChange={(next) => setFormData({ ...formData, category: next })} options={CATEGORIES.map((category) => ({ value: category, label: CATEGORY_LABELS[category] }))} /></div>
                 </div>
-                <div><Label htmlFor="addon-image">Image URL (optional)</Label><TextInput id="addon-image" value={formData.image} onChange={(event) => setFormData({ ...formData, image: event.target.value })} placeholder="https://..." /></div>
-                <div className="rounded-lg border border-border bg-surface p-3"><ToggleSwitch checked={formData.active} label="Available to guests" onChange={(event) => setFormData({ ...formData, active: event.target.checked })} /></div>
+                <div><Label htmlFor="addon-image">{t('admin.imageUrl')}</Label><TextInput id="addon-image" value={formData.image} onChange={(event) => setFormData({ ...formData, image: event.target.value })} placeholder="https://..." /></div>
+                <div className="rounded-lg bg-surface p-3 shadow-sm"><ToggleSwitch checked={formData.active} label="Available to guests" onChange={(event) => setFormData({ ...formData, active: event.target.checked })} /></div>
 
                 {editingId && (
                   <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-3"><div><Label>Assigned properties</Label><p className="mt-1 text-xs text-muted">Choose which stays may offer this service.</p></div></div>
-                    <div className="max-h-44 overflow-y-auto rounded-lg border border-border bg-elevated p-2">
-                      {properties.length === 0 ? <p className="p-2 text-xs text-muted">No properties are available.</p> : properties.map((property) => {
+                    <div className="flex items-start justify-between gap-3"><div><Label>{t('admin.assignedProperties')}</Label><p className="mt-1 text-xs text-muted">{t('admin.assignedPropertiesHint')}</p></div></div>
+                    <div className="max-h-44 overflow-y-auto rounded-lg bg-elevated p-2 shadow-sm">
+                      {properties.length === 0 ? <p className="p-2 text-xs text-muted">{t('admin.noPropertiesAvailable')}</p> : properties.map((property) => {
                         const assigned = (assignments[editingId] || new Set()).has(property.id);
                         return <Label key={property.id} className="flex items-center gap-3 rounded-md px-2 py-2"><Checkbox checked={assigned} disabled={assigning} onChange={() => toggleAssignment(property.id, editingId, assigned)} /><span className="min-w-0"><strong className="block truncate text-sm font-semibold text-navy">{property.title}</strong><small className="block truncate text-xs text-muted">{property.location}</small></span></Label>;
                       })}
@@ -371,7 +376,7 @@ function AdminAddOns() {
                   </div>
                 )}
 
-                <div className="flex items-center justify-end gap-2 pt-1"><Button color="light" type="button" onClick={closeForm} disabled={saving}>Cancel</Button><Button type="submit" disabled={saving}>{saving ? 'Saving...' : editingId ? 'Save changes' : 'Create add-on'}</Button></div>
+                <div className="flex items-center justify-end gap-2 pt-1"><Button color="light" type="button" onClick={closeForm} disabled={saving}>{t('common.cancel')}</Button><Button type="submit" disabled={saving}>{saving ? 'Saving...' : editingId ? 'Save changes' : 'Create add-on'}</Button></div>
               </form>
             </ModalBody>
           </>
@@ -380,7 +385,7 @@ function AdminAddOns() {
 
       <ConfirmDialog
         open={Boolean(deleteTarget)}
-        title="Delete this add-on"
+        title={t('admin.deleteAddOn')}
         description={deleteTarget
           ? `${deleteTarget.name} will be removed permanently, including from every property and every booking that uses it. This cannot be undone.`
           : ''}

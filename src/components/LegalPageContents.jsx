@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ChevronDown } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Scans the rendered article for h2 headings and assigns each a stable id
 // (derived from its own text) so a contents nav can link to them - no
@@ -71,10 +72,12 @@ LegalPageContentsMobile.propTypes = { containerRef: containerRefProp };
 /** Desktop sticky sidebar - place as a grid sibling beside the article. */
 export function LegalPageContentsDesktop({ containerRef }) {
   const items = useHeadingIds(containerRef);
+  // Above the early return: a hook may not sit behind a condition.
+  const { t } = useLanguage();
   if (items.length === 0) return null;
 
   return (
-    <nav aria-label="Table of contents" className="hidden lg:sticky lg:top-24 lg:block">
+    <nav aria-label={t('a11y1.tableOfContents')} className="hidden lg:sticky lg:top-24 lg:block">
       <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#8A6B52]">Contents</p>
       <ul className="max-h-[70vh] space-y-2 overflow-y-auto border-l border-[#E3E8EF] pl-4">
         {items.map((item) => (

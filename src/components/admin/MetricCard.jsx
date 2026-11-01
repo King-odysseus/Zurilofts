@@ -15,7 +15,7 @@ const VALUE_TONES = {
 
 function MetricCard({ label, value, note, tone = 'default', className = '' }) {
   return (
-    <article className={`rounded-xl border border-border bg-elevated p-5 shadow-sm ${className}`.trim()}>
+    <article className={`rounded-xl bg-elevated shadow-md p-5 ${className}`.trim()}>
       <span className="block text-[11px] font-semibold uppercase tracking-wide text-muted">{label}</span>
       <strong className={`mt-2 block text-2xl font-bold ${VALUE_TONES[tone] || VALUE_TONES.default}`}>{value}</strong>
       {note && <small className="mt-1 block text-xs text-muted">{note}</small>}

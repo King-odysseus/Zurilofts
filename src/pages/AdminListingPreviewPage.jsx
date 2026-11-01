@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Alert, Badge, Button, Spinner } from 'flowbite-react';
 import { ArrowLeft, Eye, ShieldCheck } from 'lucide-react';
 import apiClient from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import ListingMirrorBody from '../components/ListingMirrorBody.jsx';
 import { listingStatusLabel } from '../utils/listingStatus.js';
 
@@ -22,15 +23,17 @@ const BADGE_COLOR = {
   SUSPENDED: 'failure',
 };
 
-function displayDate(value) {
-  if (!value) return 'Not recorded';
+function displayDate(value, t, lang) {
+  if (!value) return t('adminlisting.notRecorded');
   const date = new Date(value);
+  const locale = lang === 'sw' ? 'sw-KE' : 'en-GB';
   return Number.isNaN(date.getTime())
-    ? 'Not recorded'
-    : date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+    ? t('adminlisting.notRecorded')
+    : date.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 export default function AdminListingPreviewPage() {
+  const { t, lang } = useLanguage();
   const { id } = useParams();
   const [listing, setListing] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -45,17 +48,17 @@ export default function AdminListingPreviewPage() {
         if (!cancelled) setListing(response.data.data);
       })
       .catch((cause) => {
-        if (!cancelled) setError(cause.response?.data?.error || 'This listing could not be loaded.');
+        if (!cancelled) setError(cause.response?.data?.error || t('adminlisting.loadFailed'));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
-  }, [id]);
+  }, [id, t]);
 
   const backLink = <Link to={`/admin/properties/${id}`} className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-navy">
     <ArrowLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-    Back to review record
+    {t('adminlisting.backToReviewRecord')}
   </Link>;
 
   if (loading) {
@@ -65,28 +68,28 @@ export default function AdminListingPreviewPage() {
   if (error || !listing) {
     return <div className="space-y-5">
       {backLink}
-      <Alert color="failure">{error || 'This listing could not be found.'}</Alert>
+      <Alert color="failure">{error || t('adminlisting.notFound')}</Alert>
     </div>;
   }
 
   const sidePanel = <section className="rounded-xl border border-border bg-elevated p-5 shadow-sm">
     <div className="flex items-center justify-between gap-2">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Moderation</p>
-      <Badge color={BADGE_COLOR[listing.status] || 'gray'}>{listingStatusLabel(listing.status)}</Badge>
+      <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">{t('adminlisting.moderation')}</p>
+      <Badge color={BADGE_COLOR[listing.status] || 'gray'}>{listingStatusLabel(listing.status, t)}</Badge>
     </div>
 
     <dl className="mt-5 space-y-3 text-sm">
       <div>
-        <dt className="text-xs text-muted">Submitted</dt>
-        <dd className="font-medium text-navy">{displayDate(listing.submittedAt)}</dd>
+        <dt className="text-xs text-muted">{t('adminlisting.submitted')}</dt>
+        <dd className="font-medium text-navy">{displayDate(listing.submittedAt, t, lang)}</dd>
       </div>
       <div>
-        <dt className="text-xs text-muted">Last reviewed</dt>
-        <dd className="font-medium text-navy">{displayDate(listing.listingReviewedAt)}</dd>
+        <dt className="text-xs text-muted">{t('adminlisting.lastReviewed')}</dt>
+        <dd className="font-medium text-navy">{displayDate(listing.listingReviewedAt, t, lang)}</dd>
       </div>
       {listing.listingReviewNote && (
         <div>
-          <dt className="text-xs text-muted">Note to host</dt>
+          <dt className="text-xs text-muted">{t('adminlisting.noteToHost')}</dt>
           <dd className="mt-1 whitespace-pre-wrap break-words rounded-lg border border-border bg-surface p-2 text-xs text-charcoal">
             {listing.listingReviewNote}
           </dd>
@@ -96,15 +99,12 @@ export default function AdminListingPreviewPage() {
 
     <div className="mt-5 flex items-start gap-2 rounded-lg border border-border bg-surface p-3 text-xs leading-relaxed text-muted">
       <Eye className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
-      <p>
-        Guests also see live availability, a Book button and the checkout. None of that is shown here,
-        because an admin does not book on a guest&apos;s behalf.
-      </p>
+      <p>{t('adminlisting.guestsAlsoSee')}</p>
     </div>
 
     <Button as={Link} to={`/admin/properties/${id}`} size="sm" color="light" className="mt-5 w-full rounded-full">
       <ShieldCheck className="mr-1.5 h-4 w-4" strokeWidth={2} aria-hidden="true" />
-      Open review actions
+      {t('adminlisting.openReviewActions')}
     </Button>
   </section>;
 
@@ -114,13 +114,13 @@ export default function AdminListingPreviewPage() {
         {backLink}
         <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Admin</p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-navy sm:text-3xl">Guest view</h1>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">{t('adminlisting.adminEyebrow')}</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-navy sm:text-3xl">{t('adminlisting.guestView')}</h1>
             <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">
-              The listing as a guest meets it, with the booking controls removed and the moderation record in their place.
+              {t('adminlisting.guestViewDescription')}
             </p>
           </div>
-          <Badge color={BADGE_COLOR[listing.status] || 'gray'}>{listingStatusLabel(listing.status)}</Badge>
+          <Badge color={BADGE_COLOR[listing.status] || 'gray'}>{listingStatusLabel(listing.status, t)}</Badge>
         </div>
       </div>
 

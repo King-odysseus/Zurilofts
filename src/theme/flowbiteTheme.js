@@ -170,6 +170,12 @@ export const brandTheme = {
   },
   alert: {
     base: 'flex flex-col gap-2 rounded-[10px] p-4 text-sm',
+    // The component puts the message in a bare div inside this wrapper, and a
+    // row flexbox shrinks that div to fit its text. text-center then has nothing
+    // to centre within, so a centred message still rendered hard against the
+    // left edge. Growing the message box to fill the banner is what makes the
+    // alignment actually visible; the icon alerts keep their row layout.
+    wrapper: 'flex w-full items-center [&>div]:flex-1',
     color: {
       info: `border-[#203565] bg-[#EEF2F8] text-[#203565] dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200`,
       gray: 'border-gray-500 bg-[#F8FAFC] text-[#334155] dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300',
@@ -216,7 +222,9 @@ export const brandTheme = {
   table: {
     root: {
       base: `w-full text-left text-sm text-[#111827] dark:text-gray-300`,
-      shadow: `absolute left-0 top-0 -z-10 h-full w-full rounded-[14px] border border-[#E3E8EF] bg-white dark:border-gray-700 dark:bg-gray-800`,
+      // Borderless for the same reason as the card: this layer sits behind every
+      // table, so a 1px outline there drew a hairline around the whole grid.
+      shadow: `absolute left-0 top-0 -z-10 h-full w-full rounded-[14px] bg-white dark:bg-gray-800`,
     },
     head: {
       base: `group/head text-[11px] font-semibold uppercase tracking-wide text-[#5B6B82] dark:text-gray-400`,

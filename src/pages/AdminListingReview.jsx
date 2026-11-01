@@ -11,16 +11,19 @@ import MetricCard from '../components/admin/MetricCard.jsx';
 import Panel, { PanelFooter, PanelHead } from '../components/admin/Panel.jsx';
 import { StateBadge } from '../components/admin/StatusBadge.jsx';
 import usePagedResource from '../hooks/usePagedResource.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const PAGE_SIZE = 20;
 
+// Keys, not words: the filter menu is rendered per visit, so it follows the
+// chosen language instead of freezing at module load.
 const STATUS_OPTIONS = [
-  { value: 'PENDING_REVIEW', label: 'Awaiting review' },
-  { value: 'PUBLISHED', label: 'Published' },
-  { value: 'REJECTED', label: 'Rejected' },
-  { value: 'SUSPENDED', label: 'Suspended' },
-  { value: 'DRAFT', label: 'Draft' },
-  { value: 'ALL', label: 'All listings' },
+  { value: 'PENDING_REVIEW', labelKey: 'admin.awaitingReview' },
+  { value: 'PUBLISHED', labelKey: 'adminlisting.statusPublished' },
+  { value: 'REJECTED', labelKey: 'adminlisting.statusRejected' },
+  { value: 'SUSPENDED', labelKey: 'adminlisting.statusSuspended' },
+  { value: 'DRAFT', labelKey: 'adminlisting.statusDraft' },
+  { value: 'ALL', labelKey: 'admin.allListings' },
 ];
 
 // Statuses that get a headline count. Each needs its own request because the
@@ -52,6 +55,7 @@ function formatDate(value) {
 }
 
 export default function AdminListingReview() {
+  const { t } = useLanguage();
   // The queue defaults to what actually needs a decision, not to a flat list of
   // everything the platform has ever hosted.
   const [filter, setFilter] = useState('PENDING_REVIEW');
@@ -133,32 +137,32 @@ export default function AdminListingReview() {
   return (
     <div className="space-y-8">
       <AdminPageHeader
-        title="Listing approvals"
-        description="Approve, reject or suspend what hosts submit. Hosts create and edit their own listings."
+        title={t('admin.approvalsTitle')}
+        description={t('admin.approvalsDescription')}
       />
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard
-          label="Awaiting review"
+          label={t('admin.awaitingReview')}
           value={counts.PENDING_REVIEW ?? '-'}
-          note="Oldest submission first"
+          note={t('admin.oldestFirst')}
           tone={(counts.PENDING_REVIEW ?? 0) > 0 ? 'warning' : 'default'}
         />
-        <MetricCard label="Published" value={counts.PUBLISHED ?? '-'} note="Live to guests" tone="positive" />
-        <MetricCard label="Suspended" value={counts.SUSPENDED ?? '-'} note="Hidden from guests" />
-        <MetricCard label="Rejected" value={counts.REJECTED ?? '-'} note="Sent back for changes" />
+        <MetricCard label={t('admin.published')} value={counts.PUBLISHED ?? '-'} note={t('admin.liveToGuests')} tone="positive" />
+        <MetricCard label={t('admin.suspended')} value={counts.SUSPENDED ?? '-'} note={t('admin.hiddenFromGuests')} />
+        <MetricCard label={t('admin.rejected')} value={counts.REJECTED ?? '-'} note={t('admin.sentBackForChanges')} />
       </div>
 
       {countsFailed && (
-        <p className="text-xs font-medium text-[#B42318]" role="alert">
+        <p className="text-center text-xs font-medium text-[#B42318]" role="alert">
           Status totals could not be refreshed. The queue below is still live.
         </p>
       )}
 
       <Panel>
         <PanelHead
-          title="Review queue"
-          subtitle={filter === 'ALL' ? 'Every listing, oldest first' : 'Oldest first, so the longest wait is at the top'}
+          title={t('admin.reviewQueue')}
+          subtitle={filter === 'ALL' ? t('admin.everyListing') : t('admin.oldestFirst')}
           actions={(
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
@@ -166,41 +170,41 @@ export default function AdminListingReview() {
                 type="search"
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
-                placeholder="Search title or area"
-                aria-label="Search listings by title or area"
-                className="h-9 w-full rounded-lg border border-border bg-elevated pl-9 pr-3 text-sm text-charcoal placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-60"
+                placeholder={t('admin.searchTitleOrArea')}
+                aria-label={t('admin.searchListingsLabel')}
+                className="h-9 w-full rounded-lg border-0 bg-surface pl-9 pr-3 text-sm text-charcoal placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:w-60"
               />
             </div>
           )}
         />
 
         <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:gap-4">
-          <label htmlFor="listing-review-filter" className="text-xs font-semibold uppercase tracking-wide text-muted">Show</label>
+          <label htmlFor="listing-review-filter" className="text-xs font-semibold uppercase tracking-wide text-muted">{t('admin.show')}</label>
           <SelectMenu
             id="listing-review-filter"
-            ariaLabel="Filter listings by status"
+            ariaLabel={t('a11y3.filterListingsByStatus')}
             wrapperClassName="w-full sm:w-[240px]"
             value={filter}
             onChange={(next) => { setFilter(next); setPage(1); }}
-            options={STATUS_OPTIONS}
+            options={STATUS_OPTIONS.map((option) => ({ value: option.value, label: t(option.labelKey) }))}
           />
         </div>
 
         {loading ? (
-          <div className="px-5 py-12 text-center text-sm text-muted">Loading listings...</div>
+          <div className="px-5 py-12 text-center text-sm text-muted">{t('admin.loadingListings')}</div>
         ) : error ? (
           <EmptyState
             kind="error"
-            title="Listings could not be loaded"
+            title={t('admin.listingsCouldNotLoad')}
             description={error}
-            action={<Button color="light" type="button" onClick={refetch}>Try again</Button>}
+            action={<Button color="light" type="button" onClick={refetch}>{t('common.retry')}</Button>}
           />
         ) : listings.length === 0 ? (
           <EmptyState
-            title={filter === 'PENDING_REVIEW' ? 'Nothing waiting for review' : 'No listings in this view'}
+            title={filter === 'PENDING_REVIEW' ? t('admin.nothingWaiting') : t('admin.noListingsInView')}
             description={filter === 'PENDING_REVIEW'
-              ? 'Every submitted listing has been decided. New submissions appear here oldest first.'
-              : 'Try another status, or clear the search.'}
+              ? t('admin.nothingWaitingHint')
+              : t('admin.noListingsInViewHint')}
           />
         ) : (
           <ul className="divide-y divide-border">
@@ -216,9 +220,9 @@ export default function AdminListingReview() {
                 <div className="min-w-0 flex-1">
                   <strong className="block truncate text-sm font-semibold text-navy">{listing.title}</strong>
                   <small className="mt-1 block text-xs text-muted">
-                    {listing.location || listing.neighborhood || 'Location pending'}
-                    {' '} &middot; {listing.images?.length || 0} photos
-                    {' '} &middot; submitted {formatDate(listing.submittedAt || listing.createdAt)}
+                    {listing.location || listing.neighborhood || t('admin.locationPending')}
+                    {' '} &middot; {t('admin.photosCount', { count: listing.images?.length || 0 })}
+                    {' '} &middot; {t('admin.submittedOn', { date: formatDate(listing.submittedAt || listing.createdAt) })}
                   </small>
                 </div>
                 <StateBadge state={listing.status} />
@@ -227,11 +231,11 @@ export default function AdminListingReview() {
                     to={`/admin/properties/${listing.id}`}
                     className="text-sm font-semibold text-primary-600 hover:underline"
                   >
-                    Preview
+                    {t('admin.preview')}
                   </Link>
                   {decisionsFor(listing.status).length > 0 && (
                     <Button size="xs" type="button" onClick={() => { setReviewing(listing); setNote(''); setActionError(''); }}>
-                      Decide
+                      {t('admin.decide')}
                     </Button>
                   )}
                 </div>
@@ -256,9 +260,9 @@ export default function AdminListingReview() {
 
       {reviewing && (
         <Modal show onClose={() => setReviewing(null)} size="lg" dismissible>
-          <ModalHeader>Review {reviewing.title}</ModalHeader>
+          <ModalHeader>{t('admin.reviewListing', { title: reviewing.title })}</ModalHeader>
           <ModalBody className="space-y-4">
-            <p className="text-sm text-charcoal">Check the listing details and photos before making a decision.</p>
+            <p className="text-sm text-charcoal">{t('admin.checkBeforeDeciding')}</p>
             {/* A new tab on purpose: the decision modal and any note typed into
                 it survive while the admin reads the full listing. */}
             <Link
@@ -267,16 +271,16 @@ export default function AdminListingReview() {
               rel="noreferrer"
               className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline"
             >
-              Open full listing <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
+              {t('admin.openFullListing')} <ExternalLink className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
             </Link>
-            {actionError && <p className="text-sm font-medium text-[#B42318]" role="alert">{actionError}</p>}
+            {actionError && <p className="text-center text-sm font-medium text-[#B42318]" role="alert">{actionError}</p>}
             <div>
-              <Label htmlFor="review-note" value="Reason or note (required for rejection)" />
+              <Label htmlFor="review-note" value={t('admin.reviewNote')} />
               <Textarea id="review-note" value={note} onChange={(event) => setNote(event.target.value)} rows={3} />
             </div>
           </ModalBody>
           <ModalFooter>
-            <Button color="light" type="button" onClick={() => setReviewing(null)}>Cancel</Button>
+            <Button color="light" type="button" onClick={() => setReviewing(null)}>{t('common.cancel')}</Button>
             {decisions.map((action) => (
               <Button
                 key={action}

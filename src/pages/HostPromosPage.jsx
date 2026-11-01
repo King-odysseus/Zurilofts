@@ -3,6 +3,7 @@ import { Alert, Badge, Button, Label, TextInput } from 'flowbite-react';
 
 import apiClient from '../api/client.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const EMPTY = { code: '', discountPercent: 10, validFrom: '', validUntil: '', maxDiscount: '', minBookingAmount: '', maxUses: '' };
 
@@ -13,18 +14,19 @@ const FIELDS = ['code', 'discountPercent', 'validFrom', 'validUntil', 'maxDiscou
 // min/max/step/minLength mirror the server schemas so the browser blocks a bad
 // value before it becomes a 400 the host has to interpret.
 const FIELD_META = {
-  code: { label: 'Code', type: 'text', required: true, minLength: 3, maxLength: 20, hint: '3-20 characters, letters, numbers, hyphens or underscores' },
-  discountPercent: { label: 'Discount %', type: 'number', required: true, min: 1, max: 100, step: 1 },
-  validFrom: { label: 'Valid from', type: 'date', required: true },
-  validUntil: { label: 'Valid until', type: 'date', required: true },
+  code: { label: 'hostaccount.fieldCode', type: 'text', required: true, minLength: 3, maxLength: 20, hint: 'hostaccount.fieldCodeHint' },
+  discountPercent: { label: 'hostaccount.fieldPercent', type: 'number', required: true, min: 1, max: 100, step: 1 },
+  validFrom: { label: 'hostaccount.fieldValidFrom', type: 'date', required: true },
+  validUntil: { label: 'hostaccount.fieldValidUntil', type: 'date', required: true },
   // min 1, not 0: the API validates these as positive integers, so letting a
   // zero through would only produce a server rejection the host has to decode.
-  maxDiscount: { label: 'Max discount (KES)', type: 'number', min: 1, step: 1, optional: true },
-  minBookingAmount: { label: 'Min booking (KES)', type: 'number', min: 1, step: 1, optional: true },
-  maxUses: { label: 'Max uses', type: 'number', min: 1, step: 1, optional: true },
+  maxDiscount: { label: 'hostaccount.fieldMaxDiscount', type: 'number', min: 1, step: 1, optional: true },
+  minBookingAmount: { label: 'hostaccount.fieldMinBooking', type: 'number', min: 1, step: 1, optional: true },
+  maxUses: { label: 'hostaccount.fieldMaxUses', type: 'number', min: 1, step: 1, optional: true },
 };
 
 export default function HostPromosPage() {
+  const { t } = useLanguage();
   const [promos, setPromos] = useState([]);
   const [form, setForm] = useState(EMPTY);
   const [message, setMessage] = useState({ tone: 'success', text: '' });
@@ -94,14 +96,14 @@ export default function HostPromosPage() {
   return (
     <div className="flex flex-col gap-6 lg:gap-8">
       <header>
-        <p className={HOST_EYEBROW}>Host workspace</p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Discounts</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Create offers funded from your own booking earnings.</p>
+        <p className={HOST_EYEBROW}>{t('host.workspace')}</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('hostaccount.discountsTitle')}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t('hostaccount.discountsDescription')}</p>
       </header>
 
       {message.text && <Alert color={message.tone === 'error' ? 'failure' : 'success'}>{message.text}</Alert>}
 
-      <HostCard title="Create a discount" description="Required fields are the code, the percentage, and the valid dates.">
+      <HostCard title={t('hostaccount.createDiscount')} description={t('hostaccount.createDiscountHint')}>
         <form onSubmit={createPromo} className="flex flex-col gap-6">
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {FIELDS.map((name) => {
@@ -109,7 +111,7 @@ export default function HostPromosPage() {
               return (
                 <div key={name}>
                   <Label htmlFor={`host-promo-${name}`} className="mb-1.5 block">
-                    {meta.label}{meta.optional ? <span className="font-medium text-muted"> (optional)</span> : null}
+                    {t(meta.label)}{meta.optional ? <span className="font-medium text-muted"> {t('hostaccount.fieldOptional')}</span> : null}
                   </Label>
                   <TextInput
                     id={`host-promo-${name}`}
@@ -123,14 +125,14 @@ export default function HostPromosPage() {
                     onChange={(event) => updateField(name, event.target.value)}
                     required={meta.required}
                   />
-                  {meta.hint && <p className="mt-1.5 text-xs text-muted">{meta.hint}</p>}
+                  {meta.hint && <p className="mt-1.5 text-xs text-muted">{t(meta.hint)}</p>}
                 </div>
               );
             })}
           </div>
 
           <Button type="submit" disabled={saving} className="w-full sm:w-fit">
-            {saving ? 'Creating...' : 'Create discount'}
+            {saving ? t('hostaccount.creating') : t('hostaccount.createDiscountAction')}
           </Button>
         </form>
       </HostCard>
@@ -139,19 +141,19 @@ export default function HostPromosPage() {
           border and the rows supply their own padding. */}
       <HostCard
         flush
-        title="Your discounts"
-        description="Deactivated codes stop working immediately; existing bookings keep their discount."
-        action={loading ? undefined : <Badge color="gray">{promos.length} {promos.length === 1 ? 'code' : 'codes'}</Badge>}
+        title={t('hostaccount.yourDiscounts')}
+        description={t('hostaccount.yourDiscountsHint')}
+        action={loading ? undefined : <Badge color="gray">{t(promos.length === 1 ? 'hostaccount.codeSingular' : 'hostaccount.codePlural', { count: promos.length })}</Badge>}
       >
         {loading ? (
-          <div className="flex flex-col gap-3 px-4 py-4" aria-label="Loading discounts" role="status">
+          <div className="flex flex-col gap-3 px-4 py-4" aria-label={t('hostaccount.loadingDiscounts')} role="status">
             <span className="block h-16 animate-pulse rounded-xl bg-inset" />
             <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:150ms]" />
           </div>
         ) : promos.length === 0 ? (
           <div className="flex flex-col items-center gap-1.5 px-4 py-10 text-center">
-            <strong className="text-sm font-semibold text-navy">No discounts yet</strong>
-            <p className="mx-auto max-w-[320px] text-xs leading-relaxed text-muted">Create your first code above and it will appear here.</p>
+            <strong className="text-sm font-semibold text-navy">{t('hostaccount.noDiscounts')}</strong>
+            <p className="mx-auto max-w-[320px] text-xs leading-relaxed text-muted">{t('hostaccount.noDiscountsHint')}</p>
           </div>
         ) : (
           <ul className="divide-y divide-border">

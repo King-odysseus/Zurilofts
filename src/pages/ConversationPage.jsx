@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMessagesLayout.jsx';
 import MessageComposer from '../components/MessageComposer.jsx';
@@ -26,6 +27,7 @@ function formatStayContext(booking) {
 }
 
 function ConversationPage() {
+  const { t } = useLanguage();
   const { conversationId: routeId } = useParams();
   const { pathname } = useLocation();
   const conversationId = routeId || pathname.split('/')[2];
@@ -140,7 +142,7 @@ function ConversationPage() {
     detailOpen
   >
     <header className="opg-message-pane-head">
-      <Link className="opg-message-back" to="/inbox" aria-label="Back to messages">
+      <Link className="opg-message-back" to="/inbox" aria-label={t('a11y2.backToMessages')}>
         <ChevronLeft strokeWidth={1.9} aria-hidden="true" />
       </Link>
       {image && <img className="opg-message-context-image" src={image} alt="" />}
@@ -154,7 +156,7 @@ function ConversationPage() {
     {/* Same gap under the pane header as the support thread: the thread rule in
         styles.css pins its own padding, so the ! prefix is what applies here. */}
     <div className="opg-message-thread !pt-6" ref={threadRef} aria-live="polite">
-      {loading ? <div className="opg-message-loading" aria-label="Loading messages"><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadMessages}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>No messages yet</strong><p>Say hello to {participant.name} and start planning the stay.</p></div> : messages.map((message) => {
+      {loading ? <div className="opg-message-loading" aria-label={t('a11y2.loadingMessages')}><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadMessages}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>No messages yet</strong><p>Say hello to {participant.name} and start planning the stay.</p></div> : messages.map((message) => {
         const isMine = message.senderId === user?.id;
         const senderName = [message.sender?.firstName, message.sender?.lastName].filter(Boolean).join(' ') || 'User';
         return <GuestMessageBubble key={message.id} mine={isMine} attachments={message.attachments} meta={`${isMine ? 'You' : senderName} · ${formatMessageTime(message.createdAt)}`}>{message.content}</GuestMessageBubble>;
@@ -169,8 +171,8 @@ function ConversationPage() {
         value={draft}
         onChange={setDraft}
         onSubmit={sendMessage}
-        placeholder={`Reply to ${participant.name}...`}
-        ariaLabel={`Message ${participant.name}`}
+        placeholder={t('a11y2.replyToPlaceholder', { name: participant.name })}
+        ariaLabel={t('a11y2.messageTo', { name: participant.name })}
         sending={sending}
       />
     </div>

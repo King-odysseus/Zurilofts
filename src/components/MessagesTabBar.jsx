@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Shared tab styling. On a phone the two tabs split the width evenly (flex-1 with
 // min-w-0), so neither the row nor the labels can ever force a horizontal scroll;
@@ -18,11 +19,12 @@ function tabClassName(isActive) {
  * purely a navigation affordance between them, per design2.md G5.
  */
 function MessagesTabBar({ active }) {
+  const { t } = useLanguage();
   return (
     <div
       className="mb-6 flex w-full items-stretch border-b border-border sm:w-auto sm:items-center sm:gap-5"
       role="tablist"
-      aria-label="Messages"
+      aria-label={t('a11y1.messages')}
     >
       <Link
         to="/inbox"

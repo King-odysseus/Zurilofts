@@ -2,11 +2,13 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { NotebookPen, Star } from 'lucide-react';
 import apiClient from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function StarRating({ rating, size = 'sm' }) {
+  const { t } = useLanguage();
   const sz = size === 'lg' ? 'w-5 h-5' : 'w-4 h-4';
   return (
-    <div className="flex items-center gap-0.5" aria-label={`${rating} out of 5 stars`}>
+    <div className="flex items-center gap-0.5" aria-label={t('stays.ratingOutOfFive', { rating })}>
       {[1, 2, 3, 4, 5].map((star) => (
         <Star key={star} className={`${sz} ${star <= rating ? 'text-[#8A6B52]' : 'text-[#C9D3DF]'}`} fill="currentColor" aria-hidden="true" />
       ))}
@@ -15,6 +17,7 @@ function StarRating({ rating, size = 'sm' }) {
 }
 
 function ReviewSection({ propertyId, onSummary }) {
+  const { t } = useLanguage();
   const [reviews, setReviews] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -58,14 +61,14 @@ function ReviewSection({ propertyId, onSummary }) {
   if (!summary || summary.totalReviews === 0) {
     return (
       <section className="mt-12 border-t border-[#E3E8EF] pt-8">
-        <h2 className="mb-2 text-2xl font-bold text-[#203565]">Guest Reviews</h2>
-        <p className="mb-4 text-[#5B6B82]">No reviews yet. Be the first to share your experience.</p>
+        <h2 className="mb-2 text-2xl font-bold text-[#203565]">{t('stays.guestReviews')}</h2>
+        <p className="mb-4 text-[#5B6B82]">{t('stays.noReviewsShare')}</p>
         <Link
           to="/bookings"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#8A6B52] hover:text-[#203565] transition-colors"
         >
           <NotebookPen className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
-          Write a Review
+          {t('stays.writeReview')}
         </Link>
       </section>
     );
@@ -77,14 +80,14 @@ function ReviewSection({ propertyId, onSummary }) {
     <section className="mt-12 border-t border-[#E3E8EF] pt-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
         <div>
-      <h2 className="mb-1 text-2xl font-bold text-[#203565]">Guest Reviews</h2>
+      <h2 className="mb-1 text-2xl font-bold text-[#203565]">{t('stays.guestReviews')}</h2>
           <div className="flex items-center gap-3">
             <StarRating rating={Math.round(summary.averageRating)} size="lg" />
             <span className="text-lg font-bold text-[#203565]">
               {summary.averageRating}
             </span>
             <span className="text-sm text-[#5B6B82]">
-              · {summary.totalReviews} review{summary.totalReviews !== 1 ? 's' : ''}
+              · {t(summary.totalReviews === 1 ? 'common.review_one' : 'common.review_other', { count: summary.totalReviews })}
             </span>
           </div>
         </div>
@@ -93,13 +96,13 @@ function ReviewSection({ propertyId, onSummary }) {
           className="inline-flex items-center gap-1.5 self-start px-4 py-2 border-2 border-[#203565] text-[#203565] rounded-full text-sm font-semibold hover:bg-[#203565] hover:text-white transition-all duration-200"
         >
           <NotebookPen className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
-          Write a Review
+          {t('stays.writeReview')}
         </Link>
       </div>
 
       {['cleanliness', 'location', 'value'].some((key) => summary.subScores?.[key] != null) && (
         <div className="mb-6 grid gap-3 sm:grid-cols-3">
-          {[['cleanliness', 'Cleanliness'], ['location', 'Location'], ['value', 'Value']].map(([key, label]) => summary.subScores?.[key] != null && (
+          {[['cleanliness', t('stays.cleanliness')], ['location', t('stays.location')], ['value', t('stays.value')]].map(([key, label]) => summary.subScores?.[key] != null && (
             <div key={key} className="rounded-2xl bg-elevated p-4 shadow-[0_1px_3px_rgb(38_34_98_/_0.06)]">
               <p className="text-xs font-semibold text-[#5B6B82]">{label}</p>
               <p className="text-lg font-bold text-[#203565]">{summary.subScores[key]}</p>

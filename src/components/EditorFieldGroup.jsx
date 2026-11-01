@@ -20,7 +20,7 @@ import { Check, ChevronDown } from 'lucide-react';
 // The option panel. Compact and scroll-capped: a time list runs to eighteen
 // entries, and an uncapped panel would hang past the bottom of the form.
 const MENU_CLASS =
-  'absolute left-0 top-full z-30 mt-1 max-h-64 w-full max-w-[320px] overflow-y-auto rounded-xl border border-border bg-elevated py-1 shadow-lg';
+  'absolute left-0 top-full z-30 mt-1 max-h-64 w-full max-w-[320px] overflow-y-auto rounded-xl bg-elevated py-1 shadow-lg';
 const OPTION_CLASS =
   'flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm text-navy transition-colors hover:bg-surface focus:outline-none focus-visible:bg-surface';
 
@@ -42,7 +42,7 @@ export function EditorFieldGroup({ children, className }) {
   return (
     <div
       className={[
-        'rounded-xl border border-border bg-elevated',
+        'rounded-xl bg-elevated shadow-md',
         // Rows are rounded at the ends rather than clipped by `overflow-hidden`,
         // because clipping would also cut off a row's open menu.
         '[&>*:first-child]:rounded-t-xl [&>*:last-child]:rounded-b-xl',

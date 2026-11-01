@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, Settings } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * The one header for the host listing editor.
@@ -11,6 +12,7 @@ import { ArrowLeft, Settings } from 'lucide-react';
  * wording and the back target drifting apart as one side is edited.
  */
 export default function ListingEditorTabs({ listingId, active }) {
+  const { t } = useLanguage();
   const sections = [
     { key: 'space', label: 'Your space', to: `/host/properties/${listingId}/edit` },
     { key: 'arrival', label: 'Arrival guide', to: `/host/properties/${listingId}/arrival-guide` },
@@ -27,7 +29,7 @@ export default function ListingEditorTabs({ listingId, active }) {
       <div className="flex items-center gap-3">
         <Link
           to="/host/listings"
-          aria-label="Back to your listings"
+          aria-label={t('trust.backToListings')}
           className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-inset text-navy transition-colors hover:bg-surface"
         >
           <ArrowLeft className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
@@ -35,7 +37,7 @@ export default function ListingEditorTabs({ listingId, active }) {
         <h1 className="min-w-0 flex-1 truncate text-2xl font-semibold tracking-tight text-navy">Listing editor</h1>
         <Link
           to="/host/settings"
-          aria-label="Listing settings"
+          aria-label={t('trust.listingSettings')}
           className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-inset text-navy transition-colors hover:bg-surface"
         >
           <Settings className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
@@ -46,7 +48,7 @@ export default function ListingEditorTabs({ listingId, active }) {
           stays flat text so only one half ever looks selected. */}
       <div
         role="tablist"
-        aria-label="Listing editor sections"
+        aria-label={t('trust.editorSections')}
         className="grid grid-cols-2 gap-1 rounded-full bg-inset p-1"
       >
         {sections.map((section) => {

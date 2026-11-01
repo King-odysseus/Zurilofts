@@ -6,6 +6,7 @@ import apiClient from '../api/client.js';
 import ListingEditorTabs from '../components/ListingEditorTabs.jsx';
 import ArrivalSectionList from '../components/ArrivalSectionList.jsx';
 import CheckInCheckoutFields from '../components/CheckInCheckoutFields.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import {
   EditorFieldGroup,
   EditorTextAreaRow,
@@ -131,6 +132,7 @@ function summaryFor(key, property) {
 }
 
 export default function HostArrivalGuidePage() {
+  const { t } = useLanguage();
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -213,7 +215,7 @@ export default function HostArrivalGuidePage() {
 
   if (loading) {
     return (
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4" role="status" aria-label="Loading arrival guide">
+      <div className="mx-auto flex w-full max-w-2xl flex-col gap-4" role="status" aria-label={t('a11y2.loadingArrivalGuide')}>
         <span className="block h-12 animate-pulse rounded-2xl bg-inset" />
         <span className="block h-24 animate-pulse rounded-2xl bg-inset" />
         <span className="block h-24 animate-pulse rounded-2xl bg-inset" />
@@ -238,7 +240,7 @@ export default function HostArrivalGuidePage() {
   const listSections = SECTIONS.map((section) => ({
     key: section.key,
     title: section.title,
-    placeholder: 'Add details',
+    placeholder: t('a11y2.addDetails'),
     ...(section.key === 'rules'
       ? { rules: Array.isArray(property?.houseRules) ? property.houseRules : [] }
       : { lines: summaryFor(section.key, property) }),
@@ -295,7 +297,7 @@ export default function HostArrivalGuidePage() {
                 rows={6}
                 value={draft.directions}
                 onChange={(next) => update('directions', next)}
-                placeholder="Landmarks, the gate colour, where to park, which floor."
+                placeholder={t('a11y2.directionsPlaceholder')}
               />
             </EditorFieldGroup>
           )}
@@ -319,14 +321,14 @@ export default function HostArrivalGuidePage() {
                 label="Network name"
                 value={draft.wifiNetwork}
                 onChange={(next) => update('wifiNetwork', next)}
-                placeholder="The name a guest picks from the wifi list"
+                placeholder={t('a11y2.wifiNetworkPlaceholder')}
               />
               <EditorTextRow
                 id="guide-wifi-password"
                 label="Password"
                 value={draft.wifiPassword}
                 onChange={(next) => update('wifiPassword', next)}
-                placeholder="Case matters, as it does on the router"
+                placeholder={t('a11y2.wifiPasswordPlaceholder')}
               />
             </EditorFieldGroup>
           )}
@@ -339,7 +341,7 @@ export default function HostArrivalGuidePage() {
                 rows={8}
                 value={draft.houseManual}
                 onChange={(next) => update('houseManual', next)}
-                placeholder="Appliances, hot water, bins, anything that is not obvious."
+                placeholder={t('a11y2.houseManualPlaceholder')}
               />
             </EditorFieldGroup>
           )}
@@ -353,7 +355,7 @@ export default function HostArrivalGuidePage() {
                   rows={6}
                   value={draft.rulesText}
                   onChange={(next) => update('rulesText', next)}
-                  placeholder={'Up to 2 overnight guests\nNo pets\nNo smoking'}
+                  placeholder={t('a11y2.houseRulesPlaceholder')}
                 />
               </EditorFieldGroup>
               <p className={HINT}>One rule per line. The section card shows the first three.</p>

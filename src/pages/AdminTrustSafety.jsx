@@ -23,19 +23,20 @@ import {
   UserRoundCheck,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const VERIFICATION_META = {
-  UNVERIFIED: { label: 'Not started', tone: 'gray' },
-  SUBMITTED: { label: 'In review', tone: 'warning' },
-  APPROVED: { label: 'Approved', tone: 'success' },
-  REJECTED: { label: 'Changes needed', tone: 'failure' },
+  UNVERIFIED: { label: 'admin.verificationNotStarted', tone: 'gray' },
+  SUBMITTED: { label: 'admin.verificationInReview', tone: 'warning' },
+  APPROVED: { label: 'admin.verificationApproved', tone: 'success' },
+  REJECTED: { label: 'admin.verificationChanges', tone: 'failure' },
 };
 
 const DISPUTE_META = {
-  OPEN: { label: 'Open', tone: 'warning' },
-  UNDER_REVIEW: { label: 'In review', tone: 'info' },
-  RESOLVED: { label: 'Resolved', tone: 'success' },
-  DISMISSED: { label: 'Dismissed', tone: 'gray' },
+  OPEN: { label: 'admin.disputeOpen', tone: 'warning' },
+  UNDER_REVIEW: { label: 'admin.disputeUnderReview', tone: 'info' },
+  RESOLVED: { label: 'admin.disputeResolved', tone: 'success' },
+  DISMISSED: { label: 'admin.disputeDismissed', tone: 'gray' },
 };
 
 const DOCUMENT_LABELS = {
@@ -68,6 +69,7 @@ function disputeTitle(dispute) {
 }
 
 function AdminTrustSafety() {
+  const { t } = useLanguage();
   const [verifications, setVerifications] = useState([]);
   const [disputes, setDisputes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -251,8 +253,8 @@ function AdminTrustSafety() {
     <div className="space-y-8">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Verification and disputes</h1>
-          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Identity checks, document review and guest or host dispute resolution.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.trustTitle')}</h1>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('admin.trustDescription')}</p>
         </div>
         <Button color="light" disabled={refreshing} onClick={() => load(true)}>
           <RefreshCw className={refreshing ? 'animate-spin' : ''} strokeWidth={1.8} aria-hidden="true" />
@@ -260,10 +262,10 @@ function AdminTrustSafety() {
         </Button>
       </div>
 
-      {error && <Alert color="failure" role="alert">{error}</Alert>}
+      {error && <Alert color="failure" role="alert" className="text-center">{error}</Alert>}
 
       {(truncated.verifications || truncated.disputes) && (
-        <p className="rounded-lg border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-xs leading-relaxed text-[#B54708] dark:border-[#B54708]/40 dark:bg-[#B54708]/15 dark:text-[#FEDF89]" role="note">
+        <p className="rounded-lg border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-center text-xs leading-relaxed text-[#B54708] dark:border-[#B54708]/40 dark:bg-[#B54708]/15 dark:text-[#FEDF89]" role="note">
           {truncated.verifications && truncated.disputes
             ? 'Both queues hold more than 100 records, so older identity checks and disputes are not listed here.'
             : truncated.verifications
@@ -274,26 +276,26 @@ function AdminTrustSafety() {
       )}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
-        <section className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm" aria-labelledby="verification-queue-title">
+        <section className="overflow-hidden rounded-xl bg-elevated shadow-md" aria-labelledby="verification-queue-title">
           <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 id="verification-queue-title" className="text-base font-semibold text-navy">Verification queue</h2>
-              <p className="text-xs text-muted">Submitted identity checks with document evidence attached.</p>
+              <h2 id="verification-queue-title" className="text-base font-semibold text-navy">{t('admin.verificationQueue')}</h2>
+              <p className="text-xs text-muted">{t('admin.verificationQueueHint')}</p>
             </div>
-            <Badge color="info">{summary.pendingVerifications.length} open</Badge>
+            <Badge color="info">{t('admin.openCount', { count: summary.pendingVerifications.length })}</Badge>
           </div>
 
           {loading ? (
             <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
               <Spinner size="lg" aria-hidden="true" />
-              <strong className="text-sm font-semibold text-navy">Loading verification queue</strong>
-              <p className="text-xs text-muted">Fetching submitted checks and encrypted document metadata.</p>
+              <strong className="text-sm font-semibold text-navy">{t('admin.loadingVerification')}</strong>
+              <p className="text-xs text-muted">{t('admin.loadingVerificationHint')}</p>
             </div>
           ) : summary.pendingVerifications.length === 0 ? (
             <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
               <UserRoundCheck className="text-primary-600" strokeWidth={1.6} aria-hidden="true" />
-              <strong className="text-sm font-semibold text-navy">No identity checks are waiting</strong>
-              <p className="text-xs text-muted">New submissions will appear here as soon as they are sent for review.</p>
+              <strong className="text-sm font-semibold text-navy">{t('admin.noVerificationWaiting')}</strong>
+              <p className="text-xs text-muted">{t('admin.noVerificationHint')}</p>
             </div>
           ) : (
             <div>
@@ -305,28 +307,28 @@ function AdminTrustSafety() {
                     <span className="block truncate text-xs text-muted">{verification.idType?.replaceAll('_', ' ') || 'Identity document'} · {verification.documents?.length || 0} files · {formatDate(verification.submittedAt || verification.updatedAt)}</span>
                   </div>
                   <Badge color={VERIFICATION_META[verification.status]?.tone || 'gray'}>
-                    {VERIFICATION_META[verification.status]?.label || verification.status}
+                    {t(VERIFICATION_META[verification.status]?.label || verification.status)}
                   </Badge>
-                  <Button size="xs" onClick={() => { setSelectedVerification(verification); setVerificationNote(''); setError(''); }}>Review</Button>
+                  <Button size="xs" onClick={() => { setSelectedVerification(verification); setVerificationNote(''); setError(''); }}>{t('admin.review')}</Button>
                 </article>
               ))}
             </div>
           )}
         </section>
 
-        <aside className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm" aria-labelledby="dispute-queue-title">
+        <aside className="overflow-hidden rounded-xl bg-elevated shadow-md" aria-labelledby="dispute-queue-title">
           <div className="flex flex-col gap-4 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 id="dispute-queue-title" className="text-base font-semibold text-navy">Disputes</h2>
-              <p className="text-xs text-muted">Booking-linked cases needing mediation.</p>
+              <h2 id="dispute-queue-title" className="text-base font-semibold text-navy">{t('admin.disputes')}</h2>
+              <p className="text-xs text-muted">{t('admin.disputesHint')}</p>
             </div>
-            <Badge color="warning">{summary.openDisputes.length} open</Badge>
+            <Badge color="warning">{t('admin.openCount', { count: summary.openDisputes.length })}</Badge>
           </div>
 
           <div className="grid grid-cols-2 gap-3 border-b border-border px-5 py-4 sm:grid-cols-4">
             {Object.entries(summary.disputeCounts).map(([status, count]) => (
-              <div key={status} className="flex items-center justify-between gap-2 rounded-xl border border-border bg-surface px-3 py-2">
-                <span className="text-xs text-muted">{DISPUTE_META[status]?.label || status}</span>
+              <div key={status} className="flex items-center justify-between gap-2 rounded-xl bg-surface px-3 py-2 shadow-sm">
+                <span className="text-xs text-muted">{t(DISPUTE_META[status]?.label || status)}</span>
                 <strong className="text-sm font-semibold text-navy">{count}</strong>
               </div>
             ))}
@@ -339,10 +341,10 @@ function AdminTrustSafety() {
                   <strong className="block truncate text-sm font-semibold text-navy">{disputeTitle(dispute)}</strong>
                   <small className="block truncate text-xs text-muted">{displayName(dispute.booking?.user, 'Guest')} · {dispute.category?.replaceAll('_', ' ')}</small>
                 </span>
-                <Badge color={DISPUTE_META[dispute.status]?.tone || 'gray'}>{DISPUTE_META[dispute.status]?.label || dispute.status}</Badge>
+                <Badge color={DISPUTE_META[dispute.status]?.tone || 'gray'}>{t(DISPUTE_META[dispute.status]?.label || dispute.status)}</Badge>
               </button>
             ))}
-            {!loading && summary.openDisputes.length === 0 && <p className="px-5 py-10 text-center text-sm text-muted">No open disputes need mediation.</p>}
+            {!loading && summary.openDisputes.length === 0 && <p className="px-5 py-10 text-center text-sm text-muted">{t('admin.noOpenDisputes')}</p>}
             {summary.openDisputes.length > 4 && <p className="border-t border-border px-5 py-3 text-xs text-muted">{summary.openDisputes.length - 4} more open cases are available in the current queue.</p>}
           </div>
         </aside>
@@ -354,50 +356,50 @@ function AdminTrustSafety() {
             <ModalHeader>Identity verification · {displayName(selectedVerification.user, selectedVerification.fullName)}</ModalHeader>
             <ModalBody>
               <div className="space-y-5">
-                <section className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 sm:flex-row sm:items-center">
+                <section className="flex flex-col gap-3 rounded-xl bg-surface p-4 shadow-sm sm:flex-row sm:items-center">
                   <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-primary-600 dark:text-primary-300" aria-hidden="true"><ShieldCheck strokeWidth={1.8} /></span>
                   <div className="min-w-0 flex-1">
-                    <small className="block text-[11px] font-semibold uppercase tracking-wide text-primary-600">Applicant</small>
+                    <small className="block text-[11px] font-semibold uppercase tracking-wide text-primary-600">{t('admin.applicant')}</small>
                     <strong className="block truncate text-sm font-semibold text-navy">{displayName(selectedVerification.user, selectedVerification.fullName)}</strong>
                     <span className="block truncate text-xs text-muted">{selectedVerification.user?.email || 'Email not available'}</span>
                   </div>
                   <Badge color={VERIFICATION_META[selectedVerification.status]?.tone || 'gray'}>
-                    {VERIFICATION_META[selectedVerification.status]?.label || selectedVerification.status}
+                    {t(VERIFICATION_META[selectedVerification.status]?.label || selectedVerification.status)}
                   </Badge>
                 </section>
 
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                  <p className="rounded-xl border border-border bg-elevated p-3">
-                    <span className="block text-xs text-muted">Legal name</span>
+                  <p className="rounded-xl bg-elevated shadow-md p-3">
+                    <span className="block text-xs text-muted">{t('admin.legalName')}</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.fullName || 'Not supplied'}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-elevated p-3">
-                    <span className="block text-xs text-muted">Date of birth</span>
+                  <p className="rounded-xl bg-elevated shadow-md p-3">
+                    <span className="block text-xs text-muted">{t('admin.dateOfBirth')}</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.dateOfBirth || 'Not supplied'}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-elevated p-3">
-                    <span className="block text-xs text-muted">ID type</span>
+                  <p className="rounded-xl bg-elevated shadow-md p-3">
+                    <span className="block text-xs text-muted">{t('admin.idType')}</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.idType?.replaceAll('_', ' ') || 'Not supplied'}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-elevated p-3">
-                    <span className="block text-xs text-muted">ID number</span>
+                  <p className="rounded-xl bg-elevated shadow-md p-3">
+                    <span className="block text-xs text-muted">{t('admin.idNumber')}</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.idNumber || 'Not supplied'}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-elevated p-3">
-                    <span className="block text-xs text-muted">Submitted</span>
+                  <p className="rounded-xl bg-elevated shadow-md p-3">
+                    <span className="block text-xs text-muted">{t('admin.submitted')}</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{formatDate(selectedVerification.submittedAt, true)}</strong>
                   </p>
-                  <p className="rounded-xl border border-border bg-elevated p-3">
-                    <span className="block text-xs text-muted">Account role</span>
+                  <p className="rounded-xl bg-elevated shadow-md p-3">
+                    <span className="block text-xs text-muted">{t('admin.accountRole')}</span>
                     <strong className="mt-0.5 block truncate text-sm font-medium text-navy">{selectedVerification.user?.role || 'USER'}</strong>
                   </p>
                 </div>
 
-                <section className="rounded-xl border border-border bg-surface p-4">
+                <section className="rounded-xl bg-surface p-4 shadow-sm">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <div>
-                      <h3 className="text-sm font-semibold text-navy">Encrypted documents</h3>
-                      <p className="mt-1 text-xs text-muted">Each file is decrypted only for this authorised review.</p>
+                      <h3 className="text-sm font-semibold text-navy">{t('admin.encryptedDocuments')}</h3>
+                      <p className="mt-1 text-xs text-muted">{t('admin.decryptedForReview')}</p>
                     </div>
                     <span className="text-xs text-muted">{selectedVerification.documents?.length || 0} files</span>
                   </div>
@@ -413,24 +415,24 @@ function AdminTrustSafety() {
                         </Button>
                       ))}
                     </div>
-                  ) : <p className="mt-3 text-xs text-muted">No documents are attached to this verification.</p>}
+                  ) : <p className="mt-3 text-xs text-muted">{t('admin.noDocumentsAttached')}</p>}
                 </section>
 
-                <section className="space-y-3 rounded-xl border border-border bg-surface p-4">
+                <section className="space-y-3 rounded-xl bg-surface p-4 shadow-sm">
                   <div>
-                    <h3 className="text-sm font-semibold text-navy">Decision</h3>
-                    <p className="mt-1 text-xs text-muted">Approving unlocks payment on any pending bookings for this guest.</p>
+                    <h3 className="text-sm font-semibold text-navy">{t('admin.decision')}</h3>
+                    <p className="mt-1 text-xs text-muted">{t('admin.approvingUnlocks')}</p>
                   </div>
                   {selectedVerification.status === 'SUBMITTED' && (
                     <div className="space-y-1">
-                      <Label htmlFor="verification-review-note">Reason for rejection</Label>
+                      <Label htmlFor="verification-review-note">{t('admin.reasonForRejection')}</Label>
                       <Textarea
                         id="verification-review-note"
                         rows={3}
                         maxLength={2000}
                         value={verificationNote}
                         onChange={(event) => setVerificationNote(event.target.value)}
-                        placeholder="Required when the applicant must correct or resubmit their details."
+                        placeholder={t('admin.rejectionPlaceholder')}
                       />
                     </div>
                   )}
@@ -439,14 +441,14 @@ function AdminTrustSafety() {
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button color="light" onClick={closeVerification} disabled={Boolean(busy)}>Close</Button>
+              <Button color="light" onClick={closeVerification} disabled={Boolean(busy)}>{t('common.close')}</Button>
               {selectedVerification.status === 'SUBMITTED' && (
                 <>
                   <Button color="failure" onClick={() => reviewVerification('reject')} disabled={Boolean(busy)}>
                     {busy === 'reject' ? 'Sending back...' : 'Request changes'}
                   </Button>
                   <Button onClick={() => reviewVerification('approve')} disabled={Boolean(busy)}>
-                    {busy === 'approve' ? 'Approving...' : <><BadgeCheck strokeWidth={1.8} aria-hidden="true" />Approve identity</>}
+                    {busy === 'approve' ? 'Approving...' : <><BadgeCheck strokeWidth={1.8} aria-hidden="true" />{t('admin.approveIdentity')}</>}
                   </Button>
                 </>
               )}
@@ -461,7 +463,7 @@ function AdminTrustSafety() {
             <ModalHeader>{disputeTitle(selectedDispute)} · dispute case</ModalHeader>
             <ModalBody>
               <div className="space-y-5">
-                <div className="flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 sm:flex-row sm:items-center">
+                <div className="flex flex-col gap-3 rounded-xl bg-surface p-4 shadow-sm sm:flex-row sm:items-center">
                   <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-primary-600 dark:text-primary-300" aria-hidden="true"><AlertTriangle strokeWidth={1.8} /></span>
                   <div className="min-w-0 flex-1">
                     <small className="block text-[11px] font-semibold uppercase tracking-wide text-primary-600">{selectedDispute.category?.replaceAll('_', ' ') || 'Booking issue'}</small>
@@ -469,18 +471,18 @@ function AdminTrustSafety() {
                     <span className="block truncate text-xs text-muted">Raised by {selectedDispute.raisedByRole === 'HOST' ? 'host' : 'guest'} · {formatDate(selectedDispute.createdAt, true)}</span>
                   </div>
                   <Badge color={DISPUTE_META[selectedDispute.status]?.tone || 'gray'}>
-                    {DISPUTE_META[selectedDispute.status]?.label || selectedDispute.status}
+                    {t(DISPUTE_META[selectedDispute.status]?.label || selectedDispute.status)}
                   </Badge>
                 </div>
 
                 <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-                  <section className="rounded-xl border border-border bg-surface p-4">
-                    <h3 className="text-sm font-semibold text-navy">Issue summary</h3>
+                  <section className="rounded-xl bg-surface p-4 shadow-sm">
+                    <h3 className="text-sm font-semibold text-navy">{t('admin.issueSummary')}</h3>
                     <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-charcoal">{selectedDispute.description || 'No description was supplied.'}</p>
 
                     <div className="mt-4">
-                      <h3 className="text-sm font-semibold text-navy">Evidence</h3>
-                      <p className="mt-1 text-xs text-muted">Secure participant uploads.</p>
+                      <h3 className="text-sm font-semibold text-navy">{t('admin.evidence')}</h3>
+                      <p className="mt-1 text-xs text-muted">{t('admin.secureUploads')}</p>
                       {selectedDispute.evidence?.length ? (
                         <div className="mt-3 space-y-3">
                           {selectedDispute.evidence.map((evidence) => (
@@ -493,11 +495,11 @@ function AdminTrustSafety() {
                             </Button>
                           ))}
                         </div>
-                      ) : <p className="mt-2 text-xs text-muted">No evidence has been added.</p>}
+                      ) : <p className="mt-2 text-xs text-muted">{t('admin.noEvidence')}</p>}
                     </div>
 
                     <div className="mt-5">
-                      <h3 className="text-sm font-semibold text-navy">Timeline</h3>
+                      <h3 className="text-sm font-semibold text-navy">{t('admin.timeline')}</h3>
                       <div className="mt-3 space-y-3">
                         {(selectedDispute.timeline || []).map((entry, index) => (
                           <div key={`${entry.createdAt}-${entry.action}-${index}`} className="flex items-start gap-3">
@@ -507,7 +509,7 @@ function AdminTrustSafety() {
                                 <strong className="font-semibold">{entry.action?.replaceAll('_', ' ') || 'Status updated'}</strong>
                                 <small className="text-xs text-muted">{formatDate(entry.createdAt, true)}</small>
                               </p>
-                              {entry.note && <blockquote className="mt-1 rounded-xl border border-border bg-elevated px-3 py-2 text-xs text-muted">{entry.note}</blockquote>}
+                              {entry.note && <blockquote className="mt-1 rounded-xl bg-elevated shadow-md px-3 py-2 text-xs text-muted">{entry.note}</blockquote>}
                             </div>
                           </div>
                         ))}
@@ -515,31 +517,31 @@ function AdminTrustSafety() {
                     </div>
                   </section>
 
-                  <section className="rounded-xl border border-border bg-surface p-4">
+                  <section className="rounded-xl bg-surface p-4 shadow-sm">
                     <div>
-                      <h3 className="text-sm font-semibold text-navy">Conversation</h3>
-                      <p className="mt-1 text-xs text-muted">Messages visible to the guest, host and admin team.</p>
+                      <h3 className="text-sm font-semibold text-navy">{t('admin.conversation')}</h3>
+                      <p className="mt-1 text-xs text-muted">{t('admin.conversationHint')}</p>
                     </div>
                     <div className="mt-4 space-y-3">
                       {selectedDispute.messages?.length ? selectedDispute.messages.map((message) => (
-                        <article key={message.id} className={`rounded-xl border border-border p-3 ${message.senderRole === 'ADMIN' ? 'bg-primary-50 dark:bg-primary/15' : 'bg-elevated'}`}>
+                        <article key={message.id} className={`rounded-xl p-3 shadow-sm ${message.senderRole === 'ADMIN' ? 'bg-primary-50 dark:bg-primary/15' : 'bg-elevated'}`}>
                           <span className="block text-[11px] font-semibold uppercase tracking-wide text-primary-600">{message.senderRole}</span>
                           <p className="mt-1 whitespace-pre-wrap text-sm text-charcoal">{message.body}</p>
                           <small className="mt-1 block text-xs text-muted">{formatDate(message.createdAt, true)}</small>
                         </article>
-                      )) : <p className="text-xs text-muted">No messages have been exchanged on this dispute yet.</p>}
+                      )) : <p className="text-xs text-muted">{t('admin.noDisputeMessages')}</p>}
                     </div>
                   </section>
                 </div>
 
-                <div className="flex flex-col gap-5 rounded-xl border border-border bg-surface p-4 lg:flex-row lg:items-end lg:justify-between">
+                <div className="flex flex-col gap-5 rounded-xl bg-surface p-4 shadow-sm lg:flex-row lg:items-end lg:justify-between">
                   <div className="w-full space-y-1 lg:max-w-md">
-                    <Label htmlFor="dispute-resolution">Resolution summary</Label>
+                    <Label htmlFor="dispute-resolution">{t('admin.resolutionSummary')}</Label>
                     <TextInput
                       id="dispute-resolution"
                       value={resolutionNote}
                       onChange={(event) => setResolutionNote(event.target.value)}
-                      placeholder="Required when resolving the case"
+                      placeholder={t('admin.resolutionPlaceholder')}
                       disabled={selectedDispute.status === 'RESOLVED' || selectedDispute.status === 'DISMISSED'}
                     />
                   </div>
@@ -551,20 +553,20 @@ function AdminTrustSafety() {
                       {busy === 'DISMISSED' ? 'Dismissing...' : 'Dismiss'}
                     </Button>
                     <Button disabled={Boolean(busy) || selectedDispute.status === 'RESOLVED' || selectedDispute.status === 'DISMISSED'} onClick={() => updateDisputeStatus('RESOLVED')}>
-                      {busy === 'RESOLVED' ? 'Resolving...' : <><CheckCircle2 strokeWidth={1.8} aria-hidden="true" />Resolve case</>}
+                      {busy === 'RESOLVED' ? 'Resolving...' : <><CheckCircle2 strokeWidth={1.8} aria-hidden="true" />{t('admin.resolveCase')}</>}
                     </Button>
                   </div>
                 </div>
 
-                <section className="rounded-xl border border-border bg-surface p-4">
+                <section className="rounded-xl bg-surface p-4 shadow-sm">
                   <div>
-                    <h3 className="text-sm font-semibold text-navy">Private admin notes</h3>
-                    <p className="mt-1 text-xs text-muted">Never shown to the guest or host.</p>
+                    <h3 className="text-sm font-semibold text-navy">{t('admin.privateNotes')}</h3>
+                    <p className="mt-1 text-xs text-muted">{t('admin.privateNotesHint')}</p>
                   </div>
                   {selectedDispute.notes?.length > 0 && (
                     <div className="mt-4 space-y-3">
                       {selectedDispute.notes.map((note) => (
-                        <p key={note.id} className="rounded-xl border border-border bg-elevated p-3">
+                        <p key={note.id} className="rounded-xl bg-elevated shadow-md p-3">
                           <strong className="block text-sm font-medium text-navy">{note.body}</strong>
                           <small className="mt-1 block text-xs text-muted">{formatDate(note.createdAt, true)}</small>
                         </p>
@@ -577,8 +579,8 @@ function AdminTrustSafety() {
                       maxLength={2000}
                       value={disputeNote}
                       onChange={(event) => setDisputeNote(event.target.value)}
-                      placeholder="Add context for the resolution team"
-                      aria-label="Private admin note"
+                      placeholder={t('admin.privateNotePlaceholder')}
+                      aria-label={t('admin.privateNoteLabel')}
                     />
                     <Button onClick={addPrivateNote} disabled={busy === 'note' || !disputeNote.trim()}>
                       <MessageSquareText strokeWidth={1.8} aria-hidden="true" />
@@ -589,7 +591,7 @@ function AdminTrustSafety() {
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button color="light" onClick={closeDispute} disabled={Boolean(busy)}>Close</Button>
+              <Button color="light" onClick={closeDispute} disabled={Boolean(busy)}>{t('common.close')}</Button>
             </ModalFooter>
           </>
         )}

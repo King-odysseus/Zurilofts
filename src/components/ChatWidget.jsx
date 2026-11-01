@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { MessagesSquare, Send, X } from 'lucide-react';
 import apiClient from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const STORAGE_KEY = 'zuri_chat_session';
 
@@ -14,6 +15,7 @@ function getOrCreateSessionId() {
 }
 
 function ChatWidget() {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [started, setStarted] = useState(false);
 
@@ -87,7 +89,7 @@ function ChatWidget() {
 
   function handleStart() {
     if (!name.trim()) {
-      setError('Please enter your name first');
+      setError(t('chrome.chatNameRequired'));
       return;
     }
     setError('');
@@ -100,7 +102,7 @@ function ChatWidget() {
     if (!trimmed || sending) return;
 
     if (!name.trim()) {
-      setError('Please enter your name first');
+      setError(t('chrome.chatNameRequired'));
       return;
     }
 
@@ -142,7 +144,7 @@ function ChatWidget() {
         <button
           onClick={() => setOpen(true)}
           className="fixed bottom-6 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#16294B] shadow-lg transition-all duration-200 group hover:scale-110 hover:shadow-xl"
-          aria-label="Open chat"
+          aria-label={t('chrome.chatOpen')}
         >
           <MessagesSquare className="w-7 h-7 text-white" strokeWidth={2} aria-hidden="true" />
           <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse"></span>
@@ -159,8 +161,8 @@ function ChatWidget() {
                 <MessagesSquare className="w-5 h-5 text-white" strokeWidth={2} aria-hidden="true" />
               </div>
               <div>
-                <p className="text-white font-semibold text-sm">ZuriLofts Chat</p>
-                <p className="text-white/60 text-xs">We reply within 2 hours</p>
+                <p className="text-white font-semibold text-sm">{t('chrome.chatTitle')}</p>
+                <p className="text-white/60 text-xs">{t('chrome.chatReplyTime')}</p>
               </div>
             </div>
             <button onClick={() => setOpen(false)} className="text-white/60 hover:text-white transition-colors">
@@ -192,14 +194,14 @@ function ChatWidget() {
                   type="text"
                   value={name}
                   onChange={(e) => { setName(e.target.value); setError(''); }}
-                  placeholder="Your name"
+                  placeholder={t('chrome.chatNamePlaceholder')}
                   className="w-full rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#203565] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C5A28C]/40"
                 />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email (optional)"
+                  placeholder={t('chrome.chatEmailPlaceholder')}
                   className="w-full rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#203565] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C5A28C]/40"
                 />
                 {error && <p className="text-red-500 text-xs">{error}</p>}
@@ -209,13 +211,13 @@ function ChatWidget() {
                   disabled={sending}
                   className="w-full rounded-[10px] bg-[#16294B] py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#16294B] disabled:opacity-50"
                 >
-                  Start Chat
+                  {t('chrome.chatStart')}
                 </button>
               </div>
             ) : (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs text-[#5B6B82]">Chatting as <span className="font-semibold text-[#203565]">{name}</span></span>
+                  <span className="text-xs text-[#5B6B82]">{t('chrome.chattingAs')} <span className="font-semibold text-[#203565]">{name}</span></span>
                   <button
                     type="button"
                     onClick={() => { setStarted(false); setName(''); setEmail(''); setMessages([{ from: 'bot', text: 'Hi! 👋 How can we help you today? Ask us anything about our apartments.' }]); setSent(false); }}
@@ -229,7 +231,7 @@ function ChatWidget() {
                     type="text"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Type your message..."
+                    placeholder={t('chrome.chatMessagePlaceholder')}
                     className="min-w-0 flex-1 rounded-[10px] border-0 bg-surface px-4 py-2.5 text-sm text-[#203565] placeholder-[#94A3B8] focus:outline-none focus:ring-2 focus:ring-[#C5A28C]/40 disabled:opacity-50"
                   />
                   <button

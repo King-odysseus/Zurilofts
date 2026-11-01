@@ -11,6 +11,7 @@ import {
   uploadAttachments,
   validateAttachmentFile,
 } from '../utils/attachments.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * The one message composer used by the guest inbox, support, the admin reply
@@ -39,7 +40,7 @@ import {
 // navigation menu, because a saved reply shows its label and a line of preview.
 const ADD_MENU_THEME = {
   floating: {
-    base: 'z-[70] w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-border bg-elevated shadow-lg',
+    base: 'z-[70] w-[min(20rem,calc(100vw-2rem))] overflow-hidden rounded-2xl bg-elevated shadow-lg',
     content: 'max-h-[min(20rem,45vh)] overflow-y-auto py-1 text-sm text-navy',
     header: 'block px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted',
     item: {
@@ -58,8 +59,8 @@ export default function MessageComposer({
   value,
   onChange,
   onSubmit,
-  placeholder = 'Write a message',
-  ariaLabel = 'Message',
+  placeholder,
+  ariaLabel,
   sending = false,
   disabled = false,
   savedReplies = [],
@@ -67,6 +68,11 @@ export default function MessageComposer({
   showAttach = true,
   className = '',
 }) {
+  const { t } = useLanguage();
+  // A caller may pass its own wording; these are only the fallbacks, so the
+  // field still has a name when nobody does.
+  const fieldLabel = placeholder ?? t('a11y1.writeMessage');
+  const composerLabel = ariaLabel ?? t('a11y1.message');
   const textareaRef = useRef(null);
   const fileRef = useRef(null);
   const [attachments, setAttachments] = useState([]);
@@ -157,7 +163,7 @@ export default function MessageComposer({
   }
 
   return (
-    <form className={`flex flex-col gap-2 ${className}`.trim()} onSubmit={submit} aria-label={ariaLabel}>
+    <form className={`flex flex-col gap-2 ${className}`.trim()} onSubmit={submit} aria-label={composerLabel}>
       {attachments.length > 0 && (
         <ul className="flex flex-wrap gap-2">
           {attachments.map((entry) => (
@@ -169,7 +175,7 @@ export default function MessageComposer({
                 type="button"
                 onClick={() => removeAttachment(entry.id)}
                 className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-primary-600"
-                aria-label={`Remove ${entry.name}`}
+                aria-label={t('a11y1.removeAttachment', { name: entry.name })}
               >
                 <X className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
@@ -195,7 +201,7 @@ export default function MessageComposer({
                   type="button"
                   disabled={busy || disabled}
                   className={`${INNER_BUTTON} text-muted hover:bg-surface hover:text-navy disabled:opacity-50`}
-                  aria-label="Add an attachment or a saved reply"
+                  aria-label={t('a11y1.addAttachmentOrSavedReply')}
                 >
                   <Plus className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
                 </button>
@@ -245,8 +251,8 @@ export default function MessageComposer({
             }
           }}
           rows={1}
-          placeholder={placeholder}
-          aria-label={ariaLabel}
+          placeholder={fieldLabel}
+          aria-label={composerLabel}
           disabled={disabled}
           className="msg-composer-input w-full flex-1"
           style={{ resize: 'none' }}
@@ -258,7 +264,7 @@ export default function MessageComposer({
           type="submit"
           disabled={!canSend}
           className={`${INNER_BUTTON} bg-navy-bg text-white hover:bg-navy-hover disabled:bg-surface disabled:text-muted`}
-          aria-label={sending ? 'Sending message' : 'Send message'}
+          aria-label={sending ? t('a11y1.sendingMessage') : t('a11y1.sendMessage')}
         >
           {busy ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <ArrowUp className="h-4 w-4" strokeWidth={2.4} aria-hidden="true" />}
         </button>

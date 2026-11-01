@@ -40,6 +40,20 @@ const envSchema = z.object({
   ADMIN_PASSWORD: z.string().optional(),
   // Platform fees. Every rate below is configuration rather than code: a
   // business decision changes the money split with an env var, no deploy.
+  // Withholding tax deducted from the host's share. This is a STATUTORY rate,
+  // not a free choice: Kenya's Income Tax Act s.35 withholds 10% of gross rent
+  // paid to a resident landlord (residential and commercial alike, per KRA's
+  // own withholding-tax guidance). The 7.5% figure that circulates for short
+  // lets is the Monthly Rental Income regime, which applies to long-term
+  // residential letting and is not the default for nightly accommodation;
+  // that is generally business income instead. 20% is the NON-RESIDENT rate
+  // for professional, management and royalty fees, and does not apply to a
+  // resident host who has not registered for a KRA PIN.
+  //
+  // The default below (5) is NOT one of those statutory rates. Confirm the rate
+  // with the platform's tax adviser before going live, and note that KRA treats
+  // withholding as a credit the host reclaims, so the payer is remitting tax on
+  // the host's behalf rather than taxing them twice.
   WITHHOLDING_TAX_RATE: z.string().default('5'),
   // Paystack's collection fee, charged to the GUEST on top of the booking total
   // and grossed up so the platform still receives the full total afterwards.

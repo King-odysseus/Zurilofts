@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { BarChart3, CalendarCheck, CalendarClock, FileText, Settings } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * The left-hand menu of the host Earnings page.
@@ -16,10 +17,10 @@ import { BarChart3, CalendarCheck, CalendarClock, FileText, Settings } from 'luc
 // Exported alongside the component for that reason, as CancelBookingDialog does.
 // eslint-disable-next-line react-refresh/only-export-components
 export const EARNINGS_SECTIONS = [
-  { key: 'performance', label: 'Performance', Icon: BarChart3 },
-  { key: 'upcoming', label: 'Upcoming', Icon: CalendarClock },
-  { key: 'paid', label: 'Paid', Icon: CalendarCheck },
-  { key: 'reports', label: 'Reports', Icon: FileText },
+  { key: 'performance', label: 'hostmoney.performance', Icon: BarChart3 },
+  { key: 'upcoming', label: 'hostmoney.upcoming', Icon: CalendarClock },
+  { key: 'paid', label: 'hostmoney.paid', Icon: CalendarCheck },
+  { key: 'reports', label: 'hostmoney.reports', Icon: FileText },
 ];
 
 // One row shape, worn by the section buttons and the settings link alike, so
@@ -36,16 +37,17 @@ function rowClass(isActive) {
 }
 
 export default function EarningsSideNav({ activeKey, onSelect, settingsTo = '/host/payouts' }) {
+  const { t } = useLanguage();
   return (
     <div>
-      <h1 className="text-2xl font-bold tracking-tight text-navy">Earnings</h1>
+      <h1 className="text-2xl font-bold tracking-tight text-navy">{t('hostmoney.earningsTitle')}</h1>
 
       {/* One nav for both layouts rather than two: a duplicated phone copy would
           put every section in the accessibility tree twice. The phone strip wraps
           instead of scrolling sideways: Reports sat entirely off the right edge
           with nothing on screen to say the row continued. */}
       <nav
-        aria-label="Earnings sections"
+        aria-label={t('hostmoney.earningsNav')}
         className="mt-6 flex flex-wrap gap-1 lg:flex-col lg:gap-1"
       >
         {EARNINGS_SECTIONS.map(({ key, label, Icon }) => {
@@ -64,7 +66,7 @@ export default function EarningsSideNav({ activeKey, onSelect, settingsTo = '/ho
                 strokeWidth={1.8}
                 aria-hidden="true"
               />
-              {label}
+              {t(label)}
             </button>
           );
         })}
@@ -73,7 +75,7 @@ export default function EarningsSideNav({ activeKey, onSelect, settingsTo = '/ho
       <div className="mt-2 border-t border-border pt-2 lg:my-5 lg:pt-0">
         <Link to={settingsTo} className={rowClass(false)}>
           <Settings className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />
-          Settings and documents
+          {t('hostmoney.settingsAndDocuments')}
         </Link>
       </div>
     </div>

@@ -5,9 +5,11 @@ import { TextInput } from 'flowbite-react';
 import { ChevronRight, MapPin } from 'lucide-react';
 import { googleMapsDirectionsUrl } from '../utils/googleMaps.js';
 import SelectMenu from './SelectMenu.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /** Card for a single place or restaurant */
 function NearbyCard({ item, areaLabels, categoryLabels }) {
+  const { t } = useLanguage();
   const mapsUrl = googleMapsDirectionsUrl({
     ...item,
     label: item.mapsQuery || `${item.name}, Nairobi, Kenya`,
@@ -17,7 +19,7 @@ function NearbyCard({ item, areaLabels, categoryLabels }) {
     <article className="op-place-card group">
       <div className="h-48 overflow-hidden relative">
         <img className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 rounded-t-[14px]" src={item.image} alt={item.name} />
-        <span className="op-place-area">{areaLabels[item.area] || item.area}</span><a href={mapsUrl} target="_blank" rel="noopener noreferrer" title="Get directions in Google Maps"
+        <span className="op-place-area">{areaLabels[item.area] || item.area}</span><a href={mapsUrl} target="_blank" rel="noopener noreferrer" title={t('discovery.nearbyDirectionsTitle')}
            className="absolute bottom-2 right-2 z-10 rounded-full bg-white/90 p-2 shadow-md backdrop-blur-sm transition-all duration-200 hover:bg-[#16294B] hover:text-white">
           <MapPin className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
         </a>
@@ -32,7 +34,7 @@ function NearbyCard({ item, areaLabels, categoryLabels }) {
           rel="noopener noreferrer"
           className="mt-4 inline-flex items-center gap-2 min-h-[44px] rounded-lg bg-[#143A80] px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-[#0B2A5E]"
         >
-          Get directions
+          {t('discovery.nearbyGetDirections')}
           <span aria-hidden="true">↗</span>
         </a>
       </div>
@@ -47,6 +49,7 @@ NearbyCard.propTypes = {
 };
 
 function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, categories, viewMoreLink, maxCards }) {
+  const { t } = useLanguage();
   const [areaFilter, setAreaFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [query, setQuery] = useState('');
@@ -75,14 +78,14 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
 
       {/* Filters: free-text search plus area/category selects */}
       <div className="flex flex-col sm:flex-row justify-center items-center gap-3 mb-10 px-4 md:px-0">
-        <TextInput className="op-place-search-wrap" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search places, areas or categories" aria-label="Search places" />
+        <TextInput className="op-place-search-wrap" type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t('discovery.nearbySearchPlaceholder')} aria-label={t('discovery.nearbySearchAria')} />
         <SelectMenu
           className="op-place-select-wrap"
           wrapperClassName="op-place-select-field"
           value={areaFilter}
           onChange={(next) => setAreaFilter(next)}
           options={areaOptions}
-          ariaLabel="Filter by area"
+          ariaLabel={t('discovery.nearbyFilterArea')}
         />
         {catOptions && (
           <SelectMenu
@@ -91,15 +94,15 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
             value={categoryFilter}
             onChange={(next) => setCategoryFilter(next)}
             options={catOptions}
-            ariaLabel="Filter by category"
+            ariaLabel={t('discovery.nearbyFilterCategory')}
           />
         )}
-        <button className="op-place-clear" type="button" onClick={() => { setQuery(''); setAreaFilter('all'); setCategoryFilter('all'); }}>Clear all</button><span className="op-place-count">{filtered.length} places</span>
+        <button className="op-place-clear" type="button" onClick={() => { setQuery(''); setAreaFilter('all'); setCategoryFilter('all'); }}>{t('discovery.nearbyClearAll')}</button><span className="op-place-count">{t('discovery.nearbyCount', { count: filtered.length })}</span>
       </div>
 
       {/* List only by design: the grid/map toggle and its NearbyMap view were removed. */}
       {filtered.length === 0 ? (
-        <p className="py-12 text-center text-[#5B6B82]">Nothing matches those filters - try a different area or category.</p>
+        <p className="py-12 text-center text-[#5B6B82]">{t('discovery.nearbyEmpty')}</p>
       ) : (
         <>
           <div className="op-place-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -114,7 +117,7 @@ function NearbySection({ title, subtitle, items, areaLabels, categoryLabels, cat
                 to={viewMoreLink}
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] border border-[#E3E8EF] px-8 py-3 font-semibold text-[#203565] transition-all duration-200 hover:bg-surface"
               >
-                View All {filtered.length} Places
+                {t('discovery.nearbyViewAll', { count: filtered.length })}
                 <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
               </Link>
             </div>

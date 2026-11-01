@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function SavedStaysHeader({ activeTab, title, subtitle, actionLabel = '', actionTo = '', onAction, showTabs = true }) {
+  const { t } = useLanguage();
   const action = actionLabel ? (
     actionTo ? (
       <Link className="opg-saved-action" to={actionTo}>{actionLabel}</Link>
@@ -19,9 +21,9 @@ function SavedStaysHeader({ activeTab, title, subtitle, actionLabel = '', action
         </div>
         {action}
       </header>
-      {showTabs && <nav className="opg-saved-tabs" aria-label="Saved stays views">
-        <Link className={activeTab === 'saved' ? 'is-active' : ''} to="/favourites">All saved</Link>
-        <Link className={activeTab === 'lists' ? 'is-active' : ''} to="/shortlists">My lists</Link>
+      {showTabs && <nav className="opg-saved-tabs" aria-label={t('stays.savedViews')}>
+        <Link className={activeTab === 'saved' ? 'is-active' : ''} to="/favourites">{t('stays.allSaved')}</Link>
+        <Link className={activeTab === 'lists' ? 'is-active' : ''} to="/shortlists">{t('stays.myLists')}</Link>
       </nav>}
     </>
   );

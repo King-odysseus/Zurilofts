@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'flowbite-react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Local YYYY-MM-DD (avoids UTC off-by-one from toISOString)
 function toISO(date) {
@@ -51,10 +52,12 @@ const DAY_BUTTON = [
  *  - unavailableRanges: [{ start, end }] (ISO date strings / dates)
  */
 function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
+  const { t } = useLanguage();
   const today = useMemo(() => {
-    const t = new Date();
-    t.setHours(0, 0, 0, 0);
-    return t;
+    // Named `start` rather than `t`, which is the translator in this component.
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    return start;
   }, []);
 
   const [viewMonth, setViewMonth] = useState(() => {
@@ -151,7 +154,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
             color="light"
             onClick={goToPreviousMonth}
             disabled={!canGoBack}
-            aria-label="Previous month"
+            aria-label={t('a11y1.previousMonth')}
             className={PAGER_BUTTON}
           >
             <ChevronLeft className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
@@ -163,7 +166,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
             type="button"
             color="light"
             onClick={goToNextMonth}
-            aria-label="Next month"
+            aria-label={t('a11y1.nextMonth')}
             className={PAGER_BUTTON}
           >
             <ChevronRight className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
@@ -223,7 +226,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
                 type="button"
                 onClick={() => handleDayClick(date)}
                 disabled={disabled}
-                aria-label={`${dateLabel}${disabled ? ', unavailable' : ''}`}
+                aria-label={`${dateLabel}${disabled ? t('a11y1.unavailableSuffix') : ''}`}
                 aria-pressed={isEndpoint}
                 className={[DAY_BUTTON, stateClass, todayRing].join(' ')}
               >
@@ -237,7 +240,7 @@ function AvailabilityCalendar({ value, onChange, unavailableRanges = [] }) {
   }
 
   return (
-    <div className="w-full rounded-2xl border border-border bg-elevated p-2 shadow-sm sm:p-4">
+    <div className="w-full rounded-2xl bg-elevated shadow-md p-2 sm:p-4">
       {/* One month on phones (cells stay tappable), the pair from md up. */}
       <div className="flex flex-col gap-6 md:flex-row md:gap-8">
         {renderMonth(viewMonth)}

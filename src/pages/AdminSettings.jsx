@@ -4,13 +4,14 @@ import { Button, Label, Spinner, TextInput } from 'flowbite-react';
 import { Camera, CircleAlert, LockKeyhole, LogOut, ShieldCheck, UserRound } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Admin account settings, inside the admin workspace. /profile is the traveller
 // side of the product: it carries bookings, favourites, verification and payout
 // fields an administrator never touches, and leaving /admin to correct a name
 // reads as the wrong section. Same endpoints back both, so no server work.
 
-const CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
+const CARD = 'rounded-xl bg-elevated shadow-md p-5';
 const CHIP_ICON = 'grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary-50 dark:bg-primary/15 text-primary-600';
 
 function Panel({ title, description, icon: Icon, children }) {
@@ -38,32 +39,34 @@ function Message({ tone, children }) {
   return (
     <p
       role={isError ? 'alert' : 'status'}
-      className={`rounded-lg px-3 py-2 text-sm ${isError ? 'border border-red-200 bg-red-50 text-red-700' : 'border border-green-200 bg-green-50 text-green-700'}`}
+      className={`rounded-lg px-3 py-2 text-center text-sm ${isError ? 'border border-red-200 bg-red-50 text-red-700' : 'border border-green-200 bg-green-50 text-green-700'}`}
     >
       {children}
     </p>
   );
 }
 
-function formatDate(value) {
-  if (!value) return 'Unknown';
+// Takes t because the fallback is user-facing copy, not a sentinel value.
+function formatDate(value, t) {
+  if (!value) return t('admin.unknown');
   const date = new Date(value);
   return Number.isNaN(date.getTime())
-    ? 'Unknown'
+    ? t('admin.unknown')
     : date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 // Mirrors passwordChangeSchema, so the form refuses what the API would reject
 // instead of spending a round trip to say the same thing.
-function passwordProblem(next, confirmation) {
-  if (next.length < 8) return 'The new password must be at least 8 characters.';
-  if (!/[A-Z]/.test(next)) return 'The new password needs at least one uppercase letter.';
-  if (!/[0-9]/.test(next)) return 'The new password needs at least one number.';
-  if (next !== confirmation) return 'The two new passwords do not match.';
+function passwordProblem(next, confirmation, t) {
+  if (next.length < 8) return t('admin.passwordTooShort');
+  if (!/[A-Z]/.test(next)) return t('admin.passwordNeedsUppercase');
+  if (!/[0-9]/.test(next)) return t('admin.passwordNeedsNumber');
+  if (next !== confirmation) return t('admin.passwordMismatch');
   return '';
 }
 
 export default function AdminSettings() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { user, setUser, logout } = useAuth();
   const fileInput = useRef(null);
@@ -103,7 +106,10 @@ export default function AdminSettings() {
         });
       })
       .catch((cause) => {
-        if (!cancelled) setLoadError(cause.response?.data?.error || 'Could not load your account.');
+        // The message itself is translated at render time by the fallback below,
+        // so this effect stays independent of the active language: re-running it
+        // on a language switch would discard anything typed into the form.
+        if (!cancelled) setLoadError(cause.response?.data?.error || '');
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -114,7 +120,7 @@ export default function AdminSettings() {
   async function saveDetails(event) {
     event.preventDefault();
     if (!form.firstName.trim() || !form.lastName.trim()) {
-      setDetailsError('First and last name are both required.');
+      setDetailsError(t('admin.namesRequired'));
       setDetailsMessage('');
       return;
     }
@@ -133,9 +139,9 @@ export default function AdminSettings() {
       // save that only updated this page would look like it silently failed.
       // setUser takes a plain object, not an updater, hence the manual spread.
       setUser({ ...user, ...saved });
-      setDetailsMessage('Your details were saved.');
+      setDetailsMessage(t('admin.detailsSaved'));
     } catch (cause) {
-      setDetailsError(cause.response?.data?.error || 'Could not save your details.');
+      setDetailsError(cause.response?.data?.error || t('admin.detailsSaveFailed'));
     } finally {
       setSavingDetails(false);
     }
@@ -147,11 +153,11 @@ export default function AdminSettings() {
     event.target.value = '';
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      setAvatarError('Choose a JPEG, PNG or WebP image.');
+      setAvatarError(t('admin.chooseImage'));
       return;
     }
     if (file.size > 5 * 1024 * 1024) {
-      setAvatarError('The photo must be 5MB or smaller.');
+      setAvatarError(t('admin.photoTooLarge'));
       return;
     }
     setAvatarBusy(true);
@@ -165,7 +171,7 @@ export default function AdminSettings() {
       setProfile((previous) => ({ ...previous, ...saved }));
       setUser({ ...user, ...saved });
     } catch (cause) {
-      setAvatarError(cause.response?.data?.error || 'Could not upload that photo.');
+      setAvatarError(cause.response?.data?.error || t('admin.photoUploadFailed'));
     } finally {
       setAvatarBusy(false);
     }
@@ -173,9 +179,9 @@ export default function AdminSettings() {
 
   async function savePassword(event) {
     event.preventDefault();
-    const problem = passwordProblem(passwords.next, passwords.confirm);
+    const problem = passwordProblem(passwords.next, passwords.confirm, t);
     if (!passwords.current) {
-      setPasswordError('Enter your current password.');
+      setPasswordError(t('admin.enterCurrentPassword'));
       setPasswordMessage('');
       return;
     }
@@ -193,9 +199,9 @@ export default function AdminSettings() {
         newPassword: passwords.next,
       });
       setPasswords({ current: '', next: '', confirm: '' });
-      setPasswordMessage('Password updated. Every other session has been signed out, and this one ends when the current access token expires.');
+      setPasswordMessage(t('admin.passwordUpdated'));
     } catch (cause) {
-      setPasswordError(cause.response?.data?.error || 'Could not change your password.');
+      setPasswordError(cause.response?.data?.error || t('admin.passwordChangeFailed'));
     } finally {
       setSavingPassword(false);
     }
@@ -214,10 +220,10 @@ export default function AdminSettings() {
   if (loading) {
     return (
       <div className="space-y-8">
-        <div className="flex flex-col items-center gap-2 rounded-xl border border-border bg-elevated px-5 py-16 text-center shadow-sm" role="status" aria-label="Loading account settings">
+        <div className="flex flex-col items-center gap-2 rounded-xl bg-elevated shadow-md px-5 py-16 text-center" role="status" aria-label={t('admin.loadingSettings')}>
           <Spinner size="lg" aria-hidden="true" />
-          <strong className="text-sm font-semibold text-navy">Loading account...</strong>
-          <p className="text-xs text-muted">Fetching your admin profile.</p>
+          <strong className="text-sm font-semibold text-navy">{t('admin.loadingAccount')}</strong>
+          <p className="text-xs text-muted">{t('admin.loadingAccountHint')}</p>
         </div>
       </div>
     );
@@ -227,45 +233,45 @@ export default function AdminSettings() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Account settings</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.navAccountSettings')}</h1>
         </div>
         <section className={`${CARD} text-center`}>
           <span className="mx-auto grid h-11 w-11 place-items-center rounded-full bg-primary-50 dark:bg-primary/15 text-primary-600">
             <CircleAlert className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
           </span>
-          <p role="alert" className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
-            {loadError || 'Your account could not be loaded.'}
+          <p role="alert" className="mx-auto mt-3 max-w-md text-center text-sm leading-relaxed text-muted">
+            {loadError || t('admin.accountLoadFailed')}
           </p>
-          <Button className="mx-auto mt-4 w-fit" size="sm" onClick={() => window.location.reload()}>Try again</Button>
+          <Button className="mx-auto mt-4 w-fit" size="sm" onClick={() => window.location.reload()}>{t('common.retry')}</Button>
         </section>
       </div>
     );
   }
 
-  const displayName = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || 'Administrator';
+  const displayName = [profile.firstName, profile.lastName].filter(Boolean).join(' ') || t('admin.administrator');
   const initials = `${profile.firstName?.[0] || ''}${profile.lastName?.[0] || ''}`.toUpperCase() || 'A';
   const usesGoogleSignIn = Boolean(profile.googleId);
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Account settings</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.navAccountSettings')}</h1>
         <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">
-          Your own administrator account: the name and photo on admin actions, and the password that protects them.
+          {t('admin.settingsLede')}
         </p>
       </div>
 
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-8">
           <Panel
-            title="Your details"
-            description="Shown beside every decision you record in the admin workspace."
+            title={t('admin.yourDetails')}
+            description={t('admin.yourDetailsHint')}
             icon={UserRound}
           >
             <form onSubmit={saveDetails} className="flex flex-col gap-5">
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="admin-first-name" className="mb-1.5 block">First name</Label>
+                  <Label htmlFor="admin-first-name" className="mb-1.5 block">{t('common.firstName')}</Label>
                   <TextInput
                     id="admin-first-name"
                     value={form.firstName}
@@ -274,7 +280,7 @@ export default function AdminSettings() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="admin-last-name" className="mb-1.5 block">Last name</Label>
+                  <Label htmlFor="admin-last-name" className="mb-1.5 block">{t('common.lastName')}</Label>
                   <TextInput
                     id="admin-last-name"
                     value={form.lastName}
@@ -284,7 +290,7 @@ export default function AdminSettings() {
                 </div>
               </div>
               <div>
-                <Label htmlFor="admin-phone" className="mb-1.5 block">Phone</Label>
+                <Label htmlFor="admin-phone" className="mb-1.5 block">{t('admin.phone')}</Label>
                 <TextInput
                   id="admin-phone"
                   value={form.phone}
@@ -294,15 +300,15 @@ export default function AdminSettings() {
                 />
               </div>
               <div>
-                <Label htmlFor="admin-email" className="mb-1.5 block">Email</Label>
+                <Label htmlFor="admin-email" className="mb-1.5 block">{t('admin.email')}</Label>
                 <TextInput id="admin-email" value={profile.email || ''} readOnly disabled />
                 {/* This address is the login credential and the send target for
                     account recovery; a silent self-service change locks people out. */}
-                <p className="mt-1.5 text-xs text-muted">Email changes go through support so sign-in and account history stay attached.</p>
+                <p className="mt-1.5 text-xs text-muted">{t('admin.emailLockedHint')}</p>
               </div>
               <div className="flex flex-col gap-2 border-t border-border pt-4">
                 <Button type="submit" disabled={savingDetails} className="w-full sm:w-fit">
-                  {savingDetails ? 'Saving...' : 'Save details'}
+                  {savingDetails ? t('common.saving') : t('admin.saveDetails')}
                 </Button>
                 <Message tone="error">{detailsError}</Message>
                 <Message>{detailsMessage}</Message>
@@ -311,20 +317,20 @@ export default function AdminSettings() {
           </Panel>
 
           <Panel
-            title="Password"
+            title={t('common.password')}
             description={usesGoogleSignIn
-              ? 'This account signs in with Google, so there is no password to manage here.'
-              : 'Changing it ends every other session on this account.'}
+              ? t('admin.passwordGoogleSignIn')
+              : t('admin.passwordChangeHint')}
             icon={LockKeyhole}
           >
             {usesGoogleSignIn ? (
               <p className="text-sm leading-relaxed text-muted">
-                Sign-in runs through Google. Manage the credential in your Google account, or contact support to add a password.
+                {t('admin.passwordGoogleBody')}
               </p>
             ) : (
               <form onSubmit={savePassword} className="flex flex-col gap-5">
                 <div>
-                  <Label htmlFor="admin-current-password" className="mb-1.5 block">Current password</Label>
+                  <Label htmlFor="admin-current-password" className="mb-1.5 block">{t('admin.currentPassword')}</Label>
                   <TextInput
                     id="admin-current-password"
                     type="password"
@@ -335,7 +341,7 @@ export default function AdminSettings() {
                 </div>
                 <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="admin-new-password" className="mb-1.5 block">New password</Label>
+                    <Label htmlFor="admin-new-password" className="mb-1.5 block">{t('admin.newPassword')}</Label>
                     <TextInput
                       id="admin-new-password"
                       type="password"
@@ -345,7 +351,7 @@ export default function AdminSettings() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="admin-confirm-password" className="mb-1.5 block">Confirm new password</Label>
+                    <Label htmlFor="admin-confirm-password" className="mb-1.5 block">{t('admin.confirmNewPassword')}</Label>
                     <TextInput
                       id="admin-confirm-password"
                       type="password"
@@ -355,10 +361,10 @@ export default function AdminSettings() {
                     />
                   </div>
                 </div>
-                <p className="text-xs text-muted">At least 8 characters, with one uppercase letter and one number.</p>
+                <p className="text-xs text-muted">{t('admin.passwordRules')}</p>
                 <div className="flex flex-col gap-2 border-t border-border pt-4">
                   <Button type="submit" disabled={savingPassword} className="w-full sm:w-fit">
-                    {savingPassword ? 'Updating...' : 'Update password'}
+                    {savingPassword ? t('admin.updating') : t('admin.updatePassword')}
                   </Button>
                   <Message tone="error">{passwordError}</Message>
                   <Message>{passwordMessage}</Message>
@@ -370,7 +376,7 @@ export default function AdminSettings() {
 
         <aside className="space-y-8">
           <section className={CARD}>
-            <h2 className="text-base font-semibold text-navy">Your account</h2>
+            <h2 className="text-base font-semibold text-navy">{t('admin.yourAccount')}</h2>
             <div className="mt-5 flex items-center gap-3">
               <span className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-bg text-sm font-bold text-white">
                 {profile.avatar
@@ -387,10 +393,10 @@ export default function AdminSettings() {
               <span className="inline-flex items-center rounded-full bg-primary-50 dark:bg-primary/15 px-2.5 py-1 text-[11px] font-semibold text-navy">
                 {profile.role || 'ADMIN'}
               </span>
-              <span className="text-xs text-muted">Member since {formatDate(profile.createdAt)}</span>
+              <span className="text-xs text-muted">{t('admin.memberSince', { date: formatDate(profile.createdAt, t) })}</span>
             </div>
 
-            <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={uploadAvatar} aria-label="Upload a new profile photo" />
+            <input ref={fileInput} type="file" accept="image/*" className="hidden" onChange={uploadAvatar} aria-label={t('admin.uploadPhotoAria')} />
             <Button
               color="light"
               size="sm"
@@ -399,28 +405,27 @@ export default function AdminSettings() {
               onClick={() => fileInput.current?.click()}
             >
               <Camera className="mr-1.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
-              {avatarBusy ? 'Uploading...' : 'Change photo'}
+              {avatarBusy ? t('admin.uploading') : t('admin.changePhoto')}
             </Button>
             <div className="mt-3">
               <Message tone="error">{avatarError}</Message>
             </div>
-            <p className="mt-3 text-xs text-muted">JPEG, PNG or WebP, up to 5MB.</p>
+            <p className="mt-3 text-xs text-muted">{t('admin.photoHint')}</p>
           </section>
 
           <section className={CARD}>
             <div className="flex items-start justify-between gap-3">
-              <h2 className="text-base font-semibold text-navy">This session</h2>
+              <h2 className="text-base font-semibold text-navy">{t('admin.thisSession')}</h2>
               <span className={CHIP_ICON}>
                 <ShieldCheck className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
               </span>
             </div>
             <p className="mt-4 text-sm leading-relaxed text-muted">
-              You are signed in as <span className="font-medium text-charcoal">{profile.email}</span>. Admin access is limited to
-              reviews, accounts and platform settings.
+              {t('admin.signedInAs')} <span className="font-medium text-charcoal">{profile.email}</span>{t('admin.signedInTail')}
             </p>
             <Button color="light" size="sm" className="mt-5 w-full" disabled={signingOut} onClick={handleSignOut}>
               <LogOut className="mr-1.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
-              {signingOut ? 'Signing out...' : 'Sign out'}
+              {signingOut ? t('admin.signingOut') : t('admin.signOut')}
             </Button>
           </section>
         </aside>

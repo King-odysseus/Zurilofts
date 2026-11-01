@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { CircleUserRound, Home, Heart, Luggage, MessageCircleMore } from 'lucide-react';
 import { useMode } from '../context/ModeContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Paths where global navigation (including these tabs) is intentionally
 // hidden: checkout and payment results (compact logo/back header only), and the host/admin
@@ -19,7 +20,7 @@ function isHiddenPath(pathname) {
 const TABS = [
   {
     key: 'home',
-    label: 'Home',
+    label: 'mobileNav.home',
     to: '/',
     match: (p) => p === '/' || p.startsWith('/properties') || p.startsWith('/property/'),
     icon: (active) => (
@@ -28,7 +29,7 @@ const TABS = [
   },
   {
     key: 'saved',
-    label: 'Saved',
+    label: 'mobileNav.saved',
     to: '/favourites',
     match: (p) => p.startsWith('/favourites') || p.startsWith('/shortlists'),
     icon: (active) => (
@@ -37,7 +38,7 @@ const TABS = [
   },
   {
     key: 'trips',
-    label: 'Trips',
+    label: 'mobileNav.trips',
     to: '/trips',
     match: (p) => p.startsWith('/trips') || p.startsWith('/bookings'),
     icon: (active) => (
@@ -46,7 +47,7 @@ const TABS = [
   },
   {
     key: 'messages',
-    label: 'Inbox',
+    label: 'mobileNav.inbox',
     to: '/inbox',
     match: (p) => p.startsWith('/inbox') || p.startsWith('/messages') || p.startsWith('/disputes'),
     icon: (active) => (
@@ -55,7 +56,7 @@ const TABS = [
   },
   {
     key: 'profile',
-    label: 'Profile',
+    label: 'mobileNav.profile',
     to: '/profile',
     match: (p) => p.startsWith('/profile') || p.startsWith('/verify-identity') || p.startsWith('/login') || p.startsWith('/register'),
     icon: (active) => (
@@ -77,6 +78,7 @@ const TABS = [
  * remember to add its own spacer.
  */
 function MobileBottomNav() {
+  const { t } = useLanguage();
   const location = useLocation();
   const { mode } = useMode();
   const hidden = isHiddenPath(location.pathname) || mode === 'hosting';
@@ -95,7 +97,7 @@ function MobileBottomNav() {
   // inline, where it also stays visible to whoever restyles this bar next.
   return (
     <nav
-      aria-label="Primary"
+      aria-label={t('a11y1.primaryNav')}
       style={{ paddingBottom: 'calc(6px + env(safe-area-inset-bottom))' }}
       className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto grid max-w-[390px] grid-cols-5 items-stretch rounded-full border border-border bg-elevated text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] md:hidden"
     >
@@ -119,7 +121,7 @@ function MobileBottomNav() {
             <span className="relative flex h-[18px] w-[18px] items-center justify-center">
               {tab.icon(active)}
             </span>
-            <span className="w-full truncate text-center">{tab.label}</span>
+            <span className="w-full truncate text-center">{t(tab.label)}</span>
           </Link>
         );
       })}

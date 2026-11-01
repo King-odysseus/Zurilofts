@@ -6,6 +6,7 @@ import { Button } from 'flowbite-react';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
 import { generateInvoice } from '../utils/invoice.js';
@@ -74,6 +75,7 @@ MoneyRow.propTypes = {
 };
 
 function BookingDetailPage() {
+  const { t } = useLanguage();
   const { bookingId: routeId } = useParams();
   const { pathname } = useLocation();
   // The app switches on pathname instead of declaring <Route>s, so useParams is
@@ -163,20 +165,20 @@ function BookingDetailPage() {
 
   if (loading) {
     return (
-      <GuestAccountLayout active="bookings" eyebrow="Reservation" title="Booking details" description="Loading your reservation.">
-        <div className="opg-trip-loading" aria-label="Loading booking"><span /><span /><span /></div>
+      <GuestAccountLayout active="bookings" eyebrow={t('booking.reservation')} title={t('booking.bookingDetails')} description={t('booking.loadingReservation')}>
+        <div className="opg-trip-loading" aria-label={t('a11y2.loadingBooking')}><span /><span /><span /></div>
       </GuestAccountLayout>
     );
   }
 
   if (notFound) {
     return (
-      <GuestAccountLayout active="bookings" eyebrow="Reservation" title="Booking details" description="We could not find that reservation.">
+      <GuestAccountLayout active="bookings" eyebrow={t('booking.reservation')} title={t('booking.bookingDetails')} description={t('booking.bookingNotFoundHint')}>
         <div className="opg-trip-empty">
           <ClipboardList strokeWidth={1.6} aria-hidden="true" />
-          <h2>Booking not found</h2>
+          <h2>{t('booking.bookingNotFound')}</h2>
           <p>It may have been removed, or it does not belong to this account.</p>
-          <Button as={Link} to="/bookings" size="sm">Back to bookings</Button>
+          <Button as={Link} to="/bookings" size="sm">{t('booking.backToBookings')}</Button>
         </div>
       </GuestAccountLayout>
     );
@@ -184,7 +186,7 @@ function BookingDetailPage() {
 
   if (error || !booking) {
     return (
-      <GuestAccountLayout active="bookings" eyebrow="Reservation" title="Booking details" description="Something went wrong.">
+      <GuestAccountLayout active="bookings" eyebrow={t('booking.reservation')} title={t('booking.bookingDetails')} description={t('common.somethingWentWrong')}>
         <div className="opg-trip-error">
           <p>{error || 'Could not load this booking. Please try again.'}</p>
           <Button className="mx-auto w-fit" size="sm" type="button" onClick={() => window.location.reload()}>Try again</Button>
@@ -199,48 +201,48 @@ function BookingDetailPage() {
   return (
     <GuestAccountLayout
       active="bookings"
-      eyebrow="Reservation"
-      title={property.title || 'Booking details'}
-      description={`Booked ${formatDate(booking.createdAt)}`}
-      action={<Button as={Link} to="/bookings" className="w-fit max-md:mt-3.5" size="sm">All bookings</Button>}
+      eyebrow={t('booking.reservation')}
+      title={property.title || t('booking.bookingDetails')}
+      description={t('booking.bookedOn', { date: formatDate(booking.createdAt) })}
+      action={<Button as={Link} to="/bookings" className="w-fit max-md:mt-3.5" size="sm">{t('booking.allBookings')}</Button>}
     >
-      <article className="opg-history-card rounded-xl border border-border">
-        <Link to={`/property/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={`View ${property.title || 'stay'}`}>
+      <article className="opg-history-card rounded-xl shadow-md">
+        <Link to={`/property/${property.id || booking.propertyId}`} className="opg-history-image" aria-label={t('a11y2.viewStay', { name: property.title || t('a11y2.stay') })}>
           <img src={image} alt="" />
         </Link>
         <div className="opg-history-copy">
           <div className="opg-history-title-row">
             <div>
-              <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || 'Property'}</Link></h2>
+              <h2><Link to={`/property/${property.id || booking.propertyId}`}>{property.title || t('booking.propertyUnavailable')}</Link></h2>
               <p><MapPin size={13} aria-hidden="true" /> {property.location || 'Nairobi'}</p>
             </div>
             <span className={`${STATUS_PILL} ${status.className}`}>{status.label}</span>
           </div>
 
           <dl className="opg-history-meta !mt-6">
-            <div><dt>Check-in</dt><dd>{formatDate(booking.checkIn)}</dd></div>
-            <div><dt>Check-out</dt><dd>{formatDate(booking.checkOut)}</dd></div>
-            <div><dt>Guests</dt><dd>{booking.guests || 1}</dd></div>
-            <div><dt>Total</dt><dd>{formatCurrency(booking.total)}</dd></div>
+            <div><dt>{t('booking.checkIn')}</dt><dd>{formatDate(booking.checkIn)}</dd></div>
+            <div><dt>{t('booking.checkOut')}</dt><dd>{formatDate(booking.checkOut)}</dd></div>
+            <div><dt>{t('booking.guests')}</dt><dd>{booking.guests || 1}</dd></div>
+            <div><dt>{t('booking.total')}</dt><dd>{formatCurrency(booking.total)}</dd></div>
           </dl>
 
           <dl className="opg-history-meta !mt-6">
-            <div><dt>Arrival time</dt><dd>{formatTime(booking.checkInTime)}</dd></div>
-            <div><dt>Departure time</dt><dd>{formatTime(booking.checkOutTime)}</dd></div>
-            <div><dt>Payment</dt><dd>{booking.paidAt ? `Paid ${formatDate(booking.paidAt)}` : (booking.paymentMethod || '-')}</dd></div>
-            <div><dt>Reference</dt><dd>{booking.id.slice(-8).toUpperCase()}</dd></div>
+            <div><dt>{t('booking.arrivalTime')}</dt><dd>{formatTime(booking.checkInTime)}</dd></div>
+            <div><dt>{t('booking.departureTime')}</dt><dd>{formatTime(booking.checkOutTime)}</dd></div>
+            <div><dt>{t('booking.payment')}</dt><dd>{booking.paidAt ? `Paid ${formatDate(booking.paidAt)}` : (booking.paymentMethod || '-')}</dd></div>
+            <div><dt>{t('booking.reference')}</dt><dd>{booking.id.slice(-8).toUpperCase()}</dd></div>
           </dl>
         </div>
       </article>
 
-      <section className="opg-detail-panel !mt-6 rounded-xl border border-border" aria-labelledby="detail-payment">
-        <h2 id="detail-payment" className="!mb-5">Payment summary</h2>
+      <section className="opg-detail-panel !mt-6 rounded-xl shadow-md" aria-labelledby="detail-payment">
+        <h2 id="detail-payment" className="!mb-5">{t('booking.paymentSummary')}</h2>
         <dl className="opg-detail-money">
-          <MoneyRow label={`Accommodation (${booking.bedOption === '2bed' ? '2-bed' : '1-bed'})`} value={formatCurrency(booking.subtotal)} />
-          {booking.lateCheckoutFee > 0 && <MoneyRow label="Late check-out" value={formatCurrency(booking.lateCheckoutFee)} />}
-          <MoneyRow label="Cleaning fee" value={formatCurrency(booking.cleaningFee)} />
-          <MoneyRow label="Service fee" value={formatCurrency(booking.serviceFee)} />
-          {booking.addonsSubtotal > 0 && <MoneyRow label="Add-ons" value={formatCurrency(booking.addonsSubtotal)} />}
+          <MoneyRow label={t('booking.accommodation', { bed: booking.bedOption === '2bed' ? '2-bed' : '1-bed' })} value={formatCurrency(booking.subtotal)} />
+          {booking.lateCheckoutFee > 0 && <MoneyRow label={t('booking.lateCheckout')} value={formatCurrency(booking.lateCheckoutFee)} />}
+          <MoneyRow label={t('booking.cleaningFee')} value={formatCurrency(booking.cleaningFee)} />
+          <MoneyRow label={t('booking.serviceFee')} value={formatCurrency(booking.serviceFee)} />
+          {booking.addonsSubtotal > 0 && <MoneyRow label={t('booking.addOns')} value={formatCurrency(booking.addonsSubtotal)} />}
           {booking.discountAmount > 0 && (
             <MoneyRow
               label={`Promo${booking.promoCode?.code ? ` (${booking.promoCode.code})` : ''}`}
@@ -250,7 +252,7 @@ function BookingDetailPage() {
           {/* The total sits 32px below the last money row (16px margin plus 16px
               padding above the rule) instead of the previous 22px. */}
           <div className="opg-detail-money-total !mt-4 !pt-4">
-            <dt>Total</dt>
+            <dt>{t('booking.total')}</dt>
             <dd>{formatCurrency(booking.total)}</dd>
           </div>
         </dl>
@@ -260,17 +262,17 @@ function BookingDetailPage() {
         <div className="opg-history-actions">
           {canResumePayment && (
             <Button size="sm" type="button" onClick={resumePayment} disabled={paymentPending}>
-              {paymentPending ? 'Opening payment...' : 'Complete payment'}
+              {paymentPending ? t('booking.openingPayment') : t('booking.completePayment')}
             </Button>
           )}
-          {!isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message guest'}</Button>}
-          {isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</Button>}
-          <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>Invoice</Button>
+          {!isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? t('booking.opening') : t('booking.messageGuest')}</Button>}
+          {isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? t('booking.opening') : t('booking.messageHost')}</Button>}
+          <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>{t('booking.invoice')}</Button>
           {calendarReady && (
-            <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>Add to calendar</Button>
+            <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>{t('booking.addToCalendar')}</Button>
           )}
           {calendarLink && (
-            <Button as="a" href={calendarLink} target="_blank" rel="noopener noreferrer" color="light" size="sm">Google Calendar</Button>
+            <Button as="a" href={calendarLink} target="_blank" rel="noopener noreferrer" color="light" size="sm">{t('booking.googleCalendar')}</Button>
           )}
           <Button as={Link} to={`/property/${property.id || booking.propertyId}`} color="light" size="sm">View stay</Button>
           <Button as={Link} to={isGuestOwner ? '/trips' : '/host/today'} color="light" size="sm">{isGuestOwner ? 'My trips' : 'Today'}</Button>

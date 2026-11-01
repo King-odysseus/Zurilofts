@@ -423,8 +423,8 @@ function Navbar() {
                 }}
                 aria-expanded={searchOpen}
                 aria-controls="navbar-search"
-                aria-label="Search stays"
-                title="Search stays"
+                aria-label={t('nav.searchStays')}
+                title={t('nav.searchStays')}
                 className={`grid h-10 w-10 place-items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C] focus-visible:ring-offset-2 ${
                   needsWhiteNav ? 'text-[#203565] hover:bg-[#F4F0E8]' : 'text-white hover:bg-white/10'
                 }`}
@@ -441,11 +441,11 @@ function Navbar() {
                     onClick={() => setNotifOpen((o) => !o)}
                     aria-haspopup="true"
                     aria-expanded={notifOpen}
-                    aria-label="Notifications"
+                    aria-label={t('host.notifications')}
                     className={`rounded-full p-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C] focus-visible:ring-offset-2 ${
                       needsWhiteNav ? 'text-[#203565] hover:bg-surface' : 'text-white hover:bg-white/10'
                     }`}
-                    title="Notifications"
+                    title={t('host.notifications')}
                   >
                     <Bell className="w-5 h-5" strokeWidth={2} aria-hidden="true" />
                   </button>
@@ -520,7 +520,7 @@ function Navbar() {
                     onClick={() => { setMenuOpen(false); setDropdownOpen((open) => !open); }}
                     aria-haspopup="true"
                     aria-expanded={dropdownOpen}
-                    aria-label="Open menu"
+                    aria-label={t('trust.openMenu')}
                     className="flex items-center space-x-2 px-2 py-2 rounded-full hover:bg-[#F4F0E8] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C] focus-visible:ring-offset-2"
                   >
                     <div className="relative w-8 h-8 bg-[#16294B] rounded-full flex items-center justify-center text-sm font-bold text-white overflow-hidden">
@@ -666,7 +666,7 @@ function Navbar() {
                 label={<><span className="sr-only">Open account menu</span><span className="zl-header-avatar-icon" aria-hidden="true"><CircleUserRound strokeWidth={1.8} /></span></>}
                 arrowIcon={false}
                 placement="bottom-end"
-                aria-label="Open account menu"
+                aria-label={t('trust.openAccountMenu')}
               >
                 <DropdownItem onClick={() => navigate('/login')}>{t('nav.signIn')}</DropdownItem>
                 <DropdownItem onClick={() => navigate('/register')}>{t('nav.createAccount')}</DropdownItem>
@@ -701,7 +701,7 @@ function Navbar() {
               }`}
               aria-controls="navbar-main"
               aria-expanded={menuOpen}
-              aria-label="Toggle navigation menu"
+              aria-label={t('trust.toggleNavigation')}
             >
               <span className="sr-only">Open main menu</span>
               {menuOpen ? (
@@ -726,8 +726,8 @@ function Navbar() {
               <button
                 type="button"
                 onClick={() => { setSearchOpen(false); setSearchQuery(''); }}
-                aria-label="Close search"
-                title="Close search"
+                aria-label={t('nav.closeSearch')}
+                title={t('nav.closeSearch')}
                 className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-[#5B6B82] transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
               >
                 <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
@@ -736,7 +736,7 @@ function Navbar() {
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
                 placeholder="Where do you want to stay?"
-                aria-label="Search destination"
+                aria-label={t('trust.searchDestination')}
                 sizing="sm"
                 className="min-w-0 flex-1"
                 autoFocus
@@ -752,7 +752,7 @@ function Navbar() {
         {menuOpen && (
           <button
             type="button"
-            aria-label="Close menu"
+            aria-label={t('trust.closeMenu')}
             onClick={() => setMenuOpen(false)}
             className="fixed inset-0 top-16 z-10 bg-black/20"
           />
@@ -761,8 +761,8 @@ function Navbar() {
           id="navbar-main"
           role="dialog"
           aria-modal="true"
-          aria-label="Account and navigation menu"
-          className={`fixed left-1/2 top-20 z-30 flex w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-6rem)] -translate-x-1/2 flex-col overflow-hidden rounded-2xl border border-[#E3E8EF] bg-elevated shadow-[0_20px_60px_rgba(20,58,128,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
+          aria-label={t('trust.accountAndNavigation')}
+          className={`fixed left-1/2 top-20 z-30 flex w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-6rem)] -translate-x-1/2 flex-col overflow-hidden rounded-2xl bg-elevated shadow-[0_20px_60px_rgba(20,58,128,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
         >
           <div className="flex shrink-0 items-center justify-between border-b border-[#E3E8EF] bg-elevated px-4 py-3">
             <div className="flex items-center gap-3 min-w-0">
@@ -781,7 +781,7 @@ function Navbar() {
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
-              aria-label="Close menu"
+              aria-label={t('trust.closeMenu')}
               className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-[#203565] transition hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
             >
               <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />

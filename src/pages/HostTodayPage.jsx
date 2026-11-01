@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import { CalendarDays } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
+import { useLanguage } from "../context/LanguageContext.jsx";
 import apiClient from "../api/client.js";
 import { firstImage } from "../utils/images.js";
 import HostCard, { HOST_EYEBROW } from "../components/HostCard.jsx";
@@ -14,8 +15,8 @@ const TONE_COLORS = { arrival: "info", inhouse: "warning", departure: "success" 
 
 const SKELETON_HEIGHTS = ["h-24", "h-44", "h-24", "h-64"];
 
-function formatToday() {
-  return new Date().toLocaleDateString("en-KE", { weekday: "long", day: "numeric", month: "long" });
+function formatToday(lang) {
+  return new Date().toLocaleDateString(lang === 'sw' ? 'sw-KE' : 'en-KE', { weekday: 'long', day: 'numeric', month: 'long' });
 }
 
 function guestName(booking) {
@@ -31,7 +32,7 @@ function guestInitials(booking) {
 function bookingTime(booking, type) {
   if (type === "arrival") return booking.checkInTime || "15:00";
   if (type === "departure") return booking.checkOutTime || "10:00";
-  return "In house";
+  return 'host.inHouse';
 }
 
 function relativeTime(iso) {
@@ -47,6 +48,7 @@ function relativeTime(iso) {
 }
 
 function GuestOperationCard({ booking, type, compact = false, onMessage, messagePending }) {
+  const { t } = useLanguage();
   const property = booking.property || {};
   const image = firstImage(property) || property.coverImage;
   const propertyTitle = property.title || "Your stay";
@@ -64,9 +66,9 @@ function GuestOperationCard({ booking, type, compact = false, onMessage, message
       <span className="block truncate text-xs text-muted">{propertyTitle} · {time}</span>
       {/* A guest conversation belongs to the host inbox. This used to open the
           traveller support thread, which is a different inbox entirely. */}
-      <button type="button" onClick={() => onMessage(booking.id)} disabled={messagePending} className="mt-1.5 text-xs font-semibold text-navy underline-offset-2 hover:underline disabled:opacity-60">{messagePending ? "Opening..." : "Message guest"}</button>
+      <button type="button" onClick={() => onMessage(booking.id)} disabled={messagePending} className="mt-1.5 text-xs font-semibold text-navy underline-offset-2 hover:underline disabled:opacity-60">{messagePending ? t('host.opening') : t('host.messageGuest')}</button>
     </div>
-    <Link className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-navy" to={`/host/reservations/${booking.id}`}>View</Link>
+    <Link className="shrink-0 text-xs font-semibold text-muted transition-colors hover:text-navy" to={`/host/reservations/${booking.id}`}>{t('host.view')}</Link>
   </article>;
 }
 
@@ -90,15 +92,17 @@ GuestOperationCard.propTypes = {
   messagePending: PropTypes.bool,
 };
 
-function EmptyPanel({ label }) {
+function EmptyPanel({ kind }) {
+  const { t } = useLanguage();
+  const message = t(kind === 'arrival' ? 'host.noArrivals' : kind === 'departure' ? 'host.noDepartures' : 'host.noInHouse');
   return <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-elevated px-5 py-12 text-center">
     <span className="grid h-9 w-9 place-items-center rounded-full bg-surface text-muted"><CalendarDays className="h-4 w-4" strokeWidth={1.6} aria-hidden="true" /></span>
-    <strong className="text-sm font-semibold text-navy">No {label.toLowerCase()} today</strong>
-    <p className="text-xs text-muted">This panel will update when the schedule changes.</p>
+    <strong className="text-sm font-semibold text-navy">{message}</strong>
+    <p className="text-xs text-muted">{t('host.panelUpdates')}</p>
   </div>;
 }
 
-EmptyPanel.propTypes = { label: PropTypes.string.isRequired };
+EmptyPanel.propTypes = { kind: PropTypes.oneOf(['arrival', 'departure', 'inhouse']).isRequired };
 
 function StatTile({ label, hint, value }) {
   return <HostCard>
@@ -119,9 +123,10 @@ StatTile.propTypes = {
 };
 
 function OperationPanel({ title, count, tone, bookings, type, onMessage, messageBookingId }) {
-  return <HostCard title={title} action={<Badge color={TONE_COLORS[tone]}>{count} today</Badge>}>
+  const { t } = useLanguage();
+  return <HostCard title={title} action={<Badge color={TONE_COLORS[tone]}>{t('host.countToday', { count })}</Badge>}>
     <div className="space-y-4">
-      {bookings.length === 0 ? <EmptyPanel label={title} /> : bookings.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={type} compact onMessage={onMessage} messagePending={messageBookingId === booking.id} />)}
+      {bookings.length === 0 ? <EmptyPanel kind={type} /> : bookings.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={type} compact onMessage={onMessage} messagePending={messageBookingId === booking.id} />)}
     </div>
   </HostCard>;
 }
@@ -137,10 +142,11 @@ OperationPanel.propTypes = {
 };
 
 function RecentMessages({ conversations, loading }) {
+  const { t } = useLanguage();
   return <HostCard
     eyebrow="GUEST MESSAGES"
-    title="Recent conversations"
-    action={<Button as={Link} to="/host/inbox" color="light" size="sm">View inbox</Button>}
+    title={t('host.recentConversations')}
+    action={<Button as={Link} to="/host/inbox" color="light" size="sm">{t('host.viewInbox')}</Button>}
   >
     {loading
       ? <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -149,8 +155,8 @@ function RecentMessages({ conversations, loading }) {
       </div>
       : conversations.length === 0
         ? <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border px-5 py-12 text-center">
-          <strong className="text-sm font-semibold text-navy">No guest messages yet</strong>
-          <p className="text-xs text-muted">New stay conversations will appear here.</p>
+          <strong className="text-sm font-semibold text-navy">{t('host.noGuestMessages')}</strong>
+          <p className="text-xs text-muted">{t('host.noGuestMessagesHint')}</p>
         </div>
         : <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       {conversations.map((conversation) => {
@@ -175,6 +181,7 @@ RecentMessages.propTypes = {
 };
 
 export default function HostTodayPage() {
+  const { t, lang } = useLanguage();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
@@ -198,7 +205,7 @@ export default function HostTodayPage() {
         const response = await apiClient.get("/bookings/host/today");
         if (active) setData(response.data.data);
       } catch {
-        if (active) setError("Could not load today's overview. Please try again.");
+        if (active) setError(t('host.loadTodayFailed'));
       } finally {
         if (active) setLoading(false);
       }
@@ -230,7 +237,7 @@ export default function HostTodayPage() {
     loadConversations();
     loadFollowUps();
     return () => { active = false; };
-  }, [isAuthenticated]);
+  }, [isAuthenticated, t]);
 
   // The conversation is created on demand, so a host writing to a guest they have
   // never messaged lands in the same thread the guest will see.
@@ -241,19 +248,19 @@ export default function HostTodayPage() {
       const response = await apiClient.post("/conversations", { bookingId });
       navigate(`/host/inbox/${response.data.data.id}`);
     } catch {
-      setMessageError("Could not open that conversation. Please try again.");
+      setMessageError(t('host.openConversationFailed'));
     } finally {
       setMessageBookingId(null);
     }
   }
 
-  if (loading) return <div className="space-y-6" aria-label="Loading host dashboard">
+  if (loading) return <div className="space-y-6" aria-label={t('host.loadingDashboard')}>
     {SKELETON_HEIGHTS.map((height, index) => <HostCard key={`${height}-${index}`}>
       <span className={`block ${height} animate-pulse rounded-xl bg-surface`} />
     </HostCard>)}
   </div>;
 
-  if (error) return <div className="space-y-6"><HostCard><p className="text-sm text-charcoal">{error}</p><Button type="button" size="sm" onClick={() => window.location.reload()}>Try again</Button></HostCard></div>;
+  if (error) return <div className="space-y-6"><HostCard><p className="text-sm text-charcoal">{error}</p><Button type="button" size="sm" onClick={() => window.location.reload()}>{t('common.retry')}</Button></HostCard></div>;
 
   const { arrivals = [], departures = [], inHouse = [], summary = {} } = data || {};
   const priority = arrivals[0] || inHouse[0] || departures[0];
@@ -262,31 +269,38 @@ export default function HostTodayPage() {
   return <div className="space-y-8">
     <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <p className={HOST_EYEBROW}>HOST WORKSPACE</p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Today</h1>
-        <span className="mt-2 block text-sm text-muted">{formatToday()}</span>
+        <p className={HOST_EYEBROW}>{t('host.todayEyebrow')}</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('host.todayTitle')}</h1>
+        <span className="mt-2 block text-sm text-muted">{formatToday(lang)}</span>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button as={Link} to="/host/reservations" color="light" size="sm" className="hidden md:inline-flex">All reservations</Button>
-        <Button as={Link} to="/host/calendar" color="light" size="sm" className="hidden md:inline-flex">Open calendar</Button>
+        <Button as={Link} to="/host/reservations" color="light" size="sm" className="hidden md:inline-flex">{t('host.allReservations')}</Button>
+        <Button as={Link} to="/host/calendar" color="light" size="sm" className="hidden md:inline-flex">{t('host.openCalendar')}</Button>
       </div>
     </header>
 
     {messageError && <Alert color="failure">
       <div className="flex w-full flex-wrap items-center justify-between gap-3">
         <p className="min-w-0 flex-1">{messageError}</p>
-        <Button size="xs" color="light" onClick={() => setMessageError("")}>Dismiss</Button>
+        <Button size="xs" color="light" onClick={() => setMessageError("")}>{t('common.dismiss')}</Button>
       </div>
     </Alert>}
 
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
       <HostCard
         className="lg:col-span-2"
-        eyebrow="TODAY AT YOUR STAYS"
-        title={`Good ${new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}${user?.firstName ? `, ${user.firstName}` : ""}`}
-        action={<Button as={Link} to="/host/calendar" size="sm" className="md:hidden">Open calendar</Button>}
+        eyebrow={t('host.todayAtYourStays')}
+        titleClassName="text-xl sm:text-2xl"
+        title={(() => {
+          const hour = new Date().getHours();
+          const part = hour < 12 ? 'Morning' : hour < 18 ? 'Afternoon' : 'Evening';
+          return user?.firstName
+            ? t(`host.greetingNamed${part}`, { name: user.firstName })
+            : t(`host.greeting${part}`);
+        })()}
+        action={<Button as={Link} to="/host/calendar" size="sm" className="md:hidden">{t('host.openCalendar')}</Button>}
       >
-        <p className="text-sm leading-relaxed text-muted">{summary.arrivals || 0} arrivals, {summary.departures || 0} departures, and {summary.inHouse || 0} in-house guests on today&apos;s schedule.</p>
+        <p className="text-sm leading-relaxed text-muted">{t('host.daySummary', { arrivals: summary.arrivals || 0, departures: summary.departures || 0, inHouse: summary.inHouse || 0 })}</p>
       </HostCard>
       {/* White-on-navy text cannot use the shared head props, so the tint is the
           card body itself: flush removes the body padding and overflow-hidden
@@ -294,28 +308,28 @@ export default function HostTodayPage() {
       <HostCard flush className="overflow-hidden">
         <div className="flex h-full flex-col gap-4 bg-navy-bg p-4 sm:p-5">
           <div className="min-w-0">
-            <p className={HOST_EYEBROW}>PRIORITY NEXT STEP</p>
-            <h2 className="mt-1 text-base font-semibold text-white">{priority ? (priorityType === "arrival" ? "Confirm arrival details" : priorityType === "departure" ? "Review today's checkout" : "Check your in-house guest") : "Your day is clear"}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-white/70">{priority ? `${guestName(priority)} at ${priority.property?.title || "your property"} · ${bookingTime(priority, priorityType)}` : "There are no urgent guest actions scheduled right now."}</p>
+            <p className={HOST_EYEBROW}>{t('host.priorityEyebrow')}</p>
+            <h2 className="mt-1 text-base font-semibold text-white">{priority ? t(priorityType === 'arrival' ? 'host.priorityConfirmArrival' : priorityType === 'departure' ? 'host.priorityReviewCheckout' : 'host.priorityCheckInHouse') : t('host.priorityClear')}</h2>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">{priority ? t('host.priorityDetail', { guest: guestName(priority), property: priority.property?.title || t('host.yourProperty'), time: t(bookingTime(priority, priorityType)) }) : t('host.priorityClearHint')}</p>
           </div>
           {/* The card only needs its own action when there is a booking to open.
               With nothing scheduled the call to action repeated the calendar
               button already shown above, so the card stays informational. */}
-          {priority && <Button as={Link} to={`/host/reservations/${priority.id}`} size="sm" className="self-start">Review booking</Button>}
+          {priority && <Button as={Link} to={`/host/reservations/${priority.id}`} size="sm" className="self-start">{t('host.reviewBooking')}</Button>}
         </div>
       </HostCard>
     </div>
 
     <div className="hidden grid-cols-1 gap-5 sm:grid sm:grid-cols-3">
-      <StatTile label="Arrivals" hint="Guests checking in" value={summary.arrivals || 0} />
-      <StatTile label="Departures" hint="Guests checking out" value={summary.departures || 0} />
-      <StatTile label="In house" hint="Stays in progress" value={summary.inHouse || 0} />
+      <StatTile label={t('host.arrivals')} hint={t('host.hintArrivals')} value={summary.arrivals || 0} />
+      <StatTile label={t('host.departures')} hint={t('host.hintDepartures')} value={summary.departures || 0} />
+      <StatTile label={t('host.inHouse')} hint={t('host.hintInHouse')} value={summary.inHouse || 0} />
     </div>
 
     <div className="hidden gap-5 md:grid md:grid-cols-2 lg:grid-cols-3 md:[&>div:last-child]:col-span-2 lg:[&>div:last-child]:col-span-1">
-      <OperationPanel title="Arrivals" count={arrivals.length} tone="arrival" bookings={arrivals} type="arrival" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
-      <OperationPanel title="In house" count={inHouse.length} tone="inhouse" bookings={inHouse} type="inhouse" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
-      <OperationPanel title="Departures" count={departures.length} tone="departure" bookings={departures} type="departure" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
+      <OperationPanel title={t('host.arrivals')} count={arrivals.length} tone="arrival" bookings={arrivals} type="arrival" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
+      <OperationPanel title={t('host.inHouse')} count={inHouse.length} tone="inhouse" bookings={inHouse} type="inhouse" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
+      <OperationPanel title={t('host.departures')} count={departures.length} tone="departure" bookings={departures} type="departure" onMessage={openGuestConversation} messageBookingId={messageBookingId} />
     </div>
 
     <div className="md:hidden">
@@ -323,11 +337,11 @@ export default function HostTodayPage() {
           not the segments, which always read the app-wide tab theme and kept its
           p-4 padding. Three switches inside one control is small enough to draw
           directly, and then the selected and unselected looks cannot drift. */}
-      <div role="tablist" aria-label="Today's operations" className="inline-flex max-w-full flex-nowrap gap-1 rounded-full border border-border bg-surface p-1">
+      <div role="tablist" aria-label={t('a11y2.todaysOperations')} className="inline-flex max-w-full flex-nowrap gap-1 rounded-full border border-border bg-surface p-1">
         {[
-          ["arrival", "Arrivals", arrivals],
-          ["inhouse", "In house", inHouse],
-          ["departure", "Departures", departures],
+          ["arrival", t('host.arrivals'), arrivals],
+          ["inhouse", t('host.inHouse'), inHouse],
+          ["departure", t('host.departures'), departures],
         ].map(([key, label, items]) => <button
           key={key}
           type="button"
@@ -346,9 +360,9 @@ export default function HostTodayPage() {
       </div>
 
       {[
-        ["arrival", "Arrivals", arrivals],
-        ["inhouse", "In house", inHouse],
-        ["departure", "Departures", departures],
+        ["arrival", t('host.arrivals'), arrivals],
+        ["inhouse", t('host.inHouse'), inHouse],
+        ["departure", t('host.departures'), departures],
       ].filter(([key]) => key === mobileTab).map(([key, , items]) => <div
         key={key}
         role="tabpanel"
@@ -357,7 +371,7 @@ export default function HostTodayPage() {
         className="mt-6 space-y-5"
       >
         {items.length === 0
-          ? <EmptyPanel label={key === "arrival" ? "Arrivals" : key === "departure" ? "Departures" : "In-house guests"} />
+          ? <EmptyPanel kind={key} />
           : items.map((booking) => <GuestOperationCard key={booking.id} booking={booking} type={key} compact onMessage={openGuestConversation} messagePending={messageBookingId === booking.id} />)}
       </div>)}
     </div>

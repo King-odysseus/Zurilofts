@@ -5,6 +5,7 @@ import { Alert, Button, Label, TextInput } from 'flowbite-react';
 import { BadgeCheck, Banknote, CircleAlert, Smartphone } from 'lucide-react';
 import apiClient from '../api/client.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
 
 // Host settings, inside the host workspace. Payouts and profile links used to
@@ -13,9 +14,9 @@ import SelectMenu from '../components/SelectMenu.jsx';
 // money moved; only the place a host lands did.
 
 const FREQUENCY_OPTIONS = [
-  { value: 'weekly', label: 'Weekly' },
-  { value: 'monthly', label: 'Monthly' },
-  { value: 'on_demand', label: 'As soon as funds are released' },
+  { value: 'weekly', label: 'hostaccount.weekly' },
+  { value: 'monthly', label: 'hostaccount.monthly' },
+  { value: 'on_demand', label: 'hostaccount.onDemand' },
 ];
 
 function Section({ title, description, children, icon: Icon }) {
@@ -47,6 +48,7 @@ function Message({ tone, children }) {
 Message.propTypes = { tone: PropTypes.string, children: PropTypes.node };
 
 export default function HostSettingsPage() {
+  const { t } = useLanguage();
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -174,7 +176,7 @@ export default function HostSettingsPage() {
   }
 
   if (loading) {
-    return <div className="flex flex-col gap-4" role="status" aria-label="Loading host settings">
+    return <div className="flex flex-col gap-4" role="status" aria-label={t('hostaccount.loadingSettings')}>
       <span className="block h-24 animate-pulse rounded-2xl bg-inset" />
       <span className="block h-40 animate-pulse rounded-2xl bg-inset" />
       <span className="block h-28 animate-pulse rounded-2xl bg-inset" />
@@ -188,7 +190,7 @@ export default function HostSettingsPage() {
           <CircleAlert className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
         </span>
         <p className="mt-3 text-sm text-muted">{error}</p>
-        <Button className="mt-4 min-h-[44px] w-full sm:mx-auto sm:w-fit" size="sm" onClick={load}>Try again</Button>
+        <Button className="mt-4 min-h-[44px] w-full sm:mx-auto sm:w-fit" size="sm" onClick={load}>{t('common.retry')}</Button>
       </div>
     </HostCard>;
   }
@@ -198,9 +200,9 @@ export default function HostSettingsPage() {
 
   return <div className="flex flex-col gap-6 lg:gap-8">
     <header>
-      <p className={HOST_EYEBROW}>Host workspace</p>
-      <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Host settings</h1>
-      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Your host profile, how you get paid, and when funds reach you.</p>
+      <p className={HOST_EYEBROW}>{t('host.workspace')}</p>
+      <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('hostaccount.settingsTitle')}</h1>
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t('hostaccount.settingsDescription')}</p>
     </header>
 
     <HostCard>
@@ -222,8 +224,8 @@ export default function HostSettingsPage() {
     </HostCard>
 
     <Section
-      title="Your details"
-      description="The name guests see when they book, and the number we use to reach you about a stay."
+      title={t('hostaccount.yourDetails')}
+      description={t('hostaccount.yourDetailsDescription')}
       icon={BadgeCheck}
     >
       {/* One rhythm for every group: label above field, gap-6 between groups,
@@ -231,7 +233,7 @@ export default function HostSettingsPage() {
       <form onSubmit={saveProfile} className="flex flex-col gap-6">
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
-            <Label htmlFor="host-first-name" className="mb-1.5 block">First name</Label>
+            <Label htmlFor="host-first-name" className="mb-1.5 block">{t('hostaccount.firstName')}</Label>
             <TextInput
               id="host-first-name"
               value={form.firstName}
@@ -240,7 +242,7 @@ export default function HostSettingsPage() {
             />
           </div>
           <div>
-            <Label htmlFor="host-last-name" className="mb-1.5 block">Last name</Label>
+            <Label htmlFor="host-last-name" className="mb-1.5 block">{t('hostaccount.lastName')}</Label>
             <TextInput
               id="host-last-name"
               value={form.lastName}
@@ -250,7 +252,7 @@ export default function HostSettingsPage() {
           </div>
         </div>
         <div>
-          <Label htmlFor="host-phone" className="mb-1.5 block">Phone</Label>
+          <Label htmlFor="host-phone" className="mb-1.5 block">{t('hostaccount.phone')}</Label>
           <TextInput
             id="host-phone"
             value={form.phone}
@@ -259,12 +261,12 @@ export default function HostSettingsPage() {
           />
         </div>
         <div>
-          <Label htmlFor="host-email" className="mb-1.5 block">Email</Label>
+          <Label htmlFor="host-email" className="mb-1.5 block">{t('hostaccount.email')}</Label>
           <TextInput id="host-email" value={profile?.email || ''} readOnly disabled />
-          <p className="mt-1.5 text-xs text-muted">Email changes go through support so your booking history stays attached.</p>
+          <p className="mt-1.5 text-xs text-muted">{t('hostaccount.emailLocked')}</p>
         </div>
         <div className="flex flex-col gap-1 border-t border-border pt-6">
-          <Button type="submit" disabled={savingProfile} className="min-h-[44px] w-full sm:w-fit">{savingProfile ? 'Saving...' : 'Save details'}</Button>
+          <Button type="submit" disabled={savingProfile} className="min-h-[44px] w-full sm:w-fit">{savingProfile ? t('common.saving') : t('hostaccount.saveDetails')}</Button>
           <Message>{profileMessage}</Message>
           <Message tone="error">{profileError}</Message>
         </div>
@@ -272,15 +274,15 @@ export default function HostSettingsPage() {
     </Section>
 
     <Section
-      title="How you get paid"
+      title={t('hostaccount.howYouGetPaid')}
       description={hasDestination ? 'Guests pay the platform; your share is paid out to this destination.' : 'Add a destination so your earnings can be paid out.'}
       icon={Banknote}
     >
       <form onSubmit={savePayout} className="flex flex-col gap-6">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Payout destination type">
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t('hostaccount.destinationType')}>
           {[
-            { key: 'mpesa', label: 'M-PESA', icon: Smartphone },
-            { key: 'bank', label: 'Bank account', icon: Banknote },
+            { key: 'mpesa', label: t('booking.payByMpesa'), icon: Smartphone },
+            { key: 'bank', label: t('hostaccount.bank'), icon: Banknote },
           ].map(({ key, label, icon: Icon }) => <button
             key={key}
             type="button"
@@ -294,17 +296,17 @@ export default function HostSettingsPage() {
         </div>
 
         {payoutMethod === 'mpesa' ? <div>
-          <Label htmlFor="host-mpesa" className="mb-1.5 block">M-PESA number</Label>
+          <Label htmlFor="host-mpesa" className="mb-1.5 block">{t('hostaccount.mpesaNumber')}</Label>
           <TextInput
             id="host-mpesa"
             value={mpesaPhone}
             onChange={(event) => setMpesaPhone(event.target.value)}
             placeholder="07xx xxx xxx"
           />
-          <p className="mt-1.5 text-xs text-muted">Use the Safaricom number registered in your name.</p>
+          <p className="mt-1.5 text-xs text-muted">{t('hostaccount.mpesaHint')}</p>
         </div> : <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div className="sm:col-span-2">
-            <Label htmlFor="host-bank-name" className="mb-1.5 block">Bank</Label>
+            <Label htmlFor="host-bank-name" className="mb-1.5 block">{t('hostaccount.bank')}</Label>
             {/* SelectMenu, not Flowbite's Select: a native <select> opens the
                 operating system's blue option list, which ignores the palette.
                 Codes are compared as strings so Paystack codes that start with a
@@ -321,20 +323,20 @@ export default function HostSettingsPage() {
                 }));
               }}
               options={[
-                { value: '', label: 'Choose your bank' },
+                { value: '', label: t('hostaccount.chooseBank') },
                 ...banks.map((bank) => ({ value: String(bank.code), label: bank.name })),
               ]}
-              ariaLabel="Bank"
-              placeholder="Choose your bank"
+              ariaLabel={t('a11y2.bank')}
+              placeholder={t('a11y2.chooseYourBank')}
             /> : <TextInput
               id="host-bank-name"
               value={bankForm.bankName}
               onChange={(event) => setBankForm((previous) => ({ ...previous, bankName: event.target.value }))}
-              placeholder="Bank name"
+              placeholder={t('hostaccount.bankName')}
             />}
           </div>
           <div>
-            <Label htmlFor="host-bank-account" className="mb-1.5 block">Account number</Label>
+            <Label htmlFor="host-bank-account" className="mb-1.5 block">{t('hostaccount.accountNumber')}</Label>
             <TextInput
               id="host-bank-account"
               value={bankForm.bankAccountNo}
@@ -343,7 +345,7 @@ export default function HostSettingsPage() {
             />
           </div>
           <div>
-            <Label htmlFor="host-bank-code" className="mb-1.5 block">Bank code</Label>
+            <Label htmlFor="host-bank-code" className="mb-1.5 block">{t('hostaccount.bankCode')}</Label>
             <TextInput
               id="host-bank-code"
               value={bankForm.bankCode}
@@ -353,7 +355,7 @@ export default function HostSettingsPage() {
         </div>}
 
         <div className="flex flex-col gap-1 border-t border-border pt-6">
-          <Button type="submit" disabled={savingPayout} className="min-h-[44px] w-full sm:w-fit">{savingPayout ? 'Saving...' : 'Save payout destination'}</Button>
+          <Button type="submit" disabled={savingPayout} className="min-h-[44px] w-full sm:w-fit">{savingPayout ? t('common.saving') : t('hostaccount.savePayoutDestination')}</Button>
           <Message>{payoutMessage}</Message>
           <Message tone="error">{payoutError}</Message>
         </div>
@@ -361,20 +363,20 @@ export default function HostSettingsPage() {
     </Section>
 
     <Section
-      title="When you get paid"
-      description="Funds are held for a short window after check-in so a problem can be resolved before money moves."
+      title={t('hostaccount.whenYouGetPaid')}
+      description={t('hostaccount.whenYouGetPaidDescription')}
     >
       {/* The section body already spaces its children, so no extra wrapper. */}
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Payout timing">
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t('hostaccount.payoutTiming')}>
         {FREQUENCY_OPTIONS.map((option) => <button
           key={option.value}
           type="button"
           onClick={() => saveFrequency(option.value)}
           aria-pressed={frequency === option.value}
           disabled={savingFrequency}
-          className={`inline-flex min-h-[44px] items-center rounded-full px-4 text-sm font-semibold transition-colors disabled:opacity-60 ${frequency === option.value ? 'bg-navy-bg text-white hover:bg-navy-hover' : 'border border-border text-muted hover:text-navy'}`}
+          className={`inline-flex h-10 items-center rounded-full px-4 text-sm font-semibold transition-colors disabled:opacity-60 ${frequency === option.value ? 'bg-navy-bg text-white hover:bg-navy-hover' : 'bg-surface text-muted hover:bg-inset hover:text-navy'}`}
         >
-          {option.label}
+          {t(option.label)}
         </button>)}
       </div>
       <div className="flex flex-col gap-1">
@@ -382,13 +384,13 @@ export default function HostSettingsPage() {
         <Message tone="error">{frequencyError}</Message>
       </div>
       <p className="text-xs text-muted">
-        See <Link to="/host/payouts" className="font-semibold text-navy underline underline-offset-2">payout history</Link> for what has already been paid.
+        {t('hostaccount.seeHistoryPrefix')} <Link to="/host/payouts" className="font-semibold text-navy underline underline-offset-2">{t('hostaccount.payoutHistoryLink')}</Link> {t('hostaccount.seeHistorySuffix')}
       </p>
     </Section>
 
     <Alert color="info">
       <p className="text-xs leading-relaxed">
-        A guest is never charged a platform fee. The platform earns a commission from your side of the booking, and it is shown on every reservation under &quot;What you earn&quot;.
+        {t('hostaccount.commissionNote')}
       </p>
     </Alert>
   </div>;

@@ -3,6 +3,7 @@ import { useLocation, useParams, Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const detailImages = [
   '/images/place-sarit-centre.jpg',
@@ -15,6 +16,7 @@ function GuideDetailPage() {
   const { slug: routeSlug } = useParams();
   const { pathname } = useLocation();
   const slug = routeSlug || pathname.split('/')[2];
+  const { t, lang } = useLanguage();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
@@ -54,11 +56,11 @@ function GuideDetailPage() {
       <main className="op-public-page op-guide-detail-page">
         <div className="op-content-container op-public-loader">
           <div className="op-guide-not-found space-y-4">
-            <span>Guide not found</span>
-            <h1>This story has moved</h1>
-            <p>The guide may have been removed or its address changed.</p>
+            <span>{t('discovery.guidesNotFound')}</span>
+            <h1>{t('discovery.guidesMovedTitle')}</h1>
+            <p>{t('discovery.guidesMovedBody')}</p>
             <Link to="/guides" className="op-primary-action">
-              Browse Guides
+              {t('discovery.guidesBrowse')}
             </Link>
           </div>
         </div>
@@ -74,7 +76,7 @@ function GuideDetailPage() {
           className="op-directory-back"
         >
           <ChevronLeft className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
-          Back to Guides
+          {t('discovery.guidesBack')}
         </Link>
 
         <img
@@ -84,10 +86,10 @@ function GuideDetailPage() {
         />
 
         <header className="op-guide-detail-header space-y-4">
-          <span className="op-eyebrow">City guide</span>
+          <span className="op-eyebrow">{t('discovery.guidesCityGuide')}</span>
           <h1>{post.title}</h1>
           <p>
-          {new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+          {new Date(post.createdAt).toLocaleDateString(lang === 'sw' ? 'sw-KE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </header>
 

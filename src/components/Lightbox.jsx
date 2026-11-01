@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function Lightbox({ images, initialIndex = 0, onClose }) {
+  const { t } = useLanguage();
   const [index, setIndex] = useState(initialIndex);
   const touchStartX = useRef(null);
 
@@ -55,7 +57,7 @@ function Lightbox({ images, initialIndex = 0, onClose }) {
         <button
           onClick={onClose}
           className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-          aria-label="Close gallery"
+          aria-label={t('stays.galleryClose')}
         >
           <X className="w-6 h-6" strokeWidth={2} aria-hidden="true" />
         </button>
@@ -71,7 +73,7 @@ function Lightbox({ images, initialIndex = 0, onClose }) {
         <button
           onClick={goPrev}
           className="absolute left-2 sm:left-6 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
-          aria-label="Previous image"
+          aria-label={t('stays.galleryPrev')}
         >
           <ChevronLeft className="w-6 h-6 text-white" strokeWidth={2} aria-hidden="true" />
         </button>
@@ -86,7 +88,7 @@ function Lightbox({ images, initialIndex = 0, onClose }) {
         <button
           onClick={goNext}
           className="absolute right-2 sm:right-6 z-10 w-12 h-12 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors"
-          aria-label="Next image"
+          aria-label={t('stays.galleryNext')}
         >
           <ChevronRight className="w-6 h-6 text-white" strokeWidth={2} aria-hidden="true" />
         </button>

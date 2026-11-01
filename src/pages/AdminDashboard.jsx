@@ -3,6 +3,7 @@ import BrandLogo from '../components/BrandLogo.jsx';
 import PropTypes from 'prop-types';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
 import ConfirmDialog from '../components/admin/ConfirmDialog.jsx';
@@ -43,6 +44,7 @@ import {
   X,
 } from 'lucide-react';
 import ThemeToggle from '../components/ThemeToggle.jsx';
+import LanguageSwitcher from '../components/LanguageSwitcher.jsx';
 
 // ---------------------------------------------------------------------------
 // Shared Tailwind recipes
@@ -54,12 +56,12 @@ const NAV_LINK_BASE = 'flex items-center gap-3 rounded-lg text-sm font-medium tr
 const NAV_LINK_ACTIVE = 'bg-primary font-semibold text-white';
 const NAV_LINK_IDLE = 'text-white/80 hover:bg-white/10 hover:text-white';
 
-const METRIC_CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
+const METRIC_CARD = 'rounded-xl bg-elevated shadow-md p-5';
 const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
 const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
 const METRIC_NOTE = 'mt-1 block text-xs text-muted';
 
-const PANEL = 'overflow-hidden rounded-xl border border-border bg-elevated shadow-sm';
+const PANEL = 'overflow-hidden rounded-xl bg-elevated shadow-md';
 const PANEL_HEAD = 'flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between';
 const PANEL_TITLE = 'text-base font-semibold text-navy';
 const PANEL_SUBTITLE = 'text-xs text-muted';
@@ -84,49 +86,52 @@ const PILL = 'inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font
 // Admin scope is people and the platform. Listings appear only as the approval
 // queue: hosts own create, edit, calendar, pricing, money and discounts, so
 // those screens (and their nav entries) do not belong here.
+// `label` holds a dictionary key, not display text: the same arrays feed the
+// sidebar, the phone bar and the "more" sheet, so each surface resolves the key
+// with t() where it renders.
 const adminNavGroups = [
   {
-    label: 'Overview',
+    label: 'admin.groupOverview',
     items: [
-      { path: '/admin', label: 'Dashboard', icon: LayoutGrid, exact: true },
+      { path: '/admin', label: 'admin.navDashboard', icon: LayoutGrid, exact: true },
     ],
   },
   {
-    label: 'People',
+    label: 'admin.groupPeople',
     items: [
-      { path: '/admin/users', label: 'Users & Hosts', icon: Users },
-      { path: '/admin/host-applications', label: 'Host Applications', icon: FileText },
-      { path: '/admin/trust-safety', label: 'Trust & Safety', icon: ShieldCheck },
-      { path: '/admin/messages', label: 'Messages', icon: MessageCircle },
+      { path: '/admin/users', label: 'admin.navUsers', icon: Users },
+      { path: '/admin/host-applications', label: 'admin.navHostApplications', icon: FileText },
+      { path: '/admin/trust-safety', label: 'admin.navTrustSafety', icon: ShieldCheck },
+      { path: '/admin/messages', label: 'admin.navMessages', icon: MessageCircle },
     ],
   },
   {
-    label: 'Platform',
+    label: 'admin.groupPlatform',
     items: [
-      { path: '/admin/revenue', label: 'Revenue', icon: Wallet },
-      { path: '/admin/bookings', label: 'Reservations', icon: CalendarCheck },
-      { path: '/admin/properties', label: 'Listing approvals', icon: House },
-      { path: '/admin/addons', label: 'Add-ons', icon: SlidersHorizontal },
-      { path: '/admin/guides', label: 'Guides', icon: BookOpen },
-      { path: '/admin/feedback', label: 'Reviews', icon: Star },
-      { path: '/admin/governance', label: 'Governance', icon: ScrollText },
+      { path: '/admin/revenue', label: 'admin.navRevenue', icon: Wallet },
+      { path: '/admin/bookings', label: 'admin.navReservations', icon: CalendarCheck },
+      { path: '/admin/properties', label: 'admin.navListingApprovals', icon: House },
+      { path: '/admin/addons', label: 'admin.navAddons', icon: SlidersHorizontal },
+      { path: '/admin/guides', label: 'admin.navGuides', icon: BookOpen },
+      { path: '/admin/feedback', label: 'admin.navReviews', icon: Star },
+      { path: '/admin/governance', label: 'admin.navGovernance', icon: ScrollText },
     ],
   },
   {
     // Last because it is about the admin's own account, not the platform. Without
     // this entry the page is only reachable from the avatar menu, which is the
     // one place a moderator looks last when hunting for settings.
-    label: 'Account',
+    label: 'admin.groupAccount',
     items: [
-      { path: '/admin/settings', label: 'Account settings', icon: Settings, exact: true },
+      { path: '/admin/settings', label: 'admin.navAccountSettings', icon: Settings, exact: true },
     ],
   },
 ];
 
 const adminMobilePrimaryItems = [
-  { path: '/admin', label: 'Overview', icon: LayoutGrid, exact: true },
-  { path: '/admin/host-applications', label: 'Hosts', icon: FileText },
-  { path: '/admin/users', label: 'People', icon: Users, matchPaths: ['/admin/users', '/admin/trust-safety'] },
+  { path: '/admin', label: 'admin.groupOverview', icon: LayoutGrid, exact: true },
+  { path: '/admin/host-applications', label: 'admin.mobileHosts', icon: FileText },
+  { path: '/admin/users', label: 'admin.groupPeople', icon: Users, matchPaths: ['/admin/users', '/admin/trust-safety'] },
 ];
 
 /**
@@ -158,10 +163,11 @@ SidebarFlyout.propTypes = {
 
 
 function HeaderUserMenu({ user, onLogout }) {
+  const { t } = useLanguage();
   return (
     <Dropdown
       placement="bottom-end"
-      className="w-60 border border-border shadow-lg"
+      className="w-60 shadow-lg"
       // The trigger is our own button: Flowbite's default inline wrapper has no
       // Tailwind hook on the element, so styling it through className is impossible.
       renderTrigger={() => (
@@ -180,17 +186,17 @@ function HeaderUserMenu({ user, onLogout }) {
       <DropdownHeader className="flex flex-col gap-0.5 px-3 py-2">
         <strong className="block w-full text-xs font-semibold text-navy">{user?.firstName} {user?.lastName}</strong>
         <span className="block w-full truncate text-[11px] text-muted">{user?.email}</span>
-        <small className="block w-full text-[10px] font-bold uppercase tracking-wider text-primary-600">Admin</small>
+        <small className="block w-full text-[10px] font-bold uppercase tracking-wider text-primary-600">{t('admin.adminRole')}</small>
       </DropdownHeader>
-      <DropdownItem as={Link} to="/admin/settings">Account settings</DropdownItem>
-      <DropdownItem as={Link} to="/admin/messages">Messages</DropdownItem>
+      <DropdownItem as={Link} to="/admin/settings">{t('admin.navAccountSettings')}</DropdownItem>
+      <DropdownItem as={Link} to="/admin/messages">{t('admin.navMessages')}</DropdownItem>
       {/* The public site is a different product surface: a fresh tab keeps the
           workspace (and any half-finished review) exactly where it was. A plain
           anchor is deliberate: DropdownItem swallows the target on a Link, which
           turned this into a same-tab jump out of the admin workspace. */}
-      <DropdownItem as="a" href="/" target="_blank" rel="noreferrer">View public site</DropdownItem>
+      <DropdownItem as="a" href="/" target="_blank" rel="noreferrer">{t('admin.menuPublicSite')}</DropdownItem>
       <DropdownDivider />
-      <DropdownItem className="text-red-600" onClick={onLogout}>Sign Out</DropdownItem>
+      <DropdownItem className="text-red-600" onClick={onLogout}>{t('admin.signOut')}</DropdownItem>
     </Dropdown>
   );
 }
@@ -208,6 +214,7 @@ HeaderUserMenu.propTypes = {
 
 
 function AdminSearch() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState({ users: [], properties: [] });
@@ -224,12 +231,12 @@ function AdminSearch() {
   const hasResults = results.users.length > 0 || results.properties.length > 0;
   function go(path) { setQuery(''); navigate(path); }
   return (
-    <div className="relative w-full max-w-md">
+    <div className="relative w-full max-w-md [&_input]:border-0 [&_input]:bg-surface [&_input]:pl-9">
       <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
-      <TextInput type="search" sizing="sm" className="[&_input]:pl-9" placeholder="Search people and listings" aria-label="Search people and listings" value={query} onChange={(event) => setQuery(event.target.value)} />
+      <TextInput type="search" sizing="sm" placeholder={t('admin.searchPlaceholder')} aria-label={t('admin.searchPlaceholder')} value={query} onChange={(event) => setQuery(event.target.value)} />
       {query.trim().length >= 2 && (
-        <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-xl border border-border bg-elevated py-1 shadow-lg" role="listbox">
-          {!hasResults && <p className="px-3 py-2 text-xs text-muted">No matches</p>}
+        <div className="absolute inset-x-0 top-full z-40 mt-1 overflow-hidden rounded-xl bg-elevated py-1 shadow-lg" role="listbox">
+          {!hasResults && <p className="px-3 py-2 text-xs text-muted">{t('admin.noMatches')}</p>}
           {results.users.map((u) => <button type="button" key={u.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go(`/admin/users?search=${encodeURIComponent(u.email)}`)}><strong className="text-xs font-semibold text-navy">{u.firstName} {u.lastName}</strong><span className="text-[11px] text-muted">{u.email} · {u.role}</span></button>)}
           {results.properties.map((p) => <button type="button" key={p.id} className="flex w-full flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-surface" onClick={() => go(`/admin/properties/${p.id}`)}><strong className="text-xs font-semibold text-navy">{p.title}</strong><span className="text-[11px] text-muted">{p.location} · {p.status}</span></button>)}
         </div>
@@ -239,6 +246,7 @@ function AdminSearch() {
 }
 
 function AdminLayout() {
+  const { t } = useLanguage();
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -252,10 +260,12 @@ function AdminLayout() {
   const mobilePrimaryItems = adminMobilePrimaryItems;
   const mobilePrimaryPaths = new Set(mobilePrimaryItems.map((item) => item.path));
   const mobileMoreItems = navItems.filter((item) => !mobilePrimaryPaths.has(item.path));
+  // Short forms for the phone bar and the "more" sheet: each full nav key maps
+  // to the label that fits in that space.
   const mobileNavLabels = {
-    'Users & Hosts': 'Users',
-    'Host Applications': 'Hosts',
-    'Listing approvals': 'Approvals',
+    'admin.navUsers': 'admin.shortUsers',
+    'admin.navHostApplications': 'admin.mobileHosts',
+    'admin.navListingApprovals': 'admin.shortListingApprovals',
   };
   const currentNavItem = [...navItems]
     .filter(({ path, exact }) => (exact
@@ -295,8 +305,9 @@ function AdminLayout() {
       } catch { /* silently ignore */ }
     };
     poll();
-    const t = setInterval(poll, 25000);
-    return () => { active = false; clearInterval(t); };
+    // Named timer, not t: t is the translate function from useLanguage here.
+    const timer = setInterval(poll, 25000);
+    return () => { active = false; clearInterval(timer); };
   }, []);
 
   useEffect(() => {
@@ -357,7 +368,7 @@ function AdminLayout() {
         </div>
         {!collapsed && (
           <span className="block shrink-0 px-6 pb-1 pt-4 text-xs font-semibold uppercase tracking-wider text-primary">
-            Workspace
+            {t('admin.workspace')}
           </span>
         )}
         {/* Rows sit close together so the menu reads as one block. The breathing room lives in each group label's top padding instead of in stretched gaps, so sections stay distinct without the column going sparse. */}
@@ -368,14 +379,15 @@ function AdminLayout() {
         <nav className={`flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto pb-4 pt-1 [scrollbar-color:rgba(255,255,255,0.22)_transparent] [scrollbar-width:thin] ${collapsed ? 'items-center px-2' : 'justify-between px-3'}`}>
           {navGroups.map((group, groupIndex) => (
             <Fragment key={group.label}>
-              {collapsed ? (groupIndex > 0 && <span className="my-2.5 h-px w-6 bg-white/15" aria-hidden="true" />) : (<p className="px-3 pb-1.5 pt-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">{group.label}</p>)}
+              {collapsed ? (groupIndex > 0 && <span className="my-2.5 h-px w-6 bg-white/15" aria-hidden="true" />) : (<p className="px-3 pb-1.5 pt-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">{t(group.label)}</p>)}
               {group.items.map(({ path, label, icon: NavIcon, exact }) => {
                 const active = exact ? location.pathname === path : location.pathname.startsWith(path);
+                const text = t(label);
                 return (
-                  <SidebarFlyout key={path} active={collapsed} label={label}>
+                  <SidebarFlyout key={path} active={collapsed} label={text}>
                     <Link
                       to={path}
-                      aria-label={collapsed ? label : undefined}
+                      aria-label={collapsed ? text : undefined}
                       aria-current={active ? 'page' : undefined}
                       className={`${NAV_LINK_BASE} ${active ? NAV_LINK_ACTIVE : NAV_LINK_IDLE} ${
                         collapsed ? 'h-11 w-11 justify-center' : 'px-3 py-2.5'
@@ -389,7 +401,7 @@ function AdminLayout() {
                           </span>
                         )}
                       </div>
-                      {!collapsed && <span>{label}</span>}
+                      {!collapsed && <span>{text}</span>}
                     </Link>
                   </SidebarFlyout>
                 );
@@ -405,21 +417,21 @@ function AdminLayout() {
             {!collapsed && (
               <div className="text-sm">
                 <p className="font-medium text-white">{user?.firstName}</p>
-                <p className="text-xs text-white/50">Admin</p>
+                <p className="text-xs text-white/50">{t('admin.adminRole')}</p>
               </div>
             )}
           </div>
-          <SidebarFlyout active={collapsed} label="Sign Out">
+          <SidebarFlyout active={collapsed} label={t('admin.signOut')}>
             <button
               type="button"
               onClick={handleLogout}
-              aria-label={collapsed ? 'Sign Out' : undefined}
+              aria-label={collapsed ? t('admin.signOut') : undefined}
               className={`flex items-center text-white/60 transition-colors hover:text-white ${
                 collapsed ? 'mt-3 h-10 w-10 justify-center text-base' : 'mt-3 text-[15px]'
               }`}
             >
               <LogOut className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
-              {!collapsed && <span className="ml-2.5">Sign Out</span>}
+              {!collapsed && <span className="ml-2.5">{t('admin.signOut')}</span>}
             </button>
           </SidebarFlyout>
         </div>
@@ -428,8 +440,8 @@ function AdminLayout() {
           onClick={toggleSidebar}
           className="absolute left-full top-1/2 z-50 grid h-14 w-5 -translate-y-1/2 place-items-center rounded-r-lg bg-navy-bg text-white shadow-sm transition-colors hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           aria-expanded={!collapsed}
-          aria-label={collapsed ? 'Expand admin sidebar' : 'Collapse admin sidebar'}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-label={collapsed ? t('admin.expandSidebar') : t('admin.collapseSidebar')}
+          title={collapsed ? t('admin.expandSidebarShort') : t('admin.collapseSidebarShort')}
         >
           {collapsed
             ? <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
@@ -444,19 +456,20 @@ function AdminLayout() {
             <BrandLogo imgClassName="h-6 w-auto" alt="" />
             <span className="flex flex-col leading-tight">
               <strong className="font-montserrat text-sm font-bold text-navy">zuri.admin</strong>
-              <small className="text-[10px] uppercase tracking-wide text-muted">Workspace</small>
+              <small className="text-[10px] uppercase tracking-wide text-muted">{t('admin.workspace')}</small>
             </span>
           </Link>
         </div>
         <div className="flex items-center gap-2">
           <ThemeToggle className={ICON_BUTTON} />
+          <LanguageSwitcher triggerClassName={ICON_BUTTON} />
           <div className="relative">
             <button
               type="button"
               className={ICON_BUTTON}
               onClick={() => navigate('/admin/messages')}
-              title={`${notif.unreadMessages} unread`}
-              aria-label={`${notif.unreadMessages} unread messages`}
+              title={t('admin.unread', { count: notif.unreadMessages })}
+              aria-label={t('admin.unreadMessages', { count: notif.unreadMessages })}
             >
               <Bell className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
             </button>
@@ -470,7 +483,7 @@ function AdminLayout() {
         </div>
       </div>
       {/* min-h-[58px] is half of the clearance contract in contentSpacing. */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex min-h-[58px] items-center justify-around border-t border-border bg-elevated pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label="Admin workspace sections">
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex min-h-[58px] items-center justify-around border-t border-border bg-elevated pb-[env(safe-area-inset-bottom)] lg:hidden" aria-label={t('admin.adminWorkspaceSections')}>
         {mobilePrimaryItems.map((item) => {
           const active = matchesMobilePrimary(item);
           const Icon = item.icon;
@@ -482,7 +495,7 @@ function AdminLayout() {
               aria-current={active ? 'page' : undefined}
             >
               <Icon className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
-              <span>{item.label}</span>
+              <span>{t(item.label)}</span>
             </Link>
           );
         })}
@@ -494,7 +507,7 @@ function AdminLayout() {
           aria-controls="admin-mobile-more-drawer"
         >
           <Ellipsis className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
-          <span>More</span>
+          <span>{t('common.more')}</span>
         </button>
       </nav>
 
@@ -505,9 +518,9 @@ function AdminLayout() {
           className="fixed inset-0 z-50 lg:hidden"
           role="dialog"
           aria-modal="true"
-          aria-label="Admin workspace navigation"
+          aria-label={t('admin.adminWorkspaceNav')}
         >
-          <button type="button" className="absolute inset-0 bg-navy-bg/40" aria-label="Close navigation" onClick={() => setMobileMoreOpen(false)} />
+          <button type="button" className="absolute inset-0 bg-navy-bg/40" aria-label={t('admin.closeNav')} onClick={() => setMobileMoreOpen(false)} />
           <div className="absolute inset-y-0 left-0 flex w-72 flex-col bg-navy-bg p-4 text-white">
             <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-3">
               <div className="inline-flex items-center gap-2">
@@ -518,16 +531,16 @@ function AdminLayout() {
                 type="button"
                 className="grid h-9 w-9 place-items-center rounded-lg text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                 onClick={() => setMobileMoreOpen(false)}
-                aria-label="Close navigation"
+                aria-label={t('admin.closeNav')}
               >
                 <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
               </button>
             </div>
-            <p className="px-1 pb-2 pt-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/50">Workspace navigation</p>
+            <p className="px-1 pb-2 pt-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/50">{t('admin.workspaceNav')}</p>
             <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
               {mobileMoreItems.map(({ path, label, icon: NavIcon }) => {
                 const active = location.pathname === path || location.pathname.startsWith(`${path}/`);
-                const displayLabel = mobileNavLabels[label] || label;
+                const displayLabel = t(mobileNavLabels[label] || label);
                 return (
                   <Link
                     key={path}
@@ -556,20 +569,21 @@ function AdminLayout() {
               <LayoutGrid className="h-4 w-4" strokeWidth={2} />
             </span>
             <span className="flex flex-col leading-tight">
-              <small className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Admin workspace</small>
-              <strong className="text-sm font-semibold text-navy">{currentNavItem?.label || 'Dashboard'}</strong>
+              <small className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">{t('admin.adminWorkspace')}</small>
+              <strong className="text-sm font-semibold text-navy">{t(currentNavItem?.label || 'admin.navDashboard')}</strong>
             </span>
           </div>
           <AdminSearch />
           <div className="flex items-center gap-2">
             <ThemeToggle className={ICON_BUTTON} />
+          <LanguageSwitcher triggerClassName={ICON_BUTTON} />
             <div className="relative">
               <button
                 type="button"
                 className={ICON_BUTTON}
                 onClick={() => navigate('/admin/messages')}
-                title={`${notif.unreadMessages} unread messages`}
-                aria-label={`${notif.unreadMessages} unread messages`}
+                title={t('admin.unreadMessages', { count: notif.unreadMessages })}
+                aria-label={t('admin.unreadMessages', { count: notif.unreadMessages })}
               >
                 <Bell className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
               </button>
@@ -594,6 +608,7 @@ function AdminLayout() {
 // Bookings, earnings, payouts and discounts belong to the host workspace, so
 // they are deliberately absent here.
 function DashboardOverview() {
+  const { t } = useLanguage();
   const [summary, setSummary] = useState({
     applications: [],
     applicationsPending: 0,
@@ -670,10 +685,10 @@ function DashboardOverview() {
         // Keep the failure visible: an empty chart is indistinguishable from a
         // day with genuinely no signups.
         setTrend(null);
-        setTrendError(cause.response?.data?.error || 'Signup trend could not be loaded.');
+        setTrendError(cause.response?.data?.error || t('admin.trendError'));
       });
     return () => { active = false; };
-  }, [trendDays]);
+  }, [trendDays, t]);
 
   // Submitting the form asks first; the dialog is what actually calls the API,
   // because these figures publish straight to the marketing page.
@@ -686,18 +701,18 @@ function DashboardOverview() {
     setSavingLanding(true); setLandingMsg('');
     try {
       await apiClient.put('/admin/settings/landing-stats', { starRating: Number(landingStats.starRating), satisfaction: Number(landingStats.satisfaction) });
-      setLandingMsg('Saved.');
-    } catch (err) { setLandingMsg(err.response?.data?.error || 'Save failed.'); }
+      setLandingMsg(t('admin.saved'));
+    } catch (err) { setLandingMsg(err.response?.data?.error || t('admin.saveFailed')); }
     finally { setSavingLanding(false); setLandingConfirm(false); }
   }
 
   const [landingConfirm, setLandingConfirm] = useState(false);
 
   const quickLinks = [
-    { to: '/admin/host-applications', label: 'Review host applications' },
-    { to: '/admin/users', label: 'Manage accounts' },
-    { to: '/admin/properties', label: 'Open listing approvals' },
-    { to: '/admin/trust-safety', label: 'Open trust and safety' },
+    { to: '/admin/host-applications', label: 'admin.quickReviewApplications' },
+    { to: '/admin/users', label: 'admin.quickManageAccounts' },
+    { to: '/admin/properties', label: 'admin.quickOpenApprovals' },
+    { to: '/admin/trust-safety', label: 'admin.quickOpenTrustSafety' },
   ];
 
   // Bars are scaled against the busiest day in the window, so a quiet week still
@@ -707,132 +722,137 @@ function DashboardOverview() {
   return <div className="space-y-8">
     <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Platform overview</h1>
-        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Host applications, accounts and listing approvals that need a decision. Listings, bookings and money are managed by hosts.</p>
+        <h1 className="mt-2 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.platformOverview')}</h1>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('admin.platformOverviewLede')}</p>
       </div>
       <div className="shrink-0">
         <Dropdown
-          label="Quick actions"
+          label={t('admin.quickActions')}
           placement="bottom-end"
           // Flowbite's default trigger has no Tailwind hook on the element, so the
           // pill is rendered by us: same pattern as the header user menu above.
           renderTrigger={() => (
-            <button type="button" className={BTN_SECONDARY}>Quick actions</button>
+            <button type="button" className={BTN_SECONDARY}>{t('admin.quickActions')}</button>
           )}
         >
-          {quickLinks.map((link) => <DropdownItem as={Link} key={link.to} to={link.to}>{link.label}</DropdownItem>)}
+          {quickLinks.map((link) => <DropdownItem as={Link} key={link.to} to={link.to}>{t(link.label)}</DropdownItem>)}
         </Dropdown>
       </div>
     </div>
     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
-      <article className={METRIC_CARD}><span className={METRIC_LABEL}>HOST APPLICATIONS</span><strong className={METRIC_VALUE}>{summary.applicationsPending}</strong><small className={METRIC_NOTE}>Awaiting your review</small></article>
-      <article className={METRIC_CARD}><span className={METRIC_LABEL}>ACCOUNTS</span><strong className={METRIC_VALUE}>{summary.accounts}</strong><small className={METRIC_NOTE}>Guests and hosts</small></article>
-      <article className={METRIC_CARD}><span className={METRIC_LABEL}>LISTING APPROVALS</span><strong className={METRIC_VALUE}>{summary.listingsPending}</strong><small className={METRIC_NOTE}>Submitted by hosts</small></article>
-      <article className={METRIC_CARD}><span className={METRIC_LABEL}>IDENTITY CHECKS</span><strong className={METRIC_VALUE}>{summary.verificationsPending}</strong><small className={METRIC_NOTE}>Awaiting review</small></article>
+      <article className={METRIC_CARD}><span className={METRIC_LABEL}>{t('admin.metricHostApplications')}</span><strong className={METRIC_VALUE}>{summary.applicationsPending}</strong><small className={METRIC_NOTE}>{t('admin.noteAwaitingReview')}</small></article>
+      <article className={METRIC_CARD}><span className={METRIC_LABEL}>{t('admin.metricAccounts')}</span><strong className={METRIC_VALUE}>{summary.accounts}</strong><small className={METRIC_NOTE}>{t('admin.noteGuestsAndHosts')}</small></article>
+      <article className={METRIC_CARD}><span className={METRIC_LABEL}>{t('admin.metricListingApprovals')}</span><strong className={METRIC_VALUE}>{summary.listingsPending}</strong><small className={METRIC_NOTE}>{t('admin.noteSubmittedByHosts')}</small></article>
+      <article className={METRIC_CARD}><span className={METRIC_LABEL}>{t('admin.metricIdentityChecks')}</span><strong className={METRIC_VALUE}>{summary.verificationsPending}</strong><small className={METRIC_NOTE}>{t('admin.noteAwaitingReviewShort')}</small></article>
     </div>
     {summaryFailed && (
-      <p className="rounded-lg border border-[#FECDCA] bg-[#FEF3F2] px-4 py-3 text-sm font-medium text-[#B42318] dark:border-[#B42318]/40 dark:bg-[#B42318]/15 dark:text-[#FECDCA]" role="alert">
-        Some figures above could not be loaded and are showing zero. Refresh the page to try again.
+      <p className="rounded-lg border border-[#FECDCA] bg-[#FEF3F2] px-4 py-3 text-center text-sm font-medium text-[#B42318] dark:border-[#B42318]/40 dark:bg-[#B42318]/15 dark:text-[#FECDCA]" role="alert">
+        {t('admin.figuresFailed')}
       </p>
     )}
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-[minmax(0,2.7fr)_minmax(245px,1fr)]">
       <section className={PANEL}>
         <div className={PANEL_HEAD}>
           <div>
-            <h2 className={PANEL_TITLE}>Applications to review</h2>
+            <h2 className={PANEL_TITLE}>{t('admin.applicationsToReview')}</h2>
           </div>
-          <span className={`self-start ${PILL} bg-primary-50 text-primary-700`}>{summary.applicationsPending} open</span>
+          <span className={`self-start ${PILL} bg-primary-50 text-primary-700`}>{t('admin.openCount', { count: summary.applicationsPending })}</span>
         </div>
         {summary.applications.length ? summary.applications.map((application) => (
           <div className={LIST_ROW} key={application.id}>
             <div className="min-w-0 flex-1">
-              <strong className="block truncate text-sm font-semibold text-navy">{application.businessName || application.legalName || 'Host application'}</strong>
-              <small className="mt-1 block truncate text-xs text-muted">{application.user?.email || application.contactEmail || 'No email yet'}
+              <strong className="block truncate text-sm font-semibold text-navy">{application.businessName || application.legalName || t('admin.hostApplicationFallback')}</strong>
+              <small className="mt-1 block truncate text-xs text-muted">{application.user?.email || application.contactEmail || t('admin.noEmailYet')}
                 {application.submittedAt ? ` · ${new Date(application.submittedAt).toLocaleDateString()}` : ''}</small>
             </div>
             <div className="flex items-center gap-3">
-              <span className={`${PILL} bg-red-50 text-red-700`}>Submitted</span>
-              <Button as={Link} to="/admin/host-applications" size="sm" color="light" className={BTN_SECONDARY}>Open</Button>
+              <span className={`${PILL} bg-red-50 text-red-700`}>{t('admin.submitted')}</span>
+              <Button as={Link} to="/admin/host-applications" size="sm" color="light" className={BTN_SECONDARY}>{t('admin.open')}</Button>
             </div>
           </div>
         )) : <div className={EMPTY_STATE}>
-          <strong className="text-sm font-semibold text-navy">No applications waiting</strong>
-          <p className={PANEL_SUBTITLE}>New host applications land here for review.</p>
-          <Button as={Link} to="/admin/host-applications" size="sm" className={`mt-2 ${BTN_PRIMARY}`}>Open host applications</Button>
+          <strong className="text-sm font-semibold text-navy">{t('admin.noApplicationsWaiting')}</strong>
+          <p className={PANEL_SUBTITLE}>{t('admin.noApplicationsHint')}</p>
+          <Button as={Link} to="/admin/host-applications" size="sm" className={`mt-2 ${BTN_PRIMARY}`}>{t('admin.openHostApplications')}</Button>
         </div>}
       </section>
       <section className={PANEL}>
         <div className={PANEL_HEAD}>
-          <h2 className={`${PANEL_TITLE} whitespace-nowrap`}>New sign-ups</h2>
+          <h2 className={`${PANEL_TITLE} whitespace-nowrap`}>{t('admin.newSignups')}</h2>
           <SelectMenu
             sizing="sm"
-            ariaLabel="Sign-up date range"
+            ariaLabel={t('admin.signupRange')}
             value={String(trendDays)}
             onChange={(next) => setTrendDays(Number(next))}
-            options={[{ value: '7', label: 'Last 7 days' }, { value: '30', label: 'Last 30 days' }, { value: '90', label: 'Last 90 days' }]}
+            options={[{ value: '7', label: t('admin.last7Days') }, { value: '30', label: t('admin.last30Days') }, { value: '90', label: t('admin.last90Days') }]}
             wrapperClassName="w-36 shrink-0"
           />
         </div>
         <div className="px-5 py-4">
           {trend ? <>
-            <p className={PANEL_SUBTITLE}><strong className="mr-1 text-base font-bold text-navy">{trend.total}</strong>new accounts in the last {trend.days} days</p>
+            <p className={PANEL_SUBTITLE}><strong className="mr-1 text-base font-bold text-navy">{trend.total}</strong>{t('admin.newAccountsSuffix', { days: trend.days })}</p>
             {/* With no sign-ups every bar collapsed to a 4% stub, which read as a
                 row of stray dots. Say so instead of drawing a chart with no data. */}
             {trend.total > 0 ? (
-              <div className="mt-4 flex h-24 items-end gap-1" role="img" aria-label={`Daily sign-ups over the last ${trend.days} days`}>
+              <div className="mt-4 flex h-24 items-end gap-1" role="img" aria-label={t('admin.dailySignups', { days: trend.days })}>
                 {trend.series.map((point) => <span key={point.date} title={`${point.date}: ${point.signups}`} className="flex-1 rounded-t bg-primary" style={{ height: `${Math.max(4, (point.signups / peakSignups) * 100)}%` }} />)}
               </div>
             ) : (
               <p className="mt-4 rounded-lg border border-dashed border-border px-4 py-6 text-center text-xs text-muted">
-                No sign-ups in the last {trend.days} days.
+                {t('admin.noSignups', { days: trend.days })}
               </p>
             )}
-          </> : <p className={PANEL_SUBTITLE} role={trendError ? 'alert' : undefined}>{trendError || 'Trend data is unavailable right now.'}</p>}
+          </> : <p className={PANEL_SUBTITLE} role={trendError ? 'alert' : undefined}>{trendError || t('admin.trendUnavailable')}</p>}
         </div>
       </section>
       <section className={PANEL}>
         <div className={PANEL_HEAD}>
-          <h2 className={PANEL_TITLE}>Platform at a glance</h2>
+          <h2 className={PANEL_TITLE}>{t('admin.platformGlance')}</h2>
         </div>
         <div className="space-y-3 px-5 py-4">
-          <p className="flex items-center justify-between text-xs text-muted"><span>Live listings</span><strong className="text-sm font-semibold text-navy">{summary.listingsLive}</strong></p>
-          <p className="flex items-center justify-between text-xs text-muted"><span>Awaiting approval</span><strong className="text-sm font-semibold text-navy">{summary.listingsPending}</strong></p>
-          <p className="flex items-center justify-between text-xs text-muted"><span>Identity checks</span><strong className="text-sm font-semibold text-navy">{summary.verificationsPending}</strong></p>
+          <p className="flex items-center justify-between text-xs text-muted"><span>{t('admin.liveListings')}</span><strong className="text-sm font-semibold text-navy">{summary.listingsLive}</strong></p>
+          <p className="flex items-center justify-between text-xs text-muted"><span>{t('admin.awaitingApproval')}</span><strong className="text-sm font-semibold text-navy">{summary.listingsPending}</strong></p>
+          <p className="flex items-center justify-between text-xs text-muted"><span>{t('admin.identityChecks')}</span><strong className="text-sm font-semibold text-navy">{summary.verificationsPending}</strong></p>
         </div>
         <div className="px-5 pb-5">
-          <Button as={Link} to="/admin/properties" size="sm" className={BTN_PRIMARY}>Open listing approvals</Button>
+          <Button as={Link} to="/admin/properties" size="sm" className={BTN_PRIMARY}>{t('admin.quickOpenApprovals')}</Button>
         </div>
       </section>
     </div>
     <div>
-      <Accordion alwaysOpen className="overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
+      {/* `!border-0` is deliberate: the accordion's own theme still draws a
+          hairline, and this component ignores a theme override for it, so the
+          only place the outline can be cleared is here. The shadow carries the
+          elevation instead. */}
+      <Accordion alwaysOpen className="overflow-hidden rounded-xl bg-elevated shadow-md !border-0">
         <AccordionPanel>
-          <AccordionTitle className="bg-elevated text-navy [&>button]:bg-elevated">Landing page statistics</AccordionTitle>
+          <AccordionTitle className="bg-elevated text-navy [&>button]:bg-elevated">{t('admin.landingStats')}</AccordionTitle>
           <AccordionContent>
-            <p className={PANEL_SUBTITLE}>Happy stays is counted from guest stays that have checked out, so it cannot be edited here. Set the other values to 0 to use live review data.</p>
+            <p className={PANEL_SUBTITLE}>{t('admin.landingStatsHint')}</p>
             {/* These numbers are published on the marketing page, so the form
                 says so and asks before overwriting them. */}
             <p className="mt-3 rounded-lg border border-[#FEDF89] bg-[#FFFAEB] px-3 py-2 text-xs leading-relaxed text-[#B54708] dark:border-[#B54708]/40 dark:bg-[#B54708]/15 dark:text-[#FEDF89]">
-              The star rating and satisfaction figure are shown to visitors on the public landing page. Saving replaces them immediately.
+              {t('admin.landingStatsWarning')}
             </p>
             <form onSubmit={saveLandingStats} className="mt-5 flex flex-wrap items-end gap-5">
               {/* Deliberately not a field: it is a live count, so a box would invite typing. */}
               <div className="grid w-28 gap-1 text-xs font-semibold text-navy">
-                <span>Happy stays</span>
-                <strong aria-label="Happy stays, counted from completed guest stays" className="flex min-h-[44px] items-center text-lg font-bold text-navy">
+                <span>{t('admin.happyStays')}</span>
+                <strong aria-label={t('admin.happyStaysAria')} className="flex min-h-[44px] items-center text-lg font-bold text-navy">
                   {liveStays === null ? '...' : liveStays}
                 </strong>
               </div>
-              <label className="grid gap-1 text-xs font-semibold text-navy">Star rating<TextInput type="number" min="0" max="5" step="0.1" className="w-32" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
-              <label className="grid gap-1 text-xs font-semibold text-navy">Satisfaction %<TextInput type="number" min="0" max="100" className="w-32" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
-              <Button type="submit" size="sm" className={BTN_PRIMARY} disabled={savingLanding}>{savingLanding ? 'Saving...' : 'Update'}</Button>
+              <label className="grid gap-1 text-xs font-semibold text-navy">{t('admin.starRating')}<TextInput type="number" min="0" max="5" step="0.1" className="w-32" value={landingStats.starRating} onChange={(event) => setLandingStats({ ...landingStats, starRating: event.target.value })} /></label>
+              <label className="grid gap-1 text-xs font-semibold text-navy">{t('admin.satisfaction')}<TextInput type="number" min="0" max="100" className="w-32" value={landingStats.satisfaction} onChange={(event) => setLandingStats({ ...landingStats, satisfaction: event.target.value })} /></label>
+              <Button type="submit" size="sm" className={BTN_PRIMARY} disabled={savingLanding}>{savingLanding ? t('common.saving') : t('admin.update')}</Button>
               {landingMsg && <span role="status" className="text-xs font-semibold text-primary-700">{landingMsg}</span>}
             </form>
             <ConfirmDialog
               open={landingConfirm}
-              title="Publish these statistics?"
-              description={`Visitors will see a ${landingStats.starRating} star rating and ${landingStats.satisfaction}% satisfaction on the landing page as soon as this is saved.`}
-              confirmLabel="Publish"
+              title={t('admin.publishConfirmTitle')}
+              description={t('admin.publishConfirmBody', { rating: landingStats.starRating, satisfaction: landingStats.satisfaction })}
+              confirmLabel={t('admin.publish')}
+              cancelLabel={t('common.cancel')}
               tone="warning"
               busy={savingLanding}
               onConfirm={() => { publishLandingStats(); }}

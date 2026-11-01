@@ -7,6 +7,7 @@ import PropTypes from 'prop-types';
 import { heroImage } from '../assets/images';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function AnimatedNumber({ value, suffix = '', duration = 2000 }) {
   const [displayValue, setDisplayValue] = useState(0);
@@ -79,6 +80,7 @@ AnimatedNumber.propTypes = {
  * design system) instead of a bespoke pill input.
  */
 function SearchBar({ discovery = false }) {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -234,7 +236,7 @@ function SearchBar({ discovery = false }) {
                   </div>
                   <div className="flex-shrink-0 text-right">
                     <p className="text-sm font-bold text-[#203565]">KES {p.price.toLocaleString()}</p>
-                    <p className="text-xs text-[#5B6B82]">/ night</p>
+                    <p className="text-xs text-[#5B6B82]">{t('discovery.perNightCompact')}</p>
                   </div>
                 </button>
               </li>
@@ -246,7 +248,7 @@ function SearchBar({ discovery = false }) {
               onClick={handleSearch}
               className="w-full border-t border-[#E3E8EF] py-3 text-center text-sm font-semibold text-[#203565] hover:bg-surface"
             >
-              View all results &rarr;
+              {t('discovery.heroViewAllResults')} &rarr;
             </button>
           )}
         </div>
@@ -256,6 +258,7 @@ function SearchBar({ discovery = false }) {
 }
 
 function RoleToggle({ mode, onChange }) {
+  const { t } = useLanguage();
   return (
     <div className="inline-flex items-center bg-white/10 backdrop-blur-sm rounded-full p-1 gap-1">
       <button
@@ -267,7 +270,7 @@ function RoleToggle({ mode, onChange }) {
             : 'text-white/70 hover:text-white'
         }`}
       >
-        I&apos;m traveling
+        {t('discovery.heroRoleTraveler')}
       </button>
       <button
         type="button"
@@ -278,7 +281,7 @@ function RoleToggle({ mode, onChange }) {
             : 'text-white/70 hover:text-white'
         }`}
       >
-        I&apos;m a host
+        {t('discovery.heroRoleHost')}
       </button>
     </div>
   );
@@ -295,6 +298,7 @@ RoleToggle.propTypes = {
  * with live results, and the animated trust/stat row.
  */
 function Hero({ stats }) {
+  const { t } = useLanguage();
   const { rating = '5.0', stays = '50', satisfaction = '100' } = stats || {};
   const [mode, setMode] = useState('traveler');
   const { isAuthenticated } = useAuth();
@@ -333,21 +337,21 @@ function Hero({ stats }) {
             <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
               <span className={`h-2 w-2 animate-pulse rounded-full ${isHost ? 'bg-[#C5A28C]' : 'bg-green-500'}`}></span>
               <span className="text-white/90 text-sm font-medium">
-                {isHost ? 'List Your Property' : 'Available for Booking'}
+                {isHost ? t('discovery.heroBadgeHost') : t('discovery.heroBadgeGuest')}
               </span>
             </div>
 
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-10 leading-tight tracking-tight drop-shadow-lg hero-heading">
               {isHost ? (
-                <>Earn More by Hosting on ZuriLofts</>
+                <>{t('discovery.heroTitleHost')}</>
               ) : (
-                <>Choose Luxury &amp; Comfort for Your Time Away</>
+                <>{t('discovery.heroTitleGuest')}</>
               )}
             </h1>
             <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed mb-4">
               {isHost
-                ? 'List your furnished apartment and start earning today. We handle the bookings - you focus on hospitality.'
-                : 'Premium furnished apartments in Nairobi. Experience comfort, convenience, and luxury all in one place.'
+                ? t('discovery.heroBodyHost')
+                : t('discovery.heroBodyGuest')
               }
             </p>
           </div>
@@ -365,7 +369,7 @@ function Hero({ stats }) {
                 className="inline-flex min-h-[44px] items-center gap-2 rounded-[10px] bg-[#143A80] px-10 py-3 text-lg font-bold text-white shadow-lg transition-all duration-200 hover:bg-[#0B2A5E] hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#203565]"
               >
                 <House className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
-                Get Started as a Host
+                {t('discovery.heroCtaHost')}
               </Link>
             </div>
           ) : (
@@ -374,21 +378,21 @@ function Hero({ stats }) {
                 <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 group-hover:scale-110">
                   <AnimatedNumber value={String(rating)} />
                 </div>
-                <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Star Rating</div>
+                <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">{t('discovery.heroStatRating')}</div>
               </div>
               <div className="w-px h-12 bg-white/20"></div>
               <div className="text-center group cursor-default">
                 <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 group-hover:scale-110">
                   <AnimatedNumber value={String(stays)} suffix="+" />
                 </div>
-                <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Happy Stays</div>
+                <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">{t('discovery.heroStatStays')}</div>
               </div>
               <div className="w-px h-12 bg-white/20 hidden md:block"></div>
               <div className="text-center hidden md:block group cursor-default">
                 <div className="text-4xl md:text-5xl font-bold text-white transform transition-all duration-500 group-hover:scale-110">
                   <AnimatedNumber value={String(satisfaction)} suffix="%" />
                 </div>
-                <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">Satisfaction</div>
+                <div className="text-white/70 text-sm mt-1 font-medium transform transition-all duration-300 group-hover:text-white">{t('discovery.heroStatSatisfaction')}</div>
               </div>
             </div>
           )}

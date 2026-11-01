@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const guideImages = [
   '/images/place-sarit-centre.jpg',
@@ -14,6 +15,7 @@ const guideImages = [
 ];
 
 function GuidesPage() {
+  const { t, lang } = useLanguage();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,14 +41,14 @@ function GuidesPage() {
     <main className="op-guides-page">
       <header className="op-guides-hero">
         <div className="op-content-container space-y-4">
-          <nav className="op-breadcrumbs" aria-label="Breadcrumb">
-            <Link to="/">Home</Link>
+          <nav className="op-breadcrumbs" aria-label={t('discovery.guidesBreadcrumb')}>
+            <Link to="/">{t('discovery.navHome')}</Link>
             <span>/</span>
-            <span>Guides</span>
+            <span>{t('discovery.guidesNav')}</span>
           </nav>
-          <span className="op-eyebrow">City notes</span>
-          <h1>Nairobi Travel Guides</h1>
-          <p>Tips, recommendations, and local knowledge for making the most of your stay in Nairobi.</p>
+          <span className="op-eyebrow">{t('discovery.guidesEyebrow')}</span>
+          <h1>{t('discovery.guidesTitle')}</h1>
+          <p>{t('discovery.guidesIntro')}</p>
         </div>
       </header>
 
@@ -57,8 +59,8 @@ function GuidesPage() {
               <div className="op-guides-empty-icon">
                 <BookOpen strokeWidth={2} aria-hidden="true" />
               </div>
-              <h2>Guides are on the way</h2>
-              <p>Our city notes are being prepared. Check back soon.</p>
+              <h2>{t('discovery.guidesEmptyTitle')}</h2>
+              <p>{t('discovery.guidesEmptyBody')}</p>
             </div>
           ) : (
             <div className="op-guide-grid">
@@ -70,18 +72,18 @@ function GuidesPage() {
                 >
                   <div className="op-guide-card-media">
                     <img src={post.coverImage || guideImages[index % guideImages.length]} alt="" loading="lazy" />
-                    <span>City guide</span>
+                    <span>{t('discovery.guidesCityGuide')}</span>
                   </div>
                   <div className="op-guide-card-copy gap-2">
                     <p className="op-guide-date">
-                      {new Date(post.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      {new Date(post.createdAt).toLocaleDateString(lang === 'sw' ? 'sw-KE' : 'en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
                     </p>
                     <h2>{post.title}</h2>
                     {post.excerpt && (
                       <p>{post.excerpt}</p>
                     )}
                     <span className="op-guide-link">
-                      Read guide
+                      {t('discovery.guidesRead')}
                       <ChevronRight strokeWidth={2} aria-hidden="true" />
                     </span>
                   </div>

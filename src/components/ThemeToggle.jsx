@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function ThemeToggle({ className = '', showLabel = false }) {
   const { isDark, toggleTheme } = useTheme();
-  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode';
+  const { t } = useLanguage();
+  const label = t(isDark ? 'trust.switchToLightMode' : 'trust.switchToDarkMode');
 
   return (
     <button

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { Check, ChevronRight, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * The phone counterpart of the desktop action bar on the host calendar.
@@ -28,6 +29,7 @@ export default function CalendarQuickSheet({
   onEditPrice,
   onSettings,
 }) {
+  const { t } = useLanguage();
   if (!open) return null;
 
   // Only one segment may look filled: the chosen mode is the single solid
@@ -43,7 +45,7 @@ export default function CalendarQuickSheet({
     <div
       className="fixed inset-x-3 bottom-[calc(var(--zl-bottom-nav-space)_+_8px)] z-30 mx-auto flex max-w-md flex-col gap-2 md:hidden"
       role="region"
-      aria-label="Selected dates"
+      aria-label={t('a11y1.selectedDates')}
     >
       <div className="flex items-center justify-end gap-2">
         <span className="rounded-full bg-elevated px-3 py-2 text-xs font-semibold tabular-nums text-navy shadow-lg ring-1 ring-border">
@@ -53,7 +55,7 @@ export default function CalendarQuickSheet({
         <button
           type="button"
           onClick={onClear}
-          aria-label="Clear selected dates"
+          aria-label={t('a11y1.clearSelectedDates')}
           className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-elevated text-navy shadow-lg ring-1 ring-border transition-colors hover:bg-surface"
         >
           <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
@@ -73,14 +75,14 @@ export default function CalendarQuickSheet({
           <div
             className="mt-3 grid grid-cols-2 gap-1 rounded-full bg-white/10 p-1"
             role="group"
-            aria-label="Availability for the selected nights"
+            aria-label={t('a11y1.availabilitySelectedNights')}
           >
             <button
               type="button"
               onClick={onBlock}
               disabled={saving || !canBlock}
               aria-pressed={!allOpen}
-              aria-label="Block the selected nights"
+              aria-label={t('a11y1.blockNights')}
               className={`${segmentBase}${!allOpen ? segmentActive : (canBlock ? segmentIdle : segmentUnavailable)}`}
             >
               <X className="h-4 w-4" strokeWidth={2.4} aria-hidden="true" />
@@ -90,7 +92,7 @@ export default function CalendarQuickSheet({
               onClick={onOpen}
               disabled={saving || !canOpen}
               aria-pressed={allOpen}
-              aria-label="Open the selected nights"
+              aria-label={t('a11y1.openNights')}
               className={`${segmentBase}${allOpen ? segmentActive : (canOpen ? segmentIdle : segmentUnavailable)}`}
             >
               <Check className="h-4 w-4" strokeWidth={2.4} aria-hidden="true" />

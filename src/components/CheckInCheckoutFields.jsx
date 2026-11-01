@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { EditorFieldGroup, EditorSelectRow } from './EditorFieldGroup.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * The check-in and checkout half of the arrival guide, as rows.
@@ -43,6 +44,7 @@ const CHECK_IN_WINDOW_END_OPTIONS = [UNSET, { value: 'Flexible', label: 'Flexibl
 const HEADING = 'text-sm font-semibold text-navy';
 
 export default function CheckInCheckoutFields({ value, onChange }) {
+  const { t } = useLanguage();
   return (
     <div className="flex flex-col gap-7">
       <div className="flex flex-col gap-4">
@@ -54,8 +56,8 @@ export default function CheckInCheckoutFields({ value, onChange }) {
             value={value.checkInMethod}
             onChange={(next) => onChange('checkInMethod', next)}
             options={CHECK_IN_METHODS}
-            placeholder="Choose how guests get in"
-            ariaLabel="Check-in method"
+            placeholder={t('a11y1.chooseHowGuestsGetIn')}
+            ariaLabel={t('a11y1.checkInMethod')}
           />
         </EditorFieldGroup>
       </div>
@@ -69,8 +71,8 @@ export default function CheckInCheckoutFields({ value, onChange }) {
             value={value.checkInWindowStart}
             onChange={(next) => onChange('checkInWindowStart', next)}
             options={TIME_OPTIONS}
-            placeholder="Select a time"
-            ariaLabel="Check-in window start time"
+            placeholder={t('a11y1.selectTime')}
+            ariaLabel={t('a11y1.checkInWindowStart')}
           />
           <EditorSelectRow
             id="guide-checkin-end"
@@ -78,8 +80,8 @@ export default function CheckInCheckoutFields({ value, onChange }) {
             value={value.checkInWindowEnd}
             onChange={(next) => onChange('checkInWindowEnd', next)}
             options={CHECK_IN_WINDOW_END_OPTIONS}
-            placeholder="Select a time"
-            ariaLabel="Check-in window end time"
+            placeholder={t('a11y1.selectTime')}
+            ariaLabel={t('a11y1.checkInWindowEnd')}
           />
         </EditorFieldGroup>
       </div>
@@ -93,8 +95,8 @@ export default function CheckInCheckoutFields({ value, onChange }) {
             value={value.checkOutTime}
             onChange={(next) => onChange('checkOutTime', next)}
             options={TIME_OPTIONS}
-            placeholder="Select a time"
-            ariaLabel="Checkout time"
+            placeholder={t('a11y1.selectTime')}
+            ariaLabel={t('a11y1.checkOutTime')}
           />
         </EditorFieldGroup>
       </div>

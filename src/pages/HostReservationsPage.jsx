@@ -6,6 +6,7 @@ import { AlertCircle, CalendarDays, Search } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Every reservation across the host's listings. Hosts used to reach this list
 // only through the traveller booking history, which mixes in the bookings they
@@ -30,18 +31,20 @@ const STATUS_LABEL = {
 };
 
 const FILTERS = [
-  { key: 'upcoming', label: 'Upcoming' },
-  { key: 'current', label: 'Staying now' },
-  { key: 'past', label: 'Past' },
-  { key: 'all', label: 'All' },
+  { key: 'upcoming', label: 'host.filterUpcoming' },
+  { key: 'current', label: 'host.filterCurrent' },
+  { key: 'past', label: 'host.filterPast' },
+  { key: 'all', label: 'host.filterAll' },
 ];
 
 // Filters wrap on a phone rather than clip, so each pill is its own control:
-// a wrapping capsule with one shared border would break mid-row. Every pill
-// keeps a 44px touch height even though the label is only 12px.
-const PILL = 'inline-flex min-h-11 items-center rounded-full border px-3 text-xs font-semibold transition-colors';
-const PILL_SELECTED = 'border-transparent bg-navy-bg text-white';
-const PILL_IDLE = 'border-border text-muted hover:border-primary hover:text-navy';
+// a wrapping capsule with one shared border would break mid-row. The pill is
+// sized to its 12px label: a 44px touch target left a 36px band of empty pill
+// around one line of text, which read as a bar rather than a filter. Idle pills
+// carry a tinted fill instead of a hairline, so no pill is an outlined box.
+const PILL = 'inline-flex h-9 items-center rounded-full px-3 text-xs font-semibold transition-colors';
+const PILL_SELECTED = 'bg-navy-bg text-white';
+const PILL_IDLE = 'bg-surface text-muted hover:bg-inset hover:text-navy';
 
 function startOfDay(value) {
   const date = new Date(value);
@@ -134,7 +137,8 @@ function ReservationRow({ booking }) {
 ReservationRow.propTypes = { booking: PropTypes.object.isRequired };
 
 function LoadingRows() {
-  return <div className="flex flex-col gap-3 px-4 py-4" role="status" aria-label="Loading reservations">
+  const { t } = useLanguage();
+  return <div className="flex flex-col gap-3 px-4 py-4" role="status" aria-label={t('host.loadingReservations')}>
     <span className="block h-16 animate-pulse rounded-xl bg-inset" />
     <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:150ms]" />
     <span className="block h-16 animate-pulse rounded-xl bg-inset [animation-delay:300ms]" />
@@ -142,6 +146,7 @@ function LoadingRows() {
 }
 
 export default function HostReservationsPage() {
+  const { t } = useLanguage();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -193,12 +198,12 @@ export default function HostReservationsPage() {
   return <div className="flex flex-col gap-6 sm:gap-8">
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <p className={HOST_EYEBROW}>Host workspace</p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Reservations</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Every booking across your listings, newest first.</p>
+        <p className={HOST_EYEBROW}>{t('host.workspace')}</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('host.reservationsTitle')}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t('host.reservationsDescription')}</p>
       </div>
       <Button as={Link} to="/host/today" color="light" size="sm" className="w-full min-h-11 sm:w-fit sm:min-h-0">
-        Today&apos;s schedule
+        {t('host.todaysSchedule')}
       </Button>
     </header>
 
@@ -207,16 +212,16 @@ export default function HostReservationsPage() {
     <HostCard
       flush
       className="overflow-hidden"
-      title="All reservations"
-      description="Open a reservation for the guest, the dates and what you earn."
-      action={loading ? undefined : <Badge color="gray">{visible.length} shown</Badge>}
+      title={t('host.allReservationsTitle')}
+      description={t('host.allReservationsDescription')}
+      action={loading ? undefined : <Badge color="gray">{t('host.shownCount', { count: visible.length })}</Badge>}
     >
       {error && <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4">
         <div className="flex min-w-0 flex-1 items-start gap-2.5">
           <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />
           <p className="min-w-0 text-sm leading-relaxed text-charcoal">{error}</p>
         </div>
-        <Button type="button" color="light" size="sm" onClick={load} className="min-h-11 sm:min-h-0">Try again</Button>
+        <Button type="button" color="light" size="sm" onClick={load} className="min-h-11 sm:min-h-0">{t('common.retry')}</Button>
       </div>}
 
       <div className="border-b border-border px-4 py-4">
@@ -228,20 +233,22 @@ export default function HostReservationsPage() {
             aria-pressed={filter === item.key}
             className={`${PILL} ${filter === item.key ? PILL_SELECTED : PILL_IDLE}`}
           >
-            {item.label}{counts[item.key] > 0 && <span className="ml-1.5 opacity-70">{counts[item.key]}</span>}
+            {t(item.label)}{counts[item.key] > 0 && <span className="ml-1.5 opacity-70">{counts[item.key]}</span>}
           </button>)}
         </div>
 
         {/* The icon sits outside the field so the input keeps the shared theme
-            focus ring; [&_input]:pl-9 reserves the room for it. */}
-        <div className="relative mt-4 [&_input]:pl-9">
+            focus ring; [&_input]:pl-9 reserves the room for it. The field is
+            borderless: it sits on a panel, so a hairline here drew a second box
+            inside the card. A tinted fill marks the field instead. */}
+        <div className="relative mt-4 [&_input]:border-0 [&_input]:bg-surface [&_input]:pl-9">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.9} aria-hidden="true" />
           <TextInput
             type="search"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search guests or listings"
-            aria-label="Search reservations"
+            placeholder={t('host.searchGuestsOrListings')}
+            aria-label={t('host.searchReservations')}
           />
         </div>
       </div>
@@ -252,12 +259,12 @@ export default function HostReservationsPage() {
             <CalendarDays className="h-5 w-5" strokeWidth={1.6} aria-hidden="true" />
           </span>
           <strong className="mt-1 text-sm font-semibold text-navy">
-            {bookings.length === 0 ? 'No reservations yet' : 'Nothing in this view'}
+            {bookings.length === 0 ? t('host.noReservations') : t('host.nothingInView')}
           </strong>
           <p className="mx-auto max-w-[320px] text-xs leading-relaxed text-muted">
             {bookings.length === 0
-              ? 'When a guest books one of your listings, the reservation appears here with their dates and what you earn.'
-              : 'Try another filter, or clear the search to see every reservation.'}
+              ? t('host.noReservationsHint')
+              : t('host.nothingInViewHint')}
           </p>
         </div>
       ) : (

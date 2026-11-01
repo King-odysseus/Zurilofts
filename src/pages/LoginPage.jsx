@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ChevronRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { googleOAuthUrl } from '../utils/authUrls.js';
 import AuthShell from '../components/AuthShell.jsx';
 import GoogleIcon from '../components/GoogleIcon.jsx';
@@ -13,6 +14,7 @@ function getDashboardPath(user) {
 }
 
 function LoginPage() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -32,9 +34,9 @@ function LoginPage() {
 
   useEffect(() => {
     if (searchParams.get('error')) {
-      setLocalError('Google sign-in failed. Please try again.');
+      setLocalError(t('auth.googleSignInFailed'));
     }
-  }, [searchParams]);
+  }, [searchParams, t]);
 
   useEffect(() => () => clearError(), [clearError]);
 
@@ -49,13 +51,13 @@ function LoginPage() {
 
   return (
     <AuthShell>
-      <h2>Welcome back</h2>
-      <p>Sign in to manage your stays, bookings and saved places.</p>
+      <h2>{t('auth.welcomeBack')}</h2>
+      <p>{t('auth.signInSubtitle')}</p>
       {(localError || error) && <div className="op-auth-error" role="alert">{localError || error}</div>}
 
       <form onSubmit={handleSubmit}>
         <label className="op-auth-label">
-          <span>Email address</span>
+          <span>{t('auth.emailLabel')}</span>
           <span className="op-auth-control">
             <Mail className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
             <input
@@ -64,7 +66,7 @@ function LoginPage() {
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
-              placeholder="you@example.com"
+              placeholder={t('auth.emailPlaceholder')}
               required
               autoComplete="email"
             />
@@ -72,7 +74,7 @@ function LoginPage() {
         </label>
 
         <label className="op-auth-label">
-          <span>Password</span>
+          <span>{t('auth.passwordLabel')}</span>
           <span className="op-auth-control op-auth-password">
             <LockKeyhole className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
             <input
@@ -81,7 +83,7 @@ function LoginPage() {
               type={showPassword ? 'text' : 'password'}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              placeholder="Enter your password"
+              placeholder={t('auth.passwordPlaceholder')}
               required
               autoComplete="current-password"
             />
@@ -92,31 +94,32 @@ function LoginPage() {
         <div className="op-auth-form-row">
           <span className="op-auth-check">
             <input type="checkbox" id="remember-me" defaultChecked />
-            <label htmlFor="remember-me">Remember me</label>
+            <label htmlFor="remember-me">{t('auth.rememberMe')}</label>
           </span>
-          <Link to="/forgot-password">Forgot password?</Link>
+          <Link to="/forgot-password">{t('auth.forgotPassword')}</Link>
         </div>
 
         <button type="submit" className="op-auth-submit" disabled={submitting}>
-          {submitting ? 'Signing in…' : <>Sign in <ChevronRight className="w-4 h-4" aria-hidden="true" /></>}
+          {submitting ? t('auth.signingIn') : <>{t('auth.signIn')} <ChevronRight className="w-4 h-4" aria-hidden="true" /></>}
         </button>
       </form>
 
-      <div className="op-auth-divider">or continue with</div>
-      <a className="op-auth-google" href={googleHref}><GoogleIcon className="h-[18px] w-[18px]" /> Continue with Google</a>
+      <div className="op-auth-divider">{t('auth.orContinueWith')}</div>
+      <a className="op-auth-google" href={googleHref}><GoogleIcon className="h-[18px] w-[18px]" /> {t('auth.continueWithGoogle')}</a>
       {/* Keep the hosting intent: a host who came from the hosting entry point
           must land on the same sign-up form in hosting mode. */}
-      <div className="op-auth-switch">New to ZuriLofts? <Link to={searchParams.get('role')?.toUpperCase() === 'HOST' ? '/register?role=HOST' : '/register'}>Create account</Link></div>
+      <div className="op-auth-switch">{t('auth.newToZuriLofts')} <Link to={searchParams.get('role')?.toUpperCase() === 'HOST' ? '/register?role=HOST' : '/register'}>{t('auth.createAccount')}</Link></div>
     </AuthShell>
   );
 }
 
 function PasswordToggle({ shown, onClick }) {
+  const { t } = useLanguage();
   return (
     <button
       type="button"
       onClick={onClick}
-      aria-label={shown ? 'Hide password' : 'Show password'}
+      aria-label={shown ? t('auth.hidePassword') : t('auth.showPassword')}
       className="op-auth-password-toggle"
     >
       {shown ? (

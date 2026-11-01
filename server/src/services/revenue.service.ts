@@ -181,6 +181,16 @@ export async function getPlatformRevenue(filter?: { from?: Date; to?: Date }) {
     month.bookings += 1;
   }
 
+  // Paid bookings with no payment date. The totals above count them, but the
+  // monthly trend cannot place them, so the amount is reported rather than
+  // silently dropped from a chart that would otherwise read as empty.
+  const undatedRows = settledRows.filter((row) => !row.paidAt);
+  const undated = {
+    bookings: undatedRows.length,
+    grossPaid: undatedRows.reduce((sum, row) => sum + row.grossPaid, 0),
+    platformRevenue: undatedRows.reduce((sum, row) => sum + row.platformRevenue, 0),
+  };
+
   const hostMap = new Map<string, {
     hostId: string; name: string; email: string; bookings: number;
     grossPaid: number; hostNet: number; platformRevenue: number;
@@ -212,6 +222,7 @@ export async function getPlatformRevenue(filter?: { from?: Date; to?: Date }) {
   return {
     totals,
     collected,
+    undated,
     monthly,
     byHost,
     recent: rows.slice(0, 50),

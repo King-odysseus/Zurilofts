@@ -75,7 +75,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
         {openField === 'dates' && (
           <div
             role="dialog"
-            aria-label="Choose dates"
+            aria-label={t('a11y1.chooseDates')}
             className="fixed inset-0 z-[100] overflow-y-auto bg-elevated p-4 sm:absolute sm:inset-auto sm:left-0 sm:top-full sm:z-[100] sm:mt-2 sm:w-[min(640px,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(20,58,128,0.14)]"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
@@ -83,7 +83,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
               <button
                 type="button"
                 onClick={() => setOpenField(null)}
-                aria-label="Close"
+                aria-label={t('a11y1.close')}
                 className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface"
               >
                 <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
@@ -126,7 +126,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
         {openField === 'guests' && (
           <div
             role="dialog"
-            aria-label="Choose guests"
+            aria-label={t('a11y1.chooseGuests')}
             className="fixed inset-0 z-[100] bg-elevated p-4 sm:absolute sm:inset-auto sm:right-0 sm:top-full sm:left-auto sm:z-[100] sm:mt-2 sm:w-[min(18rem,calc(100vw-2rem))] sm:max-w-[calc(100vw-2rem)] sm:rounded-2xl sm:border sm:border-[#E3E8EF] sm:p-5 sm:shadow-[0_8px_28px_rgba(20,58,128,0.14)]"
           >
             <div className="mb-3 flex items-center justify-between sm:hidden">
@@ -134,7 +134,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
               <button
                 type="button"
                 onClick={() => setOpenField(null)}
-                aria-label="Close"
+                aria-label={t('a11y1.close')}
                 className="flex h-11 w-11 items-center justify-center rounded-full hover:bg-surface"
               >
                 <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
@@ -150,7 +150,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
                   type="button"
                   onClick={() => onGuestsChange(clampGuests(guests - 1))}
                   disabled={guests <= 1}
-                  aria-label="Decrease guests"
+                  aria-label={t('a11y1.decreaseGuests')}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#203565] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
                 >
                   &minus;
@@ -160,7 +160,7 @@ function SearchDateGuestFields({ dates, onDatesChange, guests, onGuestsChange })
                   type="button"
                   onClick={() => onGuestsChange(clampGuests(guests + 1))}
                   disabled={guests >= 16}
-                  aria-label="Increase guests"
+                  aria-label={t('a11y1.increaseGuests')}
                   className="flex h-9 w-9 items-center justify-center rounded-full border border-[#E3E8EF] text-[#203565] hover:bg-surface disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
                 >
                   +

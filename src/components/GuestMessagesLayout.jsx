@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { MessageCircleMore, Search } from 'lucide-react';
 import GuestAccountLayout from './GuestAccountLayout.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import MessageAttachments from './MessageAttachments.jsx';
 import { firstImage } from '../utils/images.js';
 import { getConversationParticipant } from '../utils/conversations.js';
@@ -83,13 +84,14 @@ ConversationRow.propTypes = {
 };
 
 function SupportRow({ selected }) {
+  const { t } = useLanguage();
   return <Link to="/messages" className={`opg-conversation-row opg-support-row${selected ? ' is-selected' : ''}`}>
     <span className="opg-conversation-avatar is-support">
       <MessageCircleMore strokeWidth={1.8} aria-hidden="true" />
     </span>
     <span className="opg-conversation-summary">
-      <span className="opg-conversation-line"><strong>ZuriLofts Support</strong><span>Help</span></span>
-      <span className="opg-conversation-preview">Questions about a stay or booking?</span>
+      <span className="opg-conversation-line"><strong>{t('messages.supportName')}</strong><span>{t('messages.supportTag')}</span></span>
+      <span className="opg-conversation-preview">{t('messages.supportHint')}</span>
     </span>
   </Link>;
 }
@@ -97,6 +99,7 @@ function SupportRow({ selected }) {
 SupportRow.propTypes = { selected: PropTypes.bool };
 
 function ConversationList({ activeTab, conversations, currentUserId, selectedId, loading, error, onRetry }) {
+  const { t } = useLanguage();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
 
@@ -117,33 +120,33 @@ function ConversationList({ activeTab, conversations, currentUserId, selectedId,
 
   const narrowed = query.trim().length > 0 || filter === 'unread';
 
-  return <aside className="opg-conversation-list" aria-label="Conversations">
+  return <aside className="opg-conversation-list" aria-label={t('messages.conversations')}>
     <div className="opg-conversation-list-head">
-      <h2>Messages</h2>
+      <h2>{t('messages.title')}</h2>
       <label className="opg-conversation-search">
         <Search strokeWidth={2} aria-hidden="true" />
         <input
           type="search"
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search messages"
-          aria-label="Search messages"
+          placeholder={t('messages.searchPlaceholder')}
+          aria-label={t('messages.searchLabel')}
         />
       </label>
-      <div className="opg-message-tabs" role="tablist" aria-label="Message type">
-        <Link to="/inbox" role="tab" aria-selected={activeTab === 'inbox'} className={activeTab === 'inbox' ? 'is-active' : ''}>Inbox</Link>
-        <Link to="/messages" role="tab" aria-selected={activeTab === 'support'} className={activeTab === 'support' ? 'is-active' : ''}>Support</Link>
+      <div className="opg-message-tabs" role="tablist" aria-label={t('messages.messageType')}>
+        <Link to="/inbox" role="tab" aria-selected={activeTab === 'inbox'} className={activeTab === 'inbox' ? 'is-active' : ''}>{t('messages.inbox')}</Link>
+        <Link to="/messages" role="tab" aria-selected={activeTab === 'support'} className={activeTab === 'support' ? 'is-active' : ''}>{t('messages.support')}</Link>
       </div>
-      {activeTab === 'inbox' && <div className="opg-conversation-filters" role="group" aria-label="Filter conversations">
-        <button type="button" className={filter === 'all' ? 'is-active' : ''} aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>All<span>{conversations.length}</span></button>
-        <button type="button" className={filter === 'unread' ? 'is-active' : ''} aria-pressed={filter === 'unread'} onClick={() => setFilter('unread')}>Unread<span>{unreadCount}</span></button>
+      {activeTab === 'inbox' && <div className="opg-conversation-filters" role="group" aria-label={t('messages.filterConversations')}>
+        <button type="button" className={filter === 'all' ? 'is-active' : ''} aria-pressed={filter === 'all'} onClick={() => setFilter('all')}>{t('messages.all')}<span>{conversations.length}</span></button>
+        <button type="button" className={filter === 'unread' ? 'is-active' : ''} aria-pressed={filter === 'unread'} onClick={() => setFilter('unread')}>{t('messages.unread')}<span>{unreadCount}</span></button>
       </div>}
     </div>
 
     <div className="opg-conversation-scroll">
-      {loading ? <div className="opg-conversation-loading" aria-label="Loading conversations"><span /><span /><span /></div> : error ? <div className="opg-conversation-error"><p>{error}</p><button type="button" onClick={onRetry}>Try again</button></div> : <>
-        {conversations.length === 0 && <div className="opg-conversation-empty"><strong>No stay messages</strong><span>Conversations with hosts will appear here.</span></div>}
-        {conversations.length > 0 && visible.length === 0 && <div className="opg-conversation-empty"><strong>No matches</strong><span>Try a different name, or clear the search.</span></div>}
+      {loading ? <div className="opg-conversation-loading" aria-label={t('messages.loadingConversations')}><span /><span /><span /></div> : error ? <div className="opg-conversation-error"><p>{error}</p><button type="button" onClick={onRetry}>{t('common.retry')}</button></div> : <>
+        {conversations.length === 0 && <div className="opg-conversation-empty"><strong>{t('messages.noStayMessages')}</strong><span>{t('messages.noStayMessagesHint')}</span></div>}
+        {conversations.length > 0 && visible.length === 0 && <div className="opg-conversation-empty"><strong>{t('messages.noMatches')}</strong><span>{t('messages.noMatchesHint')}</span></div>}
         {visible.map((conversation) => <ConversationRow key={conversation.id} conversation={conversation} currentUserId={currentUserId} selected={selectedId === conversation.id} />)}
       </>}
       {/* Support stays reachable even when search or the unread filter hides every stay. */}
@@ -186,11 +189,12 @@ GuestMessageBubble.propTypes = {
 };
 
 function GuestMessagesLayout({ activeTab, conversations = [], currentUserId, selectedId, loading, error, onRetry, detailOpen, children }) {
+  const { t } = useLanguage();
   return <GuestAccountLayout
     active="inbox"
     eyebrow="Travel"
-    title="Messages"
-    description="Stay conversations and ZuriLofts support in one place."
+    title={t('messages.title')}
+    description={t('messages.description')}
     pageClassName={detailOpen ? 'is-message-thread' : 'is-messages-index'}
   >
     {/* `is-thread-open` marks the opened conversation for the stylesheet, which

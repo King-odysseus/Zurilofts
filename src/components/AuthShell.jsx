@@ -28,17 +28,17 @@ function AuthShell({ children }) {
           <ul>
             <li>Identity-checked hosts and secure payments</li>
             <li>High-speed internet, smart lock, hotel-grade linen</li>
-            <li>Local support on call, in English and Kiswahili</li>
+            <li>Local support on call, in English and Swahili</li>
           </ul>
         </div>
-        <div className="op-auth-stars" aria-label="Five-star guest rating">★★★★★</div>
+        <div className="op-auth-stars" aria-label={t('a11y3.fiveStarGuestRating')}>★★★★★</div>
       </section>
 
       <section className="op-auth-side">
         <div className="op-auth-top">
           <RouteBackButton className="op-auth-back" />
           <div className="op-auth-top-actions">
-            <Link to="/guides">Need help?</Link>
+            <Link to="/guides">{t('trust.needHelp')}</Link>
             <Dropdown
               inline
               theme={{ inlineWrapper: 'op-auth-language' }}

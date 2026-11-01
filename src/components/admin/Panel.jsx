@@ -3,13 +3,13 @@ import PropTypes from 'prop-types';
 /**
  * The card that wraps every admin list and form section.
  *
- * Pages used to retype `overflow-hidden rounded-xl border border-border
- * bg-elevated shadow-sm` plus their own head, which is why padding and
- * title size drifted between screens.
+ * Pages used to retype `overflow-hidden rounded-xl bg-elevated shadow-md` plus
+ * their own head, which is why padding and title size drifted between screens.
+ * The panel is borderless: elevation comes from the shadow, never from a hairline.
  */
 export function Panel({ children, className = '', ...rest }) {
   return (
-    <section className={`overflow-hidden rounded-xl border border-border bg-elevated shadow-sm ${className}`.trim()} {...rest}>
+    <section className={`overflow-hidden rounded-xl bg-elevated shadow-md ${className}`.trim()} {...rest}>
       {children}
     </section>
   );

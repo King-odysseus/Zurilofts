@@ -8,6 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import Navbar from './components/Navbar.jsx';
 import Spinner from './components/Spinner.jsx';
 import { resolveTitle } from './utils/pageTitle.js';
+import { useLanguage } from './context/LanguageContext.jsx';
 
 // Only browsing (home, stays, a property) is in the first download. Everything
 // else is fetched when its route is first opened, so a guest never pays to
@@ -114,10 +115,11 @@ function RouteFallback() {
 // below so a page that names itself from its own data (a property name, a
 // guide title) still has the last word.
 function RouteTitle() {
+  const { t, lang } = useLanguage();
   const { pathname } = useLocation();
   useEffect(() => {
-    document.title = resolveTitle(pathname);
-  }, [pathname]);
+    document.title = resolveTitle(pathname, t);
+  }, [pathname, t, lang]);
   return null;
 }
 

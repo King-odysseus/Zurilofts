@@ -5,6 +5,7 @@ import apiClient from '../api/client.js';
 import GuestMessagesLayout, { GuestMessageBubble } from '../components/GuestMessagesLayout.jsx';
 import MessageComposer from '../components/MessageComposer.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 function formatMessageTime(iso) {
   if (!iso) return '';
@@ -18,6 +19,7 @@ function formatMessageTime(iso) {
 }
 
 function MessagesPage() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [conversations, setConversations] = useState([]);
   const [conversationsLoading, setConversationsLoading] = useState(true);
@@ -101,15 +103,15 @@ function MessagesPage() {
     detailOpen
   >
     <header className="opg-message-pane-head">
-      <Link className="opg-message-back" to="/inbox" aria-label="Back to messages">
+      <Link className="opg-message-back" to="/inbox" aria-label={t('a11y2.backToMessages')}>
         <ChevronLeft strokeWidth={1.9} aria-hidden="true" />
       </Link>
       <span className="opg-message-context-icon">
         <MessageCircleMore strokeWidth={1.7} aria-hidden="true" />
       </span>
       <div className="opg-message-context">
-        <h2>ZuriLofts Support</h2>
-        <p>Booking help and general questions</p>
+        <h2>{t('messages.supportName')}</h2>
+        <p>{t('messages.supportContext')}</p>
       </div>
     </header>
 
@@ -118,9 +120,9 @@ function MessagesPage() {
         the thread rule in styles.css ships after Tailwind's utilities and pins
         its padding. */}
     <div className="opg-message-thread !pt-6" ref={threadRef} aria-live="polite">
-      {loading ? <div className="opg-message-loading" aria-label="Loading support messages"><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadThread}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>How can we help?</strong><p>Send the team a message about your booking or account.</p></div> : messages.map((message) => {
+      {loading ? <div className="opg-message-loading" aria-label={t('messages.loadingSupport')}><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadThread}>{t('common.retry')}</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>{t('messages.howCanWeHelp')}</strong><p>{t('messages.howCanWeHelpHint')}</p></div> : messages.map((message) => {
         const mine = message.senderRole === 'USER';
-        return <GuestMessageBubble key={message.id} mine={mine} attachments={message.attachments} meta={`${mine ? 'You' : 'ZuriLofts Support'} · ${formatMessageTime(message.createdAt)}`}>{message.body}</GuestMessageBubble>;
+        return <GuestMessageBubble key={message.id} mine={mine} attachments={message.attachments} meta={`${mine ? t('messages.you') : t('messages.supportName')} · ${formatMessageTime(message.createdAt)}`}>{message.body}</GuestMessageBubble>;
       })}
       {error && messages.length > 0 && <p className="opg-message-inline-error">{error}</p>}
     </div>
@@ -132,8 +134,8 @@ function MessagesPage() {
         value={body}
         onChange={setBody}
         onSubmit={sendMessage}
-        placeholder="Write a message"
-        ariaLabel="Message ZuriLofts Support"
+        placeholder={t('messages.writeMessage')}
+        ariaLabel={t('messages.composerLabel')}
         sending={sending}
       />
     </div>

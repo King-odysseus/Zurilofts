@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * Price editor for the dates a host picked on their calendar.
@@ -28,7 +29,7 @@ const CHIP_ACTIVE = 'border-[#143A80] bg-[#143A80] text-white';
 const CHIP_IDLE = 'border-border bg-elevated text-navy hover:bg-surface';
 
 const INPUT_SHELL =
-  'flex min-w-0 flex-1 items-center gap-1.5 rounded-xl border border-border bg-elevated px-3 py-2 focus-within:border-[#143A80]';
+  'flex min-w-0 flex-1 items-center gap-1.5 rounded-xl bg-elevated shadow-md px-3 py-2 focus-within:border-[#143A80]';
 const INPUT_FIELD =
   'w-full min-w-0 border-0 bg-transparent p-0 text-sm font-bold tabular-nums text-navy outline-none ring-0 focus:ring-0 disabled:opacity-60';
 
@@ -59,6 +60,7 @@ export default function DayRateDialog({
   onSaveMinimumStay,
   onClose,
 }) {
+  const { t } = useLanguage();
   const [rateDraft, setRateDraft] = useState('');
   const [customPercent, setCustomPercent] = useState('');
 
@@ -141,7 +143,7 @@ export default function DayRateDialog({
             type="button"
             onClick={onClose}
             disabled={saving}
-            aria-label="Close"
+            aria-label={t('chrome.close')}
             className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-navy transition-colors hover:bg-surface disabled:cursor-not-allowed disabled:opacity-50"
           >
             <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
@@ -150,7 +152,7 @@ export default function DayRateDialog({
 
         <div className="space-y-5 px-5 py-4">
           <section className="space-y-2">
-            <h3 className={SECTION_TITLE}>Nightly rate</h3>
+            <h3 className={SECTION_TITLE}>{t('chrome.nightlyRate')}</h3>
             <div className="flex items-center gap-2">
               <div className={INPUT_SHELL}>
                 <span className="text-xs font-semibold text-muted">KES</span>
@@ -163,7 +165,7 @@ export default function DayRateDialog({
                   value={rateDraft}
                   onChange={(event) => setRateDraft(event.target.value)}
                   disabled={saving}
-                  aria-label="Nightly rate for these dates"
+                  aria-label={t('chrome.nightlyRateAria')}
                   className={INPUT_FIELD}
                 />
               </div>
@@ -180,7 +182,7 @@ export default function DayRateDialog({
           </section>
 
           <section className="space-y-2">
-            <h3 className={SECTION_TITLE}>Discount</h3>
+            <h3 className={SECTION_TITLE}>{t('chrome.discount')}</h3>
             <div className="flex flex-wrap gap-2">
               {percentChips.map((percent) => (
                 <button
@@ -207,8 +209,8 @@ export default function DayRateDialog({
                   value={customPercent}
                   onChange={(event) => setCustomPercent(event.target.value)}
                   disabled={saving}
-                  placeholder="Custom"
-                  aria-label="Custom discount percent"
+                  placeholder={t('chrome.custom')}
+                  aria-label={t('chrome.customDiscountAria')}
                   className={INPUT_FIELD}
                 />
                 <span className="text-xs font-semibold text-muted">%</span>
@@ -226,11 +228,11 @@ export default function DayRateDialog({
                 lifted back off on its own: the original dated rate is gone once a
                 percentage replaces it. The footer offers one reset instead of two
                 that would do the same thing. */}
-            <p className={HINT}>Guests pay the lower price on these dates.</p>
+            <p className={HINT}>{t('chrome.lowerPriceHint')}</p>
           </section>
 
           <section className="space-y-2">
-            <h3 className={SECTION_TITLE}>Minimum stay</h3>
+            <h3 className={SECTION_TITLE}>{t('chrome.minimumStay')}</h3>
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -250,7 +252,7 @@ export default function DayRateDialog({
                   disabled={saving}
                   className={`${CHIP_BASE} ${minNights === count ? CHIP_ACTIVE : CHIP_IDLE}`}
                 >
-                  {count} nights
+                  {t(count === 1 ? 'chrome.nightsCountOne' : 'chrome.nightsCountOther', { count })}
                 </button>
               ))}
             </div>
@@ -260,11 +262,11 @@ export default function DayRateDialog({
         <footer className="flex items-center justify-between gap-3 border-t border-border px-5 py-4">
           {hasDatedRate ? (
             <button type="button" onClick={() => run(onClearRate)} disabled={saving} className={TEXT_ACTION}>
-              Remove custom price
+              {t('chrome.removeCustomPrice')}
             </button>
           ) : <span />}
           <button type="button" onClick={onClose} disabled={saving} className={PRIMARY_BUTTON}>
-            {saving ? 'Saving...' : 'Done'}
+            {saving ? t('chrome.saving') : t('chrome.done')}
           </button>
         </footer>
       </div>

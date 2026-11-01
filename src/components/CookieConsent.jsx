@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Cookie } from 'lucide-react';
 import apiClient from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import {
   getConsent,
   setConsent,
@@ -34,6 +35,7 @@ const CATEGORIES = [
 ];
 
 function CookieConsent() {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false); // drives the slide-up transition
   const [mode, setMode] = useState('banner'); // 'banner' | 'manage'
@@ -103,7 +105,7 @@ function CookieConsent() {
     <div
       role="dialog"
       aria-live="polite"
-      aria-label="Cookie consent"
+      aria-label={t('chrome.cookieConsentAria')}
       className={`fixed bottom-4 left-4 right-4 sm:right-auto sm:max-w-md z-50 transition-all duration-300 ease-out ${
         visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
       }`}

@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { Link } from 'react-router-dom';
 
 /**
@@ -22,6 +23,7 @@ function formatMoney(value) {
 }
 
 export default function EarningsPropertyList({ rows, amountLabel, emptyTitle, emptyBody, emptyAction }) {
+  const { t } = useLanguage();
   // Guarded rather than trusted: the page renders this while its figures are
   // still arriving, and a list that has not landed yet must not take the panel
   // down with it.
@@ -41,8 +43,8 @@ export default function EarningsPropertyList({ rows, amountLabel, emptyTitle, em
           it. On a phone the row collapses to a stacked cell, so the heading is
           dropped there and the amount carries its own label instead. */}
       <div className={`hidden gap-x-4 border-b border-border px-4 py-2 md:grid ${COLUMNS}`}>
-        <span className={HEADING}>Property</span>
-        <span className={`${HEADING} text-right`}>Stays</span>
+        <span className={HEADING}>{t('hostmoney.colProperty')}</span>
+        <span className={`${HEADING} text-right`}>{t('hostmoney.colStays')}</span>
         <span className={`${HEADING} text-right`}>{amountLabel}</span>
       </div>
 

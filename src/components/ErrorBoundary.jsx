@@ -2,6 +2,34 @@ import { Component } from 'react';
 import { CircleAlert } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import { useLanguage } from '../context/LanguageContext.jsx';
+
+// The boundary must stay a class to catch render errors, but a class cannot
+// call hooks, so the fallback screen is a function component of its own.
+function CrashFallback() {
+  const { t } = useLanguage();
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      <Navbar />
+      <div className="flex-1 flex items-center justify-center px-6">
+        <div className="text-center max-w-md">
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDECEC]">
+            <CircleAlert className="h-10 w-10 text-[#B42318]" strokeWidth={2} aria-hidden="true" />
+          </div>
+          <h1 className="mb-2 text-2xl font-bold text-[#203565]">{t('chrome.somethingWrong')}</h1>
+          <p className="mb-6 text-[#5B6B82]">{t('chrome.tryRefreshing')}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="rounded-[10px] bg-[#16294B] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#16294B]"
+          >
+            {t('chrome.refreshPage')}
+          </button>
+        </div>
+      </div>
+      <Footer />
+    </div>
+  );
+}
 
 class ErrorBoundary extends Component {
   constructor(props) {
@@ -42,27 +70,7 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-white flex flex-col">
-          <Navbar />
-          <div className="flex-1 flex items-center justify-center px-6">
-            <div className="text-center max-w-md">
-              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FDECEC]">
-                <CircleAlert className="h-10 w-10 text-[#B42318]" strokeWidth={2} aria-hidden="true" />
-              </div>
-              <h1 className="mb-2 text-2xl font-bold text-[#203565]">Something went wrong</h1>
-              <p className="mb-6 text-[#5B6B82]">
-                We&apos;re sorry - an unexpected error occurred. Try refreshing the page.
-              </p>
-              <button
-                onClick={() => window.location.reload()}
-                className="rounded-[10px] bg-[#16294B] px-6 py-2.5 font-semibold text-white transition-all duration-200 hover:bg-[#16294B]"
-              >
-                Refresh Page
-              </button>
-            </div>
-          </div>
-          <Footer />
-        </div>
+        <CrashFallback />
       );
     }
 

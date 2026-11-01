@@ -7,32 +7,34 @@ import IdentityVerificationPanel from '../components/IdentityVerificationPanel.j
 import RouteBackButton from '../components/RouteBackButton.jsx';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 const RECOVERY_CARDS = [
   {
     key: 'checking',
-    title: 'Checking payment',
-    copy: 'We are confirming your payment securely. Keep this page open.',
+    titleKey: 'trust.recoveryCheckingTitle',
+    copyKey: 'trust.recoveryCheckingCopy',
     icon: Clock3,
     tone: 'info',
   },
   {
     key: 'pending',
-    title: 'Payment pending',
-    copy: 'Your provider is still processing the payment. You will not be charged again.',
+    titleKey: 'trust.recoveryPendingTitle',
+    copyKey: 'trust.recoveryPendingCopy',
     icon: LifeBuoy,
     tone: 'warning',
   },
   {
     key: 'failed',
-    title: 'Payment was not completed',
-    copy: 'No booking is confirmed until the provider verifies payment.',
+    titleKey: 'trust.recoveryFailedTitle',
+    copyKey: 'trust.recoveryFailedCopy',
     icon: AlertTriangle,
     tone: 'danger',
   },
 ];
 
 export default function TrustPage() {
+  const { t } = useLanguage();
   const { user, logout } = useAuth();
   const [disputes, setDisputes] = useState([]);
   const [bookings, setBookings] = useState([]);
@@ -50,11 +52,11 @@ export default function TrustPage() {
       setDisputes(Array.isArray(disputeResponse.data.data) ? disputeResponse.data.data : []);
       setBookings(Array.isArray(bookingResponse.data.data) ? bookingResponse.data.data : []);
     } catch (loadError) {
-      setError(loadError.response?.data?.error || 'Trust and recovery data could not be loaded.');
+      setError(loadError.response?.data?.error || t('trust.trustLoadFailed'));
     } finally {
       if (!silent) setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     loadTrustData();
@@ -64,11 +66,11 @@ export default function TrustPage() {
     const openDisputes = disputes.filter((dispute) => dispute.status === 'OPEN' || dispute.status === 'UNDER_REVIEW').length;
     const heldBookings = bookings.filter((booking) => booking.status === 'PENDING').length;
     return [
-      { value: loading ? '-' : openDisputes, label: openDisputes === 1 ? 'Open dispute' : 'Open disputes' },
-      { value: loading ? '-' : heldBookings, label: heldBookings === 1 ? 'Booking held' : 'Bookings held' },
-      { value: '24h', label: 'First response target' },
+      { value: loading ? '-' : openDisputes, label: t(openDisputes === 1 ? 'trust.openDisputeOne' : 'trust.openDisputeOther') },
+      { value: loading ? '-' : heldBookings, label: t(heldBookings === 1 ? 'trust.bookingHeldOne' : 'trust.bookingHeldOther') },
+      { value: '24h', label: t('trust.firstResponseTarget') },
     ];
-  }, [bookings, disputes, loading]);
+  }, [bookings, disputes, loading, t]);
 
   const nextPaymentBooking = bookings.find((booking) => booking.status === 'PENDING');
   const paymentLink = nextPaymentBooking ? `/bookings/${nextPaymentBooking.id}` : '/trips';
@@ -80,11 +82,11 @@ export default function TrustPage() {
 
       <header className="op-trust-hero">
         <div className="op-trust-hero-copy">
-          <p>TRUST &amp; RECOVERY</p>
-          <h1>Keep your account safe</h1>
-          <span>Identity verification, dispute resolution and payment recovery in one place.</span>
+          <p>{t('misc.trustEyebrow')}</p>
+          <h1>{t('misc.trustTitle')}</h1>
+          <span>{t('misc.trustDescription')}</span>
         </div>
-        <div className="op-trust-stats" aria-label="Trust and recovery overview">
+        <div className="op-trust-stats" aria-label={t('misc.trustOverview')}>
           {stats.map((stat) => <div key={stat.label}><strong>{stat.value}</strong><span>{stat.label}</span></div>)}
         </div>
       </header>
@@ -93,15 +95,15 @@ export default function TrustPage() {
         <aside className="op-trust-sidebar">
           <div className="op-trust-person">
             {user?.avatar ? <img src={user.avatar} alt="" /> : <span>{initials}</span>}
-            <div><strong>{[user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Guest'}</strong><small>{user?.email}</small></div>
+            <div><strong>{[user?.firstName, user?.lastName].filter(Boolean).join(' ') || t('trust.guestFallback')}</strong><small>{user?.email}</small></div>
           </div>
-          <nav aria-label="Trust sections">
-            <a href="#identity"><BadgeCheck size={16} strokeWidth={1.8} aria-hidden="true" />Identity verification</a>
-            <a href="#disputes"><AlertTriangle size={16} strokeWidth={1.8} aria-hidden="true" />Disputes{stats[0].value !== 0 && <em>{stats[0].value}</em>}</a>
-            <a href="#payment-recovery"><WalletCards size={16} strokeWidth={1.8} aria-hidden="true" />Payment recovery</a>
-            <Link to="/profile#privacy"><ShieldCheck size={16} strokeWidth={1.8} aria-hidden="true" />Security</Link>
+          <nav aria-label={t('misc.trustSections')}>
+            <a href="#identity"><BadgeCheck size={16} strokeWidth={1.8} aria-hidden="true" />{t('misc.identityVerification')}</a>
+            <a href="#disputes"><AlertTriangle size={16} strokeWidth={1.8} aria-hidden="true" />{t('admin.disputes')}{stats[0].value !== 0 && <em>{stats[0].value}</em>}</a>
+            <a href="#payment-recovery"><WalletCards size={16} strokeWidth={1.8} aria-hidden="true" />{t('misc.paymentRecovery')}</a>
+            <Link to="/profile#privacy"><ShieldCheck size={16} strokeWidth={1.8} aria-hidden="true" />{t('misc.security')}</Link>
           </nav>
-          <button type="button" className="op-trust-logout" onClick={logout}><LogOut size={16} strokeWidth={1.8} aria-hidden="true" />Log out</button>
+          <button type="button" className="op-trust-logout" onClick={logout}><LogOut size={16} strokeWidth={1.8} aria-hidden="true" />{t('misc.logOut')}</button>
         </aside>
 
         <div className="op-trust-content">
@@ -113,19 +115,19 @@ export default function TrustPage() {
 
           <section id="payment-recovery" className="op-trust-panel op-trust-recovery-panel">
             <div className="op-trust-panel-head">
-              <div><h2>Payment recovery</h2><p>What guests see if a payment is interrupted.</p></div>
-              <Badge color="gray" icon={ShieldCheck}>Secure provider check</Badge>
+              <div><h2>{t('misc.paymentRecovery')}</h2><p>{t('misc.paymentRecoveryHint')}</p></div>
+              <Badge color="gray" icon={ShieldCheck}>{t('misc.secureProviderCheck')}</Badge>
             </div>
             <div className="op-trust-recovery">
-              {RECOVERY_CARDS.map(({ key, title, copy, icon: Icon, tone }) => <article key={key} className={`op-trust-recovery-card is-${tone}`}>
+              {RECOVERY_CARDS.map(({ key, titleKey, copyKey, icon: Icon, tone }) => <article key={key} className={`op-trust-recovery-card is-${tone}`}>
                 <span><Icon size={18} strokeWidth={1.8} aria-hidden="true" /></span>
-                <h3>{title}</h3>
-                <p>{copy}</p>
-                {key === 'pending' && <Button as={Link} to={paymentLink} color="light" size="sm">Review booking</Button>}
-                {key === 'failed' && <div className="op-trust-recovery-actions"><Button as={Link} to={paymentLink} size="sm" className="op-trust-button-primary">Try payment again</Button><Link to="/trips">Return to booking</Link></div>}
+                <h3>{t(titleKey)}</h3>
+                <p>{t(copyKey)}</p>
+                {key === 'pending' && <Button as={Link} to={paymentLink} color="light" size="sm">{t('misc.reviewBooking')}</Button>}
+                {key === 'failed' && <div className="op-trust-recovery-actions"><Button as={Link} to={paymentLink} size="sm" className="op-trust-button-primary">{t('misc.tryPaymentAgain')}</Button><Link to="/trips">{t('misc.returnToBooking')}</Link></div>}
               </article>)}
             </div>
-            {loading && <div className="op-trust-inline-loading"><Spinner size="sm" /><span>Checking your booking state...</span></div>}
+            {loading && <div className="op-trust-inline-loading"><Spinner size="sm" /><span>{t('misc.checkingBookingState')}</span></div>}
           </section>
         </div>
       </div>

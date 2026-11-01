@@ -3,8 +3,10 @@ import PropTypes from "prop-types";
 import { Heart } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import apiClient from "../api/client.js";
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 export default function SaveToShortlistButton({ propertyId }) {
+  const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const [open, setOpen] = useState(false);
   const [shortlists, setShortlists] = useState([]);
@@ -74,7 +76,7 @@ export default function SaveToShortlistButton({ propertyId }) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        aria-label={isSaved ? "Saved to shortlist" : "Save to shortlist"}
+        aria-label={isSaved ? t('stays.savedToShortlist') : t('stays.saveToShortlist')}
         className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-semibold transition-all duration-200 ${
           isSaved
             ? "bg-[#143A80] text-white"
@@ -82,19 +84,19 @@ export default function SaveToShortlistButton({ propertyId }) {
         }`}
       >
         <Heart className="w-4 h-4" fill={isSaved ? "currentColor" : "none"} strokeWidth={2} aria-hidden="true" />
-        {isSaved ? `Saved (${savedIds.size})` : "Save"}
+        {isSaved ? t('stays.savedCount', { count: savedIds.size }) : t('common.save')}
       </button>
 
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
           <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-[#E3E8EF] bg-elevated p-3 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
-            <h4 className="mb-2 text-sm font-semibold text-[#203565]">Save to shortlist</h4>
+            <h4 className="mb-2 text-sm font-semibold text-[#203565]">{t('stays.saveToShortlist')}</h4>
 
             {loading ? (
-              <p className="py-2 text-xs text-[#5B6B82]">Loading...</p>
+              <p className="py-2 text-xs text-[#5B6B82]">{t('common.loading')}</p>
             ) : shortlists.length === 0 ? (
-              <p className="py-2 text-xs text-[#5B6B82]">No shortlists yet.</p>
+              <p className="py-2 text-xs text-[#5B6B82]">{t('stays.noShortlists')}</p>
             ) : (
               <div className="space-y-1 max-h-48 overflow-y-auto mb-2">
                 {shortlists.map((sl) => (
@@ -120,12 +122,12 @@ export default function SaveToShortlistButton({ propertyId }) {
                   type="text"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  placeholder="Shortlist name"
+                  placeholder={t('stays.shortlistName')}
                   className="min-h-[36px] flex-1 rounded-[10px] border border-[#E3E8EF] px-2 py-1 text-xs text-[#203565] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C5A28C]"
                   autoFocus
                   onKeyDown={(e) => { if (e.key === "Enter") handleCreate(); if (e.key === "Escape") setShowCreate(false); }}
                 />
-                <button onClick={handleCreate} className="rounded-[10px] bg-[#143A80] px-2 py-1 text-xs font-semibold text-white">Add</button>
+                <button onClick={handleCreate} className="rounded-[10px] bg-[#143A80] px-2 py-1 text-xs font-semibold text-white">{t('common.add')}</button>
               </div>
             ) : (
               <button
@@ -133,7 +135,7 @@ export default function SaveToShortlistButton({ propertyId }) {
                 onClick={() => setShowCreate(true)}
                 className="w-full rounded-[10px] px-2 py-1.5 text-left text-xs font-medium text-[#9A7B61] transition-colors hover:bg-[#FDE8D8]"
               >
-                + Create new shortlist
+                {t('stays.createShortlist')}
               </button>
             )}
           </div>

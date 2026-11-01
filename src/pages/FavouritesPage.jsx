@@ -8,6 +8,7 @@ import Spinner from '../components/Spinner.jsx';
 import { heroImage } from '../assets/images.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 
 function getPropertyImage(property) {
@@ -42,6 +43,7 @@ CollectionCard.propTypes = {
 };
 
 function FavouritesPage() {
+  const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const { favorites } = useFavorites();
   const [searchParams] = useSearchParams();
@@ -80,7 +82,7 @@ function FavouritesPage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      window.prompt('Copy this link to share your wishlist:', url);
+      window.prompt(t('saved.copyLinkPrompt'), url);
     }
   };
 
@@ -92,11 +94,11 @@ function FavouritesPage() {
       <div className="opg-saved-container">
         <SavedStaysHeader
           activeTab="saved"
-          title={sharedIds ? 'Shared wishlist' : 'Saved stays'}
+          title={sharedIds ? t('saved.sharedWishlist') : t('saved.savedStays')}
           subtitle={sharedIds
-            ? `${sharedProperties.length} ${sharedProperties.length === 1 ? 'stay' : 'stays'} shared with you.`
-            : 'Your favourites and stay collections in one place.'}
-          actionLabel={sharedIds ? '' : 'Create shortlist'}
+            ? t(sharedProperties.length === 1 ? 'saved.sharedWithYouOne' : 'saved.sharedWithYouOther', { count: sharedProperties.length })
+            : t('saved.subtitle')}
+          actionLabel={sharedIds ? '' : t('saved.createShortlist')}
           actionTo="/shortlists?new=1"
           showTabs={!sharedIds}
         />
@@ -104,10 +106,10 @@ function FavouritesPage() {
         {!isAuthenticated && !sharedIds ? (
           // The stylesheet spaces sibling sections itself, but this card is the
           // first block under the heading and had no gap at all.
-          <section className="opg-saved-auth mt-6" aria-label="Sign in to save stays">
+          <section className="opg-saved-auth mt-6" aria-label={t('saved.signInToSaveAria')}>
             <UserRound strokeWidth={1.7} aria-hidden="true" />
-            <p>Sign in to save stays to your account and keep your lists in sync across devices.</p>
-            <Link to="/login?returnUrl=/favourites">Sign in</Link>
+            <p>{t('saved.signInToSaveBody')}</p>
+            <Link to="/login?returnUrl=/favourites">{t('saved.signIn')}</Link>
           </section>
         ) : loadingShared ? (
           <div className="flex min-h-[320px] items-center justify-center"><Spinner /></div>
@@ -117,26 +119,26 @@ function FavouritesPage() {
               <section className="opg-saved-section" aria-labelledby="saved-collections-heading">
                 <div className="opg-saved-section-title">
                   <div>
-                    <h2 id="saved-collections-heading">Your collections</h2>
-                    <p>Favourites and lists, ready for your next trip.</p>
+                    <h2 id="saved-collections-heading">{t('saved.yourCollections')}</h2>
+                    <p>{t('saved.collectionsHint')}</p>
                   </div>
                 </div>
                 {/* Stylesheet gaps here are 14px above the cards and 16px between them, both under the 20px floor. mt-5 collapses with the title's 14px to render 20px, and !gap-5 outranks the 16px. */}
                 <div className="opg-saved-collections mt-5 !gap-5">
                   <CollectionCard
-                    title="Favourites"
-                    meta={`${favorites.length} ${favorites.length === 1 ? 'stay' : 'stays'} saved`}
+                    title={t('saved.favourites')}
+                    meta={t(favorites.length === 1 ? 'saved.staysSavedOne' : 'saved.staysSavedOther', { count: favorites.length })}
                     images={favouriteImages}
-                    linkLabel={favorites.length ? 'Browse favourites' : 'Find a stay'}
+                    linkLabel={favorites.length ? t('saved.browseFavourites') : t('saved.findAStay')}
                     to={favorites.length ? '/favourites#saved-stays' : '/properties'}
                   />
                   {shortlistCards.map((shortlist) => (
                     <CollectionCard
                       key={shortlist.id}
                       title={shortlist.name}
-                      meta={`${shortlist._count?.items || 0} ${shortlist._count?.items === 1 ? 'stay' : 'stays'} saved`}
+                      meta={t(shortlist._count?.items === 1 ? 'saved.staysSavedOne' : 'saved.staysSavedOther', { count: shortlist._count?.items || 0 })}
                       images={shortlist.previewImages || []}
-                      linkLabel="Open shortlist"
+                      linkLabel={t('saved.openShortlist')}
                       to={`/shortlists/${shortlist.id}`}
                     />
                   ))}
@@ -147,8 +149,8 @@ function FavouritesPage() {
             {sharedIds && sharedProperties.length === 0 && (
               <div className="opg-saved-empty mt-6">
                 <div>
-                  <h2>No stays in this wishlist</h2>
-                  <p>The shared link is valid, but there are no properties to display.</p>
+                  <h2>{t('saved.emptyWishlistTitle')}</h2>
+                  <p>{t('saved.emptyWishlistBody')}</p>
                 </div>
               </div>
             )}
@@ -157,12 +159,12 @@ function FavouritesPage() {
               <section className="opg-saved-section" id="saved-stays" aria-labelledby="saved-stays-heading">
                 <div className="opg-saved-section-title">
                   <div>
-                    <h2 id="saved-stays-heading">{sharedIds ? 'Shared stays' : 'Saved stays'}</h2>
-                    <p>{displayProperties.length} {displayProperties.length === 1 ? 'property' : 'properties'} saved</p>
+                    <h2 id="saved-stays-heading">{sharedIds ? t('saved.sharedStays') : t('saved.savedStays')}</h2>
+                    <p>{t(displayProperties.length === 1 ? 'saved.propertiesSavedOne' : 'saved.propertiesSavedOther', { count: displayProperties.length })}</p>
                   </div>
                   {!sharedIds && favorites.length > 0 && (
                     <button type="button" className="opg-saved-action opg-saved-secondary" onClick={handleShare}>
-                      {copied ? 'Link copied' : 'Share wishlist'}
+                      {copied ? t('saved.linkCopied') : t('saved.shareWishlist')}
                     </button>
                   )}
                 </div>

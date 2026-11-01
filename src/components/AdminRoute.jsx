@@ -1,6 +1,7 @@
 import { Link, Navigate } from 'react-router-dom';
 import { TriangleAlert } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
  * Guards every /admin route.
@@ -11,14 +12,15 @@ import { useAuth } from '../context/AuthContext.jsx';
  * product instead of dead-ending a signed-in user.
  */
 function AdminRoute({ children }) {
+  const { t } = useLanguage();
   const { user, isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-canvas">
-        <div className="text-center" role="status" aria-label="Checking your access">
+        <div className="text-center" role="status" aria-label={t('chrome.checkingAccess')}>
           <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary" />
-          <p className="text-sm text-muted">Loading...</p>
+          <p className="text-sm text-muted">{t('chrome.loadingEllipsis')}</p>
         </div>
       </div>
     );
@@ -37,15 +39,15 @@ function AdminRoute({ children }) {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#FEF3F2] text-[#B42318] dark:bg-[#B42318]/20">
             <TriangleAlert className="h-8 w-8" strokeWidth={2} aria-hidden="true" />
           </div>
-          <h2 className="mb-2 text-xl font-bold text-navy">Access denied</h2>
+          <h2 className="mb-2 text-xl font-bold text-navy">{t('chrome.accessDenied')}</h2>
           <p className="mb-5 text-sm text-muted">
-            You do not have permission to view the admin workspace. Your account is signed in.
+            {t('chrome.noAdminPermission')}
           </p>
           <Link
             to="/"
             className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-primary px-6 text-sm font-semibold text-white transition-colors hover:bg-primary-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
-            Back to ZuriLofts
+            {t('chrome.backToZuriLofts')}
           </Link>
         </div>
       </div>

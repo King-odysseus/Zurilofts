@@ -1,5 +1,6 @@
 import { useId, useState } from 'react';
 import PropTypes from 'prop-types';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { ChevronDown } from 'lucide-react';
 
 /**
@@ -45,6 +46,7 @@ Dot.propTypes = {
 };
 
 export default function EarningsMonthCard({ heading, figures, breakdown }) {
+  const { t } = useLanguage();
   const [open, setOpen] = useState(false);
   // Generated rather than derived from the heading: two cards can name the same
   // month (this year and last), and duplicated ids would point aria-controls at
@@ -59,7 +61,9 @@ export default function EarningsMonthCard({ heading, figures, breakdown }) {
   const hasBreakdown = rows.length > 0;
 
   return (
-    <section className="rounded-2xl border border-border bg-elevated p-5 shadow-sm sm:p-6">
+    // Borderless, like every other host panel: the shadow carries the lift, so a
+    // hairline here would read as an outlined box sitting among raised cards.
+    <section className="rounded-2xl bg-elevated p-5 shadow-md sm:p-6">
       <h2 className="text-base font-semibold text-navy">{heading}</h2>
 
       {/* One column on a phone: three figures at 33% width wrap a KES amount
@@ -90,7 +94,7 @@ export default function EarningsMonthCard({ heading, figures, breakdown }) {
             aria-controls={panelId}
             className="flex w-full items-center justify-between gap-2 text-sm font-semibold text-navy"
           >
-            <span>Paid breakdown</span>
+            <span>{t('hostmoney.paidBreakdown')}</span>
             <ChevronDown
               className={`h-4 w-4 shrink-0 text-muted transition-transform ${open ? 'rotate-180' : ''}`}
               strokeWidth={2}

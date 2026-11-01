@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, Label, TextInput, ToggleSwitch } from 'flowbite-react';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import PropTypes from 'prop-types';
 import {
   Ban,
@@ -26,7 +27,14 @@ import { useToast } from '../context/ToastContext.jsx';
 // rather than on another page. A host should be able to answer "is this night
 // free, and what does it cost" without leaving the month.
 
-const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+// A fixed English table cannot follow a language switch, and Intl already
+// carries every locale this app ships. Monday first, matching the grid.
+function weekdayLabels(lang) {
+  const format = new Intl.DateTimeFormat(lang === 'sw' ? 'sw-KE' : 'en-GB', { weekday: 'short' });
+  // 2024-01-01 was a Monday, so seven days from it gives Mon..Sun in order.
+  return Array.from({ length: 7 }, (_, index) => format.format(new Date(2024, 0, 1 + index)));
+}
 
 
 // Each night is its own rounded tile, so a week has to be tall enough for the
@@ -173,8 +181,8 @@ async function replaceDatedRulesForRuns({ listPath, runs, makeRule, keepOutside 
   }
 }
 
-function formatMonth(date) {
-  return date.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+function formatMonth(date, lang) {
+  return date.toLocaleDateString(lang === 'sw' ? 'sw-KE' : 'en-GB', { month: 'long', year: 'numeric' });
 }
 
 function formatDay(iso) {
@@ -237,6 +245,7 @@ SidebarSection.propTypes = {
 /* ------------------------------------------------------------------ grid ---- */
 
 function StayBar({ booking, weekStart, row }) {
+  const { t } = useLanguage();
   const weekDays = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
   const firstVisible = weekDays.findIndex((day) => inStay(day, booking.start, booking.end));
   if (firstVisible < 0) return null;
@@ -260,7 +269,7 @@ function StayBar({ booking, weekStart, row }) {
       marginTop: `${BAR_TOP + row * BAR_STEP}px`,
       height: `${BAR_HEIGHT}px`,
     }}
-    title={`${booking.guestName || 'Guest'}, ${formatDay(booking.start)} to ${formatDay(booking.end)}`}
+    title={t('a11y2.stayBarTooltip', { guest: booking.guestName || t('a11y2.guest'), start: formatDay(booking.start), end: formatDay(booking.end) })}
   >
     <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-navy-bg text-[8px] font-bold text-white">{initialsOf(booking.guestName)}</span>
     <span className="truncate">{booking.guestName || 'Guest'}{booking.guests > 1 ? ` + ${booking.guests - 1}` : ''}</span>
@@ -280,6 +289,7 @@ StayBar.propTypes = {
  * single column (~46px) with no room for the label, so it shows initials alone.
  */
 function ReservedTile({ booking, weekStart }) {
+  const { t } = useLanguage();
   const weekDays = Array.from({ length: 7 }, (_, index) => addDays(weekStart, index));
   const firstVisible = weekDays.findIndex((day) => inStay(day, booking.start, booking.end));
   if (firstVisible < 0) return null;
@@ -292,12 +302,12 @@ function ReservedTile({ booking, weekStart }) {
 
   return <Link
     to={`/host/reservations/${booking.id}`}
-    aria-label={`Reserved, ${booking.guestName || 'guest'}, ${formatDay(booking.start)} to ${formatDay(booking.end)}`}
+    aria-label={t('host.reservedLabel', { guest: booking.guestName || t('common.guest'), start: formatDay(booking.start), end: formatDay(booking.end) })}
     className="pointer-events-auto flex h-full min-w-0 items-center gap-1.5 overflow-hidden rounded-[10px] border border-border bg-elevated px-1.5"
     style={{ gridColumn: `${firstVisible + 1} / span ${span}`, gridRow: 1 }}
   >
     <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-navy-bg text-[9px] font-bold text-white">{initialsOf(booking.guestName)}</span>
-    {span > 1 && <span className="min-w-0 truncate text-[10px] font-semibold text-navy">Reserved</span>}
+    {span > 1 && <span className="min-w-0 truncate text-[10px] font-semibold text-navy">{t('host.reserved')}</span>}
   </Link>;
 }
 
@@ -307,6 +317,7 @@ ReservedTile.propTypes = {
 };
 
 function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
+  const { t, lang } = useLanguage();
   // The grid is generated as six whole weeks so the arithmetic never runs short.
   // A month that ends mid-week leaves a last row made entirely of next-month
   // days, which would draw a band of empty tiles under the month, so any week
@@ -332,7 +343,7 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
         background must be opaque: the tiles pass underneath it. */}
     <div className="sticky top-16 z-20 -mx-4 bg-elevated px-4 pb-1 pt-1.5 sm:static sm:mx-0 sm:px-0 sm:py-0">
       <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
-        {WEEKDAYS.map((day) => <span key={day} className="min-w-0 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted sm:text-[11px]">
+        {weekdayLabels(lang).map((day) => <span key={day} className="min-w-0 py-2 text-center text-[10px] font-semibold uppercase tracking-[0.08em] text-muted sm:text-[11px]">
           {/* A phone column is ~46px wide, so it gets a single letter. */}
           <span className="sm:hidden">{day[0]}</span>
           <span className="hidden sm:inline">{day}</span>
@@ -363,14 +374,19 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
             const nightPrice = priceFor(day, basePrice, priceRules);
             // A booked night cannot be blocked or opened, and a day lent in from
             // the next month is not a night of this month, so both are labels.
-            const label = `${day.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}: ${stay ? 'booked' : blocked ? 'blocked' : `open, ${money(nightPrice)}`}`;
+            const dayText = day.toLocaleDateString(lang === 'sw' ? 'sw-KE' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+            const label = stay
+              ? t('host.dayBooked', { date: dayText })
+              : blocked
+                ? t('host.dayBlocked', { date: dayText })
+                : t('host.dayOpen', { date: dayText, price: money(nightPrice) });
             return <button
               key={day.toISOString()}
               type="button"
               onClick={(event) => { if (!stay && !outside) onToggle(day, event.shiftKey); }}
               aria-pressed={isSelected}
               disabled={stay || outside}
-              aria-label={`${label}${outside ? ', outside this month' : stay ? ', not editable' : isSelected ? ', selected' : ', tap to select'}`}
+              aria-label={`${label}${outside ? t('a11y2.outsideThisMonth') : stay ? t('a11y2.notEditable') : isSelected ? t('a11y2.selected') : t('a11y2.tapToSelect')}`}
               className={`flex min-h-[92px] min-w-0 flex-col justify-between gap-1 rounded-[10px] border p-1.5 text-left transition-colors focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary sm:min-h-[var(--cal-min,104px)] sm:rounded-2xl sm:p-2.5 ${
                 isSelected || stay
                   ? 'border-navy-bg bg-navy-bg text-white'
@@ -443,6 +459,7 @@ MonthGrid.propTypes = {
 /* ------------------------------------------------------------------ page ---- */
 
 export default function HostCalendarPage() {
+  const { t, lang } = useLanguage();
   const { id } = useParams();
   const navigate = useNavigate();
   const toast = useToast();
@@ -825,9 +842,9 @@ export default function HostCalendarPage() {
   const shownMonth = firstOfMonth(new Date());
   const onCurrentMonth = monthAnchor.getFullYear() === shownMonth.getFullYear() && monthAnchor.getMonth() === shownMonth.getMonth();
   const monthStats = [
-    { label: 'Nights booked', shortLabel: 'Booked', value: monthNights.booked },
-    { label: 'Nights blocked', shortLabel: 'Blocked', value: monthNights.blocked },
-    { label: 'Base rate', shortLabel: 'Base rate', value: money(basePrice) },
+    { label: t('host.nightsBookedStat'), shortLabel: t('host.booked'), value: monthNights.booked },
+    { label: t('host.nightsBlockedStat'), shortLabel: t('host.blocked'), value: monthNights.blocked },
+    { label: t('host.baseRateStat'), shortLabel: t('host.baseRateStat'), value: money(basePrice) },
   ];
 
   // The sheet names the pick the way the reference does: one date, or the span.
@@ -893,34 +910,34 @@ export default function HostCalendarPage() {
   function renderSettings() {
     return <HostCard flush>
       <div className="border-b border-border px-4 py-4">
-        <h2 className="text-sm font-semibold text-navy">Pricing and availability</h2>
-        <p className="mt-1.5 text-[11px] leading-relaxed text-muted">Changes here apply to this stay only.</p>
+        <h2 className="text-sm font-semibold text-navy">{t('host.pricingAndAvailability')}</h2>
+        <p className="mt-1.5 text-[11px] leading-relaxed text-muted">{t('host.changesApplyToThisStay')}</p>
       </div>
 
       {selectionCount > 0 && <div className="border-b border-border bg-[#F7F9FC] px-4 py-4">
-        <p className="text-[11px] font-semibold text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</p>
+        <p className="text-[11px] font-semibold text-navy">{t(selectionCount === 1 ? 'host.selectionNightsOne' : 'host.selectionNightsOther', { count: selectionCount })} selected</p>
         <p className="mt-1.5 text-[10px] leading-relaxed text-muted">
           {selectedOpenDays.length > 0 && `${selectedOpenDays.length} open`}
           {selectedOpenDays.length > 0 && selectedBlockedDays.length > 0 && ' · '}
           {selectedBlockedDays.length > 0 && `${selectedBlockedDays.length} blocked`}
         </p>
         <div className="mt-4 flex items-center justify-between gap-3">
-          <span className="text-[11px] font-semibold text-navy">Available</span>
+          <span className="text-[11px] font-semibold text-navy">{t('host.available')}</span>
           <ToggleSwitch
             checked={selectedAllOpen}
             onChange={toggleSelectedAvailability}
             disabled={saving}
             sizing="sm"
-            aria-label="Selected nights are available"
+            aria-label={t('host.selectedNightsAvailable')}
           />
         </div>
-        <p className="mt-1.5 text-[10px] leading-relaxed text-muted">On opens these nights, off blocks them.</p>
-        <button type="button" onClick={clearSelection} className="mt-2 w-full text-left text-[10px] text-muted underline underline-offset-2 hover:text-navy">Clear selection</button>
+        <p className="mt-1.5 text-[10px] leading-relaxed text-muted">{t('host.onOpensOffBlocks')}</p>
+        <button type="button" onClick={clearSelection} className="mt-2 w-full text-left text-[10px] text-muted underline underline-offset-2 hover:text-navy">{t('host.clearSelection')}</button>
       </div>}
 
-      <SidebarSection title="Pricing" icon={Wallet} defaultOpen>
+      <SidebarSection title={t('host.pricing')} icon={Wallet} defaultOpen>
         <div className="flex items-baseline justify-between gap-3 border-b border-border pb-2">
-          <span className="text-xs text-muted">Base nightly rate</span>
+          <span className="text-xs text-muted">{t('host.baseNightlyRate')}</span>
           <strong className="text-sm font-bold tabular-nums text-navy">{money(basePrice)}</strong>
         </div>
         {priceRules.length > 0 ? <ul className="mt-2 space-y-1.5">
@@ -928,7 +945,7 @@ export default function HostCalendarPage() {
             <span className="min-w-0 truncate text-navy">{rule.name || 'Date range'}</span>
             <span className="shrink-0 tabular-nums text-muted">{money(rule.price)} <span className="text-[10px]">({formatDay(rule.start)}-{formatDay(addDays(new Date(rule.end), -1))})</span></span>
           </li>)}
-        </ul> : <p className="mt-2 text-[11px] leading-relaxed text-muted">No dated rates. Every night uses the base rate.</p>}
+        </ul> : <p className="mt-2 text-[11px] leading-relaxed text-muted">{t('host.noDatedRates')}</p>}
         {/* Dates are priced on the calendar itself: pick nights on the grid and the
             day editor opens. The listing editor is only for the base rate, so it is
             a quiet second link rather than the way in. */}
@@ -940,66 +957,66 @@ export default function HostCalendarPage() {
           disabled={selectedDays.length === 0}
           onClick={() => setDayRateOpen(true)}
         >
-          {selectedDays.length > 0 ? 'Set price for picked nights' : 'Pick nights to set a price'}
+          {selectedDays.length > 0 ? t('host.setPriceForPicked') : t('host.pickNightsToSetPrice')}
         </Button>
-        <Link to={`/host/properties/${activePropertyId}/edit`} className="mt-2 block text-center text-[11px] text-muted underline underline-offset-2 hover:text-navy">Edit the base rate in the listing</Link>
+        <Link to={`/host/properties/${activePropertyId}/edit`} className="mt-2 block text-center text-[11px] text-muted underline underline-offset-2 hover:text-navy">{t('host.editBaseRate')}</Link>
       </SidebarSection>
 
-      <SidebarSection title="Availability" icon={Ban}>
+      <SidebarSection title={t('host.availability')} icon={Ban}>
         <form onSubmit={addBlock} className="space-y-2">
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <Label htmlFor={`block-start`} className="text-[11px]">From</Label>
+              <Label htmlFor={`block-start`} className="text-[11px]">{t('host.from')}</Label>
               <TextInput id={`block-start`} type="date" sizing="sm" value={blockDraft.start} onChange={(event) => setBlockDraft((current) => ({ ...current, start: event.target.value }))} required />
             </div>
             <div>
-              <Label htmlFor={`block-end`} className="text-[11px]">To</Label>
+              <Label htmlFor={`block-end`} className="text-[11px]">{t('host.toLabel')}</Label>
               <TextInput id={`block-end`} type="date" sizing="sm" value={blockDraft.end} onChange={(event) => setBlockDraft((current) => ({ ...current, end: event.target.value }))} required />
             </div>
           </div>
           <div>
-            <Label htmlFor={`block-summary`} className="text-[11px]">Reason (optional)</Label>
-            <TextInput id={`block-summary`} sizing="sm" value={blockDraft.summary} onChange={(event) => setBlockDraft((current) => ({ ...current, summary: event.target.value }))} placeholder="Maintenance" />
+            <Label htmlFor={`block-summary`} className="text-[11px]">{t('host.reasonOptional')}</Label>
+            <TextInput id={`block-summary`} sizing="sm" value={blockDraft.summary} onChange={(event) => setBlockDraft((current) => ({ ...current, summary: event.target.value }))} placeholder={t('host.reasonPlaceholder')} />
           </div>
-          <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>{saving ? 'Saving...' : 'Block these dates'}</Button>
+          <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>{saving ? t('common.saving') : t('host.blockTheseDates')}</Button>
         </form>
 
         {(calendar?.blocks || []).length > 0 && <ul className="mt-3 space-y-1.5 border-t border-border pt-2">
           {calendar.blocks.map((block) => <li key={block.id} className="flex items-center justify-between gap-2 text-[11px]">
             <span className="min-w-0 truncate text-navy">{formatDay(block.start)} - {formatDay(block.end)}</span>
             <span className="flex shrink-0 items-center gap-1.5">
-              <span className="text-muted">{block.manual ? 'Manual' : block.sourceName || 'Imported'}</span>
-              {block.manual && <button type="button" onClick={() => removeBlock(block.id)} className="text-muted underline underline-offset-2 hover:text-navy" disabled={saving}>Undo</button>}
+              <span className="text-muted">{block.manual ? t('host.manual') : block.sourceName || t('host.imported')}</span>
+              {block.manual && <button type="button" onClick={() => removeBlock(block.id)} className="text-muted underline underline-offset-2 hover:text-navy" disabled={saving}>{t('host.undo')}</button>}
             </span>
           </li>)}
         </ul>}
       </SidebarSection>
 
-      <SidebarSection title="Connected calendars" icon={Link2}>
-        <p className="text-[11px] leading-relaxed text-muted">Pull bookings from other platforms so a stay is never double-sold.</p>
+      <SidebarSection title={t('host.connectedCalendars')} icon={Link2}>
+        <p className="text-[11px] leading-relaxed text-muted">{t('host.connectedCalendarsHint')}</p>
         {(calendar?.sources || []).length > 0 ? <ul className="mt-2 space-y-2">
           {calendar.sources.map((source) => <li key={source.id} className="rounded-lg border border-border p-2">
             <p className="truncate text-xs font-semibold text-navy">{source.name}</p>
             <p className={`text-[10px] ${source.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-muted'}`}>
-              {source.lastSyncedAt ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}` : 'Not synced yet'}
+              {source.lastSyncedAt ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}` : t('host.notSyncedYet')}
             </p>
-            <button type="button" onClick={() => removeSource(source.id)} className="mt-1 text-[10px] text-muted underline underline-offset-2 hover:text-navy" disabled={saving}>Remove</button>
+            <button type="button" onClick={() => removeSource(source.id)} className="mt-1 text-[10px] text-muted underline underline-offset-2 hover:text-navy" disabled={saving}>{t('common.remove')}</button>
           </li>)}
-        </ul> : <p className="mt-2 text-[11px] text-muted">No external calendars connected.</p>}
+        </ul> : <p className="mt-2 text-[11px] text-muted">{t('host.noExternalCalendars')}</p>}
 
         <Button color="light" size="xs" className="mt-2 w-full" disabled={syncing || (calendar?.sources || []).length === 0} onClick={syncNow}>
-          {syncing ? 'Syncing...' : 'Sync now'}
+          {syncing ? t('host.syncing') : t('host.syncNow')}
         </Button>
 
         <form onSubmit={addSource} className="mt-2 space-y-2 border-t border-border pt-2">
-          <TextInput id={`calendar-platform`} sizing="sm" value={sourceDraft.name} onChange={(event) => setSourceDraft((current) => ({ ...current, name: event.target.value }))} placeholder="Platform, e.g. Airbnb" required />
+          <TextInput id={`calendar-platform`} sizing="sm" value={sourceDraft.name} onChange={(event) => setSourceDraft((current) => ({ ...current, name: event.target.value }))} placeholder={t('host.platformPlaceholder')} required />
           <TextInput id={`calendar-url`} sizing="sm" type="url" value={sourceDraft.url} onChange={(event) => setSourceDraft((current) => ({ ...current, url: event.target.value }))} placeholder="https://example.com/calendar.ics" required />
-          <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>Add feed</Button>
+          <Button type="submit" color="light" size="xs" className="w-full" disabled={saving}>{t('host.addFeed')}</Button>
         </form>
       </SidebarSection>
 
-      <SidebarSection title="Export to another platform" icon={Info}>
-        <p className="text-[11px] leading-relaxed text-muted">Paste this link where the other platform asks for an iCal address.</p>
+      <SidebarSection title={t('host.exportToPlatform')} icon={Info}>
+        <p className="text-[11px] leading-relaxed text-muted">{t('host.exportHint')}</p>
         <TextInput readOnly sizing="sm" className="mt-2" value={calendar?.feedUrl || ''} onFocus={(event) => event.target.select()} />
         <Button color="light" size="xs" className="mt-2 w-full" onClick={copyFeed}>{copied ? 'Copied' : 'Copy link'}</Button>
       </SidebarSection>
@@ -1009,9 +1026,9 @@ export default function HostCalendarPage() {
   return <div className="space-y-6">
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="min-w-0">
-        <p className={HOST_EYEBROW}>HOST WORKSPACE</p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Calendar</h1>
-        <p className="mt-2 hidden max-w-2xl text-sm leading-relaxed text-muted sm:block">Every night you can sell, what it costs, and who is already booked.</p>
+        <p className={HOST_EYEBROW}>{t('host.todayEyebrow')}</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('host.calendarTitle')}</h1>
+        <p className="mt-2 hidden max-w-2xl text-sm leading-relaxed text-muted sm:block">{t('host.calendarDescription')}</p>
       </div>
 
       <div className="flex w-full flex-col gap-2 sm:w-auto sm:items-end">
@@ -1024,7 +1041,7 @@ export default function HostCalendarPage() {
             value={activePropertyId || ''}
             onChange={(next) => navigate(`/host/calendar/${next}`)}
             options={properties.map((property) => ({ value: property.id, label: property.title }))}
-            ariaLabel="Listing"
+            ariaLabel={t('a11y2.listing')}
             shape="pill"
             className="font-semibold"
           />
@@ -1037,22 +1054,22 @@ export default function HostCalendarPage() {
             <button
               type="button"
               onClick={() => moveMonth(-1)}
-              aria-label="Previous month"
+              aria-label={t('host.previousMonth')}
               className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-navy transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
             </button>
-            <span className="min-w-0 flex-1 truncate px-1 text-center text-sm font-semibold text-navy sm:min-w-[7.5rem] sm:flex-none">{formatMonth(monthAnchor)}</span>
+            <span className="min-w-0 flex-1 truncate px-1 text-center text-sm font-semibold text-navy sm:min-w-[7.5rem] sm:flex-none">{formatMonth(monthAnchor, lang)}</span>
             <button
               type="button"
               onClick={() => moveMonth(1)}
-              aria-label="Next month"
+              aria-label={t('host.nextMonth')}
               className="grid h-11 w-11 shrink-0 place-items-center rounded-full text-navy transition-colors hover:bg-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
               <ChevronRight className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
             </button>
           </div>
-          <Button type="button" size="xs" color="light" onClick={goToday} disabled={onCurrentMonth} className="min-h-[44px] shrink-0">Today</Button>
+          <Button type="button" size="xs" color="light" onClick={goToday} disabled={onCurrentMonth} className="min-h-[44px] shrink-0">{t('host.legendToday')}</Button>
         </div>
       </div>
     </header>
@@ -1060,21 +1077,21 @@ export default function HostCalendarPage() {
     {error && <Alert color="failure">
       <div className="flex w-full flex-wrap items-center justify-between gap-3">
         <p className="min-w-0 flex-1">{error}</p>
-        <Button type="button" size="xs" color="light" onClick={() => load()}>Try again</Button>
+        <Button type="button" size="xs" color="light" onClick={() => load()}>{t('common.retry')}</Button>
       </div>
     </Alert>}
 
-    {loading ? <HostCard aria-label="Loading calendar">
+    {loading ? <HostCard aria-label={t('host.loadingCalendar')}>
       <span className="block h-[420px] animate-pulse rounded-lg bg-surface" />
     </HostCard> : !activePropertyId ? <HostCard className="py-12 text-center">
       <CalendarDays className="mx-auto h-6 w-6 text-muted" strokeWidth={1.6} aria-hidden="true" />
-      <strong className="mt-2 block text-base font-semibold text-navy">No listings to manage</strong>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">Add a listing before setting availability.</p>
-      <Button as={Link} to="/host/properties/new" size="sm" className="mx-auto mt-4 w-fit">Add a listing</Button>
+      <strong className="mt-2 block text-base font-semibold text-navy">{t('host.noListingsToManage')}</strong>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted">{t('host.addListingBeforeAvailability')}</p>
+      <Button as={Link} to="/host/properties/new" size="sm" className="mx-auto mt-4 w-fit">{t('host.addListing')}</Button>
     </HostCard> : <div className="grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,320px)]">
       {/* Flush: the grid and the totals strip run edge to edge, while the head
           keeps its padding so it still lines up with the side panel. */}
-      <section aria-label="Month calendar">
+      <section aria-label={t('host.monthCalendar')}>
       {/* Overflow stays visible on a phone so the weekday strip can pin to the
           viewport; a clipping ancestor would trap it inside the card. */}
       <HostCard flush className="overflow-visible sm:overflow-hidden">
@@ -1082,15 +1099,15 @@ export default function HostCalendarPage() {
           <div className="min-w-0">
             <h2 className="truncate text-base font-semibold text-navy">{calendar?.property?.title || 'Your stay'}</h2>
             <p className="text-xs text-muted">
-              {stayCount} {stayCount === 1 ? 'stay' : 'stays'} booked
-              {selectionCount > 0 && <> <span aria-hidden="true">·</span> {selectionCount} {selectionCount === 1 ? 'night' : 'nights'} selected</>}
+              {t(stayCount === 1 ? 'host.staysBookedOne' : 'host.staysBookedOther', { count: stayCount })}
+              {selectionCount > 0 && <> <span aria-hidden="true">·</span> {t(selectionCount === 1 ? 'host.selectionNightsOne' : 'host.selectionNightsOther', { count: selectionCount })} selected</>}
             </p>
           </div>
           <div className="hidden flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted sm:flex">
-            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-navy-bg" aria-hidden="true" />Booked</span>
-            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[#B9C3D1]" aria-hidden="true" />Blocked</span>
-            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-border bg-elevated" aria-hidden="true" />Open</span>
-            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-primary bg-elevated" aria-hidden="true" />Today</span>
+            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-navy-bg" aria-hidden="true" />{t('host.booked')}</span>
+            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm bg-[#B9C3D1]" aria-hidden="true" />{t('host.blocked')}</span>
+            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-border bg-elevated" aria-hidden="true" />{t('host.open')}</span>
+            <span className="inline-flex items-center gap-1.5"><i className="h-2.5 w-2.5 rounded-sm border border-primary bg-elevated" aria-hidden="true" />{t('host.today')}</span>
           </div>
         </div>
 
@@ -1104,7 +1121,7 @@ export default function HostCalendarPage() {
         </div>
 
         <p className="hidden border-b border-border px-4 py-2 text-[11px] leading-relaxed text-muted sm:block">
-          Tap the nights you want, then block or open them together. Shift-click fills a whole range.
+          {t('host.tapNightsHint')}
         </p>
 
         <MonthGrid
@@ -1117,7 +1134,7 @@ export default function HostCalendarPage() {
         </HostCard>
       </section>
 
-      <aside id="calendar-settings" aria-label="Calendar settings" className="h-fit scroll-mt-20">
+      <aside id="calendar-settings" aria-label={t('host.calendarSettings')} className="h-fit scroll-mt-20">
         {renderSettings()}
       </aside>
     </div>}
@@ -1156,13 +1173,13 @@ export default function HostCalendarPage() {
         <div
           className="flex items-center gap-2 rounded-full border border-border bg-elevated px-2 py-2 shadow-xl"
           role="region"
-          aria-label="Selected dates, actions"
+          aria-label={t('host.selectedDatesActions')}
         >
-          <span className="pl-1 pr-1 text-xs font-semibold tabular-nums text-navy">{selectionCount} {selectionCount === 1 ? 'night' : 'nights'}</span>
-          <Button type="button" size="xs" color="dark" className="min-h-[44px]" disabled={saving} onClick={() => setDayRateOpen(true)}>Price and discount</Button>
-          <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? 'Saving...' : 'Block'}</Button>
+          <span className="pl-1 pr-1 text-xs font-semibold tabular-nums text-navy">{t(selectionCount === 1 ? 'host.selectionNightsOne' : 'host.selectionNightsOther', { count: selectionCount })}</span>
+          <Button type="button" size="xs" color="dark" className="min-h-[44px]" disabled={saving} onClick={() => setDayRateOpen(true)}>{t('host.priceAndDiscount')}</Button>
+          <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedOpenDays.length === 0} onClick={blockSelected}>{saving ? t('common.saving') : t('host.block')}</Button>
           <Button type="button" size="xs" color="light" className="min-h-[44px]" disabled={saving || selectedBlockedDays.length === 0} onClick={openSelected}>Open</Button>
-          <button type="button" onClick={clearSelection} aria-label="Clear selection" className="ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy">
+          <button type="button" onClick={clearSelection} aria-label={t('a11y2.clearSelection')} className="ml-auto grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted transition-colors hover:bg-surface hover:text-navy">
             <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
           </button>
         </div>

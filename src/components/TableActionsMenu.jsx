@@ -107,7 +107,7 @@ function TableActionsMenu({ label = 'More actions', actions }) {
           role="menu"
           aria-label={label}
           style={{ top: pos.top, left: pos.left, width: MENU_WIDTH }}
-          className="fixed z-[80] overflow-hidden rounded-xl border border-border bg-elevated p-1 shadow-lg"
+          className="fixed z-[80] overflow-hidden rounded-xl bg-elevated p-1 shadow-lg"
         >
           {actions.map((action) => (
             <button

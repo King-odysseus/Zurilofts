@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { Alert, Button } from 'flowbite-react';
 import { CalendarDays, ChevronLeft, MapPin, PencilLine, Users } from 'lucide-react';
 import apiClient from '../api/client.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
 import ListingMirrorBody from '../components/ListingMirrorBody.jsx';
 import Spinner from '../components/Spinner.jsx';
@@ -26,15 +27,16 @@ const STATUS_TONE = {
   DRAFT: 'border-border bg-surface text-navy',
 };
 
-function statusSentence(property) {
-  if (property.status === 'PUBLISHED') return 'Guests can find this listing and book it.';
-  if (property.status === 'PENDING_REVIEW') return 'Guests cannot see this listing until review approves it.';
-  if (property.status === 'REJECTED') return property.listingReviewNote || 'Guests cannot see this listing. Update the requested details, then submit it again.';
-  if (property.status === 'SUSPENDED') return property.listingReviewNote || 'Guests cannot see this listing while it is suspended.';
-  return 'Guests cannot see this listing yet. Finish the details, then submit it for review.';
+function statusSentence(property, t) {
+  if (property.status === 'PUBLISHED') return t('hostpreview.statusPublished');
+  if (property.status === 'PENDING_REVIEW') return t('hostpreview.statusPendingReview');
+  if (property.status === 'REJECTED') return property.listingReviewNote || t('hostpreview.statusRejected');
+  if (property.status === 'SUSPENDED') return property.listingReviewNote || t('hostpreview.statusSuspended');
+  return t('hostpreview.statusDraft');
 }
 
 export default function HostListingPreviewPage() {
+  const { t } = useLanguage();
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,14 +52,14 @@ export default function HostListingPreviewPage() {
         if (!active) return;
         setProperty(response.data.data);
       } catch (err) {
-        if (active) setError(err.response?.data?.error || 'Could not load this listing. Please try again.');
+        if (active) setError(err.response?.data?.error || t('hostpreview.listingLoadFailed'));
       } finally {
         if (active) setLoading(false);
       }
     }
     load();
     return () => { active = false; };
-  }, [id]);
+  }, [id, t]);
 
   if (loading) {
     return <div className="grid min-h-[40vh] place-items-center"><Spinner /></div>;
@@ -67,48 +69,48 @@ export default function HostListingPreviewPage() {
     return <div className="space-y-4">
       <Link to="/host/listings" className="inline-flex items-center gap-1 text-sm font-semibold text-muted hover:text-navy">
         <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-        Back to listings
+        {t('hostpreview.backToListings')}
       </Link>
-      <Alert color="failure">{error || 'This listing could not be found.'}</Alert>
+      <Alert color="failure">{error || t('hostpreview.listingNotFound')}</Alert>
     </div>;
   }
 
   const price = formatPrice(property.price);
 
-  const sidePanel = <HostCard eyebrow="Guest side" title="What a guest can do here">
+  const sidePanel = <HostCard eyebrow={t('hostpreview.guestSide')} title={t('hostpreview.whatGuestCanDo')}>
     <div className="flex flex-col gap-4">
       <p className="text-2xl font-bold text-navy">
-        {price || 'No rate set'}
-        {price && <span className="text-sm font-medium text-muted"> /night</span>}
+        {price || t('hostpreview.noRateSet')}
+        {price && <span className="text-sm font-medium text-muted"> {t('hostpreview.perNight')}</span>}
       </p>
       <p className="text-xs leading-relaxed text-muted">
-        The rate guests start from, before any weekly or monthly discount you have set.
+        {t('hostpreview.rateHint')}
       </p>
 
       <ul className="flex flex-col gap-2 border-t border-border pt-4 text-sm text-charcoal">
         <li className="flex items-start gap-2"><Users className="mt-0.5 h-4 w-4 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />
-          Pick dates, choose guests and book.
+          {t('hostpreview.pickDates')}
         </li>
         <li className="flex items-start gap-2"><AlertIcon />
-          Booking and payment happen in the traveller app, so there is no Book button on this page.
+          {t('hostpreview.bookingHappensInTravellerApp')}
         </li>
       </ul>
 
       <div className="flex flex-col gap-2 border-t border-border pt-4">
         <Button as={Link} to={`/host/properties/${property.id}/edit`} size="sm" className="rounded-full">
           <PencilLine className="mr-1.5 h-4 w-4" strokeWidth={2} aria-hidden="true" />
-          Edit listing
+          {t('hostpreview.editListing')}
         </Button>
         <Button as={Link} to={`/host/calendar/${property.id}`} size="sm" color="light" className="rounded-full">
           <CalendarDays className="mr-1.5 h-4 w-4" strokeWidth={2} aria-hidden="true" />
-          Manage calendar
+          {t('hostpreview.manageCalendar')}
         </Button>
         <Link
           to={`/host/properties/${property.id}/arrival-guide`}
           className="inline-flex min-h-[40px] items-center justify-center gap-1.5 rounded-full px-3 text-xs font-semibold text-muted hover:text-navy"
         >
           <MapPin className="h-4 w-4" strokeWidth={1.8} aria-hidden="true" />
-          Arrival guide
+          {t('hostpreview.arrivalGuide')}
         </Link>
       </div>
     </div>
@@ -119,22 +121,22 @@ export default function HostListingPreviewPage() {
       <div>
         <Link to="/host/listings" className="inline-flex items-center gap-1 text-sm font-semibold text-muted hover:text-navy">
           <ChevronLeft className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
-          Back to listings
+          {t('hostpreview.backToListings')}
         </Link>
         <div className="mt-2 flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p className={HOST_EYEBROW}>Host workspace</p>
-            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-navy sm:text-3xl">Guest preview</h1>
+            <p className={HOST_EYEBROW}>{t('hostpreview.hostWorkspace')}</p>
+            <h1 className="mt-1 text-2xl font-semibold tracking-tight text-navy sm:text-3xl">{t('hostpreview.guestPreview')}</h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
-              Your own copy of this listing, laid out as a guest reads it. Nothing you click here books or pays for anything.
+              {t('hostpreview.guestPreviewHint')}
             </p>
           </div>
         </div>
       </div>
 
       <div className={`rounded-xl border px-4 py-3 text-sm ${STATUS_TONE[property.status] || STATUS_TONE.DRAFT}`}>
-        <strong className="font-semibold">{listingStatusLabel(property.status)}</strong>
-        <span className="ml-2">{statusSentence(property)}</span>
+        <strong className="font-semibold">{listingStatusLabel(property.status, t)}</strong>
+        <span className="ml-2">{statusSentence(property, t)}</span>
       </div>
 
       <HostCard>

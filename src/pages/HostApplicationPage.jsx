@@ -1,13 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import { Alert, Badge, Button, Checkbox, FileInput, Label, Textarea, TextInput } from 'flowbite-react';
+import { Alert, Badge, Button, Checkbox, Label, Textarea, TextInput } from 'flowbite-react';
+import { Upload } from 'lucide-react';
 import SelectMenu from '../components/SelectMenu.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
 import { formatPrice } from '../utils/currency.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 
 const EMPTY_FORM = {
@@ -21,41 +23,41 @@ const EMPTY_FORM = {
 };
 
 const STATUS_COPY = {
-  DRAFT: 'Your draft is ready to complete. Save at any time, then submit it for verification.',
-  CHANGES_REQUESTED: 'Update the requested details or documents below, then submit again.',
-  SUBMITTED: 'Your application is with Trust and Safety. We will notify you when the review is complete.',
-  APPROVED: 'Your host application is approved. You can now create and publish your first listing.',
-  REJECTED: 'Your application was not approved. Contact support if you need help with the review outcome.',
+  DRAFT: 'hostsetup.draftHint',
+  CHANGES_REQUESTED: 'hostsetup.changesHint',
+  SUBMITTED: 'hostsetup.submittedHint',
+  APPROVED: 'hostsetup.approvedHint',
+  REJECTED: 'hostsetup.rejectedHint',
 };
 
 const STATUS_LABELS = {
-  DRAFT: 'Draft',
-  CHANGES_REQUESTED: 'Changes requested',
-  SUBMITTED: 'Under review',
-  APPROVED: 'Approved',
-  REJECTED: 'Not approved',
+  DRAFT: 'hostsetup.draft',
+  CHANGES_REQUESTED: 'hostsetup.changesRequested',
+  SUBMITTED: 'hostsetup.underReview',
+  APPROVED: 'hostsetup.approved',
+  REJECTED: 'hostsetup.notApproved',
 };
 
 const STEP_DEFINITIONS = [
   {
     key: 'identity',
-    label: 'Identity and contact',
-    description: 'Legal name, contact and ID details',
+    label: 'hostsetup.step1Title',
+    description: 'hostsetup.step1Short',
   },
   {
     key: 'business',
-    label: 'Hosting business',
-    description: 'Host type, trading name and payouts',
+    label: 'hostsetup.step2Title',
+    description: 'hostsetup.step2Short',
   },
   {
     key: 'properties',
-    label: 'Property details',
-    description: 'Locations, property mix and experience',
+    label: 'hostsetup.step3Title',
+    description: 'hostsetup.step3Short',
   },
   {
     key: 'review',
-    label: 'Review and submit',
-    description: 'Documents, terms and final checks',
+    label: 'hostsetup.step4Title',
+    description: 'hostsetup.step4Short',
   },
 ];
 
@@ -65,16 +67,16 @@ const PROPERTY_TYPES = [
 ];
 
 const DOCUMENT_LABELS = {
-  IDENTITY_FRONT: 'Identity document - photo/details side',
-  IDENTITY_BACK: 'Identity document - reverse side',
-  PROPERTY_AUTHORITY: 'Proof of ownership or authority to host',
-  BUSINESS_REGISTRATION: 'Business registration certificate',
+  IDENTITY_FRONT: 'hostsetup.docFront',
+  IDENTITY_BACK: 'hostsetup.docBack',
+  PROPERTY_AUTHORITY: 'hostsetup.docAuthority',
+  BUSINESS_REGISTRATION: 'hostsetup.docBusiness',
 };
 
 // Shared with the listing editor so both multi-step host forms read identically.
-const CARD_CLASS = 'rounded-xl border border-border bg-elevated p-5 shadow-sm sm:p-6';
+const CARD_CLASS = 'rounded-xl bg-elevated shadow-md p-5 sm:p-6';
 const STEP_BUTTON_BASE = 'flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-surface';
-const STEP_CIRCLE_BASE = 'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-[11px] font-bold';
+const STEP_CIRCLE_BASE = 'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-surface dark:bg-primary/15 text-[11px] font-bold';
 
 function formFromApplication(application, user) {
   return {
@@ -106,6 +108,7 @@ function formFromApplication(application, user) {
 }
 
 function HostApplicationPage() {
+  const { t } = useLanguage();
   const { user, setUser } = useAuth();
   const { setMode } = useMode();
   const navigate = useNavigate();
@@ -207,10 +210,10 @@ function HostApplicationPage() {
     const reviewComplete = documentsComplete && form.agreedTerms;
 
     return [
-      { ...STEP_DEFINITIONS[0], complete: identityComplete, detail: identityComplete ? 'Complete' : 'In progress' },
-      { ...STEP_DEFINITIONS[1], complete: businessComplete, detail: businessComplete ? 'Complete' : 'Needs details' },
-      { ...STEP_DEFINITIONS[2], complete: propertiesComplete, detail: propertiesComplete ? 'Complete' : 'Needs details' },
-      { ...STEP_DEFINITIONS[3], complete: reviewComplete, detail: reviewComplete ? 'Ready to submit' : 'Documents required' },
+      { ...STEP_DEFINITIONS[0], complete: identityComplete, detail: identityComplete ? t('hostsetup.detailed') : t('hostsetup.inProgress') },
+      { ...STEP_DEFINITIONS[1], complete: businessComplete, detail: businessComplete ? t('hostsetup.detailed') : t('hostsetup.needsDetails') },
+      { ...STEP_DEFINITIONS[2], complete: propertiesComplete, detail: propertiesComplete ? t('hostsetup.detailed') : t('hostsetup.needsDetails') },
+      { ...STEP_DEFINITIONS[3], complete: reviewComplete, detail: reviewComplete ? t('hostsetup.readyToSubmit') : t('hostsetup.documentsRequired') },
     ];
   }, [
     application?.documents,
@@ -236,6 +239,7 @@ function HostApplicationPage() {
     form.propertyRelationship,
     form.propertyTypes,
     requiredDocuments,
+    t,
   ]);
 
   const completedCount = completionItems.filter((item) => item.complete).length;
@@ -243,9 +247,9 @@ function HostApplicationPage() {
   const statusLabel = saving
     ? 'Saving'
     : application
-      ? STATUS_LABELS[application.status] || application.status.replaceAll('_', ' ')
+      ? t(STATUS_LABELS[application.status]) || application.status.replaceAll('_', ' ')
       : user?.role === 'HOST' ? 'Approved' : 'Not started';
-  const statusMeta = application ? STATUS_COPY[application.status] : STATUS_COPY.DRAFT;
+  const statusMeta = application ? t(STATUS_COPY[application.status]) : STATUS_COPY.DRAFT;
 
   function update(name, value) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -392,7 +396,7 @@ function HostApplicationPage() {
         ...current,
         documents: [...(current.documents || []).filter((doc) => doc.kind !== kind), response.data.data],
       }));
-      setMessage(`${DOCUMENT_LABELS[kind]} uploaded securely.`);
+      setMessage(`${t(DOCUMENT_LABELS[kind])} uploaded securely.`);
     } catch (err) {
       setError(err.response?.data?.error || 'Could not upload the document.');
     } finally { setUploadingKind(''); }
@@ -425,36 +429,36 @@ function HostApplicationPage() {
   return (
     <div className="space-y-6">
       <header>
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Host setup</p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Get your space ready to host</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Complete your identity, property details and review before you publish.</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">{t('hostsetup.eyebrow')}</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('hostsetup.title')}</h1>
+        <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t('hostsetup.description')}</p>
       </header>
 
-      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3" aria-label="Application summary">
-        <div className="rounded-xl border border-border bg-elevated p-4 shadow-sm">
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-3" aria-label={t('hostsetup.summaryLabel')}>
+        <div className="rounded-xl bg-elevated shadow-md p-4">
           <strong className="block text-lg font-bold text-navy">{completedCount} / {STEP_DEFINITIONS.length}</strong>
-          <span className="text-xs text-muted">Steps complete</span>
+          <span className="text-xs text-muted">{t('hostsetup.stepsComplete')}</span>
         </div>
-        <div className="rounded-xl border border-border bg-elevated p-4 shadow-sm">
-          <strong className="block text-lg font-bold text-navy">~10 min</strong>
-          <span className="text-xs text-muted">Estimated time</span>
+        <div className="rounded-xl bg-elevated shadow-md p-4">
+          <strong className="block text-lg font-bold text-navy">{t('hostsetup.tenMinutes')}</strong>
+          <span className="text-xs text-muted">{t('hostsetup.estimatedTime')}</span>
         </div>
-        <div className="rounded-xl border border-border bg-elevated p-4 shadow-sm">
+        <div className="rounded-xl bg-elevated shadow-md p-4">
           <strong className="block text-lg font-bold text-navy">{statusLabel}</strong>
           <span className="text-xs text-muted">{saving ? 'Saving changes' : 'Current status'}</span>
         </div>
       </section>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[260px_minmax(0,1fr)] lg:items-start">
-        <aside className="space-y-2 rounded-xl border border-border bg-elevated p-5 shadow-sm lg:sticky lg:top-24">
+        <aside className="space-y-2 rounded-xl bg-elevated shadow-md p-5 lg:sticky lg:top-24">
           <div>
-            <strong className="block text-sm font-semibold text-navy">Your progress</strong>
+            <strong className="block text-sm font-semibold text-navy">{t('hostsetup.yourProgress')}</strong>
             <span className="text-xs text-muted">{completedCount} of {STEP_DEFINITIONS.length} steps complete</span>
           </div>
           <div className="h-1.5 w-full overflow-hidden rounded-full bg-surface" aria-hidden="true">
             <i className="block h-full rounded-full bg-primary" style={{ width: `${completionPercent}%` }} />
           </div>
-          <nav className="space-y-2 pt-2" aria-label="Host application steps">
+          <nav className="space-y-2 pt-2" aria-label={t('hostsetup.stepsLabel')}>
             {completionItems.map((step, index) => (
               <button
                 key={step.key}
@@ -463,18 +467,18 @@ function HostApplicationPage() {
                 onClick={() => goToStep(step.key)}
                 aria-current={activeStep === step.key ? 'step' : undefined}
               >
-                <span className={`${STEP_CIRCLE_BASE} ${step.complete || activeStep === step.key ? 'bg-surface dark:bg-primary/15 text-navy' : 'text-muted'}`}>
+                <span className={`${STEP_CIRCLE_BASE} ${step.complete || activeStep === step.key ? 'text-navy' : 'text-muted'}`}>
                   {step.complete ? '\u2713' : index + 1}
                 </span>
                 <span className="flex min-w-0 flex-col gap-0.5">
-                  <strong className="text-sm font-semibold text-navy">{step.label}</strong>
+                  <strong className="text-sm font-semibold text-navy">{t(step.label)}</strong>
                   <small className="truncate text-xs text-muted">{step.detail}</small>
                 </span>
               </button>
             ))}
           </nav>
           <Button type="button" color="light" className="w-full" onClick={handleSaveAndLeave} disabled={saving || !editable}>
-            Save and exit
+            {t('hostsetup.saveAndExit')}
           </Button>
         </aside>
 
@@ -491,24 +495,24 @@ function HostApplicationPage() {
               <section id="host-application-identity" className={`${CARD_CLASS} scroll-mt-24`}>
                 <ApplicationCardHeader
                   step="1"
-                  title="Identity and contact"
-                  description="Your legal details must match the identity document you upload."
+                  title={t('hostsetup.step1Title')}
+                  description={t('hostsetup.step1Description')}
                 />
                 <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="host-legal-name">Full legal name</Label>
+                    <Label htmlFor="host-legal-name">{t('hostsetup.legalName')}</Label>
                     <TextInput id="host-legal-name" value={form.legalName} onChange={(e) => update('legalName', e.target.value)} required />
                   </div>
                   <div>
-                    <Label htmlFor="host-dob">Date of birth</Label>
+                    <Label htmlFor="host-dob">{t('hostsetup.dateOfBirth')}</Label>
                     <TextInput id="host-dob" type="date" value={form.dateOfBirth} onChange={(e) => update('dateOfBirth', e.target.value)} required />
                   </div>
                   <div>
-                    <Label htmlFor="host-nationality">Nationality</Label>
+                    <Label htmlFor="host-nationality">{t('hostsetup.nationality')}</Label>
                     <TextInput id="host-nationality" value={form.nationality} onChange={(e) => update('nationality', e.target.value)} required />
                   </div>
                   <div>
-                    <Label htmlFor="host-identity-type">Identity document</Label>
+                    <Label htmlFor="host-identity-type">{t('hostsetup.identityDocument')}</Label>
                     <SelectMenu id="host-identity-type" value={form.identityType} onChange={(v) => update('identityType', v)} options={[
                       { value: 'NATIONAL_ID', label: 'Kenyan national ID' },
                       { value: 'PASSPORT', label: 'Passport' },
@@ -516,15 +520,15 @@ function HostApplicationPage() {
                     ]} />
                   </div>
                   <div>
-                    <Label htmlFor="host-contact-email">Contact email</Label>
+                    <Label htmlFor="host-contact-email">{t('hostsetup.contactEmail')}</Label>
                     <TextInput id="host-contact-email" type="email" value={form.contactEmail} onChange={(e) => update('contactEmail', e.target.value)} required />
                   </div>
                   <div>
-                    <Label htmlFor="host-contact-phone">Contact phone</Label>
+                    <Label htmlFor="host-contact-phone">{t('hostsetup.contactPhone')}</Label>
                     <TextInput id="host-contact-phone" type="tel" value={form.contactPhone} onChange={(e) => update('contactPhone', e.target.value)} required />
                   </div>
                   <div>
-                    <Label htmlFor="host-kra-pin">KRA PIN</Label>
+                    <Label htmlFor="host-kra-pin">{t('hostsetup.kraPin')}</Label>
                     <TextInput id="host-kra-pin" value={form.kraPin} onChange={(e) => update('kraPin', e.target.value.toUpperCase())} placeholder="A123456789B" required />
                   </div>
                 </div>
@@ -539,44 +543,44 @@ function HostApplicationPage() {
               <section id="host-application-business" className={`${CARD_CLASS} scroll-mt-24`}>
                 <ApplicationCardHeader
                   step="2"
-                  title="Hosting business"
-                  description="Tell us whether you host as an individual or through a registered company."
+                  title={t('hostsetup.step2Title')}
+                  description={t('hostsetup.step2Description')}
                 />
                 <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="host-business-type">Host type</Label>
+                    <Label htmlFor="host-business-type">{t('hostsetup.hostType')}</Label>
                     <SelectMenu id="host-business-type" value={form.businessType} onChange={(v) => update('businessType', v)} options={[
                       { value: 'individual', label: 'Individual' },
                       { value: 'company', label: 'Registered company' },
                     ]} />
                   </div>
                   <div>
-                    <Label htmlFor="host-business-name">Host or business name</Label>
+                    <Label htmlFor="host-business-name">{t('hostsetup.hostOrBusinessName')}</Label>
                     <TextInput id="host-business-name" value={form.businessName} onChange={(e) => update('businessName', e.target.value)} required />
                   </div>
                   {form.businessType === 'company' && (
                     <div>
-                      <Label htmlFor="host-company-number">Company registration number</Label>
+                      <Label htmlFor="host-company-number">{t('hostsetup.companyNumber')}</Label>
                       <TextInput id="host-company-number" value={form.companyRegistrationNo} onChange={(e) => update('companyRegistrationNo', e.target.value)} required />
                     </div>
                   )}
                   <div>
-                    <Label htmlFor="host-payout-method">Preferred payout</Label>
+                    <Label htmlFor="host-payout-method">{t('hostsetup.preferredPayout')}</Label>
                     <SelectMenu id="host-payout-method" value={form.preferredPayoutMethod} onChange={(v) => update('preferredPayoutMethod', v)} options={[
                       { value: 'mpesa', label: 'M-PESA' },
                       { value: 'bank', label: 'Bank transfer' },
                     ]} />
-                    <p className="mt-2 text-xs text-muted">Earnings are paid out by Paystack to the account below. M-PESA goes straight to your phone number; bank transfer goes to your account number using your bank code.</p>
+                    <p className="mt-2 text-xs text-muted">{t('hostsetup.payoutExplainer')}</p>
                   </div>
                   {form.preferredPayoutMethod === 'mpesa' ? (
                     <div>
-                      <Label htmlFor="host-payout-mpesa">M-PESA number for payouts</Label>
+                      <Label htmlFor="host-payout-mpesa">{t('hostsetup.mpesaNumber')}</Label>
                       <TextInput id="host-payout-mpesa" type="tel" value={form.payoutMpesaPhone} onChange={(e) => update('payoutMpesaPhone', e.target.value)} placeholder="0712345678" required />
-                      <p className="mt-2 text-xs text-muted">Use the Safaricom number registered in your own name, for example 0712345678 or 254712345678.</p>
+                      <p className="mt-2 text-xs text-muted">{t('hostsetup.mpesaExplainer')}</p>
                     </div>
                   ) : banks.length > 0 ? (
                     <div>
-                      <Label htmlFor="host-payout-bank">Bank</Label>
+                      <Label htmlFor="host-payout-bank">{t('hostsetup.bank')}</Label>
                       <SelectMenu id="host-payout-bank" value={form.payoutBankCode} onChange={(code) => {
                         const bank = banks.find((item) => item.code === code);
                         update('payoutBankName', bank?.name || '');
@@ -586,19 +590,19 @@ function HostApplicationPage() {
                   ) : (
                     <div className="space-y-4">
                       <div>
-                        <Label htmlFor="host-payout-bank-name">Bank name</Label>
-                        <TextInput id="host-payout-bank-name" value={form.payoutBankName} onChange={(e) => update('payoutBankName', e.target.value)} placeholder="Equity Bank" required />
+                        <Label htmlFor="host-payout-bank-name">{t('hostsetup.bankName')}</Label>
+                        <TextInput id="host-payout-bank-name" value={form.payoutBankName} onChange={(e) => update('payoutBankName', e.target.value)} placeholder={t('hostsetup.bankPlaceholder')} required />
                       </div>
                       <div>
-                        <Label htmlFor="host-payout-bank-code">Bank code</Label>
+                        <Label htmlFor="host-payout-bank-code">{t('hostsetup.bankCode')}</Label>
                         <TextInput id="host-payout-bank-code" value={form.payoutBankCode} onChange={(e) => update('payoutBankCode', e.target.value)} placeholder="068" required />
                       </div>
-                      <p className="mt-2 text-xs text-muted">Enter the Paystack bank code, for example 068 for Equity Bank. We could not load the bank list automatically.</p>
+                      <p className="mt-2 text-xs text-muted">{t('hostsetup.bankCodeExplainer')}</p>
                     </div>
                   )}
                   {form.preferredPayoutMethod === 'bank' && (
                     <div>
-                      <Label htmlFor="host-payout-account">Bank account number</Label>
+                      <Label htmlFor="host-payout-account">{t('hostsetup.bankAccount')}</Label>
                       <TextInput id="host-payout-account" value={form.payoutBankAccountNo} onChange={(e) => update('payoutBankAccountNo', e.target.value.replace(/\D/g, ''))} placeholder="0123456789" inputMode="numeric" required />
                     </div>
                   )}
@@ -614,20 +618,20 @@ function HostApplicationPage() {
               <section id="host-application-properties" className={`${CARD_CLASS} scroll-mt-24`}>
                 <ApplicationCardHeader
                   step="3"
-                  title="Property details"
-                  description="These details help Trust and Safety confirm that you can list the accommodation."
+                  title={t('hostsetup.step3Title')}
+                  description={t('hostsetup.step3Description')}
                 />
                 <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="host-city">Primary city or area</Label>
+                    <Label htmlFor="host-city">{t('hostsetup.primaryCity')}</Label>
                     <TextInput id="host-city" value={form.city} onChange={(e) => update('city', e.target.value)} required />
                   </div>
                   <div>
-                    <Label htmlFor="host-property-count">Number of properties</Label>
+                    <Label htmlFor="host-property-count">{t('hostsetup.numberOfProperties')}</Label>
                     <TextInput id="host-property-count" type="number" min="1" max="1000" value={form.propertyCount} onChange={(e) => update('propertyCount', e.target.value)} required />
                   </div>
                   <div>
-                    <Label htmlFor="host-relationship">Relationship to the properties</Label>
+                    <Label htmlFor="host-relationship">{t('hostsetup.relationship')}</Label>
                     <SelectMenu id="host-relationship" value={form.propertyRelationship} onChange={(v) => update('propertyRelationship', v)} options={[
                       { value: 'OWNER', label: 'Owner' },
                       { value: 'MANAGER', label: 'Property manager' },
@@ -636,20 +640,20 @@ function HostApplicationPage() {
                     ]} />
                   </div>
                   <div>
-                    <Label htmlFor="host-years">Years of hosting experience</Label>
+                    <Label htmlFor="host-years">{t('hostsetup.yearsHosting')}</Label>
                     <TextInput id="host-years" type="number" min="0" max="80" value={form.yearsHosting} onChange={(e) => update('yearsHosting', e.target.value)} required />
                   </div>
                 </div>
 
                 <fieldset className="mt-5">
-                  <legend className="mb-2 block text-sm font-medium text-navy">Property types</legend>
+                  <legend className="mb-2 block text-sm font-medium text-navy">{t('hostsetup.propertyTypes')}</legend>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
                     {PROPERTY_TYPES.map(([value, label]) => {
                       const selected = form.propertyTypes.includes(value);
                       return (
                         <label
                           key={value}
-                          className={`flex min-h-[46px] cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium text-navy ${selected ? 'border-primary bg-surface dark:bg-primary/15' : 'border-border bg-surface'}`}
+                          className={`flex min-h-[46px] cursor-pointer items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-navy shadow-sm ${selected ? 'bg-primary/10 dark:bg-primary/15' : 'bg-surface'}`}
                         >
                           <Checkbox
                             checked={selected}
@@ -664,26 +668,26 @@ function HostApplicationPage() {
 
                 <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="host-property-locations">Property locations</Label>
+                    <Label htmlFor="host-property-locations">{t('hostsetup.propertyLocations')}</Label>
                     <Textarea
                       id="host-property-locations"
                       value={form.propertyLocations}
                       onChange={(e) => update('propertyLocations', e.target.value)}
                       rows={4}
                       maxLength={500}
-                      placeholder="Neighbourhoods, towns or addresses you intend to list"
+                      placeholder={t('hostsetup.locationsPlaceholder')}
                       required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="host-experience">Hosting experience</Label>
+                    <Label htmlFor="host-experience">{t('hostsetup.hostingExperience')}</Label>
                     <Textarea
                       id="host-experience"
                       value={form.experience}
                       onChange={(e) => update('experience', e.target.value)}
                       rows={4}
                       maxLength={2000}
-                      placeholder="Tell us about your experience, team and guest support."
+                      placeholder={t('hostsetup.experiencePlaceholder')}
                     />
                   </div>
                 </div>
@@ -698,8 +702,8 @@ function HostApplicationPage() {
               <section id="host-application-review" className={`${CARD_CLASS} scroll-mt-24`}>
                 <ApplicationCardHeader
                   step="4"
-                  title="Review and submit"
-                  description="Upload the required documents and confirm that the information is accurate."
+                  title={t('hostsetup.step4Title')}
+                  description={t('hostsetup.step4Description')}
                 />
                 <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                   {requiredDocuments.map((kind) => {
@@ -724,7 +728,7 @@ function HostApplicationPage() {
                   />
                   <span>
                     I confirm the information is accurate, I am authorised to list these properties,
-                    and I agree to the <Link to="/terms" className="font-semibold text-muted hover:underline">Terms of Service</Link> and verification checks.
+                    and I agree to the <Link to="/terms" className="font-semibold text-muted hover:underline">{t('hostsetup.termsOfService')}</Link> and verification checks.
                   </span>
                 </label>
 
@@ -742,9 +746,9 @@ function HostApplicationPage() {
               </section>
             </form>
           ) : !application && user.role !== 'HOST' ? (
-            <section className="rounded-xl border border-border bg-elevated p-6 shadow-sm sm:p-8">
-              <h2 className="text-xl font-bold tracking-tight text-navy sm:text-2xl">Start your host application</h2>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Open your application to add your identity, business and property details.</p>
+            <section className="rounded-xl bg-elevated shadow-md p-6 sm:p-8">
+              <h2 className="text-xl font-bold tracking-tight text-navy sm:text-2xl">{t('hostsetup.startApplication')}</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t('hostsetup.startApplicationHint')}</p>
               <div className="mt-5">
                 <Button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
                   {error ? 'Retry application' : 'Start application'}
@@ -781,6 +785,7 @@ function referredHostsLabel(total) {
  * their application.
  */
 function HostReferralCard() {
+  const { t } = useLanguage();
   const [referral, setReferral] = useState(null);
   // 'idle' is the resting label, the other two are the transient confirmations.
   const [copyStatus, setCopyStatus] = useState('idle');
@@ -867,7 +872,7 @@ function HostReferralCard() {
 
   return (
     <section className="op-referral" aria-labelledby="host-referral-heading">
-      <h2 id="host-referral-heading" className="op-referral-heading">Invite another host</h2>
+      <h2 id="host-referral-heading" className="op-referral-heading">{t('hostsetup.inviteHost')}</h2>
       <p className="op-referral-lede">
         {rewardLabel
           ? `${rewardLabel} is credited to your wallet when a host you refer completes their first stay.`
@@ -913,9 +918,20 @@ function StepActions({ saving, uploading, onSave, onContinue }) {
   );
 }
 
+/**
+ * One required document upload tile.
+ *
+ * The native file control is kept off screen and driven by a Flowbite Button.
+ * Rendered visibly it is a near-black button on a grey field that matches no
+ * other control on this form, so every upload in the app (identity
+ * verification, dispute evidence, listing photos) hides it this way instead.
+ */
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
+  const { t } = useLanguage();
+  const fileInput = useRef(null);
+
   return (
-    <div className={`flex flex-col gap-3 rounded-xl border p-4 ${document ? 'border-primary bg-surface dark:bg-primary/15' : 'border-border bg-surface'}`}>
+    <div className={`flex flex-col gap-3 rounded-xl p-4 shadow-sm ${document ? 'bg-surface dark:bg-primary/15' : 'bg-surface'}`}>
       <div className="flex items-start gap-3">
         <span
           aria-hidden="true"
@@ -924,7 +940,7 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
           {document ? '\u2713' : '+'}
         </span>
         <div className="min-w-0">
-          <strong className="block text-sm font-semibold text-navy">{DOCUMENT_LABELS[kind]}</strong>
+          <strong className="block text-sm font-semibold text-navy">{t(DOCUMENT_LABELS[kind])}</strong>
           <small className="block text-xs text-muted">{document ? 'Uploaded and encrypted' : 'JPEG, PNG, WebP or PDF up to 8MB'}</small>
         </div>
       </div>
@@ -936,14 +952,32 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
           </Button>
         </div>
       )}
-      <FileInput
-        aria-label={`${document ? 'Replace' : 'Upload'} ${DOCUMENT_LABELS[kind]}`}
+      <Button
+        type="button"
+        size="sm"
+        color="light"
+        className="self-start"
+        disabled={busy}
+        onClick={() => fileInput.current?.click()}
+      >
+        <Upload className="h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
+        {busy ? 'Uploading...' : document ? 'Replace file' : 'Choose file'}
+      </Button>
+      <input
+        ref={fileInput}
+        type="file"
+        className="sr-only"
+        aria-label={`${document ? t('hostsetup.replace') : t('hostsetup.upload')} ${t(DOCUMENT_LABELS[kind])}`}
         accept="image/jpeg,image/png,image/webp,application/pdf"
         disabled={busy}
-        onChange={(e) => onUpload(kind, e.target.files?.[0])}
-        sizing="sm"
+        onChange={(event) => {
+          const picked = event.target.files?.[0];
+          // Cleared so re-picking the same file after a failed or removed upload
+          // still fires onChange; the browser otherwise reports no change.
+          event.target.value = '';
+          if (picked) onUpload(kind, picked);
+        }}
       />
-      {busy && <p className="text-xs text-muted">Uploading securely...</p>}
     </div>
   );
 }
@@ -953,6 +987,7 @@ function Notice({ tone, children }) {
 }
 
 function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravelling }) {
+  const { t } = useLanguage();
   const approved = application?.status === 'APPROVED' || user?.role === 'HOST';
   const statusColor = approved
     ? 'success'
@@ -963,21 +998,21 @@ function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravel
         : 'gray';
 
   return (
-    <section className="rounded-xl border border-border bg-elevated p-6 shadow-sm sm:p-8">
+    <section className="rounded-xl bg-elevated shadow-md p-6 sm:p-8">
       <Badge color={statusColor}>{statusLabel}</Badge>
       <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{approved ? 'You are ready to host' : 'Application status'}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{statusMeta}</p>
       {application?.reviewNote && (
         <div className="mt-5 rounded-lg bg-surface p-4">
-          <strong className="block text-sm font-semibold text-navy">Reviewer note</strong>
+          <strong className="block text-sm font-semibold text-navy">{t('hostsetup.reviewerNote')}</strong>
           <span className="text-sm text-muted">{application.reviewNote}</span>
         </div>
       )}
       <div className="mt-6 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center">
         {approved ? (
           <>
-            <Button as={Link} to="/host/properties/new">Set up your first property</Button>
-            <Button as={Link} to="/host/today" color="light">Open host dashboard</Button>
+            <Button as={Link} to="/host/properties/new">{t('hostsetup.setUpProperty')}</Button>
+            <Button as={Link} to="/host/today" color="light">{t('hostsetup.openDashboard')}</Button>
           </>
         ) : (
           <Button type="button" color="light" onClick={onBackToTravelling}>

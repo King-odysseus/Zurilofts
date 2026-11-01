@@ -6,6 +6,7 @@ import { Button, Label, TextInput } from 'flowbite-react';
 import SavedStaysHeader from '../components/SavedStaysHeader.jsx';
 import { heroImage } from '../assets/images.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 
 function SkeletonCard() {
@@ -13,13 +14,14 @@ function SkeletonCard() {
 }
 
 function EmptyState({ onCreateClick }) {
+  const { t } = useLanguage();
   return (
     <div className="opg-saved-empty mt-6">
       <div>
         <Heart strokeWidth={1.6} aria-hidden="true" />
-        <h2>No shortlists yet</h2>
-        <p>Create a collection to keep trip ideas together and share them with the people you travel with.</p>
-        <Button className="opg-saved-action" onClick={onCreateClick}>Create your first shortlist</Button>
+        <h2>{t('saved.noShortlistsTitle')}</h2>
+        <p>{t('saved.noShortlistsBody')}</p>
+        <Button className="opg-saved-action" onClick={onCreateClick}>{t('saved.createFirstShortlist')}</Button>
       </div>
     </div>
   );
@@ -30,6 +32,7 @@ EmptyState.propTypes = {
 };
 
 function CreateForm({ onSubmit, onCancel, saving = false }) {
+  const { t } = useLanguage();
   const [name, setName] = useState('');
 
   const handleSubmit = (event) => {
@@ -39,21 +42,21 @@ function CreateForm({ onSubmit, onCancel, saving = false }) {
 
   return (
     <form className="opg-saved-create-form" onSubmit={handleSubmit}>
-      <Label htmlFor="shortlist-name" className="opg-saved-field-label">Shortlist name</Label>
+      <Label htmlFor="shortlist-name" className="opg-saved-field-label">{t('saved.shortlistName')}</Label>
       <TextInput
         id="shortlist-name"
         value={name}
         onChange={(event) => setName(event.target.value)}
-        placeholder="e.g. Weekend getaways"
+        placeholder={t('saved.shortlistNamePlaceholder')}
         maxLength={80}
         autoFocus
       />
       <div className="opg-shortlist-actions">
         <Button type="submit" className="opg-saved-action" disabled={!name.trim() || saving}>
-          {saving ? 'Creating...' : 'Create'}
+          {saving ? t('saved.creating') : t('saved.create')}
         </Button>
         <Button type="button" className="opg-saved-secondary" onClick={onCancel} disabled={saving}>
-          Cancel
+          {t('saved.cancel')}
         </Button>
       </div>
     </form>
@@ -67,6 +70,7 @@ CreateForm.propTypes = {
 };
 
 function ShortlistCard({ shortlist, onDelete, onRename }) {
+  const { t } = useLanguage();
   const [renaming, setRenaming] = useState(false);
   const [newName, setNewName] = useState(shortlist.name);
   const [copied, setCopied] = useState(false);
@@ -87,7 +91,7 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
 
   return (
     <article className="opg-saved-collection">
-      <Link to={`/shortlists/${shortlist.id}`} className="opg-saved-collage" aria-label={`Open ${shortlist.name}`}>
+      <Link to={`/shortlists/${shortlist.id}`} className="opg-saved-collage" aria-label={t('saved.openNamed', { name: shortlist.name })}>
         {images.map((image, index) => <img key={`${image}-${index}`} src={image} alt="" aria-hidden="true" />)}
       </Link>
       <div className="opg-saved-collection-copy">
@@ -106,12 +110,12 @@ function ShortlistCard({ shortlist, onDelete, onRename }) {
             <h3>{shortlist.name}</h3>
           </Link>
         )}
-        <p>{itemCount} {itemCount === 1 ? 'stay' : 'stays'} · Updated {new Date(shortlist.updatedAt).toLocaleDateString('en-KE', { day: 'numeric', month: 'short' })}</p>
+        <p>{t(itemCount === 1 ? 'saved.stayCountUpdatedOne' : 'saved.stayCountUpdatedOther', { count: itemCount, date: new Date(shortlist.updatedAt).toLocaleDateString('en-KE', { day: 'numeric', month: 'short' }) })}</p>
       </div>
       <div className="opg-shortlist-card-actions">
-        <Button size="xs" className="opg-saved-action" onClick={handleCopyLink}>{copied ? 'Copied' : 'Share'}</Button>
-        <Button size="xs" className="opg-saved-secondary" onClick={() => { setNewName(shortlist.name); setRenaming(true); }}>Rename</Button>
-        <Button size="xs" color="failure" onClick={() => onDelete(shortlist.id)}>Delete</Button>
+        <Button size="xs" className="opg-saved-action" onClick={handleCopyLink}>{copied ? t('saved.copied') : t('saved.share')}</Button>
+        <Button size="xs" className="opg-saved-secondary" onClick={() => { setNewName(shortlist.name); setRenaming(true); }}>{t('saved.rename')}</Button>
+        <Button size="xs" color="failure" onClick={() => onDelete(shortlist.id)}>{t('saved.delete')}</Button>
       </div>
     </article>
   );
@@ -131,6 +135,7 @@ ShortlistCard.propTypes = {
 };
 
 export default function ShortlistsPage() {
+  const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const [searchParams] = useSearchParams();
   const [shortlists, setShortlists] = useState([]);
@@ -146,11 +151,11 @@ export default function ShortlistsPage() {
       const response = await apiClient.get('/shortlists');
       setShortlists(response.data.data || []);
     } catch {
-      setError('Could not load your shortlists. Please try again.');
+      setError(t('saved.loadFailed'));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (isAuthenticated) fetchShortlists();
@@ -163,19 +168,19 @@ export default function ShortlistsPage() {
       setShowCreate(false);
       await fetchShortlists();
     } catch {
-      setError('Could not create shortlist.');
+      setError(t('saved.createFailed'));
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this shortlist? This cannot be undone.')) return;
+    if (!window.confirm(t('saved.deleteConfirm'))) return;
     try {
       await apiClient.delete(`/shortlists/${id}`);
       await fetchShortlists();
     } catch {
-      setError('Could not delete shortlist.');
+      setError(t('saved.deleteFailed'));
     }
   };
 
@@ -184,7 +189,7 @@ export default function ShortlistsPage() {
       await apiClient.patch(`/shortlists/${id}`, { name });
       await fetchShortlists();
     } catch {
-      setError('Could not rename shortlist.');
+      setError(t('saved.renameFailed'));
     }
   };
 
@@ -193,9 +198,9 @@ export default function ShortlistsPage() {
       <div className="opg-saved-container">
         <SavedStaysHeader
           activeTab="lists"
-          title="Saved stays"
-          subtitle="Organise your favourite stays into shareable collections."
-          actionLabel={shortlists.length > 0 && !showCreate ? 'New shortlist' : ''}
+          title={t('saved.savedStays')}
+          subtitle={t('saved.shortlistsSubtitle')}
+          actionLabel={shortlists.length > 0 && !showCreate ? t('saved.newShortlist') : ''}
           onAction={() => setShowCreate(true)}
         />
 
@@ -204,7 +209,7 @@ export default function ShortlistsPage() {
         {error && (
           <div className="opg-saved-error mt-6">
             <p>{error}</p>
-            <Button className="opg-saved-action mt-4" onClick={fetchShortlists}>Try again</Button>
+            <Button className="opg-saved-action mt-4" onClick={fetchShortlists}>{t('saved.tryAgain')}</Button>
           </div>
         )}
 

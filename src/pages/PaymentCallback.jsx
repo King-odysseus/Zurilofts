@@ -13,6 +13,7 @@ import {
 import apiClient from '../api/client';
 import RouteBackButton from '../components/RouteBackButton.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { canAddToCalendar, downloadStayCalendar, googleCalendarUrl } from '../utils/stayCalendar.js';
 
 const PENDING_PROVIDER_STATES = new Set(['pending', 'ongoing', 'processing', 'abandoned']);
@@ -29,6 +30,7 @@ function formatMoney(value) {
 }
 
 function PaymentCallback() {
+  const { t } = useLanguage();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const reference = searchParams.get('reference');
@@ -45,8 +47,8 @@ function PaymentCallback() {
 
     if (!reference) {
       setStatus('failed');
-      setError('No payment reference was found. Please return to your trip and try again.');
-      setErrorLabel('Missing payment reference');
+      setError(t('payment.missingReferenceError'));
+      setErrorLabel(t('payment.missingReferenceLabel'));
       return () => { cancelled = true; };
     }
 
@@ -73,8 +75,8 @@ function PaymentCallback() {
 
         const providerStatus = String(paymentData.providerStatus || '').toLowerCase();
         setStatus(PENDING_PROVIDER_STATES.has(providerStatus) ? 'pending' : 'failed');
-        setError(data.message || 'Payment verification did not complete. Please review your trip before trying again.');
-        setErrorLabel(providerStatus ? `Provider status: ${providerStatus}` : 'Verification not completed');
+        setError(data.message || t('payment.verificationIncompleteError'));
+        setErrorLabel(providerStatus ? t('payment.providerStatusLabel', { status: providerStatus }) : t('payment.verificationNotCompleted'));
       } catch (err) {
         if (cancelled) return;
         const responseStatus = err.response?.status;
@@ -83,15 +85,15 @@ function PaymentCallback() {
         setError(
           err.response?.data?.message
             || err.response?.data?.error
-            || 'Unable to verify the payment right now. If you completed payment, it will be confirmed shortly.',
+            || t('payment.verifyError'),
         );
-        setErrorLabel(providerPending ? 'Verification is still in progress' : 'Payment could not be verified');
+        setErrorLabel(providerPending ? t('payment.verificationOngoing') : t('payment.couldNotVerify'));
       }
     }
 
     verify();
     return () => { cancelled = true; };
-  }, [reference]);
+  }, [reference, t]);
 
   const isSaved = saved || (booking?.propertyId ? isFavorite(booking.propertyId) : false);
   const calendarReady = canAddToCalendar(booking);
@@ -106,36 +108,36 @@ function PaymentCallback() {
   return (
     <main className="op-payment-result" aria-live="polite">
       <div className="op-payment-result-inner">
-        <RouteBackButton className="op-payment-back" label="Back" />
+        <RouteBackButton className="op-payment-back" label={t('payment.back')} />
         <header className="op-payment-result-heading">
-          <p>PAYMENT STATUS</p>
-          <h1>Your stay confirmation</h1>
-          <span>We verify every payment securely before confirming a reservation.</span>
+          <p>{t('payment.statusEyebrow')}</p>
+          <h1>{t('payment.confirmationTitle')}</h1>
+          <span>{t('payment.confirmationBody')}</span>
         </header>
 
         <Card className={`op-payment-card is-${status}`} aria-busy={status === 'loading'}>
           {status === 'loading' && (
             <div className="op-payment-state">
               <div className="op-payment-icon is-loading" aria-hidden="true"><RefreshCw /></div>
-              <h2>Confirming payment</h2>
-              <p>This usually takes a few seconds. Keep this page open while we finish.</p>
-              <ol className="op-payment-progress" aria-label="Payment verification progress">
+              <h2>{t('payment.confirmingTitle')}</h2>
+              <p>{t('payment.confirmingBody')}</p>
+              <ol className="op-payment-progress" aria-label={t('payment.progressLabel')}>
                 <li className="op-payment-step is-complete">
                   <span className="op-payment-step-dot"><Check aria-hidden="true" /></span>
-                  <span>Request received</span>
+                  <span>{t('payment.stepRequestReceived')}</span>
                 </li>
                 <li className="op-payment-step is-active">
                   <span className="op-payment-step-dot" />
-                  <span>Checking with the payment provider</span>
+                  <span>{t('payment.stepCheckingProvider')}</span>
                 </li>
                 <li className="op-payment-step">
                   <span className="op-payment-step-dot" />
-                  <span>Confirming your stay</span>
+                  <span>{t('payment.stepConfirmingStay')}</span>
                 </li>
               </ol>
-              <p className="op-payment-note">Don&apos;t close this window while we finish.</p>
+              <p className="op-payment-note">{t('payment.dontCloseNote')}</p>
               <Button color="light" className="op-payment-secondary op-payment-cancel" onClick={() => navigate('/')}>
-                Cancel
+                {t('payment.cancel')}
               </Button>
             </div>
           )}
@@ -143,13 +145,13 @@ function PaymentCallback() {
           {status === 'success' && (
             <div className="op-payment-state">
               <div className="op-payment-icon is-success" aria-hidden="true"><Check /></div>
-              <h2>Payment successful</h2>
-              <p>Your stay is confirmed. Your booking details are below.</p>
+              <h2>{t('payment.successTitle')}</h2>
+              <p>{t('payment.successBody')}</p>
               <dl className="op-payment-details">
-                <div><dt>Reference</dt><dd>{booking?.paymentReference || reference || '-'}</dd></div>
-                <div><dt>Check-in</dt><dd>{formatDate(booking?.checkIn)}</dd></div>
-                <div><dt>Check-out</dt><dd>{formatDate(booking?.checkOut)}</dd></div>
-                <div><dt>Total paid</dt><dd>{formatMoney(booking?.total)}</dd></div>
+                <div><dt>{t('payment.reference')}</dt><dd>{booking?.paymentReference || reference || '-'}</dd></div>
+                <div><dt>{t('payment.checkIn')}</dt><dd>{formatDate(booking?.checkIn)}</dd></div>
+                <div><dt>{t('payment.checkOut')}</dt><dd>{formatDate(booking?.checkOut)}</dd></div>
+                <div><dt>{t('payment.totalPaid')}</dt><dd>{formatMoney(booking?.total)}</dd></div>
               </dl>
               <div className="op-payment-action-row">
                 <Button
@@ -159,28 +161,28 @@ function PaymentCallback() {
                   disabled={!booking?.propertyId || isSaved}
                 >
                   <Heart aria-hidden="true" />
-                  {isSaved ? 'Saved' : 'Save'}
+                  {isSaved ? t('payment.saved') : t('payment.save')}
                 </Button>
                 <Button color="dark" className="op-payment-primary" onClick={() => navigate('/')}>
                   <House aria-hidden="true" />
-                  Home
+                  {t('payment.home')}
                 </Button>
               </div>
               {calendarReady && (
                 <div className="op-payment-calendar">
                   <button type="button" className="op-payment-link" onClick={() => downloadStayCalendar(booking)}>
-                    Add to calendar
+                    {t('payment.addToCalendar')}
                   </button>
                   {calendarLink && (
                     <a className="op-payment-link" href={calendarLink} target="_blank" rel="noopener noreferrer">
-                      Google Calendar
+                      {t('payment.googleCalendar')}
                     </a>
                   )}
                 </div>
               )}
               {booking?.propertyId && (
                 <button type="button" className="op-payment-link" onClick={() => navigate(`/property/${booking.propertyId}`)}>
-                  View property
+                  {t('payment.viewProperty')}
                 </button>
               )}
             </div>
@@ -189,27 +191,27 @@ function PaymentCallback() {
           {status === 'pending' && (
             <div className="op-payment-state">
               <div className="op-payment-icon is-pending" aria-hidden="true"><Clock3 /></div>
-              <h2>Payment pending</h2>
-              <p>{error || 'The payment provider is still confirming this transaction. We are holding your booking while it clears.'}</p>
-              <span className="op-payment-badge">Verification in progress</span>
-              <p className="op-payment-note">We&apos;ll update your trip as soon as the payment clears.</p>
+              <h2>{t('payment.pendingTitle')}</h2>
+              <p>{error || t('payment.pendingBody')}</p>
+              <span className="op-payment-badge">{t('payment.verificationInProgress')}</span>
+              <p className="op-payment-note">{t('payment.pendingNote')}</p>
               <Button color="dark" className="op-payment-primary op-payment-wide" onClick={() => navigate('/trips')}>
-                Check trip status
+                {t('payment.checkTripStatus')}
               </Button>
-              <button type="button" className="op-payment-link" onClick={() => navigate('/')}>Back to home</button>
+              <button type="button" className="op-payment-link" onClick={() => navigate('/')}>{t('payment.backToHome')}</button>
             </div>
           )}
 
           {status === 'failed' && (
             <div className="op-payment-state">
               <div className="op-payment-icon is-failed" aria-hidden="true"><CircleX /></div>
-              <h2>Payment failed</h2>
-              <p>No confirmed booking or charge was recorded for this payment attempt.</p>
+              <h2>{t('payment.failedTitle')}</h2>
+              <p>{t('payment.failedBody')}</p>
               <div className="op-payment-alert" role="alert">
                 <TriangleAlert aria-hidden="true" />
                 <div>
-                  <strong>{errorLabel || 'Payment not completed'}</strong>
-                  <span>{error || 'Please review your payment method and try again.'}</span>
+                  <strong>{errorLabel || t('payment.notCompleted')}</strong>
+                  <span>{error || t('payment.reviewPaymentMethod')}</span>
                 </div>
               </div>
               <Button
@@ -217,10 +219,10 @@ function PaymentCallback() {
                 className="op-payment-primary op-payment-wide"
                 onClick={() => navigate(bookingId ? '/trips' : '/')}
               >
-                Try again
+                {t('payment.tryAgain')}
               </Button>
               <button type="button" className="op-payment-link" onClick={() => navigate('/inbox')}>
-                Need help? Contact support
+                {t('payment.contactSupport')}
               </button>
             </div>
           )}

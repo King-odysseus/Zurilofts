@@ -1,3 +1,4 @@
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Spinner, TextInput } from 'flowbite-react';
 import { ChevronLeft, MessageSquareText, Search } from 'lucide-react';
@@ -8,7 +9,7 @@ import MessageAttachments from '../components/MessageAttachments.jsx';
 import { parseAttachments } from '../utils/attachments.js';
 
 // Shared surface styles for both panes so the inbox reads as one component.
-const METRIC_CARD = 'rounded-xl border border-border bg-elevated p-5 shadow-sm';
+const METRIC_CARD = 'rounded-xl bg-elevated shadow-md p-5';
 const METRIC_LABEL = 'text-[11px] font-semibold uppercase tracking-wide text-muted';
 const METRIC_VALUE = 'mt-2 block text-2xl font-bold text-navy';
 const METRIC_NOTE = 'mt-1 block text-xs text-muted';
@@ -37,6 +38,7 @@ function formatThreadTime(value) {
 }
 
 function AdminMessages() {
+  const { t } = useLanguage();
   const { userId } = useParams();
   const activeUserId = userId || null;
   const [conversations, setConversations] = useState([]);
@@ -179,31 +181,31 @@ function AdminMessages() {
     <div className={activeUserId ? 'space-y-0 lg:space-y-8' : 'space-y-8'}>
       <div className={`flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between ${activeUserId ? 'hidden lg:flex' : ''}`}>
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Messages</h1>
-          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">Review guest conversations, keep support replies moving, and track unread demand.</p>
+          <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.messagesTitle')}</h1>
+          <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('admin.messagesDescription')}</p>
         </div>
       </div>
 
       <div className={`grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4 ${activeUserId ? 'hidden lg:grid' : ''}`}>
         <article className={METRIC_CARD}>
-          <span className={METRIC_LABEL}>CONVERSATIONS</span>
+          <span className={METRIC_LABEL}>{t('admin.conversations').toUpperCase()}</span>
           <strong className={METRIC_VALUE}>{conversations.length}</strong>
-          <small className={METRIC_NOTE}>Guests with a support history</small>
+          <small className={METRIC_NOTE}>{t('admin.conversationsNote')}</small>
         </article>
         <article className={METRIC_CARD}>
-          <span className={METRIC_LABEL}>UNREAD MESSAGES</span>
+          <span className={METRIC_LABEL}>{t('admin.unreadMessages').toUpperCase()}</span>
           <strong className={METRIC_VALUE}>{unreadTotal}</strong>
-          <small className={METRIC_NOTE}>Waiting for an operations reply</small>
+          <small className={METRIC_NOTE}>{t('admin.unreadNote')}</small>
         </article>
         <article className={METRIC_CARD}>
-          <span className={METRIC_LABEL}>OPEN THREAD</span>
+          <span className={METRIC_LABEL}>{t('admin.openThread').toUpperCase()}</span>
           <strong className={`${METRIC_VALUE} truncate`}>{activePreview ? `${activePreview.firstName || ''} ${activePreview.lastName || ''}`.trim() || 'Guest' : 'None'}</strong>
           <small className={METRIC_NOTE}>{activePreview ? activePreview.email || 'Guest conversation' : 'Select a guest to read the thread'}</small>
         </article>
         <article className={METRIC_CARD}>
-          <span className={METRIC_LABEL}>LAST SYNC</span>
+          <span className={METRIC_LABEL}>{t('admin.lastSync').toUpperCase()}</span>
           <strong className={METRIC_VALUE}>{lastSync ? lastSync.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '-'}</strong>
-          <small className={METRIC_NOTE}>Automatically refreshed every 30 seconds</small>
+          <small className={METRIC_NOTE}>{t('admin.autoRefresh')}</small>
         </article>
       </div>
 
@@ -216,7 +218,7 @@ function AdminMessages() {
       <section className={`overflow-hidden ${
         activeUserId
           ? '-mx-4 -mb-[calc(92px_+_env(safe-area-inset-bottom))] bg-transparent lg:mx-0 lg:mb-0 lg:rounded-xl lg:border lg:border-border lg:bg-elevated lg:shadow-sm'
-          : 'rounded-xl border border-border bg-elevated shadow-sm'
+          : 'rounded-xl bg-elevated shadow-md'
       }`}>
         {/* Two panes on desktop; one pane at a time on phones, driven by the route.
             The phone height is the viewport minus everything the admin shell spends
@@ -227,24 +229,24 @@ function AdminMessages() {
         <div className={`grid grid-cols-1 lg:h-[calc(100vh_-_18rem)] lg:max-h-[680px] lg:min-h-[520px] lg:grid-cols-3 lg:overflow-hidden ${activeUserId ? 'h-[calc(100dvh_-_194px_-_env(safe-area-inset-bottom))] min-h-[420px]' : ''}`}>
           <aside className={`${activeUserId ? 'hidden lg:flex' : 'flex'} min-h-0 min-w-0 flex-col border-border lg:col-span-1 lg:border-r`}>
             <div className="flex-none border-b border-border p-3">
-              <div className="relative">
+              <div className="relative [&_input]:border-0 [&_input]:bg-surface [&_input]:pl-9">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" strokeWidth={1.8} aria-hidden="true" />
-                <TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search conversations" aria-label="Search conversations" className="pl-9" />
+                <TextInput type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('admin.searchConversations')} aria-label={t('a11y3.searchConversations')} />
               </div>
             </div>
             {/* The queue's own failure has to be visible in the index view too, so
                 it lives in the list pane instead of inside the thread. */}
-            {listError && <Alert color="failure" role="alert" className="m-2">{listError}</Alert>}
+            {listError && <Alert color="failure" role="alert" className="m-2 text-center">{listError}</Alert>}
             <div className="min-h-0 flex-1 space-y-1 overflow-y-auto p-2">
               {loadingList ? (
                 <div className={EMPTY_STATE}>
                   <Spinner size="md" aria-hidden="true" />
-                  <strong className="text-sm font-semibold text-navy">Loading conversations</strong>
+                  <strong className="text-sm font-semibold text-navy">{t('admin.loadingConversations')}</strong>
                 </div>
               ) : visibleConversations.length === 0 ? (
                 <div className={EMPTY_STATE}>
-                  <strong className="text-sm font-semibold text-navy">No conversations found</strong>
-                  <p className="text-xs text-muted">Adjust the search or wait for a new guest message.</p>
+                  <strong className="text-sm font-semibold text-navy">{t('admin.noConversations')}</strong>
+                  <p className="text-xs text-muted">{t('admin.noConversationsHint')}</p>
                 </div>
               ) : visibleConversations.map((conversation) => (
                 <Link key={conversation.userId} to={`/admin/messages/${encodeURIComponent(conversation.userId)}`} className={`flex items-center gap-3 rounded-lg px-3 py-2.5 ${activeUserId === conversation.userId ? 'bg-primary-50 dark:bg-primary/15' : 'hover:bg-surface'}`} aria-current={activeUserId === conversation.userId ? 'page' : undefined}>
@@ -266,13 +268,13 @@ function AdminMessages() {
             {!activeUserId ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 py-12 text-center">
                 <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-navy" aria-hidden="true"><MessageSquareText className="h-6 w-6" strokeWidth={1.5} /></span>
-                <strong className="text-sm font-semibold text-navy">Select a conversation</strong>
-                <p className="max-w-sm text-xs leading-relaxed text-muted">Choose a guest from the queue to read the full thread and reply.</p>
+                <strong className="text-sm font-semibold text-navy">{t('admin.selectConversation')}</strong>
+                <p className="max-w-sm text-xs leading-relaxed text-muted">{t('admin.selectConversationHint')}</p>
               </div>
             ) : (
               <>
                 <header className="flex min-h-[64px] flex-none items-center gap-3 border-b border-border px-4 py-3">
-                  <Link className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface text-navy lg:hidden" to="/admin/messages" aria-label="Back to conversations"><BackIcon /></Link>
+                  <Link className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface text-navy lg:hidden" to="/admin/messages" aria-label={t('admin.backToConversations')}><BackIcon /></Link>
                   <span className={AVATAR} aria-hidden="true">{initials(activePreview)}</span>
                   <div className="min-w-0">
                     <strong className="block truncate text-sm font-semibold text-navy">{activePreview?.firstName} {activePreview?.lastName}</strong>
@@ -280,18 +282,18 @@ function AdminMessages() {
                   </div>
                 </header>
 
-                {error && <Alert color="failure" role="alert" className="mx-4 mt-3">{error}</Alert>}
+                {error && <Alert color="failure" role="alert" className="mx-4 mt-3 text-center">{error}</Alert>}
 
                 <div className="flex min-h-0 flex-1 flex-col gap-2.5 overflow-y-auto p-4">
                   {loadingThread ? (
                     <div className={EMPTY_STATE}>
                       <Spinner size="md" aria-hidden="true" />
-                      <strong className="text-sm font-semibold text-navy">Loading thread</strong>
+                      <strong className="text-sm font-semibold text-navy">{t('admin.loadingThread')}</strong>
                     </div>
                   ) : thread.length === 0 ? (
                     <div className={EMPTY_STATE}>
-                      <strong className="text-sm font-semibold text-navy">No messages in this thread</strong>
-                      <p className="text-xs text-muted">Send the first reply below.</p>
+                      <strong className="text-sm font-semibold text-navy">{t('admin.noMessagesInThread')}</strong>
+                      <p className="text-xs text-muted">{t('admin.sendFirstReply')}</p>
                     </div>
                   ) : thread.map((message) => {
                     const fromAdmin = message.senderRole === 'ADMIN';
@@ -314,8 +316,8 @@ function AdminMessages() {
                     value={body}
                     onChange={setBody}
                     onSubmit={handleReply}
-                    placeholder={activePreview?.firstName ? `Reply to ${activePreview.firstName}` : 'Write a reply to the guest'}
-                    ariaLabel="Reply to guest"
+                    placeholder={activePreview?.firstName ? t('a11y3.replyToName', { name: activePreview.firstName }) : t('a11y3.replyToGuestPlaceholder')}
+                    ariaLabel={t('a11y3.replyToGuestLabel')}
                     sending={sending}
                   />
                 </div>

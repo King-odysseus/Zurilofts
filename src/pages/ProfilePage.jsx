@@ -5,6 +5,7 @@ import { CalendarDays, Camera, ChevronRight, Heart, Info, Star } from 'lucide-re
 import StayCard from '../components/StayCard.jsx';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 import apiClient from '../api/client.js';
 import { openConsentManager } from '../utils/consent.js';
@@ -31,6 +32,7 @@ const PAYOUT_FREQUENCY_OPTIONS = [
 ];
 
 function ProfilePage() {
+  const { t } = useLanguage();
   const { user, setUser, logout } = useAuth();
   const { favorites } = useFavorites();
   const navigate = useNavigate();
@@ -340,16 +342,16 @@ function ProfilePage() {
   };
 
   if (loading) {
-    return <GuestAccountLayout active="profile" eyebrow="Account" title="Personal details" description="Keep your details current for stays and host communication.">
-      <div className="opg-profile-loading" aria-label="Loading profile"><span /><span /><span /></div>
+    return <GuestAccountLayout active="profile" eyebrow="Account" title={t('profile.title')} description={t('profile.description')}>
+      <div className="opg-profile-loading" aria-label={t('profile.loadingProfile')}><span /><span /><span /></div>
     </GuestAccountLayout>;
   }
 
   return <GuestAccountLayout
     active="profile"
     eyebrow="Account"
-    title="Personal details"
-    description="Keep your details current for stays and host communication."
+    title={t('profile.title')}
+    description={t('profile.description')}
   >
     <div className="opg-profile">
           <div className="opg-profile-summary">
@@ -358,7 +360,7 @@ function ProfilePage() {
                 {profile?.avatar ? (
                   <img
                     src={profile.avatar}
-                    alt="Profile"
+                    alt={t('profile.photoAlt')}
                     className="w-16 h-16 rounded-full object-cover border-2 border-[#D9D9D9]"
                   />
                 ) : (
@@ -388,17 +390,17 @@ function ProfilePage() {
                   {profile?.firstName} {profile?.lastName}
                 </h2>
                 <p className="text-[#6b7280]">{profile?.email}</p>
-                <span>Guest account</span>
+                <span>{t('profile.guestAccount')}</span>
               </div>
             </div>
-            <Link to="/verify-identity" className="opg-profile-verify">View verification status</Link>
+            <Link to="/verify-identity" className="opg-profile-verify">{t('profile.viewVerification')}</Link>
           </div>
 
           {/* Tabs */}
           {/* The account grid in the stylesheet spaces its children by 18px. A 6px
               margin on the surface below lifts every stacked block in this page to
               24px, the same rhythm the rest of the app uses, without touching CSS. */}
-          <div className="opg-profile-tabs mt-1.5" role="tablist" aria-label="Profile sections">
+          <div className="opg-profile-tabs mt-1.5" role="tablist" aria-label={t('profile.sections')}>
             {['info', 'bookings', 'favorites'].map((tab) => (
               <button
                 key={tab}
@@ -408,7 +410,7 @@ function ProfilePage() {
                 onClick={() => setActiveTab(tab)}
                 className={activeTab === tab ? 'is-active' : ''}
               >
-                {tab === 'info' ? 'My Info' : tab === 'bookings' ? 'Booking History' : `Favourites${favorites.length ? ` (${favorites.length})` : ''}`}
+                {tab === 'info' ? t('profile.tabInfo') : tab === 'bookings' ? t('profile.tabBookings') : `${t('profile.tabFavourites')}${favorites.length ? ` (${favorites.length})` : ''}`}
               </button>
             ))}
           </div>
@@ -420,13 +422,13 @@ function ProfilePage() {
                 <div className="mb-6 bg-[#F4F0E8] border border-[#C5A28C] rounded-2xl p-5 flex items-start gap-3">
                   <Info className="w-5 h-5 text-[#8A6B52] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
                   <div>
-                    <p className="font-semibold text-[#203565] text-sm">Complete your profile</p>
-                    <p className="text-sm text-[#6b7280] mt-2">Fill in your details below to get the most out of ZuriLofts.</p>
+                    <p className="font-semibold text-[#203565] text-sm">{t('profile.completeProfile')}</p>
+                    <p className="text-sm text-[#6b7280] mt-2">{t('profile.completeProfileHint')}</p>
                   </div>
                 </div>
               )}
               <div className="neu-card p-6">
-                <h2 className="text-lg font-bold text-[#203565] mb-6">Personal Information</h2>
+                <h2 className="text-lg font-bold text-[#203565] mb-6">{t('profile.personalInformation')}</h2>
                 {message && (
                   <div className={`rounded-xl px-4 py-3 mb-4 text-sm ${
                     message.includes('success')
@@ -438,7 +440,7 @@ function ProfilePage() {
                 )}
                 <form onSubmit={handleProfileUpdate} className="opg-profile-form">
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">First Name</label>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.firstName')}</label>
                     <input
                       type="text"
                       value={formData.firstName}
@@ -447,7 +449,7 @@ function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Last Name</label>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.lastName')}</label>
                     <input
                       type="text"
                       value={formData.lastName}
@@ -456,7 +458,7 @@ function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Email</label>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.email')}</label>
                     <input
                       type="email"
                       value={formData.email}
@@ -468,12 +470,12 @@ function ProfilePage() {
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Phone</label>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.phone')}</label>
                     <div className="flex gap-2">
                       <SelectMenu
                         value={countryCode}
                         onChange={(next) => handlePhoneChange(next, phoneNumber)}
-                        ariaLabel="Select country code"
+                        ariaLabel={t('a11y2.selectCountryCode')}
                         wrapperClassName="opg-profile-country"
                         options={COUNTRY_OPTIONS}
                       />
@@ -495,17 +497,17 @@ function ProfilePage() {
                     disabled={saving}
                     className="bg-[#143A80] text-white font-semibold px-6 py-3 rounded-full hover:bg-[#0B2A5E] transition-all duration-200 disabled:opacity-50"
                   >
-                    {saving ? 'Saving...' : 'Save Changes'}
+                    {saving ? t('common.saving') : t('profile.saveChanges')}
                   </button>
                 </form>
               </div>
 
               {/* Privacy and data */}
               <div id="privacy" className="scroll-mt-28 mt-10 pt-8 border-t-2 border-[#D9D9D9]">
-                <h3 className="text-xl font-bold text-[#203565] mb-1">Privacy and data</h3>
+                <h3 className="text-xl font-bold text-[#203565] mb-1">{t('profile.privacyAndData')}</h3>
                 <p className="text-sm text-[#6b7280] mb-6">
                   Manage your personal data and consent choices. See our{' '}
-                  <Link to="/privacy" className="text-[#8A6B52] hover:underline font-medium">Privacy Policy</Link>{' '}
+                  <Link to="/privacy" className="text-[#8A6B52] hover:underline font-medium">{t('profile.privacyPolicy')}</Link>{' '}
                   for full details.
                 </p>
 
@@ -513,9 +515,9 @@ function ProfilePage() {
                   {/* Download my data */}
                   <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                     <div>
-                      <h4 className="font-semibold text-[#1f2937]">Download my data</h4>
+                      <h4 className="font-semibold text-[#1f2937]">{t('profile.downloadMyData')}</h4>
                       <p className="text-sm text-[#6b7280] mt-2">
-                        Get a copy of the personal data we hold about you in a portable format.
+                        {t('profile.dataCopyHint')}
                       </p>
                       {exportMessage && (
                         <p className={`text-sm mt-2 font-medium ${exportMessage.includes('Could') ? 'text-red-500' : 'text-green-600'}`}>
@@ -543,9 +545,9 @@ function ProfilePage() {
                   {/* Cookie preferences */}
                   <div className="neu-card p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                     <div>
-                      <h4 className="font-semibold text-[#1f2937]">Cookie preferences</h4>
+                      <h4 className="font-semibold text-[#1f2937]">{t('profile.cookiePreferences')}</h4>
                       <p className="text-sm text-[#6b7280] mt-2">
-                        Review or change which optional cookies we may use. You can withdraw consent at any time.
+                        {t('profile.cookieHint')}
                       </p>
                     </div>
                     <button
@@ -553,7 +555,7 @@ function ProfilePage() {
                       onClick={openConsentManager}
                       className="flex-shrink-0 bg-[#16294B] text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-[#06062a] transition-all duration-200"
                     >
-                      Manage preferences
+                      {t('profile.managePreferences')}
                     </button>
                   </div>
 
@@ -561,7 +563,7 @@ function ProfilePage() {
                   <div className="rounded-2xl border-2 border-red-200 bg-red-50/50 p-5">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
                       <div>
-                        <h4 className="font-semibold text-red-700">Delete my account</h4>
+                        <h4 className="font-semibold text-red-700">{t('profile.deleteMyAccount')}</h4>
                         <p className="text-sm text-[#6b7280] mt-2">
                           Permanently erase your account and personal data. Bookings and payment records are
                           retained for legal and tax reasons but are anonymised so they no longer identify you.
@@ -573,20 +575,20 @@ function ProfilePage() {
                         onClick={() => { setShowDeleteDialog(true); setDeleteConfirm(''); setDeleteError(''); }}
                         className="flex-shrink-0 bg-red-600 text-white font-semibold px-5 py-2.5 rounded-full text-sm hover:bg-red-700 transition-all duration-200"
                       >
-                        Delete my account
+                        {t('profile.deleteMyAccount')}
                       </button>
                     </div>
 
                     {showDeleteDialog && (
                       <div className="mt-5 pt-5 border-t border-red-200">
                         <p className="text-sm font-semibold text-[#1f2937] mb-2">
-                          To confirm, type <span className="font-mono font-bold text-red-700">DELETE</span> below.
+                          {t('profile.confirmDelete')}
                         </p>
                         <input
                           type="text"
                           value={deleteConfirm}
                           onChange={(e) => { setDeleteConfirm(e.target.value); setDeleteError(''); }}
-                          placeholder="Type DELETE to confirm"
+                          placeholder={t('profile.typeDelete')}
                           className="neu-input w-full sm:w-72 px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280] rounded-xl"
                         />
                         {deleteError && <p className="text-red-500 text-xs mt-2">{deleteError}</p>}
@@ -619,14 +621,14 @@ function ProfilePage() {
           {/* Payout Settings - HOST only */}
           {activeTab === 'info' && profile?.role === 'HOST' && (
             <div className="mt-10 pt-8 border-t-2 border-[#D9D9D9]">
-              <h3 className="text-xl font-bold text-[#203565] mb-1">Payout Settings</h3>
+              <h3 className="text-xl font-bold text-[#203565] mb-1">{t('profile.payoutSettings')}</h3>
               <p className="text-sm text-[#6b7280] mb-6">
                 Your earnings are held in your wallet and paid out on your chosen schedule. WHT (5%) is automatically deducted and remitted to KRA.
               </p>
 
               {/* Payout destination */}
               <form onSubmit={handlePayoutDestinationSave} className="space-y-5 mb-8">
-                <h4 className="font-semibold text-[#1f2937]">Payout Destination</h4>
+                <h4 className="font-semibold text-[#1f2937]">{t('profile.payoutDestination')}</h4>
 
                 <div className="grid grid-cols-2 gap-2 rounded-full bg-[#16294B]/5 p-1">
                   {[
@@ -651,13 +653,13 @@ function ProfilePage() {
                 {payoutMethod === 'bank' ? (
                   <>
                     <div>
-                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Bank Name *</label>
+                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.bankName')}</label>
                       {banksLoading ? (
-                        <p className="text-sm text-[#6b7280]">Loading banks...</p>
+                        <p className="text-sm text-[#6b7280]">{t('profile.loadingBanks')}</p>
                       ) : banks.length > 0 ? (
                         <SelectMenu
                           value={bankForm.bankCode}
-                          ariaLabel="Select your bank"
+                          ariaLabel={t('a11y2.selectYourBank')}
                           onChange={(next) => {
                             const bank = banks.find((item) => item.code === next);
                             setBankForm((prev) => ({ ...prev, bankCode: next, bankName: bank?.name || '' }));
@@ -670,7 +672,7 @@ function ProfilePage() {
                           type="text"
                           value={bankForm.bankName}
                           onChange={(e) => setBankForm((prev) => ({ ...prev, bankName: e.target.value }))}
-                          placeholder="e.g. KCB Bank"
+                          placeholder={t('profile.bankPlaceholder')}
                           className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280]"
                           required
                         />
@@ -678,13 +680,13 @@ function ProfilePage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">Account Number *</label>
+                      <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.accountNumber')}</label>
                       <input
                         type="text"
                         value={bankForm.bankAccountNo}
                         onChange={(e) => setBankForm((prev) => ({ ...prev, bankAccountNo: e.target.value.replace(/\D/g, '').slice(0, 20) }))}
                         maxLength={20}
-                        placeholder="Bank account number"
+                        placeholder={t('profile.accountNumberPlaceholder')}
                         className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280]"
                         required
                       />
@@ -692,7 +694,7 @@ function ProfilePage() {
                   </>
                 ) : (
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">Safaricom M-PESA Number *</label>
+                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.mpesaNumber')}</label>
                     <input
                       type="tel"
                       value={mpesaPhone}
@@ -702,7 +704,7 @@ function ProfilePage() {
                       className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280]"
                       required
                     />
-                    <p className="text-xs text-[#6b7280] mt-2">Use the Safaricom number registered to receive your host payouts.</p>
+                    <p className="text-xs text-[#6b7280] mt-2">{t('profile.mpesaHint')}</p>
                   </div>
                 )}
 
@@ -717,8 +719,8 @@ function ProfilePage() {
 
               {/* Payout Frequency */}
               <div className="space-y-4">
-                <h4 className="font-semibold text-[#1f2937]">Payout Frequency</h4>
-                <p className="text-xs text-[#6b7280]">Your accumulated earnings will be sent to your selected payout destination on this schedule.</p>
+                <h4 className="font-semibold text-[#1f2937]">{t('profile.payoutFrequency')}</h4>
+                <p className="text-xs text-[#6b7280]">{t('profile.payoutFrequencyHint')}</p>
                 {/* The select is pinned to 280px by the shared stylesheet and forced
                     to full width below 768px, so a Save button beside it was pushed
                     off the right edge at 390px. Stacking until md keeps both visible
@@ -727,7 +729,7 @@ function ProfilePage() {
                   <SelectMenu
                     value={payoutFrequency}
                     onChange={(next) => setPayoutFrequency(next)}
-                    ariaLabel="Select payout frequency"
+                    ariaLabel={t('a11y2.selectPayoutFrequency')}
                     wrapperClassName="opg-profile-frequency"
                     options={PAYOUT_FREQUENCY_OPTIONS}
                   />
@@ -758,8 +760,8 @@ function ProfilePage() {
                   <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
                     <CalendarDays className="w-8 h-8 text-[#6b7280]" strokeWidth={2} aria-hidden="true" />
                   </div>
-                  <h3 className="text-lg font-bold text-[#203565] mb-1">No bookings yet</h3>
-                  <p className="text-[#6b7280]">Your upcoming stays will appear here.</p>
+                  <h3 className="text-lg font-bold text-[#203565] mb-1">{t('profile.noBookings')}</h3>
+                  <p className="text-[#6b7280]">{t('profile.noBookingsHint')}</p>
                 </div>
               ) : (
                 bookings.map((booking) => (
@@ -807,17 +809,17 @@ function ProfilePage() {
                         {/* Post-stay review */}
                         {booking.review ? (
                           <div className="mt-5 pt-5 border-t border-[#D9D9D9]">
-                            <p className="text-sm font-semibold text-[#203565] mb-1">Your rating</p>
+                            <p className="text-sm font-semibold text-[#203565] mb-1">{t('profile.yourRating')}</p>
                             <div className="flex items-center gap-1">
                               {[1, 2, 3, 4, 5].map((star) => (
                                 <Star key={star} className={`w-5 h-5 ${star <= booking.review.rating ? 'text-[#8A6B52]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
                               ))}
-                              <span className="ml-2 text-xs text-green-600 font-medium">Thanks for your feedback!</span>
+                              <span className="ml-2 text-xs text-green-600 font-medium">{t('profile.thanksFeedback')}</span>
                             </div>
                           </div>
                         ) : isStayCompleted(booking) ? (
                           <div className="mt-5 pt-5 border-t border-[#D9D9D9]">
-                            <p className="text-sm font-semibold text-[#203565] mb-2">Rate your stay</p>
+                            <p className="text-sm font-semibold text-[#203565] mb-2">{t('profile.rateYourStay')}</p>
                             <div className="flex items-center gap-1 mb-3">
                               {[1, 2, 3, 4, 5].map((star) => {
                                 const current = reviewForms[booking.id]?.rating || 0;
@@ -827,7 +829,7 @@ function ProfilePage() {
                                     type="button"
                                     onClick={() => setReviewField(booking.id, 'rating', star)}
                                     className="p-0.5 transition-transform hover:scale-110"
-                                    aria-label={`${star} star${star > 1 ? 's' : ''}`}
+                                    aria-label={t(star > 1 ? 'a11y2.starOther' : 'a11y2.starOne', { count: star })}
                                   >
                                     <Star className={`w-7 h-7 ${star <= current ? 'text-[#8A6B52]' : 'text-[#D9D9D9]'}`} fill="currentColor" aria-hidden="true" />
                                   </button>
@@ -842,13 +844,13 @@ function ProfilePage() {
                                     value={String(reviewForms[booking.id]?.[field] || '')}
                                     onChange={(next) => setReviewField(booking.id, field, Number(next) || 0)}
                                     options={SUB_SCORE_OPTIONS}
-                                    ariaLabel={`${label} rating (optional)`}
+                                    ariaLabel={t('a11y2.ratingOptional', { label })}
                                   />
                                 </label>
                               ))}
                             </div>
                             <label className="block text-xs font-semibold text-[#6b7280] mb-2">
-                              How satisfied were you with your stay?
+                              {t('profile.howSatisfied')}
                             </label>
                             <div className="flex items-center gap-3 mb-4">
                               {[
@@ -875,22 +877,22 @@ function ProfilePage() {
                               })}
                             </div>
                             <label className="block text-xs font-semibold text-[#6b7280] mb-1">
-                              Public review <span className="font-normal">(shown on the property page)</span>
+                              {t('profile.publicReview')} <span className="font-normal">(shown on the property page)</span>
                             </label>
                             <textarea
                               value={reviewForms[booking.id]?.publicComment || ''}
                               onChange={(e) => setReviewField(booking.id, 'publicComment', e.target.value)}
-                              placeholder="Share what other guests should know about this stay. This appears publicly with your first name."
+                              placeholder={t('a11y2.publicReviewPlaceholder')}
                               maxLength={1000}
                               className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm mb-4"
                             />
                             <label className="block text-xs font-semibold text-[#6b7280] mb-1">
-                              Private note to ZuriLofts <span className="font-normal">(only our team sees this)</span>
+                              {t('profile.privateNoteToZuri')} <span className="font-normal">(only our team sees this)</span>
                             </label>
                             <textarea
                               value={reviewForms[booking.id]?.privateNote || ''}
                               onChange={(e) => setReviewField(booking.id, 'privateNote', e.target.value)}
-                              placeholder="Only the ZuriLofts team will see this. Tell us what we could do better."
+                              placeholder={t('a11y2.privateNotePlaceholder')}
                               maxLength={2000}
                               className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] placeholder-[#6b7280] h-20 resize-none text-sm"
                             />
@@ -918,7 +920,7 @@ function ProfilePage() {
                     to="/bookings"
                     className="inline-flex items-center gap-2 text-sm font-semibold text-[#8A6B52] hover:text-[#203565] transition-colors"
                   >
-                    View all bookings
+                    {t('profile.viewAllBookings')}
                     <ChevronRight className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
                   </Link>
                 </div>
@@ -934,10 +936,10 @@ function ProfilePage() {
                   <div className="w-16 h-16 bg-[#D9D9D9] rounded-full flex items-center justify-center mx-auto mb-4">
                     <Heart className="w-8 h-8 text-[#6b7280]" strokeWidth={2} aria-hidden="true" />
                   </div>
-                  <h3 className="text-lg font-bold text-[#203565] mb-1">No favourites yet</h3>
-                  <p className="text-[#6b7280] mb-4">Tap the heart on any property to save it here.</p>
+                  <h3 className="text-lg font-bold text-[#203565] mb-1">{t('profile.noFavouritesYet')}</h3>
+                  <p className="text-[#6b7280] mb-4">{t('profile.tapHeartHint')}</p>
                   <Link to="/properties" className="inline-block bg-[#143A80] text-white px-6 py-2.5 rounded-full font-semibold hover:bg-[#0B2A5E] transition-all duration-200">
-                    Browse properties
+                    {t('profile.browseProperties')}
                   </Link>
                 </div>
               ) : (

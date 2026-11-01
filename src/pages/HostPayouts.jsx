@@ -5,6 +5,7 @@ import { CircleAlert } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Payout statuses map onto the themed Badge palette instead of hand-rolled
 // background/text pairs.
@@ -25,6 +26,7 @@ function formatDate(value) {
 }
 
 function HostPayouts() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [wallet, setWallet] = useState(null);
   const [destination, setDestination] = useState(null);
@@ -63,8 +65,8 @@ function HostPayouts() {
         <span className="grid h-12 w-12 place-items-center rounded-full bg-surface text-muted">
           <CircleAlert strokeWidth={2} aria-hidden="true" />
         </span>
-        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">Access denied</h1>
-        <p className="text-sm leading-relaxed text-muted">This page is for hosts and administrators only.</p>
+        <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('hostaccount.accessDenied')}</h1>
+        <p className="text-sm leading-relaxed text-muted">{t('hostaccount.hostsOnly')}</p>
       </div>
     </HostCard>;
   }
@@ -146,19 +148,19 @@ function HostPayouts() {
     URL.revokeObjectURL(url);
   }
 
-  if (loading) return <div className="grid grid-cols-1 gap-5 sm:grid-cols-3" aria-label="Loading payout information">
+  if (loading) return <div className="grid grid-cols-1 gap-5 sm:grid-cols-3" aria-label={t('hostaccount.loadingPayouts')}>
     {[0, 1, 2].map((key) => <HostCard key={key} className="h-24 animate-pulse" />)}
   </div>;
 
   return <div className="space-y-6 lg:space-y-8">
     <header className="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <Link to="/host/earnings" className="text-xs font-semibold text-muted transition-colors hover:text-navy">Back to earnings</Link>
-        <p className={HOST_EYEBROW}>Host workspace</p>
-        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Payouts</h1>
+        <Link to="/host/earnings" className="text-xs font-semibold text-muted transition-colors hover:text-navy">{t('hostaccount.backToEarnings')}</Link>
+        <p className={HOST_EYEBROW}>{t('host.workspace')}</p>
+        <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('hostaccount.payoutsTitle')}</h1>
         <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">Manage how you get paid and review your payout history.</p>
       </div>
-      <Button as={Link} to="/host/settings" size="sm">{destination?.method ? 'Change destination' : 'Set up payouts'}</Button>
+      <Button as={Link} to="/host/settings" size="sm">{destination?.method ? t('hostaccount.changeDestination') : t('hostaccount.setUpPayouts')}</Button>
     </header>
 
     {error && <Alert color="failure">
@@ -168,61 +170,61 @@ function HostPayouts() {
       </div>
     </Alert>}
 
-    <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4" aria-label="Payout balance summary">
-      <HostCard eyebrow="Available balance">
+    <section className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4" aria-label={t('hostaccount.balanceSummary')}>
+      <HostCard eyebrow={t('hostaccount.availableBalance')}>
         <strong className="block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.balance || 0).toLocaleString()}</strong>
-        <small className="block text-xs text-muted">Ready for the next payout</small>
+        <small className="block text-xs text-muted">{t('hostaccount.readyForNextPayout')}</small>
       </HostCard>
-      <HostCard eyebrow="Total earned">
+      <HostCard eyebrow={t('hostaccount.totalEarned')}>
         <strong className="block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.totalEarned || 0).toLocaleString()}</strong>
-        <small className="block text-xs text-muted">Recorded host earnings</small>
+        <small className="block text-xs text-muted">{t('hostaccount.recordedEarnings')}</small>
       </HostCard>
-      <HostCard eyebrow="Total paid out">
+      <HostCard eyebrow={t('hostaccount.totalPaidOut')}>
         <strong className="block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.totalPaidOut || 0).toLocaleString()}</strong>
-        <small className="block text-xs text-muted">Completed host payouts</small>
+        <small className="block text-xs text-muted">{t('hostaccount.completedPayouts')}</small>
       </HostCard>
       {/* Earned but not yet withdrawable. Shown so a stay that has not started
           does not look like missing money. */}
-      <HostCard eyebrow="Held until check-in">
+      <HostCard eyebrow={t('hostaccount.heldUntilCheckIn')}>
         <strong className="block text-2xl font-bold text-navy tabular-nums">KES {(wallet?.pendingBalance || 0).toLocaleString()}</strong>
         <small className="block text-xs text-muted">
           {(wallet?.pendingBookings || 0) === 1
-            ? '1 stay releasing after check-in'
-            : `${wallet?.pendingBookings || 0} stays releasing after check-in`}
+            ? t('hostaccount.stayReleasingOne')
+            : t('hostaccount.staysReleasing', { count: wallet?.pendingBookings || 0 })}
         </small>
       </HostCard>
     </section>
 
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
       <HostCard
-        title="Payout destination"
-        description="Where your available balance is sent."
-        action={<Badge color={destination?.method ? 'success' : 'warning'}>{destination?.method ? 'Ready' : 'Needs setup'}</Badge>}
+        title={t('hostaccount.payoutDestinationTitle')}
+        description={t('hostaccount.payoutDestinationDescription')}
+        action={<Badge color={destination?.method ? 'success' : 'warning'}>{destination?.method ? t('hostaccount.ready') : t('hostaccount.needsSetup')}</Badge>}
       >
         <div className="rounded-xl bg-surface px-4 py-3">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{destination?.method || 'NOT CONFIGURED'}</span>
-          <strong className="mt-1.5 block text-sm font-semibold text-navy">{destination?.label || 'Add a payout destination'}</strong>
-          <small className="mt-2 block text-xs text-muted">{destination?.maskedAccount || 'Bank or mobile money details are required before payout.'}</small>
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">{destination?.method || t('hostaccount.notConfigured')}</span>
+          <strong className="mt-1.5 block text-sm font-semibold text-navy">{destination?.label || t('hostaccount.addDestination')}</strong>
+          <small className="mt-2 block text-xs text-muted">{destination?.maskedAccount || t('hostaccount.destinationRequired')}</small>
         </div>
         <dl className="space-y-3 text-sm">
-          <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Next payout</dt><dd className="font-semibold text-navy">{wallet?.nextPayoutAt ? new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : 'Not scheduled'}</dd></div>
-          <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">Last payout</dt><dd className="font-semibold text-navy">{formatDate(wallet?.lastPayoutAt)}</dd></div>
+          <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">{t('hostaccount.nextPayout')}</dt><dd className="font-semibold text-navy">{wallet?.nextPayoutAt ? new Date(wallet.nextPayoutAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : t('hostaccount.notScheduled')}</dd></div>
+          <div className="flex flex-wrap items-center justify-between gap-3"><dt className="text-muted">{t('hostaccount.lastPayout')}</dt><dd className="font-semibold text-navy">{formatDate(wallet?.lastPayoutAt)}</dd></div>
         </dl>
-        <Button as={Link} to="/host/settings" color="light" size="sm" className="w-fit">{destination?.method ? 'Update payout details' : 'Add payout details'}</Button>
+        <Button as={Link} to="/host/settings" color="light" size="sm" className="w-fit">{destination?.method ? t('hostaccount.updatePayoutDetails') : t('hostaccount.addPayoutDetails')}</Button>
       </HostCard>
 
       <HostCard
         className="lg:col-span-2"
-        title="WHT statement"
-        description="Withholding tax certificates for KRA returns."
-        action={<span className="text-xs font-medium text-muted">5% rate</span>}
+        title={t('hostaccount.whtStatementTitle')}
+        description={t('hostaccount.whtStatementDescription')}
+        action={<span className="text-xs font-medium text-muted">{t('hostaccount.whtRate')}</span>}
       >
         <div className="flex flex-wrap items-end gap-3">
           <div>
-            <Label htmlFor="wht-month" className="mb-1.5 block">Statement month</Label>
+            <Label htmlFor="wht-month" className="mb-1.5 block">{t('hostaccount.statementMonth')}</Label>
             <TextInput id="wht-month" type="month" value={whtMonth} onChange={(event) => setWhtMonth(event.target.value)} />
           </div>
-          <Button type="button" size="sm" onClick={loadWht}>View statement</Button>
+          <Button type="button" size="sm" onClick={loadWht}>{t('hostaccount.viewStatement')}</Button>
         </div>
         {whtData ? <div className="space-y-5">
           <div className="rounded-xl bg-surface px-4 py-3">
@@ -247,8 +249,8 @@ function HostPayouts() {
               <TableHead>
                 <TableRow>
                   <TableHeadCell>Property</TableHeadCell>
-                  <TableHeadCell>Paid date</TableHeadCell>
-                  <TableHeadCell className="text-right">Earnings</TableHeadCell>
+                  <TableHeadCell>{t('hostaccount.colPaidDate')}</TableHeadCell>
+                  <TableHeadCell className="text-right">{t('hostaccount.colEarnings')}</TableHeadCell>
                   <TableHeadCell className="text-right">WHT</TableHeadCell>
                 </TableRow>
               </TableHead>
@@ -264,24 +266,24 @@ function HostPayouts() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <Button type="button" color="light" size="sm" onClick={csvWht}>Download CSV</Button>
-            <Button type="button" color="light" size="sm" onClick={printWht}>Print PDF</Button>
+            <Button type="button" color="light" size="sm" onClick={csvWht}>{t('hostaccount.downloadCsv')}</Button>
+            <Button type="button" color="light" size="sm" onClick={printWht}>{t('hostaccount.printPdf')}</Button>
           </div>
         </div> : <div className="flex flex-col items-center gap-2 px-2 py-8 text-center">
-          <strong className="text-sm font-semibold text-navy">Choose a month, or leave it empty for all time</strong>
-          <p className="text-xs text-muted">An empty month sums every withholding tax entry recorded on your account.</p>
+          <strong className="text-sm font-semibold text-navy">{t('hostaccount.monthHint')}</strong>
+          <p className="text-xs text-muted">{t('hostaccount.emptyMonthSums')}</p>
         </div>}
       </HostCard>
     </div>
 
     <HostCard
-      title="Payout history"
-      description="Completed and in-flight transfers to your destination."
-      action={<span className="text-xs font-medium text-muted">{payouts.length} records</span>}
+      title={t('hostaccount.payoutHistoryTitle')}
+      description={t('hostaccount.payoutHistoryDescription')}
+      action={<span className="text-xs font-medium text-muted">{t('hostaccount.recordCount', { count: payouts.length })}</span>}
     >
       {payouts.length === 0 ? <div className="flex flex-col items-center gap-2 px-2 py-8 text-center">
-        <strong className="text-sm font-semibold text-navy">No payouts yet</strong>
-        <p className="text-xs text-muted">Your first payout will appear here after a transfer is created.</p>
+        <strong className="text-sm font-semibold text-navy">{t('hostaccount.noPayoutsYet')}</strong>
+        <p className="text-xs text-muted">{t('hostaccount.noPayoutsHint')}</p>
       </div> : <>
         <ul className="divide-y divide-border text-sm sm:hidden">
           {payouts.map((payout) => <li key={payout.id} className="space-y-2 py-4">
@@ -298,9 +300,9 @@ function HostPayouts() {
           <Table>
             <TableHead>
               <TableRow>
-                <TableHeadCell className="text-right">Amount</TableHeadCell>
-                <TableHeadCell className="text-right">Bookings</TableHeadCell>
-                <TableHeadCell>Status</TableHeadCell>
+                <TableHeadCell className="text-right">{t('hostaccount.colAmount')}</TableHeadCell>
+                <TableHeadCell className="text-right">{t('hostaccount.colBookings')}</TableHeadCell>
+                <TableHeadCell>{t('hostaccount.colStatus')}</TableHeadCell>
                 <TableHeadCell>Date</TableHeadCell>
               </TableRow>
             </TableHead>

@@ -3,24 +3,25 @@ import PropTypes from 'prop-types';
 import { Button } from 'flowbite-react';
 import { ChevronRight } from 'lucide-react';
 import HostCard from './HostCard.jsx';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // The reference puts follow-ups directly on the day view: what a host owes a
 // guest, and what a guest owes them, each with a face and a stay. They come from
 // the same insights endpoint as the Insights page, so the two never disagree.
 
-function headline(item) {
-  if (item.kind === 'read-review') return `Read ${item.guestName}'s ${item.rating}-star review`;
-  if (item.kind === 'ask-for-review') return `Ask ${item.guestName} for a review`;
-  return `Respond to ${item.guestName}`;
+function headline(item, t) {
+  if (item.kind === 'read-review') return t('host.followReadReview', { guest: item.guestName, rating: item.rating });
+  if (item.kind === 'ask-for-review') return t('host.followAskReview', { guest: item.guestName });
+  return t('host.followRespond', { guest: item.guestName });
 }
 
-function kicker(item) {
-  if (item.kind === 'read-review') return 'Review received';
+function kicker(item, t) {
+  if (item.kind === 'read-review') return t('host.followReviewReceived');
   if (item.kind === 'ask-for-review') {
-    if (item.daysSince == null) return 'Stay finished';
-    return item.daysSince === 0 ? 'Checked out today' : `${item.daysSince}d since checkout`;
+    if (item.daysSince == null) return t('host.followStayFinished');
+    return item.daysSince === 0 ? t('host.followCheckedOutToday') : t('host.followSinceCheckout', { days: item.daysSince });
   }
-  return 'Booking request';
+  return t('host.followBookingRequest');
 }
 
 // Every follow-up leads somewhere: a review is read on the insights screen, and
@@ -31,15 +32,16 @@ function destination(item) {
   return '/host/reservations';
 }
 
-function actionLabel(item) {
-  if (item.kind === 'read-review') return 'Read review';
-  if (item.kind === 'ask-for-review') return 'Open stay';
-  return 'Respond';
+function actionLabel(item, t) {
+  if (item.kind === 'read-review') return t('host.followReadReviewAction');
+  if (item.kind === 'ask-for-review') return t('host.followOpenStay');
+  return t('host.followRespondAction');
 }
 
 export default function HostFollowUps({ items, loading }) {
+  const { t } = useLanguage();
   if (loading) {
-    return <HostCard eyebrow="FOLLOW-UPS">
+    return <HostCard eyebrow={t('host.followUps')}>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <span className="block h-24 animate-pulse rounded-xl bg-surface" />
         <span className="block h-24 animate-pulse rounded-xl bg-surface" />
@@ -52,9 +54,9 @@ export default function HostFollowUps({ items, loading }) {
   if (items.length === 0) return null;
 
   return <HostCard
-    eyebrow="FOLLOW-UPS"
-    title="Your follow-ups"
-    action={<Button as={Link} to="/host/insights" color="light" size="sm">See insights</Button>}
+    eyebrow={t('host.followUps')}
+    title={t('host.yourFollowUps')}
+    action={<Button as={Link} to="/host/insights" color="light" size="sm">{t('host.seeInsights')}</Button>}
   >
     {/* A row that scrolls sideways on a phone, like the reference, and settles
         into a grid once there is width for two cards side by side. */}
@@ -66,8 +68,8 @@ export default function HostFollowUps({ items, loading }) {
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-semibold text-muted">{kicker(item)}</p>
-            <strong className="mt-1.5 block text-sm font-semibold leading-snug text-navy">{headline(item)}</strong>
+            <p className="text-[11px] font-semibold text-muted">{kicker(item, t)}</p>
+            <strong className="mt-1.5 block text-sm font-semibold leading-snug text-navy">{headline(item, t)}</strong>
             <p className="mt-1 truncate text-xs text-muted">{item.propertyTitle}</p>
           </div>
           <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full bg-navy-bg text-[11px] font-bold text-white">
@@ -77,7 +79,7 @@ export default function HostFollowUps({ items, loading }) {
           </span>
         </div>
         <span className="inline-flex items-center gap-1 text-xs font-semibold text-navy">
-          {actionLabel(item)}
+          {actionLabel(item, t)}
           <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" strokeWidth={2} aria-hidden="true" />
         </span>
       </Link>)}

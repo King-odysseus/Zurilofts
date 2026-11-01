@@ -7,6 +7,7 @@ import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
 import ListingEditorTabs from '../components/ListingEditorTabs.jsx';
 import { findSearchLocation, isNairobiSearchLocation, SEARCH_LOCATION_GROUPS } from '../data/searchLocations.js';
+import { useLanguage } from '../context/LanguageContext.jsx';
 
 // SelectMenu renders a flat option list, so the optgroups the native select used
 // are flattened here. Area names are unique across the groups, so no value is lost.
@@ -14,10 +15,12 @@ const AREA_OPTIONS = SEARCH_LOCATION_GROUPS.flatMap((group) => (
   group.options.map((area) => ({ value: area, label: area }))
 ));
 
+// labelKey rather than label: the words are resolved where the menu is
+// rendered, so the type list follows the chosen language.
 const PROPERTY_TYPE_OPTIONS = [
-  { value: 'apartment', label: 'Apartment' },
-  { value: 'studio', label: 'Studio' },
-  { value: 'penthouse', label: 'Penthouse' },
+  { value: 'apartment', labelKey: 'stays.typeApartment' },
+  { value: 'studio', labelKey: 'stays.typeStudio' },
+  { value: 'penthouse', labelKey: 'stays.typePenthouse' },
 ];
 
 const EMPTY = {
@@ -49,14 +52,14 @@ const EMPTY = {
 };
 
 const EDITOR_STEPS = [
-  { key: 'basics', label: 'Basics' },
-  { key: 'photos', label: 'Photos' },
-  { key: 'amenities', label: 'Amenities' },
-  { key: 'pricing', label: 'Pricing' },
+  { key: 'basics', labelKey: 'admin.basics' },
+  { key: 'photos', labelKey: 'admin.photos' },
+  { key: 'amenities', labelKey: 'admin.amenities' },
+  { key: 'pricing', labelKey: 'admin.pricing' },
 ];
 
 // Shared with the host application form so both multi-step host forms read identically.
-const CARD_CLASS = 'rounded-xl border border-border bg-elevated p-5 shadow-sm sm:p-6';
+const CARD_CLASS = 'rounded-xl bg-elevated shadow-md p-5 sm:p-6';
 const STEP_BUTTON_BASE = 'flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-surface';
 const STEP_CIRCLE_BASE = 'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-[11px] font-bold';
 
@@ -91,6 +94,7 @@ function SectionHeader({ step, title, description }) {
 }
 
 function AdminPropertyForm() {
+  const { t } = useLanguage();
   const { id } = useParams();
   const isEdit = Boolean(id);
   const navigate = useNavigate();
@@ -136,12 +140,12 @@ function AdminPropertyForm() {
           address: p.address || '',
         });
       } catch {
-        setError('Failed to load property');
+        setError(t('stays.loadFailed'));
       } finally {
         setLoading(false);
       }
     })();
-  }, [id, isEdit]);
+  }, [id, isEdit, t]);
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -164,7 +168,7 @@ function AdminPropertyForm() {
       const urls = res.data.data?.urls || [];
       setForm((f) => ({ ...f, images: [...f.images, ...urls] }));
     } catch (err) {
-      setError(err.response?.data?.error || 'Image upload failed');
+      setError(err.response?.data?.error || t('admin.imageUploadFailed'));
     } finally {
       setUploading(false);
     }
@@ -212,7 +216,7 @@ function AdminPropertyForm() {
     payload.address = form.address ? form.address : null;
 
     if (payload.images.length === 0) {
-      setError('Add at least one image');
+      setError(t('admin.addImageRequired'));
       setSaving(false);
       return;
     }
@@ -230,7 +234,7 @@ function AdminPropertyForm() {
         navigate(`/host/properties/${res.data.data.id}/edit`);
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to save property');
+      setError(err.response?.data?.message || err.response?.data?.error || t('admin.savePropertyFailed'));
     } finally {
       setSaving(false);
     }
@@ -240,10 +244,10 @@ function AdminPropertyForm() {
   const amenitiesCount = linesToArray(form.amenities).length;
   const nearbyCount = linesToArray(form.nearby).length;
   const completionItems = [
-    { key: 'basics', label: 'Basics', complete: basicsComplete === 5, detail: `${basicsComplete} of 5 complete` },
-    { key: 'photos', label: 'Photos', complete: form.images.length > 0, detail: `${form.images.length} photo${form.images.length === 1 ? '' : 's'} added` },
-    { key: 'amenities', label: 'Amenities', complete: amenitiesCount > 0, detail: `${amenitiesCount} amenit${amenitiesCount === 1 ? 'y' : 'ies'} · ${nearbyCount} nearby` },
-    { key: 'pricing', label: 'Pricing', complete: Boolean(form.price && form.bedrooms && form.bathrooms), detail: form.price ? `KES ${Number(form.price).toLocaleString()} / night` : 'Rate not set' },
+    { key: 'basics', complete: basicsComplete === 5, detail: t('admin.progressOfComplete', { done: basicsComplete, total: 5 }) },
+    { key: 'photos', complete: form.images.length > 0, detail: t(form.images.length === 1 ? 'admin.photosAddedOne' : 'admin.photosAdded', { count: form.images.length }) },
+    { key: 'amenities', complete: amenitiesCount > 0, detail: t(amenitiesCount === 1 ? 'admin.amenitiesDetailOne' : 'admin.amenitiesDetail', { count: amenitiesCount, nearby: nearbyCount }) },
+    { key: 'pricing', complete: Boolean(form.price && form.bedrooms && form.bathrooms), detail: form.price ? `KES ${Number(form.price).toLocaleString()} ${t('discovery.perNightCompact')}` : t('admin.rateNotSet') },
   ];
   const completedCount = completionItems.filter((item) => item.complete).length;
 
@@ -273,13 +277,13 @@ function AdminPropertyForm() {
           <ListingEditorTabs listingId={id} active="space" />
           <div className="flex flex-wrap items-center gap-2">
             <p className="mr-auto max-w-xl text-sm leading-relaxed text-muted">
-              Prepare the basics, photos, amenities and pricing guests will see.
+              {t('admin.propertyFormDescription')}
             </p>
             <Button type="button" color="light" onClick={() => setShowFullPreview(true)}>
               <Eye className="mr-2 h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
-              Preview listing
+              {t('admin.previewListing')}
             </Button>
-            <Button as={Link} to={`/host/calendar/${id}`} color="light">Manage calendar</Button>
+            <Button as={Link} to={`/host/calendar/${id}`} color="light">{t('admin.manageCalendar')}</Button>
           </div>
         </div>
       ) : (
@@ -287,16 +291,16 @@ function AdminPropertyForm() {
           <div>
             <Link to="/host/listings" className="inline-flex items-center gap-1 text-xs font-semibold text-muted transition-colors hover:text-navy">
               <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
-              Listings
+              {t('host.tabListings')}
             </Link>
-            <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Host setup</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">Create a listing</h1>
-            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">Prepare the basics, photos, amenities and pricing guests will see.</p>
+            <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">{t('admin.hostSetup')}</p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.propertyFormTitle')}</h1>
+            <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted">{t('admin.propertyFormDescription')}</p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Button type="button" color="light" onClick={() => setShowFullPreview(true)}>
               <Eye className="mr-2 h-4 w-4" strokeWidth={1.5} aria-hidden="true" />
-              Preview listing
+              {t('admin.previewListing')}
             </Button>
           </div>
         </header>
@@ -312,15 +316,15 @@ function AdminPropertyForm() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[230px_minmax(0,1fr)_300px] lg:items-start">
-          <aside className="space-y-3 rounded-xl border border-border bg-elevated p-5 shadow-sm lg:sticky lg:top-24">
+          <aside className="space-y-3 rounded-xl bg-elevated shadow-md p-5 lg:sticky lg:top-24">
             <div>
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">Listing progress</span>
-              <strong className="mt-1 block text-sm font-semibold text-navy">{completedCount} of 4 steps complete</strong>
+              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">{t('admin.listingProgress')}</span>
+              <strong className="mt-1 block text-sm font-semibold text-navy">{t('admin.progressOfComplete', { done: completedCount, total: EDITOR_STEPS.length })}</strong>
               <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-surface" aria-hidden="true">
                 <i className="block h-full rounded-full bg-primary" style={{ width: `${(completedCount / EDITOR_STEPS.length) * 100}%` }} />
               </div>
             </div>
-            <nav className="space-y-2 pt-3" aria-label="Listing setup steps">
+            <nav className="space-y-2 pt-3" aria-label={t('admin.listingSetupSteps')}>
               {EDITOR_STEPS.map((step, index) => {
                 const item = completionItems.find((entry) => entry.key === step.key);
                 const active = activeStep === step.key;
@@ -336,63 +340,63 @@ function AdminPropertyForm() {
                       {item?.complete ? <Check className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" /> : index + 1}
                     </span>
                     <span className="flex min-w-0 flex-col gap-0.5">
-                      <strong className="text-sm font-semibold text-navy">{step.label}</strong>
-                      <small className="truncate text-xs text-muted">{item?.complete ? 'Complete' : item?.detail || 'Needs attention'}</small>
+                      <strong className="text-sm font-semibold text-navy">{t(step.labelKey)}</strong>
+                      <small className="truncate text-xs text-muted">{item?.complete ? t('admin.stepComplete') : item?.detail || t('admin.stepNeedsAttention')}</small>
                     </span>
                   </button>
                 );
               })}
             </nav>
-            <p className="border-t border-border pt-3 text-xs text-muted">Your progress is saved when you submit this listing.</p>
+            <p className="border-t border-border pt-3 text-xs text-muted">{t('admin.progressSavedOnSubmit')}</p>
           </aside>
 
           <div className="space-y-6">
             <section id="host-editor-basics" className={`${CARD_CLASS} scroll-mt-24`}>
-              <SectionHeader step="1" title="Listing basics" description="Tell guests what makes your stay special." />
+              <SectionHeader step="1" title={t('admin.listingBasics')} description={t('admin.listingBasicsHint')} />
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="listing-title">Listing title</Label>
-                  <TextInput id="listing-title" value={form.title} onChange={(e) => update('title', e.target.value)} placeholder="Bright two-bedroom loft" required />
+                  <Label htmlFor="listing-title">{t('admin.listingTitle')}</Label>
+                  <TextInput id="listing-title" value={form.title} onChange={(e) => update('title', e.target.value)} placeholder={t('admin.listingTitlePlaceholder')} required />
                 </div>
                 <div>
-                  <Label htmlFor="listing-neighborhood">Area</Label>
-                  <SelectMenu id="listing-neighborhood" ariaLabel="Area" value={form.neighborhood} onChange={(next) => update('neighborhood', next)} options={AREA_OPTIONS} />
+                  <Label htmlFor="listing-neighborhood">{t('admin.area')}</Label>
+                  <SelectMenu id="listing-neighborhood" ariaLabel={t('admin.area')} value={form.neighborhood} onChange={(next) => update('neighborhood', next)} options={AREA_OPTIONS} />
                 </div>
                 <div>
-                  <Label htmlFor="listing-location">Location details</Label>
-                  <TextInput id="listing-location" value={form.location} onChange={(e) => update('location', e.target.value)} placeholder="Street, building or landmark" required />
+                  <Label htmlFor="listing-location">{t('admin.locationDetails')}</Label>
+                  <TextInput id="listing-location" value={form.location} onChange={(e) => update('location', e.target.value)} placeholder={t('admin.locationPlaceholder')} required />
                 </div>
                 <div className="sm:col-span-2">
-                  <Label htmlFor="listing-address">Street address (optional)</Label>
+                  <Label htmlFor="listing-address">{t('admin.streetAddress')}</Label>
                   <TextInput
                     id="listing-address"
                     value={form.address}
                     onChange={(e) => update('address', e.target.value)}
-                    placeholder="Building name, street or nearest landmark"
+                    placeholder={t('admin.streetAddressPlaceholder')}
                   />
                   <p className="mt-1 text-xs text-muted">
-                    Shown to guests and used for the Google Maps link. Leave empty to use the location above.
+                    {t('admin.addressHint')}
                   </p>
                 </div>
                 <div className="sm:col-span-2">
-                  <Label htmlFor="listing-description">Description</Label>
-                  <Textarea id="listing-description" rows={5} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder="Share the layout, views and details guests should know before booking." required />
+                  <Label htmlFor="listing-description">{t('admin.description')}</Label>
+                  <Textarea id="listing-description" rows={5} value={form.description} onChange={(e) => update('description', e.target.value)} placeholder={t('admin.listingDescriptionPlaceholder')} required />
                 </div>
               </div>
             </section>
 
             <section id="host-editor-photos" className={`${CARD_CLASS} scroll-mt-24`}>
-              <SectionHeader step="2" title="Photos" description="Add clear, well-lit images. The first photo becomes the cover." />
+              <SectionHeader step="2" title={t('admin.photos')} description={t('admin.photosHint')} />
               {form.images.length > 0 && (
                 <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                   {form.images.map((src, i) => (
                     <div key={src + i} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
                       <img src={src} alt={`Property photo ${i + 1}`} className="h-full w-full object-cover" />
-                      {i === 0 && <span className="absolute left-2 top-2 rounded-full bg-navy-bg/85 px-2 py-0.5 text-[10px] font-semibold text-white">Cover</span>}
+                      {i === 0 && <span className="absolute left-2 top-2 rounded-full bg-navy-bg/85 px-2 py-0.5 text-[10px] font-semibold text-white">{t('admin.cover')}</span>}
                       <button
                         type="button"
                         onClick={() => removeImage(i)}
-                        aria-label="Remove image"
+                        aria-label={t('admin.removeImage')}
                         className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-navy shadow-sm hover:bg-white"
                       >
                         <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
@@ -405,13 +409,13 @@ function AdminPropertyForm() {
                 {uploading ? (
                   <>
                     <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" aria-hidden="true" />
-                    <strong className="text-sm font-semibold text-navy">Uploading and optimizing...</strong>
+                    <strong className="text-sm font-semibold text-navy">{t('admin.uploadingOptimizing')}</strong>
                   </>
                 ) : (
                   <>
                     <Upload className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
-                    <strong className="text-sm font-semibold text-navy">Add photos</strong>
-                    <span className="text-xs">JPEG, PNG or WebP. Up to 10 at a time.</span>
+                    <strong className="text-sm font-semibold text-navy">{t('admin.addPhotos')}</strong>
+                    <span className="text-xs">{t('admin.photoFormats')}</span>
                   </>
                 )}
                 <input type="file" className="sr-only" accept="image/jpeg,image/png,image/webp" multiple onChange={handleFiles} disabled={uploading} />
@@ -419,46 +423,46 @@ function AdminPropertyForm() {
             </section>
 
             <section id="host-editor-amenities" className={`${CARD_CLASS} scroll-mt-24`}>
-              <SectionHeader step="3" title="Amenities and rules" description="List the essentials and useful places around the stay." />
+              <SectionHeader step="3" title={t('admin.amenitiesAndRules')} description={t('admin.amenitiesAndRulesHint')} />
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="listing-amenities">Amenities</Label>
+                  <Label htmlFor="listing-amenities">{t('admin.amenities')}</Label>
                   <Textarea id="listing-amenities" rows={5} placeholder={'WiFi\nPool\nParking'} value={form.amenities} onChange={(e) => update('amenities', e.target.value)} />
-                  <p className="mt-1 text-xs text-muted">Enter one item per line.</p>
+                  <p className="mt-1 text-xs text-muted">{t('admin.oneItemPerLine')}</p>
                 </div>
                 <div>
-                  <Label htmlFor="listing-nearby">What&apos;s nearby</Label>
+                  <Label htmlFor="listing-nearby">{t('admin.whatsNearby')}</Label>
                   <Textarea id="listing-nearby" rows={5} placeholder={'Airport - 20 min\nVillage Market - 8 min'} value={form.nearby} onChange={(e) => update('nearby', e.target.value)} />
-                  <p className="mt-1 text-xs text-muted">Enter one item per line.</p>
+                  <p className="mt-1 text-xs text-muted">{t('admin.oneItemPerLine')}</p>
                 </div>
               </div>
             </section>
 
             <section id="host-editor-pricing" className={`${CARD_CLASS} scroll-mt-24`}>
-              <SectionHeader step="4" title="Pricing and availability" description="Set the nightly rate, capacity and booking state." />
+              <SectionHeader step="4" title={t('admin.pricingAndAvailability')} description={t('admin.pricingAndAvailabilityHint')} />
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <Label htmlFor="listing-price">Base price / night (KES)</Label>
+                  <Label htmlFor="listing-price">{t('admin.basePrice')}</Label>
                   <TextInput id="listing-price" type="number" min="1" value={form.price} onChange={(e) => update('price', e.target.value)} required />
                 </div>
                 <div>
-                  <Label htmlFor="listing-area">Area (sq ft)</Label>
+                  <Label htmlFor="listing-area">{t('admin.areaSqft')}</Label>
                   <TextInput id="listing-area" type="number" min="1" value={form.area} onChange={(e) => update('area', e.target.value)} required />
                 </div>
                 <div>
-                  <Label htmlFor="listing-bedrooms">Bedrooms</Label>
+                  <Label htmlFor="listing-bedrooms">{t('admin.bedrooms')}</Label>
                   <TextInput id="listing-bedrooms" type="number" min="0" value={form.bedrooms} onChange={(e) => update('bedrooms', e.target.value)} required />
                 </div>
                 <div>
-                  <Label htmlFor="listing-bathrooms">Bathrooms</Label>
+                  <Label htmlFor="listing-bathrooms">{t('admin.bathrooms')}</Label>
                   <TextInput id="listing-bathrooms" type="number" min="0" value={form.bathrooms} onChange={(e) => update('bathrooms', e.target.value)} required />
                 </div>
               </div>
 
-              <div className="mt-5 rounded-lg border border-border bg-surface p-4">
+              <div className="mt-5 rounded-lg bg-surface p-4 shadow-sm">
                 <div>
-                  <h3 className="text-sm font-semibold text-navy">Bed size options</h3>
-                  <p className="mt-1 text-xs text-muted">Add a one-bed or two-bed rate when the same stay can be booked at different capacities.</p>
+                  <h3 className="text-sm font-semibold text-navy">{t('admin.bedSizeOptions')}</h3>
+                  <p className="mt-1 text-xs text-muted">{t('admin.bedSizeHint')}</p>
                 </div>
                 <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                   <div className={`flex items-start gap-3 rounded-lg border p-3 ${form.price1Bed !== '' ? 'border-primary bg-primary-50 dark:bg-primary/15' : 'border-border bg-elevated'}`}>
@@ -471,12 +475,12 @@ function AdminPropertyForm() {
                       }}
                     />
                     <div className="min-w-0 flex-1">
-                      <Label htmlFor="listing-variant-1">List as 1-bed</Label>
-                      <span className="block text-xs text-muted">Appears as a separate one-bedroom option.</span>
+                      <Label htmlFor="listing-variant-1">{t('admin.listAsOneBed')}</Label>
+                      <span className="block text-xs text-muted">{t('admin.oneBedHint')}</span>
                       {form.price1Bed !== '' && (
                         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                          <TextInput type="number" min="1" placeholder="Price per night" value={form.price1Bed} onChange={(e) => update('price1Bed', e.target.value)} required />
-                          <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms1Bed} onChange={(e) => update('bathrooms1Bed', e.target.value)} />
+                          <TextInput type="number" min="1" placeholder={t('admin.pricePerNight')} value={form.price1Bed} onChange={(e) => update('price1Bed', e.target.value)} required />
+                          <TextInput type="number" min="0" placeholder={t('admin.bathrooms')} value={form.bathrooms1Bed} onChange={(e) => update('bathrooms1Bed', e.target.value)} />
                         </div>
                       )}
                     </div>
@@ -491,12 +495,12 @@ function AdminPropertyForm() {
                       }}
                     />
                     <div className="min-w-0 flex-1">
-                      <Label htmlFor="listing-variant-2">List as 2-bed</Label>
-                      <span className="block text-xs text-muted">Appears as a separate two-bedroom option.</span>
+                      <Label htmlFor="listing-variant-2">{t('admin.listAsTwoBed')}</Label>
+                      <span className="block text-xs text-muted">{t('admin.twoBedHint')}</span>
                       {form.price2Bed !== '' && (
                         <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                          <TextInput type="number" min="1" placeholder="Price per night" value={form.price2Bed} onChange={(e) => update('price2Bed', e.target.value)} required />
-                          <TextInput type="number" min="0" placeholder="Bathrooms" value={form.bathrooms2Bed} onChange={(e) => update('bathrooms2Bed', e.target.value)} />
+                          <TextInput type="number" min="1" placeholder={t('admin.pricePerNight')} value={form.price2Bed} onChange={(e) => update('price2Bed', e.target.value)} required />
+                          <TextInput type="number" min="0" placeholder={t('admin.bathrooms')} value={form.bathrooms2Bed} onChange={(e) => update('bathrooms2Bed', e.target.value)} />
                         </div>
                       )}
                     </div>
@@ -506,23 +510,23 @@ function AdminPropertyForm() {
 
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <div>
-                  <Label htmlFor="listing-type">Property type</Label>
-                  <SelectMenu id="listing-type" ariaLabel="Property type" value={form.type} onChange={(next) => update('type', next)} options={PROPERTY_TYPE_OPTIONS} />
+                  <Label htmlFor="listing-type">{t('admin.propertyType')}</Label>
+                  <SelectMenu id="listing-type" ariaLabel={t('admin.propertyType')} value={form.type} onChange={(next) => update('type', next)} options={PROPERTY_TYPE_OPTIONS.map((option) => ({ value: option.value, label: t(option.labelKey) }))} />
                 </div>
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between gap-3 rounded-lg bg-surface p-3 shadow-sm">
                     <div>
-                      <strong className="block text-sm font-semibold text-navy">Available for bookings</strong>
-                      <span className="text-xs text-muted">Guests can reserve open dates.</span>
+                      <strong className="block text-sm font-semibold text-navy">{t('admin.availableForBookings')}</strong>
+                      <span className="text-xs text-muted">{t('admin.availableHint')}</span>
                     </div>
-                    <ToggleSwitch checked={form.available} onChange={(checked) => update('available', checked)} aria-label="Available for bookings" />
+                    <ToggleSwitch checked={form.available} onChange={(checked) => update('available', checked)} aria-label={t('admin.availableForBookings')} />
                   </div>
-                  <div className="flex items-center justify-between gap-3 rounded-lg border border-border p-3">
+                  <div className="flex items-center justify-between gap-3 rounded-lg bg-surface p-3 shadow-sm">
                     <div>
-                      <strong className="block text-sm font-semibold text-navy">Featured listing</strong>
-                      <span className="text-xs text-muted">Highlight this stay in discovery.</span>
+                      <strong className="block text-sm font-semibold text-navy">{t('admin.featuredListing')}</strong>
+                      <span className="text-xs text-muted">{t('admin.featuredHint')}</span>
                     </div>
-                    <ToggleSwitch checked={form.featured} onChange={(checked) => update('featured', checked)} aria-label="Featured listing" />
+                    <ToggleSwitch checked={form.featured} onChange={(checked) => update('featured', checked)} aria-label={t('admin.featuredListing')} />
                   </div>
                 </div>
               </div>
@@ -531,24 +535,24 @@ function AdminPropertyForm() {
             {isEdit && <SeasonalPricing propertyId={id} />}
           </div>
 
-          <aside className="space-y-3 rounded-xl border border-border bg-elevated p-5 shadow-sm lg:sticky lg:top-24">
+          <aside className="space-y-3 rounded-xl bg-elevated shadow-md p-5 lg:sticky lg:top-24">
             <header className="flex items-start justify-between gap-3">
               <div>
-                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">GUEST PREVIEW</span>
-                <h2 className="text-base font-semibold text-navy">Listing card</h2>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-primary-600">{t('admin.guestPreview')}</span>
+                <h2 className="text-base font-semibold text-navy">{t('admin.listingCard')}</h2>
               </div>
-              <Button type="button" color="light" size="sm" onClick={() => setShowFullPreview(true)}>Open</Button>
+              <Button type="button" color="light" size="sm" onClick={() => setShowFullPreview(true)}>{t('admin.openPreview')}</Button>
             </header>
             <PropertyPreview form={form} />
-            <p className="text-xs text-muted">This card updates as you edit the listing.</p>
+            <p className="text-xs text-muted">{t('admin.cardUpdates')}</p>
           </aside>
         </div>
 
         <div className="flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <Button type="submit" disabled={saving}>
-            {saving ? 'Saving...' : isEdit ? 'Save changes' : 'Create listing'}
+            {saving ? t('common.saving') : isEdit ? t('common.saveChanges') : t('admin.createListing')}
           </Button>
-          <Link to="/host/listings" className="text-sm font-semibold text-muted transition-colors hover:text-navy">Cancel</Link>
+          <Link to="/host/listings" className="text-sm font-semibold text-muted transition-colors hover:text-navy">{t('common.cancel')}</Link>
         </div>
       </form>
     </div>
@@ -591,6 +595,7 @@ function bedBathLabel(form) {
 
 // Live preview of the public listing card, driven by the current form values
 function PropertyPreview({ form }) {
+  const { t } = useLanguage();
   const cover = form.images?.[0];
   const price = Number(form.price) || 0;
   // The bed-variant checkboxes drive the card's bed count: a property listed as
@@ -601,23 +606,23 @@ function PropertyPreview({ form }) {
   const area = form.area === '' ? '-' : form.area;
 
   return (
-    <div className="max-w-sm overflow-hidden rounded-xl border border-border bg-elevated shadow-sm">
+    <div className="max-w-sm overflow-hidden rounded-xl bg-elevated shadow-md">
       <div className="relative">
         {cover ? (
           <img src={cover} alt={form.title || 'Property'} className="aspect-[4/3] w-full object-cover" />
         ) : (
-          <div className="flex aspect-[4/3] w-full items-center justify-center bg-surface text-sm text-muted">No photo yet</div>
+          <div className="flex aspect-[4/3] w-full items-center justify-center bg-surface text-sm text-muted">{t('admin.noPhotoYet')}</div>
         )}
         {form.featured && (
-          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-white">Featured</span>
+          <span className="absolute left-3 top-3 rounded-full bg-primary px-3 py-1 text-[10px] font-semibold text-white">{t('admin.featured')}</span>
         )}
         {!form.available && (
-          <span className="absolute right-3 top-3 rounded-full bg-navy-bg px-3 py-1 text-[10px] font-semibold text-white">Unavailable</span>
+          <span className="absolute right-3 top-3 rounded-full bg-navy-bg px-3 py-1 text-[10px] font-semibold text-white">{t('admin.unavailable')}</span>
         )}
       </div>
 
       <div className="space-y-3 p-4">
-        <h3 className="text-base font-semibold leading-tight text-navy">{form.title || 'Property title'}</h3>
+        <h3 className="text-base font-semibold leading-tight text-navy">{form.title || t('admin.propertyTitlePlaceholder')}</h3>
         <div className="flex items-center text-muted">
           <MapPin className="mr-2 h-4 w-4 flex-shrink-0" strokeWidth={2} aria-hidden="true" />
           <span className="truncate text-sm">{buildLocationLabel(form.location, form.neighborhood) || 'Location'}</span>
@@ -626,24 +631,24 @@ function PropertyPreview({ form }) {
         <div className="flex items-center justify-between border-y border-border py-3 text-center">
           <div className="flex-1">
             <p className="text-sm font-semibold text-navy">{bedrooms}</p>
-            <p className="text-xs text-muted">Beds</p>
+            <p className="text-xs text-muted">{t('admin.beds')}</p>
           </div>
           <div className="flex-1 border-x border-border">
             <p className="text-sm font-semibold text-navy">{bathrooms}</p>
-            <p className="text-xs text-muted">Baths</p>
+            <p className="text-xs text-muted">{t('admin.baths')}</p>
           </div>
           <div className="flex-1">
             <p className="text-sm font-semibold text-navy">{area}</p>
-            <p className="text-xs text-muted">Sqft</p>
+            <p className="text-xs text-muted">{t('admin.sqft')}</p>
           </div>
         </div>
 
         <div className="flex items-center justify-between">
           <div>
-            <span className="text-xs text-muted">per night</span>
+            <span className="text-xs text-muted">{t('common.perNight')}</span>
             <div className="text-xl font-bold text-primary-600">KES {price.toLocaleString()}</div>
           </div>
-          <span className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white">Book Now</span>
+          <span className="rounded-full bg-primary px-4 py-2 text-sm font-semibold text-white">{t('admin.bookNow')}</span>
         </div>
       </div>
     </div>
@@ -656,6 +661,7 @@ PropertyPreview.propTypes = {
 
 // Full property-detail page preview (modal) built from current form values
 function FullPagePreview({ form, onClose }) {
+  const { t } = useLanguage();
   const images = form.images || [];
   const [active, setActive] = useState(0);
   const amenities = linesToArray(form.amenities);
@@ -665,18 +671,18 @@ function FullPagePreview({ form, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/60 p-4">
-      <div className="my-8 w-full max-w-5xl overflow-hidden rounded-xl border border-border bg-elevated shadow-lg">
+      <div className="my-8 w-full max-w-5xl overflow-hidden rounded-xl bg-elevated shadow-lg">
         {/* Bar */}
         <div className="sticky top-0 z-10 flex items-center justify-between bg-navy-bg px-5 py-3 text-white">
-          <span className="text-sm font-semibold">Page preview - not yet saved</span>
-          <button onClick={onClose} className="text-white/70 hover:text-white" aria-label="Close preview">
+          <span className="text-sm font-semibold">{t('admin.pagePreviewUnsaved')}</span>
+          <button onClick={onClose} className="text-white/70 hover:text-white" aria-label={t('admin.closePreview')}>
             <X className="h-5 w-5" strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
 
         <div className="p-5 md:p-8">
           {/* Title */}
-          <h1 className="mb-1 text-2xl font-bold tracking-tight text-navy md:text-3xl">{form.title || 'Property title'}</h1>
+          <h1 className="mb-1 text-2xl font-bold tracking-tight text-navy md:text-3xl">{form.title || t('admin.propertyTitlePlaceholder')}</h1>
           <div className="mb-6 flex items-center text-muted">
             <MapPin className="mr-1 h-5 w-5" strokeWidth={2} aria-hidden="true" />
             {buildLocationLabel(form.location, form.neighborhood) || 'Location'}
@@ -702,7 +708,7 @@ function FullPagePreview({ form, onClose }) {
               )}
             </div>
           ) : (
-            <div className="mb-8 flex h-64 w-full items-center justify-center rounded-xl bg-surface text-muted md:h-[420px]">No photos uploaded yet</div>
+            <div className="mb-8 flex h-64 w-full items-center justify-center rounded-xl bg-surface text-muted md:h-[420px]">{t('admin.noPhotosYet')}</div>
           )}
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -711,30 +717,30 @@ function FullPagePreview({ form, onClose }) {
               <div className="mb-6 flex flex-wrap gap-8 border-b border-border pb-6">
                 <div>
                   <p className="font-bold text-navy">{bedLabel(form)}</p>
-                  <p className="text-sm text-muted">Bedrooms</p>
+                  <p className="text-sm text-muted">{t('admin.bedrooms')}</p>
                 </div>
                 <div>
                   <p className="font-bold text-navy">{bedBathLabel(form)}</p>
-                  <p className="text-sm text-muted">Bathrooms</p>
+                  <p className="text-sm text-muted">{t('admin.bathrooms')}</p>
                 </div>
                 <div>
                   <p className="font-bold text-navy">{form.area === '' ? '-' : `${form.area} sq ft`}</p>
-                  <p className="text-sm text-muted">Area</p>
+                  <p className="text-sm text-muted">{t('admin.area')}</p>
                 </div>
                 <div>
                   <p className="font-bold capitalize text-navy">{form.type}</p>
-                  <p className="text-sm text-muted">Type</p>
+                  <p className="text-sm text-muted">{t('admin.type')}</p>
                 </div>
               </div>
 
               {/* Description */}
-              <h2 className="mb-3 text-xl font-bold text-navy">About this property</h2>
-              <p className="mb-8 whitespace-pre-line leading-relaxed text-charcoal">{form.description || 'No description yet.'}</p>
+              <h2 className="mb-3 text-xl font-bold text-navy">{t('admin.aboutThisProperty')}</h2>
+              <p className="mb-8 whitespace-pre-line leading-relaxed text-charcoal">{form.description || t('admin.noDescriptionYet')}</p>
 
               {/* Amenities */}
               {amenities.length > 0 && (
                 <div className="mb-8">
-                  <h2 className="mb-3 text-xl font-bold text-navy">Amenities</h2>
+                  <h2 className="mb-3 text-xl font-bold text-navy">{t('admin.amenities')}</h2>
                   <div className="grid grid-cols-2 gap-3">
                     {amenities.map((a, i) => (
                       <div key={i} className="flex items-center text-charcoal">
@@ -749,7 +755,7 @@ function FullPagePreview({ form, onClose }) {
               {/* Nearby */}
               {nearby.length > 0 && (
                 <div>
-                  <h2 className="mb-3 text-xl font-bold text-navy">What&apos;s nearby</h2>
+                  <h2 className="mb-3 text-xl font-bold text-navy">{t('admin.whatsNearby')}</h2>
                   <ul className="space-y-3">
                     {nearby.map((n, i) => (
                       <li key={i} className="flex items-center text-charcoal">
@@ -764,12 +770,12 @@ function FullPagePreview({ form, onClose }) {
 
             {/* Booking card */}
             <div className="lg:col-span-1">
-              <div className="sticky top-20 rounded-xl border border-border bg-elevated p-6 shadow-sm">
+              <div className="sticky top-20 rounded-xl bg-elevated shadow-md p-6">
                 <span className="text-3xl font-bold text-navy">KES {price.toLocaleString()}</span>
-                <span className="text-muted"> / night</span>
-                <div className="mt-4 block w-full rounded-full bg-primary py-3 text-center font-bold text-white">Book Now</div>
+                <span className="text-muted"> {t('common.perNight')}</span>
+                <div className="mt-4 block w-full rounded-full bg-primary py-3 text-center font-bold text-white">{t('admin.bookNow')}</div>
                 {!form.available && (
-                  <p className="mt-3 text-center text-sm font-medium text-red-600">Currently marked unavailable</p>
+                  <p className="mt-3 text-center text-sm font-medium text-red-600">{t('admin.currentlyUnavailable')}</p>
                 )}
               </div>
             </div>
@@ -787,6 +793,7 @@ FullPagePreview.propTypes = {
 
 // ---- Seasonal pricing (price rules) - only available once a property exists ----
 function SeasonalPricing({ propertyId }) {
+  const { t } = useLanguage();
   // Price rules are host-scoped; the old admin namespace no longer exists, so
   // there is a single path to read and write here.
   const rulesPath = `/properties/${propertyId}/price-rules`;
@@ -825,7 +832,7 @@ function SeasonalPricing({ propertyId }) {
       setDraft({ name: '', start: '', end: '', price: '' });
       load();
     } catch (err) {
-      setError(err.response?.data?.message || err.response?.data?.error || 'Failed to add rule');
+      setError(err.response?.data?.message || err.response?.data?.error || t('admin.ruleAddFailed'));
     }
   }
 
@@ -836,7 +843,7 @@ function SeasonalPricing({ propertyId }) {
     } catch (err) {
       // Surfaced in the panel instead of a browser alert, which blocks the page
       // and vanishes the moment it is dismissed.
-      setError(err.response?.data?.error || 'Failed to delete rule');
+      setError(err.response?.data?.error || t('admin.ruleDeleteFailed'));
     }
   }
 
@@ -844,13 +851,13 @@ function SeasonalPricing({ propertyId }) {
 
   return (
     <section className={CARD_CLASS}>
-      <h2 className="text-base font-semibold text-navy">Seasonal Pricing</h2>
-      <p className="mt-1 text-xs text-muted">Override the base nightly price for specific date ranges (e.g. peak season). The base price applies on any date with no rule.</p>
+      <h2 className="text-base font-semibold text-navy">{t('admin.seasonalPricing')}</h2>
+      <p className="mt-1 text-xs text-muted">{t('admin.seasonalPricingHint')}</p>
 
       {error && <Alert color="failure" className="mt-5">{error}</Alert>}
 
       {loading ? (
-        <p className="mt-5 text-sm text-muted">Loading...</p>
+        <p className="mt-5 text-sm text-muted">{t('common.loading')}</p>
       ) : rules.length > 0 ? (
         <div className="mt-5 space-y-3">
           {rules.map((r) => (
@@ -861,33 +868,33 @@ function SeasonalPricing({ propertyId }) {
               </div>
               <div className="flex items-center gap-3">
                 <span className="font-semibold text-navy">KES {r.price.toLocaleString()}/night</span>
-                <button type="button" onClick={() => removeRule(r.id)} className="text-xs font-semibold text-red-600 hover:text-red-800">Remove</button>
+                <button type="button" onClick={() => removeRule(r.id)} className="text-xs font-semibold text-red-600 hover:text-red-800">{t('common.remove')}</button>
               </div>
             </div>
           ))}
         </div>
       ) : (
-        <p className="mt-5 text-sm text-muted">No seasonal rates yet.</p>
+        <p className="mt-5 text-sm text-muted">{t('admin.noSeasonalRates')}</p>
       )}
 
       <div className="mt-5 grid grid-cols-1 items-end gap-4 sm:grid-cols-2 lg:grid-cols-5">
         <div className="sm:col-span-2 lg:col-span-1">
-          <Label htmlFor="seasonal-name">Name</Label>
-          <TextInput id="seasonal-name" placeholder="Peak" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+          <Label htmlFor="seasonal-name">{t('admin.rateName')}</Label>
+          <TextInput id="seasonal-name" placeholder={t('admin.rateNamePlaceholder')} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
         </div>
         <div>
-          <Label htmlFor="seasonal-start">From</Label>
+          <Label htmlFor="seasonal-start">{t('common.from')}</Label>
           <TextInput id="seasonal-start" type="date" value={draft.start} onChange={(e) => setDraft({ ...draft, start: e.target.value })} />
         </div>
         <div>
-          <Label htmlFor="seasonal-end">To</Label>
+          <Label htmlFor="seasonal-end">{t('common.to')}</Label>
           <TextInput id="seasonal-end" type="date" value={draft.end} onChange={(e) => setDraft({ ...draft, end: e.target.value })} />
         </div>
         <div>
-          <Label htmlFor="seasonal-price">Price / night</Label>
+          <Label htmlFor="seasonal-price">{t('admin.priceNight')}</Label>
           <TextInput id="seasonal-price" type="number" min="1" value={draft.price} onChange={(e) => setDraft({ ...draft, price: e.target.value })} />
         </div>
-        <Button type="button" onClick={addRule}>Add rate</Button>
+        <Button type="button" onClick={addRule}>{t('admin.addRate')}</Button>
       </div>
     </section>
   );

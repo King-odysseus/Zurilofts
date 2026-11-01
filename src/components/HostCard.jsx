@@ -31,6 +31,10 @@ export default function HostCard({
   className = '',
   flush = false,
   id,
+  // Titles are panel headings at one size by default. A card whose title IS the
+  // page's greeting needs to read as a greeting, and sizing it on the call site
+  // keeps every other panel identical.
+  titleClassName = 'text-base',
 }) {
   const hasHead = Boolean(eyebrow || title || action);
 
@@ -45,7 +49,7 @@ export default function HostCard({
             action button, and a single nowrap line cut real names off ("Good
             evening, Hann..."). Clamping keeps a very long title from growing
             the head without limit. */}
-        {title && <h2 className="line-clamp-2 text-base font-semibold text-navy">{title}</h2>}
+        {title && <h2 className={`line-clamp-2 font-semibold text-navy ${titleClassName}`}>{title}</h2>}
         {description && <p className="mt-2 text-xs leading-relaxed text-muted">{description}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -63,4 +67,5 @@ HostCard.propTypes = {
   className: PropTypes.string,
   flush: PropTypes.bool,
   id: PropTypes.string,
+  titleClassName: PropTypes.string,
 };
