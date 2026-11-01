@@ -642,7 +642,7 @@ function ReservationPanel({ conversation, currentUserId, onClose, className }) {
         <p className="mt-2 text-xs text-muted">{property.title || t('hostinbox.stay')}</p>
       </div>
 
-      <div className="mt-5 rounded-xl border border-border">
+      <div className="mt-5 rounded-xl bg-surface">
         <div className="grid grid-cols-2 divide-x divide-border">
           <div className="p-3">
             <p className="text-[11px] font-semibold text-navy">{t('hostinbox.checkIn')}</p>
@@ -657,7 +657,7 @@ function ReservationPanel({ conversation, currentUserId, onClose, className }) {
         </div>
       </div>
 
-      <div className="mt-4 space-y-3 rounded-xl border border-border p-3.5">
+      <div className="mt-4 space-y-3 rounded-xl bg-surface p-3.5">
         <p className="flex items-center gap-2 text-xs text-navy">
           <Users className="h-3.5 w-3.5 shrink-0 text-muted" strokeWidth={1.8} aria-hidden="true" />
           {t((booking.guests || 1) === 1 ? 'hostinbox.guestOne' : 'hostinbox.guestOther', { count: booking.guests || 1 })}

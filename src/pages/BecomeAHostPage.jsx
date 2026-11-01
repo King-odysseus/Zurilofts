@@ -250,7 +250,7 @@ export default function BecomeAHostPage() {
                   <ResultRow label={t('discovery.rowTakeHome')} value={money(result.zuriNet)} emphasis />
                 </dl>
 
-                <div className="mt-6 rounded-lg border border-line bg-surface p-4">
+                <div className="mt-6 rounded-lg bg-surface p-4 shadow-sm">
                   <h3 className="text-sm font-semibold text-navy">
                     {t('discovery.againstTitle', { percent: currentPlatformPercent })}
                   </h3>
@@ -297,7 +297,7 @@ export default function BecomeAHostPage() {
 
         {/* Founding hosts */}
         {fees && fees.foundingPlaceLimit > 0 && (
-          <div className="mt-6 rounded-xl border border-primary-500 bg-primary-50 p-5 dark:bg-primary/15 sm:p-6">
+          <div className="mt-6 rounded-xl bg-primary-50 p-5 shadow-sm dark:bg-primary/15 sm:p-6">
             <h2 className="font-montserrat text-lg font-bold text-navy">
               {t('discovery.foundingTitle', { founding: fees.foundingCommissionPercent, commission: fees.commissionPercent })}
             </h2>

@@ -390,7 +390,7 @@ function AdminPropertyForm() {
               {form.images.length > 0 && (
                 <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
                   {form.images.map((src, i) => (
-                    <div key={src + i} className="group relative aspect-square overflow-hidden rounded-lg border border-border">
+                    <div key={src + i} className="group relative aspect-square overflow-hidden rounded-lg shadow-sm">
                       <img src={src} alt={`Property photo ${i + 1}`} className="h-full w-full object-cover" />
                       {i === 0 && <span className="absolute left-2 top-2 rounded-full bg-navy-bg/85 px-2 py-0.5 text-[10px] font-semibold text-white">{t('admin.cover')}</span>}
                       <button

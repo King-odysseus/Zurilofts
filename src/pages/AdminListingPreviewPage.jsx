@@ -90,14 +90,14 @@ export default function AdminListingPreviewPage() {
       {listing.listingReviewNote && (
         <div>
           <dt className="text-xs text-muted">{t('adminlisting.noteToHost')}</dt>
-          <dd className="mt-1 whitespace-pre-wrap break-words rounded-lg border border-border bg-surface p-2 text-xs text-charcoal">
+          <dd className="mt-1 whitespace-pre-wrap break-words rounded-lg bg-surface p-2 text-xs text-charcoal">
             {listing.listingReviewNote}
           </dd>
         </div>
       )}
     </dl>
 
-    <div className="mt-5 flex items-start gap-2 rounded-lg border border-border bg-surface p-3 text-xs leading-relaxed text-muted">
+    <div className="mt-5 flex items-start gap-2 rounded-lg bg-surface p-3 text-xs leading-relaxed text-muted">
       <Eye className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.8} aria-hidden="true" />
       <p>{t('adminlisting.guestsAlsoSee')}</p>
     </div>

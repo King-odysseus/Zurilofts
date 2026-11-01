@@ -995,7 +995,7 @@ export default function HostCalendarPage() {
       <SidebarSection title={t('host.connectedCalendars')} icon={Link2}>
         <p className="text-[11px] leading-relaxed text-muted">{t('host.connectedCalendarsHint')}</p>
         {(calendar?.sources || []).length > 0 ? <ul className="mt-2 space-y-2">
-          {calendar.sources.map((source) => <li key={source.id} className="rounded-lg border border-border p-2">
+          {calendar.sources.map((source) => <li key={source.id} className="rounded-lg bg-surface p-2">
             <p className="truncate text-xs font-semibold text-navy">{source.name}</p>
             <p className={`text-[10px] ${source.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-muted'}`}>
               {source.lastSyncedAt ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}` : t('host.notSyncedYet')}
