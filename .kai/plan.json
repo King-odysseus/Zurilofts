@@ -2,37 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Find the host application form (step 2) and its save request",
-      "state": "done"
-    },
-    {
-      "text": "Trace the server save endpoint and find why it 500s",
-      "state": "done"
-    },
-    {
-      "text": "Reproduce against a running server: local save works, so the difference is production",
-      "state": "done"
-    },
-    {
-      "text": "Root cause: production Postgres Prisma schema lacks the four payout fields the save writes",
-      "state": "done"
-    },
-    {
-      "text": "Add the four payout fields to schema.postgresql.prisma",
-      "state": "done"
-    },
-    {
-      "text": "Add a schema-parity test so the two schemas cannot drift again (proved it fails on the old schema)",
-      "state": "done"
-    },
-    {
-      "text": "Verify: prisma validate, server typecheck, test suite, lint, build, live save round trip",
-      "state": "done"
-    },
-    {
-      "text": "Commit the schema fix and the new test, then push",
+      "text": "Verify, commit and push the uncommitted SEO head/robots/404 work",
       "state": "active"
+    },
+    {
+      "text": "Audit transport security: is plain HTTP enough (headers, cookies, redirect, CORS)",
+      "state": "done"
+    },
+    {
+      "text": "Audit the remaining host application cards for fields that do not persist or submit",
+      "state": "done"
+    },
+    {
+      "text": "Check card payment path (Paystack) for what data touches our server",
+      "state": "done"
+    },
+    {
+      "text": "Verify the top findings against the code before reporting them",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-01T22:34:15.641Z"
+  "updatedAt": "2026-11-01T22:58:19.270Z"
 }
