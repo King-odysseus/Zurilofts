@@ -3776,11 +3776,21 @@ html.dark .opg-guide-grid a {
   color: var(--dm-text) !important;
 }
 
-/* The phone search card gives each field its own pale row. In dark mode the
-   inputs inside turned near-black on that row while the CHECK IN label stayed
-   light, so the row read as an empty box with an unreadable heading. */
+/* Phones turn the search bar into a card and give each field its own pale row.
+   In dark mode the inputs inside turned near-black on that row while the CHECK
+   IN label stayed light, so the row read as an empty box with an unreadable
+   heading. Scoped to the same 767px breakpoint that builds the card: from 768px
+   up the fields are transparent columns inside one pill-shaped bar, and a fill
+   there became a square block painting over the bar's rounding - the first
+   column covered the left corners and squared off a pill whose right end still
+   drew round. */
+@media (max-width: 767px) {
+  html.dark .opg-search .opg-search-field {
+    background-color: var(--dm-surface-soft) !important;
+  }
+}
+
 html.dark .opg-search .opg-search-field {
-  background-color: var(--dm-surface-soft) !important;
   color: var(--dm-text) !important;
 }
 
@@ -3793,6 +3803,16 @@ html.dark .opg-search .opg-search-field input,
 html.dark .opg-search .opg-search-field select,
 html.dark .opg-guest-trigger {
   color: var(--dm-text) !important;
+}
+
+/* The bar is one surface, so nothing inside it paints a fill of its own: the bar
+   in the pill layout, each field in the phone card. A global dark rule earlier
+   gives every text input a dark background, which drew a visible box behind each
+   empty date field sitting in the bar. The surrounding surface now supplies it,
+   the same way light mode does at every width. */
+html.dark .opg-search .opg-search-field input,
+html.dark .opg-search .opg-search-field select {
+  background-color: transparent !important;
 }
 
 /* An empty CHECK IN or CHECK OUT field shows a placeholder, and the light rule

@@ -2,21 +2,41 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read translation service and route",
+      "text": "Answer: is LibreTranslate hosted on Railway or must it be added as variables?",
       "state": "done"
     },
     {
-      "text": "Check env config and frontend caller",
+      "text": "Check translation service + env config for provider/URL vars",
       "state": "done"
     },
     {
-      "text": "Live-test the endpoint and clean up test rig",
+      "text": "Check railway.json / deployment config for a LibreTranslate service",
       "state": "done"
     },
     {
-      "text": "Run frontend build, then report",
+      "text": "Identify the broken pill shape (dark search bar, desktop width)",
       "state": "done"
+    },
+    {
+      "text": "Reproduce in browser before changing CSS",
+      "state": "done"
+    },
+    {
+      "text": "Fix the pill so it stays a pill in dark mode",
+      "state": "done"
+    },
+    {
+      "text": "Verify in browser at phone and desktop widths, light and dark",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and build",
+      "state": "done"
+    },
+    {
+      "text": "Commit the fix",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-01T14:34:33.042Z"
+  "updatedAt": "2026-11-01T14:44:16.014Z"
 }
