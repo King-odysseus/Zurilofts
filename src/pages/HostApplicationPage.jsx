@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Alert, Badge, Button, Checkbox, Label, Textarea, TextInput } from 'flowbite-react';
-import { Building, Check, CreditCard, House, IdCard, Upload } from 'lucide-react';
+import { AlertCircle, Building, Check, CheckCircle2, CreditCard, House, IdCard, Upload, X } from 'lucide-react';
 import SelectMenu from '../components/SelectMenu.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
@@ -85,6 +85,47 @@ const DOCUMENT_ICONS = {
   BUSINESS_REGISTRATION: Building,
 };
 
+// The tile promises "JPEG, PNG, WebP or PDF up to 8MB", so the same limits are
+// checked here. A picked file is filtered by the input's accept attribute, but a
+// dropped one is not, and the server's rejection arrives far from the tile.
+const ALLOWED_DOCUMENT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+const MAX_DOCUMENT_BYTES = 8 * 1024 * 1024;
+
+function describeDocumentProblem(file) {
+  if (!file) return 'No file was received. Choose the file again.';
+  const type = String(file.type || '').toLowerCase();
+  if (!ALLOWED_DOCUMENT_TYPES.includes(type)) {
+    return 'ZuriLofts accepts a JPEG, PNG or WebP photo, or a PDF. Convert the file, then add it again.';
+  }
+  if (file.size > MAX_DOCUMENT_BYTES) {
+    const megabytes = (file.size / (1024 * 1024)).toFixed(1);
+    return `That file is ${megabytes}MB. The limit is 8MB, so compress it or take a lower-resolution photo.`;
+  }
+  return '';
+}
+
+// The API answers an unexpected crash with one flat sentence, "Internal server
+// error". It is accurate and useless: it names no cause and suggests no action,
+// so every failure is rewritten as a title the applicant can scan plus a body
+// that says what is still true and what to do next.
+const UNHELPFUL_SERVER_MESSAGES = new Set(['error', 'internal server error', 'server error', 'something went wrong']);
+
+function describeRequestFailure(err, action) {
+  const title = `Could not ${action}`;
+  if (!err?.response) {
+    return { title, text: 'ZuriLofts could not be reached. Check your internet connection, then try again.' };
+  }
+  const serverMessage = String(err.response.data?.error || '').trim();
+  const unhelpful = !serverMessage || UNHELPFUL_SERVER_MESSAGES.has(serverMessage.toLowerCase());
+  if (err.response.status >= 500 || unhelpful) {
+    return {
+      title,
+      text: 'Something went wrong at our end, not because of anything you did. Everything you have filled in is still on this page, so try again in a moment. If it keeps failing, contact support and say what you were doing.',
+    };
+  }
+  return { title, text: serverMessage };
+}
+
 // Shared with the listing editor so both multi-step host forms read identically.
 const CARD_CLASS = 'rounded-xl bg-elevated shadow-md p-5 sm:p-6';
 const STEP_BUTTON_BASE = 'flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-surface';
@@ -129,8 +170,10 @@ function HostApplicationPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingKind, setUploadingKind] = useState('');
-  const [message, setMessage] = useState('');
-  const [error, setError] = useState('');
+  const [loadError, setLoadError] = useState('');
+  // One outcome at a time, tagged with where it happened, so it can be drawn
+  // beside the button that caused it instead of at the top of the page.
+  const [feedback, setFeedback] = useState(null);
   const [activeStep, setActiveStep] = useState('identity');
   const [loadAttempt, setLoadAttempt] = useState(0);
   const [banks, setBanks] = useState([]);
@@ -153,6 +196,21 @@ function HostApplicationPage() {
     return () => { ignore = true; };
   }, [user]);
 
+  // A file dropped a few pixels outside a tile would otherwise make the browser
+  // navigate to it and throw away a half-completed application. Nothing else on
+  // this page accepts a drop, so cancelling the default everywhere is safe.
+  useEffect(() => {
+    function blockBrowserHandling(event) {
+      event.preventDefault();
+    }
+    window.addEventListener('dragover', blockBrowserHandling);
+    window.addEventListener('drop', blockBrowserHandling);
+    return () => {
+      window.removeEventListener('dragover', blockBrowserHandling);
+      window.removeEventListener('drop', blockBrowserHandling);
+    };
+  }, []);
+
   useEffect(() => {
     if (!user || user.role === 'ADMIN') return;
     // AuthContext resolves the logged-in user asynchronously (it refreshes the
@@ -165,7 +223,7 @@ function HostApplicationPage() {
     let ignore = false;
     async function loadApplication() {
       setLoading(true);
-      setError('');
+      setLoadError('');
       try {
         let response = await apiClient.get('/host-application');
         let current = response.data.data;
@@ -182,7 +240,7 @@ function HostApplicationPage() {
         setForm(formFromApplication(current, user));
       } catch (err) {
         if (ignore) return;
-        setError(err.response?.data?.error || 'Could not load your host application.');
+        setLoadError(err.response?.data?.error || 'Could not load your host application.');
       } finally {
         if (!ignore) setLoading(false);
       }
@@ -349,55 +407,121 @@ function HostApplicationPage() {
     return response.data.data;
   }
 
-  async function handleSave(event) {
+  function reportFailure(where, action, err) {
+    setFeedback({ tone: 'error', where, ...describeRequestFailure(err, action) });
+  }
+
+  function reportSuccess(where, title, text) {
+    setFeedback({ tone: 'success', where, title, text });
+  }
+
+  function clearFeedback() {
+    setFeedback(null);
+  }
+
+  const feedbackFor = (where) => (feedback?.where === where ? feedback : null);
+
+  async function handleSave(event, where = 'review') {
     event?.preventDefault();
-    setSaving(true); setError(''); setMessage('');
+    setSaving(true);
+    clearFeedback();
     try {
       await saveApplication();
-      setMessage('Your application draft has been saved.');
+      reportSuccess(where, 'Draft saved', 'Your answers are stored. You can leave this page and pick it up later.');
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not save your application.');
+      reportFailure(where, 'save your application', err);
     } finally { setSaving(false); }
   }
 
-  async function handleSaveAndContinue(nextStep) {
-    setSaving(true); setError(''); setMessage('');
+  async function handleSaveAndContinue(nextStep, where) {
+    setSaving(true);
+    clearFeedback();
     try {
       await saveApplication();
-      setMessage('Your application draft has been saved.');
+      reportSuccess(where, 'Draft saved', 'Your answers are stored, and the next step is open.');
       if (nextStep) goToStep(nextStep);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not save your application.');
+      reportFailure(where, 'save your application', err);
     } finally { setSaving(false); }
+  }
+
+  /**
+   * What the server would reject the submission for, worked out here first so
+   * the applicant is told which step or file is missing in plain words, straight
+   * away, without a round trip. The server stays the authority: this only
+   * decides what to say before asking it.
+   */
+  function submissionBlockers() {
+    const blockers = [];
+    completionItems.slice(0, 3).forEach((item) => {
+      if (!item.complete) {
+        blockers.push({ text: `${t(item.label)} still needs a few details.`, step: item.key });
+      }
+    });
+    const missingDocuments = requiredDocuments.filter((kind) => (
+      !application?.documents?.some((doc) => doc.kind === kind)
+    ));
+    if (missingDocuments.length > 0) {
+      blockers.push({
+        text: `Upload the remaining documents: ${missingDocuments.map((kind) => t(DOCUMENT_LABELS[kind])).join(', ')}.`,
+      });
+    }
+    if (!form.agreedTerms) {
+      blockers.push({ text: 'Tick the confirmation box to confirm the details are accurate.' });
+    }
+    return blockers;
   }
 
   async function handleSubmit() {
-    setSaving(true); setError(''); setMessage('');
+    clearFeedback();
+    const blockers = submissionBlockers();
+    if (blockers.length > 0) {
+      const firstStep = blockers.find((blocker) => blocker.step)?.step;
+      const stepLabel = firstStep && t(STEP_DEFINITIONS.find((step) => step.key === firstStep).label);
+      setFeedback({
+        tone: 'error',
+        where: 'review',
+        title: 'Finish these before submitting',
+        items: blockers.map((blocker) => blocker.text),
+        action: firstStep
+          ? { label: `Go to ${stepLabel}`, onClick: () => goToStep(firstStep) }
+          : undefined,
+      });
+      return;
+    }
+    setSaving(true);
     try {
       await saveApplication();
       const response = await apiClient.post('/host-application/submit');
       setApplication(response.data.data);
-      setMessage('Your host application has been submitted for review.');
+      clearFeedback();
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not submit your application.');
+      reportFailure('review', 'submit your application', err);
     } finally { setSaving(false); }
   }
 
-  async function handleSaveAndLeave() {
-    setSaving(true); setError(''); setMessage('');
+  async function handleSaveAndLeave(where = 'sidebar') {
+    setSaving(true);
+    clearFeedback();
     try {
       await saveApplication();
       setMode('travelling');
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not save your application.');
+      reportFailure(where, 'save your application', err);
       setSaving(false);
     }
   }
 
   async function uploadDocument(kind, file) {
     if (!file) return;
-    setUploadingKind(kind); setError(''); setMessage('');
+    const problem = describeDocumentProblem(file);
+    if (problem) {
+      setFeedback({ tone: 'error', where: kind, title: 'That file cannot be uploaded', text: problem });
+      return;
+    }
+    setUploadingKind(kind);
+    clearFeedback();
     try {
       const body = new FormData();
       body.append('document', file);
@@ -408,14 +532,15 @@ function HostApplicationPage() {
         ...current,
         documents: [...(current.documents || []).filter((doc) => doc.kind !== kind), response.data.data],
       }));
-      setMessage(`${t(DOCUMENT_LABELS[kind])} uploaded securely.`);
+      reportSuccess(kind, 'Uploaded', `${t(DOCUMENT_LABELS[kind])} uploaded securely.`);
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not upload the document.');
+      reportFailure(kind, 'upload the document', err);
     } finally { setUploadingKind(''); }
   }
 
   async function removeDocument(kind) {
-    setUploadingKind(kind); setError('');
+    setUploadingKind(kind);
+    clearFeedback();
     try {
       await apiClient.delete(`/host-application/documents/${kind}`);
       setApplication((current) => ({
@@ -423,7 +548,7 @@ function HostApplicationPage() {
         documents: (current.documents || []).filter((doc) => doc.kind !== kind),
       }));
     } catch (err) {
-      setError(err.response?.data?.error || 'Could not remove the document.');
+      reportFailure(kind, 'remove the document', err);
     } finally { setUploadingKind(''); }
   }
 
@@ -489,21 +614,21 @@ function HostApplicationPage() {
               </button>
             ))}
           </nav>
-          <Button type="button" color="light" className="w-full" onClick={handleSaveAndLeave} disabled={saving || !editable}>
+          <Button type="button" color="light" className="w-full" onClick={() => handleSaveAndLeave('sidebar')} disabled={saving || !editable}>
             {t('hostsetup.saveAndExit')}
           </Button>
+          <ActionFeedback feedback={feedbackFor('sidebar')} onDismiss={clearFeedback} />
         </aside>
 
         <div className="space-y-5">
-          {message && <Notice tone="success">{message}</Notice>}
-          {error && <Notice tone="error">{error}</Notice>}
+          {loadError && <Notice tone="error">{loadError}</Notice>}
 
           {/* Sits above the step forms: it is a share-and-leave note, not part of
               the application, so it must not interrupt a host filling one in. */}
           <HostReferralCard />
 
           {editable ? (
-            <form onSubmit={handleSave} className="space-y-5">
+            <form onSubmit={(event) => handleSave(event, activeStep)} className="space-y-5">
               <section id="host-application-identity" className={`${CARD_CLASS} scroll-mt-24`}>
                 <ApplicationCardHeader
                   step="1"
@@ -547,8 +672,10 @@ function HostApplicationPage() {
                 <StepActions
                   saving={saving}
                   uploading={Boolean(uploadingKind)}
-                  onSave={handleSave}
-                  onContinue={() => handleSaveAndContinue('business')}
+                  feedback={feedbackFor('identity')}
+                  onDismiss={clearFeedback}
+                  onSave={() => handleSave(null, 'identity')}
+                  onContinue={() => handleSaveAndContinue('business', 'identity')}
                 />
               </section>
 
@@ -622,8 +749,10 @@ function HostApplicationPage() {
                 <StepActions
                   saving={saving}
                   uploading={Boolean(uploadingKind)}
-                  onSave={handleSave}
-                  onContinue={() => handleSaveAndContinue('properties')}
+                  feedback={feedbackFor('business')}
+                  onDismiss={clearFeedback}
+                  onSave={() => handleSave(null, 'business')}
+                  onContinue={() => handleSaveAndContinue('properties', 'business')}
                 />
               </section>
 
@@ -706,8 +835,10 @@ function HostApplicationPage() {
                 <StepActions
                   saving={saving}
                   uploading={Boolean(uploadingKind)}
-                  onSave={handleSave}
-                  onContinue={() => handleSaveAndContinue('review')}
+                  feedback={feedbackFor('properties')}
+                  onDismiss={clearFeedback}
+                  onSave={() => handleSave(null, 'properties')}
+                  onContinue={() => handleSaveAndContinue('review', 'properties')}
                 />
               </section>
 
@@ -726,8 +857,10 @@ function HostApplicationPage() {
                         kind={kind}
                         document={document}
                         busy={uploadingKind === kind}
+                        feedback={feedbackFor(kind)}
                         onUpload={uploadDocument}
                         onRemove={removeDocument}
+                        onDismiss={clearFeedback}
                       />
                     );
                   })}
@@ -744,16 +877,19 @@ function HostApplicationPage() {
                   </span>
                 </label>
 
-                <div className="mt-5 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
-                  <Button type="submit" color="light" disabled={saving || Boolean(uploadingKind)}>
-                    {saving ? 'Saving...' : 'Save draft'}
-                  </Button>
-                  <Button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)}>
-                    {saving ? 'Working...' : 'Submit for review'}
-                  </Button>
-                  <Button type="button" color="light" onClick={handleSaveAndLeave} disabled={saving || Boolean(uploadingKind)}>
-                    Save and travel
-                  </Button>
+                <div className="mt-5 space-y-3 border-t border-border pt-5">
+                  <ActionFeedback feedback={feedbackFor('review')} onDismiss={clearFeedback} />
+                  <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
+                    <Button type="button" color="light" onClick={() => handleSave(null, 'review')} disabled={saving || Boolean(uploadingKind)}>
+                      {saving ? 'Saving...' : 'Save draft'}
+                    </Button>
+                    <Button type="button" onClick={handleSubmit} disabled={saving || Boolean(uploadingKind)}>
+                      {saving ? 'Working...' : 'Submit for review'}
+                    </Button>
+                    <Button type="button" color="light" onClick={() => handleSaveAndLeave('review')} disabled={saving || Boolean(uploadingKind)}>
+                      Save and travel
+                    </Button>
+                  </div>
                 </div>
               </section>
             </form>
@@ -763,7 +899,7 @@ function HostApplicationPage() {
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{t('hostsetup.startApplicationHint')}</p>
               <div className="mt-5">
                 <Button type="button" onClick={() => setLoadAttempt((attempt) => attempt + 1)}>
-                  {error ? 'Retry application' : 'Start application'}
+                  {loadError ? 'Retry application' : 'Start application'}
                 </Button>
               </div>
             </section>
@@ -917,15 +1053,18 @@ function ApplicationCardHeader({ step, title, description }) {
   );
 }
 
-function StepActions({ saving, uploading, onSave, onContinue }) {
+function StepActions({ saving, uploading, feedback, onSave, onContinue, onDismiss }) {
   return (
-    <div className="mt-5 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between">
-      <Button type="button" color="light" disabled={saving || uploading} onClick={onSave}>
-        {saving ? 'Saving...' : 'Save draft'}
-      </Button>
-      <Button type="button" disabled={saving || uploading} onClick={onContinue}>
-        Save and continue
-      </Button>
+    <div className="mt-5 space-y-3 border-t border-border pt-5">
+      <ActionFeedback feedback={feedback} onDismiss={onDismiss} />
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Button type="button" color="light" disabled={saving || uploading} onClick={onSave}>
+          {saving ? 'Saving...' : 'Save draft'}
+        </Button>
+        <Button type="button" disabled={saving || uploading} onClick={onContinue}>
+          Save and continue
+        </Button>
+      </div>
     </div>
   );
 }
@@ -938,13 +1077,56 @@ function StepActions({ saving, uploading, onSave, onContinue }) {
  * other control on this form, so every upload in the app (identity
  * verification, dispute evidence, listing photos) hides it this way instead.
  */
-function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
+function DocumentUpload({ kind, document, busy, feedback, onUpload, onRemove, onDismiss }) {
   const { t } = useLanguage();
   const fileInput = useRef(null);
   const DocumentIcon = DOCUMENT_ICONS[kind] || Upload;
+  const [dragging, setDragging] = useState(false);
+  // Every child the pointer crosses fires its own dragenter and dragleave, so a
+  // single boolean flickers off the moment the pointer passes over the caption
+  // or the button. Counting the enters against the leaves keeps the tile in its
+  // dragged-over state until the pointer truly leaves the tile.
+  const dragDepth = useRef(0);
+  const inputLabel = `${document ? t('hostsetup.replace') : t('hostsetup.upload')} ${t(DOCUMENT_LABELS[kind])}`;
+
+  function handleDragEnter(event) {
+    if (busy) return;
+    event.preventDefault();
+    dragDepth.current += 1;
+    setDragging(true);
+  }
+
+  function handleDragOver(event) {
+    if (busy) return;
+    // Without this the browser treats the tile as a non-target, never fires drop,
+    // and opens the dropped file instead, losing a half-filled application.
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  function handleDragLeave(event) {
+    event.preventDefault();
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setDragging(false);
+  }
+
+  function handleDrop(event) {
+    event.preventDefault();
+    dragDepth.current = 0;
+    setDragging(false);
+    if (busy) return;
+    const dropped = event.dataTransfer?.files?.[0];
+    if (dropped) onUpload(kind, dropped);
+  }
 
   return (
-    <div className={`flex flex-col gap-3 rounded-xl p-4 shadow-sm ${document ? 'bg-surface dark:bg-primary/15' : 'bg-surface'}`}>
+    <div
+      onDragEnter={handleDragEnter}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      className={`flex flex-col gap-3 rounded-xl p-4 shadow-sm ${document ? 'bg-surface dark:bg-primary/15' : 'bg-surface'} ${dragging ? 'ring-2 ring-inset ring-[#143A80]' : ''}`}
+    >
       <div className="flex items-start gap-3">
         {/* The disc does both jobs: it names the document, and it turns navy once
             a file is in, so a completed tile is still obvious at a glance without
@@ -957,13 +1139,15 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
         </span>
         <div className="min-w-0">
           <strong className="block text-sm font-semibold text-navy">{t(DOCUMENT_LABELS[kind])}</strong>
-          {document ? (
+          {dragging ? (
+            <small className="block text-xs font-semibold text-navy">Drop the file to upload it</small>
+          ) : document ? (
             <small className="flex items-center gap-1 text-xs text-muted">
               <Check className="h-3.5 w-3.5 shrink-0 text-primary-600 dark:text-primary-300" strokeWidth={2.5} aria-hidden="true" />
               Uploaded and encrypted
             </small>
           ) : (
-            <small className="block text-xs text-muted">JPEG, PNG, WebP or PDF up to 8MB</small>
+            <small className="block text-xs text-muted">JPEG, PNG, WebP or PDF up to 8MB, or drag and drop</small>
           )}
         </div>
       </div>
@@ -990,7 +1174,7 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
         ref={fileInput}
         type="file"
         className="sr-only"
-        aria-label={`${document ? t('hostsetup.replace') : t('hostsetup.upload')} ${t(DOCUMENT_LABELS[kind])}`}
+        aria-label={inputLabel}
         accept="image/jpeg,image/png,image/webp,application/pdf"
         disabled={busy}
         onChange={(event) => {
@@ -1001,12 +1185,72 @@ function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
           if (picked) onUpload(kind, picked);
         }}
       />
+      <ActionFeedback feedback={feedback} onDismiss={onDismiss} />
     </div>
   );
 }
 
 function Notice({ tone, children }) {
   return <Alert color={tone === 'success' ? 'success' : 'failure'}>{children}</Alert>;
+}
+
+const FEEDBACK_TONES = {
+  error: { Icon: AlertCircle, frame: 'bg-[#FDECEC] text-[#B42318]' },
+  success: { Icon: CheckCircle2, frame: 'bg-[#E7F6EE] text-[#157347]' },
+};
+
+/**
+ * The single place an action's outcome is shown.
+ *
+ * It is rendered inside the card holding the button that was pressed, because a
+ * banner at the top of this page sits above four screens of form: the applicant
+ * presses "Submit for review" at the bottom and the only reply appears where
+ * they are not looking. The tone hexes are the theme's own alert colours and
+ * have dark-mode equivalents in styles.css, so both themes stay readable.
+ */
+function ActionFeedback({ feedback: current, onDismiss }) {
+  const banner = useRef(null);
+
+  useEffect(() => {
+    if (!current) return;
+    // 'nearest' does nothing when the banner is already on screen, so this only
+    // moves the page when the button that failed sat at the very edge of it.
+    banner.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [current]);
+
+  if (!current) return null;
+
+  const { Icon, frame } = FEEDBACK_TONES[current.tone] || FEEDBACK_TONES.error;
+
+  return (
+    <div ref={banner} role="alert" className={`flex items-start gap-3 rounded-xl p-4 ${frame}`}>
+      <Icon className="mt-0.5 h-5 w-5 shrink-0" strokeWidth={2} aria-hidden="true" />
+      <div className="min-w-0 flex-1 space-y-1">
+        <strong className="block text-sm font-semibold">{current.title}</strong>
+        {current.text && <p className="text-sm leading-relaxed">{current.text}</p>}
+        {current.items?.length > 0 && (
+          <ul className="list-disc space-y-1 pl-5 text-sm leading-relaxed">
+            {current.items.map((item, index) => (
+              <li key={`${index}-${item}`}>{item}</li>
+            ))}
+          </ul>
+        )}
+        {current.action && (
+          <Button type="button" size="xs" color="light" className="mt-2" onClick={current.action.onClick}>
+            {current.action.label}
+          </Button>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onDismiss}
+        aria-label="Dismiss this message"
+        className="shrink-0 rounded p-1 opacity-70 transition-opacity hover:opacity-100"
+      >
+        <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
+      </button>
+    </div>
+  );
 }
 
 function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravelling }) {
@@ -1056,16 +1300,31 @@ ApplicationCardHeader.propTypes = {
 StepActions.propTypes = {
   saving: PropTypes.bool.isRequired,
   uploading: PropTypes.bool.isRequired,
+  feedback: PropTypes.shape({ tone: PropTypes.string, title: PropTypes.string }),
   onSave: PropTypes.func.isRequired,
   onContinue: PropTypes.func.isRequired,
+  onDismiss: PropTypes.func.isRequired,
 };
 
 DocumentUpload.propTypes = {
   kind: PropTypes.string.isRequired,
   document: PropTypes.shape({ originalName: PropTypes.string }),
   busy: PropTypes.bool.isRequired,
+  feedback: PropTypes.shape({ tone: PropTypes.string, title: PropTypes.string }),
   onUpload: PropTypes.func.isRequired,
   onRemove: PropTypes.func.isRequired,
+  onDismiss: PropTypes.func.isRequired,
+};
+
+ActionFeedback.propTypes = {
+  feedback: PropTypes.shape({
+    tone: PropTypes.oneOf(['error', 'success']),
+    title: PropTypes.string,
+    text: PropTypes.string,
+    items: PropTypes.arrayOf(PropTypes.string),
+    action: PropTypes.shape({ label: PropTypes.string, onClick: PropTypes.func }),
+  }),
+  onDismiss: PropTypes.func.isRequired,
 };
 
 Notice.propTypes = {
