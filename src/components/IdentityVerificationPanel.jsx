@@ -13,7 +13,6 @@ import {
   IdCard,
   LockKeyhole,
   ShieldCheck,
-  Upload,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
 import { useAuth } from '../context/AuthContext.jsx';
@@ -22,14 +21,24 @@ import SelectMenu from './SelectMenu.jsx';
 import CameraCapture from './CameraCapture.jsx';
 
 // Each row carries a mark for the document it asks for, so the three requests
-// are told apart before the caption is read. The two ID sides use a card mark,
-// while the selfie uses a camera because it is taken here rather than found
-// on the device.
+// are told apart before the caption is read. All three can also be photographed:
+// a phone camera is the only camera many people have, and a card is quicker to
+// shoot than to scan. The ID sides look through the rear camera, which is the
+// one that can focus on a card held at arm's length, while the selfie uses the
+// front one because the person has to see themselves to frame it.
 const DOCUMENT_KINDS = [
-  { kind: 'ID_FRONT', labelKey: 'trust.docIdFront', required: true, Icon: IdCard },
-  { kind: 'ID_BACK', labelKey: 'trust.docIdBack', required: false, Icon: CreditCard },
-  { kind: 'SELFIE', labelKey: 'trust.docSelfie', required: true, Icon: Camera, camera: true },
+  { kind: 'ID_FRONT', labelKey: 'trust.docIdFront', required: true, Icon: IdCard, facingMode: 'environment' },
+  { kind: 'ID_BACK', labelKey: 'trust.docIdBack', required: false, Icon: CreditCard, facingMode: 'environment' },
+  { kind: 'SELFIE', labelKey: 'trust.docSelfie', required: true, Icon: Camera, facingMode: 'user' },
 ];
+
+// The picker offers these four types and the server sniffs for the same ones,
+// and it refuses anything over 8MB (multer in
+// server/src/routes/identity-verification.routes.ts). Repeating both here lets a
+// dropped file be answered inside its own row instead of after a round trip, so
+// keep them in step with the server.
+const ACCEPTED_DOCUMENT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
+const MAX_DOCUMENT_BYTES = 8 * 1024 * 1024;
 
 const ID_TYPE_OPTIONS = [
   { value: 'NATIONAL_ID', labelKey: 'trust.idNational' },
@@ -66,9 +75,22 @@ function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verif
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(null);
-  // Only the selfie opens the camera; the other two documents already exist.
-  const [cameraOpen, setCameraOpen] = useState(false);
+  // Which document the camera is photographing, or null while it is closed. A
+  // kind rather than a flag, so a capture lands on the row that asked for it
+  // instead of always on the selfie.
+  const [cameraKind, setCameraKind] = useState(null);
+  // The row a file is hovering over. One value rather than a flag per row,
+  // because a drag can only be over one row at a time.
+  const [draggingKind, setDraggingKind] = useState(null);
+  // A refused or failed upload belongs beside the row it concerns, not at the
+  // top of a page that is three screens tall.
+  const [rowError, setRowError] = useState({ kind: null, message: '' });
   const fileInputs = useRef({});
+  // Every child the pointer crosses fires its own dragenter and dragleave, so one
+  // boolean flickers off the moment the pointer passes over the caption or a
+  // button. Counting enters against leaves, per row, holds the drop state until
+  // the pointer truly leaves that row.
+  const dragDepth = useRef({});
 
   const load = useCallback(async () => {
     try {
@@ -128,6 +150,18 @@ function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verif
   }
 
   async function handleUpload(kind, file) {
+    setRowError({ kind: null, message: '' });
+    // A file with no reported type is sent on rather than refused: some browsers
+    // leave it blank for a file they do not recognise, and the server reads the
+    // bytes anyway, so refusing here would block a real document.
+    if (file.type && !ACCEPTED_DOCUMENT_TYPES.includes(file.type)) {
+      setRowError({ kind, message: t('trust.fileWrongType') });
+      return;
+    }
+    if (file.size > MAX_DOCUMENT_BYTES) {
+      setRowError({ kind, message: t('trust.fileTooLarge') });
+      return;
+    }
     setUploading(kind);
     setNotice('');
     setError('');
@@ -140,10 +174,44 @@ function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verif
       await load();
       setNotice(t('trust.documentUploaded'));
     } catch (error) {
-      setError(error.response?.data?.error || t('trust.documentUploadFailed'));
+      setRowError({ kind, message: error.response?.data?.error || t('trust.documentUploadFailed') });
     } finally {
       setUploading(null);
     }
+  }
+
+  // A dropped file and a chosen one end in the same place; only the source of
+  // the File differs, so these handlers stay separate from the upload itself.
+  function handleDragEnter(kind, event) {
+    if (uploading) return;
+    event.preventDefault();
+    dragDepth.current[kind] = (dragDepth.current[kind] || 0) + 1;
+    setDraggingKind(kind);
+  }
+
+  function handleDragOver(event) {
+    if (uploading) return;
+    // Without this the row counts as a non-target, drop never fires, and the
+    // browser opens the file instead, losing a half-filled form.
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'copy';
+  }
+
+  function handleDragLeave(kind, event) {
+    event.preventDefault();
+    dragDepth.current[kind] = Math.max(0, (dragDepth.current[kind] || 0) - 1);
+    if (dragDepth.current[kind] === 0) {
+      setDraggingKind((current) => (current === kind ? null : current));
+    }
+  }
+
+  function handleDrop(kind, event) {
+    event.preventDefault();
+    dragDepth.current[kind] = 0;
+    setDraggingKind(null);
+    if (uploading) return;
+    const dropped = event.dataTransfer?.files?.[0];
+    if (dropped) handleUpload(kind, dropped);
   }
 
   async function handleSubmit() {
@@ -250,33 +318,45 @@ function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verif
         <p>{t('trust.documentsHint')}</p>
       </div>
       <div className="op-verify-document-list">
-        {DOCUMENT_KINDS.map(({ kind, labelKey, required, Icon, camera }) => {
+        {DOCUMENT_KINDS.map(({ kind, labelKey, required, Icon }) => {
           const uploaded = uploadedKinds.has(kind);
           const busy = uploading === kind;
-          return <div key={kind} className="op-verify-document">
+          const dragging = draggingKind === kind;
+          const rowMessage = rowError.kind === kind ? rowError.message : '';
+          return <div
+            key={kind}
+            onDragEnter={(event) => handleDragEnter(kind, event)}
+            onDragOver={handleDragOver}
+            onDragLeave={(event) => handleDragLeave(kind, event)}
+            onDrop={(event) => handleDrop(kind, event)}
+            className={`op-verify-document${dragging ? ' ring-2 ring-navy' : ''}`}
+          >
             <span className="op-verify-document-icon"><Icon size={19} strokeWidth={1.8} aria-hidden="true" /></span>
             <div>
               <strong>{t(labelKey)}{required && <em>{t('trust.required')}</em>}</strong>
-              <small>{uploaded ? t('trust.uploadedEncrypted') : t('trust.notUploadedYet')}</small>
+              {/* A span, not the small the stylesheet styles, so the drop wording
+                  keeps its own weight and colour above a caption it replaces. */}
+              {dragging
+                ? <span className="mt-1 block text-[10px] font-semibold text-navy">{t('trust.dropToUpload')}</span>
+                : <small>{uploaded ? t('trust.uploadedEncrypted') : t('trust.notUploadedYet')}</small>}
+              {rowMessage && <span role="alert" className="mt-1 block text-[10px] font-semibold text-red-600 dark:text-red-300">{rowMessage}</span>}
             </div>
-            {/* The selfie is the one document someone cannot already have on
-                the device, so it opens the camera instead of sending them away
-                to take a photo first. The file picker stays available for a
-                machine with no camera, and it is where the dialog points when
-                the browser blocks access. */}
-            <Button size="sm" color="light" disabled={busy} onClick={() => (camera ? setCameraOpen(true) : fileInputs.current[kind]?.click())}>
-              {busy ? <Spinner size="sm" /> : <>{camera ? <Camera size={14} strokeWidth={1.8} aria-hidden="true" /> : <Upload size={14} strokeWidth={1.8} aria-hidden="true" />}{camera ? t(uploaded ? 'trust.retakePhoto' : 'trust.takePhoto') : t(uploaded ? 'hostsetup.replace' : 'hostsetup.upload')}</>}
+            {/* Every document can be shot or chosen, so the camera leads and the
+                picker stays beside it for a machine without one. The picker is
+                also where the dialog points when access is blocked. */}
+            <Button size="sm" color="light" disabled={busy} onClick={() => setCameraKind(kind)}>
+              {busy ? <Spinner size="sm" /> : <><Camera size={14} strokeWidth={1.8} aria-hidden="true" />{t(uploaded ? 'trust.retakePhoto' : 'trust.takePhoto')}</>}
             </Button>
-            {camera && <button type="button" className="op-verify-document-alt" disabled={busy} onClick={() => fileInputs.current[kind]?.click()}>{t('trust.uploadInstead')}</button>}
+            <button type="button" className="op-verify-document-alt" disabled={busy} onClick={() => fileInputs.current[kind]?.click()}>{t('trust.uploadInstead')}</button>
             <input
               ref={(element) => { fileInputs.current[kind] = element; }}
               type="file"
               className="sr-only"
               accept="image/jpeg,image/png,image/webp,application/pdf"
-              // On a phone the fallback should still offer the front camera, so
-              // it opens where the photo is taken rather than in a camera roll
-              // that may hold nothing usable.
-              capture={camera ? 'user' : undefined}
+              // On a phone the fallback still opens a camera, so it goes where
+              // the photo is taken rather than to a camera roll that may hold
+              // nothing usable. The ID sides match the dialog's rear lens.
+              capture={kind === 'SELFIE' ? 'user' : 'environment'}
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (file) handleUpload(kind, file);
@@ -305,12 +385,13 @@ function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verif
         the editable block because closing the dialog must not depend on the
         form still being editable. */}
     <CameraCapture
-      open={cameraOpen}
-      onCapture={(file) => handleUpload('SELFIE', file)}
-      onClose={() => setCameraOpen(false)}
+      open={cameraKind !== null}
+      facingMode={DOCUMENT_KINDS.find((entry) => entry.kind === cameraKind)?.facingMode || 'user'}
+      onCapture={(file) => { if (cameraKind) handleUpload(cameraKind, file); }}
+      onClose={() => setCameraKind(null)}
       labels={{
-        title: t('trust.cameraTitle'),
-        hint: t('trust.cameraHint'),
+        title: t(cameraKind === 'SELFIE' ? 'trust.cameraTitle' : 'trust.cameraTitleId'),
+        hint: t(cameraKind === 'SELFIE' ? 'trust.cameraHint' : 'trust.cameraHintId'),
         starting: t('trust.cameraStarting'),
         capture: t('trust.cameraCapture'),
         cancel: t('common.cancel'),

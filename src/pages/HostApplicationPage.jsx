@@ -1132,7 +1132,7 @@ function DocumentUpload({ kind, document, busy, feedback, onUpload, onRemove, on
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
-      className={`flex flex-col gap-3 rounded-xl p-4 shadow-sm ${document ? 'bg-surface dark:bg-primary/15' : 'bg-surface'} ${dragging ? 'ring-2 ring-inset ring-[#143A80]' : ''}`}
+      className={`flex flex-col gap-3 rounded-xl p-4 shadow-sm ${document ? 'bg-surface dark:bg-primary/15' : 'bg-surface'} ${dragging ? 'ring-2 ring-navy' : ''}`}
     >
       <div className="flex items-start gap-3">
         {/* The disc does both jobs: it names the document, and it turns navy once
