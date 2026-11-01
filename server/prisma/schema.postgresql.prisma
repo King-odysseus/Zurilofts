@@ -132,7 +132,15 @@ model HostApplication {
   propertyLocations String?
   yearsHosting  Int?
   preferredPayoutMethod String?
-  experience    String?
+  // Where the money should go, collected up front so approval can hand Paystack
+  // a real destination. These four must stay identical to schema.prisma:
+  // production generates its Prisma client from this file, and a field missing
+  // here throws "Unknown argument" on every save that sends it.
+  payoutBankName        String?
+  payoutBankCode        String?
+  payoutBankAccountNo   String?
+  payoutMpesaPhone      String?
+  experience    String? // hosting background / notes for verification
   agreedTerms   Boolean   @default(false)
   // Founding-host programme. Enrolled at approval while places remain; a
   // founding host pays a lower commission for as long as they host.

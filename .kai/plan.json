@@ -2,29 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the established shadow/card style (styles.css tokens, Panel, zl-panel)",
+      "text": "Find the host application form (step 2) and its save request",
       "state": "done"
     },
     {
-      "text": "Audit every page and component for hairline borders on cards",
+      "text": "Trace the server save endpoint and find why it 500s",
       "state": "done"
     },
     {
-      "text": "Run a codemod stripping hairlines from card surfaces only",
+      "text": "Reproduce against a running server: local save works, so the difference is production",
       "state": "done"
     },
     {
-      "text": "Review the diff file by file",
+      "text": "Root cause: production Postgres Prisma schema lacks the four payout fields the save writes",
       "state": "done"
     },
     {
-      "text": "Verify with lint, build and rendered-page checks",
+      "text": "Add the four payout fields to schema.postgresql.prisma",
       "state": "done"
     },
     {
-      "text": "Commit and push",
+      "text": "Add a schema-parity test so the two schemas cannot drift again (proved it fails on the old schema)",
+      "state": "done"
+    },
+    {
+      "text": "Verify: prisma validate, server typecheck, test suite, lint, build, live save round trip",
+      "state": "done"
+    },
+    {
+      "text": "Commit the schema fix and the new test, then push",
       "state": "active"
     }
   ],
-  "updatedAt": "2026-11-01T21:02:31.460Z"
+  "updatedAt": "2026-11-01T22:34:15.641Z"
 }
