@@ -19,6 +19,9 @@ function readStoredLang() {
 // back to English, then to the key itself so a missing string never crashes
 // the page - it just shows the raw key, which is easy to spot while translating.
 function lookup(lang, key) {
+  // A key can arrive as undefined when it is built from data, so guard before
+  // splitting. Returning an empty string keeps the surrounding layout intact.
+  if (typeof key !== 'string' || key === '') return '';
   const path = key.split('.');
   let node = translations[lang];
   for (const part of path) {
@@ -32,10 +35,10 @@ function lookup(lang, key) {
   return fallback ?? key;
 }
 
-// Translation coverage today is scoped to the navbar and the sign-in /
-// register pages (see translations.js). Other pages still render English
-// text regardless of the selected language - expand `translations.js` before
-// wiring up more surfaces.
+// Every string a page shows comes from src/i18n/translations.js, which merges
+// one dictionary per area of the product (src/i18n/domains/*). Adding strings
+// to a dictionary does nothing until the page calls `t`: the markup still
+// carries its English literal until it is replaced with a lookup.
 export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState(readStoredLang);
 
@@ -49,7 +52,17 @@ export function LanguageProvider({ children }) {
     }
   }, []);
 
-  const t = useCallback((key) => lookup(lang, key), [lang]);
+  // A sentence with a value in it stays one translated string: the count or
+  // name is a {placeholder} inside the dictionary entry, not a fragment glued
+  // on by the page. Otherwise word order would be fixed by the English
+  // sentence and Swahili could not phrase it correctly.
+  const t = useCallback((key, params) => {
+    const value = lookup(lang, key);
+    if (!params || typeof value !== 'string') return value;
+    return value.replace(/\{(\w+)\}/g, (match, name) => (
+      params[name] === undefined ? match : String(params[name])
+    ));
+  }, [lang]);
 
   const value = useMemo(() => ({ lang, setLang, t }), [lang, setLang, t]);
 

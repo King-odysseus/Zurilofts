@@ -18,91 +18,95 @@ export const BASE_TITLE = 'ZuriLofts - Premium Short-let Apartments';
 // while /bookings/:id is a past booking, and /host-earnings-calculator is a
 // public page even though its path begins with /host.
 const ROUTE_TITLES = [
-  [/^\/$/, BASE_TITLE],
+  [/^\/$/, 'title.home'],
 
   // Guest: discovery and public pages
-  [/^\/properties$/, 'Stays in Nairobi | ZuriLofts'],
-  [/^\/property\/[^/]+$/, 'Stay | ZuriLofts'],
-  [/^\/places$/, 'Places to visit | ZuriLofts'],
-  [/^\/restaurants$/, 'Restaurants | ZuriLofts'],
-  [/^\/guides$/, 'Travel guides | ZuriLofts'],
-  [/^\/guides\/[^/]+$/, 'Travel guide | ZuriLofts'],
-  [/^\/become-a-host$/, 'Become a host | ZuriLofts'],
-  [/^\/host-earnings-calculator$/, 'Earnings calculator | ZuriLofts'],
-  [/^\/privacy$/, 'Privacy policy | ZuriLofts'],
-  [/^\/terms$/, 'Terms of service | ZuriLofts'],
+  [/^\/properties$/, 'title.stays'],
+  [/^\/property\/[^/]+$/, 'title.stay'],
+  [/^\/places$/, 'title.places'],
+  [/^\/restaurants$/, 'title.restaurants'],
+  [/^\/guides$/, 'title.guides'],
+  [/^\/guides\/[^/]+$/, 'title.guide'],
+  [/^\/become-a-host$/, 'title.becomeHost'],
+  [/^\/host-earnings-calculator$/, 'title.earningsCalculator'],
+  [/^\/privacy$/, 'title.privacy'],
+  [/^\/terms$/, 'title.terms'],
 
   // Guest: account and the booking flow
-  [/^\/login$/, 'Sign in | ZuriLofts'],
-  [/^\/register$/, 'Create account | ZuriLofts'],
-  [/^\/auth\/callback$/, 'Signing in | ZuriLofts'],
-  [/^\/booking\/[^/]+$/, 'Checkout | ZuriLofts'],
-  [/^\/payment\/callback$/, 'Payment | ZuriLofts'],
-  [/^\/trips$/, 'Trips | ZuriLofts'],
-  [/^\/(?:booking-history|bookings)$/, 'Booking history | ZuriLofts'],
-  [/^\/bookings\/[^/]+$/, 'Booking details | ZuriLofts'],
-  [/^\/inbox$/, 'Messages | ZuriLofts'],
-  [/^\/inbox\/[^/]+$/, 'Conversation | ZuriLofts'],
-  [/^\/messages$/, 'Support | ZuriLofts'],
-  [/^\/profile$/, 'My profile | ZuriLofts'],
-  [/^\/verify-identity$/, 'Trust and recovery | ZuriLofts'],
-  [/^\/favourites$/, 'Favourites | ZuriLofts'],
-  [/^\/shortlists$/, 'My Shortlists | ZuriLofts'],
-  [/^\/shortlists\/[^/]+$/, 'Shortlist | ZuriLofts'],
-  [/^\/s\/[^/]+$/, 'Shared Shortlist | ZuriLofts'],
+  [/^\/login$/, 'title.login'],
+  [/^\/register$/, 'title.register'],
+  [/^\/auth\/callback$/, 'title.authCallback'],
+  [/^\/booking\/[^/]+$/, 'title.checkout'],
+  [/^\/payment\/callback$/, 'title.payment'],
+  [/^\/trips$/, 'title.trips'],
+  [/^\/(?:booking-history|bookings)$/, 'title.bookingHistory'],
+  [/^\/bookings\/[^/]+$/, 'title.bookingDetail'],
+  [/^\/inbox$/, 'title.messages'],
+  [/^\/inbox\/[^/]+$/, 'title.conversation'],
+  [/^\/messages$/, 'title.support'],
+  [/^\/profile$/, 'title.profile'],
+  [/^\/verify-identity$/, 'title.verifyIdentity'],
+  [/^\/favourites$/, 'title.favourites'],
+  [/^\/shortlists$/, 'title.shortlists'],
+  [/^\/shortlists\/[^/]+$/, 'title.shortlist'],
+  [/^\/s\/[^/]+$/, 'title.sharedShortlist'],
 
   // Host workspace
-  [/^\/host\/today$/, 'Today | ZuriLofts Host'],
-  [/^\/host\/calendar\/[^/]+$/, 'Property calendar | ZuriLofts Host'],
-  [/^\/host\/calendar$/, 'Availability calendar | ZuriLofts Host'],
-  [/^\/host\/listings$/, 'Your listings | ZuriLofts Host'],
-  [/^\/host\/listings\/[^/]+\/preview$/, 'Guest preview | ZuriLofts Host'],
-  [/^\/host\/verification$/, 'Identity verification | ZuriLofts Host'],
-  [/^\/host\/inbox$/, 'Guest messages | ZuriLofts Host'],
-  [/^\/host\/inbox\/[^/]+$/, 'Guest conversation | ZuriLofts Host'],
-  [/^\/host\/properties\/new$/, 'New listing | ZuriLofts Host'],
-  [/^\/host\/properties\/[^/]+\/edit$/, 'Edit listing | ZuriLofts Host'],
-  [/^\/host\/earnings$/, 'Earnings | ZuriLofts Host'],
-  [/^\/host\/payouts$/, 'Payouts | ZuriLofts Host'],
-  [/^\/host\/discounts$/, 'Discounts | ZuriLofts Host'],
-  [/^\/host\/application$/, 'Host setup | ZuriLofts Host'],
-  [/^\/host\/reservations$/, 'Reservations | ZuriLofts Host'],
-  [/^\/host\/reservations\/[^/]+$/, 'Reservation | ZuriLofts Host'],
-  [/^\/host\/settings$/, 'Host settings | ZuriLofts Host'],
-  [/^\/host\/insights$/, 'Insights | ZuriLofts Host'],
+  [/^\/host\/today$/, 'title.hostToday'],
+  [/^\/host\/calendar\/[^/]+$/, 'title.hostPropertyCalendar'],
+  [/^\/host\/calendar$/, 'title.hostCalendar'],
+  [/^\/host\/listings$/, 'title.hostListings'],
+  [/^\/host\/listings\/[^/]+\/preview$/, 'title.hostPreview'],
+  [/^\/host\/verification$/, 'title.hostVerification'],
+  [/^\/host\/inbox$/, 'title.hostInbox'],
+  [/^\/host\/inbox\/[^/]+$/, 'title.hostConversation'],
+  [/^\/host\/properties\/new$/, 'title.hostNewListing'],
+  [/^\/host\/properties\/[^/]+\/edit$/, 'title.hostEditListing'],
+  [/^\/host\/earnings$/, 'title.hostEarnings'],
+  [/^\/host\/payouts$/, 'title.hostPayouts'],
+  [/^\/host\/discounts$/, 'title.hostDiscounts'],
+  [/^\/host\/application$/, 'title.hostApplication'],
+  [/^\/host\/reservations$/, 'title.hostReservations'],
+  [/^\/host\/reservations\/[^/]+$/, 'title.hostReservation'],
+  [/^\/host\/settings$/, 'title.hostSettings'],
+  [/^\/host\/insights$/, 'title.hostInsights'],
 
   // Admin
-  [/^\/admin$/, 'Overview | ZuriLofts Admin'],
-  [/^\/admin\/revenue$/, 'Revenue | ZuriLofts Admin'],
-  [/^\/admin\/properties$/, 'Listing review | ZuriLofts Admin'],
-  [/^\/admin\/properties\/[^/]+\/preview$/, 'Listing preview | ZuriLofts Admin'],
-  [/^\/admin\/properties\/[^/]+$/, 'Listing review | ZuriLofts Admin'],
-  [/^\/admin\/settings$/, 'Account settings | ZuriLofts Admin'],
-  [/^\/admin\/users$/, 'Users | ZuriLofts Admin'],
-  [/^\/admin\/host-applications$/, 'Host applications | ZuriLofts Admin'],
-  [/^\/admin\/trust-safety$/, 'Trust and safety | ZuriLofts Admin'],
-  [/^\/admin\/governance$/, 'Governance | ZuriLofts Admin'],
-  [/^\/admin\/addons$/, 'Add-ons | ZuriLofts Admin'],
-  [/^\/admin\/feedback$/, 'Feedback | ZuriLofts Admin'],
-  [/^\/admin\/messages(?:\/[^/]+)?$/, 'Support messages | ZuriLofts Admin'],
-  [/^\/admin\/guides$/, 'Guides | ZuriLofts Admin'],
+  [/^\/admin$/, 'title.adminOverview'],
+  [/^\/admin\/revenue$/, 'title.adminRevenue'],
+  [/^\/admin\/properties$/, 'title.adminListingReview'],
+  [/^\/admin\/properties\/[^/]+\/preview$/, 'title.adminListingPreview'],
+  [/^\/admin\/properties\/[^/]+$/, 'title.adminListingReview'],
+  [/^\/admin\/settings$/, 'title.adminSettings'],
+  [/^\/admin\/users$/, 'title.adminUsers'],
+  [/^\/admin\/host-applications$/, 'title.adminHostApplications'],
+  [/^\/admin\/trust-safety$/, 'title.adminTrustSafety'],
+  [/^\/admin\/governance$/, 'title.adminGovernance'],
+  [/^\/admin\/addons$/, 'title.adminAddons'],
+  [/^\/admin\/bookings$/, 'title.adminReservations'],
+  [/^\/admin\/feedback$/, 'title.adminFeedback'],
+  [/^\/admin\/messages(?:\/[^/]+)?$/, 'title.adminMessages'],
+  [/^\/admin\/guides$/, 'title.adminGuides'],
 
   // A workspace path that is not listed above still belongs to its app, so name
   // the app rather than letting it fall through to "not found".
-  [/^\/host\//, 'Host workspace | ZuriLofts Host'],
-  [/^\/admin\//, 'Overview | ZuriLofts Admin'],
+  [/^\/host\//, 'title.hostWorkspace'],
+  [/^\/admin\//, 'title.adminOverview'],
 ];
 
 /**
  * The tab title for a pathname. Unknown or unmatched paths get the not-found
  * title, which is also what the not-found page renders.
  */
-export function resolveTitle(pathname) {
-  if (typeof pathname !== 'string' || pathname === '') return BASE_TITLE;
+export function resolveTitle(pathname, t) {
+  // Without a translator (a test, or a caller with no language in scope) fall
+  // back to English rather than returning a raw key.
+  const translate = typeof t === 'function' ? t : (key) => key;
+  if (typeof pathname !== 'string' || pathname === '') return translate('title.home');
   // A trailing slash is the same page; the table matches the bare path.
   const path = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname;
   for (const [pattern, title] of ROUTE_TITLES) {
-    if (pattern.test(path)) return title;
+    if (pattern.test(path)) return translate(title);
   }
-  return 'Page not found | ZuriLofts';
+  return translate('title.notFound');
 }

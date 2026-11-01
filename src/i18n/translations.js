@@ -1,7 +1,45 @@
-// Translation dictionaries. Scope is intentionally limited to the navbar and
-// the sign-in / register pages for now - see the language switcher rollout
-// note in LanguageContext.jsx before adding more surfaces.
-export const translations = {
+// Translation dictionaries, one per area of the product.
+//
+// Each area lives in src/i18n/domains/ so a page and the words it uses can be
+// changed together without two people editing one enormous file. The nav,
+// sign-in, register and search-bar strings below predate that split and are
+// still read from here.
+import { common } from './domains/common.js';
+import { discovery } from './domains/discovery.js';
+import { stays } from './domains/stays.js';
+import { booking } from './domains/booking.js';
+import { account } from './domains/account.js';
+import { host } from './domains/host.js';
+import { trips } from './domains/trips.js';
+import { messages } from './domains/messages.js';
+import { profile } from './domains/profile.js';
+import { titles } from './domains/titles.js';
+import { hostaccount } from './domains/hostaccount.js';
+import { hostsetup } from './domains/hostsetup.js';
+import { hostmoney } from './domains/hostmoney.js';
+import { admindash } from './domains/admindash.js';
+import { admin } from './domains/admin.js';
+import { legalPrivacy } from './domains/legal-privacy.js';
+import { legalTerms } from './domains/legal-terms.js';
+import { payment } from './domains/payment.js';
+import { hostinbox } from './domains/hostinbox.js';
+import { saved } from './domains/saved.js';
+import { auth } from './domains/auth.js';
+import { adminlisting } from './domains/adminlisting.js';
+import { hostpreview } from './domains/hostpreview.js';
+import { chrome } from './domains/chrome.js';
+import { a11y1 } from './domains/a11y1.js';
+import { a11y2 } from './domains/a11y2.js';
+import { a11y3 } from './domains/a11y3.js';
+
+const legal = {
+  en: { legal: { ...legalPrivacy.en.legal, ...legalTerms.en.legal } },
+  sw: { legal: { ...legalPrivacy.sw.legal, ...legalTerms.sw.legal } },
+};
+
+const DOMAINS = [common, discovery, stays, booking, account, trips, messages, profile, titles, hostaccount, host, hostmoney, hostsetup, admindash, admin, legal, payment, hostinbox, saved, auth, adminlisting, hostpreview, chrome, a11y1, a11y2, a11y3];
+
+const base = {
   en: {
     nav: {
       explore: 'Explore',
@@ -49,7 +87,7 @@ export const translations = {
       subheadline: "Premium furnished apartments in the city's best neighbourhoods, verified, ready to live in, and supported by people who know Nairobi.",
       point1: 'Identity-checked hosts and secure payments',
       point2: 'High-speed internet, smart lock, hotel-grade linen',
-      point3: 'Local support on call, in English and Kiswahili',
+      point3: 'Local support on call, in English and Swahili',
       welcomeBack: 'Welcome back',
       subtitle: 'Sign in, then choose Traveling or Hosting',
       email: 'Email address',
@@ -218,13 +256,11 @@ export const translations = {
       needHelp: 'Unahitaji usaidizi?',
       title: 'Fungua akaunti yako',
       subtitle: 'Jiunge na ZuriLofts kuhifadhi au kukaribisha wageni Nairobi',
-      badge: 'Jiunge na wageni na wakaribishaji 2,140+',
       headline: 'Jiunge na ZuriLofts.',
       subheadline: 'Fungua akaunti ili kuhifadhi makazi yaliyothibitishwa Nairobi, hifadhi vipendwa vyako, au orodhesha mali yako na uanze kupata mapato.',
       benefit1: 'Wakaribishaji waliohakikiwa na malipo salama ya escrow',
       benefit2: 'Hifadhi vipendwa na fuatilia kila uhifadhi mahali pamoja',
       benefit3: 'Orodhesha mali yako bila malipo na uanze kupata kama mkaribishaji',
-      trustText: 'Wastani wa 4.9 kutoka kwa maoni 3,200+ ya wageni',
       firstName: 'Jina la kwanza',
       lastName: 'Jina la ukoo',
       email: 'Barua pepe',
@@ -306,7 +342,14 @@ export const translations = {
   },
 };
 
+// An area that defines the same section twice replaces it rather than merging
+// key by key, so a stale key cannot survive under a live one.
+export const translations = DOMAINS.reduce((acc, domain) => ({
+  en: { ...acc.en, ...domain.en },
+  sw: { ...acc.sw, ...domain.sw },
+}), base);
+
 export const languageOptions = [
   { value: 'en', label: 'English' },
-  { value: 'sw', label: 'Kiswahili' },
+  { value: 'sw', label: 'Swahili' },
 ];
