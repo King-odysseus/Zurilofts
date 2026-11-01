@@ -5,22 +5,30 @@ import { Alert, Badge, Button, Label, Spinner, TextInput } from 'flowbite-react'
 import {
   AlertCircle,
   BadgeCheck,
+  Camera,
   CheckCircle2,
   Clock3,
-  FileCheck2,
+  CreditCard,
   FileText,
+  IdCard,
   LockKeyhole,
   ShieldCheck,
   Upload,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
+import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import SelectMenu from './SelectMenu.jsx';
+import CameraCapture from './CameraCapture.jsx';
 
+// Each row carries a mark for the document it asks for, so the three requests
+// are told apart before the caption is read. The two ID sides use a card mark,
+// while the selfie uses a camera because it is taken here rather than found
+// on the device.
 const DOCUMENT_KINDS = [
-  { kind: 'ID_FRONT', labelKey: 'trust.docIdFront', required: true },
-  { kind: 'ID_BACK', labelKey: 'trust.docIdBack', required: false },
-  { kind: 'SELFIE', labelKey: 'trust.docSelfie', required: true },
+  { kind: 'ID_FRONT', labelKey: 'trust.docIdFront', required: true, Icon: IdCard },
+  { kind: 'ID_BACK', labelKey: 'trust.docIdBack', required: false, Icon: CreditCard },
+  { kind: 'SELFIE', labelKey: 'trust.docSelfie', required: true, Icon: Camera, camera: true },
 ];
 
 const ID_TYPE_OPTIONS = [
@@ -49,6 +57,7 @@ const VERIFICATION_STEPS = [
  */
 function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verification', showTripsLink = true, context = 'traveller' }) {
   const { t } = useLanguage();
+  const { setUser } = useAuth();
   const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,6 +66,8 @@ function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verif
   const [notice, setNotice] = useState('');
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(null);
+  // Only the selfie opens the camera; the other two documents already exist.
+  const [cameraOpen, setCameraOpen] = useState(false);
   const fileInputs = useRef({});
 
   const load = useCallback(async () => {
@@ -143,6 +154,13 @@ function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verif
       const response = await apiClient.post('/identity-verification/submit');
       setData(response.data.data);
       setNotice(t('trust.submittedForReview'));
+      // The account shell decides whether to show the "verify your identity"
+      // reminder from the session copy of this status. Without refreshing it
+      // here, a guest who had just handed over their documents would be asked
+      // to verify again on the very next page they opened, until a reload.
+      apiClient.get('/auth/me')
+        .then((me) => setUser(me.data.data))
+        .catch((refreshError) => console.warn('Could not refresh the session after submitting verification', refreshError));
     } catch (error) {
       setError(error.response?.data?.error || t('trust.completeRequiredFirst'));
     } finally {
@@ -232,22 +250,33 @@ function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verif
         <p>{t('trust.documentsHint')}</p>
       </div>
       <div className="op-verify-document-list">
-        {DOCUMENT_KINDS.map(({ kind, labelKey, required }) => {
+        {DOCUMENT_KINDS.map(({ kind, labelKey, required, Icon, camera }) => {
           const uploaded = uploadedKinds.has(kind);
+          const busy = uploading === kind;
           return <div key={kind} className="op-verify-document">
-            <span className="op-verify-document-icon"><FileCheck2 size={19} strokeWidth={1.8} aria-hidden="true" /></span>
+            <span className="op-verify-document-icon"><Icon size={19} strokeWidth={1.8} aria-hidden="true" /></span>
             <div>
               <strong>{t(labelKey)}{required && <em>{t('trust.required')}</em>}</strong>
               <small>{uploaded ? t('trust.uploadedEncrypted') : t('trust.notUploadedYet')}</small>
             </div>
-            <Button size="sm" color="light" disabled={uploading === kind} onClick={() => fileInputs.current[kind]?.click()}>
-              {uploading === kind ? <Spinner size="sm" /> : <><Upload size={14} strokeWidth={1.8} aria-hidden="true" />{uploaded ? t('hostsetup.replace') : t('hostsetup.upload')}</>}
+            {/* The selfie is the one document someone cannot already have on
+                the device, so it opens the camera instead of sending them away
+                to take a photo first. The file picker stays available for a
+                machine with no camera, and it is where the dialog points when
+                the browser blocks access. */}
+            <Button size="sm" color="light" disabled={busy} onClick={() => (camera ? setCameraOpen(true) : fileInputs.current[kind]?.click())}>
+              {busy ? <Spinner size="sm" /> : <>{camera ? <Camera size={14} strokeWidth={1.8} aria-hidden="true" /> : <Upload size={14} strokeWidth={1.8} aria-hidden="true" />}{camera ? t(uploaded ? 'trust.retakePhoto' : 'trust.takePhoto') : t(uploaded ? 'hostsetup.replace' : 'hostsetup.upload')}</>}
             </Button>
+            {camera && <button type="button" className="op-verify-document-alt" disabled={busy} onClick={() => fileInputs.current[kind]?.click()}>{t('trust.uploadInstead')}</button>}
             <input
               ref={(element) => { fileInputs.current[kind] = element; }}
               type="file"
               className="sr-only"
               accept="image/jpeg,image/png,image/webp,application/pdf"
+              // On a phone the fallback should still offer the front camera, so
+              // it opens where the photo is taken rather than in a camera roll
+              // that may hold nothing usable.
+              capture={camera ? 'user' : undefined}
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (file) handleUpload(kind, file);
@@ -270,6 +299,26 @@ function IdentityVerificationPanel({ onApproved, afterSavePath = '/profile#verif
         {showTripsLink && <Link to="/trips">{t('trust.returnToTrips')}</Link>}
       </div> : <div className="op-verify-submitted"><FileText size={17} strokeWidth={1.8} aria-hidden="true" /><span>{t('trust.submittedInfoShown')}</span></div>}
     </section>
+
+    {/* A captured photo goes through the same upload path as a chosen one, so
+        there is one place that knows how a document is stored. It sits outside
+        the editable block because closing the dialog must not depend on the
+        form still being editable. */}
+    <CameraCapture
+      open={cameraOpen}
+      onCapture={(file) => handleUpload('SELFIE', file)}
+      onClose={() => setCameraOpen(false)}
+      labels={{
+        title: t('trust.cameraTitle'),
+        hint: t('trust.cameraHint'),
+        starting: t('trust.cameraStarting'),
+        capture: t('trust.cameraCapture'),
+        cancel: t('common.cancel'),
+        denied: t('trust.cameraDenied'),
+        unsupported: t('trust.cameraUnsupported'),
+        retry: t('common.retry'),
+      }}
+    />
   </div>;
 }
 

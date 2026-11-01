@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { CalendarDays, ClipboardList, LockKeyhole, MessageCircleMore, ShieldCheck, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import VerificationNudge from './VerificationNudge.jsx';
 
 function AccountIcon({ type }) {
   const icons = {
@@ -44,9 +45,25 @@ const EYEBROW_KEYS = {
   Messages: 'account.eyebrowMessages',
 };
 
+// Keyed by IdentityVerification.status. SUBMITTED says the documents are with
+// the reviewer instead of asking for them again, since re-uploading files
+// already under review is busywork; REJECTED says they were not accepted, so
+// the person knows to replace them rather than keep waiting.
+const GUEST_NUDGE = {
+  UNVERIFIED: { tone: 'attention', title: 'account.verificationNudgeUnverifiedTitle', description: 'account.verificationNudgeUnverifiedBody', actionLabel: 'account.verificationNudgeAction' },
+  SUBMITTED: { tone: 'review', title: 'account.verificationNudgeSubmittedTitle', description: 'account.verificationNudgeSubmittedBody', actionLabel: 'account.verificationNudgeViewStatus' },
+  REJECTED: { tone: 'rejected', title: 'account.verificationNudgeRejectedTitle', description: 'account.verificationNudgeRejectedBody', actionLabel: 'account.verificationNudgeAction' },
+};
+
 function GuestAccountLayout({ active, title, description, eyebrow, action, pageClassName = '', children }) {
   const { user } = useAuth();
   const { t } = useLanguage();
+  // A guest only learns that identity verification is required when checkout
+  // refuses to take their money, which is the worst possible moment to find
+  // out. The status already arrives with the session, so the shell can say it
+  // plainly on every account page - profile, trips, bookings - long before a
+  // stay is chosen. APPROVED has no entry, so a verified guest never sees it.
+  const verificationNudge = GUEST_NUDGE[user?.identityVerificationStatus];
   const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.name || 'Guest account';
     const eyebrowKey = eyebrow ? EYEBROW_KEYS[eyebrow] : null;
   const initials = `${user?.firstName?.[0] || user?.name?.[0] || 'G'}${user?.lastName?.[0] || ''}`.toUpperCase();
@@ -80,6 +97,14 @@ function GuestAccountLayout({ active, title, description, eyebrow, action, pageC
             </div>
             {action}
           </header>
+          {verificationNudge && <VerificationNudge
+            tone={verificationNudge.tone}
+            title={t(verificationNudge.title)}
+            description={t(verificationNudge.description)}
+            actionLabel={t(verificationNudge.actionLabel)}
+            to="/verify-identity"
+            className="mb-5"
+          />}
           {children}
         </section>
       </div>

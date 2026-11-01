@@ -2480,6 +2480,28 @@ html.dark .opg-message-placeholder > span {
   color: #6b7280;
   font-size: 10px;
 }
+.op-verify-document-alt {
+  flex: none;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: #6b7280;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.op-verify-document-alt:hover {
+  color: #203565;
+}
+
+.op-verify-document-alt:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 
 .op-verify-review-actions > a {
   color: #203565;
@@ -5052,4 +5074,16 @@ html.dark .op-referral-copy:hover,
 html.dark .op-referral-copy:focus-visible {
   background: var(--op-action-hover);
   color: #FFFFFF;
+}
+
+/* The selfie row offers a file-picker fallback beside the camera button. It
+   keeps its own hover here because the grouped muted rule above is !important
+   and would stop the hover ever changing colour. */
+html.dark .op-verify-document-alt {
+  color: var(--dm-muted);
+}
+
+html.dark .op-verify-document-alt:hover,
+html.dark .op-verify-document-alt:focus-visible {
+  color: #E2E8F0;
 }

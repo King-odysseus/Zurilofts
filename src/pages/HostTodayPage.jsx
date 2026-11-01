@@ -9,11 +9,26 @@ import apiClient from "../api/client.js";
 import { firstImage } from "../utils/images.js";
 import HostCard, { HOST_EYEBROW } from "../components/HostCard.jsx";
 import HostFollowUps from "../components/HostFollowUps.jsx";
+import VerificationNudge from "../components/VerificationNudge.jsx";
 
 // Badge tones replace the old per-tone status pills on each panel header.
 const TONE_COLORS = { arrival: "info", inhouse: "warning", departure: "success" };
 
 const SKELETON_HEIGHTS = ["h-24", "h-44", "h-24", "h-64"];
+
+// Nothing on this dashboard used to mention that the host was still mid
+// verification, so a host who had not finished their application saw an empty,
+// calm day exactly like an approved host's - with no hint that their listings
+// could never be published until it was approved. The explainer under each
+// title is borrowed from the setup page's own copy (hostsetup.*) rather than
+// rewritten, so the reminder and the form cannot drift into saying different
+// things about the same state.
+const HOST_NUDGE = {
+  DRAFT: { tone: "attention", title: "host.nudgeDraftTitle", description: "hostsetup.draftHint", actionLabel: "host.nudgeContinue" },
+  CHANGES_REQUESTED: { tone: "attention", title: "host.nudgeChangesTitle", description: "hostsetup.changesHint", actionLabel: "host.nudgeContinue" },
+  SUBMITTED: { tone: "review", title: "host.nudgeReviewTitle", description: "hostsetup.submittedHint", actionLabel: "host.nudgeViewStatus" },
+  REJECTED: { tone: "rejected", title: "host.nudgeRejectedTitle", description: "hostsetup.rejectedHint", actionLabel: "host.nudgeViewStatus" },
+};
 
 function formatToday(lang) {
   return new Date().toLocaleDateString(lang === 'sw' ? 'sw-KE' : 'en-KE', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -265,6 +280,9 @@ export default function HostTodayPage() {
   const { arrivals = [], departures = [], inHouse = [], summary = {} } = data || {};
   const priority = arrivals[0] || inHouse[0] || departures[0];
   const priorityType = arrivals[0] ? "arrival" : inHouse[0] ? "inhouse" : "departure";
+  // An approved host has no entry here, which is what keeps the reminder off
+  // their dashboard entirely.
+  const hostNudge = HOST_NUDGE[user?.hostApplicationStatus];
 
   return <div className="space-y-8">
     <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -278,6 +296,14 @@ export default function HostTodayPage() {
         <Button as={Link} to="/host/calendar" color="light" size="sm" className="hidden md:inline-flex">{t('host.openCalendar')}</Button>
       </div>
     </header>
+
+    {hostNudge && <VerificationNudge
+      tone={hostNudge.tone}
+      title={t(hostNudge.title)}
+      description={t(hostNudge.description)}
+      actionLabel={t(hostNudge.actionLabel)}
+      to="/host/application"
+    />}
 
     {messageError && <Alert color="failure">
       <div className="flex w-full flex-wrap items-center justify-between gap-3">

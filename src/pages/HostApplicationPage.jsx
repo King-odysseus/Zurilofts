@@ -495,6 +495,13 @@ function HostApplicationPage() {
       const response = await apiClient.post('/host-application/submit');
       setApplication(response.data.data);
       clearFeedback();
+      // The host dashboard says whether the application is still a draft or
+      // already with the reviewer from the session copy of this status, so it
+      // has to be refreshed here. Otherwise Today would keep telling the host
+      // to finish an application they had just submitted.
+      apiClient.get('/auth/me')
+        .then((me) => setUser(me.data.data))
+        .catch((refreshError) => console.warn('Could not refresh the session after submitting the application', refreshError));
     } catch (err) {
       reportFailure('review', 'submit your application', err);
     } finally { setSaving(false); }

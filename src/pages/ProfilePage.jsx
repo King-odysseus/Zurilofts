@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import SelectMenu from '../components/SelectMenu.jsx';
-import { CalendarDays, Camera, ChevronRight, Heart, Info, Star } from 'lucide-react';
+import { CalendarDays, Camera, ChevronRight, Heart, Star, UserRound } from 'lucide-react';
 import StayCard from '../components/StayCard.jsx';
 import GuestAccountLayout from '../components/GuestAccountLayout.jsx';
+import VerificationNudge from '../components/VerificationNudge.jsx';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
@@ -31,6 +32,32 @@ const PAYOUT_FREQUENCY_OPTIONS = [
   { value: 'monthly', label: 'Monthly (1st of month)' },
 ];
 
+// The required details, in the order the form asks for them, so the notice
+// lists what is missing in the same order the person scrolls to fix it.
+const REQUIRED_PROFILE_FIELDS = [
+  { field: 'firstName', labelKey: 'profile.fieldFirstName' },
+  { field: 'lastName', labelKey: 'profile.fieldLastName' },
+  { field: 'email', labelKey: 'profile.fieldEmail' },
+  { field: 'phone', labelKey: 'profile.fieldPhone' },
+];
+
+// An absent value and an empty string both count as missing: the API returns
+// null for a detail never added, and a form submitted blank sends "".
+function missingProfileFieldLabels(profile) {
+  return REQUIRED_PROFILE_FIELDS
+    .filter(({ field }) => !profile?.[field])
+    .map(({ labelKey }) => labelKey);
+}
+
+// "first name", "first name and phone number", "first name, last name and phone
+// number". Built as a plain string because t() only substitutes strings, and the
+// joiner comes from the dictionary so Swahili is not forced into English order.
+function joinFieldLabels(labelKeys, t) {
+  const labels = labelKeys.map((key) => t(key));
+  if (labels.length <= 1) return labels[0] || '';
+  return `${labels.slice(0, -1).join(', ')} ${t('common.and')} ${labels[labels.length - 1]}`;
+}
+
 function ProfilePage() {
   const { t } = useLanguage();
   const { user, setUser, logout } = useAuth();
@@ -53,7 +80,9 @@ function ProfilePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
   const [avatarUploading, setAvatarUploading] = useState(false);
-  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
+  // Translation keys of the required details that are still empty, in the order
+  // the form asks for them. An empty list is what keeps the notice off the page.
+  const [missingProfileFields, setMissingProfileFields] = useState([]);
 
   // Bank / Payout state (HOST only)
   const [bankSaving, setBankSaving] = useState(false);
@@ -145,9 +174,9 @@ function ProfilePage() {
         const { countryCode: cc, phoneNumber: pn } = detectCountry(prof.phone || '');
         setCountryCode(cc);
         setPhoneNumber(pn);
-        // Show completion banner if any required field is missing
-        const missing = !prof.firstName || !prof.lastName || !prof.email || !prof.phone;
-        setShowCompletionBanner(missing);
+        // The notice names what is missing, so it needs the keys, not a flag.
+        // If this load fails the list stays empty and no notice is shown.
+        setMissingProfileFields(missingProfileFieldLabels(prof));
       } catch {
         // silent
       } finally {
@@ -267,7 +296,9 @@ function ProfilePage() {
       // Sync to auth context so navbar shows updated name/avatar
       setUser({ ...user, ...res.data.data });
       setMessage('Profile updated successfully!');
-      setShowCompletionBanner(false);
+      // Recompute rather than hide: the saved payload is what the form now holds,
+      // so adding the last missing detail clears the notice without a reload.
+      setMissingProfileFields(missingProfileFieldLabels(res.data.data));
     } catch (err) {
       setMessage(err.response?.data?.error || 'Update failed');
     } finally {
@@ -418,14 +449,14 @@ function ProfilePage() {
           {/* My Info Tab */}
           {activeTab === 'info' && (
             <div className="mt-1.5">
-              {showCompletionBanner && (
-                <div className="mb-6 bg-[#F4F0E8] border border-[#C5A28C] rounded-2xl p-5 flex items-start gap-3">
-                  <Info className="w-5 h-5 text-[#8A6B52] flex-shrink-0 mt-0.5" strokeWidth={2} aria-hidden="true" />
-                  <div>
-                    <p className="font-semibold text-[#203565] text-sm">{t('profile.completeProfile')}</p>
-                    <p className="text-sm text-[#6b7280] mt-2">{t('profile.completeProfileHint')}</p>
-                  </div>
-                </div>
+              {missingProfileFields.length > 0 && (
+                <VerificationNudge
+                  tone="attention"
+                  icon={UserRound}
+                  title={t('profile.completeProfileTitle')}
+                  description={t('profile.completeProfileBody', { fields: joinFieldLabels(missingProfileFields, t) })}
+                  className="mb-5"
+                />
               )}
               <div className="neu-card p-6">
                 <h2 className="text-lg font-bold text-[#203565] mb-6">{t('profile.personalInformation')}</h2>
@@ -440,8 +471,9 @@ function ProfilePage() {
                 )}
                 <form onSubmit={handleProfileUpdate} className="opg-profile-form">
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.firstName')}</label>
+                    <label htmlFor="profile-firstName" className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.firstName')}</label>
                     <input
+                      id="profile-firstName"
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
@@ -449,8 +481,9 @@ function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.lastName')}</label>
+                    <label htmlFor="profile-lastName" className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.lastName')}</label>
                     <input
+                      id="profile-lastName"
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
@@ -458,19 +491,21 @@ function ProfilePage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.email')}</label>
+                    <label htmlFor="profile-email" className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.email')}</label>
                     <input
+                      id="profile-email"
                       type="email"
+                      aria-describedby={emailError ? 'profile-email-error' : undefined}
                       value={formData.email}
                       onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
                       className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937]"
                     />
                     {emailError && (
-                      <p className="text-red-500 text-xs mt-1">{emailError}</p>
+                      <p id="profile-email-error" className="text-red-500 text-xs mt-1">{emailError}</p>
                     )}
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.phone')}</label>
+                    <label htmlFor="profile-phone" className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.phone')}</label>
                     <div className="flex gap-2">
                       <SelectMenu
                         value={countryCode}
@@ -480,7 +515,9 @@ function ProfilePage() {
                         options={COUNTRY_OPTIONS}
                       />
                       <input
+                        id="profile-phone"
                         type="tel"
+                        aria-describedby={phoneError ? 'profile-phone-error' : undefined}
                         value={phoneNumber}
                         onChange={(e) => handlePhoneChange(countryCode, e.target.value.replace(/\D/g, ''))}
                         maxLength={15}
@@ -489,7 +526,7 @@ function ProfilePage() {
                       />
                     </div>
                     {phoneError && (
-                      <p className="text-red-500 text-xs mt-1">{phoneError}</p>
+                      <p id="profile-phone-error" className="text-red-500 text-xs mt-1">{phoneError}</p>
                     )}
                   </div>
                   <button
