@@ -1,6 +1,7 @@
+import { useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Dropdown, DropdownItem } from 'flowbite-react';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Search } from 'lucide-react';
 
 /**
  * A select built on Flowbite's Dropdown, so the option list is styled by the
@@ -16,6 +17,10 @@ import { Check, ChevronDown } from 'lucide-react';
  *   <SelectMenu value={v} onChange={(next) => setV(next)} />   this
  *
  * `onChange` receives the option's value directly, not a DOM event.
+ *
+ * Pass `searchable` when the list is long enough that scanning it is work: a
+ * bank list runs to dozens of names. The search box filters on the option
+ * label, ignoring case and accents, so "equity" finds "Equity Bank Kenya Ltd".
  */
 
 // Trigger styling mirrors brandTheme's TextInput (theme/flowbiteTheme.js) so a
@@ -60,6 +65,99 @@ const MENU_THEME = {
   },
 };
 
+// Case and accent folding: a host typing "mpesa" or "M-PESA", or "Cafe" for
+// "Café", should still narrow the list.
+function foldForSearch(text) {
+  return String(text ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+/**
+ * The menu body, split out so its search query resets every time the menu
+ * opens: the panel (and therefore this component) only mounts while open, and
+ * unmounting throws the query away. Keeping the query in the parent would
+ * leave a stale filter in place the next time the menu is opened.
+ */
+function MenuBody({
+  options,
+  value,
+  onChange,
+  searchable,
+  searchPlaceholder,
+  noMatchLabel,
+}) {
+  const [query, setQuery] = useState('');
+  const itemRefs = useRef(new Map());
+
+  const term = foldForSearch(query.trim());
+  const visible = useMemo(
+    () => (term ? options.filter((option) => foldForSearch(option.label).includes(term)) : options),
+    [options, term],
+  );
+
+  // Enter picks the top match, so a host can type "equity" and press Enter
+  // without reaching for the mouse. Clicking that item's own button lets the
+  // dropdown run its normal select-and-close path instead of duplicating it.
+  function handleSearchKeyDown(event) {
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    const first = visible[0];
+    if (first) itemRefs.current.get(first.value)?.click();
+  }
+
+  return (
+    <>
+      {searchable && (
+        <li role="presentation" className="sticky top-0 z-10 border-b border-[#E2DAD0] bg-elevated px-2 pb-2 pt-2 dark:border-gray-600 dark:bg-gray-700">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[#6b7280] dark:text-gray-400" strokeWidth={2} aria-hidden="true" />
+            <input
+              type="text"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={handleSearchKeyDown}
+              placeholder={searchPlaceholder}
+              aria-label={searchPlaceholder}
+              autoComplete="off"
+              spellCheck={false}
+              // The menu toggles open on click, so focusing this box saves a
+              // second click for anyone who came here to type.
+              autoFocus
+              className="w-full rounded-[8px] border border-[#E2DAD0] bg-white py-2 pl-8 pr-2 text-sm text-[#111827] placeholder:text-[#6b7280] focus:border-[#C5A28C] focus:outline-none focus:ring-1 focus:ring-[#C5A28C] dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder:text-gray-400"
+            />
+          </div>
+        </li>
+      )}
+      {visible.map((option) => {
+        const isSelected = option.value === value;
+        return (
+          <DropdownItem
+            key={option.value}
+            ref={(node) => {
+              if (node) itemRefs.current.set(option.value, node);
+              else itemRefs.current.delete(option.value);
+            }}
+            onClick={() => onChange(option.value)}
+            className={isSelected ? 'font-semibold text-[#203565] dark:text-white' : undefined}
+          >
+            <span className="flex items-center justify-between gap-3">
+              <span className="truncate">{option.label}</span>
+              {isSelected && <Check className="h-4 w-4 shrink-0 text-[#8A6B52]" strokeWidth={2.5} aria-hidden="true" />}
+            </span>
+          </DropdownItem>
+        );
+      })}
+      {visible.length === 0 && (
+        <li role="presentation" className="px-3 py-2.5 text-sm text-[#6b7280] dark:text-gray-400">
+          {noMatchLabel}
+        </li>
+      )}
+    </>
+  );
+}
+
 function SelectMenu({
   id,
   name,
@@ -73,6 +171,9 @@ function SelectMenu({
   invalid = false,
   ariaLabel,
   placement = 'bottom-start',
+  searchable = false,
+  searchPlaceholder = 'Search',
+  noMatchLabel = 'No matches',
   className = '',
   wrapperClassName,
 }) {
@@ -94,6 +195,10 @@ function SelectMenu({
         dismissOnClick
         placement={placement}
         disabled={disabled}
+        // Typeahead jumps the highlight between items on a keypress, which
+        // would fight the search box: a hidden filter would eat the letters
+        // the person meant to type.
+        enableTypeAhead={!searchable}
         theme={MENU_THEME}
         renderTrigger={() => (
           <button
@@ -118,21 +223,14 @@ function SelectMenu({
           </button>
         )}
       >
-        {options.map((option) => {
-          const isSelected = option.value === value;
-          return (
-            <DropdownItem
-              key={option.value}
-              onClick={() => onChange(option.value)}
-              className={isSelected ? 'font-semibold text-[#203565] dark:text-white' : undefined}
-            >
-              <span className="flex items-center justify-between gap-3">
-                <span className="truncate">{option.label}</span>
-                {isSelected && <Check className="h-4 w-4 shrink-0 text-[#8A6B52]" strokeWidth={2.5} aria-hidden="true" />}
-              </span>
-            </DropdownItem>
-          );
-        })}
+        <MenuBody
+          options={options}
+          value={value}
+          onChange={onChange}
+          searchable={searchable}
+          searchPlaceholder={searchPlaceholder}
+          noMatchLabel={noMatchLabel}
+        />
       </Dropdown>
     </div>
   );
@@ -156,6 +254,9 @@ SelectMenu.propTypes = {
   invalid: PropTypes.bool,
   ariaLabel: PropTypes.string,
   placement: PropTypes.oneOf(['top', 'top-start', 'top-end', 'bottom', 'bottom-start', 'bottom-end', 'left', 'right']),
+  searchable: PropTypes.bool,
+  searchPlaceholder: PropTypes.string,
+  noMatchLabel: PropTypes.string,
   wrapperClassName: PropTypes.string,
   className: PropTypes.string,
 };

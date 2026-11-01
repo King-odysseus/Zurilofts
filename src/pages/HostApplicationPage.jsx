@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Alert, Badge, Button, Checkbox, Label, Textarea, TextInput } from 'flowbite-react';
-import { Upload } from 'lucide-react';
+import { Building, Check, CreditCard, House, IdCard, Upload } from 'lucide-react';
 import SelectMenu from '../components/SelectMenu.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
@@ -71,6 +71,18 @@ const DOCUMENT_LABELS = {
   IDENTITY_BACK: 'hostsetup.docBack',
   PROPERTY_AUTHORITY: 'hostsetup.docAuthority',
   BUSINESS_REGISTRATION: 'hostsetup.docBusiness',
+};
+
+// Four tiles sit in one grid with only their captions to tell them apart, and
+// the captions begin with the same two words ("Identity document..."). The mark
+// on each tile therefore has to say which file goes in it, so it follows the
+// document kind instead of being one shared placeholder. It is decorative: the
+// caption beside it is the accessible name.
+const DOCUMENT_ICONS = {
+  IDENTITY_FRONT: IdCard,
+  IDENTITY_BACK: CreditCard,
+  PROPERTY_AUTHORITY: House,
+  BUSINESS_REGISTRATION: Building,
 };
 
 // Shared with the listing editor so both multi-step host forms read identically.
@@ -585,7 +597,7 @@ function HostApplicationPage() {
                         const bank = banks.find((item) => item.code === code);
                         update('payoutBankName', bank?.name || '');
                         update('payoutBankCode', code);
-                      }} options={banks.map((bank) => ({ value: bank.code, label: bank.name }))} />
+                      }} options={banks.map((bank) => ({ value: bank.code, label: bank.name }))} searchable searchPlaceholder={t('hostsetup.bankSearch')} noMatchLabel={t('hostsetup.bankNoMatch')} />
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -929,19 +941,30 @@ function StepActions({ saving, uploading, onSave, onContinue }) {
 function DocumentUpload({ kind, document, busy, onUpload, onRemove }) {
   const { t } = useLanguage();
   const fileInput = useRef(null);
+  const DocumentIcon = DOCUMENT_ICONS[kind] || Upload;
 
   return (
     <div className={`flex flex-col gap-3 rounded-xl p-4 shadow-sm ${document ? 'bg-surface dark:bg-primary/15' : 'bg-surface'}`}>
       <div className="flex items-start gap-3">
+        {/* The disc does both jobs: it names the document, and it turns navy once
+            a file is in, so a completed tile is still obvious at a glance without
+            a second check mark competing with the icon. */}
         <span
           aria-hidden="true"
-          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold ${document ? 'bg-navy-bg text-white' : 'bg-elevated text-muted'}`}
+          className={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${document ? 'bg-navy-bg text-white' : 'bg-elevated text-navy'}`}
         >
-          {document ? '\u2713' : '+'}
+          <DocumentIcon className="h-[18px] w-[18px]" strokeWidth={1.8} />
         </span>
         <div className="min-w-0">
           <strong className="block text-sm font-semibold text-navy">{t(DOCUMENT_LABELS[kind])}</strong>
-          <small className="block text-xs text-muted">{document ? 'Uploaded and encrypted' : 'JPEG, PNG, WebP or PDF up to 8MB'}</small>
+          {document ? (
+            <small className="flex items-center gap-1 text-xs text-muted">
+              <Check className="h-3.5 w-3.5 shrink-0 text-primary-600 dark:text-primary-300" strokeWidth={2.5} aria-hidden="true" />
+              Uploaded and encrypted
+            </small>
+          ) : (
+            <small className="block text-xs text-muted">JPEG, PNG, WebP or PDF up to 8MB</small>
+          )}
         </div>
       </div>
       {document && (

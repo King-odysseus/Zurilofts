@@ -320,7 +320,24 @@ export const brandTheme = {
       content: `max-h-[min(70vh,20rem)] overflow-y-auto py-1 text-sm text-[#111827] dark:text-gray-200`,
       header: `block px-4 py-2 text-sm font-semibold text-[#203565] dark:text-gray-200`,
       item: {
-        base: `flex w-full cursor-pointer items-center justify-start px-4 py-2 text-sm text-[#111827] hover:bg-[#F8FAFC] focus:bg-[#F8FAFC] focus:outline-none dark:text-gray-200 dark:hover:bg-gray-600`,
+        // A menu row sits on a white panel, and the old hover tint was #F8FAFC -
+        // three to seven steps of grey away from the white behind it. That is
+        // not a highlight, so a pointer over a list of options was impossible to
+        // follow. The tint is now #E8EDF7, the same light navy wash the app's own
+        // Dropdown (components/Dropdown.jsx) uses, so a hovered row is clearly
+        // visible and menus match each other.
+        //
+        // Do not swap this for a pale warm hex such as #F4F0E8: styles.css maps
+        // a list of light hexes to dark surfaces with `[class*="bg-[#...]"
+        // i]`, and a substring match also matches `hover:bg-[#...]`. A hover
+        // tint from that list therefore paints every row at rest in dark mode,
+        // and the hover itself can no longer change it. See the #FDE8D8 note in
+        // the dark-mode block for the same trap.
+        //
+        // The focus tint carries its own dark variant: `focus:bg-[...]` alone is
+        // not dark-aware, so keyboard focus inside a dark panel painted a light
+        // bar under light grey text.
+        base: `flex w-full cursor-pointer items-center justify-start px-4 py-2 text-sm text-[#111827] hover:bg-[#E8EDF7] focus:bg-[#E8EDF7] focus:outline-none dark:text-gray-200 dark:hover:bg-gray-600 dark:focus:bg-gray-600`,
       },
       style: {
         auto: `border border-[#E3E8EF] bg-white text-[#203565] dark:border-gray-600 dark:bg-gray-700 dark:text-white`,
