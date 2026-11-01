@@ -9,6 +9,7 @@ import {
   BookOpen,
   Building2,
   CalendarDays,
+  Check,
   ChevronDown,
   CircleUserRound,
   ClipboardList,
@@ -35,6 +36,7 @@ import {
 import { useAuth } from '../context/AuthContext.jsx';
 import { useMode } from '../context/ModeContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { useTheme } from '../context/ThemeContext.jsx';
 import apiClient from '../api/client.js';
 import { playMessageSound, playBookingSound } from '../utils/notificationSound.js';
 import MobileBottomNav from './MobileBottomNav.jsx';
@@ -83,7 +85,8 @@ function Navbar() {
 
   const { user, isAuthenticated, logout } = useAuth();
   const { setMode, canSelectHosting } = useMode();
-  const { setLang, t } = useLanguage();
+  const { lang, setLang, t } = useLanguage();
+  const { isDark, toggleTheme } = useTheme();
   // Only an approved HOST account has verified host access. ADMINS are excluded
   // here (they administer the platform through /admin), so they get no Payouts
   // or other verified-host affordances.
@@ -454,8 +457,14 @@ function Navbar() {
                       {totalNotif > 9 ? '9+' : totalNotif}
                     </span>
                   )}
+                  {/* On a phone the bell sits close to the right edge, so a panel
+                      anchored to it cannot fit: it was 52px off the screen at 320px
+                      wide and its heading read "fications". Phones pin the panel to
+                      the screen with an even gutter and a fixed top (the header is a
+                      fixed h-16 bar); from sm up it anchors back to the bell. The
+                      height cap keeps a long list scrollable. */}
                   {notifOpen && (
-                    <div className="absolute right-0 z-30 mt-2 w-[min(16rem,calc(100vw-2rem))] rounded-2xl border border-[#E3E8EF] bg-elevated py-2 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
+                    <div className="fixed inset-x-3 top-[4.25rem] z-40 max-h-[calc(100dvh-6rem)] overflow-y-auto overscroll-contain rounded-2xl border border-[#E3E8EF] bg-elevated py-2 shadow-[0_8px_28px_rgba(20,58,128,0.14)] sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 sm:w-[min(16rem,calc(100vw-2rem))]">
                       <div className="border-b border-[#E3E8EF] px-4 py-2">
                         <p className="text-sm font-semibold text-[#203565]">Notifications</p>
                       </div>
@@ -536,7 +545,10 @@ function Navbar() {
                   </button>
 
                   {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-[min(14rem,calc(100vw-2rem))] bg-elevated rounded-2xl shadow-xl py-2 z-30 border border-[#E3E8EF]">
+                    /* The panel is taller than a short laptop viewport now that it
+                       carries theme and language, and being fixed to the header it
+                       cannot be scrolled to. Cap it and let the rows scroll. */
+                    <div className="absolute right-0 mt-2 max-h-[calc(100dvh-5rem)] w-[min(14rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain bg-elevated rounded-2xl shadow-xl py-2 z-30 border border-[#E3E8EF]">
                       <div className="px-4 py-3 border-b border-[#E3E8EF]">
                         <p className="text-sm font-semibold text-[#203565]">{user?.firstName} {user?.lastName}</p>
                         <p className="text-xs text-[#5B6B82]">{user?.email}</p>
@@ -646,6 +658,31 @@ function Navbar() {
                           </button>
                         </div>
                       )}
+                      {/* Set-once preferences, kept out of the header row. */}
+                      <div className="mt-1 border-t border-[#E3E8EF] pt-1">
+                        <ThemeToggle className={`${accountItemClass} w-full gap-3`} showLabel />
+                        <div className="px-4 py-2">
+                          <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8A97A8]">
+                            <Languages className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+                            {t('nav.language')}
+                          </p>
+                          <div className="mt-1.5 flex gap-1 rounded-[10px] bg-surface p-1">
+                            {languageOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                onClick={() => setLang(option.value)}
+                                aria-pressed={lang === option.value}
+                                className={`flex-1 rounded-[8px] px-2 py-1.5 text-xs font-semibold transition-colors ${
+                                  lang === option.value ? 'bg-[#143A80] text-white' : 'text-[#203565] hover:bg-elevated'
+                                }`}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                       <div className="border-t border-[#E3E8EF] mt-1 pt-1">
                         <button
                           onClick={handleLogout}
@@ -672,23 +709,26 @@ function Navbar() {
                 <DropdownItem onClick={() => navigate('/register')}>{t('nav.createAccount')}</DropdownItem>
                 <DropdownDivider />
                 <DropdownItem onClick={() => navigate('/register?role=HOST')}>{t('nav.becomeHost')}</DropdownItem>
+                <DropdownDivider />
+                <DropdownItem onClick={toggleTheme}>
+                  {isDark ? t('trust.switchToLightMode') : t('trust.switchToDarkMode')}
+                </DropdownItem>
+                {languageOptions.map((option) => (
+                  <DropdownItem key={option.value} onClick={() => setLang(option.value)}>
+                    <span className="flex w-full items-center justify-between gap-4">
+                      {option.label}
+                      {lang === option.value && <Check className="h-4 w-4 shrink-0" strokeWidth={2} aria-hidden="true" />}
+                    </span>
+                  </DropdownItem>
+                ))}
               </Dropdown>
             )}
 
-            {/* Theme switcher */}
-            <ThemeToggle className={`zl-nav-icon-button zl-theme-toggle ${needsWhiteNav ? '' : 'is-inverse'}`} />
-
-            {/* Language switcher */}
-            <Dropdown
-              inline
-              theme={{ inlineWrapper: `zl-nav-icon-button ${needsWhiteNav ? '' : 'is-inverse'}` }}
-              label={<><span className="sr-only">{t('nav.language')}</span><span className="zl-header-action-icon" aria-hidden="true"><Languages className="h-5 w-5" strokeWidth={1.8} /></span></>}
-              arrowIcon={false}
-              placement="bottom-end"
-              aria-label={t('nav.language')}
-            >
-              {languageOptions.map((option) => <DropdownItem key={option.value} onClick={() => setLang(option.value)}>{option.label}</DropdownItem>)}
-            </Dropdown>
+            {/* Theme and language are deliberately not header buttons. Both are
+                set-once preferences, while search, notifications and the account
+                are used on every screen; keeping all six in one corner read as a
+                toolbar and squeezed the brand on a phone. They live in the
+                account menu and the phone drawer instead. */}
 
             {/* Hamburger */}
             <button
@@ -940,6 +980,32 @@ function Navbar() {
                 </li>
               </>
             )}
+
+            <li className="my-2 border-t border-[#E3E8EF]" aria-hidden="true" />
+            <li>
+              <ThemeToggle className={`${menuRowClass()} gap-3`} showLabel />
+            </li>
+            <li className="px-4 py-2">
+              <p className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-[0.12em] text-[#8A97A8]">
+                <Languages className="h-3.5 w-3.5" strokeWidth={2} aria-hidden="true" />
+                {t('nav.language')}
+              </p>
+              <div className="mt-1.5 flex gap-1 rounded-[10px] bg-surface p-1">
+                {languageOptions.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setLang(option.value)}
+                    aria-pressed={lang === option.value}
+                    className={`flex-1 rounded-[8px] px-2 py-2 text-sm font-semibold transition-colors ${
+                      lang === option.value ? 'bg-[#143A80] text-white' : 'text-[#203565] hover:bg-elevated'
+                    }`}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </li>
 
           </ul>
 
