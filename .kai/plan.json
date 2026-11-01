@@ -2,23 +2,23 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Run git status to see the real dirty set, not just the four files this session touched",
+      "text": "Check what is uncommitted with git status",
       "state": "done"
     },
     {
-      "text": "Separate source edits from scratch output; confirm scratch is ignored",
+      "text": "Review the diff for anything unintended or secret",
       "state": "done"
     },
     {
-      "text": "Verify the tree builds and lints before committing",
+      "text": "Run lint and build on the current tree",
       "state": "done"
     },
     {
-      "text": "Stage the source files and commit with a message describing the change",
+      "text": "Stage the relevant files and commit",
       "state": "done"
     },
     {
-      "text": "Push to origin/main and confirm the branch is level with the remote",
+      "text": "Push and confirm the branch is level with origin",
       "state": "done"
     },
     {
@@ -26,5 +26,5 @@
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-01T15:30:10.102Z"
+  "updatedAt": "2026-11-01T16:36:01.061Z"
 }
