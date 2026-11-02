@@ -3,6 +3,7 @@ import { randomBytes } from 'crypto';
 import path from 'path';
 import fs from 'fs';
 import { env } from '../config/env.js';
+import { AppError } from '../types/index.js';
 
 // Local fallback directory - used only when Cloudinary is NOT configured
 // (e.g. local development). In production on Railway the filesystem is
@@ -22,6 +23,38 @@ if (cloudinaryEnabled) {
 
 const CLOUD_FOLDER = 'zurilofts';
 
+// A refused or unreachable storage backend is an outage, not a caller mistake.
+// A bare 500 leaves the host staring at "Internal server error" with no way to
+// know whether to retry, so map it to a 503 with a sentence they can act on and
+// keep the real cause (403 from Cloudinary, bad credentials, quota) in the log.
+function storageUnavailable(error: unknown): AppError {
+  const detail = error as { name?: unknown; http_code?: unknown; message?: unknown } | null;
+  console.error('Image storage upload failed:', {
+    name: typeof detail?.name === 'string' ? detail.name : undefined,
+    httpCode: typeof detail?.http_code === 'number' ? detail.http_code : undefined,
+    message: typeof detail?.message === 'string' ? detail.message : String(error),
+  });
+  return new AppError('Photo storage is unavailable right now. Please try again in a moment.', 503);
+}
+
+async function uploadToCloudinary(
+  buffer: Buffer,
+  options: { resource_type: 'image' | 'raw'; format?: string },
+  publicId: string
+): Promise<{ secure_url: string }> {
+  try {
+    return await new Promise<{ secure_url: string }>((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream({ folder: CLOUD_FOLDER, public_id: publicId, ...options }, (err, res) =>
+          err || !res ? reject(err ?? new Error('Cloudinary upload failed')) : resolve(res)
+        )
+        .end(buffer);
+    });
+  } catch (error) {
+    throw storageUnavailable(error);
+  }
+}
+
 /**
  * Persist an already-optimized JPEG buffer and return its public URL.
  * Uploads to Cloudinary when configured; otherwise writes to local disk
@@ -33,15 +66,7 @@ export async function storeImage(buffer: Buffer, prefix: string): Promise<string
   const baseName = `${prefix}-${Date.now()}-${randomBytes(4).toString('hex')}`;
 
   if (cloudinaryEnabled) {
-    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          { folder: CLOUD_FOLDER, public_id: baseName, resource_type: 'image', format: 'jpg' },
-          (err, res) =>
-            err || !res ? reject(err ?? new Error('Cloudinary upload failed')) : resolve(res)
-        )
-        .end(buffer);
-    });
+    const result = await uploadToCloudinary(buffer, { resource_type: 'image', format: 'jpg' }, baseName);
     return result.secure_url;
   }
 
@@ -73,15 +98,7 @@ export async function storeDocument(buffer: Buffer, filename: string, prefix: st
   const ext = safeExtension(filename);
 
   if (cloudinaryEnabled) {
-    const result = await new Promise<{ secure_url: string }>((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          { folder: CLOUD_FOLDER, public_id: baseName, resource_type: 'raw' },
-          (err, res) =>
-            err || !res ? reject(err ?? new Error('Cloudinary upload failed')) : resolve(res)
-        )
-        .end(buffer);
-    });
+    const result = await uploadToCloudinary(buffer, { resource_type: 'raw' }, baseName);
     return result.secure_url;
   }
 

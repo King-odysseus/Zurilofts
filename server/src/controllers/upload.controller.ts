@@ -32,7 +32,17 @@ export async function uploadImages(req: Request, res: Response, next: NextFuncti
     }
 
     const urls = await Promise.all(
-      files.map(async (file) => storeImage(await optimizeToJpeg(file.buffer), 'prop'))
+      files.map(async (file) => {
+        let optimized: Buffer;
+        try {
+          optimized = await optimizeToJpeg(file.buffer);
+        } catch {
+          // sharp only fails on bytes that are not a decodable image, which is
+          // client input rather than a server fault, so it must not read as 500.
+          throw new ValidationError(`${file.originalname || 'That file'} could not be read as an image`);
+        }
+        return storeImage(optimized, 'prop');
+      })
     );
 
     res.status(201).json({ success: true, data: { urls } });
