@@ -2,37 +2,17 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Prove arrival guide example chips persist through Save on a throwaway draft, then delete it",
+      "text": "Identify the node processes behind ports 3000 and 5173 by command line, then stop only mine",
       "state": "done"
     },
     {
-      "text": "Read the stylesheet tokens and existing button/card classes",
+      "text": "Verify the amenities checklist and draft strings shipped in the live bundle",
       "state": "done"
     },
     {
-      "text": "Restyle the arrival guide example chips: square corners, no border, no shadow",
-      "state": "done"
-    },
-    {
-      "text": "Restyle the listing form action row buttons and amenity tiles to match",
-      "state": "done"
-    },
-    {
-      "text": "Verify the restyled UI at desktop and phone width, then lint and build",
-      "state": "done"
-    },
-    {
-      "text": "Investigate the live site console error left open at deploy verification",
-      "state": "done"
-    },
-    {
-      "text": "Stop the leftover dev servers on ports 3000 and 5173",
-      "state": "done"
-    },
-    {
-      "text": "Commit, push and deploy the styling fix",
-      "state": "done"
+      "text": "Confirm the working tree and remote are clean, then report what remains",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-02T15:57:57.366Z"
+  "updatedAt": "2026-11-02T15:59:00.081Z"
 }
