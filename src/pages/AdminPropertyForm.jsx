@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Alert, Button, Checkbox, Label, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
-import { Check, ChevronLeft, Eye, MapPin, Star, Upload, X } from 'lucide-react';
+import { Check, ChevronLeft, Eye, MapPin, Plus, Star, Upload, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
@@ -21,6 +21,32 @@ const PROPERTY_TYPE_OPTIONS = [
   { value: 'apartment', labelKey: 'stays.typeApartment' },
   { value: 'studio', labelKey: 'stays.typeStudio' },
   { value: 'penthouse', labelKey: 'stays.typePenthouse' },
+];
+
+// What a short-let guest in Nairobi actually looks for. Hosts tick these instead
+// of typing, so the same amenity is spelled the same way on every listing. A name
+// added through "Add New" is kept alongside these and is never lost on save.
+const RECOMMENDED_AMENITIES = [
+  'High-Speed WiFi',
+  'Air Conditioning',
+  'Fully Equipped Kitchen',
+  'Washing Machine',
+  'Hot Water',
+  'Smart TV',
+  'Netflix',
+  'Balcony',
+  'Workspace',
+  '24/7 Power Backup',
+  '24/7 Security',
+  'Secure Parking',
+  'Swimming Pool',
+  'Gym',
+  'Elevator',
+  'Cleaning Service',
+  'Breakfast',
+  'Pet Friendly',
+  'Wheelchair Accessible',
+  'Smoking Allowed',
 ];
 
 const EMPTY = {
@@ -143,6 +169,10 @@ function AdminPropertyForm() {
   const [dragging, setDragging] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [activeStep, setActiveStep] = useState('basics');
+  const [newAmenity, setNewAmenity] = useState('');
+  // Inline note under the amenity box (e.g. a duplicate name), not the page-wide
+  // error banner: a refused amenity is no reason to shout at the whole form.
+  const [amenityNotice, setAmenityNotice] = useState('');
 
   useEffect(() => {
     if (!isEdit) return;
@@ -180,6 +210,63 @@ function AdminPropertyForm() {
       }
     })();
   }, [id, isEdit, t]);
+
+  // Amenities stay one name per line in the form (that is also what gets saved),
+  // so the checklist reads and rewrites that same string. The guest preview, the
+  // progress panel and the save payload therefore need no change at all.
+  const selectedAmenities = linesToArray(form.amenities);
+  // Amenities not in the recommended list: typed in by this host, or already
+  // stored on the listing before this checklist existed. They get their own
+  // tiles so editing an older listing never hides an amenity it already had.
+  const customAmenities = selectedAmenities.filter(
+    (name) => !RECOMMENDED_AMENITIES.some((item) => item.toLowerCase() === name.toLowerCase())
+  );
+
+  function amenityIsSelected(name) {
+    return selectedAmenities.some((item) => item.toLowerCase() === name.toLowerCase());
+  }
+
+  function toggleAmenity(name) {
+    setAmenityNotice('');
+    setForm((f) => {
+      const current = linesToArray(f.amenities);
+      // Case-insensitive throughout, so "WiFi" and "wifi" can never both land on
+      // one listing and show up twice on the guest page.
+      const already = current.some((item) => item.toLowerCase() === name.toLowerCase());
+      const next = already
+        ? current.filter((item) => item.toLowerCase() !== name.toLowerCase())
+        : [...current, name];
+      return { ...f, amenities: next.join('\n') };
+    });
+  }
+
+  // Adds a typed amenity. A name that is already on the list is never added a
+  // second time: its tile is ticked instead, and only a name that is already
+  // ticked gets refused with a note.
+  function addAmenity() {
+    const name = newAmenity.trim().replace(/\s+/g, ' ');
+    if (!name) return;
+
+    // A typed name that matches an existing tile picks that tile instead of
+    // creating a second, differently spelled copy of the same amenity.
+    const existing = [...RECOMMENDED_AMENITIES, ...selectedAmenities].find(
+      (item) => item.toLowerCase() === name.toLowerCase()
+    );
+    if (existing) {
+      if (amenityIsSelected(existing)) {
+        setAmenityNotice(t('admin.amenityAlreadyListed'));
+        return;
+      }
+      toggleAmenity(existing);
+      setNewAmenity('');
+      setAmenityNotice('');
+      return;
+    }
+
+    setForm((f) => ({ ...f, amenities: [...linesToArray(f.amenities), name].join('\n') }));
+    setNewAmenity('');
+    setAmenityNotice('');
+  }
 
   function update(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -545,11 +632,63 @@ function AdminPropertyForm() {
 
             <section id="host-editor-amenities" className={`${CARD_CLASS} scroll-mt-24`}>
               <SectionHeader step="3" title={t('admin.amenitiesAndRules')} description={t('admin.amenitiesAndRulesHint')} />
-              <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div className="mt-5 grid grid-cols-1 gap-5">
                 <div>
-                  <Label htmlFor="listing-amenities">{t('admin.amenities')}</Label>
-                  <Textarea id="listing-amenities" rows={5} placeholder={'WiFi\nPool\nParking'} value={form.amenities} onChange={(e) => update('amenities', e.target.value)} />
-                  <p className="mt-1 text-xs text-muted">{t('admin.oneItemPerLine')}</p>
+                  <span className="block text-sm font-medium text-charcoal">{t('admin.amenities')}</span>
+                  <p className="mt-1 text-xs text-muted">{t('admin.amenitiesChecklistHint')}</p>
+                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2" role="group" aria-label={t('admin.amenities')}>
+                    {[...RECOMMENDED_AMENITIES, ...customAmenities].map((name) => {
+                      const checked = amenityIsSelected(name);
+                      return (
+                        <label
+                          key={name}
+                          className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
+                            checked
+                              ? 'border-primary bg-primary-50 text-navy dark:bg-primary/15'
+                              : 'border-border bg-elevated text-charcoal hover:border-primary'
+                          }`}
+                        >
+                          <Checkbox checked={checked} onChange={() => toggleAmenity(name)} />
+                          <span className="min-w-0 flex-1">{name}</span>
+                          {checked && <Check className="h-3.5 w-3.5 shrink-0 text-primary-600" strokeWidth={2.5} aria-hidden="true" />}
+                        </label>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-4">
+                    <Label htmlFor="amenity-new">{t('admin.amenityAddLabel')}</Label>
+                    <div className="mt-1 flex gap-2">
+                      <div className="min-w-0 flex-1">
+                        <TextInput
+                          id="amenity-new"
+                          value={newAmenity}
+                          placeholder={t('admin.amenityAddPlaceholder')}
+                          onChange={(e) => {
+                            setNewAmenity(e.target.value);
+                            setAmenityNotice('');
+                          }}
+                          // The listing form is a <form>, so Enter would submit a
+                          // half-finished listing instead of adding the amenity.
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              addAmenity();
+                            }
+                          }}
+                        />
+                      </div>
+                      <Button type="button" color="light" onClick={addAmenity} disabled={!newAmenity.trim()}>
+                        <Plus className="mr-1.5 h-4 w-4" strokeWidth={2} aria-hidden="true" />
+                        {t('admin.amenityAdd')}
+                      </Button>
+                    </div>
+                    {amenityNotice && (
+                      <p className="mt-1 text-xs font-medium text-red-600" role="alert">{amenityNotice}</p>
+                    )}
+                    <p className="mt-1 text-xs text-muted">
+                      {t(selectedAmenities.length === 1 ? 'admin.amenitiesSelectedOne' : 'admin.amenitiesSelected', { count: selectedAmenities.length })}
+                    </p>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="listing-nearby">{t('admin.whatsNearby')}</Label>

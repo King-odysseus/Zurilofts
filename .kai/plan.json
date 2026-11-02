@@ -2,21 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check the repo state: the image display fix is committed and pushed, no stray files",
+      "text": "Read the amenities section of the listing form and how amenities are saved",
       "state": "done"
     },
     {
-      "text": "Find how this project deploys: Railway CLI signed in, project linked, GitHub push triggers the build",
+      "text": "Check whether the project already has a recommended amenities list to reuse",
       "state": "done"
     },
     {
-      "text": "Follow the running build of commit 9ed10eb through to a live deployment",
+      "text": "Build the checklist with checked items plus an Add New option that rejects duplicates",
       "state": "done"
     },
     {
-      "text": "Verify on the live site: the image rule allows Cloudinary and a hosted image loads",
+      "text": "Wire the selected list into the save payload and the edit-load path",
       "state": "done"
+    },
+    {
+      "text": "Add the English and Swahili wording",
+      "state": "done"
+    },
+    {
+      "text": "Check it in the browser at desktop and phone width",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and build, then commit and push",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-02T15:09:56.072Z"
+  "updatedAt": "2026-11-02T15:20:32.314Z"
 }
