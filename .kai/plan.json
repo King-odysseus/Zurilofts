@@ -2,21 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check repo state and whether any commits are unpushed",
+      "text": "Read the screenshot and reproduce the create/draft 500 on the live API",
       "state": "done"
     },
     {
-      "text": "Check Railway deployment status for the latest commit",
+      "text": "Find the root cause: the save path sends photo/list fields Postgres does not have",
       "state": "done"
     },
     {
-      "text": "Confirm the deployment succeeded and the service is online",
+      "text": "Fix the write path and prove it against the generated production client",
       "state": "done"
     },
     {
-      "text": "Verify the live site serves the current build (bundle hashes and API)",
-      "state": "done"
+      "text": "Run lint/build checks, commit, push and confirm the deploy",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-02T16:10:42.577Z"
+  "updatedAt": "2026-11-02T16:21:05.660Z"
 }
