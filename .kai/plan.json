@@ -2,25 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Reproduce: local dev shows thumbnails, so the break is specific to the live site",
+      "text": "Check the repo state: the image display fix is committed and pushed, no stray files",
       "state": "done"
     },
     {
-      "text": "Find the cause: the server's image policy allows only its own domain, blocking Cloudinary photos",
+      "text": "Find how this project deploys: Railway CLI signed in, project linked, GitHub push triggers the build",
       "state": "done"
     },
     {
-      "text": "Confirm the block on a production-style server, then allow the photo hosts in the policy",
-      "state": "active"
+      "text": "Follow the running build of commit 9ed10eb through to a live deployment",
+      "state": "done"
     },
     {
-      "text": "Verify the photos load, then run lint, build and the server type check",
-      "state": "pending"
-    },
-    {
-      "text": "Commit and push",
-      "state": "pending"
+      "text": "Verify on the live site: the image rule allows Cloudinary and a hosted image loads",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T15:01:08.781Z"
+  "updatedAt": "2026-11-02T15:09:56.072Z"
 }
