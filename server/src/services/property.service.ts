@@ -1,5 +1,5 @@
 import prisma from '../config/prisma.js';
-import { NotFoundError, ValidationError, ForbiddenError, ConflictError } from '../types/index.js';
+import { NotFoundError, ValidationError, ForbiddenError, ConflictError, propertyCreateSchema } from '../types/index.js';
 import { isRangeAvailable } from './calendar.service.js';
 
 // Listing publication lifecycle - independent of the host's own account
@@ -195,20 +195,35 @@ function buildCreateData(data: any) {
   // or what status field (if any) was in the request body. Going live always
   // requires an explicit submit-for-review + admin approval - see
   // submitPropertyForReview / adminReviewProperty below.
+  //
+  // These eight columns are NOT NULL, but the draft route lets a host save a
+  // listing with only some fields filled, so an omitted one still needs a value
+  // here or Prisma throws and the host loses their work. 0 / '' are the honest
+  // "not set yet" values: the listing is a private draft, never shown to guests.
+  const defaults = {
+    title: '',
+    location: '',
+    price: 0,
+    bedrooms: 1,
+    bathrooms: 1,
+    area: 0,
+    description: '',
+    type: 'apartment',
+  };
   if (isSQLite()) {
     const base: any = {
-      title: data.title,
-      location: data.location,
+      title: data.title ?? defaults.title,
+      location: data.location ?? defaults.location,
       neighborhood: data.neighborhood,
-      price: data.price,
-      bedrooms: data.bedrooms,
-      bathrooms: data.bathrooms,
-      area: data.area,
-      description: data.description,
+      price: data.price ?? defaults.price,
+      bedrooms: data.bedrooms ?? defaults.bedrooms,
+      bathrooms: data.bathrooms ?? defaults.bathrooms,
+      area: data.area ?? defaults.area,
+      description: data.description ?? defaults.description,
       imagesJson: JSON.stringify(data.images || data.imagesJson || []),
       amenitiesJson: JSON.stringify(data.amenities || data.amenitiesJson || []),
       nearbyJson: JSON.stringify(data.nearby || data.nearbyJson || []),
-      type: data.type,
+      type: data.type ?? defaults.type,
       available: data.available,
       featured: data.featured,
       rating: data.rating,
@@ -237,9 +252,19 @@ function buildCreateData(data: any) {
     return base;
   }
   const { status: _ignoredStatus, houseRules, ...rest } = data;
+  // The defaults go in first and whatever the host actually sent overwrites
+  // them. A key that arrived as undefined is skipped: spreading it would put
+  // undefined back over a default, which is exactly what makes Prisma reject
+  // the insert on a NOT NULL column.
+  const payload: any = { ...defaults };
+  for (const [key, value] of Object.entries(rest)) {
+    if (value !== undefined) payload[key] = value;
+  }
   // Rules are stored as a JSON string under both providers, so the conversion
   // happens here as well as in the SQLite branch above.
-  return { ...rest, houseRulesJson: JSON.stringify(houseRules || []), status: 'DRAFT' };
+  payload.houseRulesJson = JSON.stringify(houseRules || []);
+  payload.status = 'DRAFT';
+  return payload;
 }
 
 function buildUpdateData(data: any) {
@@ -516,6 +541,31 @@ export async function updateProperty(id: string, data: any, hostId?: string) {
 }
 
 /**
+ * A draft may be saved almost empty (see propertyDraftCreateSchema), so this is
+ * the point of no return: a listing carrying nothing a guest could act on must
+ * not reach the admin queue, where it would be reviewed and published blank.
+ * The create schema is the definition of a complete listing, so it is reused
+ * here rather than restating which fields matter.
+ */
+function assertListingIsComplete(property: Record<string, unknown>): void {
+  // The stored row carries null for every optional column the host never filled
+  // (neighborhood, the per-bed rates, the legacy pin). Those fields are optional
+  // in the schema but not nullable, so a null would read as a bad value rather
+  // than an absent one and refuse a perfectly good listing. Dropping them makes
+  // "null in the database" mean the same thing as "not sent" here.
+  const present = Object.fromEntries(
+    Object.entries(property).filter(([, value]) => value !== null && value !== undefined)
+  );
+
+  const result = propertyCreateSchema.safeParse(present);
+  if (result.success) return;
+  const missing = [...new Set(result.error.issues.map((issue) => String(issue.path[0] ?? '')))].filter(Boolean);
+  throw new ValidationError(
+    `This listing is not ready to submit yet. Finish these first: ${missing.join(', ')}.`
+  );
+}
+
+/**
  * Host submits a DRAFT or previously-REJECTED listing for admin review.
  * Requires the caller's own HostApplication to be APPROVED - a host may hold
  * and edit drafts at any verification stage, but may not put a listing in
@@ -531,6 +581,7 @@ export async function submitPropertyForReview(id: string, hostId: string) {
     throw new ForbiddenError('Your host account must be verified before you can submit a listing for review.');
   }
   assertCanSubmitForReview(property.status);
+  assertListingIsComplete(normalizeProperty(property));
   const updated = await prisma.property.update({
     where: { id },
     data: { status: 'PENDING_REVIEW', submittedAt: new Date(), listingReviewNote: null },

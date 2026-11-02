@@ -517,6 +517,11 @@ export const admindash = {
         rateNotSet: 'Rate not set',
         bathroomsPlaceholder: 'Bathrooms',
         savePropertyFailed: 'Failed to save the listing',
+        // A draft can be saved before the listing has photos or a price, so a
+        // host is never trapped by the fields a finished listing requires.
+        saveDraft: 'Save as draft',
+        savingDraft: 'Saving draft...',
+        draftSaveFailed: 'Could not save your draft',
         stepComplete: 'Complete',
         stepNeedsAttention: 'Needs attention',
         createListing: 'Create listing',
@@ -1120,6 +1125,9 @@ export const admindash = {
         rateNotSet: 'Bei haijawekwa',
         bathroomsPlaceholder: 'Bafu',
         savePropertyFailed: 'Imeshindikana kuhifadhi tangazo',
+        saveDraft: 'Hifadhi kama rasimu',
+        savingDraft: 'Inahifadhi rasimu...',
+        draftSaveFailed: 'Imeshindwa kuhifadhi rasimu yako',
         stepComplete: 'Imekamilika',
         stepNeedsAttention: 'Inahitaji uangalizi',
         createListing: 'Unda tangazo',

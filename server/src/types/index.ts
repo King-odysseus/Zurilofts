@@ -106,6 +106,13 @@ export const propertyCreateSchema = z.object({
   houseRules: z.array(z.string().max(200)).optional(),
 });
 
+// A host has to be able to stop halfway through a listing and come back to it,
+// so a draft accepts whatever has been filled in so far. Every field the strict
+// create schema insists on becomes optional and the service fills a safe default
+// for each NOT NULL column. A complete listing still goes through
+// propertyCreateSchema, so "create" cannot silently save half a listing.
+export const propertyDraftCreateSchema = propertyCreateSchema.partial();
+
 export const propertyUpdateSchema = propertyCreateSchema.partial();
 
 // Admin review action on a single listing. Separate from host account

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { authenticate, requireHost, requireHostWorkspace } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { propertyCreateSchema, propertyUpdateSchema, autoMessageTemplatesSchema, calendarSourceSchema, calendarBlockSchema, priceRuleSchema, stayRuleSchema } from '../types/index.js';
+import { propertyCreateSchema, propertyDraftCreateSchema, propertyUpdateSchema, autoMessageTemplatesSchema, calendarSourceSchema, calendarBlockSchema, priceRuleSchema, stayRuleSchema } from '../types/index.js';
 import * as ctrl from '../controllers/property.controller.js';
 import * as calendarCtrl from '../controllers/calendar.controller.js';
 import * as autoMsgCtrl from '../controllers/auto-message.controller.js';
@@ -58,6 +58,11 @@ router.get('/:id', ctrl.getById);
 // new listing is created as a private DRAFT (see property.service.ts) so
 // hosting-intent USER accounts may prepare listings before verification.
 router.post('/', authenticate, requireHostWorkspace, validate(propertyCreateSchema), ctrl.create);
+// Saving a listing the host has not finished yet. Only the fields filled in so
+// far are required, so a half-written listing can be stored and reopened later.
+// It is always created as a DRAFT (see property.service.ts), so an incomplete
+// listing can never reach guests, and going live still needs submit + review.
+router.post('/draft', authenticate, requireHostWorkspace, validate(propertyDraftCreateSchema), ctrl.create);
 router.put('/:id', authenticate, requireHostWorkspace, validate(propertyUpdateSchema), ctrl.update);
 router.delete('/:id', authenticate, requireHostWorkspace, ctrl.remove);
 

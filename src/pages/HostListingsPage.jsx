@@ -60,6 +60,13 @@ function bedSummary(property, t) {
   return t((property.bedrooms || 1) === 1 ? 'host.bedsCountOne' : 'host.bedsCountOther', { count: property.bedrooms || 1 });
 }
 
+// A draft can be saved before the host names it, so a blank title is normal and
+// must still read as a deliberate listing on this page rather than as a gap.
+function listingTitle(property, t) {
+  const title = String(property.title || '').trim();
+  return title || t('host.untitledDraft');
+}
+
 function where(property) {
   return property.neighborhood || property.location || 'Nairobi';
 }
@@ -163,7 +170,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
       <div>
         <div className="flex items-start justify-between gap-3">
           <h2 className="text-[15px] font-semibold leading-snug text-navy">
-            <Link to={`/host/listings/${property.id}/preview`} className="hover:text-muted">{property.title}</Link>
+            <Link to={`/host/listings/${property.id}/preview`} className="hover:text-muted">{listingTitle(property, t)}</Link>
           </h2>
           <strong className="whitespace-nowrap text-sm font-bold text-navy">
             KES {(property.price || 0).toLocaleString()}<span className="text-[11px] font-medium text-muted"> {t('host.perNightShort')}</span>
@@ -196,7 +203,7 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
             checked={Boolean(property.available)}
             onChange={() => onToggleAvailability(property)}
             disabled={busy}
-            aria-label={`${property.title} availability`}
+            aria-label={`${listingTitle(property, t)} availability`}
           />
           <span className="text-xs text-muted">{property.available ? t('host.acceptingBookings') : t('host.notAcceptingBookings')}</span>
         </div>
@@ -246,7 +253,7 @@ function HostListingRow({ property, onToggleAvailability, onDelete, onReview, bu
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
           <h2 className="min-w-0 flex-1 truncate text-[15px] font-semibold text-navy">
-            <Link to={`/host/listings/${property.id}/preview`} className="hover:text-muted">{property.title}</Link>
+            <Link to={`/host/listings/${property.id}/preview`} className="hover:text-muted">{listingTitle(property, t)}</Link>
           </h2>
           <StatusPill tone={status.tone}>{status.label}</StatusPill>
         </div>
@@ -356,7 +363,7 @@ export default function HostListingsPage() {
   }
 
   async function handleDelete(property) {
-    if (!window.confirm(`Delete "${property.title}"? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete "${listingTitle(property, t)}"? This cannot be undone.`)) return;
     setBusyId(property.id);
     try {
       await apiClient.delete(`/properties/${property.id}`);
