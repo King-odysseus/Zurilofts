@@ -2,25 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Review git status and diff to see every changed and untracked file",
+      "text": "Review the pending diff and confirm only the green badge change is present",
       "state": "done"
     },
     {
-      "text": "Remove any scratch/verification scripts that do not belong in the repo",
+      "text": "Re-run lint and build on this exact tree",
       "state": "done"
     },
     {
-      "text": "Run lint and build to confirm the tree is green before committing",
+      "text": "Commit the badge change and push to main",
       "state": "done"
     },
     {
-      "text": "Stage the verification work and commit with a descriptive message",
-      "state": "done"
-    },
-    {
-      "text": "Push the commit and confirm the remote accepted it",
-      "state": "done"
+      "text": "Record the finished plan in its own commit",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-02T09:43:46.036Z"
+  "updatedAt": "2026-11-02T09:50:37.683Z"
 }
