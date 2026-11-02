@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { Button, Label, Modal, ModalBody, ModalFooter, ModalHeader, Textarea } from 'flowbite-react';
 import { ExternalLink, House, Search } from 'lucide-react';
 import apiClient from '../api/client.js';
@@ -14,6 +15,38 @@ import usePagedResource from '../hooks/usePagedResource.js';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 const PAGE_SIZE = 20;
+
+// A photo whose file is gone - deleted from storage, or replaced after the
+// listing was submitted - would otherwise paint the browser's broken-image icon
+// in the queue, which reads as a broken page rather than a missing photo. This
+// falls back to the same house tile a listing with no photo already gets, so a
+// reviewer still sees a normal row and can open the listing to look properly.
+function QueueThumbnail({ src, alt }) {
+  const [failed, setFailed] = useState(false);
+
+  if (!src || failed) {
+    return (
+      <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-navy dark:bg-primary/15">
+        <House className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
+      </span>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className="h-12 w-12 shrink-0 rounded-lg object-cover"
+    />
+  );
+}
+
+QueueThumbnail.propTypes = {
+  src: PropTypes.string,
+  alt: PropTypes.string,
+};
 
 // Keys, not words: the filter menu is rendered per visit, so it follows the
 // chosen language instead of freezing at module load.
@@ -210,13 +243,7 @@ export default function AdminListingReview() {
           <ul className="divide-y divide-border">
             {listings.map((listing) => (
               <li key={listing.id} className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:gap-4">
-                {listing.images?.[0] ? (
-                  <img src={listing.images[0]} alt="" className="h-12 w-12 shrink-0 rounded-lg object-cover" />
-                ) : (
-                  <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary-50 text-navy dark:bg-primary/15">
-                    <House className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />
-                  </span>
-                )}
+                <QueueThumbnail src={listing.images?.[0]} alt="" />
                 <div className="min-w-0 flex-1">
                   <strong className="block truncate text-sm font-semibold text-navy">{listing.title}</strong>
                   <small className="mt-1 block text-xs text-muted">
