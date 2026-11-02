@@ -2,29 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Confirm the deploy triggered by the last push finished and the site is healthy",
+      "text": "Find the home page stay card component and its sizing",
       "state": "done"
     },
     {
-      "text": "Read the exact photos on the production listing from the screenshot and test them",
+      "text": "Shrink the card so a single stay is a reasonable size",
       "state": "done"
     },
     {
-      "text": "Find why notifications never reach anyone (permission prompt never mounted, gated on marketing consent)",
+      "text": "Verify in the browser at desktop, tablet and phone width",
       "state": "done"
     },
     {
-      "text": "Mount the notification prompt and let signed-in people turn notifications on",
+      "text": "Run lint and build",
       "state": "done"
     },
     {
-      "text": "Prove a subscription is stored and a push is actually delivered",
-      "state": "done"
-    },
-    {
-      "text": "Run the checks, commit, push and deploy",
-      "state": "done"
+      "text": "Commit and push",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-02T17:01:26.904Z"
+  "updatedAt": "2026-11-02T18:35:21.659Z"
 }

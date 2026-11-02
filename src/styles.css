@@ -840,7 +840,13 @@ html.dark {
 .opg-categories button,.opg-filter-action{border:1px solid #e1e5ea;border-radius:30px;background:#fff;color:var(--op-navy);font:600 12px Inter,Arial,sans-serif;padding:9px 16px;white-space:nowrap;text-decoration:none;cursor:pointer}
 .opg-categories button.active{background: var(--op-action);border-color:#C5A28C;color:#fff}
 .opg-filter-action{border-radius:8px}
-.opg-stay-grid{display:grid;grid-template-columns:repeat(var(--opg-stay-columns,4),minmax(0,1fr));gap:34px 18px}
+/* A column stops growing at 400px. The column count follows how many cards
+   there are, so one or two published stays used to get a single full-width
+   column: a 1200px card with an 800px-tall photo, which read as a banner rather
+   than a listing. Capping the track keeps a lone card the size of a normal grid
+   card, and changes nothing once there are three or more (at 1200px those are
+   already narrower than 400px). */
+.opg-stay-grid{display:grid;grid-template-columns:repeat(var(--opg-stay-columns,4),minmax(0,400px));gap:34px 18px}
 .opg-stay-card{position:relative;min-width:0}
 .opg-stay-image{display:block;position:relative;aspect-ratio:282/182;overflow:hidden;border-radius:12px;background:#e7e4df;text-decoration:none}
 .opg-stay-image img{width:100%;height:100%;object-fit:cover;transition:transform .2s}
