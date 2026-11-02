@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Alert, Button, Checkbox, Label, Textarea, TextInput, ToggleSwitch } from 'flowbite-react';
-import { Check, ChevronLeft, Eye, MapPin, Upload, X } from 'lucide-react';
+import { Check, ChevronLeft, Eye, MapPin, Star, Upload, X } from 'lucide-react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 import SelectMenu from '../components/SelectMenu.jsx';
@@ -60,6 +60,11 @@ const EDITOR_STEPS = [
 
 // Shared with the host application form so both multi-step host forms read identically.
 const CARD_CLASS = 'rounded-xl bg-elevated shadow-md p-5 sm:p-6';
+// Mirrors the server's upload route: same types, same per-request cap. Checking
+// here as well means a dropped file is rejected with an explanation instead of a
+// round trip that comes back as an error banner.
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
+const MAX_PHOTOS_PER_UPLOAD = 10;
 const STEP_BUTTON_BASE = 'flex w-full items-start gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-surface';
 const STEP_CIRCLE_BASE = 'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-[11px] font-bold';
 
@@ -131,6 +136,11 @@ function AdminPropertyForm() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
+  // Counts nested dragenter/dragleave pairs: moving the cursor across a child
+  // element fires dragleave on the parent, which would otherwise flicker the
+  // highlight off mid-drag.
+  const dragDepth = useRef(0);
+  const [dragging, setDragging] = useState(false);
   const [showFullPreview, setShowFullPreview] = useState(false);
   const [activeStep, setActiveStep] = useState('basics');
 
@@ -175,17 +185,30 @@ function AdminPropertyForm() {
     setForm((f) => ({ ...f, [field]: value }));
   }
 
-  // Upload selected files to the backend, which optimizes them and returns paths
-  async function handleFiles(e) {
-    const files = Array.from(e.target.files || []);
-    e.target.value = ''; // allow re-selecting the same file
-    if (files.length === 0) return;
+  // Upload selected or dropped files to the backend, which optimizes them and
+  // returns paths. Shared by the file picker and the drop target.
+  async function uploadFiles(fileList) {
+    const picked = Array.from(fileList || []);
+    if (picked.length === 0) return;
+    setError('');
+
+    const images = picked.filter((f) => ALLOWED_IMAGE_TYPES.includes(f.type));
+    if (images.length === 0) {
+      setError(t('admin.imageTypeRejected'));
+      return;
+    }
+
+    // Upload what is valid, but say so when part of the batch was refused - a
+    // silently shorter result looks like the upload dropped files.
+    if (images.length < picked.length) setError(t('admin.imageTypeRejected'));
+
+    const batch = images.slice(0, MAX_PHOTOS_PER_UPLOAD);
+    if (images.length > MAX_PHOTOS_PER_UPLOAD) setError(t('admin.photoLimit'));
 
     setUploading(true);
-    setError('');
     try {
       const data = new FormData();
-      files.forEach((f) => data.append('images', f));
+      batch.forEach((f) => data.append('images', f));
       const res = await apiClient.post('/uploads', data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
@@ -196,6 +219,58 @@ function AdminPropertyForm() {
     } finally {
       setUploading(false);
     }
+  }
+
+  function handleFiles(e) {
+    const files = Array.from(e.target.files || []);
+    e.target.value = ''; // allow re-selecting the same file
+    uploadFiles(files);
+  }
+
+  // Only react to an actual file drag; dragging text or a link over the form
+  // must not arm the dropzone.
+  function isFileDrag(e) {
+    return Array.from(e.dataTransfer?.types || []).includes('Files');
+  }
+
+  function handleDragEnter(e) {
+    if (!isFileDrag(e)) return;
+    e.preventDefault();
+    dragDepth.current += 1;
+    setDragging(true);
+  }
+
+  function handleDragOver(e) {
+    if (!isFileDrag(e)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  }
+
+  function handleDragLeave(e) {
+    if (!isFileDrag(e)) return;
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setDragging(false);
+  }
+
+  function handleDrop(e) {
+    if (!isFileDrag(e)) return;
+    e.preventDefault();
+    dragDepth.current = 0;
+    setDragging(false);
+    if (uploading) return;
+    uploadFiles(e.dataTransfer.files);
+  }
+
+  // Image order is what the listing shows: the first one is the cover, both in
+  // the guest preview card and on the stay page, so "use as cover" is a move to
+  // the front rather than a separate flag to keep in sync.
+  function setCover(index) {
+    setForm((f) => {
+      if (index <= 0 || index >= f.images.length) return f;
+      const images = [...f.images];
+      const [chosen] = images.splice(index, 1);
+      return { ...f, images: [chosen, ...images] };
+    });
   }
 
   function removeImage(index) {
@@ -409,7 +484,14 @@ function AdminPropertyForm() {
               </div>
             </section>
 
-            <section id="host-editor-photos" className={`${CARD_CLASS} scroll-mt-24`}>
+            <section
+              id="host-editor-photos"
+              className={`${CARD_CLASS} scroll-mt-24`}
+              onDragEnter={handleDragEnter}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               <SectionHeader step="2" title={t('admin.photos')} description={t('admin.photosHint')} />
               {form.images.length > 0 && (
                 <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
@@ -425,11 +507,26 @@ function AdminPropertyForm() {
                       >
                         <X className="h-4 w-4" strokeWidth={2} aria-hidden="true" />
                       </button>
+                      {i > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setCover(i)}
+                          aria-label={t('admin.setCover')}
+                          className="absolute inset-x-2 bottom-2 inline-flex items-center justify-center gap-1 rounded-full bg-white/95 px-2 py-1 text-[11px] font-semibold text-navy shadow-sm hover:bg-white"
+                        >
+                          <Star className="h-3 w-3" strokeWidth={2} aria-hidden="true" />
+                          {t('admin.setCover')}
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
               )}
-              <label className="mt-5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-surface px-4 py-8 text-center text-sm text-muted hover:border-primary">
+              <label
+                className={`mt-5 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border border-dashed px-4 py-8 text-center text-sm transition-colors ${
+                  dragging ? 'border-primary bg-primary-50 text-navy dark:bg-primary/15' : 'border-border bg-surface text-muted hover:border-primary'
+                } ${uploading ? 'cursor-progress' : ''}`}
+              >
                 {uploading ? (
                   <>
                     <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary border-t-transparent" aria-hidden="true" />
@@ -438,7 +535,7 @@ function AdminPropertyForm() {
                 ) : (
                   <>
                     <Upload className="h-5 w-5" strokeWidth={1.5} aria-hidden="true" />
-                    <strong className="text-sm font-semibold text-navy">{t('admin.addPhotos')}</strong>
+                    <strong className="text-sm font-semibold text-navy">{dragging ? t('admin.dropPhotosActive') : t('admin.dropPhotos')}</strong>
                     <span className="text-xs">{t('admin.photoFormats')}</span>
                   </>
                 )}

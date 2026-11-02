@@ -2,25 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check working tree and see what is changed",
+      "text": "Inspect screenshot and reproduce the upload 500 error",
       "state": "done"
     },
     {
-      "text": "Separate real source changes from scratch review files",
+      "text": "Find root cause: production Cloudinary API key lacks upload (create) permission",
       "state": "done"
     },
     {
-      "text": "Stage and commit the listing form alignment changes",
+      "text": "Server: storage failures return a clear 503, unreadable images a clear 400",
       "state": "done"
     },
     {
-      "text": "Push to the remote",
+      "text": "Add drag and drop for photo uploads on the listing form",
       "state": "done"
     },
     {
-      "text": "Commit the finished plan file",
+      "text": "Add set-as-cover control that reorders the photo to first",
       "state": "done"
+    },
+    {
+      "text": "Verify in the running app at desktop and mobile widths, then run lint and build",
+      "state": "done"
+    },
+    {
+      "text": "Commit the two changes and push",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-02T12:55:42.985Z"
+  "updatedAt": "2026-11-02T13:24:54.878Z"
 }
