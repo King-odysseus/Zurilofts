@@ -121,11 +121,9 @@ export function planListingReview(status: string, action: ListingReviewAction): 
   return 'PUBLISHED';
 }
 
-// SQLite stores arrays as JSON strings; Postgres uses native arrays.
-// This helper normalizes both to JS arrays for API responses.
+// Both schemas store these lists as JSON strings, so this turns the stored
+// columns back into the arrays the API returns.
 function normalizeProperty(property: any) {
-  // houseRulesJson is a JSON string under both providers (Postgres keeps the
-  // same string column), so it is parsed before the early return below.
   const { houseRulesJson, ...rest } = property;
   const toArray = (value: string | null | undefined) => {
     if (!value) return [];
@@ -136,11 +134,10 @@ function normalizeProperty(property: any) {
       return [];
     }
   };
-  if (property.images !== undefined) {
-    // PostgreSQL - native arrays
-    return { ...rest, houseRules: toArray(houseRulesJson) };
-  }
-  // SQLite - JSON fields, map to expected property names
+  // Both schemas keep these lists as JSON strings, so one mapping serves both
+  // providers. There is no native-array branch to switch on (see
+  // withJsonListColumns for the write side, which is where that assumption
+  // actually broke production).
   const { imagesJson, amenitiesJson, nearbyJson, ...fields } = rest;
   return {
     ...fields,
@@ -190,7 +187,41 @@ function isSQLite(): boolean {
   return (process.env.DATABASE_URL || '').trim().startsWith('file:');
 }
 
-function buildCreateData(data: any) {
+// Both Prisma schemas keep the list columns as JSON strings: imagesJson,
+// amenitiesJson, nearbyJson and houseRulesJson. Postgres never moved to native
+// arrays, so a body still carrying the plural API names (images, amenities,
+// nearby, houseRules) has to be re-keyed before Prisma sees it. Miss that and
+// production answers every listing save with "Unknown argument `images`".
+const JSON_LIST_COLUMNS: Record<string, string> = {
+  images: 'imagesJson',
+  amenities: 'amenitiesJson',
+  nearby: 'nearbyJson',
+  houseRules: 'houseRulesJson',
+};
+
+function withJsonListColumns(data: Record<string, any>): Record<string, any> {
+  const mapped: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data)) {
+    // Dropping the key rather than writing a value is what keeps "the host did
+    // not touch this field" intact, so the column default applies instead of an
+    // empty list overwriting what is already stored.
+    if (value === undefined) continue;
+    const column = JSON_LIST_COLUMNS[key];
+    if (!column) {
+      mapped[key] = value;
+      continue;
+    }
+    // A caller may already hold the stored string form; encoding that again
+    // would nest a JSON string inside a JSON string, so only arrays are encoded.
+    mapped[column] = typeof value === 'string' ? value : JSON.stringify(Array.isArray(value) ? value : []);
+  }
+  return mapped;
+}
+
+export function buildCreateData(raw: any) {
+  // One conversion for both providers. The columns are the same shape on each,
+  // and branching on the provider is what let the two drift apart.
+  const data = withJsonListColumns(raw);
   // Every new listing starts as a private draft, regardless of who creates it
   // or what status field (if any) was in the request body. Going live always
   // requires an explicit submit-for-review + admin approval - see
@@ -220,9 +251,9 @@ function buildCreateData(data: any) {
       bathrooms: data.bathrooms ?? defaults.bathrooms,
       area: data.area ?? defaults.area,
       description: data.description ?? defaults.description,
-      imagesJson: JSON.stringify(data.images || data.imagesJson || []),
-      amenitiesJson: JSON.stringify(data.amenities || data.amenitiesJson || []),
-      nearbyJson: JSON.stringify(data.nearby || data.nearbyJson || []),
+      imagesJson: data.imagesJson ?? '[]',
+      amenitiesJson: data.amenitiesJson ?? '[]',
+      nearbyJson: data.nearbyJson ?? '[]',
       type: data.type ?? defaults.type,
       available: data.available,
       featured: data.featured,
@@ -248,10 +279,10 @@ function buildCreateData(data: any) {
     if (data.wifiNetwork !== undefined) base.wifiNetwork = data.wifiNetwork;
     if (data.wifiPassword !== undefined) base.wifiPassword = data.wifiPassword;
     if (data.houseManual !== undefined) base.houseManual = data.houseManual;
-    base.houseRulesJson = JSON.stringify(data.houseRules || []);
+    base.houseRulesJson = data.houseRulesJson ?? '[]';
     return base;
   }
-  const { status: _ignoredStatus, houseRules, ...rest } = data;
+  const { status: _ignoredStatus, ...rest } = data;
   // The defaults go in first and whatever the host actually sent overwrites
   // them. A key that arrived as undefined is skipped: spreading it would put
   // undefined back over a default, which is exactly what makes Prisma reject
@@ -260,39 +291,20 @@ function buildCreateData(data: any) {
   for (const [key, value] of Object.entries(rest)) {
     if (value !== undefined) payload[key] = value;
   }
-  // Rules are stored as a JSON string under both providers, so the conversion
-  // happens here as well as in the SQLite branch above.
-  payload.houseRulesJson = JSON.stringify(houseRules || []);
+  payload.houseRulesJson = data.houseRulesJson ?? '[]';
   payload.status = 'DRAFT';
   return payload;
 }
 
-function buildUpdateData(data: any) {
+export function buildUpdateData(raw: any) {
+  // Same conversion as create. An update carrying photos sent them as `images`
+  // and was refused on Postgres for exactly the reason create was.
+  const data = withJsonListColumns(raw);
   // status is never writable through the plain update path - it only moves via
   // submitPropertyForReview / adminReviewProperty, which own their own audit
   // trail (submittedAt/listingReviewedBy/listingReviewedAt/listingReviewNote).
   const { status: _ignoredStatus, ...data2 } = data;
   const updateData: any = { ...data2 };
-  if (isSQLite()) {
-    if (data.images !== undefined) {
-      updateData.imagesJson = JSON.stringify(data.images);
-      delete updateData.images;
-    }
-    if (data.amenities !== undefined) {
-      updateData.amenitiesJson = JSON.stringify(data.amenities);
-      delete updateData.amenities;
-    }
-    if (data.nearby !== undefined) {
-      updateData.nearbyJson = JSON.stringify(data.nearby);
-      delete updateData.nearby;
-    }
-  }
-  // Rules are a JSON string under both providers, so this conversion cannot sit
-  // inside the SQLite-only block: Postgres also rejects an unknown houseRules key.
-  if (data.houseRules !== undefined) {
-    updateData.houseRulesJson = JSON.stringify(data.houseRules);
-    delete updateData.houseRules;
-  }
   // Allow clearing bed prices & bathrooms by sending null
   if (data.price1Bed === null) updateData.price1Bed = null;
   if (data.price2Bed === null) updateData.price2Bed = null;
