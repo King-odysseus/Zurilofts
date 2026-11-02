@@ -4,6 +4,7 @@ import BrandLogo from './BrandLogo.jsx';
 import PropTypes from 'prop-types';
 import {
   ArrowLeftRight,
+  BadgeCheck,
   Bell,
   Building2,
   CalendarClock,
@@ -71,6 +72,22 @@ const ACCOUNT_EYEBROW = 'px-4 pb-1 pt-2 text-[11px] font-medium uppercase tracki
 const NOTIF_ITEM = 'flex items-center gap-3 px-4 py-3 text-sm text-navy transition-colors hover:bg-surface';
 const NOTIF_TILE = 'grid h-8 w-8 shrink-0 place-items-center rounded-full bg-primary-50 text-primary-600 dark:bg-primary/15 dark:text-primary-300';
 
+// Trust and Safety approved this host. The notice is shown once and then
+// acknowledged here, because there is no read flag for review outcomes: the
+// approval is a status, not a message with a read state. The key is cleared
+// whenever the account stops being verified, so a host who is sent back and
+// re-approved is told again.
+const VERIFIED_NOTICE_KEY = 'zuri_host_verified_notice_seen';
+
+function readVerifiedNoticeSeen() {
+  try {
+    return window.localStorage.getItem(VERIFIED_NOTICE_KEY) === '1';
+  } catch {
+    // Private mode, or storage turned off: show the notice rather than hide it.
+    return false;
+  }
+}
+
 function UnreadBadge({ count }) {
   if (!count) return null;
   return <span className="flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">{count > 9 ? '9+' : count}</span>;
@@ -100,6 +117,7 @@ function HostLayout({ children }) {
   // because the two lead to different pages and mean different things: one is a
   // conversation, the other is money and dates that stay blocked until answered.
   const [pendingBookings, setPendingBookings] = useState(0);
+  const [verifiedNoticeSeen, setVerifiedNoticeSeen] = useState(readVerifiedNoticeSeen);
   const menuRef = useRef(null);
   const notifRef = useRef(null);
 
@@ -200,11 +218,39 @@ function HostLayout({ children }) {
   }
 
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Your account';
+  // Approved by Trust and Safety. The host sees the badge on their own account,
+  // not only on the public listing where guests see it.
+  const isVerifiedHost = user?.hostApplicationStatus === 'APPROVED';
 
   // A returned application is a notification too: it blocks publishing until the
   // host corrects it, and nothing else in this header says so.
   const applicationNeedsChanges = user?.hostApplicationStatus === 'CHANGES_REQUESTED';
-  const totalNotifications = unreadGuestMessages + pendingBookings + (applicationNeedsChanges ? 1 : 0);
+  const showVerifiedNotice = isVerifiedHost && !verifiedNoticeSeen;
+  const totalNotifications = unreadGuestMessages + pendingBookings
+    + (applicationNeedsChanges ? 1 : 0)
+    + (showVerifiedNotice ? 1 : 0);
+
+  function acknowledgeVerified() {
+    setVerifiedNoticeSeen(true);
+    setNotifOpen(false);
+    try {
+      window.localStorage.setItem(VERIFIED_NOTICE_KEY, '1');
+    } catch {
+      // Not persisted, so the notice returns next time. Harmless.
+    }
+  }
+
+  // A re-approved account is a new outcome, so the old acknowledgement must not
+  // swallow it.
+  useEffect(() => {
+    if (isVerifiedHost) return;
+    try {
+      window.localStorage.removeItem(VERIFIED_NOTICE_KEY);
+    } catch {
+      // Nothing to clear.
+    }
+    setVerifiedNoticeSeen(false);
+  }, [isVerifiedHost]);
 
   return (
     <div className="min-h-screen bg-canvas">
@@ -265,6 +311,13 @@ function HostLayout({ children }) {
                   <p className="px-4 py-6 text-center text-sm text-muted">{t('host.noNewNotifications')}</p>
                 ) : (
                   <>
+                    {showVerifiedNotice && <Link to="/host/application" onClick={acknowledgeVerified} className={NOTIF_ITEM}>
+                      <span className={NOTIF_TILE} aria-hidden="true"><BadgeCheck className="h-4 w-4" strokeWidth={2} /></span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold text-navy">You are verified</span>
+                        <span className="block text-[11px] text-muted">Trust and Safety approved your host application. Your account now carries the verified badge.</span>
+                      </span>
+                    </Link>}
                     {applicationNeedsChanges && <Link to="/host/application" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>
                       <span className={NOTIF_TILE} aria-hidden="true"><ClipboardList className="h-4 w-4" strokeWidth={2} /></span>
                       <span className="min-w-0 flex-1">
@@ -308,7 +361,18 @@ function HostLayout({ children }) {
 
               {menuOpen && <div className="absolute right-0 z-30 mt-2 w-64 rounded-2xl bg-elevated py-2 shadow-xl">
                 <div className="border-b border-border px-4 py-3">
-                  <p className="text-sm font-semibold text-navy">{displayName}</p>
+                  <p className="flex items-center gap-1.5 text-sm font-semibold text-navy">
+                    <span className="min-w-0 truncate">{displayName}</span>
+                    {isVerifiedHost && (
+                      <span
+                        className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-navy dark:bg-primary/15 dark:text-primary-300"
+                        title="Your host account is verified"
+                      >
+                        <BadgeCheck className="h-3 w-3" strokeWidth={2.4} aria-hidden="true" />
+                        Verified
+                      </span>
+                    )}
+                  </p>
                   <p className="truncate text-xs text-muted">{user?.email}</p>
                 </div>
 

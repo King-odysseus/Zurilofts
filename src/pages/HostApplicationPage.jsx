@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { Alert, Badge, Button, Checkbox, Label, Textarea, TextInput } from 'flowbite-react';
-import { AlertCircle, Building, Check, CheckCircle2, CreditCard, House, IdCard, Upload, X } from 'lucide-react';
+import { AlertCircle, BadgeCheck, Building, Check, CheckCircle2, CreditCard, House, IdCard, Upload, X } from 'lucide-react';
 import SelectMenu from '../components/SelectMenu.jsx';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
@@ -1318,6 +1318,12 @@ function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravel
       <Badge color={statusColor}>{statusLabel}</Badge>
       <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{approved ? 'You are ready to host' : 'Application status'}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{statusMeta}</p>
+      {approved && (
+        <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-navy dark:bg-primary/15 dark:text-primary-300">
+          <BadgeCheck className="h-4 w-4" strokeWidth={2.4} aria-hidden="true" />
+          Verified host badge is on your account
+        </p>
+      )}
       {application?.reviewNote && (
         <div className="mt-5 rounded-lg bg-surface p-4">
           <strong className="block text-sm font-semibold text-navy">{t('hostsetup.reviewerNote')}</strong>

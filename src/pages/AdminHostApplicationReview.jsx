@@ -161,13 +161,13 @@ export default function AdminHostApplicationReview() {
         await apiClient.post(`/admin/host-applications/${application.id}/request-changes`, {
           reason: composeRequestNote(neededItems, note),
         });
-        setMessage('Sent back to the host. They can now reply and upload the missing files.');
+        setMessage('Sent back to the host. They have been messaged with what is needed, and can now reply and upload the missing files.');
       } else if (chosenStatus === 'REJECTED') {
         await apiClient.post(`/admin/host-applications/${application.id}/reject`, { reason: note.trim() });
-        setMessage('Application rejected. The host can read the reason.');
+        setMessage('Application rejected. The host has been messaged with the reason.');
       } else {
         await apiClient.post(`/admin/host-applications/${application.id}/approve`, {});
-        setMessage('Host verified. They can now create listings.');
+        setMessage('Host verified. They have been messaged, and their account now carries the verified badge.');
       }
       setMessageTone('success');
       resetDecision();
@@ -230,7 +230,15 @@ export default function AdminHostApplicationReview() {
     );
   }
 
-  const canDecide = application.status === 'SUBMITTED';
+  // A verified host can still be sent back for more information or have the
+  // verification withdrawn, because the facts behind a verification go stale.
+  // Approving is not offered here: they already are approved, and re-approving
+  // would only re-send the good-news notice.
+  const isVerified = application.status === 'APPROVED';
+  const canDecide = application.status === 'SUBMITTED' || isVerified;
+  const statusChoices = isVerified
+    ? STATUS_CHOICES.filter((choice) => choice.value !== 'APPROVED')
+    : STATUS_CHOICES;
   const decisionLabel = {
     APPROVED: 'Mark as verified',
     CHANGES_REQUESTED: 'Return to host',
@@ -356,7 +364,9 @@ export default function AdminHostApplicationReview() {
       <Panel
         title="Status and decision"
         hint={canDecide
-          ? 'Pick a status, then add what the host needs to know. The host sees this message on their host application page.'
+          ? (isVerified
+            ? 'This host is verified. Sending the application back removes nothing from their account: their dashboard and listings keep working. The change is the verification status, and they are told what you need. Blocking the account itself is done from the users page.'
+            : 'Pick a status, then add what the host needs to know. The host sees this message on their host application page.')
           : 'This application has already been decided. A new decision becomes available only after the host resubmits.'}
       >
         {canDecide ? (
@@ -369,7 +379,7 @@ export default function AdminHostApplicationReview() {
                 value={chosenStatus}
                 onChange={setChosenStatus}
                 placeholder="Choose a status"
-                options={STATUS_CHOICES}
+                options={statusChoices}
                 wrapperClassName="mt-1"
               />
             </div>

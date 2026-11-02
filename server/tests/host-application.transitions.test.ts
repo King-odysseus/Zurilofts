@@ -150,18 +150,22 @@ test('approval from any non-submitted, non-approved status is rejected', () => {
 
 // ---- Request changes / reject ----
 
-test('changes can only be requested on a SUBMITTED application', () => {
+test('changes can be requested on a SUBMITTED application or on a verified one', () => {
   assert.doesNotThrow(() => assertCanRequestChanges('SUBMITTED'));
-  for (const status of ['DRAFT', 'CHANGES_REQUESTED', 'APPROVED', 'REJECTED']) {
-    assert.throws(() => assertCanRequestChanges(status), /submitted application/i, status);
+  // A verified host can still be asked for more information; requesting it never
+  // touches User.role, so their dashboard keeps working while they resubmit.
+  assert.doesNotThrow(() => assertCanRequestChanges('APPROVED'));
+  for (const status of ['DRAFT', 'CHANGES_REQUESTED', 'REJECTED']) {
+    assert.throws(() => assertCanRequestChanges(status), /submitted or verified application/i, status);
   }
 });
 
-test('rejection is allowed while under review (SUBMITTED or CHANGES_REQUESTED)', () => {
+test('rejection is allowed while under review and after approval', () => {
   assert.doesNotThrow(() => assertCanReject('SUBMITTED'));
   assert.doesNotThrow(() => assertCanReject('CHANGES_REQUESTED'));
-  for (const status of ['DRAFT', 'APPROVED', 'REJECTED']) {
-    assert.throws(() => assertCanReject(status), /under review/i, status);
+  assert.doesNotThrow(() => assertCanReject('APPROVED'));
+  for (const status of ['DRAFT', 'REJECTED']) {
+    assert.throws(() => assertCanReject(status), /under review or an approved one/i, status);
   }
 });
 

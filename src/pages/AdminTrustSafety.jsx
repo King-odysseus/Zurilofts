@@ -32,6 +32,18 @@ const VERIFICATION_META = {
   REJECTED: { label: 'admin.verificationChanges', tone: 'failure' },
 };
 
+/**
+ * Which slice of the verification queue is on screen. The queue used to show only
+ * cases waiting on a first decision, which left an already-verified account
+ * unreachable: an admin who needs to withdraw a badge or ask a verified person
+ * for more information cannot act on a record they cannot open.
+ */
+const VERIFICATION_FILTERS = [
+  { status: 'SUBMITTED', label: 'In review' },
+  { status: 'APPROVED', label: 'Verified' },
+  { status: 'REJECTED', label: 'Changes requested' },
+];
+
 const DISPUTE_META = {
   OPEN: { label: 'admin.disputeOpen', tone: 'warning' },
   UNDER_REVIEW: { label: 'admin.disputeUnderReview', tone: 'info' },
@@ -81,6 +93,7 @@ function AdminTrustSafety() {
   const [disputeNote, setDisputeNote] = useState('');
   const [resolutionNote, setResolutionNote] = useState('');
   const [busy, setBusy] = useState('');
+  const [verificationFilter, setVerificationFilter] = useState('SUBMITTED');
   const [truncated, setTruncated] = useState({ verifications: false, disputes: false });
 
   const load = useCallback(async (silent = false) => {
@@ -112,10 +125,10 @@ function AdminTrustSafety() {
   useEffect(() => { load(); }, [load]);
 
   const summary = useMemo(() => {
-    const pendingVerifications = verifications.filter((item) => item.status === 'SUBMITTED');
     const openDisputes = disputes.filter((item) => item.status === 'OPEN' || item.status === 'UNDER_REVIEW');
     return {
-      pendingVerifications,
+      visibleVerifications: verifications.filter((item) => item.status === verificationFilter),
+      countFor: (status) => verifications.filter((item) => item.status === status).length,
       openDisputes,
       disputeCounts: {
         OPEN: disputes.filter((item) => item.status === 'OPEN').length,
@@ -124,7 +137,7 @@ function AdminTrustSafety() {
         DISMISSED: disputes.filter((item) => item.status === 'DISMISSED').length,
       },
     };
-  }, [disputes, verifications]);
+  }, [disputes, verifications, verificationFilter]);
 
   function closeVerification() {
     if (busy) return;
@@ -282,7 +295,22 @@ function AdminTrustSafety() {
               <h2 id="verification-queue-title" className="text-base font-semibold text-navy">{t('admin.verificationQueue')}</h2>
               <p className="text-xs text-muted">{t('admin.verificationQueueHint')}</p>
             </div>
-            <Badge color="info">{t('admin.openCount', { count: summary.pendingVerifications.length })}</Badge>
+            <Badge color="info">{t('admin.openCount', { count: summary.countFor(verificationFilter) })}</Badge>
+          </div>
+
+          <div className="flex flex-wrap gap-2 border-b border-border px-5 py-3" role="tablist" aria-label="Verification status">
+            {VERIFICATION_FILTERS.map(({ status, label }) => (
+              <Button
+                key={status}
+                size="xs"
+                role="tab"
+                aria-selected={verificationFilter === status}
+                color={verificationFilter === status ? 'primary' : 'light'}
+                onClick={() => setVerificationFilter(status)}
+              >
+                {label} ({summary.countFor(status)})
+              </Button>
+            ))}
           </div>
 
           {loading ? (
@@ -291,15 +319,21 @@ function AdminTrustSafety() {
               <strong className="text-sm font-semibold text-navy">{t('admin.loadingVerification')}</strong>
               <p className="text-xs text-muted">{t('admin.loadingVerificationHint')}</p>
             </div>
-          ) : summary.pendingVerifications.length === 0 ? (
+          ) : summary.visibleVerifications.length === 0 ? (
             <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
               <UserRoundCheck className="text-primary-600" strokeWidth={1.6} aria-hidden="true" />
-              <strong className="text-sm font-semibold text-navy">{t('admin.noVerificationWaiting')}</strong>
-              <p className="text-xs text-muted">{t('admin.noVerificationHint')}</p>
+              <strong className="text-sm font-semibold text-navy">
+                {verificationFilter === 'APPROVED' ? 'No verified identities yet' : t('admin.noVerificationWaiting')}
+              </strong>
+              <p className="text-xs text-muted">
+                {verificationFilter === 'APPROVED'
+                  ? 'Identities you approve will be listed here, so you can ask for more information later.'
+                  : t('admin.noVerificationHint')}
+              </p>
             </div>
           ) : (
             <div>
-              {summary.pendingVerifications.map((verification) => (
+              {summary.visibleVerifications.map((verification) => (
                 <article className="flex flex-col gap-3 border-b border-border px-5 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between" key={verification.id}>
                   <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-bold text-navy" aria-hidden="true">{initials(verification.user)}</span>
                   <div className="min-w-0 flex-1">
@@ -423,7 +457,7 @@ function AdminTrustSafety() {
                     <h3 className="text-sm font-semibold text-navy">{t('admin.decision')}</h3>
                     <p className="mt-1 text-xs text-muted">{t('admin.approvingUnlocks')}</p>
                   </div>
-                  {selectedVerification.status === 'SUBMITTED' && (
+                  {['SUBMITTED', 'APPROVED'].includes(selectedVerification.status) && (
                     <div className="space-y-1">
                       <Label htmlFor="verification-review-note">{t('admin.reasonForRejection')}</Label>
                       <Textarea
@@ -434,6 +468,13 @@ function AdminTrustSafety() {
                         onChange={(event) => setVerificationNote(event.target.value)}
                         placeholder={t('admin.rejectionPlaceholder')}
                       />
+                      {selectedVerification.status === 'APPROVED' && (
+                        <p className="text-xs text-muted">
+                          Sending this back removes the verified badge straight away and tells the account holder
+                          what you need from them. Their details and documents stay on file, so they only replace
+                          what is wrong.
+                        </p>
+                      )}
                     </div>
                   )}
                   {selectedVerification.reviewNote && <p className="text-xs text-muted">Current note: {selectedVerification.reviewNote}</p>}
@@ -442,6 +483,11 @@ function AdminTrustSafety() {
             </ModalBody>
             <ModalFooter>
               <Button color="light" onClick={closeVerification} disabled={Boolean(busy)}>{t('common.close')}</Button>
+              {selectedVerification.status === 'APPROVED' && (
+                <Button color="failure" onClick={() => reviewVerification('reject')} disabled={Boolean(busy)}>
+                  {busy === 'reject' ? 'Sending back...' : 'Request more information'}
+                </Button>
+              )}
               {selectedVerification.status === 'SUBMITTED' && (
                 <>
                   <Button color="failure" onClick={() => reviewVerification('reject')} disabled={Boolean(busy)}>

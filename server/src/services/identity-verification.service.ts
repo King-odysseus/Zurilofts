@@ -6,6 +6,7 @@ import {
   encryptHostDocument,
   safeDocumentName,
 } from '../utils/hostDocumentCrypto.js';
+import { notifyReviewOutcome } from './review-notice.service.js';
 
 // ============================================================
 // Guest identity verification - gates payment on a booking, not dashboard or
@@ -69,9 +70,18 @@ export function assertSubmittable(app: VerificationFields & { status: string }, 
   }
 }
 
+/**
+ * Rejection (which is also how "send back for more information" is expressed -
+ * the applicant can edit and resubmit from REJECTED) is valid while a review is
+ * pending, and afterwards too: an admin who has already verified someone must
+ * still be able to withdraw that verification when the documents turn out to be
+ * wrong. UNVERIFIED has never been reviewed, and REJECTED is already rejected.
+ */
 export function assertCanReject(status: string): void {
-  if (status !== 'SUBMITTED') {
-    throw new ValidationError(`Only a submitted verification can be rejected (status: ${status}).`);
+  if (status !== 'SUBMITTED' && status !== 'APPROVED') {
+    throw new ValidationError(
+      `Only a submitted or verified identity can be rejected (status: ${status}).`,
+    );
   }
 }
 
@@ -303,16 +313,38 @@ export async function adminDownloadDocument(verificationId: string, documentId: 
   return { buffer, mimeType: document.mimeType, originalName: document.originalName };
 }
 
+/**
+ * Reject a verification, or ask for more information. Both land in REJECTED
+ * with the reason attached, because that is the one status the applicant can
+ * still edit and resubmit from - a separate "needs information" state would add
+ * a state the payment gate and the applicant form would both have to learn.
+ *
+ * A previously APPROVED record keeps its documents so the applicant can see what
+ * was rejected; they only have to replace what is wrong. The notice is what
+ * turns a silent status change into something the account holder actually sees.
+ */
 export async function adminReject(id: string, reviewerId: string, reason: string) {
   const v = await prisma.identityVerification.findUnique({ where: { id } });
   if (!v) throw new NotFoundError('Identity verification');
   assertCanReject(v.status);
 
+  const wasApproved = v.status === 'APPROVED';
   const updated = await prisma.identityVerification.update({
     where: { id },
     data: { status: 'REJECTED', reviewNote: reason, reviewedBy: reviewerId, reviewedAt: new Date() },
     include: ADMIN_INCLUDE,
   });
+
+  await notifyReviewOutcome({
+    userId: v.userId,
+    subject: wasApproved ? 'Your verification has been withdrawn' : 'Your identity needs another look',
+    body: wasApproved
+      ? `Trust and Safety withdrew your verified status. Reason: ${reason}\n\nYou can update your details and upload the documents again on your verification page. Until it is verified again you cannot pay for a stay.`
+      : `We could not verify your identity yet. Reason: ${reason}\n\nUpdate your details and upload the documents again on your verification page, then resubmit.`,
+    pushBody: wasApproved ? 'Trust and Safety withdrew your verified status.' : 'We need more information to verify your identity.',
+    url: '/verify-identity',
+  });
+
   return toAdminView(updated);
 }
 
@@ -328,5 +360,17 @@ export async function adminApprove(id: string, reviewerId: string) {
     data: { status: 'APPROVED', reviewedBy: reviewerId, reviewedAt: new Date(), reviewNote: null },
     include: ADMIN_INCLUDE,
   });
+
+  // Approving is the one moment the person has been waiting on, so it has to
+  // arrive as a message they can read later, not only as a status the next page
+  // load happens to show.
+  await notifyReviewOutcome({
+    userId: v.userId,
+    subject: 'Your identity is verified',
+    body: 'Trust and Safety verified your identity. Your account now carries the verified badge, hosts can see it, and you can pay for a stay. Nothing else is needed from you.',
+    pushBody: 'Your identity is verified. Your account now carries the verified badge.',
+    url: '/profile',
+  });
+
   return toAdminView(updated);
 }

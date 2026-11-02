@@ -9,6 +9,7 @@ import {
   type HostDocumentKind,
 } from '../utils/hostDocumentCrypto.js';
 import { normalizeKenyanMpesaPhone } from '../utils/payoutDestination.js';
+import { notifyReviewOutcome } from './review-notice.service.js';
 import { enrolFoundingHost } from './foundingHost.service.js';
 import { applyReferralCode, ensureReferralCode, normaliseReferralCode } from './referral.service.js';
 
@@ -238,20 +239,32 @@ export function planApproval(status: string): 'APPLY' | 'IDEMPOTENT' {
   throw new ValidationError(`Only a submitted application can be approved (status: ${status}).`);
 }
 
-/** Request-changes is only valid on a submitted application. */
+/**
+ * Changes can be requested while a review is pending, and afterwards too: a
+ * verified host whose details stop adding up (a new payout account, a licence
+ * that expires) gets the same "send it back" path as an applicant, which keeps
+ * one way of asking for information instead of a second, admin-only one.
+ * Requesting changes never touches User.role, so a working host keeps working.
+ */
 export function assertCanRequestChanges(status: string): void {
-  if (status !== 'SUBMITTED') {
+  if (status !== 'SUBMITTED' && status !== 'APPROVED') {
     throw new ValidationError(
-      `Changes can only be requested on a submitted application (status: ${status}).`,
+      `Changes can only be requested on a submitted or verified application (status: ${status}).`,
     );
   }
 }
 
-/** Rejection is valid while the application is under review with the admin. */
+/**
+ * Rejection is valid while under review and after approval. An approved
+ * application can still be rejected, because the documents behind it can turn
+ * out to be wrong later; this records that on the application and tells the
+ * host, and leaves account access to the separate suspension control on the
+ * users page (see requireHost in middleware/auth.ts).
+ */
 export function assertCanReject(status: string): void {
-  if (status !== 'SUBMITTED' && status !== 'CHANGES_REQUESTED') {
+  if (status !== 'SUBMITTED' && status !== 'CHANGES_REQUESTED' && status !== 'APPROVED') {
     throw new ValidationError(
-      `Only an application under review can be rejected (status: ${status}).`,
+      `Only an application under review or an approved one can be rejected (status: ${status}).`,
     );
   }
 }
@@ -620,7 +633,17 @@ export async function adminRequestChanges(id: string, reviewerId: string, reason
     });
     return row;
   });
-  // Never touches User.role.
+  // Never touches User.role, so this is the same message whether the host was
+  // waiting for a first decision or is being asked again after living verified
+  // for a while.
+  await notifyReviewOutcome({
+    userId: app.userId,
+    subject: 'Your host application needs more information',
+    body: `Trust and Safety needs more information on your host application.\n\nWhat to do next: ${reason}\n\nOpen your host application, update the requested details or documents, then submit it again.${app.status === 'APPROVED' ? '\n\nYour host dashboard and listings keep working while you do this.' : ''}`,
+    pushBody: 'Trust and Safety needs more information on your host application.',
+    url: '/host/application',
+  });
+
   return toAdminView(updated);
 }
 
@@ -645,7 +668,17 @@ export async function adminReject(id: string, reviewerId: string, reason: string
     });
     return row;
   });
-  // Never touches User.role.
+  // Never touches User.role. Blocking the account itself is the suspension
+  // control on the users page; this records the decision and tells the host.
+
+  await notifyReviewOutcome({
+    userId: app.userId,
+    subject: 'Your host application was not approved',
+    body: `Trust and Safety has not verified your host application.\n\nReason: ${reason}\n\nReply here if you believe this is a mistake, or submit a new application once the issue is sorted.${app.status === 'APPROVED' ? '\n\nThis does not close your account: your host dashboard and listings keep working. Contact Trust and Safety if you need your access reviewed as well.' : ''}`,
+    pushBody: 'Trust and Safety did not approve your host application.',
+    url: '/host/application',
+  });
+
   return toAdminView(updated);
 }
 
@@ -688,7 +721,7 @@ function buildApprovedPayoutPatch(app: any): Record<string, unknown> | null {
  * Privilege is therefore never granted from stale client state.
  */
 export async function adminApprove(id: string, reviewerId: string) {
-  return prisma.$transaction(async (tx) => {
+  const result = await prisma.$transaction(async (tx) => {
     // Re-read both application and user inside the transaction so approval is
     // based on the state being promoted, not a stale pre-transaction snapshot.
     const app = await tx.hostApplication.findUnique({
@@ -698,7 +731,9 @@ export async function adminApprove(id: string, reviewerId: string) {
     if (!app) throw new NotFoundError('Host application');
 
     const plan = planApproval(app.status);
-    if (plan === 'IDEMPOTENT') return toAdminView(app);
+    if (plan === 'IDEMPOTENT') {
+      return { view: toAdminView(app), applicantId: null as string | null };
+    }
 
     if (app.user.suspended) {
       throw new ForbiddenError('A suspended applicant cannot be approved as a host.');
@@ -748,6 +783,21 @@ export async function adminApprove(id: string, reviewerId: string) {
     await tx.hostApplicationAudit.create({
       data: { applicationId: id, actorId: reviewerId, action: 'APPROVED' },
     });
-    return toAdminView(updated);
+    return { view: toAdminView(updated), applicantId: app.userId };
   });
+
+  // Sent after the commit, so a notice can never be delivered for an approval
+  // that then rolled back. The idempotent branch returns no applicant, which is
+  // what keeps a repeated click from sending the same good news twice.
+  if (result.applicantId) {
+    await notifyReviewOutcome({
+      userId: result.applicantId,
+      subject: 'You are verified as a host',
+      body: 'Trust and Safety approved your host application. Your account is verified as a host and carries the verified badge, and your listings will show it to guests.\n\nYour host dashboard is open: you can finish a listing and submit it for review whenever you are ready.',
+      pushBody: 'Your host application is approved. Your account carries the verified badge.',
+      url: '/host/application',
+    });
+  }
+
+  return result.view;
 }

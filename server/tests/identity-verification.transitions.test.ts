@@ -69,10 +69,14 @@ test('assertSubmittable requires an editable status, complete fields, and comple
 
 // ---- Admin actions ----
 
-test('only a SUBMITTED verification can be rejected', () => {
+test('a verification under review, or one already approved, can be rejected', () => {
   assert.doesNotThrow(() => assertCanReject('SUBMITTED'));
-  for (const status of ['UNVERIFIED', 'APPROVED', 'REJECTED']) {
-    assert.throws(() => assertCanReject(status), /submitted verification can be rejected/i);
+  // Withdrawing a badge is the same operation as asking for more information:
+  // both leave the record REJECTED, which is the one status the applicant can
+  // still edit and resubmit from (see the isEditable test above).
+  assert.doesNotThrow(() => assertCanReject('APPROVED'));
+  for (const status of ['UNVERIFIED', 'REJECTED']) {
+    assert.throws(() => assertCanReject(status), /submitted or verified identity can be rejected/i);
   }
 });
 
