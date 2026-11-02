@@ -2,21 +2,17 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the screenshot and reproduce the create/draft 500 on the live API",
+      "text": "Check whether anything is uncommitted or unpushed",
       "state": "done"
     },
     {
-      "text": "Find the root cause: the save path sends photo/list fields Postgres does not have",
+      "text": "Confirm GitHub has the latest commit",
       "state": "done"
     },
     {
-      "text": "Fix the write path and prove it against the generated production client",
-      "state": "done"
-    },
-    {
-      "text": "Run lint/build checks, commit, push and confirm the deploy",
+      "text": "Follow the running Railway build to completion and check the live site",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T16:25:39.232Z"
+  "updatedAt": "2026-11-02T16:27:38.682Z"
 }
