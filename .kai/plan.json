@@ -2,17 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check whether anything is uncommitted or unpushed",
+      "text": "Find the exact stored image URL behind the broken admin thumbnail",
       "state": "done"
     },
     {
-      "text": "Confirm GitHub has the latest commit",
+      "text": "Fix the admin thumbnail (and any other place rendering a raw image path)",
       "state": "done"
     },
     {
-      "text": "Follow the running Railway build to completion and check the live site",
+      "text": "Notify the host when an admin approves, rejects, suspends or restores their listing",
+      "state": "done"
+    },
+    {
+      "text": "Verify both in the browser and with tests",
+      "state": "done"
+    },
+    {
+      "text": "Run lint/build, commit, push and deploy",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T16:27:38.682Z"
+  "updatedAt": "2026-11-02T16:49:46.499Z"
 }
