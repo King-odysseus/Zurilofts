@@ -86,6 +86,51 @@ const EDITOR_STEPS = [
 
 // Shared with the host application form so both multi-step host forms read identically.
 const CARD_CLASS = 'rounded-xl bg-elevated shadow-md p-5 sm:p-6';
+
+// A draft is saved without the checks a completed listing has to pass, so every
+// field the host has not filled in is LEFT OUT of the request rather than sent as
+// "" or 0. Sending it would fail validation on its own rule (an empty title is
+// too short, and 0 is not a price), and omitting it is what tells the server to
+// apply its own "not set yet" default for a column that cannot be null.
+function buildDraftPayload(form) {
+  const payload = {
+    type: form.type,
+    bedrooms: Number(form.bedrooms) || 1,
+    bathrooms: Number(form.bathrooms) || 1,
+    available: form.available,
+    featured: form.featured,
+    amenities: linesToArray(form.amenities),
+    nearby: linesToArray(form.nearby),
+  };
+
+  const title = form.title.trim();
+  if (title) payload.title = title;
+  const description = form.description.trim();
+  if (description) payload.description = description;
+  const location = buildLocationLabel(form.location, form.neighborhood);
+  if (location) payload.location = location;
+  if (form.neighborhood) payload.neighborhood = form.neighborhood;
+  // Sent even when blank: an empty value clears a street name the host deleted.
+  payload.address = form.address ? form.address : null;
+
+  // Only amounts the host actually typed. Each has to be greater than zero, so a
+  // blank box is an omission, not a zero.
+  ['price', 'area', 'price1Bed', 'price2Bed', 'bathrooms1Bed', 'bathrooms2Bed'].forEach((field) => {
+    const value = Number(form[field]);
+    if (form[field] !== '' && Number.isFinite(value) && value > 0) payload[field] = value;
+  });
+
+  // The photo list has a minimum of one, so an empty one must be left out too.
+  if (form.images.length > 0) payload.images = form.images;
+
+  if (form.lat !== '' && form.lat !== null && form.lat !== undefined) {
+    payload.lat = Number(form.lat);
+    payload.lng = Number(form.lng);
+  }
+
+  return payload;
+}
+
 // Mirrors the server's upload route: same types, same per-request cap. Checking
 // here as well means a dropped file is rejected with an explanation instead of a
 // round trip that comes back as an error banner.
@@ -160,6 +205,9 @@ function AdminPropertyForm() {
   const [form, setForm] = useState(EMPTY);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
+  // Separate from `saving` so the two buttons cannot both look idle while one is
+  // working, and so a slow photo upload does not disable saving a draft.
+  const [savingDraft, setSavingDraft] = useState(false);
   const [error, setError] = useState('');
   const [uploading, setUploading] = useState(false);
   // Counts nested dragenter/dragleave pairs: moving the cursor across a child
@@ -184,14 +232,14 @@ function AdminPropertyForm() {
           title: p.title || '',
           location: p.location || '',
           neighborhood: p.neighborhood || findSearchLocation(p.location) || 'Nairobi',
-          price: p.price ?? '',
+          price: p.price || '',
           price1Bed: p.price1Bed ?? '',
           price2Bed: p.price2Bed ?? '',
           bathrooms1Bed: p.bathrooms1Bed ?? '',
           bathrooms2Bed: p.bathrooms2Bed ?? '',
           bedrooms: p.bedrooms ?? 1,
           bathrooms: p.bathrooms ?? 1,
-          area: p.area ?? '',
+          area: p.area || '',
           description: p.description || '',
           type: p.type || 'apartment',
           available: p.available ?? true,
@@ -362,6 +410,30 @@ function AdminPropertyForm() {
 
   function removeImage(index) {
     setForm((f) => ({ ...f, images: f.images.filter((_, i) => i !== index) }));
+  }
+
+  // Stores whatever the host has so far and leaves the page, which is what makes
+  // a half-finished listing resumable: it lands in host listings as a draft with
+  // no title, price or photos required.
+  async function handleSaveDraft() {
+    setSavingDraft(true);
+    setError('');
+
+    try {
+      const payload = buildDraftPayload(form);
+      if (isEdit) {
+        await apiClient.put(`/properties/${id}`, payload);
+      } else {
+        // The draft route relaxes every required field; the plain create route
+        // still demands a complete listing, so it cannot be used here.
+        await apiClient.post('/properties/draft', payload);
+      }
+      navigate('/host/listings');
+    } catch (err) {
+      setError(err.response?.data?.message || err.response?.data?.error || t('admin.draftSaveFailed'));
+    } finally {
+      setSavingDraft(false);
+    }
   }
 
   async function handleSubmit(e) {
@@ -805,10 +877,21 @@ function AdminPropertyForm() {
         </div>
 
         <div className="flex flex-col gap-4 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <Button type="submit" disabled={saving}>
-            {saving ? t('common.saving') : isEdit ? t('common.saveChanges') : t('admin.createListing')}
-          </Button>
-          <Link to="/host/listings" className="text-sm font-semibold text-muted transition-colors hover:text-navy">{t('common.cancel')}</Link>
+          {/* The two save actions belong to each other, so they share one group at
+              the start of the row. Spread across the full width they read as three
+              unrelated controls, with Cancel stranded at the far edge. */}
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Button type="submit" disabled={saving || savingDraft}>
+              {saving ? t('common.saving') : isEdit ? t('common.saveChanges') : t('admin.createListing')}
+            </Button>
+            <Button type="button" color="light" onClick={handleSaveDraft} disabled={saving || savingDraft}>
+              {savingDraft ? t('admin.savingDraft') : t('admin.saveDraft')}
+            </Button>
+          </div>
+          {/* Cancel wears the same button shape as Save as draft rather than being a
+              bare text link: a link beside two buttons read as a caption, and on a
+              phone it looked like a stray label under the form. */}
+          <Button as={Link} to="/host/listings" color="light">{t('common.cancel')}</Button>
         </div>
       </form>
     </div>
