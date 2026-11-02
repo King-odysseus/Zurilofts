@@ -2,33 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Inspect screenshot and reproduce the upload 500 error",
+      "text": "Reproduce: local dev shows thumbnails, so the break is specific to the live site",
       "state": "done"
     },
     {
-      "text": "Find root cause: production Cloudinary API key lacks upload (create) permission",
+      "text": "Find the cause: the server's image policy allows only its own domain, blocking Cloudinary photos",
       "state": "done"
     },
     {
-      "text": "Server: storage failures return a clear 503, unreadable images a clear 400",
-      "state": "done"
-    },
-    {
-      "text": "Add drag and drop for photo uploads on the listing form",
-      "state": "done"
-    },
-    {
-      "text": "Add set-as-cover control that reorders the photo to first",
-      "state": "done"
-    },
-    {
-      "text": "Verify in the running app at desktop and mobile widths, then run lint and build",
-      "state": "done"
-    },
-    {
-      "text": "Commit the two changes and push",
+      "text": "Confirm the block on a production-style server, then allow the photo hosts in the policy",
       "state": "active"
+    },
+    {
+      "text": "Verify the photos load, then run lint, build and the server type check",
+      "state": "pending"
+    },
+    {
+      "text": "Commit and push",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-02T13:24:54.878Z"
+  "updatedAt": "2026-11-02T15:01:08.781Z"
 }

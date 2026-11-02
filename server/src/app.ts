@@ -49,6 +49,17 @@ app.set('trust proxy', 1);
 // HMAC-SHA512 signature is computed over the raw request body.
 app.use('/api/payments/webhook', express.raw({ type: 'application/json' }));
 
+// Hosts the app loads images from. In production the server also serves the
+// built frontend, so this policy covers every page a guest or host sees: a host
+// missing from this list renders as a broken image even when the photo itself
+// saved fine. Listed host by host rather than opening up https: so a stray or
+// injected image source is still refused.
+const IMAGE_HOSTS = [
+  'https://res.cloudinary.com', // uploaded listing photos, avatars, chat attachments
+  'https://lh3.googleusercontent.com', // profile photo from a Google sign-in
+  'https://images.unsplash.com', // home hero background in styles.css
+];
+
 // Global middleware
 app.use(
   helmet({
@@ -58,9 +69,10 @@ app.use(
         frameSrc: ["'self'"],
         scriptSrc: ["'self'"],
         styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
-        // No map tiles are loaded: the app embeds no map, it only links out to
-        // Google Maps, so third-party images are never fetched.
-        imgSrc: ["'self'", 'data:'],
+        // No map tiles are loaded (the app links out to Google Maps rather than
+        // embedding it), but photos are stored off-site, so the storage and
+        // identity hosts above have to be allowed.
+        imgSrc: ["'self'", 'data:', ...IMAGE_HOSTS],
         fontSrc: ["'self'", 'https:', 'data:'],
         objectSrc: ["'none'"],
         baseUri: ["'self'"],
