@@ -12,6 +12,7 @@ import AdminSettings from './pages/AdminSettings.jsx';
 import AdminPropertyForm from './pages/AdminPropertyForm.jsx';
 import AdminUsers from './pages/AdminUsers.jsx';
 import AdminHostApplications from './pages/AdminHostApplications.jsx';
+import AdminHostApplicationReview from './pages/AdminHostApplicationReview.jsx';
 import AdminAddOns from './pages/AdminAddOns.jsx';
 import AdminFeedback from './pages/AdminFeedback.jsx';
 import AdminMessages from './pages/AdminMessages.jsx';
@@ -106,6 +107,10 @@ export default function WorkspaceRoutes() {
       <Route path="promos" element={<Navigate to="/admin" replace />} />
       <Route path="users" element={<AdminUsers />} />
       <Route path="host-applications" element={<AdminHostApplications />} />
+      {/* One application, reviewed on its own page: a full record, the decision
+          and the reply to the host do not fit in a dialog, and a returned
+          application has to be reopenable from a link. */}
+      <Route path="host-applications/:id" element={<AdminHostApplicationReview />} />
       <Route path="trust-safety" element={<AdminTrustSafety />} />
       <Route path="identity-verifications" element={<Navigate to="/admin/trust-safety" replace />} />
       <Route path="disputes" element={<Navigate to="/admin/trust-safety" replace />} />

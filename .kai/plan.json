@@ -2,25 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Verify, commit and push the uncommitted SEO head/robots/404 work",
+      "text": "Reorganise host application review into a vertical, single-column layout on its own page",
+      "state": "done"
+    },
+    {
+      "text": "Add request-more-information flow: stated needs list plus text/upload for the host to respond",
+      "state": "done"
+    },
+    {
+      "text": "Add a status dropdown with Verified / Need more information / Rejected",
+      "state": "done"
+    },
+    {
+      "text": "Verify layout is column-free and features work in the browser; lint and build pass",
+      "state": "done"
+    },
+    {
+      "text": "Carry on prior plan: M-PESA number validation fix",
       "state": "active"
     },
     {
-      "text": "Audit transport security: is plain HTTP enough (headers, cookies, redirect, CORS)",
-      "state": "done"
+      "text": "Carry on prior plan: refuse plain-http public URL in production",
+      "state": "pending"
     },
     {
-      "text": "Audit the remaining host application cards for fields that do not persist or submit",
-      "state": "done"
-    },
-    {
-      "text": "Check card payment path (Paystack) for what data touches our server",
-      "state": "done"
-    },
-    {
-      "text": "Verify the top findings against the code before reporting them",
+      "text": "Carry on prior plan: tests for both fixes, then tsc/tests/lint/build and commit",
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-01T22:58:19.270Z"
+  "updatedAt": "2026-11-02T07:09:16.427Z"
 }

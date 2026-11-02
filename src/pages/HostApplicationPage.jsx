@@ -20,6 +20,9 @@ const EMPTY_FORM = {
   propertyLocations: '', yearsHosting: '0', preferredPayoutMethod: 'mpesa',
   payoutMpesaPhone: '', payoutBankName: '', payoutBankCode: '', payoutBankAccountNo: '',
   experience: '', agreedTerms: false,
+  // Free-text answer to a reviewer's request for more information. It travels
+  // with the rest of the form so one save carries both the reply and the fixes.
+  applicantResponse: '',
 };
 
 const STATUS_COPY = {
@@ -156,6 +159,7 @@ function formFromApplication(application, user) {
     payoutBankCode: application?.payoutBankCode || '',
     payoutBankAccountNo: application?.payoutBankAccountNo || '',
     experience: application?.experience || '',
+    applicantResponse: application?.applicantResponse || '',
     agreedTerms: Boolean(application?.agreedTerms),
   };
 }
@@ -362,6 +366,7 @@ function HostApplicationPage() {
       city: form.city,
       propertyLocations: form.propertyLocations,
       experience: form.experience,
+      applicantResponse: form.applicantResponse,
     };
 
     Object.entries(optionalText).forEach(([key, value]) => {
@@ -633,6 +638,43 @@ function HostApplicationPage() {
           {/* Sits above the step forms: it is a share-and-leave note, not part of
               the application, so it must not interrupt a host filling one in. */}
           <HostReferralCard />
+
+          {/* A returned application has to lead with what is missing: the
+              reviewer note is the reason the host is back on this page. */}
+          {application?.status === 'CHANGES_REQUESTED' && (
+            <section className={CARD_CLASS}>
+              <h2 className="text-base font-semibold text-navy">More information needed</h2>
+              <p className="mt-1 text-sm leading-relaxed text-muted">
+                Our team needs a few details before this application can be verified.
+              </p>
+              {application.reviewNote && (
+                <p className="mt-3 whitespace-pre-line rounded-xl bg-surface p-4 text-sm leading-relaxed text-charcoal">
+                  {application.reviewNote}
+                </p>
+              )}
+              <div className="mt-4">
+                <Label htmlFor="host-application-response">Your reply</Label>
+                <p className="mt-1 text-xs leading-relaxed text-muted">
+                  Explain or confirm what was asked for. Save the reply, upload any missing files under Review,
+                  then resubmit the application.
+                </p>
+                <Textarea
+                  id="host-application-response"
+                  className="mt-2"
+                  rows={4}
+                  maxLength={2000}
+                  value={form.applicantResponse}
+                  onChange={(event) => update('applicantResponse', event.target.value)}
+                  placeholder="Type the details our team asked for."
+                />
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Button type="button" onClick={() => handleSave(undefined, 'response')} disabled={saving}>Save reply</Button>
+                <Button type="button" color="light" onClick={() => goToStep('review')}>Go to documents</Button>
+              </div>
+              <ActionFeedback feedback={feedbackFor('response')} onDismiss={clearFeedback} />
+            </section>
+          )}
 
           {editable ? (
             <form onSubmit={(event) => handleSave(event, activeStep)} className="space-y-5">
