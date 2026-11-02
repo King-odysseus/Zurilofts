@@ -30,6 +30,7 @@ const STATUS_COPY = {
   CHANGES_REQUESTED: 'hostsetup.changesHint',
   SUBMITTED: 'hostsetup.submittedHint',
   UNDER_INVESTIGATION: 'hostsetup.investigationHint',
+  SUSPENDED: 'hostsetup.suspendedHint',
   APPROVED: 'hostsetup.approvedHint',
   REJECTED: 'hostsetup.rejectedHint',
 };
@@ -39,6 +40,7 @@ const STATUS_LABELS = {
   CHANGES_REQUESTED: 'hostsetup.changesRequested',
   SUBMITTED: 'hostsetup.underReview',
   UNDER_INVESTIGATION: 'hostsetup.underInvestigation',
+  SUSPENDED: 'hostsetup.suspended',
   APPROVED: 'hostsetup.approved',
   REJECTED: 'hostsetup.notApproved',
 };
@@ -1317,7 +1319,7 @@ function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravel
   const stillHosting = user?.role === 'HOST';
   const statusColor = approved
     ? 'success'
-    : application?.status === 'REJECTED'
+    : application?.status === 'REJECTED' || application?.status === 'SUSPENDED'
       ? 'failure'
       : application?.status === 'SUBMITTED' || application?.status === 'CHANGES_REQUESTED' || application?.status === 'UNDER_INVESTIGATION'
         ? 'warning'

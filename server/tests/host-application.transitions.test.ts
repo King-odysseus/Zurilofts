@@ -17,8 +17,8 @@ import {
   assertSubmittable,
   planApproval,
   planStatusChange,
-  isAdminReviewStatus,
-  ADMIN_REVIEW_STATUSES,
+  isAdminSettableStatus,
+  ADMIN_SETTABLE_STATUSES,
   assertCanRequestChanges,
   assertCanReject,
   toApplicantView,
@@ -147,6 +147,12 @@ test('an application under investigation can be approved directly', () => {
   assert.equal(planApproval('UNDER_INVESTIGATION'), 'APPLY');
 });
 
+// Restoring a suspended verification is an approval, not a resubmission: the
+// documents that earned it are still on file.
+test('a suspended verification can be restored by approving it again', () => {
+  assert.equal(planApproval('SUSPENDED'), 'APPLY');
+});
+
 test('approving an already-APPROVED application is idempotent, not an error', () => {
   assert.equal(planApproval('APPROVED'), 'IDEMPOTENT');
 });
@@ -165,8 +171,9 @@ test('changes can be requested on a SUBMITTED application or on a verified one',
   // touches User.role, so their dashboard keeps working while they resubmit.
   assert.doesNotThrow(() => assertCanRequestChanges('APPROVED'));
   assert.doesNotThrow(() => assertCanRequestChanges('UNDER_INVESTIGATION'));
+  assert.doesNotThrow(() => assertCanRequestChanges('SUSPENDED'));
   for (const status of ['DRAFT', 'CHANGES_REQUESTED', 'REJECTED']) {
-    assert.throws(() => assertCanRequestChanges(status), /submitted or verified application/i, status);
+    assert.throws(() => assertCanRequestChanges(status), /submitted, suspended or verified application/i, status);
   }
 });
 
@@ -175,6 +182,7 @@ test('rejection is allowed while under review and after approval', () => {
   assert.doesNotThrow(() => assertCanReject('UNDER_INVESTIGATION'));
   assert.doesNotThrow(() => assertCanReject('CHANGES_REQUESTED'));
   assert.doesNotThrow(() => assertCanReject('APPROVED'));
+  assert.doesNotThrow(() => assertCanReject('SUSPENDED'));
   for (const status of ['DRAFT', 'REJECTED']) {
     assert.throws(() => assertCanReject(status), /under review or an approved one/i, status);
   }
@@ -182,34 +190,44 @@ test('rejection is allowed while under review and after approval', () => {
 
 // ---- Admin status change on a decided application ----
 
-test('an admin may move a decided application back into review or under investigation', () => {
+test('an admin may move a decided application back into review, under investigation or suspended', () => {
   assert.equal(planStatusChange('APPROVED', 'SUBMITTED'), 'APPLY');
   assert.equal(planStatusChange('APPROVED', 'UNDER_INVESTIGATION'), 'APPLY');
+  assert.equal(planStatusChange('APPROVED', 'SUSPENDED'), 'APPLY');
   // A case can be moved out of investigation back into the queue, or held under
   // investigation while it is still waiting for a first decision, without the
-  // host submitting anything again.
+  // host submitting anything again. The three admin states move freely between
+  // each other: an investigation that concludes can be suspended, and a
+  // suspension that is lifted can go back into review.
   assert.equal(planStatusChange('UNDER_INVESTIGATION', 'SUBMITTED'), 'APPLY');
   assert.equal(planStatusChange('SUBMITTED', 'UNDER_INVESTIGATION'), 'APPLY');
+  assert.equal(planStatusChange('UNDER_INVESTIGATION', 'SUSPENDED'), 'APPLY');
+  assert.equal(planStatusChange('SUSPENDED', 'UNDER_INVESTIGATION'), 'APPLY');
+  assert.equal(planStatusChange('SUSPENDED', 'SUBMITTED'), 'APPLY');
 });
 
 test('setting the status an application already has is a no-op, not a second notice', () => {
   assert.equal(planStatusChange('UNDER_INVESTIGATION', 'UNDER_INVESTIGATION'), 'IDEMPOTENT');
   assert.equal(planStatusChange('SUBMITTED', 'SUBMITTED'), 'IDEMPOTENT');
+  assert.equal(planStatusChange('SUSPENDED', 'SUSPENDED'), 'IDEMPOTENT');
 });
 
 test('an application still with the applicant, or already closed, cannot be pulled into review', () => {
   for (const status of ['DRAFT', 'CHANGES_REQUESTED', 'REJECTED']) {
     assert.throws(() => planStatusChange(status, 'SUBMITTED'), /cannot be moved to review/i, status);
+    // The same holds for suspension: a closed case is reopened by the applicant
+    // submitting again, not by an admin moving it sideways.
+    assert.throws(() => planStatusChange(status, 'SUSPENDED'), /cannot be moved to review/i, status);
   }
 });
 
-test('the status endpoint can only set the two review states', () => {
+test('the status endpoint can only set the three states an admin controls', () => {
   for (const target of ['APPROVED', 'REJECTED', 'CHANGES_REQUESTED', 'DRAFT']) {
-    assert.equal(isAdminReviewStatus(target), false, `${target} must not be settable here`);
-    assert.throws(() => planStatusChange('APPROVED', target), /moved back into review or placed under investigation/i, target);
+    assert.equal(isAdminSettableStatus(target), false, `${target} must not be settable here`);
+    assert.throws(() => planStatusChange('APPROVED', target), /moved back into review, placed under investigation or suspended/i, target);
   }
-  for (const target of ADMIN_REVIEW_STATUSES) {
-    assert.equal(isAdminReviewStatus(target), true);
+  for (const target of ADMIN_SETTABLE_STATUSES) {
+    assert.equal(isAdminSettableStatus(target), true);
   }
 });
 
@@ -251,11 +269,12 @@ test('the admin view includes reviewer identity and applicant summary', () => {
   assert.equal(view.user.email, 'a@b.com');
 });
 
-test('the lifecycle enumerates exactly the six expected statuses', () => {
+test('the lifecycle enumerates exactly the seven expected statuses', () => {
   assert.deepEqual(HOST_APPLICATION_STATUSES, [
     'DRAFT',
     'SUBMITTED',
     'UNDER_INVESTIGATION',
+    'SUSPENDED',
     'CHANGES_REQUESTED',
     'APPROVED',
     'REJECTED',

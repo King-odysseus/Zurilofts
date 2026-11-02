@@ -31,6 +31,10 @@ const HOST_NUDGE = {
   // the badge and gets this band instead, so the change is visible where they
   // start their day rather than only on the application page.
   UNDER_INVESTIGATION: { tone: "attention", title: "host.nudgeInvestigationTitle", description: "hostsetup.investigationHint", actionLabel: "host.nudgeViewStatus" },
+  // A suspended verification is worse than an open question, so it takes the
+  // red tint rather than amber: the host has lost the badge and needs the page
+  // that says why.
+  SUSPENDED: { tone: "rejected", title: "host.nudgeSuspendedTitle", description: "hostsetup.suspendedHint", actionLabel: "host.nudgeViewStatus" },
   REJECTED: { tone: "rejected", title: "host.nudgeRejectedTitle", description: "hostsetup.rejectedHint", actionLabel: "host.nudgeViewStatus" },
 };
 

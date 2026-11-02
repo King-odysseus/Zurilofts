@@ -91,6 +91,7 @@ export const hostsetup = {
       draft: 'Draft',
       changesRequested: 'Changes requested',
       underInvestigation: 'Under investigation',
+      suspended: 'Verification suspended',
       underReview: 'Under review',
       notApproved: 'Not approved',
       step1Short: 'Legal name, contact and ID details',
@@ -107,6 +108,7 @@ export const hostsetup = {
       approvedHint: 'Your host application is approved. You can now create and publish your first listing.',
       rejectedHint: 'Your application was not approved. Contact support if you need help with the review outcome.',
       investigationHint: 'Trust and Safety is reviewing your host account. The verified badge is off until the review is complete, and your dashboard, listings and earnings keep working.',
+      suspendedHint: 'Trust and Safety has suspended your host verification. The badge is off your account until it is restored, your application stays on file so nothing has to be resubmitted, and your dashboard, listings and earnings keep working.',
     },
   },
   sw: {
@@ -187,6 +189,7 @@ export const hostsetup = {
       draft: 'Rasimu',
       changesRequested: 'Marekebisho yameombwa',
       underInvestigation: 'Inachunguzwa',
+      suspended: 'Uthibitisho umesimamishwa',
       underReview: 'Inakaguliwa',
       notApproved: 'Haijaidhinishwa',
       step1Short: 'Jina la kisheria, mawasiliano na kitambulisho',
@@ -203,6 +206,7 @@ export const hostsetup = {
       approvedHint: 'Ombi lako la mkaribishaji limeidhinishwa. Sasa unaweza kuunda na kuchapisha tangazo lako la kwanza.',
       rejectedHint: 'Ombi lako halikuidhinishwa. Wasiliana na usaidizi ikiwa unahitaji msaada kuhusu matokeo.',
       investigationHint: 'Uaminifu na Usalama wanachunguza akaunti yako ya mkaribishaji. Beji ya uthibitisho itaondolewa hadi ukaguzi ukamilike, na dashibodi, matangazo na mapato yako vinaendelea kufanya kazi.',
+      suspendedHint: 'Uaminifu na Usalama wamesimamisha uthibitisho wa akaunti yako ya mkaribishaji. Beji itaondolewa hadi uthibitisho urejeshwe, ombi lako linabaki kwenye faili hivyo hakuna cha kuwasilisha tena, na dashibodi, matangazo na mapato yako vinaendelea kufanya kazi.',
     },
   },
 };

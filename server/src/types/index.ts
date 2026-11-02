@@ -334,13 +334,13 @@ export const hostApplicationReviewSchema = z.object({
   reason: z.string().min(1, 'A reason is required').max(2000),
 });
 
-// Moving an application that has already been decided back into the queue, or
-// holding it under investigation. The status is restricted to those two review
-// states on purpose: this endpoint can never be used to approve, reject or edit
-// an application under another name, and the reason is the sentence the host
-// reads on their own application page.
+// Moving an application that has already been decided back into the queue,
+// holding it under investigation, or suspending its verification. The status is
+// restricted to those three on purpose: this endpoint can never be used to
+// approve, reject or edit an application under another name, and the reason is
+// the sentence the host reads on their own application page.
 export const hostApplicationStatusChangeSchema = z.object({
-  status: z.enum(['SUBMITTED', 'UNDER_INVESTIGATION']),
+  status: z.enum(['SUBMITTED', 'UNDER_INVESTIGATION', 'SUSPENDED']),
   reason: z.string().trim().min(1, 'A reason is required').max(2000),
 });
 

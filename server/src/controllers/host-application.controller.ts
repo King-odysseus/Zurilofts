@@ -128,13 +128,13 @@ export async function adminReject(req: Request, res: Response, next: NextFunctio
 }
 
 /**
- * POST /api/admin/host-applications/:id/status - move a decided application
- * back into the review queue, or hold it under investigation. Leaves the
+ * POST /api/admin/host-applications/:id/status - move an application back into
+ * review, place it under investigation, or suspend its verification. Leaves the
  * account's role alone so the host keeps working while it is looked at.
  */
 export async function adminSetStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const application = await hostAppService.adminSetReviewStatus(
+    const application = await hostAppService.adminSetApplicationStatus(
       req.params.id,
       req.user!.sub,
       req.body.status,

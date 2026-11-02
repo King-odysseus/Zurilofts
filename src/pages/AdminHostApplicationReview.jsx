@@ -12,11 +12,13 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 // means the reviewer never has to know the token names.
 const STATUS_CHOICES = [
   { value: 'APPROVED', label: 'Verified - approve this host' },
-  // An application that has already been decided can be put back into the queue
-  // or held under investigation. Neither touches the account's role, so the host
-  // keeps their dashboard while the question is answered.
+  // An application that has already been decided can be put back into the queue,
+  // held under investigation, or have its verification suspended. None of them
+  // touches the account's role, so the host keeps their dashboard while the
+  // question is answered.
   { value: 'SUBMITTED', label: 'Pending review - put back in the queue' },
   { value: 'UNDER_INVESTIGATION', label: 'Under investigation - hold the account' },
+  { value: 'SUSPENDED', label: 'Verification suspended - take the badge away for now' },
   { value: 'CHANGES_REQUESTED', label: 'Need more information - return to host' },
   { value: 'REJECTED', label: 'Not approved - reject application' },
 ];
@@ -36,6 +38,7 @@ const STATUS_META = {
   DRAFT: { labelKey: 'adminlisting.statusDraft', color: 'gray' },
   SUBMITTED: { labelKey: 'admin.awaitingReview', color: 'warning' },
   UNDER_INVESTIGATION: { labelKey: 'admin.underInvestigation', color: 'failure' },
+  SUSPENDED: { labelKey: 'admin.verificationSuspended', color: 'failure' },
   CHANGES_REQUESTED: { labelKey: 'admin.changesRequested', color: 'warning' },
   APPROVED: { labelKey: 'admin.verificationApproved', color: 'success' },
   REJECTED: { labelKey: 'adminlisting.statusRejected', color: 'failure' },
@@ -169,14 +172,16 @@ export default function AdminHostApplicationReview() {
       } else if (chosenStatus === 'REJECTED') {
         await apiClient.post(`/admin/host-applications/${application.id}/reject`, { reason: note.trim() });
         setMessage('Application rejected. The host has been messaged with the reason.');
-      } else if (chosenStatus === 'SUBMITTED' || chosenStatus === 'UNDER_INVESTIGATION') {
+      } else if (chosenStatus === 'SUBMITTED' || chosenStatus === 'UNDER_INVESTIGATION' || chosenStatus === 'SUSPENDED') {
         await apiClient.post(`/admin/host-applications/${application.id}/status`, {
           status: chosenStatus,
           reason: note.trim(),
         });
-        setMessage(chosenStatus === 'UNDER_INVESTIGATION'
-          ? 'Held under investigation. The verified badge is off their account, what you wrote has been messaged to them, and their dashboard keeps working.'
-          : 'Back in the review queue. The verified badge is off their account, and they have been messaged with the reason.');
+        setMessage({
+          UNDER_INVESTIGATION: 'Held under investigation. The verified badge is off their account, what you wrote has been messaged to them, and their dashboard keeps working.',
+          SUSPENDED: 'Verification suspended. The badge is off their account, what you wrote has been messaged to them, and their dashboard, listings and earnings keep working.',
+          SUBMITTED: 'Back in the review queue. The verified badge is off their account, and they have been messaged with the reason.',
+        }[chosenStatus]);
       } else {
         await apiClient.post(`/admin/host-applications/${application.id}/approve`, {});
         setMessage('Host verified. They have been messaged, and their account now carries the verified badge.');
@@ -260,6 +265,7 @@ export default function AdminHostApplicationReview() {
     APPROVED: 'Mark as verified',
     SUBMITTED: 'Put back in the queue',
     UNDER_INVESTIGATION: 'Place under investigation',
+    SUSPENDED: 'Suspend verification',
     CHANGES_REQUESTED: 'Return to host',
     REJECTED: 'Reject application',
   }[chosenStatus] || 'Save decision';
@@ -267,6 +273,7 @@ export default function AdminHostApplicationReview() {
     APPROVED: 'Verifying...',
     SUBMITTED: 'Saving...',
     UNDER_INVESTIGATION: 'Holding...',
+    SUSPENDED: 'Suspending...',
     CHANGES_REQUESTED: 'Returning...',
     REJECTED: 'Rejecting...',
   }[busy];
@@ -386,7 +393,7 @@ export default function AdminHostApplicationReview() {
         title="Status and decision"
         hint={canDecide
           ? (isVerified
-            ? 'This host is verified. Putting the application back in the queue or under investigation takes the badge off their account as soon as you save, and their dashboard, listings and earnings keep working. They are told why. Blocking the account itself is done from the users page.'
+            ? 'This host is verified. Pending review, under investigation or suspended takes the badge off their account as soon as you save, and their dashboard, listings and earnings keep working. They are told why. Blocking the account itself is done from the users page.'
             : 'Pick a status, then add what the host needs to know. The host sees this message on their host application page.')
           : 'This application has already been decided. A new decision becomes available only after the host resubmits.'}
       >
@@ -454,7 +461,7 @@ export default function AdminHostApplicationReview() {
               </div>
             )}
 
-            {['REJECTED', 'SUBMITTED', 'UNDER_INVESTIGATION'].includes(chosenStatus) && (
+            {['REJECTED', 'SUBMITTED', 'UNDER_INVESTIGATION', 'SUSPENDED'].includes(chosenStatus) && (
               <div className="space-y-3 rounded-xl bg-surface p-4">
                 <div>
                   <Label htmlFor="host-application-note">
@@ -462,7 +469,9 @@ export default function AdminHostApplicationReview() {
                       ? 'Reason for rejection'
                       : chosenStatus === 'UNDER_INVESTIGATION'
                         ? 'What is being investigated'
-                        : 'Why it is going back into the queue'}
+                        : chosenStatus === 'SUSPENDED'
+                          ? 'Why the verification is suspended'
+                          : 'Why it is going back into the queue'}
                   </Label>
                   <p className="mt-1 text-xs text-muted">Required, and shown to the host.</p>
                 </div>
@@ -476,7 +485,9 @@ export default function AdminHostApplicationReview() {
                     ? 'Say why this application cannot be approved.'
                     : chosenStatus === 'UNDER_INVESTIGATION'
                       ? 'Say what is being looked into, for example: a guest complaint about a cancelled stay.'
-                      : 'Say why it is back in the queue, for example: new payout details to check.'}
+                      : chosenStatus === 'SUSPENDED'
+                        ? 'Say why verification is suspended, for example: the identity document does not match the account holder.'
+                        : 'Say why it is back in the queue, for example: new payout details to check.'}
                 />
                 {chosenStatus !== 'REJECTED' && (
                   <p className="text-xs leading-relaxed text-muted">

@@ -26,6 +26,7 @@ export type HostApplicationStatus =
   | 'DRAFT'
   | 'SUBMITTED'
   | 'UNDER_INVESTIGATION'
+  | 'SUSPENDED'
   | 'CHANGES_REQUESTED'
   | 'APPROVED'
   | 'REJECTED';
@@ -34,11 +35,23 @@ export const HOST_APPLICATION_STATUSES: HostApplicationStatus[] = [
   'DRAFT',
   'SUBMITTED',
   'UNDER_INVESTIGATION',
+  'SUSPENDED',
   'CHANGES_REQUESTED',
   'APPROVED',
   'REJECTED',
 ];
 
+// Three states can take verification away from an already-verified host, and the
+// difference is what the host should understand:
+//   UNDER_INVESTIGATION - a question has been raised; we are still looking.
+//   SUSPENDED           - verification is withdrawn for now, for a stateable
+//                         reason, and an admin can restore it. The application
+//                         stays on file, so nothing has to be resubmitted.
+//   REJECTED            - the application did not pass; only a fresh application
+//                         gets them back in.
+// None of the three touches User.role or blocks sign-in. Blocking an account is
+// the suspension control on the users page, a separate decision on purpose.
+//
 // Statuses where the applicant may still edit and (re)submit their draft.
 export const EDITABLE_STATUSES: HostApplicationStatus[] = ['DRAFT', 'CHANGES_REQUESTED'];
 
@@ -237,10 +250,11 @@ export function assertSubmittable(app: ApplicantFields & { status: string }, upl
  */
 export function planApproval(status: string): 'APPLY' | 'IDEMPOTENT' {
   if (status === 'APPROVED') return 'IDEMPOTENT';
-  // A case held under investigation is still a case a reviewer may decide on.
-  // Making them push it through "pending review" first would be a second click
-  // that changes nothing about who is allowed to approve it.
-  if (status === 'SUBMITTED' || status === 'UNDER_INVESTIGATION') return 'APPLY';
+  // A case held under investigation, or a verification that was suspended, is
+  // still a case a reviewer may decide on. Making them push it through "pending
+  // review" first would be a second click that changes nothing about who is
+  // allowed to approve it.
+  if (status === 'SUBMITTED' || status === 'UNDER_INVESTIGATION' || status === 'SUSPENDED') return 'APPLY';
   throw new ValidationError(`Only a submitted application can be approved (status: ${status}).`);
 }
 
@@ -252,9 +266,14 @@ export function planApproval(status: string): 'APPLY' | 'IDEMPOTENT' {
  * Requesting changes never touches User.role, so a working host keeps working.
  */
 export function assertCanRequestChanges(status: string): void {
-  if (status !== 'SUBMITTED' && status !== 'UNDER_INVESTIGATION' && status !== 'APPROVED') {
+  if (
+    status !== 'SUBMITTED'
+    && status !== 'UNDER_INVESTIGATION'
+    && status !== 'SUSPENDED'
+    && status !== 'APPROVED'
+  ) {
     throw new ValidationError(
-      `Changes can only be requested on a submitted or verified application (status: ${status}).`,
+      `Changes can only be requested on a submitted, suspended or verified application (status: ${status}).`,
     );
   }
 }
@@ -270,6 +289,7 @@ export function assertCanReject(status: string): void {
   if (
     status !== 'SUBMITTED'
     && status !== 'UNDER_INVESTIGATION'
+    && status !== 'SUSPENDED'
     && status !== 'CHANGES_REQUESTED'
     && status !== 'APPROVED'
   ) {
@@ -290,13 +310,15 @@ export function assertCanReject(status: string): void {
 // the question is answered.
 // ============================================================
 
-// Targets an admin may set from the review queue. Both mean "a reviewer is
-// looking at this", which is why neither is editable by the applicant.
-export const ADMIN_REVIEW_STATUSES = ['SUBMITTED', 'UNDER_INVESTIGATION'] as const;
-export type AdminReviewStatus = (typeof ADMIN_REVIEW_STATUSES)[number];
+// Targets an admin may set directly on an application that is already open for
+// review or has been decided. All three mean "verification is not standing right
+// now", and none of them is editable by the applicant, so the form never opens
+// under a host whose case is with Trust and Safety.
+export const ADMIN_SETTABLE_STATUSES = ['SUBMITTED', 'UNDER_INVESTIGATION', 'SUSPENDED'] as const;
+export type AdminSettableStatus = (typeof ADMIN_SETTABLE_STATUSES)[number];
 
-export function isAdminReviewStatus(value: string): value is AdminReviewStatus {
-  return (ADMIN_REVIEW_STATUSES as readonly string[]).includes(value);
+export function isAdminSettableStatus(value: string): value is AdminSettableStatus {
+  return (ADMIN_SETTABLE_STATUSES as readonly string[]).includes(value);
 }
 
 /**
@@ -307,16 +329,17 @@ export function isAdminReviewStatus(value: string): value is AdminReviewStatus {
  * Any other combination is invalid and throws.
  */
 export function planStatusChange(current: string, next: string): 'APPLY' | 'IDEMPOTENT' {
-  if (!isAdminReviewStatus(next)) {
+  if (!isAdminSettableStatus(next)) {
     throw new ValidationError(
-      `An application can only be moved back into review or placed under investigation (requested: ${next}).`,
+      `An application can only be moved back into review, placed under investigation or suspended (requested: ${next}).`,
     );
   }
   if (current === next) return 'IDEMPOTENT';
   // DRAFT and CHANGES_REQUESTED sit with the applicant: moving one of those into
   // review would take the form away mid-edit and hide what the reviewer asked
-  // for. A verified application has been decided, and can be put back into review.
-  if (!['SUBMITTED', 'UNDER_INVESTIGATION', 'APPROVED'].includes(current)) {
+  // for. A verified application has been decided, and can be put back into review
+  // or suspended; a suspended one can move between the three freely.
+  if (!['SUBMITTED', 'UNDER_INVESTIGATION', 'SUSPENDED', 'APPROVED'].includes(current)) {
     throw new ValidationError(`This application cannot be moved to review from ${current}.`);
   }
   return 'APPLY';
@@ -735,36 +758,72 @@ export async function adminReject(id: string, reviewerId: string, reason: string
   return toAdminView(updated);
 }
 
+// What the host reads for each way verification can be taken away. One table
+// rather than nested ternaries: this is the wording a host is most likely to be
+// upset by, so it should be readable in the source beside its siblings.
+const SET_STATUS_NOTICE = {
+  UNDER_INVESTIGATION: {
+    action: 'UNDER_INVESTIGATION',
+    subject: 'Your host account is under review',
+    headline: 'Trust and Safety is reviewing your host account.',
+    pushBody: 'Trust and Safety is reviewing your host account.',
+    badgeLine: 'The verified badge is off your account until this review is complete.',
+    standing: 'Your dashboard, listings and earnings keep working while we look at this, and we will message you as soon as it is decided.',
+  },
+  SUSPENDED: {
+    action: 'SUSPENDED',
+    subject: 'Your host verification has been suspended',
+    headline: 'Trust and Safety has suspended your host verification.',
+    pushBody: 'Trust and Safety suspended your host verification.',
+    badgeLine: 'The verified badge is off your account while it is suspended.',
+    standing: 'Your dashboard, listings and earnings keep working while it is suspended, and we will message you as soon as it is restored.',
+  },
+  SUBMITTED: {
+    action: 'RETURNED_TO_REVIEW',
+    subject: 'Your host application is back with our team',
+    headline: 'Trust and Safety moved your host application back into the review queue.',
+    pushBody: 'Your host application is back with our team for review.',
+    badgeLine: 'The verified badge is off your account until this review is complete.',
+    standing: 'Your dashboard, listings and earnings keep working while we look at this, and we will message you as soon as it is decided.',
+  },
+} as const;
+
 /**
- * Move an application between the two review states an admin controls.
+ * Move an application into one of the states an admin controls directly.
  *
- * This is how a verified host gets sent back to "pending" or held "under
- * investigation": the status changes, the badge comes off because it is derived
- * from that status, and the host is told in words why. User.role is left alone,
- * so their dashboard, listings and earnings keep running while the question is
- * answered - cutting access is the separate suspension control on the users page.
+ * This is how a verified host is put back to "pending", held "under
+ * investigation", or "suspended": the status changes, the badge comes off because
+ * it is derived from that status, and the host is told in words why. User.role is
+ * left alone, so their dashboard, listings and earnings keep running while the
+ * question is answered - cutting access is the separate suspension control on the
+ * users page.
  *
  * The status is written and audited in one transaction, and the notice is sent
  * after it commits, so a message can never describe a change that rolled back.
  */
-export async function adminSetReviewStatus(id: string, reviewerId: string, rawStatus: string, reason: string) {
+export async function adminSetApplicationStatus(id: string, reviewerId: string, rawStatus: string, reason: string) {
   const next = String(rawStatus || '').toUpperCase();
-  const note = String(reason || '').trim();
   // The host reads this reason on their application page, so a status change
   // without one would tell them something happened but not what it is about.
+  const note = String(reason || '').trim();
   if (!note) throw new ValidationError('Say why the status is changing: the host reads this as the reason.');
 
   const app = await prisma.hostApplication.findUnique({ where: { id } });
   if (!app) throw new NotFoundError('Host application');
 
+  // Throws for anything outside the admin-controlled set, so the lookup below
+  // can never miss.
   const plan = planStatusChange(app.status, next);
+  const notice = SET_STATUS_NOTICE[next as AdminSettableStatus];
+
   if (plan === 'IDEMPOTENT') {
     const current = await prisma.hostApplication.findUnique({ where: { id }, include: ADMIN_APPLICATION_INCLUDE });
     return toAdminView(current);
   }
 
+  // Only a host who is losing a badge they had is told the badge is coming off;
+  // an application that was never approved never had one.
   const wasVerified = app.status === 'APPROVED';
-  const investigated = next === 'UNDER_INVESTIGATION';
 
   const updated = await prisma.$transaction(async (tx) => {
     const row = await tx.hostApplication.update({
@@ -773,39 +832,25 @@ export async function adminSetReviewStatus(id: string, reviewerId: string, rawSt
       include: ADMIN_APPLICATION_INCLUDE,
     });
     await tx.hostApplicationAudit.create({
-      data: {
-        applicationId: id,
-        actorId: reviewerId,
-        action: investigated ? 'UNDER_INVESTIGATION' : 'RETURNED_TO_REVIEW',
-        note,
-      },
+      data: { applicationId: id, actorId: reviewerId, action: notice.action, note },
     });
     return row;
   });
 
-  const headline = investigated
-    ? 'Trust and Safety is reviewing your host account.'
-    : 'Trust and Safety moved your host application back into the review queue.';
-  const badgeLine = wasVerified
-    ? 'The verified badge is off your account until this review is complete.'
-    : '';
-
   await notifyReviewOutcome({
     userId: app.userId,
-    subject: investigated ? 'Your host account is under review' : 'Your host application is back with our team',
+    subject: notice.subject,
     // One thought per line, so the notice reads as a short letter in the support
     // thread rather than a paragraph the host has to unpick on a phone.
     body: [
-      headline,
+      notice.headline,
       '',
       `Reason: ${note}`,
       '',
-      ...(badgeLine ? [badgeLine, ''] : []),
-      'Your dashboard, listings and earnings keep working while we look at this, and we will message you as soon as it is decided.',
+      ...(wasVerified ? [notice.badgeLine, ''] : []),
+      notice.standing,
     ].join('\n'),
-    pushBody: investigated
-      ? 'Trust and Safety is reviewing your host account.'
-      : 'Your host application is back with our team for review.',
+    pushBody: notice.pushBody,
     url: '/host/application',
   });
 

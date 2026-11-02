@@ -230,10 +230,15 @@ function HostLayout({ children }) {
   // investigation loses the badge with no other trace in this header, which is
   // exactly the moment they need the page that explains why.
   const applicationUnderInvestigation = user?.hostApplicationStatus === 'UNDER_INVESTIGATION';
+  // A suspended verification looks identical to a hold from inside the header,
+  // because both simply remove the badge. The row has to say which one it is:
+  // "we are looking into this" and "we have suspended it" are different news.
+  const applicationSuspended = user?.hostApplicationStatus === 'SUSPENDED';
   const showVerifiedNotice = isVerifiedHost && !verifiedNoticeSeen;
   const totalNotifications = unreadGuestMessages + pendingBookings
     + (applicationNeedsChanges ? 1 : 0)
     + (applicationUnderInvestigation ? 1 : 0)
+    + (applicationSuspended ? 1 : 0)
     + (showVerifiedNotice ? 1 : 0);
 
   function acknowledgeVerified() {
@@ -336,6 +341,13 @@ function HostLayout({ children }) {
                       <span className="min-w-0 flex-1">
                         <span className="block text-xs font-semibold text-navy">{t('hostsetup.underInvestigation')}</span>
                         <span className="block text-[11px] text-muted">{t('hostsetup.investigationHint')}</span>
+                      </span>
+                    </Link>}
+                    {applicationSuspended && <Link to="/host/application" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>
+                      <span className={NOTIF_TILE} aria-hidden="true"><ShieldAlert className="h-4 w-4" strokeWidth={2} /></span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold text-navy">{t('hostsetup.suspended')}</span>
+                        <span className="block text-[11px] text-muted">{t('hostsetup.suspendedHint')}</span>
                       </span>
                     </Link>}
                     {pendingBookings > 0 && <Link to="/host/reservations" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>
