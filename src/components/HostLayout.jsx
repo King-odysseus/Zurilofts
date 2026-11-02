@@ -118,6 +118,10 @@ function HostLayout({ children }) {
   // because the two lead to different pages and mean different things: one is a
   // conversation, the other is money and dates that stay blocked until answered.
   const [pendingBookings, setPendingBookings] = useState(0);
+  // Listings an admin sent back or hid. Counted here as well as on the listings
+  // page because a host who never opens Listings would otherwise never learn
+  // that a reviewer is waiting on them.
+  const [listingsNeedingAttention, setListingsNeedingAttention] = useState(0);
   const [verifiedNoticeSeen, setVerifiedNoticeSeen] = useState(readVerifiedNoticeSeen);
   const menuRef = useRef(null);
   const notifRef = useRef(null);
@@ -164,10 +168,16 @@ function HostLayout({ children }) {
     async function loadPendingBookings() {
       try {
         const response = await apiClient.get('/notifications');
-        if (active) setPendingBookings(Number(response.data.data?.pendingBookings) || 0);
+        if (active) {
+          setPendingBookings(Number(response.data.data?.pendingBookings) || 0);
+          setListingsNeedingAttention(Number(response.data.data?.listingsNeedingAttention) || 0);
+        }
       } catch {
         // A failed count must not leave a stale badge claiming work is waiting.
-        if (active) setPendingBookings(0);
+        if (active) {
+          setPendingBookings(0);
+          setListingsNeedingAttention(0);
+        }
       }
     }
     loadPendingBookings();
@@ -236,6 +246,7 @@ function HostLayout({ children }) {
   const applicationSuspended = user?.hostApplicationStatus === 'SUSPENDED';
   const showVerifiedNotice = isVerifiedHost && !verifiedNoticeSeen;
   const totalNotifications = unreadGuestMessages + pendingBookings
+    + (listingsNeedingAttention > 0 ? 1 : 0)
     + (applicationNeedsChanges ? 1 : 0)
     + (applicationUnderInvestigation ? 1 : 0)
     + (applicationSuspended ? 1 : 0)
@@ -355,6 +366,13 @@ function HostLayout({ children }) {
                       <span className="min-w-0 flex-1">
                         <span className="block text-xs font-semibold text-navy">{t('host.bookingsToConfirm')}</span>
                         <span className="block text-[11px] text-muted">{t(pendingBookings === 1 ? 'host.bookingsAwaitingOne' : 'host.bookingsAwaitingOther', { count: pendingBookings })}</span>
+                      </span>
+                    </Link>}
+                    {listingsNeedingAttention > 0 && <Link to="/host/listings" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>
+                      <span className={NOTIF_TILE} aria-hidden="true"><Building2 className="h-4 w-4" strokeWidth={2} /></span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold text-navy">{t('host.listingNeedsAttention')}</span>
+                        <span className="block text-[11px] text-muted">{t(listingsNeedingAttention === 1 ? 'host.listingDecisionOne' : 'host.listingDecisionOther', { count: listingsNeedingAttention })}</span>
                       </span>
                     </Link>}
                     {unreadGuestMessages > 0 && <Link to="/host/inbox" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>

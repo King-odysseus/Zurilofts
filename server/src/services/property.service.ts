@@ -602,6 +602,61 @@ export async function submitPropertyForReview(id: string, hostId: string) {
 }
 
 /**
+ * What the host is told when an admin decides on one of their listings.
+ *
+ * Kept pure and exported so the wording can be asserted without a database and
+ * so the push body and the in-app copy cannot drift apart. A reviewer's note is
+ * the reason the host has to read, so it wins over the generic sentence: "Update
+ * the requested details" tells them nothing when the reviewer already said which
+ * photo is wrong.
+ *
+ * Approval is the one decision with nothing to do, so it opens the listings page
+ * rather than to the editor.
+ */
+export function listingDecisionNotice(input: {
+  action: ListingReviewAction;
+  title: string;
+  note?: string | null;
+  propertyId: string;
+}): { title: string; body: string; url: string } {
+  const name = input.title || 'your listing';
+  const note = (input.note || '').trim();
+  const editUrl = `/host/listings/${input.propertyId}/edit`;
+
+  switch (input.action) {
+    case 'approve':
+      return {
+        title: 'Your listing is live',
+        body: `${name} is now visible to guests and open for bookings.`,
+        url: '/host/listings',
+      };
+    case 'reject':
+      return {
+        title: 'Changes needed on your listing',
+        body: note
+          ? `${name} was not approved. ${note}`
+          : `${name} was not approved. Update the requested details and submit it again.`,
+        url: editUrl,
+      };
+    case 'suspend':
+      return {
+        title: 'Your listing is hidden',
+        body: note
+          ? `${name} has been hidden from guests. ${note}`
+          : `${name} has been hidden from guests.`,
+        url: '/host/listings',
+      };
+    // unsuspend
+    default:
+      return {
+        title: 'Your listing is live again',
+        body: `${name} is visible to guests again.`,
+        url: '/host/listings',
+      };
+  }
+}
+
+/**
  * Admin action on a single listing's publication status. Independent of the
  * host's own account verification (HostApplication) - a fully verified host
  * can still have an individual listing rejected or suspended.
@@ -626,6 +681,27 @@ export async function adminReviewProperty(
       listingReviewedAt: new Date(),
     },
   });
+
+  // Tell the host. The decision is already committed, so a host who never enabled
+  // push notifications must not lose the review over a failed send: this is
+  // best-effort and their listing card carries the same note either way.
+  // hostId is nullable (an admin-created listing may have none), so there may be
+  // nobody to notify.
+  try {
+    if (updated.hostId) {
+      const { sendPushToUser } = await import('./push.service.js');
+      const notice = listingDecisionNotice({
+        action,
+        title: updated.title,
+        note,
+        propertyId: updated.id,
+      });
+      await sendPushToUser(updated.hostId, notice.title, notice.body, notice.url);
+    }
+  } catch (err) {
+    console.error('Listing decision notification failed:', err);
+  }
+
   return normalizeProperty(updated);
 }
 

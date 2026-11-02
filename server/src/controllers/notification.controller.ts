@@ -23,9 +23,17 @@ export async function myNotifications(req: Request, res: Response, next: NextFun
 
     // Hosts get a count of bookings on their properties that are still PENDING
     let pendingBookings = 0;
+    // Listings an admin sent back or hid. This is the in-app half of a review
+    // decision: push only reaches a host who enabled notifications, so the bell
+    // has to carry it too. It clears itself when the host resubmits (the status
+    // moves on), so it needs no read/unread bookkeeping.
+    let listingsNeedingAttention = 0;
     if (role === 'HOST') {
       pendingBookings = await prisma.booking.count({
         where: { status: 'PENDING', property: { hostId: userId } },
+      });
+      listingsNeedingAttention = await prisma.property.count({
+        where: { hostId: userId, status: { in: ['REJECTED', 'SUSPENDED'] } },
       });
     }
     // Admins see all pending bookings
@@ -55,7 +63,7 @@ export async function myNotifications(req: Request, res: Response, next: NextFun
 
     res.json({
       success: true,
-      data: { unreadMessages, pendingBookings, bookingUpdates },
+      data: { unreadMessages, pendingBookings, bookingUpdates, listingsNeedingAttention },
     });
   } catch (error) {
     next(error);
