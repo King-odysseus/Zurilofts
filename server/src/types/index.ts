@@ -315,7 +315,12 @@ export const hostApplicationUpdateSchema = z.object({
   payoutBankName: z.string().trim().min(1).max(100).optional(),
   payoutBankCode: z.string().trim().min(1).max(20).optional(),
   payoutBankAccountNo: z.string().trim().regex(/^\d{6,20}$/, 'Enter a valid bank account number').optional(),
-  payoutMpesaPhone: z.string().trim().min(10).max(16).optional(),
+  // Shaped loosely on purpose: the service normalises to the local 10-digit form
+  // on save, so a number typed with spaces or a +254 prefix must reach it instead
+  // of being rejected here for being "too long".
+  payoutMpesaPhone: z.string().trim().min(10).max(20).optional(),
+  // The host's written reply to a request for more information.
+  applicantResponse: z.string().trim().max(2000).optional(),
   experience: z.string().max(2000).optional(),
   agreedTerms: z.boolean().optional(),
   // Optional referral code typed by the applicant. Kept lenient on purpose: a

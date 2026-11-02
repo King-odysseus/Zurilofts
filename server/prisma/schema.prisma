@@ -137,6 +137,10 @@ model HostApplication {
   nudgeCount            Int                       @default(0)
   lastNudgeAt           DateTime?
   reviewNote            String? // applicant-visible reviewer note (reason for changes/rejection)
+  // What the host typed back when asked for more information. Written while the
+  // application is open for edits, so the reviewer sees the answer next to the
+  // note it replies to.
+  applicantResponse     String?
   reviewedBy            String? // audit: admin userId who last reviewed (no relation, like Payout.initiatedBy)
   submittedAt           DateTime?
   reviewedAt            DateTime?

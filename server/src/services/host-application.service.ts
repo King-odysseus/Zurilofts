@@ -86,6 +86,10 @@ export const EDITABLE_APPLICANT_FIELDS = [
   'payoutBankAccountNo',
   'payoutMpesaPhone',
   'experience',
+  // Only meaningful once a reviewer has asked for more information, but keeping
+  // it editable at the same time as the fields lets one save carry both the
+  // answer and the corrected details.
+  'applicantResponse',
   'agreedTerms',
 ] as const;
 
@@ -112,6 +116,8 @@ export interface ApplicantFields {
   payoutBankAccountNo?: string | null;
   payoutMpesaPhone?: string | null;
   experience?: string | null;
+  // The applicant's written answer when a reviewer asked for more information.
+  applicantResponse?: string | null;
   agreedTerms?: boolean | null;
   referredByCode?: string | null;
 }
@@ -119,6 +125,32 @@ export interface ApplicantFields {
 /** True when a field holds no usable value (blank string, null, undefined). */
 function isBlank(value: unknown): boolean {
   return value === null || value === undefined || (typeof value === 'string' && value.trim() === '');
+}
+
+/**
+ * The database patch for a draft save, restricted to the applicant's editable
+ * fields.
+ *
+ * Pure so the normalising rules can be tested without a database. The M-PESA
+ * number in particular must be stored in the local 10-digit form Paystack
+ * documents: approval copies it straight into a transfer recipient, so a number
+ * that only looks right would let an application finish and then fail for an
+ * admin at approval instead of showing the applicant their own error.
+ */
+export function buildApplicantPatch(data: ApplicantFields): Record<string, unknown> {
+  const patch: Record<string, unknown> = {};
+  for (const field of EDITABLE_APPLICANT_FIELDS) {
+    if (data[field] === undefined) continue;
+    if (field === 'propertyTypes') {
+      patch.propertyTypesJson = JSON.stringify(data.propertyTypes || []);
+    } else if (field === 'payoutMpesaPhone') {
+      // Throws ValidationError, which the route returns as a 400 on the field.
+      patch[field] = isBlank(data[field]) ? null : normalizeKenyanMpesaPhone(String(data[field]));
+    } else {
+      patch[field] = data[field];
+    }
+  }
+  return patch;
 }
 
 /**
@@ -273,6 +305,9 @@ export function toApplicantView(app: any) {
     foundingHost: Boolean(app.foundingHost),
     documents: (app.documents || []).map(toDocumentMetadata),
     reviewNote: app.reviewNote ?? null,
+    // The host's own words, shown back to them and to the reviewer so the
+    // question and the answer stay side by side.
+    applicantResponse: app.applicantResponse ?? null,
     submittedAt: app.submittedAt ?? null,
     reviewedAt: app.reviewedAt ?? null,
     createdAt: app.createdAt,
@@ -391,15 +426,7 @@ export async function updateDraft(userId: string, data: ApplicantFields) {
   assertEditable(app.status);
 
   // Whitelist: only ever persist editable applicant fields.
-  const patch: Record<string, unknown> = {};
-  for (const field of EDITABLE_APPLICANT_FIELDS) {
-    if (data[field] === undefined) continue;
-    if (field === 'propertyTypes') {
-      patch.propertyTypesJson = JSON.stringify(data.propertyTypes || []);
-    } else {
-      patch[field] = data[field];
-    }
-  }
+  const patch = buildApplicantPatch(data);
 
   // A referral link is resolved rather than stored raw: the applicant typed a
   // code, and what the money depends on is the host behind it. An unknown or

@@ -155,6 +155,7 @@ model HostApplication {
   nudgeCount            Int                       @default(0)
   lastNudgeAt           DateTime?
   reviewNote    String?
+  applicantResponse String? // host's written reply when more information was requested
   reviewedBy    String?
   submittedAt   DateTime?
   reviewedAt    DateTime?
