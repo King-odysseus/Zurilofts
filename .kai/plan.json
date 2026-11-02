@@ -2,21 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Review the pending diff and confirm only the green badge change is present",
+      "text": "Record a plan for this commit/push run",
       "state": "done"
     },
     {
-      "text": "Re-run lint and build on this exact tree",
+      "text": "Inspect working tree and review the full diff for scope and secrets",
       "state": "done"
     },
     {
-      "text": "Commit the badge change and push to main",
+      "text": "Confirm scratch/test files are not being staged",
       "state": "done"
     },
     {
-      "text": "Record the finished plan in its own commit",
-      "state": "active"
+      "text": "Run lint, build and server type check on this exact tree",
+      "state": "done"
+    },
+    {
+      "text": "Stage the source files and commit with a change-focused message",
+      "state": "done"
+    },
+    {
+      "text": "Push to origin and confirm the branch is clean",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T09:50:37.683Z"
+  "updatedAt": "2026-11-02T10:14:01.895Z"
 }
