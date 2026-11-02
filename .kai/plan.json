@@ -2,33 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Reorganise host application review into a vertical, single-column layout on its own page",
+      "text": "Review git status and diff to see every changed and untracked file",
       "state": "done"
     },
     {
-      "text": "Add request-more-information flow: stated needs list plus text/upload for the host to respond",
+      "text": "Remove any scratch/verification scripts that do not belong in the repo",
       "state": "done"
     },
     {
-      "text": "Add a status dropdown with Verified / Need more information / Rejected",
+      "text": "Run lint and build to confirm the tree is green before committing",
       "state": "done"
     },
     {
-      "text": "Verify layout is column-free and features work in the browser; lint and build pass",
+      "text": "Stage the verification work and commit with a descriptive message",
       "state": "done"
     },
     {
-      "text": "Carry on prior plan: M-PESA number validation fix",
-      "state": "active"
-    },
-    {
-      "text": "Carry on prior plan: refuse plain-http public URL in production",
-      "state": "pending"
-    },
-    {
-      "text": "Carry on prior plan: tests for both fixes, then tsc/tests/lint/build and commit",
-      "state": "pending"
+      "text": "Push the commit and confirm the remote accepted it",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T07:09:16.427Z"
+  "updatedAt": "2026-11-02T09:43:46.036Z"
 }
