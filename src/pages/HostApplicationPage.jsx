@@ -29,6 +29,7 @@ const STATUS_COPY = {
   DRAFT: 'hostsetup.draftHint',
   CHANGES_REQUESTED: 'hostsetup.changesHint',
   SUBMITTED: 'hostsetup.submittedHint',
+  UNDER_INVESTIGATION: 'hostsetup.investigationHint',
   APPROVED: 'hostsetup.approvedHint',
   REJECTED: 'hostsetup.rejectedHint',
 };
@@ -37,6 +38,7 @@ const STATUS_LABELS = {
   DRAFT: 'hostsetup.draft',
   CHANGES_REQUESTED: 'hostsetup.changesRequested',
   SUBMITTED: 'hostsetup.underReview',
+  UNDER_INVESTIGATION: 'hostsetup.underInvestigation',
   APPROVED: 'hostsetup.approved',
   REJECTED: 'hostsetup.notApproved',
 };
@@ -1304,12 +1306,20 @@ function ActionFeedback({ feedback: current, onDismiss }) {
 
 function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravelling }) {
   const { t } = useLanguage();
-  const approved = application?.status === 'APPROVED' || user?.role === 'HOST';
+  // The application status is the truth for the badge, not the role: a verified
+  // host sent back into review or held under investigation keeps the HOST role on
+  // purpose, and only the badge comes off. The role is the fallback for a legacy
+  // host with no application row at all.
+  const approved = application ? application.status === 'APPROVED' : user?.role === 'HOST';
+  // A host sent back into review or held under investigation keeps the HOST role
+  // and was told in the notice that their dashboard keeps working. Leaving them
+  // only an exit here would contradict that message.
+  const stillHosting = user?.role === 'HOST';
   const statusColor = approved
     ? 'success'
     : application?.status === 'REJECTED'
       ? 'failure'
-      : application?.status === 'SUBMITTED' || application?.status === 'CHANGES_REQUESTED'
+      : application?.status === 'SUBMITTED' || application?.status === 'CHANGES_REQUESTED' || application?.status === 'UNDER_INVESTIGATION'
         ? 'warning'
         : 'gray';
 
@@ -1331,10 +1341,10 @@ function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravel
         </div>
       )}
       <div className="mt-6 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center">
-        {approved ? (
+        {approved || stillHosting ? (
           <>
-            <Button as={Link} to="/host/listings/new">{t('hostsetup.setUpProperty')}</Button>
-            <Button as={Link} to="/host/today" color="light">{t('hostsetup.openDashboard')}</Button>
+            {approved && <Button as={Link} to="/host/listings/new">{t('hostsetup.setUpProperty')}</Button>}
+            <Button as={Link} to="/host/today" color={approved ? 'light' : 'primary'}>{t('hostsetup.openDashboard')}</Button>
           </>
         ) : (
           <Button type="button" color="light" onClick={onBackToTravelling}>

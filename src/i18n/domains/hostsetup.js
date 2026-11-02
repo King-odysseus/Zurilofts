@@ -90,6 +90,7 @@ export const hostsetup = {
       approved: 'Approved',
       draft: 'Draft',
       changesRequested: 'Changes requested',
+      underInvestigation: 'Under investigation',
       underReview: 'Under review',
       notApproved: 'Not approved',
       step1Short: 'Legal name, contact and ID details',
@@ -105,6 +106,7 @@ export const hostsetup = {
       submittedHint: 'Your application is with Trust and Safety. We will notify you when the review is complete.',
       approvedHint: 'Your host application is approved. You can now create and publish your first listing.',
       rejectedHint: 'Your application was not approved. Contact support if you need help with the review outcome.',
+      investigationHint: 'Trust and Safety is reviewing your host account. The verified badge is off until the review is complete, and your dashboard, listings and earnings keep working.',
     },
   },
   sw: {
@@ -184,6 +186,7 @@ export const hostsetup = {
       approved: 'Imeidhinishwa',
       draft: 'Rasimu',
       changesRequested: 'Marekebisho yameombwa',
+      underInvestigation: 'Inachunguzwa',
       underReview: 'Inakaguliwa',
       notApproved: 'Haijaidhinishwa',
       step1Short: 'Jina la kisheria, mawasiliano na kitambulisho',
@@ -199,6 +202,7 @@ export const hostsetup = {
       submittedHint: 'Ombi lako liko kwa Uaminifu na Usalama. Tutakujulisha ukaguzi utakapokamilika.',
       approvedHint: 'Ombi lako la mkaribishaji limeidhinishwa. Sasa unaweza kuunda na kuchapisha tangazo lako la kwanza.',
       rejectedHint: 'Ombi lako halikuidhinishwa. Wasiliana na usaidizi ikiwa unahitaji msaada kuhusu matokeo.',
+      investigationHint: 'Uaminifu na Usalama wanachunguza akaunti yako ya mkaribishaji. Beji ya uthibitisho itaondolewa hadi ukaguzi ukamilike, na dashibodi, matangazo na mapato yako vinaendelea kufanya kazi.',
     },
   },
 };

@@ -53,6 +53,9 @@ const STATE_TONES = {
   REVERSED: 'neutral',
   // Applications and verification
   SUBMITTED: 'warning',
+  // Held by Trust and Safety. Red rather than amber: it is the one application
+  // state an admin needs to spot in a table of ordinary pending work.
+  UNDER_INVESTIGATION: 'danger',
   CHANGES_REQUESTED: 'warning',
   APPROVED: 'success',
   UNVERIFIED: 'neutral',

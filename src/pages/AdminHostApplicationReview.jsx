@@ -12,6 +12,11 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 // means the reviewer never has to know the token names.
 const STATUS_CHOICES = [
   { value: 'APPROVED', label: 'Verified - approve this host' },
+  // An application that has already been decided can be put back into the queue
+  // or held under investigation. Neither touches the account's role, so the host
+  // keeps their dashboard while the question is answered.
+  { value: 'SUBMITTED', label: 'Pending review - put back in the queue' },
+  { value: 'UNDER_INVESTIGATION', label: 'Under investigation - hold the account' },
   { value: 'CHANGES_REQUESTED', label: 'Need more information - return to host' },
   { value: 'REJECTED', label: 'Not approved - reject application' },
 ];
@@ -30,6 +35,7 @@ const INFO_ITEMS = [
 const STATUS_META = {
   DRAFT: { labelKey: 'adminlisting.statusDraft', color: 'gray' },
   SUBMITTED: { labelKey: 'admin.awaitingReview', color: 'warning' },
+  UNDER_INVESTIGATION: { labelKey: 'admin.underInvestigation', color: 'failure' },
   CHANGES_REQUESTED: { labelKey: 'admin.changesRequested', color: 'warning' },
   APPROVED: { labelKey: 'admin.verificationApproved', color: 'success' },
   REJECTED: { labelKey: 'adminlisting.statusRejected', color: 'failure' },
@@ -142,13 +148,11 @@ export default function AdminHostApplicationReview() {
 
   async function applyDecision() {
     if (!application) return;
-    if (chosenStatus === 'CHANGES_REQUESTED' && !note.trim()) {
-      setMessage('Say what more information is needed before returning the application.');
-      setMessageTone('error');
-      return;
-    }
-    if (chosenStatus === 'REJECTED' && !note.trim()) {
-      setMessage('A rejection needs a reason that the host can read.');
+    // Every outcome except approval is read by the host as the reason for it, so
+    // each needs a sentence they can act on. Approval needs none: the outcome is
+    // the message.
+    if (chosenStatus && chosenStatus !== 'APPROVED' && !note.trim()) {
+      setMessage('Add a reason before saving: the host reads it on their application page.');
       setMessageTone('error');
       return;
     }
@@ -165,6 +169,14 @@ export default function AdminHostApplicationReview() {
       } else if (chosenStatus === 'REJECTED') {
         await apiClient.post(`/admin/host-applications/${application.id}/reject`, { reason: note.trim() });
         setMessage('Application rejected. The host has been messaged with the reason.');
+      } else if (chosenStatus === 'SUBMITTED' || chosenStatus === 'UNDER_INVESTIGATION') {
+        await apiClient.post(`/admin/host-applications/${application.id}/status`, {
+          status: chosenStatus,
+          reason: note.trim(),
+        });
+        setMessage(chosenStatus === 'UNDER_INVESTIGATION'
+          ? 'Held under investigation. The verified badge is off their account, what you wrote has been messaged to them, and their dashboard keeps working.'
+          : 'Back in the review queue. The verified badge is off their account, and they have been messaged with the reason.');
       } else {
         await apiClient.post(`/admin/host-applications/${application.id}/approve`, {});
         setMessage('Host verified. They have been messaged, and their account now carries the verified badge.');
@@ -230,22 +242,31 @@ export default function AdminHostApplicationReview() {
     );
   }
 
-  // A verified host can still be sent back for more information or have the
-  // verification withdrawn, because the facts behind a verification go stale.
-  // Approving is not offered here: they already are approved, and re-approving
-  // would only re-send the good-news notice.
+  // A verified host can still be sent back into review, held under
+  // investigation, asked for more information, or have the verification
+  // withdrawn, because the facts behind a verification go stale. The application
+  // row is never removed or hidden here, so the host stays visible on this page
+  // throughout - which is the point: the admin works from this screen while the
+  // question is open.
   const isVerified = application.status === 'APPROVED';
-  const canDecide = application.status === 'SUBMITTED' || isVerified;
-  const statusChoices = isVerified
-    ? STATUS_CHOICES.filter((choice) => choice.value !== 'APPROVED')
-    : STATUS_CHOICES;
+  const canDecide = isVerified
+    || application.status === 'SUBMITTED'
+    || application.status === 'UNDER_INVESTIGATION';
+  // The status the application already holds is not offered, because setting it
+  // again would only send the same notice twice. For a verified host that also
+  // hides "approve", which they no longer need.
+  const statusChoices = STATUS_CHOICES.filter((choice) => choice.value !== application.status);
   const decisionLabel = {
     APPROVED: 'Mark as verified',
+    SUBMITTED: 'Put back in the queue',
+    UNDER_INVESTIGATION: 'Place under investigation',
     CHANGES_REQUESTED: 'Return to host',
     REJECTED: 'Reject application',
   }[chosenStatus] || 'Save decision';
   const busyLabel = {
     APPROVED: 'Verifying...',
+    SUBMITTED: 'Saving...',
+    UNDER_INVESTIGATION: 'Holding...',
     CHANGES_REQUESTED: 'Returning...',
     REJECTED: 'Rejecting...',
   }[busy];
@@ -365,7 +386,7 @@ export default function AdminHostApplicationReview() {
         title="Status and decision"
         hint={canDecide
           ? (isVerified
-            ? 'This host is verified. Sending the application back removes nothing from their account: their dashboard and listings keep working. The change is the verification status, and they are told what you need. Blocking the account itself is done from the users page.'
+            ? 'This host is verified. Putting the application back in the queue or under investigation takes the badge off their account as soon as you save, and their dashboard, listings and earnings keep working. They are told why. Blocking the account itself is done from the users page.'
             : 'Pick a status, then add what the host needs to know. The host sees this message on their host application page.')
           : 'This application has already been decided. A new decision becomes available only after the host resubmits.'}
       >
@@ -433,10 +454,16 @@ export default function AdminHostApplicationReview() {
               </div>
             )}
 
-            {chosenStatus === 'REJECTED' && (
+            {['REJECTED', 'SUBMITTED', 'UNDER_INVESTIGATION'].includes(chosenStatus) && (
               <div className="space-y-3 rounded-xl bg-surface p-4">
                 <div>
-                  <Label htmlFor="host-application-note">Reason for rejection</Label>
+                  <Label htmlFor="host-application-note">
+                    {chosenStatus === 'REJECTED'
+                      ? 'Reason for rejection'
+                      : chosenStatus === 'UNDER_INVESTIGATION'
+                        ? 'What is being investigated'
+                        : 'Why it is going back into the queue'}
+                  </Label>
                   <p className="mt-1 text-xs text-muted">Required, and shown to the host.</p>
                 </div>
                 <Textarea
@@ -445,8 +472,19 @@ export default function AdminHostApplicationReview() {
                   onChange={(event) => setNote(event.target.value)}
                   rows={3}
                   maxLength={1200}
-                  placeholder="Say why this application cannot be approved."
+                  placeholder={chosenStatus === 'REJECTED'
+                    ? 'Say why this application cannot be approved.'
+                    : chosenStatus === 'UNDER_INVESTIGATION'
+                      ? 'Say what is being looked into, for example: a guest complaint about a cancelled stay.'
+                      : 'Say why it is back in the queue, for example: new payout details to check.'}
                 />
+                {chosenStatus !== 'REJECTED' && (
+                  <p className="text-xs leading-relaxed text-muted">
+                    The verified badge comes off their account as soon as you save, and returns only if the application
+                    is approved again. Their dashboard, listings and earnings keep working, and the message tells them
+                    so.
+                  </p>
+                )}
               </div>
             )}
 

@@ -16,6 +16,9 @@ import {
   missingRequiredDocuments,
   assertSubmittable,
   planApproval,
+  planStatusChange,
+  isAdminReviewStatus,
+  ADMIN_REVIEW_STATUSES,
   assertCanRequestChanges,
   assertCanReject,
   toApplicantView,
@@ -138,6 +141,12 @@ test('only a SUBMITTED application applies an approval', () => {
   assert.equal(planApproval('SUBMITTED'), 'APPLY');
 });
 
+// A case held under investigation is still a case a reviewer decides on; making
+// them reopen it first would be a click that changes nothing.
+test('an application under investigation can be approved directly', () => {
+  assert.equal(planApproval('UNDER_INVESTIGATION'), 'APPLY');
+});
+
 test('approving an already-APPROVED application is idempotent, not an error', () => {
   assert.equal(planApproval('APPROVED'), 'IDEMPOTENT');
 });
@@ -155,6 +164,7 @@ test('changes can be requested on a SUBMITTED application or on a verified one',
   // A verified host can still be asked for more information; requesting it never
   // touches User.role, so their dashboard keeps working while they resubmit.
   assert.doesNotThrow(() => assertCanRequestChanges('APPROVED'));
+  assert.doesNotThrow(() => assertCanRequestChanges('UNDER_INVESTIGATION'));
   for (const status of ['DRAFT', 'CHANGES_REQUESTED', 'REJECTED']) {
     assert.throws(() => assertCanRequestChanges(status), /submitted or verified application/i, status);
   }
@@ -162,10 +172,44 @@ test('changes can be requested on a SUBMITTED application or on a verified one',
 
 test('rejection is allowed while under review and after approval', () => {
   assert.doesNotThrow(() => assertCanReject('SUBMITTED'));
+  assert.doesNotThrow(() => assertCanReject('UNDER_INVESTIGATION'));
   assert.doesNotThrow(() => assertCanReject('CHANGES_REQUESTED'));
   assert.doesNotThrow(() => assertCanReject('APPROVED'));
   for (const status of ['DRAFT', 'REJECTED']) {
     assert.throws(() => assertCanReject(status), /under review or an approved one/i, status);
+  }
+});
+
+// ---- Admin status change on a decided application ----
+
+test('an admin may move a decided application back into review or under investigation', () => {
+  assert.equal(planStatusChange('APPROVED', 'SUBMITTED'), 'APPLY');
+  assert.equal(planStatusChange('APPROVED', 'UNDER_INVESTIGATION'), 'APPLY');
+  // A case can be moved out of investigation back into the queue, or held under
+  // investigation while it is still waiting for a first decision, without the
+  // host submitting anything again.
+  assert.equal(planStatusChange('UNDER_INVESTIGATION', 'SUBMITTED'), 'APPLY');
+  assert.equal(planStatusChange('SUBMITTED', 'UNDER_INVESTIGATION'), 'APPLY');
+});
+
+test('setting the status an application already has is a no-op, not a second notice', () => {
+  assert.equal(planStatusChange('UNDER_INVESTIGATION', 'UNDER_INVESTIGATION'), 'IDEMPOTENT');
+  assert.equal(planStatusChange('SUBMITTED', 'SUBMITTED'), 'IDEMPOTENT');
+});
+
+test('an application still with the applicant, or already closed, cannot be pulled into review', () => {
+  for (const status of ['DRAFT', 'CHANGES_REQUESTED', 'REJECTED']) {
+    assert.throws(() => planStatusChange(status, 'SUBMITTED'), /cannot be moved to review/i, status);
+  }
+});
+
+test('the status endpoint can only set the two review states', () => {
+  for (const target of ['APPROVED', 'REJECTED', 'CHANGES_REQUESTED', 'DRAFT']) {
+    assert.equal(isAdminReviewStatus(target), false, `${target} must not be settable here`);
+    assert.throws(() => planStatusChange('APPROVED', target), /moved back into review or placed under investigation/i, target);
+  }
+  for (const target of ADMIN_REVIEW_STATUSES) {
+    assert.equal(isAdminReviewStatus(target), true);
   }
 });
 
@@ -207,10 +251,11 @@ test('the admin view includes reviewer identity and applicant summary', () => {
   assert.equal(view.user.email, 'a@b.com');
 });
 
-test('the lifecycle enumerates exactly the five expected statuses', () => {
+test('the lifecycle enumerates exactly the six expected statuses', () => {
   assert.deepEqual(HOST_APPLICATION_STATUSES, [
     'DRAFT',
     'SUBMITTED',
+    'UNDER_INVESTIGATION',
     'CHANGES_REQUESTED',
     'APPROVED',
     'REJECTED',

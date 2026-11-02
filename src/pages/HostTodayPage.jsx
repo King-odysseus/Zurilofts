@@ -27,6 +27,10 @@ const HOST_NUDGE = {
   DRAFT: { tone: "attention", title: "host.nudgeDraftTitle", description: "hostsetup.draftHint", actionLabel: "host.nudgeContinue" },
   CHANGES_REQUESTED: { tone: "attention", title: "host.nudgeChangesTitle", description: "hostsetup.changesHint", actionLabel: "host.nudgeContinue" },
   SUBMITTED: { tone: "review", title: "host.nudgeReviewTitle", description: "hostsetup.submittedHint", actionLabel: "host.nudgeViewStatus" },
+  // A host whose account was verified and then held by Trust and Safety loses
+  // the badge and gets this band instead, so the change is visible where they
+  // start their day rather than only on the application page.
+  UNDER_INVESTIGATION: { tone: "attention", title: "host.nudgeInvestigationTitle", description: "hostsetup.investigationHint", actionLabel: "host.nudgeViewStatus" },
   REJECTED: { tone: "rejected", title: "host.nudgeRejectedTitle", description: "hostsetup.rejectedHint", actionLabel: "host.nudgeViewStatus" },
 };
 

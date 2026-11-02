@@ -9,6 +9,7 @@ import {
   userRoleSchema,
   userSuspendSchema,
   hostApplicationReviewSchema,
+  hostApplicationStatusChangeSchema,
   adminAccountDeletionSchema,
   blogPostCreateSchema,
   blogPostUpdateSchema,
@@ -50,6 +51,10 @@ router.get('/host-applications/:id', hostAppCtrl.adminGet);
 router.get('/host-applications/:id/documents/:documentId', hostAppCtrl.adminDownloadDocument);
 router.post('/host-applications/:id/request-changes', validate(hostApplicationReviewSchema), hostAppCtrl.adminRequestChanges);
 router.post('/host-applications/:id/reject', validate(hostApplicationReviewSchema), hostAppCtrl.adminReject);
+// Status change on an application that has already been decided: a verified
+// host can be returned to the queue or held under investigation without being
+// asked to resubmit, and they stay reachable on this application page throughout.
+router.post('/host-applications/:id/status', validate(hostApplicationStatusChangeSchema), hostAppCtrl.adminSetStatus);
 router.post('/host-applications/:id/approve', hostAppCtrl.adminApprove);
 
 // Guest identity verification (review queue: list, detail, reject, approve).

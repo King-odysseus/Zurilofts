@@ -20,6 +20,7 @@ import {
   MessageCircleMore,
   MessagesSquare,
   Percent,
+  ShieldAlert,
   Wallet,
 } from 'lucide-react';
 import HostMobileBottomNav from './HostMobileBottomNav.jsx';
@@ -225,9 +226,14 @@ function HostLayout({ children }) {
   // A returned application is a notification too: it blocks publishing until the
   // host corrects it, and nothing else in this header says so.
   const applicationNeedsChanges = user?.hostApplicationStatus === 'CHANGES_REQUESTED';
+  // So is a hold. A host who was verified and has now been put under
+  // investigation loses the badge with no other trace in this header, which is
+  // exactly the moment they need the page that explains why.
+  const applicationUnderInvestigation = user?.hostApplicationStatus === 'UNDER_INVESTIGATION';
   const showVerifiedNotice = isVerifiedHost && !verifiedNoticeSeen;
   const totalNotifications = unreadGuestMessages + pendingBookings
     + (applicationNeedsChanges ? 1 : 0)
+    + (applicationUnderInvestigation ? 1 : 0)
     + (showVerifiedNotice ? 1 : 0);
 
   function acknowledgeVerified() {
@@ -323,6 +329,13 @@ function HostLayout({ children }) {
                       <span className="min-w-0 flex-1">
                         <span className="block text-xs font-semibold text-navy">{t('host.applicationNeedsChanges')}</span>
                         <span className="block text-[11px] text-muted">{t('host.applicationNeedsChangesHint')}</span>
+                      </span>
+                    </Link>}
+                    {applicationUnderInvestigation && <Link to="/host/application" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>
+                      <span className={NOTIF_TILE} aria-hidden="true"><ShieldAlert className="h-4 w-4" strokeWidth={2} /></span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-xs font-semibold text-navy">{t('hostsetup.underInvestigation')}</span>
+                        <span className="block text-[11px] text-muted">{t('hostsetup.investigationHint')}</span>
                       </span>
                     </Link>}
                     {pendingBookings > 0 && <Link to="/host/reservations" onClick={() => setNotifOpen(false)} className={NOTIF_ITEM}>

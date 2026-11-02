@@ -90,7 +90,7 @@ model AccountErasureLog {
 // A prospective host's application to become a HOST. Registering with role HOST
 // only expresses intent: the user is created as USER with a DRAFT application
 // here, and the HOST role is granted (User.role) only on admin approval.
-// Lifecycle status: "DRAFT" | "SUBMITTED" | "CHANGES_REQUESTED" | "APPROVED" | "REJECTED".
+// Lifecycle status: "DRAFT" | "SUBMITTED" | "UNDER_INVESTIGATION" | "CHANGES_REQUESTED" | "APPROVED" | "REJECTED".
 // Verification documents are stored separately as AES-GCM encrypted bytes.
 model HostApplication {
   id                    String                    @id @default(cuid())

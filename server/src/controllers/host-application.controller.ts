@@ -127,6 +127,25 @@ export async function adminReject(req: Request, res: Response, next: NextFunctio
   }
 }
 
+/**
+ * POST /api/admin/host-applications/:id/status - move a decided application
+ * back into the review queue, or hold it under investigation. Leaves the
+ * account's role alone so the host keeps working while it is looked at.
+ */
+export async function adminSetStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const application = await hostAppService.adminSetReviewStatus(
+      req.params.id,
+      req.user!.sub,
+      req.body.status,
+      req.body.reason,
+    );
+    res.json({ success: true, data: application });
+  } catch (error) {
+    next(error);
+  }
+}
+
 /** POST /api/admin/host-applications/:id/approve - grants HOST atomically, idempotent. */
 export async function adminApprove(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

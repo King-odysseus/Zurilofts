@@ -25,6 +25,7 @@ import { applyReferralCode, ensureReferralCode, normaliseReferralCode } from './
 export type HostApplicationStatus =
   | 'DRAFT'
   | 'SUBMITTED'
+  | 'UNDER_INVESTIGATION'
   | 'CHANGES_REQUESTED'
   | 'APPROVED'
   | 'REJECTED';
@@ -32,6 +33,7 @@ export type HostApplicationStatus =
 export const HOST_APPLICATION_STATUSES: HostApplicationStatus[] = [
   'DRAFT',
   'SUBMITTED',
+  'UNDER_INVESTIGATION',
   'CHANGES_REQUESTED',
   'APPROVED',
   'REJECTED',
@@ -235,7 +237,10 @@ export function assertSubmittable(app: ApplicantFields & { status: string }, upl
  */
 export function planApproval(status: string): 'APPLY' | 'IDEMPOTENT' {
   if (status === 'APPROVED') return 'IDEMPOTENT';
-  if (status === 'SUBMITTED') return 'APPLY';
+  // A case held under investigation is still a case a reviewer may decide on.
+  // Making them push it through "pending review" first would be a second click
+  // that changes nothing about who is allowed to approve it.
+  if (status === 'SUBMITTED' || status === 'UNDER_INVESTIGATION') return 'APPLY';
   throw new ValidationError(`Only a submitted application can be approved (status: ${status}).`);
 }
 
@@ -247,7 +252,7 @@ export function planApproval(status: string): 'APPLY' | 'IDEMPOTENT' {
  * Requesting changes never touches User.role, so a working host keeps working.
  */
 export function assertCanRequestChanges(status: string): void {
-  if (status !== 'SUBMITTED' && status !== 'APPROVED') {
+  if (status !== 'SUBMITTED' && status !== 'UNDER_INVESTIGATION' && status !== 'APPROVED') {
     throw new ValidationError(
       `Changes can only be requested on a submitted or verified application (status: ${status}).`,
     );
@@ -262,11 +267,59 @@ export function assertCanRequestChanges(status: string): void {
  * users page (see requireHost in middleware/auth.ts).
  */
 export function assertCanReject(status: string): void {
-  if (status !== 'SUBMITTED' && status !== 'CHANGES_REQUESTED' && status !== 'APPROVED') {
+  if (
+    status !== 'SUBMITTED'
+    && status !== 'UNDER_INVESTIGATION'
+    && status !== 'CHANGES_REQUESTED'
+    && status !== 'APPROVED'
+  ) {
     throw new ValidationError(
       `Only an application under review or an approved one can be rejected (status: ${status}).`,
     );
   }
+}
+
+// ============================================================
+// Admin status changes on a decided application
+// ------------------------------------------------------------
+// A verified host does not stop being one because Trust and Safety has a
+// question about them. An admin can therefore put a verified account back into
+// the review queue, or hold it under investigation, without asking the host to
+// resubmit anything: the facts that earned the verification are still on file,
+// and the host has to stay reachable and visible on this application page while
+// the question is answered.
+// ============================================================
+
+// Targets an admin may set from the review queue. Both mean "a reviewer is
+// looking at this", which is why neither is editable by the applicant.
+export const ADMIN_REVIEW_STATUSES = ['SUBMITTED', 'UNDER_INVESTIGATION'] as const;
+export type AdminReviewStatus = (typeof ADMIN_REVIEW_STATUSES)[number];
+
+export function isAdminReviewStatus(value: string): value is AdminReviewStatus {
+  return (ADMIN_REVIEW_STATUSES as readonly string[]).includes(value);
+}
+
+/**
+ * Decide how a status change should be applied.
+ *  - 'APPLY'      -> write the new status and tell the host.
+ *  - 'IDEMPOTENT' -> already in that status; a repeat click must neither write
+ *                    nor send the notice a second time.
+ * Any other combination is invalid and throws.
+ */
+export function planStatusChange(current: string, next: string): 'APPLY' | 'IDEMPOTENT' {
+  if (!isAdminReviewStatus(next)) {
+    throw new ValidationError(
+      `An application can only be moved back into review or placed under investigation (requested: ${next}).`,
+    );
+  }
+  if (current === next) return 'IDEMPOTENT';
+  // DRAFT and CHANGES_REQUESTED sit with the applicant: moving one of those into
+  // review would take the form away mid-edit and hide what the reviewer asked
+  // for. A verified application has been decided, and can be put back into review.
+  if (!['SUBMITTED', 'UNDER_INVESTIGATION', 'APPROVED'].includes(current)) {
+    throw new ValidationError(`This application cannot be moved to review from ${current}.`);
+  }
+  return 'APPLY';
 }
 
 // ============================================================
@@ -676,6 +729,83 @@ export async function adminReject(id: string, reviewerId: string, reason: string
     subject: 'Your host application was not approved',
     body: `Trust and Safety has not verified your host application.\n\nReason: ${reason}\n\nReply here if you believe this is a mistake, or submit a new application once the issue is sorted.${app.status === 'APPROVED' ? '\n\nThis does not close your account: your host dashboard and listings keep working. Contact Trust and Safety if you need your access reviewed as well.' : ''}`,
     pushBody: 'Trust and Safety did not approve your host application.',
+    url: '/host/application',
+  });
+
+  return toAdminView(updated);
+}
+
+/**
+ * Move an application between the two review states an admin controls.
+ *
+ * This is how a verified host gets sent back to "pending" or held "under
+ * investigation": the status changes, the badge comes off because it is derived
+ * from that status, and the host is told in words why. User.role is left alone,
+ * so their dashboard, listings and earnings keep running while the question is
+ * answered - cutting access is the separate suspension control on the users page.
+ *
+ * The status is written and audited in one transaction, and the notice is sent
+ * after it commits, so a message can never describe a change that rolled back.
+ */
+export async function adminSetReviewStatus(id: string, reviewerId: string, rawStatus: string, reason: string) {
+  const next = String(rawStatus || '').toUpperCase();
+  const note = String(reason || '').trim();
+  // The host reads this reason on their application page, so a status change
+  // without one would tell them something happened but not what it is about.
+  if (!note) throw new ValidationError('Say why the status is changing: the host reads this as the reason.');
+
+  const app = await prisma.hostApplication.findUnique({ where: { id } });
+  if (!app) throw new NotFoundError('Host application');
+
+  const plan = planStatusChange(app.status, next);
+  if (plan === 'IDEMPOTENT') {
+    const current = await prisma.hostApplication.findUnique({ where: { id }, include: ADMIN_APPLICATION_INCLUDE });
+    return toAdminView(current);
+  }
+
+  const wasVerified = app.status === 'APPROVED';
+  const investigated = next === 'UNDER_INVESTIGATION';
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const row = await tx.hostApplication.update({
+      where: { id },
+      data: { status: next, reviewNote: note, reviewedBy: reviewerId, reviewedAt: new Date() },
+      include: ADMIN_APPLICATION_INCLUDE,
+    });
+    await tx.hostApplicationAudit.create({
+      data: {
+        applicationId: id,
+        actorId: reviewerId,
+        action: investigated ? 'UNDER_INVESTIGATION' : 'RETURNED_TO_REVIEW',
+        note,
+      },
+    });
+    return row;
+  });
+
+  const headline = investigated
+    ? 'Trust and Safety is reviewing your host account.'
+    : 'Trust and Safety moved your host application back into the review queue.';
+  const badgeLine = wasVerified
+    ? 'The verified badge is off your account until this review is complete.'
+    : '';
+
+  await notifyReviewOutcome({
+    userId: app.userId,
+    subject: investigated ? 'Your host account is under review' : 'Your host application is back with our team',
+    // One thought per line, so the notice reads as a short letter in the support
+    // thread rather than a paragraph the host has to unpick on a phone.
+    body: [
+      headline,
+      '',
+      `Reason: ${note}`,
+      '',
+      ...(badgeLine ? [badgeLine, ''] : []),
+      'Your dashboard, listings and earnings keep working while we look at this, and we will message you as soon as it is decided.',
+    ].join('\n'),
+    pushBody: investigated
+      ? 'Trust and Safety is reviewing your host account.'
+      : 'Your host application is back with our team for review.',
     url: '/host/application',
   });
 

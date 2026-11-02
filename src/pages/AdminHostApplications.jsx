@@ -24,6 +24,7 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 const STATUS_OPTIONS = [
   { value: '', labelKey: 'admin.allApplications' },
   { value: 'SUBMITTED', labelKey: 'admin.awaitingReview' },
+  { value: 'UNDER_INVESTIGATION', labelKey: 'admin.underInvestigation' },
   { value: 'CHANGES_REQUESTED', labelKey: 'admin.changesRequested' },
   { value: 'APPROVED', labelKey: 'admin.verificationApproved' },
   { value: 'REJECTED', labelKey: 'adminlisting.statusRejected' },
@@ -33,6 +34,7 @@ const STATUS_OPTIONS = [
 const STATUS_META = {
   DRAFT: { labelKey: 'adminlisting.statusDraft', tone: 'neutral' },
   SUBMITTED: { labelKey: 'admin.awaitingReview', tone: 'pending' },
+  UNDER_INVESTIGATION: { labelKey: 'admin.underInvestigation', tone: 'danger' },
   CHANGES_REQUESTED: { labelKey: 'admin.changesRequested', tone: 'warning' },
   APPROVED: { labelKey: 'admin.verificationApproved', tone: 'success' },
   REJECTED: { labelKey: 'adminlisting.statusRejected', tone: 'danger' },
