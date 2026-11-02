@@ -81,11 +81,35 @@ function buildLocationLabel(location, neighborhood) {
   return label;
 }
 
+// Field in a multi-column row. The label box grows to the tallest label in the
+// row and hugs the bottom of it, so a label that wraps to two lines ("Base price
+// / night (KES)") no longer pushes its input below the inputs beside it.
+function AlignedField({ htmlFor, label, children }) {
+  return (
+    <div className="flex flex-col">
+      <div className="flex grow items-end">
+        <Label htmlFor={htmlFor}>{label}</Label>
+      </div>
+      {children}
+    </div>
+  );
+}
+
+AlignedField.propTypes = {
+  htmlFor: PropTypes.string.isRequired,
+  label: PropTypes.string.isRequired,
+  children: PropTypes.node.isRequired,
+};
+
+// On a phone the numbered sections read as centred cards: the step circle sits
+// above the title instead of beside it. From `sm` up the row returns to its
+// one-line layout, so a wide screen is untouched. The fields below stay left
+// aligned - a centred label above a left aligned input reads as broken.
 function SectionHeader({ step, title, description }) {
   return (
-    <header className="flex items-start gap-3 border-b border-border pb-4">
+    <header className="flex flex-col items-center gap-2 border-b border-border pb-4 text-center sm:flex-row sm:items-start sm:gap-3 sm:text-left">
       <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-bold text-navy">{step}</span>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 sm:flex-1">
         <h2 className="text-base font-semibold text-navy">{title}</h2>
         <p className="text-xs text-muted">{description}</p>
       </div>
@@ -441,22 +465,18 @@ function AdminPropertyForm() {
             <section id="host-editor-pricing" className={`${CARD_CLASS} scroll-mt-24`}>
               <SectionHeader step="4" title={t('admin.pricingAndAvailability')} description={t('admin.pricingAndAvailabilityHint')} />
               <div className="mt-5 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-                <div>
-                  <Label htmlFor="listing-price">{t('admin.basePrice')}</Label>
+                <AlignedField htmlFor="listing-price" label={t('admin.basePrice')}>
                   <TextInput id="listing-price" type="number" min="1" value={form.price} onChange={(e) => update('price', e.target.value)} required />
-                </div>
-                <div>
-                  <Label htmlFor="listing-area">{t('admin.areaSqft')}</Label>
+                </AlignedField>
+                <AlignedField htmlFor="listing-area" label={t('admin.areaSqft')}>
                   <TextInput id="listing-area" type="number" min="1" value={form.area} onChange={(e) => update('area', e.target.value)} required />
-                </div>
-                <div>
-                  <Label htmlFor="listing-bedrooms">{t('admin.bedrooms')}</Label>
+                </AlignedField>
+                <AlignedField htmlFor="listing-bedrooms" label={t('admin.bedrooms')}>
                   <TextInput id="listing-bedrooms" type="number" min="0" value={form.bedrooms} onChange={(e) => update('bedrooms', e.target.value)} required />
-                </div>
-                <div>
-                  <Label htmlFor="listing-bathrooms">{t('admin.bathrooms')}</Label>
+                </AlignedField>
+                <AlignedField htmlFor="listing-bathrooms" label={t('admin.bathrooms')}>
                   <TextInput id="listing-bathrooms" type="number" min="0" value={form.bathrooms} onChange={(e) => update('bathrooms', e.target.value)} required />
-                </div>
+                </AlignedField>
               </div>
 
               <div className="mt-5 rounded-lg bg-surface p-4 shadow-sm">
