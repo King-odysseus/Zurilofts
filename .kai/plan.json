@@ -2,33 +2,41 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the amenities section of the listing form and how amenities are saved",
+      "text": "Deploy the amenities build to Railway and verify the live site",
       "state": "done"
     },
     {
-      "text": "Check whether the project already has a recommended amenities list to reuse",
+      "text": "Add Save-as-draft end to end: draft schema, service defaults, form action, wording",
       "state": "done"
     },
     {
-      "text": "Build the checklist with checked items plus an Add New option that rejects duplicates",
+      "text": "Stop an empty draft reaching the admin queue (completeness gate on submit)",
       "state": "done"
     },
     {
-      "text": "Wire the selected list into the save payload and the edit-load path",
+      "text": "Verify draft save, resume and reload in the browser; lint, build and tests pass",
       "state": "done"
     },
     {
-      "text": "Add the English and Swahili wording",
+      "text": "Align the listing form footer save buttons and check at phone width",
       "state": "done"
     },
     {
-      "text": "Check it in the browser at desktop and phone width",
+      "text": "Style the Cancel action in the listing form footer as a proper button",
       "state": "done"
     },
     {
-      "text": "Run lint and build, then commit and push",
+      "text": "Wire the arrival guide example chips into the directions, manual and rules panes",
+      "state": "done"
+    },
+    {
+      "text": "Verify the arrival guide in the browser, then run lint and build",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push the draft, alignment, cancel and arrival guide work",
       "state": "active"
     }
   ],
-  "updatedAt": "2026-11-02T15:20:32.314Z"
+  "updatedAt": "2026-11-02T15:46:58.422Z"
 }
