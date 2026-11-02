@@ -10,6 +10,7 @@ import Spinner from './components/Spinner.jsx';
 import { resolveTitle } from './utils/pageTitle.js';
 import { syncCanonical } from './utils/documentHead.js';
 import { useLanguage } from './context/LanguageContext.jsx';
+import PushNotificationPrompt from './components/PushNotificationPrompt.jsx';
 
 // Only browsing (home, stays, a property) is in the first download. Everything
 // else is fetched when its route is first opened, so a guest never pays to
@@ -145,6 +146,10 @@ function RouteTitle() {
 export default function App() {
   return <BrowserRouter>
     <RouteTitle />
+    {/* Mounted once here so it can appear on any screen. It was written for this
+        job but never rendered anywhere, so no device had ever subscribed and
+        every push the server sent reached nobody. */}
+    <PushNotificationPrompt />
     <Suspense fallback={<RouteFallback />}><Shell /></Suspense>
   </BrowserRouter>;
 }
