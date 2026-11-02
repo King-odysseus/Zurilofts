@@ -2,25 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Find the home page stay card component and its sizing",
+      "text": "Find every place a host's name is shown to guests",
       "state": "done"
     },
     {
-      "text": "Shrink the card so a single stay is a reasonable size",
+      "text": "Server: stop sending a host's last name on guest-facing payloads (stay page, guest reviews, inbox, automated messages)",
       "state": "done"
     },
     {
-      "text": "Verify in the browser at desktop, tablet and phone width",
+      "text": "Client: render first name only on the stay page, guest inbox/thread and review author lines",
       "state": "done"
     },
     {
-      "text": "Run lint and build",
+      "text": "Update the guest-review test and add a test proving no host last name leaks",
       "state": "done"
     },
     {
-      "text": "Commit and push",
-      "state": "active"
+      "text": "Verify in the browser and via the API, run lint/build/tests, commit and push",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T18:35:21.659Z"
+  "updatedAt": "2026-11-02T18:46:17.006Z"
 }
