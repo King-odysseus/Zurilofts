@@ -6,6 +6,7 @@ import apiClient from '../api/client.js';
 import ListingEditorTabs from '../components/ListingEditorTabs.jsx';
 import ArrivalSectionList from '../components/ArrivalSectionList.jsx';
 import CheckInCheckoutFields from '../components/CheckInCheckoutFields.jsx';
+import ArrivalExamples from '../components/ArrivalExamples.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import {
   EditorFieldGroup,
@@ -42,6 +43,32 @@ const SECTION_FIELDS = {
   rules: ['rulesText'],
 };
 
+
+// Starter lines for the three sections a host most often leaves blank. Keys point
+// at the wording rather than carrying it, so a chip and the sentence it inserts
+// are both translated where they render.
+const EXAMPLES = {
+  directions: [
+    { id: 'airport', labelKey: 'host.arrivalExamples.directionsAirportLabel', textKey: 'host.arrivalExamples.directionsAirportText' },
+    { id: 'gate', labelKey: 'host.arrivalExamples.directionsGateLabel', textKey: 'host.arrivalExamples.directionsGateText' },
+    { id: 'matatu', labelKey: 'host.arrivalExamples.directionsMatatuLabel', textKey: 'host.arrivalExamples.directionsMatatuText' },
+  ],
+  houseManual: [
+    { id: 'wifi', labelKey: 'host.arrivalExamples.manualWifiLabel', textKey: 'host.arrivalExamples.manualWifiText' },
+    { id: 'water', labelKey: 'host.arrivalExamples.manualHotWaterLabel', textKey: 'host.arrivalExamples.manualHotWaterText' },
+    { id: 'bins', labelKey: 'host.arrivalExamples.manualBinsLabel', textKey: 'host.arrivalExamples.manualBinsText' },
+    { id: 'ac', labelKey: 'host.arrivalExamples.manualAcLabel', textKey: 'host.arrivalExamples.manualAcText' },
+    { id: 'power', labelKey: 'host.arrivalExamples.manualPowerLabel', textKey: 'host.arrivalExamples.manualPowerText' },
+  ],
+  rulesText: [
+    { id: 'smoking', labelKey: 'host.arrivalExamples.rulesSmokingLabel', textKey: 'host.arrivalExamples.rulesSmokingText' },
+    { id: 'parties', labelKey: 'host.arrivalExamples.rulesPartiesLabel', textKey: 'host.arrivalExamples.rulesPartiesText' },
+    { id: 'quiet', labelKey: 'host.arrivalExamples.rulesQuietLabel', textKey: 'host.arrivalExamples.rulesQuietText' },
+    { id: 'pets', labelKey: 'host.arrivalExamples.rulesPetsLabel', textKey: 'host.arrivalExamples.rulesPetsText' },
+    { id: 'guests', labelKey: 'host.arrivalExamples.rulesGuestsLabel', textKey: 'host.arrivalExamples.rulesGuestsText' },
+    { id: 'checkout', labelKey: 'host.arrivalExamples.rulesCheckoutLabel', textKey: 'host.arrivalExamples.rulesCheckoutText' },
+  ],
+};
 const HINT = 'mt-1.5 text-xs text-muted';
 
 function draftFrom(property) {
@@ -176,6 +203,28 @@ export default function HostArrivalGuidePage() {
     );
   }, [activeKey, draft, property]);
 
+  // The chip wording and the line it inserts, resolved here so the section follows
+  // the chosen language.
+  function examplesFor(field) {
+    return EXAMPLES[field].map((item) => ({ id: item.id, label: t(item.labelKey), text: t(item.textKey) }));
+  }
+
+  // A line already in the box is shown as used rather than removed, so the row
+  // does not reshuffle under the host finger between taps.
+  function usedExampleIds(field) {
+    const current = String(draft[field] || '').toLowerCase();
+    return EXAMPLES[field].filter((item) => current.includes(t(item.textKey).toLowerCase())).map((item) => item.id);
+  }
+
+  // Inserted on its own line, and never twice: tapping a chip for a line the box
+  // already holds must not duplicate the paragraph.
+  function addExample(field, text) {
+    const current = String(draft[field] || '');
+    if (current.toLowerCase().includes(text.toLowerCase())) return;
+    const trimmed = current.trimEnd();
+    update(field, trimmed ? trimmed + String.fromCharCode(10) + text : text);
+  }
+
   function update(field, value) {
     setDraft((previous) => ({ ...previous, [field]: value }));
     setSavedNote('');
@@ -290,7 +339,14 @@ export default function HostArrivalGuidePage() {
 
         <div className="flex flex-col gap-2 pb-2">
           {activeKey === 'directions' && (
-            <EditorFieldGroup>
+            <>
+              <ArrivalExamples
+                label={t('host.arrivalExamples.title')}
+                items={examplesFor('directions')}
+                onPick={(text) => addExample('directions', text)}
+                disabledIds={usedExampleIds('directions')}
+              />
+              <EditorFieldGroup>
               <EditorTextAreaRow
                 id="guide-directions"
                 label="Directions"
@@ -299,7 +355,8 @@ export default function HostArrivalGuidePage() {
                 onChange={(next) => update('directions', next)}
                 placeholder={t('a11y2.directionsPlaceholder')}
               />
-            </EditorFieldGroup>
+              </EditorFieldGroup>
+            </>
           )}
 
           {activeKey === 'checkIn' && (
@@ -334,7 +391,14 @@ export default function HostArrivalGuidePage() {
           )}
 
           {activeKey === 'manual' && (
-            <EditorFieldGroup>
+            <>
+              <ArrivalExamples
+                label={t('host.arrivalExamples.title')}
+                items={examplesFor('houseManual')}
+                onPick={(text) => addExample('houseManual', text)}
+                disabledIds={usedExampleIds('houseManual')}
+              />
+              <EditorFieldGroup>
               <EditorTextAreaRow
                 id="guide-manual"
                 label="House manual"
@@ -343,11 +407,18 @@ export default function HostArrivalGuidePage() {
                 onChange={(next) => update('houseManual', next)}
                 placeholder={t('a11y2.houseManualPlaceholder')}
               />
-            </EditorFieldGroup>
+              </EditorFieldGroup>
+            </>
           )}
 
           {activeKey === 'rules' && (
             <>
+              <ArrivalExamples
+                label={t('host.arrivalExamples.title')}
+                items={examplesFor('rulesText')}
+                onPick={(text) => addExample('rulesText', text)}
+                disabledIds={usedExampleIds('rulesText')}
+              />
               <EditorFieldGroup>
                 <EditorTextAreaRow
                   id="guide-rules"
