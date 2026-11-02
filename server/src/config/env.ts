@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { z } from 'zod';
+import { findPlainHttpOrigins } from '../utils/secureOrigin.js';
 
 const envSchema = z.object({
   PORT: z.string().default('3000'),
@@ -188,6 +189,20 @@ const envSchema = z.object({
     }
     // Never allow the shipped dev placeholder secrets in production.
     if (data.NODE_ENV === 'production') {
+      // The app's own address must be HTTPS. Login passwords, bearer tokens,
+      // host identity documents and payout bank details all travel in request
+      // bodies, and the refresh cookie is only flagged Secure in production, so
+      // an http origin means every session is readable by anyone on the same
+      // network. A localhost value is exempt because the code deliberately falls
+      // back to the request's own origin in that case.
+      const plainHttpOrigins = findPlainHttpOrigins(data.CLIENT_URL, data.CORS_ORIGIN);
+      if (plainHttpOrigins.length > 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['CLIENT_URL'],
+          message: `Production must be served over HTTPS. These configured origins are plain http: ${plainHttpOrigins.join(', ')}. Set them to https:// or sessions and documents would travel in clear text.`,
+        });
+      }
       const weak = [data.JWT_ACCESS_SECRET, data.JWT_REFRESH_SECRET].some((s) =>
         /zurilofts-dev|change-?me|secret-key|placeholder/i.test(s)
       );
