@@ -2,29 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Record a plan for this commit/push run",
+      "text": "Record commit and push plan",
       "state": "done"
     },
     {
-      "text": "Inspect working tree and review the full diff for scope and secrets",
+      "text": "Inspect working tree, diff and any scratch files",
       "state": "done"
     },
     {
-      "text": "Confirm scratch/test files are not being staged",
+      "text": "Run lint, build, server typecheck and flow tests",
       "state": "done"
     },
     {
-      "text": "Run lint, build and server type check on this exact tree",
+      "text": "Stage source files and commit",
       "state": "done"
     },
     {
-      "text": "Stage the source files and commit with a change-focused message",
-      "state": "done"
-    },
-    {
-      "text": "Push to origin and confirm the branch is clean",
+      "text": "Push, then commit the plan file separately",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T10:14:01.895Z"
+  "updatedAt": "2026-11-02T10:24:12.413Z"
 }
