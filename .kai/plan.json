@@ -2,25 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Find the exact stored image URL behind the broken admin thumbnail",
+      "text": "Confirm the deploy triggered by the last push finished and the site is healthy",
       "state": "done"
     },
     {
-      "text": "Fix the admin thumbnail (and any other place rendering a raw image path)",
+      "text": "Read the exact photos on the production listing from the screenshot and test them",
       "state": "done"
     },
     {
-      "text": "Notify the host when an admin approves, rejects, suspends or restores their listing",
+      "text": "Find why notifications never reach anyone (permission prompt never mounted, gated on marketing consent)",
       "state": "done"
     },
     {
-      "text": "Verify both in the browser and with tests",
+      "text": "Mount the notification prompt and let signed-in people turn notifications on",
       "state": "done"
     },
     {
-      "text": "Run lint/build, commit, push and deploy",
+      "text": "Prove a subscription is stored and a push is actually delivered",
+      "state": "done"
+    },
+    {
+      "text": "Run the checks, commit, push and deploy",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T16:49:46.499Z"
+  "updatedAt": "2026-11-02T17:01:26.904Z"
 }
