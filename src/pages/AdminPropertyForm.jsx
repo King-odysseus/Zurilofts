@@ -714,10 +714,8 @@ function AdminPropertyForm() {
                       return (
                         <label
                           key={name}
-                          className={`flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors ${
-                            checked
-                              ? 'border-primary bg-primary-50 text-navy dark:bg-primary/15'
-                              : 'border-border bg-elevated text-charcoal hover:border-primary'
+                          className={`flex cursor-pointer items-center gap-2 px-3 py-2.5 text-sm transition-all ${
+                            checked ? 'neu-radio-selected text-navy' : 'neu-radio-card text-charcoal'
                           }`}
                         >
                           <Checkbox checked={checked} onChange={() => toggleAmenity(name)} />

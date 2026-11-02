@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+import { Button } from 'flowbite-react';
 
 /**
  * Starter examples for one arrival-guide section.
@@ -13,14 +14,10 @@ import PropTypes from 'prop-types';
  * which examples are already covered.
  */
 
-// Two complete looks rather than a base plus overrides: a used chip must not
-// light up on hover, and when two equal Tailwind utilities disagree the winner
-// is decided by the order they were generated in, not by the order written here.
-const CHIP_BASE =
-  'inline-flex min-h-8 items-center rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors';
-const CHIP_ACTIVE = 'border-border bg-surface text-navy hover:border-primary hover:bg-primary-50';
-const CHIP_USED = 'cursor-default border-border bg-surface text-muted opacity-60';
-
+// The chip is the app's secondary pill, not a look of its own: the Flowbite theme
+// already defines that as a fully rounded white button with the #E2DAD0 border and
+// #203565 ink, plus an inset/muted disabled state that reads as "already used"
+// without a second colour being invented here.
 export default function ArrivalExamples({ label, items, onPick, disabledIds = [] }) {
   // A heading over no chips reads as a broken control rather than a hint, so a
   // section without examples renders nothing at all.
@@ -41,17 +38,18 @@ export default function ArrivalExamples({ label, items, onPick, disabledIds = []
           // tooltip, so no extra wording has to be translated.
           const used = usedIds.includes(item.id);
           return (
-            <button
+            <Button
               key={item.id}
               type="button"
+              color="light"
+              size="sm"
               onClick={() => onPick(item.text)}
               disabled={used}
               aria-disabled={used}
               title={used ? item.label : undefined}
-              className={`${CHIP_BASE} ${used ? CHIP_USED : CHIP_ACTIVE}`}
             >
               {item.label}
-            </button>
+            </Button>
           );
         })}
       </div>
