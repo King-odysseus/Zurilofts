@@ -365,7 +365,7 @@ function HostLayout({ children }) {
                     <span className="min-w-0 truncate">{displayName}</span>
                     {isVerifiedHost && (
                       <span
-                        className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-navy dark:bg-primary/15 dark:text-primary-300"
+                        className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#E7F6EE] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#157347]"
                         title="Your host account is verified"
                       >
                         <BadgeCheck className="h-3 w-3" strokeWidth={2.4} aria-hidden="true" />

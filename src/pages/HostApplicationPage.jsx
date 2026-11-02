@@ -1319,7 +1319,7 @@ function StatusCard({ application, statusLabel, statusMeta, user, onBackToTravel
       <h2 className="mt-3 text-2xl font-bold tracking-tight text-navy sm:text-3xl">{approved ? 'You are ready to host' : 'Application status'}</h2>
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">{statusMeta}</p>
       {approved && (
-        <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-primary-50 px-3 py-1 text-xs font-semibold text-navy dark:bg-primary/15 dark:text-primary-300">
+        <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-[#E7F6EE] px-3 py-1 text-xs font-semibold text-[#157347]">
           <BadgeCheck className="h-4 w-4" strokeWidth={2.4} aria-hidden="true" />
           Verified host badge is on your account
         </p>
