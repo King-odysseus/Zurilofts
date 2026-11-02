@@ -2,25 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Record commit and push plan",
+      "text": "Check working tree and see what is changed",
       "state": "done"
     },
     {
-      "text": "Inspect working tree, diff and any scratch files",
+      "text": "Separate real source changes from scratch review files",
       "state": "done"
     },
     {
-      "text": "Run lint, build, server typecheck and flow tests",
+      "text": "Stage and commit the listing form alignment changes",
       "state": "done"
     },
     {
-      "text": "Stage source files and commit",
+      "text": "Push to the remote",
       "state": "done"
     },
     {
-      "text": "Push, then commit the plan file separately",
+      "text": "Commit the finished plan file",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T10:24:12.413Z"
+  "updatedAt": "2026-11-02T12:55:42.985Z"
 }
