@@ -63,8 +63,9 @@ function joinFieldLabels(labelKeys, t) {
 // since have been deleted, in which case the name is empty and the line falls
 // back to the date alone instead of showing a stranded comma.
 function reviewAuthorName(host) {
-  if (!host) return '';
-  return [host.firstName, host.lastName].filter(Boolean).join(' ');
+  // First name only: the author is a host, and whoever reads this may be a
+  // guest they hosted. The payload does not carry a surname either.
+  return host?.firstName || '';
 }
 
 function ProfilePage() {

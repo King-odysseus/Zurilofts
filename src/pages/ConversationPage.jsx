@@ -161,7 +161,12 @@ function ConversationPage() {
     <div className="opg-message-thread !pt-6" ref={threadRef} aria-live="polite">
       {loading ? <div className="opg-message-loading" aria-label={t('a11y2.loadingMessages')}><span /><span /><span /></div> : error && messages.length === 0 ? <div className="opg-message-error"><p>{error}</p><button type="button" onClick={loadMessages}>Try again</button></div> : messages.length === 0 ? <div className="opg-message-empty"><strong>No messages yet</strong><p>Say hello to {participant.name} and start planning the stay.</p></div> : messages.map((message) => {
         const isMine = message.senderId === user?.id;
-        const senderName = [message.sender?.firstName, message.sender?.lastName].filter(Boolean).join(' ') || 'User';
+        // In a guest's thread the other party is the host, shown by first name
+        // only to match the header. A host still sees the guest's full name,
+        // which they need to know who is arriving.
+        const senderName = (participant.isHost
+          ? message.sender?.firstName
+          : [message.sender?.firstName, message.sender?.lastName].filter(Boolean).join(' ')) || 'User';
         return <GuestMessageBubble key={message.id} mine={isMine} attachments={message.attachments} meta={`${isMine ? 'You' : senderName} · ${formatMessageTime(message.createdAt)}`}>{translatedMessages.get(message.content) ?? message.content}</GuestMessageBubble>;
       })}
       {error && messages.length > 0 && <p className="opg-message-inline-error">{error}</p>}

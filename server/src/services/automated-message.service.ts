@@ -323,7 +323,9 @@ function buildContext(booking: ContextBooking): Record<string, string> {
   const guest = booking.user;
   const host = p.host;
   const guestName = [guest?.firstName, guest?.lastName].filter(Boolean).join(' ').trim();
-  const hostName = [host?.firstName, host?.lastName].filter(Boolean).join(' ').trim();
+  // These templates are read by the guest, so the host signs with a first name
+  // only - the same rule the stay page follows.
+  const hostName = (host?.firstName ?? '').trim();
   const checkInMs = nairobiDayMs(booking.checkIn);
   const daysUntil = Math.max(0, Math.round((checkInMs - nairobiDayMs(new Date())) / DAY_MS));
 

@@ -19,8 +19,10 @@ export type ListingReviewAction = 'approve' | 'reject' | 'suspend' | 'unsuspend'
  */
 export interface PublicHostSummary {
   id: string;
+  // First name only. This object is served to anyone on the internet, and a
+  // surname adds nothing to a booking decision while making the host
+  // personally identifiable. Admin endpoints carry the full name for staff.
   firstName: string;
-  lastName: string;
   avatar: string | null;
   /** When the host account was created, so the badge can say "host since ...". */
   memberSince: Date;
@@ -491,7 +493,6 @@ export async function getProperty(id: string, viewer?: { sub: string; role: stri
         select: {
           id: true,
           firstName: true,
-          lastName: true,
           avatar: true,
           createdAt: true,
           identityVerification: { select: { status: true } },
@@ -521,7 +522,6 @@ export async function getProperty(id: string, viewer?: { sub: string; role: stri
     ? {
         id: host.id,
         firstName: host.firstName,
-        lastName: host.lastName,
         avatar: host.avatar,
         memberSince: host.createdAt,
         identityVerified: host.identityVerification?.status === 'APPROVED',

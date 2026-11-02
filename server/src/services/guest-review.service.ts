@@ -105,7 +105,7 @@ export interface PublicGuestReview {
   rating: number;
   publicComment: string | null;
   createdAt: Date | string;
-  host: { firstName: string; lastName: string } | null;
+  host: { firstName: string } | null;
   property: { id: string; title: string } | null;
 }
 
@@ -115,7 +115,7 @@ interface GuestReviewSource {
   rating: number;
   publicComment?: string | null;
   createdAt: Date | string;
-  host?: { firstName: string; lastName: string } | null;
+  host?: { firstName: string } | null;
   property?: { id: string; title: string } | null;
 }
 
@@ -131,7 +131,9 @@ export function toPublicGuestReview(review: GuestReviewSource): PublicGuestRevie
     publicComment: review.publicComment ?? null,
     createdAt: review.createdAt,
     host: review.host
-      ? { firstName: review.host.firstName, lastName: review.host.lastName }
+      // First name only: the author is a host, and whoever reads this row may
+      // be a guest they hosted.
+      ? { firstName: review.host.firstName }
       : null,
     property: review.property
       ? { id: review.property.id, title: review.property.title }

@@ -10,7 +10,9 @@ export function getConversationParticipant(conversation, currentUserId) {
   const person = currentUserIsGuest ? host : guest;
   const fallback = currentUserIsGuest ? 'Host' : 'Guest';
   return {
-    name: fullName(person, fallback),
+    // A guest sees the host by first name only. The guest's own surname stays
+    // visible to the host, who needs it to know who is arriving.
+    name: currentUserIsGuest ? (person?.firstName?.trim() || fallback) : fullName(person, fallback),
     avatar: person.avatar || null,
     isHost: currentUserIsGuest,
   };

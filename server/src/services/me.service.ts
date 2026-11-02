@@ -80,7 +80,9 @@ export async function exportUserData(userId: string) {
           id: true,
           property: {
             select: {
-              host: { select: { id: true, firstName: true, lastName: true } },
+              // First name only, as everywhere a host is shown outside their
+              // own workspace.
+              host: { select: { id: true, firstName: true } },
             },
           },
           user: { select: { id: true, firstName: true, lastName: true } },

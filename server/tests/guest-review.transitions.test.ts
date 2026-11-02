@@ -159,12 +159,14 @@ test('toPublicGuestReview exposes only the allowlisted key set', () => {
     rating: 5,
     publicComment: 'Quiet, tidy, left the place spotless.',
     createdAt: PAST,
-    host: { firstName: 'Jane', lastName: 'Doe' },
+    host: { firstName: 'Jane' },
     property: { id: 'p-1', title: 'Kilimani Loft' },
   });
 
   // Explicitly assert nothing private survived serialization.
   const serialized = JSON.stringify(pub);
+  // The author is a host, so their surname must not reach the reader.
+  assert.ok(!serialized.includes('Doe'), 'a host surname must not reach the guest');
   for (const leak of [
     'privateNote',
     'hidden',

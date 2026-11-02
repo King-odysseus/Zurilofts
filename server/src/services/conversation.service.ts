@@ -33,7 +33,7 @@ async function requireParticipant(
     include: {
       booking: {
         include: {
-          property: { select: { hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
+          property: { select: { hostId: true, host: { select: { id: true, firstName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -50,6 +50,25 @@ async function requireParticipant(
   }
 
   return { conversation, role: 'host' }; // admins treated as host for read-purposes
+}
+
+type MessageWithSender = {
+  sender?: Record<string, unknown> | null;
+  [key: string]: unknown;
+};
+
+/**
+ * Drops the surname from a message whose sender is the property's host.
+ * A guest reads this thread, and a host's surname is their own information;
+ * it is never needed to follow a conversation. Exported so the rule is tested
+ * directly rather than only through a database round trip.
+ */
+export function hideHostSurname<T extends MessageWithSender>(message: T, hostId?: string | null): T {
+  const sender = message.sender;
+  if (!hostId || !sender || sender.id !== hostId) return message;
+  const trimmed = { ...sender };
+  delete trimmed.lastName;
+  return { ...message, sender: trimmed };
 }
 
 // ---------------------------------------------------------------
@@ -80,7 +99,7 @@ export async function getOrCreateConversation(input: GetOrCreateInput) {
     include: {
       booking: {
         include: {
-          property: { select: { id: true, title: true, location: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
+          property: { select: { id: true, title: true, location: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -94,7 +113,7 @@ export async function getOrCreateConversation(input: GetOrCreateInput) {
     include: {
       booking: {
         include: {
-          property: { select: { id: true, title: true, location: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
+          property: { select: { id: true, title: true, location: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -137,7 +156,7 @@ export async function listUserConversations(userId: string, side?: ConversationS
       },
       booking: {
         include: {
-          property: { select: { id: true, title: true, location: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
+          property: { select: { id: true, title: true, location: true, imagesJson: true, hostId: true, host: { select: { id: true, firstName: true, avatar: true } } } },
           user: { select: { id: true, firstName: true, lastName: true, avatar: true } },
         },
       },
@@ -180,7 +199,8 @@ export async function getMessages(
   page = 1,
   limit = 50
 ) {
-  await requireParticipant(conversationId, userId, isAdmin);
+  const { conversation } = await requireParticipant(conversationId, userId, isAdmin);
+  const hostId = conversation.booking.property.hostId;
 
   const skip = (page - 1) * limit;
 
@@ -198,7 +218,7 @@ export async function getMessages(
   ]);
 
   return {
-    messages: messages.reverse().map(withParsedAttachments), // return chronological order
+    messages: messages.reverse().map((message) => hideHostSurname(withParsedAttachments(message), hostId)), // return chronological order
     pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
   };
 }
@@ -223,7 +243,7 @@ export async function sendMessage(
     include: {
       booking: {
         include: {
-          property: { select: { hostId: true, host: { select: { id: true, firstName: true, lastName: true, avatar: true } } } },
+          property: { select: { hostId: true, host: { select: { id: true, firstName: true, avatar: true } } } },
         },
       },
     },
@@ -264,7 +284,7 @@ export async function sendMessage(
     } catch (err) { console.error('Push notification failed:', err); }
   }
 
-  return withParsedAttachments(message);
+  return hideHostSurname(withParsedAttachments(message), conversation.booking.property.hostId);
 }
 
 export async function markAsRead(conversationId: string, userId: string, isAdmin: boolean) {

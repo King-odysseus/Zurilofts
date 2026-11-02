@@ -210,10 +210,15 @@ function PropertyPage() {
   // and whether ZuriLofts confirmed their identity), so verification is read
   // from the payload and never inferred here, and no second request is made.
   const host = property.host ?? null;
-  const hostName = host ? [host.firstName, host.lastName].filter(Boolean).join(' ') : '';
-  // Same initials rule as the account shells (GuestAccountLayout, HostLayout):
-  // first letter of each name part, uppercased, so the circle is never blank.
-  const hostInitials = `${host?.firstName?.[0] ?? ''}${host?.lastName?.[0] ?? ''}`.toUpperCase();
+  // First name only. This page is readable by anyone, and a surname adds
+  // nothing to a booking decision while making the host personally
+  // identifiable. The API no longer sends one; reading it here as well keeps
+  // the rule visible, so a future payload change cannot quietly widen it.
+  const hostName = host?.firstName ?? '';
+  // One initial, from the first name alone. The account shells use the initials
+  // of first and last, but here a surname initial would leak the first letter
+  // of the name this rule just removed.
+  const hostInitials = `${host?.firstName?.[0] ?? ''}`.toUpperCase();
   // memberSince arrives as an ISO string; an unparseable value is left out
   // rather than printing "Invalid Date" or a guessed year.
   const hostSinceDate = host?.memberSince ? new Date(host.memberSince) : null;

@@ -183,7 +183,9 @@ function GuestReviewList({ reviews }) {
 
   return <ul className="flex flex-col divide-y divide-border">
     {reviews.map((review) => {
-      const hostName = [review.host?.firstName, review.host?.lastName].filter(Boolean).join(' ');
+      // First name only: the author is a host, and the payload no longer
+      // carries a surname.
+      const hostName = review.host?.firstName || '';
       return <li key={review.id} className="flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <GuestStars rating={review.rating} />
