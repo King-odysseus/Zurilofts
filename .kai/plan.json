@@ -2,17 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Identify the node processes behind ports 3000 and 5173 by command line, then stop only mine",
+      "text": "Check repo state and whether any commits are unpushed",
       "state": "done"
     },
     {
-      "text": "Verify the amenities checklist and draft strings shipped in the live bundle",
+      "text": "Check Railway deployment status for the latest commit",
       "state": "done"
     },
     {
-      "text": "Confirm the working tree and remote are clean, then report what remains",
-      "state": "active"
+      "text": "Confirm the deployment succeeded and the service is online",
+      "state": "done"
+    },
+    {
+      "text": "Verify the live site serves the current build (bundle hashes and API)",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T15:59:00.081Z"
+  "updatedAt": "2026-11-02T16:10:42.577Z"
 }
