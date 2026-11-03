@@ -7,11 +7,11 @@
     },
     {
       "text": "SEC-07: stop an out-of-order transfer.success reopening a settled payout and crediting the host twice",
-      "state": "pending"
+      "state": "done"
     },
     {
-      "text": "SEC-02: move message attachments to private storage with membership-checked downloads",
-      "state": "pending"
+      "text": "SEC-02: serve conversation files only to the people in that conversation",
+      "state": "done"
     },
     {
       "text": "Trust and Safety: server-side paging, search and accurate totals so cases past the first 100 are reachable",
@@ -36,11 +36,7 @@
     {
       "text": "Eight Tier 3 feature proposals, unimplemented and unapproved",
       "state": "pending"
-    },
-    {
-      "text": "Record the corrected remaining-work list in .kai/plan.json and commit it",
-      "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-03T12:02:24.474Z"
+  "updatedAt": "2026-11-03T12:12:51.871Z"
 }
