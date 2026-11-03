@@ -80,6 +80,29 @@ anonymous, unrelated and suspended accounts cannot. Test URL expiry,
 forwarded URLs, deleted messages and legacy public assets. Inventory and
 migrate existing files rather than protecting new uploads alone.
 
+Status: fixed in code. `msg-` files are refused by the public upload
+directory (`server/src/app.ts`) and served instead by
+`GET /api/messages/attachments/:filename`, which matches the requester
+against the thread that carries the file - sender, recipient of that
+booking, or an administrator (`server/src/services/chatAttachment.service.ts`).
+A missing file and a refusal answer identically, so the route cannot be used
+to enumerate stored documents. Files are sent `no-store`, `nosniff`, and as
+a download unless they are images. Listing photos and avatars stay public,
+because the public site renders them.
+
+Verified against a running isolated instance: 13 checks, including the public
+URL now returning 404, an anonymous request refused, the sender, the booking's
+host and an administrator each allowed, an unrelated signed-in user refused,
+the support thread covered, a PDF delivered intact as a download, and a
+traversal attempt refused. The guest inbox and the support thread were also
+opened in a browser: both render the photo from a private blob fetch with no
+public `/uploads/msg-` request.
+
+Still outstanding: production uses Cloudinary, where these files are uploaded
+publicly. The delivery route proxies and authorizes them, but the stored
+objects themselves should be re-uploaded as private/authenticated assets.
+Existing files should be inventoried before that switch.
+
 ### SEC-03: P1 - Google sign-in lacks browser-bound transaction verification
 
 Affected screens: login, registration and OAuth callback.

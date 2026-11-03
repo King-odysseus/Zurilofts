@@ -51,6 +51,34 @@ export function formatAttachmentSize(bytes) {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
+/**
+ * The authenticated route for a conversation attachment, or null for a URL that
+ * may be used directly.
+ *
+ * Chat files are private: the stored URL is a storage address, not something a
+ * browser may fetch. Requests for them go through the message route, which
+ * checks the requester is part of that conversation, so a link forwarded to
+ * someone else stops working for them.
+ */
+export function chatAttachmentPath(url) {
+  if (typeof url !== 'string') return null;
+  // Only our own storage shapes, matching the server's rule: a name that merely
+  // looks generated on somebody else's host is not ours to fetch.
+  if (!url.startsWith('/uploads/') && !(url.startsWith('https://res.cloudinary.com/') && url.includes('/zurilofts/'))) {
+    return null;
+  }
+  const name = url.split(/[?#]/)[0].split('/').pop() || '';
+  let decoded = name;
+  try {
+    decoded = decodeURIComponent(name);
+  } catch {
+    return null;
+  }
+  return /^msg-[a-z0-9-]{1,80}(?:\.(?:jpg|jpeg|png|webp|pdf))?$/i.test(decoded)
+    ? `/messages/attachments/${encodeURIComponent(decoded)}`
+    : null;
+}
+
 export async function uploadAttachments(files) {
   const form = new FormData();
   files.forEach((file) => form.append('files', file));

@@ -8,6 +8,7 @@ import { corsOptions } from './config/cors.js';
 import { env } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { UPLOAD_DIR } from './controllers/upload.controller.js';
+import { requestsChatAttachment } from './utils/chatAttachment.js';
 
 // Import routes
 import authRoutes from './routes/auth.routes.js';
@@ -91,6 +92,20 @@ app.use(cookieParser());
 
 // Serve uploaded files. crossOrigin policy is relaxed so the dev frontend
 // (different port) can render them through the Vite proxy.
+//
+// Only the public families live here: listing photos and avatars are rendered by
+// the public site, so they must stay fetchable without a session. Conversation
+// attachments do not - they belong to a private thread - so a `msg-` request is
+// refused here and answered instead by the authenticated message route, which
+// checks that the requester is part of that conversation.
+app.use('/uploads', (req, res, next) => {
+  const requested = req.path.replace(/^\/+/, '').split('/').pop() ?? '';
+  if (requestsChatAttachment(requested)) {
+    res.status(404).end();
+    return;
+  }
+  next();
+});
 app.use(
   '/uploads',
   express.static(UPLOAD_DIR, {

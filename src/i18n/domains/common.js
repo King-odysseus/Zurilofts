@@ -1092,6 +1092,9 @@ export const common = {
       // Failure copy. Every failed request says what failed and what to do,
       // never a bare "error", so these are the defaults pages reuse.
       couldNotLoad: 'That could not be loaded.',
+      // A conversation file is fetched with the reader's own session; this is
+      // what they see when that fails, so it must not claim the file is gone.
+      attachmentUnavailable: 'This file could not be opened. Try again.',
       couldNotSave: 'That could not be saved.',
       checkConnection: 'Check your connection and try again.',
       signInRequired: 'Sign in to continue.',
@@ -2442,6 +2445,7 @@ export const common = {
       details: 'Maelezo',
       notes: 'Maelezo ya ndani',
       couldNotLoad: 'Haikuweza kupakiwa.',
+      attachmentUnavailable: 'Faili hii haikuweza kufunguliwa. Jaribu tena.',
       couldNotSave: 'Haikuweza kuhifadhiwa.',
       checkConnection: 'Angalia muunganisho wako kisha ujaribu tena.',
       signInRequired: 'Ingia ili kuendelea.',
