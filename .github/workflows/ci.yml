@@ -45,9 +45,16 @@ jobs:
       CORS_ORIGIN: "http://localhost:5173"
       WITHHOLDING_TAX_RATE: "5"
       CLOUDINARY_URL: "cloudinary://999999999999999:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef@ci-cloud"
-      PAYSTACK_SECRET_KEY: "sk_test_ci_dummy_dummy_dummy_dummy"
-      VAPID_PUBLIC_KEY: "ci-vapid-public-key"
-      VAPID_PRIVATE_KEY: "ci-vapid-private-key"
+      # A fixture, not a credential: no request leaves the runner, so the value
+      # only has to satisfy validation. It must not look like a sandbox key -
+      # env validation refuses sk_test_ under NODE_ENV=production, because a test
+      # key in production would confirm bookings and release host payouts against
+      # money that never moved. That refusal was rejecting this whole env, so
+      # every suite died at import and the server job never ran an assertion.
+      PAYSTACK_SECRET_KEY: "sk_live_ci_fixture_not_a_real_key"
+      # No VAPID key material is stored here. web-push throws at import on a
+      # malformed key, so a placeholder string took down every suite that touches
+      # push. The pair is generated per run in the test step below.
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -70,4 +77,8 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit
       - name: Run tests
-        run: node --import tsx --test tests/*.test.ts
+        run: |
+          # Generated per run, so no key material lives in the repository and the
+          # pair is always a shape web-push accepts.
+          eval "$(node -e "const w = require('web-push'); const k = w.generateVAPIDKeys(); console.log('export VAPID_PUBLIC_KEY=' + k.publicKey); console.log('export VAPID_PRIVATE_KEY=' + k.privateKey);")"
+          node --import tsx --test tests/*.test.ts
