@@ -2,25 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Find every place a host's name is shown to guests",
+      "text": "Review source findings across admin, guest and host apps; runtime confirmation remains outstanding",
       "state": "done"
     },
     {
-      "text": "Server: stop sending a host's last name on guest-facing payloads (stay page, guest reviews, inbox, automated messages)",
+      "text": "Verify security findings using source and isolated tests; document remaining deployment checks",
       "state": "done"
     },
     {
-      "text": "Client: render first name only on the stay page, guest inbox/thread and review author lines",
+      "text": "Map navigation and verify routes, redirects and login returns with isolated role fixtures; record live checks",
       "state": "done"
     },
     {
-      "text": "Update the guest-review test and add a test proving no host last name leaks",
+      "text": "Plan terminology edits in translations, titles and messages: stays for guests, listings for host/admin",
       "state": "done"
     },
     {
-      "text": "Verify in the browser and via the API, run lint/build/tests, commit and push",
+      "text": "Specify a real Help Centre and secure password recovery, including screens, routes and failure states",
+      "state": "done"
+    },
+    {
+      "text": "Specify admin queue pagination and complete audit history, including older records and sensitive actions",
+      "state": "done"
+    },
+    {
+      "text": "Verify guest booking and host publishing, calendar, messaging and payout journeys on desktop and mobile",
+      "state": "done"
+    },
+    {
+      "text": "Rank proposed features and document affected screens/files, risks, fixes and acceptance checks; no implementation yet",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-02T18:46:17.006Z"
+  "updatedAt": "2026-11-03T11:23:36.277Z"
 }
