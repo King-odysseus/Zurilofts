@@ -811,7 +811,7 @@ function Navbar() {
           role="dialog"
           aria-modal="true"
           aria-label={t('trust.accountAndNavigation')}
-          className={`fixed left-1/2 top-20 z-30 flex w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-9rem)] -translate-x-1/2 flex-col overflow-hidden rounded-2xl bg-elevated shadow-[0_20px_60px_rgba(20,58,128,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
+          className={`fixed left-1/2 top-20 z-30 flex w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-var(--zl-bottom-nav-space)-5.75rem)] -translate-x-1/2 flex-col overflow-hidden rounded-2xl bg-elevated shadow-[0_20px_60px_rgba(20,58,128,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
         >
           <div className="flex shrink-0 items-center justify-between border-b border-[#E3E8EF] bg-elevated px-4 py-3">
             <div className="flex items-center gap-3 min-w-0">

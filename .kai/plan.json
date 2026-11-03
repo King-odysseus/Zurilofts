@@ -2,29 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Run the production build and fix whatever is failing",
+      "text": "Reproduce all three issues in a browser at real phone sizes (390x844, 360x640, 375x600)",
       "state": "done"
     },
     {
-      "text": "Reduce padding inside calendar date tiles (reported too large)",
+      "text": "Fix calendar tile and row spacing on mobile",
       "state": "done"
     },
     {
-      "text": "Fix calendar row spacing on mobile",
+      "text": "Fix mobile bottom nav jump and excess padding under the tabs",
       "state": "done"
     },
     {
-      "text": "Fix mobile nav jump and excess padding below nav items",
+      "text": "Fix the traveller/host mode switch being covered by the nav on short screens",
       "state": "done"
     },
     {
-      "text": "Fix the traveller/host mode switch being blocked by the nav on short screens",
-      "state": "done"
-    },
-    {
-      "text": "Verify in a browser at several phone widths and heights, then lint and build",
-      "state": "done"
+      "text": "Re-measure in the browser, run lint and build, commit and push",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-03T14:52:22.258Z"
+  "updatedAt": "2026-11-03T15:06:46.515Z"
 }

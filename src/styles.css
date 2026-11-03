@@ -206,6 +206,16 @@ body {
     --zl-bottom-nav-space: calc(64px + env(safe-area-inset-bottom));
     padding-bottom: calc(64px + env(safe-area-inset-bottom));
   }
+  /* The class above is added by an effect, which runs after the first paint of
+     each route, so a short page used to reserve nothing for one frame and then
+     jump the footer up 64px. :has() follows the bar in the DOM instead, so the
+     reservation is already in the stylesheet the moment the bar renders. Both
+     bars carry data-bottom-nav, which keeps this rule off the checkout and
+     workspace routes where neither bar is mounted. */
+  body:has([data-bottom-nav]) {
+    --zl-bottom-nav-space: calc(64px + env(safe-area-inset-bottom));
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
 }
 
 /* Keyboard focus must stay visible even where components set Tailwind's
@@ -904,7 +914,7 @@ html.dark {
    navy and keeps the last legal row clear of it. Body's padding-bottom is now
    exactly --zl-bottom-nav-space, so the negative margin is exactly that value;
    any extra offset would reopen a hairline of white under the footer. */
-@media(max-width:767px){body.has-mobile-bottom-nav .opg-footer{margin-bottom:calc(-1 * var(--zl-bottom-nav-space));padding-bottom:calc(var(--zl-bottom-nav-space) + 20px)}}
+@media(max-width:767px){body.has-mobile-bottom-nav .opg-footer,body:has(.mobile-bottom-nav) .opg-footer{margin-bottom:calc(-1 * var(--zl-bottom-nav-space));padding-bottom:calc(var(--zl-bottom-nav-space) + 20px)}}
 @media(max-width:767px){.zl-header-auth-link,.zl-header-register,.zl-header-language{display:none}.zl-header .zl-menu-btn{display:inline-grid;place-items:center}.zl-header .zl-icon-btn{display:none}.zl-header-actions{gap:4px}}
 
 .zl-header .zl-header-icon-button,

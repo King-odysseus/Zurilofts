@@ -101,6 +101,7 @@ function MobileBottomNav() {
   return (
     <nav
       aria-label={t('a11y1.primaryNav')}
+      data-bottom-nav="guest"
       style={{ paddingBottom: 'calc(4px + env(safe-area-inset-bottom))' }}
       className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto grid max-w-[390px] grid-cols-5 items-stretch rounded-full bg-elevated text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] md:hidden"
     >

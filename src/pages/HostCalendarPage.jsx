@@ -373,7 +373,7 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle, onRan
   // keeps the same seven tracks and the same gap, or a label would drift off
   // its column. The rows are spaced by the same measure down the month, so the
   // tiles read as a grid of nights rather than one tall stack.
-  return <div className="select-none space-y-2 px-4 pb-3 sm:space-y-2 sm:pb-4">
+  return <div className="select-none space-y-2.5 px-4 pb-3 sm:space-y-2 sm:pb-4">
     {/* The weekday strip pins under the workspace header while the month
         scrolls beneath it, the way the reference keeps the column letters in
         view down a long month. The negative margin lets the strip run full
@@ -449,7 +449,7 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle, onRan
               aria-pressed={isSelected}
               disabled={stay || outside}
               aria-label={`${label}${outside ? t('a11y2.outsideThisMonth') : stay ? t('a11y2.notEditable') : isSelected ? t('a11y2.selected') : t('a11y2.tapToSelect')}`}
-              className={`flex ${outside ? 'min-h-0' : 'min-h-[44px]'} min-w-0 flex-col justify-start gap-1 rounded-[10px] border p-1 text-left transition-colors focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary sm:justify-between sm:min-h-[var(--cal-min,104px)] sm:rounded-2xl sm:p-2.5 ${
+              className={`flex ${outside ? 'min-h-0' : 'min-h-[46px]'} min-w-0 flex-col justify-start gap-1.5 rounded-[10px] border p-1 text-left transition-colors focus-visible:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-primary sm:justify-between sm:min-h-[var(--cal-min,104px)] sm:rounded-2xl sm:p-2.5 ${
                 isSelected || stay
                   ? 'border-navy-bg bg-navy-bg text-white'
                   : blocked
