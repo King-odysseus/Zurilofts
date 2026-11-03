@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import SelectMenu from '../components/SelectMenu.jsx';
 import { CalendarDays, Camera, ChevronRight, Heart, Star, UserRound } from 'lucide-react';
 import StayCard from '../components/StayCard.jsx';
@@ -73,10 +73,20 @@ function ProfilePage() {
   const { user, setUser, logout } = useAuth();
   const { favorites } = useFavorites();
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState(() => {
     const hash = window.location.hash.replace('#', '');
     return ['info', 'bookings', 'favorites'].includes(hash) ? hash : 'info';
   });
+  // The tab was only read once, when the page first mounted, so a link to
+  // /profile#bookings from another screen left an already-open profile showing
+  // whichever tab it happened to be on. The section is part of the address, so
+  // the page follows it.
+  useEffect(() => {
+    const hash = location.hash.replace('#', '');
+    if (['info', 'bookings', 'favorites'].includes(hash)) setActiveTab(hash);
+  }, [location.hash]);
+
   const [profile, setProfile] = useState(null);
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);

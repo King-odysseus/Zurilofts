@@ -70,7 +70,7 @@ function ReviewSection({ propertyId, onSummary }) {
         <h2 className="mb-2 text-2xl font-bold text-[#203565]">{t('stays.guestReviews')}</h2>
         <p className="mb-4 text-[#5B6B82]">{t('stays.noReviewsShare')}</p>
         <Link
-          to="/bookings"
+          to="/profile#bookings"
           className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#8A6B52] hover:text-[#203565] transition-colors"
         >
           <NotebookPen className="w-4 h-4" strokeWidth={2} aria-hidden="true" />
@@ -98,7 +98,7 @@ function ReviewSection({ propertyId, onSummary }) {
           </div>
         </div>
         <Link
-          to="/bookings"
+          to="/profile#bookings"
           className="inline-flex items-center gap-1.5 self-start px-4 py-2 border-2 border-[#203565] text-[#203565] rounded-full text-sm font-semibold hover:bg-[#203565] hover:text-white transition-all duration-200"
         >
           <NotebookPen className="w-4 h-4" strokeWidth={2} aria-hidden="true" />

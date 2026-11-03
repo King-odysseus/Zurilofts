@@ -135,7 +135,9 @@ export const common = {
       switchToDarkMode: 'Switch to dark mode',
       switchToLightMode: 'Switch to light mode',
       backToListings: 'Back to your listings',
-      listingSettings: 'Listing settings',
+      // The gear in the listing editor opens host account settings, not settings
+      // for the listing being edited, so the name says what it opens.
+      hostAccountSettings: 'Host account settings',
       editorSections: 'Listing editor sections',
       closeMenu: 'Close menu',
       openAccountMenu: 'Open account menu',
@@ -1238,7 +1240,7 @@ export const common = {
       switchToDarkMode: 'Badilisha hali ya giza',
       switchToLightMode: 'Badilisha hali ya mwanga',
       backToListings: 'Rudi kwa matangazo yako',
-      listingSettings: 'Mipangilio ya tangazo',
+      hostAccountSettings: 'Mipangilio ya akaunti ya mwenyeji',
       editorSections: 'Sehemu za kuhariri tangazo',
       closeMenu: 'Funga menyu',
       openAccountMenu: 'Fungua menyu ya akaunti',

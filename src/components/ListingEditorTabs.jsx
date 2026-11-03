@@ -37,7 +37,7 @@ export default function ListingEditorTabs({ listingId, active }) {
         <h1 className="min-w-0 flex-1 truncate text-2xl font-semibold tracking-tight text-navy">Listing editor</h1>
         <Link
           to="/host/settings"
-          aria-label={t('trust.listingSettings')}
+          aria-label={t('trust.hostAccountSettings')}
           className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-inset text-navy transition-colors hover:bg-surface"
         >
           <Settings className="h-5 w-5" strokeWidth={1.8} aria-hidden="true" />

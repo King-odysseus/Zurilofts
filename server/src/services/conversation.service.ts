@@ -280,7 +280,11 @@ export async function sendMessage(
   if (recipientId) {
     try {
       const { sendPushToUser } = await import('./push.service.js');
-      sendPushToUser(recipientId, 'New Message', 'You have a new message about your booking.', `/inbox/${conversationId}`);
+      // The two sides have separate inboxes, so the link has to match the
+      // recipient. A host was being sent to the guest inbox and lost their
+      // workspace navigation on the way.
+      const inboxPath = isGuest ? `/host/inbox/${conversationId}` : `/inbox/${conversationId}`;
+      sendPushToUser(recipientId, 'New Message', 'You have a new message about your booking.', inboxPath);
     } catch (err) { console.error('Push notification failed:', err); }
   }
 

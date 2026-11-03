@@ -274,6 +274,10 @@ export function GuestFooter() {
   // straight to the sign-in page.
   const hostHref = !isAuthenticated
     ? '/become-a-host'
-    : user?.role === 'USER' ? '/host/application' : '/host/today';
+    : user?.role === 'USER'
+      ? '/host/application'
+      // An administrator has no host workspace to land on; HostRoute bounces them
+      // to the admin dashboard, so send them there directly.
+      : user?.role === 'ADMIN' ? '/admin' : '/host/today';
   return <footer className="opg-footer"><div className="opg-container"><div className="opg-footer-columns"><div><Link className="opg-footer-brand" to="/" aria-label={t('discovery.footerBrandHome')}><BrandLogo imgClassName="h-16 w-auto" alt="ZuriLofts" /></Link><p>{t('discovery.footerAbout')}</p></div><div><h3>{t('discovery.footerExplore')}</h3><Link to="/stays">{t('discovery.footerStaysLink')}</Link><Link to="/places">{t('discovery.footerNeighbourhoods')}</Link><Link to="/guides">{t('discovery.footerGuides')}</Link><Link to="/restaurants">{t('discovery.footerRestaurants')}</Link></div><div><h3>{t('discovery.footerCompany')}</h3><Link to={hostHref}>{t('discovery.footerBecomeHost')}</Link><Link to="/become-a-host">{t('discovery.footerFeeCalculator')}</Link></div><div><h3>{t('discovery.footerSupport')}</h3><Link to="/guides">{t('discovery.footerHelpCentre')}</Link><Link to="/terms">{t('discovery.legalTerms')}</Link><Link to="/privacy">{t('discovery.legalPrivacy')}</Link></div><div><h3>{t('discovery.footerStayUpdated')}</h3><p>{t('discovery.footerNewsletter')}</p></div></div><div className="opg-footer-bottom">{t('discovery.rightsReserved', { year: new Date().getFullYear() })} <span><Link to="/privacy">{t('discovery.legalPrivacy')}</Link><Link to="/terms">{t('discovery.legalTerms')}</Link><button type="button" onClick={openConsentManager}>{t('discovery.legalCookies')}</button></span></div></div></footer>;
 }
