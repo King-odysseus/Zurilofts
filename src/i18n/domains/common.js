@@ -1014,6 +1014,7 @@ export const common = {
     },
 
     common: {
+      bankListUnavailable: 'The bank list is temporarily unavailable. Your other details can still be saved.',
       save: 'Save',
       saveChanges: 'Save changes',
       saveDraft: 'Save draft',
@@ -2367,6 +2368,7 @@ export const common = {
     },
 
     common: {
+      bankListUnavailable: 'Orodha ya benki haipatikani kwa sasa. Maelezo yako mengine bado yanaweza kuhifadhiwa.',
       save: 'Hifadhi',
       saveChanges: 'Hifadhi mabadiliko',
       saveDraft: 'Hifadhi rasimu',

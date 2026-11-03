@@ -113,6 +113,8 @@ function ProfilePage() {
   const [payoutFrequency, setPayoutFrequency] = useState('monthly');
   const [banks, setBanks] = useState([]);
   const [banksLoading, setBanksLoading] = useState(false);
+  const [banksUnavailable, setBanksUnavailable] = useState(false);
+  const [banksReload, setBanksReload] = useState(0);
 
   // Per-booking review form state, keyed by booking id
   const [reviewForms, setReviewForms] = useState({});
@@ -242,13 +244,19 @@ function ProfilePage() {
   useEffect(() => {
     if (hostRole !== 'HOST') return;
     setBanksLoading(true);
+    setBanksUnavailable(false);
     apiClient.get('/payments/banks')
       .then((res) => {
-        if (res.data?.data) setBanks(res.data.data);
+        if (Array.isArray(res.data?.data)) setBanks(res.data.data);
       })
-      .catch(() => {})
+      .catch(() => {
+        // An outage has to be shown as an outage. An empty dropdown reads as
+        // "your bank is not supported" and leaves the person stuck with no way
+        // to tell the two apart.
+        setBanksUnavailable(true);
+      })
       .finally(() => setBanksLoading(false));
-  }, [hostRole]);
+  }, [hostRole, banksReload]);
 
   async function handlePayoutDestinationSave(e) {
     e.preventDefault();
@@ -752,6 +760,17 @@ function ProfilePage() {
                       <label className="block text-sm font-semibold text-[#1f2937] mb-2">{t('profile.bankName')}</label>
                       {banksLoading ? (
                         <p className="text-sm text-[#6b7280]">{t('profile.loadingBanks')}</p>
+                      ) : banksUnavailable ? (
+                        <div className="space-y-2">
+                          <p className="text-sm text-[#6b7280]">{t('common.bankListUnavailable')}</p>
+                          <button
+                            type="button"
+                            onClick={() => setBanksReload((count) => count + 1)}
+                            className="text-sm font-semibold text-[#143A80] underline"
+                          >
+                            {t('common.retry')}
+                          </button>
+                        </div>
                       ) : banks.length > 0 ? (
                         <SelectMenu
                           value={bankForm.bankCode}

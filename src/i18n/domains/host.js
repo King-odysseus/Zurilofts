@@ -217,6 +217,9 @@ export const host = {
       continueSetup: 'Continue setup',
       untitledDraft: 'Untitled draft',
       editListing: 'Edit listing',
+      // A listing awaiting review cannot be edited, so the primary action has to
+      // match what it opens.
+      viewListing: 'View listing',
       acceptingBookings: 'Accepting bookings',
       notAcceptingBookings: 'Not accepting bookings',
       filterAllStays: 'All stays',
@@ -480,6 +483,7 @@ export const host = {
       continueSetup: 'Endelea kuandaa',
       untitledDraft: 'Rasimu isiyo na jina',
       editListing: 'Hariri tangazo',
+      viewListing: 'Tazama tangazo',
       acceptingBookings: 'Inapokea uhifadhi',
       notAcceptingBookings: 'Haipokei uhifadhi',
       filterAllStays: 'Makaazi yote',

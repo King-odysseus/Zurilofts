@@ -184,9 +184,17 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, o
       {showTips && <QualityMeter property={property} />}
 
       <div className="mt-auto flex flex-wrap items-center justify-between gap-1 pt-1">
-        <Button as={Link} to={`/host/listings/${property.id}/edit`} size="sm" className="rounded-full" disabled={busy}>
-          {property.status === 'DRAFT' ? t('host.continueSetup') : t('host.editListing')}
-        </Button>
+        {/* A listing under review cannot be saved, so the primary button opens
+            the preview rather than an editor that refuses the first save. */}
+        {property.status === 'PENDING_REVIEW' ? (
+          <Button as={Link} to={`/host/listings/${property.id}/preview`} size="sm" className="rounded-full">
+            {t('host.viewListing')}
+          </Button>
+        ) : (
+          <Button as={Link} to={`/host/listings/${property.id}/edit`} size="sm" className="rounded-full" disabled={busy}>
+            {property.status === 'DRAFT' ? t('host.continueSetup') : t('host.editListing')}
+          </Button>
+        )}
         <div className="flex flex-wrap items-center gap-0.5">
           {canSubmit && <QuietAction onClick={() => onReview(property)}>{busy ? 'Submitting...' : 'Submit for review'}</QuietAction>}
           {property.status === 'PENDING_REVIEW' && <span className="px-2 text-xs font-medium text-muted">{t('host.awaitingReview')}</span>}

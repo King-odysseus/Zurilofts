@@ -63,12 +63,21 @@ export async function verify(req: Request, res: Response, next: NextFunction): P
 }
 
 /** GET /api/payments/banks - auth required (used by ProfilePage for dropdown) */
-export async function banks(_req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function banks(_req: Request, res: Response, _next: NextFunction): Promise<void> {
   try {
-    const banks = await import('../config/paystack.js').then((m) => m.fetchBanks('KES', 'kepss'));
-    res.json({ success: true, data: banks });
+    const bankList = await import('../config/paystack.js').then((m) => m.fetchBanks('KES', 'kepss'));
+    // An empty list is a real answer, so it must not be confused with an outage.
+    res.json({ success: true, data: bankList });
   } catch (error) {
-    next(error);
+    // A payment provider being unreachable is expected operationally, not a
+    // fault here. It gets a controlled answer the screens can explain and offer
+    // to retry, instead of a server error that leaves an empty dropdown.
+    console.error('Bank list unavailable:', error);
+    res.status(503).json({
+      success: false,
+      code: 'BANK_LIST_UNAVAILABLE',
+      error: 'The bank list is temporarily unavailable. Try again in a moment.',
+    });
   }
 }
 
