@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -88,12 +89,21 @@ app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 
-// Serve uploaded (optimized) property images. crossOrigin policy is relaxed so
-// the dev frontend (different port) can render them through the Vite proxy.
+// Serve uploaded files. crossOrigin policy is relaxed so the dev frontend
+// (different port) can render them through the Vite proxy.
 app.use(
   '/uploads',
   express.static(UPLOAD_DIR, {
-    setHeaders: (res) => res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'),
+    setHeaders: (res, filePath) => {
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+      // These bytes came from a person, not from us. Never let a browser decide
+      // for itself what they are, and make documents download rather than render
+      // inline, so a stored file cannot become a page on our origin.
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      if (path.extname(filePath).toLowerCase() === '.pdf') {
+        res.setHeader('Content-Disposition', 'attachment');
+      }
+    },
   })
 );
 

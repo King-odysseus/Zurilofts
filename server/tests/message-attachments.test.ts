@@ -76,6 +76,42 @@ test('urls that are not ours are refused', () => {
   }
 });
 
+test('an attachment cannot point at a page we do not control', () => {
+  // The point of the allowlist: a message must not become a link to the
+  // sender's own site, a phishing page or a tracking pixel.
+  const foreignUrls = [
+    'https://evil.example/invoice.pdf',
+    'http://198.51.100.7/photo.jpg',
+    'https://res.cloudinary.com/otheraccount/raw/upload/v1/elsewhere/msg.pdf',
+    'https://res.cloudinary.com.evil.example/demo/raw/upload/v1/zurilofts/msg.pdf',
+    'https://user:pass@res.cloudinary.com/demo/raw/upload/v1/zurilofts/msg.pdf',
+    '/uploads/evil.html',
+    '/uploads/msg-1.svg',
+    '/uploads/other-1.jpg',
+  ];
+  for (const url of foreignUrls) {
+    assert.throws(
+      () => normalizeAttachments([{ ...IMAGE, url }]),
+      /invalid url/,
+      `expected ${url} to be refused`
+    );
+  }
+});
+
+test('both of our own storage shapes are accepted', () => {
+  const accepted = [
+    '/uploads/msg-1770000000000-ab12cd34.pdf',
+    '/uploads/msg-1.jpg',
+    '/uploads/prop-1770000000000-ab12cd34.jpg',
+    '/uploads/avatar-1770000000000-ab12cd34.jpg',
+    'https://res.cloudinary.com/demo/raw/upload/v1/zurilofts/msg-2.pdf',
+    'https://res.cloudinary.com/demo/image/upload/v1234/zurilofts/msg-1770000000000-ab12cd34.jpg',
+  ];
+  for (const url of accepted) {
+    assert.equal(parseAttachments(normalizeAttachments([{ ...IMAGE, url }]))[0].url, url);
+  }
+});
+
 test('a missing name falls back to a readable label', () => {
   const stored = normalizeAttachments([{ ...IMAGE, name: undefined }]);
   assert.equal(parseAttachments(stored)[0].name, 'Attachment');

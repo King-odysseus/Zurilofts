@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import sharp from 'sharp';
 import { ValidationError } from '../types/index.js';
 import { storeImage, storeDocument } from '../utils/imageStorage.js';
+import { looksLikePdf } from '../utils/fileSignature.js';
 
 // Re-export so existing consumers (app.ts static serving) keep their import.
 export { UPLOAD_DIR } from '../utils/imageStorage.js';
@@ -9,6 +10,18 @@ export { UPLOAD_DIR } from '../utils/imageStorage.js';
 const PDF_MIME = 'application/pdf';
 // Mirrors MAX_NAME_LENGTH in utils/messageAttachments.ts.
 const MAX_NAME_LENGTH = 200;
+
+/**
+ * A client-declared type is not evidence of content. Without this check a file
+ * labelled application/pdf could hold HTML and be stored, then served back with
+ * a type the browser would act on. The bytes are checked before anything is
+ * written.
+ */
+function assertPdfContents(buffer: Buffer, name: string): void {
+  if (!looksLikePdf(buffer)) {
+    throw new ValidationError(`${name} is not a readable PDF.`);
+  }
+}
 
 // Rotate for EXIF orientation, cap camera images at 2400px wide (retina-friendly)
 // without ever upscaling, then encode as a high quality JPEG. Chat images and
@@ -69,10 +82,12 @@ async function storeAttachment(file: Express.Multer.File): Promise<StoredAttachm
   const name = displayName(file.originalname);
 
   if (file.mimetype === PDF_MIME) {
+    assertPdfContents(file.buffer, name);
     // Documents are served exactly as received, so the size reported is the
-    // size the sender's file has.
+    // size the sender's file has. The stored extension comes from the verified
+    // content type, never from the sender's filename.
     return {
-      url: await storeDocument(file.buffer, file.originalname, 'msg'),
+      url: await storeDocument(file.buffer, 'pdf', 'msg'),
       name,
       mimeType: PDF_MIME,
       size: file.buffer.length,

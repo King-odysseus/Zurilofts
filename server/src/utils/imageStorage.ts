@@ -75,14 +75,6 @@ export async function storeImage(buffer: Buffer, prefix: string): Promise<string
   return `/uploads/${name}`;
 }
 
-// Keep only a plausible extension from a client filename ("Invoice.PDF" ->
-// "pdf"). The name itself is untrusted, so anything unusual becomes "bin"
-// rather than becoming part of a path.
-function safeExtension(filename: string): string {
-  const ext = path.extname(filename).slice(1).toLowerCase();
-  return /^[a-z0-9]{1,8}$/.test(ext) ? ext : 'bin';
-}
-
 /**
  * Persist a document (PDFs today) byte for byte and return its public URL.
  *
@@ -91,11 +83,15 @@ function safeExtension(filename: string): string {
  * an image and can rewrite it. Local dev writes into the same /uploads directory
  * that app.ts serves statically.
  *
+ * @param extension file extension derived from the verified content type, never
+ *   from a client filename, e.g. "pdf"
  * @param prefix short label baked into the asset name, e.g. "msg"
  */
-export async function storeDocument(buffer: Buffer, filename: string, prefix: string): Promise<string> {
+export async function storeDocument(buffer: Buffer, extension: string, prefix: string): Promise<string> {
   const baseName = `${prefix}-${Date.now()}-${randomBytes(4).toString('hex')}`;
-  const ext = safeExtension(filename);
+  // The caller has already established what the bytes are. This only stops a
+  // caller mistake from becoming part of a path.
+  const ext = /^[a-z0-9]{1,8}$/.test(extension) ? extension : 'bin';
 
   if (cloudinaryEnabled) {
     const result = await uploadToCloudinary(buffer, { resource_type: 'raw' }, baseName);

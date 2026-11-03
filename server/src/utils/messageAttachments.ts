@@ -32,15 +32,38 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-/** Only urls our own upload endpoint can produce: a local /uploads/* path or an
- *  absolute http(s) Cloudinary url. javascript:, data: and file: are refused so
- *  a crafted message cannot become a click-to-run link in the other party's UI. */
+/** Only urls our own storage can produce. Anything else would let a message
+ *  offer the other party a link to a page we do not control (phishing, tracking
+ *  pixels, a file the sender never uploaded), so external hosts are refused
+ *  outright rather than merely scheme-checked. */
 function isAllowedUrl(url: string): boolean {
   // A ".." segment never comes from our upload endpoint, and these urls are
   // rendered straight into <img src> and <a href>, so refuse the shape outright
   // rather than relying on the static handler to normalise it away.
   if (url.includes('..')) return false;
-  return url.startsWith('/uploads/') || url.startsWith('http://') || url.startsWith('https://');
+  return isLocalUpload(url) || isOurCloudinaryDelivery(url);
+}
+
+// Prefixes the upload endpoints use: property photos, avatars, chat files.
+const LOCAL_UPLOAD_PATTERN = /^\/uploads\/(?:prop|avatar|msg)-[a-z0-9._-]*\.(?:jpg|jpeg|png|webp|pdf)$/i;
+
+function isLocalUpload(url: string): boolean {
+  return LOCAL_UPLOAD_PATTERN.test(url);
+}
+
+// Our documents live in one Cloudinary folder. Matching the fixed host and that
+// folder is what makes the url ours; a sender cannot host content there.
+function isOurCloudinaryDelivery(url: string): boolean {
+  if (!url.startsWith('https://')) return false;
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+  if (parsed.hostname !== 'res.cloudinary.com') return false;
+  if (parsed.username || parsed.password) return false;
+  return /^\/[^/]+\/(?:image|raw)\/upload\/(?:v\d+\/)?zurilofts\/[a-z0-9._-]+$/i.test(parsed.pathname);
 }
 
 function normalizeOne(entry: unknown, index: number): MessageAttachment {
