@@ -89,3 +89,11 @@ skills-lock.json
 
 # Local smoke-test doubles for third-party APIs (not part of the app)
 server/.tmp-*.mjs
+
+# Throwaway PostgreSQL client and schema copy used to compile-check the server
+# against the production datasource. Generated on demand, never deployed: the
+# real schema is prisma/schema.postgresql.prisma and the real client comes from
+# `prisma generate` during the Railway build.
+server/.tmp-pg-client/
+server/prisma/.tmp-schema-pg.prisma
+server/tsconfig.tmp-pg.json
