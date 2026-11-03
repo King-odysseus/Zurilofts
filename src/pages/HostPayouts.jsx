@@ -131,7 +131,7 @@ function HostPayouts() {
 
   function csvWht() {
     if (!whtData?.bookings) return;
-    const rows = [['Host', 'Property', 'Earnings (KES)', 'WHT Deducted (KES)']];
+    const rows = [['Host', 'Listing', 'Earnings (KES)', 'WHT Deducted (KES)']];
     for (const booking of whtData.bookings) {
       rows.push(['Host', booking.property?.title, booking.hostNetAmount, booking.withholdingTax]);
     }
@@ -237,7 +237,7 @@ function HostPayouts() {
               screens get the same rows stacked instead of a scrolling table. */}
           <ul className="divide-y divide-border text-sm sm:hidden">
             {whtData.bookings.map((booking, index) => <li key={booking.id || index} className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-3">
-              <span className="w-full break-words font-medium text-navy">{booking.property?.title || 'Property'}</span>
+              <span className="w-full break-words font-medium text-navy">{booking.property?.title || 'Listing'}</span>
               <span className="text-xs text-muted">{formatDate(booking.paidAt)}</span>
               <span className="tabular-nums text-navy">KES {(booking.hostNetAmount || 0).toLocaleString()}</span>
               <span className="tabular-nums text-muted">WHT KES {(booking.withholdingTax || 0).toLocaleString()}</span>
@@ -256,7 +256,7 @@ function HostPayouts() {
               </TableHead>
               <TableBody>
                 {whtData.bookings.map((booking, index) => <TableRow key={booking.id || index}>
-                  <TableCell className="max-w-[14rem] truncate">{booking.property?.title || 'Property'}</TableCell>
+                  <TableCell className="max-w-[14rem] truncate">{booking.property?.title || 'Listing'}</TableCell>
                   <TableCell>{formatDate(booking.paidAt)}</TableCell>
                   <TableCell className="tabular-nums text-right">KES {(booking.hostNetAmount || 0).toLocaleString()}</TableCell>
                   <TableCell className="tabular-nums text-right">KES {(booking.withholdingTax || 0).toLocaleString()}</TableCell>

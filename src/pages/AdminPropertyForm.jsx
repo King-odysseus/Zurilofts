@@ -252,7 +252,7 @@ function AdminPropertyForm() {
           address: p.address || '',
         });
       } catch {
-        setError(t('stays.loadFailed'));
+        setError(t('host.loadListingFailed'));
       } finally {
         setLoading(false);
       }
@@ -946,7 +946,7 @@ function PropertyPreview({ form }) {
     <div className="max-w-sm overflow-hidden rounded-xl bg-elevated shadow-md">
       <div className="relative">
         {cover ? (
-          <img src={cover} alt={form.title || 'Property'} className="aspect-[4/3] w-full object-cover" />
+          <img src={cover} alt={form.title || 'Listing'} className="aspect-[4/3] w-full object-cover" />
         ) : (
           <div className="flex aspect-[4/3] w-full items-center justify-center bg-surface text-sm text-muted">{t('admin.noPhotoYet')}</div>
         )}

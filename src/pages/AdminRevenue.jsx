@@ -229,7 +229,7 @@ function AdminRevenue() {
    * comma or a quote cannot break the file.
    */
   function exportCsv() {
-    const header = ['Booking', 'Property', 'Host', 'Paid at', 'Gross paid', 'Host net', 'Withholding tax', 'Commission', 'Platform revenue'];
+    const header = ['Booking', 'Listing', 'Host', 'Paid at', 'Gross paid', 'Host net', 'Withholding tax', 'Commission', 'Platform revenue'];
     const escape = (value) => `"${String(value ?? '').replace(/"/g, '""')}"`;
     const rows = recent.map((row) => [
       row.id,
@@ -451,7 +451,7 @@ function AdminRevenue() {
                             <span className="whitespace-nowrap text-xs text-muted">Stay from {formatDate(row.checkIn)}</span>
                           </div>
                         </TableCell>
-                        <TableCell><strong className="text-sm font-semibold text-navy">{row.propertyTitle || 'Property unavailable'}</strong></TableCell>
+                        <TableCell><strong className="text-sm font-semibold text-navy">{row.propertyTitle || t('admin.listingUnavailable')}</strong></TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
                             <span className="text-sm text-navy">{row.hostName || 'Unknown host'}</span>

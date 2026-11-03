@@ -35,7 +35,7 @@ export const payment = {
       home: 'Home',
       addToCalendar: 'Add to calendar',
       googleCalendar: 'Google Calendar',
-      viewProperty: 'View property',
+      viewProperty: 'View stay',
 
       pendingTitle: 'Payment pending',
       pendingBody: 'The payment provider is still confirming this transaction. We are holding your booking while it clears.',
@@ -92,7 +92,7 @@ export const payment = {
       home: 'Nyumbani',
       addToCalendar: 'Ongeza kwenye kalenda',
       googleCalendar: 'Kalenda ya Google',
-      viewProperty: 'Tazama mali',
+      viewProperty: 'Tazama malazi',
 
       pendingTitle: 'Malipo yanasubiri',
       pendingBody: 'Mtoa huduma wa malipo bado anathibitisha muamala huu. Tunashikilia uhifadhi wako hadi malipo yakamilike.',

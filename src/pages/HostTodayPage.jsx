@@ -350,7 +350,7 @@ export default function HostTodayPage() {
           <div className="min-w-0">
             <p className={HOST_EYEBROW}>{t('host.priorityEyebrow')}</p>
             <h2 className="mt-1 text-base font-semibold text-white">{priority ? t(priorityType === 'arrival' ? 'host.priorityConfirmArrival' : priorityType === 'departure' ? 'host.priorityReviewCheckout' : 'host.priorityCheckInHouse') : t('host.priorityClear')}</h2>
-            <p className="mt-2 text-sm leading-relaxed text-white/70">{priority ? t('host.priorityDetail', { guest: guestName(priority), property: priority.property?.title || t('host.yourProperty'), time: t(bookingTime(priority, priorityType)) }) : t('host.priorityClearHint')}</p>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">{priority ? t('host.priorityDetail', { guest: guestName(priority), listing: priority.property?.title || t('host.yourProperty'), time: t(bookingTime(priority, priorityType)) }) : t('host.priorityClearHint')}</p>
           </div>
           {/* The card only needs its own action when there is a booking to open.
               With nothing scheduled the call to action repeated the calendar

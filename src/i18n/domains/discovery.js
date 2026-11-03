@@ -10,7 +10,7 @@ export const discovery = {
       // Hero and the traveller/host entry toggle
       heroRoleTraveler: 'I\'m traveling',
       heroRoleHost: 'I\'m a host',
-      heroBadgeHost: 'List Your Property',
+      heroBadgeHost: 'List Your Place',
       heroBadgeGuest: 'Available for Booking',
       heroTitleHost: 'Earn More by Hosting on ZuriLofts',
       heroTitleGuest: 'Choose Luxury & Comfort for Your Time Away',

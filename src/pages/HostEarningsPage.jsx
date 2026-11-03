@@ -428,7 +428,7 @@ export default function HostEarningsPage() {
 
     autoTable(doc, {
       startY: (doc.lastAutoTable?.finalY || 54) + 8,
-      head: [['Property', 'Bookings', 'Gross rent', 'Host net', 'WHT']],
+      head: [['Listing', 'Bookings', 'Gross rent', 'Host net', 'WHT']],
       body: earningRows.map((row) => [
         row.title,
         row.bookings || 0,

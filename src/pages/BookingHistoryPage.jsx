@@ -65,7 +65,7 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
     <div className="opg-history-copy">
       <div className="opg-history-title-row">
         <div>
-          <h2><Link to={`/stay/${property.id || booking.propertyId}`}>{propertyTitle || 'Property'}</Link></h2>
+          <h2><Link to={`/stay/${property.id || booking.propertyId}`}>{propertyTitle || 'Stay'}</Link></h2>
           <p>{propertyLocation || 'Nairobi'}</p>
         </div>
         <span className={`${STATUS_PILL} ${status.className}`}>{t(status.label)}</span>

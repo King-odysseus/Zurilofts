@@ -6,15 +6,15 @@
 export const stays = {
   en: {
     stays: {
-      // Property type labels. Shared by the card, the trust strip and the
+      // Accommodation type labels. Shared by the card, the trust strip and the
       // detail page, so a type reads the same on every surface.
       typeApartment: 'Apartment',
       typeStudio: 'Studio',
       typePenthouse: 'Penthouse',
-      typeProperty: 'Property',
+      typeProperty: 'Stay',
       typeInLocation: '{type} in {area}',
 
-      // Stay card - the one guest property card used everywhere.
+      // Stay card - the one guest stay card used everywhere.
       photoComingSoon: 'Photo coming soon',
       viewStay: 'View {title}',
       guestFavourite: 'Guest favourite',
@@ -28,16 +28,16 @@ export const stays = {
       freeCancellationUntil: 'Free cancellation until {date}',
 
       // Trust strip
-      overview: 'Property overview',
+      overview: 'Stay overview',
       guestRating: 'Guest rating',
-      propertyType: 'Property type',
+      propertyType: 'Accommodation type',
       location: 'Location',
       newListing: 'New',
       noReviewsYet: 'No reviews yet',
 
       // Similar properties strip
-      similarTitle: 'Similar properties',
-      similarEmpty: 'No similar properties found right now.',
+      similarTitle: 'Similar stays',
+      similarEmpty: 'No similar stays found right now.',
 
       // Guest reviews
       ratingOutOfFive: '{rating} out of 5 stars',
@@ -71,18 +71,18 @@ export const stays = {
       shortlistName: 'Shortlist name',
       createShortlist: '+ Create new shortlist',
 
-      // Property detail page
-      loadingProperty: 'Loading property',
-      loadingPropertyText: 'Loading property...',
-      loadFailed: 'Failed to load property',
-      notFoundTitle: 'Property Not Found',
-      notFoundBody: 'This property could not be loaded.',
+      // Stay detail page
+      loadingProperty: 'Loading stay',
+      loadingPropertyText: 'Loading stay...',
+      loadFailed: 'Failed to load stay',
+      notFoundTitle: 'Stay not found',
+      notFoundBody: 'This stay could not be loaded.',
       viewAllStays: 'View All Stays',
       oneBedOption: '1-Bedroom Option',
       twoBedOption: '2-Bedroom Option',
       breadcrumb: 'Breadcrumb',
       backToStays: 'Back to Stays',
-      photoGallery: 'Property photo gallery',
+      photoGallery: 'Stay photo gallery',
       photoAltSingle: '{title} - photo 1 of 1',
       photoAlt: '{title} - photo {index} of {total}',
       thumbnailAlt: '{title} - thumbnail {index}',
@@ -105,7 +105,7 @@ export const stays = {
       nearbyTitle: 'What\'s nearby',
       whereYoullBe: 'Where you\'ll be',
       getDirections: 'Get directions',
-      detailsPreparing: 'Additional details about this property are being prepared.',
+      detailsPreparing: 'Additional details about this stay are being prepared.',
       bookingAside: 'Booking',
       bookingSummary: 'Booking summary',
       perNightCompact: '/ night',
@@ -117,14 +117,14 @@ export const stays = {
       continueBooking: 'Continue to booking',
       continueBookingAria: 'Continue to booking for {what} at {price} per night',
       variantOption: '{variant} option',
-      thisProperty: 'this property',
+      thisProperty: 'this stay',
       notChargedYet: 'You won\'t be charged yet',
       cleaningFee: 'Cleaning fee',
       serviceFee: 'Service fee',
       processingFee: 'Payment processing fee',
       shownAtCheckout: 'Shown at checkout',
       addDatesForTotal: 'Add dates for total',
-      aboutListing: 'About this listing',
+      aboutListing: 'About this stay',
       ratingWord: 'rating',
       secureBooking: 'Secure booking via Paystack',
       showPhoto: 'Show photo {position} of {total}',
@@ -200,7 +200,7 @@ export const stays = {
       loadingProperty: 'Inapakia malazi',
       loadingPropertyText: 'Inapakia malazi...',
       loadFailed: 'Imeshindikana kupakia malazi',
-      notFoundTitle: 'Malazi Hayakupatikana',
+      notFoundTitle: 'Malazi hayakupatikana',
       notFoundBody: 'Malazi haya hayakuweza kupakiwa.',
       viewAllStays: 'Tazama Malazi Yote',
       oneBedOption: 'Chaguo la Chumba 1 cha Kulala',
@@ -249,7 +249,7 @@ export const stays = {
       processingFee: 'Ada ya malipo',
       shownAtCheckout: 'Inaonekana wakati wa malipo',
       addDatesForTotal: 'Ongeza tarehe kupata jumla',
-      aboutListing: 'Kuhusu tangazo hili',
+      aboutListing: 'Kuhusu malazi haya',
       ratingWord: 'ukadiriaji',
       secureBooking: 'Uhifadhi salama kupitia Paystack',
       showPhoto: 'Onyesha picha {position} kati ya {total}',
