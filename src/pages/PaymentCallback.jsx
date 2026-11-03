@@ -74,6 +74,17 @@ function PaymentCallback() {
         }
 
         const providerStatus = String(paymentData.providerStatus || '').toLowerCase();
+
+        // Paid, but the dates were taken. The money is real and the stay is not,
+        // so this needs its own state: calling it "failed" tells the guest the
+        // charge did not happen, and calling it "confirmed" sends them to a stay
+        // they do not have.
+        if (paymentData.reason === 'conflict') {
+          setStatus('conflict');
+          setError(data.message || t('payment.conflictBody'));
+          return;
+        }
+
         setStatus(PENDING_PROVIDER_STATES.has(providerStatus) ? 'pending' : 'failed');
         setError(data.message || t('payment.verificationIncompleteError'));
         setErrorLabel(providerStatus ? t('payment.providerStatusLabel', { status: providerStatus }) : t('payment.verificationNotCompleted'));
@@ -199,6 +210,28 @@ function PaymentCallback() {
                 {t('payment.checkTripStatus')}
               </Button>
               <button type="button" className="op-payment-link" onClick={() => navigate('/')}>{t('payment.backToHome')}</button>
+            </div>
+          )}
+
+          {status === 'conflict' && (
+            <div className="op-payment-state">
+              <div className="op-payment-icon is-pending" aria-hidden="true"><TriangleAlert /></div>
+              <h2>{t('payment.conflictTitle')}</h2>
+              <p>{t('payment.conflictBody')}</p>
+              <div className="op-payment-alert" role="alert">
+                <TriangleAlert aria-hidden="true" />
+                <div>
+                  <strong>{t('payment.conflictTitle')}</strong>
+                  <span>{error || t('payment.conflictBody')}</span>
+                </div>
+              </div>
+              <p className="op-payment-note">{t('payment.conflictNote')}</p>
+              <Button color="dark" className="op-payment-primary op-payment-wide" onClick={() => navigate('/trips')}>
+                {t('payment.checkTripStatus')}
+              </Button>
+              <button type="button" className="op-payment-link" onClick={() => navigate('/inbox')}>
+                {t('payment.contactSupport')}
+              </button>
             </div>
           )}
 

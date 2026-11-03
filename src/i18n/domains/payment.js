@@ -51,6 +51,10 @@ export const payment = {
       tryAgain: 'Try again',
       contactSupport: 'Need help? Contact support',
 
+      conflictTitle: 'Payment received, stay not confirmed',
+      conflictBody: 'We received your payment, but the dates were taken by another booking before this one completed, so this stay is not confirmed.',
+      conflictNote: 'Our team will contact you to arrange different dates or refund you. You have not been charged twice.',
+
       missingReferenceError: 'No payment reference was found. Please return to your trip and try again.',
       missingReferenceLabel: 'Missing payment reference',
       verificationIncompleteError: 'Payment verification did not complete. Please review your trip before trying again.',
@@ -103,6 +107,10 @@ export const payment = {
       reviewPaymentMethod: 'Tafadhali kagua njia yako ya malipo na ujaribu tena.',
       tryAgain: 'Jaribu tena',
       contactSupport: 'Unahitaji msaada? Wasiliana na huduma kwa wateja',
+
+      conflictTitle: 'Malipo yamepokelewa, uhifadhi haujathibitishwa',
+      conflictBody: 'Tumepokea malipo yako, lakini tarehe hizo zilichukuliwa na uhifadhi mwingine kabla huu kukamilika, kwa hivyo uhifadhi huu haujathibitishwa.',
+      conflictNote: 'Timu yetu itawasiliana nawe ili kupanga tarehe nyingine au kukurudishia fedha. Hujatozwa mara mbili.',
 
       missingReferenceError: 'Hakuna kumbukumbu ya malipo iliyopatikana. Tafadhali rudi kwenye safari yako na ujaribu tena.',
       missingReferenceLabel: 'Kumbukumbu ya malipo haipo',

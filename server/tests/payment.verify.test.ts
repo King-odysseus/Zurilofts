@@ -10,7 +10,13 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { checkVerifiedPayment, isTerminalBookingStatus, paymentChannelsForMethod } from '../src/services/payment.service.js';
+import {
+  CONFLICT_MESSAGE,
+  checkVerifiedPayment,
+  describeSettledPayment,
+  isTerminalBookingStatus,
+  paymentChannelsForMethod,
+} from '../src/services/payment.service.js';
 import { bookingPaymentInitSchema, paymentMethodSchema } from '../src/types/index.js';
 
 const EXPECTED_KES = 5000; // -> 500000 subunits
@@ -132,4 +138,22 @@ test('every accepted payment method maps to a real Paystack channel', () => {
     const channels = paymentChannelsForMethod(method);
     assert.ok(channels?.length, `${method} must map to at least one channel`);
   }
+});
+
+test('a parked booking is never reported as confirmed', () => {
+  const settled = describeSettledPayment('CONFLICT');
+
+  assert.equal(settled.confirmed, false);
+  assert.equal(settled.reason, 'conflict');
+  assert.equal(settled.message, CONFLICT_MESSAGE);
+  // The wording has to admit both halves: money taken, and no stay.
+  assert.match(settled.message, /payment was received/i);
+  assert.match(settled.message, /not confirmed/i);
+});
+
+test('an already-confirmed booking stays confirmed on a repeat verify', () => {
+  const settled = describeSettledPayment('CONFIRMED');
+
+  assert.equal(settled.confirmed, true);
+  assert.equal(settled.reason, undefined);
 });

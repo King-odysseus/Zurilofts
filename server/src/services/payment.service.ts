@@ -100,6 +100,32 @@ export function isTerminalBookingStatus(status: string): boolean {
   return (TERMINAL_BOOKING_STATUSES as readonly string[]).includes(status);
 }
 
+/**
+ * Shown when money was taken but the stay is not confirmed. It has to say both
+ * halves plainly: the guest has paid, and does not have a booking.
+ */
+export const CONFLICT_MESSAGE =
+  'Your payment was received, but the dates were taken by another booking before this one completed, '
+  + 'so this stay is not confirmed. Our team will contact you to rebook or refund you.';
+
+/**
+ * What to report for a booking whose payment is already settled.
+ *
+ * Both settled states are terminal, but they mean opposite things to a guest, so
+ * they must never share an answer. A parked booking is not a confirmed stay and
+ * reporting it as one would send someone to a place they have no reservation for.
+ */
+export function describeSettledPayment(status: string): {
+  confirmed: boolean;
+  reason?: string;
+  message: string;
+} {
+  if (status === 'CONFLICT') {
+    return { confirmed: false, reason: 'conflict', message: CONFLICT_MESSAGE };
+  }
+  return { confirmed: true, message: 'Already confirmed' };
+}
+
 /** Minimal shape of a Paystack verification we need to trust a payment. */
 interface VerifiedTransaction {
   reference: string;
@@ -189,11 +215,15 @@ export async function verifyAndConfirmPayment(
     return { confirmed: false, reason: 'not_found', message: 'No booking found for this payment reference' };
   }
   if (isTerminalBookingStatus(existing.status)) {
-    // A re-verify of an already-CONFIRMED booking (callback + webhook raced).
-    // Fire the confirmation message again - the dedupe log makes it a no-op if
-    // it already went out, so this is just covering a lost-first-delivery.
-    if (existing.status === 'CONFIRMED') void fireBookingConfirmed(existing.id);
-    return { confirmed: true, bookingId: existing.id, message: 'Already confirmed' };
+    // Parked for admin resolution is terminal, but it is not a confirmed stay.
+    const settled = describeSettledPayment(existing.status);
+    if (settled.confirmed) {
+      // A re-verify of an already-CONFIRMED booking (callback + webhook raced).
+      // Fire the confirmation message again - the dedupe log makes it a no-op if
+      // it already went out, so this is just covering a lost-first-delivery.
+      void fireBookingConfirmed(existing.id);
+    }
+    return { ...settled, bookingId: existing.id };
   }
 
   // A transport/API failure throws out of here and propagates to the caller, so a
@@ -223,11 +253,17 @@ export async function verifyAndConfirmPayment(
   }
 
   // Confirm the booking
-  await confirmBookingPayment(existing.id, {
+  const outcome = await confirmBookingPayment(existing.id, {
     reference: verification.reference,
     channel: verification.channel,
     paidAt: verification.paid_at,
   });
+
+  // The dates can be taken while the payment is in flight. The money is real but
+  // the stay is not, so this must not come back as a confirmed booking.
+  if (outcome === 'CONFLICT') {
+    return { confirmed: false, bookingId: existing.id, reason: 'conflict', message: CONFLICT_MESSAGE };
+  }
 
   // Fire-and-forget host confirmation message after the booking is CONFIRMED.
   // If the range check flipped it to CONFLICT instead, deliverTrigger sees a
@@ -238,11 +274,16 @@ export async function verifyAndConfirmPayment(
   return { confirmed: true, bookingId: existing.id, message: 'Payment confirmed' };
 }
 
-/** Update booking with payment details and credit host wallet */
+/**
+ * Update booking with payment details and record the split.
+ *
+ * Returns what actually happened to the row, so the caller can tell the guest
+ * the truth: a payment whose dates were taken is a CONFLICT, not a booking.
+ */
 async function confirmBookingPayment(
   bookingId: string,
   payment: { reference: string; channel: string; paidAt: string }
-): Promise<void> {
+): Promise<'CONFIRMED' | 'CONFLICT' | 'SKIPPED'> {
   const booking = await prisma.booking.findUnique({
     where: { id: bookingId },
     include: {
@@ -254,7 +295,9 @@ async function confirmBookingPayment(
   });
 
   if (!booking) throw new Error(`Booking ${bookingId} not found`);
-  if (isTerminalBookingStatus(booking.status)) return; // idempotent
+  if (isTerminalBookingStatus(booking.status)) {
+    return booking.status === 'CONFLICT' ? 'CONFLICT' : 'SKIPPED'; // idempotent
+  }
 
   // Re-check availability - the guest's hold may have lapsed and another
   // booking may have taken the dates in the meantime.
@@ -279,7 +322,10 @@ async function confirmBookingPayment(
       },
     });
 
-    if (flagged.count === 0) return; // another delivery already handled it
+    if (flagged.count === 0) {
+      // Another delivery already handled it. Report the row as it actually is.
+      return booking.status === 'CONFLICT' ? 'CONFLICT' : 'SKIPPED';
+    }
 
     const msg = `DOUBLE-BOOK_CONFLICT booking=${bookingId} property=${booking.propertyId} ` +
       `checkIn=${booking.checkIn.toISOString().slice(0,10)} checkOut=${booking.checkOut.toISOString().slice(0,10)} ` +
@@ -294,7 +340,7 @@ async function confirmBookingPayment(
       `Status set to CONFLICT \u2014 admin action required.`
     );
 
-    return;
+    return 'CONFLICT';
   }
 
   // Calculate host earnings
@@ -353,7 +399,9 @@ async function confirmBookingPayment(
     },
   });
 
-  if (confirmedNow.count === 0) return; // another delivery already confirmed it
+  if (confirmedNow.count === 0) return 'SKIPPED'; // another delivery already confirmed it
+
+  return 'CONFIRMED';
 }
 
 /** Handle an incoming Paystack webhook event */
@@ -362,16 +410,12 @@ export async function handleWebhookEvent(
   body: string,
   signature: string
 ): Promise<{ handled: boolean; message: string }> {
-  // Verify signature
+  // Verify signature before anything touches the database. This endpoint has no
+  // authentication, so writing a row per bad signature would let anonymous
+  // traffic grow the table and fill the disk. The fact is logged without the
+  // sender's payload, and nothing is persisted.
   if (!paystack.verifyWebhookSignature(body, signature)) {
-    // Log the event for auditing even if signature is invalid
-    await prisma.paymentLog.create({
-      data: {
-        event,
-        payload: body.slice(0, 2000),
-        reference: 'invalid-signature',
-      },
-    });
+    console.warn(`WEBHOOK-REJECTED invalid signature event=${event.slice(0, 40)}`);
     return { handled: false, message: 'Invalid webhook signature' };
   }
 

@@ -47,7 +47,14 @@ export async function verify(req: Request, res: Response, next: NextFunction): P
     });
     res.json({
       success: result.confirmed,
-      data: { confirmed: result.confirmed, bookingId: result.bookingId, providerStatus: result.providerStatus },
+      data: {
+        confirmed: result.confirmed,
+        bookingId: result.bookingId,
+        providerStatus: result.providerStatus,
+        // Lets the callback screen distinguish "dates were taken after paying"
+        // from "the payment did not go through".
+        reason: result.reason,
+      },
       message: result.message,
     });
   } catch (error) {
@@ -73,19 +80,28 @@ export async function webhook(req: Request, res: Response, next: NextFunction): 
     // The body is a Buffer from express.raw(), so req.body.event is undefined.
     // The event type lives inside the JSON payload - parse it from the raw string.
     const rawBody = req.body instanceof Buffer ? req.body.toString('utf-8') : JSON.stringify(req.body);
+
     let event = '';
     try {
       event = JSON.parse(rawBody)?.event || '';
-    } catch (err) {
-      console.error('Failed to parse webhook body:', err);
+    } catch {
+      // A body that is not JSON cannot become a payment event later either, so
+      // this is a permanent rejection rather than something worth retrying.
+      console.warn('Webhook body was not JSON; rejected without retry.');
+      res.status(400).json({ success: false, error: 'invalid_payload' });
+      return;
     }
 
     const result = await paymentService.handleWebhookEvent(event, rawBody, signature);
-    // Always return 200 so Paystack doesn't keep retrying
+    // A bad signature is not going to become valid on a retry, so answer 200
+    // and stop Paystack resending it.
     res.status(200).json({ received: true, ...result });
   } catch (error) {
-    // Always respond 200 for webhooks even on error
-    console.error('Webhook error:', error);
-    res.status(200).json({ received: true, error: true });
+    // A database or provider outage is the opposite case: answering 200 would
+    // tell Paystack the event was handled, it would never resend, and the
+    // payment would be silently lost. Ask for redelivery instead; every handler
+    // is idempotent, so a repeat cannot apply money twice.
+    console.error('Webhook processing failed, asking for redelivery:', error);
+    res.status(500).json({ received: false, error: 'processing_failed' });
   }
 }
