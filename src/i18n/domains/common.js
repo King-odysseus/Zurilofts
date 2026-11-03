@@ -1004,16 +1004,15 @@ export const common = {
       checkingBookingState: 'Checking your booking state...',
     },
 
-    pushPrompt: {
-      title: 'Stay updated',
-      guestBody: 'Get a notification when a booking is confirmed or when we reply to your message.',
-      hostBody: 'Get a notification when a guest messages you, or when we reach a decision on one of your listings.',
-      adminBody: 'Get a notification when a case or listing needs your review.',
-      allow: 'Allow',
-      notNow: 'Not now',
-    },
-
     common: {
+      pushPrompt: {
+        title: 'Stay updated',
+        guestBody: 'Get a notification when a booking is confirmed or when we reply to your message.',
+        hostBody: 'Get a notification when a guest messages you, or when we reach a decision on one of your listings.',
+        adminBody: 'Get a notification when a case or listing needs your review.',
+        allow: 'Allow',
+        notNow: 'Not now',
+      },
       bankListUnavailable: 'The bank list is temporarily unavailable. Your other details can still be saved.',
       save: 'Save',
       saveChanges: 'Save changes',
@@ -2358,16 +2357,15 @@ export const common = {
  
  
  
-    pushPrompt: {
-      title: 'Pata taarifa',
-      guestBody: 'Pata taarifa uhifadhi unapothibitishwa au tunapojibu ujumbe wako.',
-      hostBody: 'Pata taarifa mgeni anapokutumia ujumbe, au tunapofikia uamuzi kuhusu moja ya matangazo yako.',
-      adminBody: 'Pata taarifa kesi au tangazo linapohitaji ukaguzi wako.',
-      allow: 'Ruhusu',
-      notNow: 'Si sasa',
-    },
-
     common: {
+      pushPrompt: {
+        title: 'Pata taarifa',
+        guestBody: 'Pata taarifa uhifadhi unapothibitishwa au tunapojibu ujumbe wako.',
+        hostBody: 'Pata taarifa mgeni anapokutumia ujumbe, au tunapofikia uamuzi kuhusu moja ya matangazo yako.',
+        adminBody: 'Pata taarifa kesi au tangazo linapohitaji ukaguzi wako.',
+        allow: 'Ruhusu',
+        notNow: 'Si sasa',
+      },
       bankListUnavailable: 'Orodha ya benki haipatikani kwa sasa. Maelezo yako mengine bado yanaweza kuhifadhiwa.',
       save: 'Hifadhi',
       saveChanges: 'Hifadhi mabadiliko',

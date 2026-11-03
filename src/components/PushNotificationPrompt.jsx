@@ -44,7 +44,7 @@ function PushNotificationPrompt() {
     // dismissed it. The wrapper also lets clicks fall through to the page, so
     // even a future overlap cannot swallow a tap meant for a control underneath;
     // only the buttons below take pointer events.
-    <div className="pointer-events-none fixed bottom-[calc(var(--zl-bottom-nav-space)_+_96px)] left-4 right-4 z-40 md:bottom-24 md:left-auto md:right-4 md:w-96">
+    <div className="pointer-events-none fixed bottom-[calc(var(--zl-bottom-nav-space)_+_96px)] left-4 right-4 z-40 md:bottom-28 md:left-auto md:right-4 md:w-96">
       <div className="pointer-events-auto rounded-2xl bg-elevated p-4 shadow-[0_8px_28px_rgba(20,58,128,0.14)]">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 bg-[#F4F0E8] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
