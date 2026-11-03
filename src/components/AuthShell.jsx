@@ -38,7 +38,7 @@ function AuthShell({ children }) {
         <div className="op-auth-top">
           <RouteBackButton className="op-auth-back" />
           <div className="op-auth-top-actions">
-            <Link to="/guides">{t('trust.needHelp')}</Link>
+            <Link to="/help">{t('trust.needHelp')}</Link>
             <Dropdown
               inline
               theme={{ inlineWrapper: 'op-auth-language' }}

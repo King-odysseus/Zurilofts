@@ -33,11 +33,15 @@ const ROUTE_TITLES = [
   [/^\/guides\/[^/]+$/, 'title.guide'],
   [/^\/become-a-host$/, 'title.becomeHost'],
   [/^\/host-earnings-calculator$/, 'title.earningsCalculator'],
+  [/^\/help$/, 'title.help'],
+  [/^\/help\/[^/]+$/, 'title.helpArticle'],
   [/^\/privacy$/, 'title.privacy'],
   [/^\/terms$/, 'title.terms'],
 
   // Guest: account and the booking flow
   [/^\/login$/, 'title.login'],
+  [/^\/forgot-password$/, 'title.forgotPassword'],
+  [/^\/reset-password$/, 'title.resetPassword'],
   [/^\/register$/, 'title.register'],
   [/^\/auth\/callback$/, 'title.authCallback'],
   [/^\/booking\/[^/]+$/, 'title.checkout'],

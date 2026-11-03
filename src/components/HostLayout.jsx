@@ -442,6 +442,9 @@ function HostLayout({ children }) {
                   <Wallet className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
                   {t('host.menuPayouts')}
                 </Link>}
+                <Link to="/help" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
+                  {t('host.menuHelpCentre')}
+                </Link>
                 <Link to="/host/application" onClick={() => setMenuOpen(false)} className={ACCOUNT_ITEM}>
                   <ClipboardList className={ACCOUNT_ICON} strokeWidth={2} aria-hidden="true" />
                   {t('host.menuHostSetup')}

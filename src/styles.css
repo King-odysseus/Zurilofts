@@ -1261,6 +1261,20 @@ html.dark .op-auth-check label {
 @media(max-width:850px){.op-place-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.op-place-count{display:none}}
 @media(max-width:600px){.op-content-container{width:calc(100% - 32px)}.op-public-hero{padding:34px 0 28px}.op-breadcrumbs{margin-bottom:18px}.op-public-hero h1,.op-guides-hero h1,.op-guide-not-found h1{font-size:32px}.op-public-directory{padding:24px 0 var(--zl-space-page)}.op-places-list>div:first-child h2{font-size:23px}.op-places-list>div:nth-child(2){display:flex;flex-direction:row;flex-wrap:wrap}.op-place-search-wrap,.op-place-select-field{flex:1 1 100%;width:100%;min-width:0}.op-place-grid{grid-template-columns:1fr;gap:24px}.op-place-card>div:first-child{height:210px}.op-guides-hero{padding:34px 0 28px}.op-guides-content{padding:26px 0 var(--zl-space-page)}.op-guide-grid{grid-template-columns:1fr;gap:20px}.op-guide-card h2{font-size:19px}.op-guide-detail{padding-top:24px;padding-bottom:var(--zl-space-page)}.op-guide-detail-cover{aspect-ratio:16/11;margin-bottom:26px}.op-guide-detail-content{font-size:15px;line-height:1.75}.op-guide-detail-content h2{font-size:23px}.op-legal-layout{padding-top:28px;padding-bottom:var(--zl-space-page)}.op-legal-content section{padding:22px 0}.op-legal-content h2{font-size:20px}.op-legal-content p,.op-legal-content li{font-size:13px}.op-legal-content table{font-size:12px}.op-not-found{padding-bottom:var(--zl-space-page)}}
 
+/* Help Centre search.
+
+   The same control the places directory uses: pill, no border, soft slate fill,
+   brass focus ring. A search box should look the same wherever a person meets
+   one, and the help screens are reached from the same public header. */
+.op-help-search{position:relative;width:100%}
+.op-help-search>svg{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#6E7686;pointer-events:none}
+.op-help-search input{width:100%;height:44px;border:0;border-radius:9999px;padding:0 18px 0 44px;background:#F1F5F9;color:#203565;font-size:13px;appearance:none}
+.op-help-search input::placeholder{color:#94A3B8}
+/* Focus is left to the shared control rule further down this file, so a search
+   field here matches every other text input in the product. Only the fill
+   changes, which is what marks the field as active on this page. */
+.op-help-search input:focus{background:#fff}
+
 /* ===== saved-stays ===== */
 .opg-saved-page{min-height:calc(100vh - 72px - var(--zl-legal-strip-h, 0px) - var(--zl-bottom-nav-space, 0px));padding:var(--zl-space-section) 0 var(--zl-space-page);background:#fff;color:#203565;font-family:Inter,Arial,sans-serif}
 .opg-saved-container{width:calc(100% - 48px);margin:0 auto}
@@ -4750,6 +4764,15 @@ html.dark .op-place-search-wrap input,
 html.dark .op-place-select-wrap select {
   background-color: var(--dm-surface-soft) !important;
   color: var(--dm-text) !important;
+}
+
+html.dark .op-help-search input {
+  background-color: var(--dm-surface-soft) !important;
+  color: var(--dm-text) !important;
+}
+
+html.dark .op-help-search > svg {
+  color: var(--dm-muted);
 }
 
 html.dark .op-place-area,

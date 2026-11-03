@@ -23,6 +23,10 @@ const PaymentCallback = lazy(() => import('./pages/PaymentCallback.jsx'));
 const PlacesPage = lazy(() => import('./pages/PlacesPage.jsx'));
 const RestaurantsPage = lazy(() => import('./pages/RestaurantsPage.jsx'));
 const GuidesPage = lazy(() => import('./pages/GuidesPage.jsx'));
+const HelpCentrePage = lazy(() => import('./pages/HelpCentrePage.jsx'));
+const HelpArticlePage = lazy(() => import('./pages/HelpArticlePage.jsx'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage.jsx'));
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage.jsx'));
 const GuideDetailPage = lazy(() => import('./pages/GuideDetailPage.jsx'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage.jsx'));
 const TermsPage = lazy(() => import('./pages/TermsPage.jsx'));
@@ -93,6 +97,10 @@ function Shell() {
   if (pathname.startsWith('/host') || pathname.startsWith('/admin')) return <WorkspaceRoutes />;
   if (pathname.startsWith('/booking/')) return <BookingPage />;
   if (pathname === '/login') return <LoginPage />;
+  // Password recovery has to be reachable while signed out, which is the only
+  // state someone who has forgotten a password can be in.
+  if (pathname === '/forgot-password') return <ForgotPasswordPage />;
+  if (pathname === '/reset-password') return <ResetPasswordPage />;
   if (pathname === '/register') return <RegisterPage />;
   if (pathname === '/payment/callback') return <GuestShell><PaymentCallback /></GuestShell>;
   if (pathname === '/trips') return <GuestShell><ProtectedRoute><TripHubPage /></ProtectedRoute></GuestShell>;
@@ -112,6 +120,8 @@ function Shell() {
   else if (pathname.startsWith('/stay/')) content = <RealPropertyPage />;
   else if (pathname === '/places') content = <PlacesPage />;
   else if (pathname === '/restaurants') content = <RestaurantsPage />;
+  else if (pathname === '/help') content = <HelpCentrePage />;
+  else if (pathname.startsWith('/help/')) content = <HelpArticlePage />;
   else if (pathname === '/guides') content = <GuidesPage />;
   else if (pathname.startsWith('/guides/')) content = <GuideDetailPage />;
   else if (pathname === '/privacy') content = <PrivacyPage />;

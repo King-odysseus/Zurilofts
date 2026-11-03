@@ -31,13 +31,14 @@ import { chrome } from './domains/chrome.js';
 import { a11y1 } from './domains/a11y1.js';
 import { a11y2 } from './domains/a11y2.js';
 import { a11y3 } from './domains/a11y3.js';
+import { help } from './domains/help.js';
 
 const legal = {
   en: { legal: { ...legalPrivacy.en.legal, ...legalTerms.en.legal } },
   sw: { legal: { ...legalPrivacy.sw.legal, ...legalTerms.sw.legal } },
 };
 
-const DOMAINS = [common, discovery, stays, booking, account, trips, messages, profile, titles, hostaccount, host, hostmoney, hostsetup, admindash, admin, legal, payment, hostinbox, saved, auth, adminlisting, hostpreview, chrome, a11y1, a11y2, a11y3];
+const DOMAINS = [common, discovery, stays, booking, account, trips, messages, profile, titles, hostaccount, host, hostmoney, hostsetup, admindash, admin, legal, payment, hostinbox, saved, auth, adminlisting, hostpreview, chrome, a11y1, a11y2, a11y3, help];
 
 const base = {
   en: {
