@@ -132,11 +132,19 @@ async function revokeAllSessions(userId: string): Promise<void> {
 
 /** Issue an access token + a fresh stored refresh session for a user. */
 async function generateTokens(
-  user: { id: string; email: string; role: string },
+  user: { id: string; email: string; role: string; credentialVersion: number },
   meta?: SessionMeta,
   persistent = true
 ): Promise<AuthTokens> {
-  const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN' });
+  // `ver` pins the token to the password it was issued under: changing the
+  // password increments User.credentialVersion and the auth middleware then
+  // refuses every older token (see middleware/auth.ts).
+  const accessToken = signAccessToken({
+    sub: user.id,
+    email: user.email,
+    role: user.role as 'USER' | 'HOST' | 'ADMIN',
+    ver: user.credentialVersion,
+  });
   const refreshToken = await createRefreshSession(user.id, meta, persistent);
   return { accessToken, refreshToken, persistent };
 }
@@ -257,7 +265,7 @@ export async function refreshTokens(
         return {
           user: toUserResponse(reused.user, await loadUserStatusExtras(reused.user.id)),
           tokens: {
-            accessToken: signAccessToken({ sub: reused.user.id, email: reused.user.email, role: reused.user.role as 'USER' | 'HOST' | 'ADMIN' }),
+            accessToken: signAccessToken({ sub: reused.user.id, email: reused.user.email, role: reused.user.role as 'USER' | 'HOST' | 'ADMIN', ver: reused.user.credentialVersion }),
             refreshToken: token,
             persistent: reused.persistent,
           },
@@ -285,7 +293,7 @@ export async function refreshTokens(
   return {
     user: toUserResponse(user, await loadUserStatusExtras(user.id)),
     tokens: {
-      accessToken: signAccessToken({ sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN' }),
+      accessToken: signAccessToken({ sub: user.id, email: user.email, role: user.role as 'USER' | 'HOST' | 'ADMIN', ver: user.credentialVersion }),
       refreshToken: token,
       persistent: session.persistent,
     },

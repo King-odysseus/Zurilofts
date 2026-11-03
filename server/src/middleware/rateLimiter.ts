@@ -20,6 +20,24 @@ export const authLimiter = rateLimit({
  * for a stolen-cookie brute force. Keep the window long enough that a normal
  * multi-tab user (each tab refreshing once an hour) is never hit.
  */
+/**
+ * Password reset (request + complete). Unauthenticated and guessable, so it has
+ * its own bucket instead of sharing the login limiter: a member who cannot sign
+ * in still has to be able to ask for a link. Keyed on IP like the limiters
+ * around it. Ten per quarter hour: enough for a shared office address and a
+ * member who mistypes, useless for email bombing a mailbox.
+ */
+export const passwordResetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many password reset attempts. Please try again after 15 minutes.',
+  },
+});
+
 export const refreshLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 60,

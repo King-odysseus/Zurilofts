@@ -48,3 +48,17 @@ export function googleCallbackUrlForRequest(req: Request): string {
   }
   return `${requestOrigin(req)}/api/auth/google/callback`;
 }
+
+/**
+ * The app's own public address, from configuration only.
+ *
+ * Deliberately takes no Request: a link inside an email is built long before
+ * anyone clicks it, and the Host header is attacker-controlled, so a reset link
+ * derived from it would point at whatever domain the requester typed in. The
+ * configured CLIENT_URL is the only honest answer. Falls back to the raw env
+ * value so a misconfigured deployment still forms an absolute URL instead of a
+ * relative one.
+ */
+export function publicClientUrl(): string {
+  return (normalizeEnvUrl('CLIENT_URL', env.CLIENT_URL) || env.CLIENT_URL).replace(/\/+$/, '');
+}

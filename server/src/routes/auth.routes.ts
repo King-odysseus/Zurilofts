@@ -2,8 +2,8 @@ import { Router } from 'express';
 import passport from '../config/passport.js';
 import { authenticate } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
-import { authLimiter, refreshLimiter } from '../middleware/rateLimiter.js';
-import { registerSchema, loginSchema, refreshSchema } from '../types/index.js';
+import { authLimiter, refreshLimiter, passwordResetLimiter } from '../middleware/rateLimiter.js';
+import { registerSchema, loginSchema, refreshSchema, passwordResetRequestSchema, passwordResetCompleteSchema } from '../types/index.js';
 import { env } from '../config/env.js';
 import * as authController from '../controllers/auth.controller.js';
 import { clientUrlForRequest, googleCallbackUrlForRequest } from '../utils/publicUrl.js';
@@ -27,6 +27,23 @@ router.post('/logout', authController.logout);
 
 // Current user (requires auth)
 router.get('/me', authenticate, authController.me);
+
+// Password recovery. Both unauthenticated: a member who cannot sign in has to
+// be able to ask for a link, and the link itself is the only credential the
+// completion call needs. One limiter for the pair, so a script cannot alternate
+// between the two to double its budget.
+router.post(
+  '/password-reset/request',
+  passwordResetLimiter,
+  validate(passwordResetRequestSchema),
+  authController.requestPasswordReset
+);
+router.post(
+  '/password-reset/complete',
+  passwordResetLimiter,
+  validate(passwordResetCompleteSchema),
+  authController.completePasswordReset
+);
 
 // Google OAuth - only register routes if Google credentials are configured.
 // The callback URL is derived from the production request when Railway/custom

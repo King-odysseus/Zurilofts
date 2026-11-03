@@ -20,10 +20,17 @@ export async function authenticate(req: Request, _res: Response, next: NextFunct
     // an already-issued access token to expire.
     const account = await prisma.user.findUnique({
       where: { id: decoded.sub },
-      select: { email: true, role: true, suspended: true, deletedAt: true },
+      select: { email: true, role: true, suspended: true, deletedAt: true, credentialVersion: true },
     });
     if (!account || account.suspended || account.deletedAt) {
       throw new UnauthorizedError('This account is no longer active');
+    }
+    // A password change increments credentialVersion, so every token minted
+    // before it stops working here instead of at its natural expiry. A token
+    // with no `ver` at all predates this check and is refused too, which costs
+    // each account exactly one sign-in after the rollout.
+    if (typeof decoded.ver !== 'number' || decoded.ver !== account.credentialVersion) {
+      throw new UnauthorizedError('This session has ended. Please sign in again.');
     }
     req.user = {
       ...decoded,

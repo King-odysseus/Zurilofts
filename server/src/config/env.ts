@@ -122,6 +122,16 @@ const envSchema = z.object({
   // only switched on by someone who has decided that, and said so in the
   // privacy policy.
   TRANSLATION_PRIVATE_CONTENT: z.string().default('false'),
+  // Outgoing mail for password reset links. All optional: without a transport
+  // the server still boots and every other feature works. SMTP_* drives the
+  // built-in SMTP client; MAIL_WEBHOOK_URL is the provider-agnostic fallback
+  // (a JSON POST). See utils/mailer.ts for which one wins.
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.string().regex(/^\d+$/, 'SMTP_PORT must be a port number').optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  MAIL_FROM: z.string().optional(),
+  MAIL_WEBHOOK_URL: z.string().url('MAIL_WEBHOOK_URL must be an absolute URL').optional(),
 })
   .superRefine((data, ctx) => {
     // A rate outside 0..1 would pay a host a multiplied or negative amount.
@@ -247,6 +257,15 @@ const envSchema = z.object({
           path: ['CLOUDINARY_URL'],
           message: 'CLOUDINARY_URL is required in production for persistent image storage (Railway disk is ephemeral).',
         });
+      }
+      // Password reset still answers 202 without a transport, so nothing looks
+      // broken from the outside while no member can ever recover an account.
+      // Say it at boot rather than only in the log of a failed request.
+      const mailReady = Boolean(data.SMTP_HOST && data.SMTP_PORT && data.MAIL_FROM) || Boolean(data.MAIL_WEBHOOK_URL);
+      if (!mailReady) {
+        console.warn(
+          '  No mail transport is configured (SMTP_HOST/SMTP_PORT/MAIL_FROM or MAIL_WEBHOOK_URL). Password reset links cannot be delivered and every request will be logged as undelivered.'
+        );
       }
       if (!data.VAPID_PUBLIC_KEY || !data.VAPID_PRIVATE_KEY) {
         console.warn(

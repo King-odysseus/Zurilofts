@@ -1,4 +1,6 @@
 import { z } from 'zod';
+// The governance-log action vocabulary and its query schema live in
+// services/audit.service.ts, which keeps this module free of Prisma imports.
 
 // ============================================================
 // JWT payload augmented to Express Request
@@ -7,6 +9,14 @@ export interface JwtPayload {
   sub: string;
   email: string;
   role: 'USER' | 'HOST' | 'ADMIN';
+  /**
+   * User.credentialVersion at the moment the token was signed. The auth
+   * middleware rejects a token whose `ver` no longer matches, which is how a
+   * password change ends every other session immediately. Tokens issued before
+   * this field existed carry no `ver` and are rejected too, so each account
+   * signs in once after the rollout.
+   */
+  ver: number;
 }
 
 declare global {
@@ -440,6 +450,63 @@ export const adminPasswordSetSchema = z.object({
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
 });
+
+/**
+ * The password rule. It is stated once here and reused by the reset flow; the
+ * inline copies in registerSchema, passwordChangeSchema and adminPasswordSetSchema
+ * apply the same three checks.
+ */
+export const passwordPolicy = z
+  .string()
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+  .regex(/[0-9]/, 'Password must contain at least one number');
+
+/**
+ * bcrypt reads at most 72 BYTES of a password and silently ignores the rest, so
+ * without a limit two different long passphrases could open the same account.
+ * Bytes, not characters: one accented character can be two or more bytes.
+ */
+export const PASSWORD_MAX_BYTES = 72;
+
+export function passwordByteLength(value: string): number {
+  return Buffer.byteLength(value, 'utf8');
+}
+
+/**
+ * Shape of a password reset token: 32 random bytes in base64url (43 characters,
+ * no padding). Anything else is rejected before it reaches the database.
+ */
+export const PASSWORD_RESET_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/;
+
+export const passwordResetRequestSchema = z.object({
+  // Normalised here so the lookup and the stored `address` binding agree:
+  // "A@Example.com " and "a@example.com" are the same mailbox.
+  email: z
+    .string()
+    .trim()
+    .email('Enter a valid email address')
+    .transform((value) => value.toLowerCase()),
+});
+
+export const passwordResetCompleteSchema = z
+  .object({
+    token: z.string().trim().regex(PASSWORD_RESET_TOKEN_PATTERN, 'This reset link is invalid or has expired.'),
+    newPassword: passwordPolicy.refine(
+      (value) => passwordByteLength(value) <= PASSWORD_MAX_BYTES,
+      `Password must be ${PASSWORD_MAX_BYTES} bytes or fewer`
+    ),
+    confirmPassword: z.string().min(1, 'Confirm your new password'),
+  })
+  .refine((body) => body.newPassword === body.confirmPassword, {
+    message: 'The two passwords do not match',
+    path: ['confirmPassword'],
+  });
+
+/**
+ * The governance-log query schema lives in `services/audit.service.ts`, beside
+ * the action vocabulary it validates against, so the two cannot drift apart.
+ */
 
 export const bookingStatusSchema = z.object({
   status: z.enum(['CONFIRMED', 'CANCELLED']),

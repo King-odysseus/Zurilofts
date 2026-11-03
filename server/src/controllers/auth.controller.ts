@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import * as authService from '../services/auth.service.js';
+import * as passwordResetService from '../services/password-reset.service.js';
 import { env } from '../config/env.js';
 import { clientUrlForRequest } from '../utils/publicUrl.js';
 
@@ -158,6 +159,41 @@ export async function me(req: Request, res: Response, next: NextFunction): Promi
   try {
     const user = await authService.getCurrentUser(req.user!.sub);
     res.json({ success: true, data: user });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/password-reset/request
+ *
+ * Always 202 with the same body. The service decides silently whether a link
+ * was issued, because an unknown address, a Google-only account, a suspended
+ * account and an administrator must look identical from the outside. The token
+ * never appears in this response in any environment.
+ */
+export async function requestPasswordReset(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { email } = req.body;
+    const result = await passwordResetService.requestPasswordReset(email);
+    res.status(202).json({ success: true, data: result });
+  } catch (error) {
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/password-reset/complete
+ *
+ * On success there is no session and no token: the client signs in with the new
+ * password, which is also what proves the change took effect. A bad, expired,
+ * used or stale token all produce the same generic failure.
+ */
+export async function completePasswordReset(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { token, newPassword } = req.body;
+    const result = await passwordResetService.completePasswordReset(token, newPassword);
+    res.json({ success: true, data: result });
   } catch (error) {
     next(error);
   }

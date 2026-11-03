@@ -46,6 +46,10 @@ model User {
   paystackRecipientKey  String? // Hash of destination details used by that recipient
   payoutFrequency String?      // "weekly" | "biweekly" | "monthly"
   deletedAt    DateTime?       // account erased; row retained only for legal/financial relations
+  // Bumped on every password replacement. Access tokens carry the value they
+  // were issued with ("ver"), so one increment ends every session at once
+  // without waiting for the 15 minute access-token expiry.
+  credentialVersion Int      @default(0)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   bookings     Booking[]
@@ -63,6 +67,7 @@ model User {
   identityVerification IdentityVerification?
   disputesRaised  Dispute[]
   refreshSessions RefreshSession[]
+  passwordResetTokens PasswordResetToken[]
   guestReviewsAuthored GuestReview[] @relation("GuestReviewsAuthored")
   guestReviewsReceived GuestReview[] @relation("GuestReviewsReceived")
 }
@@ -88,6 +93,26 @@ model RefreshSession {
   @@index([expiresAt])
 }
 
+// A single-use password reset link. Only the sha256 of the token is stored, so a
+// database leak cannot be turned into a working reset link. `address` binds the
+// link to the mailbox it was sent to, and `credentialVersion` binds it to the
+// password that existed when it was issued: a completed reset (or a password
+// change by any other path) makes every older link unusable.
+model PasswordResetToken {
+  id                String    @id @default(uuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash         String    @unique // sha256 hex of the raw token; the raw value is never stored
+  address           String // lowercase email address the link was sent to
+  credentialVersion Int // User.credentialVersion at issue time
+  expiresAt         DateTime
+  consumedAt        DateTime? // set when used, superseded, or cleared by a password change
+  createdAt         DateTime  @default(now())
+
+  @@index([userId, expiresAt])
+  @@index([expiresAt])
+}
+
 // Durable, non-PII audit trail for self-service and staff-initiated erasure.
 // IDs are intentionally not foreign keys because the target may be hard-deleted.
 model AccountErasureLog {
@@ -101,6 +126,39 @@ model AccountErasureLog {
 
   @@index([targetUserId])
   @@index([actorId])
+}
+
+// Append-only governance log for staff decisions.
+//
+// No relations on purpose. Every other audit table in this schema hangs off the
+// record it describes with onDelete: Cascade, so erasing the record erases the
+// evidence of who decided what: HostApplicationAudit disappears with the
+// application, DisputeAudit with the dispute. This table has no foreign keys at
+// all, so a listing delete, an account erasure or a cascade cannot take an entry
+// with it. Everything needed to read a row later is snapshotted at write time,
+// which also means the log stays readable after the actor's account is gone.
+//
+// Append-only is enforced in code: audit.service.ts exposes create and read and
+// nothing else, and a test asserts no update/delete is reachable.
+model AdminAuditEvent {
+  id           String   @id @default(uuid())
+  actorId      String? // staff id at the time; null for system-originated entries
+  actorEmail   String? // snapshot where the caller supplies it; null when only an id is passed
+  actorRole    String // ADMIN | SYSTEM
+  action       String // taxonomy in audit.service.ts, e.g. LISTING_REJECTED
+  targetType   String // Listing | User | HostApplication | Dispute | Account
+  targetId     String? // the record's id at the time, which may no longer exist
+  targetLabel  String? // human label snapshot: listing title, user email, ...
+  reason       String? // the decision note the affected party was given
+  metadataJson String? // extra structured context, applied through redactAuditMetadata
+  ipAddress    String?
+  userAgent    String?
+  createdAt    DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorId])
+  @@index([action])
+  @@index([targetType, targetId])
 }
 
 // A prospective host's application to become a HOST. Registering with role HOST
