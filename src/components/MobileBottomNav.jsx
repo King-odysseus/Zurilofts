@@ -1,7 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 import { CircleUserRound, Home, Heart, Luggage, MessageCircleMore } from 'lucide-react';
-import { useMode } from '../context/ModeContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 // Paths where global navigation (including these tabs) is intentionally
@@ -80,8 +79,11 @@ const TABS = [
 function MobileBottomNav() {
   const { t } = useLanguage();
   const location = useLocation();
-  const { mode } = useMode();
-  const hidden = isHiddenPath(location.pathname) || mode === 'hosting';
+  // Hidden by surface, not by a remembered mode. The host and admin workspaces
+  // are already covered below, so also keying this on "hosting" meant a guest
+  // who had visited the host workspace lost their guest tabs on /stays and
+  // /trips too, with no navigation left at the bottom of the screen.
+  const hidden = isHiddenPath(location.pathname);
 
   useEffect(() => {
     document.body.classList.toggle('has-mobile-bottom-nav', !hidden);

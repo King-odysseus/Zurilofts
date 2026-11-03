@@ -416,7 +416,14 @@ const APP_ONLY_PREFIXES = [
 
 export function isAppOnlyPath(pathname: string): boolean {
   const clean = pathname.replace(/\/+$/, '') || '/';
-  return APP_ONLY_PREFIXES.some((prefix) => clean === prefix.replace(/\/$/, '') || clean.startsWith(prefix));
+  return APP_ONLY_PREFIXES.some((prefix) => {
+    const base = prefix.replace(/\/$/, '');
+    // Match the segment itself or something below it, never a longer word. A
+    // plain startsWith treated /hostxyz as a signed-in screen, so every typo
+    // built on a protected prefix answered 200 with the app shell instead of
+    // being a not-found.
+    return clean === base || clean.startsWith(`${base}/`);
+  });
 }
 
 /**

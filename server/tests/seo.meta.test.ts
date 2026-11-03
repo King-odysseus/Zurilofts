@@ -5,7 +5,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildRobots, injectMeta, type PageMeta } from '../src/services/seo.service.js';
+import { buildRobots, injectMeta, isAppOnlyPath, type PageMeta } from '../src/services/seo.service.js';
 
 const shell = `<!doctype html><html lang="en"><head>
     <meta name="description" content="Home page description." />
@@ -92,5 +92,20 @@ test('buildRobots does not block a public page that merely starts with a private
   for (const path of publicPages) {
     const blocking = rules.filter((rule) => path.startsWith(rule));
     assert.deepEqual(blocking, [], `${path} must not match any Disallow rule`);
+  }
+});
+
+test('a protected prefix answers only for its own segment', () => {
+  // Real signed-in screens keep the app shell, even deep inside the workspace.
+  for (const path of ['/host', '/host/today', '/host/listings/abc/edit', '/admin', '/trips', '/profile']) {
+    assert.equal(isAppOnlyPath(path), true, `${path} should be app-only`);
+  }
+});
+
+test('a word that merely starts like a protected prefix is not one', () => {
+  // These used to answer 200 with the app shell, so every typo built on a
+  // protected prefix looked healthy to a crawler or a link checker.
+  for (const path of ['/hostxyz', '/adminpanel', '/tripsomething', '/loginfoo', '/bookinger']) {
+    assert.equal(isAppOnlyPath(path), false, `${path} should be unknown`);
   }
 });
