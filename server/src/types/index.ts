@@ -453,9 +453,30 @@ export const bookingRefundSchema = z.object({
 
 // ---- Calendar sync & seasonal pricing ----
 
+// Scheme and credential checks run here so an obviously unusable feed is
+// rejected before it is stored. The address is checked again at sync time
+// against a public-address allowlist (see utils/safeFetch.ts), because DNS can
+// change between saving and fetching and a host must never be able to aim the
+// server at an internal address.
+const calendarFeedUrl = z
+  .string()
+  .url('Must be a valid iCal/ICS URL')
+  .refine((value) => {
+    try {
+      const parsed = new URL(value);
+      return (
+        (parsed.protocol === 'http:' || parsed.protocol === 'https:') &&
+        !parsed.username &&
+        !parsed.password
+      );
+    } catch {
+      return false;
+    }
+  }, 'The calendar URL must be a public http:// or https:// address.');
+
 export const calendarSourceSchema = z.object({
   name: z.string().min(1, 'Name is required').max(60),
-  url: z.string().url('Must be a valid iCal/ICS URL'),
+  url: calendarFeedUrl,
 });
 
 const dateString = z.string().refine((d) => !isNaN(Date.parse(d)), 'Invalid date');

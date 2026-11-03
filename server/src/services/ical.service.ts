@@ -1,6 +1,7 @@
 import ical from 'node-ical';
 import prisma from '../config/prisma.js';
 import { NotFoundError } from '../types/index.js';
+import { fetchCalendarFeedText, mapWithConcurrency } from '../utils/safeFetch.js';
 
 /**
  * Two-way iCal calendar sync.
@@ -26,7 +27,10 @@ export async function syncSource(sourceId: string): Promise<{ events: number }> 
   if (!source) throw new NotFoundError('Calendar source');
 
   try {
-    const data = await ical.async.fromURL(source.url);
+    // Fetched through the guarded client rather than ical.async.fromURL, so a
+    // host cannot point the server at an internal address.
+    const text = await fetchCalendarFeedText(source.url);
+    const data = ical.sync.parseICS(text);
 
     const events = Object.values(data).filter(
       (e: any) => e && e.type === 'VEVENT' && e.start && e.end
@@ -71,7 +75,9 @@ export async function syncProperty(propertyId: string, ownerId?: string) {
   });
   if (!property) throw new NotFoundError('Property');
   const sources = await prisma.calendarSource.findMany({ where: { propertyId } });
-  const results = await Promise.allSettled(sources.map((s) => syncSource(s.id)));
+  // Bounded: one host with many slow feeds must not open an unlimited number
+  // of outbound connections at once.
+  const results = await mapWithConcurrency(sources, 4, (s) => syncSource(s.id));
   return sources.map((s, i) => ({
     sourceId: s.id,
     name: s.name,
@@ -82,7 +88,7 @@ export async function syncProperty(propertyId: string, ownerId?: string) {
 /** Sync all sources across all properties (used by the periodic background job). */
 export async function syncAll() {
   const sources = await prisma.calendarSource.findMany({ select: { id: true } });
-  await Promise.allSettled(sources.map((s) => syncSource(s.id)));
+  await mapWithConcurrency(sources, 4, (s) => syncSource(s.id));
   return sources.length;
 }
 
