@@ -15,6 +15,8 @@ type GoogleAuthenticateOptions = {
   session: false;
   failureRedirect?: string;
   callbackURL: string;
+  // Forwarded to Google and echoed back; verified against the cookie on return.
+  state?: string;
 };
 
 // Email/Password auth
@@ -30,17 +32,29 @@ router.get('/me', authenticate, authController.me);
 // The callback URL is derived from the production request when Railway/custom
 // domain env still points at localhost.
 if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
-  router.get(
-    '/google',
-    (req, res, next) => passport.authenticate('google', {
+  router.get('/google', (req, res, next) => {
+    // The value is minted here and kept in an httpOnly cookie, so the callback
+    // can prove it came back to the browser that started the sign-in.
+    const state = authController.beginGoogleAuth(res);
+    passport.authenticate('google', {
       scope: ['profile', 'email'],
       session: false,
       callbackURL: googleCallbackUrlForRequest(req),
-    } as GoogleAuthenticateOptions)(req, res, next)
-  );
+      state,
+    } as GoogleAuthenticateOptions)(req, res, next);
+  });
 
   router.get(
     '/google/callback',
+    // Runs before passport exchanges the code, so a callback that is not ours
+    // never gets that far.
+    (req, res, next) => {
+      if (!authController.verifyGoogleState(req, res)) {
+        res.redirect(`${clientUrlForRequest(req)}/login?error=google_auth_failed`);
+        return;
+      }
+      next();
+    },
     (req, res, next) => passport.authenticate('google', {
       session: false,
       failureRedirect: '/login?error=google_auth_failed',

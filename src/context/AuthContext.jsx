@@ -140,15 +140,20 @@ export function AuthProvider({ children }) {
     dispatch({ type: 'LOGOUT' });
   }, []);
 
-  const handleOAuthCallback = useCallback(async (oauthToken) => {
+  const handleOAuthCallback = useCallback(async () => {
     dispatch({ type: 'AUTH_START' });
     try {
-      setAccessToken(oauthToken);
-      const res = await apiClient.get('/auth/me');
-      const user = res.data.data;
-      dispatch({ type: 'AUTH_SUCCESS', payload: { user, accessToken: oauthToken } });
+      // The callback route sets the refresh cookie and puts nothing sensitive in
+      // the URL, so the session is established from the cookie here. A bearer
+      // token in the address bar would end up in history, logs and analytics.
+      const res = await refreshSession();
+      if (!res.data?.success || !res.data.data) throw new Error('No session was created');
+
+      const { user, accessToken } = res.data.data;
+      setAccessToken(accessToken);
+      dispatch({ type: 'AUTH_SUCCESS', payload: { user, accessToken } });
       return { success: true, user };
-    } catch (err) {
+    } catch {
       clearAccessToken();
       const message = 'Google sign-in failed';
       dispatch({ type: 'AUTH_FAILURE', payload: message });

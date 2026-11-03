@@ -1,10 +1,9 @@
 import { useEffect, useRef } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 import { consumePostAuthMode, rememberNavMode } from '../utils/authIntent.js';
 
 function OAuthCallback() {
-  const [searchParams] = useSearchParams();
   const { handleOAuthCallback } = useAuth();
   const navigate = useNavigate();
   const called = useRef(false);
@@ -14,13 +13,9 @@ function OAuthCallback() {
     called.current = true;
 
     async function processOAuth() {
-      const token = searchParams.get('token');
-      if (!token) {
-        navigate('/login?error=oauth_failed', { replace: true });
-        return;
-      }
-
-      const result = await handleOAuthCallback(token);
+      // No token is read from the URL: the callback route stores the session in
+      // an httpOnly cookie, and that cookie is what signs the person in.
+      const result = await handleOAuthCallback();
       if (result.success) {
         const requestedMode = consumePostAuthMode();
         rememberNavMode(requestedMode);
@@ -38,7 +33,7 @@ function OAuthCallback() {
     }
 
     processOAuth();
-  }, [searchParams, handleOAuthCallback, navigate]);
+  }, [handleOAuthCallback, navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#D9D9D9]">

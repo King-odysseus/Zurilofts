@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
+import { randomBytes, timingSafeEqual } from 'node:crypto';
 import * as authService from '../services/auth.service.js';
 import { env } from '../config/env.js';
 import { clientUrlForRequest } from '../utils/publicUrl.js';
 
 const REFRESH_COOKIE = 'zuri_refresh_token';
+const GOOGLE_STATE_COOKIE = 'zuri_google_state';
 
 // persistent (== "remember me" checked) survives 7 days like today. Unchecked,
 // the cookie carries no maxAge at all, so the browser treats it as a session
@@ -34,6 +36,52 @@ function clearRefreshCookie(res: Response): void {
 
 function sessionMetaFor(req: Request): { ip?: string; userAgent?: string } {
   return { ip: req.ip, userAgent: req.get('user-agent') || undefined };
+}
+
+function googleStateCookieOptions(maxAge?: number) {
+  return {
+    httpOnly: true,
+    secure: env.NODE_ENV === 'production',
+    sameSite: 'lax' as const,
+    // Scoped to the sign-in routes so it is sent to the callback and nowhere else.
+    path: '/api/auth/google',
+    ...(maxAge ? { maxAge } : {}),
+  };
+}
+
+/**
+ * Constant-time comparison of the state we issued with the one Google echoed.
+ * Both sides must be non-empty, and a missing value is a failure rather than a
+ * wildcard: without this, a callback completed in one browser could sign a
+ * different person into the attacker's account (login CSRF).
+ */
+export function googleStateMatches(expected: unknown, received: unknown): boolean {
+  if (typeof expected !== 'string' || typeof received !== 'string') return false;
+  if (!expected || !received) return false;
+  const left = Buffer.from(expected);
+  const right = Buffer.from(received);
+  if (left.length !== right.length) return false;
+  return timingSafeEqual(left, right);
+}
+
+/**
+ * Start Google sign-in: mint a fresh value bound to this browser, returned to
+ * Google as the OAuth state parameter and kept in an httpOnly cookie.
+ */
+export function beginGoogleAuth(res: Response): string {
+  const state = randomBytes(32).toString('base64url');
+  res.cookie(GOOGLE_STATE_COOKIE, state, googleStateCookieOptions(10 * 60 * 1000));
+  return state;
+}
+
+/**
+ * Check the callback belongs to the browser that started it. Single use: the
+ * cookie is cleared on every outcome, so a replayed callback URL fails.
+ */
+export function verifyGoogleState(req: Request, res: Response): boolean {
+  const expected = req.cookies?.[GOOGLE_STATE_COOKIE];
+  res.clearCookie(GOOGLE_STATE_COOKIE, googleStateCookieOptions());
+  return googleStateMatches(expected, req.query.state);
 }
 
 /**
@@ -137,9 +185,10 @@ export async function googleCallback(req: Request, res: Response, next: NextFunc
     );
 
     setRefreshCookie(res, tokens.refreshToken, tokens.persistent);
-    const redirectUrl = new URL('/auth/callback', clientUrl);
-    redirectUrl.searchParams.set('token', tokens.accessToken);
-    res.redirect(redirectUrl.toString());
+    // Nothing sensitive goes in the address bar. The refresh cookie already
+    // carries the session, and the client trades it for an access token, so a
+    // bearer token never reaches history, logs, referrers or analytics.
+    res.redirect(new URL('/auth/callback', clientUrl).toString());
   } catch (error) {
     next(error);
   }
