@@ -2,37 +2,45 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Review source findings across admin, guest and host apps; runtime confirmation remains outstanding",
+      "text": "Landed and pushed 20 of 27 audit fixes (security, blocked tasks, small polish)",
       "state": "done"
     },
     {
-      "text": "Verify security findings using source and isolated tests; document remaining deployment checks",
-      "state": "done"
+      "text": "SEC-07: stop an out-of-order transfer.success reopening a settled payout and crediting the host twice",
+      "state": "pending"
     },
     {
-      "text": "Map navigation and verify routes, redirects and login returns with isolated role fixtures; record live checks",
-      "state": "done"
+      "text": "SEC-02: move message attachments to private storage with membership-checked downloads",
+      "state": "pending"
     },
     {
-      "text": "Plan terminology edits in translations, titles and messages: stays for guests, listings for host/admin",
-      "state": "done"
+      "text": "Trust and Safety: server-side paging, search and accurate totals so cases past the first 100 are reachable",
+      "state": "pending"
     },
     {
-      "text": "Specify a real Help Centre and secure password recovery, including screens, routes and failure states",
-      "state": "done"
+      "text": "Help Centre with real articles, and secure password recovery with expiring single-use links",
+      "state": "pending"
     },
     {
-      "text": "Specify admin queue pagination and complete audit history, including older records and sensitive actions",
-      "state": "done"
+      "text": "Durable append-only audit history for admin decisions that survives record deletion",
+      "state": "pending"
     },
     {
-      "text": "Verify guest booking and host publishing, calendar, messaging and payout journeys on desktop and mobile",
-      "state": "done"
+      "text": "Server-side filters and paging for feedback, support messages, bookings and orphaned listings",
+      "state": "pending"
     },
     {
-      "text": "Rank proposed features and document affected screens/files, risks, fixes and acceptance checks; no implementation yet",
-      "state": "done"
+      "text": "Terminology pass: stays for guests, listings for management, EN/SW parity and titles",
+      "state": "pending"
+    },
+    {
+      "text": "Eight Tier 3 feature proposals, unimplemented and unapproved",
+      "state": "pending"
+    },
+    {
+      "text": "Record the corrected remaining-work list in .kai/plan.json and commit it",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-03T11:23:36.277Z"
+  "updatedAt": "2026-11-03T12:02:24.474Z"
 }
