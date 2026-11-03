@@ -15,7 +15,7 @@
     },
     {
       "text": "Trust and Safety: server-side paging, search and accurate totals so cases past the first 100 are reachable",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Help Centre with real articles, and secure password recovery with expiring single-use links",
@@ -38,5 +38,5 @@
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-03T12:12:51.871Z"
+  "updatedAt": "2026-11-03T12:20:29.143Z"
 }
