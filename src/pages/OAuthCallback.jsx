@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
-import { consumePostAuthMode, rememberNavMode } from '../utils/authIntent.js';
+import { consumePostAuthMode, consumePostAuthPath, rememberNavMode } from '../utils/authIntent.js';
 
 function OAuthCallback() {
   const { handleOAuthCallback } = useAuth();
@@ -17,15 +17,18 @@ function OAuthCallback() {
       // an httpOnly cookie, and that cookie is what signs the person in.
       const result = await handleOAuthCallback();
       if (result.success) {
+        // A page that sent us to sign in wins over the usual landing screen.
+        const returnTo = consumePostAuthPath();
         const requestedMode = consumePostAuthMode();
         rememberNavMode(requestedMode);
-        const dest = result.user?.role === 'ADMIN'
-          ? '/admin'
-          : result.user?.role === 'HOST'
-            ? '/host/today'
-            : requestedMode === 'hosting'
-              ? '/host/application'
-              : '/';
+        const dest = returnTo
+          || (result.user?.role === 'ADMIN'
+            ? '/admin'
+            : result.user?.role === 'HOST'
+              ? '/host/today'
+              : requestedMode === 'hosting'
+                ? '/host/application'
+                : '/');
         navigate(dest, { replace: true });
       } else {
         navigate('/login?error=oauth_failed', { replace: true });

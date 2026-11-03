@@ -6,6 +6,7 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 import { googleOAuthUrl } from '../utils/authUrls.js';
 import AuthShell from '../components/AuthShell.jsx';
 import GoogleIcon from '../components/GoogleIcon.jsx';
+import { consumePostAuthPath, safeInternalPath } from '../utils/authIntent.js';
 
 function getDashboardPath(user) {
   if (user?.role === 'ADMIN') return '/admin';
@@ -27,7 +28,12 @@ function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated && !isLoading && user) {
-      const returnTo = searchParams.get('returnUrl') || getDashboardPath(user);
+      // The guarded destination, then the one remembered for this tab, then the
+      // account's own home. Only a site-internal path is ever followed.
+      const returnTo =
+        safeInternalPath(searchParams.get('returnUrl')) ||
+        consumePostAuthPath() ||
+        getDashboardPath(user);
       navigate(returnTo, { replace: true });
     }
   }, [isAuthenticated, isLoading, user, navigate, searchParams]);

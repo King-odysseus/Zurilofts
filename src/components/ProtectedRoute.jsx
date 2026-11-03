@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
+import { rememberPostAuthPath } from '../utils/authIntent.js';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -17,7 +18,12 @@ function ProtectedRoute({ children }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to={`/login?returnUrl=${encodeURIComponent(location.pathname)}`} replace />;
+    // The query and the section anchor are part of the destination: a filtered
+    // list or a deep link into a page is often the whole reason for the link,
+    // and returning to the bare path loses it.
+    const destination = `${location.pathname}${location.search}${location.hash}`;
+    rememberPostAuthPath(destination);
+    return <Navigate to={`/login?returnUrl=${encodeURIComponent(destination)}`} replace />;
   }
 
   return children;

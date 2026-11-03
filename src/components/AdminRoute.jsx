@@ -1,7 +1,8 @@
-import { Link, Navigate } from 'react-router-dom';
+import { Link, Navigate, useLocation } from 'react-router-dom';
 import { TriangleAlert } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
+import { rememberPostAuthPath } from '../utils/authIntent.js';
 
 /**
  * Guards every /admin route.
@@ -14,6 +15,7 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 function AdminRoute({ children }) {
   const { t } = useLanguage();
   const { user, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -27,7 +29,11 @@ function AdminRoute({ children }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // An admin deep link (a case, a filtered queue) is worth keeping: signing in
+    // should land on the screen that was asked for, not on a dashboard.
+    const destination = `${location.pathname}${location.search}${location.hash}`;
+    rememberPostAuthPath(destination);
+    return <Navigate to={`/login?returnUrl=${encodeURIComponent(destination)}`} replace />;
   }
 
   // Admin control centre is ADMIN-only. Hosts have their own workspace under

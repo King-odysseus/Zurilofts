@@ -1,7 +1,8 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { CircleAlert } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { rememberPostAuthPath } from '../utils/authIntent.js';
 
 // Guards the host workspace (/host/*). Only an approved HOST, or a plain USER
 // who has expressed hosting intent (a host application, any status), is
@@ -14,6 +15,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 // /login; any other non-host/non-intent user sees the Access Denied panel.
 function HostRoute({ children }) {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const location = useLocation();
   const hasHostIntent = user?.hostApplicationStatus != null;
 
   if (isLoading) {
@@ -28,7 +30,11 @@ function HostRoute({ children }) {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    // Keep the workspace page they asked for, so signing in does not drop them
+    // on the guest home page with no way back.
+    const destination = `${location.pathname}${location.search}${location.hash}`;
+    rememberPostAuthPath(destination);
+    return <Navigate to={`/login?returnUrl=${encodeURIComponent(destination)}`} replace />;
   }
 
   if (user?.role === 'ADMIN') {

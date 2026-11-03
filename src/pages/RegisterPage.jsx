@@ -6,6 +6,7 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 import { googleOAuthUrl } from '../utils/authUrls.js';
 import { rememberNavMode, rememberPostAuthMode } from '../utils/authIntent.js';
+import { consumePostAuthPath } from '../utils/authIntent.js';
 import AuthShell from '../components/AuthShell.jsx';
 import GoogleIcon from '../components/GoogleIcon.jsx';
 
@@ -46,7 +47,11 @@ function RegisterPage() {
 
   useEffect(() => {
     if (isAuthenticated && !isLoading && user) {
-      navigate(isHost && user.role === 'USER' ? '/host/application' : getDashboardPath(user), { replace: true });
+      // A guarded destination beats the usual landing spot: someone who signed
+      // up to finish a booking should not be dropped on the home page.
+      const returnTo = consumePostAuthPath()
+        || (isHost && user.role === 'USER' ? '/host/application' : getDashboardPath(user));
+      navigate(returnTo, { replace: true });
     }
   }, [isAuthenticated, isLoading, user, navigate, isHost]);
 
