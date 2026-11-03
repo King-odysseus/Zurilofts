@@ -327,7 +327,7 @@ function Navbar() {
     'flex w-full min-h-[44px] items-center rounded-[10px] px-4 py-2.5 text-sm text-left text-red-600 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-red-500';
 
   return (
-    <><nav className={`zl-navbar fixed w-full z-20 top-0 start-0 transition-all duration-300 ${
+    <><nav className={`zl-navbar fixed w-full top-0 start-0 transition-all duration-300 ${menuOpen ? 'z-50' : 'z-20'} ${
       needsWhiteNav
         ? 'border-b border-[#E3E8EF] bg-elevated shadow-[0_4px_16px_rgba(20,58,128,0.06)]'
         : 'bg-transparent'
@@ -788,7 +788,16 @@ function Navbar() {
           )}
         </div>
 
-        {/* Secondary navigation drawer */}
+        {/* Secondary navigation drawer. Two constraints drive the classes below.
+            The drawer must outrank the mobile bottom tab bar, which is a sibling
+            rendered after the header, so the level is raised on the header
+            element itself while the menu is open: the drawer lives inside the
+            header's stacking context, so no z-index of its own could ever paint
+            over a sibling of the header. And the drawer must stop short of the
+            strip that bar occupies, because its footer holds the traveller/host
+            switch and sign out, which a full-height panel would bury under the
+            fixed bar on a short screen. The backdrop needs no change of its own;
+            it inherits the raised level and dims the bar as a modal should. */}
         {menuOpen && (
           <button
             type="button"
@@ -802,7 +811,7 @@ function Navbar() {
           role="dialog"
           aria-modal="true"
           aria-label={t('trust.accountAndNavigation')}
-          className={`fixed left-1/2 top-20 z-30 flex w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-6rem)] -translate-x-1/2 flex-col overflow-hidden rounded-2xl bg-elevated shadow-[0_20px_60px_rgba(20,58,128,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
+          className={`fixed left-1/2 top-20 z-30 flex w-[calc(100%-2rem)] max-w-md max-h-[calc(100dvh-9rem)] -translate-x-1/2 flex-col overflow-hidden rounded-2xl bg-elevated shadow-[0_20px_60px_rgba(20,58,128,0.2)] transition-all duration-200 ${menuOpen ? 'translate-y-0 opacity-100' : '-translate-y-3 pointer-events-none opacity-0'}`}
         >
           <div className="flex shrink-0 items-center justify-between border-b border-[#E3E8EF] bg-elevated px-4 py-3">
             <div className="flex items-center gap-3 min-w-0">

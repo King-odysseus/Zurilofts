@@ -2,33 +2,29 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check the reported build failure (frontend, server, lint)",
+      "text": "Run the production build and fix whatever is failing",
       "state": "done"
     },
     {
-      "text": "Read the host calendar grid and selection code",
+      "text": "Reduce padding inside calendar date tiles (reported too large)",
       "state": "done"
     },
     {
-      "text": "Add vertical spacing between calendar rows",
+      "text": "Fix calendar row spacing on mobile",
       "state": "done"
     },
     {
-      "text": "Make date clicks select multiple nights without opening the pop-up (click, shift-click, drag range, double-click to edit)",
+      "text": "Fix mobile nav jump and excess padding below nav items",
       "state": "done"
     },
     {
-      "text": "Update the on-screen hint in English and Swahili",
+      "text": "Fix the traveller/host mode switch being blocked by the nav on short screens",
       "state": "done"
     },
     {
-      "text": "Skip booked nights when filling a range, and make a double-click outside the pick edit only that night",
-      "state": "done"
-    },
-    {
-      "text": "Verify with lint, build and a real browser check of spacing and multi-select",
+      "text": "Verify in a browser at several phone widths and heights, then lint and build",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-03T14:38:50.069Z"
+  "updatedAt": "2026-11-03T14:52:22.258Z"
 }

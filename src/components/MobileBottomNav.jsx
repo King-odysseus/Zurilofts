@@ -96,11 +96,12 @@ function MobileBottomNav() {
   // the bronze active rail and for the page space reserved by
   // body.has-mobile-bottom-nav. That rule sits after the Tailwind layers, so a
   // pb-* utility would lose to it; the home-indicator inset is therefore set
-  // inline, where it also stays visible to whoever restyles this bar next.
+  // inline, where it also stays visible to whoever restyles this bar next. Kept
+  // at 4px so the gap under the labels matches the gap above the icons.
   return (
     <nav
       aria-label={t('a11y1.primaryNav')}
-      style={{ paddingBottom: 'calc(6px + env(safe-area-inset-bottom))' }}
+      style={{ paddingBottom: 'calc(4px + env(safe-area-inset-bottom))' }}
       className="mobile-bottom-nav fixed inset-x-3 bottom-3 z-40 mx-auto grid max-w-[390px] grid-cols-5 items-stretch rounded-full bg-elevated text-muted shadow-[0_10px_30px_rgba(15,23,42,0.14)] md:hidden"
     >
       {TABS.map((tab) => {
