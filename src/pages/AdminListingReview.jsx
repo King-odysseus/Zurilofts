@@ -9,6 +9,7 @@ import AdminPageHeader from '../components/admin/AdminPageHeader.jsx';
 import AdminPagination from '../components/admin/AdminPagination.jsx';
 import EmptyState from '../components/admin/EmptyState.jsx';
 import MetricCard from '../components/admin/MetricCard.jsx';
+import OrphanedListingsPanel from '../components/admin/OrphanedListingsPanel.jsx';
 import Panel, { PanelFooter, PanelHead } from '../components/admin/Panel.jsx';
 import { StateBadge } from '../components/admin/StatusBadge.jsx';
 import usePagedResource from '../hooks/usePagedResource.js';
@@ -100,6 +101,7 @@ export default function AdminListingReview() {
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [actionError, setActionError] = useState('');
+  const [showOrphans, setShowOrphans] = useState(false);
 
   const params = useMemo(() => {
     const next = { sort: 'oldest' };
@@ -172,7 +174,14 @@ export default function AdminListingReview() {
       <AdminPageHeader
         title={t('admin.approvalsTitle')}
         description={t('admin.approvalsDescription')}
+        actions={(
+          <Button color="light" type="button" onClick={() => setShowOrphans((current) => !current)}>
+            {showOrphans ? 'Hide orphaned listings' : 'Find orphaned listings'}
+          </Button>
+        )}
       />
+
+      {showOrphans && <OrphanedListingsPanel onChanged={() => { refetch(); loadCounts(); }} />}
 
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard

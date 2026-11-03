@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Badge, Button, Label, Spinner, Textarea } from 'flowbite-react';
 import { ArrowLeft, ArrowUpRight, Eye, House, MapPin, Phone } from 'lucide-react';
 import apiClient from '../api/client.js';
@@ -101,6 +101,7 @@ function Chips({ items, empty }) {
 export default function AdminListingDetail() {
   const { t, lang } = useLanguage();
   const { id } = useParams();
+  const navigate = useNavigate();
   const [listing, setListing] = useState(null);
   const [host, setHost] = useState(null);
   // Distinguishes "this listing has no owner" from "the owner lookup failed".
@@ -164,6 +165,22 @@ export default function AdminListingDetail() {
     } catch (cause) {
       setError(cause.response?.data?.error || t('adminlisting.reviewSaveFailed'));
     } finally {
+      setBusy('');
+    }
+  }
+
+  async function deleteListing() {
+    if (!listing) return;
+    if (!window.confirm(`Permanently delete "${listing.title}"? This cannot be undone.`)) return;
+    setBusy('delete');
+    setError('');
+    setMessage('');
+    try {
+      await apiClient.delete(`/admin/properties/${listing.id}`);
+      navigate('/admin/listings', { replace: true });
+    } catch (cause) {
+      // The 409 for a listing with paid bookings carries the reason to show.
+      setError(cause.response?.data?.error || 'The listing could not be deleted.');
       setBusy('');
     }
   }
@@ -352,6 +369,15 @@ export default function AdminListingDetail() {
 
             {error && <p role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
             {message && <p role="status" className="mt-4 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-700">{message}</p>}
+
+            <div className="mt-5 border-t border-border pt-4">
+              <Button color="failure" outline type="button" disabled={Boolean(busy)} onClick={deleteListing}>
+                {busy === 'delete' ? 'Deleting...' : 'Delete listing'}
+              </Button>
+              <p className="mt-2 text-xs text-muted">
+                Permanent. Refused when the listing has a paid booking; suspend it instead.
+              </p>
+            </div>
 
             {listing.status === 'PUBLISHED' && (
               <Link to={`/admin/listings/${listing.id}/preview`} className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-link hover:underline">

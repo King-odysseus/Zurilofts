@@ -70,5 +70,8 @@ router.delete('/:id', authenticate, requireHostWorkspace, ctrl.remove);
 // host account (requireHost, not requireHostWorkspace) - going live is where
 // account verification is actually enforced.
 router.post('/:id/submit', authenticate, requireHost, ctrl.submitForReview);
+// Unlisting only hides the host's own listing, so the workspace gate is enough
+// (an unverified host's draft can't be PUBLISHED anyway).
+router.post('/:id/unpublish', authenticate, requireHostWorkspace, ctrl.unpublish);
 
 export default router;

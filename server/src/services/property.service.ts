@@ -1,6 +1,7 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError, ForbiddenError, ConflictError, propertyCreateSchema } from '../types/index.js';
 import { isRangeAvailable } from './calendar.service.js';
+import { deleteImage } from '../utils/imageStorage.js';
 
 // Listing publication lifecycle - independent of the host's own account
 // verification (User.role / HostApplication).
@@ -121,6 +122,31 @@ export function planListingReview(status: string, action: ListingReviewAction): 
     throw new ValidationError(`Only a suspended listing can be unsuspended (status: ${status}).`);
   }
   return 'PUBLISHED';
+}
+
+/** A host takes a live or in-review listing back to DRAFT. Existing stays keep
+ *  working because only new bookings check isBookable. */
+export function planHostUnpublish(status: string): PropertyStatus {
+  if (status !== 'PUBLISHED' && status !== 'PENDING_REVIEW') {
+    throw new ValidationError(`Only a published or pending listing can be unlisted (status: ${status}).`);
+  }
+  return 'DRAFT';
+}
+
+/**
+ * Whether a listing can be hard-deleted given its bookings. A paid booking
+ * carries earnings, payouts, reviews and possibly disputes that a delete would
+ * cascade away, so any paid booking blocks it. Unpaid ones (abandoned
+ * checkouts, cancelled before payment) hold no financial record and are
+ * removed with the listing.
+ */
+export function listingDeleteVerdict(bookings: { paidAt: Date | null }[]): {
+  canDelete: boolean;
+  paid: number;
+  unpaid: number;
+} {
+  const paid = bookings.filter((booking) => booking.paidAt !== null).length;
+  return { canDelete: paid === 0, paid, unpaid: bookings.length - paid };
 }
 
 // Both schemas store these lists as JSON strings, so this turns the stored
@@ -784,15 +810,113 @@ export async function deleteProperty(id: string, hostId?: string) {
   const property = await prisma.property.findUnique({ where });
   if (!property) throw new NotFoundError('Property');
 
-  // A property that has ever been booked carries financial history (bookings,
-  // earnings, payouts, reviews, disputes) that a hard delete would cascade away.
-  // Deactivate the listing instead so the audit trail survives.
-  const bookingCount = await prisma.booking.count({ where: { propertyId: id } });
-  if (bookingCount > 0) {
+  // A property with a paid booking carries financial history (earnings,
+  // payouts, reviews, disputes) that a hard delete would cascade away.
+  // Unlist or suspend it instead so the audit trail survives.
+  const bookings = await prisma.booking.findMany({ where: { propertyId: id }, select: { paidAt: true } });
+  const verdict = listingDeleteVerdict(bookings);
+  if (!verdict.canDelete) {
     throw new ConflictError(
-      'This property has booking history and cannot be deleted. Suspend or unpublish it instead to stop new bookings.'
+      `This listing has ${verdict.paid} paid booking${verdict.paid === 1 ? '' : 's'} and cannot be deleted. Unlist it instead to stop new bookings.`
     );
   }
 
-  return prisma.property.delete({ where: { id } });
+  try {
+    // Unpaid bookings go first: the Booking-to-Property relation has no cascade.
+    const [, deleted] = await prisma.$transaction([
+      prisma.booking.deleteMany({ where: { propertyId: id, paidAt: null } }),
+      prisma.property.delete({ where: { id } }),
+    ]);
+    // After the commit, and best-effort: a leftover file is harmless, a
+    // missing photo on a live listing is not.
+    await Promise.all(parseImageUrls(property.imagesJson).map((url) => deleteImage(url)));
+    return deleted;
+  } catch (err) {
+    // A booking was paid between the check above and the delete (foreign key).
+    if ((err as { code?: string })?.code === 'P2003') {
+      throw new ConflictError('This listing just received a booking and cannot be deleted. Unlist it instead.');
+    }
+    throw err;
+  }
+}
+
+function parseImageUrls(imagesJson: string | null | undefined): string[] {
+  try {
+    const parsed = JSON.parse(imagesJson || '[]');
+    return Array.isArray(parsed) ? parsed.filter((url): url is string => typeof url === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Host takes their own listing off the market without losing it. */
+export async function unpublishProperty(id: string, hostId: string) {
+  const property = await prisma.property.findUnique({ where: { id, hostId } });
+  if (!property) throw new NotFoundError('Property');
+  const status = planHostUnpublish(property.status);
+  const updated = await prisma.property.update({ where: { id }, data: { status } });
+  return normalizeProperty(updated);
+}
+
+/** Listings with no host account, with the booking counts an admin needs to
+ *  decide between deleting and suspending each one. */
+export async function listOrphanedProperties() {
+  const rows = await prisma.property.findMany({
+    where: { hostId: null },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      title: true,
+      location: true,
+      status: true,
+      createdAt: true,
+      imagesJson: true,
+      bookings: { select: { paidAt: true } },
+    },
+  });
+  return rows.map(({ bookings, imagesJson, ...rest }) => ({
+    ...rest,
+    image: parseImageUrls(imagesJson)[0] ?? null,
+    ...listingDeleteVerdict(bookings),
+  }));
+}
+
+/**
+ * Admin cleanup of host-less listings. Ids are re-checked here (hostId must
+ * still be null) so a stale list can never delete a listing that was assigned
+ * a host meanwhile. Each id is reported on its own; one failure does not abort
+ * the rest. Suspend only applies to PUBLISHED listings, others are already off
+ * the market.
+ */
+export async function cleanupOrphanedProperties(ids: string[], mode: 'delete' | 'suspend', adminId: string) {
+  const orphans = await prisma.property.findMany({
+    where: { id: { in: ids }, hostId: null },
+    select: { id: true, status: true },
+  });
+  const orphanById = new Map(orphans.map((orphan) => [orphan.id, orphan]));
+
+  const results: { id: string; outcome: 'deleted' | 'suspended' | 'skipped'; reason?: string }[] = [];
+  for (const id of ids) {
+    const orphan = orphanById.get(id);
+    if (!orphan) {
+      results.push({ id, outcome: 'skipped', reason: 'Not found or no longer without a host' });
+      continue;
+    }
+    try {
+      if (mode === 'delete') {
+        await deleteProperty(id);
+        results.push({ id, outcome: 'deleted' });
+      } else if (orphan.status === 'PUBLISHED') {
+        await adminReviewProperty(id, adminId, 'suspend', 'Listing has no host account');
+        results.push({ id, outcome: 'suspended' });
+      } else {
+        results.push({ id, outcome: 'skipped', reason: `Already off the market (${orphan.status})` });
+      }
+    } catch (err) {
+      results.push({ id, outcome: 'skipped', reason: err instanceof Error ? err.message : 'Failed' });
+    }
+  }
+  // Audit trail until a governance log exists for listings.
+  console.info(`Orphan cleanup by ${adminId} (${mode}):`, JSON.stringify(results));
+  return results;
 }

@@ -134,6 +134,46 @@ export async function submitForReview(req: Request, res: Response, next: NextFun
   }
 }
 
+// Host: take their own listing back to DRAFT.
+export async function unpublish(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const property = await propertyService.unpublishProperty(req.params.id, req.user!.sub);
+    res.json({ success: true, data: property });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Admin: delete any listing. The host-facing DELETE /properties/:id cannot be
+// used for this because requireHostWorkspace deliberately excludes ADMIN.
+export async function adminRemove(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    await propertyService.deleteProperty(req.params.id);
+    res.json({ success: true, message: 'Property deleted' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// Admin: listings with no host account.
+export async function adminListOrphans(_req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    res.json({ success: true, data: await propertyService.listOrphanedProperties() });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function adminCleanupOrphans(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { ids, mode } = req.body;
+    const results = await propertyService.cleanupOrphanedProperties(ids, mode, req.user!.sub);
+    res.json({ success: true, data: results });
+  } catch (error) {
+    next(error);
+  }
+}
+
 // Admin: approve/reject a pending listing, or suspend/unsuspend a published one.
 export async function adminReview(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

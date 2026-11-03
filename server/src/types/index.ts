@@ -126,6 +126,13 @@ export const propertyReviewSchema = z.object({
   path: ['note'],
 });
 
+// Admin cleanup of listings that have no host. Explicit ids only (no "delete
+// all"), capped so one request cannot sweep the whole catalogue.
+export const propertyOrphanCleanupSchema = z.object({
+  ids: z.array(z.string().min(1)).min(1).max(100),
+  mode: z.enum(['delete', 'suspend']),
+});
+
 // Per-property automated host messages. PUT /properties/:id/auto-messages
 // accepts the full trigger set (or a subset to upsert). See
 // automated-message.service.ts for the default bodies and engine.

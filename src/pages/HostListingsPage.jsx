@@ -150,11 +150,12 @@ QuietAction.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-function HostListingCard({ property, onToggleAvailability, onDelete, onReview, busy, showTips }) {
+function HostListingCard({ property, onToggleAvailability, onDelete, onReview, onUnpublish, busy, showTips }) {
   const { t } = useLanguage();
   const image = firstImage(property);
   const status = propertyStatus(property, t);
   const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
+  const canUnpublish = ['PUBLISHED', 'PENDING_REVIEW'].includes(property.status);
 
   return <HostCard className="group h-full transition-shadow hover:shadow-md">
     <div className="relative overflow-hidden rounded-xl bg-surface">
@@ -207,7 +208,10 @@ function HostListingCard({ property, onToggleAvailability, onDelete, onReview, b
           />
           <span className="text-xs text-muted">{property.available ? t('host.acceptingBookings') : t('host.notAcceptingBookings')}</span>
         </div>
-        <QuietAction onClick={() => onDelete(property)} danger>{busy ? 'Working...' : 'Delete'}</QuietAction>
+        <div className="flex items-center gap-0.5">
+          {canUnpublish && <QuietAction onClick={() => onUnpublish(property)}>Unlist</QuietAction>}
+          <QuietAction onClick={() => onDelete(property)} danger>{busy ? 'Working...' : 'Delete'}</QuietAction>
+        </div>
       </div>
     </div>
   </HostCard>;
@@ -230,15 +234,17 @@ HostListingCard.propTypes = {
   onToggleAvailability: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
   onReview: PropTypes.func.isRequired,
+  onUnpublish: PropTypes.func.isRequired,
   busy: PropTypes.bool.isRequired,
   showTips: PropTypes.bool.isRequired,
 };
 
-function HostListingRow({ property, onToggleAvailability, onDelete, onReview, busy }) {
+function HostListingRow({ property, onToggleAvailability, onDelete, onReview, onUnpublish, busy }) {
   const { t } = useLanguage();
   const image = firstImage(property);
   const status = propertyStatus(property, t);
   const canSubmit = ['DRAFT', 'REJECTED'].includes(property.status);
+  const canUnpublish = ['PUBLISHED', 'PENDING_REVIEW'].includes(property.status);
 
   return <HostCard>
     <div className="flex items-start gap-3 sm:gap-4">
@@ -274,6 +280,7 @@ function HostListingRow({ property, onToggleAvailability, onDelete, onReview, bu
           >
             {property.available ? 'Pause' : 'Resume'}
           </button>
+          {canUnpublish && <QuietAction onClick={() => onUnpublish(property)}>Unlist</QuietAction>}
           <QuietAction onClick={() => onDelete(property)} danger>{t('host.deleteListing')}</QuietAction>
         </div>
       </div>
@@ -362,6 +369,20 @@ export default function HostListingsPage() {
     }
   }
 
+  async function handleUnpublish(property) {
+    if (!window.confirm(`Unlist "${listingTitle(property, t)}"? It goes back to a draft and guests can no longer book it. Existing stays are not affected. You can submit it for review again later.`)) return;
+    setBusyId(property.id);
+    try {
+      const response = await apiClient.post(`/properties/${property.id}/unpublish`);
+      setProperties((current) => current.map((item) => item.id === property.id ? response.data.data : item));
+      toast.success('Listing unlisted and moved to drafts.');
+    } catch (err) {
+      toast.error(err.response?.data?.error || 'Could not unlist this listing.');
+    } finally {
+      setBusyId(null);
+    }
+  }
+
   async function handleDelete(property) {
     if (!window.confirm(`Delete "${listingTitle(property, t)}"? This cannot be undone.`)) return;
     setBusyId(property.id);
@@ -369,8 +390,9 @@ export default function HostListingsPage() {
       await apiClient.delete(`/properties/${property.id}`);
       setProperties((current) => current.filter((item) => item.id !== property.id));
       toast.success('Listing deleted.');
-    } catch {
-      toast.error('Could not delete this listing.');
+    } catch (err) {
+      // The server explains a refusal (paid bookings) and points at Unlist.
+      toast.error(err.response?.data?.error || 'Could not delete this listing.');
     } finally {
       setBusyId(null);
     }
@@ -435,9 +457,9 @@ export default function HostListingsPage() {
         {properties.length === 0 ? <Button as={Link} to="/host/listings/new" size="sm" className="rounded-full">{t('host.addListing')}</Button> : <Button type="button" color="light" size="sm" onClick={() => setFilter('ALL')}>{t('host.showAllStays')}</Button>}
       </div>
     </HostCard> : view === 'list' ? <div className="space-y-5 sm:space-y-6">
-      {visibleProperties.map((property) => <HostListingRow key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
+      {visibleProperties.map((property) => <HostListingRow key={property.id} property={property} busy={busyId === property.id} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} onUnpublish={handleUnpublish} />)}
     </div> : <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
-      {visibleProperties.map((property) => <HostListingCard key={property.id} property={property} busy={busyId === property.id} showTips={showTips} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} />)}
+      {visibleProperties.map((property) => <HostListingCard key={property.id} property={property} busy={busyId === property.id} showTips={showTips} onToggleAvailability={handleToggleAvailability} onDelete={handleDelete} onReview={handleSubmitForReview} onUnpublish={handleUnpublish} />)}
     </div>}
   </div>;
 }
