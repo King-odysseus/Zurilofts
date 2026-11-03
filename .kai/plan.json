@@ -2,25 +2,21 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Reproduce all three issues in a browser at real phone sizes (390x844, 360x640, 375x600)",
+      "text": "Check uncommitted changes and repo state",
       "state": "done"
     },
     {
-      "text": "Fix calendar tile and row spacing on mobile",
+      "text": "Run lint and build to verify before committing",
       "state": "done"
     },
     {
-      "text": "Fix mobile bottom nav jump and excess padding under the tabs",
-      "state": "done"
-    },
-    {
-      "text": "Fix the traveller/host mode switch being covered by the nav on short screens",
-      "state": "done"
-    },
-    {
-      "text": "Re-measure in the browser, run lint and build, commit and push",
+      "text": "Commit and push the migration for password reset and admin audit",
       "state": "active"
+    },
+    {
+      "text": "Watch the deploy and confirm it succeeds",
+      "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-03T15:06:46.515Z"
+  "updatedAt": "2026-11-03T15:28:40.781Z"
 }
