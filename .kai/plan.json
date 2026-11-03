@@ -31,12 +31,12 @@
     },
     {
       "text": "Terminology pass: stays for guests, listings for management, EN/SW parity and titles",
-      "state": "pending"
+      "state": "done"
     },
     {
-      "text": "Eight Tier 3 feature proposals, unimplemented and unapproved",
-      "state": "pending"
+      "text": "Correct the Tier 3 proposal table and close the audit backlog document",
+      "state": "done"
     }
   ],
-  "updatedAt": "2026-11-03T13:52:43.072Z"
+  "updatedAt": "2026-11-03T14:01:47.676Z"
 }

@@ -68,7 +68,7 @@ remaining part of this item.
 | 2.3 | SEC-10 Invalid signatures create database rows | `server/src/services/payment.service.ts`, `server/src/routes/payment.routes.ts` | Unauthenticated traffic can write payment log entries | Reject before any payment write; bounded security logging | invalid signatures produce no payment records and bounded cost; valid bursts unaffected | small |
 | 2.4 | NAV-07 Unknown URL prefixes answer "200" | `server/src/services/seo.service.ts`, `server/src/index.ts` | Broken links look healthy to crawlers and link checks | Match supported routes or segment boundaries | typo addresses return 404 with a useful screen; valid protected deep links keep their shell | small |
 | 2.5 | Lists that page locally or not at all | `AdminFeedback.jsx`, `AdminMessages.jsx`, `AdminBookings.jsx`, `OrphanedListingsPanel.jsx`, message service | Filters apply only to the visible page; support history is loaded whole | Server-side filters, counts and paging with stable ordering | filters and totals match the whole dataset; older thread messages load by cursor | medium |
-| 2.6 | Terminology: stays for guests, listings for management | translation domains, `src/utils/titles.js`, exports, server error strings | Guests read "property" in checkout and history; hosts read "stay" in management | Apply the four prepared batches, preserving legal terms, API names and stored templates | EN/SW parity kept; guest screens say stay, management says listing; legal and physical-property wording unchanged | medium |
+| 2.6 | Terminology: stays for guests, listings for management | translation domains, `src/utils/titles.js`, exports, server error strings | Guests read "property" in checkout and history; hosts read "stay" in management | Apply the four prepared batches, preserving legal terms, API names and stored templates | EN/SW parity kept; guest screens say stay, management says listing; legal and physical-property wording unchanged | medium | DONE |
 | 2.7 | J-03 Host calendar tab still says "Property calendar" | `src/utils/titles.js` | Old wording survives in the browser tab | Rename to "Listing calendar" | direct load and client navigation both show the new title | small |
 | 2.8 | J-04 "Edit listing" offered while under review | `src/pages/HostListingsPage.jsx` | A button promises an edit that cannot be saved | Label it for viewing, or open a read-only view | no under-review control implies a save that will fail | small |
 | 2.9 | NAV-09 Labels that promise a different destination | `src/components/ListingEditorTabs.jsx`, `src/GuestDiscovery.jsx`, `HostRoute.jsx` | A settings gear opens account settings; featured guide cards open the index | Relabel or point at the matching destination | label, accessible name and destination agree | small |
@@ -76,18 +76,60 @@ remaining part of this item.
 | 2.11 | Guest mobile navigation depends on remembered host mode | `src/components/MobileBottomNav.jsx`, `src/components/HostLayout.jsx` | A guest browsing from host mode can lose their mobile tabs | Derive navigation from the current surface | shared stay, `/stays` and `/trips` keep guest navigation after entering the host workspace | medium |
 | 2.12 | Calendar day cells lack a date-based accessible name | host calendar components | Screen-reader users cannot identify a night; automated checks cannot target one | Include the date in each cell's accessible name | a specific night can be addressed by name and read correctly by assistive technology | small |
 
+Status 2.6: done. Guests now read "stay" and hosts and administrators read
+"listing"; legal wording and the physical sense of a property are untouched.
+
+Changed in both languages: the stay page (type, overview, similar stays, photo
+gallery, loading, not-found), guest checkout (add-ons, loading, unavailable),
+saved stays and shortlists (counts, empty states, browse, remove), the profile
+empty hint, the payment "view stay" action, host management (earnings columns
+and description, "your listing"), the host application step naming, admin
+add-ons coverage and assignment labels, and the admin revenue fallback. CSV
+headers in the revenue, earnings and payout exports now say Listing, which is
+what a person reading the file expects; no stored data or query depends on
+those header strings.
+
+Kept deliberately: "Property condition" (a dispute category about the physical
+dwelling), "Property manager" and "Property authority" (ownership roles), and
+the host application's "Number of properties" / "Relationship to the
+properties", which describe the places a host is legally authorised to let.
+
+Two things this pass fixed beyond the rename:
+
+- The host listing editor was reporting a failed load with the guest string
+  "Failed to load property". It now has its own message.
+- Seven Swahili strings translated "hosting" as "ukumbi", which means a hall.
+  They now use "ukaribishaji", the word the rest of the product already uses.
+
+Verified: a parity check over the merged dictionaries reports 3192 keys in each
+language, no key missing from either side, and no placeholder that differs
+between them. Then nine screens were opened in a real browser and searched for
+the word: the stay page, saved stays, profile, booking history, host today,
+host listings, host earnings, the admin overview, admin add-ons and admin
+revenue all render with no "property" visible. The host application shows only
+the two ownership labels above, in both languages. Lint and the production
+build pass.
+
 ## Tier 3 - Features worth building, in value order
 
 | # | Feature | Affected screens/files | Why it helps | Main risk | Acceptance check | Effort |
 | --- | --- | --- | --- | --- | --- | --- |
-| 3.1 | Help Centre with real articles | new help pages, `App.jsx`, footer and auth shell links, reviewed EN/SW catalogue | Turns three misleading links into a support surface that also serves locked-out people | Content drift from actual behaviour | every article's steps match the shipped app; unknown article and failed load have distinct states | medium |
-| 3.2 | Secure password recovery | new recovery pages, auth routes/service, reset storage, delivery outbox, trusted origin | Removes a manual email dependency and a support burden | Account enumeration, token leakage, delivery failures | generic responses for known and unknown addresses; expired, reused and concurrent resets fail safely; old sessions die | large |
+| 3.1 | Help Centre with real articles | new help pages, `App.jsx`, footer and auth shell links, reviewed EN/SW catalogue | Turns three misleading links into a support surface that also serves locked-out people | Content drift from actual behaviour | every article's steps match the shipped app; unknown article and failed load have distinct states | medium | SHIPPED (see 1.4) |
+| 3.2 | Secure password recovery | new recovery pages, auth routes/service, reset storage, delivery outbox, trusted origin | Removes a manual email dependency and a support burden | Account enumeration, token leakage, delivery failures | generic responses for known and unknown addresses; expired, reused and concurrent resets fail safely; old sessions die | large | SHIPPED (see 1.4) |
 | 3.3 | Admin queue operations: ageing, assignment, saved views | Trust and Safety, governance, shared paging components | Cases stop waiting unnoticed | Queue mutation races between admins | ageing is visible per case; assignment survives filter changes; two admins acting at once get a clear conflict | medium |
 | 3.4 | Staff MFA and session management | admin auth, `server/src/middleware/auth.ts`, user settings | Admin accounts can approve payouts and release identity documents | Lockout and recovery procedure | MFA enforced for ADMIN; sessions can be reviewed and revoked; recovery path documented | medium |
 | 3.5 | Calendar sync health and retry | `server/src/services/ical.service.ts`, host calendar screen | A failed feed silently blocks nights or double-books them | Same network boundary as SEC-01 | last sync time, error reason and manual retry visible; repeated failures do not stack blocks | medium |
 | 3.6 | Payout and refund reconciliation view | admin revenue, payouts, payment service | Disputes about missing money get answered from evidence | Reading provider state wrongly | each payout shows provider reference, attempts and outcome; mismatches are listed for staff | medium |
 | 3.7 | Saved-search alerts for guests | discovery search, notification service | Repeat demand for the same dates and area | Notification fatigue and mailing reputation | alerts honour saved filters, can be turned off, and link to a working search | medium |
 | 3.8 | Account security page for everyone | profile, security service | People can see and end sessions after a suspected compromise | Confusing session data | active sessions listed with device and time; revoking one ends it immediately | medium |
+
+Status of these proposals: 3.1 and 3.2 were built as fixes rather than left as
+proposals, because both closed an audit finding. The remaining six (3.3 aged
+and assignable queues, 3.4 staff MFA, 3.5 calendar sync health, 3.6 payout and
+refund reconciliation, 3.7 saved-search alerts, 3.8 an account security page)
+are unimplemented and unapproved. Each names its files, its risk and its
+acceptance check above, so any of them can be started without a new design
+pass.
 
 Deliberately not proposed: a CMS for help content, an event-sourcing rewrite of
 the domain, and a general error-handling framework. Each is a large commitment
