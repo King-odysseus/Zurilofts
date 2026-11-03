@@ -2,21 +2,37 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Check uncommitted changes and repo state",
+      "text": "Confirm the password reset and audit migration is committed and applied in production",
       "state": "done"
     },
     {
-      "text": "Run lint and build to verify before committing",
+      "text": "Fix the production 500 on listing reviews: add the missing review sub-score columns",
       "state": "done"
     },
     {
-      "text": "Commit and push the migration for password reset and admin audit",
+      "text": "Fix the failing CI: valid Paystack fixture and VAPID keys generated per run",
+      "state": "done"
+    },
+    {
+      "text": "Keep the PostgreSQL verification scratch out of git",
+      "state": "done"
+    },
+    {
+      "text": "Run lint and build before pushing",
+      "state": "done"
+    },
+    {
+      "text": "Push to main and trigger the Railway deploy and CI run",
       "state": "active"
     },
     {
-      "text": "Watch the deploy and confirm it succeeds",
+      "text": "Watch the deploy: migration applies and the healthcheck passes",
+      "state": "pending"
+    },
+    {
+      "text": "Verify in production that reviews return 200 and the database has no schema drift",
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-03T15:28:40.781Z"
+  "updatedAt": "2026-11-03T16:06:05.585Z"
 }
