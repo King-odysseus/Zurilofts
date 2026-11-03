@@ -39,6 +39,7 @@ service. Nothing here is scheduled; each item needs its own approval.
 | --- | --- | --- | --- | --- | --- | --- |
 | 1.1 | J-01 The push prompt covers the message send button | `src/components/PushNotificationPrompt.jsx`, `src/App.jsx`, `src/i18n/domains/discovery.js` | Guests cannot send a message until they dismiss an unrelated banner; guests are told about "your listings" | Keep the overlay clear of the composer and the mobile tab bar; choose wording by role or workspace | send button clickable while the prompt shows at 390 and 1440; guest, host and admin each see their own wording | small |
 | 1.2 | NAV-01 Sign-in loses the page you were on | `src/components/ProtectedRoute.jsx`, `HostRoute.jsx`, `AdminRoute.jsx`, `src/pages/LoginPage.jsx`, `RegisterPage.jsx`, `OAuthCallback.jsx` | Deep links, filters and anchors are lost, and admin or host destinations drop entirely | Carry one validated internal destination (path, query, fragment) through login, signup and OAuth; keep role checks | a signed-out deep link returns to the same authorized screen after each method; external and cross-role destinations rejected | medium |
+| 1.4 | Footer "Help Centre" opens travel editorial, and a forgotten password needs a support email | `src/GuestDiscovery.jsx`, `src/components/AuthShell.jsx`, `src/pages/LoginPage.jsx`, auth service/controller | A help link promises support content it does not have; recovery asks a person to describe their own reset to support | A real Help Centre with 14 reviewed articles, search and topic browsing; email reset with a single-use 30-minute link, plus an authenticated recovery screen. See `docs/help-and-recovery-spec-2026-11-03.md` | every help entry opens help content in both languages; a reset link works once, expires, and signs out other devices | medium | DONE |
 | 1.3 | Trust and Safety cannot reach older cases | `src/pages/AdminTrustSafety.jsx`, identity and dispute controllers/services | Cases beyond the first 100 are unreachable, and only four open disputes are listed | Independent server-paged panels with status, search and accurate totals; URL-restorable filters | a queue with more than 237 records reaches every case in every status; last-page correction works | medium | DONE |
 
 Status 1.3: fixed. Both queues are now paged on the server with per-status totals
@@ -123,3 +124,44 @@ Items that touch a live boundary (payments, payouts, Google sign-in, private
 files, mail delivery) additionally need a staging check against the sandbox
 account before they are called done. Source-level and mocked verification is
 recorded in the security audit as evidence, not as a substitute for that.
+
+Status 1.4: fixed.
+
+Help Centre: `/help` and `/help/:slug` are public pages. Fourteen articles ship
+with the bundle, each in English and Kiswahili, covering finding a stay,
+booking and paying, arrival and messaging, cancellations, identity and
+disputes, reviews and saved stays, the host application, listing review,
+calendar and reservations, guest messages, earnings and payouts, account
+access, privacy and safety, and contacting support. Search runs in the browser
+over titles, summaries and keywords in the reader's own language; the results
+count is announced politely; an empty search keeps the term, offers a clear and
+still links to support. The footer, the signed-out help link and the host
+account menu all point at `/help`; the travel guides stay at `/guides`.
+
+Password recovery: `POST /api/auth/password-reset/request` and
+`POST /api/auth/password-reset/complete`. The request endpoint answers 202 with
+an identical body for every syntactically valid address, so it cannot be used
+to discover who has an account. Tokens are 32 random bytes, stored only as a
+SHA-256 hash, valid 30 minutes, single use, bound to the account and the
+credential version at issue time, and capped at three outstanding per account.
+Completion re-checks eligibility and claims the token in one transaction, then
+increments `credentialVersion`, which invalidates every earlier access token,
+and deletes the account's refresh sessions. `/forgot-password` and
+`/reset-password` are public, translated, and show one generic message for a
+bad, used or expired link.
+
+Verified: 15 checks against the running API and database, all passing - the
+unknown address answers identically and receives no email, the raw token is
+never stored, weak and mismatched passwords are refused without changing
+anything, the reset completes, the old password stops working, the new one
+works, the link cannot be reused, a pre-existing session is rejected, and
+another account's link changes only that account. Driven in a browser: the
+Help Centre lists 14 articles, search narrows to the right ones, an empty
+search behaves, an article renders its steps and action, an unknown slug
+explains itself, and all of it works in Kiswahili with no English left over.
+
+Still outstanding: no mail transport is configured in production, so a real
+deployment needs `SMTP_*` or `MAIL_WEBHOOK_URL` set before anyone can receive a
+link. The new `PasswordResetToken` model and `User.credentialVersion` must be
+applied to PostgreSQL; the local SQLite database was updated with
+`prisma db push`, and the migrations directory is locked to PostgreSQL.

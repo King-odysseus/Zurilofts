@@ -18,16 +18,16 @@
       "state": "done"
     },
     {
-      "text": "Help Centre with real articles, and secure password recovery with expiring single-use links",
-      "state": "pending"
+      "text": "Help Centre with real articles, and secure password recovery with single-use expiring links",
+      "state": "done"
     },
     {
       "text": "Durable append-only audit history for admin decisions that survives record deletion",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Server-side filters and paging for feedback, support messages, bookings and orphaned listings",
-      "state": "pending"
+      "state": "done"
     },
     {
       "text": "Terminology pass: stays for guests, listings for management, EN/SW parity and titles",
@@ -38,5 +38,5 @@
       "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-03T12:20:29.143Z"
+  "updatedAt": "2026-11-03T13:52:43.072Z"
 }
