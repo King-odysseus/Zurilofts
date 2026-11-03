@@ -292,6 +292,24 @@ export async function deleteUserAccount(
       },
     });
 
+    // The governance entry is written in the same transaction as the erasure, so
+    // the two cannot diverge: either the account is gone and the record of who
+    // erased it exists, or neither happened. AccountErasureLog above keeps the
+    // retention detail; this is the staff decision trail.
+    await tx.adminAuditEvent.create({
+      data: {
+        actorId: actor.id,
+        actorEmail: null,
+        actorRole: actor.role,
+        action: 'USER_ERASED',
+        targetType: 'Account',
+        targetId: userId,
+        targetLabel: null,
+        reason: actor.reason ? String(actor.reason).slice(0, 1000) : null,
+        metadataJson: JSON.stringify({ path }),
+      },
+    });
+
     return { avatar: user.avatar, path };
   }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 

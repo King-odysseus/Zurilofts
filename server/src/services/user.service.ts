@@ -280,10 +280,15 @@ export async function adminSetUserPassword(userId: string, newPassword: string) 
 
   const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await prisma.$transaction([
-    prisma.user.update({ where: { id: userId }, data: { passwordHash } }),
+    // Incrementing credentialVersion ends every access token already issued to
+    // this account, not just the refresh sessions removed here.
+    prisma.user.update({ where: { id: userId }, data: { passwordHash, credentialVersion: { increment: 1 } } }),
     // Revoke every browser/device session so the password replacement takes
     // effect immediately for the affected account.
     prisma.refreshSession.deleteMany({ where: { userId } }),
+    // A reset link mailed before this change must not be able to set a password
+    // the account owner did not choose.
+    prisma.passwordResetToken.updateMany({ where: { userId, consumedAt: null }, data: { consumedAt: new Date() } }),
   ]);
 
   return { message: 'Password updated and active sessions revoked.' };
@@ -303,14 +308,22 @@ export async function changePassword(userId: string, currentPassword: string, ne
   const passwordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
   await prisma.user.update({
     where: { id: userId },
-    data: { passwordHash },
+    data: { passwordHash, credentialVersion: { increment: 1 } },
   });
 
   // A password change is a credential-security event. Remove every persisted
   // refresh session, including the one which made this request, so a stolen
   // browser session cannot silently regain access after the password changes.
-  // Access JWTs are intentionally short-lived (15 minutes).
+  // The refresh cookie is gone below; the access token in the caller's memory
+  // dies with it, because the increment above changed credentialVersion and the
+  // auth middleware refuses any token carrying an older value.
+  // Reset links are retired on the same reasoning, and marked used rather than
+  // deleted so a support question about a link that "did not work" can be
+  // answered from the row: it records the address and the expiry.
   await prisma.refreshSession.deleteMany({ where: { userId } });
+  // A link mailed before this change could set a password the account owner
+  // never chose, so every outstanding one is closed here.
+  await prisma.passwordResetToken.updateMany({ where: { userId, consumedAt: null }, data: { consumedAt: new Date() } });
 
   return { message: 'Password updated successfully' };
 }

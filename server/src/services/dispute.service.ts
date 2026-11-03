@@ -276,6 +276,21 @@ export async function updateStatus(id: string, adminId: string, status: 'UNDER_R
     await tx.disputeAudit.create({
       data: { disputeId: id, actorId: adminId, action: status === 'RESOLVED' ? 'RESOLVED' : status === 'DISMISSED' ? 'DISMISSED' : 'STATUS_CHANGED', note: resolution },
     });
+    // Governance entry: DisputeAudit above cascades with the dispute, so the
+    // decision would be lost if the record were ever hard-deleted.
+    await tx.adminAuditEvent.create({
+      data: {
+        actorId: adminId,
+        actorEmail: null,
+        actorRole: 'ADMIN',
+        action: status === 'RESOLVED' ? 'DISPUTE_RESOLVED' : status === 'DISMISSED' ? 'DISPUTE_DISMISSED' : 'DISPUTE_UNDER_REVIEW',
+        targetType: 'Dispute',
+        targetId: id,
+        targetLabel: dispute.bookingId ?? null,
+        reason: resolution ? String(resolution).slice(0, 1000) : null,
+        metadataJson: JSON.stringify({ from: dispute.status, to: status }),
+      },
+    });
     return row;
   });
   return toAdminView(updated);

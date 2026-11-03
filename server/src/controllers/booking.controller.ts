@@ -88,13 +88,21 @@ export async function getById(req: Request, res: Response, next: NextFunction): 
 // so this controller is safe to mount on both admin and host routes.
 export async function listAll(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { status, page, limit } = req.query;
+    const { status, page, limit, search, propertyId, from, to } = req.query;
+    // A host sees only their own listings; that scoping comes from the token,
+    // never from the query string.
     const hostId = req.user!.role === 'ADMIN' ? undefined : req.user!.sub;
     const result = await bookingService.listAllBookings(
       status as string | undefined,
       page ? Number(page) : 1,
       limit ? Number(limit) : 20,
-      hostId
+      hostId,
+      {
+        search: typeof search === 'string' ? search : undefined,
+        propertyId: typeof propertyId === 'string' ? propertyId : undefined,
+        from: typeof from === 'string' ? from : undefined,
+        to: typeof to === 'string' ? to : undefined,
+      }
     );
     res.json({ success: true, data: result.bookings, pagination: result.pagination });
   } catch (error) {

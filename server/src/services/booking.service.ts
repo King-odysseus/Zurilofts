@@ -1,5 +1,7 @@
 import { Prisma } from '@prisma/client';
 import prisma from '../config/prisma.js';
+
+import { paginationMeta, parseDateRange, parsePaging } from '../utils/paging.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
 import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee, lateCheckoutOptions, EXTRA_GUEST_FEE_PER_NIGHT, totalWithGatewayFee, type GatewayFeeConfig } from '../utils/pricing.js';
 import { isRangeAvailable, isRangeAvailableWithDb, PENDING_HOLD_MINUTES } from './calendar.service.js';
@@ -474,15 +476,15 @@ export async function quoteBooking(input: QuoteBookingInput) {
 }
 
 export async function listUserBookings(userId: string, status?: string, page = 1, limit = 10) {
-  const where: any = { userId };
+  const window = parsePaging({ page, limit }, { defaultLimit: 10 });
+  const where: Prisma.BookingWhereInput = { userId };
   if (status) where.status = status;
 
-  const skip = (page - 1) * limit;
   const [bookings, total] = await Promise.all([
     prisma.booking.findMany({
       where,
-      skip,
-      take: limit,
+      skip: window.skip,
+      take: window.limit,
       orderBy: { createdAt: 'desc' },
       include: {
         property: {
@@ -500,7 +502,9 @@ export async function listUserBookings(userId: string, status?: string, page = 1
 
   return {
     bookings: normalizeBookings(bookings),
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    // Shared envelope: an empty result reports 1 page, not 0, matching every
+    // other list endpoint.
+    pagination: paginationMeta(total, window),
   };
 }
 
@@ -554,21 +558,59 @@ export async function getBooking(bookingId: string, scope?: { userId?: string; h
   });
 }
 
-// Lists bookings across properties. When `hostId` is provided, results are
-// scoped to bookings on that host's listings - the data-layer isolation that
-// guarantees a host can never read another host's (or guest's) bookings,
-// independent of which route called this.
-export async function listAllBookings(status?: string, page = 1, limit = 20, hostId?: string) {
-  const where: any = {};
+/**
+ * Lists bookings across properties.
+ *
+ * When `hostId` is provided the result is scoped to bookings on that host's
+ * listings. That scoping is applied in the data layer, so a host can never read
+ * another host's (or a guest's) booking regardless of which route called this.
+ *
+ * Filters are applied here rather than in the screen: the admin list used to
+ * download one page and filter it in the browser, which meant a search could
+ * only find rows that happened to be on that page.
+ */
+export interface BookingFilters {
+  search?: string;
+  propertyId?: string;
+  // Raw query strings arrive as strings; the where builder normalises both.
+  from?: Date | string;
+  to?: Date | string;
+}
+
+export async function listAllBookings(
+  status?: string,
+  page = 1,
+  limit = 20,
+  hostId?: string,
+  filters: BookingFilters = {}
+) {
+  const window = parsePaging({ page, limit });
+  const where: Prisma.BookingWhereInput = {};
   if (status) where.status = status;
   if (hostId) where.property = { hostId };
+  if (filters.propertyId) where.propertyId = filters.propertyId;
+
+  const range = parseDateRange(filters.from, filters.to);
+  if (range) where.checkIn = range;
+
+  const search = filters.search?.trim();
+  if (search) {
+    // The guest, never the booking id: a person looking for a reservation has a
+    // name or an email, and an id lookup would let one be probed.
+    where.OR = [
+      { user: { firstName: { contains: search } } },
+      { user: { lastName: { contains: search } } },
+      { user: { email: { contains: search } } },
+      { property: { title: { contains: search } } },
+    ];
+  }
 
   const skip = (page - 1) * limit;
   const [bookings, total] = await Promise.all([
     prisma.booking.findMany({
       where,
-      skip,
-      take: limit,
+      skip: window.skip,
+      take: window.limit,
       orderBy: { createdAt: 'desc' },
       include: {
         // Host-facing booking list: the guest's verification is selected so the
@@ -605,7 +647,9 @@ export async function listAllBookings(status?: string, page = 1, limit = 20, hos
 
   return {
     bookings: normalizeBookings(mapped),
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    // Shared envelope: an empty result reports 1 page, not 0, matching every
+    // other list endpoint.
+    pagination: paginationMeta(total, window),
   };
 }
 

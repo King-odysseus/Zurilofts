@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import * as messageService from '../services/message.service.js';
 import * as chatAttachmentService from '../services/chatAttachment.service.js';
+import { parseBoolean, parseSearch } from '../utils/paging.js';
 
 // ---- Customer ----
 
@@ -71,11 +72,18 @@ export async function downloadAttachment(req: Request, res: Response, next: Next
 
 // ---- Admin ----
 
-export async function adminConversations(_req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function adminConversations(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const data = await messageService.listConversations();
+    const { search, unreadOnly, page, limit } = req.query;
+    const { rows, pagination } = await messageService.listConversations({
+      search: parseSearch(search),
+      unreadOnly: parseBoolean(unreadOnly),
+      page: page === undefined ? undefined : Number(page),
+      limit: limit === undefined ? undefined : Number(limit),
+    });
     const unread = await messageService.getAdminUnreadCount();
-    res.json({ success: true, data, unread });
+    // `data` stays the array the existing screen reads; paging is additive.
+    res.json({ success: true, data: rows, pagination, unread });
   } catch (error) {
     next(error);
   }

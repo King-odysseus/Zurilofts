@@ -69,7 +69,10 @@ export async function syncConfiguredAdmin(): Promise<void> {
   const admin = existing
     ? await prisma.user.update({
         where: { id: existing.id },
-        data: { role: 'ADMIN' as any, suspended: false, deletedAt: null, ...(passwordHash && { passwordHash }) },
+        // A ternary, not `passwordHash && {...}`: the && form types the spread as
+        // `string | {...}`, which puts a string into an object literal under
+        // strict. This way the branch is exactly the password fields or nothing.
+        data: { role: 'ADMIN' as any, suspended: false, deletedAt: null, ...(passwordHash ? { passwordHash, credentialVersion: { increment: 1 } } : {}) },
       })
     : await prisma.user.create({
         data: {
@@ -84,6 +87,12 @@ export async function syncConfiguredAdmin(): Promise<void> {
   // A changed password must sign out any session started with the old one.
   if (existing && passwordHash) {
     await prisma.refreshSession.deleteMany({ where: { userId: admin.id } });
+    // The credentialVersion bump above already invalidated the access tokens;
+    // this closes any reset link mailed before the password was re-applied.
+    await prisma.passwordResetToken.updateMany({
+      where: { userId: admin.id, consumedAt: null },
+      data: { consumedAt: new Date() },
+    });
   }
 
   const others = await prisma.user.findMany({

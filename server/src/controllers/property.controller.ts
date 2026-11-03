@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as propertyService from '../services/property.service.js';
 import * as reviewService from '../services/review.service.js';
 import { verifyAccessToken } from '../utils/jwt.js';
+import { parseSearch } from '../utils/paging.js';
 
 // Best-effort auth for routes reachable both anonymously and signed-in
 // (public property detail). Never throws - an invalid/missing token is
@@ -156,9 +157,16 @@ export async function adminRemove(req: Request, res: Response, next: NextFunctio
 }
 
 // Admin: listings with no host account.
-export async function adminListOrphans(_req: Request, res: Response, next: NextFunction): Promise<void> {
+export async function adminListOrphans(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    res.json({ success: true, data: await propertyService.listOrphanedProperties() });
+    const { search, status, page, limit } = req.query;
+    const { data, pagination } = await propertyService.listOrphanedProperties({
+      search: parseSearch(search),
+      status: typeof status === 'string' ? status : undefined,
+      page: page === undefined ? undefined : Number(page),
+      limit: limit === undefined ? undefined : Number(limit),
+    });
+    res.json({ success: true, data, pagination });
   } catch (error) {
     next(error);
   }

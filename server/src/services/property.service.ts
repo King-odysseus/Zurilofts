@@ -1,7 +1,10 @@
 import prisma from '../config/prisma.js';
+import type { Prisma } from '@prisma/client';
 import { NotFoundError, ValidationError, ForbiddenError, ConflictError, propertyCreateSchema } from '../types/index.js';
 import { isRangeAvailable } from './calendar.service.js';
 import { deleteImage } from '../utils/imageStorage.js';
+import { adminActor, recordAdminAuditSafely } from './audit.service.js';
+import { paginationMeta, parseEnum, parsePaging } from '../utils/paging.js';
 
 // Listing publication lifecycle - independent of the host's own account
 // verification (User.role / HostApplication).
@@ -683,9 +686,22 @@ export function listingDecisionNotice(input: {
 }
 
 /**
+ * Governance action for each review outcome, so the log, the status machine and
+ * the API's own vocabulary cannot drift apart.
+ * A verified host can still have one listing taken down by review.
+ */
+const LISTING_AUDIT_ACTION: Record<ListingReviewAction, 'LISTING_APPROVED' | 'LISTING_REJECTED' | 'LISTING_SUSPENDED' | 'LISTING_RESTORED'> = {
+  approve: 'LISTING_APPROVED',
+  reject: 'LISTING_REJECTED',
+  suspend: 'LISTING_SUSPENDED',
+  unsuspend: 'LISTING_RESTORED',
+};
+
+/**
  * Admin action on a single listing's publication status. Independent of the
- * host's own account verification (HostApplication) - a fully verified host
- * can still have an individual listing rejected or suspended.
+ * host's own account verification (HostApplication) - a fully verified host can
+ * still have an individual listing rejected or suspended. The decision is
+ * recorded in the governance log, which outlives the listing itself.
  */
 export async function adminReviewProperty(
   id: string,
@@ -705,6 +721,28 @@ export async function adminReviewProperty(
       listingReviewNote: note ?? null,
       listingReviewedBy: reviewerId,
       listingReviewedAt: new Date(),
+    },
+  });
+
+  // Governance entry, written before the notification because the decision is
+  // what must be durable: a failed push must not cost us the record of who
+  // decided it. Written after the update commits, so a logging failure is
+  // surfaced in the log rather than reported to the reviewer as a failed
+  // decision that actually happened (see recordAdminAuditSafely).
+  await recordAdminAuditSafely({
+    actor: adminActor({ id: reviewerId }),
+    action: LISTING_AUDIT_ACTION[action],
+    targetType: 'Listing',
+    targetId: updated.id,
+    // Snapshotted: this row must still say what was removed after the listing
+    // itself is deleted.
+    targetLabel: updated.title,
+    reason: note ?? null,
+    metadata: {
+      previousStatus: property.status,
+      nextStatus,
+      hostId: updated.hostId,
+      neighborhood: updated.neighborhood ?? null,
     },
   });
 
@@ -860,9 +898,30 @@ export async function unpublishProperty(id: string, hostId: string) {
 
 /** Listings with no host account, with the booking counts an admin needs to
  *  decide between deleting and suspending each one. */
-export async function listOrphanedProperties() {
+export interface OrphanedListingFilters {
+  search?: string;
+  status?: string;
+  page?: number;
+  limit?: number;
+}
+
+export async function listOrphanedProperties(filters: OrphanedListingFilters = {}) {
+  const paging = parsePaging({ page: filters.page, limit: filters.limit });
+  const where: Prisma.PropertyWhereInput = { hostId: null };
+
+  const search = filters.search?.trim();
+  if (search) {
+    where.OR = [{ title: { contains: search } }, { location: { contains: search } }];
+  }
+  // Only a real status, so a typo cannot silently return everything.
+  const status = parseEnum(filters.status, PROPERTY_STATUSES);
+  if (status) where.status = status;
+
+  const total = await prisma.property.count({ where });
   const rows = await prisma.property.findMany({
-    where: { hostId: null },
+      where,
+      skip: paging.skip,
+      take: paging.limit,
     orderBy: { createdAt: 'desc' },
     select: {
       id: true,
@@ -874,11 +933,13 @@ export async function listOrphanedProperties() {
       bookings: { select: { paidAt: true } },
     },
   });
-  return rows.map(({ bookings, imagesJson, ...rest }) => ({
+  const data = rows.map(({ bookings, imagesJson, ...rest }) => ({
     ...rest,
     image: parseImageUrls(imagesJson)[0] ?? null,
     ...listingDeleteVerdict(bookings),
   }));
+
+  return { data, pagination: paginationMeta(total, paging) };
 }
 
 /**
@@ -891,9 +952,11 @@ export async function listOrphanedProperties() {
 export async function cleanupOrphanedProperties(ids: string[], mode: 'delete' | 'suspend', adminId: string) {
   const orphans = await prisma.property.findMany({
     where: { id: { in: ids }, hostId: null },
-    select: { id: true, status: true },
+    select: { id: true, status: true, title: true },
   });
   const orphanById = new Map(orphans.map((orphan) => [orphan.id, orphan]));
+  // Captured before deletion, so the governance entry can still name the listing.
+  const labels = new Map(orphans.map((orphan) => [orphan.id, orphan.title]));
 
   const results: { id: string; outcome: 'deleted' | 'suspended' | 'skipped'; reason?: string }[] = [];
   for (const id of ids) {
@@ -916,7 +979,30 @@ export async function cleanupOrphanedProperties(ids: string[], mode: 'delete' | 
       results.push({ id, outcome: 'skipped', reason: err instanceof Error ? err.message : 'Failed' });
     }
   }
-  // Audit trail until a governance log exists for listings.
-  console.info(`Orphan cleanup by ${adminId} (${mode}):`, JSON.stringify(results));
+  // This used to be a console.info line, which is not a record: the deleted
+  // listings are gone and stdout is not queryable. Each outcome is now an
+  // append-only entry that names the listing by title.
+  for (const result of results) {
+
+
+
+    // Only deletions are recorded here: suspensions are already recorded above
+    // by adminReviewProperty, and a skipped id or a missing listing changed
+    // nothing, so there is no decision to record.
+    if (result.outcome !== 'deleted') continue;
+    await recordAdminAuditSafely({
+      actor: adminActor({ id: adminId }),
+      action: 'ORPHAN_LISTINGS_CLEANED',
+      targetType: 'Listing',
+      targetId: result.id,
+      targetLabel: labels.get(result.id) ?? null,
+      reason: 'Removed: listing had no host account',
+      metadata: { mode },
+
+
+      // mode records what the admin asked for; the outcome is fixed here (only
+      // deletions reach this point), so there is nothing more to say.
+    });
+  }
   return results;
 }

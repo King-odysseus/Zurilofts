@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as reviewService from '../services/review.service.js';
+import { parseBoolean, parseSearch } from '../utils/paging.js';
 
 // Guest: create a post-stay review for one of their bookings
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -38,11 +39,20 @@ export async function publicStats(_req: Request, res: Response, next: NextFuncti
 // Admin: list all reviews + rating summary
 export async function listAll(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { page, limit } = req.query;
-    const result = await reviewService.listAllReviews(
-      page ? Number(page) : 1,
-      limit ? Number(limit) : 20
-    );
+    const { page, limit, rating, propertyId, hidden, search, from, to } = req.query;
+    const result = await reviewService.listAllReviews({
+      page: page === undefined ? undefined : Number(page),
+      limit: limit === undefined ? undefined : Number(limit),
+      rating: rating === undefined ? undefined : Number(rating),
+      propertyId: typeof propertyId === 'string' ? propertyId : undefined,
+      hidden: parseBoolean(hidden),
+      search: parseSearch(search),
+      from: typeof from === 'string' ? from : undefined,
+      to: typeof to === 'string' ? to : undefined,
+    });
+
+
+
     res.json({
       success: true,
       data: result.reviews,

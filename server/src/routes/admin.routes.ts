@@ -1,6 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { authenticate, requireAdmin } from '../middleware/auth.js';
-import { validate } from '../middleware/validate.js';
+import { validate, validateQuery } from '../middleware/validate.js';
 import {
   bookingStatusSchema,
   bookingRefundSchema,
@@ -25,12 +25,20 @@ import * as hostAppCtrl from '../controllers/host-application.controller.js';
 import * as verificationCtrl from '../controllers/identity-verification.controller.js';
 import * as disputeCtrl from '../controllers/dispute.controller.js';
 import { messageCreateSchema, identityVerificationReviewSchema, disputeStatusSchema, disputeNoteSchema, disputeMessageSchema } from '../types/index.js';
+import * as auditCtrl from '../controllers/audit.controller.js';
+import { adminAuditQuerySchema } from '../services/audit.service.js';
 import adminPropertyRoutes from './admin-property.routes.js';
 
 const router = Router();
 
 // All admin routes require auth + admin role
 router.use(authenticate, requireAdmin);
+
+// Governance log. Every staff decision recorded in AdminAuditEvent, durable
+// across the deletion of the record it describes. Read-only by design: there is
+// no write route, because only the decision paths may append.
+router.get('/audit', validateQuery(adminAuditQuerySchema), auditCtrl.listAudit);
+router.get('/audit/filters', auditCtrl.listAuditFilters);
 
 // User / host account management
 router.get('/users', userCtrl.adminListUsers);
@@ -90,6 +98,10 @@ router.delete('/reviews/:id', reviewCtrl.adminDeleteReview);
 // Customer messages (inbox + per-customer thread + reply)
 router.get('/messages', messageCtrl.adminConversations);
 router.get('/messages/:userId', messageCtrl.adminThread);
+
+
+
+
 router.post('/messages/:userId', validate(messageCreateSchema), messageCtrl.adminReply);
 // Reading a thread has to be recorded on the server, not only in the inbox's
 // local state, otherwise the next poll puts the unread badge straight back.

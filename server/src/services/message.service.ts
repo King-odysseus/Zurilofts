@@ -1,6 +1,8 @@
+import type { Prisma } from '@prisma/client';
 import prisma from '../config/prisma.js';
 import { ValidationError } from '../types/index.js';
 import { normalizeAttachments, withParsedAttachments } from '../utils/messageAttachments.js';
+import { paginationMeta, parsePaging } from '../utils/paging.js';
 
 // A message needs text or a file. The text itself is optional so an
 // attachment-only message is allowed, but one of the two must be there.
@@ -57,21 +59,69 @@ export async function sendUserMessage(userId: string, rawBody: unknown, rawAttac
 
 // ---- Admin side ----
 
-/** Inbox: one row per customer with a conversation, latest first, with unread counts. */
-export async function listConversations() {
+export interface ConversationFilters {
+  search?: string;
+  unreadOnly?: boolean;
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * Inbox: one row per customer with a conversation, latest first, with unread
+ * counts.
+ *
+ * This used to issue a `message.count` per user inside a Promise.all, so an
+ * inbox of 500 customers meant 501 round trips. The unread tally is now a
+ * filtered relation count riding on the single user query.
+ *
+ * The ordering is deliberately in memory: Prisma cannot order a parent by an
+ * aggregate of its children (max(message.createdAt)), and raw SQL here would tie
+ * the service to one database. What gets sorted is the filtered conversation
+ * list itself, so the cost is proportional to what an admin can actually see.
+ *
+ * The totals are therefore exact for the filters: they describe the conversation
+ * count before slicing, not just the page.
+ */
+export async function listConversations(filters: ConversationFilters = {}) {
+  const paging = parsePaging({ page: filters.page, limit: filters.limit });
+
+  const where: Prisma.UserWhereInput = { messages: { some: {} } };
+
+  const search = filters.search?.trim();
+  if (search) {
+    // One filter for both schemas: Postgres compares insensitively through
+    // Prisma's `mode`, SQLite's LIKE is already ASCII case-insensitive.
+    where.OR = [
+      { firstName: { contains: search } },
+      { lastName: { contains: search } },
+      { email: { contains: search } },
+    ];
+  }
+  if (filters.unreadOnly) {
+    // Narrow the base relation too, so a customer with only read messages is not
+    // returned at all rather than returned with a zero badge.
+    where.messages = { some: { senderRole: 'USER', readByAdmin: false } };
+  }
+
   const users = await prisma.user.findMany({
-    where: { messages: { some: {} } },
+    where,
     select: {
       id: true,
       firstName: true,
       lastName: true,
       email: true,
       messages: { orderBy: { createdAt: 'desc' }, take: 1 },
+      // Filtered relation count: the unread tally without a query per row.
+      _count: {
+        select: {
+          messages: { where: { senderRole: 'USER', readByAdmin: false } },
+        },
+      },
     },
   });
 
-  const rows = await Promise.all(
-    users.map(async (u) => ({
+  const rows = users
+    .map((u) => ({
       userId: u.id,
       firstName: u.firstName,
       lastName: u.lastName,
@@ -79,18 +129,18 @@ export async function listConversations() {
       // Parsed so the inbox can show "sent a file" without knowing the column
       // holds JSON. content is left exactly as stored.
       lastMessage: u.messages[0] ? withParsedAttachments(u.messages[0]) : null,
-      unread: await prisma.message.count({
-        where: { userId: u.id, senderRole: 'USER', readByAdmin: false },
-      }),
+      unread: u._count.messages,
     }))
-  );
+    .sort(
+      (a, b) =>
+        new Date(b.lastMessage?.createdAt || 0).getTime() -
+        new Date(a.lastMessage?.createdAt || 0).getTime()
+    );
 
-  rows.sort(
-    (a, b) =>
-      new Date(b.lastMessage?.createdAt || 0).getTime() -
-      new Date(a.lastMessage?.createdAt || 0).getTime()
-  );
-  return rows;
+  return {
+    rows: rows.slice(paging.skip, paging.skip + paging.limit),
+    pagination: paginationMeta(rows.length, paging),
+  };
 }
 
 /** Total unread customer messages across all conversations (admin badge). */

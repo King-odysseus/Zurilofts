@@ -742,6 +742,21 @@ export async function adminReject(id: string, reviewerId: string, reason: string
     await tx.hostApplicationAudit.create({
       data: { applicationId: id, actorId: reviewerId, action: 'REJECTED', note: reason },
     });
+    // Governance entry: the cascade-bound row above is gone with the application,
+    // this one survives it.
+    await tx.adminAuditEvent.create({
+      data: {
+        actorId: reviewerId,
+        actorEmail: null,
+        actorRole: 'ADMIN',
+        action: 'HOST_APPLICATION_REJECTED',
+        targetType: 'HostApplication',
+        targetId: id,
+        targetLabel: app.businessName ?? null,
+        reason: reason ? String(reason).slice(0, 1000) : null,
+        metadataJson: JSON.stringify({ applicantId: app.userId }),
+      },
+    });
     return row;
   });
   // Never touches User.role. Blocking the account itself is the suspension
@@ -957,6 +972,22 @@ export async function adminApprove(id: string, reviewerId: string) {
     });
     await tx.hostApplicationAudit.create({
       data: { applicationId: id, actorId: reviewerId, action: 'APPROVED' },
+    });
+    // Governance entry in the same transaction, so the promotion and the record
+    // of who made it cannot diverge. The cascade-bound hostApplicationAudit row
+    // above vanishes with the application; this one does not.
+    await tx.adminAuditEvent.create({
+      data: {
+        actorId: reviewerId,
+        actorEmail: null,
+        actorRole: 'ADMIN',
+        action: 'HOST_APPLICATION_APPROVED',
+        targetType: 'HostApplication',
+        targetId: id,
+        targetLabel: app.businessName ?? null,
+        reason: null,
+        metadataJson: JSON.stringify({ applicantId: app.userId }),
+      },
     });
     return { view: toAdminView(updated), applicantId: app.userId };
   });

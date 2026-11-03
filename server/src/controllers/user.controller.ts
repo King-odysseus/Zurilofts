@@ -4,6 +4,7 @@ import * as userService from '../services/user.service.js';
 import { ValidationError } from '../types/index.js';
 import { storeImage, deleteImage } from '../utils/imageStorage.js';
 import { deleteUserAccount } from '../services/me.service.js';
+import { auditActorFromRequest, recordAdminAuditSafely } from '../services/audit.service.js';
 
 export async function getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -132,6 +133,14 @@ export async function adminSearch(req: Request, res: Response, next: NextFunctio
 export async function adminUpdateUser(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const user = await userService.adminUpdateUser(req.params.id, req.body);
+    await recordAdminAuditSafely({
+      ...auditActorFromRequest(req),
+      action: 'USER_PROFILE_UPDATED',
+      targetType: 'User',
+      targetId: req.params.id,
+      targetLabel: user.email ?? null,
+      metadata: { fields: Object.keys(req.body) },
+    });
     res.json({ success: true, data: user });
   } catch (error) {
     next(error);
@@ -145,6 +154,14 @@ export async function adminSetUserRole(req: Request, res: Response, next: NextFu
       throw new ValidationError('You cannot change your own role.');
     }
     const user = await userService.setUserRole(req.params.id, req.body.role);
+    await recordAdminAuditSafely({
+      ...auditActorFromRequest(req),
+      action: 'USER_ROLE_CHANGED',
+      targetType: 'User',
+      targetId: req.params.id,
+      targetLabel: user.email ?? null,
+      metadata: { role: req.body.role },
+    });
     res.json({ success: true, data: user });
   } catch (error) {
     next(error);
@@ -158,6 +175,13 @@ export async function adminSetUserSuspended(req: Request, res: Response, next: N
       throw new ValidationError('You cannot suspend your own account.');
     }
     const user = await userService.setUserSuspended(req.params.id, req.body.suspended);
+    await recordAdminAuditSafely({
+      ...auditActorFromRequest(req),
+      action: req.body.suspended ? 'USER_SUSPENDED' : 'USER_RESTORED',
+      targetType: 'User',
+      targetId: req.params.id,
+      targetLabel: user.email ?? null,
+    });
     res.json({ success: true, data: user });
   } catch (error) {
     next(error);
@@ -171,6 +195,15 @@ export async function adminSetUserPassword(req: Request, res: Response, next: Ne
       throw new ValidationError('Use Change password in your profile to update your own password.');
     }
     const result = await userService.adminSetUserPassword(req.params.id, req.body.newPassword);
+    // The password itself is never part of the entry; that an administrator set
+    // one is exactly the fact the member and an auditor need.
+    await recordAdminAuditSafely({
+      ...auditActorFromRequest(req),
+      action: 'USER_PASSWORD_SET',
+      targetType: 'User',
+      targetId: req.params.id,
+      reason: req.body.reason ?? null,
+    });
     res.json({ success: true, ...result });
   } catch (error) {
     next(error);

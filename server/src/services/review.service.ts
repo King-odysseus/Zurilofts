@@ -1,4 +1,6 @@
 import prisma from '../config/prisma.js';
+import type { Prisma } from '@prisma/client';
+import { paginationMeta, parseDateRange, parsePaging } from '../utils/paging.js';
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
 
 interface CreateReviewInput {
@@ -228,13 +230,51 @@ export async function getPublicStats() {
   };
 }
 
-/** Admin: all reviews newest-first, plus a rating summary for the dashboard card. */
-export async function listAllReviews(page = 1, limit = 20) {
-  const skip = (page - 1) * limit;
+/** Filter set for the admin feedback list. Every field is optional, so the
+ *  screen can show everything or narrow to one rating, one listing, one window. */
+export interface ReviewFilters {
+  rating?: number;
+  propertyId?: string;
+  hidden?: boolean;
+  search?: string;
+  from?: Date | string;
+  to?: Date | string;
+  page?: number;
+  limit?: number;
+}
+
+/**
+ * Admin: reviews newest-first, filtered and paged.
+ *
+ * The summary is computed over the same `where` as the rows, so the average and
+ * the count always describe what is on screen rather than the whole table.
+ * Filtering and paging happen server-side: a dashboard cannot pull the entire
+ * review table by simply omitting a limit.
+ */
+export async function listAllReviews(filters: ReviewFilters = {}) {
+  const paging = parsePaging({ page: filters.page, limit: filters.limit });
+  const where: Prisma.ReviewWhereInput = {};
+
+  if (filters.rating !== undefined) where.rating = filters.rating;
+  if (filters.propertyId) where.propertyId = filters.propertyId;
+  if (filters.hidden !== undefined) where.hidden = filters.hidden;
+  const window = parseDateRange(filters.from, filters.to);
+  if (window) where.createdAt = window;
+  const search = filters.search?.trim();
+  if (search) {
+    // Feedback text only. Guest identity is not in scope here: an admin looking
+    // for a person uses the users screen, which can see more than this list.
+    where.OR = [
+      { publicComment: { contains: search } },
+      { privateNote: { contains: search } },
+    ];
+  }
+
   const [reviews, total, agg] = await Promise.all([
     prisma.review.findMany({
-      skip,
-      take: limit,
+      where,
+      skip: paging.skip,
+      take: paging.limit,
       orderBy: { createdAt: 'desc' },
       include: {
         user: { select: { id: true, firstName: true, lastName: true, email: true } },
@@ -242,8 +282,8 @@ export async function listAllReviews(page = 1, limit = 20) {
         booking: { select: { id: true, checkIn: true, checkOut: true } },
       },
     }),
-    prisma.review.count(),
-    prisma.review.aggregate({ _avg: { rating: true }, _count: { _all: true } }),
+    prisma.review.count({ where }),
+    prisma.review.aggregate({ where, _avg: { rating: true }, _count: { _all: true } }),
   ]);
 
   return {
@@ -252,7 +292,7 @@ export async function listAllReviews(page = 1, limit = 20) {
       averageRating: agg._avg.rating ? Math.round(agg._avg.rating * 10) / 10 : 0,
       totalReviews: agg._count._all,
     },
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    pagination: paginationMeta(total, paging),
   };
 }
 
