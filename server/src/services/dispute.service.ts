@@ -191,13 +191,29 @@ export async function postMessage(id: string, userId: string, isAdmin: boolean, 
 // Admin functions - reachable only through requireAdmin routes
 // ============================================================
 
-export async function adminList(filters: { status?: string; page?: number; limit?: number }) {
-  const page = Math.max(1, Number(filters.page) || 1);
-  const limit = Math.min(100, Math.max(1, Number(filters.limit) || 20));
-  const where: any = {};
+import { buildPagination, clampQueueWindow, countByStatus } from '../utils/adminQueue.js';
+
+export async function adminList(filters: { status?: string; search?: string; page?: number; limit?: number }) {
+  const { page, limit, skip } = clampQueueWindow(filters.page, filters.limit);
+
+  // A dispute is looked up by the stay it concerns or the guest who opened it,
+  // because that is what a mediator has in front of them - not a dispute id.
+  // As with verifications, the search narrows the counts too, while the status
+  // filter does not, so the tabs keep showing where the other cases are.
+  const searchWhere: any = {};
+  if (filters.search) {
+    searchWhere.OR = [
+      { booking: { property: { title: { contains: filters.search } } } },
+      { booking: { user: { firstName: { contains: filters.search } } } },
+      { booking: { user: { lastName: { contains: filters.search } } } },
+      { booking: { user: { email: { contains: filters.search } } } },
+    ];
+  }
+
+  const where: any = { ...searchWhere };
   if (filters.status) where.status = filters.status;
 
-  const [rows, total] = await Promise.all([
+  const [rows, total, groups] = await Promise.all([
     prisma.dispute.findMany({
       where,
       include: {
@@ -206,12 +222,18 @@ export async function adminList(filters: { status?: string; page?: number; limit
         booking: { select: { id: true, propertyId: true, userId: true, property: { select: { hostId: true, title: true } }, user: { select: { firstName: true, lastName: true, email: true } } } },
       },
       orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * limit,
+      skip,
       take: limit,
     }),
     prisma.dispute.count({ where }),
+    prisma.dispute.groupBy({ by: ['status'], where: searchWhere, _count: { _all: true } }),
   ]);
-  return { data: rows.map(toAdminView), pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
+
+  return {
+    data: rows.map(toAdminView),
+    counts: countByStatus(['OPEN', 'UNDER_REVIEW', 'RESOLVED', 'DISMISSED'], groups),
+    pagination: buildPagination(page, limit, total),
+  };
 }
 
 export async function adminGet(id: string) {

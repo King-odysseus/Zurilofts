@@ -73,9 +73,9 @@ export async function postMessage(req: Request, res: Response, next: NextFunctio
 
 export async function adminList(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { status, page, limit } = req.query as Record<string, string>;
-    const result = await disputeService.adminList({ status, page: page ? Number(page) : undefined, limit: limit ? Number(limit) : undefined });
-    res.json({ success: true, data: result.data, pagination: result.pagination });
+    const { status, search, page, limit } = req.query as Record<string, string>;
+    const result = await disputeService.adminList({ status, search, page: page ? Number(page) : undefined, limit: limit ? Number(limit) : undefined });
+    res.json({ success: true, data: result.data, counts: result.counts, pagination: result.pagination });
   } catch (error) {
     next(error);
   }

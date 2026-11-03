@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Badge,
@@ -23,6 +23,7 @@ import {
   UserRoundCheck,
 } from 'lucide-react';
 import apiClient from '../api/client.js';
+import AdminPagination from '../components/admin/AdminPagination.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 const VERIFICATION_META = {
@@ -50,6 +51,22 @@ const DISPUTE_META = {
   RESOLVED: { label: 'admin.disputeResolved', tone: 'success' },
   DISMISSED: { label: 'admin.disputeDismissed', tone: 'gray' },
 };
+
+/**
+ * Which disputes are on screen. Every status is reachable because a resolved or
+ * dismissed case is still a case: it gets reopened, appealed and checked against
+ * later, and it used to disappear from this screen entirely.
+ */
+const DISPUTE_FILTERS = [
+  { status: 'OPEN', label: 'Open' },
+  { status: 'UNDER_REVIEW', label: 'Under review' },
+  { status: 'RESOLVED', label: 'Resolved' },
+  { status: 'DISMISSED', label: 'Dismissed' },
+];
+
+// One page of each queue at a time. The screen used to fetch 100 of each and warn
+// that anything older was unreachable; paging is what makes older work reachable.
+const QUEUE_PAGE_SIZE = 10;
 
 const DOCUMENT_LABELS = {
   ID_FRONT: 'Identity front',
@@ -84,7 +101,8 @@ function AdminTrustSafety() {
   const { t } = useLanguage();
   const [verifications, setVerifications] = useState([]);
   const [disputes, setDisputes] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [verificationsLoading, setVerificationsLoading] = useState(true);
+  const [disputesLoading, setDisputesLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [selectedVerification, setSelectedVerification] = useState(null);
@@ -94,50 +112,109 @@ function AdminTrustSafety() {
   const [resolutionNote, setResolutionNote] = useState('');
   const [busy, setBusy] = useState('');
   const [verificationFilter, setVerificationFilter] = useState('SUBMITTED');
-  const [truncated, setTruncated] = useState({ verifications: false, disputes: false });
+  const [disputeFilter, setDisputeFilter] = useState('OPEN');
+  // Typed text is separate from applied text so a half-typed name does not hit
+  // the server on every keystroke.
+  const [verificationSearchInput, setVerificationSearchInput] = useState('');
+  const [disputeSearchInput, setDisputeSearchInput] = useState('');
+  const [verificationSearch, setVerificationSearch] = useState('');
+  const [disputeSearch, setDisputeSearch] = useState('');
+  const [verificationPage, setVerificationPage] = useState(1);
+  const [disputePage, setDisputePage] = useState(1);
+  const [verificationPagination, setVerificationPagination] = useState({ page: 1, limit: QUEUE_PAGE_SIZE, total: 0, totalPages: 0 });
+  const [disputePagination, setDisputePagination] = useState({ page: 1, limit: QUEUE_PAGE_SIZE, total: 0, totalPages: 0 });
+  // Totals per status come from the server: counting the rows on screen would
+  // report the size of a page, not the size of the queue.
+  const [verificationCounts, setVerificationCounts] = useState({});
+  const [disputeCounts, setDisputeCounts] = useState({});
 
-  const load = useCallback(async (silent = false) => {
-    if (silent) setRefreshing(true);
-    else setLoading(true);
+  // Requests can overlap when a filter changes quickly; only the newest answer
+  // may write its rows, or an older page can overwrite a newer one.
+  const verificationRequest = useRef(0);
+  const disputeRequest = useRef(0);
+
+  const loadVerifications = useCallback(async () => {
+    const ticket = verificationRequest.current + 1;
+    verificationRequest.current = ticket;
+    setVerificationsLoading(true);
+    try {
+      const { data } = await apiClient.get('/admin/identity-verifications', {
+        params: {
+          status: verificationFilter,
+          search: verificationSearch || undefined,
+          page: verificationPage,
+          limit: QUEUE_PAGE_SIZE,
+        },
+      });
+      if (verificationRequest.current !== ticket) return;
+      setVerifications(data.data || []);
+      setVerificationCounts(data.counts || {});
+      setVerificationPagination(data.pagination || { page: 1, limit: QUEUE_PAGE_SIZE, total: 0, totalPages: 0 });
+    } catch (cause) {
+      if (verificationRequest.current !== ticket) return;
+      setVerifications([]);
+      setError(cause.response?.data?.error || 'The identity verification queue could not be loaded.');
+    } finally {
+      if (verificationRequest.current === ticket) setVerificationsLoading(false);
+    }
+  }, [verificationFilter, verificationSearch, verificationPage]);
+
+  const loadDisputes = useCallback(async () => {
+    const ticket = disputeRequest.current + 1;
+    disputeRequest.current = ticket;
+    setDisputesLoading(true);
+    try {
+      const { data } = await apiClient.get('/admin/disputes', {
+        params: {
+          status: disputeFilter,
+          search: disputeSearch || undefined,
+          page: disputePage,
+          limit: QUEUE_PAGE_SIZE,
+        },
+      });
+      if (disputeRequest.current !== ticket) return;
+      setDisputes(data.data || []);
+      setDisputeCounts(data.counts || {});
+      setDisputePagination(data.pagination || { page: 1, limit: QUEUE_PAGE_SIZE, total: 0, totalPages: 0 });
+    } catch (cause) {
+      if (disputeRequest.current !== ticket) return;
+      setDisputes([]);
+      setError(cause.response?.data?.error || 'The dispute queue could not be loaded.');
+    } finally {
+      if (disputeRequest.current === ticket) setDisputesLoading(false);
+    }
+  }, [disputeFilter, disputeSearch, disputePage]);
+
+  useEffect(() => { loadVerifications(); }, [loadVerifications]);
+  useEffect(() => { loadDisputes(); }, [loadDisputes]);
+
+  // A search is applied after a short pause, so typing a full name is one query
+  // rather than one per character.
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setVerificationSearch(verificationSearchInput.trim());
+      setVerificationPage(1);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [verificationSearchInput]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDisputeSearch(disputeSearchInput.trim());
+      setDisputePage(1);
+    }, 350);
+    return () => clearTimeout(timer);
+  }, [disputeSearchInput]);
+
+  async function refreshQueues() {
+    setRefreshing(true);
     setError('');
     try {
-      const [verificationResponse, disputeResponse] = await Promise.all([
-        apiClient.get('/admin/identity-verifications', { params: { limit: 100 } }),
-        apiClient.get('/admin/disputes', { params: { limit: 100 } }),
-      ]);
-      setVerifications(verificationResponse.data.data || []);
-      setDisputes(disputeResponse.data.data || []);
-      // Both queues are fetched one page deep. If the platform holds more than
-      // that, older cases are absent from this screen, and the page says so
-      // rather than looking like an empty queue.
-      setTruncated({
-        verifications: (verificationResponse.data?.pagination?.total ?? 0) > 100,
-        disputes: (disputeResponse.data?.pagination?.total ?? 0) > 100,
-      });
-    } catch (cause) {
-      setError(cause.response?.data?.error || 'The trust and safety queues could not be loaded.');
+      await Promise.all([loadVerifications(), loadDisputes()]);
     } finally {
-      setLoading(false);
       setRefreshing(false);
     }
-  }, []);
-
-  useEffect(() => { load(); }, [load]);
-
-  const summary = useMemo(() => {
-    const openDisputes = disputes.filter((item) => item.status === 'OPEN' || item.status === 'UNDER_REVIEW');
-    return {
-      visibleVerifications: verifications.filter((item) => item.status === verificationFilter),
-      countFor: (status) => verifications.filter((item) => item.status === status).length,
-      openDisputes,
-      disputeCounts: {
-        OPEN: disputes.filter((item) => item.status === 'OPEN').length,
-        UNDER_REVIEW: disputes.filter((item) => item.status === 'UNDER_REVIEW').length,
-        RESOLVED: disputes.filter((item) => item.status === 'RESOLVED').length,
-        DISMISSED: disputes.filter((item) => item.status === 'DISMISSED').length,
-      },
-    };
-  }, [disputes, verifications, verificationFilter]);
+  }
 
   function closeVerification() {
     if (busy) return;
@@ -165,10 +242,13 @@ function AdminTrustSafety() {
         `/admin/identity-verifications/${selectedVerification.id}/${action}`,
         action === 'reject' ? { reason: verificationNote.trim() } : {},
       );
-      const updated = response.data.data;
-      setVerifications((current) => current.map((item) => item.id === updated.id ? updated : item));
+      if (!response.data?.data) throw new Error('The decision was not saved.');
       setSelectedVerification(null);
       setVerificationNote('');
+      // Reload rather than patch the row in place: the decision changes the
+      // status totals and usually removes the case from this filter, so the
+      // queue has to be asked again rather than edited locally.
+      await loadVerifications();
     } catch (cause) {
       setError(cause.response?.data?.error || 'The verification decision could not be saved.');
     } finally {
@@ -235,8 +315,9 @@ function AdminTrustSafety() {
       });
       const updated = response.data.data;
       setSelectedDispute(updated);
-      setDisputes((current) => current.map((item) => item.id === updated.id ? updated : item));
       if (status === 'RESOLVED' || status === 'DISMISSED') setResolutionNote(updated.resolution || '');
+      // The case may have left the current filter, and the status totals moved.
+      await loadDisputes();
     } catch (cause) {
       setError(cause.response?.data?.error || 'The dispute status could not be updated.');
     } finally {
@@ -269,24 +350,13 @@ function AdminTrustSafety() {
           <h1 className="text-2xl font-bold tracking-tight text-navy sm:text-3xl">{t('admin.trustTitle')}</h1>
           <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted">{t('admin.trustDescription')}</p>
         </div>
-        <Button color="light" disabled={refreshing} onClick={() => load(true)}>
+        <Button color="light" disabled={refreshing} onClick={refreshQueues}>
           <RefreshCw className={refreshing ? 'animate-spin' : ''} strokeWidth={1.8} aria-hidden="true" />
           {refreshing ? 'Refreshing' : 'Refresh queue'}
         </Button>
       </div>
 
       {error && <Alert color="failure" role="alert" className="text-center">{error}</Alert>}
-
-      {(truncated.verifications || truncated.disputes) && (
-        <p className="rounded-lg border border-[#FEDF89] bg-[#FFFAEB] px-4 py-3 text-center text-xs leading-relaxed text-[#B54708] dark:border-[#B54708]/40 dark:bg-[#B54708]/15 dark:text-[#FEDF89]" role="note">
-          {truncated.verifications && truncated.disputes
-            ? 'Both queues hold more than 100 records, so older identity checks and disputes are not listed here.'
-            : truncated.verifications
-              ? 'There are more than 100 identity checks, so older ones are not listed here.'
-              : 'There are more than 100 disputes, so older ones are not listed here.'}
-          {' '}Resolve the open cases below to bring the rest into view.
-        </p>
-      )}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
         <section className="overflow-hidden rounded-xl bg-elevated shadow-md" aria-labelledby="verification-queue-title">
@@ -295,7 +365,19 @@ function AdminTrustSafety() {
               <h2 id="verification-queue-title" className="text-base font-semibold text-navy">{t('admin.verificationQueue')}</h2>
               <p className="text-xs text-muted">{t('admin.verificationQueueHint')}</p>
             </div>
-            <Badge color="info">{t('admin.openCount', { count: summary.countFor(verificationFilter) })}</Badge>
+            <Badge color="info">{t('admin.openCount', { count: verificationCounts[verificationFilter] ?? 0 })}</Badge>
+          </div>
+
+          <div className="border-b border-border px-5 py-3">
+            <Label htmlFor="verification-search" className="sr-only">Search identity checks</Label>
+            <TextInput
+              id="verification-search"
+              type="search"
+              sizing="sm"
+              value={verificationSearchInput}
+              onChange={(event) => setVerificationSearchInput(event.target.value)}
+              placeholder="Search by name or email"
+            />
           </div>
 
           <div className="flex flex-wrap gap-2 border-b border-border px-5 py-3" role="tablist" aria-label="Verification status">
@@ -306,34 +388,38 @@ function AdminTrustSafety() {
                 role="tab"
                 aria-selected={verificationFilter === status}
                 color={verificationFilter === status ? 'primary' : 'light'}
-                onClick={() => setVerificationFilter(status)}
+                onClick={() => { setVerificationFilter(status); setVerificationPage(1); }}
               >
-                {label} ({summary.countFor(status)})
+                {label} ({verificationCounts[status] ?? 0})
               </Button>
             ))}
           </div>
 
-          {loading ? (
+          {verificationsLoading ? (
             <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
               <Spinner size="lg" aria-hidden="true" />
               <strong className="text-sm font-semibold text-navy">{t('admin.loadingVerification')}</strong>
               <p className="text-xs text-muted">{t('admin.loadingVerificationHint')}</p>
             </div>
-          ) : summary.visibleVerifications.length === 0 ? (
+          ) : verifications.length === 0 ? (
             <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
               <UserRoundCheck className="text-primary-600" strokeWidth={1.6} aria-hidden="true" />
               <strong className="text-sm font-semibold text-navy">
-                {verificationFilter === 'APPROVED' ? 'No verified identities yet' : t('admin.noVerificationWaiting')}
+                {verificationSearch
+                  ? 'No identity checks match that search'
+                  : verificationFilter === 'APPROVED' ? 'No verified identities yet' : t('admin.noVerificationWaiting')}
               </strong>
               <p className="text-xs text-muted">
-                {verificationFilter === 'APPROVED'
-                  ? 'Identities you approve will be listed here, so you can ask for more information later.'
-                  : t('admin.noVerificationHint')}
+                {verificationSearch
+                  ? 'Check the spelling, or clear the search to see the whole queue.'
+                  : verificationFilter === 'APPROVED'
+                    ? 'Identities you approve will be listed here, so you can ask for more information later.'
+                    : t('admin.noVerificationHint')}
               </p>
             </div>
           ) : (
             <div>
-              {summary.visibleVerifications.map((verification) => (
+              {verifications.map((verification) => (
                 <article className="flex flex-col gap-3 border-b border-border px-5 py-4 last:border-0 sm:flex-row sm:items-center sm:justify-between" key={verification.id}>
                   <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-50 dark:bg-primary/15 text-xs font-bold text-navy" aria-hidden="true">{initials(verification.user)}</span>
                   <div className="min-w-0 flex-1">
@@ -346,6 +432,16 @@ function AdminTrustSafety() {
                   <Button size="xs" onClick={() => { setSelectedVerification(verification); setVerificationNote(''); setError(''); }}>{t('admin.review')}</Button>
                 </article>
               ))}
+              <div className="px-5 py-4">
+                <AdminPagination
+                  page={verificationPagination.page}
+                  limit={verificationPagination.limit}
+                  total={verificationPagination.total}
+                  totalPages={verificationPagination.totalPages}
+                  onChange={setVerificationPage}
+                  noun="identity check"
+                />
+              </div>
             </div>
           )}
         </section>
@@ -356,20 +452,47 @@ function AdminTrustSafety() {
               <h2 id="dispute-queue-title" className="text-base font-semibold text-navy">{t('admin.disputes')}</h2>
               <p className="text-xs text-muted">{t('admin.disputesHint')}</p>
             </div>
-            <Badge color="warning">{t('admin.openCount', { count: summary.openDisputes.length })}</Badge>
+            <Badge color="warning">{t('admin.openCount', { count: (disputeCounts.OPEN ?? 0) + (disputeCounts.UNDER_REVIEW ?? 0) })}</Badge>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 border-b border-border px-5 py-4 sm:grid-cols-4">
-            {Object.entries(summary.disputeCounts).map(([status, count]) => (
-              <div key={status} className="flex items-center justify-between gap-2 rounded-xl bg-surface px-3 py-2 shadow-sm">
-                <span className="text-xs text-muted">{t(DISPUTE_META[status]?.label || status)}</span>
-                <strong className="text-sm font-semibold text-navy">{count}</strong>
-              </div>
+          <div className="border-b border-border px-5 py-3">
+            <Label htmlFor="dispute-search" className="sr-only">Search disputes</Label>
+            <TextInput
+              id="dispute-search"
+              type="search"
+              sizing="sm"
+              value={disputeSearchInput}
+              onChange={(event) => setDisputeSearchInput(event.target.value)}
+              placeholder="Search by guest, email or stay"
+            />
+          </div>
+
+          <div className="flex flex-wrap gap-2 border-b border-border px-5 py-3" role="tablist" aria-label="Dispute status">
+            {DISPUTE_FILTERS.map(({ status, label }) => (
+              <Button
+                key={status}
+                size="xs"
+                role="tab"
+                aria-selected={disputeFilter === status}
+                color={disputeFilter === status ? 'primary' : 'light'}
+                onClick={() => { setDisputeFilter(status); setDisputePage(1); }}
+              >
+                {label} ({disputeCounts[status] ?? 0})
+              </Button>
             ))}
           </div>
 
           <div>
-            {summary.openDisputes.slice(0, 4).map((dispute) => (
+            {disputesLoading ? (
+              <div className="flex flex-col items-center gap-2 px-5 py-12 text-center">
+                <Spinner size="lg" aria-hidden="true" />
+                <strong className="text-sm font-semibold text-navy">Loading disputes</strong>
+              </div>
+            ) : disputes.length === 0 ? (
+              <p className="px-5 py-10 text-center text-sm text-muted">
+                {disputeSearch ? 'No disputes match that search.' : t('admin.noOpenDisputes')}
+              </p>
+            ) : disputes.map((dispute) => (
               <button type="button" key={dispute.id} onClick={() => { setSelectedDispute(dispute); setDisputeNote(''); setResolutionNote(dispute.resolution || ''); setError(''); }} className="flex w-full items-center justify-between gap-3 border-b border-border px-5 py-4 text-left last:border-0 hover:bg-surface">
                 <span className="min-w-0">
                   <strong className="block truncate text-sm font-semibold text-navy">{disputeTitle(dispute)}</strong>
@@ -378,8 +501,18 @@ function AdminTrustSafety() {
                 <Badge color={DISPUTE_META[dispute.status]?.tone || 'gray'}>{t(DISPUTE_META[dispute.status]?.label || dispute.status)}</Badge>
               </button>
             ))}
-            {!loading && summary.openDisputes.length === 0 && <p className="px-5 py-10 text-center text-sm text-muted">{t('admin.noOpenDisputes')}</p>}
-            {summary.openDisputes.length > 4 && <p className="border-t border-border px-5 py-3 text-xs text-muted">{summary.openDisputes.length - 4} more open cases are available in the current queue.</p>}
+            {!disputesLoading && disputes.length > 0 && (
+              <div className="px-5 py-4">
+                <AdminPagination
+                  page={disputePagination.page}
+                  limit={disputePagination.limit}
+                  total={disputePagination.total}
+                  totalPages={disputePagination.totalPages}
+                  onChange={setDisputePage}
+                  noun="dispute"
+                />
+              </div>
+            )}
           </div>
         </aside>
       </div>

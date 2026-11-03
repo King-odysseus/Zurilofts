@@ -270,33 +270,43 @@ const ADMIN_INCLUDE = {
   documents: { select: DOCUMENT_METADATA_SELECT },
 } as const;
 
-export async function adminList(filters: { status?: string; search?: string; page?: number; limit?: number }) {
-  const page = Math.max(1, Number(filters.page) || 1);
-  const limit = Math.min(100, Math.max(1, Number(filters.limit) || 20));
+import { buildPagination, clampQueueWindow, countByStatus } from '../utils/adminQueue.js';
 
-  const where: any = {};
-  if (filters.status) where.status = filters.status;
+export async function adminList(filters: { status?: string; search?: string; page?: number; limit?: number }) {
+  const { page, limit, skip } = clampQueueWindow(filters.page, filters.limit);
+
+  // The search is applied to the counts as well as the page, so a tab says how
+  // many matching cases it holds. The status filter is deliberately not applied
+  // to the counts: that is what makes the tabs tell you where to go next.
+  const searchWhere: any = {};
   if (filters.search) {
-    where.OR = [
+    searchWhere.OR = [
       { fullName: { contains: filters.search } },
       { user: { email: { contains: filters.search } } },
     ];
   }
 
-  const [rows, total] = await Promise.all([
+  const where: any = { ...searchWhere };
+  if (filters.status) where.status = filters.status;
+
+  const [rows, total, groups] = await Promise.all([
     prisma.identityVerification.findMany({
       where,
       include: ADMIN_INCLUDE,
       orderBy: { updatedAt: 'desc' },
-      skip: (page - 1) * limit,
+      skip,
       take: limit,
     }),
     prisma.identityVerification.count({ where }),
+    // Real totals per status, so a queue badge is the size of the queue rather
+    // than the size of the page that happens to be on screen.
+    prisma.identityVerification.groupBy({ by: ['status'], where: searchWhere, _count: { _all: true } }),
   ]);
 
   return {
     data: rows.map(toAdminView),
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
+    counts: countByStatus(['UNVERIFIED', 'SUBMITTED', 'APPROVED', 'REJECTED'], groups),
+    pagination: buildPagination(page, limit, total),
   };
 }
 

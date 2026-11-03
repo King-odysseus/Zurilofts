@@ -75,7 +75,7 @@ export async function adminList(req: Request, res: Response, next: NextFunction)
       page: page ? Number(page) : undefined,
       limit: limit ? Number(limit) : undefined,
     });
-    res.json({ success: true, data: result.data, pagination: result.pagination });
+    res.json({ success: true, data: result.data, counts: result.counts, pagination: result.pagination });
   } catch (error) {
     next(error);
   }
