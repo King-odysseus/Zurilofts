@@ -7,7 +7,7 @@ import { calculateNights, computeExtraGuestFee } from '../utils/pricing.js';
 import { calculateHostEarnings, type HostEarningInput, type HostEarningPolicy } from '../utils/hostEarnings.js';
 import { sendTelegramAlert } from './chat.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
-import { settleFailedTransfer } from './payout.service.js';
+import { settleFailedTransfer, markTransferSucceeded } from './payout.service.js';
 import { computeHostPayableAt } from '../utils/payoutTiming.js';
 import { resolveHostCommissionRate } from './foundingHost.service.js';
 
@@ -444,11 +444,16 @@ export async function handleWebhookEvent(
       const transferRef = data.data?.reference;
       if (!transferRef) return { handled: false, message: 'No transfer reference' };
 
-      await prisma.payout.updateMany({
-        where: { transferRef },
-        data: { status: 'SUCCESS', completedAt: new Date() },
-      });
-      return { handled: true, message: 'Payout marked SUCCESS' };
+      // Conditional on purpose: a retried or replayed success can arrive after
+      // the balance was restored for a failed or reversed transfer, and marking
+      // it SUCCESS again would let a repeat reversal credit the host twice.
+      const marked = await markTransferSucceeded(transferRef);
+      return {
+        handled: true,
+        message: marked
+          ? 'Payout marked SUCCESS'
+          : 'Payout already settled; success notice ignored',
+      };
     }
 
     case 'transfer.failed': {

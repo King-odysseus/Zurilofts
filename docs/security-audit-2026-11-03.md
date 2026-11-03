@@ -188,6 +188,15 @@ funds at most once; repeated success has no extra accounting effect.
 Test replay, parallel delivery and rollback against PostgreSQL as well as
 unit stubs. Reconcile historical affected transfers before rollout.
 
+Status: fixed in code. Payout states now move through one rule set
+(`server/src/utils/payoutTransitions.ts`): FAILED and REVERSED are terminal,
+and `markTransferSucceeded` refuses to reopen either, which is the step that
+had let a repeat reversal restore the balance a second time. The webhook
+reports an ignored success notice instead of silently applying it.
+`server/tests/payout.transitions.test.ts` replays the accepted sequences and
+credits at most once. Still outstanding: parallel delivery against a real
+PostgreSQL instance, and reconciling transfers already affected in production.
+
 ### SEC-08: P1 - Webhook processing failures are acknowledged as received
 
 Files: `server/src/controllers/payment.controller.ts:85-89`,

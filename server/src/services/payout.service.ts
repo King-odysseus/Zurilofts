@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { ValidationError, NotFoundError, ConflictError } from '../types/index.js';
 import { maskPayoutAccount, normalizeKenyanMpesaPhone, payoutRecipientKey } from '../utils/payoutDestination.js';
 import { isHostFundsDue } from '../utils/payoutTiming.js';
+import { SETTLED_PAYOUT_STATUSES, isSettledPayoutStatus } from '../utils/payoutTransitions.js';
 import { creditReferralForFirstEarning } from './referral.service.js';
 
 /**
@@ -344,8 +345,28 @@ async function refundClaim(hostId: string, amount: number): Promise<void> {
   });
 }
 
-/** Payout states from which nothing more can be reversed. */
-const SETTLED_PAYOUT_STATUSES = ['FAILED', 'REVERSED'];
+/**
+ * Mark a payout SUCCESS when the provider reports the transfer arrived.
+ *
+ * Conditional, because transfer notices are retried and can arrive out of
+ * order: a success landing after the balance was already restored for a failed
+ * or reversed transfer must not reopen that payout. Reporting an ignored
+ * notice honestly is what keeps a provider-side replay visible in the logs
+ * instead of letting it move money later.
+ *
+ * Returns true only when this call performed the transition.
+ */
+export async function markTransferSucceeded(transferRef: string): Promise<boolean> {
+  const payout = await prisma.payout.findUnique({ where: { transferRef } });
+  if (!payout) return false;
+  if (isSettledPayoutStatus(payout.status)) return false;
+
+  const flipped = await prisma.payout.updateMany({
+    where: { transferRef, status: { notIn: [...SETTLED_PAYOUT_STATUSES] } },
+    data: { status: 'SUCCESS', completedAt: new Date() },
+  });
+  return flipped.count > 0;
+}
 
 /**
  * Settle a payout Paystack reports as FAILED or REVERSED.
@@ -367,7 +388,7 @@ export async function settleFailedTransfer(
   if (!payout) return false;
   // Guard against a duplicate delivery flipping an already-settled payout and
   // crediting the host twice.
-  if (SETTLED_PAYOUT_STATUSES.includes(payout.status)) return false;
+  if (isSettledPayoutStatus(payout.status)) return false;
 
   return prisma.$transaction(async (tx) => {
     const flipped = await tx.payout.updateMany({
