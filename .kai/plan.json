@@ -2,41 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Landed and pushed 20 of 27 audit fixes (security, blocked tasks, small polish)",
+      "text": "Check the reported build failure (frontend, server, lint)",
       "state": "done"
     },
     {
-      "text": "SEC-07: stop an out-of-order transfer.success reopening a settled payout and crediting the host twice",
+      "text": "Read the host calendar grid and selection code",
       "state": "done"
     },
     {
-      "text": "SEC-02: serve conversation files only to the people in that conversation",
+      "text": "Add vertical spacing between calendar rows",
       "state": "done"
     },
     {
-      "text": "Trust and Safety: server-side paging, search and accurate totals so cases past the first 100 are reachable",
+      "text": "Make date clicks select multiple nights without opening the pop-up (click, shift-click, drag range, double-click to edit)",
       "state": "done"
     },
     {
-      "text": "Help Centre with real articles, and secure password recovery with single-use expiring links",
+      "text": "Update the on-screen hint in English and Swahili",
       "state": "done"
     },
     {
-      "text": "Durable append-only audit history for admin decisions that survives record deletion",
+      "text": "Skip booked nights when filling a range, and make a double-click outside the pick edit only that night",
       "state": "done"
     },
     {
-      "text": "Server-side filters and paging for feedback, support messages, bookings and orphaned listings",
-      "state": "done"
-    },
-    {
-      "text": "Terminology pass: stays for guests, listings for management, EN/SW parity and titles",
-      "state": "done"
-    },
-    {
-      "text": "Correct the Tier 3 proposal table and close the audit backlog document",
+      "text": "Verify with lint, build and a real browser check of spacing and multi-select",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-03T14:01:47.676Z"
+  "updatedAt": "2026-11-03T14:38:50.069Z"
 }

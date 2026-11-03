@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, Label, TextInput, ToggleSwitch } from 'flowbite-react';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
@@ -100,6 +100,22 @@ function fromDayKey(key) {
 }
 
 /** Group picked nights into consecutive start/end runs; `end` is the check-out day. */
+/**
+ * Every night from one date to another, inclusive, in whichever direction the
+ * two are given. Shift-click and dragging both use it, so a range means the
+ * same thing however it was drawn.
+ */
+function dayKeysBetween(from, to) {
+  const start = midnight(from);
+  const end = midnight(to);
+  const step = end.getTime() >= start.getTime() ? 1 : -1;
+  const keys = [];
+  for (let cursor = start; step > 0 ? cursor.getTime() <= end.getTime() : cursor.getTime() >= end.getTime(); cursor = addDays(cursor, step)) {
+    keys.push(dayKey(cursor));
+  }
+  return keys;
+}
+
 function groupRuns(days) {
   const sorted = [...days].sort((a, b) => a.getTime() - b.getTime());
   const runs = [];
@@ -316,8 +332,14 @@ ReservedTile.propTypes = {
   weekStart: PropTypes.instanceOf(Date).isRequired,
 };
 
-function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
+function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle, onRange, onEditDay }) {
   const { t, lang } = useLanguage();
+  // Dragging across the month picks a run of nights. Only the anchor is state:
+  // the moment the pointer crosses into another tile the range is handed to the
+  // page, which owns the selection. The flag beside it tells a drag apart from a
+  // click, so releasing over a different tile does not also toggle that tile.
+  const [dragAnchor, setDragAnchor] = useState(null);
+  const draggedRef = useRef(false);
   // The grid is generated as six whole weeks so the arithmetic never runs short.
   // A month that ends mid-week leaves a last row made entirely of next-month
   // days, which would draw a band of empty tiles under the month, so any week
@@ -331,11 +353,27 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
   const bookings = calendar?.bookings || [];
   const blocks = calendar?.blocks || [];
 
+  // The pointer can come up anywhere, including outside the grid and outside the
+  // window, so the drag ends on the document rather than on a tile. Without this
+  // a drag released over the side panel would leave the grid armed, and the next
+  // hover would silently rewrite the selection.
+  useEffect(() => {
+    if (!dragAnchor) return undefined;
+    const endDrag = () => setDragAnchor(null);
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
+    return () => {
+      window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
+    };
+  }, [dragAnchor]);
+
   // Airbnb's month is a field of separate rounded tiles: the gap between tiles
   // carries the rhythm, so no cell is drawn with grid lines. The weekday row
   // keeps the same seven tracks and the same gap, or a label would drift off
-  // its column.
-  return <div className="select-none px-4 pb-3 sm:pb-4">
+  // its column. The rows are spaced by the same measure down the month, so the
+  // tiles read as a grid of nights rather than one tall stack.
+  return <div className="select-none space-y-1.5 px-4 pb-3 sm:space-y-2 sm:pb-4">
     {/* The weekday strip pins under the workspace header while the month
         scrolls beneath it, the way the reference keeps the column letters in
         view down a long month. The negative margin lets the strip run full
@@ -383,7 +421,31 @@ function MonthGrid({ weeks, monthAnchor, calendar, selectedKeys, onToggle }) {
             return <button
               key={day.toISOString()}
               type="button"
-              onClick={(event) => { if (!stay && !outside) onToggle(day, event.shiftKey); }}
+              // Press starts a potential drag, the click that follows is the pick.
+              // Separating the two is what lets a click toggle one night while a
+              // drag lays down a whole run, without the release also toggling the
+              // tile the pointer happened to finish on.
+              onPointerDown={(event) => {
+                if (stay || outside || event.button !== 0) return;
+                draggedRef.current = false;
+                setDragAnchor(day);
+              }}
+              onPointerEnter={() => {
+                if (!dragAnchor || stay || outside) return;
+                if (dayKey(dragAnchor) === dayKey(day)) return;
+                draggedRef.current = true;
+                onRange(dragAnchor, day);
+              }}
+              onClick={(event) => {
+                if (stay || outside) return;
+                // The pointer already drew this run, so the release is not a pick.
+                if (draggedRef.current) {
+                  draggedRef.current = false;
+                  return;
+                }
+                onToggle(day, event.shiftKey);
+              }}
+              onDoubleClick={() => { if (!stay && !outside) onEditDay(day); }}
               aria-pressed={isSelected}
               disabled={stay || outside}
               aria-label={`${label}${outside ? t('a11y2.outsideThisMonth') : stay ? t('a11y2.notEditable') : isSelected ? t('a11y2.selected') : t('a11y2.tapToSelect')}`}
@@ -454,6 +516,8 @@ MonthGrid.propTypes = {
   calendar: PropTypes.object,
   selectedKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
   onToggle: PropTypes.func.isRequired,
+  onRange: PropTypes.func.isRequired,
+  onEditDay: PropTypes.func.isRequired,
 };
 
 /* ------------------------------------------------------------------ page ---- */
@@ -475,7 +539,9 @@ export default function HostCalendarPage() {
   const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState(false);
   // The day editor is a popup over the calendar. It prices whichever nights are
-  // picked, so it needs nothing more than its own open state here.
+  // picked, so it needs nothing more than its own open state here. It opens from
+  // the action bar, the pricing panel and a double-click on a night, never from a
+  // plain pick: picking a run of nights has to stay possible.
   const [dayRateOpen, setDayRateOpen] = useState(false);
 
   const loadProperties = useCallback(async () => {
@@ -528,34 +594,54 @@ export default function HostCalendarPage() {
     setMonthAnchor(firstOfMonth(new Date()));
   }
 
-  /** Click picks a night; shift-click fills the range from the previous pick. */
+  /**
+   * A click picks or unpicks one night; shift-click fills the range from the
+   * previous pick.
+   *
+   * Neither opens the editor. Choosing several nights is the first half of every
+   * job on this screen, and raising the editor over the grid on each click made a
+   * five-night run five open-and-close rounds before a host could touch a price.
+   * The editor is one action away instead: the action bar under the grid, the
+   * pricing panel beside it, the phone sheet, or a double-click on a single night.
+   */
   function toggleDay(day, extend) {
     const key = dayKey(day);
     setSelectedKeys((current) => {
       const anchor = current[current.length - 1];
       if (extend && anchor) {
-        const from = fromDayKey(anchor);
-        const to = midnight(day);
-        const step = to.getTime() >= from.getTime() ? 1 : -1;
         const keys = new Set(current);
-        for (let cursor = from; step > 0 ? cursor.getTime() <= to.getTime() : cursor.getTime() >= to.getTime(); cursor = addDays(cursor, step)) {
-          keys.add(dayKey(cursor));
-        }
+        dayKeysBetween(fromDayKey(anchor), day)
+          // A booked night is not selectable, so filling a range over one skips
+          // it rather than counting a night the host cannot act on.
+          .filter((item) => !isBookedNight(fromDayKey(item)))
+          .forEach((item) => keys.add(item));
         return [...keys];
       }
       return current.includes(key) ? current.filter((item) => item !== key) : [...current, key];
     });
+  }
 
-    // A plain click means "price this night", so the editor opens straight on the
-    // pick. Shift-click only extends a range, which keeps multi-night picking
-    // usable without the popup reopening over the calendar on every night.
-    // A phone gets its own sheet on a pick instead, which already offers the same
-    // editor one tap away, so raising both at once would bury the availability
-    // controls a host needs more often.
-    if (!extend) {
-      const roomForPopup = window.matchMedia('(min-width: 768px)').matches;
-      setDayRateOpen(roomForPopup && !selectedKeys.includes(key));
-    }
+  /** True for a night a guest already holds; those tiles are inert. */
+  function isBookedNight(day) {
+    return (calendar?.bookings || []).some((booking) => inStay(day, booking.start, booking.end));
+  }
+
+  /** A dragged range replaces the pick outright, so it never accumulates. */
+  function selectRange(from, to) {
+    setSelectedKeys(dayKeysBetween(from, to).filter((item) => !isBookedNight(fromDayKey(item))));
+  }
+
+  /**
+   * Double-click is the shortcut straight to the editor. A night outside the
+   * current pick becomes the pick, because "double-click a night to price it"
+   * must not quietly price the nights picked before it. A night already in the
+   * pick keeps the whole pick, so a host can double-click within a run and edit
+   * the run.
+   */
+  function editDay(day) {
+    const key = dayKey(day);
+    setSelectedKeys((current) => (current.includes(key) ? current : [key]));
+    setDayRateOpen(true);
   }
 
   function clearSelection() {
@@ -1130,6 +1216,8 @@ export default function HostCalendarPage() {
           calendar={calendar}
           selectedKeys={selectedKeys}
           onToggle={toggleDay}
+          onRange={selectRange}
+          onEditDay={editDay}
         />
         </HostCard>
       </section>
