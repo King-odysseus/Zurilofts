@@ -475,10 +475,27 @@ export async function quoteBooking(input: QuoteBookingInput) {
   };
 }
 
+// Booking.status is a String column in the SQLite schema and a BookingStatus
+// enum in the PostgreSQL one, so the two generated clients type the field
+// differently and a plain `string` from a query string will not assign to the
+// PostgreSQL type. Narrowing to the values the schema declares keeps this
+// compiling against both clients without a cast into the enum type.
+//
+// A value outside that set is dropped rather than turned into a filter: it
+// cannot match a row under either schema, so keeping it would show an empty
+// list that reads as "you have nothing" instead of "that filter is not real".
+const BOOKING_STATUSES = ['PENDING', 'CONFIRMED', 'CANCELLED', 'CONFLICT'] as const;
+
+function asBookingStatus(value: string | undefined): (typeof BOOKING_STATUSES)[number] | undefined {
+  if (!value) return undefined;
+  const upper = value.toUpperCase();
+  return BOOKING_STATUSES.find((status) => status === upper);
+}
+
 export async function listUserBookings(userId: string, status?: string, page = 1, limit = 10) {
   const window = parsePaging({ page, limit }, { defaultLimit: 10 });
   const where: Prisma.BookingWhereInput = { userId };
-  if (status) where.status = status;
+  if (status) where.status = asBookingStatus(status);
 
   const [bookings, total] = await Promise.all([
     prisma.booking.findMany({
@@ -586,7 +603,7 @@ export async function listAllBookings(
 ) {
   const window = parsePaging({ page, limit });
   const where: Prisma.BookingWhereInput = {};
-  if (status) where.status = status;
+  if (status) where.status = asBookingStatus(status);
   if (hostId) where.property = { hostId };
   if (filters.propertyId) where.propertyId = filters.propertyId;
 
