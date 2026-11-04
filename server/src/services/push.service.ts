@@ -11,11 +11,23 @@ if (vapidPublicKey && vapidPrivateKey) {
   webpush.setVapidDetails('mailto:wingzatari@gmail.com', vapidPublicKey, vapidPrivateKey);
 }
 
-/** Save or update a push subscription for a user */
+/**
+ * Save a push subscription for a user.
+ *
+ * `endpoint` is unique, so a plain upsert silently handed an existing row to
+ * whoever asked last: another account's live subscription was moved rather than
+ * replaced. A browser subscription belongs to the device that created it, and on
+ * a shared machine that device does change hands, so the previous owner's row is
+ * removed deliberately and a fresh one created for the account asking now. None
+ * of the old owner's data is carried across.
+ */
 export async function subscribe(userId: string, endpoint: string, keys: { p256dh: string; auth: string }) {
+  await prisma.pushSubscription.deleteMany({
+    where: { endpoint, userId: { not: userId } },
+  });
   return prisma.pushSubscription.upsert({
     where: { endpoint },
-    update: { userId, keys: JSON.stringify(keys), updatedAt: new Date() },
+    update: { keys: JSON.stringify(keys), updatedAt: new Date() },
     create: { userId, endpoint, keys: JSON.stringify(keys) },
   });
 }
