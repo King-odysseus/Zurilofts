@@ -9,6 +9,7 @@ import { isBookable } from './property.service.js';
 import { isPromoUsableForProperty, type BookingTarget } from './promo.service.js';
 import { minNightsForCheckIn } from './stayRule.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
+import { propertyForBookingViewer } from '../utils/propertyPrivacy.js';
 import { env } from '../config/env.js';
 
 // Normalize SQLite JSON fields to JS arrays for API responses
@@ -250,6 +251,9 @@ export async function createBooking(input: CreateBookingInput) {
   let promoCodeId: string | null = null;
   let discountPercent = 0;
   let maxDiscount: number | null = null;
+  // Kept next to the id so the usage claim inside the transaction can be made
+  // conditional on the limit the promo still had when it was validated.
+  let promoMaxUses: number | null = null;
 
   if (input.promoCode) {
     // Compute subtotal upfront for promo min-booking-amount check
@@ -263,6 +267,7 @@ export async function createBooking(input: CreateBookingInput) {
     promoCodeId = promo.id;
     discountPercent = promo.discountPercent;
     maxDiscount = promo.maxDiscount ?? null;
+    promoMaxUses = promo.maxUses ?? null;
   }
 
   // Single-source pricing: nightly rate, fees, discount, late checkout, extra guests.
@@ -333,12 +338,22 @@ export async function createBooking(input: CreateBookingInput) {
           },
         });
 
-        // Increment promo code usage if used
+        // Claim one use of the promo code. The limit was checked before the
+        // transaction, so two checkouts racing for the last use both passed
+        // it; this conditional update is the real gate. A zero count means
+        // somebody else took that use first and the booking must not keep a
+        // discount the promo never had room for.
         if (promoCodeId) {
-          await tx.promoCode.update({
-            where: { id: promoCodeId },
+          const claimed = await tx.promoCode.updateMany({
+            where: {
+              id: promoCodeId,
+              ...(promoMaxUses !== null ? { currentUses: { lt: promoMaxUses } } : {}),
+            },
             data: { currentUses: { increment: 1 } },
           });
+          if (claimed.count === 0) {
+            throw new ConflictError('That promo code was just used up. Please review the new total.');
+          }
         }
 
         return created;
@@ -367,7 +382,12 @@ export async function createBooking(input: CreateBookingInput) {
     } catch (err) { console.error('Push notification failed:', err); }
   }
 
-  return normalizeBooking(booking);
+  // A brand new booking is PENDING, so the guest who just created it gets the
+  // listing without the arrival guide or the iCal token.
+  return normalizeBooking({
+    ...booking,
+    property: propertyForBookingViewer(booking.property, { status: booking.status, isOwner: false }),
+  });
 }
 
 interface QuoteBookingInput {
@@ -517,8 +537,18 @@ export async function listUserBookings(userId: string, status?: string, page = 1
     prisma.booking.count({ where }),
   ]);
 
+  // Same rule as the single-booking read: a guest's own list carries the
+  // listing, so the arrival guide appears only once that stay is CONFIRMED.
+  const visible = bookings.map((booking) => ({
+    ...booking,
+    property: propertyForBookingViewer(booking.property, {
+      status: booking.status,
+      isOwner: false,
+    }),
+  }));
+
   return {
-    bookings: normalizeBookings(bookings),
+    bookings: normalizeBookings(visible),
     // Shared envelope: an empty result reports 1 page, not 0, matching every
     // other list endpoint.
     pagination: paginationMeta(total, window),
@@ -563,14 +593,24 @@ export async function getBooking(bookingId: string, scope?: { userId?: string; h
     if (!isGuestOwner && !isHostOwner) throw new NotFoundError('Booking');
   }
 
+  // The listing is cut down for the guest until the stay is confirmed: a
+  // PENDING booking is not an arrival, and creating one used to return the
+  // door instructions, the Wi-Fi password and the host's iCal token. The host
+  // who owns the listing (and an admin, who passes no scope) keeps all of it.
+  const property = propertyForBookingViewer(booking.property, {
+    status: booking.status,
+    isOwner: scope?.hostId != null && booking.property?.hostId === scope.hostId,
+  });
+
   // The verification relation is reduced to a boolean here rather than passed
   // through. The host is entitled to know approved-or-not and nothing else, so
   // no status string, document row or reviewer note can reach a booking
   // payload. Guarded for the hollow relation an erased account can leave.
-  if (!booking.user) return normalizeBooking({ ...booking, user: null });
+  if (!booking.user) return normalizeBooking({ ...booking, property, user: null });
   const { identityVerification, ...guest } = booking.user;
   return normalizeBooking({
     ...booking,
+    property,
     user: { ...guest, identityVerified: identityVerification?.status === 'APPROVED' },
   });
 }
@@ -1218,7 +1258,13 @@ export async function cancelBooking(bookingId: string, actor: CancelActor) {
       addOns: { include: { addOn: true } },
     },
   });
-  return normalizeBooking(updated);
+  return normalizeBooking({
+    ...updated,
+    property: propertyForBookingViewer(updated?.property, {
+      status: updated?.status,
+      isOwner: false,
+    }),
+  });
 }
 
 // Admin resolves a REFUND_PENDING booking after sending the guest's refund from

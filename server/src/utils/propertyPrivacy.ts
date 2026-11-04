@@ -48,3 +48,26 @@ export function toPublicProperty<T>(property: T): T {
   for (const field of PRIVATE_PROPERTY_FIELDS) delete publicCopy[field];
   return publicCopy as T;
 }
+
+/**
+ * The listing inside a booking payload, cut down for whoever is reading it.
+ *
+ * A booking response carries the whole property row. For the guest that is a
+ * hole: anyone can create a PENDING booking on any published listing (or cancel
+ * one) and read the result, which used to hand back the door instructions, the
+ * Wi-Fi password and the host's iCal token without a single shilling paid.
+ * A cancelled or never-paid stay is not an arrival.
+ *
+ * The owner (the host whose listing it is) and an admin keep everything. A
+ * guest unlocks the arrival guide only once the booking is CONFIRMED, which is
+ * the same rule the booking screen states.
+ */
+export function propertyForBookingViewer<T>(
+  property: T,
+  options: { status?: string | null; isOwner: boolean }
+): T {
+  if (!property || typeof property !== 'object') return property;
+  if (options.isOwner) return property;
+  if (options.status === 'CONFIRMED') return property;
+  return toPublicProperty(property);
+}

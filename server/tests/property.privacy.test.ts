@@ -16,6 +16,7 @@ import assert from 'node:assert/strict';
 
 import {
   PRIVATE_PROPERTY_FIELDS,
+  propertyForBookingViewer,
   toPublicProperty,
 } from '../src/utils/propertyPrivacy.js';
 import { buildUpdateData } from '../src/services/property.service.js';
@@ -104,4 +105,34 @@ test('clearing a bed price still works after the deny-list', () => {
   const data = buildUpdateData({ price1Bed: null });
 
   assert.equal(data.price1Bed, null);
+});
+
+test('a guest booking that is not confirmed hides the arrival guide', () => {
+  // Creating a PENDING booking on any published listing - then reading it, or
+  // cancelling it and reading the response - used to return the door codes, the
+  // Wi-Fi password and the host's iCal token without a shilling paid.
+  for (const status of ['PENDING', 'CANCELLED', 'CONFLICT']) {
+    const view = propertyForBookingViewer(fullRow, { status, isOwner: false });
+    assert.equal(view.wifiPassword, undefined, `${status}: wifi password leaked`);
+    assert.equal(view.checkInMethod, undefined, `${status}: entry method leaked`);
+    assert.equal(view.directions, undefined, `${status}: directions leaked`);
+    assert.equal(view.houseManual, undefined, `${status}: house manual leaked`);
+    assert.equal(view.icalToken, undefined, `${status}: iCal token leaked`);
+    // The guest still needs the listing itself.
+    assert.equal(view.title, 'Kilimani Loft');
+  }
+});
+
+test('a confirmed stay unlocks the arrival guide for the guest', () => {
+  const view = propertyForBookingViewer(fullRow, { status: 'CONFIRMED', isOwner: false });
+
+  assert.equal(view.wifiPassword, 'sunshine-2026');
+  assert.equal(view.icalToken, 'ical_secret_token');
+});
+
+test('the host who owns the listing keeps the whole row whatever the status', () => {
+  const view = propertyForBookingViewer(fullRow, { status: 'PENDING', isOwner: true });
+
+  assert.equal(view.wifiPassword, 'sunshine-2026');
+  assert.equal(view.checkInMethod, 'Lockbox 4417');
 });
