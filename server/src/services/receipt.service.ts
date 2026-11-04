@@ -80,6 +80,19 @@ export interface ReceiptBooking {
   paymentFee: number;
   property: { title: string; location: string };
   addOns?: ReceiptAddOn[];
+  /**
+   * The paying guest, when the caller loaded the relation. A receipt that names
+   * the payer is stronger evidence than one that does not, but an erased
+   * account leaves this null, so every use of it must tolerate an absent name.
+   * Deliberately names only: an email or phone on a document a guest forwards
+   * to a hotel, an employer or a bank is a needless disclosure.
+   */
+  user?: { firstName: string; lastName: string } | null;
+  /**
+   * When an admin recorded the refund as sent. There is no stored refund
+   * amount, so the document dates the refund and never claims a figure for it.
+   */
+  refundedAt?: Date | null;
 }
 
 /** Which line this is, so the browser can print it in the reader's language. */
@@ -130,6 +143,8 @@ export interface Receipt {
   guest: {
     bookingId: string;
     reference: string | null;
+    /** "First Last", or null when the account was erased or the relation was not loaded. */
+    name: string | null;
   };
   stay: {
     propertyTitle: string;
@@ -157,7 +172,7 @@ export interface Receipt {
     gateway: string | null;
     paidAt: string | null;
   };
-  refund: { status: string } | null;
+  refund: { status: string; refundedAt: string | null } | null;
 }
 
 /** A stable YYYYMMDD stamp. UTC so every server produces the same number. */
@@ -176,7 +191,13 @@ function dateStamp(value: Date): string {
  */
 export function receiptNumberFor(booking: Pick<ReceiptBooking, 'id' | 'paidAt' | 'createdAt'>): string {
   const stamp = dateStamp(booking.paidAt ?? booking.createdAt);
-  return `ZL-${stamp}-${booking.id.slice(0, 8).toUpperCase()}`;
+  // The tail of the id, not the head. A cuid starts with a millisecond
+  // timestamp, so two bookings made in the same millisecond share their first
+  // characters and would receive the same number on the same day; the random
+  // tail is what actually separates them. It is also the same 8 characters the
+  // booking screen already shows as "Reference", so support, the guest and the
+  // printed document all quote one identifier.
+  return `ZL-${stamp}-${booking.id.slice(-8).toUpperCase()}`;
 }
 
 /**
@@ -235,6 +256,17 @@ function iso(value: Date | null): string | null {
 }
 
 /**
+ * "First Last", or null when there is no usable name. Joining on a single
+ * space keeps a missing last name from printing a trailing gap, and an erased
+ * account (which leaves `user` null) still produces a complete document.
+ */
+function payerName(user: ReceiptBooking['user']): string | null {
+  if (!user) return null;
+  const name = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+  return name === '' ? null : name;
+}
+
+/**
  * Build the document a guest can download for one booking.
  *
  * Everything is derived from stored values rather than recomputed: a receipt
@@ -284,6 +316,7 @@ export function buildReceipt(booking: ReceiptBooking): Receipt {
     guest: {
       bookingId: booking.id,
       reference: booking.paymentReference,
+      name: payerName(booking.user),
     },
     stay: {
       propertyTitle: booking.property.title,
@@ -314,7 +347,11 @@ export function buildReceipt(booking: ReceiptBooking): Receipt {
       paidAt: iso(paidAt),
     },
     // Null unless a refund has actually been recorded, so a normal receipt has
-    // no empty refund block for a guest to wonder about.
-    refund: booking.refundStatus ? { status: booking.refundStatus } : null,
+    // no empty refund block for a guest to wonder about. The date is reported
+    // when it is known; the amount never is, because the schema does not store
+    // one and a guessed refund figure would misstate a guest's money.
+    refund: booking.refundStatus
+      ? { status: booking.refundStatus, refundedAt: iso(booking.refundedAt ?? null) }
+      : null,
   };
 }

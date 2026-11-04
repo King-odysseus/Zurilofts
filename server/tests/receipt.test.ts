@@ -16,7 +16,7 @@ import assert from 'node:assert/strict';
 import { buildReceipt, receiptNumberFor, type ReceiptBooking } from '../src/services/receipt.service.js';
 import { company } from '../src/config/company.js';
 
-const BOOKING_ID = 'cm3k9x1a0000abcd';
+const BOOKING_ID = 'cm3k9x1a7f2b9c4d';
 
 /**
  * A paid, confirmed three-night stay: 3 x KES 5,100 accommodation plus the
@@ -165,12 +165,12 @@ test('the receipt number is stable for one booking and differs between bookings'
   const second = receiptNumberFor(confirmedBooking());
 
   assert.equal(first, second);
-  assert.equal(first, 'ZL-20261101-CM3K9X1A');
+  assert.equal(first, 'ZL-20261101-7F2B9C4D');
   // Same payment date, different booking: the id is what separates them, so a
   // guest and support never quote the same number for two different stays.
   assert.notEqual(first, receiptNumberFor(confirmedBooking({ id: 'cm3k9x1b1111efgh' })));
   // Built from the payment date when there is one.
-  assert.equal(receiptNumberFor(confirmedBooking({ paidAt: null })), 'ZL-20261030-CM3K9X1A');
+  assert.equal(receiptNumberFor(confirmedBooking({ paidAt: null })), 'ZL-20261030-7F2B9C4D');
 });
 
 test('no VAT is stated while the platform is not VAT registered', () => {
@@ -184,9 +184,58 @@ test('no VAT is stated while the platform is not VAT registered', () => {
 test('a refund status appears on the document', () => {
   const receipt = buildReceipt(confirmedBooking({ status: 'CANCELLED', refundStatus: 'REFUNDED' }));
 
-  assert.deepEqual(receipt.refund, { status: 'REFUNDED' });
+  assert.deepEqual(receipt.refund, { status: 'REFUNDED', refundedAt: null });
   // Nothing refunded on the normal case, so there is no refund line to misread.
   assert.equal(buildReceipt(confirmedBooking()).refund, null);
+});
+
+test('a recorded refund carries the date it was sent, never a guessed amount', () => {
+  const receipt = buildReceipt(
+    confirmedBooking({
+      status: 'CANCELLED',
+      refundStatus: 'REFUNDED',
+      refundedAt: new Date('2026-11-05T11:00:00.000Z'),
+    }),
+  );
+
+  assert.equal(receipt.refund?.refundedAt, '2026-11-05T11:00:00.000Z');
+  // No refund amount is stored, so none may appear in the payload: a number the
+  // schema never held would be an invented figure about a guest's money.
+  assert.equal(JSON.stringify(receipt.refund).includes('Kes'), false);
+  assert.deepEqual(Object.keys(receipt.refund ?? {}).sort(), ['refundedAt', 'status']);
+});
+
+test('the document names the payer and never their contact details', () => {
+  const receipt = buildReceipt(
+    confirmedBooking({ user: { firstName: 'Amina', lastName: 'Wanjiku' } }),
+  );
+
+  assert.equal(receipt.guest.name, 'Amina Wanjiku');
+
+  // The row that reaches this service carries more than a name; only the name
+  // may survive. An email or phone printed on a document a guest forwards to a
+  // hotel, an employer or a bank is a disclosure nobody asked for.
+  const rowWithContact = {
+    ...confirmedBooking(),
+    user: { firstName: 'Amina', lastName: 'Wanjiku', email: 'amina@example.com', phone: '+254700000000' },
+  };
+  const serialised = JSON.stringify(buildReceipt(rowWithContact));
+
+  assert.equal(serialised.includes('amina@example.com'), false);
+  assert.equal(serialised.includes('+254700000000'), false);
+});
+
+test('an erased account still produces a complete document, with no payer name', () => {
+  // Erasing an account nulls the relation; the guest paid and is still owed
+  // their record, so the name is omitted rather than the receipt refused.
+  const receipt = buildReceipt(confirmedBooking({ user: null }));
+
+  assert.equal(receipt.guest.name, null);
+  assert.equal(receipt.isReceipt, true);
+  assert.equal(receipt.totals.paidKes, 17370);
+
+  // A name that is present but empty must not print as a blank line either.
+  assert.equal(buildReceipt(confirmedBooking({ user: { firstName: '', lastName: '' } })).guest.name, null);
 });
 
 test('the host side of the money never reaches the guest document', () => {

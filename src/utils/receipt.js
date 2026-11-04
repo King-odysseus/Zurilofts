@@ -42,6 +42,19 @@ const REFUND_KEYS = {
   REFUND_DECLINED: 'booking.receiptRefundDeclined',
 };
 
+// The payment channel is stored as the processor's own token - 'card',
+// 'mobile_money' - which is a settlement word, not something a guest reads.
+// An unmapped value falls back to the raw token so a new channel still prints
+// the truth instead of a blank line.
+const CHANNEL_KEYS = {
+  card: 'booking.receiptChannelCard',
+  mobile_money: 'booking.receiptChannelMpesa',
+  bank: 'booking.receiptChannelBank',
+  bank_transfer: 'booking.receiptChannelBank',
+  eft: 'booking.receiptChannelBank',
+  ussd: 'booking.receiptChannelUssd',
+};
+
 function money(amount) {
   if (amount == null) return '-';
   const sign = amount < 0 ? '-' : '';
@@ -70,6 +83,11 @@ function lineLabel(line, t) {
   return key ? t(key) : line.label;
 }
 
+function channelLabel(channel, t) {
+  const key = CHANNEL_KEYS[channel];
+  return key ? t(key) : channel;
+}
+
 /**
  * Build and save the PDF. Throws if jsPDF cannot be loaded, so the caller can
  * tell the guest instead of leaving a button that appears to do nothing.
@@ -89,13 +107,22 @@ export async function renderReceipt(receipt, t, locale) {
   }
 
   function row(label, value, options = {}) {
-    ensureSpace(options.height || 6);
+    const height = options.height || 6;
     doc.setFont('helvetica', options.bold ? 'bold' : 'normal');
     doc.setFontSize(options.size || 9.5);
     doc.setTextColor(options.muted ? 107 : 31, options.muted ? 114 : 41, options.muted ? 128 : 55);
-    doc.text(String(label), left, y);
-    doc.text(String(value), right, y, { align: 'right' });
-    y += options.height || 6;
+    const valueText = String(value);
+    // A host-written add-on name or a long listing title used to overprint the
+    // amount on the right. The label now wraps into whatever space the value
+    // leaves behind, so a name and its price can never collide and every figure
+    // stays readable. 30mm is the floor, so a very wide value still leaves a
+    // column of label rather than pushing the text off the page.
+    const labelWidth = Math.max(30, right - left - doc.getTextWidth(valueText) - 4);
+    const labelLines = doc.splitTextToSize(String(label), labelWidth);
+    ensureSpace(height * labelLines.length);
+    labelLines.forEach((line, index) => doc.text(line, left, y + index * height));
+    doc.text(valueText, right, y, { align: 'right' });
+    y += height * labelLines.length;
   }
 
   function sectionHeading(text) {
@@ -142,6 +169,11 @@ export async function renderReceipt(receipt, t, locale) {
 
   row(t('booking.receiptIssued'), formatDate(receipt.issuedAt, locale), { muted: true, size: 8.5, height: 5.5 });
   row(t('booking.receiptStatus'), statusLabel(receipt, t), { muted: true, size: 8.5, height: 5.5 });
+  // Who paid. Omitted rather than left blank when the account was erased, since
+  // a guest without a name still needs the record of their own money.
+  if (receipt.guest.name) {
+    row(t('booking.receiptReceivedFrom'), receipt.guest.name);
+  }
 
   // A booking nobody has paid for must never read as proof of payment, so the
   // document says so plainly instead of leaving the reader to infer it from a
@@ -184,13 +216,19 @@ export async function renderReceipt(receipt, t, locale) {
   if (receipt.isReceipt) {
     sectionHeading(t('booking.receiptPayment'));
     if (receipt.payment.reference) row(t('booking.receiptPaymentRef'), receipt.payment.reference);
-    if (receipt.payment.channel) row(t('booking.receiptPaymentMethod'), receipt.payment.channel);
+    if (receipt.payment.channel) row(t('booking.receiptPaymentMethod'), channelLabel(receipt.payment.channel, t));
     if (receipt.payment.paidAt) row(t('booking.receiptPaidOn'), formatDate(receipt.payment.paidAt, locale));
   }
 
   if (receipt.refund) {
     const refundKey = REFUND_KEYS[receipt.refund.status];
     row(t('booking.receiptRefund'), refundKey ? t(refundKey) : receipt.refund.status);
+    // The date answers the only question a cancelled stay leaves the guest
+    // asking - when did the money come back? No amount is printed here because
+    // the system stores the refund's status, not its size.
+    if (receipt.refund.refundedAt) {
+      row(t('booking.receiptRefundedOn'), formatDate(receipt.refund.refundedAt, locale), { muted: true, size: 8.5 });
+    }
   }
 
   // Footer: how to reach the company, and only the facts that are known. The
@@ -217,6 +255,20 @@ export async function renderReceipt(receipt, t, locale) {
   doc.setFontSize(7);
   doc.setTextColor(156, 163, 175);
   doc.text(t('booking.receiptComputerGenerated'), left, y);
+
+  // A stay with several add-ons runs past one page. Without a page number a
+  // printed copy that has lost a sheet looks complete, so every page carries
+  // its position. Placed below the footer block, outside the content area.
+  const pageCount = doc.getNumberOfPages();
+  if (pageCount > 1) {
+    for (let page = 1; page <= pageCount; page += 1) {
+      doc.setPage(page);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(7);
+      doc.setTextColor(156, 163, 175);
+      doc.text(t('booking.receiptPage', { current: page, total: pageCount }), right, 289, { align: 'right' });
+    }
+  }
 
   doc.save(`ZuriLofts_Receipt_${receipt.receiptNumber}.pdf`);
 }
