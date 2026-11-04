@@ -72,9 +72,12 @@ export async function updatePayoutDestination(req: Request, res: Response, next:
 /** Backward-compatible bank endpoint for clients cached before payout selection shipped. */
 export async function updateBankDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
+    // The body is spread first: this legacy form only ever sets up a bank
+    // account, so a body field must not be able to switch the stored payout
+    // method to mpesa and leave the destination half-configured.
     const result = await userService.updatePayoutDestination(req.user!.sub, {
-      payoutMethod: 'bank',
       ...req.body,
+      payoutMethod: 'bank',
     });
     res.json({ success: true, data: result });
   } catch (error) {

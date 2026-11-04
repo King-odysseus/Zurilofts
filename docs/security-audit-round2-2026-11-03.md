@@ -109,7 +109,7 @@ unlimited. Added `bookingWriteLimiter` (20 per 15 minutes) and `uploadLimiter`
 ## Verification
 
 - `npx tsc --noEmit` in `server/`: clean.
-- Server suite: 453 of 453 passing (441 before this pass, 12 new cases).
+- Server suite: 455 of 455 passing (441 before this pass, 14 new cases).
 - `npm run lint`: clean.
 - `npm run build`: succeeds.
 - Live probe of the upload guard before and after the fix, described above.
