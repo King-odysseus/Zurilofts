@@ -2,33 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Record plan for a guest-facing receipt engine",
+      "text": "Read current receipt service, client PDF renderer, controller and tests",
       "state": "done"
     },
     {
-      "text": "Read booking/payment code and any existing invoice or receipt code",
+      "text": "Identify real gaps or bugs in the receipt engine",
       "state": "done"
     },
     {
-      "text": "Decide scope: receipt from stored booking data, no VAT claim until the accountant answers",
+      "text": "Implement the worthwhile fixes",
       "state": "done"
     },
     {
-      "text": "Build the server side: receipt data assembled from a booking, plus an endpoint",
+      "text": "Verify with tests, type-check, lint and build",
       "state": "done"
     },
     {
-      "text": "Rebuild the PDF so it reads from the server payload and follows the chosen language",
-      "state": "done"
-    },
-    {
-      "text": "Verify: lint, frontend build, server type-check, tests, real row, real browser render",
-      "state": "done"
-    },
-    {
-      "text": "Update the compliance document and commit",
+      "text": "Commit and push",
       "state": "active"
     }
   ],
-  "updatedAt": "2026-11-04T09:36:33.330Z"
+  "updatedAt": "2026-11-04T09:44:57.296Z"
 }
