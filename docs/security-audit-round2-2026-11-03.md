@@ -79,7 +79,9 @@ support. A genuine change is a support task until email verification exists.
 ### 7. Any signed-in account could silence another person's notifications (low)
 
 Unsubscribing deleted by push endpoint alone. It is now scoped to the caller, so
-the row must belong to the account making the request.
+the row must belong to the account making the request. Subscribing on the same
+endpoint now removes the previous owner's row instead of reassigning it, so a
+shared browser carries nothing from the account before it.
 
 ### 8. Google sign-in could take over a password account (high)
 
@@ -109,7 +111,13 @@ unlimited. Added `bookingWriteLimiter` (20 per 15 minutes) and `uploadLimiter`
 ## Verification
 
 - `npx tsc --noEmit` in `server/`: clean.
-- Server suite: 455 of 455 passing (441 before this pass, 14 new cases).
+- Server suite run the way CI runs it (production mode plus fixture secrets; the
+  command is in `.github/workflows/ci.yml`): 455 of 455 pass, 14 of them new.
+- The same suite with no environment overrides reports 2 failures, both in
+  `public-url`. Those cases describe the production host fallback, and the env
+  validator refuses to boot in production without real-shaped secrets, so that
+  branch is only reachable with the CI environment. They fail the same way on the
+  commit before this pass; with no overrides the count is 453 passing.
 - `npm run lint`: clean.
 - `npm run build`: succeeds.
 - Live probe of the upload guard before and after the fix, described above.
