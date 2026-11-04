@@ -23,7 +23,16 @@ const router = Router();
 
 const translateSchema = z.object({
   target: z.string(),
-  texts: z.array(z.string()).min(1).max(MAX_TEXTS_PER_REQUEST),
+  // The provider bills per character, so both the number and the volume are
+  // bounded: 40 strings of arbitrary length would otherwise be an open relay to
+  // a paid API from an unauthenticated route.
+  texts: z
+    .array(z.string().max(2000))
+    .min(1)
+    .max(MAX_TEXTS_PER_REQUEST)
+    .refine((texts) => texts.reduce((total, text) => total + text.length, 0) <= 12000, {
+      message: 'Too much text in one request',
+    }),
   // Marks content that is not public, such as a message thread.
   private: z.boolean().optional(),
 });

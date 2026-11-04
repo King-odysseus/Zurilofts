@@ -8,8 +8,9 @@ import * as revenueService from '../services/revenue.service.js';
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const booking = await bookingService.createBooking({
-      userId: req.user!.sub,
+      // Identity last: a body field named userId must never win over the session.
       ...req.body,
+      userId: req.user!.sub,
     });
 
     // A guest who has not been identity-verified may still hold their dates -

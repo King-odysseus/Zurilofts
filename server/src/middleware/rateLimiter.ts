@@ -70,6 +70,21 @@ export const quoteLimiter = rateLimit({
   },
 });
 
+/**
+ * Public contact form - 5 messages per 15 minutes per IP. The handler only
+ * writes a log line, so this bounds log flooding rather than a paid resource.
+ */
+export const contactLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many messages. Please try again later.',
+  },
+});
+
 export const chatLimiter = rateLimit({
   windowMs: 60 * 1000,
   max: 20,

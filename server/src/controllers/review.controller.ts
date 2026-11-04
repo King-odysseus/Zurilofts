@@ -6,8 +6,9 @@ import { parseBoolean, parseSearch } from '../utils/paging.js';
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const review = await reviewService.createReview({
-      userId: req.user!.sub,
+      // Identity last: a body field named userId must never win over the session.
       ...req.body,
+      userId: req.user!.sub,
     });
     res.status(201).json({ success: true, data: review });
   } catch (error) {
