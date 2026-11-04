@@ -3,6 +3,7 @@ import multer from 'multer';
 import { authenticate, requireHostWorkspace } from '../middleware/auth.js';
 import { uploadImages, uploadAttachments } from '../controllers/upload.controller.js';
 import { ValidationError } from '../types/index.js';
+import { uploadLimiter } from '../middleware/rateLimiter.js';
 
 const ALLOWED = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'];
 
@@ -87,10 +88,10 @@ const router = Router();
 // Host workspace or admin - accepts up to 10 files under the "images" field.
 // A hosting-intent USER may add photos to draft listings before verification
 // completes (property create/update routes use the same requireHostWorkspace gate).
-router.post('/', authenticate, requireHostWorkspace, handleUpload, uploadImages);
+router.post('/', authenticate, requireHostWorkspace, uploadLimiter, handleUpload, uploadImages);
 
 // Chat attachments for any signed-in user (guest, host or admin), up to 5 files
 // of 15MB under the "files" field. No host gate: guests send files too.
-router.post('/attachments', authenticate, handleAttachmentUpload, uploadAttachments);
+router.post('/attachments', authenticate, uploadLimiter, handleAttachmentUpload, uploadAttachments);
 
 export default router;

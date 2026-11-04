@@ -2,13 +2,13 @@ import { Router } from 'express';
 import { authenticate, requireHostWorkspace } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { bookingCreateSchema, bookingPaymentInitSchema, bookingQuoteSchema } from '../types/index.js';
-import { quoteLimiter } from '../middleware/rateLimiter.js';
+import { quoteLimiter, bookingWriteLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controllers/booking.controller.js';
 
 const router = Router();
 
 // Authenticated user bookings (as a guest/traveller)
-router.post('/', authenticate, validate(bookingCreateSchema), ctrl.create);
+router.post('/', authenticate, bookingWriteLimiter, validate(bookingCreateSchema), ctrl.create);
 router.get('/', authenticate, ctrl.listMine);
 
 // Price preview for the checkout summary. Public (a guest prices a stay before
@@ -27,8 +27,8 @@ router.get('/host', authenticate, requireHostWorkspace, ctrl.listAll);
 router.get('/host/earnings', authenticate, requireHostWorkspace, ctrl.propertyEarnings);
 router.get('/host/today', authenticate, requireHostWorkspace, ctrl.hostToday);
 
-router.post('/:id/payment', authenticate, validate(bookingPaymentInitSchema), ctrl.initializePayment);
-router.post('/:id/cancel', authenticate, ctrl.cancel);
+router.post('/:id/payment', authenticate, bookingWriteLimiter, validate(bookingPaymentInitSchema), ctrl.initializePayment);
+router.post('/:id/cancel', authenticate, bookingWriteLimiter, ctrl.cancel);
 router.get('/:id', authenticate, ctrl.getById);
 
 export default router;

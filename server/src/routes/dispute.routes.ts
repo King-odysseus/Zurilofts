@@ -3,6 +3,7 @@ import multer from 'multer';
 import { authenticate } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
 import { disputeCreateSchema, disputeMessageSchema, ValidationError } from '../types/index.js';
+import { chatLimiter, uploadLimiter } from '../middleware/rateLimiter.js';
 import * as ctrl from '../controllers/dispute.controller.js';
 
 const router = Router();
@@ -32,8 +33,8 @@ router.use(authenticate);
 router.post('/', validate(disputeCreateSchema), ctrl.create);
 router.get('/', ctrl.listMine);
 router.get('/:id', ctrl.getById);
-router.post('/:id/evidence', handleEvidenceUpload, ctrl.addEvidence);
+router.post('/:id/evidence', uploadLimiter, handleEvidenceUpload, ctrl.addEvidence);
 router.get('/:id/evidence/:evidenceId', ctrl.downloadEvidence);
-router.post('/:id/messages', validate(disputeMessageSchema), ctrl.postMessage);
+router.post('/:id/messages', chatLimiter, validate(disputeMessageSchema), ctrl.postMessage);
 
 export default router;

@@ -114,3 +114,36 @@ export const translateLimiter = rateLimit({
     error: 'Too many translation requests. Please slow down.',
   },
 });
+
+/**
+ * Checkout writes: creating a booking, opening a payment on one, cancelling
+ * one. Each costs a Paystack call, an availability scan or a new row, so a
+ * signed-in script could otherwise mint transactions in a loop. Twenty per
+ * quarter hour is far above a real guest (one booking, one retry).
+ */
+export const bookingWriteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many booking attempts. Please wait a few minutes and try again.',
+  },
+});
+
+/**
+ * Image and attachment uploads. Sharp decodes and re-encodes every image, so
+ * one request is real CPU; sixty an hour covers a host filling several
+ * listings and leaves nothing for someone farming the endpoint.
+ */
+export const uploadLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    error: 'Too many uploads. Please try again later.',
+  },
+});
