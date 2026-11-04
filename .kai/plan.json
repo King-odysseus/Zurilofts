@@ -2,37 +2,45 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Confirm the password reset and audit migration is committed and applied in production",
+      "text": "Read the existing security audit so the new pass does not repeat fixed ground",
       "state": "done"
     },
     {
-      "text": "Fix the production 500 on listing reviews: add the missing review sub-score columns",
+      "text": "Attack authentication and session handling (login, refresh, reset, OAuth, role escalation)",
       "state": "done"
     },
     {
-      "text": "Fix the failing CI: valid Paystack fixture and VAPID keys generated per run",
+      "text": "Attack authorization on every API route (guest, host, admin) for cross-account access",
       "state": "done"
     },
     {
-      "text": "Keep the PostgreSQL verification scratch out of git",
+      "text": "Attack input handling: injection, SSRF, XSS, open redirect, path traversal, uploads",
       "state": "done"
     },
     {
-      "text": "Run lint and build before pushing",
+      "text": "Attack money and booking integrity plus rate limiting and abuse controls",
       "state": "done"
     },
     {
-      "text": "Push to main and trigger the Railway deploy and CI run",
+      "text": "Verify each candidate finding by reading the real code path",
+      "state": "done"
+    },
+    {
+      "text": "Write the findings and prioritized remediation plan to docs",
+      "state": "done"
+    },
+    {
+      "text": "Fix the highest-risk confirmed issues with regression tests",
+      "state": "done"
+    },
+    {
+      "text": "Run lint, production build and server test suite",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push the fixes",
       "state": "active"
-    },
-    {
-      "text": "Watch the deploy: migration applies and the healthcheck passes",
-      "state": "pending"
-    },
-    {
-      "text": "Verify in production that reviews return 200 and the database has no schema drift",
-      "state": "pending"
     }
   ],
-  "updatedAt": "2026-11-03T16:06:05.585Z"
+  "updatedAt": "2026-11-04T08:03:34.739Z"
 }
