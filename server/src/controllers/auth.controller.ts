@@ -90,8 +90,8 @@ export function verifyGoogleState(req: Request, res: Response): boolean {
  */
 export async function register(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const { email, password, firstName, lastName, role } = req.body;
-    const { user, tokens } = await authService.registerUser(email, password, firstName, lastName, role, sessionMetaFor(req));
+    const { email, password, firstName, lastName, role, dateOfBirth } = req.body;
+    const { user, tokens } = await authService.registerUser(email, password, firstName, lastName, role, dateOfBirth, sessionMetaFor(req));
     setRefreshCookie(res, tokens.refreshToken, tokens.persistent);
 
     res.status(201).json({

@@ -27,6 +27,10 @@ export const legalTerms = {
         s1BodyLead: 'By accessing or using the {name} Platform - including the website',
         s1BodyTail: ', the {name} progressive web application, and any related services (collectively, the \u201cPlatform\u201d) - you (\u201cyou,\u201d \u201cGuest,\u201d or \u201cUser\u201d) agree to be bound by these Terms of Service (\u201cTerms\u201d). If you do not agree to every provision of these Terms, you must not access or use the Platform.',
         s1Agreement: 'These Terms constitute a legally binding agreement between you and {name} (\u201cwe,\u201d \u201cour,\u201d or \u201cus\u201d), a business operating in Nairobi, Kenya. You represent that you are at least 18 years of age and have the legal capacity to enter into this agreement.',
+        s1EntityTitle: '1a. The Contracting Entity',
+        s1EntityBody: '{brand} is a trading name of {entity}, a company registered in Kenya. {entity} is the party you are contracting with under these Terms, and every reference to {brand} in these Terms means {entity}.',
+        s1EntityRegistration: 'Company registration number: {number}',
+        s1EntityAddress: 'Registered office: {address}',
 
         // 2. Definitions
         s2Title: '2. Definitions',
@@ -266,6 +270,9 @@ export const legalTerms = {
         s20EmailLabel: 'Email:',
         s20WebsiteLabel: 'Website:',
         s20AddressLabel: 'Address:',
+        s20EntityLabel: 'Registered company:',
+        s20RegistrationLabel: 'Registration number:',
+        s20AddressFallback: 'Nairobi, Kenya',
       },
     },
   },
@@ -285,6 +292,10 @@ export const legalTerms = {
         s1BodyLead: 'Kwa kufikia au kutumia Jukwaa la {name} - ikiwa ni pamoja na tovuti',
         s1BodyTail: ', programu ya wavuti inayoendelea ya {name}, na huduma zozote zinazohusiana (kwa pamoja, \u201cJukwaa\u201d) - wewe (\u201cwewe,\u201d \u201cMgeni,\u201d au \u201cMtumiaji\u201d) unakubali kufungwa na Masharti haya ya Huduma (\u201cMasharti\u201d). Ikiwa hukubali kila kipengele cha Masharti haya, hupaswi kufikia au kutumia Jukwaa.',
         s1Agreement: 'Masharti haya yanaunda makubaliano yanayofunga kisheria kati yako na {name} (\u201csisi,\u201d \u201cyetu,\u201d au \u201csisi\u201d), biashara inayofanya kazi Nairobi, Kenya. Unathibitisha kwamba una umri wa angalau miaka 18 na una uwezo wa kisheria wa kuingia katika makubaliano haya.',
+        s1EntityTitle: '1a. Upande Unayefanya Naye Makubaliano',
+        s1EntityBody: '{brand} ni jina la kibiashara la {entity}, kampuni iliyosajiliwa nchini Kenya. {entity} ndiyo upande unayefanya naye makubaliano chini ya Masharti haya, na kila mahali Masharti haya yanapotaja {brand} inamaanisha {entity}.',
+        s1EntityRegistration: 'Namba ya usajili wa kampuni: {number}',
+        s1EntityAddress: 'Ofisi iliyosajiliwa: {address}',
 
         // 2. Ufafanuzi
         s2Title: '2. Ufafanuzi',
@@ -524,6 +535,9 @@ export const legalTerms = {
         s20EmailLabel: 'Barua pepe:',
         s20WebsiteLabel: 'Tovuti:',
         s20AddressLabel: 'Anwani:',
+        s20EntityLabel: 'Kampuni iliyosajiliwa:',
+        s20RegistrationLabel: 'Namba ya usajili:',
+        s20AddressFallback: 'Nairobi, Kenya',
       },
     },
   },

@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import prisma from '../config/prisma.js';
 import { signAccessToken } from '../utils/jwt.js';
 import { UnauthorizedError, NotFoundError, ValidationError, ConflictError } from '../types/index.js';
+import { CURRENT_POLICY_VERSION, hashIp } from './consent.service.js';
 
 const SALT_ROUNDS = 12;
 
@@ -168,6 +169,7 @@ export async function registerUser(
   firstName: string,
   lastName: string,
   role: 'USER' | 'HOST' = 'USER',
+  dateOfBirth: string,
   meta?: SessionMeta
 ): Promise<{ user: UserResponse; tokens: AuthTokens }> {
   const normalizedEmail = email.trim().toLowerCase();
@@ -188,11 +190,27 @@ export async function registerUser(
 
   const user = await prisma.$transaction(async (tx) => {
     const created = await tx.user.create({
-      data: { email: normalizedEmail, passwordHash, firstName, lastName, role: 'USER' },
+      data: { email: normalizedEmail, passwordHash, firstName, lastName, role: 'USER', dateOfBirth },
     });
     if (wantsToHost) {
       await tx.hostApplication.create({ data: { userId: created.id, status: 'DRAFT' } });
     }
+    // The Terms checkbox is only worth anything if acceptance can be proven
+    // later. Writing it in this same transaction means an account can never
+    // exist without a record of which policy version the person agreed to.
+    await tx.consentRecord.create({
+      data: {
+        userId: created.id,
+        necessary: true,
+        analytics: false,
+        marketing: false,
+        policyVersion: CURRENT_POLICY_VERSION,
+        termsAccepted: true,
+        termsVersion: CURRENT_POLICY_VERSION,
+        ipHash: hashIp(meta?.ip),
+        userAgent: meta?.userAgent ?? null,
+      },
+    });
     return created;
   });
 

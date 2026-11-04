@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ChevronRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
+import { CalendarDays, ChevronRight, Eye, EyeOff, LockKeyhole, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
@@ -15,6 +15,14 @@ function getDashboardPath(user) {
   if (user?.role === 'HOST') return '/host/today';
   return '/';
 }
+
+// Bounds the date picker so an under-18 date cannot be chosen in the first
+// place. The server still validates it: markup is a convenience, not a control.
+const ADULT_CUTOFF = (() => {
+  const cutoff = new Date();
+  cutoff.setFullYear(cutoff.getFullYear() - 18);
+  return cutoff.toISOString().slice(0, 10);
+})();
 
 function RegisterPage() {
   const { t } = useLanguage();
@@ -35,6 +43,7 @@ function RegisterPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    dateOfBirth: '',
   });
   const [submitting, setSubmitting] = useState(false);
   const [localError, setLocalError] = useState('');
@@ -42,6 +51,9 @@ function RegisterPage() {
   const [showConfirm, setShowConfirm] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState(null);
+  // The checkbox is required by the browser, but the value was never sent, so
+  // the server had no record that anyone agreed to the Terms before booking.
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const { user, register, isAuthenticated, isLoading, error, clearError, setUser } = useAuth();
   const navigate = useNavigate();
 
@@ -84,6 +96,8 @@ function RegisterPage() {
       email: formData.email,
       password: formData.password,
       role: isHost ? 'HOST' : 'USER',
+      dateOfBirth: formData.dateOfBirth,
+      termsAccepted: acceptedTerms,
     });
 
     if (!result.success) {
@@ -142,6 +156,15 @@ function RegisterPage() {
         </div>
 
         <label className="op-auth-label">
+          <span>{t('auth.dateOfBirthLabel')}</span>
+          <span className="op-auth-control">
+            <CalendarDays className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
+            <input className="has-icon" id="register-dob" type="date" name="dateOfBirth" value={formData.dateOfBirth} onChange={handleChange} max={ADULT_CUTOFF} required autoComplete="bday" />
+          </span>
+          <small className="op-auth-hint">{t('auth.dateOfBirthHint')}</small>
+        </label>
+
+        <label className="op-auth-label">
           <span>{t('auth.emailLabel')}</span>
           <span className="op-auth-control">
             <Mail className="op-auth-control-icon" strokeWidth={1.8} aria-hidden="true" />
@@ -182,7 +205,7 @@ function RegisterPage() {
         </label>
 
         <div className="op-auth-check op-auth-terms">
-          <input type="checkbox" id="register-terms" required />
+          <input type="checkbox" id="register-terms" required checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} />
           <label htmlFor="register-terms">{t('auth.agreeToPrefix')} <Link to="/terms">{t('auth.termsOfService')}</Link> {t('auth.andWord')} <Link to="/privacy">{t('auth.privacyPolicy')}</Link>.</label>
         </div>
 

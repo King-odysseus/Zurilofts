@@ -6,6 +6,15 @@ function TermsPage() {
   const { t } = useLanguage();
   const lastUpdated = '17 June 2026';
   const companyName = 'ZuriLofts';
+  // The brand is a trading name only. Kenyan consumer law requires the legal
+  // person behind it to be named in the terms, so the operator is stated
+  // separately from the brand it trades as.
+  const legalEntity = 'BeneAlpha Consulting Limited';
+  // Deliberately empty until the CR12 number and the registered office are
+  // confirmed: a guessed number or address would be a worse misstatement than
+  // no line at all, so each line renders only when its value is known.
+  const companyRegistrationNumber = '';
+  const companyAddress = '';
   const articleRef = useRef(null);
 
   return (
@@ -36,6 +45,24 @@ function TermsPage() {
               <p className="mt-3">
                 {t('legal.terms.s1Agreement', { name: companyName })}
               </p>
+            </section>
+
+            {/* 1a. The contracting entity */}
+            <section>
+              <h2 className="text-xl font-bold text-[#203565] mb-3">{t('legal.terms.s1EntityTitle')}</h2>
+              <p>
+                {t('legal.terms.s1EntityBody', { brand: companyName, entity: legalEntity })}
+              </p>
+              {companyRegistrationNumber && (
+                <p className="mt-3">
+                  {t('legal.terms.s1EntityRegistration', { number: companyRegistrationNumber })}
+                </p>
+              )}
+              {companyAddress && (
+                <p className="mt-3">
+                  {t('legal.terms.s1EntityAddress', { address: companyAddress })}
+                </p>
+              )}
             </section>
 
             {/* 2. Definitions */}
@@ -423,9 +450,16 @@ function TermsPage() {
                 {t('legal.terms.s20Intro')}
               </p>
               <p className="mt-2">
+                <strong>{t('legal.terms.s20EntityLabel')}</strong> {legalEntity}<br />
                 <strong>{t('legal.terms.s20EmailLabel')}</strong> enquires@zurilofts.com<br />
                 <strong>{t('legal.terms.s20WebsiteLabel')}</strong> thezurilofts.com<br />
-                <strong>{t('legal.terms.s20AddressLabel')}</strong> Nairobi, Kenya
+                <strong>{t('legal.terms.s20AddressLabel')}</strong> {companyAddress || t('legal.terms.s20AddressFallback')}
+                {companyRegistrationNumber && (
+                  <>
+                    <br />
+                    <strong>{t('legal.terms.s20RegistrationLabel')}</strong> {companyRegistrationNumber}
+                  </>
+                )}
               </p>
             </section>
 

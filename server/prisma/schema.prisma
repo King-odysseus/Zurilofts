@@ -17,6 +17,7 @@ model User {
   firstName             String
   lastName              String
   phone                 String?
+  dateOfBirth           String? // YYYY-MM-DD; 18+ is a condition of the Terms, so sign-up collects it
   googleId              String?               @unique
   avatar                String? // profile image path, e.g. /uploads/avatar-xxx.jpg
   role                  String                @default("USER") // "USER" | "HOST" | "ADMIN"
@@ -907,6 +908,13 @@ model ConsentRecord {
   analytics     Boolean  @default(false)
   marketing     Boolean  @default(false)
   policyVersion String
+
+
+  // Assent to the published Terms is recorded separately from cookie choices:
+  // Kenyan data protection law requires demonstrable consent, so the version
+  // the person accepted is stored, not just a boolean on the User row.
+  termsAccepted Boolean  @default(false)
+  termsVersion  String?
   ipHash        String?
   userAgent     String?
   createdAt     DateTime @default(now())

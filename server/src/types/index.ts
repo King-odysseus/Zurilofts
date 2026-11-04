@@ -60,6 +60,24 @@ export const registerSchema = z.object({
   firstName: z.string().min(1, 'First name is required').max(50),
   lastName: z.string().min(1, 'Last name is required').max(50),
   role: z.enum(['USER', 'HOST']).default('USER'),
+  // Required, not optional: the Terms promise an 18+ service and a contract with
+  // a minor cannot be enforced against them, so the age gate must run before the
+  // account exists instead of being skipped when the field is left blank.
+  dateOfBirth: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Date of birth must be YYYY-MM-DD')
+    .refine((value) => {
+      const birthDate = new Date(`${value}T00:00:00Z`);
+      if (Number.isNaN(birthDate.getTime())) return false;
+      const adultFrom = new Date();
+      adultFrom.setUTCFullYear(adultFrom.getUTCFullYear() - 18);
+      return birthDate <= adultFrom;
+    }, 'You must be at least 18 years old'),
+  // The checkbox existed on the form but was never sent, so acceptance of the
+  // published Terms was unprovable. It is now part of the contract.
+  termsAccepted: z
+    .boolean()
+    .refine((value) => value === true, 'You must accept the Terms of Service and Privacy Policy'),
 });
 
 export const loginSchema = z.object({

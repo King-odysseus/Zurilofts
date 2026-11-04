@@ -40,6 +40,8 @@ export const auth = {
       accountType: 'Account type',
       travelling: 'Travelling',
       hosting: 'Hosting',
+      dateOfBirthLabel: 'Date of birth',
+      dateOfBirthHint: 'You must be 18 or older to book or host.',
       firstNameLabel: 'First name',
       // Example names, not sentences: a Kenyan name reads the same in both languages.
       firstNamePlaceholder: 'Grace',
@@ -93,6 +95,8 @@ export const auth = {
       accountType: 'Aina ya akaunti',
       travelling: 'Kusafiri',
       hosting: 'Ukaribishaji',
+      dateOfBirthLabel: 'Tarehe ya kuzaliwa',
+      dateOfBirthHint: 'Unapaswa kuwa na miaka 18 au zaidi ili kuweka nafasi au kupangisha.',
       firstNameLabel: 'Jina la kwanza',
       firstNamePlaceholder: 'Grace',
       lastNameLabel: 'Jina la mwisho',

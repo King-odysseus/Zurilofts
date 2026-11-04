@@ -38,7 +38,7 @@ export const legalPrivacy = {
         s1Title: '1. Introduction',
         s1Lead: 'ZuriLofts (“we,” “our,” or “us”) operates the website',
         s1Tail: 'and the ZuriLofts progressive web application (collectively, the “Platform”). We are committed to protecting your personal data and respecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our Platform or use our services to browse or book short-let apartment stays.',
-        s1Consent: 'By using the Platform, you consent to the data practices described in this policy. If you do not agree, please discontinue use of the Platform immediately.',
+        s1Consent: 'We process your personal data because we need it to provide the service you have asked for (performance of our contract with you), because we have a legitimate interest, or because the law requires it. Where we rely on consent instead, for example for optional cookies and marketing, we ask for that consent separately, and you can withdraw it at any time.',
 
         // 2. Data Controller
         s2Title: '2. Data Controller',
@@ -97,7 +97,7 @@ export const legalPrivacy = {
         s5Bookings: 'To process, confirm, and manage your bookings.',
         s5Communicate: 'To communicate with you about your reservations - confirmations, reminders, changes, and cancellations.',
         s5Messaging: 'To facilitate in-app messaging between you and the ZuriLofts team.',
-        s5Payments: 'To process payments and issue receipts or invoices.',
+        s5Payments: 'To take payment for your booking and to keep records of that payment.',
         s5Pricing: 'To calculate and apply seasonal pricing, promo code discounts, late check-out fees, and extra-guest charges.',
         s5Calendar: 'To sync your booking dates with external calendar platforms (e.g., Airbnb, Booking.com) via iCal feeds to prevent double-booking.',
         s5Reviews: 'To collect and display post-stay reviews and ratings.',
@@ -114,7 +114,7 @@ export const legalPrivacy = {
         s6Title: '6. Data Sharing and Disclosure',
         s6Intro: 'We may share your data only in the following limited circumstances:',
         s6ProvidersLabel: 'Service providers:',
-        s6ProvidersText: 'Trusted third-party vendors who perform services on our behalf - payment processors, hosting providers (our servers are hosted in a secure data centre), email delivery services, and analytics providers. These providers are contractually bound to process data only on our instructions and with equivalent data protection standards.',
+        s6ProvidersText: 'Trusted third-party vendors who perform services on our behalf - payment processors, hosting providers (our servers are hosted in a secure data centre), and email delivery services. These providers are contractually bound to process data only on our instructions and with equivalent data protection standards.',
         s6CalendarLabel: 'External calendar platforms:',
         s6CalendarText: 'When you book a stay, your booking dates (but not your personal identity) are included in our outbound iCal feed so that external platforms like Airbnb and Booking.com can block those dates. No guest names, contact details, or payment information are included in iCal feeds.',
         s6LegalLabel: 'Legal compliance:',
@@ -132,11 +132,11 @@ export const legalPrivacy = {
         s7BookingLabel: 'Booking records:',
         s7BookingText: 'Retained for 7 years after the stay date to comply with Kenyan tax and accounting obligations. After this period, records are anonymised.',
         s7MessagesLabel: 'Messages:',
-        s7MessagesText: 'Retained for 2 years after your last interaction unless you request earlier deletion.',
+        s7MessagesText: 'Kept for as long as your account is active and for as long as we need them to deal with any booking, dispute or legal obligation connected to them. You can ask us to delete them sooner.',
         s7ReviewsLabel: 'Reviews:',
         s7ReviewsText: "Retained for the life of the property listing. If you delete your account, reviews are anonymised and kept for the property's aggregate rating integrity.",
         s7UsageLabel: 'Usage data and logs:',
-        s7UsageText: 'Retained for up to 12 months in identifiable form; aggregated thereafter.',
+        s7UsageText: 'We keep technical and usage records only for as long as we need them for security, fraud prevention and troubleshooting, and we remove or aggregate them once that purpose has been met.',
         s7PaymentLabel: 'Payment data:',
         s7PaymentText: 'Transaction records retained for 7 years per tax law. Sensitive payment credentials (card numbers, M-Pesa details) are not stored on our servers.',
 
@@ -153,7 +153,7 @@ export const legalPrivacy = {
 
         // 9. International Data Transfers
         s9Title: '9. International Data Transfers',
-        s9Body: 'Your data is primarily stored and processed in Kenya. Some of our service providers may process data in other jurisdictions (e.g., the United States or the European Union for email delivery, analytics, or hosting). When we transfer data internationally, we ensure that:',
+        s9Body: 'We store and process your data in Kenya and in the other jurisdictions where our service providers operate (for example the United States and the European Union, for image delivery, hosting and email). Where we transfer data internationally, we ensure that:',
         s9Adequate: 'The recipient country has been deemed to provide an adequate level of data protection by the relevant authority; or',
         s9Clauses: 'We have entered into standard contractual clauses or equivalent safeguards with the data recipient; or',
         s9Contract: 'The transfer is necessary for the performance of a contract with you (e.g., to process your booking).',
@@ -277,7 +277,7 @@ export const legalPrivacy = {
         s1Title: '1. Utangulizi',
         s1Lead: 'ZuriLofts (“sisi,” “yetu,” au “sisi”) inaendesha tovuti',
         s1Tail: 'na programu ya wavuti inayoendelea ya ZuriLofts (kwa pamoja, “Jukwaa”). Tumejitolea kulinda data yako binafsi na kuheshimu faragha yako. Sera hii ya Faragha inaeleza jinsi tunavyokusanya, kutumia, kufichua, na kulinda taarifa zako unapotembelea Jukwaa letu au kutumia huduma zetu kuvinjari au kuhifadhi makazi ya ghorofa ya muda mfupi.',
-        s1Consent: 'Kwa kutumia Jukwaa, unatoa idhini kwa mbinu za data zilizoelezwa katika sera hii. Ikiwa hukubaliani, tafadhali acha kutumia Jukwaa mara moja.',
+        s1Consent: 'Tunachakata data yako binafsi kwa sababu tunaihitaji ili kutoa huduma uliyoiomba (utekelezaji wa mkataba wetu na wewe), kwa sababu tuna maslahi halali, au kwa sababu sheria inahitaji hivyo. Pale tunapotegemea idhini badala yake, kwa mfano kwa vidakuzi vya hiari na masoko, tunaomba idhini hiyo kando, na unaweza kuiondoa wakati wowote.',
 
         // 2. Mdhibiti wa Data
         s2Title: '2. Mdhibiti wa Data',
@@ -336,7 +336,7 @@ export const legalPrivacy = {
         s5Bookings: 'Kuchakata, kuthibitisha, na kusimamia uhifadhi wako.',
         s5Communicate: 'Kuwasiliana nawe kuhusu uhifadhi wako - uthibitisho, vikumbusho, mabadiliko, na kughairi.',
         s5Messaging: 'Kuwezesha ujumbe ndani ya programu kati yako na timu ya ZuriLofts.',
-        s5Payments: 'Kuchakata malipo na kutoa risiti au ankara.',
+        s5Payments: 'Kuchukua malipo kwa uhifadhi wako na kutunza kumbukumbu za malipo hayo.',
         s5Pricing: 'Kuhesabu na kutumia bei za msimu, punguzo la msimbo wa promo, ada za kuchelewa kutoka, na malipo ya wageni wa ziada.',
         s5Calendar: 'Kusawazisha tarehe zako za uhifadhi na majukwaa ya kalenda ya nje (k.m., Airbnb, Booking.com) kupitia mitandao ya iCal ili kuzuia uhifadhi maradufu.',
         s5Reviews: 'Kukusanya na kuonyesha tathmini na viwango vya baada ya kukaa.',
@@ -353,7 +353,7 @@ export const legalPrivacy = {
         s6Title: '6. Kushiriki Data na Kufichua',
         s6Intro: 'Tunaweza kushiriki data yako tu katika mazingira machache yafuatayo:',
         s6ProvidersLabel: 'Watoa huduma:',
-        s6ProvidersText: 'Wachuuzi wa wahusika wa tatu wanaoaminika wanaofanya huduma kwa niaba yetu - wasindikaji wa malipo, watoa huduma za uwekaji wa seva (seva zetu zimewekwa katika kituo cha data salama), huduma za utumaji wa barua pepe, na watoa huduma za uchanganuzi. Watoa huduma hawa wamefungwa kimkataba kuchakata data kwa maelekezo yetu tu na kwa viwango sawa vya ulinzi wa data.',
+        s6ProvidersText: 'Wachuuzi wa wahusika wa tatu wanaoaminika wanaofanya huduma kwa niaba yetu - wasindikaji wa malipo, watoa huduma za uwekaji wa seva (seva zetu zimewekwa katika kituo cha data salama), na huduma za utumaji wa barua pepe. Watoa huduma hawa wamefungwa kimkataba kuchakata data kwa maelekezo yetu tu na kwa viwango sawa vya ulinzi wa data.',
         s6CalendarLabel: 'Majukwaa ya kalenda ya nje:',
         s6CalendarText: 'Unapohifadhi makazi, tarehe zako za uhifadhi (lakini si utambulisho wako binafsi) zinajumuishwa katika mtandao wetu wa iCal unaotoka ili majukwaa ya nje kama Airbnb na Booking.com yaweze kuzuia tarehe hizo. Hakuna majina ya wageni, maelezo ya mawasiliano, au taarifa za malipo zinazojumuishwa katika mitandao ya iCal.',
         s6LegalLabel: 'Uzingatiaji wa kisheria:',
@@ -371,11 +371,11 @@ export const legalPrivacy = {
         s7BookingLabel: 'Kumbukumbu za uhifadhi:',
         s7BookingText: 'Inahifadhiwa kwa miaka 7 baada ya tarehe ya kukaa ili kutii wajibu wa kodi na uhasibu wa Kenya. Baada ya kipindi hiki, kumbukumbu hufanywa zisizotambulisha mtu.',
         s7MessagesLabel: 'Ujumbe:',
-        s7MessagesText: 'Inahifadhiwa kwa miaka 2 baada ya mwingiliano wako wa mwisho isipokuwa uombe kufutwa mapema.',
+        s7MessagesText: 'Huhifadhiwa kwa muda wote ambao akaunti yako inatumika na kwa muda tunaouhitaji ili kushughulikia uhifadhi, mgogoro, au wajibu wowote wa kisheria unaohusiana na ujumbe huo. Unaweza kuomba tuzifute mapema.',
         s7ReviewsLabel: 'Tathmini:',
         s7ReviewsText: 'Inahifadhiwa kwa muda wote wa tangazo la mali. Ukifuta akaunti yako, tathmini hufanywa zisizotambulisha mtu na huhifadhiwa kwa ajili ya uadilifu wa kiwango cha jumla cha mali.',
         s7UsageLabel: 'Data ya matumizi na kumbukumbu:',
-        s7UsageText: 'Inahifadhiwa hadi miezi 12 katika hali inayotambulika; baada ya hapo hujumuishwa.',
+        s7UsageText: 'Tunahifadhi kumbukumbu za kiufundi na za matumizi kwa muda tunaouhitaji tu kwa usalama, kuzuia ulaghai, na utatuzi wa matatizo, na tunaziondoa au kuzijumuisha mara tu lengo hilo linapotimizwa.',
         s7PaymentLabel: 'Data ya malipo:',
         s7PaymentText: 'Kumbukumbu za miamala huhifadhiwa kwa miaka 7 kwa mujibu wa sheria ya kodi. Vitambulisho nyeti vya malipo (namba za kadi, maelezo ya M-Pesa) havihifadhiwi kwenye seva zetu.',
 
@@ -392,7 +392,7 @@ export const legalPrivacy = {
 
         // 9. Uhamishaji wa Data Kimataifa
         s9Title: '9. Uhamishaji wa Data Kimataifa',
-        s9Body: 'Data yako huhifadhiwa na kuchakatwa hasa Kenya. Baadhi ya watoa huduma wetu wanaweza kuchakata data katika mamlaka nyingine (k.m., Marekani au Umoja wa Ulaya kwa utumaji wa barua pepe, uchanganuzi, au uwekaji wa seva). Tunapohamisha data kimataifa, tunahakikisha kwamba:',
+        s9Body: 'Tunahifadhi na kuchakata data yako nchini Kenya na katika mamlaka nyingine ambazo watoa huduma wetu wanaendesha shughuli zao (kwa mfano Marekani na Umoja wa Ulaya, kwa usambazaji wa picha, uwekaji wa seva, na barua pepe). Tunapohamisha data kimataifa, tunahakikisha kwamba:',
         s9Adequate: 'Nchi inayopokea imeonekana kutoa kiwango cha kutosha cha ulinzi wa data na mamlaka husika; au',
         s9Clauses: 'Tumeingia katika vifungu vya kawaida vya kimkataba au ulinzi sawa na mpokeaji wa data; au',
         s9Contract: 'Uhamishaji ni muhimu kwa utekelezaji wa mkataba na wewe (k.m., kuchakata uhifadhi wako).',

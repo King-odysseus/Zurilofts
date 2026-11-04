@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import CookieConsent from './components/CookieConsent.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ModeProvider } from './context/ModeContext.jsx'
 import { FavoritesProvider } from './context/FavoritesContext.jsx'
@@ -52,6 +53,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               <ModeProvider>
                 <FavoritesProvider>
                   <App />
+                  <CookieConsent />
                 </FavoritesProvider>
               </ModeProvider>
             </AuthProvider>
