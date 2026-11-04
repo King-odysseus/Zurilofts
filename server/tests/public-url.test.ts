@@ -8,6 +8,7 @@ import assert from 'node:assert/strict';
 import {
   clientUrlForRequest,
   googleCallbackUrlForRequest,
+  publicOriginForCrawlers,
   requestOrigin,
 } from '../src/utils/publicUrl.js';
 import { env } from '../src/config/env.js';
@@ -64,6 +65,41 @@ test('Google callback env pasted as KEY=value is normalized to only the URL', ()
     assert.equal(callbackUrl, 'https://thezurilofts.com/api/auth/google/callback');
   } finally {
     env.GOOGLE_CALLBACK_URL = original;
+  }
+});
+
+test('a configured public CLIENT_URL wins over a forged request host', () => {
+  // Canonical links, og:url and the sitemap are read by crawlers and caches. The
+  // Host header is whatever the requester typed, so the configured address is the
+  // only answer that cannot be pointed at an attacker's domain.
+  const original = env.CLIENT_URL;
+  env.CLIENT_URL = 'https://thezurilofts.com';
+  try {
+    const origin = publicOriginForCrawlers(req({
+      'x-forwarded-proto': 'https',
+      'x-forwarded-host': 'evil.example',
+      host: 'internal.railway.app',
+    }));
+
+    assert.equal(origin, 'https://thezurilofts.com');
+  } finally {
+    env.CLIENT_URL = original;
+  }
+});
+
+test('a local CLIENT_URL falls back to the request origin', () => {
+  // Development has no public address, so the request is all there is.
+  const original = env.CLIENT_URL;
+  env.CLIENT_URL = 'http://localhost:5173';
+  try {
+    const origin = publicOriginForCrawlers(req({
+      'x-forwarded-proto': 'https',
+      'x-forwarded-host': 'zurilofts.co.ke',
+    }));
+
+    assert.equal(origin, 'https://zurilofts.co.ke');
+  } finally {
+    env.CLIENT_URL = original;
   }
 });
 
