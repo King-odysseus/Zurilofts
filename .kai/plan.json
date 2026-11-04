@@ -2,25 +2,45 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Record plan in .kai/plan.json",
+      "text": "Record plan",
       "state": "done"
     },
     {
-      "text": "Research Kenyan law: Data Protection Act 2019 (ODPC), Consumer Protection Act 2012, Electronic Transactions Act, Computer Misuse and Cybercrimes Act, tourism and short-let rules, payments and KRA tax",
+      "text": "Read files involved",
       "state": "done"
     },
     {
-      "text": "Read the app's actual data, payments, consent and privacy implementation to compare against the law",
+      "text": "Add BeneAlpha Consulting Limited to terms and footer",
       "state": "done"
     },
     {
-      "text": "Write compliance report with required adjustments and features to build",
+      "text": "Mount cookie consent banner",
       "state": "done"
     },
     {
-      "text": "Verify the report covers the required Kenyan areas and lists actionable fixes",
+      "text": "Record terms acceptance server-side",
       "state": "done"
+    },
+    {
+      "text": "Correct false privacy promises",
+      "state": "done"
+    },
+    {
+      "text": "Enforce 18+ age requirement",
+      "state": "done"
+    },
+    {
+      "text": "Verify with lint, build, browser and validation checks",
+      "state": "done"
+    },
+    {
+      "text": "Write build-vs-paperwork breakdown",
+      "state": "done"
+    },
+    {
+      "text": "Commit and push",
+      "state": "active"
     }
   ],
-  "updatedAt": "2026-11-04T08:57:40.422Z"
+  "updatedAt": "2026-11-04T09:21:32.370Z"
 }
