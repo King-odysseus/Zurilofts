@@ -15,9 +15,12 @@ export async function listPosts(filters: { published?: boolean; page?: number; l
   return { posts, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } };
 }
 
-export async function getPostBySlug(slug: string) {
+export async function getPostBySlug(slug: string, options: { publishedOnly?: boolean } = {}) {
   const post = await prisma.blogPost.findUnique({ where: { slug } });
-  if (!post) throw new NotFoundError('Blog post');
+  // The public route reads by slug. Without this filter an unpublished draft was
+  // readable by anyone who guessed its slug or was sent the link, which is how
+  // an unapproved announcement reaches the open web.
+  if (!post || (options.publishedOnly && !post.published)) throw new NotFoundError('Blog post');
   return post;
 }
 

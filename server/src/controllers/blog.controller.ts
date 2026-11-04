@@ -23,7 +23,7 @@ export async function list(req: Request, res: Response, next: NextFunction): Pro
 // Public: get single post by slug
 export async function getBySlug(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    const post = await blogService.getPostBySlug(req.params.slug);
+    const post = await blogService.getPostBySlug(req.params.slug, { publishedOnly: true });
     res.json({ success: true, data: { ...post, body: sanitizeHtml(post.body) } });
   } catch (error) {
     next(error);
