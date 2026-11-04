@@ -270,6 +270,17 @@ export async function initializePayment(req: Request, res: Response, next: NextF
       res.status(400).json({ success: false, error: 'Booking is already confirmed' });
       return;
     }
+    // CONFLICT means the money already arrived but the nights were taken. A new
+    // Paystack reference here would overwrite the one the reconciliation and
+    // refund depend on, and would charge the guest a second time for a stay an
+    // admin is already resolving.
+    if (booking.status === 'CONFLICT') {
+      res.status(409).json({
+        success: false,
+        error: 'This payment is with our team. You will not be charged again; we will contact you shortly.',
+      });
+      return;
+    }
 
     // Payment never opens for an unverified guest, even if the client tries to
     // skip the verification step - the booking itself stays intact either way.
