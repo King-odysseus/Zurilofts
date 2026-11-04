@@ -21,9 +21,11 @@ export async function subscribe(userId: string, endpoint: string, keys: { p256dh
 }
 
 /** Remove a subscription by endpoint */
-export async function unsubscribe(endpoint: string) {
+export async function unsubscribe(userId: string, endpoint: string) {
   try {
-    await prisma.pushSubscription.delete({ where: { endpoint } });
+    // Scoped to the caller: the endpoint alone identifies the row, so deleting
+    // by endpoint let any signed-in account silence someone else's alerts.
+    await prisma.pushSubscription.deleteMany({ where: { endpoint, userId } });
   } catch (err) { console.error('Failed to remove push subscription:', err); }
   return { ok: true };
 }

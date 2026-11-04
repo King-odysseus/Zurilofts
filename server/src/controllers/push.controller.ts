@@ -15,7 +15,7 @@ export async function subscribe(req: Request, res: Response, next: NextFunction)
 // User: unsubscribe
 export async function unsubscribe(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    await pushService.unsubscribe(req.body.endpoint);
+    await pushService.unsubscribe(req.user!.sub, req.body.endpoint);
     res.json({ success: true });
   } catch (error) {
     next(error);
