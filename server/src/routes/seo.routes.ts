@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { buildRobots, buildSitemap } from '../services/seo.service.js';
-import { requestOrigin } from '../utils/publicUrl.js';
+import { publicOriginForCrawlers } from '../utils/publicUrl.js';
 
 const router = Router();
 
@@ -9,12 +9,12 @@ const router = Router();
 const CACHE_FOR_AN_HOUR = 'public, max-age=3600';
 
 router.get('/robots.txt', (req, res) => {
-  res.type('text/plain').set('Cache-Control', CACHE_FOR_AN_HOUR).send(buildRobots(requestOrigin(req)));
+  res.type('text/plain').set('Cache-Control', CACHE_FOR_AN_HOUR).send(buildRobots(publicOriginForCrawlers(req)));
 });
 
 router.get('/sitemap.xml', async (req, res, next) => {
   try {
-    const xml = await buildSitemap(requestOrigin(req));
+    const xml = await buildSitemap(publicOriginForCrawlers(req));
     res.type('application/xml').set('Cache-Control', CACHE_FOR_AN_HOUR).send(xml);
   } catch (err) {
     next(err);

@@ -41,6 +41,23 @@ export function clientUrlForRequest(req: Request): string {
   return clientUrl;
 }
 
+/**
+ * The address that belongs in a canonical link, an Open Graph tag or the
+ * sitemap entry for a page.
+ *
+ * These all answer "where does this page really live", and they are written into
+ * HTML that crawlers and shared caches read. Building that answer from the Host
+ * header means one request can declare the site lives somewhere else, so the
+ * configured CLIENT_URL wins whenever it is a real public address. Only a local
+ * or missing one falls back to the request, which is the development case where
+ * no public address exists.
+ */
+export function publicOriginForCrawlers(req: Request): string {
+  const configured = (normalizeEnvUrl('CLIENT_URL', env.CLIENT_URL) || env.CLIENT_URL || '').replace(/\/+$/, '');
+  if (configured && !isLocalUrl(configured)) return configured;
+  return requestOrigin(req).replace(/\/+$/, '');
+}
+
 export function googleCallbackUrlForRequest(req: Request): string {
   const callbackUrl = normalizeEnvUrl('GOOGLE_CALLBACK_URL', env.GOOGLE_CALLBACK_URL);
   if (callbackUrl && !(env.NODE_ENV === 'production' && isLocalUrl(callbackUrl))) {

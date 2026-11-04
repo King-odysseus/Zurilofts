@@ -1,6 +1,6 @@
 import type { Request } from 'express';
 import prisma from '../config/prisma.js';
-import { requestOrigin } from '../utils/publicUrl.js';
+import { publicOriginForCrawlers } from '../utils/publicUrl.js';
 
 /**
  * Search engine surface for a single-page app.
@@ -431,7 +431,7 @@ export function isAppOnlyPath(pathname: string): boolean {
  * (signed-in screens, checkout) and should keep the plain shell.
  */
 export async function metaForPath(pathname: string, req: Request): Promise<PageMeta | null> {
-  const origin = requestOrigin(req);
+  const origin = publicOriginForCrawlers(req);
   const clean = pathname.replace(/\/+$/, '') || '/';
 
   const staticPage = STATIC_PAGE_BY_PATH.get(clean);
