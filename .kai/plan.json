@@ -2,41 +2,25 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the prior audit, then attack sessions, OAuth and role handling",
+      "text": "Record plan in .kai/plan.json",
       "state": "done"
     },
     {
-      "text": "Attack authorization on every route for cross-account access",
+      "text": "Research Kenyan law: Data Protection Act 2019 (ODPC), Consumer Protection Act 2012, Electronic Transactions Act, Computer Misuse and Cybercrimes Act, tourism and short-let rules, payments and KRA tax",
       "state": "done"
     },
     {
-      "text": "Attack input handling: injection, SSRF, XSS, redirects, uploads, crawler output",
+      "text": "Read the app's actual data, payments, consent and privacy implementation to compare against the law",
       "state": "done"
     },
     {
-      "text": "Attack money and booking integrity plus rate limiting",
+      "text": "Write compliance report with required adjustments and features to build",
       "state": "done"
     },
     {
-      "text": "Verify findings against the real code and a live upload probe",
-      "state": "done"
-    },
-    {
-      "text": "Fix confirmed issues with regression tests (attachments, booking payloads, promo race, blog drafts, email change, payment conflict, push scope, Google link, canonical origin, payout method, rate limits)",
-      "state": "done"
-    },
-    {
-      "text": "Run type check, 455 server tests under the CI environment, lint and production build",
-      "state": "done"
-    },
-    {
-      "text": "Reconcile both audit notes and record what remains open",
-      "state": "done"
-    },
-    {
-      "text": "Commit each fix and push",
+      "text": "Verify the report covers the required Kenyan areas and lists actionable fixes",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-04T08:19:18.990Z"
+  "updatedAt": "2026-11-04T08:57:40.422Z"
 }
