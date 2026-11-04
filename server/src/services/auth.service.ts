@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import prisma from '../config/prisma.js';
 import { signAccessToken } from '../utils/jwt.js';
-import { UnauthorizedError, NotFoundError, ValidationError } from '../types/index.js';
+import { UnauthorizedError, NotFoundError, ValidationError, ConflictError } from '../types/index.js';
 
 const SALT_ROUNDS = 12;
 
@@ -310,6 +310,29 @@ export async function logoutUser(refreshToken?: string): Promise<void> {
 }
 
 /**
+ * Whether a Google identity may be attached to an account that already holds
+ * the same email address.
+ *
+ * Kept separate from the database calls so the rule can be tested directly. The
+ * password case is the one that matters: registration never proves the person
+ * owns the address, so somebody could register a stranger's mailbox with a
+ * password of their choosing and wait. Auto-linking on the next Google sign-in
+ * then handed them a permanent way into the real owner's account (bookings,
+ * messages, identity documents). That owner can still recover the account with
+ * "Forgot password", which is delivered to the same mailbox.
+ */
+export type GoogleLinkDecision = 'link' | 'refuse-password' | 'refuse-other-google';
+
+export function googleLinkDecision(existing: {
+  googleId: string | null;
+  passwordHash: string | null;
+}): GoogleLinkDecision {
+  if (existing.googleId) return 'refuse-other-google';
+  if (existing.passwordHash) return 'refuse-password';
+  return 'link';
+}
+
+/**
  * Find or create user from Google OAuth profile.
  */
 export async function googleAuth(
@@ -318,19 +341,40 @@ export async function googleAuth(
     email: string;
     firstName: string;
     lastName: string;
+    /**
+     * Google's own verdict on the address. Required rather than optional: this
+     * flow has no other proof that the person owns the mailbox, so a caller
+     * that cannot say the address is verified must not be trusted with it.
+     */
+    emailVerified: boolean;
   },
   meta?: SessionMeta
 ): Promise<{ user: UserResponse; tokens: AuthTokens }> {
+  if (!profile.emailVerified) {
+    throw new UnauthorizedError(
+      'Google has not verified this email address. Verify it with Google and try again.'
+    );
+  }
+
   // Try to find by Google ID first
   let user = await prisma.user.findUnique({ where: { googleId: profile.googleId } });
 
-  // If not found, try by email - link accounts
+  // Not linked yet: the address may already belong to an account created
+  // another way, so the linking rule decides whether this sign-in may continue.
   if (!user) {
-    user = await prisma.user.findUnique({ where: { email: profile.email } });
-    if (user) {
-      // Link Google account to existing user
+    const existing = await prisma.user.findUnique({ where: { email: profile.email } });
+    if (existing) {
+      const decision = googleLinkDecision(existing);
+      if (decision === 'refuse-password') {
+        throw new ConflictError(
+          'An account with this email already uses a password. Sign in with that password, or reset it, and then link Google from your profile.'
+        );
+      }
+      if (decision === 'refuse-other-google') {
+        throw new ConflictError('This email is already linked to a different Google account.');
+      }
       user = await prisma.user.update({
-        where: { id: user.id },
+        where: { id: existing.id },
         data: { googleId: profile.googleId },
       });
     }

@@ -214,6 +214,12 @@ export async function googleCallback(req: Request, res: Response, next: NextFunc
       {
         googleId: profile.id,
         email: profile.emails?.[0]?.value || `${profile.id}@google.oauth`,
+        // Google's verdict, from whichever profile shape the strategy used:
+        // the OpenID parser marks it on the email entry, the default Google
+        // Sign-In parser leaves it in the raw payload. An address Google has not
+        // verified is a claim, not proof of ownership, so auth.service refuses it.
+        emailVerified:
+          profile.emails?.[0]?.verified === true || profile._json?.email_verified === true,
         firstName: profile.name?.givenName || profile.displayName?.split(' ')[0] || 'User',
         lastName: profile.name?.familyName || profile.displayName?.split(' ').slice(1).join(' ') || '',
       },
