@@ -69,6 +69,45 @@ section 1a and date of birth field were confirmed in a running browser.
 
 ---
 
+## Built today: the guest receipt
+
+Item 2 above is now in the product. What it does, and why each choice was made:
+
+- **The figures come from the stored booking, not from the page.** A receipt
+  rebuilt in the browser from a list row can disagree with the record on file.
+  `GET /bookings/:id/receipt` returns the record, using the same access scope as
+  the booking itself, so a receipt can never be pulled for a booking the caller
+  could not already read.
+- **It is only called a receipt once money was received.** An unpaid booking
+  produces a document headed "Booking summary" that states plainly that no
+  payment has arrived. A confirmed stay with no payment timestamp still counts as
+  paid, because this codebase only confirms a booking after the gateway confirms
+  the money; telling a guest who did pay that nothing was received would be the
+  worse error.
+- **The company, not just the brand, is on the document.** BeneAlpha Consulting
+  Limited prints under the ZuriLofts name, with the registration number and
+  registered office appearing only once those constants are filled in. A brand is
+  not a person a customer, a court or a tax authority can act against.
+- **Every charge is itemised, and the lines add up to what was charged.** There is
+  a test that asserts the sum of the lines equals the stored total whenever every
+  fee is present, because a receipt whose parts do not reach its total is worse
+  than no receipt.
+- **No VAT statement is made.** `vatMode` is `'none'`, so the document says
+  nothing about VAT rather than guessing. When the accountant confirms
+  registration, flipping it to `'inclusive'` adds the VAT portion (extracted from
+  the VAT-inclusive total, never added on top) and the VAT number.
+- **The receipt number is stable, not sequential.** It is derived from the booking
+  id and the payment date, so the same booking always prints the same number.
+  Sequential numbering is a requirement of a VAT-registered supplier issuing tax
+  invoices; it becomes necessary only alongside that registration.
+- **It prints in the guest's language.** English and Swahili, including the charge
+  labels. Only an add-on keeps its own name, because that text is host-written.
+
+Verified: the sum of the lines matches the stored total on a real booking row in
+the local database, 11 unit tests pass, the server type-checks, the frontend
+lints and builds, and the PDF was generated in a real browser in both languages
+with the company name, receipt number and amounts present.
+
 ## Must be built, in this order
 
 ### Before taking another booking
@@ -78,11 +117,12 @@ section 1a and date of birth field were confirmed in a running browser.
    notice for the Office of the Data Protection Commissioner, and a written
    one-page runbook. The 72-hour clock only starts when someone can declare an
    incident, so this is a build, not just a document.
-2. **Guest-facing payment record.** The policy no longer claims invoices, but
-   Kenyan tax rules still require compliant documents and customers expect a
-   receipt. Build a per-payment record showing dates, amounts, the company, and
-   VAT status. Whether it must be an eTIMS tax invoice depends on the VAT decision
-   below.
+2. **Guest-facing payment record.** Done. A receipt can now be downloaded from
+   the booking history and the booking detail screen, built from the stored
+   booking rather than from the browser's copy of it. Still open, and blocked on
+   the VAT decision below: whether this must become an eTIMS tax invoice, and the
+   VAT line itself. `server/src/config/company.ts` holds the single switch for
+   that (`vatMode`), so the change is one constant and one test, not a rebuild.
 3. **Age enforcement at booking, and for Google sign-ups.** Registration now
    collects and checks a date of birth, but accounts created through Google have
    none, and booking does not yet refuse an account that is known to be under 18.

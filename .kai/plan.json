@@ -2,45 +2,33 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Record plan",
+      "text": "Record plan for a guest-facing receipt engine",
       "state": "done"
     },
     {
-      "text": "Read files involved",
+      "text": "Read booking/payment code and any existing invoice or receipt code",
       "state": "done"
     },
     {
-      "text": "Add BeneAlpha Consulting Limited to terms and footer",
+      "text": "Decide scope: receipt from stored booking data, no VAT claim until the accountant answers",
       "state": "done"
     },
     {
-      "text": "Mount cookie consent banner",
+      "text": "Build the server side: receipt data assembled from a booking, plus an endpoint",
       "state": "done"
     },
     {
-      "text": "Record terms acceptance server-side",
+      "text": "Rebuild the PDF so it reads from the server payload and follows the chosen language",
       "state": "done"
     },
     {
-      "text": "Correct false privacy promises",
+      "text": "Verify: lint, frontend build, server type-check, tests, real row, real browser render",
       "state": "done"
     },
     {
-      "text": "Enforce 18+ age requirement",
-      "state": "done"
-    },
-    {
-      "text": "Verify with lint, build, browser and validation checks",
-      "state": "done"
-    },
-    {
-      "text": "Write build-vs-paperwork breakdown",
-      "state": "done"
-    },
-    {
-      "text": "Commit and push",
+      "text": "Update the compliance document and commit",
       "state": "active"
     }
   ],
-  "updatedAt": "2026-11-04T09:21:32.370Z"
+  "updatedAt": "2026-11-04T09:36:33.330Z"
 }
