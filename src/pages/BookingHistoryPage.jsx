@@ -7,7 +7,8 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
 import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
-import { generateInvoice } from '../utils/invoice.js';
+import { downloadReceipt } from '../utils/receipt.js';
+import { useToast } from '../context/ToastContext.jsx';
 import { useTranslated } from '../i18n/useTranslated.js';
 import { canAddToCalendar, downloadStayCalendar, isUpcomingStay } from '../utils/stayCalendar.js';
 
@@ -50,7 +51,22 @@ function getBookingImage(booking, index = 0) {
 // between the photo and the copy; max-md raises only that stack to 20px and
 // leaves the desktop photo-to-copy gap as it was.
 function HistoryCard({ booking, index, onMessage, messagePending }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const toast = useToast();
+  // A receipt is fetched from the server before it is drawn, so the button has
+  // to show that something is happening and stay inert on a second click.
+  const [receiptPending, setReceiptPending] = useState(false);
+  async function handleReceipt() {
+    setReceiptPending(true);
+    try {
+      await downloadReceipt(booking.id, t, lang);
+    } catch (error) {
+      console.error('Receipt download failed:', error);
+      toast.error(t('booking.receiptFailed'));
+    } finally {
+      setReceiptPending(false);
+    }
+  }
   const property = booking.property || {};
   // A listing's title and area were typed by the host, so they are translated
   // here rather than by the API. The photo link's aria-label keeps the raw title.
@@ -80,7 +96,7 @@ function HistoryCard({ booking, index, onMessage, messagePending }) {
 
       <div className="opg-history-actions !pt-6">
         <Button size="sm" type="button" onClick={() => onMessage(booking.id)} disabled={messagePending}>{messagePending ? 'Opening...' : 'Message host'}</Button>
-        <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>{t('booking.invoice')}</Button>
+        <Button color="light" size="sm" type="button" onClick={handleReceipt} disabled={receiptPending}>{receiptPending ? t('booking.opening') : t('booking.receipt')}</Button>
         {canAddToCalendar(booking) && isUpcomingStay(booking) && (
           <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>{t('booking.addToCalendar')}</Button>
         )}

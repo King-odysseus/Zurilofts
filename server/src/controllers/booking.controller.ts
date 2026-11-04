@@ -4,6 +4,7 @@ import * as paymentService from '../services/payment.service.js';
 import { isApprovedForPayment } from '../services/identity-verification.service.js';
 import prisma from '../config/prisma.js';
 import * as revenueService from '../services/revenue.service.js';
+import { buildReceipt } from '../services/receipt.service.js';
 
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -79,6 +80,21 @@ export async function getById(req: Request, res: Response, next: NextFunction): 
     const scope = isAdmin ? undefined : { userId: req.user!.sub, hostId: req.user!.sub };
     const booking = await bookingService.getBooking(req.params.id, scope);
     res.json({ success: true, data: booking });
+  } catch (error) {
+    next(error);
+  }
+}
+
+// The guest's payment record for one booking, as data rather than a document:
+// the browser turns it into a PDF so no rendering library has to run server
+// side. Same lookup and same scope as getById, so a receipt can never be pulled
+// for a booking the caller could not already read.
+export async function getReceipt(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const isAdmin = req.user?.role === 'ADMIN';
+    const scope = isAdmin ? undefined : { userId: req.user!.sub, hostId: req.user!.sub };
+    const booking = await bookingService.getBooking(req.params.id, scope);
+    res.json({ success: true, data: buildReceipt(booking) });
   } catch (error) {
     next(error);
   }

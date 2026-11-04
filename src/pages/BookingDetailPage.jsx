@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { firstImage } from '../utils/images.js';
 import { zuriImages } from '../assets/images.js';
-import { generateInvoice } from '../utils/invoice.js';
+import { downloadReceipt } from '../utils/receipt.js';
 import { useTranslated } from '../i18n/useTranslated.js';
 import { canAddToCalendar, downloadStayCalendar, googleCalendarUrl } from '../utils/stayCalendar.js';
 
@@ -76,7 +76,7 @@ MoneyRow.propTypes = {
 };
 
 function BookingDetailPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const { bookingId: routeId } = useParams();
   const { pathname } = useLocation();
   // The app switches on pathname instead of declaring <Route>s, so useParams is
@@ -93,6 +93,22 @@ function BookingDetailPage() {
   const [actionError, setActionError] = useState('');
   const [messagePending, setMessagePending] = useState(false);
   const [paymentPending, setPaymentPending] = useState(false);
+  const [receiptPending, setReceiptPending] = useState(false);
+
+  // The receipt is drawn from the server's own record, so this page waits for it
+  // rather than printing whatever booking object it currently holds.
+  async function handleReceipt() {
+    setReceiptPending(true);
+    setActionError('');
+    try {
+      await downloadReceipt(bookingId, t, lang);
+    } catch (receiptError) {
+      console.error('Receipt download failed:', receiptError);
+      setActionError(t('booking.receiptFailed'));
+    } finally {
+      setReceiptPending(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -273,7 +289,7 @@ function BookingDetailPage() {
           )}
           {!isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? t('booking.opening') : t('booking.messageGuest')}</Button>}
           {isGuestOwner && <Button size="sm" type="button" onClick={openConversation} disabled={messagePending}>{messagePending ? t('booking.opening') : t('booking.messageHost')}</Button>}
-          <Button color="light" size="sm" type="button" onClick={() => generateInvoice(booking)}>{t('booking.invoice')}</Button>
+          <Button color="light" size="sm" type="button" onClick={handleReceipt} disabled={receiptPending}>{receiptPending ? t('booking.opening') : t('booking.receipt')}</Button>
           {calendarReady && (
             <Button color="light" size="sm" type="button" onClick={() => downloadStayCalendar(booking)}>{t('booking.addToCalendar')}</Button>
           )}

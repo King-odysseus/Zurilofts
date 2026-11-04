@@ -29,6 +29,9 @@ router.get('/host/today', authenticate, requireHostWorkspace, ctrl.hostToday);
 
 router.post('/:id/payment', authenticate, bookingWriteLimiter, validate(bookingPaymentInitSchema), ctrl.initializePayment);
 router.post('/:id/cancel', authenticate, bookingWriteLimiter, ctrl.cancel);
+// A guest, the listing's host, or an admin may pull the payment record; the
+// controller applies the same scope as getById, so it never widens access.
+router.get('/:id/receipt', authenticate, ctrl.getReceipt);
 router.get('/:id', authenticate, ctrl.getById);
 
 export default router;
