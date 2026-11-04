@@ -88,3 +88,21 @@ test('the static guard catches a chat file on any suffix', () => {
   assert.equal(requestsChatAttachment('msg-anything'), true);
   assert.equal(requestsChatAttachment('MsG-173-abc.jpg'), true);
 });
+
+test('an encoded name cannot slip past the guard', () => {
+  // express.static decodes the path before it looks at the disk, so the guard
+  // has to decode it too. Before this rule `/%6dsg-...` passed the raw check and
+  // then served the decoded private file - proved with a live probe.
+  assert.equal(requestsChatAttachment('/%6dsg-173-abc.pdf'), true);
+  assert.equal(requestsChatAttachment('/uploads/%6Dsg-173-abc.pdf'), true);
+  assert.equal(requestsChatAttachment('/uploads/msg-173-abc.pdf'), true);
+  // Not a bypass: one decode (what `send` does) leaves `%6dsg-`, a name that
+  // does not exist on disk, so double encoding cannot reach the file either.
+  assert.equal(requestsChatAttachment('/%256dsg-173-abc.pdf'), false);
+  // Malformed encoding is refused rather than guessed at.
+  assert.equal(requestsChatAttachment('/%zz/msg-173-abc.pdf'), true);
+  assert.equal(requestsChatAttachment('/uploads/%E0%A4%A.pdf'), true);
+  // A normal photo of a listing stays public.
+  assert.equal(requestsChatAttachment('/uploads/prop-173-abc.jpg'), false);
+  assert.equal(requestsChatAttachment('/uploads/avatar-173-abc.jpg'), false);
+});

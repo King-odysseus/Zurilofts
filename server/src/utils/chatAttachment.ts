@@ -57,12 +57,34 @@ export function isChatAttachmentUrl(url: string): boolean {
 }
 
 /**
- * True for a request path segment that specifically asks for a chat file.
+ * True for a request path that specifically asks for a chat file.
  *
- * Used by the guard in front of the public upload directory: it must catch
- * `msg-...` on any suffix, including one a static handler would otherwise
- * normalise, so it deliberately does not require a valid extension.
+ * The guard in front of the public upload directory runs BEFORE the static
+ * handler, and the two read the path differently: this middleware sees the raw
+ * request path, while `send` (inside express.static) decodes it before touching
+ * the filesystem. Comparing only the raw form let `/%6dsg-123-secret.pdf`
+ * through the guard and then served the decoded `msg-123-secret.pdf` - a
+ * one-character bypass of the whole private-attachment rule.
+ *
+ * So every segment is checked in both forms, and malformed percent-encoding is
+ * refused rather than guessed at (our own names are plain ASCII, so a name that
+ * cannot be decoded is not one of ours).
  */
-export function requestsChatAttachment(segment: string): boolean {
-  return segment.toLowerCase().startsWith('msg-');
+export function requestsChatAttachment(pathOrSegment: string): boolean {
+  const rawSegments = String(pathOrSegment).split('/');
+  for (const raw of rawSegments) {
+    if (raw.toLowerCase().startsWith('msg-')) return true;
+    let decoded: string;
+    try {
+      decoded = decodeURIComponent(raw);
+    } catch {
+      return true;
+    }
+    if (decoded.toLowerCase().startsWith('msg-')) return true;
+    // A decoded separator means one segment becomes several.
+    if (decoded.includes('/') && decoded.split('/').some((part) => part.toLowerCase().startsWith('msg-'))) {
+      return true;
+    }
+  }
+  return false;
 }

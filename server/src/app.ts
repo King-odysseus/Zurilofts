@@ -99,8 +99,9 @@ app.use(cookieParser());
 // refused here and answered instead by the authenticated message route, which
 // checks that the requester is part of that conversation.
 app.use('/uploads', (req, res, next) => {
-  const requested = req.path.replace(/^\/+/, '').split('/').pop() ?? '';
-  if (requestsChatAttachment(requested)) {
+  // The whole path, not just its last segment: the guard and express.static must
+  // judge the same string, and only this function knows to decode it first.
+  if (requestsChatAttachment(req.path)) {
     res.status(404).end();
     return;
   }
