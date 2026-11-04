@@ -34,15 +34,21 @@ export async function updateUserProfile(userId: string, data: { firstName?: stri
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError('User');
 
-  // If email is being changed, verify it isn't already taken by another user
+  // The sign-in address is the account: whoever controls it can reset the
+  // password. An open session is therefore not enough to move it, or a
+  // borrowed or stolen login becomes a permanent takeover (change the
+  // address, request a reset, own the account). Real changes go through
+  // support, who can verify the person first.
   if (data.email && data.email !== user.email) {
-    const existing = await prisma.user.findUnique({ where: { email: data.email } });
-    if (existing) throw new ConflictError('An account with this email already exists');
+    throw new ValidationError(
+      'Your sign-in email cannot be changed here. Contact support to move the account to a new address.',
+    );
   }
+  const { email: _unchangedEmail, ...profile } = data;
 
   return prisma.user.update({
     where: { id: userId },
-    data,
+    data: profile,
     select: {
       id: true,
       email: true,

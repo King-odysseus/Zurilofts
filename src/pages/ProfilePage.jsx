@@ -562,11 +562,17 @@ function ProfilePage() {
                     <input
                       id="profile-email"
                       type="email"
-                      aria-describedby={emailError ? 'profile-email-error' : undefined}
+                      readOnly
+                      aria-describedby={emailError ? 'profile-email-error' : 'profile-email-hint'}
                       value={formData.email}
-                      onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setEmailError(''); }}
-                      className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937]"
+                      className="neu-input w-full px-4 py-3 focus:outline-none bg-elevated text-[#1f2937] opacity-70 cursor-not-allowed"
                     />
+                    {/* Read-only on purpose: the sign-in address is the account, so
+                        changing it from an open session would let whoever holds that
+                        session take the account over permanently. Support moves it. */}
+                    <p id="profile-email-hint" className="text-xs text-[#6b7280] mt-1">
+                      To change your sign-in email, contact support.
+                    </p>
                     {emailError && (
                       <p id="profile-email-error" className="text-red-500 text-xs mt-1">{emailError}</p>
                     )}
