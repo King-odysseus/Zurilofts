@@ -23,12 +23,12 @@ Severity:
 | 4 | P3 | Contact form allowed log injection and unbounded log lines | Fixed |
 | 5 | P3 | Translation endpoint had no per-string or total length cap | Fixed |
 | 6 | P4 | Identity spread before the request body in booking and review controllers | Fixed |
-| 7 | P2 | Google sign-in links to an existing account by email with no verification check | Open |
+| 7 | P2 | Google sign-in links to an existing account by email with no verification check | Fixed |
 | 8 | P3 | Chat read endpoint is unauthenticated; the session id is the only capability | Open |
-| 9 | P3 | Request host header drives canonical URLs and the sitemap | Open |
-| 10 | P3 | Push subscription can be reassigned to another account | Open |
+| 9 | P3 | Request host header drives canonical URLs and the sitemap | Fixed |
+| 10 | P3 | Push subscription can be reassigned to another account | Fixed |
 | 11 | P4 | Admin "edit any property" branch is unreachable, so `featured` has no admin path | Open |
-| 12 | P4 | Legacy bank endpoint lets the body override `payoutMethod` | Open |
+| 12 | P4 | Legacy bank endpoint lets the body override `payoutMethod` | Fixed |
 | 13 | P4 | Hand-rolled HTML sanitiser | Open, accepted |
 
 ## Fixed in this pass
@@ -223,18 +223,24 @@ third-party input. Until then, leaving it is reasonable.
 - Admin routes are guarded once at the router level (`authenticate`, `requireAdmin`);
   every `/api/admin` mount goes through that router.
 
-## Fix plan, in order
+## Still open
 
-1. Google account linking (item 7). Highest remaining risk: account takeover, no
-   precondition beyond registering the victim's address first.
-2. Canonical and redirect URLs from `CLIENT_URL` (item 9). Cheap, removes a whole class
-   of header-injection bugs.
-3. Sign the chat session id (item 8). Small change, keeps the anonymous widget.
-4. Push subscription ownership (item 10).
-5. Admin control for `featured` plus audit entry (item 11), and the bank-method ordering
-   fix (item 12).
-6. Optional: swap the sanitiser for a maintained library (item 13) before any non-admin
-   input reaches blog HTML.
+Items 7, 9, 10 and 12 were closed in the follow-up commits of this pass. What
+remains:
+
+- Chat session id (item 8). The id is `chat_` plus a browser-generated v4 UUID, so
+  guessing is not practical; the exposure is that it travels in a query string and
+  acts as the only capability. Server-issued, signed ids are the clean fix and keep
+  the anonymous widget working.
+- Admin control for `featured` plus an audit entry (item 11). Hosts can no longer
+  set it, and no admin screen can either, so the flag is effectively seed-only.
+- Hand-rolled sanitiser (item 13), accepted for now; revisit before any non-admin
+  input reaches blog HTML.
+
+See also `docs/security-audit-round2-2026-11-03.md`, written in parallel: it covers
+private conversation files, booking payloads, promo code races, blog drafts, the
+sign-in email, upload and checkout rate limits, and a live probe of the attachment
+guard.
 
 ## How to verify this pass
 

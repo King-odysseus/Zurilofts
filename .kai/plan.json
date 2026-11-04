@@ -2,11 +2,7 @@
   "schemaVersion": 1,
   "items": [
     {
-      "text": "Read the earlier security audit so this pass attacked new ground",
-      "state": "done"
-    },
-    {
-      "text": "Attack authentication and session handling (login, refresh, reset, OAuth, role escalation)",
+      "text": "Read the prior audit, then attack sessions, OAuth and role handling",
       "state": "done"
     },
     {
@@ -22,21 +18,25 @@
       "state": "done"
     },
     {
-      "text": "Verify each candidate finding against the real code and a live probe",
+      "text": "Verify findings against the real code and a live upload probe",
       "state": "done"
     },
     {
-      "text": "Fix the ten confirmed issues with regression tests",
+      "text": "Fix confirmed issues with regression tests (attachments, booking payloads, promo race, blog drafts, email change, payment conflict, push scope, Google link, canonical origin, payout method, rate limits)",
       "state": "done"
     },
     {
-      "text": "Run type check, 453 server tests, lint and production build",
+      "text": "Run type check, 455 server tests under the CI environment, lint and production build",
       "state": "done"
     },
     {
-      "text": "Write the round two audit note and commit each fix, then push",
+      "text": "Reconcile both audit notes and record what remains open",
+      "state": "done"
+    },
+    {
+      "text": "Commit each fix and push",
       "state": "done"
     }
   ],
-  "updatedAt": "2026-11-04T08:15:20.965Z"
+  "updatedAt": "2026-11-04T08:19:18.990Z"
 }

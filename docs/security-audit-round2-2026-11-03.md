@@ -5,6 +5,9 @@ first pass. This pass assumed every earlier finding was closed and attacked the
 areas that pass had not covered: authorization on every route, authentication and
 session handling, input handling, money integrity and abuse controls.
 
+Companion: `docs/security-audit-2026-11-04.md` holds a second, overlapping review
+written alongside this one, with its own numbering and remaining items.
+
 Each finding below was confirmed by reading the decisive lines, and where a
 runtime check was possible it was run before and after the fix. Claims that could
 not be confirmed were dropped rather than listed.
