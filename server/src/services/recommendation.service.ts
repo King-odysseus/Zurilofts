@@ -1,4 +1,5 @@
 import prisma from "../config/prisma.js";
+import { toPublicProperty } from "../utils/propertyPrivacy.js";
 
 // SQLite stores arrays as JSON strings; Postgres uses native arrays.
 // This helper mirrors the normalisation in property.service.ts so the
@@ -26,7 +27,9 @@ function normalizeProperty(property: any) {
 }
 
 function normalizeProperties(properties: any[]) {
-  return properties.map(normalizeProperty);
+  // Recommendations are a public discovery surface: never hand back the host's
+  // arrival guide, Wi-Fi password or iCal token.
+  return properties.map((property) => toPublicProperty(normalizeProperty(property)));
 }
 
 // ---------------------------------------------------------------
@@ -52,7 +55,7 @@ export async function getPersonalizedRecommendations(
   // No history -> fallback to popular
   if (bookings.length === 0) {
     const popular = await prisma.property.findMany({
-      where: { NOT: suspendedFilter },
+      where: { NOT: suspendedFilter, status: "PUBLISHED" },
       take: limit,
       orderBy: [{ rating: "desc" }, { createdAt: "desc" }],
     });
@@ -81,7 +84,7 @@ export async function getPersonalizedRecommendations(
     if (needed <= 0) return;
     const exclude = [...bookedIds, ...seen];
     const batch = await prisma.property.findMany({
-      where: { ...where, id: { notIn: exclude }, NOT: suspendedFilter },
+      where: { ...where, status: "PUBLISHED", id: { notIn: exclude }, NOT: suspendedFilter },
       take: needed,
       orderBy,
     });

@@ -92,7 +92,10 @@ export const propertyCreateSchema = z.object({
   nearby: z.array(z.string()),
   type: z.enum(['apartment', 'studio', 'penthouse']),
   available: z.boolean().default(true),
-  featured: z.boolean().default(false),
+  // `featured` is deliberately absent: it is an admin marketing flag that puts
+  // a listing on the homepage. Hosts could set it on their own listing through
+  // PUT /properties/:id (and on create), which was free self-promotion.
+  // Promotion is granted by ops, not by the host writing the listing.
   // Location shown to guests and used for the Google Maps link. The app embeds
   // no map, so a readable address is what matters here.
   // lat/lng are legacy columns from the removed drop-a-pin picker: still

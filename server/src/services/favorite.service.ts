@@ -1,6 +1,7 @@
 import prisma from '../config/prisma.js';
 import { NotFoundError } from '../types/index.js';
 import { withLiveRatings } from './property.service.js';
+import { toPublicProperty } from '../utils/propertyPrivacy.js';
 
 function normalizeProperty(p: any) {
   if (!p) return p;
@@ -22,7 +23,9 @@ export async function listFavorites(userId: string) {
   // The saved grid must report the same figures as the Stays grid. Without this
   // a seeded listing showed "5.0 (12)" on Saved stays and nothing at all on the
   // listing cards, because only the listing query recomputed the rating.
-  return withLiveRatings(favs.map((f) => normalizeProperty(f.property)));
+  // A saved stay is not a booking: the grid only needs the public card fields,
+  // so drop the host's arrival guide and iCal token before it leaves.
+  return withLiveRatings(favs.map((f) => toPublicProperty(normalizeProperty(f.property))));
 }
 
 export async function addFavorite(userId: string, propertyId: string) {

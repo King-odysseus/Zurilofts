@@ -5,6 +5,7 @@ import { isRangeAvailable } from './calendar.service.js';
 import { deleteImage } from '../utils/imageStorage.js';
 import { adminActor, recordAdminAuditSafely } from './audit.service.js';
 import { paginationMeta, parseEnum, parsePaging } from '../utils/paging.js';
+import { PRIVATE_PROPERTY_FIELDS, UNWRITABLE_PROPERTY_FIELDS, toPublicProperty } from '../utils/propertyPrivacy.js';
 
 // Listing publication lifecycle - independent of the host's own account
 // verification (User.role / HostApplication).
@@ -208,7 +209,9 @@ export async function withLiveRatings<T extends { id: string }>(properties: T[])
 }
 
 function normalizeProperties(properties: any[]) {
-  return properties.map(normalizeProperty);
+  // Public discovery only: owner and admin paths use normalizeProperty directly
+  // so a host still reads their own arrival guide back from the editor.
+  return properties.map((property) => toPublicProperty(normalizeProperty(property)));
 }
 
 // Detect if we're using SQLite (JSON columns) or Postgres (native arrays)
@@ -336,6 +339,7 @@ export function buildUpdateData(raw: any) {
   // trail (submittedAt/listingReviewedBy/listingReviewedAt/listingReviewNote).
   const { status: _ignoredStatus, ...data2 } = data;
   const updateData: any = { ...data2 };
+  for (const field of UNWRITABLE_PROPERTY_FIELDS) delete updateData[field];
   // Allow clearing bed prices & bathrooms by sending null
   if (data.price1Bed === null) updateData.price1Bed = null;
   if (data.price2Bed === null) updateData.price2Bed = null;
@@ -558,7 +562,13 @@ export async function getProperty(id: string, viewer?: { sub: string; role: stri
       }
     : null;
 
-  return { ...normalizeProperty(rest), host: hostSummary };
+  // A visitor never receives the arrival guide or the iCal token, even though
+  // the row had to be read in full to decide whether this viewer is the owner.
+  const normalised = normalizeProperty(rest);
+  return {
+    ...(isOwnerOrAdmin ? normalised : toPublicProperty(normalised)),
+    host: hostSummary,
+  };
 }
 
 export async function createProperty(data: any) {
@@ -772,7 +782,7 @@ export async function adminReviewProperty(
 export async function getPropertiesByIds(ids: string[]) {
   if (!ids.length) return [];
   const properties = await prisma.property.findMany({
-    where: { id: { in: ids } },
+    where: { id: { in: ids }, status: 'PUBLISHED' },
   });
   return normalizeProperties(properties);
 }
@@ -801,7 +811,8 @@ export async function getSimilarProperties(id: string, limit: number = 4) {
   ): Promise<any[]> {
     if (needed <= 0) return [];
     const batch = await prisma.property.findMany({
-      where: { ...where, id: { notIn: [...seen] }, NOT: suspendedFilter },
+      // Published only: a draft must never surface in public "similar stays".
+      where: { ...where, status: 'PUBLISHED', id: { notIn: [...seen] }, NOT: suspendedFilter },
       take: needed,
       orderBy,
     });
