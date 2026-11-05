@@ -39,7 +39,7 @@ export interface CompanyProfile {
 export const company: CompanyProfile = {
   legalName: 'BeneAlpha Consulting Limited',
   tradingName: 'ZuriLofts',
-  supportEmail: 'enquires@zurilofts.com',
+  supportEmail: 'enquiries@thezurilofts.com',
   privacyEmail: 'privacy@thezurilofts.com',
   website: 'thezurilofts.com',
   // Intentionally empty. A company registration number or registered office

@@ -130,7 +130,7 @@ function ChatWidget() {
         setSent(true);
       }
     } catch (err) {
-      const errMsg = err.response?.data?.error || 'Failed to send. Please try again or email us at enquires@zurilofts.com.';
+      const errMsg = err.response?.data?.error || 'Failed to send. Please try again or email us at enquiries@thezurilofts.com.';
       setMessages((prev) => [...prev, { from: 'bot', text: errMsg }]);
     } finally {
       setSending(false);

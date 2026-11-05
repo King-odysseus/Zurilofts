@@ -92,7 +92,7 @@ function TermsPage() {
               </p>
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li>{t('legal.terms.s32Password')}</li>
-                <li>{t('legal.terms.s32NotifyLead')} <strong>enquires@zurilofts.com</strong>{t('legal.terms.s32NotifyTail')}</li>
+                <li>{t('legal.terms.s32NotifyLead')} <strong>enquiries@thezurilofts.com</strong>{t('legal.terms.s32NotifyTail')}</li>
                 <li>{t('legal.terms.s32Logout')}</li>
               </ul>
               <p className="mt-2">
@@ -196,7 +196,7 @@ function TermsPage() {
                 <li><strong>{t('legal.terms.s61NoShowTerm')}</strong>{t('legal.terms.s61NoShowBody')}</li>
               </ul>
               <p className="mt-2">
-                {t('legal.terms.s61ContactLead')} <strong>enquires@zurilofts.com</strong>{t('legal.terms.s61ContactTail')}
+                {t('legal.terms.s61ContactLead')} <strong>enquiries@thezurilofts.com</strong>{t('legal.terms.s61ContactTail')}
               </p>
 
               <h3 className="text-lg font-semibold text-[#203565] mt-4 mb-2">{t('legal.terms.s62Title')}</h3>
@@ -394,7 +394,7 @@ function TermsPage() {
               <h2 className="text-xl font-bold text-[#203565] mb-3">{t('legal.terms.s17Title')}</h2>
               <h3 className="text-lg font-semibold text-[#203565] mt-4 mb-2">{t('legal.terms.s171Title')}</h3>
               <p>
-                {t('legal.terms.s171Lead')} <strong>enquires@zurilofts.com</strong>{t('legal.terms.s171Tail')}
+                {t('legal.terms.s171Lead')} <strong>enquiries@thezurilofts.com</strong>{t('legal.terms.s171Tail')}
               </p>
 
               <h3 className="text-lg font-semibold text-[#203565] mt-4 mb-2">{t('legal.terms.s172Title')}</h3>
@@ -438,7 +438,7 @@ function TermsPage() {
                 <li><strong>{t('legal.terms.s19WaiverTerm')}</strong>{t('legal.terms.s19WaiverBody')}</li>
                 <li><strong>{t('legal.terms.s19AssignTerm')}</strong>{t('legal.terms.s19AssignBody')}</li>
                 <li><strong>{t('legal.terms.s19RelationTerm')}</strong>{t('legal.terms.s19RelationBody', { name: companyName })}</li>
-                <li><strong>{t('legal.terms.s19NoticesTerm')}</strong>{t('legal.terms.s19NoticesLead', { name: companyName })} <strong>enquires@zurilofts.com</strong>{t('legal.terms.s19NoticesTail')}</li>
+                <li><strong>{t('legal.terms.s19NoticesTerm')}</strong>{t('legal.terms.s19NoticesLead', { name: companyName })} <strong>enquiries@thezurilofts.com</strong>{t('legal.terms.s19NoticesTail')}</li>
                 <li><strong>{t('legal.terms.s19ElectronicTerm')}</strong>{t('legal.terms.s19ElectronicBody')}</li>
               </ul>
             </section>
@@ -451,7 +451,7 @@ function TermsPage() {
               </p>
               <p className="mt-2">
                 <strong>{t('legal.terms.s20EntityLabel')}</strong> {legalEntity}<br />
-                <strong>{t('legal.terms.s20EmailLabel')}</strong> enquires@zurilofts.com<br />
+                <strong>{t('legal.terms.s20EmailLabel')}</strong> enquiries@thezurilofts.com<br />
                 <strong>{t('legal.terms.s20WebsiteLabel')}</strong> thezurilofts.com<br />
                 <strong>{t('legal.terms.s20AddressLabel')}</strong> {companyAddress || t('legal.terms.s20AddressFallback')}
                 {companyRegistrationNumber && (

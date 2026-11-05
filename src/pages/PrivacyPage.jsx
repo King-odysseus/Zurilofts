@@ -319,7 +319,7 @@ function PrivacyPage() {
               <p>{t('legal.privacy.s16Body')}</p>
               <p className="mt-2">
                 <strong>{t('legal.privacy.emailLabel')}</strong> privacy@thezurilofts.com<br />
-                <strong>{t('legal.privacy.generalEnquiriesLabel')}</strong> enquires@zurilofts.com<br />
+                <strong>{t('legal.privacy.generalEnquiriesLabel')}</strong> enquiries@thezurilofts.com<br />
                 <strong>{t('legal.privacy.addressLabel')}</strong> Nairobi, Kenya
               </p>
               <p className="mt-2">
