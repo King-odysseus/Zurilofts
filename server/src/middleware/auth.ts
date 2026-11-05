@@ -4,6 +4,22 @@ import { UnauthorizedError, ForbiddenError } from '../types/index.js';
 import prisma from '../config/prisma.js';
 
 /**
+ * Best-effort auth for routes reachable both anonymously and signed-in. Never
+ * throws: an invalid or missing token is treated as anonymous, so the route keeps
+ * its public behaviour and only gains the identity when one is genuinely present.
+ */
+export function getSoftUser(req: Request): { sub: string; role: string } | null {
+  const authHeader = req.headers.authorization;
+  if (!authHeader?.startsWith('Bearer ')) return null;
+  try {
+    const decoded = verifyAccessToken(authHeader.split(' ')[1]);
+    return { sub: decoded.sub, role: decoded.role };
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Require a valid JWT access token. Attaches decoded payload to req.user.
  */
 export async function authenticate(req: Request, _res: Response, next: NextFunction): Promise<void> {

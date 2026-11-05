@@ -22,7 +22,7 @@ export async function unsubscribe(req: Request, res: Response, next: NextFunctio
   }
 }
 
-// Admin: send push to all subscribers
+// Admin: send push to subscribers who opted in to marketing
 export async function broadcast(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { title, body, url } = req.body;
@@ -30,7 +30,7 @@ export async function broadcast(req: Request, res: Response, next: NextFunction)
       res.status(400).json({ success: false, error: 'title and body are required' });
       return;
     }
-    const subs = await pushService.getAllSubscriptions();
+    const subs = await pushService.getMarketingSubscriptions();
     const results = await pushService.sendPush(
       subs.map((s: { endpoint: string; keys: string }) => ({ endpoint: s.endpoint, keys: s.keys })),
       title,

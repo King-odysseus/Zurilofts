@@ -47,9 +47,17 @@ export async function getSubscriptionsForUser(userId: string) {
   return prisma.pushSubscription.findMany({ where: { userId } });
 }
 
-/** Get all subscriptions (admin broadcast) */
-export async function getAllSubscriptions() {
-  return prisma.pushSubscription.findMany({ take: 5000 });
+/**
+ * Subscriptions that may receive marketing: those whose owner's latest consent
+ * choice allows it. Subscribing to push is permission to be notified about
+ * bookings and messages, not to be sold to, so promotions and broadcasts use this
+ * and never the raw subscription list.
+ */
+export async function getMarketingSubscriptions() {
+  const { getMarketingOptInUserIds } = await import('./consent.service.js');
+  const optedIn = await getMarketingOptInUserIds();
+  if (optedIn.size === 0) return [];
+  return prisma.pushSubscription.findMany({ where: { userId: { in: [...optedIn] } }, take: 5000 });
 }
 
 /** Send push notification with title + body payload */

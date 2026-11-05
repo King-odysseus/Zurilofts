@@ -1,22 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import * as propertyService from '../services/property.service.js';
 import * as reviewService from '../services/review.service.js';
-import { verifyAccessToken } from '../utils/jwt.js';
+import { getSoftUser } from '../middleware/auth.js';
 import { parseSearch } from '../utils/paging.js';
-
-// Best-effort auth for routes reachable both anonymously and signed-in
-// (public property detail). Never throws - an invalid/missing token is
-// treated as anonymous, matching the same route's public behavior.
-function getSoftUser(req: Request): { sub: string; role: string } | null {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  try {
-    const decoded = verifyAccessToken(authHeader.split(' ')[1]);
-    return { sub: decoded.sub, role: decoded.role };
-  } catch {
-    return null;
-  }
-}
 
 export async function list(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {

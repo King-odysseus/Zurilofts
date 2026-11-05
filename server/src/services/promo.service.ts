@@ -66,11 +66,11 @@ export async function createPromoCode(data: any) {
 
   const promo = await prisma.promoCode.create({ data });
 
-  // Announce active promo codes to every subscribed browser (best-effort)
+  // Announce active promo codes to subscribers who opted in to marketing (best-effort)
   if (promo.active) {
     try {
-      const { getAllSubscriptions, sendPush } = await import('./push.service.js');
-      const subs = await getAllSubscriptions();
+      const { getMarketingSubscriptions, sendPush } = await import('./push.service.js');
+      const subs = await getMarketingSubscriptions();
       sendPush(
         subs.map((s: { endpoint: string; keys: string }) => ({ endpoint: s.endpoint, keys: s.keys })),
         'New Promo Code!',

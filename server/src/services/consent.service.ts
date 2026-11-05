@@ -88,3 +88,30 @@ export async function getConsentRecordsForUser(userId: string) {
     },
   });
 }
+
+/**
+ * Users whose most recent recorded choice allows marketing. The trail is
+ * append-only, so a later "no" must beat an earlier "yes": the first record seen
+ * per user, newest first, decides. A user with no record at all is not opted in.
+ */
+export function marketingOptInUserIds(
+  newestFirst: Array<{ userId: string | null; marketing: boolean }>,
+): Set<string> {
+  const decided = new Set<string>();
+  const optedIn = new Set<string>();
+  for (const record of newestFirst) {
+    if (!record.userId || decided.has(record.userId)) continue;
+    decided.add(record.userId);
+    if (record.marketing) optedIn.add(record.userId);
+  }
+  return optedIn;
+}
+
+export async function getMarketingOptInUserIds(): Promise<Set<string>> {
+  const records = await prisma.consentRecord.findMany({
+    where: { userId: { not: null } },
+    orderBy: { createdAt: 'desc' },
+    select: { userId: true, marketing: true },
+  });
+  return marketingOptInUserIds(records);
+}
