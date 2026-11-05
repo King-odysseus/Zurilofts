@@ -1,6 +1,7 @@
 {
   "name": "zurilofts",
   "private": true,
+  "license": "UNLICENSED",
   "version": "0.0.0",
   "type": "module",
   "engines": {
@@ -9,6 +10,7 @@
   "scripts": {
     "dev": "vite",
     "dev:server": "cd server && npm run dev",
+    "notices": "node scripts/generate-notices.mjs",
     "build": "vite build",
     "build:server": "cd server && npm run build",
     "build:all": "npm run build && cd server && npm run build",
