@@ -19,17 +19,10 @@ const CATEGORIES = [
     alwaysOn: true,
   },
   {
-    key: 'analytics',
-    label: 'Analytics',
-    description:
-      'Helps us understand how the site is used so we can improve it. Off by default.',
-    alwaysOn: false,
-  },
-  {
     key: 'marketing',
     label: 'Marketing',
     description:
-      'Lets us show you relevant offers and updates. Off by default.',
+      'Lets us send you offers and updates by email or notification. Off by default; booking and safety messages are not marketing and are always sent.',
     alwaysOn: false,
   },
 ];
@@ -39,7 +32,7 @@ function CookieConsent() {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(false); // drives the slide-up transition
   const [mode, setMode] = useState('banner'); // 'banner' | 'manage'
-  const [prefs, setPrefs] = useState({ analytics: false, marketing: false });
+  const [prefs, setPrefs] = useState({ marketing: false });
 
   // Show the banner on first visit (no stored decision for the current policy).
   useEffect(() => {
@@ -54,7 +47,7 @@ function CookieConsent() {
   // Reopen in Manage mode when the consent manager is requested (footer/profile).
   useEffect(() => {
     function handleOpenManager() {
-      setPrefs({ analytics: false, marketing: false });
+      setPrefs({ marketing: false });
       setMode('manage');
       setOpen(true);
       requestAnimationFrame(() => setVisible(true));
@@ -72,8 +65,10 @@ function CookieConsent() {
   // Persist locally, then best-effort sync to the server. Never block the UI
   // if the network call fails - the local choice is authoritative for this
   // session and the server can be reconciled later.
-  function save(analytics, marketing) {
-    const consent = setConsent({ analytics, marketing });
+  // The site runs no analytics, so that choice is always stored as false rather
+  // than offered: a toggle that controls nothing would misstate what we do.
+  function save(marketing) {
+    const consent = setConsent({ analytics: false, marketing });
     close();
     apiClient
       .post('/consent', {
@@ -88,15 +83,15 @@ function CookieConsent() {
   }
 
   function handleAcceptAll() {
-    save(true, true);
+    save(true);
   }
 
   function handleRejectAll() {
-    save(false, false);
+    save(false);
   }
 
   function handleSaveChoices() {
-    save(prefs.analytics, prefs.marketing);
+    save(prefs.marketing);
   }
 
   if (!open) return null;
@@ -121,8 +116,8 @@ function CookieConsent() {
             </h2>
             <p className="text-sm text-[#5B6B82] mt-1 leading-relaxed">
               {mode === 'manage'
-                ? 'Choose which optional cookies we may use. Strictly necessary cookies are always on.'
-                : 'We use essential cookies to keep you signed in and your bookings working, plus optional cookies to understand how the site is used. Read our '}
+                ? 'Choose whether we may send you marketing. Strictly necessary cookies are always on.'
+                : 'We use essential cookies to keep you signed in and your bookings working. You can also choose whether we send you marketing. Read our '}
               {mode === 'banner' && (
                 <>
                   <a href="/privacy#cookies" className="text-[#8A6B52] hover:underline font-medium">

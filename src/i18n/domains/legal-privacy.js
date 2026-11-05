@@ -68,7 +68,7 @@ export const legalPrivacy = {
         s32DeviceLabel: 'Device data:',
         s32DeviceText: 'IP address, browser type and version, operating system, device type, screen resolution, and referring URLs.',
         s32CookieLabel: 'Cookie data:',
-        s32CookieText: 'Session tokens for authentication, preference cookies, and analytics cookies. See Section 10 for our Cookie Policy.',
+        s32CookieText: 'Session tokens for authentication, and preference cookies. See Section 10 for our Cookie Policy.',
         s32StorageLabel: 'Local storage:',
         s32StorageText: "We may store preferences (such as your display settings) in your browser's local storage.",
 
@@ -165,8 +165,6 @@ export const legalPrivacy = {
         s10EssentialText: 'Required for core functionality - authentication sessions, booking flow state, and security. The Platform cannot function without these.',
         s10PreferenceLabel: 'Preference cookies:',
         s10PreferenceText: 'Remember your display settings and preferences (e.g., which bed configuration you last viewed).',
-        s10AnalyticsLabel: 'Analytics cookies:',
-        s10AnalyticsText: 'Help us understand how visitors use the Platform so we can improve it. These collect anonymous, aggregated data.',
         s10Control: 'You can control cookies through your browser settings. Blocking essential cookies may prevent the Platform from functioning correctly. We do not respond to “Do Not Track” signals at this time as there is no consistent industry standard.',
 
         // 11. Third-Party Processors
@@ -307,7 +305,7 @@ export const legalPrivacy = {
         s32DeviceLabel: 'Data ya kifaa:',
         s32DeviceText: 'Anwani ya IP, aina na toleo la kivinjari, mfumo wa uendeshaji, aina ya kifaa, ubora wa skrini, na URL za marejeleo.',
         s32CookieLabel: 'Data ya vidakuzi:',
-        s32CookieText: 'Vianzio vya kipindi kwa uthibitishaji, vidakuzi vya mapendeleo, na vidakuzi vya uchanganuzi. Tazama Sehemu ya 10 kwa Sera yetu ya Vidakuzi.',
+        s32CookieText: 'Vianzio vya kipindi kwa uthibitishaji, na vidakuzi vya mapendeleo. Tazama Sehemu ya 10 kwa Sera yetu ya Vidakuzi.',
         s32StorageLabel: 'Hifadhi ya ndani:',
         s32StorageText: 'Tunaweza kuhifadhi mapendeleo (kama mipangilio yako ya kuonyesha) katika hifadhi ya ndani ya kivinjari chako.',
 
@@ -404,8 +402,6 @@ export const legalPrivacy = {
         s10EssentialText: 'Vinahitajika kwa utendakazi wa msingi - vipindi vya uthibitishaji, hali ya mtiririko wa uhifadhi, na usalama. Jukwaa haliwezi kufanya kazi bila hivi.',
         s10PreferenceLabel: 'Vidakuzi vya mapendeleo:',
         s10PreferenceText: 'Hukumbuka mipangilio yako ya kuonyesha na mapendeleo (k.m., mpangilio wa vitanda uliouona mwisho).',
-        s10AnalyticsLabel: 'Vidakuzi vya uchanganuzi:',
-        s10AnalyticsText: 'Hutusaidia kuelewa jinsi wageni wanavyotumia Jukwaa ili tuweze kuliboresha. Hivi hukusanya data zisizotambulisha mtu na zilizojumuishwa.',
         s10Control: 'Unaweza kudhibiti vidakuzi kupitia mipangilio ya kivinjari chako. Kuzuia vidakuzi muhimu kunaweza kuzuia Jukwaa kufanya kazi ipasavyo. Hatujibu ishara za “Do Not Track” kwa sasa kwa kuwa hakuna kiwango cha tasnia kinacholingana.',
 
         // 11. Wasindikaji wa Wahusika wa Tatu

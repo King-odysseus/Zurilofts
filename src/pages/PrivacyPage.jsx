@@ -191,7 +191,6 @@ function PrivacyPage() {
               <ul className="list-disc pl-6 space-y-2 mt-2">
                 <li><strong>{t('legal.privacy.s10EssentialLabel')}</strong> {t('legal.privacy.s10EssentialText')}</li>
                 <li><strong>{t('legal.privacy.s10PreferenceLabel')}</strong> {t('legal.privacy.s10PreferenceText')}</li>
-                <li><strong>{t('legal.privacy.s10AnalyticsLabel')}</strong> {t('legal.privacy.s10AnalyticsText')}</li>
               </ul>
               <p className="mt-2">
                 {t('legal.privacy.s10Control')}

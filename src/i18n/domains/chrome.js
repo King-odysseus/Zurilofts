@@ -22,8 +22,6 @@ export const chrome = {
 
       catNecessary: 'Strictly necessary',
       catNecessaryBody: 'Required for core functionality - keeping you signed in and your bookings working. These are always on and cannot be disabled.',
-      catAnalytics: 'Analytics',
-      catAnalyticsBody: 'Helps us understand how the site is used so we can improve it. Off by default.',
       catMarketing: 'Marketing',
       catMarketingBody: 'Lets us show you relevant offers and updates. Off by default.',
 
@@ -81,8 +79,6 @@ export const chrome = {
 
       catNecessary: 'Ya lazima kabisa',
       catNecessaryBody: 'Inahitajika kwa utendaji wa msingi - kukuweka umeingia na uhifadhi wako kufanya kazi. Hizi huwaka kila wakati na haziwezi kuzimwa.',
-      catAnalytics: 'Uchambuzi',
-      catAnalyticsBody: 'Hutusaidia kuelewa jinsi tovuti inavyotumika ili tuiboreshe. Huzimwa kwa kawaida.',
       catMarketing: 'Masoko',
       catMarketingBody: 'Hutuwezesha kukuonyesha ofa na taarifa zinazokuhusu. Huzimwa kwa kawaida.',
 
