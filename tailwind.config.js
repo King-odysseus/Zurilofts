@@ -1,5 +1,4 @@
 /** @type {import('tailwindcss').Config} */
-import daisyui from 'daisyui';
 
 export default {
   darkMode: 'class',
@@ -81,23 +80,5 @@ export default {
       },
     },
   },
-  plugins: [daisyui, 'flowbite/plugin'],
-  daisyui: {
-    themes: [
-      {
-        zuriloft: {
-          primary:            '#143A80',  // Brand navy
-          secondary:          '#0B2A5E',  // Deep navy
-          accent:             '#C5A28C',  // Antique brass, accents only
-          neutral:            '#E5E7EB',  // Border Grey
-          'base-100':         '#ffffff',  // White canvas
-          'base-200':         '#F4F0E8',  // Floral white tint
-          'base-300':         '#D1D5DB',  // Darker grey
-          'base-content':     '#222222',  // Charcoal
-          'primary-content':  '#ffffff',  // White on navy
-          'secondary-content':'#ffffff',  // White on navy
-        },
-      },
-    ],
-  },
+  plugins: ['flowbite/plugin'],
 }
