@@ -84,6 +84,11 @@ skills-lock.json
 # KAI tool cache, not project source: lists Railway workspaces and ids.
 .kai/projects.json
 
+# Per-conversation plans and editor history. Session scratch: they describe how a
+# change was made, and git log already records the change itself.
+.kai/plans/
+.kai/spec/.history/
+
 # Browser tool scratch output (snapshots, console logs)
 .playwright-mcp/
 
