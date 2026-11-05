@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { BookOpen, ChevronRight } from 'lucide-react';
 import Spinner from '../components/Spinner.jsx';
 import apiClient from '../api/client.js';
+import LoadFailed from '../components/LoadFailed.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useTranslatedList } from '../i18n/useTranslated.js';
 
@@ -19,14 +20,18 @@ function GuidesPage() {
   const { t, lang } = useLanguage();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
+    setLoading(true);
+    setFailed(false);
     apiClient
       .get('/guides')
       .then((res) => setPosts(res.data.data || []))
-      .catch(() => setPosts([]))
+      .catch(() => setFailed(true))
       .finally(() => setLoading(false));
-  }, []);
+  }, [reloadToken]);
 
   // Post titles and standfirsts are written in the database, so they are read in
   // the reader's language too. Both hooks sit above the list's .map, in the order
@@ -61,7 +66,15 @@ function GuidesPage() {
 
       <section className="op-guides-content">
         <div className="op-content-container">
-          {posts.length === 0 ? (
+          {failed ? (
+            <div className="op-guides-empty">
+              <LoadFailed
+                align="center"
+                message="We could not load the guides. Check your connection and try again."
+                onRetry={() => setReloadToken((token) => token + 1)}
+              />
+            </div>
+          ) : posts.length === 0 ? (
             <div className="op-guides-empty space-y-5">
               <div className="op-guides-empty-icon">
                 <BookOpen strokeWidth={2} aria-hidden="true" />

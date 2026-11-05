@@ -15,6 +15,7 @@ import assert from 'node:assert/strict';
 import {
   SETTLED_PAYOUT_STATUSES,
   canMarkTransferSucceeded,
+  canSettleFailedTransfer,
   isSettledPayoutStatus,
 } from '../src/utils/payoutTransitions.js';
 
@@ -34,9 +35,11 @@ function replayNotices(notices: string[]) {
       if (canMarkTransferSucceeded(status)) status = 'SUCCESS';
       continue;
     }
-    // failed | reversed
-    if (isSettledPayoutStatus(status)) continue;
-    status = notice === 'failed' ? 'FAILED' : 'REVERSED';
+    // failed | reversed - the current state decides, not the order the notices
+    // arrived in. A notice that may not apply to this state is ignored.
+    const settlement = notice === 'failed' ? 'FAILED' : 'REVERSED';
+    if (!canSettleFailedTransfer(status, settlement)) continue;
+    status = settlement;
     balance += AMOUNT;
   }
 
@@ -98,5 +101,44 @@ test('every settled status refuses a later success', () => {
 test('states that are still in flight may be marked successful', () => {
   for (const live of ['PENDING', 'PROCESSING', 'SUCCESS']) {
     assert.equal(canMarkTransferSucceeded(live), true, `${live} may move to SUCCESS`);
+  }
+});
+
+test('a failure notice cannot refund a transfer the provider already delivered', () => {
+  // The bug this pins: SUCCESS was not in the settled set, so a delayed or
+  // replayed `transfer.failed` flipped a delivered payout to FAILED and restored
+  // the host balance for money that had already been sent.
+  assert.equal(canSettleFailedTransfer('SUCCESS', 'FAILED'), false);
+  assert.deepEqual(replayNotices(['success', 'failed']), { status: 'SUCCESS', balance: 0 });
+  assert.deepEqual(replayNotices(['success', 'failed', 'failed']), { status: 'SUCCESS', balance: 0 });
+});
+
+test('a reversal after a success restores the balance, exactly once', () => {
+  // Different event, different meaning: the money genuinely came back from the
+  // recipient bank, so the host is owed it again - but only once.
+  assert.equal(canSettleFailedTransfer('SUCCESS', 'REVERSED'), true);
+  assert.deepEqual(replayNotices(['success', 'reversed', 'reversed', 'success']), {
+    status: 'REVERSED',
+    balance: AMOUNT,
+  });
+});
+
+test('no ordering of contradicting notices ever credits the host twice', () => {
+  const notices = ['success', 'failed', 'reversed'];
+  const permutations = (items: string[]): string[][] =>
+    items.length <= 1
+      ? [items]
+      : items.flatMap((item, i) =>
+          permutations([...items.slice(0, i), ...items.slice(i + 1)]).map((rest) => [item, ...rest]),
+        );
+
+  for (const order of permutations(notices)) {
+    for (const repeat of [1, 2]) {
+      const outcome = replayNotices(order.flatMap((n) => Array(repeat).fill(n)));
+      assert.ok(
+        outcome.balance <= AMOUNT,
+        `${order.join(',')} x${repeat} credited ${outcome.balance}, more than ${AMOUNT}`,
+      );
+    }
   }
 });

@@ -4,6 +4,11 @@ const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
+  // A request the server never answers used to leave the page on its spinner for
+  // ever, with no error state and nothing to act on. 30s is longer than the
+  // slowest real endpoint (an image upload while sharp re-encodes it) and short
+  // enough to fail while the person is still looking at the screen.
+  timeout: 30_000,
 });
 
 // Track access token in a module-level variable
@@ -41,7 +46,9 @@ async function postRefresh() {
       return await axios.post(
         `${apiClient.defaults.baseURL}/auth/refresh`,
         {},
-        { withCredentials: true }
+        // Same deadline as every other call: this one runs unattended on page
+        // load, so a hung socket would hold the restored session for ever.
+        { withCredentials: true, timeout: 15_000 }
       );
     } catch (err) {
       if (attempt >= REFRESH_ATTEMPTS || !isTransientRefreshFailure(err)) throw err;

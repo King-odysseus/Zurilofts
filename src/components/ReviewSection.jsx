@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { NotebookPen, Star } from 'lucide-react';
 import apiClient from '../api/client.js';
+import LoadFailed from './LoadFailed.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import { useTranslatedList } from '../i18n/useTranslated.js';
 
@@ -22,6 +24,8 @@ function ReviewSection({ propertyId, onSummary }) {
   const [reviews, setReviews] = useState([]);
   const [summary, setSummary] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+  const [reloadToken, setReloadToken] = useState(0);
 
   // Guests write reviews in their own words, so the text goes through the hook
   // rather than the dictionary. Batched here, above the early returns, because a
@@ -31,6 +35,7 @@ function ReviewSection({ propertyId, onSummary }) {
   useEffect(() => {
     if (!propertyId) return;
     setLoading(true);
+    setFailed(false);
     apiClient
       .get(`/properties/${propertyId}/reviews`)
       .then((res) => {
@@ -44,9 +49,12 @@ function ReviewSection({ propertyId, onSummary }) {
         setSummary(null);
         // undefined means "could not load", which is not the same as "no reviews".
         onSummary?.(undefined);
+        // Kept apart from the empty state: a failed fetch left summary null, which
+        // the empty branch below used to claim as "no reviews yet".
+        setFailed(true);
       })
       .finally(() => setLoading(false));
-  }, [propertyId, onSummary]);
+  }, [propertyId, onSummary, reloadToken]);
 
   if (loading) {
     return (
@@ -60,6 +68,18 @@ function ReviewSection({ propertyId, onSummary }) {
             ))}
           </div>
         </div>
+      </section>
+    );
+  }
+
+  if (failed) {
+    return (
+      <section className="mt-12 border-t border-[#E3E8EF] pt-8">
+        <h2 className="mb-2 text-2xl font-bold text-[#203565]">{t('stays.guestReviews')}</h2>
+        <LoadFailed
+          message="We could not load the reviews for this stay."
+          onRetry={() => setReloadToken((token) => token + 1)}
+        />
       </section>
     );
   }
@@ -160,5 +180,10 @@ function ReviewSection({ propertyId, onSummary }) {
     </section>
   );
 }
+
+ReviewSection.propTypes = {
+  propertyId: PropTypes.string,
+  onSummary: PropTypes.func,
+};
 
 export default ReviewSection;

@@ -35,3 +35,31 @@ export function isSettledPayoutStatus(status: string): boolean {
 export function canMarkTransferSucceeded(status: string): boolean {
   return !isSettledPayoutStatus(status);
 }
+
+/**
+ * Source states each failure notice may settle a payout from.
+ *
+ * FAILED means the provider never delivered the money, so it may only settle a
+ * payout that was still in flight. Applying it to a payout the provider already
+ * confirmed as delivered would restore a balance for money that has moved, and
+ * the next sweep would then pay the same shillings a second time.
+ *
+ * REVERSED is different: the money genuinely came back from the recipient bank,
+ * so it may follow a success. Neither may follow FAILED or REVERSED - the
+ * balance was already restored then, and repeating it would credit twice.
+ */
+export const FAILURE_NOTICE_SOURCE_STATUSES: Record<'FAILED' | 'REVERSED', readonly string[]> = {
+  FAILED: ['PENDING', 'PROCESSING'],
+  REVERSED: ['PENDING', 'PROCESSING', 'SUCCESS'],
+};
+
+/**
+ * May a transfer FAILED or REVERSED notice settle this payout?
+ *
+ * Distinct from isSettledPayoutStatus, which only answers "has this already been
+ * settled?". SUCCESS is settled for the failure direction while still being a
+ * state a reversal may follow, so the question needs the notice as well.
+ */
+export function canSettleFailedTransfer(status: string, notice: 'FAILED' | 'REVERSED'): boolean {
+  return FAILURE_NOTICE_SOURCE_STATUSES[notice].includes(status);
+}

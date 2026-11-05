@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation, useParams, Link } from 'react-router-dom';
 import { ChevronLeft } from 'lucide-react';
 import Spinner from '../components/Spinner.jsx';
+import LoadFailed from '../components/LoadFailed.jsx';
 import TranslatedHtml from '../components/TranslatedHtml.jsx';
 import apiClient from '../api/client.js';
 import { applyPageOverrides } from '../utils/documentHead.js';
@@ -23,17 +24,26 @@ function GuideDetailPage() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [reloadToken, setReloadToken] = useState(0);
   // Above the loading and not-found returns so the hook order never changes.
   const title = useTranslated(post?.title ?? '');
 
   useEffect(() => {
     setLoading(true);
+    setNotFound(false);
+    setFailed(false);
     apiClient
       .get(`/guides/${slug}`)
       .then((res) => setPost(res.data.data))
-      .catch(() => setNotFound(true))
+      .catch((error) => {
+        // Only a 404 says the guide is gone. Offline, a 5xx or a timeout is a
+        // failed load, and telling the reader the guide does not exist is wrong.
+        if (error?.response?.status === 404) setNotFound(true);
+        else setFailed(true);
+      })
       .finally(() => setLoading(false));
-  }, [slug]);
+  }, [slug, reloadToken]);
 
   // SEO meta: cleaned up on the way out so the next page does not inherit a
   // guide's title, excerpt and cover image.
@@ -54,6 +64,22 @@ function GuideDetailPage() {
       <main className="op-public-page op-guide-detail-page">
         <div className="op-content-container op-public-loader">
           <Spinner />
+        </div>
+      </main>
+    );
+  }
+
+  if (failed) {
+    return (
+      <main className="op-public-page op-guide-detail-page">
+        <div className="op-content-container op-public-loader">
+          <div className="op-guide-not-found">
+            <LoadFailed
+              align="center"
+              message="We could not load this guide. Check your connection and try again."
+              onRetry={() => setReloadToken((token) => token + 1)}
+            />
+          </div>
         </div>
       </main>
     );

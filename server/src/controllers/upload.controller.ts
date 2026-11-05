@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import sharp from 'sharp';
 import { ValidationError } from '../types/index.js';
 import { storeImage, storeDocument } from '../utils/imageStorage.js';
-import { looksLikePdf } from '../utils/fileSignature.js';
+import { detectImageFormat, looksLikePdf } from '../utils/fileSignature.js';
 
 // Re-export so existing consumers (app.ts static serving) keep their import.
 export { UPLOAD_DIR } from '../utils/imageStorage.js';
@@ -20,6 +20,20 @@ const MAX_NAME_LENGTH = 200;
 function assertPdfContents(buffer: Buffer, name: string): void {
   if (!looksLikePdf(buffer)) {
     throw new ValidationError(`${name} is not a readable PDF.`);
+  }
+}
+
+/**
+ * Decode only what the bytes say they are.
+ *
+ * multer's allowlist and the route's fileFilter both read file.mimetype, which
+ * is whatever the client declared. sharp, by contrast, picks a decoder from the
+ * content, so before this check a file labelled image/jpeg could reach the HEIF
+ * or SVG decoder. The signature decides; the label is not evidence.
+ */
+function assertImageContents(buffer: Buffer, name: string): void {
+  if (!detectImageFormat(buffer)) {
+    throw new ValidationError(`${name} is not a JPEG, PNG, WebP or GIF image.`);
   }
 }
 
@@ -46,13 +60,18 @@ export async function uploadImages(req: Request, res: Response, next: NextFuncti
 
     const urls = await Promise.all(
       files.map(async (file) => {
+        const label = file.originalname || 'That file';
+        // Checked before sharp so an unreadable or mislabelled file never reaches
+        // a decoder, and the failure reads as client input rather than a 500.
+        assertImageContents(file.buffer, label);
+
         let optimized: Buffer;
         try {
           optimized = await optimizeToJpeg(file.buffer);
         } catch {
           // sharp only fails on bytes that are not a decodable image, which is
           // client input rather than a server fault, so it must not read as 500.
-          throw new ValidationError(`${file.originalname || 'That file'} could not be read as an image`);
+          throw new ValidationError(`${label} could not be read as an image`);
         }
         return storeImage(optimized, 'prop');
       })
@@ -93,6 +112,8 @@ async function storeAttachment(file: Express.Multer.File): Promise<StoredAttachm
       size: file.buffer.length,
     };
   }
+
+  assertImageContents(file.buffer, name);
 
   // The shared image path writes JPEG, so an animated GIF keeps its first frame
   // only (the same trade-off a listing photo makes). The reported type is what is

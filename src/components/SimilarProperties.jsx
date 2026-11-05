@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import apiClient from '../api/client.js';
 import PropertyCardRow from './PropertyCardRow';
+import LoadFailed from './LoadFailed.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 
 /**
@@ -17,11 +18,15 @@ function SimilarProperties({ property }) {
   const { t } = useLanguage();
   const [similar, setSimilar] = useState([]);
   const [loaded, setLoaded] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [reloadToken, setReloadToken] = useState(0);
 
   const { id, location, type } = property;
 
   useEffect(() => {
     let cancelled = false;
+    // A retry keeps the failure on screen until it succeeds: this strip has no
+    // loading view, so clearing it here would flash the empty message instead.
 
     async function load() {
       try {
@@ -34,9 +39,11 @@ function SimilarProperties({ property }) {
             p.id !== id &&
             (p.location === location || p.type === type)
         );
+        setFailed(false);
         setSimilar(matches.slice(0, 4));
       } catch {
-        if (!cancelled) setSimilar([]);
+        // An empty strip is a claim about the catalogue; a failed request is not.
+        if (!cancelled) setFailed(true);
       } finally {
         if (!cancelled) setLoaded(true);
       }
@@ -44,9 +51,21 @@ function SimilarProperties({ property }) {
 
     load();
     return () => { cancelled = true; };
-  }, [id, location, type]);
+  }, [id, location, type, reloadToken]);
 
   if (!loaded) return null;
+
+  if (failed) {
+    return (
+      <section className="mx-auto w-full max-w-[1344px] px-4 md:px-6" aria-label={t('stays.similarTitle')}>
+        <h2 className="mb-6 text-2xl font-bold text-navy md:text-3xl">{t('stays.similarTitle')}</h2>
+        <LoadFailed
+          message="We could not load other stays nearby."
+          onRetry={() => setReloadToken((token) => token + 1)}
+        />
+      </section>
+    );
+  }
 
   return (
     <PropertyCardRow

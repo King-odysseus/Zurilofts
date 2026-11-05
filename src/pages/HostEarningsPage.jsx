@@ -6,6 +6,7 @@ import { jsPDF } from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
 import apiClient from '../api/client.js';
 import HostCard, { HOST_EYEBROW } from '../components/HostCard.jsx';
+import LoadFailed from '../components/LoadFailed.jsx';
 import SelectMenu from '../components/SelectMenu.jsx';
 import EarningsSideNav from '../components/EarningsSideNav.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
@@ -232,12 +233,19 @@ export default function HostEarningsPage() {
   const [destination, setDestination] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  // The payout summary is its own request. When it fails there is no balance to
+  // report, which is not the same as a balance of zero.
+  const [payoutFailed, setPayoutFailed] = useState(false);
+  const [payoutLoading, setPayoutLoading] = useState(true);
+  const [payoutReloadToken, setPayoutReloadToken] = useState(0);
 
   const dates = useMemo(() => periodDates(period), [period]);
   const periodLabel = PERIOD_OPTIONS.find((option) => option.value === period)?.label || 'All time';
 
   useEffect(() => {
     let active = true;
+    setPayoutFailed(false);
+    setPayoutLoading(true);
 
     async function loadPayoutSummary() {
       try {
@@ -247,15 +255,18 @@ export default function HostEarningsPage() {
         setDestination(response.data.data?.destination || null);
       } catch {
         if (active) {
+          setPayoutFailed(true);
           setWallet(null);
           setDestination(null);
         }
+      } finally {
+        if (active) setPayoutLoading(false);
       }
     }
 
     loadPayoutSummary();
     return () => { active = false; };
-  }, []);
+  }, [payoutReloadToken]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -314,7 +325,9 @@ export default function HostEarningsPage() {
     [rows]
   );
   const processing = Math.max(totals.hostNet - confirmedHostNet, 0);
-  const availablePayout = wallet?.balance ?? 0;
+  // Left as null when the payout summary did not load: a zero here printed
+  // "Available payout 0" in both exports, which reads as having earned nothing.
+  const availablePayout = typeof wallet?.balance === 'number' ? wallet.balance : null;
 
   // Paid is what the platform has confirmed; anything else still owed to the
   // host is upcoming. Both are the host's take-home, not the guest's total.
@@ -389,7 +402,7 @@ export default function HostEarningsPage() {
       'Summary',
       `Net earnings,${totals.hostNet}`,
       `Processing,${processing}`,
-      `Available payout,${availablePayout}`,
+      `Available payout,${availablePayout === null ? 'Not available' : availablePayout}`,
       '',
       'Property,Gross rent,Host net,WHT,Bookings',
       ...earningRows.map((row) => `${JSON.stringify(row.title)},${row.grossRent || 0},${row.hostNet || 0},${row.wht || 0},${row.bookings || 0}`),
@@ -419,7 +432,7 @@ export default function HostEarningsPage() {
     autoTable(doc, {
       startY: 36,
       head: [['Net earnings', 'Processing', 'Available payout']],
-      body: [[formatMoney(totals.hostNet), formatMoney(processing), formatMoney(availablePayout)]],
+      body: [[formatMoney(totals.hostNet), formatMoney(processing), availablePayout === null ? 'Not available' : formatMoney(availablePayout)]],
       theme: 'grid',
       headStyles: { fillColor: [11, 47, 107], textColor: [255, 255, 255] },
       styles: { fontSize: 10, cellPadding: 4 },
@@ -671,11 +684,19 @@ export default function HostEarningsPage() {
                 </HostCard>
 
                 <HostCard title={t('hostmoney.payoutsCardTitle')} description={t('hostmoney.payoutsHint')}>
-                  <div className="rounded-xl bg-surface px-4 py-3">
-                    <span className={HOST_EYEBROW}>{t('hostmoney.destination')}</span>
-                    <strong className="mt-1.5 block truncate text-sm font-semibold text-navy">{destination?.label || 'Not configured'}</strong>
-                    <small className="mt-2 block text-xs leading-relaxed text-muted">{destination?.maskedAccount || 'Add a payout destination in settings'}</small>
-                  </div>
+                  {payoutFailed && (
+                    <LoadFailed
+                      message="We could not load your payout details, so there is no balance to show here. Nothing has changed on your account."
+                      onRetry={() => setPayoutReloadToken((token) => token + 1)}
+                    />
+                  )}
+                  {!payoutFailed && !payoutLoading && (
+                    <div className="rounded-xl bg-surface px-4 py-3">
+                      <span className={HOST_EYEBROW}>{t('hostmoney.destination')}</span>
+                      <strong className="mt-1.5 block truncate text-sm font-semibold text-navy">{destination?.label || 'Not configured'}</strong>
+                      <small className="mt-2 block text-xs leading-relaxed text-muted">{destination?.maskedAccount || 'Add a payout destination in settings'}</small>
+                    </div>
+                  )}
                   {wallet?.nextPayoutAt && (
                     <p className="text-sm text-muted">
                       Next scheduled payout: <strong className="font-semibold text-navy">{formatDate(wallet.nextPayoutAt)}</strong>

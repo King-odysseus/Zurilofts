@@ -18,6 +18,36 @@ import { fetchCalendarFeedText, mapWithConcurrency } from '../utils/safeFetch.js
 // Import
 // ---------------------------------------------------------------------------
 
+/** Prefix on lastStatus when a feed came back empty but was not applied yet. */
+export const EMPTY_FEED_WARNING_PREFIX = 'WARN: empty feed';
+
+/**
+ * True when a fetched body is a calendar at all.
+ *
+ * Exported and pure so it can be tested without a network or a database.
+ */
+export function looksLikeCalendar(text: string): boolean {
+  return /BEGIN:VCALENDAR/i.test(text);
+}
+
+/**
+ * Whether a parsed feed may replace the blocks stored for its source.
+ *
+ * An empty feed only wins once it has been seen twice. A provider answering with
+ * a valid but empty calendar is otherwise indistinguishable from every booking
+ * being cancelled at once, and believing it frees every night on the first sync.
+ * Exported and pure so the rule is testable without a database.
+ */
+export function shouldReplaceBlocks(params: {
+  parsedEvents: number;
+  existingBlocks: number;
+  lastStatus: string | null;
+}): boolean {
+  if (params.parsedEvents > 0) return true;
+  if (params.existingBlocks === 0) return true;
+  return (params.lastStatus ?? '').startsWith(EMPTY_FEED_WARNING_PREFIX);
+}
+
 /**
  * Sync a single external calendar source: fetch + parse the feed, then replace
  * that source's blocks with the freshly parsed events.
@@ -30,11 +60,36 @@ export async function syncSource(sourceId: string): Promise<{ events: number }> 
     // Fetched through the guarded client rather than ical.async.fromURL, so a
     // host cannot point the server at an internal address.
     const text = await fetchCalendarFeedText(source.url);
+
+    // A dead share link answered with an HTML login or error page still comes
+    // back as 200 with a body. Parsing that finds no events, and treating that as
+    // the truth deleted every block and resold nights booked elsewhere. A body
+    // that is not a calendar is an error, and an error keeps the blocks.
+    if (!looksLikeCalendar(text)) {
+      throw new Error('The feed did not return a calendar (no BEGIN:VCALENDAR)');
+    }
+
     const data = ical.sync.parseICS(text);
 
     const events = Object.values(data).filter(
       (e: any) => e && e.type === 'VEVENT' && e.start && e.end
     ) as any[];
+
+    // A calendar that really empties says so on two syncs. Holding the existing
+    // blocks for one round means a provider answering with a valid but empty
+    // calendar cannot free every night at once; the next sync applies it.
+    const existingBlocks = await prisma.calendarBlock.count({ where: { sourceId } });
+    if (!shouldReplaceBlocks({ parsedEvents: events.length, existingBlocks, lastStatus: source.lastStatus })) {
+      await prisma.calendarSource.update({
+        where: { id: sourceId },
+        data: {
+          lastSyncedAt: new Date(),
+          lastStatus:
+            `${EMPTY_FEED_WARNING_PREFIX}, kept ${existingBlocks} block(s). Sync again to confirm the calendar is empty.`,
+        },
+      });
+      return { events: 0 };
+    }
 
     // Replace this source's blocks atomically
     await prisma.$transaction([
@@ -85,11 +140,25 @@ export async function syncProperty(propertyId: string, ownerId?: string) {
   }));
 }
 
+let syncAllInFlight = false;
+
 /** Sync all sources across all properties (used by the periodic background job). */
 export async function syncAll() {
-  const sources = await prisma.calendarSource.findMany({ select: { id: true } });
-  await mapWithConcurrency(sources, 4, (s) => syncSource(s.id));
-  return sources.length;
+  // Two rounds must not overlap. Each round rewrites a source's blocks, so an
+  // overlapping pair deleted the other's rows and rewrote them from the same
+  // feed, and every slow round let the next one queue up behind it.
+  if (syncAllInFlight) {
+    console.warn('Calendar sync skipped: the previous round has not finished');
+    return 0;
+  }
+  syncAllInFlight = true;
+  try {
+    const sources = await prisma.calendarSource.findMany({ select: { id: true } });
+    await mapWithConcurrency(sources, 4, (s) => syncSource(s.id));
+    return sources.length;
+  } finally {
+    syncAllInFlight = false;
+  }
 }
 
 // ---------------------------------------------------------------------------

@@ -1206,20 +1206,51 @@ export async function cancelBooking(bookingId: string, actor: CancelActor) {
     }
   }
 
-  const wasPaid = booking.paidAt != null;
-  const hostNet = wasPaid && booking.hostNetAmount != null ? booking.hostNetAmount : 0;
+  // Read again inside the transaction. The guards above look at a snapshot taken
+  // before it opened, and a webhook can confirm the booking or release the host's
+  // funds in between; a second cancel arriving at the same moment passes those
+  // same guards, so both would debit the wallet for one cancelled stay.
+  let wasPaid = booking.paidAt != null;
+  let hostNet = wasPaid && booking.hostNetAmount != null ? booking.hostNetAmount : 0;
   const hostId = booking.property?.hostId ?? null;
 
   let debited = 0;
   let shortfall = 0;
 
   await prisma.$transaction(async (tx) => {
+    const current = await tx.booking.findUnique({
+      where: { id: bookingId },
+      select: { paidAt: true, hostNetAmount: true, hostFundsReleasedAt: true },
+    });
+    if (!current) throw new NotFoundError('Booking');
+
+    wasPaid = current.paidAt != null;
+    hostNet = wasPaid && current.hostNetAmount != null ? current.hostNetAmount : 0;
+    const fundsReleased = current.hostFundsReleasedAt != null;
+
+    // Claim the cancellation before moving any money. Only one caller can move a
+    // booking out of PENDING or CONFIRMED, and only that caller reaches the
+    // reversal below.
+    const claimed = await tx.booking.updateMany({
+      where: { id: bookingId, status: { in: ['PENDING', 'CONFIRMED'] } },
+      data: {
+        status: 'CANCELLED',
+        cancelledAt: new Date(),
+        cancelledBy: actor.role === 'ADMIN' ? 'ADMIN' : 'GUEST',
+        cancelledById: actor.userId,
+        refundStatus: wasPaid ? 'REFUND_PENDING' : null,
+      },
+    });
+    if (claimed.count === 0) {
+      throw new ConflictError('This booking has already been cancelled');
+    }
+
     // Reverse the host's earnings for the cancelled stay. Only released money
     // can be reversed: a stay cancelled before check-in never reached the
     // wallet, so there is nothing to take back. Reversal is capped at the
     // current balance, and a shortfall is recorded for admin clawback when the
     // funds had already been paid out.
-    if (wasPaid && hostNet > 0 && hostId && booking.hostFundsReleasedAt) {
+    if (wasPaid && hostNet > 0 && hostId && fundsReleased) {
       const wallet = await tx.hostWallet.findUnique({
         where: { hostId },
         select: { id: true, balance: true },
@@ -1238,17 +1269,6 @@ export async function cancelBooking(bookingId: string, actor: CancelActor) {
         shortfall = hostNet;
       }
     }
-
-    await tx.booking.update({
-      where: { id: bookingId },
-      data: {
-        status: 'CANCELLED',
-        cancelledAt: new Date(),
-        cancelledBy: actor.role === 'ADMIN' ? 'ADMIN' : 'GUEST',
-        cancelledById: actor.userId,
-        refundStatus: wasPaid ? 'REFUND_PENDING' : null,
-      },
-    });
 
     await tx.paymentLog.create({
       data: {
@@ -1522,8 +1542,12 @@ export async function abandonStaleBookings(olderThanMinutes = PENDING_HOLD_MINUT
   // treats CANCELLED bookings as non-blocking for availability (see
   // isRangeAvailable / getUnavailableRanges), so this matches the existing
   // dead-booking idiom and preserves an audit trail.
+  // The write carries the same conditions as the read above. Between reading the
+  // candidates and writing, a `charge.success` webhook can confirm a booking that
+  // is in this list; cancelling that one holds the guest's money with nothing in
+  // the refund queue, because the status write sets no refundStatus.
   const result = await prisma.booking.updateMany({
-    where: { id: { in: idsToCancel } },
+    where: { id: { in: idsToCancel }, status: 'PENDING', paidAt: null },
     data: { status: 'CANCELLED' },
   });
 

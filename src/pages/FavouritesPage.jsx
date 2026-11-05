@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext.jsx';
 import { useFavorites } from '../context/FavoritesContext.jsx';
 import { useLanguage } from '../context/LanguageContext.jsx';
 import apiClient from '../api/client.js';
+import LoadFailed from '../components/LoadFailed.jsx';
 
 function getPropertyImage(property) {
   return property?.image || property?.images?.[0] || '';
@@ -52,24 +53,31 @@ function FavouritesPage() {
   const [shortlists, setShortlists] = useState([]);
   const [loadingShared, setLoadingShared] = useState(Boolean(sharedIds));
   const [copied, setCopied] = useState(false);
+  // Kept apart from the lists themselves: an empty list is an answer, a rejected
+  // request is not, and the empty-wishlist panel used to claim both as empty.
+  const [sharedFailed, setSharedFailed] = useState(false);
+  const [shortlistsFailed, setShortlistsFailed] = useState(false);
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     if (!sharedIds) return;
     setLoadingShared(true);
+    setSharedFailed(false);
     apiClient
       .get('/properties/bulk', { params: { ids: sharedIds } })
       .then((res) => setSharedProperties(res.data.data || []))
-      .catch(() => setSharedProperties([]))
+      .catch(() => setSharedFailed(true))
       .finally(() => setLoadingShared(false));
-  }, [sharedIds]);
+  }, [sharedIds, reloadToken]);
 
   useEffect(() => {
     if (!isAuthenticated || sharedIds) return;
+    setShortlistsFailed(false);
     apiClient
       .get('/shortlists')
       .then((res) => setShortlists(res.data.data || []))
-      .catch(() => setShortlists([]));
-  }, [isAuthenticated, sharedIds]);
+      .catch(() => setShortlistsFailed(true));
+  }, [isAuthenticated, sharedIds, reloadToken]);
 
   const displayProperties = sharedIds ? sharedProperties : favorites;
 
@@ -96,7 +104,9 @@ function FavouritesPage() {
           activeTab="saved"
           title={sharedIds ? t('saved.sharedWishlist') : t('saved.savedStays')}
           subtitle={sharedIds
-            ? t(sharedProperties.length === 1 ? 'saved.sharedWithYouOne' : 'saved.sharedWithYouOther', { count: sharedProperties.length })
+            ? sharedFailed
+              ? 'We could not load these stays.'
+              : t(sharedProperties.length === 1 ? 'saved.sharedWithYouOne' : 'saved.sharedWithYouOther', { count: sharedProperties.length })
             : t('saved.subtitle')}
           actionLabel={sharedIds ? '' : t('saved.createShortlist')}
           actionTo="/shortlists?new=1"
@@ -124,6 +134,13 @@ function FavouritesPage() {
                   </div>
                 </div>
                 {/* Stylesheet gaps here are 14px above the cards and 16px between them, both under the 20px floor. mt-5 collapses with the title's 14px to render 20px, and !gap-5 outranks the 16px. */}
+                {shortlistsFailed && (
+                  <LoadFailed
+                    className="mb-5"
+                    message="Your collections could not be loaded."
+                    onRetry={() => setReloadToken((token) => token + 1)}
+                  />
+                )}
                 <div className="opg-saved-collections mt-5 !gap-5">
                   <CollectionCard
                     title={t('saved.favourites')}
@@ -146,7 +163,17 @@ function FavouritesPage() {
               </section>
             )}
 
-            {sharedIds && sharedProperties.length === 0 && (
+            {sharedIds && sharedFailed && (
+              <div className="opg-saved-empty mt-6">
+                <LoadFailed
+                  align="center"
+                  message="This wishlist could not be loaded. The link may still be fine, so try again."
+                  onRetry={() => setReloadToken((token) => token + 1)}
+                />
+              </div>
+            )}
+
+            {sharedIds && !sharedFailed && sharedProperties.length === 0 && (
               <div className="opg-saved-empty mt-6">
                 <div>
                   <h2>{t('saved.emptyWishlistTitle')}</h2>

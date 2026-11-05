@@ -6,6 +6,7 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { corsOptions } from './config/cors.js';
 import { env } from './config/env.js';
+import prisma from './config/prisma.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { UPLOAD_DIR } from './controllers/upload.controller.js';
 import { requestsChatAttachment } from './utils/chatAttachment.js';
@@ -26,7 +27,6 @@ import adminRoutes from './routes/admin.routes.js';
 import hostApplicationRoutes from './routes/host-application.routes.js';
 import identityVerificationRoutes from './routes/identity-verification.routes.js';
 import disputeRoutes from './routes/dispute.routes.js';
-import chatRoutes from './routes/chat.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import paymentRoutes from './routes/payment.routes.js';
 import payoutRoutes from './routes/payout.routes.js';
@@ -137,13 +137,34 @@ app.use(
   })
 );
 
-// Health check
-app.get('/api/health', (_req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
+/**
+ * Fails a promise that has not settled within `ms`.
+ *
+ * The health route needs it because a query stuck behind an exhausted pool would
+ * otherwise hang the check itself, which reports nothing to anyone.
+ */
+function withDeadline<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      const timer = setTimeout(() => reject(new Error(label)), ms);
+      timer.unref();
+    }),
+  ]);
+}
+
+// Health check. It answers only when a trivial query succeeds: reporting plain
+// "ok" through a total database outage kept a broken server in rotation and
+// showed 100 percent uptime while every real request failed.
+app.get('/api/health', async (_req, res) => {
+  const base = { timestamp: new Date().toISOString(), uptime: process.uptime() };
+  try {
+    await withDeadline(prisma.$queryRaw`SELECT 1`, 3000, 'health query timed out after 3s');
+    res.json({ status: 'ok', ...base });
+  } catch (err) {
+    console.error('Health check failed:', err instanceof Error ? err.message : err);
+    res.status(503).json({ status: 'unhealthy', database: 'unreachable', ...base });
+  }
 });
 
 // Routes
@@ -162,7 +183,6 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/host-application', hostApplicationRoutes);
 app.use('/api/identity-verification', identityVerificationRoutes);
 app.use('/api/disputes', disputeRoutes);
-app.use('/api/chat', chatRoutes);
 app.use('/api/uploads', uploadRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api', payoutRoutes); // /api/host/payouts, /api/admin/payouts, etc.

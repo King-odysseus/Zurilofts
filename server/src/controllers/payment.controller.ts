@@ -104,9 +104,10 @@ export async function webhook(req: Request, res: Response, next: NextFunction): 
       event = JSON.parse(rawBody)?.event || '';
     } catch {
       // A body that is not JSON cannot become a payment event later either, so
-      // this is a permanent rejection rather than something worth retrying.
+      // this is permanent. Answer 200: a 4xx tells Paystack to redeliver, which
+      // retried a body that could never succeed.
       console.warn('Webhook body was not JSON; rejected without retry.');
-      res.status(400).json({ success: false, error: 'invalid_payload' });
+      res.status(200).json({ received: true, handled: false, error: 'invalid_payload' });
       return;
     }
 

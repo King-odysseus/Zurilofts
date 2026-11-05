@@ -382,9 +382,11 @@ export function fireBookingConfirmed(bookingId: string): Promise<DeliverOutcome>
  * run. Safe to run on many instances - dedupe logs make each booking+trigger
  * send exactly once. Returns a summary for logging.
  */
-export async function runDueAutoMessages(now: Date = new Date()): Promise<{ scanned: number; sent: number }> {
+export async function runDueAutoMessages(
+  now: Date = new Date(),
+): Promise<{ scanned: number; sent: number; failed: number; stoppedEarly: boolean }> {
   const templates = await prisma.propertyMessageTemplate.findMany({ where: { enabled: true } });
-  if (templates.length === 0) return { scanned: 0, sent: 0 };
+  if (templates.length === 0) return { scanned: 0, sent: 0, failed: 0, stoppedEarly: false };
 
   // propertyId|trigger -> persisted offsetDays. `undefined` marks a template
   // that doesn't exist for a property; null is a legitimate stored value.
@@ -413,6 +415,12 @@ export async function runDueAutoMessages(now: Date = new Date()): Promise<{ scan
   });
 
   let sent = 0;
+  let failed = 0;
+  // A systemic failure (database gone, templates unreadable) repeats for every
+  // booking and trigger, so one run could write thousands of near-identical
+  // lines. Stopping early keeps the log readable and hands the sweep back.
+  const MAX_FAILED_PER_RUN = 20;
+
   for (const booking of bookings) {
     for (const trigger of AUTO_MESSAGE_TRIGGERS) {
       if (trigger === 'BOOKING_CONFIRMED') continue; // handled on confirmation
@@ -420,9 +428,18 @@ export async function runDueAutoMessages(now: Date = new Date()): Promise<{ scan
       if (offsetDays === undefined) continue;
       if (!isDue(trigger, offsetDays, booking, todayMs)) continue;
       const outcome = await deliverTrigger(booking.id, trigger);
-      if (outcome.sent) sent += 1;
+      if (outcome.sent) {
+        sent += 1;
+      } else if (outcome.reason === 'error') {
+        // Counted, not ignored: the sweep reported only what it sent, so a run
+        // where every delivery failed looked exactly like a quiet one.
+        failed += 1;
+        if (failed >= MAX_FAILED_PER_RUN) {
+          return { scanned: bookings.length, sent, failed, stoppedEarly: true };
+        }
+      }
     }
   }
 
-  return { scanned: bookings.length, sent };
+  return { scanned: bookings.length, sent, failed, stoppedEarly: false };
 }

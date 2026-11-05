@@ -128,24 +128,68 @@ function headers(): Record<string, string> {
   };
 }
 
+/**
+ * Total deadline for every Paystack call.
+ *
+ * Without one a stalled socket held an admin's payout request, and the hourly
+ * payout sweep, open with nothing to report: undici's own guards are per phase
+ * and measured in minutes rather than a deadline for the whole call.
+ */
+const REQUEST_TIMEOUT_MS = 20_000;
+
+/** A non-2xx answer from Paystack. `status` lets a caller tell 404 from an outage. */
+export class PaystackHttpError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = 'PaystackHttpError';
+    this.status = status;
+  }
+}
+
+/**
+ * True when a Paystack call ran out of time instead of being refused.
+ *
+ * The difference decides money: a refusal means nothing was sent, while a lost
+ * reply means the transfer may already be on its way.
+ */
+export function isPaystackTimeout(err: unknown): boolean {
+  const name = (err as { name?: string } | null)?.name;
+  return name === 'TimeoutError' || name === 'AbortError';
+}
+
+function paystackFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  return fetch(`${BASE}${path}`, { ...init, signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+}
+
 async function paystackGet<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, { headers: headers() });
+  const res = await paystackFetch(path, { headers: headers() });
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`Paystack GET ${path} failed (${res.status}): ${body}`);
+    throw new PaystackHttpError(`Paystack GET ${path} failed (${res.status}): ${body}`, res.status);
   }
   return res.json() as Promise<T>;
 }
 
 async function paystackPost<T>(path: string, body: Record<string, any>): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await paystackFetch(path, {
     method: 'POST',
     headers: headers(),
     body: JSON.stringify(body),
   });
-  const json = await res.json() as any;
-  if (!res.ok || !json.status) {
-    throw new Error(`Paystack POST ${path} failed: ${json.message || res.statusText}`);
+  let json: any;
+  try {
+    json = await res.json();
+  } catch {
+    // A reply that is not JSON still carries a definite answer in its status.
+    json = null;
+  }
+  if (!res.ok || !json?.status) {
+    throw new PaystackHttpError(
+      `Paystack POST ${path} failed: ${json?.message || res.statusText}`,
+      res.status,
+    );
   }
   return json as T;
 }
@@ -283,6 +327,31 @@ export async function initiateTransfer(params: {
     transferRef: res.data.reference,
     status: res.data.status,
   };
+}
+
+/**
+ * Ask Paystack what became of a transfer.
+ *
+ * Used to resolve a payout whose reply was lost: the money may have been sent
+ * even though no response arrived, and guessing either way either pays a host
+ * twice or strands what they earned. Returns null when Paystack has no record of
+ * the reference, which is a real answer rather than an outage.
+ */
+export async function verifyTransfer(
+  reference: string,
+): Promise<{ reference: string; status: string } | null> {
+  try {
+    const res = await paystackGet<{
+      status: boolean;
+      data: { reference: string; status: string };
+    }>(`/transfer/verify/${encodeURIComponent(reference)}`);
+    if (!res.status || !res.data) return null;
+    return { reference: res.data.reference, status: res.data.status };
+  } catch (err) {
+    // 404 is Paystack saying it never saw this reference: nothing moved.
+    if (err instanceof PaystackHttpError && err.status === 404) return null;
+    throw err;
+  }
 }
 
 /**

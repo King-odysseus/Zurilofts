@@ -95,15 +95,20 @@ export function nudgeMessage(status: string): { title: string; body: string; url
 /**
  * Find idle applications and remind their owners.
  *
- * Returns the number of reminders sent. Each send is claimed by incrementing
- * `nudgeCount` on the row it read, so two servers running the sweep at once
- * cannot both remind the same host: only one update matches the count it saw.
+ * Returns what the sweep achieved. Sent, failed and unanswered are reported
+ * separately: a reminder that no device accepted is not a reminder delivered,
+ * and the old signature had no room to say so. Each send is claimed by
+ * incrementing `nudgeCount` on the row it read, so two servers running the sweep
+ * at once cannot both remind the same host: only one update matches the count.
  */
-export async function sendHostApplicationNudges(
-  now: Date = new Date(),
-): Promise<{ sent: number; candidates: number }> {
+export async function sendHostApplicationNudges(now: Date = new Date()): Promise<{
+  sent: number;
+  failed: number;
+  unanswered: number;
+  candidates: number;
+}> {
   const maxNudges = parseNudgeMax(env.HOST_NUDGE_MAX);
-  if (maxNudges < 1) return { sent: 0, candidates: 0 };
+  if (maxNudges < 1) return { sent: 0, failed: 0, unanswered: 0, candidates: 0 };
 
   const afterDays = parseNudgeAfterDays(env.HOST_NUDGE_AFTER_DAYS);
   const statuses = nudgeableStatuses();
@@ -124,6 +129,8 @@ export async function sendHostApplicationNudges(
   });
 
   let sent = 0;
+  let failed = 0;
+  let unanswered = 0;
   for (const application of candidates) {
     const due = shouldNudge({
       status: application.status,
@@ -152,15 +159,34 @@ export async function sendHostApplicationNudges(
       });
       if (claim.count === 0) continue;
 
-      await sendPushToUser(application.userId, title, body, url);
-      sent += 1;
+      const results = await sendPushToUser(application.userId, title, body, url);
+      if (results.some((r) => r.ok)) {
+        sent += 1;
+        continue;
+      }
+
+      if (results.length === 0) {
+        // Nothing to send to: this host has no registered device. The attempt is
+        // spent rather than retried forever, which would re-claim every sweep.
+        unanswered += 1;
+        continue;
+      }
+
+      // Every device refused it. Give the attempt back so the reminder is tried
+      // again next sweep, instead of being recorded as delivered.
+      await prisma.hostApplication.updateMany({
+        where: { id: application.id, nudgeCount: application.nudgeCount + 1 },
+        data: { nudgeCount: { decrement: 1 } },
+      });
+      failed += 1;
     } catch (error) {
-      // One host failing must not stop the rest of the sweep. The count was
-      // already incremented, so this application is not retried immediately;
-      // the cap still applies and the next sweep picks up fresh candidates.
-      console.error(`NUDGE failed for application ${application.id}`, error);
+      // One host failing must not stop the rest of the sweep, but it must be
+      // counted: the sweep used to report only what it sent, so a run where
+      // every reminder failed read exactly like a run with nothing due.
+      failed += 1;
+      console.error(`NUDGE failed for application ${application.id}:`, (error as Error)?.message || error);
     }
   }
 
-  return { sent, candidates: candidates.length };
+  return { sent, failed, unanswered, candidates: candidates.length };
 }

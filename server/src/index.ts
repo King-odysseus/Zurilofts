@@ -3,12 +3,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import app from './app.js';
+import prisma from './config/prisma.js';
 import { env } from './config/env.js';
-import { startTelegramPoller } from './services/chat.service.js';
 import { syncAll } from './services/ical.service.js';
 import { runDueAutoMessages } from './services/automated-message.service.js';
 import { syncConfiguredAdmin } from './services/admin-bootstrap.service.js';
-import { processScheduledPayouts, releaseDueHostFunds } from './services/payout.service.js';
+import { processScheduledPayouts, reconcilePendingPayouts, releaseDueHostFunds } from './services/payout.service.js';
 import { sendHostApplicationNudges } from './services/nudge.service.js';
 import { pruneExpiredRefreshSessions } from './services/auth.service.js';
 import { injectMeta, isAppOnlyPath, legacyRedirect, metaForPath } from './services/seo.service.js';
@@ -60,7 +60,12 @@ if (env.NODE_ENV === 'production') {
         res.status(!shellHtml || isAppOnlyPath(req.path) ? 200 : 404).sendFile(indexHtmlPath);
         return;
       }
-      if (meta.status === 404) res.status(404);
+      if (meta.status === 503) {
+        // The page exists but we could not read it, so a short Retry-After asks
+        // crawlers to come back instead of dropping the listing for good.
+        res.set('Retry-After', '300');
+      }
+      if (meta.status !== 200) res.status(meta.status);
       res.type('html').send(injectMeta(shellHtml, meta));
     } catch (err) {
       console.error('Per-page metadata failed, serving the plain shell:', err);
@@ -70,18 +75,55 @@ if (env.NODE_ENV === 'production') {
   console.log(` Serving static files from ${clientDist}`);
 }
 
-app.listen(Number(env.PORT), () => {
-  console.log(` ZuriLofts running on port ${env.PORT}`);
-  console.log(`   Environment: ${env.NODE_ENV}`);
-  console.log(`   Health: http://localhost:${env.PORT}/api/health`);
-  syncConfiguredAdmin().catch((err) => console.error('Admin account sync failed:', err?.message || err));
-  startTelegramPoller();
-  startCalendarSync();
-  startAutomatedMessageScheduler();
-  startPayoutScheduler();
-  startHostNudgeScheduler();
-  startSessionSweep();
-});
+let server: ReturnType<typeof app.listen> | null = null;
+
+/** Stops every sweep. Filled in as the boot callback starts them. */
+const stoppers: Array<() => void> = [];
+
+/**
+ * Run a sweep on a first delay and then every interval, keeping the handles so
+ * shutdown can stop them. A round left running while the database closes is how
+ * a redeploy turns into a burst of errors that nobody reads.
+ */
+function schedule(run: () => void, firstDelayMs: number, intervalMs: number): void {
+  let interval: NodeJS.Timeout | null = null;
+  const first = setTimeout(() => {
+    run();
+    interval = setInterval(run, intervalMs);
+  }, firstDelayMs);
+  stoppers.push(() => {
+    clearTimeout(first);
+    if (interval) clearInterval(interval);
+  });
+}
+
+/**
+ * Connect before listening. A bad DATABASE_URL used to boot cleanly, pass its
+ * health check and answer its first real request with a 500, so a broken deploy
+ * stayed in rotation instead of failing where someone would see it.
+ */
+async function start(): Promise<void> {
+  try {
+    await prisma.$connect();
+  } catch (err) {
+    console.error('Cannot reach the database at boot:', err instanceof Error ? err.message : err);
+    process.exit(1);
+  }
+
+  server = app.listen(Number(env.PORT), () => {
+    console.log(` ZuriLofts running on port ${env.PORT}`);
+    console.log(`   Environment: ${env.NODE_ENV}`);
+    console.log(`   Health: http://localhost:${env.PORT}/api/health`);
+    syncConfiguredAdmin().catch((err) => console.error('Admin account sync failed:', err?.message || err));
+    startCalendarSync();
+    startAutomatedMessageScheduler();
+    startPayoutScheduler();
+    startHostNudgeScheduler();
+    startSessionSweep();
+  });
+}
+
+void start();
 
 // Unhandled promise rejections and process errors crash hard so Railway can
 // restart and healthchecks surface the failure instead of a half-alive box.
@@ -93,6 +135,49 @@ process.on('uncaughtException', (err) => {
   console.error('UNCAUGHT EXCEPTION:', err);
   process.exit(1);
 });
+
+let shuttingDown = false;
+
+/**
+ * Railway sends SIGTERM on a redeploy and the process used to die where it stood:
+ * in-flight responses were cut, and work already handed to Paystack
+ * carried on with nothing watching it.
+ */
+async function shutdown(signal: string): Promise<void> {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  console.log(` ${signal} received - finishing in-flight requests before exit`);
+
+  // Sweeps first: a payout round must not start another while the database closes.
+  for (const stop of stoppers.splice(0)) stop();
+
+  const closed = new Promise<void>((resolve) => {
+    if (!server) {
+      resolve();
+      return;
+    }
+    server.close(() => resolve());
+  });
+
+  // A hung connection must not hold the deploy open past the platform's own grace
+  // period; exiting here leaves a clear line instead of an unexplained kill.
+  const deadline = setTimeout(() => {
+    console.error(' Shutdown timed out - exiting with requests still open');
+    process.exit(1);
+  }, 15_000);
+  deadline.unref();
+
+  await closed;
+  await prisma.$disconnect().catch((err: unknown) => {
+    console.error('Database disconnect failed during shutdown:', err instanceof Error ? err.message : err);
+  });
+  clearTimeout(deadline);
+  console.log(' Shutdown complete');
+  process.exit(0);
+}
+
+process.on('SIGTERM', () => void shutdown('SIGTERM'));
+process.on('SIGINT', () => void shutdown('SIGINT'));
 
 // Periodically import external iCal feeds (every 3 hours) so blocked dates stay
 // current without manual syncing. Failures per-source are swallowed inside syncAll.
@@ -106,8 +191,7 @@ function startCalendarSync() {
       .catch((err) => console.error('Calendar sync failed:', err?.message || err));
   };
   // First run shortly after boot, then on the interval
-  setTimeout(run, 30 * 1000);
-  setInterval(run, INTERVAL_MS);
+  schedule(run, 30 * 1000, INTERVAL_MS);
 }
 
 // Periodically release host money whose hold has expired and send the payouts
@@ -134,14 +218,26 @@ function startPayoutScheduler() {
         return processScheduledPayouts()
           .then(({ processed, failed }) => {
             if (processed.length) console.log(` Payouts sent for ${processed.length} host(s)`);
-            for (const f of failed) console.warn(`Payout skipped for host ${f.hostId}: ${f.reason}`);
+            if (failed.length > 0) {
+              // One line for the run. A systemic refusal (no provider balance,
+              // provider down) skips every host with the same reason, and the
+              // per-host line repeated it once each, every hour, until nobody read it.
+              const reasons = [...new Set(failed.map((f) => String(f.reason).slice(0, 120)))].slice(0, 3);
+              console.warn(`Payouts skipped for ${failed.length} host(s): ${reasons.join('; ')}`);
+            }
+          })
+          // A payout whose transfer reply was lost is left PENDING with the money
+          // held. Nothing else ever asks the provider what became of it, so
+          // without this the host's earnings would sit there for good.
+          .then(() => reconcilePendingPayouts())
+          .then(({ checked, settled }) => {
+            if (settled > 0) console.log(` Reconciled ${settled} of ${checked} payout(s) with an unknown outcome`);
           });
       })
       .catch((err) => console.error('Scheduled payout run failed:', err?.message || err));
   };
   // Give the app time to finish booting before the first sweep.
-  setTimeout(run, 2 * 60 * 1000);
-  setInterval(run, INTERVAL_MS);
+  schedule(run, 2 * 60 * 1000, INTERVAL_MS);
 }
 
 // Remind a host whose application has been sitting untouched. Runs twice a
@@ -157,8 +253,7 @@ function startHostNudgeScheduler() {
       .catch((err) => console.error('Host nudge scan failed:', err?.message || err));
   };
   // Slow first run: boot is the busiest moment and no nudge is urgent.
-  setTimeout(run, 10 * 60 * 1000);
-  setInterval(run, INTERVAL_MS);
+  schedule(run, 10 * 60 * 1000, INTERVAL_MS);
 }
 
 // Periodically deliver time-based automated host messages (pre-arrival
@@ -168,13 +263,18 @@ function startAutomatedMessageScheduler() {
   const INTERVAL_MS = 15 * 60 * 1000;
   const run = () => {
     runDueAutoMessages()
-      .then(({ sent }) => {
+      .then(({ sent, failed, stoppedEarly }) => {
         if (sent > 0) console.log(` Automated messages sent for ${sent} booking(s)`);
+        if (failed > 0) {
+          console.warn(
+            `Automated messages failed for ${failed} send(s)` +
+              (stoppedEarly ? ' - run stopped early, the failure looks systemic' : '')
+          );
+        }
       })
       .catch((err) => console.error('Automated message scan failed:', err?.message || err));
   };
-  setTimeout(run, 45 * 1000);
-  setInterval(run, INTERVAL_MS);
+  schedule(run, 45 * 1000, INTERVAL_MS);
 }
 
 
@@ -192,6 +292,5 @@ function startSessionSweep() {
       })
       .catch((err) => console.error('Session sweep failed:', err?.message || err));
   };
-  setTimeout(run, 5 * 60 * 1000);
-  setInterval(run, INTERVAL_MS);
+  schedule(run, 5 * 60 * 1000, INTERVAL_MS);
 }

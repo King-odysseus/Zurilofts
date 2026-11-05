@@ -15,7 +15,13 @@ export async function subscribe(req: Request, res: Response, next: NextFunction)
 // User: unsubscribe
 export async function unsubscribe(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
-    await pushService.unsubscribe(req.user!.sub, req.body.endpoint);
+    const result = await pushService.unsubscribe(req.user!.sub, req.body.endpoint);
+    if (!result.ok) {
+      // The row is still there, so the browser is still subscribed. Reporting
+      // success here told the person their alerts were off when they were not.
+      res.status(500).json({ success: false, error: 'Could not turn off notifications. Please try again.' });
+      return;
+    }
     res.json({ success: true });
   } catch (error) {
     next(error);

@@ -105,9 +105,16 @@ export const propertyCreateSchema = z.object({
   area: z.number().int().positive(),
   description: z.string().min(1),
   // Accept relative paths (e.g. /uploads/..., /images/...) as well as absolute URLs
-  images: z.array(z.string().min(1)).min(1, 'At least one image is required'),
-  amenities: z.array(z.string()),
-  nearby: z.array(z.string()),
+  // Every collection carries a ceiling: an unbounded array is validated element
+  // by element, so a single 1MB body of short strings can pin the event loop
+  // while zod walks it. The caps are generous next to what the listing form can
+  // produce (10 photos per upload, a curated amenity list).
+  images: z
+    .array(z.string().min(1).max(2048))
+    .min(1, 'At least one image is required')
+    .max(30, 'A listing can have at most 30 images'),
+  amenities: z.array(z.string().max(100)).max(60, 'A listing can have at most 60 amenities'),
+  nearby: z.array(z.string().max(200)).max(30, 'A listing can have at most 30 nearby places'),
   type: z.enum(['apartment', 'studio', 'penthouse']),
   available: z.boolean().default(true),
   // `featured` is deliberately absent: it is an admin marketing flag that puts

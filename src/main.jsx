@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import CookieConsent from './components/CookieConsent.jsx'
+import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { ModeProvider } from './context/ModeContext.jsx'
 import { FavoritesProvider } from './context/FavoritesContext.jsx'
@@ -52,8 +53,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <AuthProvider>
               <ModeProvider>
                 <FavoritesProvider>
-                  <App />
-                  <CookieConsent />
+                  {/* One null dereference on a partly loaded record used to unmount
+                      the whole tree and leave a blank page. The boundary already
+                      existed but was never mounted; it sits inside the providers
+                      because its fallback renders the navbar and footer. */}
+                  <ErrorBoundary>
+                    <App />
+                    <CookieConsent />
+                  </ErrorBoundary>
                 </FavoritesProvider>
               </ModeProvider>
             </AuthProvider>

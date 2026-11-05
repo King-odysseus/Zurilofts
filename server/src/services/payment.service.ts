@@ -5,7 +5,7 @@ import crypto from 'crypto';
 import { isRangeAvailable } from './calendar.service.js';
 import { calculateNights, computeExtraGuestFee } from '../utils/pricing.js';
 import { calculateHostEarnings, type HostEarningInput, type HostEarningPolicy } from '../utils/hostEarnings.js';
-import { sendTelegramAlert } from './chat.service.js';
+import { alertOps } from '../utils/opsAlert.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
 import { settleFailedTransfer, markTransferSucceeded } from './payout.service.js';
 import { computeHostPayableAt } from '../utils/payoutTiming.js';
@@ -332,12 +332,13 @@ async function confirmBookingPayment(
       `user=${booking.user.email}`;
     console.error(msg);
 
-    sendTelegramAlert(
-      `DOUBLE-BOOK CONFLICT \u2014 Booking ${bookingId.slice(-8)} for ${booking.property.title}\n` +
-      `Dates: ${booking.checkIn.toISOString().slice(0,10)} \u2192 ${booking.checkOut.toISOString().slice(0,10)}\n` +
+    void alertOps(
+      'Double-book conflict needs a decision',
+      `Booking ${bookingId.slice(-8)} for ${booking.property.title}\n` +
+      `Dates: ${booking.checkIn.toISOString().slice(0,10)} to ${booking.checkOut.toISOString().slice(0,10)}\n` +
       `Guest: ${booking.user.email}\n` +
       `Payment ref: ${payment.reference}\n` +
-      `Status set to CONFLICT \u2014 admin action required.`
+      'Status set to CONFLICT. Admin action required.'
     );
 
     return 'CONFLICT';
@@ -404,6 +405,24 @@ async function confirmBookingPayment(
   return 'CONFIRMED';
 }
 
+/**
+ * Report a transfer notice that matched no payout.
+ *
+ * Paystack only sends these for transfers it made, so a reference we do not hold
+ * means the two sides disagree about money that has already moved. The webhook
+ * still answers 200 - a redelivery cannot make the row appear - but silence is
+ * not an option: this used to be acknowledged with no log and no alert.
+ */
+function alertUnknownTransfer(event: string, transferRef: string): void {
+  console.error(`PAYOUT-UNKNOWN ${event} ref=${transferRef} - no payout row matches`);
+  void alertOps(
+    'Payout notice with no matching payout',
+    'Payout notice for a transfer with no payout record\n' +
+      `Event: ${event}\nReference: ${transferRef}\n` +
+      'Nothing was applied. Check this reference in the Paystack dashboard against the payouts here.'
+  );
+}
+
 /** Handle an incoming Paystack webhook event */
 export async function handleWebhookEvent(
   event: string,
@@ -419,7 +438,19 @@ export async function handleWebhookEvent(
     return { handled: false, message: 'Invalid webhook signature' };
   }
 
-  const data = JSON.parse(body);
+  // Signature first, then shape. `null`, a bare number or a truncated body can
+  // still be valid JSON, and reading through it threw a 500 that made Paystack
+  // redeliver the same undeliverable event for ever, with no record of it.
+  let data: any;
+  try {
+    data = JSON.parse(body);
+  } catch {
+    data = null;
+  }
+  if (!data || typeof data !== 'object') {
+    console.warn(`WEBHOOK-REJECTED body was not a JSON object event=${event.slice(0, 40)}`);
+    return { handled: true, message: 'Webhook body was not a JSON object; nothing to apply' };
+  }
 
   // Log the event
   await prisma.paymentLog.create({
@@ -447,10 +478,14 @@ export async function handleWebhookEvent(
       // Conditional on purpose: a retried or replayed success can arrive after
       // the balance was restored for a failed or reversed transfer, and marking
       // it SUCCESS again would let a repeat reversal credit the host twice.
-      const marked = await markTransferSucceeded(transferRef);
+      const outcome = await markTransferSucceeded(transferRef);
+      if (outcome === 'not_found') {
+        alertUnknownTransfer(event, transferRef);
+        return { handled: true, message: 'Success notice for an unknown transfer; alerted' };
+      }
       return {
         handled: true,
-        message: marked
+        message: outcome === 'applied'
           ? 'Payout marked SUCCESS'
           : 'Payout already settled; success notice ignored',
       };
@@ -461,12 +496,16 @@ export async function handleWebhookEvent(
       const reason = data.data?.reason || 'Unknown failure';
       if (!transferRef) return { handled: false, message: 'No transfer reference' };
 
-      const refunded = await settleFailedTransfer(transferRef, 'FAILED', reason);
+      const outcome = await settleFailedTransfer(transferRef, 'FAILED', reason);
+      if (outcome === 'not_found') {
+        alertUnknownTransfer(event, transferRef);
+        return { handled: true, message: 'Failure notice for an unknown transfer; alerted' };
+      }
       return {
         handled: true,
-        message: refunded
+        message: outcome === 'applied'
           ? 'Payout marked FAILED and the host balance was restored'
-          : 'Payout marked FAILED (already settled)',
+          : 'Payout settled or could not be applied; failure notice recorded and ignored',
       };
     }
 
@@ -474,10 +513,14 @@ export async function handleWebhookEvent(
       const transferRef = data.data?.reference;
       if (!transferRef) return { handled: false, message: 'No transfer reference' };
 
-      const refunded = await settleFailedTransfer(transferRef, 'REVERSED', 'Transfer reversed by Paystack');
+      const outcome = await settleFailedTransfer(transferRef, 'REVERSED', 'Transfer reversed by Paystack');
+      if (outcome === 'not_found') {
+        alertUnknownTransfer(event, transferRef);
+        return { handled: true, message: 'Reversal notice for an unknown transfer; alerted' };
+      }
       return {
         handled: true,
-        message: refunded
+        message: outcome === 'applied'
           ? 'Payout marked REVERSED and the host balance was restored'
           : 'Payout marked REVERSED (already settled)',
       };

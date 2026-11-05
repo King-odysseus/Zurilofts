@@ -106,7 +106,7 @@ const STATIC_PAGES: StaticPage[] = [
 const STATIC_PAGE_BY_PATH = new Map(STATIC_PAGES.map((page) => [page.path, page]));
 
 export interface PageMeta {
-  status: 200 | 404;
+  status: 200 | 404 | 503;
   title: string;
   description: string;
   canonicalUrl: string;
@@ -228,8 +228,29 @@ function stripBrand(title: string): string {
   return trimmed;
 }
 
+/**
+ * What a crawler gets when our own database could not answer.
+ *
+ * A failed read used to be flattened into the not-found page, which told search
+ * engines a live listing had been retired during a momentary outage. A 503 asks
+ * them to come back, while a page that genuinely does not exist stays a 404.
+ */
+function unavailableMeta(origin: string, path: string): PageMeta {
+  return {
+    status: 503,
+    title: `Temporarily unavailable | ${SITE_NAME}`,
+    description: 'This page cannot be shown right now. Please try again in a moment.',
+    canonicalUrl: `${origin}${path}`,
+    imageUrl: `${origin}${DEFAULT_OG_IMAGE_PATH}`,
+    imageIsBranded: true,
+    type: 'website',
+    jsonLd: [],
+  };
+}
+
 async function stayMeta(origin: string, id: string): Promise<PageMeta> {
   // Only PUBLISHED listings are public; anything else must not be indexed.
+  let loadFailed = false;
   const property = await prisma.property
     .findFirst({
       where: { id, status: 'PUBLISHED' },
@@ -245,8 +266,13 @@ async function stayMeta(origin: string, id: string): Promise<PageMeta> {
         rating: true,
       },
     })
-    .catch(() => null);
+    .catch((err) => {
+      loadFailed = true;
+      console.error(`STAY-META read failed for listing ${id}:`, (err as Error)?.message || err);
+      return null;
+    });
 
+  if (loadFailed) return unavailableMeta(origin, `/stay/${id}`);
   if (!property) {
     return {
       status: 404,
@@ -311,13 +337,19 @@ async function stayMeta(origin: string, id: string): Promise<PageMeta> {
 }
 
 async function guideMeta(origin: string, slug: string): Promise<PageMeta> {
+  let loadFailed = false;
   const post = await prisma.blogPost
     .findFirst({
       where: { slug, published: true },
       select: { title: true, slug: true, excerpt: true, coverImage: true, updatedAt: true },
     })
-    .catch(() => null);
+    .catch((err) => {
+      loadFailed = true;
+      console.error(`GUIDE-META read failed for ${slug}:`, (err as Error)?.message || err);
+      return null;
+    });
 
+  if (loadFailed) return unavailableMeta(origin, `/guides/${slug}`);
   if (!post) {
     return {
       status: 404,

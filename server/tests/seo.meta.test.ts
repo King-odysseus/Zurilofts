@@ -5,7 +5,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { buildRobots, injectMeta, isAppOnlyPath, type PageMeta } from '../src/services/seo.service.js';
+import prisma from '../src/config/prisma.js';
+import { buildRobots, injectMeta, isAppOnlyPath, metaForPath, type PageMeta } from '../src/services/seo.service.js';
 
 const shell = `<!doctype html><html lang="en"><head>
     <meta name="description" content="Home page description." />
@@ -107,5 +108,50 @@ test('a word that merely starts like a protected prefix is not one', () => {
   // protected prefix looked healthy to a crawler or a link checker.
   for (const path of ['/hostxyz', '/adminpanel', '/tripsomething', '/loginfoo', '/bookinger']) {
     assert.equal(isAppOnlyPath(path), false, `${path} should be unknown`);
+  }
+});
+
+/** Enough of a Request for the canonical link to be absolute. */
+function fakeRequest() {
+  return {
+    protocol: 'https',
+    headers: {},
+    get: (name: string) => (name.toLowerCase() === 'host' ? 'thezurilofts.com' : undefined),
+  } as unknown as Parameters<typeof metaForPath>[1];
+}
+
+/**
+ * A read that fails must not describe the page as missing.
+ *
+ * This is the difference between "come back later" and "this listing is gone":
+ * the second one, served during a few seconds of database trouble, drops a live
+ * listing out of search results and misinforms every link preview. The two
+ * branch on the same failed query, so both paths are checked here.
+ */
+test('a listing or guide whose read fails answers 503, not 404', async () => {
+  const propertyDelegate = prisma.property as unknown as { findFirst: unknown };
+  const postDelegate = prisma.blogPost as unknown as { findFirst: unknown };
+  const originalProperty = propertyDelegate.findFirst;
+  const originalPost = postDelegate.findFirst;
+  // The service logs each failed read deliberately; keeping that quiet here so a
+  // passing run stays readable.
+  const originalError = console.error;
+  console.error = () => {};
+
+  try {
+    propertyDelegate.findFirst = () => Promise.reject(new Error('database is down'));
+    const stay = await metaForPath('/stay/abc123', fakeRequest());
+    assert.equal(stay?.status, 503, 'a failed listing read is an outage, not a retirement');
+    assert.match(stay?.title ?? '', /Temporarily unavailable/);
+    assert.equal(stay?.canonicalUrl, 'https://thezurilofts.com/stay/abc123');
+
+    postDelegate.findFirst = () => Promise.reject(new Error('database is down'));
+    const guide = await metaForPath('/guides/nairobi-in-a-weekend', fakeRequest());
+    assert.equal(guide?.status, 503, 'a failed guide read is an outage, not a deleted guide');
+    assert.match(guide?.title ?? '', /Temporarily unavailable/);
+  } finally {
+    propertyDelegate.findFirst = originalProperty;
+    postDelegate.findFirst = originalPost;
+    console.error = originalError;
   }
 });

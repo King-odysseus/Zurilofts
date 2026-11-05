@@ -5,7 +5,12 @@ import crypto from 'crypto';
 import { ValidationError, NotFoundError, ConflictError } from '../types/index.js';
 import { maskPayoutAccount, normalizeKenyanMpesaPhone, payoutRecipientKey } from '../utils/payoutDestination.js';
 import { isHostFundsDue } from '../utils/payoutTiming.js';
-import { SETTLED_PAYOUT_STATUSES, isSettledPayoutStatus } from '../utils/payoutTransitions.js';
+import {
+  FAILURE_NOTICE_SOURCE_STATUSES,
+  SETTLED_PAYOUT_STATUSES,
+  canSettleFailedTransfer,
+  isSettledPayoutStatus,
+} from '../utils/payoutTransitions.js';
 import { creditReferralForFirstEarning } from './referral.service.js';
 
 /**
@@ -300,15 +305,51 @@ export async function processHostPayout(hostId: string, initiatedBy: string = 's
       reference: transferRef,
     });
   } catch (e: any) {
-    // The claim is already taken, so put it back before failing.
+    if (paystack.isPaystackTimeout(e)) {
+      // Paystack may have accepted the transfer and the reply never arrived. The
+      // balance is already claimed, so leaving the payout PENDING holds the money
+      // instead of paying it a second time. reconcilePendingPayouts asks the
+      // provider what happened and settles it either way.
+      await prisma.payout.updateMany({
+        where: { id: payout.id, status: 'PENDING' },
+        data: {
+          failureReason:
+            'Transfer outcome unknown: the provider did not answer in time. Awaiting reconciliation.',
+        },
+      });
+      console.error(`PAYOUT-TIMEOUT ${transferRef} left PENDING for reconciliation`);
+      throw new ValidationError(
+        'The payment provider did not answer, so the transfer outcome is unknown. ' +
+          'The payout is held and will be reconciled automatically; it has not been retried.',
+      );
+    }
+    // A refusal is definite: nothing was sent, so put the claim back.
     await settleFailedTransfer(transferRef, 'FAILED', `Transfer initiation failed: ${e.message}`);
     throw new ValidationError(`Transfer initiation failed: ${e.message}`);
   }
 
-  await prisma.payout.update({
-    where: { id: payout.id },
+  // Conditional on PENDING: a `transfer.success` webhook can land between the
+  // Paystack call returning and this write. An unconditional update forces the
+  // payout back to PROCESSING, which reopens the failure direction and lets a
+  // later failure notice refund money the provider already delivered.
+  const advanced = await prisma.payout.updateMany({
+    where: { id: payout.id, status: 'PENDING' },
     data: { status: 'PROCESSING', transferRef: transferResult.transferRef },
   });
+
+  if (advanced.count === 0) {
+    // A webhook settled this payout first. Do not link the bookings now: a
+    // payoutBooking row excludes a booking from every future payout, and the
+    // failure path has already deleted the rows it knew about, so writing them
+    // here would strand that money for good.
+    const settled = await prisma.payout.findUnique({ where: { id: payout.id } });
+    return {
+      payout: settled ?? payout,
+      message:
+        `Payout of KES ${transferAmount.toLocaleString()} was settled by the payment provider ` +
+        'before it could be recorded as processing',
+    };
+  }
 
   // Link bookings to this payout
   for (const b of unpaidBookings) {
@@ -346,6 +387,16 @@ async function refundClaim(hostId: string, amount: number): Promise<void> {
 }
 
 /**
+ * What a provider transfer notice did.
+ *
+ * 'not_found' is its own answer rather than another "ignored": a notice for a
+ * reference we do not hold means the provider and this database disagree about a
+ * transfer of real money, and a person has to look. It used to be reported as
+ * false, the same as a harmless redelivery, so the alarming case was invisible.
+ */
+export type TransferOutcome = 'applied' | 'already' | 'not_found';
+
+/**
  * Mark a payout SUCCESS when the provider reports the transfer arrived.
  *
  * Conditional, because transfer notices are retried and can arrive out of
@@ -354,18 +405,19 @@ async function refundClaim(hostId: string, amount: number): Promise<void> {
  * notice honestly is what keeps a provider-side replay visible in the logs
  * instead of letting it move money later.
  *
- * Returns true only when this call performed the transition.
+ * Reports what the notice did, so a reference we cannot match is not filed as a
+ * routine replay.
  */
-export async function markTransferSucceeded(transferRef: string): Promise<boolean> {
+export async function markTransferSucceeded(transferRef: string): Promise<TransferOutcome> {
   const payout = await prisma.payout.findUnique({ where: { transferRef } });
-  if (!payout) return false;
-  if (isSettledPayoutStatus(payout.status)) return false;
+  if (!payout) return 'not_found';
+  if (isSettledPayoutStatus(payout.status)) return 'already';
 
   const flipped = await prisma.payout.updateMany({
     where: { transferRef, status: { notIn: [...SETTLED_PAYOUT_STATUSES] } },
     data: { status: 'SUCCESS', completedAt: new Date() },
   });
-  return flipped.count > 0;
+  return flipped.count > 0 ? 'applied' : 'already';
 }
 
 /**
@@ -377,25 +429,27 @@ export async function markTransferSucceeded(transferRef: string): Promise<boolea
  * payoutBooking row points at them, so a failed transfer used to strand that
  * money permanently.
  *
- * Returns true when this call performed the settlement.
+ * Reports what the notice did: 'not_found' when no payout holds the reference.
  */
 export async function settleFailedTransfer(
   transferRef: string,
   status: 'FAILED' | 'REVERSED',
   reason?: string,
-): Promise<boolean> {
+): Promise<TransferOutcome> {
   const payout = await prisma.payout.findUnique({ where: { transferRef } });
-  if (!payout) return false;
-  // Guard against a duplicate delivery flipping an already-settled payout and
-  // crediting the host twice.
-  if (isSettledPayoutStatus(payout.status)) return false;
+  if (!payout) return 'not_found';
+  // Two guards, because they answer different questions. This one refuses a
+  // notice that may not apply to this state at all - a failure arriving against
+  // a payout the provider already confirmed, or a repeat of one already applied.
+  if (!canSettleFailedTransfer(payout.status, status)) return 'already';
+  if (isSettledPayoutStatus(payout.status)) return 'already';
 
   return prisma.$transaction(async (tx) => {
     const flipped = await tx.payout.updateMany({
-      where: { id: payout.id, status: { notIn: [...SETTLED_PAYOUT_STATUSES] } },
+      where: { id: payout.id, status: { in: [...FAILURE_NOTICE_SOURCE_STATUSES[status]] } },
       data: { status, failureReason: reason ?? null },
     });
-    if (flipped.count === 0) return false;
+    if (flipped.count === 0) return 'already' as const;
 
     await tx.hostWallet.update({
       where: { hostId: payout.hostId },
@@ -405,8 +459,75 @@ export async function settleFailedTransfer(
       },
     });
     await tx.payoutBooking.deleteMany({ where: { payoutId: payout.id } });
-    return true;
+    return 'applied' as const;
   });
+}
+
+/**
+ * Resolve payouts whose transfer outcome was never learned.
+ *
+ * A transfer whose reply is lost is left PENDING with the host's balance already
+ * claimed. Without this the money sits there: the sweep skips a host who has a
+ * pending payout, and nothing else ever asks the provider what happened.
+ */
+export async function reconcilePendingPayouts(
+  olderThanMinutes = 15,
+): Promise<{ checked: number; settled: number }> {
+  if (!env.PAYSTACK_SECRET_KEY) return { checked: 0, settled: 0 };
+
+  const cutoff = new Date(Date.now() - olderThanMinutes * 60 * 1000);
+  const stuck = await prisma.payout.findMany({
+    where: { status: 'PENDING', createdAt: { lt: cutoff } },
+    select: { id: true, transferRef: true },
+  });
+
+  let settled = 0;
+
+  for (const payout of stuck) {
+    // A payout without a reference cannot be looked up, and cannot be one of the
+    // rows this routine is for: the reference is written before the transfer.
+    const transferRef = payout.transferRef;
+    if (!transferRef) continue;
+
+    let transfer: { status: string } | null;
+    try {
+      transfer = await paystack.verifyTransfer(transferRef);
+    } catch (err: any) {
+      // Still unreachable. The payout stays held and is retried next run.
+      console.error(`Reconcile ${transferRef}: provider call failed: ${err?.message || err}`);
+      continue;
+    }
+
+    if (!transfer) {
+      // Paystack never saw this reference, so nothing moved: reverse the claim.
+      const reverted = await settleFailedTransfer(
+        transferRef,
+        'FAILED',
+        'Provider had no record of this transfer - claim reversed on reconciliation',
+      );
+      if (reverted === 'applied') settled += 1;
+      continue;
+    }
+
+    const status = transfer.status.toLowerCase();
+    if (status === 'success') {
+      if ((await markTransferSucceeded(transferRef)) === 'applied') settled += 1;
+      continue;
+    }
+
+    if (['failed', 'reversed', 'abandoned', 'blocked'].includes(status)) {
+      const notice = status === 'reversed' ? 'REVERSED' : 'FAILED';
+      const reverted = await settleFailedTransfer(
+        transferRef,
+        notice,
+        `Provider reported the transfer as ${status} (reconciliation)`,
+      );
+      if (reverted === 'applied') settled += 1;
+    }
+    // pending, otp and anything unknown carry no answer yet: check again next run.
+  }
+
+  return { checked: stuck.length, settled };
 }
 
 /** Process all scheduled payouts for hosts whose next payout date is due */

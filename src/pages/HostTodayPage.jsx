@@ -10,6 +10,7 @@ import { firstImage } from "../utils/images.js";
 import HostCard, { HOST_EYEBROW } from "../components/HostCard.jsx";
 import HostFollowUps from "../components/HostFollowUps.jsx";
 import VerificationNudge from "../components/VerificationNudge.jsx";
+import LoadFailed from "../components/LoadFailed.jsx";
 
 // Badge tones replace the old per-tone status pills on each panel header.
 const TONE_COLORS = { arrival: "info", inhouse: "warning", departure: "success" };
@@ -170,7 +171,7 @@ OperationPanel.propTypes = {
   messageBookingId: PropTypes.string,
 };
 
-function RecentMessages({ conversations, loading }) {
+function RecentMessages({ conversations, loading, error, onRetry }) {
   const { t } = useLanguage();
   return <HostCard
     eyebrow="GUEST MESSAGES"
@@ -182,7 +183,12 @@ function RecentMessages({ conversations, loading }) {
         <span className="block h-20 animate-pulse rounded-xl bg-surface" />
         <span className="block h-20 animate-pulse rounded-xl bg-surface" />
       </div>
-      : conversations.length === 0
+      : error
+        ? <LoadFailed
+          message="We could not load your guest messages."
+          onRetry={onRetry}
+        />
+        : conversations.length === 0
         ? <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border px-5 py-12 text-center">
           <strong className="text-sm font-semibold text-navy">{t('host.noGuestMessages')}</strong>
           <p className="text-xs text-muted">{t('host.noGuestMessagesHint')}</p>
@@ -207,6 +213,8 @@ function RecentMessages({ conversations, loading }) {
 RecentMessages.propTypes = {
   conversations: PropTypes.arrayOf(PropTypes.object).isRequired,
   loading: PropTypes.bool.isRequired,
+  error: PropTypes.bool,
+  onRetry: PropTypes.func,
 };
 
 export default function HostTodayPage() {
@@ -223,10 +231,19 @@ export default function HostTodayPage() {
   const [messageError, setMessageError] = useState("");
   const [followUps, setFollowUps] = useState([]);
   const [followUpsLoading, setFollowUpsLoading] = useState(true);
+  // Side loads fail on their own; each keeps its own flag so a failed list is
+  // never drawn as an empty one.
+  const [conversationsError, setConversationsError] = useState(false);
+  const [followUpsError, setFollowUpsError] = useState(false);
+  const [reloadToken, setReloadToken] = useState(0);
 
   useEffect(() => {
     if (!isAuthenticated) return undefined;
     let active = true;
+    setConversationsLoading(true);
+    setConversationsError(false);
+    setFollowUpsLoading(true);
+    setFollowUpsError(false);
     async function loadToday() {
       setLoading(true);
       setError(null);
@@ -246,7 +263,7 @@ export default function HostTodayPage() {
         const response = await apiClient.get("/conversations", { params: { side: "host" } });
         if (active) setConversations((response.data.data || []).slice(0, 3));
       } catch {
-        if (active) setConversations([]);
+        if (active) setConversationsError(true);
       } finally {
         if (active) setConversationsLoading(false);
       }
@@ -256,8 +273,9 @@ export default function HostTodayPage() {
         const response = await apiClient.get("/reviews/host", { params: { limit: 10 } });
         if (active) setFollowUps(response.data.data?.followUps?.items || []);
       } catch {
-        // A missing follow-up list must not hide the day's real schedule.
-        if (active) setFollowUps([]);
+        // A missing follow-up list must not hide the day's real schedule, and an
+        // empty one must not stand in for a request that failed.
+        if (active) setFollowUpsError(true);
       } finally {
         if (active) setFollowUpsLoading(false);
       }
@@ -266,7 +284,7 @@ export default function HostTodayPage() {
     loadConversations();
     loadFollowUps();
     return () => { active = false; };
-  }, [isAuthenticated, t]);
+  }, [isAuthenticated, t, reloadToken]);
 
   // The conversation is created on demand, so a host writing to a guest they have
   // never messaged lands in the same thread the guest will see.
@@ -289,7 +307,7 @@ export default function HostTodayPage() {
     </HostCard>)}
   </div>;
 
-  if (error) return <div className="space-y-6"><HostCard><p className="text-sm text-charcoal">{error}</p><Button type="button" size="sm" onClick={() => window.location.reload()}>{t('common.retry')}</Button></HostCard></div>;
+  if (error) return <div className="space-y-6"><HostCard><p role="alert" className="text-sm text-charcoal">{error}</p><Button type="button" size="sm" onClick={() => setReloadToken((token) => token + 1)}>{t('common.retry')}</Button></HostCard></div>;
 
   const { arrivals = [], departures = [], inHouse = [], summary = {} } = data || {};
   const priority = arrivals[0] || inHouse[0] || departures[0];
@@ -416,8 +434,15 @@ export default function HostTodayPage() {
       </div>)}
     </div>
 
-    <HostFollowUps items={followUps} loading={followUpsLoading} />
+    {followUpsError
+      ? <HostCard eyebrow={t('host.followUps')} title={t('host.yourFollowUps')}>
+        <LoadFailed
+          message="We could not load your follow-ups, so this list is not the whole picture."
+          onRetry={() => setReloadToken((token) => token + 1)}
+        />
+      </HostCard>
+      : <HostFollowUps items={followUps} loading={followUpsLoading} />}
 
-    <RecentMessages conversations={conversations} loading={conversationsLoading} />
+    <RecentMessages conversations={conversations} loading={conversationsLoading} error={conversationsError} onRetry={() => setReloadToken((token) => token + 1)} />
   </div>;
 }

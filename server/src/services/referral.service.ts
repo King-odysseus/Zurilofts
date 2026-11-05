@@ -237,10 +237,13 @@ export async function creditReferralForFirstEarning(
     });
 
     return { credited: true, amount: paid.amount };
-  } catch (error) {
-    // The unique column turns a duplicate into an error; that is the expected
-    // path for every release after the first, so it is not reported as a fault.
-    console.error('REFERRAL credit skipped for host', referredHostId, error);
+  } catch (error: any) {
+    // The unique column turns a duplicate into an error, and that is the expected
+    // result of every release after the first. Logging it as a fault with the
+    // whole error object put a stack trace in the log on a normal release.
+    if (error?.code !== 'P2002') {
+      console.error('REFERRAL credit failed for host', referredHostId, error?.message || error);
+    }
     return { credited: false, amount: 0 };
   }
 }

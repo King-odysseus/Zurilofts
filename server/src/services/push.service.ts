@@ -38,7 +38,12 @@ export async function unsubscribe(userId: string, endpoint: string) {
     // Scoped to the caller: the endpoint alone identifies the row, so deleting
     // by endpoint let any signed-in account silence someone else's alerts.
     await prisma.pushSubscription.deleteMany({ where: { endpoint, userId } });
-  } catch (err) { console.error('Failed to remove push subscription:', err); }
+  } catch (err) {
+    // A delete that throws leaves the browser subscribed, so answering "ok"
+    // told the person alerts were off while every one of them still arrived.
+    console.error('Failed to remove push subscription:', (err as Error)?.message || err);
+    return { ok: false };
+  }
   return { ok: true };
 }
 
@@ -74,32 +79,68 @@ export async function sendPush(
 
   const payload = JSON.stringify({ title, body, url });
   const results: Array<{ endpoint: string; ok: boolean }> = [];
+  let removedDead = 0;
+  let cleanupFailures = 0;
 
-  await Promise.allSettled(
-    subscriptions.map(async (sub: { endpoint: string; keys: string }) => {
-      try {
-        const pushSub = {
-          endpoint: sub.endpoint,
-          keys: typeof sub.keys === 'string' ? JSON.parse(sub.keys) : sub.keys,
-        };
-        await webpush.sendNotification(pushSub, payload);
-        results.push({ endpoint: sub.endpoint, ok: true });
-      } catch (err: any) {
-        // Remove dead subscriptions (410 Gone or 404)
-        if (err.statusCode === 410 || err.statusCode === 404) {
-          try { await prisma.pushSubscription.delete({ where: { endpoint: sub.endpoint } }); } catch (err) { console.error('Failed to remove dead push subscription:', err); }
+  // Bounded fan-out. A slow push service used to hold the request handlers that
+  // await this and open one socket per subscription, up to 5,000 at a time.
+  const CONCURRENCY = 100;
+  const PUSH_TIMEOUT_MS = 10_000;
+
+  for (let start = 0; start < subscriptions.length; start += CONCURRENCY) {
+    await Promise.allSettled(
+      subscriptions.slice(start, start + CONCURRENCY).map(async (sub: { endpoint: string; keys: string }) => {
+        try {
+          const pushSub = {
+            endpoint: sub.endpoint,
+            keys: typeof sub.keys === 'string' ? JSON.parse(sub.keys) : sub.keys,
+          };
+          // web-push only arms a timeout when it is passed one, so without this a
+          // single dead endpoint could hold its whole batch open indefinitely.
+          await webpush.sendNotification(pushSub, payload, { timeout: PUSH_TIMEOUT_MS });
+          results.push({ endpoint: sub.endpoint, ok: true });
+        } catch (err: any) {
+          // Remove dead subscriptions (410 Gone or 404). A sweep where most
+          // devices are gone used to write a cleanup error line for each one.
+          if (err.statusCode === 410 || err.statusCode === 404) {
+            try {
+              await prisma.pushSubscription.delete({ where: { endpoint: sub.endpoint } });
+              removedDead += 1;
+            } catch {
+              // Usually a concurrent batch removed the row first. Counted, so a
+              // real cleanup problem still shows up in the run summary below.
+              cleanupFailures += 1;
+            }
+          }
+          results.push({ endpoint: sub.endpoint, ok: false });
         }
-        results.push({ endpoint: sub.endpoint, ok: false });
-      }
-    }),
-  );
+      }),
+    );
+  }
+
+  if (removedDead > 0) console.log(`Push: removed ${removedDead} expired subscription(s)`);
+  if (cleanupFailures > 0) {
+    console.warn(`Push: ${cleanupFailures} expired subscription(s) could not be removed this run`);
+  }
 
   return results;
 }
 
-/** Send push to a specific user by userId */
+/**
+ * Send push to a specific user by userId.
+ *
+ * Never rejects. Call sites start it without awaiting it, so a rejection here is
+ * an unhandled rejection, and the process exits on those: a transient database
+ * error while sending a courtesy notification could kill the server, including a
+ * payout or booking write in flight on another request.
+ */
 export async function sendPushToUser(userId: string, title: string, body: string, url = '/') {
-  const subs = await getSubscriptionsForUser(userId);
-  if (!subs.length) return [];
-  return sendPush(subs.map((s: { endpoint: string; keys: string }) => ({ endpoint: s.endpoint, keys: s.keys })), title, body, url);
+  try {
+    const subs = await getSubscriptionsForUser(userId);
+    if (!subs.length) return [];
+    return await sendPush(subs.map((s: { endpoint: string; keys: string }) => ({ endpoint: s.endpoint, keys: s.keys })), title, body, url);
+  } catch (err) {
+    console.error('Push send failed:', err instanceof Error ? err.message : err);
+    return [];
+  }
 }
