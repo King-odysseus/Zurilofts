@@ -51,7 +51,7 @@ function PrivacyPage() {
                 {t('legal.privacy.s2Body')}
               </p>
               <p className="mt-2">
-                <strong>{t('legal.privacy.emailLabel')}</strong> privacy@zurilofts.com<br />
+                <strong>{t('legal.privacy.emailLabel')}</strong> privacy@thezurilofts.com<br />
                 <strong>{t('legal.privacy.addressLabel')}</strong> Nairobi, Kenya
               </p>
             </section>
@@ -318,7 +318,7 @@ function PrivacyPage() {
               <h2 className="text-xl font-bold text-[#203565] mb-3">{t('legal.privacy.s16Title')}</h2>
               <p>{t('legal.privacy.s16Body')}</p>
               <p className="mt-2">
-                <strong>{t('legal.privacy.emailLabel')}</strong> privacy@zurilofts.com<br />
+                <strong>{t('legal.privacy.emailLabel')}</strong> privacy@thezurilofts.com<br />
                 <strong>{t('legal.privacy.generalEnquiriesLabel')}</strong> enquires@zurilofts.com<br />
                 <strong>{t('legal.privacy.addressLabel')}</strong> Nairobi, Kenya
               </p>

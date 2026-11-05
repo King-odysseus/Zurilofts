@@ -82,10 +82,9 @@ leaked data itself.
 | Data Protection Officer, if appointed (name and phone) | |
 | ODPC reporting route (from odpc.go.ke) | |
 
-Your privacy policy gives two different privacy email addresses
-(privacy@zurilofts.com and privacy@thezurilofts.com). The regulator notice uses
-privacy@zurilofts.com. Pick one, make sure it is read every day, and use it
-everywhere.
+The privacy address is privacy@thezurilofts.com. The privacy policy and the
+regulator notice both use it. Make sure that mailbox exists and is read every
+day, because the regulator and affected people will write to it.
 
 ## Suppliers
 
