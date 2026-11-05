@@ -19,6 +19,7 @@ import AdminMessages from './pages/AdminMessages.jsx';
 import AdminGuides from './pages/AdminGuides.jsx';
 import AdminTrustSafety from './pages/AdminTrustSafety.jsx';
 import AdminGovernance from './pages/AdminGovernance.jsx';
+import AdminIncidents from './pages/AdminIncidents.jsx';
 import AdminBookings from './pages/AdminBookings.jsx';
 import HostApplicationPage from './pages/HostApplicationPage.jsx';
 import HostArrivalGuidePage from './pages/HostArrivalGuidePage.jsx';
@@ -115,6 +116,7 @@ export default function WorkspaceRoutes() {
       <Route path="identity-verifications" element={<Navigate to="/admin/trust-safety" replace />} />
       <Route path="disputes" element={<Navigate to="/admin/trust-safety" replace />} />
       <Route path="governance" element={<AdminGovernance />} />
+      <Route path="incidents" element={<AdminIncidents />} />
       <Route path="audit" element={<Navigate to="/admin/governance" replace />} />
       <Route path="addons" element={<AdminAddOns />} />
       <Route path="feedback" element={<AdminFeedback />} />

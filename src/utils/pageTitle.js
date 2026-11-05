@@ -96,6 +96,7 @@ const ROUTE_TITLES = [
   [/^\/admin\/host-applications$/, 'title.adminHostApplications'],
   [/^\/admin\/trust-safety$/, 'title.adminTrustSafety'],
   [/^\/admin\/governance$/, 'title.adminGovernance'],
+  [/^\/admin\/incidents$/, 'title.adminIncidents'],
   [/^\/admin\/addons$/, 'title.adminAddons'],
   [/^\/admin\/bookings$/, 'title.adminReservations'],
   [/^\/admin\/feedback$/, 'title.adminFeedback'],
