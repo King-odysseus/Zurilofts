@@ -12,7 +12,10 @@
       "title": "Save your first checkpoint"
     }
   ],
-  "narrative": null,
-  "narrativeFor": "",
-  "narrativeAt": null
+  "narrative": {
+    "headline": "Understanding one piece of the code",
+    "explanation": "The project is saved in version control and has a checkpoint. Now you are on the step where you understand a piece of the code. The project has 552 files, mostly JavaScript and TypeScript, split into a server part (221 files) and a src part (208 files).\n\nThe next action is to work through the question the Learn panel has picked for you: predict which component gets rendered into the root element, and why you expect that. Answering it is not a test — it is a way to make a guess first, so that when you look at the code you notice where you were right or wrong. This is one action, not two.\n\nAfter that, the next step will be having a way to check your work, using the project's 51 test files. There is one uncommitted file waiting, but that comes later. The board is empty, so cards play no part here."
+  },
+  "narrativeFor": "understood",
+  "narrativeAt": "2026-11-05T10:25:22.684Z"
 }
