@@ -72,8 +72,9 @@ function buildFacts(property, typeLabel, t) {
   return facts;
 }
 
-function ListingMirrorBody({ property, sidePanel }) {
+function ListingMirrorBody({ property, sidePanel, titleAs = 'h1' }) {
   const { t } = useLanguage();
+  const TitleTag = titleAs;
   const [featuredImage, setFeaturedImage] = useState(0);
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
@@ -145,7 +146,10 @@ function ListingMirrorBody({ property, sidePanel }) {
       )}
 
       <header className="mb-6">
-        <h1 className="text-2xl font-bold leading-tight text-navy sm:text-3xl">{property.title}</h1>
+        {/* The title is an h1 only when the mirror is the whole page. Both
+            callers embed it under a page heading, so they pass h2 and the
+            document keeps a single h1. */}
+        <TitleTag className="text-2xl font-bold leading-tight text-navy sm:text-3xl">{property.title}</TitleTag>
         <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-muted">
           {property.location && (
             <a
@@ -293,6 +297,7 @@ const propertyShape = PropTypes.shape({
 ListingMirrorBody.propTypes = {
   property: propertyShape.isRequired,
   sidePanel: PropTypes.node,
+  titleAs: PropTypes.oneOf(['h1', 'h2']),
 };
 
 export default ListingMirrorBody;

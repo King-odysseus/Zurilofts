@@ -125,7 +125,7 @@ export default function AdminListingPreviewPage() {
       </div>
 
       <section className="rounded-2xl bg-elevated p-4 shadow-sm sm:p-6">
-        <ListingMirrorBody property={listing} sidePanel={sidePanel} />
+        <ListingMirrorBody property={listing} sidePanel={sidePanel} titleAs="h2" />
       </section>
     </div>
   );

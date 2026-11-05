@@ -101,7 +101,10 @@ function CookieConsent() {
       role="dialog"
       aria-live="polite"
       aria-label={t('chrome.cookieConsentAria')}
-      className={`fixed bottom-4 left-4 right-4 sm:right-auto sm:max-w-md z-50 transition-all duration-300 ease-out ${
+      // On phones the admin and host workspaces have a 58px bottom bar, and the
+      // panel used to sit on top of it, so the last nav items were unreachable
+      // until the visitor answered. Clear the bar below lg; desktop has none.
+      className={`fixed bottom-[calc(4.75rem+env(safe-area-inset-bottom))] left-4 right-4 sm:right-auto sm:max-w-md lg:bottom-4 z-50 transition-all duration-300 ease-out ${
         visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
       }`}
     >

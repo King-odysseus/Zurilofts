@@ -140,7 +140,7 @@ export default function HostListingPreviewPage() {
       </div>
 
       <HostCard>
-        <ListingMirrorBody property={property} sidePanel={sidePanel} />
+        <ListingMirrorBody property={property} sidePanel={sidePanel} titleAs="h2" />
       </HostCard>
     </div>
   );

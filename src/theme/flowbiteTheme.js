@@ -135,7 +135,9 @@ export const brandTheme = {
       light: `border border-[#E2DAD0] bg-white text-[#203565] hover:bg-[#F8FAFC] ${FOCUS_RING} dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700`,
       dark: `bg-[#143A80] text-white hover:bg-[#0B2A5E] ${FOCUS_RING} dark:bg-[#143A80] dark:hover:bg-[#0B2A5E]`,
       gray: `bg-[#F1F5F9] text-[#203565] hover:bg-[#E2E8F0] ${FOCUS_RING} dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600`,
-      success: `bg-green-600 text-white hover:bg-green-700 ${FOCUS_RING} dark:bg-green-600 dark:hover:bg-green-700`,
+      // green-600 is 3.3:1 against white text, under the 4.5 small-text floor.
+      // green-700 clears it (5.0:1) and green-800 keeps the hover step readable.
+      success: `bg-green-700 text-white hover:bg-green-800 ${FOCUS_RING} dark:bg-green-700 dark:hover:bg-green-800`,
       failure: `bg-red-600 text-white hover:bg-red-700 ${FOCUS_RING} dark:bg-red-600 dark:hover:bg-red-700`,
       warning: `bg-amber-500 text-[#203565] hover:bg-amber-600 ${FOCUS_RING} dark:bg-amber-500 dark:text-[#203565] dark:hover:bg-amber-600`,
     },

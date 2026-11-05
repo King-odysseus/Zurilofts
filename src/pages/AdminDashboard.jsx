@@ -173,8 +173,10 @@ function HeaderUserMenu({ user, onLogout }) {
       // The trigger is our own button: Flowbite's default inline wrapper has no
       // Tailwind hook on the element, so styling it through className is impossible.
       renderTrigger={() => (
-        <button type="button" className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-surface">
-          <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-primary text-xs font-bold text-white">
+        <button type="button" className="flex items-center gap-2 rounded-lg p-1.5 transition-colors hover:bg-surface" aria-label={t('admin.accountMenu')}>
+          {/* Without aria-hidden the initials join the name, so a screen reader
+              announced the trigger as "AUAdmin" instead of "Account menu". */}
+          <span className="grid h-8 w-8 shrink-0 place-items-center overflow-hidden rounded-full bg-primary text-xs font-bold text-white" aria-hidden="true">
             {user?.avatar ? (
               <img src={user.avatar} alt="" className="h-8 w-8 rounded-full object-cover" />
             ) : (
@@ -353,6 +355,14 @@ function AdminLayout() {
 
   return (
     <div className="min-h-screen bg-canvas text-charcoal">
+      {/* Fourteen sidebar links sit before the content. Without this, a keyboard
+          user pays for all of them on every screen. */}
+      <a
+        href="#admin-main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#143A80] focus:shadow"
+      >
+        {t('admin.skipToContent')}
+      </a>
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-10 hidden flex-col border-r border-white/10 bg-navy-bg text-white transition-all duration-300 lg:flex ${
@@ -368,8 +378,11 @@ function AdminLayout() {
             {!collapsed && <strong className="font-montserrat text-base font-bold tracking-tight">zuri.admin</strong>}
           </Link>
         </div>
+        {/* Brand navy on the navy column measured 1.5:1, so this label was
+            effectively invisible. Brass is the design system's dark-surface
+            accent and reaches 10.8:1 here. */}
         {!collapsed && (
-          <span className="block shrink-0 px-6 pb-1 pt-4 text-xs font-semibold uppercase tracking-wider text-primary">
+          <span className="block shrink-0 px-6 pb-1 pt-4 text-xs font-semibold uppercase tracking-wider text-[#E5CCB3]">
             {t('admin.workspace')}
           </span>
         )}
@@ -381,7 +394,7 @@ function AdminLayout() {
         <nav className={`flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto pb-4 pt-1 [scrollbar-color:rgba(255,255,255,0.22)_transparent] [scrollbar-width:thin] ${collapsed ? 'items-center px-2' : 'justify-between px-3'}`}>
           {navGroups.map((group, groupIndex) => (
             <Fragment key={group.label}>
-              {collapsed ? (groupIndex > 0 && <span className="my-2.5 h-px w-6 bg-white/15" aria-hidden="true" />) : (<p className="px-3 pb-1.5 pt-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">{t(group.label)}</p>)}
+              {collapsed ? (groupIndex > 0 && <span className="my-2.5 h-px w-6 bg-white/15" aria-hidden="true" />) : (<p className="px-3 pb-1.5 pt-5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/60">{t(group.label)}</p>)}
               {group.items.map(({ path, label, icon: NavIcon, exact }) => {
                 const active = exact ? location.pathname === path : location.pathname.startsWith(path);
                 const text = t(label);
@@ -571,7 +584,7 @@ function AdminLayout() {
       )}
 
       {/* Main content */}
-      <main className={`flex min-h-screen flex-1 flex-col transition-all duration-300 ${collapsed ? 'lg:pl-16' : 'lg:pl-64'}`}>
+      <main id="admin-main" tabIndex={-1} className={`flex min-h-screen flex-1 flex-col transition-all duration-300 ${collapsed ? 'lg:pl-16' : 'lg:pl-64'}`}>
         {/* Desktop workspace header */}
         <header className="sticky top-0 z-30 hidden items-center justify-between gap-3 border-b border-border bg-elevated/95 px-4 py-3 backdrop-blur lg:flex lg:px-6">
           <div className="flex items-center gap-3">
