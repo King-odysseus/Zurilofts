@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import passport from '../config/passport.js';
 import { authenticate } from '../middleware/auth.js';
 import { validate } from '../middleware/validate.js';
@@ -7,6 +7,7 @@ import { registerSchema, loginSchema, refreshSchema, passwordResetRequestSchema,
 import { env } from '../config/env.js';
 import * as authController from '../controllers/auth.controller.js';
 import { clientUrlForRequest, googleCallbackUrlForRequest } from '../utils/publicUrl.js';
+import { summarizeOAuthFailure } from '../utils/oauthDiagnostics.js';
 
 const router = Router();
 
@@ -18,6 +19,27 @@ type GoogleAuthenticateOptions = {
   // Forwarded to Google and echoed back; verified against the cookie on return.
   state?: string;
 };
+
+/**
+ * Where a Google sign-in that fails after the browser comes back ends up.
+ *
+ * passport reports a refused exchange by calling next(err), and next(err) on this
+ * route is the JSON error handler: the visitor was left on a blank page reading
+ * {"success":false,"error":"Internal server error"} with no link, no message and
+ * no way forward. Nothing the visitor can do differs between these failures - the
+ * fix is always on our side, a wrong client secret or a database missing a
+ * migration - so record the one part an operator can act on and put the browser
+ * back on the login page the sign-in started from.
+ */
+function sendGoogleFailureToLogin(error: unknown, req: Request, res: Response, next: NextFunction): void {
+  if (res.headersSent) {
+    next(error);
+    return;
+  }
+  const summary = summarizeOAuthFailure(error);
+  console.error(`Google sign-in failed: ${summary.code}${summary.detail ? ` - ${summary.detail}` : ''}`);
+  res.redirect(`${clientUrlForRequest(req)}/login?error=google_auth_failed`);
+}
 
 // Email/Password auth
 router.post('/register', authLimiter, validate(registerSchema), authController.register);
@@ -65,19 +87,20 @@ if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
     '/google/callback',
     // Runs before passport exchanges the code, so a callback that is not ours
     // never gets that far.
-    (req, res, next) => {
+    (req: Request, res: Response, next: NextFunction) => {
       if (!authController.verifyGoogleState(req, res)) {
         res.redirect(`${clientUrlForRequest(req)}/login?error=google_auth_failed`);
         return;
       }
       next();
     },
-    (req, res, next) => passport.authenticate('google', {
+    (req: Request, res: Response, next: NextFunction) => passport.authenticate('google', {
       session: false,
       failureRedirect: '/login?error=google_auth_failed',
       callbackURL: googleCallbackUrlForRequest(req),
     } as GoogleAuthenticateOptions)(req, res, next),
-    authController.googleCallback
+    authController.googleCallback,
+    sendGoogleFailureToLogin
   );
 } else {
   router.get('/google', (req, res) => {
