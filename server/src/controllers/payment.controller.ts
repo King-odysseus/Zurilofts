@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as paymentService from '../services/payment.service.js';
+import * as bookingService from '../services/booking.service.js';
 
 /** POST /api/payments/initialize - auth required */
 export async function initialize(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -28,6 +29,14 @@ export async function initialize(req: Request, res: Response, next: NextFunction
     }
     if (booking.status === 'CONFIRMED') {
       res.status(400).json({ success: false, error: 'Booking is already confirmed' });
+      return;
+    }
+
+    // Same age rule as POST /bookings/:id/payment; this older route must not be a
+    // way around it.
+    const ageGate = await bookingService.checkGuestAge(req.user!.sub);
+    if (ageGate !== 'OK') {
+      res.status(ageGate === 'UNDER_AGE' ? 403 : 422).json({ success: false, error: ageGate });
       return;
     }
 

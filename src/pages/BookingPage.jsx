@@ -40,7 +40,7 @@ function BookingPage() {
   const id = routeId || pathname.split('/')[2];
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { t } = useLanguage();
   const urlVariant = searchParams.get('variant'); // '1bed' | '2bed' | null
   const [step, setStep] = useState(1);
@@ -68,6 +68,15 @@ function BookingPage() {
   const [loadingAddOns, setLoadingAddOns] = useState(false);
   const [creatingBooking, setCreatingBooking] = useState(false);
   const [addOnsError, setAddOnsError] = useState('');
+  // Google sign-ups arrive without a date of birth; the Terms are 18+, so the
+  // first booking asks for it. Accounts that already have one never see the field.
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const needsDateOfBirth = Boolean(isAuthenticated && user && !user.dateOfBirthOnFile);
+  const latestAdultBirthDate = (() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 18);
+    return d.toISOString().slice(0, 10);
+  })();
   const [pendingAddOnId, setPendingAddOnId] = useState(null); // guards double-submit
 
   // Bed option driven by URL variant (from property card click)
@@ -418,12 +427,16 @@ function BookingPage() {
         paymentMethod: bookingData.paymentMethod,
         promoCode: promoResult?.code || undefined,
         additionalGuests: additionalGuests.filter((g) => g.firstName.trim() || g.lastName.trim()),
+        dateOfBirth: needsDateOfBirth ? dateOfBirth : undefined,
       });
       const createdId = res.data.data.booking?.id || null;
       setBookingId(createdId);
       return createdId;
     } catch (err) {
-      setAddOnsError(err.response?.data?.error || 'Could not start your booking. Please try again.');
+      const code = err.response?.data?.error;
+      if (code === 'DATE_OF_BIRTH_REQUIRED') setAddOnsError(t('booking.dateOfBirthRequired'));
+      else if (code === 'UNDER_AGE') setAddOnsError(t('booking.underAge'));
+      else setAddOnsError(code || 'Could not start your booking. Please try again.');
       return null;
     } finally {
       setCreatingBooking(false);
@@ -774,6 +787,22 @@ function BookingPage() {
         )}
       </div>
 
+      {needsDateOfBirth && (
+        <div>
+          <label className="block text-sm font-semibold text-[#1f2937] mb-3">{t('booking.dateOfBirthLabel')}</label>
+          <TextInput
+            type="date"
+            value={dateOfBirth}
+            max={latestAdultBirthDate}
+            onChange={(e) => setDateOfBirth(e.target.value)}
+            className="op-checkout-input"
+            sizing="lg"
+            required
+          />
+          <p className="text-xs text-[#6b7280] mt-2">{t('booking.dateOfBirthHint')}</p>
+        </div>
+      )}
+
       {/* Additional guests - one form per extra person in the party */}
       <div>
         <div className="flex items-center justify-between mb-2">
@@ -847,9 +876,15 @@ function BookingPage() {
         />
       </div>
 
+      {addOnsError && step === 2 && (
+        <div className="bg-red-50 border border-red-200 text-red-600 rounded-xl p-3 text-sm" role="alert">
+          {addOnsError}
+        </div>
+      )}
+
       <Button
         onClick={goToAddOns}
-        disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone || creatingBooking}
+        disabled={!bookingData.firstName || !bookingData.lastName || !bookingData.email || !bookingData.phone || (needsDateOfBirth && !dateOfBirth) || creatingBooking}
         className="op-checkout-primary"
         pill
       >

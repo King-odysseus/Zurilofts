@@ -11,6 +11,35 @@ import { minNightsForCheckIn } from './stayRule.service.js';
 import { fireBookingConfirmed } from './automated-message.service.js';
 import { propertyForBookingViewer } from '../utils/propertyPrivacy.js';
 import { env } from '../config/env.js';
+import { isAdultOn, parseDateOfBirth } from '../utils/age.js';
+
+export type GuestAgeGate = 'OK' | 'DATE_OF_BIRTH_REQUIRED' | 'UNDER_AGE';
+
+/**
+ * The Terms make this an 18+ service, so a booking or payment is refused unless
+ * the account holder is a known adult. Sign-up collects a date of birth, but
+ * accounts created through Google have none, so the checkout supplies it here
+ * the first time they book.
+ *
+ * A date of birth already on file is never overwritten by what a request says:
+ * otherwise a minor could simply type a different year. A date supplied for an
+ * account that has none is stored only when it is a real date and an adult one,
+ * so a refused minor leaves no date of birth on the account.
+ */
+export async function checkGuestAge(userId: string, suppliedDateOfBirth?: string): Promise<GuestAgeGate> {
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { dateOfBirth: true } });
+  if (!user) throw new NotFoundError('User');
+
+  if (user.dateOfBirth) return isAdultOn(user.dateOfBirth) ? 'OK' : 'UNDER_AGE';
+
+  if (!suppliedDateOfBirth) return 'DATE_OF_BIRTH_REQUIRED';
+  // A string that is not a real date is a missing answer, not proof of age.
+  if (!parseDateOfBirth(suppliedDateOfBirth)) return 'DATE_OF_BIRTH_REQUIRED';
+  if (!isAdultOn(suppliedDateOfBirth)) return 'UNDER_AGE';
+
+  await prisma.user.update({ where: { id: userId }, data: { dateOfBirth: suppliedDateOfBirth } });
+  return 'OK';
+}
 
 // Normalize SQLite JSON fields to JS arrays for API responses
 function normalizeBooking(booking: any) {

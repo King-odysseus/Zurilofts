@@ -46,6 +46,9 @@ export interface UserResponse {
   hostApplicationStatus: string | null;
   // Guest identity verification status, gates payment (not dashboard access).
   identityVerificationStatus: string;
+  // Lets checkout ask for a date of birth only when the account has none (Google
+  // sign-ups). A boolean, not the date itself, so it never travels needlessly.
+  dateOfBirthOnFile: boolean;
 }
 
 /** Optional request context recorded on a refresh session for audit. */
@@ -69,6 +72,7 @@ function toUserResponse(
     createdAt: user.createdAt,
     hostApplicationStatus: extras.hostApplicationStatus ?? null,
     identityVerificationStatus: extras.identityVerificationStatus ?? 'UNVERIFIED',
+    dateOfBirthOnFile: Boolean(user.dateOfBirth),
   };
 }
 

@@ -211,6 +211,10 @@ export const bookingCreateSchema = z.object({
     .optional(),
   paymentMethod: paymentMethodSchema,
   promoCode: z.string().optional(),
+  // Only read when the account has no date of birth on file (Google sign-ups).
+  // Whether it is a real date and an adult is decided by the age gate, so the
+  // guest gets a specific answer instead of a generic validation error.
+  dateOfBirth: z.string().max(10).optional(),
 });
 
 // Re-initializing payment for an existing booking. The method is optional so an

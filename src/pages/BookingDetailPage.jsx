@@ -165,7 +165,12 @@ function BookingDetailPage() {
         navigate('/verify-identity');
         return;
       }
-      setActionError(err.response?.data?.error || 'Could not start the payment. Please try again.');
+      const code = err.response?.data?.error;
+      // Age refusals arrive as codes. A booking made without a date of birth
+      // cannot be paid for here; the guest adds it by booking again.
+      if (code === 'DATE_OF_BIRTH_REQUIRED') setActionError(t('booking.dateOfBirthRequiredToPay'));
+      else if (code === 'UNDER_AGE') setActionError(t('booking.underAge'));
+      else setActionError(code || 'Could not start the payment. Please try again.');
     } finally {
       setPaymentPending(false);
     }

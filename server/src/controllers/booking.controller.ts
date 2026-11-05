@@ -6,11 +6,28 @@ import prisma from '../config/prisma.js';
 import * as revenueService from '../services/revenue.service.js';
 import { buildReceipt } from '../services/receipt.service.js';
 
+// Codes the checkout reads to ask for a date of birth or to explain the refusal.
+// Sent as the `error` string, like IDENTITY_VERIFICATION_REQUIRED below.
+function sendAgeRefusal(res: Response, gate: Exclude<bookingService.GuestAgeGate, 'OK'>): void {
+  const status = gate === 'UNDER_AGE' ? 403 : 422;
+  res.status(status).json({ success: false, error: gate });
+}
+
 export async function create(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
+    const { dateOfBirth, ...bookingInput } = req.body;
+
+    // Checked before the dates are held: a guest the Terms do not allow must not
+    // block the calendar for a stay they cannot pay for.
+    const ageGate = await bookingService.checkGuestAge(req.user!.sub, dateOfBirth);
+    if (ageGate !== 'OK') {
+      sendAgeRefusal(res, ageGate);
+      return;
+    }
+
     const booking = await bookingService.createBooking({
       // Identity last: a body field named userId must never win over the session.
-      ...req.body,
+      ...bookingInput,
       userId: req.user!.sub,
     });
 
@@ -296,6 +313,17 @@ export async function initializePayment(req: Request, res: Response, next: NextF
         error: 'This payment is with our team. You will not be charged again; we will contact you shortly.',
       });
       return;
+    }
+
+    // Bookings created before the age check existed, or by an account with no
+    // date of birth on file, must not slip through to payment. An admin paying on
+    // a guest's behalf is not the person being aged.
+    if (!isAdmin) {
+      const ageGate = await bookingService.checkGuestAge(req.user!.sub);
+      if (ageGate !== 'OK') {
+        sendAgeRefusal(res, ageGate);
+        return;
+      }
     }
 
     // Payment never opens for an unverified guest, even if the client tries to
