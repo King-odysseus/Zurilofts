@@ -43,3 +43,17 @@ eat-graze.jpg                    | File:Charcoal Steak.jpg                      
 == Left on original Unsplash images (no clean Kenya-appropriate source found) ==
 The Hub Karen, UN Headquarters Nairobi, Nairobi Street Kitchen,
 The Lavington Green, Lavington Curve  -> still use their original Unsplash photos.
+
+== Stay photography ==
+Ely Homes Photography (1..20 of 20).jpg | Photographer: Ely Homes Photography | Commissioned and paid for by ZuriLofts
+(operated by BeneAlpha Consulting Limited). Confirmed by the business owner on 2026-11-05.
+Keep the signed agreement or invoice that grants usage rights with the company records; it is not stored in this repository.
+
+== Unsplash (public licence, no credit required) ==
+The Hub Karen, UN Headquarters Nairobi, Nairobi Street Kitchen, The Lavington Green, Lavington Curve and
+Prestige Plaza use Unsplash images. Photographer names and source URLs were not recorded when they were added.
+To do: record them, or replace the images.
+
+== Full author list ==
+The visitor-facing list with authors and licence links is the Photo credits page (/credits), generated into
+src/data/photoCredits.js.

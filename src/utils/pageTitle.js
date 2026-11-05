@@ -37,6 +37,7 @@ const ROUTE_TITLES = [
   [/^\/help\/[^/]+$/, 'title.helpArticle'],
   [/^\/privacy$/, 'title.privacy'],
   [/^\/terms$/, 'title.terms'],
+  [/^\/credits$/, 'title.credits'],
 
   // Guest: account and the booking flow
   [/^\/login$/, 'title.login'],

@@ -30,6 +30,7 @@ const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage.jsx'));
 const GuideDetailPage = lazy(() => import('./pages/GuideDetailPage.jsx'));
 const PrivacyPage = lazy(() => import('./pages/PrivacyPage.jsx'));
 const TermsPage = lazy(() => import('./pages/TermsPage.jsx'));
+const PhotoCreditsPage = lazy(() => import('./pages/PhotoCreditsPage.jsx'));
 const SharedShortlistPage = lazy(() => import('./pages/SharedShortlistPage.jsx'));
 const BookingHistoryPage = lazy(() => import('./pages/BookingHistoryPage.jsx'));
 const BookingDetailPage = lazy(() => import('./pages/BookingDetailPage.jsx'));
@@ -126,6 +127,7 @@ function Shell() {
   else if (pathname.startsWith('/guides/')) content = <GuideDetailPage />;
   else if (pathname === '/privacy') content = <PrivacyPage />;
   else if (pathname === '/terms') content = <TermsPage />;
+  else if (pathname === '/credits') content = <PhotoCreditsPage />;
   else if (pathname.startsWith('/s/')) content = <SharedShortlistPage />;
   else if (pathname === '/favourites') content = <ProtectedRoute><FavouritesPage /></ProtectedRoute>;
   else if (pathname === '/shortlists') content = <ProtectedRoute><ShortlistsPage /></ProtectedRoute>;
