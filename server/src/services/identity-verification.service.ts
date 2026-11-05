@@ -317,10 +317,22 @@ export async function adminGet(id: string) {
 }
 
 export async function adminDownloadDocument(verificationId: string, documentId: string) {
-  const document = await prisma.identityVerificationDocument.findFirst({ where: { id: documentId, verificationId } });
+  const document = await prisma.identityVerificationDocument.findFirst({
+    where: { id: documentId, verificationId },
+    // The applicant's id travels with the bytes so the caller can write down
+    // whose document was opened. A passport scan is the most sensitive object
+    // here and the read itself is the event worth recording.
+    include: { verification: { select: { userId: true } } },
+  });
   if (!document) throw new NotFoundError('Identity verification document');
   const buffer = decryptHostDocument(Buffer.from(document.ciphertext), Buffer.from(document.iv), Buffer.from(document.authTag));
-  return { buffer, mimeType: document.mimeType, originalName: document.originalName };
+  return {
+    buffer,
+    mimeType: document.mimeType,
+    originalName: document.originalName,
+    kind: document.kind,
+    applicantId: document.verification.userId,
+  };
 }
 
 /**

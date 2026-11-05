@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import * as verificationService from '../services/identity-verification.service.js';
+import { auditActorFromRequest, recordAdminAuditSafely } from '../services/audit.service.js';
 import { ValidationError } from '../types/index.js';
 
 // ── Applicant endpoints - userId is always taken from the JWT (req.user.sub) ──
@@ -111,6 +112,24 @@ export async function adminApprove(req: Request, res: Response, next: NextFuncti
 export async function adminDownloadDocument(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const document = await verificationService.adminDownloadDocument(req.params.id, req.params.documentId);
+    // Reading a passport scan or a selfie is the most invasive thing an
+    // administrator can do here, and it left no trace: approvals and rejections
+    // were recorded, views were not. Written before the bytes are sent, so a
+    // failure to record means the request fails rather than the read going
+    // unwitnessed. The applicant id is the target, which is what an inquiry
+    // ("who has looked at my documents?") needs to answer.
+    await recordAdminAuditSafely({
+      ...auditActorFromRequest(req),
+      action: 'IDENTITY_DOCUMENT_VIEWED',
+      targetType: 'User',
+      targetId: document.applicantId,
+      targetLabel: null,
+      metadata: {
+        verificationId: req.params.id,
+        documentId: req.params.documentId,
+        kind: document.kind,
+      },
+    });
     res.setHeader('Content-Type', document.mimeType);
     res.setHeader('Content-Disposition', `inline; filename="${document.originalName.replace(/"/g, '')}"`);
     res.setHeader('Cache-Control', 'no-store, private');

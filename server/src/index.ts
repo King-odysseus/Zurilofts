@@ -10,6 +10,7 @@ import { runDueAutoMessages } from './services/automated-message.service.js';
 import { syncConfiguredAdmin } from './services/admin-bootstrap.service.js';
 import { processScheduledPayouts, releaseDueHostFunds } from './services/payout.service.js';
 import { sendHostApplicationNudges } from './services/nudge.service.js';
+import { pruneExpiredRefreshSessions } from './services/auth.service.js';
 import { injectMeta, isAppOnlyPath, legacyRedirect, metaForPath } from './services/seo.service.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -79,6 +80,7 @@ app.listen(Number(env.PORT), () => {
   startAutomatedMessageScheduler();
   startPayoutScheduler();
   startHostNudgeScheduler();
+  startSessionSweep();
 });
 
 // Unhandled promise rejections and process errors crash hard so Railway can
@@ -175,3 +177,21 @@ function startAutomatedMessageScheduler() {
   setInterval(run, INTERVAL_MS);
 }
 
+
+// A refresh session row carries the address and browser it was created from.
+// Rows are removed when used again or logged out, so the only ones that survive
+// are abandoned devices that will never come back. Sweeping them is what stops
+// that history growing without limit; hourly is far more often than needed, but
+// the query is a single indexed delete.
+function startSessionSweep() {
+  const INTERVAL_MS = 60 * 60 * 1000;
+  const run = () => {
+    pruneExpiredRefreshSessions()
+      .then((removed) => {
+        if (removed > 0) console.log(` Removed ${removed} expired session record(s)`);
+      })
+      .catch((err) => console.error('Session sweep failed:', err?.message || err));
+  };
+  setTimeout(run, 5 * 60 * 1000);
+  setInterval(run, INTERVAL_MS);
+}

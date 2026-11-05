@@ -9,6 +9,7 @@ import { env } from './config/env.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { UPLOAD_DIR } from './controllers/upload.controller.js';
 import { requestsChatAttachment } from './utils/chatAttachment.js';
+import { redactResetToken } from './utils/logRedaction.js';
 
 // Import routes
 import authRoutes from './routes/auth.routes.js';
@@ -86,7 +87,20 @@ app.use(
   })
 );
 app.use(cors(corsOptions));
-app.use(morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev'));
+// morgan hands the raw IncomingMessage, which Express has already decorated with
+// originalUrl at runtime; only the type is unaware of it.
+morgan.token('url', (req) =>
+  redactResetToken((req as typeof req & { originalUrl?: string }).originalUrl ?? req.url)
+);
+morgan.token('referrer', (req) => redactResetToken(req.headers.referer));
+// Only the API surface is logged. The client is served by this same process, so
+// logging page views and asset fetches would bury the API lines and would record
+// the reset page above, whose address carries a live credential.
+app.use(
+  morgan(env.NODE_ENV === 'production' ? 'combined' : 'dev', {
+    skip: (req) => !(req.originalUrl ?? req.url).startsWith('/api'),
+  })
+);
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 

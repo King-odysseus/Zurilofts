@@ -16,7 +16,7 @@ const VISITOR_KEY = 'zurilofts_visitor_id';
 
 // Single source of truth for the policy version. Consent records store this so
 // a policy change can be detected and the user re-prompted.
-export const POLICY_VERSION = '2026-08-08';
+export const POLICY_VERSION = '2026-11-05';
 
 /** Read the stored consent. Returns null if the user has not decided. */
 export function getConsent() {

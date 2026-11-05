@@ -7,7 +7,7 @@ function PrivacyPage() {
   const { t } = useLanguage();
   // The date and the version are values, not prose: they stay as data here and
   // are dropped into the translated sentence around them.
-  const lastUpdated = '8 August 2026';
+  const lastUpdated = '5 November 2026';
   const articleRef = useRef(null);
 
   return (
@@ -237,6 +237,16 @@ function PrivacyPage() {
                       <td className="py-3 pr-4 align-top font-medium">Telegram</td>
                       <td className="py-3 pr-4 align-top">{t('legal.privacy.s11TelegramReceives')}</td>
                       <td className="py-3 align-top">{t('legal.privacy.s11TelegramPurpose')}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">{t('legal.privacy.s11EmailName')}</td>
+                      <td className="py-3 pr-4 align-top">{t('legal.privacy.s11EmailReceives')}</td>
+                      <td className="py-3 align-top">{t('legal.privacy.s11EmailPurpose')}</td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 pr-4 align-top font-medium">{t('legal.privacy.s11TranslateName')}</td>
+                      <td className="py-3 pr-4 align-top">{t('legal.privacy.s11TranslateReceives')}</td>
+                      <td className="py-3 align-top">{t('legal.privacy.s11TranslatePurpose')}</td>
                     </tr>
                     <tr>
                       <td className="py-3 pr-4 align-top font-medium">Railway</td>

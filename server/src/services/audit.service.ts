@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import prisma from '../config/prisma.js';
 import { paginationMeta } from '../utils/paging.js';
+import { hashIp } from '../utils/ipHash.js';
 
 /**
  * Durable, append-only governance log for staff decisions.
@@ -37,6 +38,7 @@ export const AUDIT_ACTIONS = [
   'USER_RESTORED',
   'USER_PASSWORD_SET',
   'USER_ERASED',
+  'IDENTITY_DOCUMENT_VIEWED',
   'DISPUTE_UNDER_REVIEW',
   'DISPUTE_RESOLVED',
   'DISPUTE_DISMISSED',
@@ -86,6 +88,10 @@ export interface AuditActor {
  * Actor snapshot taken from an authenticated admin request: who acted, from
  * where, with which client. The email is copied now rather than read later
  * because the account may be erased while the entry must remain readable.
+ *
+ * The address is stored as a salted hash, never in clear. This log is read by
+ * more people than the table it describes, and an address on its own identifies
+ * a person; the hash still lets two entries from one network be correlated.
  */
 export function auditActorFromRequest(req: {
   user?: { sub: string; email?: string; role?: string };
@@ -99,7 +105,7 @@ export function auditActorFromRequest(req: {
       email: req.user?.email ?? null,
       role: (req.user?.role ?? 'ADMIN').toUpperCase(),
     },
-    ipAddress: req.ip ?? null,
+    ipAddress: hashIp(req.ip),
     userAgent: typeof userAgentHeader === 'string' ? userAgentHeader : null,
   };
 }

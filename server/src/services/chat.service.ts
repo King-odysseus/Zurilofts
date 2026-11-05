@@ -111,13 +111,20 @@ function handleUpdate(update: any): void {
     const m = replyText.match(/Session:\s*`?([A-Za-z0-9]{6,})`?/);
     if (m) sessionId = resolveSession(m[1]);
   }
-  // Fallback: route to the most recently active guest.
-  // Works well for the common case (one visitor at a time).
-  // Edge case: if two guests chat simultaneously, a non-reply
-  // message from the team will go to whichever sent a message last.
-  // The fix is to always use Telegram Reply on the guest message,
-  // which embeds the session token and routes precisely.
-  if (!sessionId) sessionId = recentSessionId;
+  // Anonymous routing, used only when there is no Telegram Reply to read.
+  // With more than one conversation live, the last speaker used to win, which
+  // sends one guest the answer meant for another. Refusing is the honest
+  // option: the team is told to use Reply, which carries the session token.
+  if (!sessionId) {
+    pruneSessions();
+    if (sessions.size > 1) {
+      void sendTelegramAlert(
+        'Several guests are chatting at once, so this reply was not delivered. Use Reply on the guest message you are answering so it reaches the right person.'
+      );
+      return;
+    }
+    sessionId = recentSessionId;
+  }
   if (!sessionId) return;
 
   recordAgentReply(sessionId, text);

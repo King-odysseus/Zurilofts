@@ -101,7 +101,7 @@ async function createRefreshSession(userId: string, meta?: SessionMeta, persiste
       tokenHash: hashToken(token),
       expiresAt: new Date(Date.now() + refreshLifetimeMs(persistent)),
       persistent,
-      ip: meta?.ip ?? null,
+      ip: hashIp(meta?.ip),
       userAgent: meta?.userAgent ?? null,
     },
   });
@@ -124,7 +124,7 @@ async function rotateRefreshSession(
       tokenHash: hashToken(token),
       previousHash: session.tokenHash,
       expiresAt: new Date(Date.now() + refreshLifetimeMs(session.persistent)),
-      ip: meta?.ip ?? undefined,
+      ip: hashIp(meta?.ip) ?? undefined,
       userAgent: meta?.userAgent ?? undefined,
     },
   });
@@ -320,6 +320,24 @@ export async function refreshTokens(
       persistent: session.persistent,
     },
   };
+}
+
+/**
+ * Delete refresh sessions that can no longer be used.
+ *
+ * A session row is normally removed the moment it is presented again (refresh)
+ * or logged out. Abandoned ones - a browser closed and never reopened - kept
+ * the address and user agent they were created with indefinitely, because
+ * nothing ever read that row again. This sweep is what bounds them.
+ *
+ * The address on these rows is already hashed (see utils/ipHash), so a row is a
+ * device trace rather than a location; it still should not outlive its use.
+ */
+export async function pruneExpiredRefreshSessions(): Promise<number> {
+  const { count } = await prisma.refreshSession.deleteMany({
+    where: { expiresAt: { lte: new Date() } },
+  });
+  return count;
 }
 
 /** Revoke the session backing a refresh token (logout). */

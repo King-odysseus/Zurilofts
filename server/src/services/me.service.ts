@@ -20,6 +20,7 @@ export async function exportUserData(userId: string) {
       firstName: true,
       lastName: true,
       phone: true,
+      dateOfBirth: true,
       avatar: true,
       role: true,
       googleId: true,
@@ -157,9 +158,57 @@ export async function exportUserData(userId: string) {
   // Consent records
   const consentRecords = await getConsentRecordsForUser(userId);
 
+  // The person's own answers, plus a description of each stored document. The
+  // images are left out: an access request is answered with what is held and
+  // where it came from, not with a second copy of an encrypted scan.
+  const identityVerification = await prisma.identityVerification.findUnique({
+    where: { userId },
+    select: {
+      id: true,
+      status: true,
+      fullName: true,
+      dateOfBirth: true,
+      idType: true,
+      idNumber: true,
+      reviewNote: true,
+      submittedAt: true,
+      reviewedAt: true,
+      documents: {
+        select: { id: true, kind: true, originalName: true, mimeType: true, size: true, createdAt: true },
+      },
+    },
+  });
+
+  const hostApplication = await prisma.hostApplication.findUnique({ where: { userId } });
+
+  const payouts = await prisma.payout.findMany({
+    where: { hostId: userId },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const wallet = await prisma.hostWallet.findUnique({ where: { hostId: userId } });
+
+  // Disputes this person raised, and the reviews written about them as a guest.
+  // Both are their data even though someone else's hand wrote the second one.
+  const disputes = await prisma.dispute.findMany({
+    where: { raisedById: userId },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  const guestReviewsReceived = await prisma.guestReview.findMany({
+    where: { guestId: userId },
+    orderBy: { createdAt: 'desc' },
+  });
+
   return {
     profile: user,
+    identityVerification,
+    hostApplication,
+    payouts,
+    wallet,
     bookings,
+    disputes,
+    guestReviewsReceived,
     conversations: conversationData,
     legacyMessages: legacyMessages.map(withParsedAttachments),
     favorites,
@@ -201,6 +250,16 @@ export async function deleteUserAccount(
     await tx.conversationMessage.deleteMany({ where: { senderId: userId } });
     await tx.message.deleteMany({ where: { userId } });
     await tx.hostApplication.deleteMany({ where: { userId } });
+    // Identity records are not payment records. The notice promises that a
+    // deleted account no longer identifies the person, and a full name, date of
+    // birth, national ID number and the encrypted scans are the most identifying
+    // rows we hold. The cascade only fires on a hard delete, and the anonymising
+    // path keeps the user row, so this has to be explicit. Documents cascade
+    // with their verification.
+    await tx.identityVerification.deleteMany({ where: { userId } });
+    // Reviews written about this person by a host. The reviews they wrote live on
+    // bookings and go with the account through the property-review delete above.
+    await tx.guestReview.deleteMany({ where: { guestId: userId } });
     await tx.consentRecord.updateMany({ where: { userId }, data: { userId: null } });
   };
 
@@ -256,6 +315,9 @@ export async function deleteUserAccount(
           firstName: '',
           lastName: '',
           phone: null,
+          // A birth date plus the retained booking history is still identifying,
+          // and the notice promises the retained records no longer do that.
+          dateOfBirth: null,
           avatar: null,
           googleId: null,
           passwordHash: null,
@@ -276,6 +338,10 @@ export async function deleteUserAccount(
       // A deleted host must not receive new bookings. Existing bookings and
       // financial records remain available to staff for fulfilment and audit.
       await tx.property.updateMany({ where: { hostId: userId }, data: { available: false } });
+      // Extra guest names belong to people who never signed up, so they have no
+      // account, no notice and no way to ask for their removal. The booking keeps
+      // the guest count it needs for the host's records.
+      await tx.booking.updateMany({ where: { userId }, data: { additionalGuestsJson: null } });
       await erasePersonalRelations(tx);
     } else {
       await erasePersonalRelations(tx);
