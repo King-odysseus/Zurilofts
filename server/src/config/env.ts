@@ -15,8 +15,6 @@ const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().optional(),
   GOOGLE_CLIENT_SECRET: z.string().optional(),
   GOOGLE_CALLBACK_URL: z.string().optional(),
-  TELEGRAM_BOT_TOKEN: z.string().optional(),
-  TELEGRAM_CHAT_ID: z.string().optional(),
   // Cloudinary (image storage). Format: cloudinary://<key>:<secret>@<cloud_name>
   // When unset, uploads fall back to local disk (dev only - ephemeral in prod).
   CLOUDINARY_URL: z.string().optional(),

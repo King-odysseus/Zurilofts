@@ -70,8 +70,7 @@ export function getVisitorId() {
 
 /**
  * Reopen the consent banner in Manage mode. Dispatches a window event so any
- * mounted CookieConsent instance can react, matching the `open-chat` pattern
- * used by ChatWidget.
+ * mounted CookieConsent instance can react.
  */
 export function openConsentManager() {
   window.dispatchEvent(new CustomEvent('open-consent-manager'));

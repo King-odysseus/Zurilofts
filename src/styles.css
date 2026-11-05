@@ -765,7 +765,6 @@ html.dark {
 .zl-account-hero { background: linear-gradient(120deg, #E7F6F4, #EDF3FF); }
 .zl-account-links a { color: var(--op-blue); }
 .zl-message-list-row.selected { background: #EAF1FF; }
-.zl-chat-bubble { background: #E3F4F1; color: #164C47; }
 
 /* Host and admin are purposefully denser while retaining the shared design tokens. */
 .zl-host-page .zl-page-heading, .zl-ops-page .zl-page-heading { border-bottom-color: #D9E2F0; }
