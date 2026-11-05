@@ -12,6 +12,7 @@ import { fireBookingConfirmed } from './automated-message.service.js';
 import { propertyForBookingViewer } from '../utils/propertyPrivacy.js';
 import { env } from '../config/env.js';
 import { isAdultOn, parseDateOfBirth } from '../utils/age.js';
+import { CANCELLATION_POLICY_VERSION, cancellationTerms } from '../utils/cancellation.js';
 
 export type GuestAgeGate = 'OK' | 'DATE_OF_BIRTH_REQUIRED' | 'UNDER_AGE';
 
@@ -339,6 +340,10 @@ export async function createBooking(input: CreateBookingInput) {
     paymentFee: bp.paymentFee,
     total: bp.total,
     addOnsTotal: 0, // no add-ons exist until the guest picks them after creation
+    // The cancellation policy that applied when the guest agreed to it. Stored
+    // rather than looked up later, because the policy will change and the guest
+    // is entitled to the terms they were shown before paying.
+    cancellationPolicyVersion: CANCELLATION_POLICY_VERSION,
   };
 
   // The isRangeAvailable() check above is a UX fast-fail. The authoritative gate
@@ -521,6 +526,10 @@ export async function quoteBooking(input: QuoteBookingInput) {
     paymentFee: bp.paymentFee,
     gatewayFeeRate: Number(env.PAYSTACK_FEE_RATE),
     total: bp.total,
+    // What cancelling would return, and when each window closes. Sent with the
+    // price so the guest sees the terms beside the total, from the same clock
+    // that will judge a cancellation, rather than from the browser's idea of it.
+    cancellation: cancellationTerms(checkIn),
   };
 }
 

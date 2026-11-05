@@ -11,6 +11,17 @@ import { useLanguage } from '../context/LanguageContext.jsx';
 
 import { COUNTRY_CODES, validatePhone, detectCountry } from '../utils/phone.js';
 
+/**
+ * A policy deadline is a calendar date, not a moment, so it is formatted in UTC:
+ * the server already decided which Nairobi day the window closes on and
+ * re-reading it in the browser's zone could show the day before.
+ */
+function formatPolicyDate(value) {
+  const date = new Date(`${value}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+}
+
 function CheckoutDropdown({ value, options, onChange, ariaLabel, className = '' }) {
   const selected = options.find((option) => String(option.value) === String(value));
   const { t } = useLanguage();
@@ -1450,6 +1461,30 @@ function BookingPage() {
                         <span>KES {pricing.total.toLocaleString()}</span>
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* The cancellation terms sit under the total, before payment: a
+                    guest is entitled to know what cancelling costs while the price
+                    is still in front of them. The dates come from the server with
+                    the quote, so the deadline shown is the one that will be applied. */}
+                {quote?.cancellation && (
+                  <div className="mt-6 pt-6 border-t border-[#D9D9D9]">
+                    <h4 className="font-semibold text-[#203565] mb-2">{t('booking.cancellationTitle')}</h4>
+                    <p className="text-sm text-[#1f2937]">
+                      {quote.cancellation.tier.code === 'FULL'
+                        ? t('booking.cancellationFull', { date: formatPolicyDate(quote.cancellation.fullRefundUntil) })
+                        : quote.cancellation.tier.code === 'HALF'
+                          ? t('booking.cancellationHalf', { date: formatPolicyDate(quote.cancellation.halfRefundUntil) })
+                          : t('booking.cancellationNone')}
+                    </p>
+                    <p className="mt-2 text-xs text-[#6b7280]">{t('booking.cancellationFees')}</p>
+                    <p className="mt-1 text-xs text-[#6b7280]">
+                      {t('booking.cancellationVersion', { version: quote.cancellation.policyVersion })}
+                    </p>
+                    <Link to="/terms" className="mt-2 inline-block text-xs font-medium text-[#8A6B52] underline">
+                      {t('booking.cancellationReadFull')}
+                    </Link>
                   </div>
                 )}
               </div>

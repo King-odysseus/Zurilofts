@@ -108,26 +108,62 @@ the local database, 11 unit tests pass, the server type-checks, the frontend
 lints and builds, and the PDF was generated in a real browser in both languages
 with the company name, receipt number and amounts present.
 
+## Built: the cancellation terms, before the guest pays
+
+The cancellation policy existed only as words in the Terms. Nothing at checkout
+mentioned it, and no booking kept a record of which version applied, so the terms
+behind a refund or a refusal were whatever the policy happened to say later. Both
+halves are now in the product.
+
+- **One place decides the tiers.** `server/src/utils/cancellation.ts` holds the two
+  boundaries (14 days and 7 days) and the percentages. Before this they existed
+  only as prose, which is why nothing could check them.
+- **The checkout prints dates, not policy wording.** The price quote now carries
+  the terms with it, so the panel under the total says when the full refund closes
+  ("on or before 3 Dec 2026") and, once it has, that only half the nightly rate is
+  returned. The browser never computes this itself, so the deadline shown is the
+  one that will be applied.
+- **Every new booking records the policy version** it was made under. That is the
+  point of the change: a guest is entitled to the terms they were shown, and the
+  policy will be revised.
+- **"Today" is the Nairobi day.** A guest cancelling at one in the morning is
+  judged on that day, not on the UTC date, which would have given them an extra
+  day of cover and a deadline a day later than the one they were shown.
+- **The contract cannot drift from the code.** A test reads the published Terms and
+  fails if they stop describing the same two boundaries the code enforces, which is
+  the failure mode this kind of change usually has.
+
+What it deliberately does not do: it does not calculate a refund amount. Refunds are
+issued by a person, and a number the site invented at checkout that the refund
+screen disagreed with would be worse than the policy statement alone.
+
+Verified: 16 unit tests pass (`node --import tsx --test tests/cancellation.test.ts`),
+the server type-checks, lint is clean, the frontend builds, and both Prisma schemas
+are in sync with a local database that has the new column. The full server suite is
+503 passing with the same 10 pre-existing Paystack and public-URL failures as before
+this change.
+
 ## Must be built, in this order
 
 ### Before taking another booking
 
-1. **Breach and incident handling.** Nothing exists. Needed: an incident record
-   with an "aware at" timestamp, an admin-only way to declare one, a generated
-   notice for the Office of the Data Protection Commissioner, and a written
-   one-page runbook. The 72-hour clock only starts when someone can declare an
-   incident, so this is a build, not just a document.
+1. **Breach and incident handling.** Done. The register, the admin-only declare
+   and update steps, the generated ODPC notice and the one-page runbook all exist
+   (`Admin, Data incidents`, and `docs/data-incident-runbook.md`). The clock counts
+   from a recorded "aware at" time, a notification time is recorded once and
+   cannot be rewritten, and every declaration lands in the governance log.
 2. **Guest-facing payment record.** Done. A receipt can now be downloaded from
    the booking history and the booking detail screen, built from the stored
    booking rather than from the browser's copy of it. Still open, and blocked on
    the VAT decision below: whether this must become an eTIMS tax invoice, and the
    VAT line itself. `server/src/config/company.ts` holds the single switch for
    that (`vatMode`), so the change is one constant and one test, not a rebuild.
-3. **Age enforcement at booking, and for Google sign-ups.** Registration now
-   collects and checks a date of birth, but accounts created through Google have
-   none, and booking does not yet refuse an account that is known to be under 18.
-   Build: collect a date of birth for Google accounts on first use, and reject
-   booking creation when the stored date of birth is under 18.
+3. **Age enforcement at booking, and for Google sign-ups.** Done. Booking creation
+   and payment initialisation both refuse an account that is known to be under 18,
+   and an account with no date of birth is asked for one at the point of booking,
+   which is where Google sign-ups are caught. A date supplied at that point is
+   stored only when it is real and adult, so a refused minor leaves nothing behind
+   and a date already on file is never overwritten by what a request claims.
 
 ### Next
 
@@ -136,19 +172,22 @@ with the company name, receipt number and amounts present.
    that purges or anonymises closed-account data, stale logs, and expired message
    threads, with the periods decided by you and then written back into the policy.
    A published period plus no job is the exact combination that invites complaint.
-5. **Marketing consent gate.** One flag must control every marketing email and
-   push, and every marketing message needs a working unsubscribe. Transactional
-   booking and safety messages stay separate.
+5. **Marketing consent gate.** Done for everything that sends today. Push and the
+   promo announcement only reach accounts whose most recent recorded choice allows
+   marketing, so withdrawing works by superseding the earlier record. There are no
+   marketing emails at all, so no unsubscribe link is owed yet; if one is ever
+   added, it must check the same function before sending.
 6. **Guest register export.** Licensed accommodation carries guest-register
    duties: name, ID type and number, nationality, and stay dates, exportable for
    inspection. Per-booking data mostly exists; the exportable register does not.
 7. **Complaints route that works without logging in**, with the Competition
    Authority of Kenya escalation path named.
 8. **Cancellation policy shown at checkout**, with its version stored on the
-   booking so the terms that applied are provable.
-9. **Analytics or nothing.** The consent panel still offers an analytics choice.
-   Either add consent-gated analytics or trim that copy. Right now it advertises a
-   capability the product does not have.
+   booking so the terms that applied are provable. Done, see the section below.
+9. **Analytics or nothing.** Done, by choosing nothing. The consent panel no longer
+   offers an analytics choice, and the stored value is written as false, so the
+   product no longer advertises a capability it does not have. Adding analytics
+   later means restoring the choice and gating the script on it first.
 
 ### Hardening
 

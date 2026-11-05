@@ -429,6 +429,8 @@ model Booking {
   refundStatus     String?
   refundedAt       DateTime?
   refundedBy       String?
+  // Which version of the cancellation policy the guest was shown before paying.
+  cancellationPolicyVersion String?
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
   review          Review?

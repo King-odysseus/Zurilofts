@@ -425,6 +425,9 @@ model Booking {
   refundStatus         String? // Paid bookings cancelled after payment: "REFUND_PENDING" | "REFUNDED" | "REFUND_DECLINED"
   refundedAt           DateTime?
   refundedBy           String? // admin userId who resolved the refund
+  // Which version of the cancellation policy the guest was shown before paying.
+  // The policy changes; the terms a guest agreed to must not change with it.
+  cancellationPolicyVersion String?
   createdAt            DateTime        @default(now())
   updatedAt            DateTime        @updatedAt
   review               Review?
