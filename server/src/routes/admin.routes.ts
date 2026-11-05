@@ -26,6 +26,8 @@ import * as verificationCtrl from '../controllers/identity-verification.controll
 import * as disputeCtrl from '../controllers/dispute.controller.js';
 import { messageCreateSchema, identityVerificationReviewSchema, disputeStatusSchema, disputeNoteSchema, disputeMessageSchema } from '../types/index.js';
 import * as auditCtrl from '../controllers/audit.controller.js';
+import * as incidentCtrl from '../controllers/incident.controller.js';
+import { incidentDeclareSchema, incidentUpdateSchema } from '../services/incident.service.js';
 import { adminAuditQuerySchema } from '../services/audit.service.js';
 import adminPropertyRoutes from './admin-property.routes.js';
 
@@ -39,6 +41,13 @@ router.use(authenticate, requireAdmin);
 // no write route, because only the decision paths may append.
 router.get('/audit', validateQuery(adminAuditQuerySchema), auditCtrl.listAudit);
 router.get('/audit/filters', auditCtrl.listAuditFilters);
+
+// Personal-data incident register: declare a suspected breach, track the 72-hour
+// regulator deadline, and generate the notice. Records are never deleted.
+router.get('/incidents', incidentCtrl.list);
+router.post('/incidents', validate(incidentDeclareSchema), incidentCtrl.declare);
+router.get('/incidents/:id', incidentCtrl.get);
+router.patch('/incidents/:id', validate(incidentUpdateSchema), incidentCtrl.update);
 
 // User / host account management
 router.get('/users', userCtrl.adminListUsers);

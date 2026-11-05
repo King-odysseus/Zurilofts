@@ -22,6 +22,8 @@ export interface CompanyProfile {
   /** The brand name traded over the top of it. */
   tradingName: string;
   supportEmail: string;
+  /** Where people send data protection requests; named in the privacy policy and in regulator notices. */
+  privacyEmail: string;
   website: string;
   /** Company registration number (CR12). Empty until confirmed, see below. */
   registrationNumber: string;
@@ -38,6 +40,7 @@ export const company: CompanyProfile = {
   legalName: 'BeneAlpha Consulting Limited',
   tradingName: 'ZuriLofts',
   supportEmail: 'enquires@zurilofts.com',
+  privacyEmail: 'privacy@zurilofts.com',
   website: 'thezurilofts.com',
   // Intentionally empty. A company registration number or registered office
   // that was guessed and then printed on a financial document is a worse

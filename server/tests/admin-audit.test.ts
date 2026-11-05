@@ -217,10 +217,12 @@ test('the action vocabulary is closed and covers every decision class', () => {
     'USER_PASSWORD_SET',
     'USER_ERASED',
     'DISPUTE_RESOLVED',
+    'DATA_INCIDENT_DECLARED',
+    'DATA_INCIDENT_UPDATED',
   ]) {
     assert.ok((AUDIT_ACTIONS as readonly string[]).includes(required), `${required} must be in the vocabulary`);
   }
-  assert.deepEqual([...AUDIT_TARGET_TYPES].sort(), ['Account', 'Dispute', 'HostApplication', 'Listing', 'User']);
+  assert.deepEqual([...AUDIT_TARGET_TYPES].sort(), ['Account', 'Dispute', 'HostApplication', 'Incident', 'Listing', 'User']);
 });
 
 // ---------------------------------------------------------------------------

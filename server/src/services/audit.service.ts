@@ -41,12 +41,14 @@ export const AUDIT_ACTIONS = [
   'DISPUTE_RESOLVED',
   'DISPUTE_DISMISSED',
   'ORPHAN_LISTINGS_CLEANED',
+  'DATA_INCIDENT_DECLARED',
+  'DATA_INCIDENT_UPDATED',
 ] as const;
 
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
 /** What kind of record the decision was about. */
-export const AUDIT_TARGET_TYPES = ['Listing', 'User', 'HostApplication', 'Dispute', 'Account'] as const;
+export const AUDIT_TARGET_TYPES = ['Listing', 'User', 'HostApplication', 'Dispute', 'Account', 'Incident'] as const;
 
 export type AuditTargetType = (typeof AUDIT_TARGET_TYPES)[number];
 

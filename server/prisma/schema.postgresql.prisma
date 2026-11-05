@@ -147,7 +147,7 @@ model AdminAuditEvent {
   actorEmail   String? // snapshot where the caller supplies it; null when only an id is passed
   actorRole    String // ADMIN | SYSTEM
   action       String // taxonomy in audit.service.ts, e.g. LISTING_REJECTED
-  targetType   String // Listing | User | HostApplication | Dispute | Account
+  targetType   String // Listing | User | HostApplication | Dispute | Account | Incident
   targetId     String? // the record's id at the time, which may no longer exist
   targetLabel  String? // human label snapshot: listing title, user email, ...
   reason       String? // the decision note the affected party was given
@@ -925,4 +925,38 @@ model HostReferral {
 
   @@index([referrerHostId])
   @@index([status])
+}
+
+// A personal-data incident: a suspected or confirmed breach that the company
+// must assess and, where there is a real risk of harm, report to the Office of
+// the Data Protection Commissioner within 72 hours of becoming aware of it.
+// The clock starts at `awareAt`, which staff enter, because the moment of
+// awareness is a fact only a person can state. No foreign keys: the record must
+// outlive the staff account that declared it, and it never holds the personal
+// data of the people affected, only a description and a count.
+// Lifecycle status: "OPEN" | "REGULATOR_NOTIFIED" | "CLOSED".
+model DataIncident {
+  id                  String    @id @default(uuid())
+  reference           String    @unique // human reference quoted in the notice, e.g. DI-20261109-A1B2C3
+  title               String
+  summary             String // the nature of the breach, in plain words
+  status              String    @default("OPEN")
+  awareAt             DateTime // when the company became aware; starts the 72-hour clock
+  dataCategories      String // JSON array of category codes (see incident.service.ts)
+  affectedCount       Int?
+  consequences        String? // likely consequences for the people affected
+  measuresTaken       String? // what has been done or is proposed to contain and reduce harm
+  regulatorNotifiedAt DateTime?
+  regulatorReference  String? // the Office's own reference for the report, if it gave one
+  delayReason         String? // why the notice went beyond 72 hours, if it did
+  usersNotifiedAt     DateTime?
+  closedAt            DateTime?
+  closingNote         String?
+  declaredById        String // staff id at the time; plain string, survives erasure
+  declaredByEmail     String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  @@index([status])
+  @@index([awareAt])
 }
