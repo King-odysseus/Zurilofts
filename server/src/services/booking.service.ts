@@ -5,6 +5,7 @@ import { paginationMeta, parseDateRange, parsePaging } from '../utils/paging.js'
 import { NotFoundError, ValidationError, ConflictError } from '../types/index.js';
 import { calculateFees, calculateNights, computeExtraGuestFee, computeSubtotal, lateCheckoutFee, lateCheckoutOptions, EXTRA_GUEST_FEE_PER_NIGHT, totalWithGatewayFee, type GatewayFeeConfig } from '../utils/pricing.js';
 import { isRangeAvailable, isRangeAvailableWithDb, PENDING_HOLD_MINUTES } from './calendar.service.js';
+import { refreshPropertyFeeds } from './ical.service.js';
 import { isBookable } from './property.service.js';
 import { isPromoUsableForProperty, type BookingTarget } from './promo.service.js';
 import { minNightsForCheckIn } from './stayRule.service.js';
@@ -247,6 +248,13 @@ export async function createBooking(input: CreateBookingInput) {
   if (checkInDate < now) {
     throw new ValidationError('Check-in date cannot be in the past');
   }
+
+  // Stored CalendarBlocks are only as current as the last import, so a night
+  // sold on Airbnb minutes ago can still look free here. Pull this property's
+  // feeds before judging the dates, but never let a slow or broken provider cost
+  // the guest the booking: the budget inside expires and the stored blocks are
+  // used as they stand.
+  await refreshPropertyFeeds(input.propertyId);
 
   // Reject dates already taken by another booking or an imported/manual block
   const available = await isRangeAvailable(input.propertyId, checkInDate, checkOutDate);
@@ -1390,6 +1398,9 @@ export async function updateBooking(bookingId: string, input: UpdateBookingInput
 
   // Check availability for new dates (exclude current booking from conflict check)
   if (input.checkIn || input.checkOut) {
+    // A rescheduled stay takes dates the same way a new one does, so the feeds
+    // are pulled fresh here too rather than trusted from the last background run.
+    await refreshPropertyFeeds(booking.propertyId);
     const available = await isRangeAvailable(booking.propertyId, checkIn, checkOut, bookingId);
     if (!available) {
       throw new ConflictError('Those dates are no longer available for this property');
@@ -1475,15 +1486,51 @@ export async function updateBooking(bookingId: string, input: UpdateBookingInput
       : null;
   }
 
-  const updated = await prisma.booking.update({
-    where: { id: bookingId },
-    data,
-    include: {
-      user: { select: { id: true, email: true, firstName: true, lastName: true } },
-      property: true,
-      promoCode: { select: { code: true } },
-    },
-  });
+  const updated = await (async () => {
+    const runUpdate = (db: any) =>
+      db.booking.update({
+        where: { id: bookingId },
+        data,
+        include: {
+          user: { select: { id: true, email: true, firstName: true, lastName: true } },
+          property: true,
+          promoCode: { select: { code: true } },
+        },
+      });
+
+    // Rescheduling onto dates somebody else is taking at the same moment passed
+    // the check above the same way two concurrent new bookings do. The gate is
+    // therefore re-checked inside the update's own transaction, as createBooking
+    // does, so the second of the two is refused instead of both being accepted.
+    const datesChanging = Boolean(input.checkIn || input.checkOut);
+    if (!datesChanging) return runUpdate(prisma);
+
+    const isPostgres = (process.env.DATABASE_URL || '').startsWith('postgres');
+    try {
+      return await prisma.$transaction(
+        async (tx) => {
+          const stillAvailable = await isRangeAvailableWithDb(
+            tx,
+            booking.propertyId,
+            checkIn,
+            checkOut,
+            bookingId
+          );
+          if (!stillAvailable) {
+            throw new ConflictError('Those dates are no longer available for this property');
+          }
+          return runUpdate(tx);
+        },
+        isPostgres ? { isolationLevel: Prisma.TransactionIsolationLevel.Serializable } : undefined
+      );
+    } catch (err: any) {
+      // P2034: a concurrent reschedule won the race; this one lost its dates.
+      if (err?.code === 'P2034') {
+        throw new ConflictError('Those dates are no longer available for this property');
+      }
+      throw err;
+    }
+  })();
 
   return normalizeBooking(updated);
 }

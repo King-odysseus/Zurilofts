@@ -179,10 +179,14 @@ async function shutdown(signal: string): Promise<void> {
 process.on('SIGTERM', () => void shutdown('SIGTERM'));
 process.on('SIGINT', () => void shutdown('SIGINT'));
 
-// Periodically import external iCal feeds (every 3 hours) so blocked dates stay
-// current without manual syncing. Failures per-source are swallowed inside syncAll.
+// Periodically import external iCal feeds so blocked dates stay current without
+// manual syncing. Failures per-source are swallowed inside syncAll.
 function startCalendarSync() {
-  const INTERVAL_MS = 3 * 60 * 60 * 1000;
+  // Hourly rather than every three hours: each round halves the window in which
+  // a night sold elsewhere still looks free here. A booking also pulls its own
+  // property's feeds first (refreshPropertyFeeds), so this round is the floor,
+  // not the only protection.
+  const INTERVAL_MS = 60 * 60 * 1000;
   const run = () => {
     syncAll()
       .then((count) => {

@@ -1086,6 +1086,7 @@ export default function HostCalendarPage() {
             <p className={`text-[10px] ${source.lastStatus?.startsWith('ERROR') ? 'text-red-600' : 'text-muted'}`}>
               {source.lastSyncedAt ? `${source.lastStatus} · ${new Date(source.lastSyncedAt).toLocaleString()}` : t('host.notSyncedYet')}
             </p>
+            {source.stale && <p className="mt-1 text-[10px] font-medium text-red-600">{t('host.syncStale')}</p>}
             <button type="button" onClick={() => removeSource(source.id)} className="mt-1 text-[10px] text-muted underline underline-offset-2 hover:text-navy" disabled={saving}>{t('common.remove')}</button>
           </li>)}
         </ul> : <p className="mt-2 text-[11px] text-muted">{t('host.noExternalCalendars')}</p>}

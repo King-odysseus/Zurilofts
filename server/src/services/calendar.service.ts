@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 import prisma from '../config/prisma.js';
 import { NotFoundError, ValidationError } from '../types/index.js';
+import { isSourceStale } from './ical.service.js';
 
 /** Duration (minutes) a PENDING booking holds inventory before it lapses. */
 export const PENDING_HOLD_MINUTES = 30;
@@ -80,7 +81,13 @@ export async function getPropertyCalendar(propertyId: string, ownerId?: string) 
       minNights: rule.minNights,
     })),
     icalToken: token,
-    sources,
+    // Whether each feed can still be trusted to know which nights are sold. A
+    // feed that stopped answering keeps its last blocks, which look healthy
+    // from the calendar but are quietly out of date, so the host is told.
+    sources: sources.map((source) => ({
+      ...source,
+      stale: isSourceStale(source.lastSyncedAt, source.lastStatus),
+    })),
     blocks: blocks.map((b) => ({
       id: b.id,
       start: b.start,
